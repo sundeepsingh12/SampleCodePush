@@ -1,0 +1,41 @@
+{
+  "name": "FareyeReact",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "postinstall": "node_modules/.bin/rn-nodeify --install sha256 --hack",
+    "test": "jest"
+  },
+  "dependencies": {
+    "apsl-react-native-button": "^3.0.1",
+    "keymirror": "^0.1.1",
+    "react": "15.3.2",
+    "react-mixin": "^3.0.5",
+    "react-native": "0.35.0",
+    "react-native-router-flux": "^3.36.0",
+    "react-native-simple-store": "^1.1.0",
+    "react-native-simpledialog-android": "^1.0.8",
+    "react-native-vector-icons": "^2.1.0",
+    "react-redux": "^4.4.5",
+    "react-timer-mixin": "^0.13.3",
+    "realm": "^0.14.3",
+    "redux": "^3.6.0",
+    "redux-logger": "^2.7.0",
+    "redux-thunk": "^2.1.0",
+    "regenerator": "^0.8.46",
+    "sha256": "^0.2.0",
+    "underscore": "^1.8.3",
+    "validate.js": "^0.10.0"
+  },
+  "jest": {
+    "preset": "jest-react-native"
+  },
+  "devDependencies": {
+    "babel-jest": "16.0.0",
+    "babel-preset-react-native": "1.9.0",
+    "jest": "16.0.1",
+    "jest-react-native": "16.0.0",
+    "react-test-renderer": "15.3.2"
+  }
+}
