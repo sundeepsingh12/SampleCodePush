@@ -11,6 +11,7 @@ Step 3: react-native run-ios
 For Android:
 Step 1: react-native init FareyeReact
 Step 2: Go to /path/to/FareyeReact/android/local.properties and update:sdk.dir
+(for e.g. sdk.dir=/Users/gauravsrivastava/JavaDev/adt-bundle-mac-x86_64-20140702/sdk)
 Step 3: react-native run-android
 
 

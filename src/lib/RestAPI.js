@@ -43,62 +43,42 @@ export class RestAPI extends Backend {
  *   json: response.json()
  */
   async _fetch (opts) {
-    // opts = _.extend({
-    //   method: 'GET',
-    //   contentType: 'application/json',
-    //   url: null,
-    //   body: null,
-    //   callback: null
-    // }, opts)
-    //
-    // var reqOpts = {
-    //   method: opts.method,
-    //   headers: {
-    //   }
-    // }
-    //
-    // if (this._sessionToken) {
-    //   reqOpts.headers['Authorization'] = 'Bearer ' + this._sessionToken
-    // }
-    //
-    // if (opts.method === 'POST' || opts.method === 'PUT') {
-    //   reqOpts.headers['Accept'] = 'application/json'
-    // }
-    //
-    // if (opts.contentType == 'application/json') {
-    //   reqOpts.headers['Content-Type'] = 'application/json'
-    // } else {
-    //   reqOpts.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    // }
-
-    // if (opts.body) {
-    //   reqOpts.body = JSON.stringify(opts.body)
-    // }
-
     let url = this.API_BASE_URL + opts.url
     if (this._sessionToken) {
       opts.headers = {}
       opts.headers['Cookie'] = this._sessionToken
     }
-    console.log(opts);
-    let response = await fetch(url, opts)
-    let res = {}
-    console.log("=========response===========");
-    console.log(response);
-
-    res.status = response.status
-    res.code = response.code
-    res.header = response.headers
-    res.json = {}
+    const response = await fetch(url, opts)
+    const {status, code, headers} = response;
+    let res = {
+      status,
+      code,
+      headers,
+      json: {}
+    }
     if (opts.headers["Content-Type"] == "application/json") {
       res.json = await response.json()
     }
     return res
-    // return response.json()
-    //   .then((json) => {
-    //     res.json = json
-    //     return res
-    //   })
+  }
+
+  /**
+  * Remove  null, NaN, empty String and empty objects from JSON Objects
+  **/
+  _pruneEmpty(obj) {
+    function prune(current) {
+      _.forEach(current, function (value, key) {
+        if (_.isUndefined(value) || _.isNull(value) || _.isNaN(value) ||
+           (_.isString(value) && _.isEmpty(value)) ||
+           (_.isObject(value) && _.isEmpty(prune(value)))) {
+
+          delete current[key];
+        }
+      });
+      return current;
+
+    };
+    return prune(obj);
   }
 
   /**
@@ -127,7 +107,7 @@ export class RestAPI extends Backend {
     return await this._fetch({
       method: 'POST',
       headers: {
-        
+
       },
       url: '/authentication',
       body: data
@@ -135,7 +115,7 @@ export class RestAPI extends Backend {
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           //Extracting j_sessionid from Header
-          return (res.header.map['set-cookie'][0]).split("; ")[0];
+          return (res.headers.map['set-cookie'][0]).split("; ")[0];
         } else {
           throw ("Invalid username/password")
         }
@@ -196,8 +176,8 @@ export class RestAPI extends Backend {
     })
     .then((res) => {
       if (res.status === 200) {
-        console.log("============response=========");
-        console.log(res.json);
+        var results = this._pruneEmpty(res.json);
+        return results;
       }
     })
     .catch((error) => {

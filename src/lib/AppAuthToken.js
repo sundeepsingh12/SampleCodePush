@@ -32,24 +32,16 @@ export class AppAuthToken {
       sessionToken: sessionToken
     })
   }
+
   /**
    * ### getSessionToken
    * @param {Object} sessionToken the currentUser object
-   *
-   * When Hot Loading, the sessionToken  will be passed in, and if so,
-   * it needs to be stored on the device.  Remember, the store is a
-   * promise so, have to be careful.
+   * Remember, the store is a promise so, have to be careful.
    */
-  getSessionToken (sessionToken) {
-    if (sessionToken) {
-      return store.save(this.SESSION_TOKEN_KEY, {
-        sessionToken: sessionToken
-      }).then(() => {
-        return store.get(this.SESSION_TOKEN_KEY)
-      })
-    }
+  getSessionToken () {
     return store.get(this.SESSION_TOKEN_KEY)
   }
+  
   /**
    * ### deleteSessionToken
    * Deleted during log out

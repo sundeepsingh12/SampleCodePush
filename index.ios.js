@@ -3,6 +3,9 @@
 import fareye from './src/fareye'
 
 fareye('ios')
+
+//Realm DB Playgroud....
+
 // import React, { Component } from 'react';
 // import _ from "underscore";
 // import Realm from 'realm';
@@ -39,12 +42,17 @@ fareye('ios')
 //       {
 //           "name": "PEXXX",
 //           "age": 99
+//       },
+//       {
+//           "name": "Gaurav",
+//           "age": 99
 //       }
 //     ]
 //
 //
 //    realm.write(() => {
-//      realm.create('People', people);
+//      realm.deleteAll()
+//      dataForInsert.forEach(data => realm.create('People', data));
 //    });
 //
 //    const people = realm.objects('People');

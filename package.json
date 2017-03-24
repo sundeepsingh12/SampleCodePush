@@ -4,19 +4,19 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "postinstall": "node_modules/.bin/rn-nodeify --install sha256 --hack",
+    "postinstall": "node_modules/.bin/rn-nodeify --install  --hack",
     "test": "jest"
   },
   "dependencies": {
     "apsl-react-native-button": "^3.0.1",
     "keymirror": "^0.1.1",
-    "react": "15.3.2",
+    "react": "^15.4.2",
     "react-mixin": "^3.0.5",
-    "react-native": "0.35.0",
+    "react-native": "^0.42.0",
     "react-native-router-flux": "^3.36.0",
     "react-native-simple-store": "^1.1.0",
     "react-native-simpledialog-android": "^1.0.8",
-    "react-native-vector-icons": "^2.1.0",
+    "react-native-vector-icons": "^4.0.0",
     "react-redux": "^4.4.5",
     "react-timer-mixin": "^0.13.3",
     "realm": "^0.14.3",

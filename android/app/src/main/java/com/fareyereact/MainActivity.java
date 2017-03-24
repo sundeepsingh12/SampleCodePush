@@ -1,8 +1,7 @@
 package com.fareyereact;
 
 import com.facebook.react.ReactActivity;
-import com.oblador.vectoricons.VectorIconsPackage;
-import com.burnweb.rnsimplealertdialog.RNSimpleAlertDialogPackage;
+import io.realm.react.RealmReactPackage;
 
 public class MainActivity extends ReactActivity {
 

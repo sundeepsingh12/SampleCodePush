@@ -1,5 +1,7 @@
 import keyMirror from 'keymirror'
 
+//keyMirror is a simple utility for creating an object with values equal to its keys.
+
 export default keyMirror({
   //Global Actions
   SET_STORE: null,
@@ -8,7 +10,6 @@ export default keyMirror({
   //Device Actions
   SET_PLATFORM: null,
   SET_VERSION: null,
-
 
   //Auth Actions
   LOGIN: null,
@@ -22,7 +23,7 @@ export default keyMirror({
 
   MASTER_DOWNLOAD_START: null,
   MASTER_DOWNLOAD_SUCCESS: null,
-  
+
   SESSION_TOKEN_REQUEST: null,
   SESSION_TOKEN_SUCCESS: null,
   SESSION_TOKEN_FAILURE: null,
@@ -31,4 +32,9 @@ export default keyMirror({
   DELETE_TOKEN_SUCCESS: null,
 
   ON_AUTH_FORM_FIELD_CHANGE: null,
+
+
+  //Database tables
+  TABLE_USER_SUMMARY: null,
+  TABLE_JOB_MASTER: null,
 })

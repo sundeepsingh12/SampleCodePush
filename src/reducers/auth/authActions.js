@@ -24,13 +24,14 @@ const {
 
   ON_AUTH_FORM_FIELD_CHANGE,
 
+  TABLE_USER_SUMMARY,
 } = require('../../lib/constants').default
 
 const BackendFactory = require('../../lib/BackendFactory').default
 
 import {Actions} from 'react-native-router-flux'
 import {appAuthToken} from '../../lib/AppAuthToken'
-
+import * as repositories from '../../repositories/'
 /**
  * ## State actions
  * controls which form is displayed to the user
@@ -103,14 +104,15 @@ export function login (username, password) {
       const j_sessionid = await BackendFactory().login(username,password)
       dispatch(loginSuccess(j_sessionid))
       dispatch(jobMasterDownloadStart())
-      console.log(j_sessionid);
       //TODO pass the complete IMEI Parameter
-      await BackendFactory().downloadJobMaster({},{},1,0)
+      const jobMasters = await BackendFactory().downloadJobMaster({},{},1,0)
+      repositories.save(TABLE_USER_SUMMARY, jobMasters.userSummary);
       await saveSessionToken(j_sessionid)
       Actions.Tabbar()
-      // dispatch(logoutState())
+      dispatch(logoutState())
     }
     catch(error) {
+      console.log(error);
       dispatch(loginFailure(error))
     }
   }
