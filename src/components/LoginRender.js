@@ -31,7 +31,9 @@ import ErrorAlert from '../components/ErrorAlert'
 /**
  * The FormButton will change it's text between the 4 states as necessary
  */
-import FormButton from '../components/FormButton'
+import ButtonSuccess from '../components/ButtonSuccess'
+import ButtonLinear from '../components/ButtonLinear'
+
 /**
  *  The LoginForm does the heavy lifting of displaying the fields for
  * textinput and displays the error messages
@@ -40,10 +42,12 @@ import LoginForm from '../components/LoginForm'
 /**
  * The itemCheckbox will toggle the display of the password fields
  */
-var ItemCheckbox = require('react-native-item-checkbox');
+// var ItemCheckbox = require('react-native-item-checkbox');
+import ItemCheckbox from '../components/ItemCheckbox'
 /**
  * The necessary React components
  */
+
 import React, {Component} from 'react'
 import
 {
@@ -51,9 +55,13 @@ import
   ScrollView,
   Text,
   TouchableHighlight,
-  View
+  View,
+  Image
 }
 from 'react-native'
+
+
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Dimensions from 'Dimensions'
 var {height, width} = Dimensions.get('window') // Screen dimensions in current orientation
@@ -73,11 +81,14 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     flex: 1
   },
+  wrapper: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   inputs: {
-    marginTop: 10,
-    marginBottom: 10,
-    marginLeft: 10,
-    marginRight: 10
+    width: '70%'
   },
   forgotContainer: {
     flexDirection: 'row',
@@ -85,7 +96,19 @@ var styles = StyleSheet.create({
     marginTop: 10,
     marginLeft: 10,
     marginRight: 10
-  }
+  },
+  logoContainer: {
+    marginTop: 90,
+    marginBottom: 30,
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center'
+  },
+  logoStyle: {
+    width: 94,
+    resizeMode: 'contain'
+  },
+ 
 })
 /**
  * ## Redux boilerplate
@@ -171,33 +194,68 @@ class LoginRender extends Component {
     return (
       <View style={styles.container}>
         <ScrollView horizontal={false} width={width} height={height}>
-          <View>
+          <View style={styles.wrapper}>
 
             <View style={styles.inputs}>
+              <View style={styles.logoContainer}>
+                <Image
+                  style={styles.logoStyle}
+                  source={require('../../images/fareye-logo.png')}
+                />
+              </View>
 
-              <LoginForm
-                form={this.props.auth.form}
-                value={this.state.value}
-                onChange={self.onChange.bind(self)} />
+              <View style={{position:'relative'}}>
+                <LoginForm
+                  form={this.props.auth.form}
+                  value={this.state.value}
+                  onChange={self.onChange.bind(self)} />
 
-              <ItemCheckbox
-                  text="show password"
-                  disabled={this.props.auth.form.isFetching}
-                  onCheck={() => {
-                    this.props.actions.onAuthFormFieldChange('showPassword', true)
-                  }}
-                  onUncheck={() => {
-                    this.props.actions.onAuthFormFieldChange('showPassword', false)
-                  }}
-              />
-              <Text> Show Password</Text>
-              <Text> ...{this.props.auth.form.currentStep}... </Text>
+                <View style={{position: 'absolute', bottom: 23, right: 10}}>
+                  <ItemCheckbox
+                      size = {28}
+                      icon_check= 'ios-eye-off-outline'
+                      icon_open= 'ios-eye-outline'
+                      disabled={this.props.auth.form.isFetching}
+                      onCheck={() => {
+                        this.props.actions.onAuthFormFieldChange('showPassword', true)
+                      }}
+                      onUncheck={() => {
+                        this.props.actions.onAuthFormFieldChange('showPassword', false)
+                      }}
+                      text=''
+                  />
+                </View>
+              </View>
+              <View style={{marginBottom: 15}}>
+                <ItemCheckbox
+                    size = {20}
+                    icon_check= 'ios-checkmark-circle-outline'
+                    icon_open= 'ios-radio-button-off'
+                    text='Remember Me'
+                />
+              </View>
+              
+              <ButtonSuccess
+                isDisabled={!this.props.auth.form.isValid || this.props.auth.form.isFetching}
+                onPress={onButtonPress}
+                buttonText="Login" />
+                <Text style={{textAlign:'center'}}>{this.props.auth.form.currentStep}... </Text>
+                
+                <View style={{marginTop: 35}}>
+                  <Text style={{textAlign:'center', color: '#d3d3d3', marginBottom: 10}}>
+                    Use scanner to login
+                  </Text>
+
+                  <ButtonLinear
+                    isDisabled={!this.props.auth.form.isValid || this.props.auth.form.isFetching}
+                    onPress={onButtonPress}
+                    buttonText="Scan" />
+                </View>
             </View>
 
-            <FormButton
-              isDisabled={!this.props.auth.form.isValid || this.props.auth.form.isFetching}
-              onPress={onButtonPress}
-              buttonText="Login" />
+
+
+            
 
           </View>
         </ScrollView>

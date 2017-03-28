@@ -34,15 +34,15 @@ import
   View
 }
 from 'react-native'
+import { Container, Content, Tab, Tabs,Body, Header, Title, Left, Right} from 'native-base';
 
-/**
- * ## Styles
- */
 var styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
-    flex: 1
-  }
+    flex: 1,
+    backgroundColor : '#f7f7f7',
+    paddingTop: 15
+  },
 })
 /**
  * ## Redux boilerplate
@@ -83,13 +83,21 @@ class Logout extends Component {
     }
 
     return (
-      <View style={styles.container}>
-        <View>
+      <Container>
+        <Header>
+            <Left/>
+            <Body>
+                <Title>Logout</Title>
+            </Body>
+            <Right/>
+        </Header>
+        <View style={styles.container}>
           <FormButton
             onPress={onButtonPress.bind(self)}
             buttonText="Logout" />
         </View>
-      </View>
+      </Container>
+     
       )
   }
 }

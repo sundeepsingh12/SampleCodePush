@@ -27,6 +27,25 @@ const {
 const t = require('tcomb-form-native')
 let Form = t.form.Form
 
+var _ = require('lodash');
+
+const stylesheet = _.cloneDeep(Form.stylesheet);
+// console.log(Form.stylesheet);
+// Form.stylesheet.textbox.normal.backgroundColor = 'green'
+// console.log(Form.stylesheet);
+
+stylesheet.textbox.normal.backgroundColor = '#F7F8FA';
+stylesheet.textbox.normal.height = 50;
+stylesheet.textbox.normal.borderRadius = 25;
+stylesheet.textbox.normal.borderWidth = 1;
+stylesheet.textbox.normal.borderColor = '#D4DCE1';
+stylesheet.textbox.normal.paddingLeft = 20;
+stylesheet.textbox.normal.paddingRight = 20;
+
+stylesheet.textbox.error.borderColor = '#D4DCE1';
+
+
+
 var LoginForm = React.createClass({
   /**
    * ## render
@@ -36,22 +55,22 @@ var LoginForm = React.createClass({
    */
   render () {
     let options = {
+      auto: 'placeholders',
+      stylesheet: stylesheet,
       fields: {
       }
     }
 
     let username = {
-      label: "Username",
       maxLength: 12,
       editable: !this.props.form.isFetching,
       hasError: this.props.form.fields.usernameHasError,
-      error: this.props.form.fields.usernameErrorMsg
+      error: this.props.form.fields.usernameErrorMsg,
     }
 
     let secureTextEntry = !this.props.form.fields.showPassword
 
     let password = {
-      label: "Password",
       maxLength: 12,
       secureTextEntry: secureTextEntry,
       editable: !this.props.form.isFetching,

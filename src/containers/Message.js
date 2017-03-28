@@ -18,7 +18,7 @@ var styles = StyleSheet.create({
   },
 })
 
-class Profile extends Component {
+class Message extends Component {
 
   render () {
     return (
@@ -26,13 +26,13 @@ class Profile extends Component {
         <Header>
             <Left/>
             <Body>
-                <Title>Profile</Title>
+                <Title>Message</Title>
             </Body>
             <Right/>
         </Header>
         <View style={styles.container}>
           <Text>
-            Profile
+            Messages
           </Text>
         </View>
       </Container>
@@ -40,4 +40,4 @@ class Profile extends Component {
   }
 };
 
-export default Profile
+export default Message

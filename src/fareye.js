@@ -10,7 +10,7 @@ import {
  *
  * Necessary components from Router-Flux
  */
-import { Router, Scene} from 'react-native-router-flux'
+import { Router, Scene, Actions} from 'react-native-router-flux'
 
 /**
  * ### Redux
@@ -37,8 +37,10 @@ import Login from './containers/Login'
 import Logout from './containers/Logout'
 // import Register from './containers/Register'
 // import ForgotPassword from './containers/ForgotPassword'
-import Profile from './containers/Profile'
+// import Profile from './containers/Profile'
 import Main from './containers/Main'
+import Utilities from './containers/Utilities'
+import Message from './containers/Message'
 // import Subview from './containers/Subview'
 
 /**
@@ -48,6 +50,7 @@ import Main from './containers/Main'
  *
  */
 import Icon from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 /**
  * ## Actions
@@ -89,7 +92,18 @@ function getInitialState () {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 70
+    height: 60,
+    borderTopWidth: 1,
+    borderColor: '#d3d3d3',
+    backgroundColor: '#ffffff'
+  },
+
+  mainHeader: {
+    backgroundColor: 'white'
+  },
+  mainTitle: {
+    fontSize: 16,
+    fontWeight: 'normal',
   }
 })
 
@@ -100,11 +114,11 @@ const styles = StyleSheet.create({
  */
 class TabIcon extends React.Component {
   render () {
-    var color = this.props.selected ? '#FF3366' : '#FFB3B3'
+    var color = this.props.selected ? '#0091EA' : '#878787'
     return (
       <View style={{flex: 1, flexDirection: 'column', alignItems: 'center', alignSelf: 'center'}}>
-        <Icon style={{color: color}} name={this.props.iconName} size={30} />
-        <Text style={{color: color}}>{this.props.title}</Text>
+        <Ionicons style={{color: color}} name={this.props.iconName} size={26} />
+        <Text style={{color: color, fontSize: 12, marginTop: 3}}>{this.props.title}</Text>
       </View>
      )
   }
@@ -136,19 +150,19 @@ export default function native (platform) {
 
         <Provider store={store}>
           <Router sceneStyle={{ backgroundColor: 'white' }}>
-            <Scene key='root' hideNavBar>
+            
+            <Scene key='root'
+              hideNavBar={false} >
               <Scene key='App'
                 component={Application}
+                hideNavBar
                 type='replace'
                 initial />
 
               <Scene key='InitialLoginForm'
                 component={Login}
+                hideNavBar
                 type='replace' />
-
-              {/* <Scene key='Login'
-                component={Login}
-                type='replace' /> */}
 
               <Scene key='Tabbar'
                 tabs
@@ -156,28 +170,41 @@ export default function native (platform) {
                 tabBarStyle={styles.tabBar}
                 default='Main'>
 
-                <Scene key='Logout'
-                  title='Logout'
-                  icon={TabIcon}
-                  iconName={"sign-out"}
-                  hideNavBar
-                  component={Logout} />
+                  <Scene key='Main'
+                    title='Home'
+                    iconName={"ios-home-outline"}
+                    icon={TabIcon}
+                    hideNavBar
+                    component={Main}
+                    initial />
 
-                <Scene key='Main'
-                  title='Main'
-                  iconName={"home"}
-                  icon={TabIcon}
-                  hideNavBar
-                  component={Main}
-                  initial />
+                  <Scene key='ReSync'
+                    title='Re-sync'
+                    icon={TabIcon}
+                    iconName={"ios-sync-outline"}
+                    onPress={()=> {}}/>
 
-                <Scene key='Profile'
-                  title='Profile'
-                  icon={TabIcon}
-                  iconName={"gear"}
-                  hideNavBar
-                  component={Profile} />
-              </Scene>
+                  <Scene key='Message'
+                    title='Message'
+                    icon={TabIcon}
+                    iconName={"ios-chatboxes-outline"}
+                    hideNavBar
+                    component={Message}/>
+
+                  <Scene key='<Utilitie></Utilitie>s'
+                    title='Utilities'
+                    icon={TabIcon}
+                    hideNavBar
+                    iconName={"ios-apps-outline"}
+                    component={Utilities}/>
+
+                  <Scene key='Logout'
+                    title='Logout'
+                    icon={TabIcon}
+                    iconName={"ios-power-outline"}
+                    hideNavBar
+                    component={Logout} />
+                </Scene>
             </Scene>
           </Router>
         </Provider>
