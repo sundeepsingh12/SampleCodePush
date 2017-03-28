@@ -10,9 +10,11 @@
   "dependencies": {
     "apsl-react-native-button": "^3.0.1",
     "keymirror": "^0.1.1",
+    "native-base": "^2.1.0",
     "react": "^15.4.2",
     "react-mixin": "^3.0.5",
     "react-native": "^0.42.0",
+    "react-native-item-checkbox": "^1.0.6",
     "react-native-router-flux": "^3.36.0",
     "react-native-simple-store": "^1.1.0",
     "react-native-simpledialog-android": "^1.0.8",
@@ -25,7 +27,9 @@
     "redux-thunk": "^2.1.0",
     "regenerator": "^0.8.46",
     "sha256": "^0.2.0",
+    "tcomb-form-native": "^0.6.6",
     "underscore": "^1.8.3",
+    "uuid": "^3.0.1",
     "validate.js": "^0.10.0"
   },
   "jest": {
