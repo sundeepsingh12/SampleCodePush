@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "apsl-react-native-button": "^3.0.1",
+    "jest-cli": "^19.0.2",
     "keymirror": "^0.1.1",
     "native-base": "^2.1.0",
     "react": "^15.4.2",
@@ -21,11 +22,12 @@
     "react-native-vector-icons": "^4.0.0",
     "react-redux": "^4.4.5",
     "react-timer-mixin": "^0.13.3",
-    "realm": "^0.14.3",
+    "realm": "^1.2.0",
     "redux": "^3.6.0",
     "redux-logger": "^2.7.0",
+    "redux-mock-store": "^1.2.2",
     "redux-thunk": "^2.1.0",
-    "regenerator": "^0.8.46",
+    "regenerator": "^0.9.7",
     "sha256": "^0.2.0",
     "tcomb-form-native": "^0.6.6",
     "underscore": "^1.8.3",
@@ -33,13 +35,11 @@
     "validate.js": "^0.10.0"
   },
   "jest": {
-    "preset": "jest-react-native"
+    "preset": "react-native",
+    "collectCoverage": true,
+    "transformIgnorePatterns": ["node_modules/(?!react-native|native-base|react-clone-referenced-element)"]
   },
   "devDependencies": {
-    "babel-jest": "16.0.0",
-    "babel-preset-react-native": "1.9.0",
-    "jest": "16.0.1",
-    "jest-react-native": "16.0.0",
-    "react-test-renderer": "15.3.2"
+    "babel-preset-react-native": "1.9.0"
   }
 }

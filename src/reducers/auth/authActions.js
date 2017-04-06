@@ -38,13 +38,13 @@ import * as repositories from '../../repositories/'
  * as in login, register, logout or reset password
  */
 
-export function logoutState () {
+function logoutState () {
   return {
     type: LOGOUT
   }
 }
 
-export function loginState () {
+function loginState () {
   return {
     type: LOGIN
   }
@@ -53,72 +53,37 @@ export function loginState () {
 /**
  * ## Login actions
  */
-export function loginRequest () {
+function loginRequest () {
   return {
     type: LOGIN_START
   }
 }
 
-export function loginSuccess (j_sessionid) {
+function loginSuccess (j_sessionid) {
   return {
     type: LOGIN_SUCCESS,
     payload: j_sessionid
   }
 }
 
-export function loginFailure (error) {
+function loginFailure (error) {
   return {
     type: LOGIN_FAILURE,
     payload: error
   }
 }
 
-export function jobMasterDownloadStart() {
+function jobMasterDownloadStart() {
   return {
     type: MASTER_DOWNLOAD_START
   }
 }
 
-export function jobMasterDownloadSuccess() {
+function jobMasterDownloadSuccess() {
   return {
     type: MASTER_DOWNLOAD_SUCCESS
   }
 }
-
-/**
- * ## Login
- * @param {string} username - user's name
- * @param {string} password - user's password
- *
- * After calling Backend, if response is good, save the json
- * which is the currentUser which contains the sessionToken
- *
- * If successful, set the state to logout
- * otherwise, dispatch a failure
- */
-
-export function login (username, password) {
-  return async function(dispatch)  {
-    try{
-      dispatch(loginRequest())
-      const j_sessionid = await BackendFactory().login(username,password)
-      dispatch(loginSuccess(j_sessionid))
-      dispatch(jobMasterDownloadStart())
-      //TODO pass the complete IMEI Parameter
-      const jobMasters = await BackendFactory().downloadJobMaster({},{},1,0)
-      repositories.save(TABLE_USER_SUMMARY, jobMasters.userSummary);
-      await saveSessionToken(j_sessionid)
-      Actions.Tabbar()
-      dispatch(logoutState())
-    }
-    catch(error) {
-      console.log(error);
-      dispatch(loginFailure(error))
-    }
-  }
-}
-
-
 
 /**
  * ## SessionToken actions
@@ -155,6 +120,49 @@ export function deleteTokenRequestSuccess () {
   }
 }
 
+
+/**
+ * ## saveSessionToken
+ * @param {Object} response - to return to keep the promise chain
+ * @param {Object} json - object with sessionToken
+ */
+export function saveSessionToken (j_sessionid) {
+  return appAuthToken.storeSessionToken(j_sessionid)
+}
+
+/**
+ * ## onAuthFormFieldChange
+ * Set the payload so the reducer can work on it
+ */
+export function onAuthFormFieldChange (field, value) {
+  return {
+    type: ON_AUTH_FORM_FIELD_CHANGE,
+    payload: {field: field, value: value}
+  }
+}
+
+/**
+ * ## Logout actions
+ */
+export function logoutRequest () {
+  return {
+    type: LOGOUT_START
+  }
+}
+
+export function logoutSuccess () {
+  return {
+    type: LOGOUT_SUCCESS
+  }
+}
+export function logoutFailure (error) {
+  return {
+    type: LOGOUT_FAILURE,
+    payload: error
+  }
+}
+
+
 /**
  * ## Delete session token
  *
@@ -167,6 +175,42 @@ export function deleteSessionToken () {
     dispatch(deleteTokenRequestSuccess())
   }
 }
+
+
+/**
+ * ## Login
+ * @param {string} username - user's name
+ * @param {string} password - user's password
+ *
+ * After calling Backend, if response is good, save the json
+ * which is the currentUser which contains the sessionToken
+ *
+ * If successful, set the state to logout
+ * otherwise, dispatch a failure
+ */
+
+export function login (username, password) {
+  return async function(dispatch)  {
+    try{
+      dispatch(loginRequest())
+      const j_sessionid = await BackendFactory().login(username,password)
+      dispatch(loginSuccess(j_sessionid))
+      dispatch(jobMasterDownloadStart())
+      //TODO pass the complete IMEI Parameter
+      const jobMasters = await BackendFactory().downloadJobMaster({},{},1,0)
+      repositories.save(TABLE_USER_SUMMARY, jobMasters.userSummary);
+      await saveSessionToken(j_sessionid)
+      Actions.Tabbar()
+      dispatch(logoutState())
+    }
+    catch(error) {
+      console.log(error);
+      dispatch(loginFailure(error))
+    }
+  }
+}
+
+
 /**
  * ## Token
  * If AppAuthToken has the sessionToken, the user is logged in
@@ -195,48 +239,7 @@ export function getSessionToken () {
 }
 
 /**
- * ## saveSessionToken
- * @param {Object} response - to return to keep the promise chain
- * @param {Object} json - object with sessionToken
- */
-export function saveSessionToken (j_sessionid) {
-  return appAuthToken.storeSessionToken(j_sessionid)
-}
-
-/**
- * ## onAuthFormFieldChange
- * Set the payload so the reducer can work on it
- */
-export function onAuthFormFieldChange (field, value) {
-  return {
-    type: ON_AUTH_FORM_FIELD_CHANGE,
-    payload: {field: field, value: value}
-  }
-}
-
-
-/**
- * ## Logout actions
- */
-export function logoutRequest () {
-  return {
-    type: LOGOUT_START
-  }
-}
-
-export function logoutSuccess () {
-  return {
-    type: LOGOUT_SUCCESS
-  }
-}
-export function logoutFailure (error) {
-  return {
-    type: LOGOUT_FAILURE,
-    payload: error
-  }
-}
-/**
- * ## Login
+ * ## Logout
  * After dispatching the logoutRequest, get the sessionToken
  *
  *
