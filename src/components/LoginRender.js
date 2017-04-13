@@ -53,15 +53,16 @@ import
 {
   StyleSheet,
   ScrollView,
-  Text,
   TouchableHighlight,
   View,
-  Image
+  Image,
+  Modal
 }
 from 'react-native'
 
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Text, Container, Content, Button,  List, ListItem, Thumbnail, Body, Left, Right, Badge } from 'native-base';
 
 import Dimensions from 'Dimensions'
 var {height, width} = Dimensions.get('window') // Screen dimensions in current orientation
@@ -87,6 +88,22 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+
+  issueWrapper: {
+    flex: 1, 
+    backgroundColor: '#ffffff', 
+    height: '100%', 
+    paddingTop: 80, 
+    flexDirection: 'column', 
+    justifyContent: 'center'
+  },
+
+  listIcons: {
+    flexBasis: '20%',
+    color: '#a3a3a3', 
+    fontSize: 24
+  },
+
   inputs: {
     width: '70%'
   },
@@ -108,6 +125,11 @@ var styles = StyleSheet.create({
     width: 94,
     resizeMode: 'contain'
   },
+
+  iconLargeWhite : {
+    color: '#fff',
+    fontSize: 104
+  }
  
 })
 /**
@@ -193,9 +215,59 @@ class LoginRender extends Component {
      */
     return (
       <View style={styles.container}>
+        <Modal
+          animationType={"slide"}
+          visible={true}
+          >
+         <View style={styles.issueWrapper}>
+            <View style={{flexDirection: 'column', flexBasis: '40%', alignItems: 'center', flex:1}}>
+              <View>
+                <Image
+                  style={styles.logoStyle}
+                  source={require('../../images/warning.png')}
+                />
+              </View>
+              <Text style={{color: '#000000', fontSize: 32, fontWeight: '200', marginTop: 30}} >
+                  Fix Issues
+              </Text>
+            </View>
+            <View style={{flexDirection: 'column', flexBasis: '40%', flex: 1, justifyContent: 'center'}}>
+              <List>
+                  <ListItem>
+                      <Left>
+                          <Ionicons name="ios-warning-outline" style={styles.listIcons} />
+                          <Text style={{color: '#a3a3a3'}}>Insert SIM</Text>
+                      </Left>
+                      <Body />
+                  </ListItem>
+                  <ListItem>
+                      <Left>
+                          <Ionicons name="ios-pin-outline" style={styles.listIcons} />
+                          <Text style={{color: '#a3a3a3'}}>Enable GPS</Text>
+                      </Left>
+                      <Body />
+                  </ListItem>
+                  <ListItem>
+                      <Left>
+                          <Ionicons name="ios-globe-outline" style={styles.listIcons} />
+                          <Text style={{color: '#a3a3a3'}}>Enable Internet</Text>
+                      </Left>
+                      <Body />
+                  </ListItem>
+              </List>
+            </View>
+            <View style={{flexBasis: '30%', paddingTop: 20, flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+              <Button rounded danger style={{margin: 10}} >
+                  <Text style={{color: '#ffffff'}} >Close</Text>
+              </Button>
+              <Button rounded success style={{margin: 10}}>
+                  <Text style={{color: '#ffffff'}}>Retry</Text>
+              </Button>
+            </View>
+         </View>
+        </Modal>
         <ScrollView horizontal={false} width={width} height={height}>
           <View style={styles.wrapper}>
-
             <View style={styles.inputs}>
               <View style={styles.logoContainer}>
                 <Image
@@ -252,11 +324,6 @@ class LoginRender extends Component {
                     buttonText="Scan" />
                 </View>
             </View>
-
-
-
-            
-
           </View>
         </ScrollView>
       </View>

@@ -105,6 +105,7 @@ class Main extends Component {
             </TouchableHighlight>
           </Right>
       </Header>
+      
       <Tabs renderTabBar={()=> <ScrollableTab />}>
           <Tab heading="All">
               <Jobs />
