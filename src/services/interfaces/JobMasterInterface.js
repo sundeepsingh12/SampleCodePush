@@ -103,19 +103,19 @@ export default class JobMasterInterface{
 
     /**This saves entire UserObject in store
      *
-     * @param userObject
+     * @param user
      *
      * @return
      * isSaveSuccess: true
      */
-    saveUserObject(userObject){}
+    saveUser(user){}
 
     /**
      * @return
      * userObject
      */
 
-    getUserObject(){}
+    getUser(){}
 
     /**This saves entire companyObject in store
      *
@@ -380,7 +380,6 @@ export default class JobMasterInterface{
     saveJobSummary(jobSummary){}
 
     getJobSummary(){}
-
 
     /**
      *

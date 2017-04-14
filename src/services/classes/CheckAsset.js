@@ -12,22 +12,13 @@ export default class CheckAsset extends CheckAssetInterface {
             deviceIMEI,
             deviceSIM
         })
-
-        return await BackendFactory()._fetch({
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            url:'/rest/device/check_asset',
-            body: postData
-        })
-        .then((res) => {
-            return res;
-        })
-        .catch((error) => {
+        try {
+            const apiUrl = '/rest/device/check_asset';
+            return   BackendFactory().serviceCall(postData,apiUrl)
+        } catch (error) {
             throw(error)
-        })
+        }
+
     }
 
     saveDeviceIMEI(deviceIMEI) {

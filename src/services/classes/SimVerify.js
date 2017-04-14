@@ -15,7 +15,7 @@ export default class SimVerify extends SimVerifyInterface {
         const apiUrl = '/rest/device/generate_otp';
 
         try {
-            return await BackendFactory().serviceCall(postData,apiUrl)
+            return  BackendFactory().serviceCall(postData,apiUrl)
         } catch (error) {
             throw(error)
         }

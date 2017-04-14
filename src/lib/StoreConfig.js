@@ -110,7 +110,7 @@ export class AppAuthToken {
     }
 
     getUser() {
-        return store.get(this.LAST_SEEN_TIME_FOR_MESSAGE_BOX)
+        return store.get(this.USER)
     }
 
     saveJobMaster(jobMaster) {
@@ -155,6 +155,10 @@ export class AppAuthToken {
 
     getFieldAttributeMaster() {
         return store.get(this.FIELD_ATTRIBUTE_MASTER)
+    }
+
+    deleteFieldAttributeMaster(){
+        return store.delete(this.FIELD_ATTRIBUTE_MASTER)
     }
 
     saveFieldAttributeValueMaster(fieldAttributeValueMaster) {
@@ -292,14 +296,22 @@ export class AppAuthToken {
         return store.get(this.JOB_MONEY_TRANSACTION_MODE)
     }
 
+    deleteJobMoneyTransactionMode(){
+        return store.delete(this.JOB_MONEY_TRANSACTION_MODE)
+    }
+
     saveSmsTemplate(smsTemplate){
         return store.save(this.SMS_TEMPLATE,{
-            jobMoneyTransactionMode: jobMoneyTransactionMode
+            smsTemplate: smsTemplate
         })
     }
 
     getSmsTemplate(){
         return store.get(this.SMS_TEMPLATE)
+    }
+
+    deleteSmsTemplate(){
+        return store.delete(this.SMS_TEMPLATE)
     }
 
     saveFieldAttributeStatus(fieldAttributeStatus){
