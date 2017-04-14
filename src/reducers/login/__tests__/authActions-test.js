@@ -1,7 +1,7 @@
 'use strict'
 
 
-var actions = require('../authActions')
+var actions = require('../loginActions')
 const {
 
   LOGOUT,

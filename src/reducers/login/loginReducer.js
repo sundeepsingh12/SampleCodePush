@@ -6,13 +6,13 @@
 'use strict'
 /**
  * ## Imports
- * The InitialState for auth
+ * The InitialState for login
  * fieldValidation for validating the fields
  * formValidation for setting the form's valid flag
  */
-const InitialState = require('./authInitialState').default
+const InitialState = require('./loginInitialState').default
 const fieldValidation = require('../../lib/fieldValidation').default
-const formValidation = require('./authFormValidation').default
+const formValidation = require('./loginFormValidation').default
 
 /**
  * ## Auth actions

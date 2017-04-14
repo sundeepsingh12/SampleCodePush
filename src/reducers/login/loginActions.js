@@ -30,7 +30,7 @@ const {
 const BackendFactory = require('../../lib/BackendFactory').default
 
 import {Actions} from 'react-native-router-flux'
-import {appAuthToken} from '../../lib/AppAuthToken'
+import {appAuthToken} from '../../lib/StoreConfig'
 import * as repositories from '../../repositories/'
 /**
  * ## State actions

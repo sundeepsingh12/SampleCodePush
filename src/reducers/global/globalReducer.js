@@ -6,7 +6,7 @@
 'use strict'
 /**
  * ## Imports
- * The InitialState for auth
+ * The InitialState for login
  * fieldValidation for validating the fields
  * formValidation for setting the form's valid flag
  */

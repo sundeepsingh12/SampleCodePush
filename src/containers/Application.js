@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 /**
  * Project actions
  */
-import * as authActions from '../reducers/auth/authActions'
+import * as authActions from '../reducers/login/loginActions'
 // import * as deviceActions from '../reducers/device/deviceActions'
 import * as globalActions from '../reducers/global/globalActions'
 

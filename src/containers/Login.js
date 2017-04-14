@@ -13,7 +13,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import * as authActions from '../reducers/auth/authActions'
+import * as authActions from '../reducers/login/loginActions'
 import LoginRender from '../components/LoginRender'
 import sha256 from 'sha256';
 

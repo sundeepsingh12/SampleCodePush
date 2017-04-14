@@ -64,7 +64,7 @@ import {setStore} from './reducers/global/globalActions'
  * Snowflake explicitly defines initial state
  *
  */
-import AuthInitialState from './reducers/auth/authInitialState'
+import AuthInitialState from './reducers/login/loginInitialState'
 import DeviceInitialState from './reducers/device/deviceInitialState'
 import GlobalInitialState from './reducers/global/globalInitialState'
 // import ProfileInitialState from './reducers/profile/profileInitialState'

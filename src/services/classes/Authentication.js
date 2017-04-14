@@ -3,10 +3,11 @@
  */
 
 import AuthenticationInterface from '../interfaces/AuthenticationInterface'
+import RestAPI from '../../lib/RestAPI'
 
-class Authentication extends AuthenticationInterface{
+class Authentication extends AuthenticationInterface {
 
-     login (j_username, j_password) {
+    login(j_username, j_password) {
         var data = new FormData()
         data.append('j_username', username)
         data.append('j_password', password)
@@ -15,9 +16,7 @@ class Authentication extends AuthenticationInterface{
 
         return this._fetch({
             method: 'POST',
-            headers: {
-
-            },
+            headers: {},
             url: '/authentication',
             body: data
         })
@@ -34,23 +33,4 @@ class Authentication extends AuthenticationInterface{
             })
     }
 
-    async _fetch (opts) {
-        let url = this.API_BASE_URL + opts.url
-        if (this._sessionToken) {
-            opts.headers = {}
-            opts.headers['Cookie'] = this._sessionToken
-        }
-        const response = await fetch(url, opts)
-        const {status, code, headers} = response;
-        let res = {
-            status,
-            code,
-            headers,
-            json: {}
-        }
-        if (opts.headers["Content-Type"] == "application/json") {
-            res.json = await response.json()
-        }
-        return res
-    }
 }
