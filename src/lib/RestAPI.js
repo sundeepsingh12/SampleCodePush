@@ -98,6 +98,25 @@ export class RestAPI extends Backend {
     * JSESSIONID: "r:Kt9wXIBWD0dNijNIq2u5rRllW"
     *
     */
+
+    serviceCall(data,apiUrl) {
+        return await BackendFactory()._fetch({
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            url:apiUrl,
+            body: data
+        })
+        .then((res) => {
+            return res;
+        })
+        .catch((error) => {
+            throw(error)
+        })
+    }
+
   async login (username,password) {
     var data = new FormData()
     data.append('j_username', username)

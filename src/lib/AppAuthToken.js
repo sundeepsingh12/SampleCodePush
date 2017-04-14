@@ -12,6 +12,7 @@
  */
 import store from 'react-native-simple-store'
 import CONFIG from './config'
+import CONSTANT from './constants'
 
 export class AppAuthToken {
   /**
@@ -21,6 +22,8 @@ export class AppAuthToken {
    */
   constructor () {
     this.SESSION_TOKEN_KEY = CONFIG.SESSION_TOKEN_KEY
+    this.DEVICE_IMEI = CONSTANT.DEVICE_IMEI
+    this.DEVICE_SIM = CONSTANT.DEVICE_SIM
   }
 
   /**
@@ -49,6 +52,35 @@ export class AppAuthToken {
   deleteSessionToken () {
     return store.delete(this.SESSION_TOKEN_KEY)
   }
+
+  storeDeviceIMEI(deviceIMEI) {
+    return store.save(this.DEVICE_IMEI,{
+      deviceIMEI: deviceIMEI
+    })
+  }
+
+   getDeviceIMEI() {
+    return store.get(this.DEVICE_IMEI)
+  }
+
+  deleteDeviceIMEI() {
+    return store.delete(this.DEVICE_IMEI)
+  }
+
+  storeDeviceSIM(deviceSIM) {
+    return store.save(this.DEVICE_SIM,{
+      deviceSIM: deviceSIM
+    })
+  }
+
+   getDeviceSIM() {
+    return store.get(this.DEVICE_SIM)
+  }
+
+  deleteDeviceSIM() {
+    return store.delete(this.DEVICE_SIM)
+  }
+
 }
 // The singleton variable
 export let appAuthToken = new AppAuthToken()

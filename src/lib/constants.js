@@ -37,4 +37,8 @@ export default keyMirror({
   //Database tables
   TABLE_USER_SUMMARY: null,
   TABLE_JOB_MASTER: null,
+
+  // Store keys
+  DEVICE_IMEI: null,
+  DEVICE_SIM: null,
 })
