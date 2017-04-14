@@ -37,4 +37,36 @@ export default keyMirror({
   //Database tables
   TABLE_USER_SUMMARY: null,
   TABLE_JOB_MASTER: null,
+
+
+    //Store
+    SERVER_TIME : null,
+    HUB:null,
+    SERVER_APK_VERSION :null,
+    LAST_SEEN_TIME_FOR_MESSAGE_BOX:null,
+    HUB_LAT_LONG:null,
+    USER:null,
+    COMPANY:null,
+    JOB_MASTER:null,
+    JOB_ATTRIBUTE_MASTER:null,
+    JOB_ATTRIBUTE_VALUE_MASTER:null,
+    FIELD_ATTRIBUTE_MASTER:null,
+    FIELD_ATTRIBUTE_VALUE_MASTER:null,
+    JOB_STATUS:null,
+    CUSTOMIZATION_APP_MODULES:null,
+    CUSTOMIZATION_JOB_LIST:null,
+    TABS:null,
+    JOB_MONEY_TRANSACTION_MODE:null,
+    CUSTOMER_CARE:null,
+    SMS_TEMPLATE:null,
+    FIELD_ATTRIBUTE_STATUS:null,
+    FIELD_VALIDATIONS:null,
+    FIELD_VALIDATION_CONDITIONS:null,
+    SMS_JOB_STATUSES:null,
+    MDM_POLICIES:null,
+    USER_SUMMARY:null,
+    JOB_SUMMARY:null
+
+
+
 })

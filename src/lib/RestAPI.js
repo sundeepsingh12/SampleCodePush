@@ -13,12 +13,11 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
-import Backend from './Backend'
+// import Backend from './Backend'
 
-export class RestAPI extends Backend {
+export class RestAPI  {
   /**
    * ## API.js client
-   *
    *
    * @throws tokenMissing if token is undefined
    */
@@ -42,7 +41,7 @@ export class RestAPI extends Backend {
  *   status: response.status,
  *   json: response.json()
  */
-  async _fetch (opts) {
+/*  async _fetch (opts) {
     let url = this.API_BASE_URL + opts.url
     if (this._sessionToken) {
       opts.headers = {}
@@ -60,7 +59,7 @@ export class RestAPI extends Backend {
       res.json = await response.json()
     }
     return res
-  }
+  }*/
 
   /**
   * Remove  null, NaN, empty String and empty objects from JSON Objects
@@ -98,7 +97,7 @@ export class RestAPI extends Backend {
     * JSESSIONID: "r:Kt9wXIBWD0dNijNIq2u5rRllW"
     *
     */
-  async login (username,password) {
+ /* async login (username,password) {
     var data = new FormData()
     data.append('j_username', username)
     data.append('j_password', password)
@@ -123,7 +122,7 @@ export class RestAPI extends Backend {
       .catch((error) => {
         throw (error)
       })
-  }
+  }*/
   /**
    * ### logout
    * prepare the request and call _fetch
@@ -158,7 +157,7 @@ export class RestAPI extends Backend {
     * ## Expected response
     * JSON body
   */
-  async downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, deviceCompanyId) {
+  /*async downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, deviceCompanyId) {
     const postData = JSON.stringify({
       deviceIMEI,
       deviceSIM,
@@ -183,7 +182,7 @@ export class RestAPI extends Backend {
     .catch((error) => {
       throw (error)
     })
-  }
+  }*/
 }
 // The singleton variable
 export let restAPI = new RestAPI()
