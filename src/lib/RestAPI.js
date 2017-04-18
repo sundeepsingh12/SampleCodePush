@@ -13,9 +13,9 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
-import Backend from './Backend'
+// import Backend from './Backend'
 
-export class RestAPI extends Backend {
+export class RestAPI {
     /**
      * ## API.js client
      *
@@ -27,6 +27,14 @@ export class RestAPI extends Backend {
             throw new Error('TokenMissing')
         }
         this._sessionToken = _.isNull(token) ? null : token.sessionToken
+
+        // if(CONFIG.backend.fareyeProduction) {
+        //     this.API_BASE_URL = CONFIG.FAREYE.production.url
+        // } else if(CONFIG.backend.fareyeStaging) {
+        //     this.API_BASE_URL = CONFIG.FAREYE.staging.url
+        // } else if(CONFIG.backend.fareyeDev) {
+        //     this.API_BASE_URL = CONFIG.FAREYE.dev.url
+        // }
 
         this.API_BASE_URL = CONFIG.backend.fareyeProduction
             ? CONFIG.FAREYE.production.url
@@ -57,7 +65,7 @@ export class RestAPI extends Backend {
             json: {}
         }
         if (opts.headers["Content-Type"] == "application/json") {
-            res.json = await response.json()
+            res.json = response.json()
         }
         return res
     }
@@ -100,7 +108,7 @@ export class RestAPI extends Backend {
      */
 
     serviceCall(data,apiUrl) {
-        return await ._fetch({
+        return this._fetch({
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -110,6 +118,8 @@ export class RestAPI extends Backend {
             body: data
         })
             .then((res) => {
+                console.log("response api")
+                console.log(res)
                 return res;
             })
             .catch((error) => {

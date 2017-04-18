@@ -32,6 +32,9 @@ const BackendFactory = require('../../lib/BackendFactory').default
 import {Actions} from 'react-native-router-flux'
 import {appAuthToken} from '../../lib/StoreConfig'
 import * as repositories from '../../repositories/'
+import {authenticationService} from '../../services/classes/Authentication'
+import {jobMasterService} from '../../services/classes/JobMaster'
+import {checkAssetService} from '../../services/classes/CheckAsset'
 /**
  * ## State actions
  * controls which form is displayed to the user
@@ -191,16 +194,59 @@ export function deleteSessionToken () {
 
 export function login (username, password) {
   return async function(dispatch)  {
-    try{
+    try {
       dispatch(loginRequest())
-      const j_sessionid = await BackendFactory().login(username,password)
+      const j_sessionid = await authenticationService.login(username,password)
       dispatch(loginSuccess(j_sessionid))
       dispatch(jobMasterDownloadStart())
+      console.log("before 1")
       //TODO pass the complete IMEI Parameter
-      const jobMasters = await BackendFactory().downloadJobMaster({},{},1,0)
-      repositories.save(TABLE_USER_SUMMARY, jobMasters.userSummary);
-      await saveSessionToken(j_sessionid)
-      Actions.Tabbar()
+      var deviceIMEI = checkAssetService.getDeviceIMEI()
+      console.log("before 2")
+      var deviceSIM = checkAssetService.getDeviceSIM()
+      console.log("before 3")
+      var user = jobMasterService.getUser()
+      console.log("before 4")
+      var jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,user.currentJobMasterVersion,user.company_id)
+      const json = await jobMasters.json
+      console.log(jobMasters);
+      console.log(jobMasters.serverTime);
+      console.log(json);
+      // if(jobMasterService.matchServerTimeWithMobileTime(jobMasters.serverTime)) {
+        // jobMasterService.saveJobMaster()
+        console.log("job master downloaded");
+        console.log("jobMasters.json >>>> ");
+        console.log(jobMasters.json);
+        console.log("jobMasters.json._65 >>>> ");
+        console.log(jobMasters.json._65);
+        deviceIMEI = json.deviceIMEI
+        deviceSIM = json.deviceSIM
+        user = json.user
+        console.log("jobMasters.user >>>> ");
+        console.log(user);
+        var companyId = user["company"].id
+        console.log(companyId);
+        checkAssetService.saveDeviceIMEI()
+        checkAssetService.saveDeviceSIM()
+        jobMasterService.saveUser(jobMasters.user)
+        if(checkAssetService.checkAsset(deviceIMEI,deviceSIM,user.hubId,companyId)) {
+          
+          
+        } else {
+          var checkAssetResponse = await checkAssetService.checkAssetAPI(deviceIMEI,deviceSIM)
+
+          console.log("checkAssetResponse >>>>>>>");
+          console.log(checkAssetResponse);
+          await saveSessionToken(j_sessionid)
+          Actions.Tabbar()
+        }
+
+      // } else {
+        // console.log("time mismatch")
+        // dispatch(timeMismatch)
+      // }
+      // repositories.save(TABLE_USER_SUMMARY, jobMasters.userSummary);
+      // Actions.Tabbar()
       dispatch(logoutState())
     }
     catch(error) {

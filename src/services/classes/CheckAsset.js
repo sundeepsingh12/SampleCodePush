@@ -5,7 +5,7 @@ import {appAuthToken} from '../../lib/StoreConfig'
 
 const BackendFactory = require('../../lib/BackendFactory').default
 
-export default class CheckAsset extends CheckAssetInterface {
+class CheckAsset extends CheckAssetInterface {
 
     checkAssetAPI(deviceIMEI,deviceSIM) {
         const postData = JSON.stringify({
@@ -58,6 +58,7 @@ export default class CheckAsset extends CheckAssetInterface {
        }
     }
 
-
 }
+
+export let checkAssetService = new CheckAsset()
 
