@@ -217,7 +217,7 @@ class LoginRender extends Component {
       <View style={styles.container}>
         <Modal
           animationType={"slide"}
-          visible={true}
+          visible={false}
           >
          <View style={styles.issueWrapper}>
             <View style={{flexDirection: 'column', flexBasis: '40%', alignItems: 'center', flex:1}}>

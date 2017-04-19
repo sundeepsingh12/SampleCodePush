@@ -15,6 +15,9 @@ const {
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
 
+  CHECK_ASSET_START,
+  CHECK_ASSET_SUCCESS,
+
   SESSION_TOKEN_REQUEST,
   SESSION_TOKEN_SUCCESS,
   SESSION_TOKEN_FAILURE,
@@ -85,6 +88,18 @@ function jobMasterDownloadStart() {
 function jobMasterDownloadSuccess() {
   return {
     type: MASTER_DOWNLOAD_SUCCESS
+  }
+}
+
+function checkAssetStart() {
+  return {
+    type : CHECK_ASSET_START
+  }
+}
+
+function checkAssetSuccess() {
+  return {
+    type : CHECK_ASSET_SUCCESS
   }
 }
 
@@ -199,55 +214,45 @@ export function login (username, password) {
       const j_sessionid = await authenticationService.login(username,password)
       dispatch(loginSuccess(j_sessionid))
       dispatch(jobMasterDownloadStart())
-      console.log("before 1")
-      //TODO pass the complete IMEI Parameter
       var deviceIMEI = checkAssetService.getDeviceIMEI()
-      console.log("before 2")
       var deviceSIM = checkAssetService.getDeviceSIM()
-      console.log("before 3")
       var user = jobMasterService.getUser()
-      console.log("before 4")
       var jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,user.currentJobMasterVersion,user.company_id)
       const json = await jobMasters.json
       console.log(jobMasters);
-      console.log(jobMasters.serverTime);
       console.log(json);
-      // if(jobMasterService.matchServerTimeWithMobileTime(jobMasters.serverTime)) {
-        // jobMasterService.saveJobMaster()
-        console.log("job master downloaded");
+      console.log(json.serverTime)
+      if(jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
+        jobMasterService.saveJSONResponse(json)
         console.log("jobMasters.json >>>> ");
         console.log(jobMasters.json);
-        console.log("jobMasters.json._65 >>>> ");
-        console.log(jobMasters.json._65);
-        deviceIMEI = json.deviceIMEI
-        deviceSIM = json.deviceSIM
         user = json.user
         console.log("jobMasters.user >>>> ");
         console.log(user);
-        var companyId = user["company"].id
+        var companyId = user.company.id
         console.log(companyId);
-        checkAssetService.saveDeviceIMEI()
-        checkAssetService.saveDeviceSIM()
-        jobMasterService.saveUser(jobMasters.user)
+        
+        dispatch(checkAssetStart())
         if(checkAssetService.checkAsset(deviceIMEI,deviceSIM,user.hubId,companyId)) {
-          
-          
+          await saveSessionToken(j_sessionid)
+          Actions.Tabbar()
         } else {
           var checkAssetResponse = await checkAssetService.checkAssetAPI(deviceIMEI,deviceSIM)
-
+          var checkAssetJson = await checkAssetResponse.json
+          checkAssetService.saveDeviceIMEI(checkAssetJson.deviceIMEI)
+          checkAssetService.saveDeviceSIM(checkAssetJson.deviceSIM)
           console.log("checkAssetResponse >>>>>>>");
           console.log(checkAssetResponse);
           await saveSessionToken(j_sessionid)
           Actions.Tabbar()
         }
-
-      // } else {
-        // console.log("time mismatch")
-        // dispatch(timeMismatch)
-      // }
+         dispatch(checkAssetSuccess())
+         dispatch(logoutState())
+      } else {
+        console.log("time mismatch")
+      }
       // repositories.save(TABLE_USER_SUMMARY, jobMasters.userSummary);
       // Actions.Tabbar()
-      dispatch(logoutState())
     }
     catch(error) {
       console.log(error);

@@ -24,6 +24,9 @@ export default keyMirror({
     MASTER_DOWNLOAD_START: null,
     MASTER_DOWNLOAD_SUCCESS: null,
 
+    CHECK_ASSET_START: null,
+    CHECK_ASSET_SUCCESS: null,
+
     SESSION_TOKEN_REQUEST: null,
     SESSION_TOKEN_SUCCESS: null,
     SESSION_TOKEN_FAILURE: null,

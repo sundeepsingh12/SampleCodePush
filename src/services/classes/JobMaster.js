@@ -35,15 +35,38 @@ class JobMaster extends JobMasterInterface{
         const apiUrl = '/rest/device/job_master';
         try {
             var jobMasterResponse = BackendFactory().serviceCall(postData,apiUrl)
-            // jobMasterResponse = BackendFactory()._pruneEmpty(jobMasterResponse)
+            jobMasterResponse = BackendFactory()._pruneEmpty(jobMasterResponse)
             return jobMasterResponse
         } catch (error) {
             throw(error)
         }
     }
 
+    saveJSONResponse(json) {
+        this.saveJobMaster(json.jobMaster)
+        this.saveUser(json.user)
+        this.saveJobAttributeMaster(json.jobAttributeMaster)
+        this.saveJobAttributeValueMaster(json.jobAttributeValueMaster)
+        this.saveFieldAttributeMaster(json.fieldAttributeMaster)
+        this.saveFieldAttributeValueMaster(json.fieldAttributeValueMaster)
+        this.saveJobStatus(json.jobStatus)
+        this.saveCustomizationAppModules(json.modulesCustomization)
+        this.saveCustomizationJobList(json.jobListCustomization)
+        this.saveTabs(json.appJobStatusTabs)
+        this.saveJobMoneyTransactionMode(json.jobMasterMoneyTransactionModes)
+        this.saveCutomerCare(json.customerCareList)
+        this.saveSmsTemplate(json.smsTemplatesList)
+        this.saveFieldAttributeStatus(json.fieldAttributeMasterStatuses)
+        this.saveFieldValidations(json.fieldAttributeMasterValidations)
+        this.saveFieldValidationsConditions(json.fieldAttributeMasterValidationConditions)
+        this.saveSmsJobStatuses(json.smsJobStatuses)
+        this.saveUserSummary(json.userSummary)
+        this.saveJobSummary(json.jobSummary)
+    }
+
     savelastSeenTimeForMessageBox(lastSeenTimeForMessageBox){
-        appAuthToken.savelastSeenTimeForMessageBox(lastSeenTimeForMessageBox)
+        if(lastSeenTimeForMessageBox !== null && lastSeenTimeForMessageBox !== undefined)
+            appAuthToken.savelastSeenTimeForMessageBox(lastSeenTimeForMessageBox)
     }
 
     matchServerTimeWithMobileTime(serverTime){
@@ -56,7 +79,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveHubLatLng(hubLatLng){
-        appAuthToken.saveHubLatLng(hubLatLng)
+        if(hubLatLng !== null && hubLatLng !== undefined)
+            appAuthToken.saveHubLatLng(hubLatLng)
     }
 
     getHubLatLng(hubLatLng) {
@@ -64,7 +88,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveUser(userObject){
-        appAuthToken.saveUser(userObject)
+        if(userObject !== null && userObject !== undefined)
+            appAuthToken.saveUser(userObject)
     }
 
     getUser() {
@@ -73,7 +98,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveJobMaster(jobMaster){
-        appAuthToken.saveJobMaster(jobMaster)
+        if(jobMaster !== null && jobMaster !== undefined)
+            appAuthToken.saveJobMaster(jobMaster)
     }
 
     getJobMaster() {
@@ -81,7 +107,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveJobAttributeMaster(jobAttributeMaster) {
-        appAuthToken.saveJobAttributeMaster(jobAttributeMaster)
+        if(jobAttributeMaster !== null && jobAttributeMaster !== undefined)
+            appAuthToken.saveJobAttributeMaster(jobAttributeMaster)
     }
 
     getJobAttributeMaster() {
@@ -89,7 +116,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveJobAttributeValueMaster(jobAttributeValueMaster) {
-        appAuthToken.saveJobAttributeValueMaster(jobAttributeValueMaster)
+        if(jobAttributeValueMaster !== null && jobAttributeValueMaster !== undefined)
+            appAuthToken.saveJobAttributeValueMaster(jobAttributeValueMaster)
     }
 
     getJobAttributeValueMaster() {
@@ -97,7 +125,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveFieldAttributeMaster(fieldAttributeMaster) {
-        appAuthToken.saveFieldAttributeMaster(fieldAttributeMaster)
+        if(fieldAttributeMaster !== null && fieldAttributeMaster !== undefined)
+            appAuthToken.saveFieldAttributeMaster(fieldAttributeMaster)
     }
 
     getFieldAttributeMaster() {
@@ -105,7 +134,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveFieldAttributeValueMaster(fieldAttributeValueMaster) {
-        appAuthToken.saveFieldAttributeValueMaster(fieldAttributeValueMaster)
+        if(fieldAttributeValueMaster !== null && fieldAttributeValueMaster !== undefined)
+            appAuthToken.saveFieldAttributeValueMaster(fieldAttributeValueMaster)
     }
 
     getFieldAttributeValueMaster() {
@@ -113,7 +143,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveJobStatus(jobStatus) {
-        appAuthToken.saveJobStatus(jobStatus)
+        if(jobStatus !== null && jobStatus !== undefined)
+            appAuthToken.saveJobStatus(jobStatus)
     }
 
     getJobStatus() {
@@ -121,7 +152,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveCustomizationAppModules(customizationAppModules) {
-        appAuthToken.saveCustomizationAppModules(customizationAppModules)
+        if(customizationAppModules !== null && customizationAppModules !== undefined)
+            appAuthToken.saveCustomizationAppModules(customizationAppModules)
     }
 
     getCustomizationAppModules() {
@@ -129,7 +161,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveCustomizationJobList(customizationJobList) {
-        appAuthToken.saveCustomizationJobList(customizationJobList)
+        if(customizationJobList !== null && customizationJobList !== undefined)
+            appAuthToken.saveCustomizationJobList(customizationJobList)
     }
 
     getCustomizationJobList() {
@@ -137,7 +170,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveTabs(tabs) {
-        appAuthToken.saveTabs(tabs)
+        if(tabs !== null && tabs !== undefined)
+            appAuthToken.saveTabs(tabs)
     }
 
     getTabs() {
@@ -145,7 +179,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveJobMoneyTransactionMode(jobMoneyTransactionMode){
-        appAuthToken.saveJobMoneyTransactionMode(jobMoneyTransactionMode)
+        if(jobMoneyTransactionMode !== null && jobMoneyTransactionMode !== undefined)
+            appAuthToken.saveJobMoneyTransactionMode(jobMoneyTransactionMode)
     }
 
     getJobMoneyTransactionMode() {
@@ -153,7 +188,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveSmsTemplate(smsTemplate){
-        appAuthToken.saveSmsTemplate(smsTemplate)
+        if(smsTemplate !== null && smsTemplate !== undefined)
+            appAuthToken.saveSmsTemplate(smsTemplate)
     }
 
     getSmsTemplate() {
@@ -161,7 +197,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveFieldAttributeStatus(fieldAttributeStatus){
-        appAuthToken.saveFieldAttributeStatus(fieldAttributeStatus)
+        if(fieldAttributeStatus !== null && fieldAttributeStatus !== undefined)
+            appAuthToken.saveFieldAttributeStatus(fieldAttributeStatus)
     }
 
     getFieldAttributeStatus() {
@@ -169,7 +206,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveFieldValidations(fieldValidations){
-        appAuthToken.saveFieldValidations(fieldValidations)
+        if(fieldValidations !== null && fieldValidations !== undefined)
+            appAuthToken.saveFieldValidations(fieldValidations)
     }
 
     getFieldValidations() {
@@ -177,7 +215,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveFieldValidationsConditions(fieldValidationsConditions){
-        appAuthToken.saveFieldValidationsConditions(fieldValidationsConditions)
+        if(fieldValidationsConditions !== null && fieldValidationsConditions !== undefined)
+            appAuthToken.saveFieldValidationsConditions(fieldValidationsConditions)
     }
 
     getFieldValidationsConditions() {
@@ -185,7 +224,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveSmsJobStatuses(smsJobStatuses){
-        appAuthToken.saveSmsJobStatuses(smsJobStatuses)
+        if(smsJobStatuses !== null && smsJobStatuses !== undefined)
+            appAuthToken.saveSmsJobStatuses(smsJobStatuses)
     }
 
     getSmsJobStatuses() {
@@ -193,7 +233,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveUserSummary(userSummary){
-        appAuthToken.saveUserSummary(userSummary)
+        if(userSummary !== null && userSummary !== undefined)
+            appAuthToken.saveUserSummary(userSummary)
     }
 
     getUserSummary() {
@@ -201,7 +242,8 @@ class JobMaster extends JobMasterInterface{
     }
 
     saveJobSummary(jobSummary){
-        appAuthToken.saveJobSummary(jobSummary)
+        if(jobSummary !== null && jobSummary !== undefined)
+            appAuthToken.saveJobSummary(jobSummary)
     }
 
     getJobSummary() {

@@ -108,6 +108,8 @@ export class RestAPI {
      */
 
     serviceCall(data,apiUrl) {
+        console.log("data before api >>>>> ")
+        console.log(data)
         return this._fetch({
             method: 'POST',
             headers: {
