@@ -6,10 +6,14 @@ import React, {Component} from 'react';
 import {
     AppRegistry,
     Dimensions,
-    StyleSheet
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
 import Camera from 'react-native-camera';
 import Login from '../containers/Login';
+import {Actions} from 'react-native-router-flux';
+
 
 class Scanner extends Component {
 
@@ -32,12 +36,15 @@ class Scanner extends Component {
     renderCamera() {
         if (this.state.showCamera) {
             return (
-                <Camera
-                    ref="cam"
-                    style={styles.container}
-                    onBarCodeRead={this._onBarCodeRead.bind(this)}
-                    type={this.state.cameraType}>
-                </Camera>
+                    <View style={styles.container}>
+                        <Camera
+                            ref="cam"
+                            onBarCodeRead={this._onBarCodeRead.bind(this)}
+                            style={styles.preview}
+                            aspect={Camera.constants.Aspect.fill}>
+                            <Text style={styles.capture} onPress={this.goBack.bind(this)}>BACK</Text>
+                        </Camera>
+                    </View>
             );
         }
         else {
@@ -57,15 +64,29 @@ class Scanner extends Component {
         const password = e.data.split("/")[1];
         this.setState({showCamera: false,username,password});
     }
-}
 
+    goBack(){
+        Actions.pop()
+    }
+}
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "transparent",
+        flexDirection: 'row',
+    },
+    preview: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center'
+    },
+    capture: {
+        flex: 0,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        color: '#000',
+        padding: 10,
+        margin: 40
     }
 });
 module.exports = Scanner

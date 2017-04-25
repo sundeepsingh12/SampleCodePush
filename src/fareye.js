@@ -167,8 +167,6 @@ export default function native (platform) {
 
                 <Scene key='Scanner'
                        title='Scanner'
-                       type="replace"
-                       hideNavBar
                        component={Scanner} />
 
               <Scene key='Tabbar'
