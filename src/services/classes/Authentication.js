@@ -3,27 +3,17 @@
  */
 
 import AuthenticationInterface from '../interfaces/AuthenticationInterface'
-import RestAPI from '../../lib/RestAPI'
 import BackendFactory from '../../lib/BackendFactory'
 
 class Authentication extends AuthenticationInterface {
 
     login(username, password) {
 
-        var data = new FormData()
+        let data = new FormData()
         data.append('j_username', username)
         data.append('j_password', password)
         data.append('_spring_security_remember_me', false)
         data.append('submit', 'Login')
-
-        // const apiUrl = '/rest/device/job_master';
-        // try {
-        //     var authenticationResponse = BackendFactory().serviceCall(data,apiUrl)
-        //     authenticationResponse = BackendFactory()._pruneEmpty(jobMasterResponse)
-        //     return ((authenticationResponse.headers.map['set-cookie'][0]).split(";")[0]);
-        // } catch (error) {
-        //     throw(error)
-        // }
 
         return BackendFactory()._fetch({
             method: 'POST',
@@ -42,8 +32,6 @@ class Authentication extends AuthenticationInterface {
             .catch((error) => {
                 throw (error)
             })
-
-            
     }
 }
 

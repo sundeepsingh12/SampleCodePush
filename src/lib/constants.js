@@ -71,4 +71,7 @@ export default keyMirror({
     JOB_SUMMARY: null,
     DEVICE_IMEI: null,
     DEVICE_SIM: null,
+
 })
+
+

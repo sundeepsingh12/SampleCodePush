@@ -1,5 +1,5 @@
 /**
- * # AppAuthToken.js
+ * # StoreConfig.js
  *
  * A thin wrapper over the react-native-simple-store
  *
@@ -14,12 +14,7 @@ import store from 'react-native-simple-store'
 import CONFIG from './config'
 import CONSTANT from './constants'
 
-export class AppAuthToken {
-    /**
-     * ## AppAuthToken
-     *
-     * set the key from the config
-     */
+export class StoreConfig {
     constructor() {
         this.SESSION_TOKEN_KEY = CONFIG.SESSION_TOKEN_KEY
         this.SERVER_TIME = CONSTANT.SERVER_TIME
@@ -107,6 +102,7 @@ export class AppAuthToken {
         return store.save(this.USER, {
             user: user
         })
+
     }
 
     getUser() {
@@ -300,6 +296,16 @@ export class AppAuthToken {
         return store.delete(this.JOB_MONEY_TRANSACTION_MODE)
     }
 
+    saveCustomerCare(customerCare){
+        return store.save(this.CUSTOMER_CARE,{
+            customerCare: customerCare
+        })
+    }
+
+    getCustomerCare(){
+        return store.get(this.CUSTOMER_CARE)
+    }
+
     saveSmsTemplate(smsTemplate){
         return store.save(this.SMS_TEMPLATE,{
             smsTemplate: smsTemplate
@@ -400,4 +406,4 @@ export class AppAuthToken {
 
 }
 // The singleton variable
-export let appAuthToken = new AppAuthToken()
+export let storeConfig = new StoreConfig()

@@ -12,6 +12,7 @@
  */
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import React from 'react'
 
 /**
  * The actions we need
@@ -48,7 +49,7 @@ import ItemCheckbox from '../components/ItemCheckbox'
  * The necessary React components
  */
 
-import React, {Component} from 'react'
+import reacReact, {Component} from 'react'
 import
 {
   StyleSheet,
@@ -197,6 +198,7 @@ class LoginRender extends Component {
    */
   render () {
     var onButtonPress = this.props.onButtonPress
+      var onScanPress = this.props.onScanPress
     let self = this
 
     // display the login / register / change password screens
@@ -216,6 +218,7 @@ class LoginRender extends Component {
     return (
       <View style={styles.container}>
         <Modal
+            onRequestClose={()=>null}
           animationType={"slide"}
           visible={false}
           >
@@ -320,7 +323,7 @@ class LoginRender extends Component {
 
                   <ButtonLinear
                     isDisabled={!this.props.auth.form.isValid || this.props.auth.form.isFetching}
-                    onPress={onButtonPress}
+                    onPress={onScanPress}
                     buttonText="Scan" />
                 </View>
             </View>

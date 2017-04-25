@@ -284,14 +284,14 @@ export default class JobMasterInterface{
      * @return
      * isSaveSuccess: true
      */
-    saveCutomerCare(cutomerCare){}
+    saveCustomerCare(customerCare){}
 
     /**
      *
      * @return
      * customerCare
      */
-    getCutomerCare(){}
+    getCustomerCare(){}
 
     /**
      *This saves entire smsTemplate array in store

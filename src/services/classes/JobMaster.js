@@ -3,11 +3,12 @@
  */
 
 import JobMasterInterface  from '../interfaces/JobMasterInterface'
-import {appAuthToken} from '../../lib/StoreConfig'
+import {storeConfig} from '../../lib/StoreConfig'
 
 import BackendFactory from '../../lib/BackendFactory'
+import CONFIG from '../../lib/config'
 
-class JobMaster extends JobMasterInterface{
+class JobMaster{
     downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, deviceCompanyId) {
         if(deviceIMEI===null){
             deviceIMEI = {}
@@ -24,7 +25,6 @@ class JobMaster extends JobMasterInterface{
             deviceCompanyId = 0
         }
 
-
         const postData = JSON.stringify({
             deviceIMEI,
             deviceSIM,
@@ -32,9 +32,8 @@ class JobMaster extends JobMasterInterface{
             deviceCompanyId
         })
 
-        const apiUrl = '/rest/device/job_master';
         try {
-            var jobMasterResponse = BackendFactory().serviceCall(postData,apiUrl)
+            let jobMasterResponse = BackendFactory().serviceCall(postData,CONFIG.API.JOB_MASTER_API,'POST')
             jobMasterResponse = BackendFactory()._pruneEmpty(jobMasterResponse)
             return jobMasterResponse
         } catch (error) {
@@ -54,7 +53,7 @@ class JobMaster extends JobMasterInterface{
         this.saveCustomizationJobList(json.jobListCustomization)
         this.saveTabs(json.appJobStatusTabs)
         this.saveJobMoneyTransactionMode(json.jobMasterMoneyTransactionModes)
-        this.saveCutomerCare(json.customerCareList)
+        this.saveCustomerCare(json.customerCareList)
         this.saveSmsTemplate(json.smsTemplatesList)
         this.saveFieldAttributeStatus(json.fieldAttributeMasterStatuses)
         this.saveFieldValidations(json.fieldAttributeMasterValidations)
@@ -66,13 +65,13 @@ class JobMaster extends JobMasterInterface{
 
     savelastSeenTimeForMessageBox(lastSeenTimeForMessageBox){
         if(lastSeenTimeForMessageBox !== null && lastSeenTimeForMessageBox !== undefined)
-            appAuthToken.savelastSeenTimeForMessageBox(lastSeenTimeForMessageBox)
+            storeConfig.savelastSeenTimeForMessageBox(lastSeenTimeForMessageBox)
     }
 
     matchServerTimeWithMobileTime(serverTime){
-        var serverTime = new Date(serverTime).getTime()
-        var currentTimeInMillis = new Date().getTime();
-        if(currentTimeInMillis - serverTime > 15*60*1000){
+        const serverTimeInMillis = new Date(serverTime).getTime()
+        const currentTimeInMillis = new Date().getTime();
+        if(currentTimeInMillis - serverTimeInMillis > 15*60*1000){
             return false
         }
         return true
@@ -80,174 +79,183 @@ class JobMaster extends JobMasterInterface{
 
     saveHubLatLng(hubLatLng){
         if(hubLatLng !== null && hubLatLng !== undefined)
-            appAuthToken.saveHubLatLng(hubLatLng)
+            storeConfig.saveHubLatLng(hubLatLng)
     }
 
     getHubLatLng(hubLatLng) {
-        return appAuthToken.getHubLatLng(hubLatLng)
+        return storeConfig.getHubLatLng(hubLatLng)
     }
 
     saveUser(userObject){
         if(userObject !== null && userObject !== undefined)
-            appAuthToken.saveUser(userObject)
+            storeConfig.saveUser(userObject)
     }
 
     getUser() {
-        const user = appAuthToken.getUser();
+        const user = storeConfig.getUser();
         return user;
     }
 
     saveJobMaster(jobMaster){
         if(jobMaster !== null && jobMaster !== undefined)
-            appAuthToken.saveJobMaster(jobMaster)
+            storeConfig.saveJobMaster(jobMaster)
     }
 
     getJobMaster() {
-        return appAuthToken.getJobMaster()
+        return storeConfig.getJobMaster()
     }
 
     saveJobAttributeMaster(jobAttributeMaster) {
         if(jobAttributeMaster !== null && jobAttributeMaster !== undefined)
-            appAuthToken.saveJobAttributeMaster(jobAttributeMaster)
+            storeConfig.saveJobAttributeMaster(jobAttributeMaster)
     }
 
     getJobAttributeMaster() {
-        return appAuthToken.getJobAttributeMaster()
+        return storeConfig.getJobAttributeMaster()
     }
 
     saveJobAttributeValueMaster(jobAttributeValueMaster) {
         if(jobAttributeValueMaster !== null && jobAttributeValueMaster !== undefined)
-            appAuthToken.saveJobAttributeValueMaster(jobAttributeValueMaster)
+            storeConfig.saveJobAttributeValueMaster(jobAttributeValueMaster)
     }
 
     getJobAttributeValueMaster() {
-        return appAuthToken.getJobAttributeValueMaster()
+        return storeConfig.getJobAttributeValueMaster()
     }
 
     saveFieldAttributeMaster(fieldAttributeMaster) {
         if(fieldAttributeMaster !== null && fieldAttributeMaster !== undefined)
-            appAuthToken.saveFieldAttributeMaster(fieldAttributeMaster)
+            storeConfig.saveFieldAttributeMaster(fieldAttributeMaster)
     }
 
     getFieldAttributeMaster() {
-        return appAuthToken.getFieldAttributeMaster()
+        return storeConfig.getFieldAttributeMaster()
     }
 
     saveFieldAttributeValueMaster(fieldAttributeValueMaster) {
         if(fieldAttributeValueMaster !== null && fieldAttributeValueMaster !== undefined)
-            appAuthToken.saveFieldAttributeValueMaster(fieldAttributeValueMaster)
+            storeConfig.saveFieldAttributeValueMaster(fieldAttributeValueMaster)
     }
 
     getFieldAttributeValueMaster() {
-        return appAuthToken.getFieldAttributeValueMaster()
+        return storeConfig.getFieldAttributeValueMaster()
     }
 
     saveJobStatus(jobStatus) {
         if(jobStatus !== null && jobStatus !== undefined)
-            appAuthToken.saveJobStatus(jobStatus)
+            storeConfig.saveJobStatus(jobStatus)
     }
 
     getJobStatus() {
-        return appAuthToken.getJobStatus()
+        return storeConfig.getJobStatus()
     }
 
     saveCustomizationAppModules(customizationAppModules) {
         if(customizationAppModules !== null && customizationAppModules !== undefined)
-            appAuthToken.saveCustomizationAppModules(customizationAppModules)
+            storeConfig.saveCustomizationAppModules(customizationAppModules)
     }
 
     getCustomizationAppModules() {
-        return appAuthToken.getCustomizationAppModules()
+        return storeConfig.getCustomizationAppModules()
     }
 
     saveCustomizationJobList(customizationJobList) {
         if(customizationJobList !== null && customizationJobList !== undefined)
-            appAuthToken.saveCustomizationJobList(customizationJobList)
+            storeConfig.saveCustomizationJobList(customizationJobList)
     }
 
     getCustomizationJobList() {
-        return appAuthToken.getCustomizationJobList()
+        return storeConfig.getCustomizationJobList()
     }
 
     saveTabs(tabs) {
         if(tabs !== null && tabs !== undefined)
-            appAuthToken.saveTabs(tabs)
+            storeConfig.saveTabs(tabs)
     }
 
     getTabs() {
-        return appAuthToken.getTabs()
+        return storeConfig.getTabs()
     }
 
     saveJobMoneyTransactionMode(jobMoneyTransactionMode){
         if(jobMoneyTransactionMode !== null && jobMoneyTransactionMode !== undefined)
-            appAuthToken.saveJobMoneyTransactionMode(jobMoneyTransactionMode)
+            storeConfig.saveJobMoneyTransactionMode(jobMoneyTransactionMode)
     }
 
     getJobMoneyTransactionMode() {
-        return appAuthToken.getJobMoneyTransactionMode()
+        return storeConfig.getJobMoneyTransactionMode()
+    }
+
+    saveCustomerCare(customerCare){
+        if(customerCare!==null && customerCare!==undefined)
+            storeConfig.saveCustomerCare()
+    }
+
+    getCustomerCare(){
+        return storeConfig.getCustomerCare()
     }
 
     saveSmsTemplate(smsTemplate){
         if(smsTemplate !== null && smsTemplate !== undefined)
-            appAuthToken.saveSmsTemplate(smsTemplate)
+            storeConfig.saveSmsTemplate(smsTemplate)
     }
 
     getSmsTemplate() {
-        return appAuthToken.getSmsTemplate()
+        return storeConfig.getSmsTemplate()
     }
 
     saveFieldAttributeStatus(fieldAttributeStatus){
         if(fieldAttributeStatus !== null && fieldAttributeStatus !== undefined)
-            appAuthToken.saveFieldAttributeStatus(fieldAttributeStatus)
+            storeConfig.saveFieldAttributeStatus(fieldAttributeStatus)
     }
 
     getFieldAttributeStatus() {
-        return appAuthToken.getFieldAttributeStatus()
+        return storeConfig.getFieldAttributeStatus()
     }
 
     saveFieldValidations(fieldValidations){
         if(fieldValidations !== null && fieldValidations !== undefined)
-            appAuthToken.saveFieldValidations(fieldValidations)
+            storeConfig.saveFieldValidations(fieldValidations)
     }
 
     getFieldValidations() {
-        return appAuthToken.getFieldValidations()
+        return storeConfig.getFieldValidations()
     }
 
     saveFieldValidationsConditions(fieldValidationsConditions){
         if(fieldValidationsConditions !== null && fieldValidationsConditions !== undefined)
-            appAuthToken.saveFieldValidationsConditions(fieldValidationsConditions)
+            storeConfig.saveFieldValidationsConditions(fieldValidationsConditions)
     }
 
     getFieldValidationsConditions() {
-        return appAuthToken.getFieldValidationsConditions()
+        return storeConfig.getFieldValidationsConditions()
     }
 
     saveSmsJobStatuses(smsJobStatuses){
         if(smsJobStatuses !== null && smsJobStatuses !== undefined)
-            appAuthToken.saveSmsJobStatuses(smsJobStatuses)
+            storeConfig.saveSmsJobStatuses(smsJobStatuses)
     }
 
     getSmsJobStatuses() {
-        return appAuthToken.getSmsJobStatuses()
+        return storeConfig.getSmsJobStatuses()
     }
 
     saveUserSummary(userSummary){
         if(userSummary !== null && userSummary !== undefined)
-            appAuthToken.saveUserSummary(userSummary)
+            storeConfig.saveUserSummary(userSummary)
     }
 
     getUserSummary() {
-        return appAuthToken.getUserSummary()
+        return storeConfig.getUserSummary()
     }
 
     saveJobSummary(jobSummary){
         if(jobSummary !== null && jobSummary !== undefined)
-            appAuthToken.saveJobSummary(jobSummary)
+            storeConfig.saveJobSummary(jobSummary)
     }
 
     getJobSummary() {
-        return appAuthToken.getJobSummary()
+        return storeConfig.getJobSummary()
     }
 }
 

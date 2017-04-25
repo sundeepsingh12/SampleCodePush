@@ -46,7 +46,7 @@ var ButtonLinear = React.createClass({
     return (
       <View>
         <Button style={styles.button}
-          textStyle={{fontSize: 16, color: '#0091EA'}}>
+          textStyle={{fontSize: 16, color: '#0091EA'}} onPress={this.props.onPress}>
           {this.props.buttonText}
         </Button>
       </View>

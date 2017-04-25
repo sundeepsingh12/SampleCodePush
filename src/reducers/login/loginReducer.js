@@ -152,6 +152,7 @@ export default function authReducer (state = initialState, action) {
     // case RESET_PASSWORD_FAILURE:
       return state.setIn(['form', 'isFetching'], false)
       .setIn(['form', 'error'], action.payload)
+          .setIn(['form','currentStep'],'Login failed')
 
 
     case MASTER_DOWNLOAD_START:

@@ -41,6 +41,7 @@ import Logout from './containers/Logout'
 import Main from './containers/Main'
 import Utilities from './containers/Utilities'
 import Message from './containers/Message'
+import Scanner from './components/Scanner'
 // import Subview from './containers/Subview'
 
 /**
@@ -163,6 +164,12 @@ export default function native (platform) {
                 component={Login}
                 hideNavBar
                 type='replace' />
+
+                <Scene key='Scanner'
+                       title='Scanner'
+                       type="replace"
+                       hideNavBar
+                       component={Scanner} />
 
               <Scene key='Tabbar'
                 tabs

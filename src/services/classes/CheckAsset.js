@@ -1,41 +1,45 @@
 'use strict'
 
 import CheckAssetInterface from '../interfaces/CheckAssetInterface'
-import {appAuthToken} from '../../lib/StoreConfig'
-
+import {storeConfig} from '../../lib/StoreConfig'
 const BackendFactory = require('../../lib/BackendFactory').default
+import CONFIG from '../../lib/config'
 
 class CheckAsset extends CheckAssetInterface {
 
     checkAssetAPI(deviceIMEI,deviceSIM) {
+        if(deviceIMEI===null || deviceIMEI===undefined){
+            deviceIMEI = {}
+        }
+        if(deviceSIM===null || deviceSIM ===undefined){
+            deviceSIM = {}
+        }
         const postData = JSON.stringify({
             deviceIMEI,
             deviceSIM
         })
         try {
-            const apiUrl = '/rest/device/check_asset';
-            return   BackendFactory().serviceCall(postData,apiUrl)
+            return BackendFactory().serviceCall(postData,CONFIG.API.CHECK_ASSET_API,'POST')
         } catch (error) {
             throw(error)
         }
-
     }
 
     saveDeviceIMEI(deviceIMEI) {
-        appAuthToken.storeDeviceIMEI(deviceIMEI);
+        storeConfig.storeDeviceIMEI(deviceIMEI);
     }
 
     saveDeviceSIM(deviceSIM) {
-        appAuthToken.storeDeviceSIM(deviceSIM);
+        storeConfig.storeDeviceSIM(deviceSIM);
     }
 
     getDeviceIMEI() {
-       const deviceIMEI =  appAuthToken.getDeviceIMEI();
+       const deviceIMEI =  storeConfig.getDeviceIMEI();
        return deviceIMEI;
     }
 
     getDeviceSIM() {
-       const deviceSIM =  appAuthToken.getDeviceSIM();
+       const deviceSIM =  storeConfig.getDeviceSIM();
        return deviceSIM;
     }
 
@@ -57,7 +61,6 @@ class CheckAsset extends CheckAssetInterface {
            return false;
        }
     }
-
 }
 
 export let checkAssetService = new CheckAsset()

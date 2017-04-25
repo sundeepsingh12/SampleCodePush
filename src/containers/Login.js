@@ -16,19 +16,8 @@ import { connect } from 'react-redux'
 import * as authActions from '../reducers/login/loginActions'
 import LoginRender from '../components/LoginRender'
 import sha256 from 'sha256';
-
-import
-{
-  StyleSheet,
-  ScrollView,
-  Text,
-  TouchableHighlight,
-  View
-}
-from 'react-native'
-
-
-import React from 'react'
+import {Actions} from 'react-native-router-flux';
+import React from 'react';
 
 const {
   LOGIN
@@ -55,6 +44,14 @@ function buttonPressHandler (login, username, password) {
   login(username, sha256(password))
 }
 
+function performLoginUsingScan(login,username,password){
+    login(username, password)
+}
+
+
+function scanPressHandler() {
+    Actions.Scanner();
+}
 
 let Login = React.createClass({
 
@@ -63,17 +60,24 @@ let Login = React.createClass({
                                                 this.props.actions.login,
                                                 this.props.auth.form.fields.username,
                                                 this.props.auth.form.fields.password
-                                               )
+                                               );
+      let onScanPress = scanPressHandler.bind();
 
     return (
       <LoginRender
         formType={LOGIN}
         onButtonPress={onButtonPress}
+        onScanPress = {onScanPress}
         auth={this.props.auth}
         global={this.props.global}
       />
     )
-  }
-})
-
+  },
+    componentDidMount(){
+        const details = this.props.details;
+        if(details!==null && details!==undefined){
+            performLoginUsingScan(this.props.actions.login,details.username,details.password);
+        }
+    }
+});
 export default connect(mapStateToProps, mapDispatchToProps)(Login)

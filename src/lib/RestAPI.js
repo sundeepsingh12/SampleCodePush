@@ -13,8 +13,6 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
-// import Backend from './Backend'
-
 export class RestAPI {
     /**
      * ## API.js client
@@ -27,14 +25,6 @@ export class RestAPI {
             throw new Error('TokenMissing')
         }
         this._sessionToken = _.isNull(token) ? null : token.sessionToken
-
-        // if(CONFIG.backend.fareyeProduction) {
-        //     this.API_BASE_URL = CONFIG.FAREYE.production.url
-        // } else if(CONFIG.backend.fareyeStaging) {
-        //     this.API_BASE_URL = CONFIG.FAREYE.staging.url
-        // } else if(CONFIG.backend.fareyeDev) {
-        //     this.API_BASE_URL = CONFIG.FAREYE.dev.url
-        // }
 
         this.API_BASE_URL = CONFIG.backend.fareyeProduction
             ? CONFIG.FAREYE.production.url
@@ -89,29 +79,9 @@ export class RestAPI {
         return prune(obj);
     }
 
-    /**
-     * ### login
-     * encode the data and and call _fetch
-     *
-     * @param
-     * * * * *  FORM DATA * * * * * * *
-     *  j_username
-     *  j_password
-     *  _spring_security_remember_me
-     *  submit
-     *
-     * @returns
-     * * * * *  HEADERS  * * * * * * *
-     * status: 200 | 403
-     * JSESSIONID: "r:Kt9wXIBWD0dNijNIq2u5rRllW"
-     *
-     */
-
-    serviceCall(data,apiUrl) {
-        console.log("data before api >>>>> ")
-        console.log(data)
+    serviceCall(data,apiUrl,methodType) {
         return this._fetch({
-            method: 'POST',
+            method: methodType,
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -120,41 +90,17 @@ export class RestAPI {
             body: data
         })
             .then((res) => {
-                console.log("response api")
-                console.log(res)
-                return res;
+                if(res.status==200) {
+                    return res;
+                }else{
+                    throw new Error({code: res.statusCode, error: res.message})
+                }
             })
             .catch((error) => {
                 throw(error)
             })
     }
 
-    async login (username,password) {
-        var data = new FormData()
-        data.append('j_username', username)
-        data.append('j_password', password)
-        data.append('_spring_security_remember_me', false)
-        data.append('submit', 'Login')
-        return await this._fetch({
-            method: 'POST',
-            headers: {
-
-            },
-            url: '/authentication',
-            body: data
-        })
-            .then((res) => {
-                if (res.status === 200 || res.status === 201) {
-                    //Extracting j_sessionid from Header
-                    return (res.headers.map['set-cookie'][0]).split("; ")[0];
-                } else {
-                    throw ("Invalid username/password")
-                }
-            })
-            .catch((error) => {
-                throw (error)
-            })
-    }
     /**
      * ### logout
      * prepare the request and call _fetch
@@ -177,44 +123,6 @@ export class RestAPI {
             })
     }
 
-    /**
-     * ## Download Job Master
-     * Post data in JSON format
-     {
-         deviceIMEI: {},
-         deviceSIM: {},
-         currentJobMasterVersion: 19,
-         deviceCompanyId: 27
-     }
-     * ## Expected response
-     * JSON body
-     */
-    async downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, deviceCompanyId) {
-        const postData = JSON.stringify({
-            deviceIMEI,
-            deviceSIM,
-            currentJobMasterVersion,
-            deviceCompanyId
-        })
-        return await this._fetch({
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            url: '/rest/device/job_master',
-            body: postData
-        })
-            .then((res) => {
-                if (res.status === 200) {
-                    var results = this._pruneEmpty(res.json);
-                    return results;
-                }
-            })
-            .catch((error) => {
-                throw (error)
-            })
-    }
 }
 // The singleton variable
 export let restAPI = new RestAPI()

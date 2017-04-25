@@ -1,6 +1,7 @@
 'use strict'
 
 import SimVerifyInterface from '../interfaces/SimVerifyInterface'
+import CONFIG from '../../lib/config'
 
 const BackendFactory = require('../../lib/BackendFactory').default
 
@@ -12,10 +13,8 @@ export default class SimVerify extends SimVerifyInterface {
             deviceSIM
         })
 
-        const apiUrl = '/rest/device/generate_otp';
-
         try {
-            return  BackendFactory().serviceCall(postData,apiUrl)
+            return  BackendFactory().serviceCall(postData,CONFIG.API.SIM_VERIFY_API,'POST')
         } catch (error) {
             throw(error)
         }
@@ -23,6 +22,5 @@ export default class SimVerify extends SimVerifyInterface {
     }
 
     verifySIM (deviceSIM) {
-
     }
 }
