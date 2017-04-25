@@ -41,6 +41,7 @@ import Logout from './containers/Logout'
 import Main from './containers/Main'
 import Utilities from './containers/Utilities'
 import Message from './containers/Message'
+import Login2 from './containers/Login2'
 // import Subview from './containers/Subview'
 
 /**
@@ -163,6 +164,10 @@ export default function native (platform) {
                 component={Login}
                 hideNavBar
                 type='replace' />
+
+             <Scene key="login2" 
+                component={Login2} 
+                title="Login2"/>
 
               <Scene key='Tabbar'
                 tabs
