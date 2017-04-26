@@ -41,6 +41,7 @@ import Logout from './containers/Logout'
 import Main from './containers/Main'
 import Utilities from './containers/Utilities'
 import Message from './containers/Message'
+import Scanner from './components/Scanner'
 // import Subview from './containers/Subview'
 
 /**
@@ -64,7 +65,7 @@ import {setStore} from './reducers/global/globalActions'
  * Snowflake explicitly defines initial state
  *
  */
-import AuthInitialState from './reducers/auth/authInitialState'
+import AuthInitialState from './reducers/login/loginInitialState'
 import DeviceInitialState from './reducers/device/deviceInitialState'
 import GlobalInitialState from './reducers/global/globalInitialState'
 // import ProfileInitialState from './reducers/profile/profileInitialState'
@@ -163,6 +164,10 @@ export default function native (platform) {
                 component={Login}
                 hideNavBar
                 type='replace' />
+
+                <Scene key='Scanner'
+                       title='Scanner'
+                       component={Scanner} />
 
               <Scene key='Tabbar'
                 tabs

@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../reducers/auth/authActions'
+import * as authActions from '../reducers/login/loginActions'
 import * as globalActions from '../reducers/global/globalActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -105,6 +105,7 @@ class Main extends Component {
             </TouchableHighlight>
           </Right>
       </Header>
+      
       <Tabs renderTabBar={()=> <ScrollableTab />}>
           <Tab heading="All">
               <Jobs />

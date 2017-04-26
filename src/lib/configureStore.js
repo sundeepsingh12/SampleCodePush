@@ -18,7 +18,7 @@ import createLogger from 'redux-logger';
 /**
 * ## Reducer
 * The reducer contains the 4 reducers from
-* device, global, auth, profile
+* device, global, login, profile
 */
 import reducer from '../reducers'
 
@@ -35,7 +35,7 @@ const createStoreWithMiddleware = applyMiddleware(
 /**
  * ## configureStore
  * @param {Object} the state with for keys:
- * device, global, auth, profile
+ * device, global, login, profile
  *
  */
 export default function configureStore (initialState) {

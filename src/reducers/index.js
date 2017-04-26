@@ -10,7 +10,7 @@
  *
  * our 4 reducers
  */
-import auth from './auth/authReducer'
+import auth from './login/loginReducer'
 import device from './device/deviceReducer'
 import global from './global/globalReducer'
 // import profile from './profile/profileReducer'

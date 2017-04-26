@@ -15,6 +15,9 @@ const {
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
 
+  CHECK_ASSET_START,
+  CHECK_ASSET_SUCCESS,
+
   SESSION_TOKEN_REQUEST,
   SESSION_TOKEN_SUCCESS,
   SESSION_TOKEN_FAILURE,
@@ -30,8 +33,11 @@ const {
 const BackendFactory = require('../../lib/BackendFactory').default
 
 import {Actions} from 'react-native-router-flux'
-import {appAuthToken} from '../../lib/AppAuthToken'
-import * as repositories from '../../repositories/'
+import {storeConfig} from '../../lib/StoreConfig'
+import {authenticationService} from '../../services/classes/Authentication'
+import {jobMasterService} from '../../services/classes/JobMaster'
+import {checkAssetService} from '../../services/classes/CheckAsset'
+
 /**
  * ## State actions
  * controls which form is displayed to the user
@@ -85,6 +91,18 @@ function jobMasterDownloadSuccess() {
   }
 }
 
+function checkAssetStart() {
+  return {
+    type : CHECK_ASSET_START
+  }
+}
+
+function checkAssetSuccess() {
+  return {
+    type : CHECK_ASSET_SUCCESS
+  }
+}
+
 /**
  * ## SessionToken actions
  */
@@ -127,7 +145,7 @@ export function deleteTokenRequestSuccess () {
  * @param {Object} json - object with sessionToken
  */
 export function saveSessionToken (j_sessionid) {
-  return appAuthToken.storeSessionToken(j_sessionid)
+  return storeConfig.storeSessionToken(j_sessionid)
 }
 
 /**
@@ -171,7 +189,7 @@ export function logoutFailure (error) {
 export function deleteSessionToken () {
   return async function(dispatch)  {
     dispatch(deleteTokenRequest())
-    await appAuthToken.deleteSessionToken()
+    await storeConfig.deleteSessionToken()
     dispatch(deleteTokenRequestSuccess())
   }
 }
@@ -191,20 +209,40 @@ export function deleteSessionToken () {
 
 export function login (username, password) {
   return async function(dispatch)  {
-    try{
+    try {
       dispatch(loginRequest())
-      const j_sessionid = await BackendFactory().login(username,password)
+      const j_sessionid = await authenticationService.login(username,password)
       dispatch(loginSuccess(j_sessionid))
       dispatch(jobMasterDownloadStart())
-      //TODO pass the complete IMEI Parameter
-      const jobMasters = await BackendFactory().downloadJobMaster({},{},1,0)
-      repositories.save(TABLE_USER_SUMMARY, jobMasters.userSummary);
-      await saveSessionToken(j_sessionid)
-      Actions.Tabbar()
-      dispatch(logoutState())
+        const deviceIMEI = await checkAssetService.getDeviceIMEI()
+        const deviceSIM = await checkAssetService.getDeviceSIM()
+        let user = await jobMasterService.getUser()
+        const currentJobMasterVersion = (user!=null || user!=undefined)?user.currentJobMasterVersion:0;
+        const companyId = (user!=null|| user!=undefined)?user.currentJobMasterVersion:0;
+        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,currentJobMasterVersion,companyId)
+      const json = await jobMasters.json
+      if(jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
+        jobMasterService.saveJSONResponse(json)
+        user = json.user
+        dispatch(checkAssetStart())
+        if(checkAssetService.checkAsset(deviceIMEI,deviceSIM,user.hubId,user.company.id)) {
+          await saveSessionToken(j_sessionid)
+          Actions.Tabbar()
+        } else {
+            const checkAssetResponse = await checkAssetService.checkAssetAPI(deviceIMEI,deviceSIM)
+            const checkAssetJson = await checkAssetResponse.json
+          checkAssetService.saveDeviceIMEI(checkAssetJson.deviceIMEI)
+          checkAssetService.saveDeviceSIM(checkAssetJson.deviceSIM)
+          await saveSessionToken(j_sessionid)
+          Actions.Tabbar()
+        }
+         dispatch(checkAssetSuccess())
+         dispatch(logoutState())
+      } else {
+          //write code for updating UI here
+      }
     }
     catch(error) {
-      console.log(error);
       dispatch(loginFailure(error))
     }
   }
@@ -221,7 +259,7 @@ export function getSessionToken () {
   return async function(dispatch)  {
     try{
       dispatch(sessionTokenRequest())
-      const token = await appAuthToken.getSessionToken()
+      const token = await storeConfig.getSessionToken()
       if (token) {
         dispatch(sessionTokenRequestSuccess(token))
         Actions.Tabbar()
@@ -260,7 +298,7 @@ export function logout () {
   return async function(dispatch)  {
     try {
       dispatch(logoutRequest())
-      const token = await appAuthToken.getSessionToken()
+      const token = await storeConfig.getSessionToken()
       await BackendFactory(token).logout()
       dispatch(logoutSuccess())
       dispatch(deleteSessionToken())

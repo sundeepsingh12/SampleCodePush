@@ -97,4 +97,6 @@
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
   </dict>
+  <key>NSCameraUsageDescription</key>
+  <string>Fareye needs access to your camera</string>
 </plist>

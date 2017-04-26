@@ -1,5 +1,5 @@
 TN:
-SF:/Users/gauravsrivastava/JavaDev/FareyeReact/src/lib/AppAuthToken.js
+SF:/Users/gauravsrivastava/JavaDev/FareyeReact/src/lib/StoreConfig.js
 FN:22,(anonymous_0)
 FN:30,(anonymous_1)
 FN:41,(anonymous_2)
@@ -184,7 +184,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/Users/gauravsrivastava/JavaDev/FareyeReact/src/reducers/auth/authActions.js
+SF:/Users/gauravsrivastava/JavaDev/FareyeReact/src/reducers/auth/loginActions.js
 FN:41,logoutState
 FN:47,loginState
 FN:56,loginRequest

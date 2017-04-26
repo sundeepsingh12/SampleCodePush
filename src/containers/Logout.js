@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../reducers/auth/authActions'
+import * as authActions from '../reducers/login/loginActions'
 import * as globalActions from '../reducers/global/globalActions'
 
 /**

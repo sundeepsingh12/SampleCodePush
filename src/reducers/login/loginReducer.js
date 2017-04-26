@@ -6,13 +6,13 @@
 'use strict'
 /**
  * ## Imports
- * The InitialState for auth
+ * The InitialState for login
  * fieldValidation for validating the fields
  * formValidation for setting the form's valid flag
  */
-const InitialState = require('./authInitialState').default
+const InitialState = require('./loginInitialState').default
 const fieldValidation = require('../../lib/fieldValidation').default
-const formValidation = require('./authFormValidation').default
+const formValidation = require('./loginFormValidation').default
 
 /**
  * ## Auth actions
@@ -31,6 +31,9 @@ const {
 
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
+
+  CHECK_ASSET_START,
+  CHECK_ASSET_SUCCESS,
   
   SET_STATE,
   ON_AUTH_FORM_FIELD_CHANGE,
@@ -149,10 +152,17 @@ export default function authReducer (state = initialState, action) {
     // case RESET_PASSWORD_FAILURE:
       return state.setIn(['form', 'isFetching'], false)
       .setIn(['form', 'error'], action.payload)
+          .setIn(['form','currentStep'],'Login failed')
 
 
     case MASTER_DOWNLOAD_START:
       return state.setIn(['form','currentStep'],'Job Master download initiated')
+
+    case CHECK_ASSET_START:
+      return state.setIn(['form','currentStep'],'Checking Assets')
+    
+    case CHECK_ASSET_SUCCESS:
+      return state.setIn(['form','currentStep'],'Assets Verified')
     /**
      * ### Hot Loading support
      *
