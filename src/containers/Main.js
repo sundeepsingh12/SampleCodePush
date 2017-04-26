@@ -100,7 +100,7 @@ class Main extends Component {
               <Title>Home</Title>
           </Body>
           <Right>
-            <TouchableHighlight underlayColor='#e7e7e7' onPress={()=>this.toggleStatus()}>
+            <TouchableHighlight underlayColor='#e7e7e7' onPress={Actions.login2}>
               <Text>Cancel</Text>
             </TouchableHighlight>
           </Right>
