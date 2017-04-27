@@ -62,7 +62,7 @@ class Scanner extends Component {
     _onBarCodeRead(e) {
         const username = e.data.split("/")[0];
         const password = e.data.split("/")[1];
-        this.setState({showCamera: false,username,password});
+        // this.setState({showCamera: false,username,password});
     }
 
     goBack(){

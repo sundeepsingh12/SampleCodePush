@@ -32,8 +32,6 @@ import ErrorAlert from '../components/ErrorAlert'
 /**
  * The FormButton will change it's text between the 4 states as necessary
  */
-import ButtonSuccess from '../components/ButtonSuccess'
-import ButtonLinear from '../components/ButtonLinear'
 
 /**
  *  The LoginForm does the heavy lifting of displaying the fields for

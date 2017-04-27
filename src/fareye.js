@@ -162,7 +162,7 @@ export default function native (platform) {
                 initial />
 
               <Scene key='InitialLoginForm'
-                component={Login}
+                component={Login2}
                 hideNavBar
                 type='replace' />
 

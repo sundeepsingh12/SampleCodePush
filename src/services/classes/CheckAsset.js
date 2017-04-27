@@ -1,12 +1,23 @@
 'use strict'
 
-import CheckAssetInterface from '../interfaces/CheckAssetInterface'
 import {storeConfig} from '../../lib/StoreConfig'
 const BackendFactory = require('../../lib/BackendFactory').default
 import CONFIG from '../../lib/config'
 
 class CheckAsset extends CheckAssetInterface {
 
+
+    /**
+     * # Check Asset API(Post)
+     *
+     * @param {*} deviceIMEI
+     * @param {*} deviceSIM
+     * ## Expected response
+     *  @returns
+     * JSON body
+     * deviceIMEI
+     * deviceSIM
+     */
     checkAssetAPI(deviceIMEI,deviceSIM) {
         if(deviceIMEI===null || deviceIMEI===undefined){
             deviceIMEI = {}
@@ -25,23 +36,57 @@ class CheckAsset extends CheckAssetInterface {
         }
     }
 
+    /**
+     * # Save Device IMEI
+     * @param {*} deviceIMEI
+     * @returns
+     * boolean (true|false)
+     */
     saveDeviceIMEI(deviceIMEI) {
         storeConfig.storeDeviceIMEI(deviceIMEI);
     }
 
+
+    /**
+     * # Save Device SIM
+     * @param {*} deviceSIM
+     * @returns
+     * boolean (always true)
+     */
     saveDeviceSIM(deviceSIM) {
         storeConfig.storeDeviceSIM(deviceSIM);
     }
 
+    /**
+     * # Get Device IMEI
+     * @returns
+     * deviceIMEI
+     */
     getDeviceIMEI() {
        const deviceIMEI =  storeConfig.getDeviceIMEI();
        return deviceIMEI;
     }
 
+    /**
+     * # Get Device SIM
+     * @returns
+     * deviceSIM
+     */
     getDeviceSIM() {
        const deviceSIM =  storeConfig.getDeviceSIM();
        return deviceSIM;
     }
+
+    /**
+     * # Check whether sim verified already
+     * @param {*} deviceIMEI
+     * @param {*} deviceSIM
+     * @param {*} companyID
+     * @param {*} hubID
+     * @param {*} simNumber
+     * @returns
+     * boolean
+     */
 
     checkAsset(deviceIMEI,deviceSIM,companyID,hubID,simNumber) {
 
