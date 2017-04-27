@@ -14,8 +14,8 @@
  * the server
  *
  */
-jest.mock('../../../lib/AppAuthToken')
-jest.mock('../../../lib/BackendFactory')
+// jest.mock('../../../lib/AppAuthToken')
+// jest.mock('../../../lib/BackendFactory')
 
 /**
  * ## Class under test

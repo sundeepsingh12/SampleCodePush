@@ -2,26 +2,26 @@
  * Created by udbhav on 12/4/17.
  */
 
-import JobMasterInterface  from '../interfaces/JobMasterInterface'
 import {storeConfig} from '../../lib/StoreConfig'
 
 import BackendFactory from '../../lib/BackendFactory'
 import CONFIG from '../../lib/config'
+import RestAPIInterface from '../../lib/RestAPIInterface'
 
-class JobMaster{
+class JobMaster {
     downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, deviceCompanyId) {
-        if(deviceIMEI===null){
+        if(deviceIMEI===null) {
             deviceIMEI = {}
         }
-        if(currentJobMasterVersion===null){
+        if(currentJobMasterVersion===null) {
             currentJobMasterVersion=0
         }
 
-        if(deviceSIM===null){
+        if(deviceSIM===null) {
             deviceSIM = {}
         }
 
-        if(deviceCompanyId===null){
+        if(deviceCompanyId===null) {
             deviceCompanyId = 0
         }
 
@@ -63,12 +63,7 @@ class JobMaster{
         this.saveJobSummary(json.jobSummary)
     }
 
-    savelastSeenTimeForMessageBox(lastSeenTimeForMessageBox){
-        if(lastSeenTimeForMessageBox !== null && lastSeenTimeForMessageBox !== undefined)
-            storeConfig.savelastSeenTimeForMessageBox(lastSeenTimeForMessageBox)
-    }
-
-    matchServerTimeWithMobileTime(serverTime){
+    matchServerTimeWithMobileTime(serverTime) {
         const serverTimeInMillis = new Date(serverTime).getTime()
         const currentTimeInMillis = new Date().getTime();
         if(currentTimeInMillis - serverTimeInMillis > 15*60*1000){
@@ -77,185 +72,255 @@ class JobMaster{
         return true
     }
 
-    saveHubLatLng(hubLatLng){
-        if(hubLatLng !== null && hubLatLng !== undefined)
-            storeConfig.saveHubLatLng(hubLatLng)
+    saveLastSeenTimeForMessageBox(lastSeenTimeForMessageBox) {
+        if(lastSeenTimeForMessageBox !== null && lastSeenTimeForMessageBox !== undefined) {
+            const data = storeConfig.saveLastSeenTimeForMessageBox(lastSeenTimeForMessageBox)
+            return data
+        }
     }
 
-    getHubLatLng(hubLatLng) {
-        return storeConfig.getHubLatLng(hubLatLng)
+    saveLastSeenTimeForMessageBox() {
+        const lastSeenTimeForMessageBox = storeConfig.getLastSeenTimeForMessageBox()
+        return lastSeenTimeForMessageBox
     }
 
-    saveUser(userObject){
-        if(userObject !== null && userObject !== undefined)
-            storeConfig.saveUser(userObject)
+    saveHubLatLong(hubLatLng) {
+        if(hubLatLng !== null && hubLatLng !== undefined) {
+            const data = storeConfig.saveHubLatLong(hubLatLng)
+            return data
+        }
+    }
+
+    getHubLatLong() {
+        const hubLatLng = storeConfig.getHubLatLong()
+        return hubLatLong
+    }
+
+    saveUser(userObject) {
+        if(userObject !== null && userObject !== undefined) {
+            const data = storeConfig.saveUser(userObject)
+            return data
+        }
     }
 
     getUser() {
         const user = storeConfig.getUser();
-        return user;
+        return user
     }
 
-    saveJobMaster(jobMaster){
-        if(jobMaster !== null && jobMaster !== undefined)
-            storeConfig.saveJobMaster(jobMaster)
+    saveJobMaster(jobMaster) {
+        if(jobMaster !== null && jobMaster !== undefined) {
+            const data = storeConfig.saveJobMaster(jobMaster)
+            return data
+        }
     }
 
     getJobMaster() {
-        return storeConfig.getJobMaster()
+        const jobMaster = storeConfig.getJobMaster()
+        return jobMaster
     }
 
     saveJobAttributeMaster(jobAttributeMaster) {
-        if(jobAttributeMaster !== null && jobAttributeMaster !== undefined)
-            storeConfig.saveJobAttributeMaster(jobAttributeMaster)
+        if(jobAttributeMaster !== null && jobAttributeMaster !== undefined) {
+            const data = storeConfig.saveJobAttributeMaster(jobAttributeMaster)
+            return data
+        }
     }
 
     getJobAttributeMaster() {
-        return storeConfig.getJobAttributeMaster()
+        const jobAttributeMaster = storeConfig.getJobAttributeMaster()
+        return jobAttributeMaster
     }
 
     saveJobAttributeValueMaster(jobAttributeValueMaster) {
-        if(jobAttributeValueMaster !== null && jobAttributeValueMaster !== undefined)
-            storeConfig.saveJobAttributeValueMaster(jobAttributeValueMaster)
+        if(jobAttributeValueMaster !== null && jobAttributeValueMaster !== undefined) { 
+            const data = storeConfig.saveJobAttributeValueMaster(jobAttributeValueMaster)
+            return data
+        }
     }
 
     getJobAttributeValueMaster() {
-        return storeConfig.getJobAttributeValueMaster()
+        const jobAttributeValueMaster = storeConfig.getJobAttributeValueMaster()
+        return jobAttributeValueMaster
     }
 
     saveFieldAttributeMaster(fieldAttributeMaster) {
-        if(fieldAttributeMaster !== null && fieldAttributeMaster !== undefined)
-            storeConfig.saveFieldAttributeMaster(fieldAttributeMaster)
+        if(fieldAttributeMaster !== null && fieldAttributeMaster !== undefined) {
+            const data = storeConfig.saveFieldAttributeMaster(fieldAttributeMaster)
+            return data
+        }
     }
 
     getFieldAttributeMaster() {
-        return storeConfig.getFieldAttributeMaster()
+        const fieldAttributeMaster = storeConfig.getFieldAttributeMaster()
+        return fieldAttributeMaster
     }
 
     saveFieldAttributeValueMaster(fieldAttributeValueMaster) {
-        if(fieldAttributeValueMaster !== null && fieldAttributeValueMaster !== undefined)
-            storeConfig.saveFieldAttributeValueMaster(fieldAttributeValueMaster)
+        if(fieldAttributeValueMaster !== null && fieldAttributeValueMaster !== undefined) {
+            const data = storeConfig.saveFieldAttributeValueMaster(fieldAttributeValueMaster)
+            return data
+        }
     }
 
     getFieldAttributeValueMaster() {
-        return storeConfig.getFieldAttributeValueMaster()
+        const fieldAttributeValueMaster = storeConfig.getFieldAttributeValueMaster()
+        return fieldAttributeValueMaster
     }
 
     saveJobStatus(jobStatus) {
-        if(jobStatus !== null && jobStatus !== undefined)
-            storeConfig.saveJobStatus(jobStatus)
+        if(jobStatus !== null && jobStatus !== undefined) {
+            const data = storeConfig.saveJobStatus(jobStatus)
+            return data
+        }
     }
 
     getJobStatus() {
-        return storeConfig.getJobStatus()
+        const jobStatus = storeConfig.getJobStatus()
     }
 
     saveCustomizationAppModules(customizationAppModules) {
-        if(customizationAppModules !== null && customizationAppModules !== undefined)
-            storeConfig.saveCustomizationAppModules(customizationAppModules)
+        if(customizationAppModules !== null && customizationAppModules !== undefined) {
+            const data = storeConfig.saveCustomizationAppModules(customizationAppModules)
+            return data
+        }
     }
 
     getCustomizationAppModules() {
-        return storeConfig.getCustomizationAppModules()
+        const customizationAppModules = storeConfig.getCustomizationAppModules()
+        return customizationAppModules
     }
 
     saveCustomizationJobList(customizationJobList) {
-        if(customizationJobList !== null && customizationJobList !== undefined)
-            storeConfig.saveCustomizationJobList(customizationJobList)
+        if(customizationJobList !== null && customizationJobList !== undefined) {
+            const data = storeConfig.saveCustomizationJobList(customizationJobList)
+            return data
+        }
     }
 
     getCustomizationJobList() {
-        return storeConfig.getCustomizationJobList()
+        const customizationJobList = storeConfig.getCustomizationJobList()
+        return customizationJobList
     }
 
     saveTabs(tabs) {
-        if(tabs !== null && tabs !== undefined)
-            storeConfig.saveTabs(tabs)
+        if(tabs !== null && tabs !== undefined) {
+            const data = storeConfig.saveTabs(tabs)
+            return data
+        }
     }
 
     getTabs() {
-        return storeConfig.getTabs()
+        const tabs = storeConfig.getTabs()
+        return tabs
     }
 
-    saveJobMoneyTransactionMode(jobMoneyTransactionMode){
-        if(jobMoneyTransactionMode !== null && jobMoneyTransactionMode !== undefined)
-            storeConfig.saveJobMoneyTransactionMode(jobMoneyTransactionMode)
+    saveJobMoneyTransactionMode(jobMoneyTransactionMode) {
+        if(jobMoneyTransactionMode !== null && jobMoneyTransactionMode !== undefined) {
+            const data = storeConfig.saveJobMoneyTransactionMode(jobMoneyTransactionMode)
+            return data
+        }
     }
 
     getJobMoneyTransactionMode() {
-        return storeConfig.getJobMoneyTransactionMode()
+        const jobMoneyTransactionMode = storeConfig.getJobMoneyTransactionMode()
+        return jobMoneyTransactionMode
     }
 
-    saveCustomerCare(customerCare){
-        if(customerCare!==null && customerCare!==undefined)
-            storeConfig.saveCustomerCare()
+    saveCustomerCare(customerCare) {
+        if(customerCare!==null && customerCare!==undefined) {
+            const data = storeConfig.saveCustomerCare()
+            return data
+        }
     }
 
-    getCustomerCare(){
-        return storeConfig.getCustomerCare()
+    getCustomerCare() {
+        const customerCare = storeConfig.getCustomerCare()
+        return customerCare
     }
 
-    saveSmsTemplate(smsTemplate){
-        if(smsTemplate !== null && smsTemplate !== undefined)
-            storeConfig.saveSmsTemplate(smsTemplate)
+    saveSmsTemplate(smsTemplate) {
+        if(smsTemplate !== null && smsTemplate !== undefined) {
+            const data = storeConfig.saveSmsTemplate(smsTemplate)
+            return data
+        }
     }
 
     getSmsTemplate() {
-        return storeConfig.getSmsTemplate()
+        const smsTemplate = storeConfig.getSmsTemplate()
+        return smsTemplate
     }
 
-    saveFieldAttributeStatus(fieldAttributeStatus){
-        if(fieldAttributeStatus !== null && fieldAttributeStatus !== undefined)
-            storeConfig.saveFieldAttributeStatus(fieldAttributeStatus)
+    saveFieldAttributeStatus(fieldAttributeStatus) {
+        if(fieldAttributeStatus !== null && fieldAttributeStatus !== undefined) {
+            const data = storeConfig.saveFieldAttributeStatus(fieldAttributeStatus)
+            return data
+        }
     }
 
     getFieldAttributeStatus() {
-        return storeConfig.getFieldAttributeStatus()
+        const fieldAttributeStatus = storeConfig.getFieldAttributeStatus()
+        return fieldAttributeStatus
     }
 
-    saveFieldValidations(fieldValidations){
-        if(fieldValidations !== null && fieldValidations !== undefined)
-            storeConfig.saveFieldValidations(fieldValidations)
+    saveFieldValidations(fieldValidations) {
+        if(fieldValidations !== null && fieldValidations !== undefined) {
+            const data = storeConfig.saveFieldValidations(fieldValidations)
+            return data
+        }
     }
 
     getFieldValidations() {
-        return storeConfig.getFieldValidations()
+        const fieldValidations = storeConfig.getFieldValidations()
+        return fieldValidations
     }
 
-    saveFieldValidationsConditions(fieldValidationsConditions){
-        if(fieldValidationsConditions !== null && fieldValidationsConditions !== undefined)
-            storeConfig.saveFieldValidationsConditions(fieldValidationsConditions)
+    saveFieldValidationsConditions(fieldValidationsConditions) {
+        if(fieldValidationsConditions !== null && fieldValidationsConditions !== undefined) {
+            const data = storeConfig.saveFieldValidationsConditions(fieldValidationsConditions)
+            return data
+        }
     }
 
     getFieldValidationsConditions() {
-        return storeConfig.getFieldValidationsConditions()
+        const fieldValidationsConditions = storeConfig.getFieldValidationsConditions()
+        return fieldValidationsConditions
     }
 
-    saveSmsJobStatuses(smsJobStatuses){
-        if(smsJobStatuses !== null && smsJobStatuses !== undefined)
-            storeConfig.saveSmsJobStatuses(smsJobStatuses)
+    saveSmsJobStatuses(smsJobStatuses) {
+        if(smsJobStatuses !== null && smsJobStatuses !== undefined) {
+            const data = storeConfig.saveSmsJobStatuses(smsJobStatuses)
+            return data
+        }
     }
 
     getSmsJobStatuses() {
-        return storeConfig.getSmsJobStatuses()
+        const smsJobStatuses = storeConfig.getSmsJobStatuses()
+        return smsJobStatuses
     }
 
-    saveUserSummary(userSummary){
-        if(userSummary !== null && userSummary !== undefined)
-            storeConfig.saveUserSummary(userSummary)
+    saveUserSummary(userSummary) {
+        if(userSummary !== null && userSummary !== undefined) {
+            const data = storeConfig.saveUserSummary(userSummary)
+            return data
+        }
     }
 
     getUserSummary() {
-        return storeConfig.getUserSummary()
+        const userSummary = storeConfig.getUserSummary()
+        return userSummary
     }
 
-    saveJobSummary(jobSummary){
-        if(jobSummary !== null && jobSummary !== undefined)
-            storeConfig.saveJobSummary(jobSummary)
+    saveJobSummary(jobSummary) {
+        if(jobSummary !== null && jobSummary !== undefined) {
+            const data = storeConfig.saveJobSummary(jobSummary)
+            return data
+        }
     }
 
     getJobSummary() {
-        return storeConfig.getJobSummary()
+        const jobSummary = storeConfig.getJobSummary()
+        return jobSummary
     }
 }
 
