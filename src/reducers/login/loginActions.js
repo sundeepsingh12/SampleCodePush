@@ -1,5 +1,6 @@
 'use strict'
 const {
+  SET_CREDENTIALS,
 
   LOGOUT,
   LOGIN,
@@ -44,13 +45,19 @@ import {checkAssetService} from '../../services/classes/CheckAsset'
  * as in login, register, logout or reset password
  */
 
-function logoutState () {
+export function setCredentials(credentials) {
+    return{
+        type:SET_CREDENTIALS,
+        payload:credentials
+    }
+}
+export function logoutState () {
   return {
     type: LOGOUT
   }
 }
 
-function loginState () {
+export function loginState () {
   return {
     type: LOGIN
   }
@@ -59,45 +66,45 @@ function loginState () {
 /**
  * ## Login actions
  */
-function loginRequest () {
+export function loginRequest () {
   return {
     type: LOGIN_START
   }
 }
 
-function loginSuccess (j_sessionid) {
+export function loginSuccess (j_sessionid) {
   return {
     type: LOGIN_SUCCESS,
     payload: j_sessionid
   }
 }
 
-function loginFailure (error) {
+export function loginFailure (error) {
   return {
     type: LOGIN_FAILURE,
     payload: error
   }
 }
 
-function jobMasterDownloadStart() {
+export function jobMasterDownloadStart() {
   return {
     type: MASTER_DOWNLOAD_START
   }
 }
 
-function jobMasterDownloadSuccess() {
+export function jobMasterDownloadSuccess() {
   return {
     type: MASTER_DOWNLOAD_SUCCESS
   }
 }
 
-function checkAssetStart() {
+export function checkAssetStart() {
   return {
     type : CHECK_ASSET_START
   }
 }
 
-function checkAssetSuccess() {
+export function checkAssetSuccess() {
   return {
     type : CHECK_ASSET_SUCCESS
   }
@@ -136,16 +143,6 @@ export function deleteTokenRequestSuccess () {
   return {
     type: DELETE_TOKEN_SUCCESS
   }
-}
-
-
-/**
- * ## saveSessionToken
- * @param {Object} response - to return to keep the promise chain
- * @param {Object} json - object with sessionToken
- */
-export function saveSessionToken (j_sessionid) {
-  return storeConfig.storeSessionToken(j_sessionid)
 }
 
 /**
@@ -213,6 +210,7 @@ export function login (username, password) {
       dispatch(loginRequest())
       const j_sessionid = await authenticationService.login(username,password)
       dispatch(loginSuccess(j_sessionid))
+        await authenticationService.storeSessionToken(j_sessionid)
       dispatch(jobMasterDownloadStart())
         const deviceIMEI = await checkAssetService.getDeviceIMEI()
         const deviceSIM = await checkAssetService.getDeviceSIM()
@@ -233,7 +231,7 @@ export function login (username, password) {
             const checkAssetJson = await checkAssetResponse.json
           checkAssetService.saveDeviceIMEI(checkAssetJson.deviceIMEI)
           checkAssetService.saveDeviceSIM(checkAssetJson.deviceSIM)
-          await saveSessionToken(j_sessionid)
+
           Actions.Tabbar()
         }
          dispatch(checkAssetSuccess())

@@ -59,7 +59,9 @@ var styles = StyleSheet.create({
 function mapStateToProps (state) {
     return {
         auth: state.auth,
-        global: state.global
+        global: state.global,
+        username:state.username,
+        password:state.password
     }
 }
 
@@ -70,14 +72,14 @@ function mapDispatchToProps (dispatch) {
 }
 class Login2 extends Component {
 
-  constructor(){
+ /* constructor(){
     super();
       this.state = {
           username:'',
           password:''
       }
   }
-
+*/
   render () {
       const isEnabled = this.isFormValid()
       console.log(isEnabled)
@@ -139,10 +141,7 @@ class Login2 extends Component {
     )
   }
     onChangeUsername(username){
-        this.setState({
-            username
 
-        })
     }
 
     onChangePassword(password){

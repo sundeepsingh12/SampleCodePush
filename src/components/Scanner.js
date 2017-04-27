@@ -48,13 +48,13 @@ class Scanner extends Component {
             );
         }
         else {
-            const details = {
+            const credentials = {
                 username : this.state.username,
                 password : this.state.password
             };
 
             return (
-                <Login details = {details} />
+                <Login credentials = {credentials} />
             )
         }
     }
@@ -63,6 +63,7 @@ class Scanner extends Component {
         const username = e.data.split("/")[0];
         const password = e.data.split("/")[1];
         // this.setState({showCamera: false,username,password});
+        dispatch()
     }
 
     goBack(){

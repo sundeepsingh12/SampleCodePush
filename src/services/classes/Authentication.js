@@ -36,11 +36,18 @@ class Authentication extends AuthenticationInterface {
             body: data
         })
             .then((res) => {
-                if (res.status === 200 || res.status === 201) {
-                    //Extracting j_sessionid from Header
-                    return (res.headers.map['set-cookie'][0]).split("; ")[0];
-                } else {
-                    throw ("Invalid username/password")
+                switch(res.status){
+                    case 200:
+                        return (res.headers.map['set-cookie'][0]).split("; ")[0];
+                        break;
+                    case 401:
+                        throw ("Invalid User Credentials")
+                        break;
+                    case 502:
+                        throw ("Bad Gateway")
+                        break;
+                    default:
+                        throw ("Error ")
                 }
             })
             .catch((error) => {
@@ -49,22 +56,13 @@ class Authentication extends AuthenticationInterface {
     }
 
     /**
-     * This saves JsessionID in store
-     * @param jsessionId
-     *
-     * @return
-     * isSavingSucessful :true
+     * ### storeSessionToken
+     * Store the session key
      */
-    saveJSessionId(jsessionId) {
+    storeSessionToken(sessionToken) {
 
     }
 
-    /**
-     * This gets JsessionId from store
-     * @return
-     * jsessionId
-     *
-     */
     getJSessionId(){}
 }
 
