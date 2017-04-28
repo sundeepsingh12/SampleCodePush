@@ -96,7 +96,7 @@
     </array>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+    <key>NSCameraUsageDescription</key>
+    <string>Fareye needs access to your camera</string>
   </dict>
-  <key>NSCameraUsageDescription</key>
-  <string>Fareye needs access to your camera</string>
 </plist>
