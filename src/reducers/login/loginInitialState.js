@@ -20,20 +20,20 @@ const {Record} = require('immutable')
  * fields it contains.
  */
 const Form = Record({
-  disabled: false,
-  error: null,
-  isValid: false,
-  isFetching: false,
-  currentStep: '',
-  fields: new (Record({
-    username: '',
-    usernameHasError: false,
-    usernameErrorMsg: '',
-    password: '',
-    passwordHasError: false,
-    passwordErrorMsg: '',
-    showPassword: false
-  }))
+  loginButtonDisabled: false,
+  // error: null,
+  // isValid: false,
+  authenticationService: '', //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
+  displayMessage: '',
+  // fields: new (Record({
+    // username: '',
+    // usernameHasError: false,
+    // usernameErrorMsg: '',
+    // password: '',
+    // passwordHasError: false,
+    // passwordErrorMsg: '',
+    // showPassword: false
+  // }))
 })
 
 /**

@@ -22,7 +22,9 @@ const {
 
   GET_STATE,
   SET_STATE,
-  SET_STORE
+  SET_STORE,
+  ON_GLOBAL_USERNAME_CHANGE,
+  ON_GLOBAL_PASSWORD_CHANGE
 
 } = require('../../lib/constants').default
 
@@ -122,6 +124,14 @@ export default function globalReducer (state = initialState, action) {
           .set('showState', false)
           .set('currentState', null)
       return next
+
+    case ON_GLOBAL_USERNAME_CHANGE:
+      const username = action.payload
+      return { ...state,username:action.payload}
+      
+    case ON_GLOBAL_PASSWORD_CHANGE:
+      const password = action.payload
+      return { ...state,password:action.payload}
 
   }
 

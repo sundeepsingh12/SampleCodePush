@@ -35,6 +35,8 @@ export default keyMirror({
     DELETE_TOKEN_SUCCESS: null,
 
     ON_AUTH_FORM_FIELD_CHANGE: null,
+    ON_GLOBAL_USERNAME_CHANGE: null,
+    ON_GLOBAL_PASSWORD_CHANGE: null,
 
 
     //Database tables

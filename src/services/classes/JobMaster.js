@@ -8,7 +8,7 @@ import BackendFactory from '../../lib/BackendFactory'
 import CONFIG from '../../lib/config'
 import RestAPIInterface from '../../lib/RestAPIInterface'
 
-class JobMaster{
+class JobMaster {
     /**
      *## This will Download Job Master from server
      * Post data in JSON format

@@ -108,9 +108,6 @@ export default function authReducer (state = initialState, action) {
      * the formValidation
      */
 
-      case SET_CREDENTIALS:
-
-
     case ON_AUTH_FORM_FIELD_CHANGE: {
       const {field, value} = action.payload
       let nextState = state.setIn(['form', 'fields', field], value)

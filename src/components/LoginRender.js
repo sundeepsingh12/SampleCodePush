@@ -140,6 +140,16 @@ function mapDispatchToProps (dispatch) {
     actions: bindActionCreators({ ...authActions, ...globalActions }, dispatch)
   }
 }
+
+function mapStateToProps (state) {
+    return {
+        auth: state.auth,
+        global: state.global,
+        username:state.username,
+        password:state.password
+    }
+}
+
 /**
  * ### Translations
  */

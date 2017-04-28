@@ -162,16 +162,13 @@ export default function native (platform) {
                 initial />
 
               <Scene key='InitialLoginForm'
-                component={Login2}
+                component={Login}
                 hideNavBar
                 type='replace' />
 
-                <Scene key='Scanner'
-                       title='Scanner'
-                       component={Scanner} />
-             <Scene key="login2"
-                component={Login2} 
-                title="Login2"/>
+              <Scene key='Scanner'
+                title='Scanner'
+                component={Scanner} />
 
               <Scene key='Tabbar'
                 tabs

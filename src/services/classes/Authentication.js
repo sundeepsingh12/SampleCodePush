@@ -4,7 +4,7 @@
 
 import BackendFactory from '../../lib/BackendFactory'
 
-class Authentication extends AuthenticationInterface {
+class Authentication {
 
     /**
      * ### login

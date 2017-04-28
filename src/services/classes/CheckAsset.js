@@ -4,7 +4,7 @@ import {storeConfig} from '../../lib/StoreConfig'
 const BackendFactory = require('../../lib/BackendFactory').default
 import CONFIG from '../../lib/config'
 
-class CheckAsset extends CheckAssetInterface {
+class CheckAsset {
 
 
     /**

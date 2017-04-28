@@ -34,7 +34,7 @@ function mapStateToProps (state) {
     deviceVersion: state.device.version,
     auth: {
       form: {
-        isFetching: state.auth.form.isFetching
+        isFetching: state.auth.form.authenticationService
       }
     },
     global: {

@@ -20,6 +20,7 @@ import {Actions} from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../reducers/login/loginActions'
+import * as globalActions from '../'
 
 import ItemCheckbox from '../components/ItemCheckbox'
 var styles = StyleSheet.create({
@@ -60,8 +61,6 @@ function mapStateToProps (state) {
     return {
         auth: state.auth,
         global: state.global,
-        username:state.username,
-        password:state.password
     }
 }
 
@@ -70,16 +69,14 @@ function mapDispatchToProps (dispatch) {
         actions: bindActionCreators(authActions, dispatch)
     }
 }
+
+
 class Login2 extends Component {
 
- /* constructor(){
-    super();
-      this.state = {
-          username:'',
-          password:''
-      }
+ constructor(props) {
+    super(props);
   }
-*/
+
   render () {
       const isEnabled = this.isFormValid()
       console.log(isEnabled)
@@ -95,14 +92,14 @@ class Login2 extends Component {
               <View style={styles.width70}>
                 <Item style={{borderWidth: 0}}>
                     <Input
-                        value = {this.state.username}
-                        placeholder='Username'
-                        style={feTheme.roundedInput}
-                        onChangeText = {value=>this.onChangeUsername(value)}/>
+                        value = {this.props.global.username}
+                        placeholder = 'Username'
+                        styl e= {feTheme.roundedInput}
+                        onChangeText = {value => this.onChangeUsername(value)}/>
                 </Item>
                 <Item style={{borderWidth: 0, marginTop: 15}}>
                     <Input
-                        value = {this.state.password}
+                        value = {this.props.global.password}
                         placeholder='Password'
                         style={feTheme.roundedInput}
                         onChangeText = {value=>this.onChangePassword(value)}
@@ -140,21 +137,19 @@ class Login2 extends Component {
       </Container>
     )
   }
-    onChangeUsername(username){
-
+    onChangeUsername(username) {
+        this.props.actions.onChangeUsername('username',username)
     }
 
-    onChangePassword(password){
-        this.setState({
-            password
-        })
+    onChangePassword(password) {
+        this.props.actions.onChangePassword('password',password)
     }
 
-    login(login){
+    login(login) {
         login(login,this.state.username, sha256(this.state.password))
     }
 
-    scanLogin(){
+    scanLogin() {
         Actions.Scanner();
     }
 

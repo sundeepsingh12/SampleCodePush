@@ -4,7 +4,7 @@ import CONFIG from '../../lib/config'
 
 const BackendFactory = require('../../lib/BackendFactory').default
 
-export default class SimVerify extends SimVerifyInterface {
+export default class SimVerify {
 
     /**
      * OTP Generation API (Post)
