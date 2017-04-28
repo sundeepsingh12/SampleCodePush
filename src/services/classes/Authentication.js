@@ -17,8 +17,13 @@ class Authentication {
      *
      *  * @returns
      * * * * *  HEADERS  * * * * * * *
-     * status: 200 | 403
-     * JSESSIONID: "r:Kt9wXIBWD0dNijNIq2u5rRllW"
+     * status: 200 : successful login,JSESSIONID: "r:Kt9wXIBWD0dNijNIq2u5rRllW"
+     * 401 : invalid username | password
+     * 502 : bad gateway
+     *1201 : user already logged in (single login functionality)
+     *1203 : user locked
+     * 500 : internal server error
+     *
 
      */
     login(username, password) {
@@ -39,13 +44,17 @@ class Authentication {
                 switch(res.status){
                     case 200:
                         return (res.headers.map['set-cookie'][0]).split("; ")[0];
-                        break;
                     case 401:
                         throw ("Invalid User Credentials")
-                        break;
+                    case 500:
+                        throw ("Internal server error")
                     case 502:
                         throw ("Bad Gateway")
-                        break;
+                    case 1201:
+                        throw ("User already logged in ")
+                    case 1203:
+                        throw ("User locked.Try after 15 minutes")
+
                     default:
                         throw ("Error ")
                 }

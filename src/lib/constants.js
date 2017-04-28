@@ -6,6 +6,8 @@ export default keyMirror({
     //Global Actions
     SET_STORE: null,
     SET_SESSION_TOKEN: null,
+    SET_CREDENTIALS:null,
+    INTERNET_CONNECTION_STATUS:null,
 
     //Device Actions
     SET_PLATFORM: null,

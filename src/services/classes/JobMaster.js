@@ -2,7 +2,7 @@
  * Created by udbhav on 12/4/17.
  */
 
-import {storeConfig} from '../../lib/StoreConfig'
+import {storeConfig} from '../../repositories/KeyValueDb'
 
 import BackendFactory from '../../lib/BackendFactory'
 import CONFIG from '../../lib/config'
@@ -493,6 +493,10 @@ class JobMaster {
         }
     }
 
+    /**This gets mdmPolicies from store
+     *
+     * @return {*}
+     */
     getMDMPolicies(){
         const mdmPolicies = storeConfig.getMDMPolicies()
         return mdmPolicies

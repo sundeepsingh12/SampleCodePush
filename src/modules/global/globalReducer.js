@@ -24,7 +24,10 @@ const {
   SET_STATE,
   SET_STORE,
   ON_GLOBAL_USERNAME_CHANGE,
-  ON_GLOBAL_PASSWORD_CHANGE
+  ON_GLOBAL_PASSWORD_CHANGE,
+  INTERNET_CONNECTION_STATUS,
+  SET_CREDENTIALS
+
 
 } = require('../../lib/constants').default
 
@@ -127,11 +130,22 @@ export default function globalReducer (state = initialState, action) {
 
     case ON_GLOBAL_USERNAME_CHANGE:
       const username = action.payload
-      return { ...state,username:action.payload}
+      console.log("global reducer onChangeUsername")
+      console.log(username)
+      var next = state.set('username',username)
+      return next
       
     case ON_GLOBAL_PASSWORD_CHANGE:
       const password = action.payload
-      return { ...state,password:action.payload}
+      var next = state.set('password',password)
+      return next
+
+    case SET_CREDENTIALS:
+        return state.set('username',action.payload.username
+            .set('password',action.payload.password))
+
+    case INTERNET_CONNECTION_STATUS:
+          return state.set('')
 
   }
 

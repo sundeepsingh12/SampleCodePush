@@ -11,8 +11,6 @@
  * formValidation for setting the form's valid flag
  */
 const InitialState = require('./loginInitialState').default
-const fieldValidation = require('../../lib/fieldValidation').default
-const formValidation = require('./loginFormValidation').default
 
 /**
  * ## Auth actions
@@ -109,13 +107,14 @@ export default function authReducer (state = initialState, action) {
      */
 
     case ON_AUTH_FORM_FIELD_CHANGE: {
-      const {field, value} = action.payload
-      let nextState = state.setIn(['form', 'fields', field], value)
-          .setIn(['form', 'error'], null)
+      // const {field, value} = action.payload
+      // let nextState = state.setIn(['form', 'fields', field], value)
+      //     .setIn(['form', 'error'], null)
+        return state.set('')
 
-      return formValidation(
-      fieldValidation(nextState, action)
-      , action)
+      // return formValidation(
+      // fieldValidation(nextState, action)
+      // , action)
     }
 
     /**

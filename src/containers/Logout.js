@@ -16,8 +16,8 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../reducers/login/loginActions'
-import * as globalActions from '../reducers/global/globalActions'
+import * as authActions from '../modules/login/loginActions'
+import * as globalActions from '../modules/global/globalActions'
 
 import {Button} from 'react-native'
 

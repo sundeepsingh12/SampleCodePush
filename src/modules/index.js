@@ -8,7 +8,7 @@
 /**
  * ## Imports
  *
- * our 4 reducers
+ * our 4 modules
  */
 import auth from './login/loginReducer'
 import device from './device/deviceReducer'

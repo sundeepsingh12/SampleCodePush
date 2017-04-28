@@ -8,7 +8,8 @@ import
   Platform,
   TouchableHighlight,
   Image,
-  Switch
+  NetInfo
+
 }
 from 'react-native'
 
@@ -19,10 +20,9 @@ import sha256 from 'sha256';
 import {Actions} from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import * as authActions from '../reducers/login/loginActions'
-import * as globalActions from '../'
+import * as authActions from '../modules/login/loginActions'
+import * as globalActions from '../modules/global/globalActions'
 
-import ItemCheckbox from '../components/ItemCheckbox'
 var styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -52,7 +52,7 @@ var styles = StyleSheet.create({
   logoStyle: {
     width: 94,
     resizeMode: 'contain'
-  },
+  }
  
 })
 
@@ -66,7 +66,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
     return {
-        actions: bindActionCreators(authActions, dispatch)
+        actions: bindActionCreators({ ...authActions, ...globalActions }, dispatch)
     }
 }
 
@@ -77,9 +77,32 @@ class Login2 extends Component {
     super(props);
   }
 
+  onChangeUsername(username) {
+        console.log("onChangeUsername called")
+        console.log(username)
+        this.props.actions.onChangeUsername(username)
+    }
+
+    onChangePassword(password) {
+        this.props.actions.onChangePassword(password)
+    }
+
+    login(login) {
+        login(login,this.props.global.username, sha256(this.props.global.password))
+    }
+
+    scanLogin() {
+        Actions.Scanner();
+    }
+
+    componentDidMount(){
+        if(this.props.global.startLogin){
+            login(login,this.props.global.username, sha256(this.props.global.password))
+        }
+    }
+
   render () {
-      const isEnabled = this.isFormValid()
-      console.log(isEnabled)
+      // const isEnabled = this.isFormValid()
     return (
       <Container>
         <View style={styles.container}>
@@ -94,28 +117,23 @@ class Login2 extends Component {
                     <Input
                         value = {this.props.global.username}
                         placeholder = 'Username'
-                        styl e= {feTheme.roundedInput}
-                        onChangeText = {value => this.onChangeUsername(value)}/>
+                        style= {feTheme.roundedInput}
+                        onChangeText = {(value) => {this.onChangeUsername(value)}}/>
                 </Item>
                 <Item style={{borderWidth: 0, marginTop: 15}}>
                     <Input
                         value = {this.props.global.password}
                         placeholder='Password'
                         style={feTheme.roundedInput}
-                        onChangeText = {value=>this.onChangePassword(value)}
+                        secureTextEntry={true}
+                        onChangeText = {(value) => {this.onChangePassword(value)}}
+                        
                     />
-                      <View style={{position: 'absolute', bottom: 7, right: 10}}>
-                        <ItemCheckbox
-                            size = {28}
-                            icon_check= 'ios-eye-off-outline'
-                            icon_open= 'ios-eye-outline'
-                            text=''
-
-                        />
-                      </View>
                 </Item>
                 
-                <Button disabled={!isEnabled} onPress={this.login.bind(this, this.props.actions.login)} rounded success style={{width: '100%', marginTop: 15}}>
+                <Button
+                 disabled = {this.props.auth.form.isLoginButtonDisabled} 
+                 onPress={this.login.bind(this, this.props.actions.login)} rounded success style={{width: '100%', marginTop: 15}}>
                     <Text style={{textAlign: 'center', width: '100%', color: 'white'}}>Log In</Text>
                 </Button>
 
@@ -137,29 +155,14 @@ class Login2 extends Component {
       </Container>
     )
   }
-    onChangeUsername(username) {
-        this.props.actions.onChangeUsername('username',username)
-    }
 
-    onChangePassword(password) {
-        this.props.actions.onChangePassword('password',password)
-    }
-
-    login(login) {
-        login(login,this.state.username, sha256(this.state.password))
-    }
-
-    scanLogin() {
-        Actions.Scanner();
-    }
-
-    isFormValid(){
-        const {username, password } = this.state;
-        return (
-            username.length > 0 &&
-            password.length > 0
-        );
-    }
+    // isFormValid(){
+    //     const {username, password } = this.state;
+    //     return (
+    //         username.length > 0 &&
+    //         password.length > 0
+    //     );
+    // }
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login2)

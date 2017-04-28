@@ -17,15 +17,13 @@ import {Actions} from 'react-native-router-flux';
 
 class Scanner extends Component {
 
-    constructor() {
-        super();
-        this.state = {
-            showCamera: true,
-            cameraType: Camera.constants.Type.back,
-            username:'',
-            password:''
-        };
-    }
+    // constructor() {
+    //     super();
+    //     this.state = {
+    //         showCamera: true,
+    //         cameraType: Camera.constants.Type.back,
+    //     };
+    // }
 
     render() {
         return (

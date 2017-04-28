@@ -17,8 +17,8 @@ import React from 'react'
 /**
  * The actions we need
  */
-import * as authActions from '../reducers/login/loginActions'
-import * as globalActions from '../reducers/global/globalActions'
+import * as authActions from '../modules/login/loginActions'
+import * as globalActions from '../modules/global/globalActions'
 
 /**
  * Router actions
@@ -190,8 +190,8 @@ class LoginRender extends Component {
    */
   onChange (value) {
     if (value.username !== '') {
-      this.props.actions.onAuthFormFieldChange('username', value.username)
-    }
+          this.props.actions.onAuthFormFieldChange('username', value.username)
+      }
     if (value.password !== '') {
       this.props.actions.onAuthFormFieldChange('password', value.password)
     }

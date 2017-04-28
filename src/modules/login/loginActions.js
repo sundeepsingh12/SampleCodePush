@@ -34,7 +34,7 @@ const {
 const BackendFactory = require('../../lib/BackendFactory').default
 
 import {Actions} from 'react-native-router-flux'
-import {storeConfig} from '../../lib/StoreConfig'
+import {storeConfig} from '../../repositories/KeyValueDb'
 import {authenticationService} from '../../services/classes/Authentication'
 import {jobMasterService} from '../../services/classes/JobMaster'
 import {checkAssetService} from '../../services/classes/CheckAsset'
@@ -45,12 +45,8 @@ import {checkAssetService} from '../../services/classes/CheckAsset'
  * as in login, register, logout or reset password
  */
 
-export function setCredentials(credentials) {
-    return{
-        type:SET_CREDENTIALS,
-        payload:credentials
-    }
-}
+
+
 export function logoutState () {
   return {
     type: LOGOUT
@@ -204,47 +200,87 @@ export function deleteSessionToken () {
  * otherwise, dispatch a failure
  */
 
-export function login (username, password) {
+export function authenticateUser (username, password) {
   return async function(dispatch)  {
     try {
       dispatch(loginRequest())
       const j_sessionid = await authenticationService.login(username,password)
+      await authenticationService.storeSessionToken(j_sessionid)
       dispatch(loginSuccess(j_sessionid))
-        await authenticationService.storeSessionToken(j_sessionid)
-      dispatch(jobMasterDownloadStart())
-        const deviceIMEI = await checkAssetService.getDeviceIMEI()
-        const deviceSIM = await checkAssetService.getDeviceSIM()
-        let user = await jobMasterService.getUser()
-        const currentJobMasterVersion = (user!=null || user!=undefined)?user.currentJobMasterVersion:0;
-        const companyId = (user!=null|| user!=undefined)?user.currentJobMasterVersion:0;
-        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,currentJobMasterVersion,companyId)
-      const json = await jobMasters.json
-      if(jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
-        jobMasterService.saveJSONResponse(json)
-        user = json.user
-        dispatch(checkAssetStart())
-        if(checkAssetService.checkAsset(deviceIMEI,deviceSIM,user.hubId,user.company.id)) {
-          await saveSessionToken(j_sessionid)
-          Actions.Tabbar()
-        } else {
-            const checkAssetResponse = await checkAssetService.checkAssetAPI(deviceIMEI,deviceSIM)
-            const checkAssetJson = await checkAssetResponse.json
-          checkAssetService.saveDeviceIMEI(checkAssetJson.deviceIMEI)
-          checkAssetService.saveDeviceSIM(checkAssetJson.deviceSIM)
+      // dispatch(jobMasterDownloadStart())
+      //   const deviceIMEI = await checkAssetService.getDeviceIMEI()
+      //   const deviceSIM = await checkAssetService.getDeviceSIM()
+      //   let user = await jobMasterService.getUser()
+      //   const currentJobMasterVersion = (user!=null || user!=undefined)?user.currentJobMasterVersion:0;
+      //   const companyId = (user!=null|| user!=undefined)?user.currentJobMasterVersion:0;
+      //   const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,currentJobMasterVersion,companyId)
+      // const json = await jobMasters.json
+      // if(jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
+      //   jobMasterService.saveJSONResponse(json)
+      //   user = json.user
+      //   dispatch(checkAssetStart())
+      //   if(checkAssetService.checkAsset(deviceIMEI,deviceSIM,user.hubId,user.company.id)) {
+      //     await saveSessionToken(j_sessionid)
+      //     Actions.Tabbar()
+      //   } else {
+      //       const checkAssetResponse = await checkAssetService.checkAssetAPI(deviceIMEI,deviceSIM)
+      //       const checkAssetJson = await checkAssetResponse.json
+      //     checkAssetService.saveDeviceIMEI(checkAssetJson.deviceIMEI)
+      //     checkAssetService.saveDeviceSIM(checkAssetJson.deviceSIM)
 
-          Actions.Tabbar()
-        }
-         dispatch(checkAssetSuccess())
-         dispatch(logoutState())
-      } else {
-          //write code for updating UI here
-      }
+      //     Actions.Tabbar()
+      //   }
+      //    dispatch(checkAssetSuccess())
+      //    dispatch(logoutState())
+      // } else {
+      //     //write code for updating UI here
+      // }
     }
     catch(error) {
       dispatch(loginFailure(error))
     }
   }
 }
+
+export function downloadJobMaster() {
+  return async function(dispatch) {
+    try {
+      const deviceIMEI = await checkAssetService.getDeviceIMEI()
+      const deviceSIM = await checkAssetService.getDeviceSIM()
+      let user = await jobMasterService.getUser()
+      const currentJobMasterVersion = (user!=null || user!=undefined)?user.currentJobMasterVersion:0;
+      const companyId = (user!=null|| user!=undefined)?user.currentJobMasterVersion:0;
+      const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,currentJobMasterVersion,companyId)
+      const json = await jobMasters.json
+    } catch(error) {
+      dispatch(jobMasterDownloadFailure(error))
+    }
+  }
+}
+
+export function saveJobMaster(jobMasterResponse) {
+  return async function(dispatch) {
+  try {
+    if(jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
+      dispatch(jobMasterSavingStart())
+      jobMasterService.saveJobMaster(jobMasterResponse)
+    } else {
+      dispatch(timeMismatch())
+    }
+  } catch(error) {
+    dispatch(saveJobMasterFailure(error))
+  }
+  }
+}
+
+export function checkAsset() {
+  return async function(dispatch) {
+  const deviceIMEI = await checkAssetService.getDeviceIMEI()
+  const deviceSIM = await checkAssetService.getDeviceSIM()
+  dispatch(checkAssetStart())
+  }
+}
+
 
 
 /**
@@ -256,15 +292,16 @@ export function login (username, password) {
 export function getSessionToken () {
   return async function(dispatch)  {
     try{
-      dispatch(sessionTokenRequest())
-      const token = await storeConfig.getSessionToken()
-      if (token) {
-        dispatch(sessionTokenRequestSuccess(token))
-        Actions.Tabbar()
-      } else {
-        dispatch(sessionTokenRequestFailure())
-        Actions.InitialLoginForm()
-      }
+      // dispatch(sessionTokenRequest())
+      // const token = await storeConfig.getSessionToken()
+      // if (token) {
+      //   dispatch(sessionTokenRequestSuccess(token))
+      //   Actions.Tabbar()
+      // } else {
+      //   dispatch(sessionTokenRequestFailure())
+      //   Actions.InitialLoginForm()
+      // }
+      Actions.InitialLoginForm()
     }
     catch(error) {
       dispatch(sessionTokenRequestFailure(error))
@@ -304,6 +341,9 @@ export function logout () {
     }
     catch(error){
       dispatch(logoutFailure(error))
+      if(checkAssetService.checkAsset(deviceIMEI,deviceSIM,user.hubId,user.company.id)) {
+
+      }
     }
   }
 }

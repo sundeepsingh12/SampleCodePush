@@ -11,8 +11,8 @@
  * Redux  & the config file
  */
 import store from 'react-native-simple-store'
-import CONFIG from './config'
-import CONSTANT from './constants'
+import CONFIG from '../lib/config'
+import CONSTANT from '../lib/constants'
 
 export class StoreConfig {
     constructor() {

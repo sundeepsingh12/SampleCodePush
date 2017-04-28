@@ -1,6 +1,6 @@
 'use strict'
 
-import {storeConfig} from '../../lib/StoreConfig'
+import {storeConfig} from '../../repositories/KeyValueDb'
 const BackendFactory = require('../../lib/BackendFactory').default
 import CONFIG from '../../lib/config'
 

@@ -21,7 +21,7 @@ import { Provider } from 'react-redux'
 /**
  * ### configureStore
  *
- *  ```configureStore``` will connect the ```reducers```, the
+ *  ```configureStore``` will connect the ```modules```, the
  *
  */
 import configureStore from './lib/configureStore'
@@ -58,18 +58,18 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
  * ## Actions
  *  The necessary actions for dispatching our bootstrap values
  */
-import {setPlatform, setVersion} from './reducers/device/deviceActions'
-import {setStore} from './reducers/global/globalActions'
+import {setPlatform, setVersion} from './modules/device/deviceActions'
+import {setStore} from './modules/global/globalActions'
 
 /**
  * ## States
  * Snowflake explicitly defines initial state
  *
  */
-import AuthInitialState from './reducers/login/loginInitialState'
-import DeviceInitialState from './reducers/device/deviceInitialState'
-import GlobalInitialState from './reducers/global/globalInitialState'
-// import ProfileInitialState from './reducers/profile/profileInitialState'
+import AuthInitialState from './modules/login/loginInitialState'
+import DeviceInitialState from './modules/device/deviceInitialState'
+import GlobalInitialState from './modules/global/globalInitialState'
+// import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
  *  The version of the app but not  displayed yet
@@ -140,8 +140,8 @@ export default function native (platform) {
     render () {
       const store = configureStore(getInitialState())
 
-      // configureStore will combine reducers from FarEye and Main application
-      // it will then create the store based on aggregate state from all reducers
+      // configureStore will combine modules from FarEye and Main application
+      // it will then create the store based on aggregate state from all modules
       store.dispatch(setPlatform(platform))
       store.dispatch(setVersion(VERSION))
       store.dispatch(setStore(store))
@@ -162,7 +162,7 @@ export default function native (platform) {
                 initial />
 
               <Scene key='InitialLoginForm'
-                component={Login}
+                component={Login2}
                 hideNavBar
                 type='replace' />
 
