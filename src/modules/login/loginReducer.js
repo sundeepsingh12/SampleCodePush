@@ -122,8 +122,8 @@ export default function authReducer (state = initialState, action) {
      * Set the fetching flag so the forms will be disabled
      */
     case LOGIN_START:
-      return state.setIn(['form', 'isFetching'], true)
-                  .setIn(['form','currentStep'],'Login request initiated')
+      return state.setIn(['form', 'authenticationService'], 'true')
+                  .setIn(['form','displayMessage'],'Login request initiated')
 
 
     /**
@@ -136,8 +136,8 @@ export default function authReducer (state = initialState, action) {
     case LOGIN_SUCCESS:
     case LOGOUT_SUCCESS:
     // case RESET_PASSWORD_SUCCESS:
-      return state.setIn(['form', 'isFetching'], false)
-                  .setIn(['form','currentStep'],'Login success')
+      return state.setIn(['form', 'authenticationService'], false)
+                  .setIn(['form','displayMessage'],'Login success')
 
     /**
      *
@@ -148,19 +148,19 @@ export default function authReducer (state = initialState, action) {
     case LOGOUT_FAILURE:
     case LOGIN_FAILURE:
     // case RESET_PASSWORD_FAILURE:
-      return state.setIn(['form', 'isFetching'], false)
-      .setIn(['form', 'error'], action.payload)
-          .setIn(['form','currentStep'],'Login failed')
+      return state.setIn(['form', 'authenticationService'], false)
+      .setIn(['form', 'displayMessage'], action.payload)
+          // .setIn(['form','displayMessage'],'Login failed')
 
 
     case MASTER_DOWNLOAD_START:
-      return state.setIn(['form','currentStep'],'Job Master download initiated')
+      return state.setIn(['form','displayMessage'],'Job Master download initiated')
 
     case CHECK_ASSET_START:
-      return state.setIn(['form','currentStep'],'Checking Assets')
+      return state.setIn(['form','displayMessage'],'Checking Assets')
     
     case CHECK_ASSET_SUCCESS:
-      return state.setIn(['form','currentStep'],'Assets Verified')
+      return state.setIn(['form','displayMessage'],'Assets Verified')
     /**
      * ### Hot Loading support
      *
@@ -170,14 +170,14 @@ export default function authReducer (state = initialState, action) {
       var form = JSON.parse(action.payload).auth.form
 
       var next = state.setIn(['form', 'state'], form.state)
-          .setIn(['form', 'disabled'], form.disabled)
-          .setIn(['form', 'error'], form.error)
-          .setIn(['form', 'isValid'], form.isValid)
-          .setIn(['form', 'isFetching'], form.isFetching)
-          .setIn(['form', 'fields', 'username'], form.fields.username)
-          .setIn(['form', 'fields', 'usernameHasError'], form.fields.usernameHasError)
-          .setIn(['form', 'fields', 'password'], form.fields.password)
-          .setIn(['form', 'fields', 'passwordHasError'], form.fields.passwordHasError)
+          // .setIn(['form', 'disabled'], form.disabled)
+          .setIn(['form', 'displayMessage'], form.displayMessage)
+          // .setIn(['form', 'isValid'], form.isValid)
+          .setIn(['form', 'authenticationService'], form.authenticationService)
+          // .setIn(['form', 'fields', 'username'], form.fields.username)
+          // .setIn(['form', 'fields', 'usernameHasError'], form.fields.usernameHasError)
+          // .setIn(['form', 'fields', 'password'], form.fields.password)
+          // .setIn(['form', 'fields', 'passwordHasError'], form.fields.passwordHasError)
 
       return next
 

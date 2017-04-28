@@ -203,38 +203,12 @@ export function deleteSessionToken () {
 export function authenticateUser (username, password) {
   return async function(dispatch)  {
     try {
+      console.log("authenticateUser called")
       dispatch(loginRequest())
+      console.log("after")
       const j_sessionid = await authenticationService.login(username,password)
       await authenticationService.storeSessionToken(j_sessionid)
       dispatch(loginSuccess(j_sessionid))
-      // dispatch(jobMasterDownloadStart())
-      //   const deviceIMEI = await checkAssetService.getDeviceIMEI()
-      //   const deviceSIM = await checkAssetService.getDeviceSIM()
-      //   let user = await jobMasterService.getUser()
-      //   const currentJobMasterVersion = (user!=null || user!=undefined)?user.currentJobMasterVersion:0;
-      //   const companyId = (user!=null|| user!=undefined)?user.currentJobMasterVersion:0;
-      //   const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,currentJobMasterVersion,companyId)
-      // const json = await jobMasters.json
-      // if(jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
-      //   jobMasterService.saveJSONResponse(json)
-      //   user = json.user
-      //   dispatch(checkAssetStart())
-      //   if(checkAssetService.checkAsset(deviceIMEI,deviceSIM,user.hubId,user.company.id)) {
-      //     await saveSessionToken(j_sessionid)
-      //     Actions.Tabbar()
-      //   } else {
-      //       const checkAssetResponse = await checkAssetService.checkAssetAPI(deviceIMEI,deviceSIM)
-      //       const checkAssetJson = await checkAssetResponse.json
-      //     checkAssetService.saveDeviceIMEI(checkAssetJson.deviceIMEI)
-      //     checkAssetService.saveDeviceSIM(checkAssetJson.deviceSIM)
-
-      //     Actions.Tabbar()
-      //   }
-      //    dispatch(checkAssetSuccess())
-      //    dispatch(logoutState())
-      // } else {
-      //     //write code for updating UI here
-      // }
     }
     catch(error) {
       dispatch(loginFailure(error))

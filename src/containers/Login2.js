@@ -88,7 +88,8 @@ class Login2 extends Component {
     }
 
     login(login) {
-        login(login,this.props.global.username, sha256(this.props.global.password))
+        console.log("login called")
+        this.props.actions.authenticateUser(this.props.global.username, sha256(this.props.global.password))
     }
 
     scanLogin() {
@@ -132,8 +133,8 @@ class Login2 extends Component {
                 </Item>
                 
                 <Button
-                 disabled = {this.props.auth.form.isLoginButtonDisabled} 
-                 onPress={this.login.bind(this, this.props.actions.login)} rounded success style={{width: '100%', marginTop: 15}}>
+                 disabled = {this.props.global.isButtonDisabled} 
+                 onPress={(username,password) => {this.login(username,password)}} rounded success style={{width: '100%', marginTop: 15}}>
                     <Text style={{textAlign: 'center', width: '100%', color: 'white'}}>Log In</Text>
                 </Button>
 

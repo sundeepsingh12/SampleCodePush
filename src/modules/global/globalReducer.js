@@ -130,14 +130,28 @@ export default function globalReducer (state = initialState, action) {
 
     case ON_GLOBAL_USERNAME_CHANGE:
       const username = action.payload
-      console.log("global reducer onChangeUsername")
-      console.log(username)
-      var next = state.set('username',username)
+      console.log(state.password)
+      const passwordState = state.password
+      if(username != undefined && username != null && username != '' && passwordState != undefined && passwordState != null && passwordState != '') {
+        var next = state.set('username',username)
+                        .set('isButtonDisabled',false)
+      } else {
+        var next = state.set('username',username)
+                        .set('isButtonDisabled',true)
+      }
       return next
       
     case ON_GLOBAL_PASSWORD_CHANGE:
       const password = action.payload
-      var next = state.set('password',password)
+      console.log(state.username)
+      const usernameState = state.username
+      if(usernameState != undefined && usernameState != null && usernameState != '' && password != undefined && password != null && password != '') {
+        var next = state.set('password',password)
+                        .set('isButtonDisabled',false)
+      } else {
+        var next = state.set('password',password)
+                        .set('isButtonDisabled',true)
+      }
       return next
 
     case SET_CREDENTIALS:

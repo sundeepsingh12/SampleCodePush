@@ -20,7 +20,6 @@ const {Record} = require('immutable')
  * fields it contains.
  */
 const Form = Record({
-  isLoginButtonDisabled: true,
   // error: null,
   // isValid: false,
   authenticationService: '', //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED

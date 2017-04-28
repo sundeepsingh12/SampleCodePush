@@ -27,7 +27,7 @@ class Authentication {
 
      */
     login(username, password) {
-
+        console.log("authentication service login called")
         let data = new FormData()
         data.append('j_username', username)
         data.append('j_password', password)

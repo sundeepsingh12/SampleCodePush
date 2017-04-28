@@ -32,6 +32,7 @@ var InitialState = Record({
   username:'',
   password:'',
   startLogin:false,
-  isInternetAvailable:false
+  isInternetAvailable:false,
+  isButtonDisabled: true
 })
 export default InitialState
