@@ -26,18 +26,19 @@ const {
   DELETE_TOKEN_REQUEST,
   DELETE_TOKEN_SUCCESS,
 
-  ON_AUTH_FORM_FIELD_CHANGE,
+  ON_LOGIN_USERNAME_CHANGE,
+  ON_LOGIN_PASSWORD_CHANGE,
 
   TABLE_USER_SUMMARY,
 } = require('../../lib/constants').default
 
 const BackendFactory = require('../../lib/BackendFactory').default
 
-import {Actions} from 'react-native-router-flux'
-import {storeConfig} from '../../repositories/KeyValueDb'
-import {authenticationService} from '../../services/classes/Authentication'
-import {jobMasterService} from '../../services/classes/JobMaster'
-import {checkAssetService} from '../../services/classes/CheckAsset'
+import { Actions } from 'react-native-router-flux'
+import { storeConfig } from '../../repositories/KeyValueDb'
+import { authenticationService } from '../../services/classes/Authentication'
+import { jobMasterService } from '../../services/classes/JobMaster'
+import { checkAssetService } from '../../services/classes/CheckAsset'
 
 /**
  * ## State actions
@@ -47,13 +48,13 @@ import {checkAssetService} from '../../services/classes/CheckAsset'
 
 
 
-export function logoutState () {
+export function logoutState() {
   return {
     type: LOGOUT
   }
 }
 
-export function loginState () {
+export function loginState() {
   return {
     type: LOGIN
   }
@@ -62,20 +63,20 @@ export function loginState () {
 /**
  * ## Login actions
  */
-export function loginRequest () {
+export function loginRequest() {
   return {
     type: LOGIN_START
   }
 }
 
-export function loginSuccess (j_sessionid) {
+export function loginSuccess(j_sessionid) {
   return {
     type: LOGIN_SUCCESS,
     payload: j_sessionid
   }
 }
 
-export function loginFailure (error) {
+export function loginFailure(error) {
   return {
     type: LOGIN_FAILURE,
     payload: error
@@ -96,31 +97,31 @@ export function jobMasterDownloadSuccess() {
 
 export function checkAssetStart() {
   return {
-    type : CHECK_ASSET_START
+    type: CHECK_ASSET_START
   }
 }
 
 export function checkAssetSuccess() {
   return {
-    type : CHECK_ASSET_SUCCESS
+    type: CHECK_ASSET_SUCCESS
   }
 }
 
 /**
  * ## SessionToken actions
  */
-export function sessionTokenRequest () {
+export function sessionTokenRequest() {
   return {
     type: SESSION_TOKEN_REQUEST
   }
 }
-export function sessionTokenRequestSuccess (token) {
+export function sessionTokenRequestSuccess(token) {
   return {
     type: SESSION_TOKEN_SUCCESS,
     payload: token
   }
 }
-export function sessionTokenRequestFailure (error) {
+export function sessionTokenRequestFailure(error) {
   return {
     type: SESSION_TOKEN_FAILURE,
     payload: error === undefined ? null : error
@@ -130,12 +131,12 @@ export function sessionTokenRequestFailure (error) {
 /**
  * ## DeleteToken actions
  */
-export function deleteTokenRequest () {
+export function deleteTokenRequest() {
   return {
     type: DELETE_TOKEN_REQUEST
   }
 }
-export function deleteTokenRequestSuccess () {
+export function deleteTokenRequestSuccess() {
   return {
     type: DELETE_TOKEN_SUCCESS
   }
@@ -145,42 +146,63 @@ export function deleteTokenRequestSuccess () {
  * ## onAuthFormFieldChange
  * Set the payload so the reducer can work on it
  */
-export function onAuthFormFieldChange (field, value) {
+export function onAuthFormFieldChange(field, value) {
   return {
     type: ON_AUTH_FORM_FIELD_CHANGE,
-    payload: {field: field, value: value}
+    payload: { field: field, value: value }
   }
 }
 
 /**
  * ## Logout actions
  */
-export function logoutRequest () {
+export function logoutRequest() {
   return {
     type: LOGOUT_START
   }
 }
 
-export function logoutSuccess () {
+export function logoutSuccess() {
   return {
     type: LOGOUT_SUCCESS
   }
 }
-export function logoutFailure (error) {
+export function logoutFailure(error) {
   return {
     type: LOGOUT_FAILURE,
     payload: error
   }
 }
 
+/**
+ * ## set the username
+ *
+ */
+export function onChangeUsername(value) {
+  return {
+    type: ON_LOGIN_USERNAME_CHANGE,
+    payload: value
+  }
+}
+
+/**
+ * ## set the password
+ *
+ */
+export function onChangePassword(value) {
+  return {
+    type: ON_LOGIN_PASSWORD_CHANGE,
+    payload: value
+  }
+}
 
 /**
  * ## Delete session token
  *
  * Call the AppAuthToken deleteSessionToken
  */
-export function deleteSessionToken () {
-  return async function(dispatch)  {
+export function deleteSessionToken() {
+  return async function (dispatch) {
     dispatch(deleteTokenRequest())
     await storeConfig.deleteSessionToken()
     dispatch(deleteTokenRequestSuccess())
@@ -200,58 +222,59 @@ export function deleteSessionToken () {
  * otherwise, dispatch a failure
  */
 
-export function authenticateUser (username, password) {
-  return async function(dispatch)  {
+export function authenticateUser(username, password) {
+  return async function (dispatch) {
     try {
       console.log("authenticateUser called")
       dispatch(loginRequest())
       console.log("after")
-      const j_sessionid = await authenticationService.login(username,password)
+      const j_sessionid = await authenticationService.login(username, password)
       await authenticationService.storeSessionToken(j_sessionid)
       dispatch(loginSuccess(j_sessionid))
+      Actions.Preloader()
     }
-    catch(error) {
+    catch (error) {
       dispatch(loginFailure(error))
     }
   }
 }
 
 export function downloadJobMaster() {
-  return async function(dispatch) {
+  return async function (dispatch) {
     try {
       const deviceIMEI = await checkAssetService.getDeviceIMEI()
       const deviceSIM = await checkAssetService.getDeviceSIM()
       let user = await jobMasterService.getUser()
-      const currentJobMasterVersion = (user!=null || user!=undefined)?user.currentJobMasterVersion:0;
-      const companyId = (user!=null|| user!=undefined)?user.currentJobMasterVersion:0;
-      const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,currentJobMasterVersion,companyId)
+      const currentJobMasterVersion = (user != null || user != undefined) ? user.currentJobMasterVersion : 0;
+      const companyId = (user != null || user != undefined) ? user.currentJobMasterVersion : 0;
+      const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, companyId)
       const json = await jobMasters.json
-    } catch(error) {
+    } catch (error) {
       dispatch(jobMasterDownloadFailure(error))
     }
   }
 }
 
 export function saveJobMaster(jobMasterResponse) {
-  return async function(dispatch) {
-  try {
-    if(jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
-      dispatch(jobMasterSavingStart())
-      jobMasterService.saveJobMaster(jobMasterResponse)
-    } else {
-      dispatch(timeMismatch())
+  return async function (dispatch) {
+    try {
+      if (jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
+        dispatch(jobMasterSavingStart())
+        jobMasterService.saveJobMaster(jobMasterResponse)
+      } else {
+        dispatch(timeMismatch())
+      }
+    } catch (error) {
+      dispatch(saveJobMasterFailure(error))
     }
-  } catch(error) {
-    dispatch(saveJobMasterFailure(error))
-  }
   }
 }
 
 export function checkAsset() {
-  return async function(dispatch) {
-  const deviceIMEI = await checkAssetService.getDeviceIMEI()
-  const deviceSIM = await checkAssetService.getDeviceSIM()
-  dispatch(checkAssetStart())
+  return async function (dispatch) {
+    const deviceIMEI = await checkAssetService.getDeviceIMEI()
+    const deviceSIM = await checkAssetService.getDeviceSIM()
+    dispatch(checkAssetStart())
   }
 }
 
@@ -263,21 +286,22 @@ export function checkAsset() {
  * so set the state to logout.
  * Otherwise, the user will default to the login in screen.
  */
-export function getSessionToken () {
-  return async function(dispatch)  {
-    try{
-      // dispatch(sessionTokenRequest())
-      // const token = await storeConfig.getSessionToken()
-      // if (token) {
-      //   dispatch(sessionTokenRequestSuccess(token))
-      //   Actions.Tabbar()
-      // } else {
-      //   dispatch(sessionTokenRequestFailure())
-      //   Actions.InitialLoginForm()
-      // }
-      Actions.InitialLoginForm()
+export function getSessionToken() {
+  return async function (dispatch) {
+    try {
+      console.log("getSessionToken")
+      dispatch(sessionTokenRequest())
+      const token = await storeConfig.getSessionToken()
+      console.log(token)
+      if (token) {
+        dispatch(sessionTokenRequestSuccess(token))
+        Actions.Preloader()
+      } else {
+        dispatch(sessionTokenRequestFailure())
+        Actions.InitialLoginForm()
+      }
     }
-    catch(error) {
+    catch (error) {
       dispatch(sessionTokenRequestFailure(error))
       dispatch(loginState())
       Actions.InitialLoginForm()
@@ -303,8 +327,8 @@ export function getSessionToken () {
  * haven't used the app for a long time.  Or they used another
  * device and logged out there.
  */
-export function logout () {
-  return async function(dispatch)  {
+export function logout() {
+  return async function (dispatch) {
     try {
       dispatch(logoutRequest())
       const token = await storeConfig.getSessionToken()
@@ -313,9 +337,9 @@ export function logout () {
       dispatch(deleteSessionToken())
       Actions.InitialLoginForm()
     }
-    catch(error){
+    catch (error) {
       dispatch(logoutFailure(error))
-      if(checkAssetService.checkAsset(deviceIMEI,deviceSIM,user.hubId,user.company.id)) {
+      if (checkAssetService.checkAsset(deviceIMEI, deviceSIM, user.hubId, user.company.id)) {
 
       }
     }

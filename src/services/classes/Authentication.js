@@ -69,7 +69,7 @@ class Authentication {
      * Store the session key
      */
     storeSessionToken(sessionToken) {
-
+        
     }
 
     getJSessionId(){}

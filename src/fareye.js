@@ -1,16 +1,17 @@
 'use strict'
 import React from 'react'
 import {
-    AppRegistry,
-    StyleSheet,
-    View,
-    Text } from 'react-native'
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text
+} from 'react-native'
 /**
  * ### Router-Flux
  *
  * Necessary components from Router-Flux
  */
-import { Router, Scene, Actions} from 'react-native-router-flux'
+import { Router, Scene, Actions } from 'react-native-router-flux'
 
 /**
  * ### Redux
@@ -43,6 +44,7 @@ import Utilities from './containers/Utilities'
 import Message from './containers/Message'
 import Scanner from './components/Scanner'
 import Login2 from './containers/Login2'
+import Preloader from './containers/Preloader'
 // import Subview from './containers/Subview'
 
 /**
@@ -69,6 +71,7 @@ import {setStore} from './modules/global/globalActions'
 import AuthInitialState from './modules/login/loginInitialState'
 import DeviceInitialState from './modules/device/deviceInitialState'
 import GlobalInitialState from './modules/global/globalInitialState'
+import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
@@ -83,11 +86,12 @@ var VERSION = pack.version
  * Create instances for the keys of each structure in snowflake
  * @returns {Object} object with 4 keys
  */
-function getInitialState () {
+function getInitialState() {
   const _initState = {
     auth: new AuthInitialState(),
     device: (new DeviceInitialState()).set('isMobile', true),
-    global: (new GlobalInitialState())
+    global: (new GlobalInitialState()),
+    preloader: (new PreloaderInitiaState())
   }
   return _initState
 }
@@ -115,14 +119,14 @@ const styles = StyleSheet.create({
  * Displays the icon for the tab w/ color dependent upon selection
  */
 class TabIcon extends React.Component {
-  render () {
+  render() {
     var color = this.props.selected ? '#0091EA' : '#878787'
     return (
-      <View style={{flex: 1, flexDirection: 'column', alignItems: 'center', alignSelf: 'center'}}>
-        <Ionicons style={{color: color}} name={this.props.iconName} size={26} />
-        <Text style={{color: color, fontSize: 12, marginTop: 3}}>{this.props.title}</Text>
+      <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', alignSelf: 'center' }}>
+        <Ionicons style={{ color: color }} name={this.props.iconName} size={26} />
+        <Text style={{ color: color, fontSize: 12, marginTop: 3 }}>{this.props.title}</Text>
       </View>
-     )
+    )
   }
 }
 
@@ -135,9 +139,9 @@ class TabIcon extends React.Component {
  * will be used when doing hot loading
  */
 
-export default function native (platform) {
+export default function native(platform) {
   let Fareye = React.createClass({
-    render () {
+    render() {
       const store = configureStore(getInitialState())
 
       // configureStore will combine modules from FarEye and Main application
@@ -152,7 +156,7 @@ export default function native (platform) {
 
         <Provider store={store}>
           <Router sceneStyle={{ backgroundColor: 'white' }}>
-            
+
             <Scene key='root'
               hideNavBar={false} >
               <Scene key='App'
@@ -164,7 +168,14 @@ export default function native (platform) {
               <Scene key='InitialLoginForm'
                 component={Login2}
                 hideNavBar
-                type='replace' />
+                type='replace'
+                 />
+
+              <Scene key='Preloader'
+                component={Preloader}
+                hideNavBar
+                title='Preloader'
+                 />
 
               <Scene key='Scanner'
                 title='Scanner'
@@ -176,50 +187,50 @@ export default function native (platform) {
                 tabBarStyle={styles.tabBar}
                 default='Main'>
 
-                  <Scene key='Main'
-                    title='Home'
-                    iconName={"ios-home-outline"}
-                    icon={TabIcon}
-                    hideNavBar
-                    component={Main}
-                    initial />
+                <Scene key='Main'
+                  title='Home'
+                  iconName={"ios-home-outline"}
+                  icon={TabIcon}
+                  hideNavBar
+                  component={Main}
+                  initial />
 
-                  <Scene key='ReSync'
-                    title='Re-sync'
-                    icon={TabIcon}
-                    iconName={"ios-sync-outline"}
-                    onPress={()=> {}}/>
+                <Scene key='ReSync'
+                  title='Re-sync'
+                  icon={TabIcon}
+                  iconName={"ios-sync-outline"}
+                  onPress={() => { }} />
 
-                  <Scene key='Message'
-                    title='Message'
-                    icon={TabIcon}
-                    iconName={"ios-chatboxes-outline"}
-                    hideNavBar
-                    component={Message}/>
+                <Scene key='Message'
+                  title='Message'
+                  icon={TabIcon}
+                  iconName={"ios-chatboxes-outline"}
+                  hideNavBar
+                  component={Message} />
 
-                  <Scene key='<Utilitie></Utilitie>s'
-                    title='Utilities'
-                    icon={TabIcon}
-                    hideNavBar
-                    iconName={"ios-apps-outline"}
-                    component={Utilities}/>
+                <Scene key='<Utilitie></Utilitie>s'
+                  title='Utilities'
+                  icon={TabIcon}
+                  hideNavBar
+                  iconName={"ios-apps-outline"}
+                  component={Utilities} />
 
-                  <Scene key='Logout'
-                    title='Logout'
-                    icon={TabIcon}
-                    iconName={"ios-power-outline"}
-                    hideNavBar
-                    component={Logout} />
-                </Scene>
+                <Scene key='Logout'
+                  title='Logout'
+                  icon={TabIcon}
+                  iconName={"ios-power-outline"}
+                  hideNavBar
+                  component={Logout} />
+              </Scene>
             </Scene>
           </Router>
         </Provider>
       )
     }
   })
-    /**
-     * registerComponent to the AppRegistery and off we go....
-     */
+  /**
+   * registerComponent to the AppRegistery and off we go....
+   */
 
   AppRegistry.registerComponent('FareyeReact', () => Fareye)
 }

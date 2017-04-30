@@ -10,7 +10,7 @@ import {
     Text,
     View
 } from 'react-native';
-import Camera from 'react-native-camera';
+// import Camera from 'react-native-camera';
 import Login from '../containers/Login';
 import {Actions} from 'react-native-router-flux';
 

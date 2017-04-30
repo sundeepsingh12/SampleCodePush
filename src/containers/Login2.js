@@ -21,7 +21,7 @@ import {Actions} from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
-import * as globalActions from '../modules/global/globalActions'
+// import * as globalActions from '../modules/global/globalActions'
 
 var styles = StyleSheet.create({
   container: {
@@ -60,13 +60,13 @@ var styles = StyleSheet.create({
 function mapStateToProps (state) {
     return {
         auth: state.auth,
-        global: state.global,
+        // global: state.global,
     }
 }
 
 function mapDispatchToProps (dispatch) {
     return {
-        actions: bindActionCreators({ ...authActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...authActions }, dispatch)
     }
 }
 
@@ -89,7 +89,7 @@ class Login2 extends Component {
 
     login(login) {
         console.log("login called")
-        this.props.actions.authenticateUser(this.props.global.username, sha256(this.props.global.password))
+        this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password))
     }
 
     scanLogin() {
@@ -97,8 +97,8 @@ class Login2 extends Component {
     }
 
     componentDidMount(){
-        if(this.props.global.startLogin){
-            login(login,this.props.global.username, sha256(this.props.global.password))
+        if(this.props.auth.form.startLogin){
+            login(login,this.props.auth.form.username, sha256(this.props.auth.form.password))
         }
     }
 
@@ -116,14 +116,14 @@ class Login2 extends Component {
               <View style={styles.width70}>
                 <Item style={{borderWidth: 0}}>
                     <Input
-                        value = {this.props.global.username}
+                        value = {this.props.auth.form.username}
                         placeholder = 'Username'
                         style= {feTheme.roundedInput}
                         onChangeText = {(value) => {this.onChangeUsername(value)}}/>
                 </Item>
                 <Item style={{borderWidth: 0, marginTop: 15}}>
                     <Input
-                        value = {this.props.global.password}
+                        value = {this.props.auth.form.password}
                         placeholder='Password'
                         style={feTheme.roundedInput}
                         secureTextEntry={true}
@@ -133,19 +133,19 @@ class Login2 extends Component {
                 </Item>
                 
                 <Button
-                 disabled = {this.props.global.isButtonDisabled} 
+                 disabled = {this.props.auth.form.isButtonDisabled} 
                  onPress={(username,password) => {this.login(username,password)}} rounded success style={{width: '100%', marginTop: 15}}>
                     <Text style={{textAlign: 'center', width: '100%', color: 'white'}}>Log In</Text>
                 </Button>
 
                 <View style={{flexDirection: 'row', flexGrow: 1, justifyContent: 'flex-start', marginTop: 15}}>
-                    <CheckBox checked={true} />
+                    <CheckBox checked={false} />
                     <Text style={{marginLeft: 20}}>Remember Me</Text>
                 </View>
                   
                 <View style={{marginTop: 35}}>
                   <Text style={{textAlign:'center', color: '#d3d3d3', marginBottom: 10}}>
-                   ...
+                   {this.props.auth.form.displayMessage}...
                   </Text>
                   <Button onPress={this.scanLogin.bind(this)} rounded style={{width: '100%', }}>
                     <Text style={{textAlign: 'center', width: '100%', color: 'white'}}>Scanner</Text>

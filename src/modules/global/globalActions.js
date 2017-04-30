@@ -22,34 +22,13 @@ const {
  * ## set the sessionToken
  *
  */
-export function setSessionToken (sessionToken) {
+export function setSessionToken(sessionToken) {
   return {
     type: SET_SESSION_TOKEN,
     payload: sessionToken
   }
 }
 
-/**
- * ## set the username
- *
- */
-export function onChangeUsername (value) {
-  return {
-    type: ON_GLOBAL_USERNAME_CHANGE,
-    payload: value
-  }
-}
-
-/**
- * ## set the password
- *
- */
-export function onChangePassword (value) {
-  return {
-    type: ON_GLOBAL_PASSWORD_CHANGE,
-    payload: value
-  }
-}
 /**
  * ## set the store
  *
@@ -58,7 +37,7 @@ export function onChangePassword (value) {
  * this is here to support Hot Loading
  *
  */
-export function setStore (store) {
+export function setStore(store) {
   return {
     type: SET_STORE,
     payload: store
@@ -71,14 +50,14 @@ export function setStore (store) {
  * @return {{type: *, payload: *}}
  */
 export function setCredentials(credentials) {
-    return{
-        type:SET_CREDENTIALS,
-        payload:credentials
-    }
+  return {
+    type: SET_CREDENTIALS,
+    payload: credentials
+  }
 }
 
-export function checkConnection(){
-    return {
-        type:INTERNET_CONNECTION_STATUS
-    }
+export function checkConnection() {
+  return {
+    type: INTERNET_CONNECTION_STATUS
+  }
 }

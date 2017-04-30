@@ -39,7 +39,7 @@ const initialState = new InitialState()
  * @param {Object} state - initialState
  * @param {Object} action - type and payload
  */
-export default function globalReducer (state = initialState, action) {
+export default function globalReducer(state = initialState, action) {
   if (!(state instanceof InitialState)) return initialState.merge(state)
 
   switch (action.type) {
@@ -103,14 +103,14 @@ export default function globalReducer (state = initialState, action) {
         newState['device'] = _state.device.toJS()
         newState['profile'] = _state.profile.toJS()
 
-      // Make sure global doesn't have the previous currentState
+        // Make sure global doesn't have the previous currentState
         // let _noCurrentState =  _state.global.set('currentState',null);
         // let _noStore = _noCurrentState.set('store',null);
 
         newState['global'] = _state.global.set('currentState', null).set('store', null).toJS()
 
         return state.set('showState', action.payload)
-        .set('currentState', newState)
+          .set('currentState', newState)
       } else {
         return state.set('showState', action.payload)
       }
@@ -124,42 +124,16 @@ export default function globalReducer (state = initialState, action) {
     case SET_STATE:
       var global = JSON.parse(action.payload).global
       var next = state.set('currentUser', global.currentUser)
-          .set('showState', false)
-          .set('currentState', null)
-      return next
-
-    case ON_GLOBAL_USERNAME_CHANGE:
-      const username = action.payload
-      console.log(state.password)
-      const passwordState = state.password
-      if(username != undefined && username != null && username != '' && passwordState != undefined && passwordState != null && passwordState != '') {
-        var next = state.set('username',username)
-                        .set('isButtonDisabled',false)
-      } else {
-        var next = state.set('username',username)
-                        .set('isButtonDisabled',true)
-      }
-      return next
-      
-    case ON_GLOBAL_PASSWORD_CHANGE:
-      const password = action.payload
-      console.log(state.username)
-      const usernameState = state.username
-      if(usernameState != undefined && usernameState != null && usernameState != '' && password != undefined && password != null && password != '') {
-        var next = state.set('password',password)
-                        .set('isButtonDisabled',false)
-      } else {
-        var next = state.set('password',password)
-                        .set('isButtonDisabled',true)
-      }
+        .set('showState', false)
+        .set('currentState', null)
       return next
 
     case SET_CREDENTIALS:
-        return state.set('username',action.payload.username
-            .set('password',action.payload.password))
+      return state.set('username', action.payload.username
+        .set('password', action.payload.password))
 
     case INTERNET_CONNECTION_STATUS:
-          return state.set('')
+      return state.set('')
 
   }
 

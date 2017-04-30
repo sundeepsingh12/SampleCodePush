@@ -12,7 +12,7 @@
 /**
  * ## Import
  */
-import {Record} from 'immutable'
+import { Record } from 'immutable'
 /**
  * ## InitialState
  *
@@ -29,10 +29,6 @@ import {Record} from 'immutable'
 var InitialState = Record({
   currentUser: null,
   store: null,
-  username:'',
-  password:'',
-  startLogin:false,
-  isInternetAvailable:false,
-  isButtonDisabled: true
+  isInternetAvailable: false,
 })
 export default InitialState

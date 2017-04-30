@@ -32,9 +32,10 @@ const {
 
   CHECK_ASSET_START,
   CHECK_ASSET_SUCCESS,
-  
+
   SET_STATE,
-  ON_AUTH_FORM_FIELD_CHANGE,
+  ON_LOGIN_USERNAME_CHANGE,
+  ON_LOGIN_PASSWORD_CHANGE,
 } = require('../../lib/constants').default
 
 const initialState = new InitialState()
@@ -43,7 +44,7 @@ const initialState = new InitialState()
  * @param {Object} state - initialState
  * @param {Object} action - type and payload
  */
-export default function authReducer (state = initialState, action) {
+export default function authReducer(state = initialState, action) {
   if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
 
   switch (action.type) {
@@ -106,16 +107,16 @@ export default function authReducer (state = initialState, action) {
      * the formValidation
      */
 
-    case ON_AUTH_FORM_FIELD_CHANGE: {
+    // case ON_AUTH_FORM_FIELD_CHANGE: {
       // const {field, value} = action.payload
       // let nextState = state.setIn(['form', 'fields', field], value)
       //     .setIn(['form', 'error'], null)
-        return state.set('')
+      // return state.set('')
 
       // return formValidation(
       // fieldValidation(nextState, action)
       // , action)
-    }
+    // }
 
     /**
      * ### Requests start
@@ -123,7 +124,7 @@ export default function authReducer (state = initialState, action) {
      */
     case LOGIN_START:
       return state.setIn(['form', 'authenticationService'], 'true')
-                  .setIn(['form','displayMessage'],'Login request initiated')
+        .setIn(['form', 'displayMessage'], 'Login request initiated')
 
 
     /**
@@ -135,9 +136,9 @@ export default function authReducer (state = initialState, action) {
     // case SIGNUP_SUCCESS:
     case LOGIN_SUCCESS:
     case LOGOUT_SUCCESS:
-    // case RESET_PASSWORD_SUCCESS:
+      // case RESET_PASSWORD_SUCCESS:
       return state.setIn(['form', 'authenticationService'], false)
-                  .setIn(['form','displayMessage'],'Login success')
+        .setIn(['form', 'displayMessage'], 'Login success')
 
     /**
      *
@@ -147,20 +148,20 @@ export default function authReducer (state = initialState, action) {
     // case SIGNUP_FAILURE:
     case LOGOUT_FAILURE:
     case LOGIN_FAILURE:
-    // case RESET_PASSWORD_FAILURE:
+      // case RESET_PASSWORD_FAILURE:
       return state.setIn(['form', 'authenticationService'], false)
-      .setIn(['form', 'displayMessage'], action.payload)
-          // .setIn(['form','displayMessage'],'Login failed')
+        .setIn(['form', 'displayMessage'], action.payload)
+    // .setIn(['form','displayMessage'],'Login failed')
 
 
     case MASTER_DOWNLOAD_START:
-      return state.setIn(['form','displayMessage'],'Job Master download initiated')
+      return state.setIn(['form', 'displayMessage'], 'Job Master download initiated')
 
     case CHECK_ASSET_START:
-      return state.setIn(['form','displayMessage'],'Checking Assets')
-    
+      return state.setIn(['form', 'displayMessage'], 'Checking Assets')
+
     case CHECK_ASSET_SUCCESS:
-      return state.setIn(['form','displayMessage'],'Assets Verified')
+      return state.setIn(['form', 'displayMessage'], 'Assets Verified')
     /**
      * ### Hot Loading support
      *
@@ -170,22 +171,48 @@ export default function authReducer (state = initialState, action) {
       var form = JSON.parse(action.payload).auth.form
 
       var next = state.setIn(['form', 'state'], form.state)
-          // .setIn(['form', 'disabled'], form.disabled)
-          .setIn(['form', 'displayMessage'], form.displayMessage)
-          // .setIn(['form', 'isValid'], form.isValid)
-          .setIn(['form', 'authenticationService'], form.authenticationService)
-          // .setIn(['form', 'fields', 'username'], form.fields.username)
-          // .setIn(['form', 'fields', 'usernameHasError'], form.fields.usernameHasError)
-          // .setIn(['form', 'fields', 'password'], form.fields.password)
-          // .setIn(['form', 'fields', 'passwordHasError'], form.fields.passwordHasError)
+        // .setIn(['form', 'disabled'], form.disabled)
+        .setIn(['form', 'displayMessage'], form.displayMessage)
+        // .setIn(['form', 'isValid'], form.isValid)
+        .setIn(['form', 'authenticationService'], form.authenticationService)
+      // .setIn(['form', 'fields', 'username'], form.fields.username)
+      // .setIn(['form', 'fields', 'usernameHasError'], form.fields.usernameHasError)
+      // .setIn(['form', 'fields', 'password'], form.fields.password)
+      // .setIn(['form', 'fields', 'passwordHasError'], form.fields.passwordHasError)
 
       return next
 
-    // case DELETE_TOKEN_REQUEST:
-    // case DELETE_TOKEN_SUCCESS:
-        /**
-         * no state change, just an ability to track action requests...
-         */
+    case ON_LOGIN_USERNAME_CHANGE:
+      const username = action.payload
+      console.log(state.form.password)
+      const passwordState = state.form.password
+      if (username != undefined && username != null && username != '' && passwordState != undefined && passwordState != null && passwordState != '') {
+        var next = state.setIn(['form', 'username'], username)
+          .setIn(['form', 'isButtonDisabled'], false)
+      } else {
+        var next = state.setIn(['form', 'username'], username)
+          .setIn(['form', 'isButtonDisabled'], true)
+      }
+      return next
+
+    case ON_LOGIN_PASSWORD_CHANGE:
+      const password = action.payload
+      console.log(state.form.username)
+      const usernameState = state.form.username
+      if (usernameState != undefined && usernameState != null && usernameState != '' && password != undefined && password != null && password != '') {
+        var next = state.setIn(['form', 'password'], password)
+          .setIn(['form', 'isButtonDisabled'], false)
+      } else {
+        var next = state.setIn(['form', 'password'], password)
+          .setIn(['form', 'isButtonDisabled'], true)
+      }
+      return next
+
+      // case DELETE_TOKEN_REQUEST:
+      // case DELETE_TOKEN_SUCCESS:
+      /**
+       * no state change, just an ability to track action requests...
+       */
       return state
 
   }
