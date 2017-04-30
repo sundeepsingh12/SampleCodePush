@@ -4,7 +4,7 @@
     <metrics statements="132" coveredstatements="27" conditionals="45" coveredconditionals="4" methods="56" coveredmethods="6" elements="233" coveredelements="37" complexity="0" loc="132" ncloc="132" packages="5" files="12" classes="12">
       <package name="lib">
         <metrics statements="51" coveredstatements="5" conditionals="36" coveredconditionals="0" methods="22" coveredmethods="1"/>
-        <file name="StoreConfig.js" path="/Users/gauravsrivastava/JavaDev/FareyeReact/src/lib/StoreConfig.js">
+        <file name="KeyValueDb.js" path="/Users/gauravsrivastava/JavaDev/FareyeReact/src/lib/KeyValueDb.js">
           <metrics statements="5" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="1"/>
           <line num="23" count="1" type="stmt"/>
           <line num="31" count="0" type="stmt"/>
@@ -164,7 +164,7 @@
       </package>
       <package name="repositories">
         <metrics statements="9" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="0"/>
-        <file name="index.js" path="/Users/gauravsrivastava/JavaDev/FareyeReact/src/repositories/index.js">
+        <file name="realmdb.js" path="/Users/gauravsrivastava/JavaDev/FareyeReact/src/repositories/realmdb.js">
           <metrics statements="9" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="0"/>
           <line num="8" count="1" type="stmt"/>
           <line num="9" count="1" type="stmt"/>

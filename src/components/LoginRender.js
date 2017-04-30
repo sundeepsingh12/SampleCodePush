@@ -17,8 +17,8 @@ import React from 'react'
 /**
  * The actions we need
  */
-import * as authActions from '../reducers/login/loginActions'
-import * as globalActions from '../reducers/global/globalActions'
+import * as authActions from '../modules/login/loginActions'
+import * as globalActions from '../modules/global/globalActions'
 
 /**
  * Router actions
@@ -32,8 +32,6 @@ import ErrorAlert from '../components/ErrorAlert'
 /**
  * The FormButton will change it's text between the 4 states as necessary
  */
-import ButtonSuccess from '../components/ButtonSuccess'
-import ButtonLinear from '../components/ButtonLinear'
 
 /**
  *  The LoginForm does the heavy lifting of displaying the fields for
@@ -142,6 +140,16 @@ function mapDispatchToProps (dispatch) {
     actions: bindActionCreators({ ...authActions, ...globalActions }, dispatch)
   }
 }
+
+function mapStateToProps (state) {
+    return {
+        auth: state.auth,
+        global: state.global,
+        username:state.username,
+        password:state.password
+    }
+}
+
 /**
  * ### Translations
  */
@@ -182,8 +190,8 @@ class LoginRender extends Component {
    */
   onChange (value) {
     if (value.username !== '') {
-      this.props.actions.onAuthFormFieldChange('username', value.username)
-    }
+          this.props.actions.onAuthFormFieldChange('username', value.username)
+      }
     if (value.password !== '') {
       this.props.actions.onAuthFormFieldChange('password', value.password)
     }

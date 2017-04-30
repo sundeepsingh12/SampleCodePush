@@ -10,9 +10,9 @@ import { connect } from 'react-redux'
 /**
  * Project actions
  */
-import * as authActions from '../reducers/login/loginActions'
-// import * as deviceActions from '../reducers/device/deviceActions'
-import * as globalActions from '../reducers/global/globalActions'
+import * as authActions from '../modules/login/loginActions'
+// import * as deviceActions from '../modules/device/deviceActions'
+import * as globalActions from '../modules/global/globalActions'
 
 /**
  * The components we need from ReactNative
@@ -34,7 +34,7 @@ function mapStateToProps (state) {
     deviceVersion: state.device.version,
     auth: {
       form: {
-        isFetching: state.auth.form.isFetching
+        isFetching: state.auth.form.authenticationService
       }
     },
     global: {

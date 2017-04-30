@@ -8,11 +8,12 @@
 /**
  * ## Imports
  *
- * our 4 reducers
+ * our 4 modules
  */
 import auth from './login/loginReducer'
 import device from './device/deviceReducer'
 import global from './global/globalReducer'
+import preloader from './pre-loader/preloaderReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -26,7 +27,8 @@ import { combineReducers } from 'redux'
 const rootReducer = combineReducers({
   auth,
   device,
-  global
+  global,
+  preloader
 })
 
 export default rootReducer

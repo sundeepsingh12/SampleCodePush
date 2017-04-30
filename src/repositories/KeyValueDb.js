@@ -11,8 +11,8 @@
  * Redux  & the config file
  */
 import store from 'react-native-simple-store'
-import CONFIG from './config'
-import CONSTANT from './constants'
+import CONFIG from '../lib/config'
+import CONSTANT from '../lib/constants'
 
 export class StoreConfig {
     constructor() {
@@ -50,7 +50,11 @@ export class StoreConfig {
 
     saveServerApkVersion(serverAPKVersion) {
         return store.save(this.SERVER_APK_VERSION, {
-            serverAPKVersion: serverAPKVersion
+            serverAPKVersion
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -60,7 +64,11 @@ export class StoreConfig {
 
     saveServerTime(serverTime) {
         return store.save(this.SERVER_APK_VERSION, {
-            serverTime: serverTime
+            serverTime
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -70,7 +78,11 @@ export class StoreConfig {
 
     saveHub(hub) {
         return store.save(this.HUB, {
-            hub: hub
+            hub
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -80,7 +92,11 @@ export class StoreConfig {
 
     saveLastSeenTimeForMessageBox(lastSeenTimeForMessageBox) {
         return store.save(this.LAST_SEEN_TIME_FOR_MESSAGE_BOX, {
-            lastSeenTimeForMessageBox: lastSeenTimeForMessageBox
+            lastSeenTimeForMessageBox
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -90,7 +106,11 @@ export class StoreConfig {
 
     saveHubLatLong(hubLatLong) {
         return store.save(this.HUB_LAT_LONG, {
-            hubLatLong: hubLatLong
+            hubLatLong
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -100,7 +120,11 @@ export class StoreConfig {
 
     saveUser(user) {
         return store.save(this.USER, {
-            user: user
+            user
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
 
     }
@@ -111,7 +135,11 @@ export class StoreConfig {
 
     saveJobMaster(jobMaster) {
         return store.save(this.JOB_MASTER, {
-            jobMaster: jobMaster
+            jobMaster
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -121,7 +149,11 @@ export class StoreConfig {
 
     saveJobAttributeMaster(jobAttributeMaster) {
         return store.save(this.JOB_ATTRIBUTE_MASTER, {
-            jobAttributeMaster: jobAttributeMaster
+            jobAttributeMaster
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -131,7 +163,11 @@ export class StoreConfig {
 
     saveJobAttributeValueMaster(jobAttributeValueMaster) {
         return store.save(this.JOB_ATTRIBUTE_VALUE_MASTER, {
-            jobAttributeValueMaster: jobAttributeValueMaster
+            jobAttributeValueMaster
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -145,7 +181,11 @@ export class StoreConfig {
 
     saveFieldAttributeMaster(fieldAttributeMaster) {
         return store.save(this.FIELD_ATTRIBUTE_MASTER, {
-            fieldAttributeMaster: fieldAttributeMaster
+            fieldAttributeMaster
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -159,7 +199,11 @@ export class StoreConfig {
 
     saveFieldAttributeValueMaster(fieldAttributeValueMaster) {
         return store.save(this.FIELD_ATTRIBUTE_VALUE_MASTER, {
-            fieldAttributeValueMaster: fieldAttributeValueMaster
+            fieldAttributeValueMaster
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -173,7 +217,11 @@ export class StoreConfig {
 
     saveJobStatus(jobStatus) {
         return store.save(this.JOB_STATUS, {
-            jobStatus: jobStatus
+            jobStatus
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -187,7 +235,11 @@ export class StoreConfig {
 
     saveCustomizationAppModules(customizationAppModules) {
         return store.save(this.CUSTOMIZATION_APP_MODULES, {
-            customizationAppModules: customizationAppModules
+            customizationAppModules
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -201,7 +253,11 @@ export class StoreConfig {
 
     saveCustomizationJobList(customizationJobList) {
         return store.save(this.CUSTOMIZATION_JOB_LIST, {
-            customizationJobList: customizationJobList
+            customizationJobList
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -215,7 +271,11 @@ export class StoreConfig {
 
     saveTabs(tabs) {
         return store.save(this.TABS, {
-            tabs: tabs
+            tabs
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -227,21 +287,16 @@ export class StoreConfig {
         return store.delete(this.TABS)
     }
 
-    /**
-     * ### storeSessionToken
-     * Store the session key
-     */
     storeSessionToken(sessionToken) {
         return store.save(this.SESSION_TOKEN_KEY, {
-            sessionToken: sessionToken
+            sessionToken
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
-    /**
-     * ### getSessionToken
-     * @param {Object} sessionToken the currentUser object
-     * Remember, the store is a promise so, have to be careful.
-     */
     getSessionToken() {
         return store.get(this.SESSION_TOKEN_KEY)
     }
@@ -256,7 +311,11 @@ export class StoreConfig {
 
     storeDeviceIMEI(deviceIMEI) {
         return store.save(this.DEVICE_IMEI, {
-            deviceIMEI: deviceIMEI
+            deviceIMEI
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -270,7 +329,11 @@ export class StoreConfig {
 
     storeDeviceSIM(deviceSIM) {
         return store.save(this.DEVICE_SIM, {
-            deviceSIM: deviceSIM
+            deviceSIM
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -284,7 +347,11 @@ export class StoreConfig {
 
     saveJobMoneyTransactionMode(jobMoneyTransactionMode){
         return store.save(this.JOB_MONEY_TRANSACTION_MODE,{
-            jobMoneyTransactionMode: jobMoneyTransactionMode
+            jobMoneyTransactionMode
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -298,7 +365,11 @@ export class StoreConfig {
 
     saveCustomerCare(customerCare){
         return store.save(this.CUSTOMER_CARE,{
-            customerCare: customerCare
+            customerCare
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -308,7 +379,11 @@ export class StoreConfig {
 
     saveSmsTemplate(smsTemplate){
         return store.save(this.SMS_TEMPLATE,{
-            smsTemplate: smsTemplate
+            smsTemplate
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -322,7 +397,11 @@ export class StoreConfig {
 
     saveFieldAttributeStatus(fieldAttributeStatus){
         return store.save(this.FIELD_ATTRIBUTE_STATUS,{
-            fieldAttributeStatus: fieldAttributeStatus
+            fieldAttributeStatus
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -336,7 +415,11 @@ export class StoreConfig {
 
     saveFieldValidations(fieldValidations){
         return store.save(this.FIELD_VALIDATIONS,{
-            fieldValidations: fieldValidations
+            fieldValidations
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -350,7 +433,11 @@ export class StoreConfig {
 
     saveFieldValidationsConditions(fieldValidationsConditions){
         return store.save(this.FIELD_VALIDATION_CONDITIONS,{
-            fieldValidationsConditions: fieldValidationsConditions
+            fieldValidationsConditions
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -364,7 +451,11 @@ export class StoreConfig {
 
     saveSmsJobStatuses(smsJobStatuses){
         return store.save(this.SMS_JOB_STATUSES,{
-            smsJobStatuses: smsJobStatuses
+            smsJobStatuses
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -378,7 +469,11 @@ export class StoreConfig {
 
     saveUserSummary(userSummary){
         return store.save(this.USER_SUMMARY,{
-            userSummary: userSummary
+            userSummary
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -392,7 +487,11 @@ export class StoreConfig {
 
     saveJobSummary(jobSummary){
         return store.save(this.JOB_SUMMARY,{
-            jobSummary: jobSummary
+            jobSummary
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
         })
     }
 
@@ -402,6 +501,24 @@ export class StoreConfig {
 
     deleteJobSummary(){
         return store.delete(this.JOB_SUMMARY)
+    }
+
+    saveMDMPolicies(mdmPolicies){
+        return store.save(this.MDM_POLICIES,{
+            mdmPolicies
+        }).then(() => {
+            return true;
+        }).catch(error => {
+            return error;
+        })
+    }
+
+    getMDMPolicies(){
+        return store.get(this.MDM_POLICIES)
+    }
+
+    deleteMDMPolicies(){
+        return store.delete(this.MDM_POLICIES)
     }
 
 }

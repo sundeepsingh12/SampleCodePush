@@ -16,13 +16,10 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../reducers/login/loginActions'
-import * as globalActions from '../reducers/global/globalActions'
+import * as authActions from '../modules/login/loginActions'
+import * as globalActions from '../modules/global/globalActions'
 
-/**
- * The FormButton will change it's text between the 4 states as necessary
- */
-import FormButton from '../components/FormButton'
+import {Button} from 'react-native'
 
 /**
  * The necessary React components
@@ -92,9 +89,9 @@ class Logout extends Component {
             <Right/>
         </Header>
         <View style={styles.container}>
-          <FormButton
+          <Button
             onPress={onButtonPress.bind(self)}
-            buttonText="Logout" />
+            title="Logout" />
         </View>
       </Container>
      

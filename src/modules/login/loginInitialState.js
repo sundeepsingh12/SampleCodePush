@@ -12,7 +12,7 @@
 /**
  * ## Import
  */
-const {Record} = require('immutable')
+const { Record } = require('immutable')
 
 /**
  * ## Form
@@ -20,20 +20,23 @@ const {Record} = require('immutable')
  * fields it contains.
  */
 const Form = Record({
-  disabled: false,
-  error: null,
-  isValid: false,
-  isFetching: false,
-  currentStep: '',
-  fields: new (Record({
-    username: '',
-    usernameHasError: false,
-    usernameErrorMsg: '',
-    password: '',
-    passwordHasError: false,
-    passwordErrorMsg: '',
-    showPassword: false
-  }))
+  // error: null,
+  // isValid: false,
+  authenticationService: '', //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
+  displayMessage: '',
+  isButtonDisabled: true,
+  startLogin: false,
+  username: '',
+  password: '',
+  // fields: new (Record({
+  // username: '',
+  // usernameHasError: false,
+  // usernameErrorMsg: '',
+  // password: '',
+  // passwordHasError: false,
+  // passwordErrorMsg: '',
+  // showPassword: false
+  // }))
 })
 
 /**

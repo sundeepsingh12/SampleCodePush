@@ -10,22 +10,20 @@ import {
     Text,
     View
 } from 'react-native';
-import Camera from 'react-native-camera';
+// import Camera from 'react-native-camera';
 import Login from '../containers/Login';
 import {Actions} from 'react-native-router-flux';
 
 
 class Scanner extends Component {
 
-    constructor() {
-        super();
-        this.state = {
-            showCamera: true,
-            cameraType: Camera.constants.Type.back,
-            username:'',
-            password:''
-        };
-    }
+    // constructor() {
+    //     super();
+    //     this.state = {
+    //         showCamera: true,
+    //         cameraType: Camera.constants.Type.back,
+    //     };
+    // }
 
     render() {
         return (
@@ -48,13 +46,13 @@ class Scanner extends Component {
             );
         }
         else {
-            const details = {
+            const credentials = {
                 username : this.state.username,
                 password : this.state.password
             };
 
             return (
-                <Login details = {details} />
+                <Login credentials = {credentials} />
             )
         }
     }
@@ -62,7 +60,8 @@ class Scanner extends Component {
     _onBarCodeRead(e) {
         const username = e.data.split("/")[0];
         const password = e.data.split("/")[1];
-        this.setState({showCamera: false,username,password});
+        // this.setState({showCamera: false,username,password});
+        dispatch()
     }
 
     goBack(){

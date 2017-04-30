@@ -6,6 +6,8 @@ export default keyMirror({
     //Global Actions
     SET_STORE: null,
     SET_SESSION_TOKEN: null,
+    SET_CREDENTIALS: null,
+    INTERNET_CONNECTION_STATUS: null,
 
     //Device Actions
     SET_PLATFORM: null,
@@ -23,9 +25,16 @@ export default keyMirror({
 
     MASTER_DOWNLOAD_START: null,
     MASTER_DOWNLOAD_SUCCESS: null,
+    MASTER_DOWNLOAD_FAILURE: null,
+
+    MASTER_SAVING_START: null,
+    MASTER_SAVING_SUCCESS: null,
+    MASTER_SAVING_FAILURE: null,
+    MASTER_TIME_FAILURE: null,
 
     CHECK_ASSET_START: null,
     CHECK_ASSET_SUCCESS: null,
+    CHECK_ASSET_FAILURE: null,
 
     SESSION_TOKEN_REQUEST: null,
     SESSION_TOKEN_SUCCESS: null,
@@ -35,6 +44,14 @@ export default keyMirror({
     DELETE_TOKEN_SUCCESS: null,
 
     ON_AUTH_FORM_FIELD_CHANGE: null,
+    ON_LOGIN_USERNAME_CHANGE: null,
+    ON_LOGIN_PASSWORD_CHANGE: null,
+
+    //Long running service's possible status
+    SERVICE_PENDING: null,
+    SERVICE_RUNNING: null,
+    SERVICE_SUCCESS: null,
+    SERVICE_FAILED: null,
 
 
     //Database tables
