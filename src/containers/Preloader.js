@@ -39,7 +39,8 @@ function mapDispatchToProps(dispatch) {
 class Preloader extends Component {
 
   componentDidMount(){
-        preloaderActions.downloadJobMaster()
+    console.log("componentDidMount")
+    this.props.actions.downloadJobMaster()
     }
 
   _renderErrorMessage() {

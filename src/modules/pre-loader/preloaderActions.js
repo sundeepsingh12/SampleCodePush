@@ -106,12 +106,13 @@ export function saveJobMaster(jobMasterResponse) {
       if (jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
         dispatch(jobMasterSavingStart())
         jobMasterService.saveJobMaster(jobMasterResponse)
-        dispatch(jobMasterDownloadSuccess())
+        dispatch(jobMasterSavingSuccess())
+        checkAsset()
       } else {
         dispatch(timeMismatch())
       }
     } catch (error) {
-      dispatch(saveJobMasterFailure(error))
+      dispatch(jobMasterSavingFailure(error))
     }
   }
 }
