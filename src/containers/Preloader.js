@@ -8,7 +8,7 @@ import {
   Image
 }
   from 'react-native'
-import feStyle from '../Themes/FeStyle'
+import feStyle from '../themes/FeStyle'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Container, Content, Button, List, ListItem, Thumbnail, Body, Left, Right, Badge, Spinner } from 'native-base';
 import { Actions } from 'react-native-router-flux'
@@ -39,7 +39,6 @@ function mapDispatchToProps(dispatch) {
 class Preloader extends Component {
 
   componentDidMount(){
-    console.log("componentDidMount")
     this.props.actions.downloadJobMaster()
     }
 
@@ -159,6 +158,5 @@ var styles = StyleSheet.create({
     resizeMode: 'contain'
   },
 })
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(Preloader)

@@ -4,12 +4,15 @@
 
 const fieldAttributeValue = {
     "id":"/fieldAttributeValue",
-    "type":"object",
-    "properties":{
-        "id":{"type":"long"},
-        "name":{"type":"string"},
-        "code":{"type":"string"},
-        "fieldAttributeMasterId":{"type":"long"}
+    "type":"array",
+    "items": {
+        "type":"object",
+        "properties": {
+            "id": {"type": "number","required":true},
+            "name": {"type": "string","required":true},
+            "code": {"type": "string","required":true},
+            "fieldAttributeMasterId": {"type": "number","required":true}
+        }
     }
 };
 

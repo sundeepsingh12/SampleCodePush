@@ -4,15 +4,18 @@
 
 const fieldAttributeValidationCondition = {
     "id":"/fieldAttributeValidationCondition",
-    "type":"object",
-    "properties":{
-        "id":{"type":"long"},
-        "key":{"type":"string"},
-        "assignValue":{"type":"string"},
-        "type":{"type":"string"},
-        "conditionType":{"type":"string"},
-        "fieldAttributeMasterValidationId":{"type":"long"},
-        "actionOnAssignFrom":{"type":"string"}
+    "type":"array",
+    "items": {
+        "type":"object",
+        "properties": {
+            "id": {"type": "number","required":true},
+            "key": {"type": "string"},
+            "assignValue": {"type": "string"},
+            "type": {"type": "string"},
+            "conditionType": {"type": "string"},
+            "fieldAttributeMasterValidationId": {"type": "number"},
+            "actionOnAssignFrom": {"type": "string"}
+        }
     }
 };
 

@@ -15,7 +15,7 @@ from 'react-native'
 
 import { Container, Body, InputGroup, Button, Input, Item, ListItem, CheckBox} from 'native-base';
 
-import feTheme from '../Themes/feTheme';
+import feTheme from '../themes/feTheme';
 import sha256 from 'sha256';
 import {Actions} from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'

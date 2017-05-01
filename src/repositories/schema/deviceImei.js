@@ -17,4 +17,6 @@ const deviceImei = {
         "overallDataConsumptionViaWifi":{},
         "dataConsumptionByFarEye":{}
     }
-}
+};
+
+module.exports = deviceImei;

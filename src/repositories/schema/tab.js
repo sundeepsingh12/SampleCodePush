@@ -4,11 +4,14 @@
 
 const tab = {
     "id":"/tab",
-    "type":"object",
-    "properties":{
-        "id":{"type":"long"},
-        "name":{"type":"string"},
-        "isDefault":{"type":"string"}
+    "type":"array",
+    "items": {
+        "type":"object",
+        "properties": {
+            "id": {"type": "long"},
+            "name": {"type": "string"},
+            "isDefault": {"type": "string"}
+        }
     }
 };
 

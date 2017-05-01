@@ -4,11 +4,17 @@
 
 const smsTemplate = {
     "id":"/smsTemplate",
-    "type": "object",
-    "properties": {
-        "title":{"type":"string"},
-        "body":{"type":"string"},
-        "jobMasterId":{"type":"integer"}
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {"type": "number"},
+            "title": {"type": "string"},
+            "body": {"type": "string"},
+            "jobMasterId": {"type": "integer"},
+            "companyId": {"type": "number"},
+            "enabled": {"type": "number"}
+        }
     }
 };
 

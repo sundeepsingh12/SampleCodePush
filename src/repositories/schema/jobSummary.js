@@ -4,16 +4,19 @@
 
 const jobSummary = {
     "id":"/jobSummary",
-    "type":"object",
-    "properties":{
-        "id":{"type":"long"},
-        "userId":{"type":"long"},
-        "hubId":{"type":"long"},
-        "companyId":{"type":"long"},
-        "date":{"type":"string"},
-        "count":{"type":"integer"},
-        "jobMasterId":{"type":"long"},
-        "jobStatusId":{"type":"long"}
+    "type":"array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {"type": "number"},
+            "userId": {"type": "number"},
+            "hubId": {"type": "number"},
+            "companyId": {"type": "integer"},
+            "date": {"type": "string"},
+            "count": {"type": "integer"},
+            "jobMasterId": {"type": "number"},
+            "jobStatusId": {"type": "number"}
+        }
     }
 };
 

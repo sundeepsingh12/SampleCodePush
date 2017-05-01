@@ -35,7 +35,7 @@ const {
 const BackendFactory = require('../../lib/BackendFactory').default
 
 import { Actions } from 'react-native-router-flux'
-import { storeConfig } from '../../repositories/KeyValueDb'
+import { keyValueDB } from '../../repositories/keyValueDb'
 import { authenticationService } from '../../services/classes/Authentication'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { checkAssetService } from '../../services/classes/CheckAsset'
@@ -204,7 +204,7 @@ export function onChangePassword(value) {
 export function deleteSessionToken() {
   return async function (dispatch) {
     dispatch(deleteTokenRequest())
-    await storeConfig.deleteSessionToken()
+    await keyValueDB.deleteSessionToken()
     dispatch(deleteTokenRequestSuccess())
   }
 }
@@ -260,7 +260,7 @@ export function getSessionToken() {
     try {
       console.log("getSessionToken")
       dispatch(sessionTokenRequest())
-      const token = await storeConfig.getSessionToken()
+      const token = await keyValueDB.getSessionToken()
       console.log(token)
       if (token) {
         dispatch(sessionTokenRequestSuccess(token))
@@ -300,7 +300,7 @@ export function logout() {
   return async function (dispatch) {
     try {
       dispatch(logoutRequest())
-      const token = await storeConfig.getSessionToken()
+      const token = await keyValueDB.getSessionToken()
       await BackendFactory(token).logout()
       dispatch(logoutSuccess())
       dispatch(deleteSessionToken())

@@ -19,4 +19,6 @@ const deviceSim = {
         "isVerified":{"type":"boolean"},
         "otpExpiryTime":{}
     }
-}
+};
+
+module.exports = deviceSim;

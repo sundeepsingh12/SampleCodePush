@@ -9,7 +9,7 @@
 'use strict'
 
 import React from 'react';
-import feStyle from '../Themes/FeStyle'
+import feStyle from '../themes/FeStyle'
 import { Spinner } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import

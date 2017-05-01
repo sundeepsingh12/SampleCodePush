@@ -4,12 +4,17 @@
 
 const customizationAppModule = {
     "id":"/customizationAppModule",
-    "type":"object",
-    "properties":{
-        "appModulesId":{"type":"integer"},
-        "displayName":{"type":"string"},
-        "remark":{"type":"string"},
-        "selectedUserType":{"type":"string"}
+    "type":"array",
+    "items": {
+        "type":"object",
+        "properties": {
+            "appModulesId": {"type": "integer"},
+            "displayName": {"type": "string"},
+            "remark": {"type": "string"},
+            "selectedUserType": {"type": "string"}
+        }
     }
 }
+
+module.exports = customizationAppModule;
 

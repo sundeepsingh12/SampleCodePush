@@ -4,7 +4,7 @@
     <metrics statements="132" coveredstatements="27" conditionals="45" coveredconditionals="4" methods="56" coveredmethods="6" elements="233" coveredelements="37" complexity="0" loc="132" ncloc="132" packages="5" files="12" classes="12">
       <package name="lib">
         <metrics statements="51" coveredstatements="5" conditionals="36" coveredconditionals="0" methods="22" coveredmethods="1"/>
-        <file name="KeyValueDb.js" path="/Users/gauravsrivastava/JavaDev/FareyeReact/src/lib/KeyValueDb.js">
+        <file name="keyValueDb.js" path="/Users/gauravsrivastava/JavaDev/FareyeReact/src/lib/keyValueDb.js">
           <metrics statements="5" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="1"/>
           <line num="23" count="1" type="stmt"/>
           <line num="31" count="0" type="stmt"/>

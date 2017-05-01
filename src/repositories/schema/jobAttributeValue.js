@@ -4,12 +4,15 @@
 
 const jobAttributeValue = {
     "id":"/jobAttributeValue",
-    "type":"object",
-    "properties":{
-        "id":{"type":"long"},
-        "name":{"type":"string"},
-        "code":{"type":"string"},
-        "jobAttributeMasterId":{"type":"long"}
+    "type":"array",
+    "items": {
+        "type":"object",
+        "properties": {
+            "id": {"type": "number","required":true},
+            "name": {"type": "string"},
+            "code": {"type": "string"},
+            "jobAttributeMasterId": {"type": "number","required":true}
+        }
     }
 };
 

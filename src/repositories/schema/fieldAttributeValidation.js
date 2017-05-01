@@ -4,16 +4,19 @@
 
 const fieldAttributeValidation = {
     "id":"/fieldAttributeValidation",
-    "type":"object",
-    "properties":{
-        "id":{"type":"long"},
-        "timeOfExecution":{"type":"string"},
-        "leftKey":{"type":"string"},
-        "condition":{"type":"string"},
-        "rightKey":{"type":"string"},
-        "fieldAttributeMasterId":{"type":"long"},
-        "companyId":{"type":"long"},
-        "jobMasterId":{"type":"long"}
+    "type":"array",
+    "items": {
+        "type":"object",
+        "properties": {
+            "id": {"type": "number","required":true},
+            "timeOfExecution": {"type": "string","required":true},
+            "leftKey": {"type": "string","required":true},
+            "condition": {"type": "string","required":true},
+            "rightKey": {"type": "string","required":true},
+            "fieldAttributeMasterId": {"type": "number","required":true},
+            "companyId": {"type": "number","required":true},
+            "jobMasterId": {"type": "number","required":true}
+        }
     }
 };
 

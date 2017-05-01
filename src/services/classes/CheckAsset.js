@@ -1,11 +1,16 @@
 'use strict'
 
-import {storeConfig} from '../../repositories/KeyValueDb'
+import {keyValueDB} from '../../repositories/keyValueDb'
 const BackendFactory = require('../../lib/BackendFactory').default
 import CONFIG from '../../lib/config'
 
-class CheckAsset {
+const {
+   deviceImei,
+   deviceSim
 
+} = require('../../lib/constants').default
+
+class CheckAsset {
 
     /**
      * # Check Asset API(Post)
@@ -19,10 +24,10 @@ class CheckAsset {
      * deviceSIM
      */
     checkAssetAPI(deviceIMEI,deviceSIM) {
-        if(deviceIMEI===null || deviceIMEI===undefined){
+        if(!deviceIMEI){
             deviceIMEI = {}
         }
-        if(deviceSIM===null || deviceSIM ===undefined){
+        if(!deviceSIM){
             deviceSIM = {}
         }
         const postData = JSON.stringify({
@@ -36,45 +41,15 @@ class CheckAsset {
         }
     }
 
-    /**
-     * # Save Device IMEI
-     * @param {*} deviceIMEI
-     * @returns
-     * boolean (true|false)
-     */
-    saveDeviceIMEI(deviceIMEI) {
-        storeConfig.storeDeviceIMEI(deviceIMEI);
+
+    validateAndSaveData(schemaName,data){
+        const storeValue = keyValueDB.validateAndSaveData(schemaName,data);
+        return storeValue;
     }
 
-
-    /**
-     * # Save Device SIM
-     * @param {*} deviceSIM
-     * @returns
-     * boolean (always true)
-     */
-    saveDeviceSIM(deviceSIM) {
-        storeConfig.storeDeviceSIM(deviceSIM);
-    }
-
-    /**
-     * # Get Device IMEI
-     * @returns
-     * deviceIMEI
-     */
-    getDeviceIMEI() {
-       const deviceIMEI =  storeConfig.getDeviceIMEI();
-       return deviceIMEI;
-    }
-
-    /**
-     * # Get Device SIM
-     * @returns
-     * deviceSIM
-     */
-    getDeviceSIM() {
-       const deviceSIM =  storeConfig.getDeviceSIM();
-       return deviceSIM;
+    getValueFromStore(schemaName){
+        const storeValue = keyValueDB.getValueFromStore(schemaName);
+        return storeValue;
     }
 
     /**
@@ -90,7 +65,7 @@ class CheckAsset {
 
     checkAsset(deviceIMEI,deviceSIM,companyID,hubID,simNumber) {
 
-       if(deviceIMEI != null && deviceSIM != null) {
+       if(deviceIMEI  && deviceSIM ) {
            if( hubID !== deviceIMEI.hubID ) {
                deviceIMEI.hubID = hubID;
            } 

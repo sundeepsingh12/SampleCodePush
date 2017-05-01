@@ -6,15 +6,18 @@ const user = {
     "id":"/user",
     "type":"object",
     "properties":{
-        "id":{},
-        "login":{},
-        "firstName":{},
-        "lastName":{},
-        "email":{},
-        "mobileNumber":{},
-        "employeeCode":{},
-        "cityId":{},
-        "hubId":{}
+        "id":{"type":"number"},
+        "login":{"type":"string"},
+        "firstName":{"type":"string"},
+        "lastName":{"type":"string"},
+        "email":{"type":"string"},
+        "mobileNumber":{"type":"string"},
+        "employeeCode":{"type":"string"},
+        "cityId":{"type":"number"},
+        "hubId":{"type":"number"},
+        "company":{"$ref": "/company"}
 
     }
 };
+
+module.exports = user;
