@@ -152,7 +152,8 @@ class JobMaster {
     }
 
     validateAndSaveData(schemaName,data){
-        const returnValue = storeConfig.validateAndSaveData(schemaName,data);
+        const storeValue = storeConfig.validateAndSaveData(schemaName,data);
+        return storeValue
     }
 
 

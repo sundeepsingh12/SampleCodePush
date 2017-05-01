@@ -72,79 +72,79 @@ export class StoreConfig {
     }
 
     validateAndSaveData(schemaName,value){
-        let instance = '',storeKey = '';
+        let schemaInstance = '',storeKey = '';
         switch(schemaName){
             case JOB_MASTER_SCHEMA:
                 storeKey = this.JOB_MASTER;
-                instance = require ('../repositories/schema/jobMaster');
+                schemaInstance = require ('../repositories/schema/jobMaster');
                 break;
             case USER_SCHEMA:
                 storeKey = this.USER;
-                instance = require ('../repositories/schema/user');
+                schemaInstance = require ('../repositories/schema/user');
                 break;
             case JOB_ATTRIBUTE_SCHEMA:
                 storeKey = this.JOB_ATTRIBUTE_MASTER;
-                instance = require ('../repositories/schema/jobAttribute');
+                schemaInstance = require ('../repositories/schema/jobAttribute');
                 break;
             case JOB_ATTRIBUTE_VALUE_SCHEMA:
                 storeKey = this.JOB_ATTRIBUTE_VALUE_MASTER;
-                instance = require ('../repositories/schema/jobAttributeValue');
+                schemaInstance = require ('../repositories/schema/jobAttributeValue');
                 break;
             case FIELD_ATTRIBUTE_SCHEMA:
                 storeKey = this.FIELD_ATTRIBUTE_MASTER;
-                instance = require ('../repositories/schema/fieldAttribute');
+                schemaInstance = require ('../repositories/schema/fieldAttribute');
                 break;
             case FIELD_ATTRIBUTE_VALUE_SCHEMA:
                 storeKey = this.FIELD_ATTRIBUTE_VALUE_MASTER;
-                instance = require ('../repositories/schema/fieldAttributeValue');
+                schemaInstance = require ('../repositories/schema/fieldAttributeValue');
                 break;
             case JOB_STATUS_SCHEMA:
                 storeKey = this.JOB_STATUS;
-                instance = require ('../repositories/schema/jobStatus');
+                schemaInstance = require ('../repositories/schema/jobStatus');
                 break;
             case TAB_SCHEMA:
                 storeKey = this.TABS;
-                instance = require ('../repositories/schema/tab');
+                schemaInstance = require ('../repositories/schema/tab');
                 break;
             case JOB_MASTER_MONEY_TRANSACTION_MODE_SCHEMA:
                 storeKey = this.JOB_MONEY_TRANSACTION_MODE;
-                instance = require ('../repositories/schema/jobMasterMoneyTransactionMode');
+                schemaInstance = require ('../repositories/schema/jobMasterMoneyTransactionMode');
                 break;
             case CUSTOMER_CARE_SCHEMA:
                 storeKey = this.CUSTOMER_CARE;
-                instance = require ('../repositories/schema/customerCare');
+                schemaInstance = require ('../repositories/schema/customerCare');
                 break;
             case SMS_TEMPLATE_SCHEMA:
                 storeKey = this.SMS_TEMPLATE;
-                instance = require ('../repositories/schema/smsTemplate');
+                schemaInstance = require ('../repositories/schema/smsTemplate');
                 break;
             case FIELD_ATTRIBUTE_STATUS_SCHEMA:
                 storeKey = this.FIELD_ATTRIBUTE_STATUS;
-                instance = require ('../repositories/schema/fieldAttributeStatus');
+                schemaInstance = require ('../repositories/schema/fieldAttributeStatus');
                 break;
             case FIELD_ATTRIBUTE_VALIDATION_SCHEMA:
                 storeKey = this.FIELD_VALIDATIONS;
-                instance = require ('../repositories/schema/fieldAttributeValidation');
+                schemaInstance = require ('../repositories/schema/fieldAttributeValidation');
                 break;
             case FIELD_ATTRIBUTE_VALIDATION_CONDITION_SCHEMA:
                 storeKey = this.FIELD_VALIDATION_CONDITIONS;
-                instance = require ('../repositories/schema/fieldAttributeValidationCondition');
+                schemaInstance = require ('../repositories/schema/fieldAttributeValidationCondition');
                 break;
             case SMS_JOB_STATUS_SCHEMA:
                 storeKey = this.SMS_JOB_STATUSES;
-                instance = require ('../repositories/schema/smsJobStatus');
+                schemaInstance = require ('../repositories/schema/smsJobStatus');
                 break;
             case USER_SUMMARY_SCHEMA:
                 storeKey = this.USER_SUMMARY;
-                instance = require ('../repositories/schema/userSummary');
+                schemaInstance = require ('../repositories/schema/userSummary');
                 break;
             case JOB_SUMMARY_SCHEMA:
                 storeKey = this.JOB_SUMMARY;
-                instance = require ('../repositories/schema/jobSummary');
+                schemaInstance = require ('../repositories/schema/'+schemaname);
                 break;
         }
 
-        if(value && validate(instance,schemaName)){
+        if(value && validate(schemaInstance,value[0])){
             return store.save(storeKey, {
                 value
             }).then(() => {

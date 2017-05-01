@@ -6,14 +6,14 @@ const deviceImei = {
     "id":"/deviceImei",
     "type":"object",
     "properties":{
-        "id":{},
-        "hubId":{},
-        "cityId":{},
-        "companyId":{},
-        "userId":{},
-        "imeiNumber":{},
+        "id":{"type":"number"},
+        "hubId":{"type":"number"},
+        "cityId":{"type":"number"},
+        "companyId":{"type":"number"},
+        "userId":{"type":"number"},
+        "imeiNumber":{"type":"number"},
         "lastUsed":{},
-        "overallDataConsumptionViaNetwork":{},
+        "overallDataConsumptionViaNetwork":{"type":"string"},
         "overallDataConsumptionViaWifi":{},
         "dataConsumptionByFarEye":{}
     }

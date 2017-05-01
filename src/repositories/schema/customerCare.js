@@ -6,8 +6,8 @@ const customerCare = {
     "id":"/customerCare",
     "type":"object",
     "properties":{
-        "name":{},
-        "mobileNumber":{},
+        "name":{"type":"string"},
+        "mobileNumber":{"type":"number"},
         "jobMasterId":{}
     }
 };

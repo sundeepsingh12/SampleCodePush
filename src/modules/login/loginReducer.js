@@ -199,7 +199,7 @@ export default function authReducer(state = initialState, action) {
       const password = action.payload
       console.log(state.form.username)
       const usernameState = state.form.username
-      if (usernameState != undefined && usernameState != null && usernameState != '' && password != undefined && password != null && password != '') {
+      if (usernameState && password) {
         var next = state.setIn(['form', 'password'], password)
           .setIn(['form', 'isButtonDisabled'], false)
       } else {
