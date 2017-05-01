@@ -8,6 +8,28 @@ import BackendFactory from '../../lib/BackendFactory'
 import CONFIG from '../../lib/config'
 import RestAPIInterface from '../../lib/RestAPIInterface'
 
+const {
+    JOB_MASTER_SCHEMA,
+    USER_SCHEMA,
+    JOB_ATTRIBUTE_SCHEMA,
+    JOB_ATTRIBUTE_VALUE_SCHEMA,
+    FIELD_ATTRIBUTE_SCHEMA,
+    FIELD_ATTRIBUTE_VALUE_SCHEMA,
+    JOB_STATUS_SCHEMA,
+    TAB_SCHEMA,
+    CUSTOMER_CARE_SCHEMA,
+    SMS_TEMPLATE_SCHEMA,
+    USER_SUMMARY_SCHEMA,
+    JOB_SUMMARY_SCHEMA,
+    SMS_JOB_STATUS_SCHEMA,
+    JOB_MASTER_MONEY_TRANSACTION_MODE_SCHEMA,
+    FIELD_ATTRIBUTE_STATUS_SCHEMA,
+    FIELD_ATTRIBUTE_VALIDATION_SCHEMA,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION_SCHEMA
+
+} = require('../../lib/constants').default
+
+
 class JobMaster {
     /**
      *## This will Download Job Master from server
@@ -94,25 +116,25 @@ class JobMaster {
      * @param json
      */
     saveJSONResponse(json) {
-        this.saveJobMaster(json.jobMaster)
-        this.saveUser(json.user)
-        this.saveJobAttributeMaster(json.jobAttributeMaster)
-        this.saveJobAttributeValueMaster(json.jobAttributeValueMaster)
-        this.saveFieldAttributeMaster(json.fieldAttributeMaster)
-        this.saveFieldAttributeValueMaster(json.fieldAttributeValueMaster)
-        this.saveJobStatus(json.jobStatus)
-        this.saveCustomizationAppModules(json.modulesCustomization)
-        this.saveCustomizationJobList(json.jobListCustomization)
-        this.saveTabs(json.appJobStatusTabs)
-        this.saveJobMoneyTransactionMode(json.jobMasterMoneyTransactionModes)
-        this.saveCustomerCare(json.customerCareList)
-        this.saveSmsTemplate(json.smsTemplatesList)
-        this.saveFieldAttributeStatus(json.fieldAttributeMasterStatuses)
-        this.saveFieldValidations(json.fieldAttributeMasterValidations)
-        this.saveFieldValidationsConditions(json.fieldAttributeMasterValidationConditions)
-        this.saveSmsJobStatuses(json.smsJobStatuses)
-        this.saveUserSummary(json.userSummary)
-        this.saveJobSummary(json.jobSummary)
+        this.validateAndSaveData(JOB_MASTER_SCHEMA,json.jobMaster);
+        this.validateAndSaveData(USER_SCHEMA,json.user)
+        this.validateAndSaveData(JOB_ATTRIBUTE_SCHEMA,json.jobAttributeMaster)
+        this.validateAndSaveData(JOB_ATTRIBUTE_VALUE_SCHEMA,json.jobAttributeValueMaster)
+        this.validateAndSaveData(FIELD_ATTRIBUTE_SCHEMA,json.fieldAttributeMaster)
+        this.validateAndSaveData(FIELD_ATTRIBUTE_VALUE_SCHEMA,json.fieldAttributeValueMaster)
+        this.validateAndSaveData(JOB_STATUS_SCHEMA,json.jobStatus)
+        this.validateAndSaveData(json.modulesCustomization)
+        this.validateAndSaveData(json.jobListCustomization)
+        this.validateAndSaveData(TAB_SCHEMA,json.appJobStatusTabs)
+        this.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE_SCHEMA,json.jobMasterMoneyTransactionModes)
+        this.validateAndSaveData(CUSTOMER_CARE_SCHEMA,json.customerCareList)
+        this.validateAndSaveData(SMS_TEMPLATE_SCHEMA,json.smsTemplatesList)
+        this.validateAndSaveData(FIELD_ATTRIBUTE_STATUS_SCHEMA,json.fieldAttributeMasterStatuses)
+        this.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION_SCHEMA,json.fieldAttributeMasterValidations)
+        this.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION_CONDITION_SCHEMA,json.fieldAttributeMasterValidationConditions)
+        this.validateAndSaveData(SMS_JOB_STATUS_SCHEMA,json.smsJobStatuses)
+        this.validateAndSaveData(USER_SUMMARY_SCHEMA,json.userSummary)
+        this.validateAndSaveData(JOB_SUMMARY_SCHEMA,json.jobSummary)
     }
 
     /**This matches device's time with server time,returns fail if difference is more than 15 minutes
@@ -127,6 +149,10 @@ class JobMaster {
             return false
         }
         return true
+    }
+
+    validateAndSaveData(schemaName,data){
+        const returnValue = storeConfig.validateAndSaveData(schemaName,data);
     }
 
 
@@ -178,17 +204,17 @@ class JobMaster {
         return user
     }
 
-    /**
+  /*  /!**
      *
      * @param jobMaster
      * @return {*}
-     */
+     *!/
     saveJobMaster(jobMaster) {
         if(jobMaster !== null && jobMaster !== undefined) {
             const data = storeConfig.saveJobMaster(jobMaster)
             return data
         }
-    }
+    }*/
 
     /**This gets job master from store
      *
@@ -200,12 +226,12 @@ class JobMaster {
     }
 
 
-    saveJobAttributeMaster(jobAttributeMaster) {
-        if(jobAttributeMaster !== null && jobAttributeMaster !== undefined) {
-            const data = storeConfig.saveJobAttributeMaster(jobAttributeMaster)
-            return data
-        }
-    }
+    // saveJobAttributeMaster(jobAttributeMaster) {
+    //     if(jobAttributeMaster !== null && jobAttributeMaster !== undefined) {
+    //         const data = storeConfig.saveJobAttributeMaster(jobAttributeMaster)
+    //         return data
+    //     }
+    // }
 
     /**This gets jobAttributeMaster from store
      *
@@ -223,12 +249,12 @@ class JobMaster {
      * @return
      * isSaveSuccess: true
      */
-    saveJobAttributeValueMaster(jobAttributeValueMaster) {
-        if(jobAttributeValueMaster !== null && jobAttributeValueMaster !== undefined) { 
-            const data = storeConfig.saveJobAttributeValueMaster(jobAttributeValueMaster)
-            return data
-        }
-    }
+    // saveJobAttributeValueMaster(jobAttributeValueMaster) {
+    //     if(jobAttributeValueMaster !== null && jobAttributeValueMaster !== undefined) {
+    //         const data = storeConfig.saveJobAttributeValueMaster(jobAttributeValueMaster)
+    //         return data
+    //     }
+    // }
 
     /**This gets jobAttributeValueMaster from store
      *
@@ -240,12 +266,12 @@ class JobMaster {
         return jobAttributeValueMaster
     }
 
-    saveFieldAttributeMaster(fieldAttributeMaster) {
-        if(fieldAttributeMaster !== null && fieldAttributeMaster !== undefined) {
-            const data = storeConfig.saveFieldAttributeMaster(fieldAttributeMaster)
-            return data
-        }
-    }
+    // saveFieldAttributeMaster(fieldAttributeMaster) {
+    //     if(fieldAttributeMaster !== null && fieldAttributeMaster !== undefined) {
+    //         const data = storeConfig.saveFieldAttributeMaster(fieldAttributeMaster)
+    //         return data
+    //     }
+    // }
 
     /**This gets fieldAttributeMaster from store
      *
@@ -256,12 +282,12 @@ class JobMaster {
         return fieldAttributeMaster
     }
 
-    saveFieldAttributeValueMaster(fieldAttributeValueMaster) {
-        if(fieldAttributeValueMaster !== null && fieldAttributeValueMaster !== undefined) {
-            const data = storeConfig.saveFieldAttributeValueMaster(fieldAttributeValueMaster)
-            return data
-        }
-    }
+    // saveFieldAttributeValueMaster(fieldAttributeValueMaster) {
+    //     if(fieldAttributeValueMaster !== null && fieldAttributeValueMaster !== undefined) {
+    //         const data = storeConfig.saveFieldAttributeValueMaster(fieldAttributeValueMaster)
+    //         return data
+    //     }
+    // }
 
     /**This gets fieldAttributeValueMaster from store
      *
