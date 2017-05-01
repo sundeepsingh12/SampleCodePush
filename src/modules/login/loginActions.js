@@ -239,37 +239,6 @@ export function authenticateUser(username, password) {
   }
 }
 
-export function downloadJobMaster() {
-  return async function (dispatch) {
-    try {
-      const deviceIMEI = await checkAssetService.getDeviceIMEI()
-      const deviceSIM = await checkAssetService.getDeviceSIM()
-      let user = await jobMasterService.getUser()
-      const currentJobMasterVersion = (user != null || user != undefined) ? user.currentJobMasterVersion : 0;
-      const companyId = (user != null || user != undefined) ? user.currentJobMasterVersion : 0;
-      const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, companyId)
-      const json = await jobMasters.json
-    } catch (error) {
-      dispatch(jobMasterDownloadFailure(error))
-    }
-  }
-}
-
-export function saveJobMaster(jobMasterResponse) {
-  return async function (dispatch) {
-    try {
-      if (jobMasterService.matchServerTimeWithMobileTime(json.serverTime)) {
-        dispatch(jobMasterSavingStart())
-        jobMasterService.saveJobMaster(jobMasterResponse)
-      } else {
-        dispatch(timeMismatch())
-      }
-    } catch (error) {
-      dispatch(saveJobMasterFailure(error))
-    }
-  }
-}
-
 export function checkAsset() {
   return async function (dispatch) {
     const deviceIMEI = await checkAssetService.getDeviceIMEI()
