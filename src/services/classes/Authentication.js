@@ -60,6 +60,7 @@ class Authentication {
                 }
             })
             .catch((error) => {
+
                 throw (error)
             })
     }

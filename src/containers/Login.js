@@ -14,7 +14,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import * as authActions from '../modules/login/loginActions'
-import LoginRender from '../components/LoginRender'
 import sha256 from 'sha256';
 import {Actions} from 'react-native-router-flux';
 import React from 'react';

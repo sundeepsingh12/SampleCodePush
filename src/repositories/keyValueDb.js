@@ -17,6 +17,7 @@ import validate from "json-schema"
 export class keyValueDb {
     validateAndSaveData(schemaName,value){
         let schemaInstance = '';
+        schemaInstance = require ('../repositories/schema/'+schemaName);
         switch(schemaName){
             case 'jobMaster':
                 schemaInstance = require ('../repositories/schema/jobMaster');

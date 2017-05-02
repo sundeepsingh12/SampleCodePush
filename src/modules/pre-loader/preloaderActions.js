@@ -105,13 +105,8 @@ export function downloadJobMaster() {
             const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, companyId)
             const json = await jobMasters.json
             const statusCode = await jobMasters.status
-            if (statusCode === 200) {
                 dispatch(jobMasterDownloadSuccess())
                 saveJobMaster(json,dispatch)
-            }
-            else {
-                dispatch(jobMasterDownloadFailure(error))
-            }
         } catch (error) {
             console.log(error)
             dispatch(jobMasterDownloadFailure(error))
@@ -121,7 +116,7 @@ export function downloadJobMaster() {
 
 
  async function saveJobMaster(jobMasterResponse,dispatch) {
-    // return async function (dispatch) {
+    return async function (dispatch) {
         try {
             const isTimeValid = await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
             if (isTimeValid) {
@@ -137,7 +132,7 @@ export function downloadJobMaster() {
         } catch (error) {
             dispatch(jobMasterSavingFailure(error))
         }
-    // }
+    }
 }
 
 
@@ -147,7 +142,7 @@ async function checkAsset() {
             dispatch(checkAssetStart())
             const deviceIMEI = await checkAssetService.getValueFromStore(deviceImei)
             const deviceSIM = await checkAssetService.getValueFromStore(deviceSim)
-            checkAssetService.checkAsset(deviceIMEI, deviceSIM)
+            // checkAssetService.checkAsset(deviceIMEI, deviceSIM)
             // }
         }catch(error){
             dispatch(checkAssetFailure(error))

@@ -16,7 +16,6 @@ from 'react-native'
 
 import { Form, Item, Input, Container, Content, Body, ListItem, CheckBox} from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import ItemCheckbox from '../components/ItemCheckbox';
 
 var styles = StyleSheet.create({
   container: {
