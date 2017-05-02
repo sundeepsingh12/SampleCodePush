@@ -47,6 +47,9 @@ export default keyMirror({
     ON_LOGIN_USERNAME_CHANGE: null,
     ON_LOGIN_PASSWORD_CHANGE: null,
 
+    PRELOADER_SUCCESS:null,
+    PRELOADER_RETRY:null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
@@ -75,7 +78,8 @@ export default keyMirror({
     customizationAppModule:null,
     deviceImei:null,
     deviceSim:null,
-    user:null
+    user:null,
+    IS_PRELOADER_COMPLETE:null
 })
 
 

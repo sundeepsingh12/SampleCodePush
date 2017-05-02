@@ -34,16 +34,12 @@ import configureStore from './lib/configureStore'
  *
  */
 import Application from './containers/Application'
-import Login from './containers/Login'
 import Logout from './containers/Logout'
-// import Register from './containers/Register'
-// import ForgotPassword from './containers/ForgotPassword'
-// import Profile from './containers/Profile'
+
 import Main from './containers/Main'
 import Utilities from './containers/Utilities'
 import Message from './containers/Message'
-import Scanner from './components/Scanner'
-import Login2 from './containers/Login2'
+import Login from './containers/Login'
 import Preloader from './containers/Preloader'
 // import Subview from './containers/Subview'
 
@@ -166,7 +162,7 @@ export default function native(platform) {
                 initial />
 
               <Scene key='InitialLoginForm'
-                component={Login2}
+                component={Login}
                 hideNavBar
                 type='replace'
                  />
@@ -176,10 +172,6 @@ export default function native(platform) {
                 hideNavBar
                 title='Preloader'
                  />
-
-              <Scene key='Scanner'
-                title='Scanner'
-                component={Scanner} />
 
               <Scene key='Tabbar'
                 tabs

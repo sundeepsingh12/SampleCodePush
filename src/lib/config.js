@@ -16,7 +16,7 @@ module.exports = {
     API:{
         JOB_MASTER_API:'/rest/device/job_master',
         CHECK_ASSET_API :'/rest/device/check_asset',
-        SIM_VERIFY_API :'/rest/device/generate_otp'
-
+        SIM_VERIFY_API :'/rest/device/generate_otp',
+        LOGOUT_API:'/logout'
     }
 }

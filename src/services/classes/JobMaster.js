@@ -6,7 +6,6 @@ import {keyValueDB} from '../../repositories/keyValueDb'
 
 import BackendFactory from '../../lib/BackendFactory'
 import CONFIG from '../../lib/config'
-import RestAPIInterface from '../../lib/RestAPIInterface'
 
 const {
     jobMaster,
@@ -82,18 +81,18 @@ class JobMaster {
      */
 
     downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, deviceCompanyId) {
-        if(deviceIMEI===null) {
+        if(!deviceIMEI) {
             deviceIMEI = {}
         }
-        if(currentJobMasterVersion===null) {
+        if(!currentJobMasterVersion) {
             currentJobMasterVersion=0
         }
 
-        if(deviceSIM===null) {
+        if(!deviceSIM) {
             deviceSIM = {}
         }
 
-        if(deviceCompanyId===null) {
+        if(!deviceCompanyId) {
             deviceCompanyId = 0
         }
 

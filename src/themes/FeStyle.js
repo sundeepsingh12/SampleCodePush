@@ -1,4 +1,5 @@
 export default {
+
   
   bgWhite: {
     backgroundColor : '#ffffff'
@@ -305,6 +306,9 @@ export default {
   },
   flexBasis100 : {
       flexBasis: '100%'
+  },
+  width100 : {
+    width : '100%'
   },
   row : {
       flexDirection : 'row'

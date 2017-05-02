@@ -1,82 +1,155 @@
-/**
- * # Login.js
- *
- *  The container to display the Login form
- *
- */
 'use strict'
-/**
- * ## Imports
- *
- * Redux
- */
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
+import React, {Component} from 'react'
+import
+{
+  StyleSheet,
+  View,
+  Text,
+  Platform,
+  TouchableHighlight,
+  Image,
+  NetInfo
 
-import * as authActions from '../modules/login/loginActions'
+}
+from 'react-native'
+
+import { Container, Body, InputGroup, Button, Input, Item, ListItem, CheckBox} from 'native-base';
+
+import feTheme from '../themes/feTheme';
 import sha256 from 'sha256';
 import {Actions} from 'react-native-router-flux';
-import React from 'react';
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import * as authActions from '../modules/login/loginActions'
 
-const {
-  LOGIN
-} = require('../lib/constants').default
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
 
-/**
- * ## Redux boilerplate
- */
+  width70 : {
+    width: '70%'
+  },
+  
+  forgotContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginLeft: 10,
+    marginRight: 10
+  },
+
+  logoContainer: {
+    marginTop: 70,
+    flexBasis: '20%',
+    justifyContent: 'flex-start',
+  },
+  
+  logoStyle: {
+    width: 94,
+    resizeMode: 'contain'
+  }
+ 
+})
 
 function mapStateToProps (state) {
-  return {
-    auth: state.auth,
-    global: state.global
-  }
+    return {
+        auth: state.auth,
+        // global: state.global,
+    }
 }
 
 function mapDispatchToProps (dispatch) {
-  return {
-    actions: bindActionCreators(authActions, dispatch)
+    return {
+        actions: bindActionCreators({ ...authActions }, dispatch)
+    }
+}
+
+class Login2 extends Component {
+
+ constructor(props) {
+    super(props);
   }
-}
 
-function buttonPressHandler (login, username, password) {
-  login(username, sha256(password))
-}
+  onChangeUsername(username) {
+        this.props.actions.onChangeUsername(username)
+    }
 
-function performLoginUsingScan(login,username,password){
-    login(username, password)
-}
+    onChangePassword(password) {
+        this.props.actions.onChangePassword(password)
+    }
 
+    login(login) {
+        this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password))
+    }
 
-function scanPressHandler() {
-    Actions.Scanner();
-}
+    scanLogin() {
+        Actions.Scanner();
+    }
 
-let Login = React.createClass({
-
-  render () {
-    let onButtonPress = buttonPressHandler.bind(null,
-                                                this.props.actions.login,
-                                                this.props.auth.form.fields.username,
-                                                this.props.auth.form.fields.password
-                                               );
-      let onScanPress = scanPressHandler.bind();
-
-    return (
-      <LoginRender
-        formType={LOGIN}
-        onButtonPress={onButtonPress}
-        onScanPress = {onScanPress}
-        auth={this.props.auth}
-        global={this.props.global}
-      />
-    )
-  },
     componentDidMount(){
-        const details = this.props.details;
-        if(details!==null && details!==undefined){
-            performLoginUsingScan(this.props.actions.login,details.username,details.password);
+        if(this.props.auth.form.startLogin){
+            login(login,this.props.auth.form.username, sha256(this.props.auth.form.password))
         }
     }
-});
-export default connect(mapStateToProps, mapDispatchToProps)(Login)
+
+  render () {
+    return (
+      <Container>
+        <View style={styles.container}>
+              <View style={styles.logoContainer}>
+                <Image
+                  style={styles.logoStyle}
+                  source={require('../../images/fareye-logo.png')}
+                />
+              </View>
+              <View style={styles.width70}>
+                <Item style={{borderWidth: 0}}>
+                    <Input
+                        value = {this.props.auth.form.username}
+                        placeholder = 'Username'
+                        style= {feTheme.roundedInput}
+                        onChangeText = {(value) => this.onChangeUsername(value)}/>
+                </Item>
+                <Item style={{borderWidth: 0, marginTop: 15}}>
+                    <Input
+                        value = {this.props.auth.form.password}
+                        placeholder='Password'
+                        style={feTheme.roundedInput}
+                        secureTextEntry={true}
+                        onChangeText = {(value) => this.onChangePassword(value)}
+                    />
+                </Item>
+                
+                <Button
+                 onPress={(username,password) =>this.login(username,password)} rounded success style={{width: '100%', marginTop: 15}}
+                 disabled = {this.props.auth.form.isButtonDisabled}
+                >
+
+                    <Text style={{textAlign: 'center', width: '100%', color: 'white'}}>Log In</Text>
+                </Button>
+
+                <View style={{flexDirection: 'row', flexGrow: 1, justifyContent: 'flex-start', marginTop: 15}}>
+                    <CheckBox checked={false} />
+                    <Text style={{marginLeft: 20}}>Remember Me</Text>
+                </View>
+                  
+                <View style={{marginTop: 35}}>
+                  <Text style={{textAlign:'center', color: '#d3d3d3', marginBottom: 10}}>
+                   {this.props.auth.form.displayMessage}...
+                  </Text>
+                  <Button onPress={this.scanLogin.bind(this)} rounded style={{width: '100%', }}>
+                    <Text style={{textAlign: 'center', width: '100%', color: 'white'}}>Scanner</Text>
+                </Button>
+                </View>
+              </View>
+            </View>
+      </Container>
+    )
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login2)

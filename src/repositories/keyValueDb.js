@@ -17,7 +17,6 @@ import validate from "json-schema"
 export class keyValueDb {
     validateAndSaveData(schemaName,value){
         let schemaInstance = '';
-        schemaInstance = require ('../repositories/schema/'+schemaName);
         switch(schemaName){
             case 'jobMaster':
                 schemaInstance = require ('../repositories/schema/jobMaster');
@@ -85,6 +84,10 @@ export class keyValueDb {
     getValueFromStore(schemaName){
         const value = store.get(schemaName);
         return value;
+    }
+
+    deleteValueFromStore(keyName){
+        return store.delete(keyName)
     }
 }
 // The singleton variable

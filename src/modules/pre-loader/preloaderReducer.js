@@ -34,6 +34,7 @@ const {
   SERVICE_RUNNING,
   SERVICE_SUCCESS,
   SERVICE_FAILED,
+  PRELOADER_SUCCESS
 
 } = require('../../lib/constants').default
 
@@ -60,13 +61,14 @@ export default function preloaderReducer (state = initialState, action) {
       return state.set('configSaveService',SERVICE_FAILED)
     case MASTER_TIME_FAILURE :
       return state.set('configSaveService',SERVICE_FAILED)
-
     case CHECK_ASSET_START :
       return state.set('deviceVerificationService',SERVICE_RUNNING)
     case CHECK_ASSET_SUCCESS :
       return state.set('deviceVerificationService',SERVICE_SUCCESS)
     case CHECK_ASSET_FAILURE :
       return state.set('deviceVerificationService',SERVICE_FAILED)
+      case PRELOADER_SUCCESS :
+          return state.set('isComplete',true)
   }
   return state  
 }

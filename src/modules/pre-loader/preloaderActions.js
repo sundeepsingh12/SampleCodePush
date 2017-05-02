@@ -24,6 +24,8 @@ const {
     SERVICE_SUCCESS,
     SERVICE_FAILED,
 
+    PRELOADER_SUCCESS,
+
     deviceImei,
     deviceSim,
     user
@@ -33,10 +35,13 @@ const BackendFactory = require('../../lib/BackendFactory').default
 
 import {Actions} from 'react-native-router-flux'
 import {keyValueDB} from '../../repositories/keyValueDb'
-import {authenticationService} from '../../services/classes/Authentication'
 import {jobMasterService} from '../../services/classes/JobMaster'
 import {checkAssetService} from '../../services/classes/CheckAsset'
+import {logoutService} from '../../services/classes/Logout'
 
+import CONFIG from '../../lib/config'
+
+import {logoutRequest,logoutSuccess,deleteSessionToken,logoutFailure} from '../global/globalActions'
 
 export function jobMasterDownloadStart() {
     return {
@@ -92,9 +97,13 @@ export function checkAssetFailure() {
     }
 }
 
+export function preloaderSuccess() {
+    return {
+        type:PRELOADER_SUCCESS
+    }
+}
 
-export function downloadJobMaster() {
-    return async function (dispatch) {
+export async function downloadJobMaster() {
         try {
             dispatch(jobMasterDownloadStart())
             const deviceIMEI = await checkAssetService.getValueFromStore(deviceImei)
@@ -104,19 +113,43 @@ export function downloadJobMaster() {
             const companyId = (userObject) ? userObject.currentJobMasterVersion : 0;
             const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, companyId)
             const json = await jobMasters.json
-            const statusCode = await jobMasters.status
                 dispatch(jobMasterDownloadSuccess())
                 saveJobMaster(json,dispatch)
         } catch (error) {
             console.log(error)
             dispatch(jobMasterDownloadFailure(error))
         }
+}
+
+export function invalidateUserSession(){
+    return async function(dispatch){
+        try{
+            dispatch(logoutRequest())
+            const token = await keyValueDB.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+             await logoutService.logout();
+            dispatch(logoutSuccess())
+            dispatch(deleteSessionToken())
+            Actions.InitialLoginForm()
+        }catch(error){
+            console.log(error)
+            dispatch(logoutFailure(error))
+        }
+    }
+}
+
+export function retryPreloader(configDownloadService,configSaveService,deviceVerificationService){
+    return async function (dispatch) {
+        if(configDownloadService==='SERVICE_FAILED' || configDownloadService==='SERVICE_PENDING' || configSaveService==='SERVICE_FAILED'){
+            downloadJobMaster();}
+      else if(deviceVerificationService==='SERVICE_FAILED'){
+            checkAsset();
+        }
     }
 }
 
 
  async function saveJobMaster(jobMasterResponse,dispatch) {
-    return async function (dispatch) {
+    // return async function (dispatch) {
         try {
             const isTimeValid = await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
             if (isTimeValid) {
@@ -130,9 +163,10 @@ export function downloadJobMaster() {
                 dispatch(timeMismatch())
             }
         } catch (error) {
+            console.log(error)
             dispatch(jobMasterSavingFailure(error))
         }
-    }
+    // }
 }
 
 
@@ -142,8 +176,9 @@ async function checkAsset() {
             dispatch(checkAssetStart())
             const deviceIMEI = await checkAssetService.getValueFromStore(deviceImei)
             const deviceSIM = await checkAssetService.getValueFromStore(deviceSim)
-            // checkAssetService.checkAsset(deviceIMEI, deviceSIM)
+             checkAssetService.checkAsset(deviceIMEI, deviceSIM)
             // }
+            //write code for saving 'isComplete' inside store
         }catch(error){
             dispatch(checkAssetFailure(error))
         }

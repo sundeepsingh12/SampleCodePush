@@ -29,7 +29,8 @@ const {
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
 
-  TABLE_USER_SUMMARY,
+  IS_PRELOADER_COMPLETE
+
 } = require('../../lib/constants').default
 
 const BackendFactory = require('../../lib/BackendFactory').default
@@ -37,16 +38,13 @@ const BackendFactory = require('../../lib/BackendFactory').default
 import { Actions } from 'react-native-router-flux'
 import { keyValueDB } from '../../repositories/keyValueDb'
 import { authenticationService } from '../../services/classes/Authentication'
-import { jobMasterService } from '../../services/classes/JobMaster'
-import { checkAssetService } from '../../services/classes/CheckAsset'
+import CONFIG from '../../lib/config'
 
 /**
  * ## State actions
  * controls which form is displayed to the user
  * as in login, register, logout or reset password
  */
-
-
 
 export function logoutState() {
   return {
@@ -83,30 +81,6 @@ export function loginFailure(error) {
   }
 }
 
-export function jobMasterDownloadStart() {
-  return {
-    type: MASTER_DOWNLOAD_START
-  }
-}
-
-export function jobMasterDownloadSuccess() {
-  return {
-    type: MASTER_DOWNLOAD_SUCCESS
-  }
-}
-
-export function checkAssetStart() {
-  return {
-    type: CHECK_ASSET_START
-  }
-}
-
-export function checkAssetSuccess() {
-  return {
-    type: CHECK_ASSET_SUCCESS
-  }
-}
-
 /**
  * ## SessionToken actions
  */
@@ -129,20 +103,6 @@ export function sessionTokenRequestFailure(error) {
 }
 
 /**
- * ## DeleteToken actions
- */
-export function deleteTokenRequest() {
-  return {
-    type: DELETE_TOKEN_REQUEST
-  }
-}
-export function deleteTokenRequestSuccess() {
-  return {
-    type: DELETE_TOKEN_SUCCESS
-  }
-}
-
-/**
  * ## onAuthFormFieldChange
  * Set the payload so the reducer can work on it
  */
@@ -153,26 +113,6 @@ export function onAuthFormFieldChange(field, value) {
   }
 }
 
-/**
- * ## Logout actions
- */
-export function logoutRequest() {
-  return {
-    type: LOGOUT_START
-  }
-}
-
-export function logoutSuccess() {
-  return {
-    type: LOGOUT_SUCCESS
-  }
-}
-export function logoutFailure(error) {
-  return {
-    type: LOGOUT_FAILURE,
-    payload: error
-  }
-}
 
 /**
  * ## set the username
@@ -197,20 +137,6 @@ export function onChangePassword(value) {
 }
 
 /**
- * ## Delete session token
- *
- * Call the AppAuthToken deleteSessionToken
- */
-export function deleteSessionToken() {
-  return async function (dispatch) {
-    dispatch(deleteTokenRequest())
-    await keyValueDB.deleteSessionToken()
-    dispatch(deleteTokenRequestSuccess())
-  }
-}
-
-
-/**
  * ## Login
  * @param {string} username - user's name
  * @param {string} password - user's password
@@ -227,7 +153,6 @@ export function authenticateUser(username, password) {
     try {
       console.log("authenticateUser called")
       dispatch(loginRequest())
-      console.log("after")
       const j_sessionid = await authenticationService.login(username, password)
       await authenticationService.storeSessionToken(j_sessionid)
       dispatch(loginSuccess(j_sessionid))
@@ -238,16 +163,6 @@ export function authenticateUser(username, password) {
     }
   }
 }
-
-export function checkAsset() {
-  return async function (dispatch) {
-    const deviceIMEI = await checkAssetService.getDeviceIMEI()
-    const deviceSIM = await checkAssetService.getDeviceSIM()
-    dispatch(checkAssetStart())
-  }
-}
-
-
 
 /**
  * ## Token
@@ -260,14 +175,18 @@ export function getSessionToken() {
     try {
       console.log("getSessionToken")
       dispatch(sessionTokenRequest())
-      const token = await keyValueDB.getSessionToken()
-      console.log(token)
-      if (token) {
+      const token = await keyValueDB.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      const isPreloaderComplete =  await keyValueDB.getValueFromStore(IS_PRELOADER_COMPLETE)
+      if (token && isPreloaderComplete) {
         dispatch(sessionTokenRequestSuccess(token))
-        Actions.Preloader()
-      } else {
-        dispatch(sessionTokenRequestFailure())
-        Actions.InitialLoginForm()
+        Actions.Tabbar()
+      } else if(token){
+          dispatch(sessionTokenRequestFailure())
+          Actions.Preloader()
+      }
+      else{
+          dispatch(sessionTokenRequestSuccess(token))
+          Actions.InitialLoginForm()
       }
     }
     catch (error) {
@@ -300,7 +219,7 @@ export function logout() {
   return async function (dispatch) {
     try {
       dispatch(logoutRequest())
-      const token = await keyValueDB.getSessionToken()
+      const token = await keyValueDB.getValueFromStore()
       await BackendFactory(token).logout()
       dispatch(logoutSuccess())
       dispatch(deleteSessionToken())
@@ -308,9 +227,6 @@ export function logout() {
     }
     catch (error) {
       dispatch(logoutFailure(error))
-      if (checkAssetService.checkAsset(deviceIMEI, deviceSIM, user.hubId, user.company.id)) {
-
-      }
     }
   }
 }

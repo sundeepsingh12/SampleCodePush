@@ -39,7 +39,7 @@ function mapDispatchToProps(dispatch) {
 class Preloader extends Component {
 
   componentDidMount(){
-    this.props.actions.downloadJobMaster()
+    this.props.actions.retryPreloader(this.props.preloader.configDownloadService,this.props.preloader.configSaveService,this.props.preloader.deviceVerificationService)
     }
 
   _renderErrorMessage() {
@@ -55,24 +55,23 @@ class Preloader extends Component {
     if (this.props.preloader.isError) {
       return (
         <View style={feStyle.row}>
-          <Button rounded danger style={{ margin: 10 }} >
+          <Button onPress={() => this.invalidateSession() } rounded danger style={{ margin: 10 }} >
             <Text style={{ color: '#ffffff' }} >Cancel</Text>
           </Button>
-          <Button rounded success style={{ margin: 10 }}>
+          <Button onPress={() => this.retry()} rounded success style={{ margin: 10 }}>
             <Text style={{ color: '#ffffff' }}>Retry</Text>
           </Button>
         </View>
       );
-    } else {
-      return (
-        <View style={feStyle.row}>
-          <Button rounded danger style={{ margin: 10 }} >
-            <Text style={{ color: '#ffffff' }} >Cancel</Text>
-          </Button>
-        </View>
-      );
     }
+  }
 
+    invalidateSession(){
+      this.props.actions.invalidateUserSession()
+  }
+
+  retry(){
+      this.props.actions.retryPreloader(this.props.preloader.configDownloadService,this.props.preloader.configSaveService,this.props.preloader.deviceVerificationService)
   }
 
   render() {
@@ -123,9 +122,8 @@ class Preloader extends Component {
             </List>
           </View>
           <View style={[feStyle.flexBasis25, feStyle.marginTop30, feStyle.flex1, feStyle.row, feStyle.justifyCenter]}>
-            {this._renderErrorMessage()}
-            {this._renderButtons()}
-
+              {this._renderErrorMessage()}
+              {this._renderButtons()}
           </View>
         </View>
       </Container>

@@ -80,15 +80,28 @@ export class RestAPI {
     }
 
     serviceCall(data,apiUrl,methodType) {
-        return this._fetch({
-            method: methodType,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            url:apiUrl,
-            body: data
-        })
+        let opts;
+        if(methodType==='POST'){
+            opts = {
+                method: methodType,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                url:apiUrl,
+                body: data
+            }
+        }else{
+            opts = {
+                method: methodType,
+                url: apiUrl,
+                headers:{
+
+                }
+            }
+        }
+
+        return this._fetch(opts)
             .then((res) => {
                 if(res.status==200) {
                     return res;
@@ -100,29 +113,6 @@ export class RestAPI {
                 throw(error)
             })
     }
-
-    /**
-     * ### logout
-     * prepare the request and call _fetch
-     */
-    async logout () {
-        return await this._fetch({
-            method: 'GET',
-            url: '/logout'
-        })
-            .then((res) => {
-                //TODO Remove 500 by getting API changed on Server
-                if ((res.status === 200 || res.status === 500)) {
-                    return {}
-                } else {
-                    throw new Error({code: res.statusCode, error: res.message})
-                }
-            })
-            .catch((error) => {
-                throw (error)
-            })
-    }
-
 }
 // The singleton variable
 export let restAPI = new RestAPI()

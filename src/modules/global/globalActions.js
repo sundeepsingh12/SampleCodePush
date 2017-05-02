@@ -5,18 +5,18 @@
  */
 'use strict'
 
-/**
- * ## Imports
- *
- * The actions supported
- */
 const {
   SET_SESSION_TOKEN,
-  SET_STORE,
-  ON_GLOBAL_USERNAME_CHANGE,
-  ON_GLOBAL_PASSWORD_CHANGE,
-  SET_CREDENTIALS
+    SET_STORE,
+    ON_GLOBAL_USERNAME_CHANGE,
+    ON_GLOBAL_PASSWORD_CHANGE,
+    SET_CREDENTIALS,
+    LOGOUT_START,
+    LOGOUT_SUCCESS,
+    LOGOUT_FAILURE
 } = require('../../lib/constants').default
+
+import {keyValueDB} from '../../repositories/keyValueDb'
 
 /**
  * ## set the sessionToken
@@ -61,3 +61,50 @@ export function checkConnection() {
     type: INTERNET_CONNECTION_STATUS
   }
 }
+
+
+/**
+ * ## Logout actions
+ */
+export function logoutRequest() {
+    return {
+        type: LOGOUT_START
+    }
+}
+
+export function logoutSuccess() {
+    return {
+        type: LOGOUT_SUCCESS
+    }
+}
+export function logoutFailure(error) {
+    return {
+        type: LOGOUT_FAILURE,
+        payload: error
+    }
+}
+
+
+/**
+ * ## DeleteToken actions
+ */
+export function deleteTokenRequest() {
+    return {
+        type: DELETE_TOKEN_REQUEST
+    }
+}
+export function deleteTokenRequestSuccess() {
+    return {
+        type: DELETE_TOKEN_SUCCESS
+    }
+}
+
+
+export function deleteSessionToken() {
+    return async function (dispatch) {
+        dispatch(deleteTokenRequest())
+        await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        dispatch(deleteTokenRequestSuccess())
+    }
+}
+
