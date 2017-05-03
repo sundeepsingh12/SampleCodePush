@@ -9,8 +9,8 @@ const jobAttributeValue = {
         "type":"object",
         "properties": {
             "id": {"type": "number","required":true},
-            "name": {"type": "string"},
-            "code": {"type": "string"},
+            "name": {"type": "string","required":true},
+            "code": {"type": "string","required":true},
             "jobAttributeMasterId": {"type": "number","required":true}
         }
     }

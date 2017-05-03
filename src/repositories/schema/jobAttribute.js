@@ -8,19 +8,19 @@ const jobAttribute = {
     "items": {
         "type":"object",
         "properties": {
-            "id": {"type": "number"},
-            "label": {"type": "string"},
-            "subLabel": {"type": "string"},
-            "key": {"type": "string"},
-            "helpText": {"type": "string"},
-            "required": {"type": "boolean"},
-            "sequence": {"type": "integer"},
-            "parentId": {"type": "integer"},
-            "jobMasterId": {"type": "long"},
-            "attributeTypeId": {"type": "integer"},
-            "hidden": {"type": "boolean"},
-            "dataStoreMasterId": {"type": "number"},
-            "dataStoreAttributeId": {"type": "number"}
+            "id": {"type": "number","required":true},
+            "label": {"type": "string","required":true},
+            "subLabel": {"type": ["string",null],"required":true},
+            "key": {"type": "string","required":true},
+            "helpText": {"type": ["string",null],"required":true},
+            "required": {"type": "boolean","required":true},
+            "sequence": {"type": "integer","required":true},
+            "parentId": {"type": ["integer",null],"required":true},
+            "jobMasterId": {"type": "number","required":true},
+            "attributeTypeId": {"type": "integer","required":true},
+            "hidden": {"type": "boolean","required":true},
+            "dataStoreMasterId": {"type": ["number",null],"required":true},
+            "dataStoreAttributeId": {"type": ["number",null],"required":true}
         }
     }
 };

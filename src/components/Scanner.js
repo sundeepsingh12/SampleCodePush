@@ -1,8 +1,11 @@
 /**
- * Created by udbhav on 20/4/17.
+ * Created by Gaurav
+ * Component which can Scan Barcode or QR code 
+ * @param onBarCodeRead: Callback function which will receive the scanning result
+ * @param onBackPress: Callback function which is called when user presses back buttton
  */
 'use strict';
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     AppRegistry,
     Dimensions,
@@ -11,61 +14,22 @@ import {
     View
 } from 'react-native';
 import Camera from 'react-native-camera';
-import Login from '../containers/Login';
-import {Actions} from 'react-native-router-flux';
 
 
 class Scanner extends Component {
 
-    constructor() {
-        super();
-        this.state = {
-            showCamera: true,
-            cameraType: Camera.constants.Type.back,
-        };
-    }
-
     render() {
         return (
-            this.renderCamera()
+            <View style={styles.container}>
+                <Camera
+                    ref="cam"
+                    onBarCodeRead={this.props.onBarCodeRead}
+                    style={styles.preview}
+                    aspect={Camera.constants.Aspect.fill}>
+                    <Text style={styles.capture} onPress={this.props.onBackPress}>BACK</Text>
+                </Camera>
+            </View>
         );
-    }
-
-    renderCamera() {
-        if (this.state.showCamera) {
-            return (
-                    <View style={styles.container}>
-                        <Camera
-                            ref="cam"
-                            onBarCodeRead={this._onBarCodeRead.bind(this)}
-                            style={styles.preview}
-                            aspect={Camera.constants.Aspect.fill}>
-                            <Text style={styles.capture} onPress={this.goBack.bind(this)}>BACK</Text>
-                        </Camera>
-                    </View>
-            );
-        }
-        else {
-            const credentials = {
-                username : this.state.username,
-                password : this.state.password
-            };
-
-            return (
-                <Login credentials = {credentials} />
-            )
-        }
-    }
-
-    _onBarCodeRead(e) {
-        const username = e.data.split("/")[0];
-        const password = e.data.split("/")[1];
-        // this.setState({showCamera: false,username,password});
-
-    }
-
-    goBack(){
-        Actions.pop()
     }
 }
 

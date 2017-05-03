@@ -18,6 +18,7 @@ const {
 
 import {keyValueDB} from '../../repositories/keyValueDb'
 
+import CONFIG from '../../lib/config'
 /**
  * ## set the sessionToken
  *

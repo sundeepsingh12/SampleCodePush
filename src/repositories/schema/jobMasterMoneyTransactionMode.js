@@ -9,8 +9,8 @@ const jobMasterMoneyTransactionMode = {
         "type":"object",
         "properties": {
             "id": {"type": "number","required":true},
-            "jobMasterId": {"type": "number"},
-            "moneyTransactionModeId": {"type": "integer"}
+            "jobMasterId": {"type": "number","required":true},
+            "moneyTransactionModeId": {"type": "integer","required":true}
         }
     }
 };

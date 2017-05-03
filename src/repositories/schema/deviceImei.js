@@ -12,10 +12,10 @@ const deviceImei = {
         "companyId":{"type":"number"},
         "userId":{"type":"number"},
         "imeiNumber":{"type":"number"},
-        "lastUsed":{},
+        "lastUsed":{"type":"string"},
         "overallDataConsumptionViaNetwork":{"type":"string"},
-        "overallDataConsumptionViaWifi":{},
-        "dataConsumptionByFarEye":{}
+        "overallDataConsumptionViaWifi":{"type":"string"},
+        "dataConsumptionByFarEye":{"type":"string"}
     }
 };
 

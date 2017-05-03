@@ -1,5 +1,6 @@
 /**
  * Created by udbhav on 28/4/17.
+ * This is SMS template for Field in Job Master Settings
  */
 
 const smsTemplate = {
@@ -8,12 +9,10 @@ const smsTemplate = {
     "items": {
         "type": "object",
         "properties": {
-            "id": {"type": "number"},
-            "title": {"type": "string"},
-            "body": {"type": "string"},
-            "jobMasterId": {"type": "integer"},
-            "companyId": {"type": "number"},
-            "enabled": {"type": "number"}
+            "id": {"type": "number","required":true},
+            "title": {"type": "string","required":true},
+            "body": {"type": "string","required":true},
+            "jobMasterId": {"type": "integer","required":true},
         }
     }
 };

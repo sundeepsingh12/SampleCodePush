@@ -39,7 +39,7 @@ function mapDispatchToProps(dispatch) {
 class Preloader extends Component {
 
   componentDidMount(){
-    this.props.actions.retryPreloader(this.props.preloader.configDownloadService,this.props.preloader.configSaveService,this.props.preloader.deviceVerificationService)
+    this.props.actions.saveSettingsAndValidateDevice(this.props.preloader.configDownloadService,this.props.preloader.configSaveService,this.props.preloader.deviceVerificationService)
     }
 
   _renderErrorMessage() {

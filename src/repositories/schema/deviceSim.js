@@ -12,12 +12,12 @@ const deviceSim = {
         "companyId":{"type":"number"},
         "userId":{"type":"number"},
         "imeiId":{"type":"number"},
-        "lastUsed":{},
+        "lastUsed":{"type":"string"},
         "simNumber":{"type":"number"},
         "contactNumber":{"type":"number"},
         "otpNumber":{"type":"number"},
         "isVerified":{"type":"boolean"},
-        "otpExpiryTime":{}
+        "otpExpiryTime":{"type":"string"}
     }
 };
 

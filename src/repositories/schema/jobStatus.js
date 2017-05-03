@@ -7,16 +7,17 @@ const jobStatus  = {
     "items": {
         "type": "object",
         "properties": {
-            "name": {"type": "string"},
-            "code": {"type": "string"},
-            "transientState": {"type": "boolean"},
-            "job_master_id": {"type": "long"},
-            "tabId": {"type": "long"},
-            "statusCategory": {"type": "integer"},
-            "buttonColor": {"type": "string"},
-            "actionOnStatus": {"type": "integer"},
-            "sequence": {"type": "integer"},
-            "saveActivated": {"type": "boolean"}
+            "id":{"type":"number","required":true},
+            "name": {"type": "string","required":true},
+            "code": {"type": "string","required":true},
+            "transient": {"type": "boolean","required":true},
+            "jobMasterId": {"type": "number","required":true},
+            "tabId": {"type": "number","required":true},
+            "statusCategory": {"type": "number","required":true},
+            "buttonColor": {"type": "string","required":true,"format":"color"},
+            "actionOnStatus": {"type": "number","required":true},
+            "sequence": {"type": ["number",null],"required":true},
+            "saveActivated": {"type": ["boolean",null],"required":true}
         }
     }
 };

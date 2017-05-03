@@ -8,14 +8,15 @@ const jobSummary = {
     "items": {
         "type": "object",
         "properties": {
-            "id": {"type": "number"},
-            "userId": {"type": "number"},
-            "hubId": {"type": "number"},
-            "companyId": {"type": "integer"},
-            "date": {"type": "string"},
-            "count": {"type": "integer"},
-            "jobMasterId": {"type": "number"},
-            "jobStatusId": {"type": "number"}
+            "id": {"type": "number","required":true},
+            "userId": {"type": "number","required":true},
+            "hubId": {"type": "number","required":true},
+            "companyId": {"type": "integer","required":true},
+            "cityId":{"type":"integer","required":true},
+            "date": {"type": "string","required":true,"format":"date-time"},
+            "count": {"type": "integer","required":true},
+            "jobMasterId": {"type": "number","required":true},
+            "jobStatusId": {"type": "number","required":true}
         }
     }
 };

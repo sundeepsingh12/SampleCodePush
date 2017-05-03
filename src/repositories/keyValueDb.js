@@ -13,64 +13,72 @@
 import store from 'react-native-simple-store'
 import validate from "json-schema"
 
-
 export class keyValueDb {
-    validateAndSaveData(schemaName,value){
-        let schemaInstance = '';
-        switch(schemaName){
-            case 'jobMaster':
-                schemaInstance = require ('../repositories/schema/jobMaster');
+    validateAndSaveData(schemaName, value) {
+        let schemaInstance = '',checkCondition = false;
+
+        switch (schemaName) {
+            case 'JOB_MASTER':
+                schemaInstance = require('../repositories/schema/jobMaster');
                 break;
-            case 'user':
-                schemaInstance = require ('../repositories/schema/user');
+            case 'USER':
+                schemaInstance = require('../repositories/schema/user');
                 break;
-            case 'jobAttribute':
-                schemaInstance = require ('../repositories/schema/jobAttribute');
+            case 'JOB_ATTRIBUTE':
+                schemaInstance = require('../repositories/schema/jobAttribute');
                 break;
-            case 'jobAttributeValue':
-                schemaInstance = require ('../repositories/schema/jobAttributeValue');
+            case 'JOB_ATTRIBUTE_VALUE':
+                schemaInstance = require('../repositories/schema/jobAttributeValue');
                 break;
-            case 'fieldAttribute':
-                schemaInstance = require ('../repositories/schema/fieldAttribute');
+            case 'FIELD_ATTRIBUTE':
+                schemaInstance = require('../repositories/schema/fieldAttribute');
                 break;
-            case 'fieldAttributeValue':
-                schemaInstance = require ('../repositories/schema/fieldAttributeValue');
+            case 'FIELD_ATTRIBUTE_VALUE':
+                schemaInstance = require('../repositories/schema/fieldAttributeValue');
                 break;
-            case 'jobStatus':
-                schemaInstance = require ('../repositories/schema/jobStatus');
+            case 'JOB_STATUS':
+                schemaInstance = require('../repositories/schema/jobStatus');
                 break;
-            case 'tab':
-                schemaInstance = require ('../repositories/schema/tab');
+            case 'CUSTOMIZATION_APP_MODULE':
+                schemaInstance = require('../repositories/schema/customizationAppModule')
                 break;
-            case 'jobMasterMoneyTransactionMode':
-                schemaInstance = require ('../repositories/schema/jobMasterMoneyTransactionMode');
+            case 'JOB_LIST_CUSTOMIZATION':
+                schemaInstance = require('../repositories/schema/jobListCustomization')
                 break;
-            case 'customerCare':
-                schemaInstance = require ('../repositories/schema/customerCare');
+            case 'TAB':
+                schemaInstance = require('../repositories/schema/tab');
                 break;
-            case 'smsTemplate':
-                schemaInstance = require ('../repositories/schema/smsTemplate');
+            case 'JOB_MASTER_MONEY_TRANSACTION_MODE':
+                schemaInstance = require('../repositories/schema/jobMasterMoneyTransactionMode');
                 break;
-            case 'fieldAttributeStatus':
-                schemaInstance = require ('../repositories/schema/fieldAttributeStatus');
+            case 'CUSTOMER_CARE':
+                schemaInstance = require('../repositories/schema/customerCare');
                 break;
-            case 'fieldAttributeValidation':
-                schemaInstance = require ('../repositories/schema/fieldAttributeValidation');
+            case 'SMS_TEMPLATE':
+                schemaInstance = require('../repositories/schema/smsTemplate');
                 break;
-            case 'fieldAttributeValidationCondition':
-                schemaInstance = require ('../repositories/schema/fieldAttributeValidationCondition');
+            case 'FIELD_ATTRIBUTE_STATUS':
+                schemaInstance = require('../repositories/schema/fieldAttributeStatus');
                 break;
-            case 'smsJobStatus':
-                schemaInstance = require ('../repositories/schema/smsJobStatus');
+            case 'FIELD_ATTRIBUTE_VALIDATION':
+                schemaInstance = require('../repositories/schema/fieldAttributeValidation');
                 break;
-            case 'userSummary':
-                schemaInstance = require ('../repositories/schema/userSummary');
+            case 'FIELD_ATTRIBUTE_VALIDATION_CONDITION':
+                schemaInstance = require('../repositories/schema/fieldAttributeValidationCondition');
                 break;
-            case 'jobSummary':
-                schemaInstance = require ('../repositories/schema/jobSummary');
+            case 'SMS_JOB_STATUS':
+                schemaInstance = require('../repositories/schema/smsJobStatus');
                 break;
+            case 'USER_SUMMARY':
+                schemaInstance = require('../repositories/schema/userSummary');
+                break;
+            case 'JOB_SUMMARY':
+                schemaInstance = require('../repositories/schema/jobSummary');
+                break;
+            default:
+             checkCondition = true;
         }
-        if(value && validate(schemaInstance,value)){
+        if (value && (checkCondition || validate(value, schemaInstance))) {
             return store.save(schemaName, {
                 value
             }).then(() => {
@@ -81,13 +89,14 @@ export class keyValueDb {
         }
     }
 
-    getValueFromStore(schemaName){
+    getValueFromStore(schemaName) {
         const value = store.get(schemaName);
         return value;
     }
 
-    deleteValueFromStore(keyName){
-        return store.delete(keyName)
+
+    deleteValueFromStore(schemaName) {
+        const value = store.delete(schemaName);
     }
 }
 // The singleton variable

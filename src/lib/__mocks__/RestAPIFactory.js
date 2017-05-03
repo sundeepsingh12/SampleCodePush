@@ -4,6 +4,6 @@
 const RestAPIInterFace = require('./RestAPIInterface').default
 
 
-export default function BackendFactory (token = null) {
+export default function RestAPIFactory (token = null) {
   return new RestAPIInterFace();
 }

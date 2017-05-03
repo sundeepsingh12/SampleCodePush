@@ -2,32 +2,34 @@
  * Created by udbhav on 12/4/17.
  */
 
-import {keyValueDB} from '../../repositories/keyValueDb'
+import { keyValueDB } from '../../repositories/keyValueDb'
 
-import BackendFactory from '../../lib/BackendFactory'
+import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 
-const {
-    jobMaster,
-    user,
-    jobAttribute,
-    jobAttributeValue,
-    fieldAttribute,
-    fieldAttributeValue,
-    jobStatus,
-    tab,
-    customerCare,
-    smsTemplate,
-    userSummary,
-    jobSummary,
-    smsJobStatus,
-    jobMasterMoneyTransactionMode,
-    fieldAttributeStatus,
-    fieldAttributeValidation,
-    fieldAttributeValidationCondition,
-    jobListCustomization,
-    customizationAppModule
+import RestAPIInterface from '../../lib/RestAPIInterface'
+import {keyValueDBService} from './KeyValueDBService'
 
+const {
+    JOB_MASTER,
+    JOB_ATTRIBUTE,
+    JOB_ATTRIBUTE_VALUE,
+    FIELD_ATTRIBUTE,
+    FIELD_ATTRIBUTE_VALUE,
+    JOB_STATUS,
+    TAB,
+    CUSTOMER_CARE,
+    SMS_TEMPLATE,
+    USER_SUMMARY,
+    JOB_SUMMARY,
+    SMS_JOB_STATUS,
+    JOB_MASTER_MONEY_TRANSACTION_MODE,
+    FIELD_ATTRIBUTE_STATUS,
+    FIELD_ATTRIBUTE_VALIDATION,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+    JOB_LIST_CUSTOMIZATION,
+    CUSTOMIZATION_APP_MODULE,
+    USER,
 } = require('../../lib/constants').default
 
 
@@ -80,36 +82,37 @@ class JobMaster {
      *
      */
 
-    downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, deviceCompanyId) {
-        if(!deviceIMEI) {
-            deviceIMEI = {}
+    downloadJobMaster(deviceIMEI, deviceSIM,userObject) {
+        let postData = "",currentJobMasterVersion=0,deviceCompanyId=0;
+        if((!deviceIMEI || !deviceSIM) && userObject){
+                deviceIMEI = {}
+                deviceSIM = {}
+                currentJobMasterVersion = userObject.value.currentJobMasterVersion
+                deviceCompanyId = userObject.value.company.id
+                postData = JSON.stringify({
+                    deviceIMEI,
+                    deviceSIM,
+                    currentJobMasterVersion,
+                    deviceCompanyId
+                })
         }
-        if(!currentJobMasterVersion) {
-            currentJobMasterVersion=0
+        else if(deviceIMEI){
+            currentJobMasterVersion = userObject.value.currentJobMasterVersion
+            deviceCompanyId = userObject.value.company.id
+            postData = JSON.stringify({
+                deviceIMEI,
+                deviceSIM,
+                currentJobMasterVersion,
+                deviceCompanyId
+            })
         }
-
-        if(!deviceSIM) {
-            deviceSIM = {}
-        }
-
-        if(!deviceCompanyId) {
-            deviceCompanyId = 0
-        }
-
-        const postData = JSON.stringify({
-            deviceIMEI,
-            deviceSIM,
-            currentJobMasterVersion,
-            deviceCompanyId
-        })
-
-        try {
-            let jobMasterResponse = BackendFactory().serviceCall(postData,CONFIG.API.JOB_MASTER_API,'POST')
-            jobMasterResponse = BackendFactory()._pruneEmpty(jobMasterResponse)
-            return jobMasterResponse
-        } catch (error) {
-            throw(error)
-        }
+        console.log(postData)
+        console.log('downloadJobMaster')
+        console.log(currentJobMasterVersion)
+        console.log(deviceCompanyId)
+        let jobMasterResponse = RestAPIFactory().serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
+        jobMasterResponse = RestAPIFactory()._pruneEmpty(jobMasterResponse)
+        return jobMasterResponse
     }
 
     /**
@@ -117,25 +120,25 @@ class JobMaster {
      * @param json
      */
     saveJobMaster(json) {
-        this.validateAndSaveData(jobMaster,json.jobMaster);
-        this.validateAndSaveData(user,json.user)
-        this.validateAndSaveData(jobAttribute,json.jobAttributeMaster)
-        this.validateAndSaveData(jobAttributeValue,json.jobAttributeValueMaster)
-        this.validateAndSaveData(fieldAttribute,json.fieldAttributeMaster)
-        this.validateAndSaveData(fieldAttributeValue,json.fieldAttributeValueMaster)
-        this.validateAndSaveData(jobStatus,json.jobStatus)
-        this.validateAndSaveData(customizationAppModule,json.modulesCustomization)
-        this.validateAndSaveData(jobListCustomization,json.jobListCustomization)
-        this.validateAndSaveData(tab,json.appJobStatusTabs)
-        this.validateAndSaveData(jobMasterMoneyTransactionMode,json.jobMasterMoneyTransactionModes)
-        this.validateAndSaveData(customerCare,json.customerCareList)
-        this.validateAndSaveData(smsTemplate,json.smsTemplatesList)
-        this.validateAndSaveData(fieldAttributeStatus,json.fieldAttributeMasterStatuses)
-        this.validateAndSaveData(fieldAttributeValidation,json.fieldAttributeMasterValidations)
-        this.validateAndSaveData(fieldAttributeValidationCondition,json.fieldAttributeMasterValidationConditions)
-        this.validateAndSaveData(smsJobStatus,json.smsJobStatuses)
-        this.validateAndSaveData(userSummary,json.userSummary)
-        this.validateAndSaveData(jobSummary,json.jobSummary)
+        keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
+        keyValueDBService.validateAndSaveData(USER, json.user)
+        keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
+        keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_VALUE, json.jobAttributeValueMaster)
+        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE, json.fieldAttributeMaster)
+        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster)
+        keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus)
+        keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
+        keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
+        keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
+        keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)
+        keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList)
+        keyValueDBService.validateAndSaveData(SMS_TEMPLATE, json.smsTemplatesList)
+        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_STATUS, json.fieldAttributeMasterStatuses)
+        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION, json.fieldAttributeMasterValidations)
+        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION_CONDITION, json.fieldAttributeMasterValidationConditions)
+        keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
+        keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
+        keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
     }
 
     /**This matches device's time with server time,returns fail if difference is more than 15 minutes
@@ -144,22 +147,36 @@ class JobMaster {
      * @return {boolean}
      */
     matchServerTimeWithMobileTime(serverTime) {
+        console.log("matchServerTimeWithMobileTime start")
         const serverTimeInMillis = new Date(serverTime).getTime()
+        console.log(serverTimeInMillis)
         const currentTimeInMillis = new Date().getTime();
-        if(currentTimeInMillis - serverTimeInMillis > 15*60*1000){
-            return false
+        if (serverTimeInMillis) {
+            console.log("no error")
+            if (currentTimeInMillis - serverTimeInMillis > 15 * 60 * 1000) {
+                return false
+            }
+            return true
+        } else {
+            console.log("parse error")
+            throw ("Server Time format incorrect")
         }
-        return true
     }
 
-    validateAndSaveData(schemaName,data){
-        const storeValue = keyValueDB.validateAndSaveData(schemaName,data);
-        return storeValue
-    }
-
-    getValueFromStore(schemaName){
-        const storeValue = keyValueDB.getValueFromStore(schemaName);
-        return storeValue;
+    /**Possible values of message returned from server -
+     * 1. Access is denied
+     * 2. Verified IMEI not valid for that HUB
+     * 3. IMEI Not Verified. Please verify it from server.
+     *
+     * @param message
+     */
+    checkIfHubAndImeiIsValid(message){
+        if(message==='Access is denied' || message==='Verified IMEI not valid for that HUB!!!' || message==='IMEI Not Verified. Please verify it from server.'){
+           throw message
+        }
+        else{
+            return true
+        }
     }
 }
 

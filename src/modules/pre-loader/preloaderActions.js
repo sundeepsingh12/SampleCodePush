@@ -23,25 +23,25 @@ const {
     SERVICE_RUNNING,
     SERVICE_SUCCESS,
     SERVICE_FAILED,
-
     PRELOADER_SUCCESS,
+    INVALID_IMEI_HUB,
 
-    deviceImei,
-    deviceSim,
-    user
+
+    DEVICE_IMEI,
+    DEVICE_SIM,
+    USER
 } = require('../../lib/constants').default
-
-const BackendFactory = require('../../lib/BackendFactory').default
 
 import {Actions} from 'react-native-router-flux'
 import {keyValueDB} from '../../repositories/keyValueDb'
 import {jobMasterService} from '../../services/classes/JobMaster'
-import {checkAssetService} from '../../services/classes/CheckAsset'
 import {logoutService} from '../../services/classes/Logout'
 
 import CONFIG from '../../lib/config'
+import {deviceVerificationService} from '../../services/classes/DeviceVerification'
+import {keyValueDBService} from '../../services/classes/KeyValueDBService'
 
-import {logoutRequest,logoutSuccess,deleteSessionToken,logoutFailure} from '../global/globalActions'
+import {logoutRequest, logoutSuccess, deleteSessionToken, logoutFailure} from '../global/globalActions'
 
 export function jobMasterDownloadStart() {
     return {
@@ -55,9 +55,10 @@ export function jobMasterDownloadSuccess() {
     }
 }
 
-export function jobMasterDownloadFailure() {
+export function jobMasterDownloadFailure(error) {
     return {
-        type: MASTER_DOWNLOAD_FAILURE
+        type: MASTER_DOWNLOAD_FAILURE,
+        payload:error
     }
 }
 
@@ -73,114 +74,162 @@ export function jobMasterSavingSuccess() {
     }
 }
 
-export function jobMasterSavingFailure() {
+export function jobMasterSavingFailure(error) {
     return {
-        type: MASTER_SAVING_FAILURE
+        type: MASTER_SAVING_FAILURE,
+        payload:error
     }
 }
 
-export function timeMismatch() {
+export function timeMismatch(error) {
     return {
-        type: MASTER_TIME_FAILURE
+        type: MASTER_TIME_FAILURE,
+        payload:error
     }
 }
 
 export function checkAssetStart() {
     return {
-        type:CHECK_ASSET_START
+        type: CHECK_ASSET_START
     }
 }
 
-export function checkAssetFailure() {
+export function checkAssetSuccess() {
     return {
-        type:CHECK_ASSET_FAILURE
+        type: CHECK_ASSET_SUCCESS
+    }
+}
+
+export function checkAssetFailure(error) {
+    return {
+        type: CHECK_ASSET_FAILURE,
+        payload:error
     }
 }
 
 export function preloaderSuccess() {
     return {
-        type:PRELOADER_SUCCESS
+        type: PRELOADER_SUCCESS
     }
 }
 
-export async function downloadJobMaster() {
-        try {
-            dispatch(jobMasterDownloadStart())
-            const deviceIMEI = await checkAssetService.getValueFromStore(deviceImei)
-            const deviceSIM = await checkAssetService.getValueFromStore(deviceSim)
-            let userObject = await jobMasterService.getValueFromStore(user)
-            const currentJobMasterVersion = (userObject) ? user.currentJobMasterVersion : 0;
-            const companyId = (userObject) ? userObject.currentJobMasterVersion : 0;
-            const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, currentJobMasterVersion, companyId)
-            const json = await jobMasters.json
-                dispatch(jobMasterDownloadSuccess())
-                saveJobMaster(json,dispatch)
-        } catch (error) {
-            console.log(error)
-            dispatch(jobMasterDownloadFailure(error))
-        }
+export function invalidImeiHub(error) {
+    return {
+        type: INVALID_IMEI_HUB,
+        payload:error
+    }
 }
 
-export function invalidateUserSession(){
-    return async function(dispatch){
-        try{
+async function downloadJobMaster(dispatch) {
+    try {
+        dispatch(jobMasterDownloadStart())
+        const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+        let userObject = await keyValueDBService.getValueFromStore(USER)
+        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM,userObject)
+        const json = await jobMasters.json
+        console.log(json)
+        dispatch(jobMasterDownloadSuccess())
+        saveJobMaster(json, dispatch)
+    } catch (error) {
+        console.log(error)
+        dispatch(jobMasterDownloadFailure(error))
+    }
+}
+
+export function invalidateUserSession() {
+    return async function (dispatch) {
+        try {
             dispatch(logoutRequest())
-            const token = await keyValueDB.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-             await logoutService.logout();
+            await logoutService.logout();
             dispatch(logoutSuccess())
             dispatch(deleteSessionToken())
             Actions.InitialLoginForm()
-        }catch(error){
+        } catch (error) {
             console.log(error)
             dispatch(logoutFailure(error))
         }
     }
 }
 
-export function retryPreloader(configDownloadService,configSaveService,deviceVerificationService){
+export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService) {
     return async function (dispatch) {
-        if(configDownloadService==='SERVICE_FAILED' || configDownloadService==='SERVICE_PENDING' || configSaveService==='SERVICE_FAILED'){
-            downloadJobMaster();}
-      else if(deviceVerificationService==='SERVICE_FAILED'){
+        if (configDownloadService === 'SERVICE_FAILED' || configDownloadService === 'SERVICE_PENDING' || configSaveService === 'SERVICE_FAILED') {
+            downloadJobMaster(dispatch);
+        }
+        else if (deviceVerificationService === 'SERVICE_FAILED') {
             checkAsset();
         }
     }
 }
 
 
- async function saveJobMaster(jobMasterResponse,dispatch) {
+async function saveJobMaster(jobMasterResponse, dispatch) {
     // return async function (dispatch) {
-        try {
+    try {
+        if (jobMasterResponse.message) {
+            const isImeiValid = await jobMasterService.checkIfHubAndImeiIsValid(jobMasterResponse.message)
+            dispatch(invalidImeiHub(isImeiValid))
+        }
+        else {
             const isTimeValid = await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
             if (isTimeValid) {
-                //write code for access denied/verify imei etc cases also inside if condition
                 dispatch(jobMasterSavingStart())
-                jobMasterService.saveJobMaster(jobMasterResponse)
+                await jobMasterService.saveJobMaster(jobMasterResponse)
                 dispatch(jobMasterSavingSuccess())
-                // checkAsset()
-                //Uncomment above code
+                checkAsset(dispatch)
             } else {
                 dispatch(timeMismatch())
             }
-        } catch (error) {
-            console.log(error)
-            dispatch(jobMasterSavingFailure(error))
         }
+
+    } catch (error) {
+        dispatch(jobMasterSavingFailure(error))
+    }
     // }
 }
 
 
-async function checkAsset() {
+async function checkAsset(dispatch) {
     // return async function (dispatch) {
-        try {
-            dispatch(checkAssetStart())
-            const deviceIMEI = await checkAssetService.getValueFromStore(deviceImei)
-            const deviceSIM = await checkAssetService.getValueFromStore(deviceSim)
-             checkAssetService.checkAsset(deviceIMEI, deviceSIM)
-            // }
-            //write code for saving 'isComplete' inside store
-        }catch(error){
-            dispatch(checkAssetFailure(error))
-        }
+    try {
+        dispatch(checkAssetStart())
 
+        const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+        const user = await keyValueDB.getValueFromStore(USER)
+        const companyId = (user) ? user.value.company.id : 0;
+        const hubId = (user) ? user.value.hubId : 0;
+        const isVerified = deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, companyId, hubId)
+        console.log(isVerified)
+        if (isVerified) {
+            dispatch(checkAssetSuccess())
+        } else {
+            const response = await deviceVerificationService.checkAssetAPI(deviceIMEI, deviceSIM)
+            const assetJSON = await response.json
+            const responseDeviceIMEI = await assetJSON.deviceIMEI
+            const responseDeviceSIM = await assetJSON.deviceSIM
+            keyValueDBService.validateAndSaveData(DEVICE_IMEI)
+            keyValueDBService.validateAndSaveData(DEVICE_SIM)
+            const responseIsVerified = deviceVerificationService.checkAsset(responseDeviceIMEI, responseDeviceSIM, companyId, hubId)
+            if (responseIsVerified) {
+                dispatch(checkAssetSuccess())
+            } else {
+                dispatch()
+            }
+        }
+        // }
+    } catch (error) {
+        console.log(error)
+        dispatch(checkAssetFailure(error))
+    }
+}
+
+async function verifyDevice() {
+    try {
+        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+        deviceVerificationService.generateOTP(deviceSIM)
+    } catch (error) {
+
+    }
 }

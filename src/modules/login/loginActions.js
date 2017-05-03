@@ -12,6 +12,7 @@ const {
   LOGIN_START,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
+  LOGIN_CAMERA_SCANNER,
 
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
@@ -33,12 +34,15 @@ const {
 
 } = require('../../lib/constants').default
 
-const BackendFactory = require('../../lib/BackendFactory').default
+import RestAPIFactory from '../../lib/RestAPIFactory'
 
 import { Actions } from 'react-native-router-flux'
 import { keyValueDB } from '../../repositories/keyValueDb'
 import { authenticationService } from '../../services/classes/Authentication'
 import CONFIG from '../../lib/config'
+import { jobMasterService } from '../../services/classes/JobMaster'
+import { deviceVerificationService } from '../../services/classes/DeviceVerification'
+import {keyValueDBService} from '../../services/classes/KeyValueDBService'
 
 /**
  * ## State actions
@@ -136,6 +140,20 @@ export function onChangePassword(value) {
   }
 }
 
+export function startScanner() {
+  return{
+    type: LOGIN_CAMERA_SCANNER,
+    payload: true
+  }
+}
+
+export function stopScanner() {
+  return{
+    type: LOGIN_CAMERA_SCANNER,
+    payload: false    
+  }
+}
+
 /**
  * ## Login
  * @param {string} username - user's name
@@ -154,11 +172,12 @@ export function authenticateUser(username, password) {
       console.log("authenticateUser called")
       dispatch(loginRequest())
       const j_sessionid = await authenticationService.login(username, password)
-      await authenticationService.storeSessionToken(j_sessionid)
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
       dispatch(loginSuccess(j_sessionid))
       Actions.Preloader()
     }
     catch (error) {
+        console.log(error)
       dispatch(loginFailure(error))
     }
   }
@@ -176,16 +195,17 @@ export function getSessionToken() {
       console.log("getSessionToken")
       dispatch(sessionTokenRequest())
       const token = await keyValueDB.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        console.log(token)
       const isPreloaderComplete =  await keyValueDB.getValueFromStore(IS_PRELOADER_COMPLETE)
+        console.log(isPreloaderComplete)
       if (token && isPreloaderComplete) {
         dispatch(sessionTokenRequestSuccess(token))
         Actions.Tabbar()
       } else if(token){
-          dispatch(sessionTokenRequestFailure())
+          dispatch(sessionTokenRequestSuccess(token))
           Actions.Preloader()
       }
       else{
-          dispatch(sessionTokenRequestSuccess(token))
           Actions.InitialLoginForm()
       }
     }
@@ -197,36 +217,3 @@ export function getSessionToken() {
   }
 }
 
-/**
- * ## Logout
- * After dispatching the logoutRequest, get the sessionToken
- *
- *
- * When the response is received and it's valid
- * change the state to register and finish the logout
- *
- * But if the call fails, like expired token or
- * no network connection, just send the failure
- *
- * And if you fail due to an invalid sessionToken, be sure
- * to delete it so the user can log in.
- *
- * How could there be an invalid sessionToken?  Maybe they
- * haven't used the app for a long time.  Or they used another
- * device and logged out there.
- */
-export function logout() {
-  return async function (dispatch) {
-    try {
-      dispatch(logoutRequest())
-      const token = await keyValueDB.getValueFromStore()
-      await BackendFactory(token).logout()
-      dispatch(logoutSuccess())
-      dispatch(deleteSessionToken())
-      Actions.InitialLoginForm()
-    }
-    catch (error) {
-      dispatch(logoutFailure(error))
-    }
-  }
-}

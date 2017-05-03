@@ -2,7 +2,7 @@
  * Created by udbhav on 12/4/17.
  */
 
-import BackendFactory from '../../lib/BackendFactory'
+import RestAPIFactory from '../../lib/RestAPIFactory'
 
 class Authentication {
 
@@ -27,21 +27,21 @@ class Authentication {
 
      */
     login(username, password) {
-        console.log("authentication service login called")
         let data = new FormData()
         data.append('j_username', username)
         data.append('j_password', password)
         data.append('_spring_security_remember_me', false)
         data.append('submit', 'Login')
 
-        return BackendFactory()._fetch({
+        return RestAPIFactory()._fetch({
             method: 'POST',
             headers: {},
             url: '/authentication',
             body: data
         })
             .then((res) => {
-                switch(res.status){
+            console.log(res.status)
+                switch (res.status) {
                     case 200:
                         return (res.headers.map['set-cookie'][0]).split("; ")[0];
                     case 401:
@@ -54,26 +54,11 @@ class Authentication {
                         throw ("User already logged in ")
                     case 1203:
                         throw ("User locked.Try after 15 minutes")
-
                     default:
                         throw ("Error ")
                 }
             })
-            .catch((error) => {
-
-                throw (error)
-            })
     }
-
-    /**
-     * ### storeSessionToken
-     * Store the session key
-     */
-    storeSessionToken(sessionToken) {
-        
-    }
-
-    getJSessionId(){}
 }
 
 export let authenticationService = new Authentication()

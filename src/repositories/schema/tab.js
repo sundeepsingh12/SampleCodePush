@@ -8,9 +8,9 @@ const tab = {
     "items": {
         "type":"object",
         "properties": {
-            "id": {"type": "long"},
-            "name": {"type": "string"},
-            "isDefault": {"type": "string"}
+            "id": {"type": "number","required":true},
+            "name": {"type": "string","required":true},
+            "isDefault": {"type": "boolean","required":true}
         }
     }
 };

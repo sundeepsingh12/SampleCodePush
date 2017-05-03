@@ -13,17 +13,13 @@ export default class SimVerify {
      * JSON body
      * deviceSIM
      */
-    generateOTP (deviceSIM) {
-        
+    generateOTP(deviceSIM) {
+
         const postData = JSON.stringify({
             deviceSIM
         })
 
-        try {
-            return  BackendFactory().serviceCall(postData,CONFIG.API.SIM_VERIFY_API,'POST')
-        } catch (error) {
-            throw(error)
-        }
+        return BackendFactory().serviceCall(postData, CONFIG.API.SIM_VERIFY_API, 'POST')
 
     }
 
@@ -36,7 +32,7 @@ export default class SimVerify {
      * JSON body
      * deviceSIM
      */
-    verifySIM (deviceSIM) {
+    verifySIM(deviceSIM) {
     }
 
     /**

@@ -8,10 +8,10 @@ const customizationAppModule = {
     "items": {
         "type":"object",
         "properties": {
-            "appModulesId": {"type": "integer"},
-            "displayName": {"type": "string"},
-            "remark": {"type": "string"},
-            "selectedUserType": {"type": "string"}
+            "appModulesId": {"type": "integer","required":true},
+            "displayName": {"type": ["string",null],"required":true},
+            "remark": {"type": ["string",null],"required":true},
+            "selectedUserType": {"type": ["string",null],"required":true}
         }
     }
 }

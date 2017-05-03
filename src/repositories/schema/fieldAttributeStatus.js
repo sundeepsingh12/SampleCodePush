@@ -13,7 +13,6 @@ const fieldAttributeStatus = {
             "fieldAttributeId": {"type": "integer","required":true},
             "statusId": {"type": "integer","required":true},
             "sequence": {"type": "integer","required":true}
-
         }
     }
 };

@@ -19,6 +19,7 @@ export default keyMirror({
     LOGIN_START: null,
     LOGIN_SUCCESS: null,
     LOGIN_FAILURE: null,
+    LOGIN_CAMERA_SCANNER: null,
     LOGOUT_START: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
@@ -49,6 +50,7 @@ export default keyMirror({
 
     PRELOADER_SUCCESS:null,
     PRELOADER_RETRY:null,
+    INVALID_IMEI_HUB:null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,
@@ -58,28 +60,29 @@ export default keyMirror({
 
 
     //Schema (Store keys)
-    jobMaster:null,
-    jobAttribute:null,
-    jobAttributeValue:null,
-    fieldAttribute:null,
-    fieldAttributeValue:null,
-    jobStatus:null,
-    tab:null,
-    customercare:null,
-    smsTemplate:null,
-    userSummary:null,
-    jobSummary:null,
-    smsJobStatus:null,
-    jobMasterMoneyTransactionMode:null,
-    fieldAttributeStatus:null,
-    fieldAttributeValidation:null,
-    fieldAttributeValidationCondition:null,
-    jobListCustomization:null,
-    customizationAppModule:null,
-    deviceImei:null,
-    deviceSim:null,
-    user:null,
-    IS_PRELOADER_COMPLETE:null
+
+    JOB_MASTER:null,
+    JOB_ATTRIBUTE:null,
+    JOB_ATTRIBUTE_VALUE:null,
+    FIELD_ATTRIBUTE:null,
+    FIELD_ATTRIBUTE_VALUE:null,
+    JOB_STATUS:null,
+    TAB:null,
+    CUSTOMER_CARE:null,
+    SMS_TEMPLATE:null,
+    USER_SUMMARY:null,
+    JOB_SUMMARY:null,
+    SMS_JOB_STATUS:null,
+    JOB_MASTER_MONEY_TRANSACTION_MODE:null,
+    FIELD_ATTRIBUTE_STATUS:null,
+    FIELD_ATTRIBUTE_VALIDATION:null,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION:null,
+    JOB_LIST_CUSTOMIZATION:null,
+    CUSTOMIZATION_APP_MODULE:null,
+    DEVICE_IMEI:null,
+    DEVICE_SIM:null,
+    USER:null,
+IS_PRELOADER_COMPLETE:null
 })
 
 

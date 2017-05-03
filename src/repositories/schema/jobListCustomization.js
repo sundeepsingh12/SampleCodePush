@@ -8,24 +8,24 @@ const jobListCustomization = {
     "items": {
         "type":"object",
         "properties": {
-            "jobMasterId": {"type": "number"},
-            "appJobListMasterId": {"type": "number"},
-            "seperator": {"type": "string"},
-            "referenceNo": {"type": ["string", null]},
-            "runsheetNo": {"type": [null, "boolean"]},
-            "noOfAttempts": {},
-            "slot": {},
-            "delimiterType": {},
-            "startTime": {"type": [null, "boolean"]},
-            "endTime": {"type": [null, "boolean"]},
-            "jobAttr": {},
-            "fieldAttr": {},
-            "trackKm": {"type": [null, "boolean"]},
-            "trackHalt": {"type": [null, "boolean"]},
-            "trackCallCount": {"type": [null, "boolean"]},
-            "trackCallDuration": {"type": [null, "boolean"]},
-            "trackSmsCount": {"type": [null, "boolean"]},
-            "trackTransactionTimeSpent": {"type": [null, "boolean"]}
+            "jobMasterId": {"type": "number","required":true},
+            "appJobListMasterId": {"type": "number","required":true},
+            "separator": {"type": ["string",null],"required":true},
+            "referenceNo": {"type": ["boolean", null],"required":true},
+            "runsheetNo": {"type": [null, "boolean"],"required":true},
+            "noOfAttempts": {"type": [null, "boolean"],"required":true},
+            "slot": {"type": [null, "boolean"],"required":true},
+            "delimiterType": {"type": [null, "string"],"required":true},
+            "startTime": {"type": [null, "boolean"],"required":true},
+            "endTime": {"type": [null, "boolean"],"required":true},
+            "jobAttr": {"type": [null, "string"],"required":true},
+            "fieldAttr": {"type": [null, "string"],"required":true},
+            "trackKm": {"type": [null, "boolean"],"required":true},
+            "trackHalt": {"type": [null, "boolean"],"required":true},
+            "trackCallCount": {"type": [null, "boolean"],"required":true},
+            "trackCallDuration": {"type": [null, "boolean"],"required":true},
+            "trackSmsCount": {"type": [null, "boolean"],"required":true},
+            "trackTransactionTimeSpent": {"type": [null, "boolean"],"required":true}
         }
     }
 };

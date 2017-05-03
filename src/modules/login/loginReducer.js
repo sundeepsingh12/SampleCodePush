@@ -19,6 +19,7 @@ const {
   LOGIN_START,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
+  LOGIN_CAMERA_SCANNER,
 
   SET_STATE,
   ON_LOGIN_USERNAME_CHANGE,
@@ -44,6 +45,7 @@ export default function authReducer(state = initialState, action) {
     case LOGIN_START:
       return state.setIn(['form', 'authenticationService'], 'true')
         .setIn(['form', 'displayMessage'], 'Login request initiated')
+        .setIn(['form', 'isButtonDisabled'], true)
 
 
     /**
@@ -59,6 +61,7 @@ export default function authReducer(state = initialState, action) {
     case LOGIN_FAILURE:
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], action.payload)
+          .setIn(['form','password'],'')
 
     /**
      * ### Hot Loading support
@@ -89,7 +92,6 @@ export default function authReducer(state = initialState, action) {
 
     case ON_LOGIN_PASSWORD_CHANGE:
       const password = action.payload
-      console.log(state.form.username)
       const usernameState = state.form.username
       if (usernameState && password) {
         var next = state.setIn(['form', 'password'], password)
@@ -99,6 +101,10 @@ export default function authReducer(state = initialState, action) {
           .setIn(['form', 'isButtonDisabled'], true)
       }
       return next
+
+      case LOGIN_CAMERA_SCANNER:
+        var next = state.setIn(['form', 'isCameraScannerActive'], action.payload)
+        return next
   }
   /**
    * ## Default
