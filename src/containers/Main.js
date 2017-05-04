@@ -47,11 +47,6 @@ import { Container, Content, Tab, Tabs,Body, Header, Title, Left, Right,Scrollab
 import Jobs from './Jobs';
 
 /**
- * The platform neutral button
- */
-// const Button = require('apsl-react-native-button')
-
-/**
  *  Instead of including all app states via ...state
  *  One could explicitly enumerate only those which Main.js will depend on.
  *
