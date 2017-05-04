@@ -177,8 +177,7 @@ export function authenticateUser(username, password) {
       Actions.Preloader()
     }
     catch (error) {
-        console.log(error)
-      dispatch(loginFailure(error))
+      dispatch(loginFailure(error.message))
     }
   }
 }
@@ -210,7 +209,7 @@ export function getSessionToken() {
       }
     }
     catch (error) {
-      dispatch(sessionTokenRequestFailure(error))
+      dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())
       Actions.InitialLoginForm()
     }

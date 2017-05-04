@@ -128,12 +128,10 @@ async function downloadJobMaster(dispatch) {
         let userObject = await keyValueDBService.getValueFromStore(USER)
         const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM,userObject)
         const json = await jobMasters.json
-        console.log(json)
         dispatch(jobMasterDownloadSuccess())
         saveJobMaster(json, dispatch)
     } catch (error) {
-        console.log(error)
-        dispatch(jobMasterDownloadFailure(error))
+        dispatch(jobMasterDownloadFailure(error.message))
     }
 }
 
@@ -146,8 +144,7 @@ export function invalidateUserSession() {
             dispatch(deleteSessionToken())
             Actions.InitialLoginForm()
         } catch (error) {
-            console.log(error)
-            dispatch(logoutFailure(error))
+            dispatch(logoutFailure(error.message))
         }
     }
 }
@@ -184,7 +181,7 @@ async function saveJobMaster(jobMasterResponse, dispatch) {
         }
 
     } catch (error) {
-        dispatch(jobMasterSavingFailure(error))
+        dispatch(jobMasterSavingFailure(error.message))
     }
     // }
 }
@@ -220,8 +217,7 @@ async function checkAsset(dispatch) {
         }
         // }
     } catch (error) {
-        console.log(error)
-        dispatch(checkAssetFailure(error))
+        dispatch(checkAssetFailure(error.message))
     }
 }
 
