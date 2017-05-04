@@ -88,9 +88,9 @@ class Login extends Component {
   loginButtonPress() {
     const password = this.props.auth.form.password;
     console.log(password.length)
-    if (password.length<64) {
+    /*if (password.length<64) {
       this.onChangePassword(sha256(password));
-    }
+    }*/
 
     this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password));
   }

@@ -3,6 +3,7 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.eguma.barcodescanner.BarcodeScannerPackage;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.horcrux.svg.SvgPackage;
@@ -29,6 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNDeviceInfo(),
             new BarcodeScannerPackage(),
             new RCTCameraPackage(),
             new SvgPackage(),
