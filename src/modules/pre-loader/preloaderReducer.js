@@ -35,7 +35,11 @@ const {
     SERVICE_SUCCESS,
     SERVICE_FAILED,
     PRELOADER_SUCCESS,
-    INVALID_IMEI_HUB
+    INVALID_IMEI_HUB,
+
+    PRE_LOGOUT_START,
+    PRE_LOGOUT_SUCCESS,
+    PRE_LOGOUT_FAILURE
 
 } = require('../../lib/constants').default
 
@@ -78,6 +82,13 @@ export default function preloaderReducer(state = initialState, action) {
                 .set('error', action.payload)
         case PRELOADER_SUCCESS :
             return state.set('isComplete', true)
+        case PRE_LOGOUT_START :
+            return state.set('error','Logging out ')
+        case PRE_LOGOUT_SUCCESS :
+            return state.set('error','Log out success')
+        case PRE_LOGOUT_FAILURE :
+            return state.set('isError',true)
+                        .set('error',action.payload)
     }
     return state
 }

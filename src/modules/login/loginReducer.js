@@ -24,6 +24,7 @@ const {
   SET_STATE,
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
+  TOGGLE_CHECKBOX,
 } = require('../../lib/constants').default
 
 const initialState = new InitialState()
@@ -46,6 +47,7 @@ export default function authReducer(state = initialState, action) {
       return state.setIn(['form', 'authenticationService'], 'true')
         .setIn(['form', 'displayMessage'], 'Login request initiated')
         .setIn(['form', 'isButtonDisabled'], true)
+        .setIn(['form','isEditTextDisabled'],true)
 
 
     /**
@@ -56,12 +58,15 @@ export default function authReducer(state = initialState, action) {
 
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], 'Login success')
+        .setIn(['form', 'isButtonDisabled'], false)
+        .setIn(['form','isEditTextDisabled'],false)
 
 
     case LOGIN_FAILURE:
       return state.setIn(['form', 'authenticationService'], false)
         .setIn(['form', 'displayMessage'], action.payload)
-          .setIn(['form','password'],'')
+        .setIn(['form','password'],'')
+        .setIn(['form','isEditTextDisabled'],false)
 
     /**
      * ### Hot Loading support
@@ -105,6 +110,9 @@ export default function authReducer(state = initialState, action) {
       case LOGIN_CAMERA_SCANNER:
         var next = state.setIn(['form', 'isCameraScannerActive'], action.payload)
         return next
+      
+      case TOGGLE_CHECKBOX:
+       return state.setIn(['form','rememberMe'],!state.form.rememberMe)
   }
   /**
    * ## Default

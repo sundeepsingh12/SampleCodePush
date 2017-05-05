@@ -13,7 +13,7 @@ const {
     SET_CREDENTIALS,
     LOGOUT_START,
     LOGOUT_SUCCESS,
-    LOGOUT_FAILURE
+    LOGOUT_FAILURE,
 } = require('../../lib/constants').default
 
 import {keyValueDB} from '../../repositories/keyValueDb'
@@ -89,23 +89,25 @@ export function logoutFailure(error) {
 /**
  * ## DeleteToken actions
  */
-export function deleteTokenRequest() {
-    return {
-        type: DELETE_TOKEN_REQUEST
-    }
-}
-export function deleteTokenRequestSuccess() {
-    return {
-        type: DELETE_TOKEN_SUCCESS
-    }
-}
+// export function deleteTokenRequest() {
+//     return {
+//         type: DELETE_TOKEN_REQUEST
+//     }
+// }
+// export function deleteTokenRequestSuccess() {
+//     return {
+//         type: DELETE_TOKEN_SUCCESS
+//     }
+// }
 
 
 export function deleteSessionToken() {
     return async function (dispatch) {
-        dispatch(deleteTokenRequest())
-        await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        dispatch(deleteTokenRequestSuccess())
+        console.log('deleteSessionToken')
+        // dispatch(deleteTokenRequest())
+        const response = await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        // dispatch(deleteTokenRequestSuccess())
+        console.log('deleteSessionToken success')
     }
 }
 

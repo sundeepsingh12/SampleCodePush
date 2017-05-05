@@ -45,7 +45,7 @@ class Preloader extends Component {
   _renderErrorMessage() {
     if (this.props.preloader.isError) {
       return (
-        <Text style={[feStyle.row, feStyle.justifyCenter, feStyle.fontDanger, feStyle.marginBottom20]}>{this.props.preloader.error}</Text>
+        <Text style={[feStyle.row, feStyle.justifyCenter, feStyle.fontDanger]}>{this.props.preloader.error}</Text>
       );
     } else {
       return null;
@@ -55,10 +55,10 @@ class Preloader extends Component {
     if (this.props.preloader.isError) {
       return (
         <View style={feStyle.row}>
-          <Button onPress={() => this.invalidateSession() } rounded danger style={{ margin: 10 }} >
+          <Button onPress={() => this.invalidateSession() } rounded danger style={{ marginLeft: 10, marginRight: 10, }} >
             <Text style={{ color: '#ffffff' }} >Cancel</Text>
           </Button>
-          <Button onPress={() => this.retry()} rounded success style={{ margin: 10 }}>
+          <Button onPress={() => this.retry()} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
             <Text style={{ color: '#ffffff' }}>Retry</Text>
           </Button>
         </View>
@@ -79,41 +79,41 @@ class Preloader extends Component {
       <Container>
         <View style={styles.issueWrapper}>
           <View style={[feStyle.column, feStyle.flexBasis40, feStyle.alignCenter, feStyle.flex1]}>
-            <View>
+            <View style={{flexBasis: '70%'}}>
               <Image
                 style={styles.logoStyle}
                 source={require('../../images/preloader.png')}
               />
             </View>
 
-            <Text style={[feStyle.fontBlack, feStyle.fontXxxl, feStyle.fontWeight200, feStyle.marginTop30]} >
+            <Text adjustsFontSizeToFit={true} style={[feStyle.fontBlack, feStyle.fontXxl, feStyle.fontWeight200, {flexBasis: '30%'}]} >
               Setting you up !
-              </Text>
+            </Text>
           </View>
-          <View style={[feStyle.column, feStyle.flexBasis40, feStyle.flex1, feStyle.justifyCenter]}>
+          <View style={[feStyle.column, feStyle.flexBasis30, feStyle.marginTop10, feStyle.flex1, feStyle.justifyCenter]}>
             <List>
-              <ListItem style={{ height: 60 }}>
+              <ListItem style={{ height: 50 }}>
                 <Left style={{ flex: 1 }}>
-                  <Ionicons name="ios-globe-outline" style={styles.listIcons} />
-                  <Text style={[feStyle.fontDarkGray, feStyle.marginTop5]}>Downloading settings</Text>
+                  <Ionicons name="ios-cloud-download-outline" style={styles.listIcons} />
+                  <Text style={[feStyle.fontDarkGray]}>Downloading settings</Text>
                 </Left>
                 <Right style={{ flex: 0.5 }}>
                   <ServiceStatusIcon status={this.props.preloader.configDownloadService} />
                 </Right>
               </ListItem>
-              <ListItem style={{ height: 60 }}>
+              <ListItem style={{ height: 50 }}>
                 <Left style={{ flex: 1 }}>
-                  <Ionicons name="ios-globe-outline" style={styles.listIcons} />
-                  <Text style={[feStyle.fontDarkGray, feStyle.marginTop5]}>Applying settings</Text>
+                  <Ionicons name="ios-construct-outline" style={styles.listIcons} />
+                  <Text style={[feStyle.fontDarkGray]}>Applying settings</Text>
                 </Left>
                 <Right style={{ flex: 0.5 }}>
                   <ServiceStatusIcon status={this.props.preloader.configSaveService} />
                 </Right>
               </ListItem>
-              <ListItem style={{ height: 60 }}>
+              <ListItem style={{ height: 50 }}>
                 <Left style={{ flex: 1 }}>
-                  <Ionicons name="ios-globe-outline" style={styles.listIcons} />
-                  <Text style={[feStyle.fontDarkGray, feStyle.marginTop5]}>Verifying handset</Text>
+                  <Ionicons name="ios-color-wand-outline" style={styles.listIcons} />
+                  <Text style={[feStyle.fontDarkGray]}>Verifying handset</Text>
                 </Left>
                 <Right style={{ flex: 0.5 }}>
                   <ServiceStatusIcon status={this.props.preloader.deviceVerificationService} />
@@ -121,7 +121,7 @@ class Preloader extends Component {
               </ListItem>
             </List>
           </View>
-          <View style={[feStyle.flexBasis25, feStyle.marginTop30, feStyle.flex1, feStyle.row, feStyle.justifyCenter]}>
+          <View style={[feStyle.flexBasis25, feStyle.marginTop15, feStyle.flex1, feStyle.column, feStyle.alignCenter, feStyle.justifyCenter]}>
               {this._renderErrorMessage()}
               {this._renderButtons()}
           </View>
@@ -141,7 +141,7 @@ var styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
     height: '100%',
-    paddingTop: 80,
+    paddingTop: 60,
     flexDirection: 'column',
     justifyContent: 'center'
   },

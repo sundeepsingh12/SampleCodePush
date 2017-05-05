@@ -29,6 +29,11 @@ const {
 
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
+  TOGGLE_CHECKBOX,
+  
+  USERNAME,
+  PASSWORD,
+  REMEMBER_ME,
 
   IS_PRELOADER_COMPLETE
 
@@ -107,18 +112,6 @@ export function sessionTokenRequestFailure(error) {
 }
 
 /**
- * ## onAuthFormFieldChange
- * Set the payload so the reducer can work on it
- */
-export function onAuthFormFieldChange(field, value) {
-  return {
-    type: ON_AUTH_FORM_FIELD_CHANGE,
-    payload: { field: field, value: value }
-  }
-}
-
-
-/**
  * ## set the username
  *
  */
@@ -154,6 +147,12 @@ export function stopScanner() {
   }
 }
 
+export function toggleCheckbox() {
+  return {
+    type: TOGGLE_CHECKBOX
+  }
+}
+
 /**
  * ## Login
  * @param {string} username - user's name
@@ -166,18 +165,42 @@ export function stopScanner() {
  * otherwise, dispatch a failure
  */
 
-export function authenticateUser(username, password) {
+export function authenticateUser(username, password,rememberMe) {
   return async function (dispatch) {
     try {
       console.log("authenticateUser called")
       dispatch(loginRequest())
       const j_sessionid = await authenticationService.login(username, password)
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
+      await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess(j_sessionid))
       Actions.Preloader()
     }
     catch (error) {
       dispatch(loginFailure(error.message))
+    }
+  }
+}
+
+export function checkRememberMe() {
+  return async function (dispatch) {
+    try {
+      console.log('checkRememberMe get')
+      let rememberMe = await keyValueDBService.getValueFromStore(REMEMBER_ME)
+      console.log('rememberMe get') 
+      console.log(rememberMe)
+      if(rememberMe) {
+        let username = await keyValueDBService.getValueFromStore(USERNAME)
+        console.log('username get')
+        console.log(username)
+        let password = await keyValueDBService.getValueFromStore(PASSWORD)
+        console.log('password get')
+        console.log(password)
+        dispatch(onChangeUsername(username.value))
+        dispatch(onChangePassword(password.value))
+      }
+    } catch(error) {
+
     }
   }
 }
@@ -193,22 +216,26 @@ export function getSessionToken() {
     try {
       console.log("getSessionToken")
       dispatch(sessionTokenRequest())
-      const token = await keyValueDB.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        console.log(token)
-      const isPreloaderComplete =  await keyValueDB.getValueFromStore(IS_PRELOADER_COMPLETE)
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      console.log(token)
+      const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
         console.log(isPreloaderComplete)
-      if (token && isPreloaderComplete) {
-        dispatch(sessionTokenRequestSuccess(token))
+        console.log(isPreloaderComplete.value)
+      if (token.value && isPreloaderComplete.value) {
+        // dispatch(sessionTokenRequestSuccess(token))
+        console.log('tabbar called')
+        // Actions.Preloader()
         Actions.Tabbar()
-      } else if(token){
-          dispatch(sessionTokenRequestSuccess(token))
+      } else if(token) {
+          // dispatch(sessionTokenRequestSuccess(token))
           Actions.Preloader()
       }
-      else{
+      else {
           Actions.InitialLoginForm()
       }
     }
     catch (error) {
+      console.log('login failure')
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())
       Actions.InitialLoginForm()

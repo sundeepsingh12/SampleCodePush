@@ -171,6 +171,7 @@ export default function native(platform) {
                 component={Preloader}
                 hideNavBar
                 title='Preloader'
+                type='replace'
                  />
 
               <Scene key='Tabbar'

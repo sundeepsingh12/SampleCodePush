@@ -77,6 +77,10 @@ class Login extends Component {
     super(props);
   }
 
+  componentDidMount() {
+    this.props.actions.checkRememberMe()
+  }
+
   onChangeUsername(username) {
     this.props.actions.onChangeUsername(username)
   }
@@ -88,11 +92,11 @@ class Login extends Component {
   loginButtonPress() {
     const password = this.props.auth.form.password;
     console.log(password.length)
-    /*if (password.length<64) {
-      this.onChangePassword(sha256(password));
-    }*/
-
-    this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password));
+    if(password.length > 50) {
+      this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
+    } else {
+      this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe);
+    }
   }
 
   _onBarCodeRead(result) {
@@ -106,6 +110,11 @@ class Login extends Component {
 
   _onScaningCancelled() {
     this.props.actions.stopScanner();
+  }
+
+  rememberMe() {
+    console.log('rememberMe called')
+    this.props.actions.toggleCheckbox()
   }
 
   render() {
@@ -125,7 +134,9 @@ class Login extends Component {
                   value={this.props.auth.form.username}
                   placeholder='Username'
                   style={feTheme.roundedInput}
-                  onChangeText={value =>  this.onChangeUsername(value) } />
+                  onChangeText={value =>  this.onChangeUsername(value) }
+                  disabled = {this.props.auth.form.isEditTextDisabled}
+                   />
               </Item>
               <Item style={{ borderWidth: 0, marginTop: 15 }}>
                 <Input
@@ -134,19 +145,21 @@ class Login extends Component {
                   style={feTheme.roundedInput}
                   secureTextEntry={true}
                   onChangeText={value =>  this.onChangePassword(value) }
-
+                  disabled = {this.props.auth.form.isEditTextDisabled}
                 />
               </Item>
 
               <Button
-                onPress={() => this.loginButtonPress()} rounded success style={{ width: '100%', marginTop: 15 }}
+                rounded success style={{ width: '100%', marginTop: 15 }}
                 disabled={this.props.auth.form.isButtonDisabled}
+                onPress={() => this.loginButtonPress()}
               >
                 <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Log In</Text>
               </Button>
 
               <View style={{ flexDirection: 'row', flexGrow: 1, justifyContent: 'flex-start', marginTop: 15 }}>
-                <CheckBox checked={false} />
+                <CheckBox checked={this.props.auth.form.rememberMe} 
+                  onPress = {this.rememberMe.bind(this)} />
                 <Text style={{ marginLeft: 20 }}>Remember Me</Text>
               </View>
 

@@ -29,7 +29,12 @@ const {
 
     DEVICE_IMEI,
     DEVICE_SIM,
-    USER
+    USER,
+    IS_PRELOADER_COMPLETE,
+
+    PRE_LOGOUT_START,
+    PRE_LOGOUT_SUCCESS,
+    PRE_LOGOUT_FAILURE
 } = require('../../lib/constants').default
 
 import {Actions} from 'react-native-router-flux'
@@ -120,6 +125,24 @@ export function invalidImeiHub(error) {
     }
 }
 
+export function preLogoutRequest() {
+    return {
+        type: PRE_LOGOUT_START
+    }
+}
+
+export function preLogoutSuccess() {
+    return {
+        type: PRE_LOGOUT_SUCCESS
+    }
+}
+export function preLogoutFailure(error) {
+    return {
+        type: PRE_LOGOUT_FAILURE,
+        payload: error
+    }
+}
+
 async function downloadJobMaster(dispatch) {
     try {
         dispatch(jobMasterDownloadStart())
@@ -138,13 +161,13 @@ async function downloadJobMaster(dispatch) {
 export function invalidateUserSession() {
     return async function (dispatch) {
         try {
-            dispatch(logoutRequest())
+            dispatch(preLogoutRequest())
             await logoutService.logout();
-            dispatch(logoutSuccess())
+            dispatch(preLogoutSuccess())
             dispatch(deleteSessionToken())
             Actions.InitialLoginForm()
         } catch (error) {
-            dispatch(logoutFailure(error.message))
+            dispatch(preLogoutFailure(error.message))
         }
     }
 }
@@ -191,7 +214,6 @@ async function checkAsset(dispatch) {
     // return async function (dispatch) {
     try {
         dispatch(checkAssetStart())
-
         const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
         const user = await keyValueDB.getValueFromStore(USER)
@@ -201,6 +223,9 @@ async function checkAsset(dispatch) {
         console.log(isVerified)
         if (isVerified) {
             dispatch(checkAssetSuccess())
+            dispatch(preloaderSuccess())
+            keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE,'true')
+            Actions.Tabbar()
         } else {
             const response = await deviceVerificationService.checkAssetAPI(deviceIMEI, deviceSIM)
             const assetJSON = await response.json
@@ -211,8 +236,11 @@ async function checkAsset(dispatch) {
             const responseIsVerified = deviceVerificationService.checkAsset(responseDeviceIMEI, responseDeviceSIM, companyId, hubId)
             if (responseIsVerified) {
                 dispatch(checkAssetSuccess())
+                keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE,'true')
+                dispatch(preloaderSuccess())
+                Actions.Tabbar()
             } else {
-                dispatch()
+                // dispatch()
             }
         }
         // }

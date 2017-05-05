@@ -18,7 +18,9 @@ const {
   LOGIN_SUCCESS,
   SESSION_TOKEN_SUCCESS,
 
+  LOGOUT_START,
   LOGOUT_SUCCESS,
+  LOGOUT_FAILURE,
 
   GET_STATE,
   SET_STATE,
@@ -134,6 +136,9 @@ export default function globalReducer(state = initialState, action) {
 
     case INTERNET_CONNECTION_STATUS:
       return state.set('')
+    
+    case LOGOUT_START:
+
 
   }
 
