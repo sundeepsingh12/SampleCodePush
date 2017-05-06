@@ -87,7 +87,7 @@ class JobMaster {
         if((!deviceIMEI || !deviceSIM) && userObject){
                 deviceIMEI = {}
                 deviceSIM = {}
-                currentJobMasterVersion = userObject.value.currentJobMasterVersion
+                currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
                 deviceCompanyId = userObject.value.company.id
                 postData = JSON.stringify({
                     deviceIMEI,
@@ -106,10 +106,6 @@ class JobMaster {
                 deviceCompanyId
             })
         }
-        console.log(postData)
-        console.log('downloadJobMaster')
-        console.log(currentJobMasterVersion)
-        console.log(deviceCompanyId)
         let jobMasterResponse = RestAPIFactory().serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
         jobMasterResponse = RestAPIFactory()._pruneEmpty(jobMasterResponse)
         return jobMasterResponse

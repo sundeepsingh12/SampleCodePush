@@ -25,6 +25,9 @@ const {
     SERVICE_FAILED,
     PRELOADER_SUCCESS,
     INVALID_IMEI_HUB,
+    SHOW_MOBILE_NUMBER,
+    SHOW_OTP_SCREEN,
+    SHOW_MOBILE_NUMBER_SCREEN,
 
 
     DEVICE_IMEI,
@@ -120,6 +123,27 @@ export function invalidImeiHub(error) {
     }
 }
 
+export function showMobileNumber(){
+    return {
+        type: SHOW_MOBILE_NUMBER_SCREEN,
+        payload:true
+    }
+}
+
+export function showOtp() {
+    return {
+        type:SHOW_OTP_SCREEN,
+        payload:true
+    }
+}
+
+export function setMobileNumber(mobileNumber){
+    return {
+        type:SET_MOBILE_NUMBER,
+        payload:mobileNumber
+    }
+}
+
 async function downloadJobMaster(dispatch) {
     try {
         dispatch(jobMasterDownloadStart())
@@ -192,33 +216,41 @@ async function checkAsset(dispatch) {
     try {
         dispatch(checkAssetStart())
 
-        const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+        let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+        let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
         const user = await keyValueDB.getValueFromStore(USER)
-        const companyId = (user) ? user.value.company.id : 0;
-        const hubId = (user) ? user.value.hubId : 0;
-        const isVerified = deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, companyId, hubId)
-        console.log(isVerified)
+
+        const isVerified = deviceVerificationService.checkAsset(deviceIMEI, deviceSIM,user)
+        console.log('isverified >>>>>'+isVerified)
         if (isVerified) {
             dispatch(checkAssetSuccess())
         } else {
+            deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+            deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
             const response = await deviceVerificationService.checkAssetAPI(deviceIMEI, deviceSIM)
             const assetJSON = await response.json
             const responseDeviceIMEI = await assetJSON.deviceIMEI
             const responseDeviceSIM = await assetJSON.deviceSIM
-            keyValueDBService.validateAndSaveData(DEVICE_IMEI)
-            keyValueDBService.validateAndSaveData(DEVICE_SIM)
-            const responseIsVerified = deviceVerificationService.checkAsset(responseDeviceIMEI, responseDeviceSIM, companyId, hubId)
+            keyValueDBService.validateAndSaveData(DEVICE_IMEI,responseDeviceIMEI)
+            keyValueDBService.validateAndSaveData(DEVICE_SIM,responseDeviceSIM)
+            const responseIsVerified = deviceVerificationService.checkAsset(responseDeviceIMEI, responseDeviceSIM,user)
+            console.log('response verified >>>>>>' +responseIsVerified);
             if (responseIsVerified) {
                 dispatch(checkAssetSuccess())
             } else {
-                dispatch()
+                dispatch(showMobileNumber())
             }
         }
         // }
     } catch (error) {
         dispatch(checkAssetFailure(error.message))
     }
+}
+
+export function setMobileNo(mobileNumber){
+   return async function(dispatch){
+       dispatch(setMobileNumber())
+   }
 }
 
 async function verifyDevice() {

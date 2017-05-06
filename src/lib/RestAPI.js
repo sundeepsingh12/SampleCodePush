@@ -81,7 +81,6 @@ export class RestAPI {
 
     serviceCall(data,apiUrl,methodType) {
         let opts;
-        console.log(data)
         if(methodType==='POST'){
             opts = {
                 method: methodType,

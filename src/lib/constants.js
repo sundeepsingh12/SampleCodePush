@@ -51,6 +51,9 @@ export default keyMirror({
     PRELOADER_SUCCESS:null,
     PRELOADER_RETRY:null,
     INVALID_IMEI_HUB:null,
+    SHOW_MOBILE_NUMBER:null,
+    SHOW_OTP_SCREEN:null,
+    SHOW_MOBILE_NUMBER_SCREEN:null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,

@@ -79,7 +79,6 @@ export default function authReducer(state = initialState, action) {
 
     case ON_LOGIN_USERNAME_CHANGE:
       const username = action.payload
-      console.log(state.form.password)
       const passwordState = state.form.password
       if (username  && passwordState ) {
         var next = state.setIn(['form', 'username'], username)

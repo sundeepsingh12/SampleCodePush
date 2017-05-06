@@ -137,7 +137,6 @@ class Login extends Component {
 
                 />
               </Item>
-
               <Button
                 onPress={() => this.loginButtonPress()} rounded success style={{ width: '100%', marginTop: 15 }}
                 disabled={this.props.auth.form.isButtonDisabled}

@@ -18,7 +18,11 @@ var InitialState = Record({
   deviceVerificationService: SERVICE_PENDING, //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
   isError: false,
   error: '',
-  isComplete: false
+  isComplete: false,
+  showMobileNumberScreen:false,
+  showOtpScreen:false,
+  mobileNumber:'',
+  disableButton:false
 })
 
 export default InitialState

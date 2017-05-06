@@ -35,7 +35,11 @@ const {
     SERVICE_SUCCESS,
     SERVICE_FAILED,
     PRELOADER_SUCCESS,
-    INVALID_IMEI_HUB
+    INVALID_IMEI_HUB,
+    SHOW_MOBILE_NUMBER_SCREEN,
+    SHOW_OTP_SCREEN,
+    SET_MOBILE_NUMBER
+
 
 } = require('../../lib/constants').default
 
@@ -78,6 +82,13 @@ export default function preloaderReducer(state = initialState, action) {
                 .set('error', action.payload)
         case PRELOADER_SUCCESS :
             return state.set('isComplete', true)
+        case SHOW_MOBILE_NUMBER_SCREEN:
+            return state.set('showMobileNumberScreen',action.payload)
+        case SHOW_OTP_SCREEN:
+            return state.set('showOtpScreen',action.payload)
+        case SET_MOBILE_NUMBER:
+            return state.set('mobileNumber',action.payload)
+                .set('disableButton',true)
     }
     return state
 }
