@@ -356,5 +356,99 @@ export default {
         alignSelf: 'flex-end'
     }
 
+<<<<<<< HEAD
+=======
+  paddingRight5 : {
+    paddingRight : 5
+  },
+  paddingRight10 : {
+    paddingRight : 10
+  },
+  paddingRight15 : {
+    paddingRight : 15
+  },
+  paddingRight20 : {
+    paddingRight : 20
+  },
+  paddingRight25 : {
+    paddingRight : 25
+  },
+  paddingRight30 : {
+    paddingRight : 30
+  },
+  
+  column : {
+      flexDirection : 'column'
+  },
+  flex1 : {
+      flex: 1
+  },
+  flexBasis25 : {
+      flexBasis: '25%'
+  },
+  flexBasis30 : {
+      flexBasis: '30%'
+  },
+  flexBasis40 : {
+      flexBasis: '40%'
+  },
+  flexBasis33_3 : {
+      flexBasis: '33.3%'
+  },
+  flexBasis50 : {
+      flexBasis: '50%'
+  },
+  flexBasis60 : {
+      flexBasis: '60%'
+  },
+  flexBasis75 : {
+      flexBasis: '75%'
+  },
+  flexBasis70 : {
+      flexBasis: '70%'
+  },
+  flexBasis100 : {
+      flexBasis: '100%'
+  },
+  width100 : {
+    width : '100%'
+  },
+  row : {
+      flexDirection : 'row'
+  },
+  justifyCenter : {
+      justifyContent: 'center'
+  },
+  justifyStart : {
+      justifyContent : 'flex-start'
+  },
+  justifyEnd : {
+      justifyContent : 'flex-end'
+  },
+  justifySpaceAround : {
+      justifyContent : 'space-around'
+  },
+  justifySpaceBetween : {
+      justifyContent : 'space-beetween'
+  },
+  alignCenter : {
+      alignItems : 'center'
+  },
+  alignStart : {
+      alignItems : 'flex-start'
+  },
+  alignEnd : {
+      alignItems : 'flex-end'
+  },
+  alignSelfCenter : {
+      alignSelf : 'center'
+  },
+  alignSelfStart : {
+      alignSelf : 'flex-start'
+  },
+  alignSelfEnd : {
+      alignSelf : 'flex-end'
+  }
+>>>>>>> test_cases_login
 
 }

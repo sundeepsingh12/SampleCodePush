@@ -3,6 +3,7 @@
 import {keyValueDBService} from './KeyValueDBService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
+import {keyValueDBService} from './KeyValueDBService'
 
 import {NativeModules} from 'react-native';
 
@@ -37,9 +38,8 @@ class DeviceVerification {
             deviceSIM
         })
 
-        console.log(postData)
-
-        let checkAssetResponse = RestAPIFactory().serviceCall(postData, CONFIG.API.CHECK_ASSET_API, 'POST')
+        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        let checkAssetResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.CHECK_ASSET_API, 'POST')
         checkAssetResponse = RestAPIFactory()._pruneEmpty(checkAssetResponse)
         return checkAssetResponse
     }

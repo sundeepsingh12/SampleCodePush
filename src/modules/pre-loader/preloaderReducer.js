@@ -38,8 +38,11 @@ const {
     INVALID_IMEI_HUB,
     SHOW_MOBILE_NUMBER_SCREEN,
     SHOW_OTP_SCREEN,
-    SET_MOBILE_NUMBER
+    SET_MOBILE_NUMBER,
 
+    PRE_LOGOUT_START,
+    PRE_LOGOUT_SUCCESS,
+    PRE_LOGOUT_FAILURE
 
 } = require('../../lib/constants').default
 
@@ -89,6 +92,13 @@ export default function preloaderReducer(state = initialState, action) {
         case SET_MOBILE_NUMBER:
             return state.set('mobileNumber',action.payload)
                 .set('disableButton',true)
+        case PRE_LOGOUT_START :
+            return state.set('error','Logging out ')
+        case PRE_LOGOUT_SUCCESS :
+            return state.set('error','Log out success')
+        case PRE_LOGOUT_FAILURE :
+            return state.set('isError',true)
+                        .set('error',action.payload)
     }
     return state
 }

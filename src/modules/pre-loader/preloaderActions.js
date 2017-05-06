@@ -32,7 +32,12 @@ const {
 
     DEVICE_IMEI,
     DEVICE_SIM,
-    USER
+    USER,
+    IS_PRELOADER_COMPLETE,
+
+    PRE_LOGOUT_START,
+    PRE_LOGOUT_SUCCESS,
+    PRE_LOGOUT_FAILURE
 } = require('../../lib/constants').default
 
 import {Actions} from 'react-native-router-flux'
@@ -61,7 +66,7 @@ export function jobMasterDownloadSuccess() {
 export function jobMasterDownloadFailure(error) {
     return {
         type: MASTER_DOWNLOAD_FAILURE,
-        payload:error
+        payload: error
     }
 }
 
@@ -80,14 +85,14 @@ export function jobMasterSavingSuccess() {
 export function jobMasterSavingFailure(error) {
     return {
         type: MASTER_SAVING_FAILURE,
-        payload:error
+        payload: error
     }
 }
 
 export function timeMismatch(error) {
     return {
         type: MASTER_TIME_FAILURE,
-        payload:error
+        payload: error
     }
 }
 
@@ -106,7 +111,7 @@ export function checkAssetSuccess() {
 export function checkAssetFailure(error) {
     return {
         type: CHECK_ASSET_FAILURE,
-        payload:error
+        payload: error
     }
 }
 
@@ -119,28 +124,45 @@ export function preloaderSuccess() {
 export function invalidImeiHub(error) {
     return {
         type: INVALID_IMEI_HUB,
-        payload:error
+        payload: error
     }
 }
 
-export function showMobileNumber(){
+export function showMobileNumber() {
     return {
         type: SHOW_MOBILE_NUMBER_SCREEN,
-        payload:true
+        payload: true
     }
 }
 
 export function showOtp() {
     return {
-        type:SHOW_OTP_SCREEN,
-        payload:true
+        type: SHOW_OTP_SCREEN,
+        payload: true
     }
 }
 
-export function setMobileNumber(mobileNumber){
+export function setMobileNumber(mobileNumber) {
     return {
-        type:SET_MOBILE_NUMBER,
-        payload:mobileNumber
+        type: SET_MOBILE_NUMBER,
+        payload: mobileNumber
+    }
+}
+export function preLogoutRequest() {
+    return {
+        type: PRE_LOGOUT_START
+    }
+}
+
+export function preLogoutSuccess() {
+    return {
+        type: PRE_LOGOUT_SUCCESS
+    }
+}
+export function preLogoutFailure(error) {
+    return {
+        type: PRE_LOGOUT_FAILURE,
+        payload: error
     }
 }
 
@@ -150,7 +172,7 @@ async function downloadJobMaster(dispatch) {
         const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
         let userObject = await keyValueDBService.getValueFromStore(USER)
-        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM,userObject)
+        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject)
         const json = await jobMasters.json
         dispatch(jobMasterDownloadSuccess())
         saveJobMaster(json, dispatch)
@@ -162,13 +184,13 @@ async function downloadJobMaster(dispatch) {
 export function invalidateUserSession() {
     return async function (dispatch) {
         try {
-            dispatch(logoutRequest())
+            dispatch(preLogoutRequest())
             await logoutService.logout();
-            dispatch(logoutSuccess())
+            dispatch(preLogoutSuccess())
             dispatch(deleteSessionToken())
             Actions.InitialLoginForm()
         } catch (error) {
-            dispatch(logoutFailure(error.message))
+            dispatch(preLogoutFailure(error.message))
         }
     }
 }
@@ -215,15 +237,17 @@ async function checkAsset(dispatch) {
     // return async function (dispatch) {
     try {
         dispatch(checkAssetStart())
-
         let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
         const user = await keyValueDB.getValueFromStore(USER)
 
-        const isVerified = deviceVerificationService.checkAsset(deviceIMEI, deviceSIM,user)
-        console.log('isverified >>>>>'+isVerified)
+        const isVerified = deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
+        console.log('isverified >>>>>' + isVerified)
         if (isVerified) {
             dispatch(checkAssetSuccess())
+            dispatch(preloaderSuccess())
+            keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, 'true')
+            Actions.Tabbar()
         } else {
             deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
             deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
@@ -231,12 +255,15 @@ async function checkAsset(dispatch) {
             const assetJSON = await response.json
             const responseDeviceIMEI = await assetJSON.deviceIMEI
             const responseDeviceSIM = await assetJSON.deviceSIM
-            keyValueDBService.validateAndSaveData(DEVICE_IMEI,responseDeviceIMEI)
-            keyValueDBService.validateAndSaveData(DEVICE_SIM,responseDeviceSIM)
-            const responseIsVerified = deviceVerificationService.checkAsset(responseDeviceIMEI, responseDeviceSIM,user)
-            console.log('response verified >>>>>>' +responseIsVerified);
+            keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
+            keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
+            const responseIsVerified = deviceVerificationService.checkAsset(responseDeviceIMEI, responseDeviceSIM, user)
+            console.log('response verified >>>>>>' + responseIsVerified);
             if (responseIsVerified) {
                 dispatch(checkAssetSuccess())
+                keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, 'true')
+                dispatch(preloaderSuccess())
+                Actions.Tabbar()
             } else {
                 dispatch(showMobileNumber())
             }
@@ -247,10 +274,10 @@ async function checkAsset(dispatch) {
     }
 }
 
-export function setMobileNo(mobileNumber){
-   return async function(dispatch){
-       dispatch(setMobileNumber())
-   }
+export function setMobileNo(mobileNumber) {
+    return async function (dispatch) {
+        dispatch(setMobileNumber())
+    }
 }
 
 async function verifyDevice() {

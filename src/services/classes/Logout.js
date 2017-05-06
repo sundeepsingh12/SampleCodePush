@@ -4,10 +4,14 @@
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
+import {keyValueDBService} from './KeyValueDBService'
 
-class Logout{
-    logout(){
+class Logout {
+    logout() {
         try {
+            let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            console.log('token logout')
+            console.log(token)
             let logoutResponse = RestAPIFactory().serviceCall(null,CONFIG.API.LOGOUT_API,'GET')
             return logoutResponse
         } catch (error) {

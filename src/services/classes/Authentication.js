@@ -3,6 +3,13 @@
  */
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
+import {keyValueDBService} from './KeyValueDBService'
+const {
+    USERNAME,
+    PASSWORD,
+    REMEMBER_ME,
+
+} = require('../../lib/constants').default
 
 class Authentication {
 
@@ -59,6 +66,29 @@ class Authentication {
                 }
             })
     }
+
+    /**
+     * save login credentials if remember me true
+     * @param {*} username 
+     * @param {*} password 
+     * @param {*} rememberMe 
+     */
+    saveLoginCredentials(username,password,rememberMe) {
+        if(rememberMe) {
+            console.log('rememberMe save')
+            console.log(rememberMe)
+            keyValueDBService.validateAndSaveData(USERNAME,username)
+            keyValueDBService.validateAndSaveData(PASSWORD,password)
+            keyValueDBService.validateAndSaveData(REMEMBER_ME,rememberMe)
+        } else {
+            console.log('rememberMe delete')
+            console.log(rememberMe)
+            keyValueDBService.deleteValueFromStore(USERNAME)
+            keyValueDBService.deleteValueFromStore(PASSWORD)
+            keyValueDBService.deleteValueFromStore(REMEMBER_ME)
+        }
+    }
+
 }
 
 export let authenticationService = new Authentication()

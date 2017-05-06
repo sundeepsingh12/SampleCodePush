@@ -55,12 +55,22 @@ export default keyMirror({
     SHOW_OTP_SCREEN:null,
     SHOW_MOBILE_NUMBER_SCREEN:null,
 
+    PRE_LOGOUT_START: null,
+    PRE_LOGOUT_SUCCESS: null,
+    PRE_LOGOUT_FAILURE: null,
+    TOGGLE_CHECKBOX: null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
     SERVICE_SUCCESS: null,
     SERVICE_FAILED: null,
 
+    //Login Credentials
+    
+    USERNAME:null,
+    PASSWORD: null,
+    REMEMBER_ME: null,
 
     //Schema (Store keys)
 
@@ -85,7 +95,7 @@ export default keyMirror({
     DEVICE_IMEI:null,
     DEVICE_SIM:null,
     USER:null,
-IS_PRELOADER_COMPLETE:null
+    IS_PRELOADER_COMPLETE:null
 })
 
 

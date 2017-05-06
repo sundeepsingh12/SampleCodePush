@@ -78,9 +78,6 @@ export class keyValueDb {
             default:
              checkCondition = true;
         }
-        console.log(schemaInstance)
-        console.log(value)
-        console.log(validate(value, schemaInstance))
         if (value && (checkCondition || validate(value, schemaInstance))) {
             return store.save(schemaName, {
                 value
@@ -89,6 +86,12 @@ export class keyValueDb {
             }).catch(error => {
                 return error;
             })
+        } else {
+            const schemaCheck = this.getValueFromStore(schemaName)
+            if(!schemaCheck) {
+                console.log(schemaName + ' validation failed')
+                throw new Error(schemaName + ' validation failed')
+            }
         }
     }
 
@@ -99,7 +102,12 @@ export class keyValueDb {
 
 
     deleteValueFromStore(schemaName) {
-        const value = store.delete(schemaName);
+        return store.delete(schemaName)
+        .then(() => {
+            return true;
+        }).catch(error => {
+            return error
+        })
     }
 }
 // The singleton variable

@@ -251,6 +251,7 @@ var styles = StyleSheet.create({
         marginLeft: 4,
         marginRight: 4
     }
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Preloader)

@@ -27,6 +27,8 @@ const Form = Record({
   username: '',
   password: '',
   isCameraScannerActive: false,
+  isEditTextDisabled: false,
+  rememberMe: false,
 })
 
 /**
