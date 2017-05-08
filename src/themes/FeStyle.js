@@ -354,10 +354,8 @@ export default {
     },
     alignSelfEnd: {
         alignSelf: 'flex-end'
-    }
+    },
 
-<<<<<<< HEAD
-=======
   paddingRight5 : {
     paddingRight : 5
   },
@@ -449,6 +447,5 @@ export default {
   alignSelfEnd : {
       alignSelf : 'flex-end'
   }
->>>>>>> test_cases_login
 
 }
