@@ -3,7 +3,6 @@
 import {keyValueDBService} from './KeyValueDBService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
-import {keyValueDBService} from './KeyValueDBService'
 
 import {NativeModules} from 'react-native';
 
