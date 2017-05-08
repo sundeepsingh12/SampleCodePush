@@ -84,12 +84,12 @@ export class keyValueDb {
             }).then(() => {
                 return true;
             }).catch(error => {
+                console.log(error)
                 return error;
             })
         } else {
             const schemaCheck = this.getValueFromStore(schemaName)
             if(!schemaCheck) {
-                console.log(schemaName + ' validation failed')
                 throw new Error(schemaName + ' validation failed')
             }
         }

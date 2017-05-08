@@ -42,7 +42,9 @@ const {
 
     PRE_LOGOUT_START,
     PRE_LOGOUT_SUCCESS,
-    PRE_LOGOUT_FAILURE
+    PRE_LOGOUT_FAILURE,
+    ON_MOBILE_NO_CHANGE,
+    ON_OTP_CHANGE
 
 } = require('../../lib/constants').default
 
@@ -89,9 +91,6 @@ export default function preloaderReducer(state = initialState, action) {
             return state.set('showMobileNumberScreen',action.payload)
         case SHOW_OTP_SCREEN:
             return state.set('showOtpScreen',action.payload)
-        case SET_MOBILE_NUMBER:
-            return state.set('mobileNumber',action.payload)
-                .set('disableButton',true)
         case PRE_LOGOUT_START :
             return state.set('error','Logging out ')
         case PRE_LOGOUT_SUCCESS :
@@ -99,6 +98,26 @@ export default function preloaderReducer(state = initialState, action) {
         case PRE_LOGOUT_FAILURE :
             return state.set('isError',true)
                         .set('error',action.payload)
+        case ON_MOBILE_NO_CHANGE :
+            let mobileNo = action.payload;
+            if(mobileNo){
+                return state.set('disableButton',false)
+                    .set('mobileNumber',mobileNo)
+            }
+            else{
+                return state.set('disableButton',true)
+                    .set('mobileNumber',mobileNo)
+            }
+
+        case ON_OTP_CHANGE :
+            let optNumber = action.payload
+            if(otpNumber){
+                return state.set('disableButton',false)
+                    .set('otpNumber',optNumber)
+            }else{
+                return state.set('disableButton',true)
+                    .set('otpNumber',optNumber)
+            }
     }
     return state
 }

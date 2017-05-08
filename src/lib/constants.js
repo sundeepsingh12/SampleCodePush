@@ -54,6 +54,8 @@ export default keyMirror({
     SHOW_MOBILE_NUMBER:null,
     SHOW_OTP_SCREEN:null,
     SHOW_MOBILE_NUMBER_SCREEN:null,
+    ON_MOBILE_NO_CHANGE:null,
+    ON_OTP_CHANGE:null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,

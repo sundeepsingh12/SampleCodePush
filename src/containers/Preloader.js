@@ -13,7 +13,6 @@ import feStyle from '../themes/FeStyle'
 import feTheme from  '../themes/feTheme'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Container, Content, Button, List, ListItem, Thumbnail, Body, Left, Right, Badge, Spinner, Input} from 'native-base';
-import {Actions} from 'react-native-router-flux'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
@@ -79,10 +78,21 @@ class Preloader extends Component {
         this.props.actions.retryPreloader(this.props.preloader.configDownloadService, this.props.preloader.configSaveService, this.props.preloader.deviceVerificationService)
     }
 
-    generateOtp(){
-        this.props.actions.setMobileNo(this.props.preloader.mobileNumber)
+    getOtp(){
+        this.props.actions.generateOtp(this.props.preloader.mobileNumber)
     }
 
+    onChangeMobileNo(mobileNumber) {
+        this.props.actions.onChangeMobileNumber(mobileNumber)
+    }
+
+    onChangeOtp(otpNumber){
+        this.props.actions.onChangeOtp(otpNumber)
+    }
+
+    validateOtp(otpNumber){
+        this.props.actions.validateOtp(otpNumber)
+    }
     render() {
         return (
             <Container>
@@ -160,12 +170,16 @@ class Preloader extends Component {
                                     placeholder='Mobile Number'
                                     style={feTheme.roundedInput}
                                     value={this.props.preloader.mobileNumber}
+                                    keyboardType = 'numeric'
+                                    onChangeText={value =>  this.onChangeMobileNo(value) }
                                 />
                             </View>
                         </View>
                         <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                            <Button onPress={() => this.generateOtp()}  full rounded>
+                            <Button onPress={() => this.getOtp()}  full rounded
+                                    disabled = {this.props.preloader.disableButton}>
                                 <Text style={[feStyle.fontWhite]}>Verify</Text>
+
                             </Button>
                         </View>
 
@@ -185,34 +199,25 @@ class Preloader extends Component {
                                 <Text style={[feStyle.fontWeight500, feStyle.fontXxl]}>Verify your mobile</Text>
                                 <Text style={[feStyle.fontSm, feStyle.fontDarkGray, feStyle.marginTop10]}>OTP code has
                                     been sent to</Text>
-                                <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>+91
-                                    9899509194</Text>
+                                <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>{this.props.preloader.mobileNumber}</Text>
                             </View>
-                            <View style={[feStyle.alignCenter, feStyle.row, feStyle.margin30]}>
-                                <View style={styles.optInputBg}>
-                                    <Input placeholder='-'
-                                           style={StyleSheet.flatten(feStyle.fontCenter, feStyle.bold, feStyle.fontPrimary)}/>
-                                </View>
-                                <View style={styles.optInputBg}>
-                                    <Input placeholder='-'
-                                           style={StyleSheet.flatten(feStyle.fontCenter, feStyle.bold, feStyle.fontPrimary)}/>
-                                </View>
-                                <View style={styles.optInputBg}>
-                                    <Input placeholder='-'
-                                           style={StyleSheet.flatten(feStyle.fontCenter, feStyle.bold, feStyle.fontPrimary)}/>
-                                </View>
-                                <View style={styles.optInputBg}>
-                                    <Input placeholder='-'
-                                           style={StyleSheet.flatten(feStyle.fontCenter, feStyle.bold, feStyle.fontPrimary)}/>
-                                </View>
+                            <View style={[feStyle.flex1, {height: 50}]}>
+                                <Input
+                                    placeholder='OTP'
+                                    style={feTheme.roundedInput}
+                                    value={this.props.preloader.otpNumber}
+                                    keyboardType = 'numeric'
+                                    maxLength = {6}
+                                    onChangeText={value =>  this.onChangeOtp(value) }
+                                />
+                            </View>
                             </View>
                             <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                                <Button full rounded>
+                                <Button onPress={() => this.validateOtp(this.props.preloader.otpNumber)} full rounded>
                                     <Text style={[feStyle.fontWhite]}>Verify</Text>
                                 </Button>
                             </View>
 
-                        </View>
                     </Modal>)}
             </Container>
         )

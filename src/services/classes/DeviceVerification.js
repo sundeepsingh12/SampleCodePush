@@ -4,9 +4,6 @@ import {keyValueDBService} from './KeyValueDBService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 
-import {NativeModules} from 'react-native';
-
-
 const {
    DEVICE_IMEI,
     DEVICE_SIM
@@ -54,9 +51,7 @@ class DeviceVerification {
      * boolean
      */
 
-    checkAsset(deviceIMEI, deviceSIM, user) {
-        console.log(deviceIMEI)
-        console.log(deviceSIM)
+     async checkAsset(deviceIMEI, deviceSIM, user) {
         const companyId = (user) ? user.value.company.id : 0;
         const hubId = (user) ? user.value.hubId : 0;
 
@@ -66,56 +61,50 @@ class DeviceVerification {
                 //update device Imei in store here
             }
             if (!deviceSIM.value.isVerified) {
-                this.populateDeviceImeiAndDeviceSim(user)
+               await this.populateDeviceImeiAndDeviceSim(user)
                 return false;
-            } else if (deviceSIM.value.isVerified && deviceSIM.value.companyId == companyId) {
+            } else if (deviceSIM.value.isVerified && deviceSIM.value.companyId === companyId) {
                 return true;
             } else {
-                this.populateDeviceImeiAndDeviceSim(user)
+                await this.populateDeviceImeiAndDeviceSim(user)
                 return false;
             }
         } else {
-            this.populateDeviceImeiAndDeviceSim(user)
+            await this.populateDeviceImeiAndDeviceSim(user)
             return false;
         }
     }
 
-     populateDeviceImeiAndDeviceSim(user) {
+    /**This method gets imei no and sim no via bridge and saves them in store
+     *
+     * @param user
+     * @return {Promise.<void>}
+     */
+     async populateDeviceImeiAndDeviceSim(user) {
+        let imei =  require('../../wrapper/IMEI');
         try {
-            let imeiNumber, simNumber;
-            NativeModules.IMEI.getIMEI().then(result => {
-                if (result && result.length > 0) {
-                    imeiNumber = result;
-                    console.log('deviceImei >>>> ' + deviceIMEI)
-                }
-            });
+            const imeiNumber =  await imei.getIMEI()
             console.log(imeiNumber)
-            NativeModules.IMEI.getSim().then(result => {
-                if (result && result.length > 0) {
-                    simNumber = result;
-                }
-            });
+            const simNumber = await imei.getSim()
             console.log(simNumber)
-            this.populateDeviceImei(user, imeiNumber)
-            this.populateDeviceSim(user, simNumber)
+           await this.populateDeviceImei(user, imeiNumber)
+           await this.populateDeviceSim(user, simNumber)
         }catch(error){
             console.log(error)
         }
     }
 
-    getDeviceImei() {
-
-    }
-
-    getSimNo(){
-
-    }
+    /**This saves device imei in store
+     *
+     * @param user
+     * @param imeiNumber
+     */
     populateDeviceImei(user,imeiNumber){
         const deviceImei = {
-            "hubId":user.value.hubId,
-            "cityId":user.value.cityId,
-            "companyId":user.value.company.id,
-            "userId":user.id,
+            hubId:user.value.hubId,
+            cityId:user.value.cityId,
+            companyId:user.value.company.id,
+            userId:user.value.id,
             imeiNumber
         }
         console.log('populateDeviceImei')
@@ -123,14 +112,19 @@ class DeviceVerification {
         keyValueDBService.validateAndSaveData(DEVICE_IMEI,deviceImei)
     }
 
+    /**This saves device sim in store
+     *
+     * @param user
+     * @param simNumber
+     */
     populateDeviceSim(user,simNumber){
         const deviceSim = {
-            "hubId":user.value.hubId,
-            "cityId":user.value.cityId,
-            "companyId":user.value.company.id,
-            "userId":user.id,
+            hubId:user.value.hubId,
+            cityId:user.value.cityId,
+            companyId:user.value.company.id,
+            userId:user.value.id,
             simNumber,
-            "isVerified":false
+            isVerified:false,
         };
         console.log('populateDeviceSim')
         console.log(deviceSim)
@@ -149,20 +143,33 @@ class DeviceVerification {
         const postData = JSON.stringify({
             deviceSIM
         });
-        let generateOtpResponse =  RestAPIFactory().serviceCall(postData, CONFIG.API.GENERATE_OTP_API, 'POST')
+        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        let generateOtpResponse =  RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.GENERATE_OTP_API, 'POST')
         generateOtpResponse = RestAPIFactory()._pruneEmpty(generateOtpResponse)
-        if(generateOtpResponse){
-            const deviceSim =  generateOtpResponse.deviceSim()
-        }
+        return generateOtpResponse
     }
 
-
+    /**
+     *
+     * @param deviceSIM
+     * @return {*}
+     */
     verifySim(deviceSIM){
         const postData = JSON.stringify({
             deviceSIM
         })
-        let simVerificationResponse =  RestAPIFactory().serviceCall(postData, CONFIG.API.SIM_VERIFICATION_API, 'POST')
+        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        let simVerificationResponse =  RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.SIM_VERIFICATION_API, 'POST')
+        simVerificationResponse = RestAPIFactory()._pruneEmpty(simVerificationResponse)
+        return simVerificationResponse
 
+    }
+
+    checkIfSimValidOnServer(deviceSim){
+        if(deviceSim.isVerify){
+            return true
+        }
+        return false
     }
 }
 

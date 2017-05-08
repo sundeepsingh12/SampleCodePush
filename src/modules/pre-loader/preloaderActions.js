@@ -25,10 +25,8 @@ const {
     SERVICE_FAILED,
     PRELOADER_SUCCESS,
     INVALID_IMEI_HUB,
-    SHOW_MOBILE_NUMBER,
     SHOW_OTP_SCREEN,
     SHOW_MOBILE_NUMBER_SCREEN,
-
 
     DEVICE_IMEI,
     DEVICE_SIM,
@@ -37,7 +35,9 @@ const {
 
     PRE_LOGOUT_START,
     PRE_LOGOUT_SUCCESS,
-    PRE_LOGOUT_FAILURE
+    PRE_LOGOUT_FAILURE,
+    ON_MOBILE_NO_CHANGE,
+    ON_OTP_CHANGE
 } = require('../../lib/constants').default
 
 import {Actions} from 'react-native-router-flux'
@@ -45,11 +45,10 @@ import {keyValueDB} from '../../repositories/keyValueDb'
 import {jobMasterService} from '../../services/classes/JobMaster'
 import {logoutService} from '../../services/classes/Logout'
 
-import CONFIG from '../../lib/config'
 import {deviceVerificationService} from '../../services/classes/DeviceVerification'
 import {keyValueDBService} from '../../services/classes/KeyValueDBService'
 
-import {logoutRequest, logoutSuccess, deleteSessionToken, logoutFailure} from '../global/globalActions'
+import {deleteSessionToken} from '../global/globalActions'
 
 export function jobMasterDownloadStart() {
     return {
@@ -142,12 +141,6 @@ export function showOtp() {
     }
 }
 
-export function setMobileNumber(mobileNumber) {
-    return {
-        type: SET_MOBILE_NUMBER,
-        payload: mobileNumber
-    }
-}
 export function preLogoutRequest() {
     return {
         type: PRE_LOGOUT_START
@@ -166,6 +159,20 @@ export function preLogoutFailure(error) {
     }
 }
 
+export function onChangeMobileNumber(mobileNumber) {
+    return {
+        type: ON_MOBILE_NO_CHANGE,
+        payload: mobileNumber
+    }
+}
+
+export function onChangeOtp(otpNumber) {
+    return {
+        type: ON_OTP_CHANGE,
+        payload: otpNumber
+    }
+}
+
 async function downloadJobMaster(dispatch) {
     try {
         dispatch(jobMasterDownloadStart())
@@ -181,6 +188,10 @@ async function downloadJobMaster(dispatch) {
     }
 }
 
+/**This method logs out the user and deletes session token from store
+ *
+ * @return {Function}
+ */
 export function invalidateUserSession() {
     return async function (dispatch) {
         try {
@@ -201,14 +212,13 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
             downloadJobMaster(dispatch);
         }
         else if (deviceVerificationService === 'SERVICE_FAILED') {
-            checkAsset();
+            checkAsset(dispatch);
         }
     }
 }
 
 
 async function saveJobMaster(jobMasterResponse, dispatch) {
-    // return async function (dispatch) {
     try {
         if (jobMasterResponse.message) {
             const isImeiValid = await jobMasterService.checkIfHubAndImeiIsValid(jobMasterResponse.message)
@@ -229,20 +239,17 @@ async function saveJobMaster(jobMasterResponse, dispatch) {
     } catch (error) {
         dispatch(jobMasterSavingFailure(error.message))
     }
-    // }
 }
 
 
 async function checkAsset(dispatch) {
-    // return async function (dispatch) {
     try {
         dispatch(checkAssetStart())
         let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
         const user = await keyValueDB.getValueFromStore(USER)
 
-        const isVerified = deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
-        console.log('isverified >>>>>' + isVerified)
+        const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
         if (isVerified) {
             dispatch(checkAssetSuccess())
             dispatch(preloaderSuccess())
@@ -255,36 +262,66 @@ async function checkAsset(dispatch) {
             const assetJSON = await response.json
             const responseDeviceIMEI = await assetJSON.deviceIMEI
             const responseDeviceSIM = await assetJSON.deviceSIM
-            keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
-            keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
-            const responseIsVerified = deviceVerificationService.checkAsset(responseDeviceIMEI, responseDeviceSIM, user)
+            await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
+            await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
+
+            deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+            deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+
+            const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
             console.log('response verified >>>>>>' + responseIsVerified);
             if (responseIsVerified) {
                 dispatch(checkAssetSuccess())
-                keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, 'true')
+                await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, 'true')
                 dispatch(preloaderSuccess())
                 Actions.Tabbar()
             } else {
                 dispatch(showMobileNumber())
             }
         }
-        // }
     } catch (error) {
         dispatch(checkAssetFailure(error.message))
     }
 }
 
-export function setMobileNo(mobileNumber) {
+export function generateOtp(dispatch) {
     return async function (dispatch) {
-        dispatch(setMobileNumber())
+        try {
+            const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+            console.log('generateOtp')
+            console.log(deviceSIM)
+            const generateOtpResponse = await deviceVerificationService.generateOTP(deviceSIM)
+            console.log('generateOtpResponse>>>>>')
+            console.log(generateOtpResponse)
+            const json = await generateOtpResponse.json
+            console.log('json otp >>>>>')
+            console.log(json)
+            const deviceSim = await json.deviceSIM
+            console.log(deviceSim)
+            await keyValueDBService.validateAndSaveData(DEVICE_SIM, deviceSim)
+
+            dispatch(showOtp())
+
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 
-async function verifyDevice() {
-    try {
-        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-        deviceVerificationService.generateOTP(deviceSIM)
-    } catch (error) {
+export function validateOtp(otpNumber) {
+        return async function (dispatch) {
+            const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+            const optNoFromStore = deviceSIM.value.otpNumber;
+            if (otpNumber === optNoFromStore) {
+                const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM)
+                const json = simVerificationResponse.json
+                console.log('json sim >>>>>')
+                console.log(json)
+                await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, 'true')
+                dispatch(preloaderSuccess())
+                Actions.Tabbar()
+            }
+        }
 
-    }
 }
+

@@ -13,23 +13,25 @@ fareye('android')
 //
 // export default class Fareye extends Component {
 //     render() {
-//         NativeModules.IMEI.getIMEI().then(result => {
-//             if (result && result.length > 0) {
-//                 imeiNumber = result;
-//                 console.log('deviceImei >>>> ' + deviceIMEI)
-//             }
-//         });
-//         console.log(imeiNumber)
-//         NativeModules.IMEI.getSim().then(result => {
-//             if (result && result.length > 0) {
-//                 simNumber = result;
-//             }
-//         });
-//         console.log(simNumber)
+//         // const imeiNumber = this.getImeiNumber()
+//         let simNumber;
+//
+//         const imei = this.getImeiNumber()
+//
+//         console.log(`imei `)
+//         console.log(imei)
 //         return (
 //             <View>
 //             </View>
 //         )
+//     }
+//
+//     //
+//     async getImeiNumber() {
+//         var IMEI = require('./src/wrapper/IMEI');
+//        const imei =  await IMEI.getIMEI()
+//         console.log(`imei 111 ${imei}`)
+//         return imei;
 //     }
 // }
 //

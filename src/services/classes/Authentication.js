@@ -47,7 +47,6 @@ class Authentication {
             body: data
         })
             .then((res) => {
-            console.log(res.status)
                 switch (res.status) {
                     case 200:
                         return (res.headers.map['set-cookie'][0]).split("; ")[0];
