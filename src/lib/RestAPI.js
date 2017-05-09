@@ -83,22 +83,32 @@ export class RestAPI {
         return prune(obj);
     }
 
-    serviceCall(data,apiUrl,methodType) {
+    serviceCall(body,url,method) {
         let opts;
-        if(methodType==='POST'){
+        if(method==='POST'){
             opts = {
-                method: methodType,
+                method,
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                url:apiUrl,
-                body: data
+                url,
+                body
             }
-        }else{
+        }
+        else if(method==='LOGIN'){
+           opts = {
+               headers: {
+               },
+               url,
+               body,
+               method:'POST'
+           }
+        }
+        else{
             opts = {
-                method: methodType,
-                url: apiUrl,
+                method,
+                url,
                 headers:{
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -113,6 +123,7 @@ export class RestAPI {
                 if(res.status==200) {
                     return res;
                 }else{
+                    console.log(res)
                     throw new Error({code: res.statusCode, error: res.message})
                 }
             })

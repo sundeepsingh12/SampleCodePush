@@ -22,7 +22,8 @@ var InitialState = Record({
   showMobileNumberScreen:false,
   showOtpScreen:false,
   mobileNumber:'',
-  disableButton:false
+  disableButton:true,
+  otpNumber:''
 })
 
 export default InitialState

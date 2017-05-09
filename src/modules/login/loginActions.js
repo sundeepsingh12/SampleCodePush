@@ -33,11 +33,8 @@ const {
 import RestAPIFactory from '../../lib/RestAPIFactory'
 
 import { Actions } from 'react-native-router-flux'
-import { keyValueDB } from '../../repositories/keyValueDb'
 import { authenticationService } from '../../services/classes/Authentication'
 import CONFIG from '../../lib/config'
-import { jobMasterService } from '../../services/classes/JobMaster'
-import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import {keyValueDBService} from '../../services/classes/KeyValueDBService'
 
 /**
@@ -89,12 +86,14 @@ export function sessionTokenRequest() {
     type: SESSION_TOKEN_REQUEST
   }
 }
+
 export function sessionTokenRequestSuccess(token) {
   return {
     type: SESSION_TOKEN_SUCCESS,
     payload: token
   }
 }
+
 export function sessionTokenRequestFailure(error) {
   return {
     type: SESSION_TOKEN_FAILURE,
@@ -159,7 +158,6 @@ export function toggleCheckbox() {
 export function authenticateUser(username, password,rememberMe) {
   return async function (dispatch) {
     try {
-      console.log("authenticateUser called")
       dispatch(loginRequest())
       const j_sessionid = await authenticationService.login(username, password)
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
@@ -176,19 +174,12 @@ export function authenticateUser(username, password,rememberMe) {
 export function checkRememberMe() {
   return async function (dispatch) {
     try {
-      console.log('checkRememberMe get')
       let rememberMe = await keyValueDBService.getValueFromStore(REMEMBER_ME)
-      console.log('rememberMe get') 
-      console.log(rememberMe)
       if(rememberMe) {
         let username = await keyValueDBService.getValueFromStore(USERNAME)
-        console.log('username get')
-        console.log(username)
         let password = await keyValueDBService.getValueFromStore(PASSWORD)
-        console.log('password get')
-        console.log(password)
-        dispatch(onChangeUsername(username.value))
-        dispatch(onChangePassword(password.value))
+        dispatch(onChangeUsername(username))
+        dispatch(onChangePassword(password))
       }
     } catch(error) {
 
@@ -211,11 +202,8 @@ export function getSessionToken() {
       console.log(token)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
         console.log(isPreloaderComplete)
-        console.log(isPreloaderComplete.value)
-      if (token.value && isPreloaderComplete.value) {
+      if (token && isPreloaderComplete) {
         // dispatch(sessionTokenRequestSuccess(token))
-        console.log('tabbar called')
-        // Actions.Preloader()
         Actions.Tabbar()
       } else if(token) {
           // dispatch(sessionTokenRequestSuccess(token))

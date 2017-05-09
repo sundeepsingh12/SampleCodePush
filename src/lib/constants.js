@@ -31,8 +31,6 @@ export default keyMirror({
     MASTER_SAVING_START: null,
     MASTER_SAVING_SUCCESS: null,
     MASTER_SAVING_FAILURE: null,
-    MASTER_TIME_FAILURE: null,
-
     CHECK_ASSET_START: null,
     CHECK_ASSET_SUCCESS: null,
     CHECK_ASSET_FAILURE: null,
@@ -50,10 +48,11 @@ export default keyMirror({
 
     PRELOADER_SUCCESS:null,
     PRELOADER_RETRY:null,
-    INVALID_IMEI_HUB:null,
     SHOW_MOBILE_NUMBER:null,
     SHOW_OTP_SCREEN:null,
     SHOW_MOBILE_NUMBER_SCREEN:null,
+    ON_MOBILE_NO_CHANGE:null,
+    ON_OTP_CHANGE:null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,

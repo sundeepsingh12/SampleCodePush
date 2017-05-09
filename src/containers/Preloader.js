@@ -13,7 +13,6 @@ import feStyle from '../themes/FeStyle'
 import feTheme from  '../themes/feTheme'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Container, Content, Button, List, ListItem, Thumbnail, Body, Left, Right, Badge, Spinner, Input} from 'native-base';
-import {Actions} from 'react-native-router-flux'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
@@ -49,7 +48,7 @@ class Preloader extends Component {
         if (this.props.preloader.isError) {
             return (
                 <Text
-                    style={[feStyle.row, feStyle.justifyCenter, feStyle.fontDanger, feStyle.marginBottom20]}>{this.props.preloader.error}</Text>
+                    style={[feStyle.row, feStyle.justifyCenter, feStyle.fontDanger]}>{this.props.preloader.error}</Text>
             );
         } else {
             return null;
@@ -60,10 +59,10 @@ class Preloader extends Component {
         if (this.props.preloader.isError) {
             return (
                 <View style={feStyle.row}>
-                    <Button onPress={() => this.invalidateSession() } rounded danger style={{margin: 10}}>
+                    <Button onPress={() => this.invalidateSession() } rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
                         <Text style={{color: '#ffffff'}}>Cancel</Text>
                     </Button>
-                    <Button onPress={() => this.retry()} rounded success style={{margin: 10}}>
+                    <Button onPress={() => this.retry()} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
                         <Text style={{color: '#ffffff'}}>Retry</Text>
                     </Button>
                 </View>
@@ -79,55 +78,63 @@ class Preloader extends Component {
         this.props.actions.retryPreloader(this.props.preloader.configDownloadService, this.props.preloader.configSaveService, this.props.preloader.deviceVerificationService)
     }
 
-    generateOtp(){
-        this.props.actions.setMobileNo(this.props.preloader.mobileNumber)
+    getOtp(){
+        this.props.actions.generateOtp(this.props.preloader.mobileNumber)
     }
 
+    onChangeMobileNo(mobileNumber) {
+        this.props.actions.onChangeMobileNumber(mobileNumber)
+    }
+
+    onChangeOtp(otpNumber){
+        this.props.actions.onChangeOtp(otpNumber)
+    }
+
+    validateOtp(otpNumber){
+        this.props.actions.validateOtp(otpNumber)
+    }
     render() {
         return (
             <Container>
                 {renderIf(!this.props.preloader.showMobileNumberScreen,
                     <View style={styles.issueWrapper}>
                         <View style={[feStyle.column, feStyle.flexBasis40, feStyle.alignCenter, feStyle.flex1]}>
-                            <View>
+                            <View style={{flexBasis: '70%'}}>
                                 <Image
                                     style={styles.logoStyle}
                                     source={require('../../images/preloader.png')}
                                 />
                             </View>
 
-                            <Text
-                                style={[feStyle.fontBlack, feStyle.fontXxxl, feStyle.fontWeight200, feStyle.marginTop30]}>
+                            <Text adjustsFontSizeToFit={true}
+                                style={[feStyle.fontBlack, feStyle.fontXxl, feStyle.fontWeight200, {flexBasis: '30%'}]}>
                                 Setting you up !
                             </Text>
                         </View>
-                        <View style={[feStyle.column, feStyle.flexBasis40, feStyle.flex1, feStyle.justifyCenter]}>
+                        <View style={[feStyle.column, feStyle.flexBasis30, feStyle.marginTop10, feStyle.flex1, feStyle.justifyCenter]}>
                             <List>
-                                <ListItem style={{height: 60}}>
+                                <ListItem style={{height: 50}}>
                                     <Left style={{flex: 1}}>
-                                        <Ionicons name="ios-globe-outline" style={styles.listIcons}/>
-                                        <Text style={[feStyle.fontDarkGray, feStyle.marginTop5]}>Downloading
-                                            settings</Text>
+                                        <Ionicons name="ios-cloud-download-outline" style={styles.listIcons} />
+                                        <Text style={[feStyle.fontDarkGray]}>Downloading settings</Text>
                                     </Left>
                                     <Right style={{flex: 0.5}}>
                                         <ServiceStatusIcon status={this.props.preloader.configDownloadService}/>
                                     </Right>
                                 </ListItem>
-                                <ListItem style={{height: 60}}>
+                                <ListItem style={{height: 50}}>
                                     <Left style={{flex: 1}}>
-                                        <Ionicons name="ios-globe-outline" style={styles.listIcons}/>
-                                        <Text style={[feStyle.fontDarkGray, feStyle.marginTop5]}>Applying
-                                            settings</Text>
+                                        <Ionicons name="ios-construct-outline" style={styles.listIcons} />
+                                        <Text style={[feStyle.fontDarkGray]}>Applying settings</Text>
                                     </Left>
                                     <Right style={{flex: 0.5}}>
                                         <ServiceStatusIcon status={this.props.preloader.configSaveService}/>
                                     </Right>
                                 </ListItem>
-                                <ListItem style={{height: 60}}>
+                                <ListItem style={{height: 50}}>
                                     <Left style={{flex: 1}}>
-                                        <Ionicons name="ios-globe-outline" style={styles.listIcons}/>
-                                        <Text style={[feStyle.fontDarkGray, feStyle.marginTop5]}>Verifying
-                                            handset</Text>
+                                        <Ionicons name="ios-color-wand-outline" style={styles.listIcons} />
+                                        <Text style={[feStyle.fontDarkGray]}>Verifying handset</Text>
                                     </Left>
                                     <Right style={{flex: 0.5}}>
                                         <ServiceStatusIcon status={this.props.preloader.deviceVerificationService}/>
@@ -136,7 +143,7 @@ class Preloader extends Component {
                             </List>
                         </View>
                         <View
-                            style={[feStyle.flexBasis25, feStyle.marginTop30, feStyle.flex1, feStyle.row, feStyle.justifyCenter]}>
+                            style={[feStyle.flexBasis25, feStyle.marginTop15, feStyle.flex1, feStyle.column, feStyle.alignCenter, feStyle.justifyCenter]}>
                             {this._renderErrorMessage()}
                             {this._renderButtons()}
                         </View>
@@ -160,12 +167,16 @@ class Preloader extends Component {
                                     placeholder='Mobile Number'
                                     style={feTheme.roundedInput}
                                     value={this.props.preloader.mobileNumber}
+                                    keyboardType = 'numeric'
+                                    onChangeText={value =>  this.onChangeMobileNo(value) }
                                 />
                             </View>
                         </View>
                         <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                            <Button onPress={() => this.generateOtp()}  full rounded>
+                            <Button onPress={() => this.getOtp()}  full rounded
+                                    disabled = {this.props.preloader.disableButton}>
                                 <Text style={[feStyle.fontWhite]}>Verify</Text>
+
                             </Button>
                         </View>
 
@@ -185,34 +196,25 @@ class Preloader extends Component {
                                 <Text style={[feStyle.fontWeight500, feStyle.fontXxl]}>Verify your mobile</Text>
                                 <Text style={[feStyle.fontSm, feStyle.fontDarkGray, feStyle.marginTop10]}>OTP code has
                                     been sent to</Text>
-                                <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>+91
-                                    9899509194</Text>
+                                <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>{this.props.preloader.mobileNumber}</Text>
                             </View>
-                            <View style={[feStyle.alignCenter, feStyle.row, feStyle.margin30]}>
-                                <View style={styles.optInputBg}>
-                                    <Input placeholder='-'
-                                           style={StyleSheet.flatten(feStyle.fontCenter, feStyle.bold, feStyle.fontPrimary)}/>
-                                </View>
-                                <View style={styles.optInputBg}>
-                                    <Input placeholder='-'
-                                           style={StyleSheet.flatten(feStyle.fontCenter, feStyle.bold, feStyle.fontPrimary)}/>
-                                </View>
-                                <View style={styles.optInputBg}>
-                                    <Input placeholder='-'
-                                           style={StyleSheet.flatten(feStyle.fontCenter, feStyle.bold, feStyle.fontPrimary)}/>
-                                </View>
-                                <View style={styles.optInputBg}>
-                                    <Input placeholder='-'
-                                           style={StyleSheet.flatten(feStyle.fontCenter, feStyle.bold, feStyle.fontPrimary)}/>
-                                </View>
+                            <View style={[feStyle.flex1, {height: 50}]}>
+                                <Input
+                                    placeholder='OTP'
+                                    style={feTheme.roundedInput}
+                                    value={this.props.preloader.otpNumber}
+                                    keyboardType = 'numeric'
+                                    maxLength = {6}
+                                    onChangeText={value =>  this.onChangeOtp(value) }
+                                />
+                            </View>
                             </View>
                             <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                                <Button full rounded>
+                                <Button onPress={() => this.validateOtp(this.props.preloader.otpNumber)} full rounded>
                                     <Text style={[feStyle.fontWhite]}>Verify</Text>
                                 </Button>
                             </View>
 
-                        </View>
                     </Modal>)}
             </Container>
         )
@@ -230,7 +232,7 @@ var styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#ffffff',
         height: '100%',
-        paddingTop: 80,
+        paddingTop: 60,
         flexDirection: 'column',
         justifyContent: 'center'
     },

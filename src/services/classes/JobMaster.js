@@ -2,12 +2,12 @@
  * Created by udbhav on 12/4/17.
  */
 
-import { keyValueDB } from '../../repositories/keyValueDb'
-
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 
 import {keyValueDBService} from './KeyValueDBService'
+
+import moment from 'moment'
 
 const {
     JOB_MASTER,
@@ -105,10 +105,6 @@ class JobMaster {
                 deviceCompanyId
             })
         }
-        console.log(postData)
-        console.log('downloadJobMaster')
-        console.log(currentJobMasterVersion)
-        console.log(deviceCompanyId)
         let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         let jobMasterResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
         jobMasterResponse = RestAPIFactory()._pruneEmpty(jobMasterResponse)
@@ -147,20 +143,17 @@ class JobMaster {
      * @return {boolean}
      */
     matchServerTimeWithMobileTime(serverTime) {
-        console.log("matchServerTimeWithMobileTime start")
-        const serverTimeInMillis = new Date(serverTime).getTime()
-        console.log(serverTimeInMillis)
-        const currentTimeInMillis = new Date().getTime();
-        if (serverTimeInMillis) {
-            console.log("no error")
-            if (currentTimeInMillis - serverTimeInMillis > 15 * 60 * 1000) {
-                return false
-            }
-            return true
-        } else {
-            console.log("parse error")
-            throw ("Server Time format incorrect")
+        const timeFromServer = moment(serverTime)
+        console.log(timeFromServer)
+        if(!timeFromServer.isValid()){
+            throw new Error("Server Time format incorrect")
         }
+        const currentTimeInMillis = moment().millisecond()
+        const serverTimeInMillis = timeFromServer.millisecond()
+        if (currentTimeInMillis - serverTimeInMillis > 15*60*1000) {
+            return false
+        }
+        return true
     }
 
     /**Possible values of message returned from server -

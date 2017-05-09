@@ -20,8 +20,6 @@ const {
     MASTER_SAVING_START,
     MASTER_SAVING_SUCCESS,
     MASTER_SAVING_FAILURE,
-    MASTER_TIME_FAILURE,
-
     CHECK_ASSET_START,
     CHECK_ASSET_SUCCESS,
     CHECK_ASSET_FAILURE,
@@ -35,14 +33,15 @@ const {
     SERVICE_SUCCESS,
     SERVICE_FAILED,
     PRELOADER_SUCCESS,
-    INVALID_IMEI_HUB,
     SHOW_MOBILE_NUMBER_SCREEN,
     SHOW_OTP_SCREEN,
     SET_MOBILE_NUMBER,
 
     PRE_LOGOUT_START,
     PRE_LOGOUT_SUCCESS,
-    PRE_LOGOUT_FAILURE
+    PRE_LOGOUT_FAILURE,
+    ON_MOBILE_NO_CHANGE,
+    ON_OTP_CHANGE
 
 } = require('../../lib/constants').default
 
@@ -70,11 +69,6 @@ export default function preloaderReducer(state = initialState, action) {
             return state.set('configSaveService', SERVICE_FAILED)
                 .set('isError', true)
                 .set('error', action.payload)
-        case MASTER_TIME_FAILURE :
-        case INVALID_IMEI_HUB:
-            return state.set('configSaveService', SERVICE_FAILED)
-                .set('isError', true)
-                .set('error', action.payload)
         case CHECK_ASSET_START :
             return state.set('deviceVerificationService', SERVICE_RUNNING)
         case CHECK_ASSET_SUCCESS :
@@ -89,9 +83,6 @@ export default function preloaderReducer(state = initialState, action) {
             return state.set('showMobileNumberScreen',action.payload)
         case SHOW_OTP_SCREEN:
             return state.set('showOtpScreen',action.payload)
-        case SET_MOBILE_NUMBER:
-            return state.set('mobileNumber',action.payload)
-                .set('disableButton',true)
         case PRE_LOGOUT_START :
             return state.set('error','Logging out ')
         case PRE_LOGOUT_SUCCESS :
@@ -99,6 +90,26 @@ export default function preloaderReducer(state = initialState, action) {
         case PRE_LOGOUT_FAILURE :
             return state.set('isError',true)
                         .set('error',action.payload)
+        case ON_MOBILE_NO_CHANGE :
+            let mobileNo = action.payload;
+            if(mobileNo){
+                return state.set('disableButton',false)
+                    .set('mobileNumber',mobileNo)
+            }
+            else{
+                return state.set('disableButton',true)
+                    .set('mobileNumber',mobileNo)
+            }
+
+        case ON_OTP_CHANGE :
+            let optNumber = action.payload
+            if(otpNumber){
+                return state.set('disableButton',false)
+                    .set('otpNumber',optNumber)
+            }else{
+                return state.set('disableButton',true)
+                    .set('otpNumber',optNumber)
+            }
     }
     return state
 }
