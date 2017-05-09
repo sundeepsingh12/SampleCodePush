@@ -41,31 +41,6 @@ class Authentication {
         data.append('_spring_security_remember_me', false)
         data.append('submit', 'Login')
 
-        // return RestAPIFactory()._fetch({
-        //     method: 'POST',
-        //     headers: {},
-        //     url: '/authentication',
-        //     body: data
-        // })
-        //     .then((res) => {
-        //         switch (res.status) {
-        //             case 200:
-        //                 return (res.headers.map['set-cookie'][0]).split("; ")[0];
-        //             case 401:
-        //                 throw ("Invalid User Credentials")
-        //             case 500:
-        //                 throw ("Internal server error")
-        //             case 502:
-        //                 throw ("Bad Gateway")
-        //             case 1201:
-        //                 throw ("User already logged in ")
-        //             case 1203:
-        //                 throw ("User locked.Try after 15 minutes")
-        //             default:
-        //                 throw ("Error ")
-        //         }
-        //     })
-
         let authenticationResponse =  RestAPIFactory().serviceCall(data, CONFIG.API.AUTHENTICATION_API, 'LOGIN')
         return authenticationResponse
     }

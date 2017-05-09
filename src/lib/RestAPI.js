@@ -83,31 +83,32 @@ export class RestAPI {
         return prune(obj);
     }
 
-    serviceCall(data,apiUrl,methodType) {
+    serviceCall(body,url,method) {
         let opts;
-        if(methodType==='POST'){
+        if(method==='POST'){
             opts = {
-                method: methodType,
+                method,
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                url:apiUrl,
-                body: data
+                url,
+                body
             }
         }
-        else if(methodType==='LOGIN'){
+        else if(method==='LOGIN'){
            opts = {
                headers: {
                },
-               url:apiUrl,
-               body: data
+               url,
+               body,
+               method:'POST'
            }
         }
         else{
             opts = {
-                method: methodType,
-                url: apiUrl,
+                method,
+                url,
                 headers:{
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
