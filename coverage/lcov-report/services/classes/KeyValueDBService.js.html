@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Code coverage report for lib/config.js</title>
+    <title>Code coverage report for services/classes/KeyValueDBService.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../prettify.css" />
-    <link rel="stylesheet" href="../base.css" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -16,13 +16,13 @@
 <div class='wrapper'>
   <div class='pad1'>
     <h1>
-      <a href="../index.html">All files</a> / <a href="index.html">lib</a> config.js
+      <a href="../../index.html">All files</a> / <a href="index.html">services/classes</a> KeyValueDBService.js
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">50% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>1/1</span>
+        <span class='fraction'>3/6</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -30,18 +30,18 @@
         <span class='fraction'>0/0</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">33.33% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/0</span>
+        <span class='fraction'>1/3</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">50% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/1</span>
+        <span class='fraction'>3/6</span>
       </div>
     </div>
   </div>
-  <div class='status-line high'></div>
+  <div class='status-line medium'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -66,7 +66,15 @@
 21
 22
 23
-24</td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+24
+25
+26
+27
+28
+29
+30
+31
+32</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -78,6 +86,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -85,34 +95,48 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">module.exports = {
-  SESSION_TOKEN_KEY: 'SESSION_TOKEN_KEY',
-  
-  backend: {
-    fareyeProduction: false,
-    fareyeStaging: true
-  },
-  FAREYE: {
-    production: {
-      url: 'https://www.fareye.co/app'
-    },
-    staging: {
-      url: 'https://staging.fareye.co/app'
+<span class="cline-any cline-yes">3x</span></td><td class="text"><pre class="prettyprint lang-js">import { keyValueDB } from '../../repositories/keyValueDb'
+import CONFIG from '../../lib/config'
+&nbsp;
+&nbsp;
+class KeyValueDB {
+&nbsp;
+    /**
+     * generic function for validating and saving a value in store
+     * @param {*} schemaName 
+     * @param {*} data 
+     */
+<span class="fstat-no" title="function not covered" >     va</span>lidateAndSaveData(schemaName, data) {
+        const storeValue = <span class="cstat-no" title="statement not covered" >keyValueDB.validateAndSaveData(schemaName, data);</span>
+<span class="cstat-no" title="statement not covered" >        return storeValue</span>
     }
-  },
-    API:{
-        JOB_MASTER_API:'/rest/device/job_master',
-        CHECK_ASSET_API :'/rest/device/check_asset',
-        GENERATE_OTP_API :'/rest/device/generate_otp',
-        SIM_VERIFICATION_API:'/rest/device/sim_verified',
-        LOGOUT_API:'/logout'
+&nbsp;
+    /**
+     * generic function for fetching value from store
+     * @param {*} schemaName 
+     */
+    getValueFromStore(schemaName) {
+        const storeValue = keyValueDB.getValueFromStore(schemaName);
+        return storeValue;
     }
+&nbsp;
+<span class="fstat-no" title="function not covered" >    de</span>leteValueFromStore(schemaName) {
+        const storeValue = <span class="cstat-no" title="statement not covered" >keyValueDB.deleteValueFromStore(schemaName);</span>
+    }
+&nbsp;
 }
-&nbsp;</pre></td></tr>
+&nbsp;
+export let keyValueDBService = new KeyValueDB()</pre></td></tr>
 </table></pre>
 <div class='push'></div><!-- for sticky footer -->
 </div><!-- /wrapper -->
@@ -121,7 +145,7 @@
   generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 08 2017 20:01:38 GMT+0530 (IST)
 </div>
 </div>
-<script src="../prettify.js"></script>
+<script src="../../prettify.js"></script>
 <script>
 window.onload = function () {
         if (typeof prettyPrint === 'function') {
@@ -129,6 +153,6 @@ window.onload = function () {
         }
 };
 </script>
-<script src="../sorter.js"></script>
+<script src="../../sorter.js"></script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 import { keyValueDB } from '../../repositories/keyValueDb'
 import CONFIG from '../../lib/config'
-import RestAPIInterface from '../../lib/RestAPIInterface'
 
 
 class KeyValueDB {

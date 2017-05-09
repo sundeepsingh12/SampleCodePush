@@ -7,7 +7,6 @@ import { keyValueDB } from '../../repositories/keyValueDb'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 
-import RestAPIInterface from '../../lib/RestAPIInterface'
 import {keyValueDBService} from './KeyValueDBService'
 
 const {

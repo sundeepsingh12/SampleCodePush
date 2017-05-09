@@ -15,20 +15,18 @@ const {
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
 
-  MASTER_DOWNLOAD_START,
-  MASTER_DOWNLOAD_SUCCESS,
-
-  CHECK_ASSET_START,
-  CHECK_ASSET_SUCCESS,
-
   SESSION_TOKEN_REQUEST,
   SESSION_TOKEN_SUCCESS,
   SESSION_TOKEN_FAILURE,
 
-  DELETE_TOKEN_REQUEST,
-  DELETE_TOKEN_SUCCESS,
-
-  ON_AUTH_FORM_FIELD_CHANGE,
+  ON_LOGIN_USERNAME_CHANGE,
+  ON_LOGIN_PASSWORD_CHANGE,
+  TOGGLE_CHECKBOX,
+  LOGIN_CAMERA_SCANNER,
+  
+  USERNAME,
+  PASSWORD,
+  REMEMBER_ME,
 
   TABLE_USER_SUMMARY,
 } = require('../../../lib/constants').default
@@ -64,22 +62,6 @@ describe('loginActions',() => {
         })
     })
 
-    it('should set job master download start ',() => {
-        expect(actions.jobMasterDownloadStart()).toEqual({type: MASTER_DOWNLOAD_START})
-    }) 
-
-    it('should set job master download success ',() => {
-        expect(actions.jobMasterDownloadSuccess()).toEqual({type: MASTER_DOWNLOAD_SUCCESS})
-    }) 
-
-    it('should set check asset start ',() => {
-        expect(actions.checkAssetStart()).toEqual({type: CHECK_ASSET_START})
-    }) 
-
-    it('should set check asset success ',() => {
-        expect(actions.checkAssetSuccess()).toEqual({type: CHECK_ASSET_SUCCESS})
-    })
-
     it('should set session token request ',() => {
         expect(actions.sessionTokenRequest()).toEqual({type: SESSION_TOKEN_REQUEST})
     })
@@ -108,7 +90,57 @@ describe('loginActions',() => {
         })
     })
 
-    it('should set delete token request ',() => {
-        expect(actions.deleteTokenRequest()).toEqual({type: DELETE_TOKEN_REQUEST})
+    it('should set username',() => {
+        const username = 'testuser'
+        expect(actions.onChangeUsername(username)).toEqual({
+            type: ON_LOGIN_USERNAME_CHANGE,
+            payload: username
+        })
     })
+
+    it('should set username',() => {
+        const username = undefined
+        expect(actions.onChangeUsername(username)).toEqual({
+            type: ON_LOGIN_USERNAME_CHANGE,
+            payload: username
+        })
+    })
+
+    it('should set password',() => {
+        const password = 'testuser'
+        expect(actions.onChangePassword(password)).toEqual({
+            type: ON_LOGIN_PASSWORD_CHANGE,
+            payload: password
+        })
+    })
+
+    it('should set password',() => {
+        const password = undefined
+        expect(actions.onChangePassword(password)).toEqual({
+            type: ON_LOGIN_PASSWORD_CHANGE,
+            payload: password
+        })
+    })
+
+    it('should start scanner',() => {
+        expect(actions.startScanner()).toEqual({
+            type: LOGIN_CAMERA_SCANNER,
+            payload: true
+        })
+    })
+
+    it('should stop scanner',() => {
+        expect(actions.stopScanner()).toEqual({
+            type: LOGIN_CAMERA_SCANNER,
+            payload: false
+        })
+    })
+
+    it('should stop toggle checkbox',() => {
+        expect(actions.toggleCheckbox()).toEqual({
+            type: TOGGLE_CHECKBOX
+        })
+    })
+
+
 })

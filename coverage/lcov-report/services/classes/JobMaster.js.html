@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for services/classes/JobMaster.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">All files</a> / <a href="index.html">services/classes</a> JobMaster.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">30.36% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>17/56</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">50% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>8/16</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">50% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>2/4</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">27.78% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>15/54</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Created by udbhav on 12/4/17.
+ */
+&nbsp;
+import { keyValueDB } from '../../repositories/keyValueDb'
+&nbsp;
+import RestAPIFactory from '../../lib/RestAPIFactory'
+import CONFIG from '../../lib/config'
+&nbsp;
+import {keyValueDBService} from './KeyValueDBService'
+&nbsp;
+const {
+    JOB_MASTER,
+    JOB_ATTRIBUTE,
+    JOB_ATTRIBUTE_VALUE,
+    FIELD_ATTRIBUTE,
+    FIELD_ATTRIBUTE_VALUE,
+    JOB_STATUS,
+    TAB,
+    CUSTOMER_CARE,
+    SMS_TEMPLATE,
+    USER_SUMMARY,
+    JOB_SUMMARY,
+    SMS_JOB_STATUS,
+    JOB_MASTER_MONEY_TRANSACTION_MODE,
+    FIELD_ATTRIBUTE_STATUS,
+    FIELD_ATTRIBUTE_VALIDATION,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+    JOB_LIST_CUSTOMIZATION,
+    CUSTOMIZATION_APP_MODULE,
+    USER,
+} = require('../../lib/constants').default
+&nbsp;
+&nbsp;
+class JobMaster {
+    /**
+     *## This will Download Job Master from server
+     * Post data in JSON format
+     *
+     * {
+        deviceIMEI: {},
+        deviceSIM: {},
+        currentJobMasterVersion: 19,
+        deviceCompanyId: 27
+    }
+     *
+     * @param deviceIMEI
+     * @param deviceSIM
+     * @param currentJobMasterVersion
+     * @param deviceCompanyId
+     *
+     *
+     * * @return
+     * Expected Json Object
+     * {
+     *  serverTime:null,
+     *  hubLatLng:null,
+     *  lastSeenTimeForMessageBox:null,
+     *  jobMaster:{},
+     *  jobAttributeMaster:[],
+     *  jobAttributeValueMaster:[],
+     *  fieldAttributeMaster:[],
+     *  fieldAttributeValueMaster:[],
+     *  jobStatus:[],
+     *  modulesCustomization:[],
+     *  jobListCustomization:[],
+     *  appJobStatusTabs:[],
+     *  jobMasterMoneyTransactionModes:[],
+     *  customerCareList:[],
+     *  smsTemplatesList:[],
+     *  fieldAttributeMasterStatuses:[],
+     *  fieldAttributeMasterValidations:[],
+     *  fieldAttributeMasterValidationConditions:[],
+     *  smsJobStatuses:[],
+     *  companyMDM:{},
+     *  attributeTypeList:[],
+     *  userSummary:{},
+     *  jobSummary:[],
+     *
+     * }
+     *
+     */
+&nbsp;
+    downloadJobMaster(deviceIMEI, deviceSIM,userObject) {
+        let postData = "",currentJobMasterVersion=0,deviceCompanyId=0;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if((!deviceIMEI || <span class="branch-1 cbranch-no" title="branch not covered" >!deviceSIM)</span> &amp;&amp; userObject) {
+<span class="cstat-no" title="statement not covered" >                deviceIMEI = {}</span>
+<span class="cstat-no" title="statement not covered" >                deviceSIM = {}</span>
+<span class="cstat-no" title="statement not covered" >                currentJobMasterVersion = userObject.value.company.currentJobMasterVersion</span>
+<span class="cstat-no" title="statement not covered" >                deviceCompanyId = userObject.value.company.id</span>
+<span class="cstat-no" title="statement not covered" >                postData = JSON.stringify({</span>
+                    deviceIMEI,
+                    deviceSIM,
+                    currentJobMasterVersion,
+                    deviceCompanyId
+                })
+        }
+        else <span class="missing-if-branch" title="if path not taken" >I</span>if(deviceIMEI){
+<span class="cstat-no" title="statement not covered" >            currentJobMasterVersion = userObject.value.currentJobMasterVersion</span>
+<span class="cstat-no" title="statement not covered" >            deviceCompanyId = userObject.value.company.id</span>
+<span class="cstat-no" title="statement not covered" >            postData = JSON.stringify({</span>
+                deviceIMEI,
+                deviceSIM,
+                currentJobMasterVersion,
+                deviceCompanyId
+            })
+        }
+        console.log(postData)
+        console.log('downloadJobMaster')
+        console.log(currentJobMasterVersion)
+        console.log(deviceCompanyId)
+        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        let jobMasterResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
+        jobMasterResponse = RestAPIFactory()._pruneEmpty(jobMasterResponse)
+        return jobMasterResponse
+    }
+&nbsp;
+    /**
+     *
+     * @param json
+     */
+<span class="fstat-no" title="function not covered" >    sa</span>veJobMaster(json) {
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(USER, json.user)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_VALUE, json.jobAttributeValueMaster)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE, json.fieldAttributeMaster)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(SMS_TEMPLATE, json.smsTemplatesList)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_STATUS, json.fieldAttributeMasterStatuses)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION, json.fieldAttributeMasterValidations)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION_CONDITION, json.fieldAttributeMasterValidationConditions)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)</span>
+<span class="cstat-no" title="statement not covered" >        keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)</span>
+    }
+&nbsp;
+    /**This matches device's time with server time,returns fail if difference is more than 15 minutes
+     *
+     * @param serverTime
+     * @return {boolean}
+     */
+<span class="fstat-no" title="function not covered" >    ma</span>tchServerTimeWithMobileTime(serverTime) {
+<span class="cstat-no" title="statement not covered" >        console.log("matchServerTimeWithMobileTime start")</span>
+        const serverTimeInMillis = <span class="cstat-no" title="statement not covered" >new Date(serverTime).getTime()</span>
+<span class="cstat-no" title="statement not covered" >        console.log(serverTimeInMillis)</span>
+        const currentTimeInMillis = <span class="cstat-no" title="statement not covered" >new Date().getTime();</span>
+<span class="cstat-no" title="statement not covered" >        if (serverTimeInMillis) {</span>
+<span class="cstat-no" title="statement not covered" >            console.log("no error")</span>
+<span class="cstat-no" title="statement not covered" >            if (currentTimeInMillis - serverTimeInMillis &gt; 15 * 60 * 1000) {</span>
+<span class="cstat-no" title="statement not covered" >                return false</span>
+            }
+<span class="cstat-no" title="statement not covered" >            return true</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >            console.log("parse error")</span>
+<span class="cstat-no" title="statement not covered" >            throw ("Server Time format incorrect")</span>
+        }
+    }
+&nbsp;
+    /**Possible values of message returned from server -
+     * 1. Access is denied
+     * 2. Verified IMEI not valid for that HUB
+     * 3. IMEI Not Verified. Please verify it from server.
+     *
+     * @param message
+     */
+    checkIfHubAndImeiIsValid(message){
+        <span class="missing-if-branch" title="else path not taken" >E</span>if(message==='Access is denied' || message==='Verified IMEI not valid for that HUB!!!' || message==='IMEI Not Verified. Please verify it from server.'){
+           throw message
+        }
+        else{
+<span class="cstat-no" title="statement not covered" >            return true</span>
+        }
+    }
+}
+&nbsp;
+export let jobMasterService = new JobMaster()
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 08 2017 20:01:38 GMT+0530 (IST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

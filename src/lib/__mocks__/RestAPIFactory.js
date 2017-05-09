@@ -1,9 +1,8 @@
 'use strict'
 
-// import RestAPIInterFace from './RestAPIInterface'
-const RestAPIInterFace = require('./RestAPIInterface').default
+const RestAPI = require('./RestAPI').default
 
 
 export default function RestAPIFactory (token = null) {
-  return new RestAPIInterFace();
+  return new RestAPI();
 }
