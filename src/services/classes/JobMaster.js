@@ -143,14 +143,13 @@ class JobMaster {
      * @return {boolean}
      */
     matchServerTimeWithMobileTime(serverTime) {
-        console.log("matchServerTimeWithMobileTime start")
         const timeFromServer = moment(serverTime)
         if(!timeFromServer.isValid()){
             throw new Error("Server Time format incorrect")
         }
-        const currentTimeInMinutes = moment().minute()
-        const serverTimeInMinutes = timeFromServer.minute() ;
-        if (currentTimeInMinutes - serverTimeInMinutes > 15) {
+        const currentTimeInMillis = moment().millisecond()
+        const serverTimeInMillis = timeFromServer.millisecond()
+        if (currentTimeInMillis - serverTimeInMillis > 15*60*1000) {
             return false
         }
         return true

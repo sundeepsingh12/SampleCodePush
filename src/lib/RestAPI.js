@@ -123,6 +123,7 @@ export class RestAPI {
                 if(res.status==200) {
                     return res;
                 }else{
+                    console.log(res)
                     throw new Error({code: res.statusCode, error: res.message})
                 }
             })

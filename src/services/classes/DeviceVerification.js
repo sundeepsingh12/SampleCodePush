@@ -166,6 +166,9 @@ class DeviceVerification {
     }
 
     checkIfSimValidOnServer(deviceSim){
+        console.log('checkIfSimValidOnServer')
+        console.log(deviceSim)
+        console.log(deviceSim.isVerify)
         if(deviceSim.isVerify){
             return true
         }

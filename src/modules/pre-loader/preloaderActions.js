@@ -216,7 +216,7 @@ async function validateAndSaveJobMaster(jobMasterResponse, dispatch) {
             // dispatch(invalidImeiHub(isImeiValid))
         }
 
-        const isTimeValid = await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
+        await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
         dispatch(jobMasterSavingStart())
         await jobMasterService.saveJobMaster(jobMasterResponse)
         dispatch(jobMasterSavingSuccess())
