@@ -95,7 +95,16 @@ export class RestAPI {
                 url:apiUrl,
                 body: data
             }
-        }else{
+        }
+        else if(methodType==='LOGIN'){
+           opts = {
+               headers: {
+               },
+               url:apiUrl,
+               body: data
+           }
+        }
+        else{
             opts = {
                 method: methodType,
                 url: apiUrl,

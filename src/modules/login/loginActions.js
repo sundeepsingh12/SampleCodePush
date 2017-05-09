@@ -42,11 +42,8 @@ const {
 import RestAPIFactory from '../../lib/RestAPIFactory'
 
 import { Actions } from 'react-native-router-flux'
-import { keyValueDB } from '../../repositories/keyValueDb'
 import { authenticationService } from '../../services/classes/Authentication'
 import CONFIG from '../../lib/config'
-import { jobMasterService } from '../../services/classes/JobMaster'
-import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import {keyValueDBService} from '../../services/classes/KeyValueDBService'
 
 /**
@@ -190,8 +187,8 @@ export function checkRememberMe() {
       if(rememberMe) {
         let username = await keyValueDBService.getValueFromStore(USERNAME)
         let password = await keyValueDBService.getValueFromStore(PASSWORD)
-        dispatch(onChangeUsername(username.value))
-        dispatch(onChangePassword(password.value))
+        dispatch(onChangeUsername(username))
+        dispatch(onChangePassword(password))
       }
     } catch(error) {
 
@@ -214,7 +211,7 @@ export function getSessionToken() {
       console.log(token)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
         console.log(isPreloaderComplete)
-      if (token.value && isPreloaderComplete) {
+      if (token && isPreloaderComplete) {
         // dispatch(sessionTokenRequestSuccess(token))
         Actions.Tabbar()
       } else if(token) {

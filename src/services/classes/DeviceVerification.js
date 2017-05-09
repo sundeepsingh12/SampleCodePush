@@ -139,11 +139,11 @@ class DeviceVerification {
      * JSON body
      * deviceSIM
      */
-    generateOTP(deviceSIM) {
+    generateOTP(deviceSIM,sessionToken) {
         const postData = JSON.stringify({
             deviceSIM
         });
-        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+
         let generateOtpResponse =  RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.GENERATE_OTP_API, 'POST')
         generateOtpResponse = RestAPIFactory()._pruneEmpty(generateOtpResponse)
         return generateOtpResponse
@@ -154,12 +154,12 @@ class DeviceVerification {
      * @param deviceSIM
      * @return {*}
      */
-    verifySim(deviceSIM){
+    verifySim(deviceSIM,sessionToken){
         const postData = JSON.stringify({
             deviceSIM
         })
-        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        let simVerificationResponse =  RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.SIM_VERIFICATION_API, 'POST')
+
+        let simVerificationResponse =  RestAPIFactory(sessionToken).serviceCall(postData, CONFIG.API.SIM_VERIFICATION_API, 'POST')
         simVerificationResponse = RestAPIFactory()._pruneEmpty(simVerificationResponse)
         return simVerificationResponse
 

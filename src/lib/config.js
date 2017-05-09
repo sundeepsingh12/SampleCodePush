@@ -14,6 +14,7 @@ module.exports = {
     }
   },
     API:{
+        AUTHENTICATION_API:'/authentication',
         JOB_MASTER_API:'/rest/device/job_master',
         CHECK_ASSET_API :'/rest/device/check_asset',
         GENERATE_OTP_API :'/rest/device/generate_otp',

@@ -2,13 +2,12 @@
  * Created by udbhav on 12/4/17.
  */
 
-import { keyValueDB } from '../../repositories/keyValueDb'
-
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 
-import RestAPIInterface from '../../lib/RestAPIInterface'
 import {keyValueDBService} from './KeyValueDBService'
+
+import moment from 'moment'
 
 const {
     JOB_MASTER,
@@ -106,10 +105,6 @@ class JobMaster {
                 deviceCompanyId
             })
         }
-        console.log(postData)
-        console.log('downloadJobMaster')
-        console.log(currentJobMasterVersion)
-        console.log(deviceCompanyId)
         let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         let jobMasterResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
         jobMasterResponse = RestAPIFactory()._pruneEmpty(jobMasterResponse)
@@ -149,19 +144,16 @@ class JobMaster {
      */
     matchServerTimeWithMobileTime(serverTime) {
         console.log("matchServerTimeWithMobileTime start")
-        const serverTimeInMillis = new Date(serverTime).getTime()
-        console.log(serverTimeInMillis)
-        const currentTimeInMillis = new Date().getTime();
-        if (serverTimeInMillis) {
-            console.log("no error")
-            if (currentTimeInMillis - serverTimeInMillis > 15 * 60 * 1000) {
-                return false
-            }
-            return true
-        } else {
-            console.log("parse error")
-            throw ("Server Time format incorrect")
+        const timeFromServer = moment(serverTime)
+        if(!timeFromServer.isValid()){
+            throw new Error("Server Time format incorrect")
         }
+        const currentTimeInMinutes = moment().minute()
+        const serverTimeInMinutes = timeFromServer.minute() ;
+        if (currentTimeInMinutes - serverTimeInMinutes > 15) {
+            return false
+        }
+        return true
     }
 
     /**Possible values of message returned from server -

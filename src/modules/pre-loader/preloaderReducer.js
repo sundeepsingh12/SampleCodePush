@@ -20,8 +20,6 @@ const {
     MASTER_SAVING_START,
     MASTER_SAVING_SUCCESS,
     MASTER_SAVING_FAILURE,
-    MASTER_TIME_FAILURE,
-
     CHECK_ASSET_START,
     CHECK_ASSET_SUCCESS,
     CHECK_ASSET_FAILURE,
@@ -35,7 +33,6 @@ const {
     SERVICE_SUCCESS,
     SERVICE_FAILED,
     PRELOADER_SUCCESS,
-    INVALID_IMEI_HUB,
     SHOW_MOBILE_NUMBER_SCREEN,
     SHOW_OTP_SCREEN,
     SET_MOBILE_NUMBER,
@@ -69,11 +66,6 @@ export default function preloaderReducer(state = initialState, action) {
         case MASTER_SAVING_SUCCESS :
             return state.set('configSaveService', SERVICE_SUCCESS)
         case MASTER_SAVING_FAILURE :
-            return state.set('configSaveService', SERVICE_FAILED)
-                .set('isError', true)
-                .set('error', action.payload)
-        case MASTER_TIME_FAILURE :
-        case INVALID_IMEI_HUB:
             return state.set('configSaveService', SERVICE_FAILED)
                 .set('isError', true)
                 .set('error', action.payload)

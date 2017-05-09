@@ -9,8 +9,6 @@ const {
     MASTER_SAVING_START,
     MASTER_SAVING_SUCCESS,
     MASTER_SAVING_FAILURE,
-    MASTER_TIME_FAILURE,
-
     CHECK_ASSET_START,
     CHECK_ASSET_SUCCESS,
     CHECK_ASSET_FAILURE,
@@ -24,7 +22,6 @@ const {
     SERVICE_SUCCESS,
     SERVICE_FAILED,
     PRELOADER_SUCCESS,
-    INVALID_IMEI_HUB,
     SHOW_OTP_SCREEN,
     SHOW_MOBILE_NUMBER_SCREEN,
 
@@ -43,7 +40,7 @@ const {
 import {Actions} from 'react-native-router-flux'
 import {keyValueDB} from '../../repositories/keyValueDb'
 import {jobMasterService} from '../../services/classes/JobMaster'
-import {logoutService} from '../../services/classes/Logout'
+import {authenticationService} from '../../services/classes/Authentication'
 
 import {deviceVerificationService} from '../../services/classes/DeviceVerification'
 import {keyValueDBService} from '../../services/classes/KeyValueDBService'
@@ -88,13 +85,6 @@ export function jobMasterSavingFailure(error) {
     }
 }
 
-export function timeMismatch(error) {
-    return {
-        type: MASTER_TIME_FAILURE,
-        payload: error
-    }
-}
-
 export function checkAssetStart() {
     return {
         type: CHECK_ASSET_START
@@ -117,13 +107,6 @@ export function checkAssetFailure(error) {
 export function preloaderSuccess() {
     return {
         type: PRELOADER_SUCCESS
-    }
-}
-
-export function invalidImeiHub(error) {
-    return {
-        type: INVALID_IMEI_HUB,
-        payload: error
     }
 }
 
@@ -182,7 +165,7 @@ async function downloadJobMaster(dispatch) {
         const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject)
         const json = await jobMasters.json
         dispatch(jobMasterDownloadSuccess())
-        saveJobMaster(json, dispatch)
+        validateAndSaveJobMaster(json, dispatch)
     } catch (error) {
         dispatch(jobMasterDownloadFailure(error.message))
     }
@@ -196,7 +179,8 @@ export function invalidateUserSession() {
     return async function (dispatch) {
         try {
             dispatch(preLogoutRequest())
-            await logoutService.logout();
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            await authenticationService.logout(token);
             dispatch(preLogoutSuccess())
             dispatch(deleteSessionToken())
             Actions.InitialLoginForm()
@@ -208,34 +192,35 @@ export function invalidateUserSession() {
 
 export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService) {
     return async function (dispatch) {
-        if (configDownloadService === 'SERVICE_FAILED' || configDownloadService === 'SERVICE_PENDING' || configSaveService === 'SERVICE_FAILED') {
+        if (configDownloadService === SERVICE_FAILED || configDownloadService === SERVICE_PENDING || configSaveService === SERVICE_FAILED) {
             downloadJobMaster(dispatch);
         }
-        else if (deviceVerificationService === 'SERVICE_FAILED') {
+        else if (deviceVerificationService === SERVICE_FAILED) {
             checkAsset(dispatch);
         }
     }
 }
 
-
-async function saveJobMaster(jobMasterResponse, dispatch) {
+/**This method validates job master response from server and if found valid then saves it,
+ * otherwise job master failure action is dispatched
+ *
+ * @param jobMasterResponse
+ * @param dispatch
+ * @return {Promise.<void>}
+ */
+async function validateAndSaveJobMaster(jobMasterResponse, dispatch) {
     try {
         if (jobMasterResponse.message) {
-            const isImeiValid = await jobMasterService.checkIfHubAndImeiIsValid(jobMasterResponse.message)
-            dispatch(invalidImeiHub(isImeiValid))
-        }
-        else {
-            const isTimeValid = await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
-            if (isTimeValid) {
-                dispatch(jobMasterSavingStart())
-                await jobMasterService.saveJobMaster(jobMasterResponse)
-                dispatch(jobMasterSavingSuccess())
-                checkAsset(dispatch)
-            } else {
-                dispatch(timeMismatch())
-            }
+            throw new Error(jobMasterResponse.message)
+            // const isImeiValid = await jobMasterService.checkIfHubAndImeiIsValid(jobMasterResponse.message)
+            // dispatch(invalidImeiHub(isImeiValid))
         }
 
+        const isTimeValid = await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
+        dispatch(jobMasterSavingStart())
+        await jobMasterService.saveJobMaster(jobMasterResponse)
+        dispatch(jobMasterSavingSuccess())
+        checkAsset(dispatch)
     } catch (error) {
         dispatch(jobMasterSavingFailure(error.message))
     }
@@ -290,7 +275,8 @@ export function generateOtp(dispatch) {
             const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
             console.log('generateOtp')
             console.log(deviceSIM)
-            const generateOtpResponse = await deviceVerificationService.generateOTP(deviceSIM)
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            const generateOtpResponse = await deviceVerificationService.generateOTP(deviceSIM,token)
             console.log('generateOtpResponse>>>>>')
             console.log(generateOtpResponse)
             const json = await generateOtpResponse.json
@@ -309,19 +295,20 @@ export function generateOtp(dispatch) {
 }
 
 export function validateOtp(otpNumber) {
-        return async function (dispatch) {
-            const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-            const optNoFromStore = deviceSIM.value.otpNumber;
-            if (otpNumber === optNoFromStore) {
-                const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM)
-                const json = simVerificationResponse.json
-                console.log('json sim >>>>>')
-                console.log(json)
-                await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, 'true')
-                dispatch(preloaderSuccess())
-                Actions.Tabbar()
-            }
+    return async function (dispatch) {
+        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+        const optNoFromStore = deviceSIM.value.otpNumber;
+        if (otpNumber === optNoFromStore) {
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM,token)
+            const json = simVerificationResponse.json
+            console.log('json sim >>>>>')
+            console.log(json)
+            await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, 'true')
+            dispatch(preloaderSuccess())
+            Actions.Tabbar()
         }
+    }
 
 }
 
