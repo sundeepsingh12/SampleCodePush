@@ -144,6 +144,7 @@ class JobMaster {
      */
     matchServerTimeWithMobileTime(serverTime) {
         const timeFromServer = moment(serverTime)
+        console.log(timeFromServer)
         if(!timeFromServer.isValid()){
             throw new Error("Server Time format incorrect")
         }
