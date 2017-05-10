@@ -178,6 +178,7 @@ export default function native(platform) {
                 tabs
                 hideNavBar
                 tabBarStyle={styles.tabBar}
+                type = 'replace'
                 default='Main'>
 
                 <Scene key='Main'

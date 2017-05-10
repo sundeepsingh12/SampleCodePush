@@ -22,8 +22,12 @@ var InitialState = Record({
   showMobileNumberScreen:false,
   showOtpScreen:false,
   mobileNumber:'',
-  disableButton:true,
-  otpNumber:''
+  isOtpVerificationButtonDisabled:true,
+  isGenerateOtpButtonDisabled:true,
+  otpNumber:'',
+  mobileDisplayMessage:'', //message which will be displayed in mobile no screen
+  otpDisplayMessage:'' //message which will be displayed in otp screen
+
 })
 
 export default InitialState

@@ -138,7 +138,7 @@ class Jobs extends Component {
           </TouchableHighlight>
 
           <View style={[styles.listCircleCheckbox, !this.state.status ? styles.hidden : {}]} >
-            <ItemCheckbox
+            <CheckBox
                 size = {36}
                 icon_check= 'ios-checkmark-circle-outline'
                 icon_open= 'ios-radio-button-off'

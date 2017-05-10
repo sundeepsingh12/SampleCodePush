@@ -81,15 +81,15 @@ class Login extends Component {
     this.props.actions.checkRememberMe()
   }
 
-  onChangeUsername(username) {
+  onChangeUsername(username){
     this.props.actions.onChangeUsername(username)
   }
 
-  onChangePassword(password) {
+  onChangePassword(password){
     this.props.actions.onChangePassword(password)
   }
 
-  loginButtonPress() {
+  loginButtonPress(){
     const password = this.props.auth.form.password;
     console.log(password.length)
     if(password.length > 50) {
@@ -108,11 +108,11 @@ class Login extends Component {
     this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password);
   }
 
-  _onScaningCancelled() {
+  _onScaningCancelled(){
     this.props.actions.stopScanner();
   }
 
-  rememberMe() {
+  rememberMe(){
     console.log('rememberMe called')
     this.props.actions.toggleCheckbox()
   }
@@ -134,7 +134,7 @@ class Login extends Component {
                   value={this.props.auth.form.username}
                   placeholder='Username'
                   style={feTheme.roundedInput}
-                  onChangeText={value =>  this.onChangeUsername(value) }
+                  onChangeText={value => this.onChangeUsername(value)}
                   disabled = {this.props.auth.form.isEditTextDisabled}
                    />
               </Item>
@@ -151,14 +151,14 @@ class Login extends Component {
               <Button
                 rounded success style={{ width: '100%', marginTop: 15 }}
                 disabled={this.props.auth.form.isButtonDisabled}
-                onPress={() => this.loginButtonPress()}
+                onPress={()=>this.loginButtonPress()}
               >
                 <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Log In</Text>
               </Button>
 
               <View style={{ flexDirection: 'row', flexGrow: 1, justifyContent: 'flex-start', marginTop: 15 }}>
                 <CheckBox checked={this.props.auth.form.rememberMe} 
-                  onPress = {this.rememberMe.bind(this)} />
+                  onPress = {()=>this.rememberMe()} />
                 <Text style={{ marginLeft: 20 }}>Remember Me</Text>
               </View>
 

@@ -22,7 +22,7 @@ class DeviceVerification {
      * deviceIMEI
      * deviceSIM
      */
-    checkAssetAPI(deviceIMEI, deviceSIM) {
+    checkAssetAPI(deviceIMEI, deviceSIM,token) {
         if (!deviceIMEI) {
             deviceIMEI = {}
         }
@@ -33,22 +33,19 @@ class DeviceVerification {
             deviceIMEI,
             deviceSIM
         })
-
-        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        let checkAssetResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.CHECK_ASSET_API, 'POST')
+        console.log('request body')
+        console.log(postData)
+        let checkAssetResponse = RestAPIFactory().serviceCall(postData, CONFIG.API.CHECK_ASSET_API, 'POST')
         checkAssetResponse = RestAPIFactory()._pruneEmpty(checkAssetResponse)
         return checkAssetResponse
     }
 
-    /**
-     * # Check whether sim verified already
-     * @param {*} deviceIMEI
-     * @param {*} deviceSIM
-     * @param {*} companyID
-     * @param {*} hubID
-     * @param {*} simNumber
-     * @returns
-     * boolean
+    /**Checks if SIM verified already
+     *
+     * @param deviceIMEI
+     * @param deviceSIM
+     * @param user
+     * @return {Promise.<boolean>}
      */
 
      async checkAsset(deviceIMEI, deviceSIM, user) {
@@ -140,12 +137,11 @@ class DeviceVerification {
      * deviceSIM
      */
     generateOTP(deviceSIM,sessionToken) {
-        const postData = JSON.stringify({
-            deviceSIM
-        });
-
-        let generateOtpResponse =  RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.GENERATE_OTP_API, 'POST')
+        console.log('generateOTP')
+        console.log(JSON.stringify(deviceSIM))
+        let generateOtpResponse =  RestAPIFactory().serviceCall(JSON.stringify(deviceSIM), CONFIG.API.GENERATE_OTP_API, 'POST')
         generateOtpResponse = RestAPIFactory()._pruneEmpty(generateOtpResponse)
+        console.log(generateOtpResponse)
         return generateOtpResponse
     }
 
@@ -155,11 +151,7 @@ class DeviceVerification {
      * @return {*}
      */
     verifySim(deviceSIM,sessionToken){
-        const postData = JSON.stringify({
-            deviceSIM
-        })
-
-        let simVerificationResponse =  RestAPIFactory(sessionToken).serviceCall(postData, CONFIG.API.SIM_VERIFICATION_API, 'POST')
+        let simVerificationResponse =  RestAPIFactory().serviceCall(JSON.stringify(deviceSIM), CONFIG.API.SIM_VERIFICATION_API, 'POST')
         simVerificationResponse = RestAPIFactory()._pruneEmpty(simVerificationResponse)
         return simVerificationResponse
 
@@ -168,8 +160,8 @@ class DeviceVerification {
     checkIfSimValidOnServer(deviceSim){
         console.log('checkIfSimValidOnServer')
         console.log(deviceSim)
-        console.log(deviceSim.isVerify)
-        if(deviceSim.isVerify){
+        console.log(deviceSim.isVerified)
+        if(deviceSim.isVerified){
             return true
         }
         return false

@@ -168,8 +168,10 @@ export function authenticateUser(username, password,rememberMe) {
   return async function (dispatch) {
     try {
       dispatch(loginRequest())
-      const j_sessionid = await authenticationService.login(username, password)
-      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
+      const authenticationResponse = await authenticationService.login(username, password)
+       const j_sessionid = (authenticationResponse.headers.map['set-cookie'][0]).split("; ")[0];
+       console.log(`jsession id ${j_sessionid}`)
+        await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess(j_sessionid))
       Actions.Preloader()
@@ -223,6 +225,7 @@ export function getSessionToken() {
       }
     }
     catch (error) {
+        console.log(error)
       console.log('login failure')
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())

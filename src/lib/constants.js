@@ -31,9 +31,18 @@ export default keyMirror({
     MASTER_SAVING_START: null,
     MASTER_SAVING_SUCCESS: null,
     MASTER_SAVING_FAILURE: null,
+
     CHECK_ASSET_START: null,
     CHECK_ASSET_SUCCESS: null,
     CHECK_ASSET_FAILURE: null,
+
+    OTP_GENERATION_START: null,
+    OTP_GENERATION_SUCCESS: null,
+    OTP_GENERATION_FAILURE: null,
+
+    OTP_VALIDATION_START:null,
+    OTP_VALIDATION_SUCCESS:null,
+    OTP_VALIDATION_FAILURE:null,
 
     SESSION_TOKEN_REQUEST: null,
     SESSION_TOKEN_SUCCESS: null,
@@ -47,7 +56,6 @@ export default keyMirror({
     ON_LOGIN_PASSWORD_CHANGE: null,
 
     PRELOADER_SUCCESS:null,
-    PRELOADER_RETRY:null,
     SHOW_MOBILE_NUMBER:null,
     SHOW_OTP_SCREEN:null,
     SHOW_MOBILE_NUMBER_SCREEN:null,
