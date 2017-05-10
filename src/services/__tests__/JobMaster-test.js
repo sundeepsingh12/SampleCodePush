@@ -20,19 +20,19 @@ describe('job master services', () => {
     expect(jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,user)).toEqual('')
   })
 
-  // it('download job master with empty request',() => {
-  //   const deviceSIM = {
-  //   }
-  //   const deviceIMEI = {
-  //   }
-  //   const user = {
-  //   }
-  //   expect(jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,user)).toEqual()
-  // })
-
-  // it('checks server time with mobile time',() => {
-  //   expect(jobMasterService.matchServerTimeWithMobileTime())
-  // })
+  it('download job master with empty request',() => {
+    const deviceSIM = {}
+    const deviceIMEI = {}
+    const user = {
+      value : {
+        company : {
+          id : 1,
+          currentJobMasterVersion : 1,
+        }
+      }
+    }
+    expect(jobMasterService.downloadJobMaster(deviceIMEI,deviceSIM,user)).toEqual("{\"deviceIMEI\":{},\"deviceSIM\":{},\"currentJobMasterVersion\":1,\"deviceCompanyId\":1}")
+  })
 
   it('check message from server',() => {
     const message = 'Access is denied'

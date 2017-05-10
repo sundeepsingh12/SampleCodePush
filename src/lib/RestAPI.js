@@ -122,9 +122,22 @@ export class RestAPI {
                 console.log(res.message)
                 if(res.status==200) {
                     return res;
-                }else{
+                } else {
                     console.log(res)
-                    throw new Error({code: res.statusCode, error: res.message})
+                    switch(res.status) {
+                    case 401:
+                        throw new Error("Invalid User Credentials")
+                    case 500:
+                        throw new Error("Internal server error")
+                    case 502:
+                        throw new Error("Bad Gateway")
+                    case 1201:
+                        throw new Error("User already logged in ")
+                    case 1203:
+                        throw new Error("User locked.Try after 15 minutes")
+                    default:
+                        throw new Error({code: res.statusCode, error: res.message})
+                    }
                 }
             })
             .catch((error) => {

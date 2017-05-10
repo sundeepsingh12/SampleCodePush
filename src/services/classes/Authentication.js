@@ -70,7 +70,7 @@ class Authentication {
     logout(sessionToken) {
         try {
             console.log(sessionToken)
-            let logoutResponse = RestAPIFactory(sessionToken).serviceCall(null,CONFIG.API.LOGOUT_API,'GET')
+            let logoutResponse = RestAPIFactory().serviceCall(null,CONFIG.API.LOGOUT_API,'GET')
             return logoutResponse
         } catch (error) {
             throw(error)

@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">24.14% </span>
+        <span class="strong">27.45% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>14/58</span>
+        <span class='fraction'>14/51</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">20% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>13/19</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">24.14% </span>
+        <span class="strong">27.45% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>14/58</span>
+        <span class='fraction'>14/51</span>
       </div>
     </div>
   </div>
@@ -270,16 +270,7 @@
 225
 226
 227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+228</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -310,9 +301,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -371,7 +359,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -446,7 +436,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -455,10 +444,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -492,9 +477,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -550,11 +532,8 @@ const {
 import RestAPIFactory from '../../lib/RestAPIFactory'
 &nbsp;
 import { Actions } from 'react-native-router-flux'
-import { keyValueDB } from '../../repositories/keyValueDb'
 import { authenticationService } from '../../services/classes/Authentication'
 import CONFIG from '../../lib/config'
-import { jobMasterService } from '../../services/classes/JobMaster'
-import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import {keyValueDBService} from '../../services/classes/KeyValueDBService'
 &nbsp;
 /**
@@ -606,12 +585,14 @@ export function sessionTokenRequest() {
     type: SESSION_TOKEN_REQUEST
   }
 }
+&nbsp;
 export function sessionTokenRequestSuccess(token) {
   return {
     type: SESSION_TOKEN_SUCCESS,
     payload: token
   }
 }
+&nbsp;
 export function sessionTokenRequestFailure(error) {
   return {
     type: SESSION_TOKEN_FAILURE,
@@ -676,7 +657,6 @@ export function toggleCheckbox() {
 export function <span class="fstat-no" title="function not covered" >authenticateUser(</span>username, password,rememberMe) {
 <span class="cstat-no" title="statement not covered" >  return <span class="fstat-no" title="function not covered" >as</span>ync function (dispatch) {</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      console.log("authenticateUser called")</span>
 <span class="cstat-no" title="statement not covered" >      dispatch(loginRequest())</span>
       const j_sessionid = <span class="cstat-no" title="statement not covered" >await authenticationService.login(username, password)</span>
 <span class="cstat-no" title="statement not covered" >      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)</span>
@@ -693,19 +673,15 @@ export function <span class="fstat-no" title="function not covered" >authenticat
 export function <span class="fstat-no" title="function not covered" >checkRememberMe(</span>) {
 <span class="cstat-no" title="statement not covered" >  return <span class="fstat-no" title="function not covered" >as</span>ync function (dispatch) {</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      console.log('checkRememberMe get')</span>
       let rememberMe = <span class="cstat-no" title="statement not covered" >await keyValueDBService.getValueFromStore(REMEMBER_ME)</span>
-<span class="cstat-no" title="statement not covered" >      console.log('rememberMe get') </span>
-<span class="cstat-no" title="statement not covered" >      console.log(rememberMe)</span>
+<span class="cstat-no" title="statement not covered" >      console.log(username)</span>
 <span class="cstat-no" title="statement not covered" >      if(rememberMe) {</span>
         let username = <span class="cstat-no" title="statement not covered" >await keyValueDBService.getValueFromStore(USERNAME)</span>
-<span class="cstat-no" title="statement not covered" >        console.log('username get')</span>
-<span class="cstat-no" title="statement not covered" >        console.log(username)</span>
         let password = <span class="cstat-no" title="statement not covered" >await keyValueDBService.getValueFromStore(PASSWORD)</span>
-<span class="cstat-no" title="statement not covered" >        console.log('password get')</span>
+<span class="cstat-no" title="statement not covered" >        console.log(username)</span>
 <span class="cstat-no" title="statement not covered" >        console.log(password)</span>
-<span class="cstat-no" title="statement not covered" >        dispatch(onChangeUsername(username.value))</span>
-<span class="cstat-no" title="statement not covered" >        dispatch(onChangePassword(password.value))</span>
+<span class="cstat-no" title="statement not covered" >        dispatch(onChangeUsername(username))</span>
+<span class="cstat-no" title="statement not covered" >        dispatch(onChangePassword(password))</span>
       }
     } catch(error) {
 &nbsp;
@@ -728,11 +704,8 @@ export function <span class="fstat-no" title="function not covered" >getSessionT
 <span class="cstat-no" title="statement not covered" >      console.log(token)</span>
       const isPreloaderComplete =  <span class="cstat-no" title="statement not covered" >await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)</span>
 <span class="cstat-no" title="statement not covered" >        console.log(isPreloaderComplete)</span>
-<span class="cstat-no" title="statement not covered" >        console.log(isPreloaderComplete.value)</span>
-<span class="cstat-no" title="statement not covered" >      if (token.value &amp;&amp; isPreloaderComplete.value) {</span>
+<span class="cstat-no" title="statement not covered" >      if (token &amp;&amp; isPreloaderComplete) {</span>
         // dispatch(sessionTokenRequestSuccess(token))
-<span class="cstat-no" title="statement not covered" >        console.log('tabbar called')</span>
-        // Actions.Preloader()
 <span class="cstat-no" title="statement not covered" >        Actions.Tabbar()</span>
       } else <span class="cstat-no" title="statement not covered" >if(token) {</span>
           // dispatch(sessionTokenRequestSuccess(token))
@@ -757,7 +730,7 @@ export function <span class="fstat-no" title="function not covered" >getSessionT
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 08 2017 20:01:38 GMT+0530 (IST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue May 09 2017 15:51:33 GMT+0530 (IST)
 </div>
 </div>
 <script src="../../prettify.js"></script>
