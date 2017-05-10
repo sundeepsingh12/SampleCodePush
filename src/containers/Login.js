@@ -105,7 +105,7 @@ class Login extends Component {
     this.props.actions.stopScanner();
     this.onChangeUsername(username);
     this.onChangePassword(password);
-    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password);
+    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe);
   }
 
   _onScaningCancelled(){

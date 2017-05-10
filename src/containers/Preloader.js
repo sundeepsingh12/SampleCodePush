@@ -213,7 +213,7 @@ class Preloader extends Component {
                                </View>
                            </View>
                            <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                               <Button onPress={()=>this.validateOtp()}  full rounded
+                               <Button onPress={()=>this.validateOtp(this.props.preloader.otpNumber)}  full rounded
                                        disabled = {this.props.preloader.isOtpVerificationButtonDisabled}>
                                    <Text style={[feStyle.fontWhite]}>Verify</Text>
 

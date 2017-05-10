@@ -117,7 +117,6 @@ export function checkAssetFailure(error) {
     }
 }
 
-
 export function showMobileNumber() {
     return {
         type: SHOW_MOBILE_NUMBER_SCREEN,
@@ -143,6 +142,7 @@ export function preLogoutSuccess() {
         type: PRE_LOGOUT_SUCCESS
     }
 }
+
 export function preLogoutFailure(error) {
     return {
         type: PRE_LOGOUT_FAILURE,
@@ -296,7 +296,6 @@ async function checkAsset(dispatch) {
  * @return {Promise.<void>}
  */
 async function checkIfSimValidOnServer(dispatch){
-    console.log('checkIfSimValidOnServer')
     let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
@@ -320,8 +319,6 @@ async function checkIfSimValidOnServer(dispatch){
         dispatch(showMobileNumber())
     }
 }
-
-
 
 export function generateOtp(mobileNumber) {
     return async function (dispatch) {
