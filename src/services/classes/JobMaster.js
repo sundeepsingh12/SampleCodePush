@@ -81,7 +81,7 @@ class JobMaster {
      *
      */
 
-    downloadJobMaster(deviceIMEI, deviceSIM,userObject) {
+    downloadJobMaster(deviceIMEI, deviceSIM,userObject,token) {
         let postData = "",currentJobMasterVersion=0,deviceCompanyId=0;
         if((!deviceIMEI || !deviceSIM) && userObject) {
                 deviceIMEI = {}
@@ -105,7 +105,7 @@ class JobMaster {
                 deviceCompanyId
             })
         }
-        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+
         let jobMasterResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
         jobMasterResponse = RestAPIFactory()._pruneEmpty(jobMasterResponse)
         return jobMasterResponse

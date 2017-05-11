@@ -22,7 +22,6 @@ const {
     MASTER_SAVING_FAILURE,
 
     CHECK_ASSET_START,
-    CHECK_ASSET_SUCCESS,
     CHECK_ASSET_FAILURE,
 
     OTP_GENERATION_START,
@@ -51,7 +50,8 @@ const {
     PRE_LOGOUT_FAILURE,
 
     ON_MOBILE_NO_CHANGE,
-    ON_OTP_CHANGE
+    ON_OTP_CHANGE,
+    PRELOADER_SUCCESS
 
 } = require('../../lib/constants').default
 
@@ -83,8 +83,7 @@ export default function preloaderReducer(state = initialState, action) {
 
         case CHECK_ASSET_START :
             return state.set('deviceVerificationService', SERVICE_RUNNING)
-        case CHECK_ASSET_SUCCESS :
-            return state.set('deviceVerificationService', SERVICE_SUCCESS)
+
         case CHECK_ASSET_FAILURE :
             return state.set('deviceVerificationService', SERVICE_FAILED)
                 .set('isError', true)
@@ -109,7 +108,9 @@ export default function preloaderReducer(state = initialState, action) {
         case PRE_LOGOUT_START :
             return state.set('error','Logging out')
         case PRE_LOGOUT_SUCCESS :
-            return state.set('error','Log out success')
+            return state.set('deviceVerificationService', SERVICE_PENDING)
+                .set('configDownloadService',SERVICE_PENDING)
+                .set('configSaveService',SERVICE_PENDING)
         case PRE_LOGOUT_FAILURE :
             return state.set('isError',true)
                         .set('error',action.payload)
@@ -138,6 +139,10 @@ export default function preloaderReducer(state = initialState, action) {
                     .set('otpNumber',otpNumber)
                     .set('otpDisplayMessage','')
             }
+        case PRELOADER_SUCCESS :
+            return state.set('deviceVerificationService', SERVICE_PENDING)
+                    .set('configDownloadService',SERVICE_PENDING)
+                .set('configSaveService',SERVICE_PENDING)
     }
     return state
 }
