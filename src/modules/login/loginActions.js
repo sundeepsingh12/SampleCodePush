@@ -25,6 +25,7 @@ const {
   USERNAME,
   PASSWORD,
   REMEMBER_ME,
+  REMEMBER_ME_SET_TRUE,
 
   IS_PRELOADER_COMPLETE
 
@@ -143,6 +144,12 @@ export function toggleCheckbox() {
   }
 }
 
+export function rememberMeSetTrue() {
+  return {
+    type: REMEMBER_ME_SET_TRUE
+  }
+}
+
 /**
  * ## Login
  * @param {string} username - user's name
@@ -159,8 +166,10 @@ export function authenticateUser(username, password,rememberMe) {
   return async function (dispatch) {
     try {
       dispatch(loginRequest())
-      const j_sessionid = await authenticationService.login(username, password)
-      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
+      const authenticationResponse = await authenticationService.login(username, password)
+       const j_sessionid = (authenticationResponse.headers.map['set-cookie'][0]).split("; ")[0];
+       console.log(`jsession id ${j_sessionid}`)
+        await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess(j_sessionid))
       Actions.Preloader()
@@ -174,12 +183,15 @@ export function authenticateUser(username, password,rememberMe) {
 export function checkRememberMe() {
   return async function (dispatch) {
     try {
+      console.log('checkRememberMe')
       let rememberMe = await keyValueDBService.getValueFromStore(REMEMBER_ME)
+      console.log(rememberMe)
       if(rememberMe) {
         let username = await keyValueDBService.getValueFromStore(USERNAME)
         let password = await keyValueDBService.getValueFromStore(PASSWORD)
-        dispatch(onChangeUsername(username))
-        dispatch(onChangePassword(password))
+        dispatch(onChangeUsername(username.value))
+        dispatch(onChangePassword(password.value))
+        dispatch(rememberMeSetTrue())
       }
     } catch(error) {
 
@@ -202,7 +214,10 @@ export function getSessionToken() {
       console.log(token)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
         console.log(isPreloaderComplete)
-      if (token && isPreloaderComplete) {
+        console.log('isPreloaderComplete')
+        console.log(token && isPreloaderComplete)
+        console.log(token && isPreloaderComplete.value)
+      if (token && isPreloaderComplete && isPreloaderComplete.value) {
         // dispatch(sessionTokenRequestSuccess(token))
         Actions.Tabbar()
       } else if(token) {
@@ -214,6 +229,7 @@ export function getSessionToken() {
       }
     }
     catch (error) {
+        console.log(error)
       console.log('login failure')
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())

@@ -24,7 +24,7 @@ class DeviceVerification {
      * deviceIMEI
      * deviceSIM
      */
-    checkAssetAPI(deviceIMEI, deviceSIM) {
+    checkAssetAPI(deviceIMEI, deviceSIM, token) {
         if (!deviceIMEI) {
             deviceIMEI = {}
         }
@@ -35,22 +35,17 @@ class DeviceVerification {
             deviceIMEI,
             deviceSIM
         })
-
-        let token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        let checkAssetResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.CHECK_ASSET_API, 'POST')
+        let checkAssetResponse = RestAPIFactory().serviceCall(postData, CONFIG.API.CHECK_ASSET_API, 'POST')
         checkAssetResponse = RestAPIFactory()._pruneEmpty(checkAssetResponse)
         return checkAssetResponse
     }
 
-    /**
-     * # Check whether sim verified already
-     * @param {*} deviceIMEI
-     * @param {*} deviceSIM
-     * @param {*} companyID
-     * @param {*} hubID
-     * @param {*} simNumber
-     * @returns
-     * boolean
+    /**Checks if SIM verified already
+     *
+     * @param deviceIMEI
+     * @param deviceSIM
+     * @param user
+     * @return {Promise.<boolean>}
      */
 
     async checkAsset(deviceIMEI, deviceSIM, user) {
@@ -87,22 +82,22 @@ class DeviceVerification {
      * @return {Promise.<void>}
      */
     async populateDeviceImeiAndDeviceSim(user) {
-        if (Platform.OS === 'ios') {
-            const deviceId = DeviceInfo.getUniqueID()
-            await this.populateDeviceImei(user,deviceId)
-            await this.populateDeviceSim(user,deviceId)
-        } else {
-            let imei = require('../../wrapper/IMEI');
-            try {
-                const imeiNumber = await imei.getIMEI()
+        let imei = require('../../wrapper/IMEI');
+        try {
+            let imeiNumber,simNumber
+            if (Platform.OS === 'ios') {
+                imeiNumber = DeviceInfo.getUniqueID()
+                simNumber = imeiNumber
+            } else {
+                imeiNumber = await imei.getIMEI()
                 console.log(imeiNumber)
-                const simNumber = await imei.getSim()
+                simNumber = await imei.getSim()
                 console.log(simNumber)
-                await this.populateDeviceImei(user, imeiNumber)
-                await this.populateDeviceSim(user, simNumber)
-            } catch (error) {
-                console.log(error)
             }
+            await this.populateDeviceImei(user, imeiNumber)
+            await this.populateDeviceSim(user, simNumber)
+        } catch (error) {
+            console.log(error)
         }
     }
 
@@ -151,13 +146,13 @@ class DeviceVerification {
      * JSON body
      * deviceSIM
      */
+
     generateOTP(deviceSIM, sessionToken) {
-        const postData = JSON.stringify(
-            deviceSIM
-        );
-        console.log(postData)
-        let generateOtpResponse = RestAPIFactory().serviceCall(postData, CONFIG.API.GENERATE_OTP_API, 'POST')
+        console.log('generateOTP')
+        console.log(JSON.stringify(deviceSIM))
+        let generateOtpResponse = RestAPIFactory().serviceCall(JSON.stringify(deviceSIM), CONFIG.API.GENERATE_OTP_API, 'POST')
         generateOtpResponse = RestAPIFactory()._pruneEmpty(generateOtpResponse)
+        console.log(generateOtpResponse)
         return generateOtpResponse
     }
 
@@ -166,12 +161,9 @@ class DeviceVerification {
      * @param deviceSIM
      * @return {*}
      */
-    verifySim(deviceSIM, sessionToken) {
-        const postData = JSON.stringify({
-            deviceSIM
-        })
 
-        let simVerificationResponse = RestAPIFactory(sessionToken).serviceCall(postData, CONFIG.API.SIM_VERIFICATION_API, 'POST')
+    verifySim(deviceSIM, sessionToken) {
+        let simVerificationResponse = RestAPIFactory().serviceCall(JSON.stringify(deviceSIM), CONFIG.API.SIM_VERIFICATION_API, 'POST')
         simVerificationResponse = RestAPIFactory()._pruneEmpty(simVerificationResponse)
         return simVerificationResponse
 

@@ -25,6 +25,7 @@ const {
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
+  REMEMBER_ME_SET_TRUE,
 } = require('../../lib/constants').default
 
 const initialState = new InitialState()
@@ -112,6 +113,10 @@ export default function authReducer(state = initialState, action) {
       
       case TOGGLE_CHECKBOX:
        return state.setIn(['form','rememberMe'],!state.form.rememberMe)
+
+      case REMEMBER_ME_SET_TRUE:
+        console.log('rememberMe set true')
+        return state.setIn(['form','rememberMe',true])
   }
   /**
    * ## Default

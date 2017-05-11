@@ -143,14 +143,25 @@ class JobMaster {
      * @return {boolean}
      */
     matchServerTimeWithMobileTime(serverTime) {
-        const timeFromServer = moment(serverTime)
-        console.log(timeFromServer)
+        const timeFromServer = moment(serverTime,"YYYY-MM-DD HH:mm:ss")
+        console.log('timeFromServer >>>>>'+timeFromServer)
+        const t1 = timeFromServer.toDate()
+        console.log('t1 >>>>>'+t1)
         if(!timeFromServer.isValid()){
             throw new Error("Server Time format incorrect")
         }
-        const currentTimeInMillis = moment().millisecond()
-        const serverTimeInMillis = timeFromServer.millisecond()
-        if (currentTimeInMillis - serverTimeInMillis > 15*60*1000) {
+        console.log('current date >>> '+new Date())
+        const t3 = moment(new Date())
+        console.log('t3 >>>>>'+t3)
+        const mobileTime = moment(new Date(),"YYYY-MM-DD HH:mm:ss")
+
+        console.log('mobileTime >>>>>'+mobileTime)
+        console.log('t2 >>>>>'+mobileTime.toDate())
+        const duration = moment.duration(mobileTime.diff(timeFromServer));
+        console.log('duration >>>>>'+duration)
+        const differenceInMinutes = duration.asMinutes();
+        console.log('differenceInMinutes >>>>>'+differenceInMinutes)
+        if (differenceInMinutes > 15) {
             return false
         }
         return true

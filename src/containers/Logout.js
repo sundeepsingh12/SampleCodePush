@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
  */
 import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
+import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 
 import {Button} from 'react-native'
 
@@ -62,7 +63,7 @@ function mapStateToProps (state) {
 
 function mapDispatchToProps (dispatch) {
   return {
-    actions: bindActionCreators({ ...authActions, ...globalActions }, dispatch)
+    actions: bindActionCreators({ ...authActions, ...globalActions, ...preloaderActions }, dispatch)
   }
 }
 
@@ -76,7 +77,7 @@ class Logout extends Component {
     let self = this
 
     let onButtonPress = () => {
-      this.props.actions.logout()
+      this.props.actions.invalidateUserSession()
     }
 
     return (

@@ -59,10 +59,10 @@ class Preloader extends Component {
         if (this.props.preloader.isError) {
             return (
                 <View style={feStyle.row}>
-                    <Button onPress={() => this.invalidateSession() } rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
+                    <Button onPress={()=>this.invalidateSession()} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
                         <Text style={{color: '#ffffff'}}>Cancel</Text>
                     </Button>
-                    <Button onPress={() => this.retry()} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
+                    <Button onPress={()=>this.retry()} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
                         <Text style={{color: '#ffffff'}}>Retry</Text>
                     </Button>
                 </View>
@@ -70,19 +70,19 @@ class Preloader extends Component {
         }
     }
 
-    invalidateSession() {
+    invalidateSession(){
         this.props.actions.invalidateUserSession()
     }
 
-    retry() {
-        this.props.actions.retryPreloader(this.props.preloader.configDownloadService, this.props.preloader.configSaveService, this.props.preloader.deviceVerificationService)
+    retry(){
+        this.props.actions.saveSettingsAndValidateDevice(this.props.preloader.configDownloadService, this.props.preloader.configSaveService, this.props.preloader.deviceVerificationService)
     }
 
     getOtp(){
         this.props.actions.generateOtp(this.props.preloader.mobileNumber)
     }
 
-    onChangeMobileNo(mobileNumber) {
+    onChangeMobileNo(mobileNumber){
         this.props.actions.onChangeMobileNumber(mobileNumber)
     }
 
@@ -168,59 +168,68 @@ class Preloader extends Component {
                                     style={feTheme.roundedInput}
                                     value={this.props.preloader.mobileNumber}
                                     keyboardType = 'numeric'
-                                    onChangeText={value =>  this.onChangeMobileNo(value) }
+                                    onChangeText={value => this.onChangeMobileNo(value)}
                                 />
                             </View>
                         </View>
                         <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                            <Button onPress={() => this.getOtp()}  full rounded
-                                    disabled = {this.props.preloader.disableButton}>
-                                <Text style={[feStyle.fontWhite]}>Verify</Text>
+                            <Button onPress={()=>this.getOtp()}  full rounded
+                                    disabled = {this.props.preloader.isGenerateOtpButtonDisabled}>
+                                <Text style={[feStyle.fontWhite]}>Send OTP</Text>
 
                             </Button>
                         </View>
-
+                        <Text style={{ textAlign: 'center', color: '#d3d3d3', marginBottom: 10 }}>
+                            {this.props.preloader.mobileDisplayMessage}...
+                        </Text>
                     </View>
                 </Modal>)}
 
                {renderIf(this.props.preloader.showOtpScreen,
-                    <Modal
-                        animationType={"slide"}
-                        transparent={false}
-                        onRequestClose={() => {
-                            alert("Modal has been closed.")
-                        }}
-                    >
-                        <View style={[feStyle.bgWhite, feStyle.flex1, feStyle.column, {paddingTop: 70}]}>
-                            <View style={[feStyle.alignCenter, feStyle.column]}>
-                                <Text style={[feStyle.fontWeight500, feStyle.fontXxl]}>Verify your mobile</Text>
-                                <Text style={[feStyle.fontSm, feStyle.fontDarkGray, feStyle.marginTop10]}>OTP code has
-                                    been sent to</Text>
-                                <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>{this.props.preloader.mobileNumber}</Text>
-                            </View>
-                            <View style={[feStyle.flex1, {height: 50}]}>
-                                <Input
-                                    placeholder='OTP'
-                                    style={feTheme.roundedInput}
-                                    value={this.props.preloader.otpNumber}
-                                    keyboardType = 'numeric'
-                                    maxLength = {6}
-                                    onChangeText={value =>  this.onChangeOtp(value) }
-                                />
-                            </View>
-                            </View>
-                            <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                                <Button onPress={() => this.validateOtp(this.props.preloader.otpNumber)} full rounded>
-                                    <Text style={[feStyle.fontWhite]}>Verify</Text>
-                                </Button>
-                            </View>
+                   <Modal
+                       animationType={"slide"}
+                       transparent={false}
+                       onRequestClose={() => {
+                           alert("Modal has been closed.")
+                       }}
+                   >
+                       <View style={[feStyle.bgWhite, feStyle.flex1, feStyle.column, {paddingTop: 70}]}>
+                           <View style={[feStyle.alignCenter, feStyle.column]}>
+                               <Text style={[feStyle.fontWeight500, feStyle.fontXxl]}>Verify your mobile</Text>
+                               <Text style={[feStyle.fontSm, feStyle.fontDarkGray, feStyle.marginTop10]}>OTP code has
+                                   been sent to</Text>
+                               <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>{this.props.preloader.mobileNumber}</Text>
+                           </View>
+                           <View style={[feStyle.alignCenter, feStyle.row, feStyle.margin30]}>
+                               <View style={[feStyle.flex1, {height: 50}]}>
+                                   <Input
+                                       placeholder='OTP'
+                                       style={feTheme.roundedInput}
+                                       value={this.props.preloader.otpNumber}
+                                       keyboardType = 'numeric'
+                                       maxLength = {6}
+                                       onChangeText={value => this.onChangeOtp(value)}
+                                   />
+                               </View>
+                           </View>
+                           <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
+                               <Button onPress={()=>this.validateOtp()}  full rounded
+                                       disabled = {this.props.preloader.isOtpVerificationButtonDisabled}>
+                                   <Text style={[feStyle.fontWhite]}>Verify</Text>
 
-                    </Modal>)}
+                               </Button>
+                           </View>
+                           <Text style={{ textAlign: 'center', color: '#d3d3d3', marginBottom: 10 }}>
+                               {this.props.preloader.otpDisplayMessage}...
+                           </Text>
+                       </View>
+                   </Modal>
+
+                   )}
             </Container>
         )
     }
-}
-;
+};
 
 var styles = StyleSheet.create({
     container: {

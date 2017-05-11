@@ -23,10 +23,10 @@ export class RestAPI {
     initialize (token) {
         console.log('token initialize')
         console.log(token)
-        if (!_.isNull(token) && _.isUndefined(token.sessionToken)) {
+        if (!_.isNull(token) && _.isUndefined(token)) {
             throw new Error('TokenMissing')
         }
-        this._sessionToken = _.isNull(token) ? null : token.sessionToken
+        this._sessionToken = _.isNull(token) ? null : token
 
         this.API_BASE_URL = CONFIG.backend.fareyeProduction
             ? CONFIG.FAREYE.production.url

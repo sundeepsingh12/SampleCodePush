@@ -20,9 +20,18 @@ const {
     MASTER_SAVING_START,
     MASTER_SAVING_SUCCESS,
     MASTER_SAVING_FAILURE,
+
     CHECK_ASSET_START,
     CHECK_ASSET_SUCCESS,
     CHECK_ASSET_FAILURE,
+
+    OTP_GENERATION_START,
+    OTP_GENERATION_SUCCESS,
+    OTP_GENERATION_FAILURE,
+
+    OTP_VALIDATION_START,
+    OTP_VALIDATION_SUCCESS,
+    OTP_VALIDATION_FAILURE,
 
     SESSION_TOKEN_REQUEST,
     SESSION_TOKEN_SUCCESS,
@@ -32,7 +41,7 @@ const {
     SERVICE_RUNNING,
     SERVICE_SUCCESS,
     SERVICE_FAILED,
-    PRELOADER_SUCCESS,
+
     SHOW_MOBILE_NUMBER_SCREEN,
     SHOW_OTP_SCREEN,
     SET_MOBILE_NUMBER,
@@ -40,6 +49,7 @@ const {
     PRE_LOGOUT_START,
     PRE_LOGOUT_SUCCESS,
     PRE_LOGOUT_FAILURE,
+
     ON_MOBILE_NO_CHANGE,
     ON_OTP_CHANGE
 
@@ -61,6 +71,7 @@ export default function preloaderReducer(state = initialState, action) {
             return state.set('configDownloadService', SERVICE_FAILED)
                 .set('isError', true)
                 .set('error', action.payload)
+
         case MASTER_SAVING_START :
             return state.set('configSaveService', SERVICE_RUNNING)
         case MASTER_SAVING_SUCCESS :
@@ -69,6 +80,7 @@ export default function preloaderReducer(state = initialState, action) {
             return state.set('configSaveService', SERVICE_FAILED)
                 .set('isError', true)
                 .set('error', action.payload)
+
         case CHECK_ASSET_START :
             return state.set('deviceVerificationService', SERVICE_RUNNING)
         case CHECK_ASSET_SUCCESS :
@@ -77,38 +89,54 @@ export default function preloaderReducer(state = initialState, action) {
             return state.set('deviceVerificationService', SERVICE_FAILED)
                 .set('isError', true)
                 .set('error', action.payload)
-        case PRELOADER_SUCCESS :
-            return state.set('isComplete', true)
+
+        case OTP_GENERATION_START:
+            return state.set('mobileDisplayMessage','Sending OTP')
+                .set('isGenerateOtpButtonDisabled',true)
+        case OTP_GENERATION_FAILURE:
+            return state.set('mobileDisplayMessage',action.payload)
+
+        case OTP_VALIDATION_START:
+            return state.set('otpDisplayMessage','Validating OTP')
+                .set('isOtpVerificationButtonDisabled',true)
+        case OTP_VALIDATION_FAILURE:
+            return state.set('otpDisplayMessage',action.payload)
+
         case SHOW_MOBILE_NUMBER_SCREEN:
             return state.set('showMobileNumberScreen',action.payload)
         case SHOW_OTP_SCREEN:
             return state.set('showOtpScreen',action.payload)
         case PRE_LOGOUT_START :
-            return state.set('error','Logging out ')
+            return state.set('error','Logging out')
         case PRE_LOGOUT_SUCCESS :
             return state.set('error','Log out success')
         case PRE_LOGOUT_FAILURE :
             return state.set('isError',true)
                         .set('error',action.payload)
+
         case ON_MOBILE_NO_CHANGE :
             let mobileNo = action.payload;
             if(mobileNo){
-                return state.set('disableButton',false)
+                return state.set('isGenerateOtpButtonDisabled',false)
                     .set('mobileNumber',mobileNo)
+                    .set('mobileDisplayMessage','')
             }
             else{
-                return state.set('disableButton',true)
+                return state.set('isGenerateOtpButtonDisabled',true)
                     .set('mobileNumber',mobileNo)
+                    .set('mobileDisplayMessage','')
             }
 
         case ON_OTP_CHANGE :
-            let optNumber = action.payload
+            let otpNumber = action.payload
             if(otpNumber){
-                return state.set('disableButton',false)
-                    .set('otpNumber',optNumber)
+                return state.set('isOtpVerificationButtonDisabled',false)
+                    .set('otpNumber',otpNumber)
+                    .set('otpDisplayMessage','')
             }else{
-                return state.set('disableButton',true)
-                    .set('otpNumber',optNumber)
+                return state.set('isOtpVerificationButtonDisabled',true)
+                    .set('otpNumber',otpNumber)
+                    .set('otpDisplayMessage','')
             }
     }
     return state
