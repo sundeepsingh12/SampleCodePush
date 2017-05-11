@@ -33,7 +33,6 @@ export default keyMirror({
     MASTER_SAVING_FAILURE: null,
 
     CHECK_ASSET_START: null,
-    CHECK_ASSET_SUCCESS: null,
     CHECK_ASSET_FAILURE: null,
 
     OTP_GENERATION_START: null,

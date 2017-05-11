@@ -11,7 +11,6 @@ const {
     MASTER_SAVING_FAILURE,
 
     CHECK_ASSET_START,
-    CHECK_ASSET_SUCCESS,
     CHECK_ASSET_FAILURE,
 
     OTP_GENERATION_START,
@@ -44,7 +43,8 @@ const {
     PRE_LOGOUT_FAILURE,
 
     ON_MOBILE_NO_CHANGE,
-    ON_OTP_CHANGE
+    ON_OTP_CHANGE,
+    PRELOADER_SUCCESS
 } = require('../../lib/constants').default
 
 import {Actions} from 'react-native-router-flux'
@@ -104,9 +104,9 @@ export function checkAssetStart() {
 }
 
 //This action is dispatched when all the steps in preloader screen have been successfuly completed
-export function checkAssetSuccess() {
+export function preloaderSuccess() {
     return {
-        type: CHECK_ASSET_SUCCESS
+        type: PRELOADER_SUCCESS
     }
 }
 
@@ -116,7 +116,6 @@ export function checkAssetFailure(error) {
         payload: error
     }
 }
-
 
 export function showMobileNumber() {
     return {
@@ -143,6 +142,7 @@ export function preLogoutSuccess() {
         type: PRE_LOGOUT_SUCCESS
     }
 }
+
 export function preLogoutFailure(error) {
     return {
         type: PRE_LOGOUT_FAILURE,
@@ -201,8 +201,12 @@ async function downloadJobMaster(dispatch) {
         dispatch(jobMasterDownloadStart())
         const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-        let userObject = await keyValueDBService.getValueFromStore(USER)
-        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject)
+        const userObject = await keyValueDBService.getValueFromStore(USER)
+        const token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        console.log('token')
+        console.log(token)
+        console.log('token.value >>>> '+token.value)
+        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject,token)
         const json = await jobMasters.json
         dispatch(jobMasterDownloadSuccess())
         validateAndSaveJobMaster(json, dispatch)
@@ -276,11 +280,10 @@ async function checkAsset(dispatch) {
         const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
         const user = await keyValueDB.getValueFromStore(USER)
-        throw new Error('')
         const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
         console.log('isverified >>>>>'+isVerified)
         if (isVerified) {
-            dispatch(checkAssetSuccess())
+            dispatch(preloaderSuccess())
             keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
             Actions.Tabbar()
         } else {
@@ -295,8 +298,8 @@ async function checkAsset(dispatch) {
  *
  * @return {Promise.<void>}
  */
-async function checkIfSimValidOnServer(dispatch) {
-    console.log('checkIfSimValidOnServer')
+
+async function checkIfSimValidOnServer(dispatch){
     let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
@@ -314,15 +317,18 @@ async function checkIfSimValidOnServer(dispatch) {
     console.log('response verified >>>>>>' + responseIsVerified);
     if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-        dispatch(checkAssetSuccess())
+        dispatch(preloaderSuccess())
         Actions.Tabbar()
     } else {
         dispatch(showMobileNumber())
     }
 }
 
-
-
+/**Called when we click on Send OTP in mobile no screen
+ *
+ * @param mobileNumber
+ * @return {Function}
+ */
 export function generateOtp(mobileNumber) {
     return async function (dispatch) {
         try {
@@ -341,6 +347,11 @@ export function generateOtp(mobileNumber) {
     }
 }
 
+/**Called when user clicks on verify button in otp screen
+ *
+ * @param otpNumber
+ * @return {Function}
+ */
 export function validateOtp(otpNumber) {
     return async function (dispatch) {
         try {

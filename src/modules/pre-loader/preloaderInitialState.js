@@ -18,7 +18,6 @@ var InitialState = Record({
   deviceVerificationService: SERVICE_PENDING, //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
   isError: false,
   error: '',
-  isComplete: false,
   showMobileNumberScreen:false,
   showOtpScreen:false,
   mobileNumber:'',
@@ -27,7 +26,6 @@ var InitialState = Record({
   otpNumber:'',
   mobileDisplayMessage:'', //message which will be displayed in mobile no screen
   otpDisplayMessage:'' //message which will be displayed in otp screen
-
 })
 
 export default InitialState

@@ -176,7 +176,9 @@ class Preloader extends Component {
                             <Button onPress={()=>this.getOtp()}  full rounded
                                     disabled = {this.props.preloader.isGenerateOtpButtonDisabled}>
                                 <Text style={[feStyle.fontWhite]}>Send OTP</Text>
-
+                            </Button>
+                            <Button onPress={()=>this.invalidateSession()}  full rounded>
+                                <Text style={[feStyle.fontWhite]}>Logout</Text>
                             </Button>
                         </View>
                         <Text style={{ textAlign: 'center', color: '#d3d3d3', marginBottom: 10 }}>
@@ -213,9 +215,13 @@ class Preloader extends Component {
                                </View>
                            </View>
                            <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                               <Button onPress={()=>this.validateOtp()}  full rounded
+                               <Button onPress={()=>this.validateOtp(this.props.preloader.otpNumber)}  full rounded
                                        disabled = {this.props.preloader.isOtpVerificationButtonDisabled}>
                                    <Text style={[feStyle.fontWhite]}>Verify</Text>
+
+                               </Button>
+                               <Button onPress={()=>this.invalidateSession()}  full rounded>
+                                   <Text style={[feStyle.fontWhite]}>Logout</Text>
 
                                </Button>
                            </View>

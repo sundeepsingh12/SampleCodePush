@@ -116,7 +116,7 @@ export default function authReducer(state = initialState, action) {
 
       case REMEMBER_ME_SET_TRUE:
         console.log('rememberMe set true')
-        return state.setIn(['form','rememberMe',true])
+        return state.setIn(['form','rememberMe'],true)
   }
   /**
    * ## Default
