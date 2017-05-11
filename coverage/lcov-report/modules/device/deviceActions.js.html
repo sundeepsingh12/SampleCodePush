@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Code coverage report for lib/config.js</title>
+    <title>Code coverage report for modules/device/deviceActions.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../prettify.css" />
-    <link rel="stylesheet" href="../base.css" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -16,13 +16,13 @@
 <div class='wrapper'>
   <div class='pad1'>
     <h1>
-      <a href="../index.html">All files</a> / <a href="index.html">lib</a> config.js
+      <a href="../../index.html">All files</a> / <a href="index.html">modules/device</a> deviceActions.js
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>1/1</span>
+        <span class='fraction'>3/3</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -32,12 +32,12 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/0</span>
+        <span class='fraction'>2/2</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/1</span>
+        <span class='fraction'>3/3</span>
       </div>
     </div>
   </div>
@@ -67,7 +67,23 @@
 22
 23
 24
-25</td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -85,35 +101,67 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">module.exports = {
-  SESSION_TOKEN_KEY: 'SESSION_TOKEN_KEY',
-  
-  backend: {
-    fareyeProduction: false,
-    fareyeStaging: true
-  },
-  FAREYE: {
-    production: {
-      url: 'https://www.fareye.co/app'
-    },
-    staging: {
-      url: 'https://staging.fareye.co/app'
-    }
-  },
-    API:{
-        AUTHENTICATION_API:'/authentication',
-        JOB_MASTER_API:'/rest/device/job_master',
-        CHECK_ASSET_API :'/rest/device/check_asset',
-        GENERATE_OTP_API :'/rest/device/generate_otp',
-        SIM_VERIFICATION_API:'/rest/device/sim_verified',
-        LOGOUT_API:'/logout'
-    }
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * # deviceActions.js
+ *
+ * What platform are we running on, ie ```ios``` or ```android```
+ *
+ * What version is the app?
+ *
+ */
+'use strict'
+&nbsp;
+/**
+ * ## Imports
+ *
+ * The actions supported
+ */
+const {
+  SET_PLATFORM,
+  SET_VERSION
+} = require('../../lib/constants').default
+&nbsp;
+/**
+ * ## Set the platformState
+ *
+ */
+export function setPlatform (platform) {
+  return {
+    type: SET_PLATFORM,
+    payload: platform
+  }
+}
+/**
+ * ## set the version
+ *
+ */
+export function setVersion (version) {
+  return {
+    type: SET_VERSION,
+    payload: version
+  }
 }
 &nbsp;</pre></td></tr>
 </table></pre>
@@ -124,7 +172,7 @@
   generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 11 2017 12:26:00 GMT+0200 (CEST)
 </div>
 </div>
-<script src="../prettify.js"></script>
+<script src="../../prettify.js"></script>
 <script>
 window.onload = function () {
         if (typeof prettyPrint === 'function') {
@@ -132,6 +180,6 @@ window.onload = function () {
         }
 };
 </script>
-<script src="../sorter.js"></script>
+<script src="../../sorter.js"></script>
 </body>
 </html>
