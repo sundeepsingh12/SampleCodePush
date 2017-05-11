@@ -42,6 +42,7 @@
     ]
   },
   "devDependencies": {
-    "babel-preset-react-native": "1.9.0"
+    "babel-preset-react-native": "1.9.0",
+    "rn-nodeify": "^7.0.1"
   }
 }
