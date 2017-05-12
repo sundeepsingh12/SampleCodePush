@@ -79,6 +79,10 @@ export default keyMirror({
     PASSWORD: null,
     REMEMBER_ME: null,
 
+    //Preloader Credentials
+    IS_SHOW_OTP_SCREEN: null,
+    IS_SHOW_MOBILE_NUMBER_SCREEN: null,
+
     //Schema (Store keys)
 
     JOB_MASTER:null,

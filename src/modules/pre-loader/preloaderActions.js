@@ -44,18 +44,20 @@ const {
 
     ON_MOBILE_NO_CHANGE,
     ON_OTP_CHANGE,
-    PRELOADER_SUCCESS
+    PRELOADER_SUCCESS,
+    IS_SHOW_MOBILE_NUMBER_SCREEN,
+    IS_SHOW_OTP_SCREEN
 } = require('../../lib/constants').default
 
-import {Actions} from 'react-native-router-flux'
-import {keyValueDB} from '../../repositories/keyValueDb'
-import {jobMasterService} from '../../services/classes/JobMaster'
-import {authenticationService} from '../../services/classes/Authentication'
+import { Actions } from 'react-native-router-flux'
+import { keyValueDB } from '../../repositories/keyValueDb'
+import { jobMasterService } from '../../services/classes/JobMaster'
+import { authenticationService } from '../../services/classes/Authentication'
 
-import {deviceVerificationService} from '../../services/classes/DeviceVerification'
-import {keyValueDBService} from '../../services/classes/KeyValueDBService'
+import { deviceVerificationService } from '../../services/classes/DeviceVerification'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 
-import {deleteSessionToken} from '../global/globalActions'
+import { deleteSessionToken } from '../global/globalActions'
 
 import CONFIG from '../../lib/config'
 
@@ -165,33 +167,33 @@ export function onChangeOtp(otpNumber) {
 }
 
 //This action is dispatched as soon as we click on Send OTP button in enter mobile no screen
-function otpGenerationStart(){
+function otpGenerationStart() {
     return {
-        type:OTP_GENERATION_START
+        type: OTP_GENERATION_START
     }
 }
 
 //This action is dispatched if otp generation API wasn't successful
 function otpGenerationFailure(error) {
     return {
-        type:OTP_GENERATION_FAILURE,
-        payload:error
+        type: OTP_GENERATION_FAILURE,
+        payload: error
 
     }
 }
 
 //This action is dispatched as soon as we click on Verify button in enter otp screen
-function optValidationStart(){
+function optValidationStart() {
     return {
-        type:OTP_VALIDATION_START
+        type: OTP_VALIDATION_START
     }
 }
 
 //This action is dispatched if sim verification api wasn't successful
-function otpValidationFailure(error){
+function otpValidationFailure(error) {
     return {
-        type:OTP_VALIDATION_FAILURE,
-        payload:error
+        type: OTP_VALIDATION_FAILURE,
+        payload: error
 
     }
 }
@@ -205,8 +207,8 @@ async function downloadJobMaster(dispatch) {
         const token = keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         console.log('token')
         console.log(token)
-        console.log('token.value >>>> '+token.value)
-        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject,token)
+        console.log('token.value >>>> ' + token.value)
+        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject, token)
         const json = await jobMasters.json
         dispatch(jobMasterDownloadSuccess())
         validateAndSaveJobMaster(json, dispatch)
@@ -237,6 +239,21 @@ export function invalidateUserSession() {
 
 export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService) {
     return async function (dispatch) {
+        const otpScreen = await keyValueDBService.getValueFromStore(IS_SHOW_OTP_SCREEN)
+        console.log(otpScreen)
+        const mobileScreen = await keyValueDBService.getValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
+        console.log(mobileScreen)
+        console.log('otp check')
+        if (otpScreen && otpScreen.value) {
+            dispatch(showOtp())
+            return
+        }
+        console.log('mobile check')
+        if (mobileScreen && mobileScreen.value) {
+            dispatch(showMobileNumber())
+            return
+        }
+        console.log('both check')
         if (configDownloadService === SERVICE_FAILED || configDownloadService === SERVICE_PENDING || configSaveService === SERVICE_FAILED) {
             downloadJobMaster(dispatch);
         }
@@ -280,8 +297,9 @@ async function checkAsset(dispatch) {
         const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
         const user = await keyValueDB.getValueFromStore(USER)
-        const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
-        console.log('isverified >>>>>'+isVerified)
+        let isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
+        console.log('isverified >>>>>' + isVerified)
+        isVerified = false
         if (isVerified) {
             dispatch(preloaderSuccess())
             keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
@@ -299,11 +317,11 @@ async function checkAsset(dispatch) {
  * @return {Promise.<void>}
  */
 
-async function checkIfSimValidOnServer(dispatch){
+async function checkIfSimValidOnServer(dispatch) {
     let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    const response = await deviceVerificationService.checkAssetAPI(deviceIMEI.value, deviceSIM.value,token)
+    const response = await deviceVerificationService.checkAssetAPI(deviceIMEI.value, deviceSIM.value, token)
     const assetJSON = await response.json
     const responseDeviceIMEI = await assetJSON.deviceIMEI
     const responseDeviceSIM = await assetJSON.deviceSIM
@@ -313,13 +331,15 @@ async function checkIfSimValidOnServer(dispatch){
     deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
 
-    const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
+    let responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
+    responseIsVerified = false
     console.log('response verified >>>>>>' + responseIsVerified);
     if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
         Actions.Tabbar()
     } else {
+        await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
         dispatch(showMobileNumber())
     }
 }
@@ -333,14 +353,15 @@ export function generateOtp(mobileNumber) {
     return async function (dispatch) {
         try {
             dispatch(otpGenerationStart())
+            await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
             const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             deviceSIM.value.contactNumber = mobileNumber
-            const generateOtpResponse = await deviceVerificationService.generateOTP(deviceSIM.value,token)
+            const generateOtpResponse = await deviceVerificationService.generateOTP(deviceSIM.value, token)
             const json = await generateOtpResponse.json
             await keyValueDBService.validateAndSaveData(DEVICE_SIM, json)
+            await keyValueDBService.validateAndSaveData(IS_SHOW_OTP_SCREEN, true)
             dispatch(showOtp())
-
         } catch (error) {
             dispatch(otpGenerationFailure(error.message))
         }
@@ -358,14 +379,15 @@ export function validateOtp(otpNumber) {
             dispatch(optValidationStart())
             const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
             const otpNoFromStore = deviceSIM.value.otpNumber;
-            if(otpNumber!=otpNoFromStore){
+            if (otpNumber != otpNoFromStore) {
                 throw new Error('Please enter valid OTP')
             }
-                const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-                const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM.value, token)
-                await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-                Actions.Tabbar()
-        }catch(error){
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM.value, token)
+            await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+            await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
+            Actions.Tabbar()
+        } catch (error) {
             dispatch(otpValidationFailure(error.message))
         }
     }

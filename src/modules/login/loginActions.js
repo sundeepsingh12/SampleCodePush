@@ -213,6 +213,7 @@ export function getSessionToken() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       console.log(token)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
+      isPreloaderComplete = false //test
         console.log(isPreloaderComplete)
         console.log('isPreloaderComplete')
         console.log(token && isPreloaderComplete)
