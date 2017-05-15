@@ -16,7 +16,6 @@ from 'react-native'
 
 import { Form, Item, Input, Container, Content, Body, ListItem, CheckBox} from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import ItemCheckbox from '../components/ItemCheckbox';
 
 var styles = StyleSheet.create({
   container: {
@@ -139,7 +138,7 @@ class Jobs extends Component {
           </TouchableHighlight>
 
           <View style={[styles.listCircleCheckbox, !this.state.status ? styles.hidden : {}]} >
-            <ItemCheckbox
+            <CheckBox
                 size = {36}
                 icon_check= 'ios-checkmark-circle-outline'
                 icon_open= 'ios-radio-button-off'

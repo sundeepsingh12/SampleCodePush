@@ -15,9 +15,10 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../reducers/login/loginActions'
-import * as globalActions from '../reducers/global/globalActions'
+import * as authActions from '../modules/login/loginActions'
+import * as globalActions from '../modules/global/globalActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Preloader from '../containers/Preloader'
 
 /**
  * Router
@@ -44,10 +45,6 @@ from 'react-native'
 
 import { Container, Content, Tab, Tabs,Body, Header, Title, Left, Right,ScrollableTab, Icon, Fab, Button } from 'native-base';
 import Jobs from './Jobs';
-/**
- * The platform neutral button
- */
-// const Button = require('apsl-react-native-button')
 
 /**
  *  Instead of including all app states via ...state
@@ -100,7 +97,8 @@ class Main extends Component {
               <Title>Home</Title>
           </Body>
           <Right>
-            <TouchableHighlight underlayColor='#e7e7e7' onPress={()=>this.toggleStatus()}>
+
+            <TouchableHighlight underlayColor='#e7e7e7'  onPress={Actions.Preloader}>
               <Text>Cancel</Text>
             </TouchableHighlight>
           </Right>

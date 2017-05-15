@@ -15,8 +15,8 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../reducers/login/loginActions'
-import * as globalActions from '../reducers/global/globalActions'
+import * as authActions from '../modules/login/loginActions'
+import * as globalActions from '../modules/global/globalActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 /**
@@ -41,13 +41,8 @@ import
 }
 from 'react-native'
 
-import { Container, Content, Tab, Tabs,Body, Header, Title, Left, Right} from 'native-base';
+import { Container, Content, Tab, Tabs,Body, Button, Header, Title, Left, Right} from 'native-base';
 
-
-/**
- * The platform neutral button
- */
-const Button = require('apsl-react-native-button')
 
 /**
  *  Instead of including all app states via ...state

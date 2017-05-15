@@ -17,10 +17,10 @@ import createLogger from 'redux-logger';
 
 /**
 * ## Reducer
-* The reducer contains the 4 reducers from
+* The reducer contains the 4 modules from
 * device, global, login, profile
 */
-import reducer from '../reducers'
+import reducer from '../modules'
 
 const loggerMiddleware = createLogger({predicate: (getState,action) => __DEV__ });
 /**

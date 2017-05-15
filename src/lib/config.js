@@ -14,9 +14,11 @@ module.exports = {
     }
   },
     API:{
+        AUTHENTICATION_API:'/authentication',
         JOB_MASTER_API:'/rest/device/job_master',
         CHECK_ASSET_API :'/rest/device/check_asset',
-        SIM_VERIFY_API :'/rest/device/generate_otp'
-
+        GENERATE_OTP_API :'/rest/device/generate_otp',
+        SIM_VERIFICATION_API:'/rest/device/sim_verified',
+        LOGOUT_API:'/logout'
     }
 }

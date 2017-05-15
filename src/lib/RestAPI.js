@@ -21,10 +21,10 @@ export class RestAPI {
      * @throws tokenMissing if token is undefined
      */
     initialize (token) {
-        if (!_.isNull(token) && _.isUndefined(token.sessionToken)) {
+        if (!_.isNull(token) && _.isUndefined(token)) {
             throw new Error('TokenMissing')
         }
-        this._sessionToken = _.isNull(token) ? null : token.sessionToken
+        this._sessionToken = _.isNull(token) ? null : token
 
         this.API_BASE_URL = CONFIG.backend.fareyeProduction
             ? CONFIG.FAREYE.production.url
@@ -43,8 +43,8 @@ export class RestAPI {
     async _fetch (opts) {
         let url = this.API_BASE_URL + opts.url
         if (this._sessionToken) {
-            opts.headers = {}
             opts.headers['Cookie'] = this._sessionToken
+
         }
         const response = await fetch(url, opts)
         const {status, code, headers} = response;
@@ -79,50 +79,63 @@ export class RestAPI {
         return prune(obj);
     }
 
-    serviceCall(data,apiUrl,methodType) {
-        return this._fetch({
-            method: methodType,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            url:apiUrl,
-            body: data
-        })
+    serviceCall(body,url,method) {
+        let opts;
+        if(method==='POST'){
+            opts = {
+                method,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                url,
+                body
+            }
+        }
+        else if(method==='LOGIN'){
+           opts = {
+               headers: {
+               },
+               url,
+               body,
+               method:'POST'
+           }
+        }
+        else{
+            opts = {
+                method,
+                url,
+                headers:{
+                    'Accept': 'application/json',
+                }
+            }
+        }
+
+        return this._fetch(opts)
             .then((res) => {
                 if(res.status==200) {
                     return res;
-                }else{
-                    throw new Error({code: res.statusCode, error: res.message})
+                } else {
+                    switch(res.status) {
+                    case 401:
+                        throw new Error("Invalid User Credentials")
+                    case 500:
+                        throw new Error("Internal server error")
+                    case 502:
+                        throw new Error("Bad Gateway")
+                    case 1201:
+                        throw new Error("User already logged in ")
+                    case 1203:
+                        throw new Error("User locked.Try after 15 minutes")
+                    default:
+                        throw new Error({code: res.statusCode, error: res.message})
+                    }
                 }
             })
             .catch((error) => {
                 throw(error)
             })
     }
-
-    /**
-     * ### logout
-     * prepare the request and call _fetch
-     */
-    async logout () {
-        return await this._fetch({
-            method: 'GET',
-            url: '/logout'
-        })
-            .then((res) => {
-                //TODO Remove 500 by getting API changed on Server
-                if ((res.status === 200 || res.status === 500)) {
-                    return {}
-                } else {
-                    throw new Error({code: res.statusCode, error: res.message})
-                }
-            })
-            .catch((error) => {
-                throw (error)
-            })
-    }
-
 }
 // The singleton variable
 export let restAPI = new RestAPI()
