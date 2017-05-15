@@ -57,13 +57,6 @@ export function setCredentials(credentials) {
   }
 }
 
-export function checkConnection() {
-  return {
-    type: INTERNET_CONNECTION_STATUS
-  }
-}
-
-
 /**
  * ## Logout actions
  */
@@ -85,28 +78,11 @@ export function logoutFailure(error) {
     }
 }
 
-
-/**
- * ## DeleteToken actions
- */
-// export function deleteTokenRequest() {
-//     return {
-//         type: DELETE_TOKEN_REQUEST
-//     }
-// }
-// export function deleteTokenRequestSuccess() {
-//     return {
-//         type: DELETE_TOKEN_SUCCESS
-//     }
-// }
-
-
+//Deletes session token (jsession id) from store
 export function deleteSessionToken() {
     return async function (dispatch) {
         try {
-            console.log('deleteSessionToken')
             const response = await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            console.log('deleteSessionToken success')
         } catch(error) {
             throw error
         }
