@@ -65,10 +65,9 @@ export function loginRequest() {
   }
 }
 
-export function loginSuccess(j_sessionid) {
+export function loginSuccess() {
   return {
     type: LOGIN_SUCCESS,
-    payload: j_sessionid
   }
 }
 
@@ -167,11 +166,10 @@ export function authenticateUser(username, password,rememberMe) {
     try {
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
-       const j_sessionid = (authenticationResponse.headers.map['set-cookie'][0]).split("; ")[0];
-       console.log(`jsession id ${j_sessionid}`)
-        await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
+      const j_sessionid = (authenticationResponse.headers.map['set-cookie'][0]).split("; ")[0];
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
-      dispatch(loginSuccess(j_sessionid))
+      dispatch(loginSuccess())
       Actions.Preloader()
     }
     catch (error) {
@@ -183,9 +181,7 @@ export function authenticateUser(username, password,rememberMe) {
 export function checkRememberMe() {
   return async function (dispatch) {
     try {
-      console.log('checkRememberMe')
       let rememberMe = await keyValueDBService.getValueFromStore(REMEMBER_ME)
-      console.log(rememberMe)
       if(rememberMe) {
         let username = await keyValueDBService.getValueFromStore(USERNAME)
         let password = await keyValueDBService.getValueFromStore(PASSWORD)
@@ -208,21 +204,12 @@ export function checkRememberMe() {
 export function getSessionToken() {
   return async function (dispatch) {
     try {
-      console.log("getSessionToken")
       dispatch(sessionTokenRequest())
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-      console.log(token)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
-      isPreloaderComplete = false //test
-        console.log(isPreloaderComplete)
-        console.log('isPreloaderComplete')
-        console.log(token && isPreloaderComplete)
-        console.log(token && isPreloaderComplete.value)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
-        // dispatch(sessionTokenRequestSuccess(token))
         Actions.Tabbar()
       } else if(token) {
-          // dispatch(sessionTokenRequestSuccess(token))
           Actions.Preloader()
       }
       else {
@@ -230,8 +217,6 @@ export function getSessionToken() {
       }
     }
     catch (error) {
-        console.log(error)
-      console.log('login failure')
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())
       Actions.InitialLoginForm()

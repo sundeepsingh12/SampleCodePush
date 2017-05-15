@@ -84,7 +84,6 @@ export class keyValueDb {
             }).then(() => {
                 return true;
             }).catch(error => {
-                console.log(error)
                 return error;
             })
         } else {

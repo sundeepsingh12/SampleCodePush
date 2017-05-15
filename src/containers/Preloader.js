@@ -153,13 +153,11 @@ class Preloader extends Component {
                 <Modal
                     animationType={"slide"}
                     transparent={false}
-                    onRequestClose={() => {
-                        alert("Modal has been closed.")
-                    }}
+                    onRequestClose = { () => null }
                 >
                     <View style={[feStyle.bgWhite, feStyle.flex1, feStyle.column, {paddingTop: 70}]}>
                         <View style={[feStyle.alignCenter, feStyle.column]}>
-                            <Text style={[feStyle.fontWeight500, feStyle.fontXxl]}>Enter your mobile</Text>
+                            <Text style={[feStyle.fontWeight500, feStyle.fontXxl, feStyle.fontBlack]}>Enter your mobile</Text>
                         </View>
                         <View style={[feStyle.alignCenter, feStyle.row, feStyle.margin30]}>
                             <View style={[feStyle.flex1, {height: 50}]}>
@@ -172,18 +170,21 @@ class Preloader extends Component {
                                 />
                             </View>
                         </View>
+                        <Text style={{ textAlign: 'center', color: '#333333', marginBottom: 10 }}>
+                            {this.props.preloader.mobileDisplayMessage}
+                        </Text>
                         <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
                             <Button onPress={()=>this.getOtp()}  full rounded
+                                    style={StyleSheet.flatten(feStyle.margin10)}
                                     disabled = {this.props.preloader.isGenerateOtpButtonDisabled}>
                                 <Text style={[feStyle.fontWhite]}>Send OTP</Text>
                             </Button>
-                            <Button onPress={()=>this.invalidateSession()}  full rounded>
-                                <Text style={[feStyle.fontWhite]}>Logout</Text>
+                            <Button onPress={()=>this.invalidateSession()}  full rounded danger
+                                style={StyleSheet.flatten(feStyle.margin10, feStyle.bgDanger)}>
+                                <Text style={[feStyle.fontWhite]}>Close</Text>
                             </Button>
                         </View>
-                        <Text style={{ textAlign: 'center', color: '#d3d3d3', marginBottom: 10 }}>
-                            {this.props.preloader.mobileDisplayMessage}...
-                        </Text>
+                        
                     </View>
                 </Modal>)}
 
@@ -191,22 +192,20 @@ class Preloader extends Component {
                    <Modal
                        animationType={"slide"}
                        transparent={false}
-                       onRequestClose={() => {
-                           alert("Modal has been closed.")
-                       }}
+                       onRequestClose = { () => null }
                    >
                        <View style={[feStyle.bgWhite, feStyle.flex1, feStyle.column, {paddingTop: 70}]}>
                            <View style={[feStyle.alignCenter, feStyle.column]}>
-                               <Text style={[feStyle.fontWeight500, feStyle.fontXxl]}>Verify your mobile</Text>
+                               <Text style={[feStyle.fontWeight500, feStyle.fontXxl, feStyle.fontBlack]}>Verify your mobile</Text>
                                <Text style={[feStyle.fontSm, feStyle.fontDarkGray, feStyle.marginTop10]}>OTP code has
                                    been sent to</Text>
                                <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>{this.props.preloader.mobileNumber}</Text>
                            </View>
-                           <View style={[feStyle.alignCenter, feStyle.row, feStyle.margin30]}>
-                               <View style={[feStyle.flex1, {height: 50}]}>
+                           <View style={[feStyle.alignCenter, feStyle.justifyCenter, feStyle.row, feStyle.margin30]}>
+                               <View style={[feStyle.flexBasis70, {height: 50}]}>
                                    <Input
                                        placeholder='OTP'
-                                       style={feTheme.roundedInput}
+                                       style={StyleSheet.flatten([feStyle.fontCenter, feTheme.roundedInput])}
                                        value={this.props.preloader.otpNumber}
                                        keyboardType = 'numeric'
                                        maxLength = {6}
@@ -214,20 +213,23 @@ class Preloader extends Component {
                                    />
                                </View>
                            </View>
-                           <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
+                           <Text style={{ textAlign: 'center', color: '#333333', marginBottom: 10 }}>
+                               {this.props.preloader.otpDisplayMessage}
+                           </Text>
+                           <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop15]}>
                                <Button onPress={()=>this.validateOtp(this.props.preloader.otpNumber)}  full rounded
+                                       style={StyleSheet.flatten(feStyle.margin10)}
                                        disabled = {this.props.preloader.isOtpVerificationButtonDisabled}>
                                    <Text style={[feStyle.fontWhite]}>Verify</Text>
 
                                </Button>
-                               <Button onPress={()=>this.invalidateSession()}  full rounded>
-                                   <Text style={[feStyle.fontWhite]}>Logout</Text>
+                               <Button onPress={()=>this.invalidateSession()}  full rounded danger
+                                   style={StyleSheet.flatten(feStyle.margin10)}>
+                                   <Text style={[feStyle.fontWhite]}>Close</Text>
 
                                </Button>
                            </View>
-                           <Text style={{ textAlign: 'center', color: '#d3d3d3', marginBottom: 10 }}>
-                               {this.props.preloader.otpDisplayMessage}...
-                           </Text>
+                           
                        </View>
                    </Modal>
 

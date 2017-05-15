@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">52% </span>
+        <span class="strong">65% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>13/25</span>
+        <span class='fraction'>13/20</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">50% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/2</span>
+        <span class='fraction'>2/4</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">66.67% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>2/3</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">52% </span>
+        <span class="strong">65% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>13/25</span>
+        <span class='fraction'>13/20</span>
       </div>
     </div>
   </div>
@@ -121,10 +121,7 @@
 76
 77
 78
-79
-80
-81
-82</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+79</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -136,7 +133,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -166,7 +163,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -182,35 +178,33 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span></td><td class="text"><pre class="prettyprint lang-js">/**
+<span class="cline-any cline-yes">2x</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * Created by udbhav on 12/4/17.
  */
 &nbsp;
 import RestAPIFactory from '../../lib/RestAPIFactory'
-import {keyValueDBService} from './KeyValueDBService'
+import { keyValueDBService } from './KeyValueDBService'
 import CONFIG from '../../lib/config'
 const {
     USERNAME,
@@ -247,8 +241,7 @@ class Authentication {
         data.append('j_password', password)
         data.append('_spring_security_remember_me', false)
         data.append('submit', 'Login')
-&nbsp;
-        let authenticationResponse =  RestAPIFactory().serviceCall(data, CONFIG.API.AUTHENTICATION_API, 'LOGIN')
+        let authenticationResponse = RestAPIFactory().serviceCall(data, CONFIG.API.AUTHENTICATION_API, 'LOGIN')
         return authenticationResponse
     }
 &nbsp;
@@ -258,30 +251,28 @@ class Authentication {
      * @param {*} password 
      * @param {*} rememberMe 
      */
-<span class="fstat-no" title="function not covered" >    sa</span>veLoginCredentials(username,password,rememberMe) {
-<span class="cstat-no" title="statement not covered" >        if(rememberMe) {</span>
-<span class="cstat-no" title="statement not covered" >            console.log('rememberMe save')</span>
-<span class="cstat-no" title="statement not covered" >            console.log(rememberMe)</span>
-<span class="cstat-no" title="statement not covered" >            keyValueDBService.validateAndSaveData(USERNAME,username)</span>
-<span class="cstat-no" title="statement not covered" >            keyValueDBService.validateAndSaveData(PASSWORD,password)</span>
-<span class="cstat-no" title="statement not covered" >            keyValueDBService.validateAndSaveData(REMEMBER_ME,rememberMe)</span>
+<span class="fstat-no" title="function not covered" >    sa</span>veLoginCredentials(username, password, rememberMe) {
+<span class="cstat-no" title="statement not covered" >        if (rememberMe) {</span>
+<span class="cstat-no" title="statement not covered" >            keyValueDBService.validateAndSaveData(USERNAME, username)</span>
+<span class="cstat-no" title="statement not covered" >            keyValueDBService.validateAndSaveData(PASSWORD, password)</span>
+<span class="cstat-no" title="statement not covered" >            keyValueDBService.validateAndSaveData(REMEMBER_ME, rememberMe)</span>
         } else {
-<span class="cstat-no" title="statement not covered" >            console.log('rememberMe delete')</span>
-<span class="cstat-no" title="statement not covered" >            console.log(rememberMe)</span>
 <span class="cstat-no" title="statement not covered" >            keyValueDBService.deleteValueFromStore(USERNAME)</span>
 <span class="cstat-no" title="statement not covered" >            keyValueDBService.deleteValueFromStore(PASSWORD)</span>
 <span class="cstat-no" title="statement not covered" >            keyValueDBService.deleteValueFromStore(REMEMBER_ME)</span>
         }
     }
 &nbsp;
-    logout(sessionToken) {
-        try {
-            console.log(sessionToken)
-            let logoutResponse = RestAPIFactory().serviceCall(null,CONFIG.API.LOGOUT_API,'GET')
-            return logoutResponse
-        } catch (error) {
-<span class="cstat-no" title="statement not covered" >            throw(error)</span>
+    /**
+     * LOGOUT API (GET)
+     * @param {*} token 
+     */
+    logout(token) {
+        if(!token) {
+            throw new Error('Token Missing')
         }
+        let logoutResponse = RestAPIFactory(token.value).serviceCall(null, CONFIG.API.LOGOUT_API, 'GET')
+        return logoutResponse
     }
 &nbsp;
 }
@@ -292,7 +283,7 @@ export let authenticationService = new Authentication()</pre></td></tr>
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 11 2017 16:19:24 GMT+0530 (IST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 15 2017 16:48:23 GMT+0530 (IST)
 </div>
 </div>
 <script src="../../prettify.js"></script>

@@ -1,5 +1,7 @@
 'use strict'
 
+import configureStore from 'redux-mock-store'
+import thunk from 'redux-thunk'
 
 var actions = require('../loginActions')
 const {
@@ -23,6 +25,7 @@ const {
   ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
   LOGIN_CAMERA_SCANNER,
+  REMEMBER_ME_SET_TRUE,
   
   USERNAME,
   PASSWORD,
@@ -30,6 +33,12 @@ const {
 
   TABLE_USER_SUMMARY,
 } = require('../../../lib/constants').default
+
+jest.mock('../../../services/classes/Authentication')
+jest.mock('react-native-router-flux')
+
+const middlewares = [thunk]
+const mockStore = configureStore(middlewares)
 
 
 describe('loginActions',() => {
@@ -47,10 +56,8 @@ describe('loginActions',() => {
     })
 
     it('should set loginSuccess()',() => {
-        const j_sessionid="test_session_id";
-        expect(actions.loginSuccess(j_sessionid)).toEqual({
+        expect(actions.loginSuccess()).toEqual({
             type: LOGIN_SUCCESS,
-            payload: j_sessionid
         })
     })
 
@@ -142,5 +149,26 @@ describe('loginActions',() => {
         })
     })
 
+    it('should set remember me true',() => {
+        expect(actions.rememberMeSetTrue()).toEqual({
+            type: REMEMBER_ME_SET_TRUE
+        })
+    })
+
+    it('should authenticate user',() => {
+        const expectedActions = [
+            { type : LOGIN_START },
+            { type : LOGIN_SUCCESS }
+        ]
+        const store = mockStore({})
+        const username = 'test'
+        const password = 'test'
+        const rememberMe = false
+        return store.dispatch(actions.authenticateUser(username,password,rememberMe))
+        .then(() => {
+            expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+            expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+        })
+    })
 
 })

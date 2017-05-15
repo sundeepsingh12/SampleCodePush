@@ -20,7 +20,6 @@ import { Actions } from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
-// import * as globalActions from '../modules/global/globalActions'
 import renderIf from '../lib/renderIf';
 
 var styles = StyleSheet.create({
@@ -163,8 +162,8 @@ class Login extends Component {
               </View>
 
               <View style={{ marginTop: 35 }}>
-                <Text style={{ textAlign: 'center', color: '#d3d3d3', marginBottom: 10 }}>
-                  {this.props.auth.form.displayMessage}...
+                <Text style={{ textAlign: 'center', color: '#333333', marginBottom: 10 }}>
+                  {this.props.auth.form.displayMessage}
                   </Text>
                 <Button 
                   onPress={() => this.props.actions.startScanner()} rounded style={{ width: '100%', }}>

@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">2.33% </span>
+        <span class="strong">2.86% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>1/43</span>
+        <span class='fraction'>1/35</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>0/8</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">2.33% </span>
+        <span class="strong">2.86% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/43</span>
+        <span class='fraction'>1/35</span>
       </div>
     </div>
   </div>
@@ -183,15 +183,7 @@
 138
 139
 140
-141
-142
-143
-144
-145
-146
-147
-148
-149</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+141</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -216,8 +208,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -239,9 +229,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -308,15 +296,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -362,8 +346,6 @@ export class RestAPI {
      * @throws tokenMissing if token is undefined
      */
 <span class="fstat-no" title="function not covered" >    in</span>itialize (token) {
-<span class="cstat-no" title="statement not covered" >        console.log('token initialize')</span>
-<span class="cstat-no" title="statement not covered" >        console.log(token)</span>
 <span class="cstat-no" title="statement not covered" >        if (!_.isNull(token) &amp;&amp; _.isUndefined(token)) {</span>
 <span class="cstat-no" title="statement not covered" >            throw new Error('TokenMissing')</span>
         }
@@ -385,11 +367,9 @@ export class RestAPI {
  */
 <span class="fstat-no" title="function not covered" >    as</span>ync _fetch (opts) {
         let url = <span class="cstat-no" title="statement not covered" >this.API_BASE_URL + opts.url</span>
-<span class="cstat-no" title="statement not covered" >        console.log("this.sessionToken")</span>
-<span class="cstat-no" title="statement not covered" >        console.log(this._sessionToken)</span>
 <span class="cstat-no" title="statement not covered" >        if (this._sessionToken) {</span>
-<span class="cstat-no" title="statement not covered" >            opts.headers = {}</span>
 <span class="cstat-no" title="statement not covered" >            opts.headers['Cookie'] = this._sessionToken</span>
+&nbsp;
         }
         const response = <span class="cstat-no" title="statement not covered" >await fetch(url, opts)</span>
         const {status, code, headers} = <span class="cstat-no" title="statement not covered" >response;</span>
@@ -452,19 +432,15 @@ export class RestAPI {
                 url,
                 headers:{
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                 }
             }
         }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        return this._fetch(opts)</span>
             .then(<span class="fstat-no" title="function not covered" >(r</span>es) =&gt; {
-<span class="cstat-no" title="statement not covered" >                console.log(res.status)</span>
-<span class="cstat-no" title="statement not covered" >                console.log(res.message)</span>
 <span class="cstat-no" title="statement not covered" >                if(res.status==200) {</span>
 <span class="cstat-no" title="statement not covered" >                    return res;</span>
                 } else {
-<span class="cstat-no" title="statement not covered" >                    console.log(res)</span>
 <span class="cstat-no" title="statement not covered" >                    switch(res.status) {</span>
                     case 401:
 <span class="cstat-no" title="statement not covered" >                        throw new Error("Invalid User Credentials")</span>
@@ -493,7 +469,7 @@ export let restAPI = new RestAPI()</pre></td></tr>
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 11 2017 16:19:24 GMT+0530 (IST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 15 2017 16:48:23 GMT+0530 (IST)
 </div>
 </div>
 <script src="../prettify.js"></script>

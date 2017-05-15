@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">1.79% </span>
+        <span class="strong">14.55% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>1/56</span>
+        <span class='fraction'>8/55</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">14.81% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/27</span>
+        <span class='fraction'>4/27</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">28.57% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/7</span>
+        <span class='fraction'>2/7</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">1.82% </span>
+        <span class="strong">12.96% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/55</span>
+        <span class='fraction'>7/54</span>
       </div>
     </div>
   </div>
@@ -156,8 +156,7 @@
 111
 112
 113
-114
-115</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+114</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -174,12 +173,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -236,15 +232,17 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -287,78 +285,77 @@ import store from 'react-native-simple-store'
 import validate from "json-schema"
 &nbsp;
 export class keyValueDb {
-<span class="fstat-no" title="function not covered" >    va</span>lidateAndSaveData(schemaName, value) {
-        let schemaInstance = <span class="cstat-no" title="statement not covered" >'',</span>checkCondition = <span class="cstat-no" title="statement not covered" >false;</span>
+    validateAndSaveData(schemaName, value) {
+        let schemaInstance = '',checkCondition = false;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        switch (schemaName) {</span>
-            case 'JOB_MASTER':
+        switch (schemaName) {
+<span class="branch-0 cbranch-no" title="branch not covered" >            case 'JOB_MASTER':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/jobMaster');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'USER':
+<span class="branch-1 cbranch-no" title="branch not covered" >            case 'USER':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/user');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'JOB_ATTRIBUTE':
+<span class="branch-2 cbranch-no" title="branch not covered" >            case 'JOB_ATTRIBUTE':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/jobAttribute');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'JOB_ATTRIBUTE_VALUE':
+<span class="branch-3 cbranch-no" title="branch not covered" >            case 'JOB_ATTRIBUTE_VALUE':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/jobAttributeValue');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'FIELD_ATTRIBUTE':
+<span class="branch-4 cbranch-no" title="branch not covered" >            case 'FIELD_ATTRIBUTE':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/fieldAttribute');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'FIELD_ATTRIBUTE_VALUE':
+<span class="branch-5 cbranch-no" title="branch not covered" >            case 'FIELD_ATTRIBUTE_VALUE':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/fieldAttributeValue');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'JOB_STATUS':
+<span class="branch-6 cbranch-no" title="branch not covered" >            case 'JOB_STATUS':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/jobStatus');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'CUSTOMIZATION_APP_MODULE':
+<span class="branch-7 cbranch-no" title="branch not covered" >            case 'CUSTOMIZATION_APP_MODULE':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/customizationAppModule')</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'JOB_LIST_CUSTOMIZATION':
+<span class="branch-8 cbranch-no" title="branch not covered" >            case 'JOB_LIST_CUSTOMIZATION':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/jobListCustomization')</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'TAB':
+<span class="branch-9 cbranch-no" title="branch not covered" >            case 'TAB':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/tab');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'JOB_MASTER_MONEY_TRANSACTION_MODE':
+<span class="branch-10 cbranch-no" title="branch not covered" >            case 'JOB_MASTER_MONEY_TRANSACTION_MODE':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/jobMasterMoneyTransactionMode');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'CUSTOMER_CARE':
+<span class="branch-11 cbranch-no" title="branch not covered" >            case 'CUSTOMER_CARE':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/customerCare');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'SMS_TEMPLATE':
+<span class="branch-12 cbranch-no" title="branch not covered" >            case 'SMS_TEMPLATE':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/smsTemplate');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'FIELD_ATTRIBUTE_STATUS':
+<span class="branch-13 cbranch-no" title="branch not covered" >            case 'FIELD_ATTRIBUTE_STATUS':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/fieldAttributeStatus');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'FIELD_ATTRIBUTE_VALIDATION':
+<span class="branch-14 cbranch-no" title="branch not covered" >            case 'FIELD_ATTRIBUTE_VALIDATION':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/fieldAttributeValidation');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'FIELD_ATTRIBUTE_VALIDATION_CONDITION':
+<span class="branch-15 cbranch-no" title="branch not covered" >            case 'FIELD_ATTRIBUTE_VALIDATION_CONDITION':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/fieldAttributeValidationCondition');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'SMS_JOB_STATUS':
+<span class="branch-16 cbranch-no" title="branch not covered" >            case 'SMS_JOB_STATUS':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/smsJobStatus');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'USER_SUMMARY':
+<span class="branch-17 cbranch-no" title="branch not covered" >            case 'USER_SUMMARY':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/userSummary');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
-            case 'JOB_SUMMARY':
+<span class="branch-18 cbranch-no" title="branch not covered" >            case 'JOB_SUMMARY':</span>
 <span class="cstat-no" title="statement not covered" >                schemaInstance = require('../repositories/schema/jobSummary');</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
             default:
-<span class="cstat-no" title="statement not covered" >             checkCondition = true;</span>
+             checkCondition = true;
         }
-<span class="cstat-no" title="statement not covered" >        if (value &amp;&amp; (checkCondition || validate(value, schemaInstance))) {</span>
-<span class="cstat-no" title="statement not covered" >            return store.save(schemaName, {</span>
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (value &amp;&amp; (checkCondition || <span class="branch-2 cbranch-no" title="branch not covered" >validate(value, schemaInstance))</span>) {
+            return store.save(schemaName, {
                 value
             }).then(<span class="fstat-no" title="function not covered" >()</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >                return true;</span>
-            }).catch(<span class="fstat-no" title="function not covered" >er</span>ror =&gt; {
-<span class="cstat-no" title="statement not covered" >                console.log(error)</span>
-<span class="cstat-no" title="statement not covered" >                return error;</span>
+            }).catch(error =&gt; {
+                return error;
             })
         } else {
             const schemaCheck = <span class="cstat-no" title="statement not covered" >this.getValueFromStore(schemaName)</span>
@@ -391,7 +388,7 @@ export let keyValueDB = new keyValueDb()
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu May 11 2017 16:19:24 GMT+0530 (IST)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 15 2017 16:48:23 GMT+0530 (IST)
 </div>
 </div>
 <script src="../prettify.js"></script>

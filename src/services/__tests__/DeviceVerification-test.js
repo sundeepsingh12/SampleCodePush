@@ -16,20 +16,6 @@ const {
 } = require('../../lib/constants').default
 
 describe('device verification',() => {
-    it('is device locally verified',() => {
-        const deviceIMEI = null
-        const deviceSIM = null
-        const user = {
-            value : {
-                company : {
-                    id : 1,
-                    hubId : 1,
-                }
-            }
-        }
-        expect(deviceVerificationService.checkAsset(deviceIMEI,deviceSIM,user)).toBeFalsy()
-    })
-
     it('is device verified on server',() => {
         const deviceSIM = {
             isVerified : true

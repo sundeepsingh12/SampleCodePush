@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for modules/pre-loader/preloaderReducer.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">All files</a> / <a href="index.html">modules/pre-loader</a> preloaderReducer.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.75% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>30/32</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96.3% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>26/27</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/1</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">96.77% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>30/31</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * # preloaderReducer.js
+ *
+ *
+ */
+'use strict'
+/**
+ * ## Imports
+ * The InitialState for Preloader
+ */
+import InitialState from './preloaderInitialState'
+&nbsp;
+const initialState = new InitialState()
+const {
+&nbsp;
+  MASTER_DOWNLOAD_START,
+  MASTER_DOWNLOAD_SUCCESS,
+  MASTER_DOWNLOAD_FAILURE,
+&nbsp;
+  MASTER_SAVING_START,
+  MASTER_SAVING_SUCCESS,
+  MASTER_SAVING_FAILURE,
+&nbsp;
+  CHECK_ASSET_START,
+  CHECK_ASSET_FAILURE,
+&nbsp;
+  OTP_GENERATION_START,
+  OTP_GENERATION_SUCCESS,
+  OTP_GENERATION_FAILURE,
+&nbsp;
+  OTP_VALIDATION_START,
+  OTP_VALIDATION_SUCCESS,
+  OTP_VALIDATION_FAILURE,
+&nbsp;
+  SESSION_TOKEN_REQUEST,
+  SESSION_TOKEN_SUCCESS,
+  SESSION_TOKEN_FAILURE,
+&nbsp;
+  SERVICE_PENDING,
+  SERVICE_RUNNING,
+  SERVICE_SUCCESS,
+  SERVICE_FAILED,
+&nbsp;
+  SHOW_MOBILE_NUMBER_SCREEN,
+  SHOW_OTP_SCREEN,
+  SET_MOBILE_NUMBER,
+&nbsp;
+  PRE_LOGOUT_START,
+  PRE_LOGOUT_SUCCESS,
+  PRE_LOGOUT_FAILURE,
+&nbsp;
+  ON_MOBILE_NO_CHANGE,
+  ON_OTP_CHANGE,
+  PRELOADER_SUCCESS
+&nbsp;
+} = require('../../lib/constants').default
+&nbsp;
+/**
+ * ## preloaderReducer function
+ * @param {Object} state - initialState
+ * @param {Object} action - type and payload
+ */
+export default function preloaderReducer(state = initialState, action) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!(state instanceof InitialState)) <span class="cstat-no" title="statement not covered" >return initialState.merge(state)</span>
+  switch (action.type) {
+    case MASTER_DOWNLOAD_START:
+      return state.set('configDownloadService', SERVICE_RUNNING)
+                  .set('error','')
+                  .set('configSaveService',SERVICE_PENDING)
+    case MASTER_DOWNLOAD_SUCCESS:
+      return state.set('configDownloadService', SERVICE_SUCCESS)
+    case MASTER_DOWNLOAD_FAILURE:
+      return state.set('configDownloadService', SERVICE_FAILED)
+        .set('isError', true)
+        .set('error', action.payload)
+&nbsp;
+    case MASTER_SAVING_START:
+      return state.set('configSaveService', SERVICE_RUNNING)
+                   .set('error','')
+    case MASTER_SAVING_SUCCESS:
+      return state.set('configSaveService', SERVICE_SUCCESS)
+    case MASTER_SAVING_FAILURE:
+      return state.set('configSaveService', SERVICE_FAILED)
+        .set('isError', true)
+        .set('error', action.payload)
+&nbsp;
+    case CHECK_ASSET_START:
+      return state.set('deviceVerificationService', SERVICE_RUNNING)
+                   .set('error','')
+&nbsp;
+    case CHECK_ASSET_FAILURE:
+      return state.set('deviceVerificationService', SERVICE_FAILED)
+        .set('isError', true)
+        .set('error', action.payload)
+&nbsp;
+    case OTP_GENERATION_START:
+      return state.set('mobileDisplayMessage', 'Sending OTP')
+        .set('isGenerateOtpButtonDisabled', true)
+    case OTP_GENERATION_FAILURE:
+      return state.set('mobileDisplayMessage', action.payload)
+&nbsp;
+    case OTP_VALIDATION_START:
+      return state.set('otpDisplayMessage', 'Validating OTP')
+        .set('isOtpVerificationButtonDisabled', true)
+    case OTP_VALIDATION_FAILURE:
+      return state.set('otpDisplayMessage', action.payload)
+&nbsp;
+    case SHOW_MOBILE_NUMBER_SCREEN:
+      return state.set('showMobileNumberScreen', action.payload)
+    case SHOW_OTP_SCREEN:
+      return state.set('showOtpScreen', action.payload)
+    case PRE_LOGOUT_START:
+      return state.set('error', 'Logging out')
+                  .set('otpDisplayMessage','Logging out') 
+                  .set('mobileDisplayMessage','Logging out')    
+    case PRE_LOGOUT_SUCCESS:
+      return state.set('deviceVerificationService', SERVICE_PENDING)
+        .set('configDownloadService', SERVICE_PENDING)
+        .set('configSaveService', SERVICE_PENDING)
+        .set('showMobileNumberScreen', false)
+        .set('showOtpScreen', false)
+        .set('otpDisplayMessage', '')
+        .set('mobileDisplayMessage', '')
+        .set('mobileNumber','')
+        .set('otpNumber','')
+        .set('error','')
+&nbsp;
+    case PRE_LOGOUT_FAILURE:
+      return state.set('isError', true)
+        .set('error', action.payload)
+&nbsp;
+    case ON_MOBILE_NO_CHANGE:
+      let mobileNo = action.payload;
+      if (mobileNo) {
+        return state.set('isGenerateOtpButtonDisabled', false)
+          .set('mobileNumber', mobileNo)
+          .set('mobileDisplayMessage', '')
+      } else {
+        return state.set('isGenerateOtpButtonDisabled', true)
+          .set('mobileNumber', mobileNo)
+          .set('mobileDisplayMessage', '')
+      }
+&nbsp;
+    case ON_OTP_CHANGE:
+      let otpNumber = action.payload
+      if (otpNumber) {
+        return state.set('isOtpVerificationButtonDisabled', false)
+          .set('otpNumber', otpNumber)
+          .set('otpDisplayMessage', '')
+      } else {
+        return state.set('isOtpVerificationButtonDisabled', true)
+          .set('otpNumber', otpNumber)
+          .set('otpDisplayMessage', '')
+      }
+    case PRELOADER_SUCCESS:
+      return state.set('deviceVerificationService', SERVICE_PENDING)
+        .set('configDownloadService', SERVICE_PENDING)
+        .set('configSaveService', SERVICE_PENDING)
+        .set('showMobileNumberScreen', false)
+        .set('showOtpScreen', false)
+        .set('otpDisplayMessage', '')
+        .set('mobileDisplayMessage', '')
+  }
+<span class="cstat-no" title="statement not covered" >  return state</span>
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon May 15 2017 16:48:23 GMT+0530 (IST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

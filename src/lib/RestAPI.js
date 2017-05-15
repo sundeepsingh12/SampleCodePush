@@ -21,8 +21,6 @@ export class RestAPI {
      * @throws tokenMissing if token is undefined
      */
     initialize (token) {
-        console.log('token initialize')
-        console.log(token)
         if (!_.isNull(token) && _.isUndefined(token)) {
             throw new Error('TokenMissing')
         }
@@ -44,11 +42,9 @@ export class RestAPI {
  */
     async _fetch (opts) {
         let url = this.API_BASE_URL + opts.url
-        console.log("this.sessionToken")
-        console.log(this._sessionToken)
         if (this._sessionToken) {
-            opts.headers = {}
             opts.headers['Cookie'] = this._sessionToken
+
         }
         const response = await fetch(url, opts)
         const {status, code, headers} = response;
@@ -111,19 +107,15 @@ export class RestAPI {
                 url,
                 headers:{
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                 }
             }
         }
 
         return this._fetch(opts)
             .then((res) => {
-                console.log(res.status)
-                console.log(res.message)
                 if(res.status==200) {
                     return res;
                 } else {
-                    console.log(res)
                     switch(res.status) {
                     case 401:
                         throw new Error("Invalid User Credentials")
