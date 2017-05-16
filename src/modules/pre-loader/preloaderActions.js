@@ -342,7 +342,7 @@ export async function checkIfSimValidOnServer(dispatch){
     await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
     deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-    const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
+    const isVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
     if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
