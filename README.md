@@ -12,7 +12,10 @@ For Android:
 Step 1: react-native init FareyeReact
 Step 2: Go to /path/to/FareyeReact/android/local.properties and update:sdk.dir
 (for e.g. sdk.dir=/Users/gauravsrivastava/JavaDev/adt-bundle-mac-x86_64-20140702/sdk)
-Step 3: react-native run-android
+Step 3: npm install/ yarn install
+Step 4: react-native link
+Step 5: react-native start
+Step 6: react-native run-android
 
 
 ------------------------
