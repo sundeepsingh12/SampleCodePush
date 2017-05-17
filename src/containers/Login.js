@@ -59,7 +59,6 @@ var styles = StyleSheet.create({
 function mapStateToProps(state) {
   return {
     auth: state.auth,
-    // global: state.global,
   }
 }
 
@@ -112,7 +111,6 @@ class Login extends Component {
   }
 
   rememberMe(){
-    console.log('rememberMe called')
     this.props.actions.toggleCheckbox()
   }
 

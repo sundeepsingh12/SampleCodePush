@@ -18,16 +18,13 @@ const {
   LOGIN_SUCCESS,
   SESSION_TOKEN_SUCCESS,
 
-  LOGOUT_START,
   LOGOUT_SUCCESS,
-  LOGOUT_FAILURE,
 
   GET_STATE,
   SET_STATE,
   SET_STORE,
   ON_GLOBAL_USERNAME_CHANGE,
   ON_GLOBAL_PASSWORD_CHANGE,
-  INTERNET_CONNECTION_STATUS,
   SET_CREDENTIALS
 
 
@@ -133,12 +130,6 @@ export default function globalReducer(state = initialState, action) {
     case SET_CREDENTIALS:
       return state.set('username', action.payload.username
         .set('password', action.payload.password))
-
-    case INTERNET_CONNECTION_STATUS:
-      return state.set('')
-    
-    case LOGOUT_START:
-
 
   }
 

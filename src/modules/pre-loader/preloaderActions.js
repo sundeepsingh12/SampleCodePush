@@ -1,6 +1,5 @@
 'use strict'
 const {
-    SET_CREDENTIALS,
 
     MASTER_DOWNLOAD_START,
     MASTER_DOWNLOAD_SUCCESS,
@@ -20,10 +19,6 @@ const {
     OTP_VALIDATION_START,
     OTP_VALIDATION_SUCCESS,
     OTP_VALIDATION_FAILURE,
-
-    SESSION_TOKEN_REQUEST,
-    SESSION_TOKEN_SUCCESS,
-    SESSION_TOKEN_FAILURE,
 
     SERVICE_PENDING,
     SERVICE_RUNNING,
@@ -63,18 +58,21 @@ import { onChangePassword, onChangeUsername } from '../login/loginActions'
 
 import CONFIG from '../../lib/config'
 
+//Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
     return {
         type: MASTER_DOWNLOAD_START
     }
 }
 
+//Action dispatched when job master is downloaded successfully
 export function jobMasterDownloadSuccess() {
     return {
         type: MASTER_DOWNLOAD_SUCCESS
     }
 }
 
+//Action dispatched when failure in downloading job master
 export function jobMasterDownloadFailure(error) {
     return {
         type: MASTER_DOWNLOAD_FAILURE,
@@ -82,18 +80,21 @@ export function jobMasterDownloadFailure(error) {
     }
 }
 
+//Action dispatched when job master saving starts
 export function jobMasterSavingStart() {
     return {
         type: MASTER_SAVING_START
     }
 }
 
+//Action dispatched when job master is saved successfully
 export function jobMasterSavingSuccess() {
     return {
         type: MASTER_SAVING_SUCCESS
     }
 }
 
+//Action dispatched when saving job master fails
 export function jobMasterSavingFailure(error) {
     return {
         type: MASTER_SAVING_FAILURE,
@@ -121,6 +122,7 @@ export function checkAssetFailure(error) {
     }
 }
 
+//Action dispatched when imei/sim is not verified
 export function showMobileNumber() {
     return {
         type: SHOW_MOBILE_NUMBER_SCREEN,
@@ -128,6 +130,7 @@ export function showMobileNumber() {
     }
 }
 
+//This is just dispatched just after showMobileNumber action 
 export function showOtp() {
     return {
         type: SHOW_OTP_SCREEN,
@@ -135,18 +138,21 @@ export function showOtp() {
     }
 }
 
+//Action dispatched when cancel button in preloader screen is pressed
 export function preLogoutRequest() {
     return {
         type: PRE_LOGOUT_START
     }
 }
 
+//Action dispatched when logout is successful from preloader container
 export function preLogoutSuccess() {
     return {
         type: PRE_LOGOUT_SUCCESS
     }
 }
 
+//Action dispatched when logout is failed from preloader container
 export function preLogoutFailure(error) {
     return {
         type: PRE_LOGOUT_FAILURE,
@@ -154,6 +160,7 @@ export function preLogoutFailure(error) {
     }
 }
 
+//Action dispatched when user enters mobile no in enter mobile no screen
 export function onChangeMobileNumber(mobileNumber) {
     return {
         type: ON_MOBILE_NO_CHANGE,
@@ -161,6 +168,7 @@ export function onChangeMobileNumber(mobileNumber) {
     }
 }
 
+//Action dispatched when user enters otp in enter mobile no screen
 export function onChangeOtp(otpNumber) {
     return {
         type: ON_OTP_CHANGE,
@@ -199,7 +207,7 @@ export function otpValidationFailure(error) {
 
     }
 }
-
+//This hits JOB Master Api and gets the response 
 export function downloadJobMaster() {
     return async function (dispatch) {
         try {
@@ -322,7 +330,7 @@ export function checkAsset() {
     }
 }
 
-/**Checks if sim is valid on server
+/**Checks if sim is valid on server,called only if sim is not valid locally
  *
  * @return {Promise.<void>}
  */

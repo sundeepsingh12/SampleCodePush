@@ -143,7 +143,7 @@ class JobMaster {
   }
 
   /**Matches device time with server time,
-   * throw error if server time forma is invalid 
+   * throw error if server time format is invalid 
    * or if difference >=15 minutes
    * 
    * @param {*} serverTime 

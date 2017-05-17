@@ -7,7 +7,6 @@ export default keyMirror({
     SET_STORE: null,
     SET_SESSION_TOKEN: null,
     SET_CREDENTIALS: null,
-    INTERNET_CONNECTION_STATUS: null,
 
     //Device Actions
     SET_PLATFORM: null,
@@ -24,6 +23,7 @@ export default keyMirror({
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
 
+    //Preloader Actions
     MASTER_DOWNLOAD_START: null,
     MASTER_DOWNLOAD_SUCCESS: null,
     MASTER_DOWNLOAD_FAILURE: null,
