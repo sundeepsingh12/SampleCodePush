@@ -18,7 +18,9 @@ const {
     JOB_SUMMARY
 } = require('../../lib/constants').default
 
-import {keyValueDB} from '../../repositories/keyValueDb'
+import {
+  keyValueDBService
+} from '../../services/classes/KeyValueDBService'
 
 import CONFIG from '../../lib/config'
 /**
@@ -84,9 +86,9 @@ export function logoutFailure(error) {
 export function deleteSessionToken() {
     return async function (dispatch) {
         try {
-            await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            await keyValueDB.deleteValueFromStore(JOB_SUMMARY)
-            await keyValueDB.deleteValueFromStore(USER_SUMMARY)
+            await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
+            await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
         } catch(error) {
             throw error
         }
