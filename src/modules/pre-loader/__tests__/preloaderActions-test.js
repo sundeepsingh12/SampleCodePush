@@ -226,13 +226,10 @@ describe('Preloader Actions', () => {
         keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: 'testtoken' })
         authenticationService.logout = jest.fn()
         authenticationService.logout.mockReturnValue(true)
-        keyValueDBService.deleteValueFromStore = jest.fn()
-        keyValueDBService.deleteValueFromStore.mockReturnValue(null)
         return store.dispatch(actions.invalidateUserSession())
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(authenticationService.logout).toHaveBeenCalled()
-                expect(keyValueDBService.deleteValueFromStore).toHaveBeenCalledTimes(3)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
             })
