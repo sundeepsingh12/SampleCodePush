@@ -132,6 +132,7 @@ export default function preloaderReducer(state = initialState, action) {
          .set('isOtpScreenLogoutDisabled',false)
           .set('isMobileScreenLogoutDisabled',false)
           .set('isPreloaderLogoutDisabled',false)
+          .set('isError',false)
 
     case PRE_LOGOUT_FAILURE:
       return state.set('isError', true)
