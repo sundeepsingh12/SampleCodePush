@@ -44,11 +44,9 @@ class DeviceVerification {
    * 
    */
   checkAssetAPI(deviceIMEI, deviceSIM, token) {
-    if (!deviceIMEI) {
+    if (!deviceIMEI || !deviceSIM) {
       deviceIMEI = {}
-    }
-    if (!deviceSIM) {
-      deviceSIM = {}
+       deviceSIM = {}
     }
     const postData = JSON.stringify({
       deviceIMEI,
@@ -59,7 +57,7 @@ class DeviceVerification {
     return checkAssetResponse
   }
 
-  /**
+  /**Check if sim/imei is locally verified or not
    * 
    * @param {*} deviceIMEI 
    * @param {*} deviceSIM 
@@ -67,7 +65,10 @@ class DeviceVerification {
    */
 
   async checkAsset(deviceIMEI, deviceSIM, user) {
-    const companyId = (user) ? user.value.company.id : 0;
+    if(!user)
+    throw new Error('Value of user missing')
+
+    const companyId = (user && user.value.company) ? user.value.company.id : 0;
     const hubId = (user) ? user.value.hubId : 0;
 
     if (deviceIMEI && deviceSIM) {
@@ -75,10 +76,7 @@ class DeviceVerification {
         deviceIMEI.value.hubId = hubId;
         keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
       }
-      if (!deviceSIM.value.isVerified) {
-        await this.populateDeviceImeiAndDeviceSim(user)
-        return false;
-      } else if (deviceSIM.value.isVerified && deviceSIM.value.companyId == companyId) {
+     if (deviceSIM.value.isVerified && deviceSIM.value.companyId == companyId) {
         return true;
       } else {
         await this.populateDeviceImeiAndDeviceSim(user)
@@ -184,6 +182,9 @@ class DeviceVerification {
    */
 
   generateOTP(deviceSIM, token) {
+     if (!token) {
+      throw new Error('Token Missing')
+    }
     let generateOtpResponse = RestAPIFactory(token.value).serviceCall(JSON.stringify(deviceSIM), CONFIG.API.GENERATE_OTP_API, 'POST')
     generateOtpResponse = RestAPIFactory()._pruneEmpty(generateOtpResponse)
     return generateOtpResponse
@@ -201,10 +202,12 @@ class DeviceVerification {
    * 
    */
   verifySim(deviceSIM, token) {
+     if (!token) {
+      throw new Error('Token Missing')
+    }
     let simVerificationResponse = RestAPIFactory(token.value).serviceCall(JSON.stringify(deviceSIM), CONFIG.API.SIM_VERIFICATION_API, 'POST')
     simVerificationResponse = RestAPIFactory()._pruneEmpty(simVerificationResponse)
     return simVerificationResponse
-
   }
 
   /**Checks if isVerified of device sim response is true or not
@@ -212,7 +215,7 @@ class DeviceVerification {
    * @param {*} deviceSim 
    */
   checkIfSimValidOnServer(deviceSim) {
-    if (deviceSim.isVerified) {
+    if (deviceSim && deviceSim.isVerified) {
       return true
     }
     return false

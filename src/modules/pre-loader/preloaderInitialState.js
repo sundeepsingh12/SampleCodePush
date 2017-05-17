@@ -24,6 +24,9 @@ var InitialState = Record({
   isOtpVerificationButtonDisabled:true,
   isGenerateOtpButtonDisabled:true,
   otpNumber:'',
+  isPreloaderLogoutDisabled:false, //logout button which is displayed in preloader screen
+  isOtpScreenLogoutDisabled:false, //logout button which is displayed in enter opt screen
+  isMobileScreenLogoutDisabled:false, //logout button which is displayed in enter mobile no screen
   mobileDisplayMessage:'', //message which will be displayed in mobile no screen
   otpDisplayMessage:'' //message which will be displayed in otp screen
 })

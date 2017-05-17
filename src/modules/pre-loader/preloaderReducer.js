@@ -98,12 +98,14 @@ export default function preloaderReducer(state = initialState, action) {
         .set('isGenerateOtpButtonDisabled', true)
     case OTP_GENERATION_FAILURE:
       return state.set('mobileDisplayMessage', action.payload)
+                  .set('isGenerateOtpButtonDisabled', false)
 
     case OTP_VALIDATION_START:
       return state.set('otpDisplayMessage', 'Validating OTP')
         .set('isOtpVerificationButtonDisabled', true)
     case OTP_VALIDATION_FAILURE:
       return state.set('otpDisplayMessage', action.payload)
+                  .set('isOtpVerificationButtonDisabled', false)
 
     case SHOW_MOBILE_NUMBER_SCREEN:
       return state.set('showMobileNumberScreen', action.payload)
@@ -112,7 +114,10 @@ export default function preloaderReducer(state = initialState, action) {
     case PRE_LOGOUT_START:
       return state.set('error', 'Logging out')
                   .set('otpDisplayMessage','Logging out') 
-                  .set('mobileDisplayMessage','Logging out')    
+                  .set('mobileDisplayMessage','Logging out') 
+                  .set('isOtpScreenLogoutDisabled',true)
+                  .set('isMobileScreenLogoutDisabled',true)
+                  .set('isPreloaderLogoutDisabled',true)
     case PRE_LOGOUT_SUCCESS:
       return state.set('deviceVerificationService', SERVICE_PENDING)
         .set('configDownloadService', SERVICE_PENDING)
@@ -124,10 +129,16 @@ export default function preloaderReducer(state = initialState, action) {
         .set('mobileNumber','')
         .set('otpNumber','')
         .set('error','')
+         .set('isOtpScreenLogoutDisabled',false)
+          .set('isMobileScreenLogoutDisabled',false)
+          .set('isPreloaderLogoutDisabled',false)
 
     case PRE_LOGOUT_FAILURE:
       return state.set('isError', true)
         .set('error', action.payload)
+        .set('isOtpScreenLogoutDisabled',false)
+         .set('isMobileScreenLogoutDisabled',false)
+         .set('isPreloaderLogoutDisabled',false)
 
     case ON_MOBILE_NO_CHANGE:
       let mobileNo = action.payload;
