@@ -234,6 +234,8 @@ export async function downloadJobMaster(dispatch) {
     const userObject = await keyValueDBService.getValueFromStore(USER)
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject, token)
+    if(!jobMasters)
+    throw new Error('No response returned from server')
     const json = await jobMasters.json
     dispatch(jobMasterDownloadSuccess())
     validateAndSaveJobMaster(json, dispatch)
@@ -302,6 +304,8 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
  */
 export async function validateAndSaveJobMaster(jobMasterResponse, dispatch) {
   try {
+      if(!jobMasterResponse)
+      
     if (jobMasterResponse.message) {
       throw new Error(jobMasterResponse.message)
     }
@@ -343,15 +347,17 @@ export async function checkAsset(dispatch) {
  *
  * @return {Promise.<void>}
  */
-
-
 export async function checkIfSimValidOnServer(dispatch) {
   try {
     let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     const response = await deviceVerificationService.checkAssetAPI(deviceIMEI.value, deviceSIM.value, token)
+    if(!response)
+    throw new Error('No response returned from server')
     const assetJSON = await response.json
+     if(!assetJSON)
+    throw new Error('No response returned from server')
     const responseDeviceIMEI = await assetJSON.deviceIMEI
     const responseDeviceSIM = await assetJSON.deviceSIM
     await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
@@ -366,12 +372,11 @@ export async function checkIfSimValidOnServer(dispatch) {
       dispatch(showMobileNumber())
     }
   } catch (error) {
-    console.log(error.statusCode)
     dispatch(checkAssetFailure(error.message))
-    if (error.code == 403) {
-      invalidateUserSession()
+    if (error.code == 403 || error.code==400) { //clear user session 
+      dispatch(deleteSessionToken())
+      Actions.InitialLoginForm()
     }
-
   }
 }
 

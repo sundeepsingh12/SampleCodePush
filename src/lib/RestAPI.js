@@ -128,7 +128,7 @@ export class RestAPI {
                     case 1203:
                         throw new Error("User locked.Try after 15 minutes")
                     default:
-                        throw new Error({code: res.statusCode, error: res.message})
+                        throw {code: res.status, message: 'Something went wrong'}
                     }
                 }
             })

@@ -14,6 +14,8 @@ const {
     LOGOUT_START,
     LOGOUT_SUCCESS,
     LOGOUT_FAILURE,
+    USER_SUMMARY,
+    JOB_SUMMARY
 } = require('../../lib/constants').default
 
 import {keyValueDB} from '../../repositories/keyValueDb'
@@ -82,7 +84,9 @@ export function logoutFailure(error) {
 export function deleteSessionToken() {
     return async function (dispatch) {
         try {
-            const response = await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            await keyValueDB.deleteValueFromStore(JOB_SUMMARY)
+            await keyValueDB.deleteValueFromStore(USER_SUMMARY)
         } catch(error) {
             throw error
         }
