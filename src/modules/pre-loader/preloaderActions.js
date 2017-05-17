@@ -265,9 +265,9 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
       return
     }
     if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
-      checkAsset(dispatch)
+      dispatch(checkAsset())
     } else {
-      downloadJobMaster(dispatch)
+      dispatch(downloadJobMaster())
     }
   }
 }
@@ -303,7 +303,6 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
  */
 export function checkAsset() {
   return async function (dispatch) {
-    console.log('sim local called')
     try {
       dispatch(checkAssetStart())
       const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
@@ -311,12 +310,10 @@ export function checkAsset() {
       const user = await keyValueDBService.getValueFromStore(USER)
       const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
       if (isVerified) {
-        console.log('sim local')
         dispatch(preloaderSuccess())
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         Actions.Tabbar()
       } else {
-        console.log('sim server')
         dispatch(checkIfSimValidOnServer())
       }
     } catch (error) {
@@ -344,7 +341,7 @@ export function checkIfSimValidOnServer() {
       await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
       await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
       const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
-      if (isVerified) {
+      if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
         Actions.Tabbar()
@@ -353,8 +350,6 @@ export function checkIfSimValidOnServer() {
         dispatch(showMobileNumber())
       }
     } catch (error) {
-      dispatch(checkAssetFailure(error.message))
-      console.log(error.statusCode)
       dispatch(checkAssetFailure(error.message))
       if (error.code == 403) {
         invalidateUserSession()
