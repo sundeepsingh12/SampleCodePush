@@ -7,18 +7,32 @@
 
 const {
   SET_SESSION_TOKEN,
-    SET_STORE,
-    ON_GLOBAL_USERNAME_CHANGE,
-    ON_GLOBAL_PASSWORD_CHANGE,
-    SET_CREDENTIALS,
-    LOGOUT_START,
-    LOGOUT_SUCCESS,
-    LOGOUT_FAILURE,
+  SET_STORE,
+  ON_GLOBAL_USERNAME_CHANGE,
+  ON_GLOBAL_PASSWORD_CHANGE,
+  SET_CREDENTIALS,
+  LOGOUT_START,
+  LOGOUT_SUCCESS,
+  LOGOUT_FAILURE,
+  USER_SUMMARY,
+  JOB_SUMMARY,
+  IS_SHOW_MOBILE_NUMBER_SCREEN,
+  IS_SHOW_OTP_SCREEN,
+  IS_PRELOADER_COMPLETE
+
 } = require('../../lib/constants').default
 
-import {keyValueDB} from '../../repositories/keyValueDb'
+import {
+  keyValueDBService
+} from '../../services/classes/KeyValueDBService'
 
 import CONFIG from '../../lib/config'
+
+import {
+  onChangePassword,
+  onChangeUsername
+} from '../login/loginActions'
+
 /**
  * ## set the sessionToken
  *
@@ -61,32 +75,38 @@ export function setCredentials(credentials) {
  * ## Logout actions
  */
 export function logoutRequest() {
-    return {
-        type: LOGOUT_START
-    }
+  return {
+    type: LOGOUT_START
+  }
 }
 
 export function logoutSuccess() {
-    return {
-        type: LOGOUT_SUCCESS
-    }
+  return {
+    type: LOGOUT_SUCCESS
+  }
 }
 export function logoutFailure(error) {
-    return {
-        type: LOGOUT_FAILURE,
-        payload: error
-    }
+  return {
+    type: LOGOUT_FAILURE,
+    payload: error
+  }
 }
 
-//Deletes session token (jsession id) from store
+//Deletes values from store
 export function deleteSessionToken() {
-    return async function (dispatch) {
-        try {
-            const response = await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        } catch(error) {
-            throw error
-        }
+  return async function (dispatch) {
+    try {
+      await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
+      await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
+      await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
+      await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
+      await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
+       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      dispatch(onChangePassword(''))
+      dispatch(onChangeUsername(''))
+    } catch (error) {
+      throw error
     }
+  }
 
 }
-
