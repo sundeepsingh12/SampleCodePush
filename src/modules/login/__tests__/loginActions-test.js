@@ -36,6 +36,7 @@ const {
 
 jest.mock('../../../services/classes/Authentication')
 jest.mock('react-native-router-flux')
+jest.mock('../../../services/classes/KeyValueDBService')
 
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
@@ -168,6 +169,29 @@ describe('loginActions',() => {
         .then(() => {
             expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
             expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+        })
+    })
+
+    it('should check remember me',() => {
+        const expectedActions = [
+            {
+                 type : ON_LOGIN_USERNAME_CHANGE,
+                 payload : null
+            },
+            {
+                type : ON_LOGIN_PASSWORD_CHANGE,
+                payload : null
+            },
+            {
+                type : REMEMBER_ME_SET_TRUE
+            }
+        ]
+        const store = mockStore({})
+        return store.dispatch(actions.checkRememberMe())
+        .then(() => {
+            expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+            expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
         })
     })
 

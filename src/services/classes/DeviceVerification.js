@@ -71,14 +71,14 @@ class DeviceVerification {
     const hubId = (user) ? user.value.hubId : 0;
 
     if (deviceIMEI && deviceSIM) {
-      if (hubId !== deviceIMEI.value.hubId) {
+      if (hubId != deviceIMEI.value.hubId) {
         deviceIMEI.value.hubId = hubId;
         keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
       }
       if (!deviceSIM.value.isVerified) {
         await this.populateDeviceImeiAndDeviceSim(user)
         return false;
-      } else if (deviceSIM.value.isVerified && deviceSIM.value.companyId === companyId) {
+      } else if (deviceSIM.value.isVerified && deviceSIM.value.companyId == companyId) {
         return true;
       } else {
         await this.populateDeviceImeiAndDeviceSim(user)

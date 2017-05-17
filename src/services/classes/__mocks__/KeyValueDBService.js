@@ -2,7 +2,7 @@
 
 require('regenerator-runtime/runtime')
 
-export default class KeyValueDB {
+ class KeyValueDB {
 
     validateAndSaveData() {
 
@@ -13,6 +13,7 @@ export default class KeyValueDB {
     }
 
     deleteValueFromStore() {
-
     }
 }
+
+export let keyValueDBService = new KeyValueDB()

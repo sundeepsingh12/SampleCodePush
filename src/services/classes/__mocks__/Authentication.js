@@ -5,8 +5,6 @@ require('regenerator-runtime/runtime')
 class Authentication {
 
     login(username,password) {
-        console.log('test login')
-        console.log(username)
         return {
             headers : {
                 map : {
@@ -21,6 +19,9 @@ class Authentication {
 
     saveLoginCredentials(username ,password, rememberMe) {
         return username
+    }
+
+    logout(token) {
     }
 }
 

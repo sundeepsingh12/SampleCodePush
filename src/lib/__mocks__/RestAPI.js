@@ -22,7 +22,6 @@ export default class RestAPI {
   }
 
   serviceCall(postData) {
-    console.log(postData)
     return postData;
   }
 

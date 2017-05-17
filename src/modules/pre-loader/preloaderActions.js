@@ -59,7 +59,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 
 import { deleteSessionToken } from '../global/globalActions'
 
-import {onChangePassword,onChangeUsername} from '../login/loginActions'
+import { onChangePassword, onChangeUsername } from '../login/loginActions'
 
 import CONFIG from '../../lib/config'
 
@@ -200,20 +200,21 @@ export function otpValidationFailure(error) {
     }
 }
 
-export async function downloadJobMaster(dispatch) {
-    try {
-        dispatch(jobMasterDownloadStart())
-        const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-        const userObject = await keyValueDBService.getValueFromStore(USER)
-        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject,token)
-        const json = await jobMasters.json
-        dispatch(jobMasterDownloadSuccess())
-        validateAndSaveJobMaster(json, dispatch)
-      
-    } catch (error) {
-        dispatch(jobMasterDownloadFailure(error.message))
+export function downloadJobMaster() {
+    return async function (dispatch) {
+        try {
+            dispatch(jobMasterDownloadStart())
+            const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+            const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+            const userObject = await keyValueDBService.getValueFromStore(USER)
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject, token)
+            const json = await jobMasters.json
+            dispatch(jobMasterDownloadSuccess())
+            dispatch(validateAndSaveJobMaster(json))
+        } catch (error) {
+            dispatch(jobMasterDownloadFailure(error.message))
+        }
     }
 }
 
@@ -260,10 +261,10 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
             return
         }
         if (configDownloadService === SERVICE_FAILED || configDownloadService === SERVICE_PENDING || configSaveService === SERVICE_FAILED) {
-            downloadJobMaster(dispatch)
+            dispatch(downloadJobMaster())
         }
         else if (deviceVerificationService === SERVICE_FAILED) {
-            checkAsset(dispatch)
+            dispatch(checkAsset())
         }
     }
 }
@@ -275,19 +276,20 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
  * @param dispatch
  * @return {Promise.<void>}
  */
-export async function validateAndSaveJobMaster(jobMasterResponse, dispatch) {
-    try {
-        if (jobMasterResponse.message) {
-            throw new Error(jobMasterResponse.message)
+export function validateAndSaveJobMaster(jobMasterResponse) {
+    return async function (dispatch) {
+        try {
+            if (jobMasterResponse.message) {
+                throw new Error(jobMasterResponse.message)
+            }
+            await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
+            dispatch(jobMasterSavingStart())
+            await jobMasterService.saveJobMaster(jobMasterResponse)
+            dispatch(jobMasterSavingSuccess())
+            dispatch(checkAsset())
+        } catch (error) {
+            dispatch(jobMasterSavingFailure(error.message))
         }
-
-        await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
-        dispatch(jobMasterSavingStart())
-        await jobMasterService.saveJobMaster(jobMasterResponse)
-        dispatch(jobMasterSavingSuccess())
-        checkAsset(dispatch)
-    } catch (error) {
-        dispatch(jobMasterSavingFailure(error.message))
     }
 }
 
@@ -296,22 +298,27 @@ export async function validateAndSaveJobMaster(jobMasterResponse, dispatch) {
  * @param dispatch
  * @return {Promise.<void>}
  */
-export async function checkAsset(dispatch) {
-    try {
-        dispatch(checkAssetStart())
-        const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-        const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-        const user = await keyValueDB.getValueFromStore(USER)
-        const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
-        if (isVerified) {
-            dispatch(preloaderSuccess())
-            keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-            Actions.Tabbar()
-        } else {
-            checkIfSimValidOnServer(dispatch)
+export function checkAsset() {
+    return async function (dispatch) {
+        console.log('sim local called')
+        try {
+            dispatch(checkAssetStart())
+            const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+            const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+            const user = await keyValueDBService.getValueFromStore(USER)
+            const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
+            if (isVerified) {
+                console.log('sim local')
+                dispatch(preloaderSuccess())
+                await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+                Actions.Tabbar()
+            } else {
+                console.log('sim server')
+                dispatch(checkIfSimValidOnServer())
+            }
+        } catch (error) {
+            dispatch(checkAssetFailure(error.message))
         }
-    } catch (error) {
-        dispatch(checkAssetFailure(error.message))
     }
 }
 
@@ -321,30 +328,32 @@ export async function checkAsset(dispatch) {
  */
 
 
-export async function checkIfSimValidOnServer(dispatch){
-    try {
-    let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    const response = await deviceVerificationService.checkAssetAPI(deviceIMEI.value, deviceSIM.value, token)
-    const assetJSON = await response.json
-    const responseDeviceIMEI = await assetJSON.deviceIMEI
-    const responseDeviceSIM = await assetJSON.deviceSIM
-    await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
-    await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
-    deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-    const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
-    if (isVerified) {
-        await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-        dispatch(preloaderSuccess())
-        Actions.Tabbar()
-    } else {
-        await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
-        dispatch(showMobileNumber())
-    }
-} catch(error) {
-        dispatch(checkAssetFailure(error.message))
+export function checkIfSimValidOnServer() {
+    return async function (dispatch) {
+        try {
+            let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+            let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            const response = await deviceVerificationService.checkAssetAPI(deviceIMEI.value, deviceSIM.value, token)
+            const assetJSON = await response.json
+            const responseDeviceIMEI = await assetJSON.deviceIMEI
+            const responseDeviceSIM = await assetJSON.deviceSIM
+            await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
+            await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
+            deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+            deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+            const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
+            if (isVerified) {
+                await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+                dispatch(preloaderSuccess())
+                Actions.Tabbar()
+            } else {
+                await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
+                dispatch(showMobileNumber())
+            }
+        } catch (error) {
+            dispatch(checkAssetFailure(error.message))
+        }
     }
 }
 

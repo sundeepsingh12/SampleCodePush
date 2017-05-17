@@ -104,9 +104,7 @@ export function logoutFailure(error) {
 export function deleteSessionToken() {
     return async function (dispatch) {
         try {
-            console.log('deleteSessionToken')
             const response = await keyValueDB.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            console.log('deleteSessionToken success')
         } catch(error) {
             throw error
         }
