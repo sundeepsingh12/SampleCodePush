@@ -220,6 +220,11 @@ export function downloadJobMaster() {
       dispatch(validateAndSaveJobMaster(json))
     } catch (error) {
       dispatch(jobMasterDownloadFailure(error.message))
+      if (error.code == 403 || error.code == 400) { //clear user session 
+        dispatch(preLogoutSuccess())
+        dispatch(deleteSessionToken())
+        Actions.InitialLoginForm()
+      }
     }
   }
 }
@@ -281,9 +286,6 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
     try {
       if (!jobMasterResponse)
         throw new Error('No response returned from server')
-      if (jobMasterResponse.message) {
-        throw new Error(jobMasterResponse.message)
-      }
       await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
       dispatch(jobMasterSavingStart())
       await jobMasterService.saveJobMaster(jobMasterResponse)
