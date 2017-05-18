@@ -98,7 +98,7 @@ class JobMaster {
           deviceIMEI,
           deviceSIM,
           currentJobMasterVersion,
-          deviceCompanyId
+          deviceCompanyId 
         })
       } else {
         currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
@@ -112,7 +112,6 @@ class JobMaster {
       }
     }
     let jobMasterResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
-    jobMasterResponse = RestAPIFactory()._pruneEmpty(jobMasterResponse)
     return jobMasterResponse
   }
 
