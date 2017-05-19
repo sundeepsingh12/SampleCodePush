@@ -1,14 +1,11 @@
 'use strict'
 
-import {
-  keyValueDBService
-} from './KeyValueDBService'
+import { keyValueDBService } from './KeyValueDBService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import DeviceInfo from 'react-native-device-info'
-import {
-  Platform
-} from 'react-native'
+import { Platform } from 'react-native'
+let imei = require('../../wrapper/IMEI')
 
 const {
   DEVICE_IMEI,
@@ -44,16 +41,18 @@ class DeviceVerification {
    * 
    */
   checkAssetAPI(deviceIMEI, deviceSIM, token) {
+    if (!token) {
+      throw new Error('Token Missing')
+    }
     if (!deviceIMEI || !deviceSIM) {
       deviceIMEI = {}
-       deviceSIM = {}
+      deviceSIM = {}
     }
     const postData = JSON.stringify({
       deviceIMEI,
       deviceSIM
     })
     let checkAssetResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.CHECK_ASSET_API, 'POST')
-    checkAssetResponse = RestAPIFactory()._pruneEmpty(checkAssetResponse)
     return checkAssetResponse
   }
 
@@ -65,8 +64,8 @@ class DeviceVerification {
    */
 
   async checkAsset(deviceIMEI, deviceSIM, user) {
-    if(!user)
-    throw new Error('Value of user missing')
+    if (!user)
+      throw new Error('Value of user missing')
 
     const companyId = (user && user.value.company) ? user.value.company.id : 0;
     const hubId = (user) ? user.value.hubId : 0;
@@ -76,7 +75,7 @@ class DeviceVerification {
         deviceIMEI.value.hubId = hubId;
         keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
       }
-     if (deviceSIM.value.isVerified && deviceSIM.value.companyId == companyId) {
+      if (deviceSIM.value.isVerified && deviceSIM.value.companyId == companyId) {
         return true;
       } else {
         await this.populateDeviceImeiAndDeviceSim(user)
@@ -93,7 +92,6 @@ class DeviceVerification {
    * @param {*} user 
    */
   async populateDeviceImeiAndDeviceSim(user) {
-    let imei = require('../../wrapper/IMEI');
     try {
       let imeiNumber, simNumber
       if (Platform.OS === 'ios') {
@@ -114,7 +112,7 @@ class DeviceVerification {
    * @param {*} user 
    * @param {*} imeiNumber 
    */
-  populateDeviceImei(user, imeiNumber) {
+  async populateDeviceImei(user, imeiNumber) {
     const deviceImei = {
       hubId: user.value.hubId,
       cityId: user.value.cityId,
@@ -122,7 +120,7 @@ class DeviceVerification {
       userId: user.value.id,
       imeiNumber
     }
-    keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceImei)
+    await keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceImei)
   }
 
   /**This saves device sim in store
@@ -130,7 +128,7 @@ class DeviceVerification {
    * @param user
    * @param simNumber
    */
-  populateDeviceSim(user, simNumber) {
+  async populateDeviceSim(user, simNumber) {
     const deviceSim = {
       hubId: user.value.hubId,
       cityId: user.value.cityId,
@@ -138,9 +136,8 @@ class DeviceVerification {
       userId: user.value.id,
       simNumber,
       isVerified: false,
-    };
-
-    keyValueDBService.validateAndSaveData(DEVICE_SIM, deviceSim)
+    }
+    await keyValueDBService.validateAndSaveData(DEVICE_SIM, deviceSim)
   }
 
   /**POST API
@@ -182,11 +179,13 @@ class DeviceVerification {
    */
 
   generateOTP(deviceSIM, token) {
-     if (!token) {
+    if (!token) {
       throw new Error('Token Missing')
     }
+    if(!deviceSIM) {
+      throw new Error('Value of sim missing')
+    }
     let generateOtpResponse = RestAPIFactory(token.value).serviceCall(JSON.stringify(deviceSIM), CONFIG.API.GENERATE_OTP_API, 'POST')
-    generateOtpResponse = RestAPIFactory()._pruneEmpty(generateOtpResponse)
     return generateOtpResponse
   }
 
@@ -202,11 +201,13 @@ class DeviceVerification {
    * 
    */
   verifySim(deviceSIM, token) {
-     if (!token) {
+    if (!token) {
       throw new Error('Token Missing')
     }
+    if(!deviceSIM) {
+      throw new Error('Value of sim missing')
+    }
     let simVerificationResponse = RestAPIFactory(token.value).serviceCall(JSON.stringify(deviceSIM), CONFIG.API.SIM_VERIFICATION_API, 'POST')
-    simVerificationResponse = RestAPIFactory()._pruneEmpty(simVerificationResponse)
     return simVerificationResponse
   }
 

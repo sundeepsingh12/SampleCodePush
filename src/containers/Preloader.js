@@ -180,6 +180,7 @@ class Preloader extends Component {
                                 <Text style={[feStyle.fontWhite]}>Send OTP</Text>
                             </Button>
                             <Button onPress={()=>this.invalidateSession()}  full rounded danger
+                                disabled = {this.props.preloader.isMobileScreenLogoutDisabled}
                                 style={StyleSheet.flatten(feStyle.margin10, feStyle.bgDanger)}>
                                 <Text style={[feStyle.fontWhite]}>Close</Text>
                             </Button>
@@ -224,6 +225,7 @@ class Preloader extends Component {
 
                                </Button>
                                <Button onPress={()=>this.invalidateSession()}  full rounded danger
+                                   disabled = {this.props.preloader.isOtpScreenLogoutDisabled}
                                    style={StyleSheet.flatten(feStyle.margin10)}>
                                    <Text style={[feStyle.fontWhite]}>Close</Text>
 
