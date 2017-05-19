@@ -13,7 +13,7 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
-export class RestAPI {
+class RestAPI {
     /**
      * ## API.js client
      *

@@ -5,9 +5,7 @@
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 
-import {
-  keyValueDBService
-} from './KeyValueDBService'
+import { keyValueDBService } from './KeyValueDBService'
 
 import moment from 'moment'
 
@@ -90,31 +88,30 @@ class JobMaster {
     let postData = "",
       currentJobMasterVersion = 0,
       deviceCompanyId = 0;
-      if(userObject){
-    if ((!deviceIMEI || !deviceSIM)) {
-      deviceIMEI = {}
-      deviceSIM = {}
-      currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
-      deviceCompanyId = userObject.value.company.id
-      postData = JSON.stringify({
-        deviceIMEI,
-        deviceSIM,
-        currentJobMasterVersion,
-        deviceCompanyId
-      })
-    } else {
-      currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
-      deviceCompanyId = userObject.value.company.id
-      postData = JSON.stringify({
-        deviceIMEI,
-        deviceSIM,
-        currentJobMasterVersion,
-        deviceCompanyId
-      })
+    if (userObject) {
+      if ((!deviceIMEI || !deviceSIM)) {
+        deviceIMEI = {}
+        deviceSIM = {}
+        currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
+        deviceCompanyId = userObject.value.company.id
+        postData = JSON.stringify({
+          deviceIMEI,
+          deviceSIM,
+          currentJobMasterVersion,
+          deviceCompanyId 
+        })
+      } else {
+        currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
+        deviceCompanyId = userObject.value.company.id
+        postData = JSON.stringify({
+          deviceIMEI: deviceIMEI.value,
+          deviceSIM: deviceSIM.value,
+          currentJobMasterVersion,
+          deviceCompanyId
+        })
+      }
     }
-  }
     let jobMasterResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.JOB_MASTER_API, 'POST')
-    jobMasterResponse = RestAPIFactory()._pruneEmpty(jobMasterResponse)
     return jobMasterResponse
   }
 
@@ -159,6 +156,7 @@ class JobMaster {
     if (currentTimeInMillis - serverTimeInMillis > 15 * 60 * 1000) {
       throw new Error("Server Time not same as mobile time")
     }
+    return true
   }
 }
 

@@ -44,35 +44,14 @@ const {
   IS_SHOW_OTP_SCREEN
 } = require('../../lib/constants').default
 
-import {
-  Actions
-} from 'react-native-router-flux'
-import {
-  keyValueDB
-} from '../../repositories/keyValueDb'
-import {
-  jobMasterService
-} from '../../services/classes/JobMaster'
-import {
-  authenticationService
-} from '../../services/classes/Authentication'
-
-import {
-  deviceVerificationService
-} from '../../services/classes/DeviceVerification'
-import {
-  keyValueDBService
-} from '../../services/classes/KeyValueDBService'
-
-import {
-  deleteSessionToken
-} from '../global/globalActions'
-
-import {
-  onChangePassword,
-  onChangeUsername
-} from '../login/loginActions'
-
+import { Actions } from 'react-native-router-flux'
+import { keyValueDB } from '../../repositories/keyValueDb'
+import { jobMasterService } from '../../services/classes/JobMaster'
+import { authenticationService } from '../../services/classes/Authentication'
+import { deviceVerificationService } from '../../services/classes/DeviceVerification'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { deleteSessionToken } from '../global/globalActions'
+import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 
 //Action dispatched when job master downloading starts
@@ -224,24 +203,29 @@ export function otpValidationFailure(error) {
 
   }
 }
-
 //This hits JOB Master Api and gets the response 
-export async function downloadJobMaster(dispatch) {
-  try {
-    dispatch(jobMasterDownloadStart())
-    const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-    const userObject = await keyValueDBService.getValueFromStore(USER)
-    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject, token)
-    if (!jobMasters)
-      throw new Error('No response returned from server')
-    const json = await jobMasters.json
-    dispatch(jobMasterDownloadSuccess())
-    validateAndSaveJobMaster(json, dispatch)
-
-  } catch (error) {
-    dispatch(jobMasterDownloadFailure(error.message))
+export function downloadJobMaster() {
+  return async function (dispatch) {
+    try {
+      dispatch(jobMasterDownloadStart())
+      const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+      const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      const jobMasters = await jobMasterService.downloadJobMaster(deviceIMEI, deviceSIM, userObject, token)
+      if (!jobMasters)
+        throw new Error('No response returned from server')
+      const json = await jobMasters.json
+      dispatch(jobMasterDownloadSuccess())
+      dispatch(validateAndSaveJobMaster(json))
+    } catch (error) {
+      dispatch(jobMasterDownloadFailure(error.message))
+      if (error.code == 403 || error.code == 400) { //clear user session 
+        dispatch(preLogoutSuccess())
+        dispatch(deleteSessionToken())
+        Actions.InitialLoginForm()
+      }
+    }
   }
 }
 
@@ -283,9 +267,9 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
       return
     }
     if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
-      checkAsset(dispatch)
+      dispatch(checkAsset())
     } else {
-      downloadJobMaster(dispatch)
+      dispatch(downloadJobMaster())
     }
   }
 }
@@ -297,20 +281,19 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
  * @param dispatch
  * @return {Promise.<void>}
  */
-export async function validateAndSaveJobMaster(jobMasterResponse, dispatch) {
-  try {
-    if (!jobMasterResponse)
-
-      if (jobMasterResponse.message) {
-        throw new Error(jobMasterResponse.message)
-      }
-    await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
-    dispatch(jobMasterSavingStart())
-    await jobMasterService.saveJobMaster(jobMasterResponse)
-    dispatch(jobMasterSavingSuccess())
-    checkAsset(dispatch)
-  } catch (error) {
-    dispatch(jobMasterSavingFailure(error.message))
+export function validateAndSaveJobMaster(jobMasterResponse) {
+  return async function (dispatch) {
+    try {
+      if (!jobMasterResponse)
+        throw new Error('No response returned from server')
+      await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
+      dispatch(jobMasterSavingStart())
+      await jobMasterService.saveJobMaster(jobMasterResponse)
+      dispatch(jobMasterSavingSuccess())
+      dispatch(checkAsset())
+    } catch (error) {
+      dispatch(jobMasterSavingFailure(error.message))
+    }
   }
 }
 
@@ -319,22 +302,24 @@ export async function validateAndSaveJobMaster(jobMasterResponse, dispatch) {
  * @param dispatch
  * @return {Promise.<void>}
  */
-export async function checkAsset(dispatch) {
-  try {
-    dispatch(checkAssetStart())
-    const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-    const user = await keyValueDB.getValueFromStore(USER)
-    const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
-    if (isVerified) {
-      dispatch(preloaderSuccess())
-      keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-      Actions.Tabbar()
-    } else {
-      checkIfSimValidOnServer(dispatch)
+export function checkAsset() {
+  return async function (dispatch) {
+    try {
+      dispatch(checkAssetStart())
+      const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+      const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+      const user = await keyValueDBService.getValueFromStore(USER)
+      const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
+      if (isVerified) {
+        dispatch(preloaderSuccess())
+        await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+        Actions.Tabbar()
+      } else {
+        dispatch(checkIfSimValidOnServer())
+      }
+    } catch (error) {
+      dispatch(checkAssetFailure(error.message))
     }
-  } catch (error) {
-    dispatch(checkAssetFailure(error.message))
   }
 }
 
@@ -342,36 +327,40 @@ export async function checkAsset(dispatch) {
  *
  * @return {Promise.<void>}
  */
-export async function checkIfSimValidOnServer(dispatch) {
-  try {
-    let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
-    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    const response = await deviceVerificationService.checkAssetAPI(deviceIMEI.value, deviceSIM.value, token)
-    if (!response)
-      throw new Error('No response returned from server')
-    const assetJSON = await response.json
-    if (!assetJSON)
-      throw new Error('No response returned from server')
-    const responseDeviceIMEI = await assetJSON.deviceIMEI
-    const responseDeviceSIM = await assetJSON.deviceSIM
-    await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
-    await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
-    const isVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
-    if (isVerified) {
-      await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-      dispatch(preloaderSuccess())
-      Actions.Tabbar()
-    } else {
-      await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
-      dispatch(showMobileNumber())
-    }
-  } catch (error) {
-    dispatch(checkAssetFailure(error.message))
-    if (error.code == 403 || error.code == 400) { //clear user session 
-      dispatch(preLogoutSuccess())
-      dispatch(deleteSessionToken())
-      Actions.InitialLoginForm()
+
+
+export function checkIfSimValidOnServer() {
+  return async function (dispatch) {
+    try {
+      let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+      let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      const response = await deviceVerificationService.checkAssetAPI(deviceIMEI.value, deviceSIM.value, token)
+      if (!response)
+        throw new Error('No response returned from server')
+      const assetJSON = await response.json
+      if (!assetJSON)
+        throw new Error('No response returned from server')
+      const responseDeviceIMEI = await assetJSON.deviceIMEI
+      const responseDeviceSIM = await assetJSON.deviceSIM
+      await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
+      await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
+      const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
+      if (responseIsVerified) {
+        await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+        dispatch(preloaderSuccess())
+        Actions.Tabbar()
+      } else {
+        await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
+        dispatch(showMobileNumber())
+      }
+    } catch (error) {
+      dispatch(checkAssetFailure(error.message))
+      if (error.code == 403 || error.code == 400) { //clear user session 
+        dispatch(preLogoutSuccess())
+        dispatch(deleteSessionToken())
+        Actions.InitialLoginForm()
+      }
     }
   }
 }
