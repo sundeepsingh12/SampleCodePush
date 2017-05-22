@@ -3,7 +3,7 @@
  */
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
-import {keyValueDBService} from './KeyValueDBService'
+import { keyValueDBService } from './KeyValueDBService'
 import CONFIG from '../../lib/config'
 const {
     USERNAME,
@@ -40,8 +40,7 @@ class Authentication {
         data.append('j_password', password)
         data.append('_spring_security_remember_me', false)
         data.append('submit', 'Login')
-
-        let authenticationResponse =  RestAPIFactory().serviceCall(data, CONFIG.API.AUTHENTICATION_API, 'LOGIN')
+        let authenticationResponse = RestAPIFactory().serviceCall(data, CONFIG.API.AUTHENTICATION_API, 'LOGIN')
         return authenticationResponse
     }
 
@@ -51,30 +50,28 @@ class Authentication {
      * @param {*} password 
      * @param {*} rememberMe 
      */
-    saveLoginCredentials(username,password,rememberMe) {
-        if(rememberMe) {
-            console.log('rememberMe save')
-            console.log(rememberMe)
-            keyValueDBService.validateAndSaveData(USERNAME,username)
-            keyValueDBService.validateAndSaveData(PASSWORD,password)
-            keyValueDBService.validateAndSaveData(REMEMBER_ME,rememberMe)
+    saveLoginCredentials(username, password, rememberMe) {
+        if (rememberMe) {
+            keyValueDBService.validateAndSaveData(USERNAME, username)
+            keyValueDBService.validateAndSaveData(PASSWORD, password)
+            keyValueDBService.validateAndSaveData(REMEMBER_ME, rememberMe)
         } else {
-            console.log('rememberMe delete')
-            console.log(rememberMe)
             keyValueDBService.deleteValueFromStore(USERNAME)
             keyValueDBService.deleteValueFromStore(PASSWORD)
             keyValueDBService.deleteValueFromStore(REMEMBER_ME)
         }
     }
 
-    logout(sessionToken) {
-        try {
-            console.log(sessionToken)
-            let logoutResponse = RestAPIFactory(sessionToken).serviceCall(null,CONFIG.API.LOGOUT_API,'GET')
-            return logoutResponse
-        } catch (error) {
-            throw(error)
+    /**
+     * LOGOUT API (GET)
+     * @param {*} token 
+     */
+    logout(token) {
+        if(!token) {
+            throw new Error('Token Missing')
         }
+        let logoutResponse = RestAPIFactory(token.value).serviceCall(null, CONFIG.API.LOGOUT_API, 'GET')
+        return logoutResponse
     }
 
 }

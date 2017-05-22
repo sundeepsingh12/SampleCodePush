@@ -28,7 +28,6 @@ import { Record } from 'immutable'
  */
 var InitialState = Record({
   currentUser: null,
-  store: null,
-  isInternetAvailable: false,
+  store: null
 })
 export default InitialState

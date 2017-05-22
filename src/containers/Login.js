@@ -20,7 +20,6 @@ import { Actions } from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
-// import * as globalActions from '../modules/global/globalActions'
 import renderIf from '../lib/renderIf';
 
 var styles = StyleSheet.create({
@@ -60,7 +59,6 @@ var styles = StyleSheet.create({
 function mapStateToProps(state) {
   return {
     auth: state.auth,
-    // global: state.global,
   }
 }
 
@@ -81,15 +79,15 @@ class Login extends Component {
     this.props.actions.checkRememberMe()
   }
 
-  onChangeUsername(username) {
+  onChangeUsername(username){
     this.props.actions.onChangeUsername(username)
   }
 
-  onChangePassword(password) {
+  onChangePassword(password){
     this.props.actions.onChangePassword(password)
   }
 
-  loginButtonPress() {
+  loginButtonPress(){
     const password = this.props.auth.form.password;
     console.log(password.length)
     if(password.length > 50) {
@@ -105,15 +103,14 @@ class Login extends Component {
     this.props.actions.stopScanner();
     this.onChangeUsername(username);
     this.onChangePassword(password);
-    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password);
+    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password,this.props.auth.form.rememberMe);
   }
 
-  _onScaningCancelled() {
+  _onScaningCancelled(){
     this.props.actions.stopScanner();
   }
 
-  rememberMe() {
-    console.log('rememberMe called')
+  rememberMe(){
     this.props.actions.toggleCheckbox()
   }
 
@@ -134,7 +131,7 @@ class Login extends Component {
                   value={this.props.auth.form.username}
                   placeholder='Username'
                   style={feTheme.roundedInput}
-                  onChangeText={value =>  this.onChangeUsername(value) }
+                  onChangeText={value => this.onChangeUsername(value)}
                   disabled = {this.props.auth.form.isEditTextDisabled}
                    />
               </Item>
@@ -151,20 +148,20 @@ class Login extends Component {
               <Button
                 rounded success style={{ width: '100%', marginTop: 15 }}
                 disabled={this.props.auth.form.isButtonDisabled}
-                onPress={() => this.loginButtonPress()}
+                onPress={()=>this.loginButtonPress()}
               >
                 <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Log In</Text>
               </Button>
 
               <View style={{ flexDirection: 'row', flexGrow: 1, justifyContent: 'flex-start', marginTop: 15 }}>
                 <CheckBox checked={this.props.auth.form.rememberMe} 
-                  onPress = {this.rememberMe.bind(this)} />
+                  onPress = {()=>this.rememberMe()} />
                 <Text style={{ marginLeft: 20 }}>Remember Me</Text>
               </View>
 
               <View style={{ marginTop: 35 }}>
-                <Text style={{ textAlign: 'center', color: '#d3d3d3', marginBottom: 10 }}>
-                  {this.props.auth.form.displayMessage}...
+                <Text style={{ textAlign: 'center', color: '#333333', marginBottom: 10 }}>
+                  {this.props.auth.form.displayMessage}
                   </Text>
                 <Button 
                   onPress={() => this.props.actions.startScanner()} rounded style={{ width: '100%', }}>

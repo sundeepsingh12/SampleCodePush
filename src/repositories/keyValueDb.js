@@ -14,7 +14,7 @@ import store from 'react-native-simple-store'
 import validate from "json-schema"
 
 export class keyValueDb {
-    validateAndSaveData(schemaName, value) {
+   async validateAndSaveData(schemaName, value) {
         let schemaInstance = '',checkCondition = false;
 
         switch (schemaName) {
@@ -84,11 +84,10 @@ export class keyValueDb {
             }).then(() => {
                 return true;
             }).catch(error => {
-                console.log(error)
                 return error;
             })
         } else {
-            const schemaCheck = this.getValueFromStore(schemaName)
+            const schemaCheck = await this.getValueFromStore(schemaName)
             if(!schemaCheck) {
                 throw new Error(schemaName + ' validation failed')
             }

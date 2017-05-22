@@ -18,12 +18,17 @@ var InitialState = Record({
   deviceVerificationService: SERVICE_PENDING, //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
   isError: false,
   error: '',
-  isComplete: false,
   showMobileNumberScreen:false,
   showOtpScreen:false,
   mobileNumber:'',
-  disableButton:true,
-  otpNumber:''
+  isOtpVerificationButtonDisabled:true,
+  isGenerateOtpButtonDisabled:true,
+  otpNumber:'',
+  isPreloaderLogoutDisabled:false, //logout button which is displayed in preloader screen
+  isOtpScreenLogoutDisabled:false, //logout button which is displayed in enter opt screen
+  isMobileScreenLogoutDisabled:false, //logout button which is displayed in enter mobile no screen
+  mobileDisplayMessage:'', //message which will be displayed in mobile no screen
+  otpDisplayMessage:'' //message which will be displayed in otp screen
 })
 
 export default InitialState

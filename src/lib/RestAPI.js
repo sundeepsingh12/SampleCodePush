@@ -13,7 +13,7 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
-export class RestAPI {
+class RestAPI {
     /**
      * ## API.js client
      *
@@ -21,12 +21,10 @@ export class RestAPI {
      * @throws tokenMissing if token is undefined
      */
     initialize (token) {
-        console.log('token initialize')
-        console.log(token)
-        if (!_.isNull(token) && _.isUndefined(token.sessionToken)) {
+        if (!_.isNull(token) && _.isUndefined(token)) {
             throw new Error('TokenMissing')
         }
-        this._sessionToken = _.isNull(token) ? null : token.sessionToken
+        this._sessionToken = _.isNull(token) ? null : token
 
         this.API_BASE_URL = CONFIG.backend.fareyeProduction
             ? CONFIG.FAREYE.production.url
@@ -44,11 +42,9 @@ export class RestAPI {
  */
     async _fetch (opts) {
         let url = this.API_BASE_URL + opts.url
-        console.log("this.sessionToken")
-        console.log(this._sessionToken)
         if (this._sessionToken) {
-            opts.headers = {}
             opts.headers['Cookie'] = this._sessionToken
+
         }
         const response = await fetch(url, opts)
         const {status, code, headers} = response;
@@ -111,20 +107,29 @@ export class RestAPI {
                 url,
                 headers:{
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                 }
             }
         }
 
         return this._fetch(opts)
             .then((res) => {
-                console.log(res.status)
-                console.log(res.message)
                 if(res.status==200) {
                     return res;
-                }else{
-                    console.log(res)
-                    throw new Error({code: res.statusCode, error: res.message})
+                } else {
+                    switch(res.status) {
+                    case 401:
+                        throw new Error("Invalid User Credentials")
+                    case 500:
+                        throw new Error("Internal server error")
+                    case 502:
+                        throw new Error("Bad Gateway")
+                    case 1201:
+                        throw new Error("User already logged in ")
+                    case 1203:
+                        throw new Error("User locked.Try after 15 minutes")
+                    default:
+                        throw {code: res.status, message: 'Something went wrong'}
+                    }
                 }
             })
             .catch((error) => {
