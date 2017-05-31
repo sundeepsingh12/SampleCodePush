@@ -19,6 +19,8 @@ module.exports = {
         CHECK_ASSET_API :'/rest/device/check_asset',
         GENERATE_OTP_API :'/rest/device/generate_otp',
         SIM_VERIFICATION_API:'/rest/device/sim_verified',
-        LOGOUT_API:'/logout'
+        LOGOUT_API:'/logout',
+        DOWNLOAD_DATA_API:'/rest/device/get_sync_table_job_with_pagination',
+        DELETE_DATA_API:'rest/device/delete_synch_job'
     }
 }

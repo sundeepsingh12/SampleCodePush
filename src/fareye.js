@@ -58,6 +58,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
  */
 import {setPlatform, setVersion} from './modules/device/deviceActions'
 import {setStore} from './modules/global/globalActions'
+import {onResyncPress} from './modules/home/homeActions'
 
 /**
  * ## States
@@ -193,7 +194,7 @@ export default function native(platform) {
                   title='Re-sync'
                   icon={TabIcon}
                   iconName={"ios-sync-outline"}
-                  onPress={() => { }} />
+                  onPress={() => {store.dispatch(onResyncPress())}} />
 
                 <Scene key='Message'
                   title='Message'

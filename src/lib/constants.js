@@ -106,7 +106,17 @@ export default keyMirror({
     DEVICE_IMEI:null,
     DEVICE_SIM:null,
     USER:null,
-    IS_PRELOADER_COMPLETE:null
+    IS_PRELOADER_COMPLETE:null,
+
+    //Realm Tables
+    TABLE_JOB_TRANSACTION:null,
+    TABLE_JOB:null,
+    TABLE_JOB_DATA:null,
+    TABLE_RUNSHEET:null,
+    TABLE_FIELD_DATA:null,
+
+    //Home Actions
+    IS_LAST_PAGE:null
 })
 
 
