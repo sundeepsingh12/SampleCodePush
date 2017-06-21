@@ -8,18 +8,45 @@ import {
 
 class JobStatus {
 
-  async getAllUnseenIds() {
+  /**A generic method for getting all status ids based on particular status code
+   * 
+   * Possible values of statusCode - UNSEEN,PENDING
+   * @param {*} statusCode 
+   */
+  async getAllIdsForCode(statusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    const unseenJobStatusIds = jobStatusArray.value.filter(jobStatusObject => jobStatusObject.code == 'UNSEEN')
-      .map(unseenJobStatusObject => unseenJobStatusObject.id)
-    return unseenJobStatusIds
+    console.log('jobStatusArray')
+    console.log(jobStatusArray)
+    const jobStatusIds = await jobStatusArray.value.filter(jobStatusObject => jobStatusObject.code == statusCode)
+      .map(jobStatusObject => jobStatusObject.id)
+    return jobStatusIds
   }
 
-  async getStatusIdForJobMasterIdAndCode(jobMasterId,code){
+  /**Generic method for getting particular status id of a particular job master and job status code
+   * 
+   * @param {*} jobMasterId 
+   * @param {*} code 
+   */
+  async getStatusIdForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-   const jobStatusId = jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == 'UNSEEN' && jobStatusObject.jobMasterId==jobMasterId))
+    const jobStatusId = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobStatusObject.jobMasterId == jobMasterId))
       .map(jobStatusObject => jobStatusObject.id)
-      return jobStatusId
+    return jobStatusId[0]
+  }
+
+  /**
+   * 
+   * @param {*} jobMasterIdList 
+   * @param {*} jobStatusCode 
+   */
+  async getjobMasterIdStatusIdMap(jobMasterIdList, jobStatusCode) {
+    let jobMasterIdStatusIdMap = {}
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    const filteredJobStatusArray = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobMasterIdList.includes(jobStatusObject.jobMasterId)))
+    filteredJobStatusArray.forEach(jobStatusObject => {
+      jobMasterIdStatusIdMap[jobStatusObject.jobMasterId] = jobStatusObject.id
+    })
+    return jobMasterIdStatusIdMap
   }
 }
 

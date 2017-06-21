@@ -7,7 +7,7 @@ import Job from './schema/Job'
 import JobData from './schema/JobData'
 import FieldData from './schema/FieldData'
 
-const schemaVersion = 5;
+const schemaVersion = 4;
 const schema = [JobTransaction, Job, JobData, FieldData];
 let realm = new Realm({
   schemaVersion,
@@ -45,11 +45,37 @@ export function saveList(tableName, array) {
  */
 export function performBatchSave(...tableNamesVsDataList) {
   return realm.write(() => {
-    realm.deleteAll()
     tableNamesVsDataList.forEach(record => {
       if (record.value)
         record.value.forEach(data => realm.create(record.tableName, data))
     })
+  });
+}
+
+export function deleteRecords(){
+   return realm.write(() => {
+    realm.deleteAll()
+  });
+}
+
+export function deleteRecordsInBatch(...datas){
+  return realm.write(() => {
+    datas.forEach(data=>realm.delete(data))
+  });
+}
+
+export function updateRecords(...tableNameVsDataList){
+    return realm.write(() => {
+    tableNamesVsDataList.forEach(record => {
+      if (record.value)
+        record.value.forEach(data => realm.create(record.tableName, data))
+    })
+  });
+}
+
+export function updateTableRecordOnProperty(tableName,property,value){
+    return realm.write(() => {
+        tableName.property = value
   });
 }
 

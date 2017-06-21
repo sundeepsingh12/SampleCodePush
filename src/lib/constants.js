@@ -116,7 +116,11 @@ export default keyMirror({
     TABLE_FIELD_DATA:null,
 
     //Home Actions
-    IS_LAST_PAGE:null
+    IS_LAST_PAGE:null,
+
+    //Status Codes
+    UNSEEN:null,
+    PENDING:null
 })
 
 

@@ -308,12 +308,13 @@ export function checkAsset() {
       const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
       const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
       const user = await keyValueDBService.getValueFromStore(USER)
-      const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
+      const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
       if (isVerified) {
         dispatch(preloaderSuccess())
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         Actions.Tabbar()
       } else {
+        await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer())
       }
     } catch (error) {

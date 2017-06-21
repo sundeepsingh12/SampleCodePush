@@ -11,11 +11,11 @@ JobData.schema = {
   name: TABLE_JOB_DATA,
   primaryKey: 'id',
   properties: {
-      id: { type: 'int' },
-     value:{type: 'string'},
-     jobId:{type:'int'},
-     positionId:{type:'int'},
-     parentId:{type:'int'},
-     jobAttributeMasterId:{type:'int'}
+    id: { type: 'int' },
+    value: { type: 'string' },
+    jobId: { type: 'int' },
+    positionId: { type: 'int' },
+    parentId: { type: 'int' },
+    jobAttributeMasterId: { type: 'int' }
   }
 }

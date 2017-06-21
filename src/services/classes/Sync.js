@@ -12,12 +12,20 @@ import {
   jobTransactionService
 } from './JobTransaction'
 
+import {
+  jobSummaryService
+} from './JobSummary'
+
+import _ from 'underscore'
+
 const {
   TABLE_JOB_TRANSACTION,
   TABLE_FIELD_DATA,
   TABLE_JOB,
   TABLE_JOB_DATA,
-  USER
+  USER,
+  UNSEEN,
+  PENDING
 } = require('../../lib/constants').default
 
 class Sync {
@@ -79,7 +87,8 @@ class Sync {
    * 
    * @return tdcResponse object
    */
-  async downloadDataFromServer(token, pageNumber, pageSize) {
+  async downloadDataFromServer(pageNumber, pageSize) {
+    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     let formData = null
     const user = await keyValueDBService.getValueFromStore(USER)
     const isCustomErpPullActivated = user.value.company.customErpPullActivated
@@ -110,36 +119,66 @@ class Sync {
    * 
    * @param {*} tdcResponse 
    */
-  processTdcResponse(tdcResponse) {
-    let tdcResponseObject
-    for (tdcResponseObject of tdcResponse) {
-      const queryType = tdcResponseObject.type
+  processTdcResponse(tdcContentArray) {
+    let tdcContentObject
+    for (tdcContentObject of tdcContentArray) {
+      const queryType = tdcContentObject.type
       console.log(queryType)
       if (queryType == 'insert') {
-        const contentArray = JSON.parse(tdcResponseObject.query)
-        const jobTransactions = {
-          tableName: TABLE_JOB_TRANSACTION,
-          value: contentArray.jobTransactions
-        }
-        const jobs = {
-          tableName: TABLE_JOB,
-          value: contentArray.job
-        }
-
-        const jobDatas = {
-          tableName: TABLE_JOB_DATA,
-          value: contentArray.jobData
-        }
-
-        const fieldDatas = {
-          tableName: TABLE_FIELD_DATA,
-          value: contentArray.fieldData
-        }
-        realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas)
+        this.saveDataFromServerInDB(tdcContentObject.query)
+      } else if (queryType == 'delete') {
+        this.deleteDataFromDB(tdcContentObject.query)
+      } else if (queryType == 'update') {
+        this.updateDataInDB()
       }
     }
   }
 
+  saveDataFromServerInDB(query) {
+    const contentQuery = JSON.parse(query)
+    const jobTransactions = {
+      tableName: TABLE_JOB_TRANSACTION,
+      value: contentQuery.jobTransactions
+    }
+    const jobs = {
+      tableName: TABLE_JOB,
+      value: contentQuery.job
+    }
+
+    const jobDatas = {
+      tableName: TABLE_JOB_DATA,
+      value: contentQuery.jobData
+    }
+
+    const fieldDatas = {
+      tableName: TABLE_FIELD_DATA,
+      value: contentQuery.fieldData
+    }
+    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas)
+  }
+
+  deleteDataFromDB(query) {
+    console.log('inside delete query')
+    const jobTransactionIds= query.jobTransactions.map(jobTransactionObject=>jobTransactionObject.id)
+
+    const jobIds = query.job.map(jobObject=>jobObject.id)
+
+    const jobDataIds = query.jobData.map(jobDataObject=>jobDataObject.id)
+
+    const fieldDataIds = query.fieldData.map(fieldDataObject=>fieldDataObject.id)
+
+    realm.deleteRecordsInBatch(jobTransactionIds,jobIds,jobDataIds,fieldDataIds)
+
+  }
+
+  updateDataInDB(query) {
+      const jobTransactions= query.jobTransactions
+      const jobs = query.job
+      const jobDatas = query.jobData
+      const fieldDatas = query.fieldData
+
+      realm.updateRecords(jobTransactions,jobs,jobDatas,fieldDatas)
+  }
 
   /**POST API
    * 
@@ -179,8 +218,20 @@ class Sync {
    * 
    *
    */
-  deleteDataFromServer(successSyncIds, messageIdDTOs, transactionIdDTOs, jobSummary) {
-
+  async deleteDataFromServer(syncIds, messageIdDTOs, transactionIdDTOs, jobSummaries) {
+    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+    const postData = JSON.stringify({
+      syncIds,
+      messageIdDTOs,
+      transactionIdDTOs,
+      jobSummaries
+    })
+    console.log('ppstdata')
+     console.log(postData)
+     console.log('token.value')
+      console.log(token.value)
+    let deleteResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.DELETE_DATA_API, 'POST')
+    return deleteResponse
   }
 
   /**This will give value of 'id' key from tdc response
@@ -192,36 +243,26 @@ class Sync {
     return successSyncIds
   }
 
-  async getTransactionIdDTOs() {
-    const allJobTransactions = await jobTransactionService.getAllJobTransactions()
-    console.log('allJobTransactions')
-     console.log(allJobTransactions)
-    const transactionIdDtos = []
-    const unseenStatusIds = await jobStatusService.getAllUnseenIds()
-    const unseenTransactions = await jobTransactionService.getUnseenJobTransactions(allJobTransactions,unseenStatusIds)
-    console.log('unseenTransactions')
-    console.log(unseenTransactions)
-    unseenTransactions.forEach(unseenTransactionObject=>{
-      const [jobMasterId] = unseenTransactionObject
-      console.log(jobMasterId)
-      const transactionId = unseenTransactionObject.id
-      const unSeenStatusId = jobStatusService.getStatusIdForJobMasterIdAndCode(jobMasterId,'UNSEEN')
-      console.log('unSeenStatusId')
-       console.log(unSeenStatusId)
-       const pendingStatusId = jobStatusService.getStatusIdForJobMasterIdAndCode(jobMasterId,'PENDING')
-       console.log('pendingStatusId')
-       console.log(pendingStatusId)
-      const transactionIdDtoObject = {
-        jobMasterId,
-        pendingStatusId,
-        transactionId,
-        unseenStatusId
-      }
-      transactionIdDtos.push(transactionIdDtoObject)
-    })
-    console.log(unseenTransactions)
- }
-
+  /**Returns Transaction Id dto which will be used in Request body of delete sync
+   * 
+   * Sample transactionIdDTOs : [
+          {
+              "jobMasterId": 930,
+              "pendingStatusId": 4813,
+              "transactionId": "2426803",
+              "unSeenStatusId": 4814
+          }
+      ]
+   * 
+   */
+  getTransactionIdDTOs(unseenTransactionsMap) {
+    const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
+    let transactionIdDtos = []
+    for (let mapObject in jobMasterIdTransactionDtoMap) {
+      transactionIdDtos.push(jobMasterIdTransactionDtoMap[mapObject]);
+    }
+    return transactionIdDtos
+  }
 }
 
 export let sync = new Sync()

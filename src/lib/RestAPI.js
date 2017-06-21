@@ -54,6 +54,7 @@ class RestAPI {
             headers,
             json: {}
         }
+        
         if (opts.headers["Content-Type"] == "application/json") {
             res.json = response.json()
         }
