@@ -3,10 +3,11 @@
 
 import Realm from 'realm';
 import UserSummary from './schema/userSummary'
+import JobTransaction from './schema/jobTransaction'
 // import JobMaster from './jobMaster'
 
 const schemaVersion = 4;
-const schema = [ UserSummary ];
+const schema = [ JobTransaction ];
 let realm = new Realm({ schemaVersion, schema });
 
 export function save(tableName, object) {

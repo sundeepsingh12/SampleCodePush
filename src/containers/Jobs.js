@@ -10,12 +10,16 @@ import {
   Platform,
   TouchableHighlight,
   FlatList,
-  ActivityIndicator 
+  ActivityIndicator
 }
   from 'react-native'
 
 import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Text, Header, Icon, Button } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import * as homeActions from '../modules/home/homeActions'
+import { Actions } from 'react-native-router-flux';
 
 var styles = StyleSheet.create({
   container: {
@@ -62,17 +66,26 @@ var styles = StyleSheet.create({
   },
 })
 
+function mapStateToProps(state) {
+  return {
+    home: state.home
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators({ ...homeActions }, dispatch)
+  }
+}
+
 class Jobs extends Component {
 
   constructor(props) {
     super(props);
+  }
 
-    var ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-    this.state = {
-      data: this._genRow(),
-      dataSource: ds,
-      status: false
-    }
+  componentDidMount() {
+    this.props.actions.fetchJobs(this.props.home.pageNumber)
   }
 
   toggleStatus() {
@@ -80,12 +93,6 @@ class Jobs extends Component {
       status: !this.state.status
     });
     console.log('toggle button handler: ' + this.state.status);
-  }
-
-  componentDidMount() {
-    this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(this.state.data)
-    });
   }
 
   _genRow() {
@@ -134,32 +141,39 @@ class Jobs extends Component {
   };*/
 
   renderFooter = () => {
-        if (!this.state.loading) {
-            return null
-        }
-
-        return (
-            <View
-                style={{
-                    paddingVertical: 20,
-                    borderTopWidth: 1,
-                    borderColor: '#CED0CE'
-                }}>
-                <ActivityIndicator animating size='large' />
-            </View>
-        )
+    if(this.props.home.isFetching) {
+      return null
     }
+    return (
+      <View
+        style={{
+          paddingVertical: 20,
+          borderTopWidth: 1,
+          borderColor: '#CED0CE'
+        }}>
+        <ActivityIndicator animating size='large' />
+      </View>
+    )
+  }
+
+  handleLoadMore = () => {
+    console.log(this.props.home.pageNumber)
+    this.props.actions.fetchJobs(this.props.home.pageNumber)
+  }
 
   render() {
+    console.log(this.props)
     return (
       <View style={styles.container}>
         <List
-          style={{marginTop: 5, marginBottom: 50 }}>
+          style={{ marginTop: 5, marginBottom: 50 }}>
           <FlatList
-            data={this.state.data}
+            data={this.props.home.lazydata}
             renderItem={({ item }) => this.renderData(item)}
             keyExtractor={item => item.id}
             ListFooterComponent={this.renderFooter}
+            onEndReached={this.handleLoadMore}
+            onEndThreshold={0}
           />
         </List>
         {/*<ListView
@@ -225,4 +239,4 @@ class Jobs extends Component {
 
 };
 
-export default Jobs
+export default connect(mapStateToProps, mapDispatchToProps)(Jobs)

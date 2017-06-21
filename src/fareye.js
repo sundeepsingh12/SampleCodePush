@@ -68,6 +68,7 @@ import AuthInitialState from './modules/login/loginInitialState'
 import DeviceInitialState from './modules/device/deviceInitialState'
 import GlobalInitialState from './modules/global/globalInitialState'
 import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
+import HomeInititalState from './modules/home/homeInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
@@ -87,7 +88,8 @@ function getInitialState() {
     auth: new AuthInitialState(),
     device: (new DeviceInitialState()).set('isMobile', true),
     global: (new GlobalInitialState()),
-    preloader: (new PreloaderInitiaState())
+    preloader: (new PreloaderInitiaState()),
+    home : (new HomeInititalState())
   }
   return _initState
 }

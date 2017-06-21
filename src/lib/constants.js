@@ -39,9 +39,9 @@ export default keyMirror({
     OTP_GENERATION_SUCCESS: null,
     OTP_GENERATION_FAILURE: null,
 
-    OTP_VALIDATION_START:null,
-    OTP_VALIDATION_SUCCESS:null,
-    OTP_VALIDATION_FAILURE:null,
+    OTP_VALIDATION_START: null,
+    OTP_VALIDATION_SUCCESS: null,
+    OTP_VALIDATION_FAILURE: null,
 
     SESSION_TOKEN_REQUEST: null,
     SESSION_TOKEN_SUCCESS: null,
@@ -54,18 +54,22 @@ export default keyMirror({
     ON_LOGIN_USERNAME_CHANGE: null,
     ON_LOGIN_PASSWORD_CHANGE: null,
 
-    PRELOADER_SUCCESS:null,
-    SHOW_MOBILE_NUMBER:null,
-    SHOW_OTP_SCREEN:null,
-    SHOW_MOBILE_NUMBER_SCREEN:null,
-    ON_MOBILE_NO_CHANGE:null,
-    ON_OTP_CHANGE:null,
+    PRELOADER_SUCCESS: null,
+    SHOW_MOBILE_NUMBER: null,
+    SHOW_OTP_SCREEN: null,
+    SHOW_MOBILE_NUMBER_SCREEN: null,
+    ON_MOBILE_NO_CHANGE: null,
+    ON_OTP_CHANGE: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
     PRE_LOGOUT_FAILURE: null,
     TOGGLE_CHECKBOX: null,
-    REMEMBER_ME_SET_TRUE:null,
+    REMEMBER_ME_SET_TRUE: null,
+
+    //Home Actions
+    JOB_FETCHING_START: null,
+    JOB_FETCHING_WAIT: null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,
@@ -74,8 +78,8 @@ export default keyMirror({
     SERVICE_FAILED: null,
 
     //Login Credentials
-    
-    USERNAME:null,
+
+    USERNAME: null,
     PASSWORD: null,
     REMEMBER_ME: null,
 
@@ -85,28 +89,29 @@ export default keyMirror({
 
     //Schema (Store keys)
 
-    JOB_MASTER:null,
-    JOB_ATTRIBUTE:null,
-    JOB_ATTRIBUTE_VALUE:null,
-    FIELD_ATTRIBUTE:null,
-    FIELD_ATTRIBUTE_VALUE:null,
-    JOB_STATUS:null,
-    TAB:null,
-    CUSTOMER_CARE:null,
-    SMS_TEMPLATE:null,
-    USER_SUMMARY:null,
-    JOB_SUMMARY:null,
-    SMS_JOB_STATUS:null,
-    JOB_MASTER_MONEY_TRANSACTION_MODE:null,
-    FIELD_ATTRIBUTE_STATUS:null,
-    FIELD_ATTRIBUTE_VALIDATION:null,
-    FIELD_ATTRIBUTE_VALIDATION_CONDITION:null,
-    JOB_LIST_CUSTOMIZATION:null,
-    CUSTOMIZATION_APP_MODULE:null,
-    DEVICE_IMEI:null,
-    DEVICE_SIM:null,
-    USER:null,
-    IS_PRELOADER_COMPLETE:null
+    JOB_MASTER: null,
+    JOB_ATTRIBUTE: null,
+    JOB_ATTRIBUTE_VALUE: null,
+    FIELD_ATTRIBUTE: null,
+    FIELD_ATTRIBUTE_VALUE: null,
+    JOB_STATUS: null,
+    TAB: null,
+    CUSTOMER_CARE: null,
+    SMS_TEMPLATE: null,
+    USER_SUMMARY: null,
+    JOB_SUMMARY: null,
+    SMS_JOB_STATUS: null,
+    JOB_MASTER_MONEY_TRANSACTION_MODE: null,
+    FIELD_ATTRIBUTE_STATUS: null,
+    FIELD_ATTRIBUTE_VALIDATION: null,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION: null,
+    JOB_LIST_CUSTOMIZATION: null,
+    CUSTOMIZATION_APP_MODULE: null,
+    DEVICE_IMEI: null,
+    DEVICE_SIM: null,
+    USER: null,
+    IS_PRELOADER_COMPLETE: null,
+    TABLE_JOB_TRANSACTION: null
 })
 
 
