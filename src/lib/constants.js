@@ -89,29 +89,43 @@ export default keyMirror({
 
     //Schema (Store keys)
 
-    JOB_MASTER: null,
-    JOB_ATTRIBUTE: null,
-    JOB_ATTRIBUTE_VALUE: null,
-    FIELD_ATTRIBUTE: null,
-    FIELD_ATTRIBUTE_VALUE: null,
-    JOB_STATUS: null,
-    TAB: null,
-    CUSTOMER_CARE: null,
-    SMS_TEMPLATE: null,
-    USER_SUMMARY: null,
-    JOB_SUMMARY: null,
-    SMS_JOB_STATUS: null,
-    JOB_MASTER_MONEY_TRANSACTION_MODE: null,
-    FIELD_ATTRIBUTE_STATUS: null,
-    FIELD_ATTRIBUTE_VALIDATION: null,
-    FIELD_ATTRIBUTE_VALIDATION_CONDITION: null,
-    JOB_LIST_CUSTOMIZATION: null,
-    CUSTOMIZATION_APP_MODULE: null,
-    DEVICE_IMEI: null,
-    DEVICE_SIM: null,
-    USER: null,
-    IS_PRELOADER_COMPLETE: null,
-    TABLE_JOB_TRANSACTION: null
+    JOB_MASTER:null,
+    JOB_ATTRIBUTE:null,
+    JOB_ATTRIBUTE_VALUE:null,
+    FIELD_ATTRIBUTE:null,
+    FIELD_ATTRIBUTE_VALUE:null,
+    JOB_STATUS:null,
+    TAB:null,
+    CUSTOMER_CARE:null,
+    SMS_TEMPLATE:null,
+    USER_SUMMARY:null,
+    JOB_SUMMARY:null,
+    SMS_JOB_STATUS:null,
+    JOB_MASTER_MONEY_TRANSACTION_MODE:null,
+    FIELD_ATTRIBUTE_STATUS:null,
+    FIELD_ATTRIBUTE_VALIDATION:null,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION:null,
+    JOB_LIST_CUSTOMIZATION:null,
+    CUSTOMIZATION_APP_MODULE:null,
+    DEVICE_IMEI:null,
+    DEVICE_SIM:null,
+    USER:null,
+    IS_PRELOADER_COMPLETE:null,
+    CUSTOMIZATION_LIST_MAP:null,
+
+    //Realm Tables
+    TABLE_JOB_TRANSACTION:null,
+    TABLE_JOB:null,
+    TABLE_JOB_DATA:null,
+    TABLE_RUNSHEET:null,
+    TABLE_FIELD_DATA:null,
+
+    //Home Actions
+    IS_LAST_PAGE:null,
+
+    //Status Codes
+    UNSEEN:null,
+    PENDING:null
 })
 
 

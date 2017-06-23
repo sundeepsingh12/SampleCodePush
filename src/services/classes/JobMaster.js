@@ -29,6 +29,7 @@ const {
   JOB_LIST_CUSTOMIZATION,
   CUSTOMIZATION_APP_MODULE,
   USER,
+  CUSTOMIZATION_LIST_MAP,
 } = require('../../lib/constants').default
 
 
@@ -120,6 +121,10 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    console.log('json')
+    console.log(json)
+    console.log('json.jobMaster')
+    console.log(json.jobMaster)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(USER, json.user)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
@@ -139,6 +144,59 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
+    await this.prepareCustomizationListMap(json.jobListCustomization)
+  }
+
+  /**
+   * 
+   * @param {*} jobListCustomization 
+   * prepares HashMap<JobMasterId,HashMap<AppListMasterId,CustomizationListDTO>
+     CustomizationListDTO - {
+      jobMasterId
+      appJobListMasterId
+      separator
+      referenceNo
+      runsheetNo
+      noOfAttempts
+      slot
+      delimiterType
+      startTime
+      endTime
+      jobAttr
+      fieldAttr: [
+        {
+          jobAttributeMasterId
+          fieldAttributeMasterId
+        }
+      ]
+      trackKm
+      trackHalt
+      trackCallCount
+      trackCallDuration
+      trackSmsCount
+      trackTransactionTimeSpent
+     }
+   */
+  prepareCustomizationListMap(jobListCustomization) {
+    if(!jobListCustomization) {
+      return
+    }
+    let jobMasterIdCustomizationMap = []
+    jobListCustomization.forEach(jobListCustomizationObject => {
+      const jobMasterId = jobListCustomizationObject.jobMasterId
+      const appListMasterId = jobListCustomizationObject.appJobListMasterId
+      if(!jobMasterIdCustomizationMap[jobMasterId]) {
+        const jobListMasterIdMap = []
+        jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
+        jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
+      } else {
+        const jobListMasterIdMap = []
+        jobListMasterIdMap = jobMasterIdCustomizationMap[jobMasterId]
+        jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
+        jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
+      }
+    })
+    keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP,jobMasterIdCustomizationMap)
   }
 
   /**Matches device time with server time,

@@ -45,7 +45,6 @@ const {
 } = require('../../lib/constants').default
 
 import { Actions } from 'react-native-router-flux'
-import { keyValueDB } from '../../repositories/keyValueDb'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
@@ -309,12 +308,13 @@ export function checkAsset() {
       const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
       const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
       const user = await keyValueDBService.getValueFromStore(USER)
-      const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
+      const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
       if (isVerified) {
         dispatch(preloaderSuccess())
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         Actions.Tabbar()
       } else {
+        await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer())
       }
     } catch (error) {

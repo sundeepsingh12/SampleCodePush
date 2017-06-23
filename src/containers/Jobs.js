@@ -141,9 +141,10 @@ class Jobs extends Component {
   };*/
 
   renderFooter = () => {
-    if(this.props.home.isFetching) {
+    if(!this.props.home.isFetching) {
       return null
     }
+    
     return (
       <View
         style={{

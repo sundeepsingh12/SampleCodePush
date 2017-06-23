@@ -54,6 +54,7 @@ class RestAPI {
             headers,
             json: {}
         }
+        
         if (opts.headers["Content-Type"] == "application/json") {
             res.json = response.json()
         }
@@ -80,6 +81,7 @@ class RestAPI {
     }
 
     serviceCall(body,url,method) {
+        console.log('url >> '+url)
         let opts;
         if(method==='POST'){
             opts = {
@@ -107,12 +109,16 @@ class RestAPI {
                 url,
                 headers:{
                     'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Connection' : 'Keep-Alive'
                 }
             }
         }
 
         return this._fetch(opts)
             .then((res) => {
+                console.log('status code')
+                  console.log(res.status)
                 if(res.status==200) {
                     return res;
                 } else {

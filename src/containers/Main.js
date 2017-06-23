@@ -45,6 +45,7 @@ from 'react-native'
 
 import { Container, Content, Tab, Tabs,Body, Header, Title, Left, Right,ScrollableTab, Icon, Fab, Button } from 'native-base';
 import Jobs from './Jobs';
+import * as homeActions from '../modules/home/homeActions'
 
 /**
  *  Instead of including all app states via ...state
@@ -61,7 +62,8 @@ function mapStateToProps (state) {
     global: {
       currentState: state.global.currentState,
       showState: state.global.showState
-    }
+    },
+    home : state.home
   }
 };
 
@@ -70,7 +72,7 @@ function mapStateToProps (state) {
  */
 function mapDispatchToProps (dispatch) {
   return {
-    actions: bindActionCreators({ ...authActions, ...globalActions }, dispatch)
+    actions: bindActionCreators({ ...authActions, ...globalActions, ...homeActions }, dispatch)
   }
 }
 
@@ -86,6 +88,10 @@ class Main extends Component {
     this.state = {
         active: false
     };
+  }
+
+  componentDidMount() {
+    this.props.actions.onResyncPress()
   }
 
   render() {
