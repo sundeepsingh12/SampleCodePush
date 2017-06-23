@@ -15,8 +15,6 @@ class JobStatus {
    */
   async getAllIdsForCode(statusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    console.log('jobStatusArray')
-    console.log(jobStatusArray)
     const jobStatusIds = await jobStatusArray.value.filter(jobStatusObject => jobStatusObject.code == statusCode)
       .map(jobStatusObject => jobStatusObject.id)
     return jobStatusIds
@@ -48,6 +46,7 @@ class JobStatus {
     })
     return jobMasterIdStatusIdMap
   }
+
 }
 
 export let jobStatusService = new JobStatus()

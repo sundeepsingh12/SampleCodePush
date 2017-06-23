@@ -120,7 +120,7 @@ class JobTransaction {
     const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
     for(let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap){
         let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
-        realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION,jobStatusId,pendingStatusId)
+        realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION,'jobStatusId',pendingStatusId)
     }
   }
 

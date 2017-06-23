@@ -23,6 +23,7 @@ const {
   TABLE_FIELD_DATA,
   TABLE_JOB,
   TABLE_JOB_DATA,
+  TABLE_RUNSHEET,
   USER,
   UNSEEN,
   PENDING
@@ -100,20 +101,6 @@ class Sync {
     return downloadResponse
   }
 
-  /**Returns value of 'query' from transaction download response
-   * 
-   * Possible return values
-   * 
-   * Insert
-   * Update
-   * Delete
-   * Message
-   * 
-   * @param {*} tdcResponse 
-   */
-  getQueryTypeFromResponse(tdcResponse) {
-
-  }
 
   /**This iterates over the Json array response returned from API and correspondingly Realm db is updated
    * 
@@ -126,14 +113,16 @@ class Sync {
       console.log(queryType)
       if (queryType == 'insert') {
         this.saveDataFromServerInDB(tdcContentObject.query)
-      } else if (queryType == 'delete') {
-        this.deleteDataFromDB(tdcContentObject.query)
-      } else if (queryType == 'update') {
-        this.updateDataInDB()
+      }else if (queryType == 'update') {
+        this.updateDataInDB(tdcContentObject.query)
       }
     }
   }
 
+  /**
+   * 
+   * @param {*} query 
+   */
   saveDataFromServerInDB(query) {
     const contentQuery = JSON.parse(query)
     const jobTransactions = {
@@ -154,30 +143,42 @@ class Sync {
       tableName: TABLE_FIELD_DATA,
       value: contentQuery.fieldData
     }
-    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas)
-  }
 
-  deleteDataFromDB(query) {
-    console.log('inside delete query')
-    const jobTransactionIds= query.jobTransactions.map(jobTransactionObject=>jobTransactionObject.id)
+    const runsheets = {
+      tableName: TABLE_RUNSHEET,
+      value: contentQuery.runsheet  
+    }
 
-    const jobIds = query.job.map(jobObject=>jobObject.id)
-
-    const jobDataIds = query.jobData.map(jobDataObject=>jobDataObject.id)
-
-    const fieldDataIds = query.fieldData.map(fieldDataObject=>fieldDataObject.id)
-
-    realm.deleteRecordsInBatch(jobTransactionIds,jobIds,jobDataIds,fieldDataIds)
-
+    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas,runsheets)
   }
 
   updateDataInDB(query) {
-      const jobTransactions= query.jobTransactions
-      const jobs = query.job
-      const jobDatas = query.jobData
-      const fieldDatas = query.fieldData
+    const contentQuery = JSON.parse(query)
 
-      realm.updateRecords(jobTransactions,jobs,jobDatas,fieldDatas)
+    const jobs = {
+      tableName: TABLE_JOB,
+      value: contentQuery.job
+    }
+
+    const jobDatas = {
+      tableName: TABLE_JOB_DATA,
+      value: contentQuery.jobData
+    }
+
+    const fieldDatas = {
+      tableName: TABLE_FIELD_DATA,
+      value: contentQuery.fieldData
+    }
+
+    const runsheets = {
+      tableName: TABLE_RUNSHEET,
+      value: contentQuery.runsheet  
+    }
+
+    realm.deleteRecordsInBatch(jobs, jobDatas,runsheets)
+
+
+    realm.performBatchSave(jobs, jobDatas, fieldDatas,runsheets)
   }
 
   /**POST API
@@ -226,10 +227,8 @@ class Sync {
       transactionIdDTOs,
       jobSummaries
     })
-    console.log('ppstdata')
-     console.log(postData)
-     console.log('token.value')
-      console.log(token.value)
+    console.log('postData')
+    console.log(postData)
     let deleteResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.DELETE_DATA_API, 'POST')
     return deleteResponse
   }

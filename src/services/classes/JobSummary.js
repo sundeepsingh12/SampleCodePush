@@ -59,7 +59,23 @@ class JobSummary {
 
   }
 
-  updateSummary() {
+  /**
+   * 
+   * @param {*} jobSummaries 
+   */
+  async updateJobSummary(jobSummaries) {
+    const jobSummariesInStore = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+    const jobSummaryIds = await jobSummaries.map(jobSummaryObject => jobSummaryObject.id)
+    const jobSummaryIdJobSummaryObjectMap = {}
+    jobSummaries.forEach(jobSummaryObject => {
+      jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
+    })
+    jobSummariesInStore.value.forEach(jobSummaryObject => {
+      if (jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id]) {
+        jobSummaryObject.count = jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id].count
+      }
+    })
+    await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummariesInStore)
 
   }
   /**A generic method for getting jobSummary from store given a particular jobStatusId and jobMasterId

@@ -20,6 +20,8 @@ import {
   jobSummaryService
 } from '../../services/classes/JobSummary'
 
+import _ from 'underscore'
+
 export function onResyncPress() {
   return async function (dispatch) {
     try {
@@ -31,16 +33,25 @@ export function onResyncPress() {
       while (!isLastPageReached) {
         console.log('inside while')
         const tdcResponse = await sync.downloadDataFromServer(pageNumber++, pageSize)
+        console.log(tdcResponse)
         if (tdcResponse) {
           json = await tdcResponse.json
           console.log(json)
           isLastPageReached = json.last
-          await sync.processTdcResponse(json.content)
+          if (!_.isNull(json.content) && !_.isUndefined(json.content) && !_.isEmpty(json.content)) {
+            await sync.processTdcResponse(json.content)
+          } else {
+            isLastPageReached = true
+          }
         } else {
           isLastPageReached = true
         }
       }
-      dispatch(deleteDataFromServer(json))
+      const successSyncIds = await sync.getSyncIdFromResponse(json.content)
+      //Dont hit delete sync API if successSyncIds empty
+      if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
+        dispatch(deleteDataFromServer(successSyncIds))
+      }
 
     } catch (error) {
       console.log(error)
@@ -52,28 +63,23 @@ export function onResyncPress() {
  * 
  * @param {*} json 
  */
-function deleteDataFromServer(json) {
+function deleteDataFromServer(successSyncIds) {
   return async function (dispatch) {
     try {
-      const successSyncIds =  await sync.getSyncIdFromResponse(json.content)
       console.log('successSyncIds')
-        console.log(successSyncIds)
-      const allJobTransactions =  await jobTransactionService.getAllJobTransactions()
-       
+       console.log(successSyncIds)
+      const allJobTransactions = await jobTransactionService.getAllJobTransactions()
       const unseenStatusIds = await jobStatusService.getAllIdsForCode('UNSEEN')
-      const unseenTransactions =  await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
-      const unseenTransactionsMap =  await jobTransactionService.prepareUnseenTransactionMap(unseenTransactions)
-      console.log('unseenTransactionsMap')
-      console.log(unseenTransactionsMap)
-      const transactionIdDTOs =  await sync.getTransactionIdDTOs(unseenTransactionsMap)
-       const jobSummaries = await jobSummaryService.getSummaryForDeleteSyncApi(unseenTransactionsMap)
-      console.log('jobSummaries')
-      console.log(jobSummaries)
+      const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
+      const unseenTransactionsMap = await jobTransactionService.prepareUnseenTransactionMap(unseenTransactions)
+      const transactionIdDTOs = await sync.getTransactionIdDTOs(unseenTransactionsMap)
+      const jobSummaries = await jobSummaryService.getSummaryForDeleteSyncApi(unseenTransactionsMap)
       const messageIdDTOs = []
-      const deleteApiResponse = await sync.deleteDataFromServer(successSyncIds,messageIdDTOs,transactionIdDTOs,jobSummaries)
-      if(deleteApiResponse=='Success'){
-        await jobTransactionService.updateJobTransactionStatusId(unseenTransactionsMap)
-      }
+      await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, transactionIdDTOs, jobSummaries)
+
+      await jobTransactionService.updateJobTransactionStatusId(unseenTransactionsMap)
+
+      await jobSummaryService.updateJobSummary(jobSummaries)
     } catch (error) {
       console.log(error)
     }
