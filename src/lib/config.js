@@ -21,6 +21,6 @@ module.exports = {
         SIM_VERIFICATION_API:'/rest/device/sim_verified',
         LOGOUT_API:'/logout',
         DOWNLOAD_DATA_API:'/rest/device/get_sync_table_job_with_pagination',
-        DELETE_DATA_API:'rest/device/delete_synch_job'
+        DELETE_DATA_API:'/rest/device/delete_synch_job'
     }
 }

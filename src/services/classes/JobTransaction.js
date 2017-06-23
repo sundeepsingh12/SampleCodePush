@@ -55,10 +55,10 @@ class JobTransaction {
    * @param {*} unseenTransactions 
    */
   async prepareUnseenTransactionMap(unseenTransactions) {
-    jobMasterIdTransactionDtoMap = {} // Map<JobMasterId, TransactionIdDTO>
-    transactionIdDtoList = [] // ArrayList<TransactionIdDTO>
-    jobStatusIdTransactionIdDtoMap = {} // Map<JobStatusId, ArrayList<TransactionIdDTO>> 
-    jobMasterIdJobStatusIdTransactionIdDtoMap = {} // Map<JobMasterId, Map<JobStausId, ArrayList<TransactionIdDTO>>>
+    jobMasterIdTransactionDtoMap = {}, // Map<JobMasterId, TransactionIdDTO>
+      transactionIdDtoList = [], // ArrayList<TransactionIdDTO>
+      jobStatusIdTransactionIdDtoMap = {}, // Map<JobStatusId, ArrayList<TransactionIdDTO>> 
+      jobMasterIdJobStatusIdTransactionIdDtoMap = {} // Map<JobMasterId, Map<JobStausId, ArrayList<TransactionIdDTO>>>
     const jobMasterIdList = await this.getUnseenTransactionsJobMasterIds(unseenTransactions)
     const jobMasterIdStatusIdMap = await jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdList, PENDING)
     unseenTransactions.forEach(async unseenTransactionObject => {
@@ -117,14 +117,6 @@ class JobTransaction {
     return jobMasterIds
   }
 
-  updateJobTransactionStatusId(unseenTransactionsMap) {
-    const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
-    for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
-      let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
-      realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION, jobStatusId, pendingStatusId)
-    }
-  }
-
   /**
    * get different configurations for job listing
    * tabs
@@ -176,7 +168,14 @@ class JobTransaction {
     if(!customizationObject) {
       return ''
     }
+  }
 
+  updateJobTransactionStatusId(unseenTransactionsMap){
+    const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
+    for(let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap){
+        let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
+        realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION,'jobStatusId',pendingStatusId)
+    }
   }
 
 }
