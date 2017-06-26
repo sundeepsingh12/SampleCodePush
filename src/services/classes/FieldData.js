@@ -1,3 +1,6 @@
-class FieldData{
+class FieldData {
     
+    getFieldDataForJobTransactionAndFieldAttributeMaster() {
+        
+    }
 }

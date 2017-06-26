@@ -162,7 +162,12 @@ class JobMaster {
       delimiterType
       startTime
       endTime
-      jobAttr
+      jobAttr: [
+        {
+          jobAttributeMasterId
+          fieldAttributeMasterId
+        }
+      ]
       fieldAttr: [
         {
           jobAttributeMasterId

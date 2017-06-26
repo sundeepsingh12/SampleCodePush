@@ -8,6 +8,8 @@ const {
 import _ from 'underscore'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
+import { jobService } from './Job'
+import { jobDataService } from './JobData'
 
 class JobTransaction {
 
@@ -141,15 +143,17 @@ class JobTransaction {
     pageTransactions.forEach(transaction => {
       console.log('transaction')
       console.log(transaction)
+      let job = jobService.getJobForJobId(transaction.jobId)
+      console.log(job)
+      console.log(job[0])
+      console.log(job[0].id)
+      console.log(job[0].attemptCount)
+      console.log('assadfsaf   ' + job[0].jobStartTime)
       const jobMasterId = transaction.jobMasterId
       const line1Map = jobMasterIdCustomizationMap[jobMasterId][1]
       const line2Map = jobMasterIdCustomizationMap[jobMasterId][2]
       const circleLine1Map = jobMasterIdCustomizationMap[jobMasterId][3]
       const circleLine2Map = jobMasterIdCustomizationMap[jobMasterId][4]
-      transaction.line1 = setTransactionText(line1Map)
-      transaction.line2 = setTransactionText(line2Map)
-      transaction.circleLine1 = setTransactionText(circleLine1Map)
-      transaction.circleLine2 = setTransactionText(circleLine2Map)
       console.log('line1Map')
       console.log(line1Map)
       console.log('line2Map')
@@ -158,23 +162,87 @@ class JobTransaction {
       console.log(circleLine1Map)
       console.log('circleLine2Map')
       console.log(circleLine2Map)
+      transaction.line1 = this.setTransactionText(line1Map, transaction, job[0])
+      transaction.line2 = this.setTransactionText(line2Map, transaction, job[0])
+      transaction.circleLine1 = this.setTransactionText(circleLine1Map, transaction, job[0])
+      transaction.circleLine2 = this.setTransactionText(circleLine2Map, transaction, job[0])
     })
     console.log('firsttransaction')
-    console.log(firsttransaction)
-    return firsttransaction
+    console.log(pageTransactions)
+    return pageTransactions
   }
 
-  setTransactionText(customizationObject) {
-    if(!customizationObject) {
+  setTransactionText(customizationObject, jobTransaction, job) {
+    if (!customizationObject) {
       return ''
     }
+    let finalText = ''
+    const jobMasterId = customizationObject.jobMasterId
+    const jobAttributeMasterList = customizationObject.jobAttr
+    console.log('jobAttributeMasterList 111')
+     console.log(jobAttributeMasterList)
+    const fieldAttributeMasterList = customizationObject.fieldAttr
+    if (customizationObject.referenceNo) {
+      finalText += jobTransaction.referenceNumber
+    }
+
+    if (customizationObject.runsheetNo) {
+      finalText += jobTransaction.runsheetNo
+    }
+
+    if (customizationObject.noOfAttempts) {
+      finalText += "Attempt: " + job.attemptCount
+    }
+
+    if (customizationObject.slot) {
+      finalText += "Slot: " + job.slot
+    }
+
+    if (customizationObject.startTime) {
+      finalText += "Start: " + job.jobStartTime
+    }
+
+    if (customizationObject.endTime) {
+      finalText += "End: " + job.jobEndTime
+    }
+
+    if (customizationObject.trackKm) {
+      finalText += "Distance: " + jobTransaction.trackKm
+    }
+
+    if (customizationObject.trackHalt) {
+      finalText += "Halt Duration: " + jobTransaction.trackHalt
+    }
+
+    if (customizationObject.trackCallCount) {
+      finalText += "Call Count: " + jobTransaction.trackCallCount
+    }
+
+    if (customizationObject.trackCallDuration) {
+      finalText += "Call Duration: " + jobTransaction.trackCallDuration
+    }
+
+    if (customizationObject.trackSmsCount) {
+      finalText += "Sms: " + jobTransaction.trackSmsCount
+    }
+
+    if (customizationObject.trackTransactionTimeSpent) {
+      finalText += "Time Spent: " + jobTransaction.trackTransactionTimeSpent
+    }
+
+    filteredResults = jobDataService.getJobDataForJobId(job.id,jobAttributeMasterList)
+
   }
 
-  updateJobTransactionStatusId(unseenTransactionsMap){
+  appendText() {
+
+  }
+
+  updateJobTransactionStatusId(unseenTransactionsMap) {
     const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
-    for(let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap){
-        let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
-        realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION,'jobStatusId',pendingStatusId)
+    for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
+      let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
+      realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION, 'jobStatusId', pendingStatusId)
     }
   }
 
