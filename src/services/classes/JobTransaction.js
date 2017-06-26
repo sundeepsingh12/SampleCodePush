@@ -80,7 +80,7 @@ class JobTransaction {
       }
       if (jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
         if (jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unSeenStatusId]) {
-          let jobStatusIdTransactionIdDtoMap = unseenTransCount[jobMasterId]
+          let jobStatusIdTransactionIdDtoMap = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]
           let transactionIdDtoList = jobStatusIdTransactionIdDtoMap[unSeenStatusId]
           transactionIdDtoList.push(transactionIdDtoObject)
           jobStatusIdTransactionIdDtoMap[unSeenStatusId] = transactionIdDtoList

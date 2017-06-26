@@ -9,7 +9,6 @@ export default class JobData extends Realm.Object {}
 //Every Schema must have atleast 1 Primary key index
 JobData.schema = {
   name: TABLE_JOB_DATA,
-  primaryKey: 'id',
   properties: {
     id: { type: 'int' },
     value: { type: 'string' },

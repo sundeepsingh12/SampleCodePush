@@ -113,7 +113,7 @@ class Sync {
       console.log(queryType)
       if (queryType == 'insert') {
         this.saveDataFromServerInDB(tdcContentObject.query)
-      }else if (queryType == 'update') {
+      } else if (queryType == 'update' || queryType == 'updateStatus') {
         this.updateDataInDB(tdcContentObject.query)
       }
     }
@@ -123,8 +123,9 @@ class Sync {
    * 
    * @param {*} query 
    */
-  saveDataFromServerInDB(query) {
-    const contentQuery = JSON.parse(query)
+  async saveDataFromServerInDB(query) {
+    console.log('saveDataFromServerInDB called >>>> ')
+    const contentQuery = await JSON.parse(query)
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
@@ -146,39 +147,39 @@ class Sync {
 
     const runsheets = {
       tableName: TABLE_RUNSHEET,
-      value: contentQuery.runsheet  
+      value: contentQuery.runSheet
     }
 
-    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas,runsheets)
+    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
   }
 
-  updateDataInDB(query) {
-    const contentQuery = JSON.parse(query)
+  async updateDataInDB(query) {
+    try{
+    console.log('updateDataInDB called >>>>>')
+    const contentQuery = await JSON.parse(query)
 
-    const jobs = {
-      tableName: TABLE_JOB,
-      value: contentQuery.job
-    }
+    console.log('contentQuery')
+    console.log(contentQuery)
+
+    const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+
+    console.log('jobIds')
+    console.log(jobIds)
 
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
-      value: contentQuery.jobData
+      valueList: jobIds,
+      propertyName: 'jobId'
     }
 
-    const fieldDatas = {
-      tableName: TABLE_FIELD_DATA,
-      value: contentQuery.fieldData
+    //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
+    //So it's necessary to delete existing JobData First in case of update query
+    await realm.deleteRecordsInBatch(jobDatas)
+
+    await this.saveDataFromServerInDB(query)
+    }catch(Error){
+      console.log(Error)
     }
-
-    const runsheets = {
-      tableName: TABLE_RUNSHEET,
-      value: contentQuery.runsheet  
-    }
-
-    realm.deleteRecordsInBatch(jobs, jobDatas,runsheets)
-
-
-    realm.performBatchSave(jobs, jobDatas, fieldDatas,runsheets)
   }
 
   /**POST API
@@ -221,6 +222,9 @@ class Sync {
    */
   async deleteDataFromServer(syncIds, messageIdDTOs, transactionIdDTOs, jobSummaries) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+    if (!token) {
+      throw new Error('Token Missing')
+    }
     const postData = JSON.stringify({
       syncIds,
       messageIdDTOs,

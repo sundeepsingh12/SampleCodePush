@@ -6,6 +6,8 @@ import {
   keyValueDBService
 } from './KeyValueDBService'
 
+import _ from 'underscore'
+
 class JobSummary {
 
   /**Sample Return type
@@ -46,17 +48,15 @@ class JobSummary {
         let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId][0].pendingStatusId
         let unseenJobSummaryData = await this.getJobSummaryData(jobMasterId, unseenStatusId)
         unseenJobSummaryData.count = 0
-        jobSummaries.push(unseenJobSummaryData)
+        await jobSummaries.push(unseenJobSummaryData)
         let pendingJobSummaryData = await this.getJobSummaryData(jobMasterId, pendingID)
+        console.log('pendingJobSummaryData.count')
+        console.log(pendingJobSummaryData.count)
         pendingJobSummaryData.count += count
-        jobSummaries.push(pendingJobSummaryData)
+        await jobSummaries.push(pendingJobSummaryData)
       }
     }
     return jobSummaries
-  }
-
-  recalculateSummary() {
-
   }
 
   /**
@@ -67,6 +67,7 @@ class JobSummary {
     const jobSummariesInStore = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
     const jobSummaryIds = await jobSummaries.map(jobSummaryObject => jobSummaryObject.id)
     const jobSummaryIdJobSummaryObjectMap = {}
+    
     jobSummaries.forEach(jobSummaryObject => {
       jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
     })
@@ -85,7 +86,12 @@ class JobSummary {
    */
   async getJobSummaryData(jobMasterId, statusId) {
     const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+    if(_.isUndefined(alljobSummaryList.value) || _.isEmpty(alljobSummaryList.value)){
+      throw new Error('Value of JobSummary missing ')
+    }
     const filteredJobSummaryList = await alljobSummaryList.value.filter(jobSummaryObject => (jobSummaryObject.jobStatusId == statusId && jobSummaryObject.jobMasterId == jobMasterId))
+    console.log('filteredJobSummaryList[0]')
+    console.log(filteredJobSummaryList[0])
     return filteredJobSummaryList[0]
   }
 }
