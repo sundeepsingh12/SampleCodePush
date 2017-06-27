@@ -11,7 +11,7 @@ import Runsheet from './schema/Runsheet'
 
 import _ from 'underscore'
 
-const schemaVersion = 19;
+const schemaVersion = 22;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet];
 let realm = new Realm({
   schemaVersion,
@@ -82,16 +82,17 @@ export function deleteRecordsInBatch(...tableNameVsDataList) {
 }
 
 
-/**A generic method for updating a single column of a Table 
+/**A generic method for filtering out records which are in ValueList and then updating 'property'
+ *  with 'newValue'
  * 
  * @param {*} tableName 
  * @param {*} property 
  * @param {*} value 
  */
-export function updateTableRecordOnProperty(tableName, property, value) {
+export function updateTableRecordOnProperty(tableName, property, valueList, newValue) {
+  let filteredRecords = realm.objects(tableName).filtered(valueList.map(value =>  'id = "' + value + '"').join(' OR '));
   realm.write(() => {
-    let modelObject = realm.objects(tableName).filtered(property + ' == $0', value);
-    modelObject[property] = value
+    _.forEach(filteredRecords,record=>record[property] = newValue)
   });
 }
 
@@ -115,4 +116,14 @@ export function deleteRecordList(tableName, valueList, property) {
  */
 export function getAll(tableName) {
   return realm.objects(tableName);
+}
+
+/**A generic method for getting value list based on particular property in Table
+ * Eg - Returning all JobTransactionIds From Db
+ * @param {*} tableName 
+ * @param {*} property 
+ */
+export function getRecordListOnProperty(tableName, property) {
+  let records = realm.objects(tableName).map(data => data[property])
+  return records
 }

@@ -9,7 +9,6 @@ export default class Runsheet extends Realm.Object {}
 //Every Schema must have atleast 1 Primary key index
 Runsheet.schema = {
   name: TABLE_RUNSHEET,
-  primaryKey: 'id',
   properties: {
       id: { type: 'int' },
       runsheetNumber:{type:'string'},

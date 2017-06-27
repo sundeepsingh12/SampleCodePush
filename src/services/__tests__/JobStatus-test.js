@@ -12,9 +12,11 @@ describe('job status services ',()=>{
 
   it('should fetch job status ids from store ',()=>{
      const store = mockStore({})
+     const jobStatusIds = []
+     const statusCode = 'UNSEEN'
      keyValueDBService.getValueFromStore = jest.fn()
-       keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: {} })
-
+       keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: [{id:12,code:'UNSEEN'}]})
+        expect(getAllIdsForCode(statusCode)).toEqual()
   })
 
 })

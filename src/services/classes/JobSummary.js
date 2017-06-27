@@ -42,9 +42,15 @@ class JobSummary {
   async getSummaryForDeleteSyncApi(unseenTransactionsMap) {
     const jobSummaries = []
     const jobMasterIdJobStatusIdTransactionIdDtoMap = unseenTransactionsMap.jobMasterIdJobStatusIdTransactionIdDtoMap
+    console.log('jobMasterIdJobStatusIdTransactionIdDtoMap')
+     console.log(jobMasterIdJobStatusIdTransactionIdDtoMap)
     for (let jobMasterId in jobMasterIdJobStatusIdTransactionIdDtoMap) {
       for (let unseenStatusId in jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
+         console.log('test map >>>>>>>')
+         console.log(jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId])
         let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].length
+          console.log('count')
+           console.log(count)
         let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId][0].pendingStatusId
         let unseenJobSummaryData = await this.getJobSummaryData(jobMasterId, unseenStatusId)
         unseenJobSummaryData.count = 0
@@ -83,6 +89,19 @@ class JobSummary {
    * 
    * @param {*} jobMasterId 
    * @param {*} statusId 
+   * 
+   * Sample Return Type
+   * 
+   * {
+    * id: 2260120,
+    * userId: 4957,
+    * hubId: 2759,
+    * cityId: 744,
+    * companyId: 295,
+    * jobStatusId:4814,
+    * count:1,
+      date:'2017-06-26 00:00:00'
+   * }
    */
   async getJobSummaryData(jobMasterId, statusId) {
     const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)

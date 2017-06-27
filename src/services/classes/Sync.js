@@ -149,23 +149,20 @@ class Sync {
       tableName: TABLE_RUNSHEET,
       value: contentQuery.runSheet
     }
-
     await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
   }
 
   async updateDataInDB(query) {
     try{
-    console.log('updateDataInDB called >>>>>')
     const contentQuery = await JSON.parse(query)
-
-    console.log('contentQuery')
-    console.log(contentQuery)
-
     const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+    const runsheetIds = await contentQuery.runSheet.map(runsheetObject=>runsheetObject.id)
 
-    console.log('jobIds')
-    console.log(jobIds)
-
+    const runsheets = {
+      tableName: TABLE_RUNSHEET,
+      valueList: runsheetIds,
+      propertyName: 'id'
+    }
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
       valueList: jobIds,
@@ -174,8 +171,7 @@ class Sync {
 
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas)
-
+    await realm.deleteRecordsInBatch(jobDatas,runsheets)
     await this.saveDataFromServerInDB(query)
     }catch(Error){
       console.log(Error)
@@ -259,6 +255,7 @@ class Sync {
    * 
    */
   getTransactionIdDTOs(unseenTransactionsMap) {
+    console.log('')
     const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
     let transactionIdDtos = []
     for (let mapObject in jobMasterIdTransactionDtoMap) {
