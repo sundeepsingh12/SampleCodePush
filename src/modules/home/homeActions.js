@@ -12,6 +12,7 @@ import { sync } from '../../services/classes/Sync'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobSummaryService } from '../../services/classes/JobSummary'
+import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 
 export function jobDownload(jobTransactions) {
@@ -86,7 +87,7 @@ function deleteDataFromServer(successSyncIds) {
   return async function (dispatch) {
     try {
       const allJobTransactions = await jobTransactionService.getAllJobTransactions()
-      const unseenStatusIds = await jobStatusService.getAllIdsForCode('UNSEEN')
+      const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
       const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
       const unseenTransactionsMap = await jobTransactionService.prepareUnseenTransactionMap(unseenTransactions)
       const transactionIdDTOs = await sync.getTransactionIdDTOs(unseenTransactionsMap)
@@ -95,6 +96,10 @@ function deleteDataFromServer(successSyncIds) {
       await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, transactionIdDTOs, jobSummaries)
       await jobTransactionService.updateJobTransactionStatusId(unseenTransactionsMap)
       await jobSummaryService.updateJobSummary(jobSummaries)
+      const unseenTransactionIds = await unseenTransactions.map(unseenTransaction=>unseenTransaction.id)
+      console.log('unseenTransactionIds')
+       console.log(unseenTransactionIds)
+       
     } catch (error) {
       console.log(error)
     }

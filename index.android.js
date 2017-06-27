@@ -16,7 +16,7 @@ import {
 export default class Fareye extends Component {
     render() {
         let realm = new Realm({
-            schemaVersion: 8,
+            schemaVersion: 20,
             schema: [
                 {
                     name: 'People',
@@ -49,15 +49,13 @@ export default class Fareye extends Component {
             dataForInsert.forEach(data => realm.create('People', data,true));
         });
 
-         realm.write(() => {
-            dataForInsert.forEach(data => realm.create('People', {"name": "Chintu",
-                "age": 97},true));
-        });
-
     const people1 = realm.objects('People');
     console.log('length')
      console.log(people1.length)
-    
+     const property = 'age'
+    const peopleAgeList = people1.map(data=>data[property])
+       console.log('peopleAgeList')
+    console.log(peopleAgeList)
         _.forEach(people1,people => console.log(people.name));
         return (
             <View>
