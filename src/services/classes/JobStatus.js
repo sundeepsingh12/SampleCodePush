@@ -6,6 +6,8 @@ import {
   keyValueDBService
 } from './KeyValueDBService'
 
+import _ from 'underscore'
+
 class JobStatus {
 
   /**A generic method for getting all status ids based on particular status code
@@ -15,6 +17,9 @@ class JobStatus {
    */
   async getAllIdsForCode(statusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if(_.isEmpty(jobStatusArray.value) || _.isUndefined(jobStatusArray.value)){
+      throw new Error('Invalid Status Code')
+    }
     const jobStatusIds = await jobStatusArray.value.filter(jobStatusObject => jobStatusObject.code == statusCode)
       .map(jobStatusObject => jobStatusObject.id)
     return jobStatusIds
@@ -27,6 +32,9 @@ class JobStatus {
    */
   async getStatusIdForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if(_.isUndefined(jobStatusArray.value) || _.isEmpty(jobStatusArray.value)){
+      throw new Error('Invalid Job Master or Job Status')
+    }
     const jobStatusId = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobStatusObject.jobMasterId == jobMasterId))
       .map(jobStatusObject => jobStatusObject.id)
     return jobStatusId[0]
@@ -40,6 +48,9 @@ class JobStatus {
   async getjobMasterIdStatusIdMap(jobMasterIdList, jobStatusCode) {
     let jobMasterIdStatusIdMap = {}
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if(_.isUndefined(jobStatusArray.value)|| _.isEmpty(jobStatusArray.value)){
+       throw new Error('Invalid Job Master or Job Status')
+    }
     const filteredJobStatusArray = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobMasterIdList.includes(jobStatusObject.jobMasterId)))
     filteredJobStatusArray.forEach(jobStatusObject => {
       jobMasterIdStatusIdMap[jobStatusObject.jobMasterId] = jobStatusObject.id

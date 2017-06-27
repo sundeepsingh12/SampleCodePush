@@ -119,6 +119,7 @@ export default keyMirror({
     TABLE_JOB_DATA:null,
     TABLE_RUNSHEET:null,
     TABLE_FIELD_DATA:null,
+    TABLE_JOB_TRANSACTION_CUSTOMIZATION:null,
 
     //Home Actions
     IS_LAST_PAGE:null,

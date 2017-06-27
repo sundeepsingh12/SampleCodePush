@@ -16,10 +16,11 @@ import {
 export default class Fareye extends Component {
     render() {
         let realm = new Realm({
-            schemaVersion: 4,
+            schemaVersion: 8,
             schema: [
                 {
                     name: 'People',
+                    primaryKey: 'age',
                     properties: {
                         name: 'string',
                         age: 'int'
@@ -39,35 +40,29 @@ export default class Fareye extends Component {
             },
             {
                 "name": "Gaurav",
-                "age": 99
-            }
+                "age": 97
+        }
         ]
 
 
         realm.write(() => {
-            realm.deleteAll()
-            dataForInsert.forEach(data => realm.create('People', data));
+            dataForInsert.forEach(data => realm.create('People', data,true));
         });
-        const NAME_LIST = []
-        NAME_LIST.push(dataForInsert[0].age)
-         NAME_LIST.push(dataForInsert[1].age)
-           console.log(NAME_LIST)  
-           
-        const people = realm.objects('People');
-        const filteredPeople = people.filtered(NAME_LIST.map((id) => 'age = "' + id + '"').join(' OR '));
-//          realm.write(() => {
-//     realm.delete(filteredPeople)
-//   });
-filteredPeople.forEach(people=>console.log(people.name))
+
+         realm.write(() => {
+            dataForInsert.forEach(data => realm.create('People', {"name": "Chintu",
+                "age": 97},true));
+        });
+
     const people1 = realm.objects('People');
-        // people1.forEach(people => console.log(people.name));
+    console.log('length')
+     console.log(people1.length)
+    
+        _.forEach(people1,people => console.log(people.name));
         return (
             <View>
 
                 <Text>{"\n"}{"\n"}{"\n"}</Text>
-                <Text>  Count of people in Realm: {people.length}</Text>
-                <Text>  {people[0].name} | {people[0].age} </Text>
-                <Text>  {people[1].name} | {people[1].age} </Text>
             </View>
         )
     }

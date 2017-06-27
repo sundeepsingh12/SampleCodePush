@@ -10,7 +10,6 @@ import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'
 import { jobDataService } from './JobData'
-
 class JobTransaction {
 
   /**A Generic method for filtering out jobtransactions whose job status ids lie in 'statusids'  
@@ -83,7 +82,7 @@ class JobTransaction {
       }
       if (jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
         if (jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unSeenStatusId]) {
-          let jobStatusIdTransactionIdDtoMap = unseenTransCount[jobMasterId]
+          let jobStatusIdTransactionIdDtoMap = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]
           let transactionIdDtoList = jobStatusIdTransactionIdDtoMap[unSeenStatusId]
           transactionIdDtoList.push(transactionIdDtoObject)
           jobStatusIdTransactionIdDtoMap[unSeenStatusId] = transactionIdDtoList
@@ -110,10 +109,10 @@ class JobTransaction {
     return unseenTransactionsMap
   }
 
-  /**Returns JobMasterIds of unseen transactions
-   * 
-   * @param {*} unseenTransactions 
-   */
+/**Returns JobMasterIds of unseen transactions
+ * 
+ * @param {*} unseenTransactions 
+ */
   getUnseenTransactionsJobMasterIds(unseenTransactions) {
     const jobMasterIds = unseenTransactions.map(unseenTransactionObject => unseenTransactionObject.jobMasterId)
     return jobMasterIds
@@ -137,36 +136,7 @@ class JobTransaction {
     } else {
       pageTransactions = allJobTransactions.slice(0, 10)
     }
-    jobMasterIdCustomizationMapFromStore = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
-    jobMasterIdCustomizationMap = jobMasterIdCustomizationMapFromStore.value
-    console.log(jobMasterIdCustomizationMap)
-    pageTransactions.forEach(transaction => {
-      console.log('transaction')
-      console.log(transaction)
-      let job = jobService.getJobForJobId(transaction.jobId)
-      console.log(job)
-      console.log(job[0])
-      console.log(job[0].id)
-      console.log(job[0].attemptCount)
-      console.log('assadfsaf   ' + job[0].jobStartTime)
-      const jobMasterId = transaction.jobMasterId
-      const line1Map = jobMasterIdCustomizationMap[jobMasterId][1]
-      const line2Map = jobMasterIdCustomizationMap[jobMasterId][2]
-      const circleLine1Map = jobMasterIdCustomizationMap[jobMasterId][3]
-      const circleLine2Map = jobMasterIdCustomizationMap[jobMasterId][4]
-      console.log('line1Map')
-      console.log(line1Map)
-      console.log('line2Map')
-      console.log(line2Map)
-      console.log('circleLine1Map')
-      console.log(circleLine1Map)
-      console.log('circleLine2Map')
-      console.log(circleLine2Map)
-      transaction.line1 = this.setTransactionText(line1Map, transaction, job[0])
-      transaction.line2 = this.setTransactionText(line2Map, transaction, job[0])
-      transaction.circleLine1 = this.setTransactionText(circleLine1Map, transaction, job[0])
-      transaction.circleLine2 = this.setTransactionText(circleLine2Map, transaction, job[0])
-    })
+    
     console.log('firsttransaction')
     console.log(pageTransactions)
     return pageTransactions
@@ -238,11 +208,11 @@ class JobTransaction {
 
   }
 
-  updateJobTransactionStatusId(unseenTransactionsMap) {
+  updateJobTransactionStatusId(unseenTransactionsMap){
     const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
-    for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
-      let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
-      realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION, 'jobStatusId', pendingStatusId)
+    for(let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap){
+        let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
+        realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION,'jobStatusId',pendingStatusId)
     }
   }
 

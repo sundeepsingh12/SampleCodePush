@@ -85,8 +85,6 @@ export function onResyncPress() {
 function deleteDataFromServer(successSyncIds) {
   return async function (dispatch) {
     try {
-      console.log('successSyncIds')
-      console.log(successSyncIds)
       const allJobTransactions = await jobTransactionService.getAllJobTransactions()
       const unseenStatusIds = await jobStatusService.getAllIdsForCode('UNSEEN')
       const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)

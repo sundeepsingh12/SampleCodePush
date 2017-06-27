@@ -186,16 +186,16 @@ class JobMaster {
     if(!jobListCustomization) {
       return
     }
-    let jobMasterIdCustomizationMap = []
+    let jobMasterIdCustomizationMap = {}
     jobListCustomization.forEach(jobListCustomizationObject => {
       const jobMasterId = jobListCustomizationObject.jobMasterId
       const appListMasterId = jobListCustomizationObject.appJobListMasterId
       if(!jobMasterIdCustomizationMap[jobMasterId]) {
-        const jobListMasterIdMap = []
+        const jobListMasterIdMap = {}
         jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
         jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
       } else {
-        const jobListMasterIdMap = []
+        const jobListMasterIdMap = {}
         jobListMasterIdMap = jobMasterIdCustomizationMap[jobMasterId]
         jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
         jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap

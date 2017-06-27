@@ -2,7 +2,7 @@
 const { TABLE_RUNSHEET} = require('../../lib/constants').default
 import Realm from 'realm';
 
-export default class Job extends Realm.Object {}
+export default class Runsheet extends Realm.Object {}
 
 //Properties are in chronological order.
 //Default value for each property is mandatory
@@ -17,17 +17,17 @@ Runsheet.schema = {
       startDate:{type:'string'},
       userId:{type:'int'},
       hubId : {type:'int'},
-             cityId : {type:'int'},
-             companyId : {type:'int'},
-             cashCollected : {type:'double'},
-             cashPayment : {type:'double'},
-             isClosed : {type:'bool'},
-             closedDateTime : {type:'string',optional:true},
-             closedByManagerId :  {type:'int',optional:true},
-             closedByManagerSign : {type:'string',optional:true},
-             pendingCount : {type:'int'},
-             successCount : {type:'int'},
-             failCount : {type:'int'},
-             cashCollectedByCard : {type:'double'}
+      cityId: { type: 'int' },
+      companyId: { type: 'int' },
+      cashCollected: { type: 'double' },
+      cashPayment: { type: 'double' },
+      isClosed: { type: 'bool' },
+      closedDateTime: { type: 'string', optional: true },
+      closedByManagerId: { type: 'int', optional: true },
+      closedByManagerSign: { type: 'string', optional: true },
+      pendingCount: { type: 'int' },
+      successCount: { type: 'int' },
+      failCount: { type: 'int' },
+      cashCollectedByCard: { type: 'double' }
   }
 }
