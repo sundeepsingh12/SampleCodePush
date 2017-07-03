@@ -59,8 +59,12 @@ class RestAPI {
       headers,
       json: {}
     }
-
-    if (opts.headers["Content-Type"] == "application/json") {
+    console.log('responsse >>>>')
+     console.log(response)
+     if(opts.url==CONFIG.API.DELETE_DATA_API){
+        res.json = response.text()
+     }
+    else if (opts.headers["Content-Type"] == "application/json") {
       res.json = response.json()
     }
     return res

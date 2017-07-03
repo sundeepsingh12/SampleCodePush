@@ -11,7 +11,7 @@ import Runsheet from './schema/Runsheet'
 
 import _ from 'underscore'
 
-const schemaVersion = 22;
+const schemaVersion = 25;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet];
 let realm = new Realm({
   schemaVersion,

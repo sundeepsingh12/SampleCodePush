@@ -90,8 +90,14 @@ class Sync {
    */
   async downloadDataFromServer(pageNumber, pageSize) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+     if (!token) {
+      throw new Error('Token Missing')
+    }
     let formData = null
     const user = await keyValueDBService.getValueFromStore(USER)
+    if (!user || !user.value) {
+      throw new Error('Value of user missing')
+    }
     const isCustomErpPullActivated = user.value.company.customErpPullActivated
     if (!isCustomErpPullActivated) {
       formData = 'pageNumber=' + pageNumber + '&pageSize=' + pageSize
@@ -110,7 +116,6 @@ class Sync {
     let tdcContentObject
     for (tdcContentObject of tdcContentArray) {
       const queryType = tdcContentObject.type
-      console.log(queryType)
       if (queryType == 'insert') {
         this.saveDataFromServerInDB(tdcContentObject.query)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
@@ -124,8 +129,13 @@ class Sync {
    * @param {*} query 
    */
   async saveDataFromServerInDB(query) {
+    try{
+       console.log('query')
+    console.log(query)
     console.log('saveDataFromServerInDB called >>>> ')
     const contentQuery = await JSON.parse(query)
+    console.log('contentQuery')
+      console.log(contentQuery)
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
@@ -149,31 +159,41 @@ class Sync {
       tableName: TABLE_RUNSHEET,
       value: contentQuery.runSheet
     }
-    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+     realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+    }
+    catch(Error){
+      console.log('inside catch >>')
+      console.log(Error)
+    }
+   
   }
 
+/**
+ * 
+ * @param {*} query 
+ */
   async updateDataInDB(query) {
-    try{
-    const contentQuery = await JSON.parse(query)
-    const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
-    const runsheetIds = await contentQuery.runSheet.map(runsheetObject=>runsheetObject.id)
+    try {
+      const contentQuery = await JSON.parse(query)
+      const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+      const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
 
-    const runsheets = {
-      tableName: TABLE_RUNSHEET,
-      valueList: runsheetIds,
-      propertyName: 'id'
-    }
-    const jobDatas = {
-      tableName: TABLE_JOB_DATA,
-      valueList: jobIds,
-      propertyName: 'jobId'
-    }
+      const runsheets = {
+        tableName: TABLE_RUNSHEET,
+        valueList: runsheetIds,
+        propertyName: 'id'
+      }
+      const jobDatas = {
+        tableName: TABLE_JOB_DATA,
+        valueList: jobIds,
+        propertyName: 'jobId'
+      }
 
-    //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
-    //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas,runsheets)
-    await this.saveDataFromServerInDB(query)
-    }catch(Error){
+      //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
+      //So it's necessary to delete existing JobData First in case of update query
+      await realm.deleteRecordsInBatch(jobDatas, runsheets)
+      await this.saveDataFromServerInDB(query)
+    } catch (Error) {
       console.log(Error)
     }
   }
@@ -206,7 +226,7 @@ class Sync {
       "transactionIdDTOs": [
           "jobMasterId": 930,
               "pendingStatusId": 4813,
-              "transactionId": "2361130",
+              "transactionId": "2361130:123456",
               "unSeenStatusId": 4814
       ]
 
@@ -227,8 +247,6 @@ class Sync {
       transactionIdDTOs,
       jobSummaries
     })
-    console.log('postData')
-    console.log(postData)
     let deleteResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.DELETE_DATA_API, 'POST')
     return deleteResponse
   }
@@ -242,26 +260,64 @@ class Sync {
     return successSyncIds
   }
 
-  /**Returns Transaction Id dto which will be used in Request body of delete sync
-   * 
-   * Sample transactionIdDTOs : [
-          {
-              "jobMasterId": 930,
-              "pendingStatusId": 4813,
-              "transactionId": "2426803",
-              "unSeenStatusId": 4814
-          }
-      ]
-   * 
-   */
-  getTransactionIdDTOs(unseenTransactionsMap) {
-    console.log('')
-    const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
-    let transactionIdDtos = []
-    for (let mapObject in jobMasterIdTransactionDtoMap) {
-      transactionIdDtos.push(jobMasterIdTransactionDtoMap[mapObject]);
+
+  /**
+   * Sample Return type 
+   * transactionIdDTOs : [
+         {
+             "jobMasterId": 930,
+             "pendingStatusId": 4813,
+             "transactionId": "2426803:12345",
+             "unSeenStatusId": 4814
+         }
+     ]
+      jobSummaries:[
+    {
+      cityId: 744
+       companyId: 295
+       count:0
+       date:"2017-06-19 00:00:00"
+       hubId:2757
+       id:2229406
+       jobMasterId:930
+       jobStatusId:4814 //unseen status id
+       userId:4954
     }
-    return transactionIdDtos
+   ,{
+   cityId: 744
+       companyId: 295
+       count:0
+       date:"2017-06-19 00:00:00"
+       hubId:2757
+       id:2229894
+       jobMasterId:930
+       jobStatusId:4813 //pending status id
+       userId:4954
+   }
+   
+   ]
+   */
+  async getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap) {
+    let transactionIdDtos = []
+    const jobSummaries = []
+    for (let jobMasterId in jobMasterIdJobStatusIdTransactionIdDtoMap) {
+      for (let unseenStatusId in jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
+        let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].transactionId.split(":").length
+        let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].pendingStatusId
+        let unseenJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, unseenStatusId)
+        unseenJobSummaryData.count = 0
+        jobSummaries.push(unseenJobSummaryData)
+        let pendingJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, pendingID)
+        pendingJobSummaryData.count += count
+        jobSummaries.push(pendingJobSummaryData)
+        transactionIdDtos.push(jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId])
+      }
+    }
+    const dataList = {
+      jobSummaries,
+      transactionIdDtos
+    }
+    return dataList
   }
 }
 

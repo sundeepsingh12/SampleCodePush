@@ -2,7 +2,7 @@
 
 const {
   UNSEEN,
-  TABLE_RUNSHEET
+  TABLE_JOB_TRANSACTION
 } = require('../../lib/constants').default
 import CONFIG from '../../lib/config'
 import {
@@ -45,15 +45,18 @@ export function onResyncPress() {
           } else {
             isLastPageReached = true
           }
+          const successSyncIds = await sync.getSyncIdFromResponse(json.content)
+          console.log('successSyncIds')
+          console.log(successSyncIds)
+          //Dont hit delete sync API if successSyncIds empty
+          if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
+            dispatch(deleteDataFromServer(successSyncIds))
+          }
         } else {
           isLastPageReached = true
         }
       }
-      const successSyncIds = await sync.getSyncIdFromResponse(json.content)
-      //Dont hit delete sync API if successSyncIds empty
-      if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
-        dispatch(deleteDataFromServer(successSyncIds))
-      }
+
 
     } catch (error) {
       console.log(error)
@@ -68,20 +71,21 @@ export function onResyncPress() {
 function deleteDataFromServer(successSyncIds) {
   return async function (dispatch) {
     try {
-      const allJobTransactions = await jobTransactionService.getAllJobTransactions()
+      const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
       const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
-      const unseenTransactionsMap = await jobTransactionService.prepareUnseenTransactionMap(unseenTransactions)
-      const transactionIdDTOs = await sync.getTransactionIdDTOs(unseenTransactionsMap)
-      const jobSummaries = await jobSummaryService.getSummaryForDeleteSyncApi(unseenTransactionsMap)
+      console.log('unseenTransactions')
+      console.log(unseenTransactions)
+      const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
+      console.log('jobMasterIdJobStatusIdTransactionIdDtoMap')
+      console.log(jobMasterIdJobStatusIdTransactionIdDtoMap)
+      const dataList = await sync.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
+      console.log('dataList')
+      console.log(dataList)
       const messageIdDTOs = []
-      await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, transactionIdDTOs, jobSummaries)
-      await jobTransactionService.updateJobTransactionStatusId(unseenTransactionsMap)
-      await jobSummaryService.updateJobSummary(jobSummaries)
-      const unseenTransactionIds = await unseenTransactions.map(unseenTransaction=>unseenTransaction.id)
-      console.log('unseenTransactionIds')
-       console.log(unseenTransactionIds)
-       
+      await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+      await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
+      jobSummaryService.updateJobSummary(dataList.jobSummaries)
     } catch (error) {
       console.log(error)
     }
