@@ -19,7 +19,8 @@ const {
   USER,
   UNSEEN,
   PENDING,
-  CUSTOMIZATION_LIST_MAP
+  CUSTOMIZATION_LIST_MAP,
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION
 } = require('../../lib/constants').default
 
 class Sync {
@@ -98,15 +99,15 @@ class Sync {
    * 
    * @param {*} tdcResponse 
    */
-  processTdcResponse(tdcContentArray) {
+  async processTdcResponse(tdcContentArray) {
     let tdcContentObject
     for (tdcContentObject of tdcContentArray) {
       const queryType = tdcContentObject.type
       console.log(queryType)
       if (queryType == 'insert') {
-        this.saveDataFromServerInDB(tdcContentObject.query)
+        await this.saveDataFromServerInDB(tdcContentObject.query)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
-        this.updateDataInDB(tdcContentObject.query)
+        await this.updateDataInDB(tdcContentObject.query)
       }
     }
   }
@@ -141,32 +142,38 @@ class Sync {
       tableName: TABLE_RUNSHEET,
       value: contentQuery.runSheet
     }
-    const jobTransactionCustomizationList = await this.prepareJobCustomizationList(contentQuery)
-    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+    const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
+    console.log("jobTransactionCustomizationList")
+    console.log(jobTransactionCustomizationListValues)
+    const jobTransactionCustomizationList = {
+      tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+      value: jobTransactionCustomizationListValues
+    }
+    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationList)
   }
 
   async updateDataInDB(query) {
-    try{
-    const contentQuery = await JSON.parse(query)
-    const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
-    const runsheetIds = await contentQuery.runSheet.map(runsheetObject=>runsheetObject.id)
+    try {
+      const contentQuery = await JSON.parse(query)
+      const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+      const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
 
-    const runsheets = {
-      tableName: TABLE_RUNSHEET,
-      valueList: runsheetIds,
-      propertyName: 'id'
-    }
-    const jobDatas = {
-      tableName: TABLE_JOB_DATA,
-      valueList: jobIds,
-      propertyName: 'jobId'
-    }
+      const runsheets = {
+        tableName: TABLE_RUNSHEET,
+        valueList: runsheetIds,
+        propertyName: 'id'
+      }
+      const jobDatas = {
+        tableName: TABLE_JOB_DATA,
+        valueList: jobIds,
+        propertyName: 'jobId'
+      }
 
-    //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
-    //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas,runsheets)
-    await this.saveDataFromServerInDB(query)
-    }catch(Error){
+      //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
+      //So it's necessary to delete existing JobData First in case of update query
+      await realm.deleteRecordsInBatch(jobDatas, runsheets)
+      await this.saveDataFromServerInDB(query)
+    } catch (Error) {
       console.log(Error)
     }
   }
@@ -248,77 +255,15 @@ class Sync {
    * 
    */
   getTransactionIdDTOs(unseenTransactionsMap) {
-    console.log('')
+    if (_.isUndefined(unseenTransactionsMap) || _.isNull(unseenTransactionsMap) || _.isEmpty(unseenTransactionsMap)) {
+      return []
+    }
     const jobMasterIdTransactionDtoMap = unseenTransactionsMap.jobMasterIdTransactionDtoMap
     let transactionIdDtos = []
     for (let mapObject in jobMasterIdTransactionDtoMap) {
       transactionIdDtos.push(jobMasterIdTransactionDtoMap[mapObject]);
     }
     return transactionIdDtos
-  }
-
-  async prepareJobCustomizationList(contentQuery) {
-    let jobTransactionCustomizationList = []
-    const allJobTransactions = contentQuery.jobTransactions
-    const allJobs = contentQuery.job
-    const allJobData = contentQuery.jobData
-    const allFieldData = contentQuery.fieldData
-    const jobMasterIdCustomizationMapFromStore = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
-    const jobMasterIdCustomizationMap = jobMasterIdCustomizationMapFromStore.value
-    console.log(jobMasterIdCustomizationMap)
-    allJobTransactions.forEach(jobTransaction => {
-      let jobTransactionCustomization = {}
-      console.log('jobTransaction')
-      console.log(jobTransaction)
-      let job = allJobs.filter(job => job.id == jobTransaction.jobId)
-      console.log(job)
-      let jobDataMap = {}
-      let jobData = allJobData.filter(jobData => {
-        if(jobData.jobId == jobTransaction.jobId) {
-          jobDataMap[jobAttributeMasterId] = jobData
-        }
-        console.log('jobDataMap')
-        console.log(jobDataMap)
-        return jobDataMap
-      })
-      console.log(jobData)
-      let fieldData = allFieldData.filter(fieldData => fieldData.jobTransactionId == jobTransaction.id)
-      console.log(fieldData)
-      const jobMasterId = jobTransaction.jobMasterId
-      const line1Map = jobMasterIdCustomizationMap[jobMasterId][1]
-      const line2Map = jobMasterIdCustomizationMap[jobMasterId][2]
-      const circleLine1Map = jobMasterIdCustomizationMap[jobMasterId][3]
-      const circleLine2Map = jobMasterIdCustomizationMap[jobMasterId][4]
-      console.log('line1Map')
-      console.log(line1Map)
-      console.log('line2Map')
-      console.log(line2Map)
-      console.log('circleLine1Map')
-      console.log(circleLine1Map)
-      console.log('circleLine2Map')
-      console.log(circleLine2Map)
-      jobTransactionCustomization.line1 = this.setTransactionText(line1Map, jobTransaction, job, jobData, fieldData)
-      // jobTransactionCustomization.line2 = this.setTransactionText(line2Map, transaction, job[0])
-      // jobTransactionCustomization.circleLine1 = this.setTransactionText(circleLine1Map, transaction, job[0])
-      // jobTransactionCustomization.circleLine2 = this.setTransactionText(circleLine2Map, transaction, job[0])
-      jobTransactionCustomizationList.push(jobTransactionCustomization)
-    })
-  }
-
-  setTransactionText(...contentValues) {
-    if (!customizationObject) {
-      return ''
-    }
-    console.log(contentValues)
-    let finalText = ''
-    const jobMasterId = customizationObject.jobMasterId
-    const jobAttributeMasterList = customizationObject.jobAttr
-    console.log('jobAttributeMasterList 111')
-    console.log(jobAttributeMasterList)
-    jobAttributeMasterList.forEach(object => {
-    })
-    const fieldAttributeMasterList = customizationObject.fieldAttr
-    filteredResults = jobDataService.getJobDataForJobId(job.id, jobAttributeMasterList)
   }
 }
 

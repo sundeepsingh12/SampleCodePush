@@ -40,6 +40,9 @@ class JobSummary {
    * @param {*} unseenTransactionsMap 
    */
   async getSummaryForDeleteSyncApi(unseenTransactionsMap) {
+    if(_.isUndefined(unseenTransactionsMap) || _.isNull(unseenTransactionsMap) || _.isEmpty(unseenTransactionsMap)) {
+      return []
+    }
     const jobSummaries = []
     const jobMasterIdJobStatusIdTransactionIdDtoMap = unseenTransactionsMap.jobMasterIdJobStatusIdTransactionIdDtoMap
     console.log('jobMasterIdJobStatusIdTransactionIdDtoMap')
@@ -70,6 +73,9 @@ class JobSummary {
    * @param {*} jobSummaries 
    */
   async updateJobSummary(jobSummaries) {
+    if(_.isUndefined(jobSummaries) || _.isNull(jobSummaries) || _.isEmpty(jobSummaries)) {
+      return
+    }
     const jobSummariesInStore = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
     const jobSummaryIds = await jobSummaries.map(jobSummaryObject => jobSummaryObject.id)
     const jobSummaryIdJobSummaryObjectMap = {}

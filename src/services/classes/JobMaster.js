@@ -30,6 +30,7 @@ const {
   CUSTOMIZATION_APP_MODULE,
   USER,
   CUSTOMIZATION_LIST_MAP,
+  TABIDMAP,
 } = require('../../lib/constants').default
 
 
@@ -133,7 +134,8 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster)
     await keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus)
     await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
-    await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
+    // await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
+    await this.prepareCustomizationListMap(json.jobListCustomization)
     await keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
     await keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)
     await keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList)
@@ -144,7 +146,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
-    await this.prepareCustomizationListMap(json.jobListCustomization)
+    await this.prepareTabStatusIdMap(json.jobStatus)
   }
 
   /**
@@ -202,6 +204,24 @@ class JobMaster {
       }
     })
     keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP,jobMasterIdCustomizationMap)
+  }
+
+  prepareTabStatusIdMap(jobStatus) {
+    if(!jobStatus) {
+      return
+    }
+    let tabIdStatusIdsMap = {}
+    jobStatus.forEach(jobStatusObject => {
+      console.log(jobStatusObject)
+      if(!tabIdStatusIdsMap[jobStatusObject.tabId]) {
+        tabIdStatusIdsMap[jobStatusObject.tabId] = []
+      }
+      tabIdStatusIdsMap[jobStatusObject.tabId].push(jobStatusObject.id)
+    })
+
+    console.log('tabIdStatusIdsMap')
+    console.log(tabIdStatusIdsMap)
+    keyValueDBService.validateAndSaveData(TABIDMAP,tabIdStatusIdsMap)
   }
 
   /**Matches device time with server time,

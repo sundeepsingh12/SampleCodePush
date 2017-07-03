@@ -116,7 +116,7 @@ class Jobs extends Component {
         </Left>
         <Body >
           <Text adjustsFontSizeToFit>
-            {`${item.row} ${item.isSelect}`}
+            {`${item.referenceNumber}`}
           </Text>
         </Body>
         <Right >

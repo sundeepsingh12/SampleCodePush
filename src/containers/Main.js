@@ -117,15 +117,6 @@ class Main extends Component {
           <Tab heading="Pending">
               <Jobs />
           </Tab>
-          <Tab heading="Seen">
-              <Jobs />
-          </Tab>
-          <Tab heading="Success">
-              <Jobs />
-          </Tab>
-          <Tab heading="Failed">
-              <Jobs />
-          </Tab>
       </Tabs>
       <Fab
           active={this.state.active}

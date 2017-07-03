@@ -7,12 +7,13 @@ import Job from './schema/Job'
 import JobData from './schema/JobData'
 import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
+import JobTransactionCustomization from './schema/jobTransactionCustomization'
 
 
 import _ from 'underscore'
 
 const schemaVersion = 22;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet];
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, JobTransactionCustomization];
 let realm = new Realm({
   schemaVersion,
   schema
@@ -24,7 +25,8 @@ const {
   TABLE_JOB,
   TABLE_JOB_DATA,
   USER,
-  TABLE_RUNSHEET
+  TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION
 } = require('../lib/constants').default
 
 export function save(tableName, object) {
@@ -88,9 +90,9 @@ export function deleteRecordsInBatch(...tableNameVsDataList) {
  * @param {*} value 
  */
 export function updateTableRecordOnProperty(tableName, property, valueList, newValue) {
-  let filteredRecords = realm.objects(tableName).filtered(valueList.map(value =>  'id = "' + value + '"').join(' OR '));
+  let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
   realm.write(() => {
-    _.forEach(filteredRecords,record=>record[property] = newValue)
+    _.forEach(filteredRecords, record => record[property] = newValue)
   });
 }
 

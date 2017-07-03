@@ -1,5 +1,6 @@
 const {
-  JOB_STATUS
+  JOB_STATUS,
+  TABIDMAP
 } = require('../../lib/constants').default
 
 import {
@@ -75,6 +76,13 @@ class JobStatus {
        console.log(jobMasterIdStatusIdMap)
     return jobMasterIdStatusIdMap
   }
+
+  getStatusIdsForTabId(tabId) {
+    const tabIdMap = keyValueDBService.getValueFromStore()
+    console.log(tabIdMap.value[tabId])
+    return tabIdMap.value[tabId]
+  }
+
 }
 
 export let jobStatusService = new JobStatus()
