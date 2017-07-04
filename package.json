@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "postinstall": "node_modules/.bin/rn-nodeify --install  --hack",
-    "test": "jest"
+    "test": "jest",
+    "release": "cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "jest-cli": "^19.0.2",
@@ -25,7 +26,7 @@
     "react-native-vector-icons": "^4.0.0",
     "react-redux": "^4.4.5",
     "react-timer-mixin": "^0.13.3",
-    "realm": "^1.8.1",
+    "realm": "^1.8.3",
     "redux": "^3.6.0",
     "redux-logger": "^2.7.0",
     "redux-mock-store": "^1.2.2",

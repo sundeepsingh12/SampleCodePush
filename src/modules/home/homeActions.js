@@ -70,9 +70,14 @@ export function onResyncPress() {
  */
 function deleteDataFromServer(successSyncIds) {
   return async function (dispatch) {
+     console.log('deleteDataFromServer >>>s')
     try {
       const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
+      console.log('allJobTransactions >>>s')
+      console.log(allJobTransactions)
       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
+       console.log('unseenStatusIds >>>')
+      console.log(unseenStatusIds)
       const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
       console.log('unseenTransactions')
       console.log(unseenTransactions)

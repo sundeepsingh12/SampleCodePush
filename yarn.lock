@@ -3536,9 +3536,9 @@ readline2@^1.0.1:
     is-fullwidth-code-point "^1.0.0"
     mute-stream "0.0.5"
 
-realm@^1.8.1:
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/realm/-/realm-1.8.1.tgz#be0ebd8965c40570700e42e17632ffdb05ec8629"
+realm@^1.8.3:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/realm/-/realm-1.8.3.tgz#e385421b16cb03a21699ecf9072956b43200df25"
   dependencies:
     extract-zip "^1.6.0"
     ini "^1.3.4"

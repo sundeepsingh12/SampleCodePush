@@ -16,11 +16,12 @@ class JobTransaction {
    * @param {*} statusIds 
    */
   getJobTransactionsForStatusIds(allJobTransactions, statusIds) {
-    console.log('allJobTransactions')
-    console.log(allJobTransactions)
+    const allJobTransactionsClone = {...allJobTransactions}
+     console.log('allJobTransactionsClone')
+    console.log(allJobTransactionsClone)
     console.log('statusIds')
     console.log(statusIds)
-    const transactionList = _.filter(allJobTransactions, transaction => statusIds.includes(transaction.jobStatusId))
+    const transactionList = _.filter(allJobTransactionsClone, transaction => statusIds.includes(transaction.jobStatusId))
     console.log('transactionList')
     console.log(transactionList)
     return transactionList
