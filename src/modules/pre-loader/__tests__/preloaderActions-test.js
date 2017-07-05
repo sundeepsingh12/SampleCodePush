@@ -262,6 +262,45 @@ describe('Preloader Actions', () => {
             })
     })
 
+    it('should logout if server returns 500', () => {
+        const error = {
+            code: 500
+        }
+        const expectedActions = [
+            { type: PRE_LOGOUT_START },
+            {
+                type: PRE_LOGOUT_FAILURE,
+                payload: error
+            },
+            {
+                type: ON_LOGIN_PASSWORD_CHANGE,
+                payload: ''
+            },
+            {
+                type: ON_LOGIN_USERNAME_CHANGE,
+                payload: ''
+            }
+        ]
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: 'testtoken' })
+        authenticationService.logout = jest.fn(() => {
+            throw new Error(error)
+        })
+        keyValueDBService.deleteValueFromStore = jest.fn()
+        keyValueDBService.deleteValueFromStore.mockReturnValue(null)
+        const store = mockStore({})
+        return store.dispatch(actions.invalidateUserSession())
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(authenticationService.logout).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[3].type).toEqual(expectedActions[3].type)
+            })
+    })
+
     it('should dispatch otp screen', () => {
         const expectedActions = [
             {

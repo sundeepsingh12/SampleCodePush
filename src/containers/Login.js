@@ -89,7 +89,6 @@ class Login extends Component {
 
   loginButtonPress(){
     const password = this.props.auth.form.password;
-    console.log(password.length)
     if(password.length > 50) {
       this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
     } else {
@@ -145,6 +144,7 @@ class Login extends Component {
                   disabled = {this.props.auth.form.isEditTextDisabled}
                 />
               </Item>
+              
               <Button
                 rounded success style={{ width: '100%', marginTop: 15 }}
                 disabled={this.props.auth.form.isButtonDisabled}

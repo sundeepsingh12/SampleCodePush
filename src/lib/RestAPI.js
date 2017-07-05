@@ -36,9 +36,15 @@ class RestAPI {
    * A generic function that prepares the request
    *
    * @returns object:
-   *  {code: response.code,
+   * { code: response.code,
    *   status: response.status,
-   *   json: response.json()
+   *   json: response.json() }
+   * 
+   * @throws exception:
+   * {
+   *    code: response.status,
+   *    message: 'Error message like Internal server error'
+   *  }
    */
   async _fetch(opts) {
     let url = this.API_BASE_URL + opts.url
@@ -48,50 +54,37 @@ class RestAPI {
 
     }
     const response = await fetch(url, opts)
-    const {
-      status,
-      code,
-      headers
-    } = response;
+    const { status, code, headers } = response;
     let res = {
       status,
       code,
       headers,
       json: {}
     }
-    console.log('responsse >>>>')
-     console.log(response)
-     if(opts.url==CONFIG.API.DELETE_DATA_API){
-        res.json = response.text()
-     }
-    else if (opts.headers["Content-Type"] == "application/json") {
-      res.json = response.json()
+    console.log(">>>> response");
+    console.log(response);
+    //Check if server returned JSON or Text response
+    let isJsonResponse = false;
+    response.headers.forEach(function(val, key) {  if(val.indexOf('json')!=-1) isJsonResponse = true; });
+    console.log("=====Is JSON response ?======="+isJsonResponse);
+    try {
+      res.json = (isJsonResponse) ? await response.json() : await response.text()
+    } catch (e) {
+      console.log("Error in parsing response JSON/ Text")
+      console.log(e);
+      res.json = {}
     }
-    return res
-  }
-
-  /**
-   * Remove  null, NaN, empty String and empty objects from JSON Objects
-   **/
-  _pruneEmpty(obj) {
-    function prune(current) {
-      _.forEach(current, function (value, key) {
-        if (_.isUndefined(value) || _.isNull(value) || _.isNaN(value) ||
-          (_.isString(value) && _.isEmpty(value)) ||
-          (_.isObject(value) && _.isEmpty(prune(value)))) {
-
-          delete current[key];
-        }
-      });
-      return current;
-
-    };
-    return prune(obj);
+    if (res.status!=200) {
+      throw {
+        code: res.status,
+        message: ((res.json && res.json.message) ? res.json.message : 'Unknow error. Retry or contact support.') 
+      }
+    }
+    return res;
   }
 
   serviceCall(body, url, method) {
     let opts;
-    
     if (method === 'POST') {
       opts = {
         method,
@@ -119,35 +112,7 @@ class RestAPI {
         }
       }
     }
-
-    return this._fetch(opts)
-      .then((res) => {
-        console.log(res.status)
-        if (res.status == 200) {
-          return res;
-        } else {
-          switch (res.status) {
-            case 401:
-              throw new Error("Invalid User Credentials")
-            case 500:
-              throw new Error("Internal server error")
-            case 502:
-              throw new Error("Bad Gateway")
-            case 1201:
-              throw new Error("User already logged in ")
-            case 1203:
-              throw new Error("User locked.Try after 15 minutes")
-            default:
-              throw {
-                code: res.status,
-                message: 'Something went wrong'
-              }
-          }
-        }
-      })
-      .catch((error) => {
-        throw (error)
-      })
+    return this._fetch(opts);
   }
 }
 // The singleton variable

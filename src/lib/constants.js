@@ -54,6 +54,7 @@ export default keyMirror({
     ON_LOGIN_USERNAME_CHANGE: null,
     ON_LOGIN_PASSWORD_CHANGE: null,
 
+    ERROR_400_403_LOGOUT: null,
     PRELOADER_SUCCESS:null,
     SHOW_MOBILE_NUMBER:null,
     SHOW_OTP_SCREEN:null,
