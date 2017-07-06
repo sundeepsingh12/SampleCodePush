@@ -7,7 +7,6 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.horcrux.svg.SvgPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
-import com.burnweb.rnsimplealertdialog.RNSimpleAlertDialogPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -33,7 +32,6 @@ public class MainApplication extends Application implements ReactApplication {
             new RCTCameraPackage(),
             new SvgPackage(),
             new VectorIconsPackage(),
-            new RNSimpleAlertDialogPackage(),
             new RealmReactPackage() ,
             new RNIMEIPackage()
       );

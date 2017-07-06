@@ -61,21 +61,19 @@ class JobSummary {
     return filteredJobSummaryList[0]
   }
 
-  async getJobSummariesForJobMasterAndStatus(jobMasterIdStatusIdMap){
-     const jobSummaries = []
-    const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
-    if(!alljobSummaryList || !alljobSummaryList.value){
-      throw new Error('Value of JobSummary missing')
-    }
-     for (let jobMasterId in jobMasterIdStatusIdMap) {
-          const filteredJobSummaryList =  alljobSummaryList.value.filter(jobSummaryObject => (jobSummaryObject.jobStatusId == jobMasterIdStatusIdMap[jobMasterId] && jobSummaryObject.jobMasterId == jobMasterId))
-          filteredJobSummaryList.count = jobMasterIdStatusIdMap[jobMasterId].split(":")[1]
-          jobSummaries.push(filteredJobSummaryList[0])
-   }
-
-   return jobSummaries
-
-  }
+  // async getJobSummariesForJobMasterAndStatus(jobMasterIdStatusIdMap){
+  //    const jobSummaries = []
+  //   const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+  //   if(!alljobSummaryList || !alljobSummaryList.value){
+  //     throw new Error('Value of JobSummary missing')
+  //   }
+  //    for (let jobMasterId in jobMasterIdStatusIdMap) {
+  //         const filteredJobSummaryList =  alljobSummaryList.value.filter(jobSummaryObject => (jobSummaryObject.jobStatusId == jobMasterIdStatusIdMap[jobMasterId] && jobSummaryObject.jobMasterId == jobMasterId))
+  //         filteredJobSummaryList.count = jobMasterIdStatusIdMap[jobMasterId].split(":")[1]
+  //         jobSummaries.push(filteredJobSummaryList[0])
+  //  }
+  //  return jobSummaries
+  // }
 }
 
 export let jobSummaryService = new JobSummary()

@@ -90,6 +90,8 @@ export function onResyncPress() {
       const pageNumber = 0, pageSize = 3
       let isLastPageReached = false, json
        const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
+       console.log('time start >>>>')
+         console.log(new Date())
       while (!isLastPageReached) {
         console.log('inside while')
         const tdcResponse = await sync.downloadDataFromServer(pageNumber, pageSize)
@@ -119,6 +121,8 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
+       console.log('time end >>>>')
+         console.log(new Date())
 
     } catch (error) {
       console.log(error)
