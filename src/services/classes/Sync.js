@@ -90,7 +90,7 @@ class Sync {
    */
   async downloadDataFromServer(pageNumber, pageSize) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-     if (!token) {
+    if (!token) {
       throw new Error('Token Missing')
     }
     let formData = null
@@ -139,34 +139,31 @@ class Sync {
       tableName: TABLE_JOB,
       value: contentQuery.job
     }
+      const jobDatas = {
+        tableName: TABLE_JOB_DATA,
+        value: contentQuery.jobData
+      }
 
-    const jobDatas = {
-      tableName: TABLE_JOB_DATA,
-      value: contentQuery.jobData
-    }
+      const fieldDatas = {
+        tableName: TABLE_FIELD_DATA,
+        value: contentQuery.fieldData
+      }
 
-    const fieldDatas = {
-      tableName: TABLE_FIELD_DATA,
-      value: contentQuery.fieldData
+      const runsheets = {
+        tableName: TABLE_RUNSHEET,
+        value: contentQuery.runSheet
+      }
+      realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     }
-
-    const runsheets = {
-      tableName: TABLE_RUNSHEET,
-      value: contentQuery.runSheet
-    }
-     realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
-    }
-    catch(Error){
-      console.log('inside catch >>')
+    catch (Error) {
       console.log(Error)
     }
-   
   }
 
-/**
- * 
- * @param {*} query 
- */
+  /**
+   * 
+   * @param {*} query 
+   */
   async updateDataInDB(query) {
     try {
       const contentQuery = await JSON.parse(query)

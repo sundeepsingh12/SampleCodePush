@@ -45,8 +45,8 @@ class JobTransaction {
    * @param {*} unseenTransactions 
    */
   async getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions) {
-    if (_.isUndefined(unseenTransactions) || _.isNull(unseenTransactions) || _.isEmpty(unseenTransactions)) {
-      return []
+    if (_.isNull(unseenTransactions) || _.isEmpty(unseenTransactions)) {
+      return {}
     }
     let jobMasterIdTransactionDtoMap = {}, // Map<JobMasterId, TransactionIdDTO>
       jobMasterIdJobStatusIdTransactionIdDtoMap = {} // Map<JobMasterId, Map<JobStausId, TransactionIdDTO>>

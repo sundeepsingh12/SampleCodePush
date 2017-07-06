@@ -60,6 +60,7 @@ export default keyMirror({
     SHOW_MOBILE_NUMBER_SCREEN: null,
     ON_MOBILE_NO_CHANGE: null,
     ON_OTP_CHANGE: null,
+    ERROR_400_403_LOGOUT: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,

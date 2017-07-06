@@ -167,6 +167,54 @@ describe('test sync services', () => {
     }
   })
 
+  it('should save data from server in Realm', async () => {
+    const query = {
+      "job": [{
+        "id": 12
+      }],
+      "jobTransactions": [{
+        "id": 13
+      }],
+      "jobData": [{
+        "id": 23
+      }],
+      "fieldData": [ ],
+      "runSheet": [{
+        "id": 1
+      }]
+    }
+    expect.assertions(1);
+    realm.performBatchSave = jest.fn()
+    let response = await sync.saveDataFromServerInDB(JSON.stringify(query));
+    expect(realm.performBatchSave).toHaveBeenCalledTimes(1)
+  })
+
+  it('should update data in Db', async () => {
+    const query = {
+      "job": [{
+        "id": 12
+      }],
+      "jobTransactions": [{
+        "id": 13
+      }],
+      "jobData": [{
+        "id": 23
+      }],
+      "fieldData": [ ],
+      "runSheet": [{
+        id: 1
+      }]
+    }
+    realm.deleteRecordsInBatch = jest.fn()
+    sync.saveDataFromServerInDB = jest.fn()
+    await sync.updateDataInDB(JSON.stringify(query))
+    expect(realm.deleteRecordsInBatch).toHaveBeenCalledTimes(1)
+    expect(sync.saveDataFromServerInDB).toHaveBeenCalledTimes(1)
+  })
+
+})
+
+
   it('should process tdc response for insert query type', () => {
     const tdcContentArray = [{
       "id": 2326388,
@@ -193,7 +241,6 @@ describe('test sync services', () => {
 
     sync.updateDataInDB = jest.fn()
     sync.saveDataFromServerInDB = jest.fn()
-
     sync.processTdcResponse(tdcContentArray)
     expect(sync.saveDataFromServerInDB).toHaveBeenCalledTimes(1)
     expect(sync.updateDataInDB).not.toHaveBeenCalled()
@@ -230,63 +277,3 @@ describe('test sync services', () => {
     expect(sync.updateDataInDB).toHaveBeenCalledTimes(1)
     expect(sync.saveDataFromServerInDB).not.toHaveBeenCalled()
   })
-
-  it('should save data from server in Realm', () => {
-    const query = {
-      "job": [{
-        id: 12
-      }],
-      "jobTransactions": [{
-          id: 13
-        }
-
-      ],
-      "jobData": [{
-          id: 23
-        }
-
-      ],
-      "fieldData": [
-
-      ],
-      "runSheet": [{
-        id: 1
-      }]
-    }
-    realm.performBatchSave = jest.fn()
-    console.log('inside 111>>>')
-    sync.saveDataFromServerInDB(query)
-     console.log('inside 22222>>>')
-    expect(realm.performBatchSave).toHaveBeenCalledTimes(1)
-  })
-
-  it('should update data in Db', () => {
-    const query = {
-      "job": [{
-        id: 12
-      }],
-      "jobTransactions": [{
-          id: 13
-        }
-
-      ],
-      "jobData": [{
-          id: 23
-        }
-
-      ],
-      "fieldData": [
-
-      ],
-      "runSheet": [{
-        id: 1
-      }]
-    }
-    realm.deleteRecordsInBatch = jest.fn()
-    realm.saveDataFromServerInDB = jest.fn()
-    sync.updateDataInDB(query)
-    expect(realm.deleteRecordsInBatch).toHaveBeenCalledTimes(1)
-    expect(sync.saveDataFromServerInDB).toHaveBeenCalledTimes(1)
-  })
-
-})

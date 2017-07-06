@@ -172,10 +172,10 @@ describe('job master services', () => {
     try {
       let serverTime = moment()
       serverTime.subtract(20, 'm')
-      jobMasterService.matchServerTimeWithMobileTime(serverTime)
+      jobMasterService.matchServerTimeWithMobileTime(serverTime.format('YYYY-MM-DD HH:mm:ss'))
     }
     catch (error) {
-      expect(error.message).toEqual("Server Time not same as mobile time")
+      expect(error.message).toEqual("Time mismatch. Please correct time on Device")
     }
   })
 
@@ -185,7 +185,7 @@ describe('job master services', () => {
       jobMasterService.matchServerTimeWithMobileTime(serverTime)
     }
     catch (error) {
-      expect(error.message).toEqual("Server Time format incorrect")
+      expect(error.message).toEqual("Server time format incorrect")
     }
   })
 

@@ -37,6 +37,7 @@ const {
   PRE_LOGOUT_SUCCESS,
   PRE_LOGOUT_FAILURE,
 
+  ERROR_400_403_LOGOUT,
   ON_MOBILE_NO_CHANGE,
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS,
@@ -203,6 +204,15 @@ export function otpValidationFailure(error) {
 
   }
 }
+
+//This action is dispatched is IMEI verification throws 400/403 or Logout throws 500
+export function error_400_403_Logout(error) {
+  return {
+    type: ERROR_400_403_LOGOUT,
+    payload: error
+  }
+}
+
 //This hits JOB Master Api and gets the response 
 export function downloadJobMaster() {
   return async function (dispatch) {
@@ -219,11 +229,12 @@ export function downloadJobMaster() {
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
     } catch (error) {
-      dispatch(jobMasterDownloadFailure(error.message))
-      if (error.code == 403 || error.code == 400) { //clear user session 
-        dispatch(preLogoutSuccess())
-        dispatch(deleteSessionToken())
-        Actions.InitialLoginForm()
+      if (error.code == 403 || error.code == 400) { 
+        // clear user session WITHOUT Logout API call
+        // Logout API will return 500 as the session is pre-cleared on Server
+        dispatch(error_400_403_Logout(error.message))
+      } else {
+        dispatch(jobMasterDownloadFailure(error.message))
       }
     }
   }
@@ -244,8 +255,18 @@ export function invalidateUserSession() {
       dispatch(deleteSessionToken())
       Actions.InitialLoginForm()
     } catch (error) {
-      dispatch(preLogoutFailure(error.message))
+      dispatch(error_400_403_Logout(error.message))
     }
+  }
+}
+/**
+ * This methods logs out the user without calling the Logout API as the session is already invalidated on Server
+ */
+export function startLoginScreenWithoutLogout() {
+  return async function (dispatch) {
+    dispatch(preLogoutSuccess())
+    dispatch(deleteSessionToken())
+    Actions.InitialLoginForm()
   }
 }
 
@@ -317,7 +338,7 @@ export function checkAsset() {
         Actions.Tabbar()
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
-        dispatch(checkIfSimValidOnServer())
+        dispatch(checkIfSimValidOnServer());
       }
     } catch (error) {
       dispatch(checkAssetFailure(error.message))
@@ -357,11 +378,12 @@ export function checkIfSimValidOnServer() {
         dispatch(showMobileNumber())
       }
     } catch (error) {
-      dispatch(checkAssetFailure(error.message))
-      if (error.code == 403 || error.code == 400) { //clear user session 
-        dispatch(preLogoutSuccess())
-        dispatch(deleteSessionToken())
-        Actions.InitialLoginForm()
+      if (error.code == 403 || error.code == 400) {
+        // clear user session without Logout API call
+        // Logout API will return 500 as the session is pre-cleared on Server
+        dispatch(error_400_403_Logout(error.message))
+      } else {
+        dispatch(checkAssetFailure(error.message))
       }
     }
   }
