@@ -3458,6 +3458,10 @@ react-native-camera@^0.9.0:
   dependencies:
     opencollective "^1.0.3"
 
+react-native-cancelable-fetch@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-cancelable-fetch/-/react-native-cancelable-fetch-0.1.1.tgz#aab030b44b426f19d558cebe1cd910397572380d"
+
 react-native-device-info@^0.10.2:
   version "0.10.2"
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-0.10.2.tgz#350cd68ed43839022ddea0a3a423439f16fa4fba"
@@ -3506,10 +3510,6 @@ react-native-simple-store@^1.3.0:
   resolved "https://registry.yarnpkg.com/react-native-simple-store/-/react-native-simple-store-1.3.0.tgz#84953a7b007b8e3c50ec768478e98dc3636ef092"
   dependencies:
     lodash.merge "4.6.0"
-
-react-native-simpledialog-android@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/react-native-simpledialog-android/-/react-native-simpledialog-android-1.0.8.tgz#b4c5fd576c686ce79d787e1efd8f2524728326ec"
 
 react-native-svg@^5.2.0:
   version "5.2.0"
