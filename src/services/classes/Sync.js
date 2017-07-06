@@ -129,16 +129,16 @@ class Sync {
    * @param {*} query 
    */
   async saveDataFromServerInDB(query) {
-    try{
-    const contentQuery = await JSON.parse(query)
-    const jobTransactions = {
-      tableName: TABLE_JOB_TRANSACTION,
-      value: contentQuery.jobTransactions
-    }
-    const jobs = {
-      tableName: TABLE_JOB,
-      value: contentQuery.job
-    }
+    try {
+      const contentQuery = await JSON.parse(query)
+      const jobTransactions = {
+        tableName: TABLE_JOB_TRANSACTION,
+        value: contentQuery.jobTransactions
+      }
+      const jobs = {
+        tableName: TABLE_JOB,
+        value: contentQuery.job
+      }
       const jobDatas = {
         tableName: TABLE_JOB_DATA,
         value: contentQuery.jobData
@@ -153,7 +153,14 @@ class Sync {
         tableName: TABLE_RUNSHEET,
         value: contentQuery.runSheet
       }
-      realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+      const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
+      console.log("jobTransactionCustomizationList")
+      console.log(jobTransactionCustomizationListValues)
+      const jobTransactionCustomizationList = {
+        tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+        value: jobTransactionCustomizationListValues
+      }
+      realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationListValues)
     }
     catch (Error) {
       console.log(Error)
