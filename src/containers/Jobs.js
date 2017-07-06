@@ -68,7 +68,7 @@ var styles = StyleSheet.create({
 
 function mapStateToProps(state) {
   return {
-    jobs: state.home.jobs
+    tabIdJobTransactions: state.home.tabIdJobTransactions
   }
 }
 
@@ -146,7 +146,7 @@ class Jobs extends Component {
   };*/
 
   renderFooter = () => {
-    if(!this.props.jobs.isFetching) {
+    if(!this.props.tabIdJobTransactions[this.props.tabId].isFetching) {
       return null
     }
     
@@ -165,22 +165,18 @@ class Jobs extends Component {
   handleLoadMore = () => {
     console.log('handleLoadMore')
     console.log(this.props)
-    console.log(this.props.jobs.pageNumber)
-    this.props.actions.fetchJobs(this.props.id,this.props.jobs.pageNumber)
+    this.props.actions.fetchJobs(this.props.tabId,this.props.tabIdJobTransactions[this.props.tabId].pageNumber)
   }
 
   render() {
     console.log('jobs rendering')
     console.log(this.props)
-    if(this.props.jobs.isFetching) {
-      this.props.actions.fetchJobs(this.props.id,0)
-    }
     return (
       <View style={styles.container}>
         <List
           style={{ marginTop: 5, marginBottom: 50 }}>
           <FlatList
-            data={this.props.jobs.lazydata}
+            data={this.props.tabIdJobTransactions[this.props.tabId].jobTransactions}
             renderItem={({ item }) => this.renderData(item)}
             keyExtractor={item => item.id}
             ListFooterComponent={this.renderFooter}

@@ -19,17 +19,21 @@ import { tabsService } from '../../services/classes/Tabs'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 
-export function jobFetchingEnd(jobTransactions) {
+export function jobFetchingEnd(jobTransactions,tabId,pageNumber) {
   return {
     type: JOB_FETCHING_END,
-    payload: jobTransactions
+    payload: {
+      jobTransactions,
+      tabId,
+      pageNumber
+    }
   }
 }
 
-export function jobFetchingStart() {
+export function jobFetchingStart(tabId) {
   return {
     type: JOB_FETCHING_START,
-    payload: true
+    payload: tabId
   }
 }
 
@@ -64,7 +68,7 @@ export function fetchTabs() {
 export function fetchJobs(tabId,pageNumber) {
   return async function (dispatch) {
     try {
-      dispatch(jobFetchingStart())
+      dispatch(jobFetchingStart(tabId))
       console.log('pageNumber')
       console.log(pageNumber)
       console.log('tabId')
@@ -73,7 +77,7 @@ export function fetchJobs(tabId,pageNumber) {
       var data = await jobTransactionService.getJobTransactions(tabId,pageNumber)
       console.log('data fetchJobs')
       console.log(data)
-      dispatch(jobFetchingEnd(data))
+      dispatch(jobFetchingEnd(data,tabId,pageNumber))
     } catch (error) {
       console.log(error)
     }

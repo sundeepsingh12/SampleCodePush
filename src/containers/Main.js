@@ -98,7 +98,7 @@ class Main extends Component {
             key = {tab.id}
             heading={tab.name}>
               <Jobs
-               id = {tab.id}
+               tabId = {tab.id}
                pageNumber = {0}
                />
           </Tab>
