@@ -10,7 +10,7 @@ module.exports = {
       url: 'https://www.fareye.co/app'
     },
     staging: {
-      url: 'https://staging.fareye.co/app'
+      url: 'http://192.168.1.169:8080/app'
     }
   },
     API:{

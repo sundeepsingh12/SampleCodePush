@@ -2,8 +2,11 @@
 
 const {
   JOB_FETCHING_START,
-  JOB_FETCHING_WAIT,
-  UNSEEN
+  JOB_FETCHING_END,
+  UNSEEN,
+  TABLE_JOB_TRANSACTION,
+  TAB,
+  SET_TABS_LIST
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
@@ -12,34 +15,65 @@ import { sync } from '../../services/classes/Sync'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobSummaryService } from '../../services/classes/JobSummary'
+import { tabsService } from '../../services/classes/Tabs'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 
-export function jobDownload(jobTransactions) {
+export function jobFetchingEnd(jobTransactions) {
   return {
-    type: JOB_FETCHING_START,
+    type: JOB_FETCHING_END,
     payload: jobTransactions
   }
 }
 
-export function isFetchingFalse() {
+export function jobFetchingStart() {
   return {
-    type: JOB_FETCHING_WAIT,
+    type: JOB_FETCHING_START,
     payload: true
   }
 }
 
-export function fetchJobs(pageNumber) {
+export function jobRefreshingStart() {
+  return {
+    type: JOB_REFRESHING_START,
+    payload: true
+  }
+}
+
+export function setTabsList(tabsList) {
+  return {
+    type : SET_TABS_LIST,
+    payload : tabsList
+  }
+}
+
+export function fetchTabs() {
   return async function (dispatch) {
     try {
-      dispatch(isFetchingFalse())
+      console.log('fetchtabs')
+      const tabs = await keyValueDBService.getValueFromStore(TAB)
+      console.log(tabs)
+      console.log(tabs.value)
+      dispatch(setTabsList(tabs.value))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+export function fetchJobs(tabId,pageNumber) {
+  return async function (dispatch) {
+    try {
+      dispatch(jobFetchingStart())
       console.log('pageNumber')
       console.log(pageNumber)
+      console.log('tabId')
+      console.log(tabId)
       console.log('fetchJobs action')
-      var data = await jobTransactionService.getJobTransactions(pageNumber)
+      var data = await jobTransactionService.getJobTransactions(tabId,pageNumber)
       console.log('data fetchJobs')
       console.log(data)
-      dispatch(jobDownload(data))
+      dispatch(jobFetchingEnd(data))
     } catch (error) {
       console.log(error)
     }
@@ -65,17 +99,18 @@ export function onResyncPress() {
           } else {
             isLastPageReached = true
           }
+          const successSyncIds = await sync.getSyncIdFromResponse(json.content)
+          console.log('successSyncIds')
+          console.log(successSyncIds)
+          //Dont hit delete sync API if successSyncIds empty
+          if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
+            dispatch(deleteDataFromServer(successSyncIds))
+          }
         } else {
           isLastPageReached = true
         }
       }
-      console.log('after while')
-      console.log(json.content)
-      const successSyncIds = await sync.getSyncIdFromResponse(json.content)
-      //Dont hit delete sync API if successSyncIds empty
-      if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
-        dispatch(deleteDataFromServer(successSyncIds))
-      }
+      
     } catch (error) {
       console.log(error)
     }
@@ -89,19 +124,21 @@ export function onResyncPress() {
 function deleteDataFromServer(successSyncIds) {
   return async function (dispatch) {
     try {
-      const allJobTransactions = await jobTransactionService.getAllJobTransactions()
-      console.log('is empty before call ')
-      console.log(_.isEmpty(allJobTransactions))
+      const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
       const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
-      const unseenTransactionsMap = await jobTransactionService.prepareUnseenTransactionMap(unseenTransactions)
-      const transactionIdDTOs = await sync.getTransactionIdDTOs(unseenTransactionsMap)
-      const jobSummaries = await jobSummaryService.getSummaryForDeleteSyncApi(unseenTransactionsMap)
+      console.log('unseenTransactions')
+      console.log(unseenTransactions)
+      const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
+      console.log('jobMasterIdJobStatusIdTransactionIdDtoMap')
+      console.log(jobMasterIdJobStatusIdTransactionIdDtoMap)
+      const dataList = await sync.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
+      console.log('dataList')
+      console.log(dataList)
       const messageIdDTOs = []
-      await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, transactionIdDTOs, jobSummaries)
-      await jobTransactionService.updateJobTransactionStatusId(unseenTransactionsMap)
-      await jobSummaryService.updateJobSummary(jobSummaries)
-      dispatch(fetchJobs(0))
+      await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+      await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
+      jobSummaryService.updateJobSummary(dataList.jobSummaries)
     } catch (error) {
       console.log('inside catch')
       console.log(error)

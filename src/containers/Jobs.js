@@ -68,7 +68,7 @@ var styles = StyleSheet.create({
 
 function mapStateToProps(state) {
   return {
-    home: state.home
+    jobs: state.home.jobs
   }
 }
 
@@ -82,10 +82,15 @@ class Jobs extends Component {
 
   constructor(props) {
     super(props);
+    console.log('Jobs props')
+    console.log(props)
   }
 
   componentDidMount() {
-    this.props.actions.fetchJobs(this.props.home.pageNumber)
+    console.log('componentDidMount of jobs')
+    console.log('this.props')
+    console.log(this.props)
+    this.props.actions.fetchJobs(this.props.id,0)
   }
 
   toggleStatus() {
@@ -116,7 +121,7 @@ class Jobs extends Component {
         </Left>
         <Body >
           <Text adjustsFontSizeToFit>
-            {`${item.referenceNumber}`}
+            {`${item.line1}`}
           </Text>
         </Body>
         <Right >
@@ -141,7 +146,7 @@ class Jobs extends Component {
   };*/
 
   renderFooter = () => {
-    if(!this.props.home.isFetching) {
+    if(!this.props.jobs.isFetching) {
       return null
     }
     
@@ -158,18 +163,24 @@ class Jobs extends Component {
   }
 
   handleLoadMore = () => {
-    console.log(this.props.home.pageNumber)
-    this.props.actions.fetchJobs(this.props.home.pageNumber)
+    console.log('handleLoadMore')
+    console.log(this.props)
+    console.log(this.props.jobs.pageNumber)
+    this.props.actions.fetchJobs(this.props.id,this.props.jobs.pageNumber)
   }
 
   render() {
+    console.log('jobs rendering')
     console.log(this.props)
+    if(this.props.jobs.isFetching) {
+      this.props.actions.fetchJobs(this.props.id,0)
+    }
     return (
       <View style={styles.container}>
         <List
           style={{ marginTop: 5, marginBottom: 50 }}>
           <FlatList
-            data={this.props.home.lazydata}
+            data={this.props.jobs.lazydata}
             renderItem={({ item }) => this.renderData(item)}
             keyExtractor={item => item.id}
             ListFooterComponent={this.renderFooter}

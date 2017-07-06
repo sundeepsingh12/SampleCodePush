@@ -52,6 +52,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { deleteSessionToken } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
+import { logoutService } from '../../services/classes/Logout'
 
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
@@ -238,6 +239,7 @@ export function invalidateUserSession() {
       dispatch(preLogoutRequest())
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await authenticationService.logout(token)
+      await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
       Actions.InitialLoginForm()

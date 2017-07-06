@@ -46,6 +46,7 @@ from 'react-native'
 import { Container, Content, Tab, Tabs,Body, Header, Title, Left, Right,ScrollableTab, Icon, Fab, Button } from 'native-base';
 import Jobs from './Jobs';
 import * as homeActions from '../modules/home/homeActions'
+import renderIf from '../lib/renderIf';
 
 /**
  *  Instead of including all app states via ...state
@@ -54,16 +55,7 @@ import * as homeActions from '../modules/home/homeActions'
  */
 function mapStateToProps (state) {
   return {
-    auth: {
-      form: {
-        isFetching: state.auth.form.isFetching
-      }
-    },
-    global: {
-      currentState: state.global.currentState,
-      showState: state.global.showState
-    },
-    home : state.home
+    tabsList : state.home.tabsList
   }
 };
 
@@ -92,9 +84,33 @@ class Main extends Component {
 
   componentDidMount() {
     this.props.actions.onResyncPress()
+    this.props.actions.fetchTabs()
+  }
+
+  renderTabs() {
+    console.log('renderTabs')
+    const tabs = this.props.tabsList
+    const renderTabList = []
+    tabs.forEach(tab => {
+      console.log(tab)
+      renderTabList.push(
+            <Tab
+            key = {tab.id}
+            heading={tab.name}>
+              <Jobs
+               id = {tab.id}
+               pageNumber = {0}
+               />
+          </Tab>
+          )
+    })
+    return renderTabList
   }
 
   render() {
+    console.log('render main')
+    console.log(this.props.tabsList)
+    const viewTabList = this.renderTabs()
     return (
       <Container>
       <Header hasTabs>
@@ -111,12 +127,7 @@ class Main extends Component {
       </Header>
       
       <Tabs renderTabBar={()=> <ScrollableTab />}>
-          <Tab heading="All">
-              <Jobs />
-          </Tab>
-          <Tab heading="Pending">
-              <Jobs />
-          </Tab>
+        {viewTabList}
       </Tabs>
       <Fab
           active={this.state.active}
@@ -136,7 +147,6 @@ class Main extends Component {
               <Icon name="mail" />
           </Button>
       </Fab>
-      
       </Container>
     );
   }

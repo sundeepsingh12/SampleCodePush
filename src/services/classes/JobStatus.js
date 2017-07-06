@@ -21,13 +21,12 @@ class JobStatus {
    */
   async getAllIdsForCode(statusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    if(_.isEmpty(jobStatusArray.value) || _.isUndefined(jobStatusArray.value)){
-      throw new Error('Invalid Status Code')
+    if (!jobStatusArray || !jobStatusArray.value) {
+      console.log('inside error >>>>')
+      throw new Error('Job status missing in store')
     }
-    const jobStatusIds = await jobStatusArray.value.filter(jobStatusObject => jobStatusObject.code == statusCode)
+    const jobStatusIds = jobStatusArray.value.filter(jobStatusObject => jobStatusObject.code == statusCode)
       .map(jobStatusObject => jobStatusObject.id)
-      console.log('jobStatusIds')
-        console.log(jobStatusIds)
     return jobStatusIds
   }
 
@@ -38,15 +37,18 @@ class JobStatus {
    */
   async getStatusIdForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    if(_.isUndefined(jobStatusArray.value) || _.isEmpty(jobStatusArray.value)){
-      throw new Error('Invalid Job Master or Job Status')
+    console.log(jobStatusArray)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      console.log('if')
+      throw new Error('Job status missing in store')
     }
-    const jobStatusId = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobStatusObject.jobMasterId == jobMasterId))
+    console.log('after if')
+    const jobStatusId = jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobStatusObject.jobMasterId == jobMasterId))
       .map(jobStatusObject => jobStatusObject.id)
-      console.log('jobStatusId')
-       console.log(jobStatusId)
-        console.log('jobStatusId[0]')
-       console.log(jobStatusId[0])
+    console.log('jobStatusId')
+    console.log(jobStatusId)
+    console.log('jobStatusId[0]')
+    console.log(jobStatusId[0])
     return jobStatusId[0]
   }
 
@@ -62,18 +64,18 @@ class JobStatus {
   async getjobMasterIdStatusIdMap(jobMasterIdList, jobStatusCode) {
     let jobMasterIdStatusIdMap = {}
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    if(_.isUndefined(jobStatusArray.value)|| _.isEmpty(jobStatusArray.value)){
-       throw new Error('Invalid Job Master or Job Status Code')
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error('Job status missing in store')
     }
     const filteredJobStatusArray = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobMasterIdList.includes(jobStatusObject.jobMasterId)))
-    if(_.isUndefined(filteredJobStatusArray) || _.isEmpty(filteredJobStatusArray)){
-       throw new Error('Invalid Job Master or Job Status Code')
+    if (_.isUndefined(filteredJobStatusArray) || _.isNull(filteredJobStatusArray)) {
+      throw new Error('Invalid Job Master or Job Status Code')
     }
     filteredJobStatusArray.forEach(jobStatusObject => {
       jobMasterIdStatusIdMap[jobStatusObject.jobMasterId] = jobStatusObject.id
     })
-      console.log('jobMasterIdStatusIdMap')
-       console.log(jobMasterIdStatusIdMap)
+    console.log('jobMasterIdStatusIdMap')
+    console.log(jobMasterIdStatusIdMap)
     return jobMasterIdStatusIdMap
   }
 

@@ -69,7 +69,8 @@ export default keyMirror({
 
     //Home Actions
     JOB_FETCHING_START: null,
-    JOB_FETCHING_WAIT: null,
+    JOB_FETCHING_END: null,
+    SET_TABS_LIST: null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,

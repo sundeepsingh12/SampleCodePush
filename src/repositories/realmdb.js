@@ -12,8 +12,9 @@ import JobTransactionCustomization from './schema/jobTransactionCustomization'
 
 import _ from 'underscore'
 
-const schemaVersion = 22;
+const schemaVersion = 24;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, JobTransactionCustomization];
+
 let realm = new Realm({
   schemaVersion,
   schema
@@ -63,7 +64,12 @@ export function performBatchSave(...tableNamesVsDataList) {
 
 export function deleteRecords() {
   return realm.write(() => {
-    realm.deleteAll()
+    realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
+    realm.delete(realm.objects(TABLE_JOB))
+    realm.delete(realm.objects(TABLE_JOB_DATA))
+    realm.delete(realm.objects(TABLE_FIELD_DATA))
+    realm.delete(realm.objects(TABLE_JOB_TRANSACTION_CUSTOMIZATION))
+    realm.delete(realm.objects(TABLE_RUNSHEET))
   });
 }
 

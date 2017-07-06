@@ -1,7 +1,7 @@
 'use strict'
- 
+
  import fareye from './src/fareye'
- 
+
  fareye('android')
 /*import React, { Component } from 'react';
 import _ from "underscore";
@@ -16,7 +16,7 @@ import {
 export default class Fareye extends Component {
     render() {
         let realm = new Realm({
-            schemaVersion: 20,
+            schemaVersion: 23,
             schema: [
                 {
                     name: 'People',
@@ -29,7 +29,16 @@ export default class Fareye extends Component {
             ]
         });
 
-        const dataForInsert = [
+        let dataForInsert = []
+        for (let i = 0;i<100;i++) {
+            let obj = {
+                "name" : "Rahul",
+                "age" : i ,
+            }
+            dataForInsert.push(obj)
+        }
+
+        let dataForInsert1 = [
             {
                 "name": "Rex",
                 "age": 22,
@@ -41,26 +50,30 @@ export default class Fareye extends Component {
             {
                 "name": "Gaurav",
                 "age": 97
-        }
+            },
         ]
 
+        for (let i = 0; i < 5; i++) {
+            console.log(i)
+        }
 
         realm.write(() => {
-            dataForInsert.forEach(data => realm.create('People', data,true));
+            dataForInsert.forEach(data => realm.create('People', data, true));
         });
-
-    const people1 = realm.objects('People');
-    console.log('length')
-     console.log(people1.length)
-     const property = 'age'
-    const peopleAgeList = people1.map(data=>data[property])
-       console.log('peopleAgeList')
-    console.log(peopleAgeList)
-        _.forEach(people1,people => console.log(people.name));
+        
+        console.log('before')
+        console.log(new Date())
+        const people1 = realm.objects('People');
+        console.log('after query')
+        console.log(new Date())
+        const p = { ...people1 }
+        console.log('after object get')
+        console.log(new Date())
+        const test = JSON.stringify(people1)
+        console.log('hello test')
         return (
             <View>
-
-                <Text>{"\n"}{"\n"}{"\n"}</Text>
+                <Text>Hello</Text>
             </View>
         )
     }

@@ -70,6 +70,7 @@ class DeviceVerification {
     const companyId = (user && user.value.company) ? user.value.company.id : 0;
     const hubId = (user) ? user.value.hubId : 0;
     if(!deviceIMEI || !deviceSIM){
+      await this.populateDeviceImeiAndDeviceSim(user)
       return false
     }
       if (hubId != deviceIMEI.value.hubId) {
@@ -77,6 +78,7 @@ class DeviceVerification {
         keyValueDBService.validateAndSaveData(DEVICE_IMEI, deviceIMEI)
       }
       if (!deviceSIM.value.isVerified || deviceSIM.value.companyId != companyId) {
+         await this.populateDeviceImeiAndDeviceSim(user)
         return false
       }
         return true
