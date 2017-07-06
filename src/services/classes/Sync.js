@@ -26,7 +26,8 @@ const {
   TABLE_RUNSHEET,
   USER,
   UNSEEN,
-  PENDING
+  PENDING,
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION
 } = require('../../lib/constants').default
 
 class Sync {
@@ -156,6 +157,8 @@ class Sync {
       const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
       console.log("jobTransactionCustomizationList")
       console.log(jobTransactionCustomizationListValues)
+        console.log("TABLE_JOB_TRANSACTION_CUSTOMIZATION")
+      console.log(TABLE_JOB_TRANSACTION_CUSTOMIZATION)
       const jobTransactionCustomizationList = {
         tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
         value: jobTransactionCustomizationListValues
@@ -246,6 +249,8 @@ class Sync {
       transactionIdDTOs,
       jobSummaries
     })
+    console.log('postData')
+     console.log(postData)
     let deleteResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.DELETE_DATA_API, 'POST')
     return deleteResponse
   }

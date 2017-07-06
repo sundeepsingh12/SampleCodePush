@@ -87,6 +87,7 @@
 		177BB8E8620F433FAACEFB05 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = C98079D4F61746B59E863F06 /* OFL.txt */; };
 		2572135D8F5141ECBC86DC84 /* libRCTCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB6D5F2D2C004F5F93F1FF5D /* libRCTCamera.a */; };
 		1B53419634BA4DF2962C41AF /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A971B75185084D63973E9EE9 /* libRNDeviceInfo.a */; };
+		C5858F371E044E66B11E77CE /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 217CB3951FE0498A991FE699 /* SimpleLineIcons.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -384,6 +385,7 @@
 		AB6D5F2D2C004F5F93F1FF5D /* libRCTCamera.a */ = {isa = PBXFileReference; name = "libRCTCamera.a"; path = "libRCTCamera.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		E19CF6D0CEC54E369601117D /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; name = "RNDeviceInfo.xcodeproj"; path = "../node_modules/react-native-device-info/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		A971B75185084D63973E9EE9 /* libRNDeviceInfo.a */ = {isa = PBXFileReference; name = "libRNDeviceInfo.a"; path = "libRNDeviceInfo.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		217CB3951FE0498A991FE699 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; name = "SimpleLineIcons.ttf"; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -698,6 +700,7 @@
 				A725CCE6FED845D6A8D4C5AF /* Times New Roman.ttf */,
 				03189476F1C043BEA40E7056 /* Zocial.ttf */,
 				C98079D4F61746B59E863F06 /* OFL.txt */,
+				217CB3951FE0498A991FE699 /* SimpleLineIcons.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1147,6 +1150,7 @@
 				29559381AAD144BD8C811077 /* Times New Roman.ttf in Resources */,
 				C973A4441E4C452FB6E8BE52 /* Zocial.ttf in Resources */,
 				177BB8E8620F433FAACEFB05 /* OFL.txt in Resources */,
+				C5858F371E044E66B11E77CE /* SimpleLineIcons.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
