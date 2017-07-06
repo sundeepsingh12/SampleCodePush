@@ -46,7 +46,7 @@ export default function authReducer(state = initialState, action) {
      */
     case LOGIN_START:
       return state.setIn(['form', 'authenticationService'], true)
-        .setIn(['form', 'displayMessage'], 'Login request initiated')
+        .setIn(['form', 'displayMessage'], '')
         .setIn(['form', 'isButtonDisabled'], true)
         .setIn(['form','isEditTextDisabled'],true)
 
@@ -101,8 +101,5 @@ export default function authReducer(state = initialState, action) {
       case REMEMBER_ME_SET_TRUE:
         return state.setIn(['form','rememberMe'],true)
   }
-  /**
-   * ## Default
-   */
   return state
 }

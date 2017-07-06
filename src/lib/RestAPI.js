@@ -83,6 +83,23 @@ class RestAPI {
     return res;
   }
 
+  /**
+   * Parameters (Request Body, URL, Method (enum type POST, LOGIN, GET))
+   * 
+   * Success response JSON object
+   * {
+   *   status,
+   *   code,
+   *   headers,
+   *   json: {}
+   * }
+   * 
+   * Failure response JSON object
+   * {
+   *   code: xxx,
+   *   message: 'error message'
+   * }
+   */
   serviceCall(body, url, method) {
     let opts;
     if (method === 'POST') {
@@ -122,10 +139,17 @@ class RestAPI {
         return res;
       })
       .catch((e) => {
-        fetch.abort(fetchRequestId); //Aborting the Fetch API call
-        throw {
-          code: 504,
-          message: 'Slow or no internet on Device.'
+        //Aborting the Fetch API call
+        fetch.abort(fetchRequestId); 
+
+        //Throw custom error instance
+        if (e instanceof Error) {
+          throw {
+            code: 504,
+            message: 'Slow or no internet on Device.'
+          }
+        } else {
+          throw e
         }
       })
   }
