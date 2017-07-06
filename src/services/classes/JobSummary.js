@@ -15,13 +15,15 @@ class JobSummary {
    * @param {*} jobSummaries 
    */
   async updateJobSummary(jobSummaries) {
+    if(_.isUndefined(jobSummaries) || _.isNull(jobSummaries) || _.isEmpty(jobSummaries)) {
+      return
+    }
     const jobSummariesInStore = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
     if(!jobSummariesInStore || !jobSummariesInStore.value){
       throw new Error('Unable to update Job Summary')
     }
     const jobSummaryIds = await jobSummaries.map(jobSummaryObject => jobSummaryObject.id)
     const jobSummaryIdJobSummaryObjectMap = {}
-    
     jobSummaries.forEach(jobSummaryObject => {
       jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
     })
@@ -31,7 +33,6 @@ class JobSummary {
       }
     })
     await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummariesInStore)
-
   }
   /**A generic method for getting jobSummary from store given a particular jobStatusId and jobMasterId
    * 

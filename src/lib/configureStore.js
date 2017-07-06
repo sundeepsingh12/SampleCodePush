@@ -13,7 +13,7 @@
  */
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
-import createLogger from 'redux-logger';
+import { createLogger } from 'redux-logger'
 
 /**
 * ## Reducer
@@ -22,7 +22,7 @@ import createLogger from 'redux-logger';
 */
 import reducer from '../modules'
 
-const loggerMiddleware = createLogger({predicate: (getState,action) => __DEV__ });
+const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__ });
 /**
  * ## creatStoreWithMiddleware
  * Like the name...
@@ -38,6 +38,6 @@ const createStoreWithMiddleware = applyMiddleware(
  * device, global, login, profile
  *
  */
-export default function configureStore (initialState) {
+export default function configureStore(initialState) {
   return createStoreWithMiddleware(reducer, initialState)
 };

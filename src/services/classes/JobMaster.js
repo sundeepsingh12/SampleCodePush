@@ -29,6 +29,8 @@ const {
   JOB_LIST_CUSTOMIZATION,
   CUSTOMIZATION_APP_MODULE,
   USER,
+  CUSTOMIZATION_LIST_MAP,
+  TABIDMAP,
 } = require('../../lib/constants').default
 
 
@@ -120,6 +122,10 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    console.log('json')
+    console.log(json)
+    console.log('json.jobMaster')
+    console.log(json.jobMaster)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(USER, json.user)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
@@ -128,7 +134,8 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster)
     await keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus)
     await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
-    await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
+    // await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
+    await this.prepareCustomizationListMap(json.jobListCustomization)
     await keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
     await keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)
     await keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList)
@@ -139,6 +146,82 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
+    await this.prepareTabStatusIdMap(json.jobStatus)
+  }
+
+  /**
+   * 
+   * @param {*} jobListCustomization 
+   * prepares HashMap<JobMasterId,HashMap<AppListMasterId,CustomizationListDTO>
+     CustomizationListDTO - {
+      jobMasterId
+      appJobListMasterId
+      separator
+      referenceNo
+      runsheetNo
+      noOfAttempts
+      slot
+      delimiterType
+      startTime
+      endTime
+      jobAttr: [
+        {
+          jobAttributeMasterId
+          fieldAttributeMasterId
+        }
+      ]
+      fieldAttr: [
+        {
+          jobAttributeMasterId
+          fieldAttributeMasterId
+        }
+      ]
+      trackKm
+      trackHalt
+      trackCallCount
+      trackCallDuration
+      trackSmsCount
+      trackTransactionTimeSpent
+     }
+   */
+  prepareCustomizationListMap(jobListCustomization) {
+    if(!jobListCustomization) {
+      return
+    }
+    let jobMasterIdCustomizationMap = {}
+    jobListCustomization.forEach(jobListCustomizationObject => {
+      const jobMasterId = jobListCustomizationObject.jobMasterId
+      const appListMasterId = jobListCustomizationObject.appJobListMasterId
+      if(!jobMasterIdCustomizationMap[jobMasterId]) {
+        const jobListMasterIdMap = {}
+        jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
+        jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
+      } else {
+        const jobListMasterIdMap = {}
+        jobListMasterIdMap = jobMasterIdCustomizationMap[jobMasterId]
+        jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
+        jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
+      }
+    })
+    keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP,jobMasterIdCustomizationMap)
+  }
+
+  prepareTabStatusIdMap(jobStatus) {
+    if(!jobStatus) {
+      return
+    }
+    let tabIdStatusIdsMap = {}
+    jobStatus.forEach(jobStatusObject => {
+      console.log(jobStatusObject)
+      if(!tabIdStatusIdsMap[jobStatusObject.tabId]) {
+        tabIdStatusIdsMap[jobStatusObject.tabId] = []
+      }
+      tabIdStatusIdsMap[jobStatusObject.tabId].push(jobStatusObject.id)
+    })
+
+    console.log('tabIdStatusIdsMap')
+    console.log(tabIdStatusIdsMap)
+    keyValueDBService.validateAndSaveData(TABIDMAP,tabIdStatusIdsMap)
   }
 
   /**Matches device time with server time,

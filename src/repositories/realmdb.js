@@ -7,12 +7,14 @@ import Job from './schema/Job'
 import JobData from './schema/JobData'
 import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
+import JobTransactionCustomization from './schema/jobTransactionCustomization'
 
 
 import _ from 'underscore'
 
-const schemaVersion = 25;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet];
+const schemaVersion = 24;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, JobTransactionCustomization];
+
 let realm = new Realm({
   schemaVersion,
   schema
@@ -24,9 +26,9 @@ const {
   TABLE_JOB,
   TABLE_JOB_DATA,
   USER,
-  TABLE_RUNSHEET
+  TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION
 } = require('../lib/constants').default
-
 
 export function save(tableName, object) {
   return realm.write(() => {
@@ -62,7 +64,12 @@ export function performBatchSave(...tableNamesVsDataList) {
 
 export function deleteRecords() {
   return realm.write(() => {
-    realm.deleteAll()
+    realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
+    realm.delete(realm.objects(TABLE_JOB))
+    realm.delete(realm.objects(TABLE_JOB_DATA))
+    realm.delete(realm.objects(TABLE_FIELD_DATA))
+    realm.delete(realm.objects(TABLE_JOB_TRANSACTION_CUSTOMIZATION))
+    realm.delete(realm.objects(TABLE_RUNSHEET))
   });
 }
 
@@ -81,7 +88,6 @@ export function deleteRecordsInBatch(...tableNameVsDataList) {
   });
 }
 
-
 /**A generic method for filtering out records which are in ValueList and then updating 'property'
  *  with 'newValue'
  * 
@@ -90,9 +96,9 @@ export function deleteRecordsInBatch(...tableNameVsDataList) {
  * @param {*} value 
  */
 export function updateTableRecordOnProperty(tableName, property, valueList, newValue) {
-  let filteredRecords = realm.objects(tableName).filtered(valueList.map(value =>  'id = "' + value + '"').join(' OR '));
+  let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
   realm.write(() => {
-    _.forEach(filteredRecords,record=>record[property] = newValue)
+    _.forEach(filteredRecords, record => record[property] = newValue)
   });
 }
 

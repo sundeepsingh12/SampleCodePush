@@ -45,7 +45,6 @@ class RestAPI {
     console.log(url)
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
-
     }
     const response = await fetch(url, opts)
     const {
@@ -59,6 +58,7 @@ class RestAPI {
       headers,
       json: {}
     }
+
     console.log('responsse >>>>')
      console.log(response)
      if(opts.url==CONFIG.API.DELETE_DATA_API){
@@ -84,14 +84,12 @@ class RestAPI {
         }
       });
       return current;
-
     };
     return prune(obj);
   }
 
   serviceCall(body, url, method) {
     let opts;
-    
     if (method === 'POST') {
       opts = {
         method,
