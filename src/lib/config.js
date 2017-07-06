@@ -10,7 +10,7 @@ module.exports = {
       url: 'https://www.fareye.co/app'
     },
     staging: {
-      url: 'https://staging.fareye.co/app'
+      url: 'https://dev.fareye.co/app'
     }
   },
     API:{

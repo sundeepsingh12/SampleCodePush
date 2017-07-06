@@ -16,14 +16,7 @@ class JobTransaction {
    * @param {*} statusIds 
    */
   getJobTransactionsForStatusIds(allJobTransactions, statusIds) {
-    const allJobTransactionsClone = {...allJobTransactions}
-     console.log('allJobTransactionsClone')
-    console.log(allJobTransactionsClone)
-    console.log('statusIds')
-    console.log(statusIds)
-    const transactionList = _.filter(allJobTransactionsClone, transaction => statusIds.includes(transaction.jobStatusId))
-    console.log('transactionList')
-    console.log(transactionList)
+    const transactionList = _.filter(allJobTransactions, transaction => statusIds.includes(transaction.jobStatusId))
     return transactionList
   }
 
@@ -52,7 +45,6 @@ class JobTransaction {
     unseenTransactions.forEach(unseenTransactionObject => {
       let transactionIdDtoObject = {}
       if (!jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId]) {
-        console.log('jobMasterId doesnt exist')
         transactionIdDtoObject = {
           "jobMasterId": unseenTransactionObject.jobMasterId,
           "pendingStatusId": jobMasterIdStatusIdMap[unseenTransactionObject.jobMasterId],
@@ -60,17 +52,13 @@ class JobTransaction {
           "unSeenStatusId": unseenTransactionObject.jobStatusId
         }
       } else {
-        console.log('jobMasterId  exist')
         transactionIdDtoObject = jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId]
       }
       if (transactionIdDtoObject.transactionId != "")
         transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId + ":"
       transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId + unseenTransactionObject.id
       jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId] = transactionIdDtoObject
-      console.log('print 111')
-      console.log(jobMasterIdTransactionDtoMap)
       if (jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId]) {
-        console.log('outer key exists >>>')
         if (!jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId][unseenTransactionObject.jobStatusId]) {
           let jobStatusIdTransactionIdDtoMap = {}
           jobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobStatusId] = transactionIdDtoObject
@@ -82,10 +70,6 @@ class JobTransaction {
         jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId] = jobStatusIdTransactionIdDtoMap
       }
     });
-    console.log('jobMasterIdTsransactionDtoMap')
-    console.log(jobMasterIdTransactionDtoMap)
-    console.log('jobMasterIdJobStatusIdTransactionIdDtoMap')
-    console.log(jobMasterIdJobStatusIdTransactionIdDtoMap)
     return jobMasterIdJobStatusIdTransactionIdDtoMap
   }
 
@@ -96,21 +80,13 @@ class JobTransaction {
    * @param {*} unseenTransactions 
    */
   getUnseenTransactionsJobMasterIds(unseenTransactions) {
-    console.log('unseenTransactions')
-    console.log(unseenTransactions)
     const jobMasterIds = unseenTransactions.map(unseenTransactionObject => unseenTransactionObject.jobMasterId)
-    console.log('jobMasterIds')
-    console.log(jobMasterIds)
     return jobMasterIds
   }
 
   updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
-    console.log('jobMasterIdTransactionDtoMap')
-     console.log(jobMasterIdTransactionDtoMap)
     for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
       const transactionIdList = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].transactionId.split(":")
-      console.log('transactionIdList')
-      console.log(transactionIdList)
       let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
       realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION, 'jobStatusId', transactionIdList, pendingStatusId)
     }

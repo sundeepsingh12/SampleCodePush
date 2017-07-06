@@ -130,12 +130,7 @@ class Sync {
    */
   async saveDataFromServerInDB(query) {
     try{
-       console.log('query')
-    console.log(query)
-    console.log('saveDataFromServerInDB called >>>> ')
     const contentQuery = await JSON.parse(query)
-    console.log('contentQuery')
-      console.log(contentQuery)
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
@@ -247,6 +242,7 @@ class Sync {
       transactionIdDTOs,
       jobSummaries
     })
+    console.log(postData)
     let deleteResponse = RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.DELETE_DATA_API, 'POST')
     return deleteResponse
   }
@@ -300,19 +296,20 @@ class Sync {
   async getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap) {
     let transactionIdDtos = []
     const jobSummaries = []
+    let jobMasterIdUnseenStatusIdMap = {},jobMasterIdPendingStatusIdMap = {}
     for (let jobMasterId in jobMasterIdJobStatusIdTransactionIdDtoMap) {
       for (let unseenStatusId in jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
+        jobMasterIdUnseenStatusIdMap[jobMasterId] = unseenStatusId
         let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].transactionId.split(":").length
         let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].pendingStatusId
-        let unseenJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, unseenStatusId)
-        unseenJobSummaryData.count = 0
-        jobSummaries.push(unseenJobSummaryData)
-        let pendingJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, pendingID)
-        pendingJobSummaryData.count += count
-        jobSummaries.push(pendingJobSummaryData)
+        jobMasterIdPendingStatusIdMap[jobMasterId] = pendingID
         transactionIdDtos.push(jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId])
       }
     }
+    let unseenJobSummaryList = await jobSummaryService.getJobSummariesForJobMasterAndStatus(jobMasterIdUnseenStatusIdMap)
+    jobSummaries.push(unseenJobSummaryList)
+    let pendingJobSummaryList = await jobSummaryService.getJobSummariesForJobMasterAndStatus(jobMasterIdPendingStatusIdMap)
+     jobSummaries.push(pendingJobSummaryList)
     const dataList = {
       jobSummaries,
       transactionIdDtos

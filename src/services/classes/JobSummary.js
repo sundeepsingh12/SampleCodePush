@@ -57,9 +57,23 @@ class JobSummary {
       throw new Error('Value of JobSummary missing')
     }
     const filteredJobSummaryList = await alljobSummaryList.value.filter(jobSummaryObject => (jobSummaryObject.jobStatusId == statusId && jobSummaryObject.jobMasterId == jobMasterId))
-    console.log('filteredJobSummaryList[0]')
-    console.log(filteredJobSummaryList[0])
     return filteredJobSummaryList[0]
+  }
+
+  async getJobSummariesForJobMasterAndStatus(jobMasterIdStatusIdMap){
+     const jobSummaries = []
+    const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+    if(!alljobSummaryList || !alljobSummaryList.value){
+      throw new Error('Value of JobSummary missing')
+    }
+     for (let jobMasterId in jobMasterIdStatusIdMap) {
+          const filteredJobSummaryList =  alljobSummaryList.value.filter(jobSummaryObject => (jobSummaryObject.jobStatusId == jobMasterIdStatusIdMap[jobMasterId] && jobSummaryObject.jobMasterId == jobMasterId))
+          filteredJobSummaryList.count = jobMasterIdStatusIdMap[jobMasterId].split(":")[1]
+          jobSummaries.push(filteredJobSummaryList[0])
+   }
+
+   return jobSummaries
+
   }
 }
 
