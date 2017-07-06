@@ -56,8 +56,12 @@ export function performBatchSave(...tableNamesVsDataList) {
     tableNamesVsDataList.forEach(record => {
       console.log('tableName')
       console.log(record.tableName)
+      try {
       if (!_.isEmpty(record.value) && !_.isUndefined(record.value))
         record.value.forEach(data => realm.create(record.tableName, data, true))
+      } catch(error) {
+        console.log(error)
+      }
     })
   });
 }

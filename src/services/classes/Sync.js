@@ -159,11 +159,14 @@ class Sync {
       console.log(jobTransactionCustomizationListValues)
         console.log("TABLE_JOB_TRANSACTION_CUSTOMIZATION")
       console.log(TABLE_JOB_TRANSACTION_CUSTOMIZATION)
+      
       const jobTransactionCustomizationList = {
         tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
         value: jobTransactionCustomizationListValues
       }
-      realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationListValues)
+      console.log('jobTransactionCustomizationList.tablename')
+      console.log(jobTransactionCustomizationList.tableName)
+      realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationList)
     }
     catch (Error) {
       console.log(Error)

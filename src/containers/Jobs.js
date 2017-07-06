@@ -90,7 +90,7 @@ class Jobs extends Component {
     console.log('componentDidMount of jobs')
     console.log('this.props')
     console.log(this.props)
-    this.props.actions.fetchJobs(this.props.id,0)
+    this.props.actions.fetchJobs(this.props.tabId,0)
   }
 
   toggleStatus() {
@@ -114,6 +114,8 @@ class Jobs extends Component {
   }
 
   renderData = (item) => {
+    console.log('item renderData')
+    console.log(item)
     return (
       <ListItem avatar>
         <Left>
@@ -121,7 +123,7 @@ class Jobs extends Component {
         </Left>
         <Body >
           <Text adjustsFontSizeToFit>
-            {`${item.line1}`}
+            {`${item.referenceNumber}`}
           </Text>
         </Body>
         <Right >
@@ -182,8 +184,6 @@ class Jobs extends Component {
             renderItem={({ item }) => this.renderData(item)}
             keyExtractor={item => item.id}
             ListFooterComponent={this.renderFooter}
-            onEndReached={this.handleLoadMore}
-            onEndThreshold={0}
           />
         </List>
         {/*<ListView

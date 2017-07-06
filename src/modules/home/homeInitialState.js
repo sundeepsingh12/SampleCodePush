@@ -9,6 +9,7 @@ var InitialState = Record({
     downloadService: '',
     searchText: '',
     tabIdJobTransactions: {},
+    isRefreshing:false,
     tabsList: [],
 })
 

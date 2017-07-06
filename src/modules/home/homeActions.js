@@ -6,7 +6,13 @@ const {
   UNSEEN,
   TABLE_JOB_TRANSACTION,
   TAB,
-  SET_TABS_LIST
+  SET_TABS_LIST,
+  TABLE_FIELD_DATA,
+  TABLE_JOB,
+  TABLE_JOB_DATA,
+  USER,
+  TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
@@ -19,11 +25,11 @@ import { tabsService } from '../../services/classes/Tabs'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 
-export function jobFetchingEnd(jobTransactions,tabId,pageNumber) {
+export function jobFetchingEnd(jobTransactionOject,tabId,pageNumber) {
   return {
     type: JOB_FETCHING_END,
     payload: {
-      jobTransactions,
+      jobTransactionOject,
       tabId,
       pageNumber
     }

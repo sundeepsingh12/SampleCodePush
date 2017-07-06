@@ -20,29 +20,31 @@ export default function homeReducer(state = initialState, action) {
       return state.set('tabsList', action.payload)
 
     case JOB_FETCHING_START:
+      console.log(state.tabIdJobTransactions)
       tempTabIdJobTransactions = state.tabIdJobTransactions
-      if(!tempTabIdJobTransactions[action.payload]) {
-        tempTabIdJobTransactions[action.payload].jobTransactions = []
-        tempTabIdJobTransactions[action.payload].pageNumber = 0
-        tempTabIdJobTransactions[action.payload].isFetching = false
+      console.log(tempTabIdJobTransactions[action.payload])
+      if(!tempTabIdJobTransactions[action.payload.tabId]) {
+        tempTabIdJobTransactions[action.payload.tabId] = {}
+        tempTabIdJobTransactions[action.payload.tabId].jobTransactions = []
+        tempTabIdJobTransactions[action.payload.tabId].pageNumber = 0
+        tempTabIdJobTransactions[action.payload.tabId].isFetching = false
       }
-      tempTabIdJobTransactions[action.payload].isFetching = true
+      console.log('tabIdJobTransactions')
+      console.log(state.tabIdJobTransactions)
+      tempTabIdJobTransactions[action.payload.tabId].isFetching = true
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
 
     case JOB_FETCHING_END:
       let jobTransactions
-      tempTabIdJobTransactions = state.tabIdJobTransactions
-      if(!tempTabIdJobTransactions[action.payload]) {
-        tempTabIdJobTransactions[action.payload].jobTransactions = []
-        tempTabIdJobTransactions[action.payload].pageNumber = 0
-        tempTabIdJobTransactions[action.payload].isFetching = false
-      }
-      if (state.tabIdJobTransactions[action.payload.tabId]) {
-        jobTransactions = state.tabIdJobTransactions[payload.tabId].jobTransactions
-        jobTransactions.push(action.payload.jobTransactions)
+      console.log('action.payload')
+      console.log(action.payload)
+      tempTabIdJobTransactions = {...state.tabIdJobTransactions}
+      if (tempTabIdJobTransactions[action.payload.tabId] && tempTabIdJobTransactions[action.payload.tabId].jobTransactions) {
+        jobTransactions = state.tabIdJobTransactions[action.payload.tabId].jobTransactions
+        jobTransactions = jobTransactions.concat(action.payload.jobTransactionOject.jobTransactions)
       } else {
         jobTransactions = []
-        jobTransactions.push(action.payload.jobTransactions)
+        jobTransactions = jobTransactions.concat(action.payload.jobTransactionOject.jobTransactions)
       }
       tempTabIdJobTransactions[action.payload.tabId].jobTransactions = jobTransactions
       tempTabIdJobTransactions[action.payload.tabId].pageNumber += 1
