@@ -61,17 +61,12 @@ class RestAPI {
       headers,
       json: {}
     }
-    console.log(">>>> response");
-    console.log(response);
     //Check if server returned JSON or Text response
     let isJsonResponse = false;
     response.headers.forEach(function(val, key) {  if(val.indexOf('json')!=-1) isJsonResponse = true; });
-    console.log("=====Is JSON response ?======="+isJsonResponse);
     try {
       res.json = (isJsonResponse) ? await response.json() : await response.text()
     } catch (e) {
-      console.log("Error in parsing response JSON/ Text")
-      console.log(e);
       res.json = {}
     }
     if (res.status!=200) {
@@ -80,6 +75,8 @@ class RestAPI {
         message: ((res.json && res.json.message) ? res.json.message : 'Unknow error. Retry or contact support.') 
       }
     }
+    console.log("response>>>>>");
+    console.log(res);
     return res;
   }
 

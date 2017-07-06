@@ -141,20 +141,20 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
   }
 
-  /**Matches device time with server time,
+  /**Matches device time with server time (format 2017-07-05 16:30:02),
    * throw error if server time format is invalid 
    * or if difference >=15 minutes
    * 
    * @param {*} serverTime 
    */
   matchServerTimeWithMobileTime(serverTime) {
-    const serverTimeInMillis = moment(serverTime)
+    const serverTimeInMillis = moment(serverTime, 'YYYY-MM-DD HH:mm:ss')
     if (!serverTimeInMillis.isValid()) {
-      throw new Error("Server Time format incorrect")
+      throw new Error("Server time format incorrect")
     }
     const currentTimeInMillis = moment()
-    if (currentTimeInMillis - serverTimeInMillis > 15 * 60 * 1000) {
-      throw new Error("Server Time not same as mobile time")
+    if (Math.abs(currentTimeInMillis - serverTimeInMillis) > 15 * 60 * 1000) {
+      throw new Error("Time mismatch. Please correct time on Device")
     }
     return true
   }

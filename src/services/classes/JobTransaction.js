@@ -16,8 +16,8 @@ class JobTransaction {
    * @param {*} statusIds 
    */
   getJobTransactionsForStatusIds(allJobTransactions, statusIds) {
-    const allJobTransactionsClone = {...allJobTransactions}
-     console.log('allJobTransactionsClone')
+    const allJobTransactionsClone = { ...allJobTransactions }
+    console.log('allJobTransactionsClone')
     console.log(allJobTransactionsClone)
     console.log('statusIds')
     console.log(statusIds)
@@ -42,7 +42,7 @@ class JobTransaction {
    * @param {*} unseenTransactions 
    */
   async getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions) {
-    if(_.isNull(unseenTransactions) || _.isEmpty(unseenTransactions)){
+    if (_.isNull(unseenTransactions) || _.isEmpty(unseenTransactions)) {
       return {}
     }
     let jobMasterIdTransactionDtoMap = {}, // Map<JobMasterId, TransactionIdDTO>
@@ -106,7 +106,7 @@ class JobTransaction {
 
   updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
     console.log('jobMasterIdTransactionDtoMap')
-     console.log(jobMasterIdTransactionDtoMap)
+    console.log(jobMasterIdTransactionDtoMap)
     for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
       const transactionIdList = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].transactionId.split(":")
       console.log('transactionIdList')

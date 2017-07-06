@@ -336,7 +336,7 @@ export function checkAsset() {
         Actions.Tabbar()
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
-        dispatch(checkIfSimValidOnServer())
+        dispatch(checkIfSimValidOnServer());
       }
     } catch (error) {
       dispatch(checkAssetFailure(error.message))

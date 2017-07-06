@@ -56,6 +56,7 @@ const {
     PRE_LOGOUT_SUCCESS,
     PRE_LOGOUT_FAILURE,
 
+    ERROR_400_403_LOGOUT,
     ON_MOBILE_NO_CHANGE,
     ON_OTP_CHANGE,
     PRELOADER_SUCCESS,
@@ -211,15 +212,7 @@ describe('Preloader Actions', () => {
     it('should logout', () => {
         const expectedActions = [
             { type: PRE_LOGOUT_START },
-            { type: PRE_LOGOUT_SUCCESS },
-            {
-                type: ON_LOGIN_PASSWORD_CHANGE,
-                payload: ''
-            },
-            {
-                type: ON_LOGIN_USERNAME_CHANGE,
-                payload: ''
-            }
+            { type: PRE_LOGOUT_SUCCESS }
         ]
         const store = mockStore({})
         keyValueDBService.getValueFromStore = jest.fn()
@@ -240,7 +233,7 @@ describe('Preloader Actions', () => {
         const expectedActions = [
             { type: PRE_LOGOUT_START },
             {
-                type: PRE_LOGOUT_FAILURE,
+                type: ERROR_400_403_LOGOUT,
                 payload: error
             }
         ]
@@ -249,8 +242,6 @@ describe('Preloader Actions', () => {
         authenticationService.logout = jest.fn(() => {
             throw new Error(error)
         })
-        keyValueDBService.deleteValueFromStore = jest.fn()
-        keyValueDBService.deleteValueFromStore.mockReturnValue(null)
         const store = mockStore({})
         return store.dispatch(actions.invalidateUserSession())
             .then(() => {
@@ -262,42 +253,18 @@ describe('Preloader Actions', () => {
             })
     })
 
-    it('should logout if server returns 500', () => {
-        const error = {
-            code: 500
-        }
+    it('should start home screen, if server returns 500 for Logout', () => {
         const expectedActions = [
-            { type: PRE_LOGOUT_START },
             {
-                type: PRE_LOGOUT_FAILURE,
-                payload: error
-            },
-            {
-                type: ON_LOGIN_PASSWORD_CHANGE,
-                payload: ''
-            },
-            {
-                type: ON_LOGIN_USERNAME_CHANGE,
-                payload: ''
+                type: PRE_LOGOUT_SUCCESS
             }
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: 'testtoken' })
-        authenticationService.logout = jest.fn(() => {
-            throw new Error(error)
-        })
         keyValueDBService.deleteValueFromStore = jest.fn()
         keyValueDBService.deleteValueFromStore.mockReturnValue(null)
         const store = mockStore({})
-        return store.dispatch(actions.invalidateUserSession())
+        return store.dispatch(actions.startLoginScreenWithoutLogout())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
-                expect(authenticationService.logout).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
-                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
-                expect(store.getActions()[3].type).toEqual(expectedActions[3].type)
             })
     })
 
@@ -425,6 +392,7 @@ describe('Preloader Actions', () => {
         const store = mockStore({})
         return store.dispatch(actions.downloadJobMaster())
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(4)
                 expect(jobMasterService.downloadJobMaster).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
@@ -432,7 +400,7 @@ describe('Preloader Actions', () => {
             })
     })
 
-    it('download job master should throw error and logout for 403', () => {
+    it('download job master should throw error and show Unauthorized device alert for 403', () => {
         const error = {
             code : 403,
             message : 'test error'
@@ -440,10 +408,9 @@ describe('Preloader Actions', () => {
         const expectedActions = [
             { type: MASTER_DOWNLOAD_START },
             {
-                type: MASTER_DOWNLOAD_FAILURE,
+                type: ERROR_400_403_LOGOUT,
                 payload: error.message
-            },
-            { type: PRE_LOGOUT_SUCCESS },
+            }
         ]
         
         keyValueDBService.getValueFromStore = jest.fn()
@@ -458,15 +425,15 @@ describe('Preloader Actions', () => {
         const store = mockStore({})
         return store.dispatch(actions.downloadJobMaster())
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(4)
                 expect(jobMasterService.downloadJobMaster).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
-                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
             })
     })
 
-    it('download job master should throw error and logout for 400', () => {
+    it('download job master should throw error and show Unauthorized device alert for 400', () => {
         const error = {
             code : 400,
             message : 'test error'
@@ -474,10 +441,9 @@ describe('Preloader Actions', () => {
         const expectedActions = [
             { type: MASTER_DOWNLOAD_START },
             {
-                type: MASTER_DOWNLOAD_FAILURE,
+                type: ERROR_400_403_LOGOUT,
                 payload: error.message
-            },
-            { type: PRE_LOGOUT_SUCCESS },
+            }
         ]
         
         keyValueDBService.getValueFromStore = jest.fn()
@@ -496,10 +462,59 @@ describe('Preloader Actions', () => {
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
-                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
             })
     })
 
+    it('should check device locally and login success', () => {
+        const expectedActions = [
+            { type: CHECK_ASSET_START },
+            { type: PRELOADER_SUCCESS },
+        ]        
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(null)
+        deviceVerificationService.checkAssetLocal = jest.fn()
+        deviceVerificationService.checkAssetLocal.mockReturnValue(true)
+        keyValueDBService.validateAndSaveData = jest.fn()
+        keyValueDBService.validateAndSaveData.mockReturnValue(true)
+        const store = mockStore({})
+        return store.dispatch(actions.checkAsset())
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(3)
+                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+            })
+    })
+
+    it('should check device locally and hit check asset api', () => {
+        const expectedActions = [
+            { type: CHECK_ASSET_START },
+        ]
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue({
+            value: {}
+        })
+        deviceVerificationService.checkAssetLocal = jest.fn()
+        deviceVerificationService.checkAssetLocal.mockReturnValue(false)
+        keyValueDBService.validateAndSaveData = jest.fn()
+        keyValueDBService.validateAndSaveData.mockReturnValue(true)
+        deviceVerificationService.checkAssetAPI = jest.fn()
+        deviceVerificationService.checkAssetAPI.mockReturnValue({
+            json: {
+                deviceIMEI: {},
+                deviceSIM: {}
+            }
+        })
+        deviceVerificationService.populateDeviceImeiAndDeviceSim = jest.fn()
+        deviceVerificationService.populateDeviceImeiAndDeviceSim.mockReturnValue(true)
+        const store = mockStore({})
+        return store.dispatch(actions.checkAsset())
+            .then(() => {
+                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(0)
+                expect(deviceVerificationService.populateDeviceImeiAndDeviceSim).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+            })
+    })
 
     //not completed
     it('should validate and save job master', () => {
@@ -570,55 +585,6 @@ describe('Preloader Actions', () => {
                 expect(jobMasterService.saveJobMaster).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-            })
-    })
-
-    it('should check device locally and login success', () => {
-        const expectedActions = [
-            { type: CHECK_ASSET_START },
-            { type: PRELOADER_SUCCESS },
-        ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue(null)
-        deviceVerificationService.checkAsset = jest.fn()
-        deviceVerificationService.checkAsset.mockReturnValue(true)
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        const store = mockStore({})
-        return store.dispatch(actions.checkAsset())
-            .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(3)
-                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-            })
-    })
-
-    it('should check device locally and hit check asset api', () => {
-        const expectedActions = [
-            { type: CHECK_ASSET_START },
-        ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
-        deviceVerificationService.checkAsset = jest.fn()
-        deviceVerificationService.checkAsset.mockReturnValue(false)
-        keyValueDBService.validateAndSaveData = jest.fn()
-        keyValueDBService.validateAndSaveData.mockReturnValue(true)
-        deviceVerificationService.checkAssetAPI = jest.fn()
-        deviceVerificationService.checkAssetAPI.mockReturnValue({
-            json: {
-                deviceIMEI: {},
-                deviceSIM: {}
-            }
-        })
-        deviceVerificationService.checkIfSimValidOnServer = jest.fn()
-        deviceVerificationService.checkIfSimValidOnServer.mockReturnValue(true)
-        const store = mockStore({})
-        return store.dispatch(actions.checkAsset())
-            .then(() => {
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
             })
     })
 
@@ -715,10 +681,9 @@ describe('Preloader Actions', () => {
         }
         const expectedActions = [
             { 
-                type: CHECK_ASSET_FAILURE,
+                type: ERROR_400_403_LOGOUT,
                 payload : error.message 
-            },
-            { type: PRE_LOGOUT_SUCCESS }
+            }
         ]
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue({
@@ -734,11 +699,11 @@ describe('Preloader Actions', () => {
         const store = mockStore({})
         return store.dispatch(actions.checkIfSimValidOnServer())
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(3)
                 expect(deviceVerificationService.checkAssetAPI).toHaveBeenCalled()
                 expect(deviceVerificationService.checkIfSimValidOnServer).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
             })
     })
 
@@ -749,10 +714,9 @@ describe('Preloader Actions', () => {
         }
         const expectedActions = [
             { 
-                type: CHECK_ASSET_FAILURE,
+                type: ERROR_400_403_LOGOUT,
                 payload : error.message 
-            },
-            { type: PRE_LOGOUT_SUCCESS }
+            }
         ]
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue({
@@ -768,11 +732,11 @@ describe('Preloader Actions', () => {
         const store = mockStore({})
         return store.dispatch(actions.checkIfSimValidOnServer())
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(3)
                 expect(deviceVerificationService.checkAssetAPI).toHaveBeenCalled()
                 expect(deviceVerificationService.checkIfSimValidOnServer).not.toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
             })
     })
 
