@@ -146,7 +146,7 @@ class Jobs extends Component {
   };*/
 
   renderFooter = () => {
-    if(!this.props.tabIdJobTransactions[this.props.tabId].isFetching) {
+    if(this.props.tabIdJobTransactions[this.props.tabId] && !this.props.tabIdJobTransactions[this.props.tabId].isFetching) {
       return null
     }
     
@@ -176,7 +176,9 @@ class Jobs extends Component {
         <List
           style={{ marginTop: 5, marginBottom: 50 }}>
           <FlatList
-            data={this.props.tabIdJobTransactions[this.props.tabId].jobTransactions}
+            data={
+              (this.props.tabIdJobTransactions[this.props.tabId]) ? (this.props.tabIdJobTransactions[this.props.tabId].jobTransactions) : []
+              }
             renderItem={({ item }) => this.renderData(item)}
             keyExtractor={item => item.id}
             ListFooterComponent={this.renderFooter}

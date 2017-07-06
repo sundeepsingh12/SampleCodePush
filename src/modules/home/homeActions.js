@@ -33,7 +33,9 @@ export function jobFetchingEnd(jobTransactions,tabId,pageNumber) {
 export function jobFetchingStart(tabId) {
   return {
     type: JOB_FETCHING_START,
-    payload: tabId
+    payload: {
+      tabId
+    }
   }
 }
 

@@ -21,22 +21,32 @@ export default function homeReducer(state = initialState, action) {
 
     case JOB_FETCHING_START:
       tempTabIdJobTransactions = state.tabIdJobTransactions
-      tempTabIdJobTransactions[payload.tabId].isFetching = true
+      if(!tempTabIdJobTransactions[action.payload]) {
+        tempTabIdJobTransactions[action.payload].jobTransactions = []
+        tempTabIdJobTransactions[action.payload].pageNumber = 0
+        tempTabIdJobTransactions[action.payload].isFetching = false
+      }
+      tempTabIdJobTransactions[action.payload].isFetching = true
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
 
     case JOB_FETCHING_END:
       let jobTransactions
       tempTabIdJobTransactions = state.tabIdJobTransactions
-      if (state.tabIdJobTransactions[payload.tabId]) {
+      if(!tempTabIdJobTransactions[action.payload]) {
+        tempTabIdJobTransactions[action.payload].jobTransactions = []
+        tempTabIdJobTransactions[action.payload].pageNumber = 0
+        tempTabIdJobTransactions[action.payload].isFetching = false
+      }
+      if (state.tabIdJobTransactions[action.payload.tabId]) {
         jobTransactions = state.tabIdJobTransactions[payload.tabId].jobTransactions
-        jobTransactions.push(payload.jobTransactions)
+        jobTransactions.push(action.payload.jobTransactions)
       } else {
         jobTransactions = []
-        jobTransactions.push(payload.jobTransactions)
+        jobTransactions.push(action.payload.jobTransactions)
       }
-      tempTabIdJobTransactions[payload.tabId].jobTransactions = jobTransactions
-      tempTabIdJobTransactions[payload.tabId].pageNumber += 1
-      tempTabIdJobTransactions[payload.tabId] .isFetching = false
+      tempTabIdJobTransactions[action.payload.tabId].jobTransactions = jobTransactions
+      tempTabIdJobTransactions[action.payload.tabId].pageNumber += 1
+      tempTabIdJobTransactions[action.payload.tabId] .isFetching = false
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
   }
   return state

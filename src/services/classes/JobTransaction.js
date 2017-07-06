@@ -108,7 +108,7 @@ class JobTransaction {
     console.log(tabId)
     console.log('pageNumber')
     console.log(pageNumber)
-    let pageJobTransactionMap = {}, jobIdList = [], pageJobMap = {}, jobTransactionCustomizationList = []
+    let pageJobTransactionMap = {}, jobIdList = [], pageJobMap = {}, jobTransactionCustomizationList = [], pageTransactionObject = {}
     const jobMasterIdCustomizationMapFromStore = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
     const jobMasterIdCustomizationMap = jobMasterIdCustomizationMapFromStore.value
     const tabIdStatusIdMap = await keyValueDBService.getValueFromStore(TABIDMAP)
@@ -121,7 +121,7 @@ class JobTransaction {
     let sortedTransactions = filteredTransactions.sorted('seqSelected')
     console.log('sortedTransactions')
     console.log(sortedTransactions)
-    let pageTransactions = filteredTransactions.slice(pageNumber * 10, (pageNumber + 1) * 10)
+    pageTransactions.jobTransactions = filteredTransactions.slice(pageNumber * 10, (pageNumber + 1) * 10)
     pageTransactions.forEach(transaction => {
       pageJobTransactionMap[transaction.id] = transaction
       jobIdList.push(transaction.jobId)
@@ -131,7 +131,7 @@ class JobTransaction {
     let filteredJobs = jobService.getAllJobs().filtered(
       pageTransactions.map((transaction) => 'id = ' + transaction.jobId).join(' OR ')
     )
-    let jjj = {...filteredJobs}
+    let jjj = { ...filteredJobs }
     console.log('jjj')
     console.log(jjj)
     console.log('after job loop filter query')
@@ -142,13 +142,15 @@ class JobTransaction {
       console.log(job)
       pageJobMap[job.id] = job
     })
-    
-    let page = { ...allJobTransactionCustomization }
-    for (let obj in page) {
-      let jobTransactionCustomization = page[obj]
+
+    allJobTransactionCustomization.forEach(jobTransactionCustomization => {
       if (pageJobTransactionMap[jobTransactionCustomization.id]) {
         let currentJobTransactionCustomization = { ...jobTransactionCustomization }
         currentJobTransaction = pageJobTransactionMap[currentJobTransactionCustomization.id]
+        console.log('index of')
+        console.log(pageTransactions.findIndex(currentJobTransaction))
+        console.log('pageTransactions')
+        console.log(pageTransactions)
         currentJob = pageJobMap[currentJobTransaction.jobId]
         line1CustomizationObject = jobMasterIdCustomizationMap[currentJobTransaction.jobMasterId][1]
         line2CustomizationObject = jobMasterIdCustomizationMap[currentJobTransaction.jobMasterId][2]
@@ -160,7 +162,8 @@ class JobTransaction {
         currentJobTransactionCustomization.circleLine2 += this.setTransactionDynamicParameters(circleLine2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine2)
         jobTransactionCustomizationList.push(currentJobTransactionCustomization)
       }
-    }
+    })
+    pageTransactionObject.jobTransactionCustomization = jobTransactionCustomizationList
     return pageTransactions
   }
 
@@ -203,10 +206,10 @@ class JobTransaction {
     }
   }
 
-/**
- * 
- * @param {*} contentQuery 
- */
+  /**
+   * 
+   * @param {*} contentQuery 
+   */
   async prepareJobCustomizationList(contentQuery) {
     let jobTransactionCustomizationList = []
     const allJobTransactions = contentQuery.jobTransactions
