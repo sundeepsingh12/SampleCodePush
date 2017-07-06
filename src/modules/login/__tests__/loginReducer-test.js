@@ -24,7 +24,7 @@ describe('login reducer without initial state',() => {
         }
         let nextState = authReducer(undefined,action)
         expect(nextState.form.authenticationService).toBe(true)
-        expect(nextState.form.displayMessage).toBe('Login request initiated')
+        expect(nextState.form.displayMessage).toBe('')
         expect(nextState.form.isButtonDisabled).toBe(true)
         expect(nextState.form.isEditTextDisabled).toBe(true)
     })
