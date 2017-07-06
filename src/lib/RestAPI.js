@@ -13,6 +13,9 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
+
+const fetch = require('react-native-cancelable-fetch');
+
 class RestAPI {
   /**
    * ## API.js client
@@ -36,22 +39,24 @@ class RestAPI {
    * A generic function that prepares the request
    *
    * @returns object:
-   *  {code: response.code,
+   * { code: response.code,
    *   status: response.status,
-   *   json: response.json()
+   *   json: response.json() }
+   * 
+   * @throws exception:
+   * {
+   *    code: response.status,
+   *    message: 'Error message like Internal server error'
+   *  }
    */
-  async _fetch(opts) {
+  async _fetch(opts, fetchRequestId) {
     let url = this.API_BASE_URL + opts.url
     console.log(url)
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
-    const response = await fetch(url, opts)
-    const {
-      status,
-      code,
-      headers
-    } = response;
+    const response = await fetch(url, opts, fetchRequestId)
+    const { status, code, headers } = response;
     let res = {
       status,
       code,
@@ -59,15 +64,23 @@ class RestAPI {
       json: {}
     }
 
-    console.log('responsse >>>>')
-     console.log(response)
-     if(opts.url==CONFIG.API.DELETE_DATA_API){
-        res.json = response.text()
-     }
-    else if (opts.headers["Content-Type"] == "application/json") {
-      res.json = response.json()
+    //Check if server returned JSON or Text response
+    let isJsonResponse = false;
+    response.headers.forEach(function (val, key) { if (val.indexOf('json') != -1) isJsonResponse = true; });
+    try {
+      res.json = (isJsonResponse) ? await response.json() : await response.text()
+    } catch (e) {
+      res.json = {}
     }
-    return res
+    if (res.status != 200) {
+      throw {
+        code: res.status,
+        message: ((res.json && res.json.message) ? res.json.message : 'Unknow error. Retry or contact support.')
+      }
+    }
+    console.log("response>>>>>");
+    console.log(res);
+    return res;
   }
 
   /**
@@ -88,6 +101,23 @@ class RestAPI {
     return prune(obj);
   }
 
+   /** 
+   * Parameters (Request Body, URL, Method (enum type POST, LOGIN, GET))
+   * 
+   * Success response JSON object
+   * {
+   *   status,
+   *   code,
+   *   headers,
+   *   json: {}
+   * }
+   * 
+   * Failure response JSON object
+   * {
+   *   code: xxx,
+   *   message: 'error message'
+   * }
+   */
   serviceCall(body, url, method) {
     let opts;
     if (method === 'POST') {
@@ -118,35 +148,38 @@ class RestAPI {
       }
     }
 
-    return this._fetch(opts)
+    //Random number between 1 and 1000
+    const fetchRequestId = Math.floor((Math.random() * 1000) + 1);
+
+    //Creating a _fetch request which will timeout in 30 seconds
+    return this.timeoutPromise(30 * 1000, new Error('Timed Out!'), this._fetch(opts, fetchRequestId))
       .then((res) => {
-        console.log(res.status)
-        if (res.status == 200) {
-          return res;
-        } else {
-          switch (res.status) {
-            case 401:
-              throw new Error("Invalid User Credentials")
-            case 500:
-              throw new Error("Internal server error")
-            case 502:
-              throw new Error("Bad Gateway")
-            case 1201:
-              throw new Error("User already logged in ")
-            case 1203:
-              throw new Error("User locked.Try after 15 minutes")
-            default:
-              throw {
-                code: res.status,
-                message: 'Something went wrong'
-              }
+        return res;
+      })
+      .catch((e) => {
+        //Aborting the Fetch API call
+        fetch.abort(fetchRequestId); 
+
+        //Throw custom error instance
+        if (e instanceof Error) {
+          throw {
+            code: 504,
+            message: 'Slow or no internet on Device.'
           }
+        } else {
+          throw e
         }
       })
-      .catch((error) => {
-        throw (error)
-      })
   }
+
+  //Wrapper function to timeout a "Promise" after specific time
+  timeoutPromise(timeout, err, promise) {
+    return new Promise(function (resolve, reject) {
+      promise.then(resolve, reject);
+      setTimeout(reject.bind(null, err), timeout);
+    });
+  }
+
 }
 // The singleton variable
 export let restAPI = new RestAPI()

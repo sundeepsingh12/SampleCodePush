@@ -18,6 +18,8 @@ var InitialState = Record({
   deviceVerificationService: SERVICE_PENDING, //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
   isError: false,
   error: '',
+  isErrorType_403_400_Logout: false,
+  errorMessage_403_400_Logout: '',
   showMobileNumberScreen:false,
   showOtpScreen:false,
   mobileNumber:'',

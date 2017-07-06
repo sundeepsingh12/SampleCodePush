@@ -37,18 +37,11 @@ class JobStatus {
    */
   async getStatusIdForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    console.log(jobStatusArray)
     if (!jobStatusArray || !jobStatusArray.value) {
-      console.log('if')
       throw new Error('Job status missing in store')
     }
-    console.log('after if')
     const jobStatusId = jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobStatusObject.jobMasterId == jobMasterId))
       .map(jobStatusObject => jobStatusObject.id)
-    console.log('jobStatusId')
-    console.log(jobStatusId)
-    console.log('jobStatusId[0]')
-    console.log(jobStatusId[0])
     return jobStatusId[0]
   }
 
@@ -74,8 +67,6 @@ class JobStatus {
     filteredJobStatusArray.forEach(jobStatusObject => {
       jobMasterIdStatusIdMap[jobStatusObject.jobMasterId] = jobStatusObject.id
     })
-    console.log('jobMasterIdStatusIdMap')
-    console.log(jobMasterIdStatusIdMap)
     return jobMasterIdStatusIdMap
   }
 

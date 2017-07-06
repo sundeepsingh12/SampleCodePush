@@ -45,8 +45,8 @@ class JobTransaction {
    * @param {*} unseenTransactions 
    */
   async getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions) {
-    if (_.isUndefined(unseenTransactions) || _.isNull(unseenTransactions) || _.isEmpty(unseenTransactions)) {
-      return []
+    if (_.isNull(unseenTransactions) || _.isEmpty(unseenTransactions)) {
+      return {}
     }
     let jobMasterIdTransactionDtoMap = {}, // Map<JobMasterId, TransactionIdDTO>
       jobMasterIdJobStatusIdTransactionIdDtoMap = {} // Map<JobMasterId, Map<JobStausId, TransactionIdDTO>>
@@ -196,9 +196,6 @@ class JobTransaction {
   }
 
   updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
-    if (_.isUndefined(jobMasterIdTransactionDtoMap) || _.isNull(jobMasterIdTransactionDtoMap) || _.isEmpty(jobMasterIdTransactionDtoMap)) {
-      return
-    }
     for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
       const transactionIdList = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].transactionId.split(":")
       let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId

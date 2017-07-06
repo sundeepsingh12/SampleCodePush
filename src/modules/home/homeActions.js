@@ -89,10 +89,10 @@ export function onResyncPress() {
     try {
       const pageNumber = 0, pageSize = 3
       let isLastPageReached = false, json
+       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
       while (!isLastPageReached) {
         console.log('inside while')
-        const tdcResponse = await sync.downloadDataFromServer(pageNumber++, pageSize)
-        console.log(tdcResponse)
+        const tdcResponse = await sync.downloadDataFromServer(pageNumber, pageSize)
         if (tdcResponse) {
           json = await tdcResponse.json
           console.log('json')
@@ -104,47 +104,23 @@ export function onResyncPress() {
             isLastPageReached = true
           }
           const successSyncIds = await sync.getSyncIdFromResponse(json.content)
-          console.log('successSyncIds')
-          console.log(successSyncIds)
           //Dont hit delete sync API if successSyncIds empty
           if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
-            dispatch(deleteDataFromServer(successSyncIds))
+            const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
+            const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
+            const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
+            const dataList = await sync.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
+            const messageIdDTOs = []
+            await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+            await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
+            jobSummaryService.updateJobSummary(dataList.jobSummaries)
           }
         } else {
           isLastPageReached = true
         }
       }
-      
-    } catch (error) {
-      console.log(error)
-    }
-  }
-}
 
-/**
- * 
- * @param {*} json 
- */
-function deleteDataFromServer(successSyncIds) {
-  return async function (dispatch) {
-    try {
-      const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
-      const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
-      const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
-      console.log('unseenTransactions')
-      console.log(unseenTransactions)
-      const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
-      console.log('jobMasterIdJobStatusIdTransactionIdDtoMap')
-      console.log(jobMasterIdJobStatusIdTransactionIdDtoMap)
-      const dataList = await sync.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
-      console.log('dataList')
-      console.log(dataList)
-      const messageIdDTOs = []
-      await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
-      await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
-      jobSummaryService.updateJobSummary(dataList.jobSummaries)
     } catch (error) {
-      console.log('inside catch')
       console.log(error)
     }
   }

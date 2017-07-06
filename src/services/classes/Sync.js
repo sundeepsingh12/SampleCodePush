@@ -1,12 +1,20 @@
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import * as realm from '../../repositories/realmdb'
-import { keyValueDBService } from './KeyValueDBService'
+import {
+  keyValueDBService
+} from './KeyValueDBService'
 
-import { jobStatusService } from './JobStatus'
-import { jobTransactionService } from './JobTransaction'
+import {
+  jobStatusService
+} from './JobStatus'
+import {
+  jobTransactionService
+} from './JobTransaction'
 
-import { jobSummaryService } from './JobSummary'
+import {
+  jobSummaryService
+} from './JobSummary'
 
 import _ from 'underscore'
 
@@ -18,9 +26,7 @@ const {
   TABLE_RUNSHEET,
   USER,
   UNSEEN,
-  PENDING,
-  CUSTOMIZATION_LIST_MAP,
-  TABLE_JOB_TRANSACTION_CUSTOMIZATION
+  PENDING
 } = require('../../lib/constants').default
 
 class Sync {
@@ -84,7 +90,7 @@ class Sync {
    */
   async downloadDataFromServer(pageNumber, pageSize) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-     if (!token) {
+    if (!token) {
       throw new Error('Token Missing')
     }
     let formData = null
@@ -101,18 +107,19 @@ class Sync {
     return downloadResponse
   }
 
+
   /**This iterates over the Json array response returned from API and correspondingly Realm db is updated
    * 
    * @param {*} tdcResponse 
    */
-  async processTdcResponse(tdcContentArray) {
+  processTdcResponse(tdcContentArray) {
     let tdcContentObject
     for (tdcContentObject of tdcContentArray) {
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
-        await this.saveDataFromServerInDB(tdcContentObject.query)
+        this.saveDataFromServerInDB(tdcContentObject.query)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
-        await this.updateDataInDB(tdcContentObject.query)
+        this.updateDataInDB(tdcContentObject.query)
       }
     }
   }
@@ -123,12 +130,7 @@ class Sync {
    */
   async saveDataFromServerInDB(query) {
     try{
-       console.log('query')
-    console.log(query)
-    console.log('saveDataFromServerInDB called >>>> ')
     const contentQuery = await JSON.parse(query)
-    console.log('contentQuery')
-      console.log(contentQuery)
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
@@ -137,40 +139,31 @@ class Sync {
       tableName: TABLE_JOB,
       value: contentQuery.job
     }
+      const jobDatas = {
+        tableName: TABLE_JOB_DATA,
+        value: contentQuery.jobData
+      }
 
-    const jobDatas = {
-      tableName: TABLE_JOB_DATA,
-      value: contentQuery.jobData
-    }
+      const fieldDatas = {
+        tableName: TABLE_FIELD_DATA,
+        value: contentQuery.fieldData
+      }
 
-    const fieldDatas = {
-      tableName: TABLE_FIELD_DATA,
-      value: contentQuery.fieldData
+      const runsheets = {
+        tableName: TABLE_RUNSHEET,
+        value: contentQuery.runSheet
+      }
+      realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     }
-
-    const runsheets = {
-      tableName: TABLE_RUNSHEET,
-      value: contentQuery.runSheet
-    }
-    const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
-    console.log("jobTransactionCustomizationList")
-    console.log(jobTransactionCustomizationListValues)
-    const jobTransactionCustomizationList = {
-      tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
-      value: jobTransactionCustomizationListValues
-    }
-    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationList)
-    }
-    catch(Error){
-      console.log('inside catch >>')
+    catch (Error) {
       console.log(Error)
-    }   
+    }
   }
 
-/**
- * 
- * @param {*} query 
- */
+  /**
+   * 
+   * @param {*} query 
+   */
   async updateDataInDB(query) {
     try {
       const contentQuery = await JSON.parse(query)
@@ -296,14 +289,16 @@ class Sync {
    
    ]
    */
-
   async getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap) {
     let transactionIdDtos = []
     const jobSummaries = []
+    // let jobMasterIdUnseenStatusIdMap = {},jobMasterIdPendingStatusIdMap = {}
     for (let jobMasterId in jobMasterIdJobStatusIdTransactionIdDtoMap) {
       for (let unseenStatusId in jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
+        // jobMasterIdUnseenStatusIdMap[jobMasterId] = unseenStatusId
         let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].transactionId.split(":").length
         let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].pendingStatusId
+        // jobMasterIdPendingStatusIdMap[jobMasterId] = pendingID+":"+count
         let unseenJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, unseenStatusId)
         unseenJobSummaryData.count = 0
         jobSummaries.push(unseenJobSummaryData)
@@ -313,6 +308,10 @@ class Sync {
         transactionIdDtos.push(jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId])
       }
     }
+    // let unseenJobSummaryList = await jobSummaryService.getJobSummariesForJobMasterAndStatus(jobMasterIdUnseenStatusIdMap)
+    // jobSummaries.push(unseenJobSummaryList)
+    // let pendingJobSummaryList = await jobSummaryService.getJobSummariesForJobMasterAndStatus(jobMasterIdPendingStatusIdMap)
+    //  jobSummaries.push(unseenJobSummaryList)
     const dataList = {
       jobSummaries,
       transactionIdDtos
