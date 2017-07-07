@@ -26,6 +26,7 @@ export default function homeReducer(state = initialState, action) {
       if(!tempTabIdJobTransactions[action.payload.tabId]) {
         tempTabIdJobTransactions[action.payload.tabId] = {}
         tempTabIdJobTransactions[action.payload.tabId].jobTransactions = []
+        tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization = []
         tempTabIdJobTransactions[action.payload.tabId].pageNumber = 0
         tempTabIdJobTransactions[action.payload.tabId].isFetching = false
       }
@@ -35,18 +36,23 @@ export default function homeReducer(state = initialState, action) {
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
 
     case JOB_FETCHING_END:
-      let jobTransactions
+      let jobTransactions,jobTransactionCustomization
       console.log('action.payload')
       console.log(action.payload)
       tempTabIdJobTransactions = {...state.tabIdJobTransactions}
       if (tempTabIdJobTransactions[action.payload.tabId] && tempTabIdJobTransactions[action.payload.tabId].jobTransactions) {
-        jobTransactions = state.tabIdJobTransactions[action.payload.tabId].jobTransactions
+        jobTransactions = tempTabIdJobTransactions[action.payload.tabId].jobTransactions
         jobTransactions = jobTransactions.concat(action.payload.jobTransactionOject.jobTransactions)
+        jobTransactionCustomization = tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization
+        jobTransactionCustomization = jobTransactionCustomization.concat(action.payload.jobTransactionOject.jobTransactionCustomization)
       } else {
         jobTransactions = []
+        jobTransactionCustomization = []
         jobTransactions = jobTransactions.concat(action.payload.jobTransactionOject.jobTransactions)
+        jobTransactionCustomization = jobTransactionCustomization.concat(action.payload.jobTransactionOject.jobTransactionCustomization)
       }
       tempTabIdJobTransactions[action.payload.tabId].jobTransactions = jobTransactions
+      tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization = jobTransactionCustomization
       tempTabIdJobTransactions[action.payload.tabId].pageNumber += 1
       tempTabIdJobTransactions[action.payload.tabId] .isFetching = false
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)

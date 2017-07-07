@@ -137,3 +137,11 @@ export function getRecordListOnProperty(tableName, property) {
   let records = realm.objects(tableName).map(data => data[property])
   return records
 }
+
+export function getRecordListOnQuery(tableName,query,isSorted,sortProperty) {
+  let records = realm.objects(tableName).filter(query)
+  if(isSorted && sortProperty) {
+    record = records.sort(`${sortProperty}`)
+  }
+  return records
+}

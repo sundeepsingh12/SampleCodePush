@@ -9,15 +9,10 @@ module.exports = {
     production: {
       url: 'https://www.fareye.co/app'
     },
-    // staging: {
-    //   url: 'https://staging.fareye.co/app'
-
-    // },
     staging: {
-      url: 'http://192.168.1.169:8080/app'
+      url: 'https://staging.fareye.co/app'
 
-    }
-
+    },
   },
     API:{
         AUTHENTICATION_API:'/authentication',

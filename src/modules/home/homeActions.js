@@ -25,7 +25,7 @@ import { tabsService } from '../../services/classes/Tabs'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 
-export function jobFetchingEnd(jobTransactionOject,tabId,pageNumber) {
+export function jobFetchingEnd(jobTransactionOject, tabId, pageNumber) {
   return {
     type: JOB_FETCHING_END,
     payload: {
@@ -54,8 +54,8 @@ export function jobRefreshingStart() {
 
 export function setTabsList(tabsList) {
   return {
-    type : SET_TABS_LIST,
-    payload : tabsList
+    type: SET_TABS_LIST,
+    payload: tabsList
   }
 }
 
@@ -73,7 +73,7 @@ export function fetchTabs() {
   }
 }
 
-export function fetchJobs(tabId,pageNumber) {
+export function fetchJobs(tabId, pageNumber) {
   return async function (dispatch) {
     try {
       dispatch(jobFetchingStart(tabId))
@@ -82,10 +82,10 @@ export function fetchJobs(tabId,pageNumber) {
       console.log('tabId')
       console.log(tabId)
       console.log('fetchJobs action')
-      var data = await jobTransactionService.getJobTransactions(tabId,pageNumber)
+      var data = await jobTransactionService.getJobTransactions(tabId, pageNumber)
       console.log('data fetchJobs')
       console.log(data)
-      dispatch(jobFetchingEnd(data,tabId,pageNumber))
+      dispatch(jobFetchingEnd(data, tabId, pageNumber))
     } catch (error) {
       console.log(error)
     }
@@ -97,9 +97,9 @@ export function onResyncPress() {
     try {
       const pageNumber = 0, pageSize = 3
       let isLastPageReached = false, json
-       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
-       console.log('time start >>>>')
-         console.log(new Date())
+      const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
+      console.log('time start >>>>')
+      console.log(new Date())
       while (!isLastPageReached) {
         console.log('inside while')
         const tdcResponse = await sync.downloadDataFromServer(pageNumber, pageSize)
@@ -129,8 +129,8 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
-       console.log('time end >>>>')
-         console.log(new Date())
+      console.log('time end >>>>')
+      console.log(new Date())
 
     } catch (error) {
       console.log(error)

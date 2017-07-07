@@ -123,7 +123,7 @@ class Jobs extends Component {
         </Left>
         <Body >
           <Text adjustsFontSizeToFit>
-            {`${item.referenceNumber}`}
+            {`${item.circleLine1}`}
           </Text>
         </Body>
         <Right >
@@ -179,7 +179,7 @@ class Jobs extends Component {
           style={{ marginTop: 5, marginBottom: 50 }}>
           <FlatList
             data={
-              (this.props.tabIdJobTransactions[this.props.tabId]) ? (this.props.tabIdJobTransactions[this.props.tabId].jobTransactions) : []
+              (this.props.tabIdJobTransactions[this.props.tabId]) ? (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) : []
               }
             renderItem={({ item }) => this.renderData(item)}
             keyExtractor={item => item.id}

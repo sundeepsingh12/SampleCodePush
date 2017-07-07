@@ -113,14 +113,14 @@ class Sync {
    * 
    * @param {*} tdcResponse 
    */
-  processTdcResponse(tdcContentArray) {
+  async processTdcResponse(tdcContentArray) {
     let tdcContentObject
     for (tdcContentObject of tdcContentArray) {
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
-        this.saveDataFromServerInDB(tdcContentObject.query)
+        await this.saveDataFromServerInDB(tdcContentObject.query)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
-        this.updateDataInDB(tdcContentObject.query)
+        await this.updateDataInDB(tdcContentObject.query)
       }
     }
   }
@@ -131,7 +131,7 @@ class Sync {
    */
   async saveDataFromServerInDB(query) {
     try {
-      const contentQuery = await JSON.parse(query)
+      const contentQuery = JSON.parse(query)
       const jobTransactions = {
         tableName: TABLE_JOB_TRANSACTION,
         value: contentQuery.jobTransactions
@@ -157,15 +157,10 @@ class Sync {
       const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
       console.log("jobTransactionCustomizationList")
       console.log(jobTransactionCustomizationListValues)
-        console.log("TABLE_JOB_TRANSACTION_CUSTOMIZATION")
-      console.log(TABLE_JOB_TRANSACTION_CUSTOMIZATION)
-      
       const jobTransactionCustomizationList = {
         tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
         value: jobTransactionCustomizationListValues
       }
-      console.log('jobTransactionCustomizationList.tablename')
-      console.log(jobTransactionCustomizationList.tableName)
       realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationList)
     }
     catch (Error) {
