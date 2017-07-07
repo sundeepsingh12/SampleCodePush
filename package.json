@@ -19,6 +19,7 @@
     "react-native": "^0.42.0",
     "react-native-camera": "^0.6.0",
     "react-native-cancelable-fetch": "^0.1.1",
+    "react-native-code-push": "^3.0.1-beta",
     "react-native-device-info": "^0.10.2",
     "react-native-router-flux": "^3.36.0",
     "react-native-simple-store": "^1.1.0",
