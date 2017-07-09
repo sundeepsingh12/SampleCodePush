@@ -1,4 +1,5 @@
 <resources>
+    <string moduleConfig="true" name="reactNativeCodePush_androidDeploymentKey">rnpm link react-native-vector-icons</string>
 
     <string name="app_name">FareyeReact</string>
 </resources>

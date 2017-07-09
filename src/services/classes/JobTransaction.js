@@ -15,7 +15,7 @@ import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'
 import { jobDataService } from './JobData'
-import JobTransactionSchema from '../../repositories/schema/JobTransaction'
+import JobTransactionSchema from '../../repositories/schema/jobTransaction'
 class JobTransaction {
 
   /**A Generic method for filtering out jobtransactions whose job status ids lie in 'statusids'  

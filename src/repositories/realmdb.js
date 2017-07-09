@@ -2,7 +2,7 @@
 //Class to combine all Schema and create realm object
 
 import Realm from 'realm';
-import JobTransaction from './schema/JobTransaction'
+import JobTransaction from './schema/jobTransaction'
 import Job from './schema/Job'
 import JobData from './schema/JobData'
 import FieldData from './schema/FieldData'
@@ -12,7 +12,7 @@ import JobTransactionCustomization from './schema/jobTransactionCustomization'
 
 import _ from 'underscore'
 
-const schemaVersion = 24;
+const schemaVersion = 26;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, JobTransactionCustomization];
 
 let realm = new Realm({
