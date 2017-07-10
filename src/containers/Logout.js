@@ -20,7 +20,8 @@ import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 
-import {Button} from 'react-native'
+
+import { Button, Spinner } from 'native-base';
 
 /**
  * The necessary React components
