@@ -28,11 +28,6 @@ class JobTransaction {
     return transactionList
   }
 
-  getAllJobTransactionsCustomization() {
-    const allJobTransactionCustomization = realm.getAll(TABLE_JOB_TRANSACTION_CUSTOMIZATION)
-    return allJobTransactionCustomization
-  }
-
   /**Sample Return type
    * 
    * 
@@ -99,74 +94,83 @@ class JobTransaction {
 
   /**
    * get different configurations for job listing
-   * tabs
-   * jobstatus
-   * jobTransaction for status ids
-   * holderListCustomizationMap
-   * jobMaster
+   * jobTransaction for status ids page wise
+   * jobTransactionCustomizationList
+   * @returns
+   * pageData = {
+   * pageJobTransactionCustomizationList
+   * pageNumber
+   * isLastPage
+   * message
+   * }
    */
   async getJobTransactions(tabId, pageNumber) {
-    let pageJobTransactionMap = {}, jobIdList = [], pageJobMap = {}, pageJobTransactionCustomizationList = [], pageTransactionObject = {}
-    const jobMasterIdCustomizationMapFromStore = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
-    const jobMasterIdCustomizationMap = jobMasterIdCustomizationMapFromStore.value
+    let pageJobTransactionMap = {}, jobIdList = [], pageJobMap = {}, pageJobTransactionCustomizationList = [], pageJobTransactionList = [], isLastPage = false
+    const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
     const tabIdStatusIdMap = await keyValueDBService.getValueFromStore(TABIDMAP)
     const statusIdList = tabIdStatusIdMap.value[tabId]
-    if (!statusIdList) {
-      throw new Error('No records found')
+    const pageData = {
+      pageJobTransactionCustomizationList: [],
+      pageNumber: 0,
+      isLastPage: false,
+      message: '',
     }
-    let allJobTransactions = realm.getAll(TABLE_JOB_TRANSACTION)
-    let allJobTransactionCustomization = this.getAllJobTransactionsCustomization()
+    if (!statusIdList || _.isEmpty(statusIdList)) {
+      pageData.isLastPage = true
+      pageData.message = 'No Status Available'
+      return pageData
+    }
     let jobTransactionQuery = statusIdList.map((object) => 'jobStatusId = ' + object).join(' OR ')
     let filteredTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, 'seqSelected')
-    // let filteredTransactions = allJobTransactions.filtered(
-    //   statusIdList.map((object) => 'jobStatusId = ' + object).join(' OR ')
-    // )
-    // let sortedTransactions = filteredTransactions.sorted('seqSelected')
-    pageTransactionObject.jobTransactions = filteredTransactions.slice(pageNumber * 10, (pageNumber + 1) * 10)
-    pageTransactionObject.jobTransactions.forEach(transaction => {
+    console.log(filteredTransactions.length)
+    if (filteredTransactions.length == 0) {
+      pageData.isLastPage = true
+      pageData.message = 'No Records Found'
+      return pageData
+    }
+    if (filteredTransactions.length > (pageNumber + 1) * 10) {
+      pageJobTransactionList = filteredTransactions.slice(pageNumber * 10, (pageNumber + 1) * 10)
+      pageData.pageNumber = pageNumber + 1
+    } else {
+      pageJobTransactionList = filteredTransactions.slice(pageNumber * 10, filteredTransactions.length)
+      pageData.isLastPage = true
+    }
+    console.log('pageJobTransactionList', pageJobTransactionList)
+    pageJobTransactionList.forEach(transaction => {
       pageJobTransactionMap[transaction.id] = transaction
-      // jobIdList.push(transaction.jobId)
     })
-    console.log('pageTransactionObject')
-    console.log(pageTransactionObject)
-    let jobQuery = pageTransactionObject.jobTransactions.map((transaction) => 'id = ' + transaction.jobId).join(' OR ')
+    let jobQuery = pageJobTransactionList.map((transaction) => 'id = ' + transaction.jobId).join(' OR ')
     let filteredJobs = realm.getRecordListOnQuery(TABLE_JOB, jobQuery, false)
-
-    // let filteredJobs = jobService.getAllJobs().filtered(
-    //   pageTransactionObject.jobTransactions.map((transaction) => 'id = ' + transaction.jobId).join(' OR ')
-    // )
-
     filteredJobs.forEach(job => {
       pageJobMap[job.id] = job
     })
 
-    let jobTransactionCustomizationQuery = pageTransactionObject.jobTransactions.map((transaction) => 'id = ' + transaction.id).join(' OR ')
+    let jobTransactionCustomizationQuery = pageJobTransactionList.map((transaction) => 'id = ' + transaction.id).join(' OR ')
     let filteredJobTransactionCustomization = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION_CUSTOMIZATION, jobTransactionCustomizationQuery, false)
 
     filteredJobTransactionCustomization.forEach(jobTransactionCustomization => {
-      // if (pageJobTransactionMap[jobTransactionCustomization.id]) {
       let currentJobTransactionCustomization = { ...jobTransactionCustomization }
       currentJobTransaction = pageJobTransactionMap[currentJobTransactionCustomization.id]
-      // console.log('index of')
-      // console.log(pageTransactionObject.findIndex(currentJobTransaction))
-      // console.log('pageTransactionObject')
-      // console.log(pageTransactionObject)
       currentJob = pageJobMap[currentJobTransaction.jobId]
-      line1CustomizationObject = jobMasterIdCustomizationMap[currentJobTransaction.jobMasterId][1]
-      line2CustomizationObject = jobMasterIdCustomizationMap[currentJobTransaction.jobMasterId][2]
-      circleLine1CustomizationObject = jobMasterIdCustomizationMap[currentJobTransaction.jobMasterId][3]
-      circleLine2CustomizationObject = jobMasterIdCustomizationMap[currentJobTransaction.jobMasterId][4]
-      currentJobTransactionCustomization.line1 += this.setTransactionDynamicParameters(line1CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.line1)
-      currentJobTransactionCustomization.line2 += this.setTransactionDynamicParameters(line2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.line2)
-      currentJobTransactionCustomization.circleLine1 += this.setTransactionDynamicParameters(circleLine1CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine1)
-      currentJobTransactionCustomization.circleLine2 += this.setTransactionDynamicParameters(circleLine2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine2)
+      if (jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId]) {
+        line1CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][1]
+        line2CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][2]
+        circleLine1CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][3]
+        circleLine2CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][4]
+        currentJobTransactionCustomization.line1 = this.setTransactionDynamicParameters(line1CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.line1)
+        currentJobTransactionCustomization.line2 = this.setTransactionDynamicParameters(line2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.line2)
+        currentJobTransactionCustomization.circleLine1 = this.setTransactionDynamicParameters(circleLine1CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine1)
+        currentJobTransactionCustomization.circleLine2 = this.setTransactionDynamicParameters(circleLine2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine2)
+      } else {
+        currentJobTransactionCustomization.line1 = currentJobTransaction.referenceNumber
+        currentJobTransactionCustomization.line2 = ''
+        currentJobTransactionCustomization.circleLine1 = ''
+        currentJobTransactionCustomization.circleLine2 = ''
+      }
       pageJobTransactionCustomizationList.push(currentJobTransactionCustomization)
-      // }
     })
-    console.log('jobTransactionCustomizationList')
-    console.log(pageJobTransactionCustomizationList)
-    pageTransactionObject.jobTransactionCustomization = pageJobTransactionCustomizationList
-    return pageTransactionObject
+    pageData.pageJobTransactionCustomizationList = pageJobTransactionCustomizationList
+    return pageData
   }
 
   setTransactionDynamicParameters(customizationObject, jobTransaction, job, finalText) {
@@ -222,42 +226,37 @@ class JobTransaction {
     const jobMasterIdCustomizationMapFromStore = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
     const jobMasterIdCustomizationMap = jobMasterIdCustomizationMapFromStore.value
     allJobData.forEach(jobData => {
-      if(!jobDataMap[jobData.jobId]) {
+      if (!jobDataMap[jobData.jobId]) {
         jobDataMap[jobData.jobId] = {}
       }
       jobDataMap[jobData.jobId][jobData.jobAttributeMasterId] = jobData
     })
     allFieldData.forEach(fieldData => {
-        if(!fieldDataMap[fieldData.jobTransactionId]) {
-          fieldDataMap[fieldData.jobTransactionId] = {}
-        }
-        fieldDataMap[fieldData.jobTransactionId][fieldAttributeMasterId] = fieldData
-      })
+      if (!fieldDataMap[fieldData.jobTransactionId]) {
+        fieldDataMap[fieldData.jobTransactionId] = {}
+      }
+      fieldDataMap[fieldData.jobTransactionId][fieldAttributeMasterId] = fieldData
+    })
     allJobTransactions.forEach(jobTransaction => {
       let jobTransactionCustomization = {}
-      // let job = allJobs.filter(job => job.id == jobTransaction.jobId)
-      // let jobDataForJobId = {}
-      // allJobData.forEach(jobData => {
-      //   if (jobData.jobId == jobTransaction.jobId) {
-      //     jobDataForJobId[jobData.jobAttributeMasterId] = jobData
-      //   }
-      // })
-      // let fieldDataForJobTransactionId = {}
-      // allFieldData.forEach(fieldData => {
-      //   if (fieldData.jobTransactionId == jobTransaction.id) {
-      //     fieldDataForJobTransactionId[fieldData.fieldAttributeMasterId] = fieldData
-      //   }
-      // })
       const jobMasterId = jobTransaction.jobMasterId
-      const line1Map = jobMasterIdCustomizationMap[jobMasterId][1]
-      const line2Map = jobMasterIdCustomizationMap[jobMasterId][2]
-      const circleLine1Map = jobMasterIdCustomizationMap[jobMasterId][3]
-      const circleLine2Map = jobMasterIdCustomizationMap[jobMasterId][4]
-      jobTransactionCustomization.line1 = this.setTransactionJobAndFieldData(line1Map, jobTransaction, jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
-      jobTransactionCustomization.line2 = this.setTransactionJobAndFieldData(line2Map, jobTransaction, jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
-      jobTransactionCustomization.circleLine1 = this.setTransactionJobAndFieldData(circleLine1Map, jobTransaction, jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
-      jobTransactionCustomization.circleLine2 = this.setTransactionJobAndFieldData(circleLine2Map, jobTransaction, jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
-      jobTransactionCustomization.id = jobTransaction.id
+      if (jobMasterIdCustomizationMap[jobMasterId]) {
+        const line1Map = jobMasterIdCustomizationMap[jobMasterId][1]
+        const line2Map = jobMasterIdCustomizationMap[jobMasterId][2]
+        const circleLine1Map = jobMasterIdCustomizationMap[jobMasterId][3]
+        const circleLine2Map = jobMasterIdCustomizationMap[jobMasterId][4]
+        jobTransactionCustomization.line1 = this.setTransactionJobAndFieldData(line1Map, jobTransaction, jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
+        jobTransactionCustomization.line2 = this.setTransactionJobAndFieldData(line2Map, jobTransaction, jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
+        jobTransactionCustomization.circleLine1 = this.setTransactionJobAndFieldData(circleLine1Map, jobTransaction, jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
+        jobTransactionCustomization.circleLine2 = this.setTransactionJobAndFieldData(circleLine2Map, jobTransaction, jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
+        jobTransactionCustomization.id = jobTransaction.id
+      } else {
+        jobTransactionCustomization.line1 = ''
+        jobTransactionCustomization.line2 = ''
+        jobTransactionCustomization.circleLine1 = ''
+        jobTransactionCustomization.circleLine2 = ''
+        jobTransactionCustomization.id = jobTransaction.id
+      }
       jobTransactionCustomizationList.push(jobTransactionCustomization)
     })
     return jobTransactionCustomizationList

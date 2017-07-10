@@ -51,15 +51,12 @@ export function saveList(tableName, array) {
  * @param {*} tableNamesVsDataList 
  */
 export function performBatchSave(...tableNamesVsDataList) {
-  console.log('performBatchSave called >>>>')
   return realm.write(() => {
     tableNamesVsDataList.forEach(record => {
-      console.log('tableName')
-      console.log(record.tableName)
       try {
-      if (!_.isEmpty(record.value) && !_.isUndefined(record.value))
-        record.value.forEach(data => realm.create(record.tableName, data, true))
-      } catch(error) {
+        if (!_.isEmpty(record.value) && !_.isUndefined(record.value))
+          record.value.forEach(data => realm.create(record.tableName, data, true))
+      } catch (error) {
         console.log(error)
       }
     })
@@ -138,10 +135,15 @@ export function getRecordListOnProperty(tableName, property) {
   return records
 }
 
-export function getRecordListOnQuery(tableName,query,isSorted,sortProperty) {
-  let records = realm.objects(tableName).filter(query)
-  if(isSorted && sortProperty) {
-    record = records.sort(`${sortProperty}`)
+export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
+  let records
+  if (query) {
+    records = realm.objects(tableName).filtered(query)
+  } else {
+    records = realm.objects(tableName)
+  }
+  if (isSorted && sortProperty) {
+    records = records.sorted(`${sortProperty}`)
   }
   return records
 }

@@ -3,6 +3,9 @@
 const {
   JOB_FETCHING_START,
   JOB_FETCHING_END,
+  JOB_REFRESHING_START,
+  JOB_REFRESHING_WAIT,
+  SET_FETCHING_FALSE,
   UNSEEN,
   TABLE_JOB_TRANSACTION,
   TAB,
@@ -25,22 +28,24 @@ import { tabsService } from '../../services/classes/Tabs'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 
-export function jobFetchingEnd(jobTransactionOject, tabId, pageNumber) {
+export function jobFetchingEnd(pageData, tabId, pageNumber) {
   return {
     type: JOB_FETCHING_END,
     payload: {
-      jobTransactionOject,
+      jobTransactionCustomizationList: pageData.pageJobTransactionCustomizationList,
+      pageNumber: pageData.pageNumber,
+      isLastPage: pageData.isLastPage,
       tabId,
-      pageNumber
     }
   }
 }
 
-export function jobFetchingStart(tabId) {
+export function jobFetchingStart(tabId, isRefresh) {
   return {
     type: JOB_FETCHING_START,
     payload: {
-      tabId
+      tabId,
+      isRefresh
     }
   }
 }
@@ -52,6 +57,15 @@ export function jobRefreshingStart() {
   }
 }
 
+export function jobRefreshingWait(tabId) {
+  return {
+    type: JOB_REFRESHING_WAIT,
+    payload: {
+      tabId
+    }
+  }
+}
+
 export function setTabsList(tabsList) {
   return {
     type: SET_TABS_LIST,
@@ -59,13 +73,19 @@ export function setTabsList(tabsList) {
   }
 }
 
+export function setFetchingFalse(tabId) {
+  return {
+    type: SET_FETCHING_FALSE,
+    payload: {
+      tabId
+    }
+  }
+}
+
 export function fetchTabs() {
   return async function (dispatch) {
     try {
-      console.log('fetchtabs')
       const tabs = await keyValueDBService.getValueFromStore(TAB)
-      console.log(tabs)
-      console.log(tabs.value)
       dispatch(setTabsList(tabs.value))
     } catch (error) {
       console.log(error)
@@ -77,15 +97,31 @@ export function fetchJobs(tabId, pageNumber) {
   return async function (dispatch) {
     try {
       dispatch(jobFetchingStart(tabId))
-      console.log('pageNumber')
-      console.log(pageNumber)
-      console.log('tabId')
-      console.log(tabId)
-      console.log('fetchJobs action')
-      var data = await jobTransactionService.getJobTransactions(tabId, pageNumber)
-      console.log('data fetchJobs')
-      console.log(data)
-      dispatch(jobFetchingEnd(data, tabId, pageNumber))
+      var pageData = await jobTransactionService.getJobTransactions(tabId, pageNumber)
+      console.log(pageData)
+      console.log(pageData.pageJobTransactionCustomizationList)
+      console.log(_.isEmpty(pageData.pageJobTransactionCustomizationList))
+      if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
+        dispatch(jobFetchingEnd(pageData, tabId, pageNumber))
+      } else {
+        dispatch(setFetchingFalse(tabId))
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+export function refreshJobs(tabId) {
+  return async function (dispatch) {
+    try {
+      dispatch(jobRefreshingWait(tabId))
+      var pageData = await jobTransactionService.getJobTransactions(tabId, 0)
+      if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
+        dispatch(jobFetchingEnd(pageData, tabId, pageNumber))
+      } else {
+        dispatch(setFetchingFalse(tabId))
+      }
     } catch (error) {
       console.log(error)
     }
@@ -96,17 +132,12 @@ export function onResyncPress() {
   return async function (dispatch) {
     try {
       const pageNumber = 0, pageSize = 3
-      let isLastPageReached = false, json
+      let isLastPageReached = false, json, isJobsPresent = false
       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
-      console.log('time start >>>>')
-      console.log(new Date())
       while (!isLastPageReached) {
-        console.log('inside while')
         const tdcResponse = await sync.downloadDataFromServer(pageNumber, pageSize)
         if (tdcResponse) {
           json = await tdcResponse.json
-          console.log('json')
-          console.log(json)
           isLastPageReached = json.last
           if (!_.isNull(json.content) && !_.isUndefined(json.content) && !_.isEmpty(json.content)) {
             await sync.processTdcResponse(json.content)
@@ -116,6 +147,7 @@ export function onResyncPress() {
           const successSyncIds = await sync.getSyncIdFromResponse(json.content)
           //Dont hit delete sync API if successSyncIds empty
           if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
+            isJobsPresent = true
             const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
             const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
             const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
@@ -129,9 +161,10 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
-      console.log('time end >>>>')
-      console.log(new Date())
-
+      if (isJobsPresent) {
+        console.log('jobRefreshingStart')
+        dispatch(jobRefreshingStart())
+      }
     } catch (error) {
       console.log(error)
     }
