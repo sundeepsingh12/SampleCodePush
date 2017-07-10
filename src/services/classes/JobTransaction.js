@@ -122,7 +122,6 @@ class JobTransaction {
     }
     let jobTransactionQuery = statusIdList.map((object) => 'jobStatusId = ' + object).join(' OR ')
     let filteredTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, 'seqSelected')
-    console.log(filteredTransactions.length)
     if (filteredTransactions.length == 0) {
       pageData.isLastPage = true
       pageData.message = 'No Records Found'
@@ -135,7 +134,6 @@ class JobTransaction {
       pageJobTransactionList = filteredTransactions.slice(pageNumber * 10, filteredTransactions.length)
       pageData.isLastPage = true
     }
-    console.log('pageJobTransactionList', pageJobTransactionList)
     pageJobTransactionList.forEach(transaction => {
       pageJobTransactionMap[transaction.id] = transaction
     })

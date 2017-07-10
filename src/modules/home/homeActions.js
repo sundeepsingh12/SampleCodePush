@@ -3,8 +3,6 @@
 const {
   JOB_FETCHING_START,
   JOB_FETCHING_END,
-  JOB_REFRESHING_START,
-  JOB_REFRESHING_WAIT,
   SET_FETCHING_FALSE,
   UNSEEN,
   TABLE_JOB_TRANSACTION,
@@ -15,7 +13,8 @@ const {
   TABLE_JOB_DATA,
   USER,
   TABLE_RUNSHEET,
-  TABLE_JOB_TRANSACTION_CUSTOMIZATION
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+  CLEAR_HOME_STATE
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
@@ -28,7 +27,7 @@ import { tabsService } from '../../services/classes/Tabs'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 
-export function jobFetchingEnd(pageData, tabId, pageNumber) {
+export function jobFetchingEnd(pageData, tabId) {
   return {
     type: JOB_FETCHING_END,
     payload: {
@@ -50,22 +49,6 @@ export function jobFetchingStart(tabId, isRefresh) {
   }
 }
 
-export function jobRefreshingStart() {
-  return {
-    type: JOB_REFRESHING_START,
-    payload: true
-  }
-}
-
-export function jobRefreshingWait(tabId) {
-  return {
-    type: JOB_REFRESHING_WAIT,
-    payload: {
-      tabId
-    }
-  }
-}
-
 export function setTabsList(tabsList) {
   return {
     type: SET_TABS_LIST,
@@ -79,6 +62,12 @@ export function setFetchingFalse(tabId) {
     payload: {
       tabId
     }
+  }
+}
+
+export function clearHomeState() {
+  return {
+    type: CLEAR_HOME_STATE
   }
 }
 
@@ -98,27 +87,8 @@ export function fetchJobs(tabId, pageNumber) {
     try {
       dispatch(jobFetchingStart(tabId))
       var pageData = await jobTransactionService.getJobTransactions(tabId, pageNumber)
-      console.log(pageData)
-      console.log(pageData.pageJobTransactionCustomizationList)
-      console.log(_.isEmpty(pageData.pageJobTransactionCustomizationList))
       if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
-        dispatch(jobFetchingEnd(pageData, tabId, pageNumber))
-      } else {
-        dispatch(setFetchingFalse(tabId))
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-}
-
-export function refreshJobs(tabId) {
-  return async function (dispatch) {
-    try {
-      dispatch(jobRefreshingWait(tabId))
-      var pageData = await jobTransactionService.getJobTransactions(tabId, 0)
-      if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
-        dispatch(jobFetchingEnd(pageData, tabId, pageNumber))
+        dispatch(jobFetchingEnd(pageData, tabId))
       } else {
         dispatch(setFetchingFalse(tabId))
       }
@@ -160,10 +130,6 @@ export function onResyncPress() {
         } else {
           isLastPageReached = true
         }
-      }
-      if (isJobsPresent) {
-        console.log('jobRefreshingStart')
-        dispatch(jobRefreshingStart())
       }
     } catch (error) {
       console.log(error)

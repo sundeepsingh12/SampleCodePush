@@ -9,9 +9,8 @@ const {
   JOB_FETCHING_START,
   JOB_FETCHING_END,
   SET_TABS_LIST,
-  JOB_REFRESHING_START,
-  JOB_REFRESHING_WAIT,
   SET_FETCHING_FALSE,
+  CLEAR_HOME_STATE,
 } = require('../../lib/constants').default
 
 
@@ -65,19 +64,13 @@ export default function homeReducer(state = initialState, action) {
       console.log(tempTabIdJobTransactions)
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
 
-    case JOB_REFRESHING_WAIT:
-      tempTabIdJobTransactions = { ...state.tabIdJobTransactions }
-      tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization = []
-      tempTabIdJobTransactions[action.payload.tabId].isFetching = true
-      tempTabIdJobTransactions[action.payload.tabId].isLastPage = true
-      return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
-        .set('isRefreshing', false)
-
-    case JOB_REFRESHING_START:
-      return state.set('isRefreshing', true)
-
     case SET_TABS_LIST:
       return state.set('tabsList', action.payload)
+    
+    case CLEAR_HOME_STATE:
+      return state.set('tabIdJobTransactions',{})
+                  .set('tabsList',[])
+                  .set('isRefreshing',false)
   }
   return state
 }

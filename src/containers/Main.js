@@ -82,19 +82,15 @@ class Main extends Component {
     };
   }
 
-  componentDidMount() {
-    console.log('componentDidMount of main')
-    this.props.actions.onResyncPress()
+  async componentDidMount() {
+    await this.props.actions.onResyncPress()
     this.props.actions.fetchTabs()
   }
 
   renderTabs() {
-    console.log('renderTabs')
-    console.log(this.props.tabsList)
     const tabs = this.props.tabsList
     const renderTabList = []
     tabs.forEach(tab => {
-      console.log(tab)
       renderTabList.push(
             <Tab
             key = {tab.id}
@@ -109,8 +105,6 @@ class Main extends Component {
   }
 
   render() {
-    console.log('render main')
-    console.log(this.props.tabsList)
     const viewTabList = this.renderTabs()
     return (
       <Container>

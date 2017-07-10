@@ -42,4 +42,16 @@ describe('home actions', () => {
             }
         })
     })
+
+    it('should start job ending', () => {
+        const tabId = 2
+        const isRefresh = false
+        expect(actions.jobFetchingEnd(tabId, isRefresh)).toEqual({
+            type: JOB_FETCHING_START,
+            payload: {
+                tabId,
+                isRefresh
+            }
+        })
+    })
 })

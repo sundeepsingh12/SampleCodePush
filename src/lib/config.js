@@ -14,7 +14,7 @@ module.exports = {
 
     // },
     staging: {
-      url: 'http://192.168.0.11:8080/app'
+      url: 'http://192.168.1.169:8080/app'
 
     }
 
