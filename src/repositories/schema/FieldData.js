@@ -12,7 +12,7 @@ FieldData.schema = {
   primaryKey: 'id',
   properties: {
       id: { type: 'int' },
-     value:{type: 'string'},
+     value:{type: 'string',optional:true},
      jobTransactionId:{type:'int'},
      positionId:{type:'int'},
      parentId:{type:'int'},

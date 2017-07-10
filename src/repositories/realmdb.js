@@ -12,7 +12,7 @@ import JobTransactionCustomization from './schema/jobTransactionCustomization'
 
 import _ from 'underscore'
 
-const schemaVersion = 24;
+const schemaVersion = 25;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, JobTransactionCustomization];
 
 let realm = new Realm({

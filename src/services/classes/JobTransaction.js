@@ -233,11 +233,17 @@ class JobTransaction {
       if (!fieldDataMap[fieldData.jobTransactionId]) {
         fieldDataMap[fieldData.jobTransactionId] = {}
       }
-      fieldDataMap[fieldData.jobTransactionId][fieldAttributeMasterId] = fieldData
+      fieldDataMap[fieldData.jobTransactionId][fieldData.fieldAttributeMasterId] = fieldData
     })
     allJobTransactions.forEach(jobTransaction => {
       let jobTransactionCustomization = {}
       const jobMasterId = jobTransaction.jobMasterId
+      if(!jobDataMap[jobTransaction.jobId]) {
+        jobDataMap[jobTransaction.jobId] = {}
+      } 
+      if(!fieldDataMap[jobTransaction.id]) {
+        fieldDataMap[jobTransaction.id] = {}
+      }
       if (jobMasterIdCustomizationMap[jobMasterId]) {
         const line1Map = jobMasterIdCustomizationMap[jobMasterId][1]
         const line2Map = jobMasterIdCustomizationMap[jobMasterId][2]
