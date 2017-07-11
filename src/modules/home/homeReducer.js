@@ -32,6 +32,7 @@ export default function homeReducer(state = initialState, action) {
       console.log('tabIdJobTransactions')
       console.log(state.tabIdJobTransactions)
       tempTabIdJobTransactions[action.payload.tabId].isFetching = true
+      tempTabIdJobTransactions[action.payload.tabId].message = ''
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
         .set('isRefreshing', false)
 
@@ -45,13 +46,13 @@ export default function homeReducer(state = initialState, action) {
         jobTransactionCustomization = jobTransactionCustomization.concat(action.payload.jobTransactionCustomizationList)
       } else {
         jobTransactionCustomization = []
-        jobTransactions = jobTransactions.concat(action.payload.jobTransactionOject.jobTransactions)
         jobTransactionCustomization = jobTransactionCustomization.concat(action.payload.jobTransactionCustomization)
       }
       tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization = jobTransactionCustomization
       tempTabIdJobTransactions[action.payload.tabId].pageNumber = action.payload.pageNumber
       tempTabIdJobTransactions[action.payload.tabId].isFetching = false
       tempTabIdJobTransactions[action.payload.tabId].isLastPage = action.payload.isLastPage
+      tempTabIdJobTransactions[action.payload.tabId].message = ''
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
         .set('isRefreshing', false)
 
@@ -61,6 +62,10 @@ export default function homeReducer(state = initialState, action) {
       tempTabIdJobTransactions[action.payload.tabId].isFetching = false
       tempTabIdJobTransactions[action.payload.tabId].isLastPage = true
       tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization = tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization
+      tempTabIdJobTransactions[action.payload.tabId].message = ''
+      if(action.payload.message) {
+        tempTabIdJobTransactions[action.payload.tabId].message = action.payload.message
+      }
       console.log(tempTabIdJobTransactions)
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
 

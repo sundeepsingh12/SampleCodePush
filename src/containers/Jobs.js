@@ -101,7 +101,7 @@ class Jobs extends Component {
     super(props);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.props.actions.fetchJobs(this.props.tabId, 0)
   }
 
@@ -158,32 +158,50 @@ class Jobs extends Component {
     }
   }
 
+  checkIfTransactionsPresent() {
+    if (this.props.tabIdJobTransactions[this.props.tabId] &&
+      this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization &&
+      (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0 || this.props.tabIdJobTransactions[this.props.tabId].isFetching)) {
+      return true
+    }
+    return false
+  }
+
   render() {
     return (
       <Container>
-        <View style={styles.container}>
-          <List
-            style={{ marginTop: 5, marginBottom: 50 }}>
-            <FlatList
-              data={
-                (this.props.tabIdJobTransactions[this.props.tabId]) ? (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) : []
-              }
-              renderItem={({ item }) => this.renderData(item)}
-              keyExtractor={item => item.id}
-              ListFooterComponent={this.renderFooter}
-              onEndReached={this.handleLoadMore}
-            />
-          </List>
-          <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 5, marginLeft: 5, marginRight: 5 }}>
-            <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
-              <Input bordered='true' rounded style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
-                placeholder="Search Reference No." />
-            </View>
-            <View style={{ backgroundColor: '#d7d7d7', flexGrow: .10, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name='ios-barcode-outline' style={{ fontSize: 34 }} />
+        {renderIf(this.checkIfTransactionsPresent(),
+          <View style={styles.container}>
+            <List
+              style={{ marginTop: 5, marginBottom: 50 }}>
+              <FlatList
+                data={
+                  (this.props.tabIdJobTransactions[this.props.tabId]) ? (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) : []
+                }
+                renderItem={({ item }) => this.renderData(item)}
+                keyExtractor={item => item.id}
+                ListFooterComponent={this.renderFooter}
+                onEndReached={this.handleLoadMore}
+              />
+            </List>
+            <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 5, marginLeft: 5, marginRight: 5 }}>
+              <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
+                <Input bordered='true' rounded style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
+                  placeholder="Search Reference No." />
+              </View>
+              <View style={{ backgroundColor: '#d7d7d7', flexGrow: .10, height: 40, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name='ios-barcode-outline' style={{ fontSize: 34 }} />
+              </View>
             </View>
           </View>
-        </View>
+        )}
+        {renderIf(!this.checkIfTransactionsPresent(),
+          <View>
+            <Text>
+              
+            </Text>
+          </View>
+        )}
       </Container>
     )
   }

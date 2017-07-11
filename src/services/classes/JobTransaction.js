@@ -14,7 +14,6 @@ import _ from 'underscore'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'
-import { jobDataService } from './JobData'
 import JobTransactionSchema from '../../repositories/schema/JobTransaction'
 class JobTransaction {
 

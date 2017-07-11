@@ -100,7 +100,7 @@ class JobMaster {
           deviceIMEI,
           deviceSIM,
           currentJobMasterVersion,
-          deviceCompanyId 
+          deviceCompanyId
         })
       } else {
         currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
@@ -136,7 +136,8 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
     // await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
     await this.prepareCustomizationListMap(json.jobListCustomization)
-    await keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
+    // await keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
+    await this.validateAndSortTabList(TAB, json.appJobStatusTabs)
     await keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)
     await keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList)
     await keyValueDBService.validateAndSaveData(SMS_TEMPLATE, json.smsTemplatesList)
@@ -185,14 +186,14 @@ class JobMaster {
      }
    */
   prepareCustomizationListMap(jobListCustomization) {
-    if(!jobListCustomization) {
+    if (!jobListCustomization) {
       return
     }
     let jobMasterIdCustomizationMap = {}
     jobListCustomization.forEach(jobListCustomizationObject => {
       const jobMasterId = jobListCustomizationObject.jobMasterId
       const appListMasterId = jobListCustomizationObject.appJobListMasterId
-      if(!jobMasterIdCustomizationMap[jobMasterId]) {
+      if (!jobMasterIdCustomizationMap[jobMasterId]) {
         const jobListMasterIdMap = {}
         jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
         jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
@@ -203,25 +204,36 @@ class JobMaster {
         jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
       }
     })
-    keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP,jobMasterIdCustomizationMap)
+    keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP, jobMasterIdCustomizationMap)
   }
 
+  /**
+   * 
+   * @param {*} jobStatus 
+   * prepares HashMap<TabId,ArrayList<StatusIds>
+   */
   prepareTabStatusIdMap(jobStatus) {
-    if(!jobStatus) {
+    if (!jobStatus) {
       return
     }
     let tabIdStatusIdsMap = {}
     jobStatus.forEach(jobStatusObject => {
-      console.log(jobStatusObject)
-      if(!tabIdStatusIdsMap[jobStatusObject.tabId]) {
+      if (!tabIdStatusIdsMap[jobStatusObject.tabId]) {
         tabIdStatusIdsMap[jobStatusObject.tabId] = []
       }
       tabIdStatusIdsMap[jobStatusObject.tabId].push(jobStatusObject.id)
     })
+    keyValueDBService.validateAndSaveData(TABIDMAP, tabIdStatusIdsMap)
+  }
 
-    console.log('tabIdStatusIdsMap')
-    console.log(tabIdStatusIdsMap)
-    keyValueDBService.validateAndSaveData(TABIDMAP,tabIdStatusIdsMap)
+  async validateAndSortTabList(schemaName,tabs) {
+    if(!tabs) {
+      return
+    }
+    tabs.sort(function(x,y){
+      return (x.isDefault === y.isDefault)? 0 : x.isDefault? -1 : 1;
+    })
+    await keyValueDBService.validateAndSaveData(TAB, tabs)
   }
 
   /**Matches device time with server time (format 2017-07-05 16:30:02),

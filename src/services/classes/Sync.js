@@ -130,40 +130,35 @@ class Sync {
    * @param {*} query 
    */
   async saveDataFromServerInDB(query) {
-    try {
-      const contentQuery = JSON.parse(query)
-      const jobTransactions = {
-        tableName: TABLE_JOB_TRANSACTION,
-        value: contentQuery.jobTransactions
-      }
-      const jobs = {
-        tableName: TABLE_JOB,
-        value: contentQuery.job
-      }
-      const jobDatas = {
-        tableName: TABLE_JOB_DATA,
-        value: contentQuery.jobData
-      }
-
-      const fieldDatas = {
-        tableName: TABLE_FIELD_DATA,
-        value: contentQuery.fieldData
-      }
-
-      const runsheets = {
-        tableName: TABLE_RUNSHEET,
-        value: contentQuery.runSheet
-      }
-      const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
-      const jobTransactionCustomizationList = {
-        tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
-        value: jobTransactionCustomizationListValues
-      }
-      realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationList)
+    const contentQuery = JSON.parse(query)
+    const jobTransactions = {
+      tableName: TABLE_JOB_TRANSACTION,
+      value: contentQuery.jobTransactions
     }
-    catch (Error) {
-      console.log(Error)
+    const jobs = {
+      tableName: TABLE_JOB,
+      value: contentQuery.job
     }
+    const jobDatas = {
+      tableName: TABLE_JOB_DATA,
+      value: contentQuery.jobData
+    }
+
+    const fieldDatas = {
+      tableName: TABLE_FIELD_DATA,
+      value: contentQuery.fieldData
+    }
+
+    const runsheets = {
+      tableName: TABLE_RUNSHEET,
+      value: contentQuery.runSheet
+    }
+    const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
+    const jobTransactionCustomizationList = {
+      tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+      value: jobTransactionCustomizationListValues
+    }
+    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationList)
   }
 
   /**
@@ -171,29 +166,25 @@ class Sync {
    * @param {*} query 
    */
   async updateDataInDB(query) {
-    try {
-      const contentQuery = await JSON.parse(query)
-      const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
-      const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
+    const contentQuery = await JSON.parse(query)
+    const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+    const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
 
-      const runsheets = {
-        tableName: TABLE_RUNSHEET,
-        valueList: runsheetIds,
-        propertyName: 'id'
-      }
-      const jobDatas = {
-        tableName: TABLE_JOB_DATA,
-        valueList: jobIds,
-        propertyName: 'jobId'
-      }
-
-      //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
-      //So it's necessary to delete existing JobData First in case of update query
-      await realm.deleteRecordsInBatch(jobDatas, runsheets)
-      await this.saveDataFromServerInDB(query)
-    } catch (Error) {
-      console.log(Error)
+    const runsheets = {
+      tableName: TABLE_RUNSHEET,
+      valueList: runsheetIds,
+      propertyName: 'id'
     }
+    const jobDatas = {
+      tableName: TABLE_JOB_DATA,
+      valueList: jobIds,
+      propertyName: 'jobId'
+    }
+
+    //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
+    //So it's necessary to delete existing JobData First in case of update query
+    await realm.deleteRecordsInBatch(jobDatas, runsheets)
+    await this.saveDataFromServerInDB(query)
   }
 
   /**POST API

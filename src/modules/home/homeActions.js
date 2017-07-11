@@ -56,11 +56,12 @@ export function setTabsList(tabsList) {
   }
 }
 
-export function setFetchingFalse(tabId) {
+export function setFetchingFalse(tabId,message) {
   return {
     type: SET_FETCHING_FALSE,
     payload: {
-      tabId
+      tabId,
+      message
     }
   }
 }
@@ -90,7 +91,7 @@ export function fetchJobs(tabId, pageNumber) {
       if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
         dispatch(jobFetchingEnd(pageData, tabId))
       } else {
-        dispatch(setFetchingFalse(tabId))
+        dispatch(setFetchingFalse(tabId,pageData.message))
       }
     } catch (error) {
       console.log(error)
