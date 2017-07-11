@@ -72,7 +72,6 @@ class JobStatus {
 
   getStatusIdsForTabId(tabId) {
     const tabIdMap = keyValueDBService.getValueFromStore()
-    console.log(tabIdMap.value[tabId])
     return tabIdMap.value[tabId]
   }
 

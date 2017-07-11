@@ -13,6 +13,11 @@ module.exports = {
       url: 'https://staging.fareye.co/app'
 
     },
+    // staging: {
+    //   url: 'http://192.168.1.169:8080/app'
+
+    // }
+
   },
     API:{
         AUTHENTICATION_API:'/authentication',

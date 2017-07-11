@@ -78,8 +78,6 @@ class RestAPI {
         message: ((res.json && res.json.message) ? res.json.message : 'Unknow error. Retry or contact support.')
       }
     }
-    console.log("response>>>>>");
-    console.log(res);
     return res;
   }
 

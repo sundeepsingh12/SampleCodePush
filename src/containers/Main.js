@@ -82,24 +82,21 @@ class Main extends Component {
     };
   }
 
-  componentDidMount() {
-    this.props.actions.onResyncPress()
-    // this.props.actions.fetchTabs()
+  async componentDidMount() {
+    await this.props.actions.onResyncPress()
+    this.props.actions.fetchTabs()
   }
 
   renderTabs() {
-    console.log('renderTabs')
     const tabs = this.props.tabsList
     const renderTabList = []
     tabs.forEach(tab => {
-      console.log(tab)
       renderTabList.push(
             <Tab
             key = {tab.id}
             heading={tab.name}>
               <Jobs
                tabId = {tab.id}
-               pageNumber = {0}
                />
           </Tab>
           )
@@ -108,9 +105,7 @@ class Main extends Component {
   }
 
   render() {
-    console.log('render main')
-    console.log(this.props.tabsList)
-    // const viewTabList = this.renderTabs()
+    const viewTabList = this.renderTabs()
     return (
       <Container>
       <Header hasTabs>
@@ -126,9 +121,9 @@ class Main extends Component {
           </Right>
       </Header>
       
-      {/*<Tabs renderTabBar={()=> <ScrollableTab />}>
+      <Tabs renderTabBar={()=> <ScrollableTab />}>
         {viewTabList}
-      </Tabs>*/}
+      </Tabs>
       <Fab
           active={this.state.active}
           direction="up"

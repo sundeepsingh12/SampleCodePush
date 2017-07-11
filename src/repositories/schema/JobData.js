@@ -11,7 +11,7 @@ JobData.schema = {
   name: TABLE_JOB_DATA,
   properties: {
     id: { type: 'int' },
-    value: { type: 'string' },
+    value: { type: 'string',optional:true },
     jobId: { type: 'int' },
     positionId: { type: 'int' },
     parentId: { type: 'int' },

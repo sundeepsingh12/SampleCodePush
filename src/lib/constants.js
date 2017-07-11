@@ -72,6 +72,8 @@ export default keyMirror({
     JOB_FETCHING_START: null,
     JOB_FETCHING_END: null,
     SET_TABS_LIST: null,
+    SET_FETCHING_FALSE:null,
+    CLEAR_HOME_STATE:null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,

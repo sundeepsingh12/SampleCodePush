@@ -20,6 +20,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as homeActions from '../modules/home/homeActions'
 import { Actions } from 'react-native-router-flux';
+import _ from 'underscore'
+import renderIf from '../lib/renderIf';
 
 var styles = StyleSheet.create({
   container: {
@@ -64,11 +66,26 @@ var styles = StyleSheet.create({
   testsad: {
     borderBottomWidth: 0
   },
+  circleLine1: {
+    fontSize: 14,
+    color: '#ffffff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    backgroundColor: 'transparent'
+  },
+  circleLine2: {
+    fontSize: 11,
+    marginTop: 5,
+    textAlign: 'center',
+    color: '#ffffff',
+    width: 60
+  }
 })
 
 function mapStateToProps(state) {
   return {
-    tabIdJobTransactions: state.home.tabIdJobTransactions
+    tabIdJobTransactions: state.home.tabIdJobTransactions,
+    isRefreshing: state.home.isRefreshing
   }
 }
 
@@ -82,15 +99,10 @@ class Jobs extends Component {
 
   constructor(props) {
     super(props);
-    console.log('Jobs props')
-    console.log(props)
   }
 
   componentDidMount() {
-    console.log('componentDidMount of jobs')
-    console.log('this.props')
-    console.log(this.props)
-    this.props.actions.fetchJobs(this.props.tabId,0)
+    this.props.actions.fetchJobs(this.props.tabId, 0)
   }
 
   toggleStatus() {
@@ -100,58 +112,34 @@ class Jobs extends Component {
     console.log('toggle button handler: ' + this.state.status);
   }
 
-  _genRow() {
-    var datas = [];
-    for (var i = 0; i < 100; i++) {
-      datas.push({
-        row: i,
-        isSelect: false,
-        id: i + 1000
-      });
-    }
-    console.log('datas ' + JSON.stringify(datas));
-    return datas;
-  }
-
   renderData = (item) => {
-    console.log('item renderData')
-    console.log(item)
     return (
       <ListItem avatar>
         <Left>
-          <Text> Hello </Text>
+          <TouchableHighlight underlayColor='#e7e7e7' style={[styles.listCircle]} onPress={() => this.toggleStatus()}>
+            <View>
+              <Text style={StyleSheet.flatten(styles.circleLine1)}>{`${item.circleLine1}`}</Text>
+              <Text style={StyleSheet.flatten(styles.circleLine2)}>{`${item.circleLine2}`}</Text>
+            </View>
+          </TouchableHighlight>
         </Left>
         <Body >
           <Text adjustsFontSizeToFit>
-            {`${item.circleLine1}`}
+            {`${item.line1}`}
+          </Text>
+          <Text note adjustsFontSizeToFit>
+            {`${item.line2}`}
           </Text>
         </Body>
-        <Right >
-          <Text>Hi</Text>
-        </Right>
       </ListItem>
     )
   }
 
-  /*renderHeader = () => {
-    return (
-      <Header>
-          <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
-            <Input bordered='true' rounded style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
-              placeholder="Search Reference No." />
-          </View>
-          <View style={{ backgroundColor: '#d7d7d7', flexGrow: .10, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name='ios-barcode-outline' style={{ fontSize: 34 }} />
-          </View>
-      </Header>
-    );
-  };*/
-
   renderFooter = () => {
-    if(this.props.tabIdJobTransactions[this.props.tabId] && !this.props.tabIdJobTransactions[this.props.tabId].isFetching) {
+    if (this.props.tabIdJobTransactions[this.props.tabId] && !this.props.tabIdJobTransactions[this.props.tabId].isFetching) {
       return null
     }
-    
+
     return (
       <View
         style={{
@@ -165,50 +153,38 @@ class Jobs extends Component {
   }
 
   handleLoadMore = () => {
-    console.log('handleLoadMore')
-    console.log(this.props)
-    this.props.actions.fetchJobs(this.props.tabId,this.props.tabIdJobTransactions[this.props.tabId].pageNumber)
+    if (!this.props.tabIdJobTransactions[this.props.tabId].isLastPage) {
+      this.props.actions.fetchJobs(this.props.tabId, this.props.tabIdJobTransactions[this.props.tabId].pageNumber)
+    }
   }
 
   render() {
-    console.log('jobs rendering')
-    console.log(this.props)
     return (
-      <View style={styles.container}>
-        <List
-          style={{ marginTop: 5, marginBottom: 50 }}>
-          <FlatList
-            data={
-              (this.props.tabIdJobTransactions[this.props.tabId]) ? (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) : []
+      <Container>
+        <View style={styles.container}>
+          <List
+            style={{ marginTop: 5, marginBottom: 50 }}>
+            <FlatList
+              data={
+                (this.props.tabIdJobTransactions[this.props.tabId]) ? (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) : []
               }
-            renderItem={({ item }) => this.renderData(item)}
-            keyExtractor={item => item.id}
-            ListFooterComponent={this.renderFooter}
-          />
-        </List>
-        {/*<ListView
-          style={{marginTop: 5, marginBottom: 50}}
-          dataSource = {this.state.dataSource}
-          renderRow = {this._renderRow.bind(this)}
-          renderHeader = {() => <View style={{height: 0, backgroundColor: '#f5f5f5'}} 
-          />}
-          onEndReached = {() => console.log('')}
-          renderSeparator = {(sectionID, rowID) =>
-            <View
-              style={styles.style_separator}
-              key={`${sectionID} - ${rowID}`}
-            />}
-        />*/}
-        <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 5, marginLeft: 5, marginRight: 5 }}>
-          <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
-            <Input bordered='true' rounded style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
-              placeholder="Search Reference No." />
-          </View>
-          <View style={{ backgroundColor: '#d7d7d7', flexGrow: .10, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name='ios-barcode-outline' style={{ fontSize: 34 }} />
+              renderItem={({ item }) => this.renderData(item)}
+              keyExtractor={item => item.id}
+              ListFooterComponent={this.renderFooter}
+              onEndReached={this.handleLoadMore}
+            />
+          </List>
+          <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 5, marginLeft: 5, marginRight: 5 }}>
+            <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
+              <Input bordered='true' rounded style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
+                placeholder="Search Reference No." />
+            </View>
+            <View style={{ backgroundColor: '#d7d7d7', flexGrow: .10, height: 40, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name='ios-barcode-outline' style={{ fontSize: 34 }} />
+            </View>
           </View>
         </View>
-      </View>
+      </Container>
     )
   }
 
