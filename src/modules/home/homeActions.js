@@ -4,6 +4,7 @@ const {
   JOB_FETCHING_START,
   JOB_FETCHING_END,
   SET_FETCHING_FALSE,
+  SET_REFRESHING_TRUE,
   UNSEEN,
   TABLE_JOB_TRANSACTION,
   TAB,
@@ -83,6 +84,12 @@ export function fetchTabs() {
   }
 }
 
+export function setRefereshingTrue() {
+  return {
+    type: SET_REFRESHING_TRUE
+  }
+}
+
 export function fetchJobs(tabId, pageNumber) {
   return async function (dispatch) {
     try {
@@ -132,6 +139,7 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
+      dispatch(setRefereshingTrue())
     } catch (error) {
       console.log(error)
     }

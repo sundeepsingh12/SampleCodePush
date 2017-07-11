@@ -168,6 +168,9 @@ class Jobs extends Component {
   }
 
   render() {
+    if(this.props.isRefreshing) {
+      this.props.actions.fetchJobs(this.props.tabId,0)
+    }
     return (
       <Container>
         {renderIf(this.checkIfTransactionsPresent(),
