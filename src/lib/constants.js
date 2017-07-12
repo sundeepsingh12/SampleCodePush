@@ -118,6 +118,7 @@ export default keyMirror({
     IS_PRELOADER_COMPLETE:null,
     CUSTOMIZATION_LIST_MAP:null,
     TABIDMAP:null,
+    SET_TABS_TRANSACTIONS:null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION:null,

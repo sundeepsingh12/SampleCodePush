@@ -1,0 +1,405 @@
+[1mdiff --git a/src/containers/Jobs.js b/src/containers/Jobs.js[m
+[1mindex bf01361..dcdf338 100644[m
+[1m--- a/src/containers/Jobs.js[m
+[1m+++ b/src/containers/Jobs.js[m
+[36m@@ -102,6 +102,8 @@[m [mclass Jobs extends Component {[m
+   }[m
+ [m
+   componentWillMount() {[m
+[32m+[m[32m    console.log('componentWillMount')[m
+[32m+[m[32m    console.log(this.props.tabId)[m
+     this.props.actions.fetchJobs(this.props.tabId, 0)[m
+   }[m
+ [m
+[36m@@ -159,18 +161,32 @@[m [mclass Jobs extends Component {[m
+   }[m
+ [m
+   checkIfTransactionsPresent() {[m
+[32m+[m[32m    console.log('checkIfTransactionsPresent')[m
+[32m+[m[32m    if (this.props.tabIdJobTransactions[this.props.tabId]) {[m
+[32m+[m[32m      console.log(this.props.tabIdJobTransactions[this.props.tabId])[m
+[32m+[m[32m      if (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) {[m
+[32m+[m[32m        console.log(this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization)[m
+[32m+[m[32m        if (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0) {[m
+[32m+[m[32m          console.log(this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0)[m
+[32m+[m[32m          if (this.props.tabIdJobTransactions[this.props.tabId].isFetching) {[m
+[32m+[m[32m            console.log(this.props.tabIdJobTransactions[this.props.tabId].isFetching)[m
+[32m+[m[32m          }[m
+[32m+[m[32m        }[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+     if (this.props.tabIdJobTransactions[this.props.tabId] &&[m
+       this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization &&[m
+       (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0 || this.props.tabIdJobTransactions[this.props.tabId].isFetching)) {[m
+[32m+[m[32m      console.log('return true')[m
+       return true[m
+     }[m
+[32m+[m[32m    console.log('return false')[m
+     return false[m
+   }[m
+ [m
+   render() {[m
+[31m-    if(this.props.isRefreshing) {[m
+[31m-      this.props.actions.fetchJobs(this.props.tabId,0)[m
+[31m-    }[m
+[32m+[m[32m    console.log('render jobs')[m
+[32m+[m[32m    console.log(this.props)[m
+     return ([m
+       <Container>[m
+         {renderIf(this.checkIfTransactionsPresent(),[m
+[36m@@ -201,7 +217,7 @@[m [mclass Jobs extends Component {[m
+         {renderIf(!this.checkIfTransactionsPresent(),[m
+           <View>[m
+             <Text>[m
+[31m-              [m
+[32m+[m
+             </Text>[m
+           </View>[m
+         )}[m
+[1mdiff --git a/src/containers/Main.js b/src/containers/Main.js[m
+[1mindex fe9f043..a7e0ee2 100644[m
+[1m--- a/src/containers/Main.js[m
+[1m+++ b/src/containers/Main.js[m
+[36m@@ -121,7 +121,9 @@[m [mclass Main extends Component {[m
+           </Right>[m
+       </Header>[m
+       [m
+[31m-      <Tabs renderTabBar={()=> <ScrollableTab />}>[m
+[32m+[m[32m      <Tabs[m[41m [m
+[32m+[m[32m      renderTabBar={()=> <ScrollableTab />}[m
+[32m+[m[32m      >[m
+         {viewTabList}[m
+       </Tabs>[m
+       <Fab[m
+[1mdiff --git a/src/fareye.js b/src/fareye.js[m
+[1mindex 2f7c25f..857c928 100644[m
+[1m--- a/src/fareye.js[m
+[1m+++ b/src/fareye.js[m
+[36m@@ -1,5 +1,5 @@[m
+ 'use strict'[m
+[31m-import React from 'react'[m
+[32m+[m[32mimport React, { Component } from 'react'[m
+ import {[m
+   AppRegistry,[m
+   StyleSheet,[m
+[36m@@ -56,9 +56,9 @@[m [mimport Ionicons from 'react-native-vector-icons/Ionicons';[m
+  * ## Actions[m
+  *  The necessary actions for dispatching our bootstrap values[m
+  */[m
+[31m-import {setPlatform, setVersion} from './modules/device/deviceActions'[m
+[31m-import {setStore} from './modules/global/globalActions'[m
+[31m-import {onResyncPress} from './modules/home/homeActions'[m
+[32m+[m[32mimport { setPlatform, setVersion } from './modules/device/deviceActions'[m
+[32m+[m[32mimport { setStore } from './modules/global/globalActions'[m
+[32m+[m[32mimport { onResyncPress } from './modules/home/homeActions'[m
+ [m
+ /**[m
+  * ## States[m
+[36m@@ -90,7 +90,7 @@[m [mfunction getInitialState() {[m
+     device: (new DeviceInitialState()).set('isMobile', true),[m
+     global: (new GlobalInitialState()),[m
+     preloader: (new PreloaderInitiaState()),[m
+[31m-    home : (new HomeInititalState())[m
+[32m+[m[32m    home: (new HomeInititalState())[m
+   }[m
+   return _initState[m
+ }[m
+[36m@@ -138,7 +138,21 @@[m [mclass TabIcon extends React.Component {[m
+  * will be used when doing hot loading[m
+  */[m
+ [m
+[32m+[m[32mexport class Custom extends Component {[m
+[32m+[m[32m  constructor(props) {[m
+[32m+[m[32m    super(props)[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  render() {[m
+[32m+[m[32m    return ([m
+[32m+[m[32m      <View>[m
+[32m+[m[32m        <Ionicons style={{ color: 'green' }} name={'ios-home-outline'} size={26} />[m
+[32m+[m[32m      </View>[m
+[32m+[m[32m    )[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+ export default function native(platform) {[m
+[32m+[m
+   let Fareye = React.createClass({[m
+     render() {[m
+       const store = configureStore(getInitialState())[m
+[36m@@ -168,20 +182,20 @@[m [mexport default function native(platform) {[m
+                 component={Login}[m
+                 hideNavBar[m
+                 type='replace'[m
+[31m-                 />[m
+[32m+[m[32m              />[m
+ [m
+               <Scene key='Preloader'[m
+                 component={Preloader}[m
+                 hideNavBar[m
+                 title='Preloader'[m
+                 type='replace'[m
+[31m-                 />[m
+[32m+[m[32m              />[m
+ [m
+               <Scene key='Tabbar'[m
+                 tabs[m
+                 hideNavBar[m
+                 tabBarStyle={styles.tabBar}[m
+[31m-                type = 'replace'[m
+[32m+[m[32m                type='replace'[m
+                 default='Main'>[m
+ [m
+                 <Scene key='Main'[m
+[36m@@ -194,9 +208,8 @@[m [mexport default function native(platform) {[m
+ [m
+                 <Scene key='ReSync'[m
+                   title='Re-sync'[m
+[31m-                  icon={TabIcon}[m
+[31m-                  iconName={"ios-sync-outline"}[m
+[31m-                  onPress={() => {store.dispatch(onResyncPress())}} />[m
+[32m+[m[32m                  icon={Custom}[m
+[32m+[m[32m                  onPress={() => { store.dispatch(onResyncPress()) }} />[m
+ [m
+                 <Scene key='Message'[m
+                   title='Message'[m
+[1mdiff --git a/src/lib/constants.js b/src/lib/constants.js[m
+[1mindex 5a8fea7..1814767 100644[m
+[1m--- a/src/lib/constants.js[m
+[1m+++ b/src/lib/constants.js[m
+[36m@@ -118,6 +118,7 @@[m [mexport default keyMirror({[m
+     IS_PRELOADER_COMPLETE:null,[m
+     CUSTOMIZATION_LIST_MAP:null,[m
+     TABIDMAP:null,[m
+[32m+[m[32m    SET_TABS_TRANSACTIONS:null,[m
+ [m
+     //Realm Tables[m
+     TABLE_JOB_TRANSACTION:null,[m
+[1mdiff --git a/src/modules/home/homeActions.js b/src/modules/home/homeActions.js[m
+[1mindex cfecb82..cd86172 100644[m
+[1m--- a/src/modules/home/homeActions.js[m
+[1m+++ b/src/modules/home/homeActions.js[m
+[36m@@ -15,7 +15,8 @@[m [mconst {[m
+   USER,[m
+   TABLE_RUNSHEET,[m
+   TABLE_JOB_TRANSACTION_CUSTOMIZATION,[m
+[31m-  CLEAR_HOME_STATE[m
+[32m+[m[32m  CLEAR_HOME_STATE,[m
+[32m+[m[32m  SET_TABS_TRANSACTIONS[m
+ } = require('../../lib/constants').default[m
+ [m
+ import CONFIG from '../../lib/config'[m
+[36m@@ -90,6 +91,13 @@[m [mexport function setRefereshingTrue() {[m
+   }[m
+ }[m
+ [m
+[32m+[m[32mexport function setTabIdsJobTransactions(tabIdJobs) {[m
+[32m+[m[32m  return {[m
+[32m+[m[32m    type : SET_TABS_TRANSACTIONS,[m
+[32m+[m[32m    payload:tabIdJobs[m
+[32m+[m[32m  }[m
+[32m+[m[32m}[m
+[32m+[m
+ export function fetchJobs(tabId, pageNumber) {[m
+   return async function (dispatch) {[m
+     try {[m
+[36m@@ -139,7 +147,11 @@[m [mexport function onResyncPress() {[m
+           isLastPageReached = true[m
+         }[m
+       }[m
+[31m-      dispatch(setRefereshingTrue())[m
+[32m+[m[32m      if(isJobsPresent) {[m
+[32m+[m[32m        let tabIdJobs = await jobTransactionService.refreshJobs()[m
+[32m+[m[32m        console.log(tabIdJobs)[m
+[32m+[m[32m        dispatch(setTabIdsJobTransactions(tabIdJobs))[m
+[32m+[m[32m      }[m
+     } catch (error) {[m
+       console.log(error)[m
+     }[m
+[1mdiff --git a/src/modules/home/homeReducer.js b/src/modules/home/homeReducer.js[m
+[1mindex d695d78..984a996 100644[m
+[1m--- a/src/modules/home/homeReducer.js[m
+[1m+++ b/src/modules/home/homeReducer.js[m
+[36m@@ -12,6 +12,7 @@[m [mconst {[m
+   SET_FETCHING_FALSE,[m
+   CLEAR_HOME_STATE,[m
+   SET_REFRESHING_TRUE,[m
+[32m+[m[32m  SET_TABS_TRANSACTIONS,[m
+ } = require('../../lib/constants').default[m
+ [m
+ [m
+[36m@@ -81,7 +82,10 @@[m [mexport default function homeReducer(state = initialState, action) {[m
+     case SET_REFRESHING_TRUE:[m
+       return state.set('isRefreshing',true)[m
+                   .set('tabIdJobTransactions',{})[m
+[31m-                  [m
+[32m+[m
+[32m+[m[32m    case SET_TABS_TRANSACTIONS:[m
+[32m+[m[32m      console.log(action.payload)[m
+[32m+[m[32m      return state.set('tabIdJobTransactions',action.payload)[m[41m               [m
+   }[m
+   return state[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/src/services/classes/JobTransaction.js b/src/services/classes/JobTransaction.js[m
+[1mindex 05bf351..17417f5 100644[m
+[1m--- a/src/services/classes/JobTransaction.js[m
+[1m+++ b/src/services/classes/JobTransaction.js[m
+[36m@@ -8,7 +8,8 @@[m [mconst {[m
+   TABIDMAP,[m
+   TABLE_JOB,[m
+   TABLE_FIELD_DATA,[m
+[31m-  TABLE_JOB_DATA[m
+[32m+[m[32m  TABLE_JOB_DATA,[m
+[32m+[m[32m  TAB[m
+ } = require('../../lib/constants').default[m
+ import _ from 'underscore'[m
+ import { jobStatusService } from './JobStatus'[m
+[36m@@ -121,6 +122,7 @@[m [mclass JobTransaction {[m
+     }[m
+     let jobTransactionQuery = statusIdList.map((object) => 'jobStatusId = ' + object).join(' OR ')[m
+     let filteredTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, 'seqSelected')[m
+[32m+[m[32m    console.log('filteredTransactions', filteredTransactions)[m
+     if (filteredTransactions.length == 0) {[m
+       pageData.isLastPage = true[m
+       pageData.message = 'No Records Found'[m
+[36m@@ -148,6 +150,7 @@[m [mclass JobTransaction {[m
+     filteredJobTransactionCustomization.forEach(jobTransactionCustomization => {[m
+       let currentJobTransactionCustomization = { ...jobTransactionCustomization }[m
+       currentJobTransaction = pageJobTransactionMap[currentJobTransactionCustomization.id][m
+[32m+[m[32m      let index = pageJobTransactionList.indexOf(currentJobTransaction)[m
+       currentJob = pageJobMap[currentJobTransaction.jobId][m
+       if (jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId]) {[m
+         line1CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][1][m
+[36m@@ -164,8 +167,9 @@[m [mclass JobTransaction {[m
+         currentJobTransactionCustomization.circleLine1 = ''[m
+         currentJobTransactionCustomization.circleLine2 = ''[m
+       }[m
+[31m-      pageJobTransactionCustomizationList.push(currentJobTransactionCustomization)[m
+[32m+[m[32m      pageJobTransactionCustomizationList[index] = currentJobTransactionCustomization[m
+     })[m
+[32m+[m[32m    console.log(pageJobTransactionCustomizationList)[m
+     pageData.pageJobTransactionCustomizationList = pageJobTransactionCustomizationList[m
+     return pageData[m
+   }[m
+[36m@@ -237,10 +241,10 @@[m [mclass JobTransaction {[m
+     allJobTransactions.forEach(jobTransaction => {[m
+       let jobTransactionCustomization = {}[m
+       const jobMasterId = jobTransaction.jobMasterId[m
+[31m-      if(!jobDataMap[jobTransaction.jobId]) {[m
+[32m+[m[32m      if (!jobDataMap[jobTransaction.jobId]) {[m
+         jobDataMap[jobTransaction.jobId] = {}[m
+[31m-      } [m
+[31m-      if(!fieldDataMap[jobTransaction.id]) {[m
+[32m+[m[32m      }[m
+[32m+[m[32m      if (!fieldDataMap[jobTransaction.id]) {[m
+         fieldDataMap[jobTransaction.id] = {}[m
+       }[m
+       if (jobMasterIdCustomizationMap[jobMasterId]) {[m
+[36m@@ -295,6 +299,107 @@[m [mclass JobTransaction {[m
+     })[m
+     return finalText[m
+   }[m
+[32m+[m
+[32m+[m[32m  async refreshJobs() {[m
+[32m+[m[32m    const tabsList = await keyValueDBService.getValueFromStore(TAB)[m
+[32m+[m[32m    let tabIdJobs = {}[m
+[32m+[m[32m    console.log('tabsList')[m
+[32m+[m[32m    console.log(tabsList)[m
+[32m+[m[32m    for (let tab in tabsList.value) {[m
+[32m+[m[32m      console.log('tab')[m
+[32m+[m[32m      console.log(tabsList.value[tab])[m
+[32m+[m[32m      console.log('tab.id')[m
+[32m+[m[32m      console.log(tabsList.value[tab].id)[m
+[32m+[m[32m      let pageData = await this.getJobTransactions(tabsList.value[tab].id, 0)[m
+[32m+[m[32m      console.log('pageData')[m
+[32m+[m[32m      console.log(pageData)[m
+[32m+[m[32m      let tabJob = {}[m
+[32m+[m[32m    //   const pageData = {[m
+[32m+[m[32m    //   pageJobTransactionCustomizationList: [],[m
+[32m+[m[32m    //   pageNumber: 0,[m
+[32m+[m[32m    //   isLastPage: false,[m
+[32m+[m[32m    //   message: '',[m
+[32m+[m[32m    // }[m
+[32m+[m[32m      tabJob.isLastPage = pageData.isLastPage[m
+[32m+[m[32m      tabJob.jobTransactionCustomization = pageData.pageJobTransactionCustomizationList[m
+[32m+[m[32m      tabJob.message = pageData.message[m
+[32m+[m[32m      tabJob.pageNumber = pageData.pageNumber[m
+[32m+[m[32m      tabIdJobs[tabsList.value[tab].id] = tabJob[m
+[32m+[m[32m    }[m
+[32m+[m[32m    console.log('tabIdJobs')[m
+[32m+[m[32m    console.log(tabIdJobs)[m
+[32m+[m[32m    return tabIdJobs[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // async getJobTransactions(tabId, pageNumber) {[m
+[32m+[m[32m  //   let pageJobTransactionMap = {}, jobIdList = [], pageJobMap = {}, pageJobTransactionCustomizationList = [], pageJobTransactionList = [], isLastPage = false[m
+[32m+[m[32m  //   const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)[m
+[32m+[m[32m  //   const tabIdStatusIdMap = await keyValueDBService.getValueFromStore(TABIDMAP)[m
+[32m+[m[32m  //   const statusIdList = tabIdStatusIdMap.value[tabId][m
+[32m+[m[32m  //   const pageData = {[m
+[32m+[m[32m  //     pageJobTransactionCustomizationList: [],[m
+[32m+[m[32m  //     pageNumber: 0,[m
+[32m+[m[32m  //     isLastPage: false,[m
+[32m+[m[32m  //     message: '',[m
+[32m+[m[32m  //   }[m
+[32m+[m[32m  //   if (!statusIdList || _.isEmpty(statusIdList)) {[m
+[32m+[m[32m  //     pageData.isLastPage = true[m
+[32m+[m[32m  //     pageData.message = 'No Status Available'[m
+[32m+[m[32m  //     return pageData[m
+[32m+[m[32m  //   }[m
+[32m+[m[32m  //   let jobTransactionQuery = statusIdList.map((object) => 'jobStatusId = ' + object).join(' OR ')[m
+[32m+[m[32m  //   let filteredTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, 'seqSelected')[m
+[32m+[m[32m  //   console.log('filteredTransactions',filteredTransactions)[m
+[32m+[m[32m  //   if (filteredTransactions.length == 0) {[m
+[32m+[m[32m  //     pageData.isLastPage = true[m
+[32m+[m[32m  //     pageData.message = 'No Records Found'[m
+[32m+[m[32m  //     return pageData[m
+[32m+[m[32m  //   }[m
+[32m+[m[32m  //   if (filteredTransactions.length > (pageNumber + 1) * 10) {[m
+[32m+[m[32m  //     pageJobTransactionList = filteredTransactions.slice(pageNumber * 10, (pageNumber + 1) * 10)[m
+[32m+[m[32m  //     pageData.pageNumber = pageNumber + 1[m
+[32m+[m[32m  //   } else {[m
+[32m+[m[32m  //     pageJobTransactionList = filteredTransactions.slice(pageNumber * 10, filteredTransactions.length)[m
+[32m+[m[32m  //     pageData.isLastPage = true[m
+[32m+[m[32m  //   }[m
+[32m+[m[32m  //   pageJobTransactionList.forEach(transaction => {[m
+[32m+[m[32m  //     pageJobTransactionMap[transaction.id] = transaction[m
+[32m+[m[32m  //   })[m
+[32m+[m[32m  //   let jobQuery = pageJobTransactionList.map((transaction) => 'id = ' + transaction.jobId).join(' OR ')[m
+[32m+[m[32m  //   let filteredJobs = realm.getRecordListOnQuery(TABLE_JOB, jobQuery, false)[m
+[32m+[m[32m  //   filteredJobs.forEach(job => {[m
+[32m+[m[32m  //     pageJobMap[job.id] = job[m
+[32m+[m[32m  //   })[m
+[32m+[m
+[32m+[m[32m  //   let jobTransactionCustomizationQuery = pageJobTransactionList.map((transaction) => 'id = ' + transaction.id).join(' OR ')[m
+[32m+[m[32m  //   let filteredJobTransactionCustomization = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION_CUSTOMIZATION, jobTransactionCustomizationQuery, false)[m
+[32m+[m
+[32m+[m[32m  //   filteredJobTransactionCustomization.forEach(jobTransactionCustomization => {[m
+[32m+[m[32m  //     let currentJobTransactionCustomization = { ...jobTransactionCustomization }[m
+[32m+[m[32m  //     currentJobTransaction = pageJobTransactionMap[currentJobTransactionCustomization.id][m
+[32m+[m[32m  //     let index = pageJobTransactionList.indexOf(currentJobTransaction)[m
+[32m+[m[32m  //     currentJob = pageJobMap[currentJobTransaction.jobId][m
+[32m+[m[32m  //     if (jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId]) {[m
+[32m+[m[32m  //       line1CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][1][m
+[32m+[m[32m  //       line2CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][2][m
+[32m+[m[32m  //       circleLine1CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][3][m
+[32m+[m[32m  //       circleLine2CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][4][m
+[32m+[m[32m  //       currentJobTransactionCustomization.line1 = this.setTransactionDynamicParameters(line1CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.line1)[m
+[32m+[m[32m  //       currentJobTransactionCustomization.line2 = this.setTransactionDynamicParameters(line2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.line2)[m
+[32m+[m[32m  //       currentJobTransactionCustomization.circleLine1 = this.setTransactionDynamicParameters(circleLine1CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine1)[m
+[32m+[m[32m  //       currentJobTransactionCustomization.circleLine2 = this.setTransactionDynamicParameters(circleLine2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine2)[m
+[32m+[m[32m  //     } else {[m
+[32m+[m[32m  //       currentJobTransactionCustomization.line1 = currentJobTransaction.referenceNumber[m
+[32m+[m[32m  //       currentJobTransactionCustomization.line2 = ''[m
+[32m+[m[32m  //       currentJobTransactionCustomization.circleLine1 = ''[m
+[32m+[m[32m  //       currentJobTransactionCustomization.circleLine2 = ''[m
+[32m+[m[32m  //     }[m
+[32m+[m[32m  //     pageJobTransactionCustomizationList[index] = currentJobTransactionCustomization[m
+[32m+[m[32m  //   })[m
+[32m+[m[32m  //   console.log(pageJobTransactionCustomizationList)[m
+[32m+[m[32m  //   pageData.pageJobTransactionCustomizationList = pageJobTransactionCustomizationList[m
+[32m+[m[32m  //   return pageData[m
+[32m+[m[32m  // }[m
+ }[m
+ [m
+ export let jobTransactionService = new JobTransaction()[m

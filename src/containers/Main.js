@@ -121,7 +121,9 @@ class Main extends Component {
           </Right>
       </Header>
       
-      <Tabs renderTabBar={()=> <ScrollableTab />}>
+      <Tabs 
+      renderTabBar={()=> <ScrollableTab />}
+      >
         {viewTabList}
       </Tabs>
       <Fab
