@@ -15,7 +15,8 @@ const {
   USER,
   TABLE_RUNSHEET,
   TABLE_JOB_TRANSACTION_CUSTOMIZATION,
-  CLEAR_HOME_STATE
+  CLEAR_HOME_STATE,
+  SET_TABS_TRANSACTIONS
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
@@ -90,6 +91,13 @@ export function setRefereshingTrue() {
   }
 }
 
+export function setTabIdsJobTransactions(tabIdJobs) {
+  return {
+    type : SET_TABS_TRANSACTIONS,
+    payload:tabIdJobs
+  }
+}
+
 export function fetchJobs(tabId, pageNumber) {
   return async function (dispatch) {
     try {
@@ -139,7 +147,11 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
-      dispatch(setRefereshingTrue())
+      if(isJobsPresent) {
+        let tabIdJobs = await jobTransactionService.refreshJobs()
+        console.log(tabIdJobs)
+        dispatch(setTabIdsJobTransactions(tabIdJobs))
+      }
     } catch (error) {
       console.log(error)
     }

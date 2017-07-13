@@ -12,6 +12,7 @@ const {
   SET_FETCHING_FALSE,
   CLEAR_HOME_STATE,
   SET_REFRESHING_TRUE,
+  SET_TABS_TRANSACTIONS,
 } = require('../../lib/constants').default
 
 
@@ -81,7 +82,10 @@ export default function homeReducer(state = initialState, action) {
     case SET_REFRESHING_TRUE:
       return state.set('isRefreshing',true)
                   .set('tabIdJobTransactions',{})
-                  
+
+    case SET_TABS_TRANSACTIONS:
+      console.log(action.payload)
+      return state.set('tabIdJobTransactions',action.payload)               
   }
   return state
 }

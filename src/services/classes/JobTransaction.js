@@ -8,7 +8,8 @@ const {
   TABIDMAP,
   TABLE_JOB,
   TABLE_FIELD_DATA,
-  TABLE_JOB_DATA
+  TABLE_JOB_DATA,
+  TAB
 } = require('../../lib/constants').default
 import _ from 'underscore'
 import { jobStatusService } from './JobStatus'
@@ -121,6 +122,7 @@ class JobTransaction {
     }
     let jobTransactionQuery = statusIdList.map((object) => 'jobStatusId = ' + object).join(' OR ')
     let filteredTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, 'seqSelected')
+    console.log('filteredTransactions', filteredTransactions)
     if (filteredTransactions.length == 0) {
       pageData.isLastPage = true
       pageData.message = 'No Records Found'
@@ -148,6 +150,7 @@ class JobTransaction {
     filteredJobTransactionCustomization.forEach(jobTransactionCustomization => {
       let currentJobTransactionCustomization = { ...jobTransactionCustomization }
       currentJobTransaction = pageJobTransactionMap[currentJobTransactionCustomization.id]
+      let index = pageJobTransactionList.indexOf(currentJobTransaction)
       currentJob = pageJobMap[currentJobTransaction.jobId]
       if (jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId]) {
         line1CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][1]
@@ -164,8 +167,9 @@ class JobTransaction {
         currentJobTransactionCustomization.circleLine1 = ''
         currentJobTransactionCustomization.circleLine2 = ''
       }
-      pageJobTransactionCustomizationList.push(currentJobTransactionCustomization)
+      pageJobTransactionCustomizationList[index] = currentJobTransactionCustomization
     })
+    console.log(pageJobTransactionCustomizationList)
     pageData.pageJobTransactionCustomizationList = pageJobTransactionCustomizationList
     return pageData
   }
@@ -295,6 +299,107 @@ class JobTransaction {
     })
     return finalText
   }
+
+  async refreshJobs() {
+    const tabsList = await keyValueDBService.getValueFromStore(TAB)
+    let tabIdJobs = {}
+    console.log('tabsList')
+    console.log(tabsList)
+    for (let tab in tabsList.value) {
+      console.log('tab')
+      console.log(tabsList.value[tab])
+      console.log('tab.id')
+      console.log(tabsList.value[tab].id)
+      let pageData = await this.getJobTransactions(tabsList.value[tab].id, 0)
+      console.log('pageData')
+      console.log(pageData)
+      let tabJob = {}
+    //   const pageData = {
+    //   pageJobTransactionCustomizationList: [],
+    //   pageNumber: 0,
+    //   isLastPage: false,
+    //   message: '',
+    // }
+      tabJob.isLastPage = pageData.isLastPage
+      tabJob.jobTransactionCustomization = pageData.pageJobTransactionCustomizationList
+      tabJob.message = pageData.message
+      tabJob.pageNumber = pageData.pageNumber
+      tabIdJobs[tabsList.value[tab].id] = tabJob
+    }
+    console.log('tabIdJobs')
+    console.log(tabIdJobs)
+    return tabIdJobs
+  }
+
+  // async getJobTransactions(tabId, pageNumber) {
+  //   let pageJobTransactionMap = {}, jobIdList = [], pageJobMap = {}, pageJobTransactionCustomizationList = [], pageJobTransactionList = [], isLastPage = false
+  //   const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+  //   const tabIdStatusIdMap = await keyValueDBService.getValueFromStore(TABIDMAP)
+  //   const statusIdList = tabIdStatusIdMap.value[tabId]
+  //   const pageData = {
+  //     pageJobTransactionCustomizationList: [],
+  //     pageNumber: 0,
+  //     isLastPage: false,
+  //     message: '',
+  //   }
+  //   if (!statusIdList || _.isEmpty(statusIdList)) {
+  //     pageData.isLastPage = true
+  //     pageData.message = 'No Status Available'
+  //     return pageData
+  //   }
+  //   let jobTransactionQuery = statusIdList.map((object) => 'jobStatusId = ' + object).join(' OR ')
+  //   let filteredTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, 'seqSelected')
+  //   console.log('filteredTransactions',filteredTransactions)
+  //   if (filteredTransactions.length == 0) {
+  //     pageData.isLastPage = true
+  //     pageData.message = 'No Records Found'
+  //     return pageData
+  //   }
+  //   if (filteredTransactions.length > (pageNumber + 1) * 10) {
+  //     pageJobTransactionList = filteredTransactions.slice(pageNumber * 10, (pageNumber + 1) * 10)
+  //     pageData.pageNumber = pageNumber + 1
+  //   } else {
+  //     pageJobTransactionList = filteredTransactions.slice(pageNumber * 10, filteredTransactions.length)
+  //     pageData.isLastPage = true
+  //   }
+  //   pageJobTransactionList.forEach(transaction => {
+  //     pageJobTransactionMap[transaction.id] = transaction
+  //   })
+  //   let jobQuery = pageJobTransactionList.map((transaction) => 'id = ' + transaction.jobId).join(' OR ')
+  //   let filteredJobs = realm.getRecordListOnQuery(TABLE_JOB, jobQuery, false)
+  //   filteredJobs.forEach(job => {
+  //     pageJobMap[job.id] = job
+  //   })
+
+  //   let jobTransactionCustomizationQuery = pageJobTransactionList.map((transaction) => 'id = ' + transaction.id).join(' OR ')
+  //   let filteredJobTransactionCustomization = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION_CUSTOMIZATION, jobTransactionCustomizationQuery, false)
+
+  //   filteredJobTransactionCustomization.forEach(jobTransactionCustomization => {
+  //     let currentJobTransactionCustomization = { ...jobTransactionCustomization }
+  //     currentJobTransaction = pageJobTransactionMap[currentJobTransactionCustomization.id]
+  //     let index = pageJobTransactionList.indexOf(currentJobTransaction)
+  //     currentJob = pageJobMap[currentJobTransaction.jobId]
+  //     if (jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId]) {
+  //       line1CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][1]
+  //       line2CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][2]
+  //       circleLine1CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][3]
+  //       circleLine2CustomizationObject = jobMasterIdCustomizationMap.value[currentJobTransaction.jobMasterId][4]
+  //       currentJobTransactionCustomization.line1 = this.setTransactionDynamicParameters(line1CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.line1)
+  //       currentJobTransactionCustomization.line2 = this.setTransactionDynamicParameters(line2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.line2)
+  //       currentJobTransactionCustomization.circleLine1 = this.setTransactionDynamicParameters(circleLine1CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine1)
+  //       currentJobTransactionCustomization.circleLine2 = this.setTransactionDynamicParameters(circleLine2CustomizationObject, currentJobTransaction, currentJob, currentJobTransactionCustomization.circleLine2)
+  //     } else {
+  //       currentJobTransactionCustomization.line1 = currentJobTransaction.referenceNumber
+  //       currentJobTransactionCustomization.line2 = ''
+  //       currentJobTransactionCustomization.circleLine1 = ''
+  //       currentJobTransactionCustomization.circleLine2 = ''
+  //     }
+  //     pageJobTransactionCustomizationList[index] = currentJobTransactionCustomization
+  //   })
+  //   console.log(pageJobTransactionCustomizationList)
+  //   pageData.pageJobTransactionCustomizationList = pageJobTransactionCustomizationList
+  //   return pageData
+  // }
 }
 
 export let jobTransactionService = new JobTransaction()

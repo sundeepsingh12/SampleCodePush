@@ -118,12 +118,14 @@ class Main extends Component {
               <Text>Cancel</Text>
             </TouchableHighlight>
           </Right>
-        </Header>
-
-        <Tabs renderTabBar={() => <ScrollableTab />}>
-          {viewTabList}
-        </Tabs>
-        <Fab
+      </Header>
+      
+      <Tabs 
+      renderTabBar={()=> <ScrollableTab />}
+      >
+        {viewTabList}
+      </Tabs>
+      <Fab
           active={this.state.active}
           direction="up"
           style={{ backgroundColor: '#5067FF' }}

@@ -102,6 +102,8 @@ class Jobs extends Component {
   }
 
   componentWillMount() {
+    console.log('componentWillMount')
+    console.log(this.props.tabId)
     this.props.actions.fetchJobs(this.props.tabId, 0)
   }
 
@@ -159,18 +161,32 @@ class Jobs extends Component {
   }
 
   checkIfTransactionsPresent() {
+    console.log('checkIfTransactionsPresent')
+    if (this.props.tabIdJobTransactions[this.props.tabId]) {
+      console.log(this.props.tabIdJobTransactions[this.props.tabId])
+      if (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) {
+        console.log(this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization)
+        if (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0) {
+          console.log(this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0)
+          if (this.props.tabIdJobTransactions[this.props.tabId].isFetching) {
+            console.log(this.props.tabIdJobTransactions[this.props.tabId].isFetching)
+          }
+        }
+      }
+    }
     if (this.props.tabIdJobTransactions[this.props.tabId] &&
       this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization &&
       (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0 || this.props.tabIdJobTransactions[this.props.tabId].isFetching)) {
+      console.log('return true')
       return true
     }
+    console.log('return false')
     return false
   }
 
   render() {
-    if(this.props.isRefreshing) {
-      this.props.actions.fetchJobs(this.props.tabId,0)
-    }
+    console.log('render jobs')
+    console.log(this.props)
     return (
       <Container>
         {renderIf(this.checkIfTransactionsPresent(),
@@ -201,7 +217,7 @@ class Jobs extends Component {
         {renderIf(!this.checkIfTransactionsPresent(),
           <View>
             <Text>
-              
+
             </Text>
           </View>
         )}
