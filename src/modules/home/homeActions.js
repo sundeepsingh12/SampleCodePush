@@ -4,6 +4,7 @@ const {
   JOB_FETCHING_START,
   JOB_FETCHING_END,
   SET_FETCHING_FALSE,
+  SET_REFRESHING_TRUE,
   UNSEEN,
   TABLE_JOB_TRANSACTION,
   TAB,
@@ -56,11 +57,12 @@ export function setTabsList(tabsList) {
   }
 }
 
-export function setFetchingFalse(tabId) {
+export function setFetchingFalse(tabId,message) {
   return {
     type: SET_FETCHING_FALSE,
     payload: {
-      tabId
+      tabId,
+      message
     }
   }
 }
@@ -82,6 +84,12 @@ export function fetchTabs() {
   }
 }
 
+export function setRefereshingTrue() {
+  return {
+    type: SET_REFRESHING_TRUE
+  }
+}
+
 export function fetchJobs(tabId, pageNumber) {
   return async function (dispatch) {
     try {
@@ -90,7 +98,7 @@ export function fetchJobs(tabId, pageNumber) {
       if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
         dispatch(jobFetchingEnd(pageData, tabId))
       } else {
-        dispatch(setFetchingFalse(tabId))
+        dispatch(setFetchingFalse(tabId,pageData.message))
       }
     } catch (error) {
       console.log(error)
@@ -131,6 +139,7 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
+      dispatch(setRefereshingTrue())
     } catch (error) {
       console.log(error)
     }

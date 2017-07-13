@@ -14,7 +14,6 @@ import _ from 'underscore'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'
-import { jobDataService } from './JobData'
 import JobTransactionSchema from '../../repositories/schema/jobTransaction'
 class JobTransaction {
 
@@ -238,10 +237,10 @@ class JobTransaction {
     allJobTransactions.forEach(jobTransaction => {
       let jobTransactionCustomization = {}
       const jobMasterId = jobTransaction.jobMasterId
-      if(!jobDataMap[jobTransaction.jobId]) {
+      if (!jobDataMap[jobTransaction.jobId]) {
         jobDataMap[jobTransaction.jobId] = {}
-      } 
-      if(!fieldDataMap[jobTransaction.id]) {
+      }
+      if (!fieldDataMap[jobTransaction.id]) {
         fieldDataMap[jobTransaction.id] = {}
       }
       if (jobMasterIdCustomizationMap[jobMasterId]) {

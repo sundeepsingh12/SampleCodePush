@@ -2,7 +2,7 @@ import {
   keyValueDB
 } from '../../repositories/keyValueDb'
 import CONFIG from '../../lib/config'
-
+import validate from "json-schema"
 
 class KeyValueDB {
 
@@ -29,9 +29,27 @@ class KeyValueDB {
     const storeValue = keyValueDB.deleteValueFromStore(schemaName);
   }
 
-  validateAndUpdateData(schemaName,data) {
+  validateAndUpdateData(schemaName, data) {
     const storeValue = keyValueDB.updateValueInStore(schemaName, data);
     return storeValue
+  }
+
+  validateData(schemaName, data) {
+    let schemaInstance = ''
+    switch (schemaName) {
+      case 'TAB':
+        schemaInstance = require('../../repositories/schema/tab');
+        break;
+      case 'JOB_LIST_CUSTOMIZATION':
+        schemaInstance = require('../../repositories/schema/jobListCustomization')
+        break;
+    }
+
+    if(data && !validate(data,schemaInstance)) {
+      throw new Error(schemaName + ' validation failed')
+    }
+
+    return true
   }
 
 }

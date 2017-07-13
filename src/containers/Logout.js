@@ -73,13 +73,10 @@ class Logout extends Component {
    * ### render
    * Setup some default presentations and render
    */
+  onButtonPress() {
+    this.props.actions.invalidateUserSession()
+  }
   render() {
-    let self = this
-
-    let onButtonPress = () => {
-      this.props.actions.invalidateUserSession()
-    }
-
     return (
       <Container>
         <Header>
@@ -91,7 +88,7 @@ class Logout extends Component {
         </Header>
         <View style={styles.container}>
           <Button success onPress={() => this.onButtonPress()}>
-            <Text style={{ textAlign: 'center', width: '100%', color:'white' }}>Logout</Text>
+            <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Logout</Text>
           </Button>
         </View>
       </Container>

@@ -50,7 +50,7 @@ describe('home actions', () => {
             pageNumber: 2,
             isLastPage: false
         }
-        expect(actions.jobFetchingEnd(pageData,tabId)).toEqual({
+        expect(actions.jobFetchingEnd(pageData, tabId)).toEqual({
             type: JOB_FETCHING_END,
             payload: {
                 jobTransactionCustomizationList: pageData.pageJobTransactionCustomizationList,
@@ -83,5 +83,69 @@ describe('home actions', () => {
         expect(actions.clearHomeState(tabId)).toEqual({
             type: CLEAR_HOME_STATE
         })
+    })
+
+    it('should fetch tabs', () => {
+        const tabsList = [{
+            tabId: 12
+        }]
+        const expectedActions = [
+            {
+                type: SET_TABS_LIST,
+                payload: tabsList
+            },
+        ]
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(tabsList)
+        const store = mockStore({})
+        return store.dispatch(actions.fetchTabs())
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+
+    it('should fetch jobs', () => {
+        const tabId = 12, pageNumber = 0
+        const pageData = {
+            pageJobTransactionCustomizationList: [
+                {
+                    id: 1,
+                    line1: xyz
+                }
+            ],
+            pageNumber: 0,
+            isLastPage : true,
+        }
+        const expectedActions = [
+            {
+                type: JOB_FETCHING_START,
+                payload: {
+                    tabId,
+                    isRefresh
+                }
+            },
+            {
+                type: JOB_FETCHING_END,
+                payload: {
+                    jobTransactionCustomizationList: pageData.pageJobTransactionCustomizationList,
+                    pageNumber: pageData.pageNumber,
+                    isLastPage: pageData.isLastPage,
+                    tabId,
+                }
+            }
+        ]
+        jobTransactionService.getJobTransactions = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(pageData)
+        const store = mockStore({})
+        return store.dispatch(actions.fetchJobs())
+            .then(() => {
+                expect(jobTransactionService.getJobTransactions).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[0].type)
+                expect(store.getActions[1].payload).toEqual(expectedActions[0].payload)
+            })
     })
 })

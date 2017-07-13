@@ -23,14 +23,13 @@ import Preloader from '../containers/Preloader'
 /**
  * Router
  */
-import {Actions} from 'react-native-router-flux'
+import { Actions } from 'react-native-router-flux'
 
 /**
  * The components needed from React
  */
-import React, {Component} from 'react'
-import
-{
+import React, { Component } from 'react'
+import {
   StyleSheet,
   View,
   ScrollView,
@@ -41,9 +40,9 @@ import
   Platform,
   TouchableHighlight
 }
-from 'react-native'
+  from 'react-native'
 
-import { Container, Content, Tab, Tabs,Body, Header, Title, Left, Right,ScrollableTab, Icon, Fab, Button } from 'native-base';
+import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, ScrollableTab, Icon, Fab, Button } from 'native-base';
 import Jobs from './Jobs';
 import * as homeActions from '../modules/home/homeActions'
 import renderIf from '../lib/renderIf';
@@ -53,16 +52,16 @@ import renderIf from '../lib/renderIf';
  *  One could explicitly enumerate only those which Main.js will depend on.
  *
  */
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   return {
-    tabsList : state.home.tabsList
+    tabsList: state.home.tabsList
   }
 };
 
 /*
  * Bind all the actions
  */
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({ ...authActions, ...globalActions, ...homeActions }, dispatch)
   }
@@ -78,12 +77,12 @@ class Main extends Component {
   constructor() {
     super();
     this.state = {
-        active: false
+      active: false
     };
   }
 
-  async componentDidMount() {
-    await this.props.actions.onResyncPress()
+  componentDidMount() {
+    this.props.actions.onResyncPress()
     this.props.actions.fetchTabs()
   }
 
@@ -92,14 +91,14 @@ class Main extends Component {
     const renderTabList = []
     tabs.forEach(tab => {
       renderTabList.push(
-            <Tab
-            key = {tab.id}
-            heading={tab.name}>
-              <Jobs
-               tabId = {tab.id}
-               />
-          </Tab>
-          )
+        <Tab
+          key={tab.id}
+          heading={tab.name}>
+          <Jobs
+            tabId={tab.id}
+          />
+        </Tab>
+      )
     })
     return renderTabList
   }
@@ -108,45 +107,45 @@ class Main extends Component {
     const viewTabList = this.renderTabs()
     return (
       <Container>
-      <Header hasTabs>
-          <Left/>
+        <Header hasTabs>
+          <Left />
           <Body>
-              <Title>Home</Title>
+            <Title>Home</Title>
           </Body>
           <Right>
 
-            <TouchableHighlight underlayColor='#e7e7e7'  onPress={Actions.Preloader}>
+            <TouchableHighlight underlayColor='#e7e7e7' onPress={Actions.Preloader}>
               <Text>Cancel</Text>
             </TouchableHighlight>
           </Right>
-      </Header>
-      
-      <Tabs renderTabBar={()=> <ScrollableTab />}>
-        {viewTabList}
-      </Tabs>
-      <Fab
+        </Header>
+
+        <Tabs renderTabBar={() => <ScrollableTab />}>
+          {viewTabList}
+        </Tabs>
+        <Fab
           active={this.state.active}
           direction="up"
-          style={{ backgroundColor: '#5067FF'}}
+          style={{ backgroundColor: '#5067FF' }}
           position="bottomRight"
-          containerStyle={{bottom: 125}}
+          containerStyle={{ bottom: 125 }}
           onPress={() => this.setState({ active: !this.state.active })}>
           <Ionicons name="md-add" />
           <Button style={{ backgroundColor: '#34A34F' }}>
-              <Icon name="logo-whatsapp" />
+            <Icon name="logo-whatsapp" />
           </Button>
           <Button style={{ backgroundColor: '#3B5998' }}>
-              <Icon name="logo-facebook" />
+            <Icon name="logo-facebook" />
           </Button>
           <Button disabled style={{ backgroundColor: '#DD5144' }}>
-              <Icon name="mail" />
+            <Icon name="mail" />
           </Button>
-      </Fab>
+        </Fab>
       </Container>
     );
   }
 
-  
+
 };
 
 /**
