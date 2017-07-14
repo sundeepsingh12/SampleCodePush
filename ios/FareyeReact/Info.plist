@@ -34,7 +34,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>MaterialCommunityIcons.ttf</string>
@@ -91,6 +91,6 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Fareye needs access to your camera</string>
 	<key>CodePushDeploymentKey</key>
-	<string>deployment-key-here</string>
+	<string>juO4AoW41ONJEiyrQ62Njga-RRlO4a75534d-31ba-4f8d-b228-2bb58f951a4d</string>
 </dict>
 </plist>

@@ -15,7 +15,7 @@ import _ from 'underscore'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'
-import JobTransactionSchema from '../../repositories/schema/jobTransaction'
+import JobTransactionSchema from '../../repositories/schema/JobTransaction'
 class JobTransaction {
 
   /**A Generic method for filtering out jobtransactions whose job status ids lie in 'statusids'  

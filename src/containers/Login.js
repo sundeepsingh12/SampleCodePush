@@ -21,6 +21,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf';
+import codePush from "react-native-code-push";
+
 
 var styles = StyleSheet.create({
   container: {
@@ -113,6 +115,16 @@ class Login extends Component {
     this.props.actions.toggleCheckbox()
   }
 
+  codepushSync() {
+    codePush.sync({
+      updateDialog: true,
+      installMode: codePush.InstallMode.IMMEDIATE
+    }, (status) => {
+      console.log("====Code push update=====");
+      console.log(status);
+    });
+  }
+
   render() {
     return (
       <Container>
@@ -171,6 +183,12 @@ class Login extends Component {
                 <Button
                   onPress={() => this.props.actions.startScanner()} rounded style={{ width: '100%', }}>
                   <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Scanner</Text>
+                </Button>
+              </View>
+              <View style={{ marginTop: 15 }}>
+                <Button
+                  onPress={() => this.codepushSync()} rounded style={{ width: '100%', }}>
+                  <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Code Push Sync</Text>
                 </Button>
               </View>
             </View>

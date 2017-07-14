@@ -2,7 +2,7 @@
 //Class to combine all Schema and create realm object
 
 import Realm from 'realm';
-import JobTransaction from './schema/jobTransaction'
+import JobTransaction from './schema/JobTransaction'
 import Job from './schema/Job'
 import JobData from './schema/JobData'
 import FieldData from './schema/FieldData'
