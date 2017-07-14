@@ -29,6 +29,8 @@ const {
   JOB_LIST_CUSTOMIZATION,
   CUSTOMIZATION_APP_MODULE,
   USER,
+  CUSTOMIZATION_LIST_MAP,
+  TABIDMAP,
 } = require('../../lib/constants').default
 
 
@@ -98,7 +100,7 @@ class JobMaster {
           deviceIMEI,
           deviceSIM,
           currentJobMasterVersion,
-          deviceCompanyId 
+          deviceCompanyId
         })
       } else {
         currentJobMasterVersion = userObject.value.company.currentJobMasterVersion
@@ -120,6 +122,10 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    console.log('json')
+    console.log(json)
+    console.log('json.jobMaster')
+    console.log(json.jobMaster)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(USER, json.user)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
@@ -128,8 +134,10 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster)
     await keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus)
     await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
-    await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
-    await keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
+    // await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
+    await this.prepareCustomizationListMap(json.jobListCustomization)
+    // await keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
+    await this.validateAndSortTabList(TAB, json.appJobStatusTabs)
     await keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)
     await keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList)
     await keyValueDBService.validateAndSaveData(SMS_TEMPLATE, json.smsTemplatesList)
@@ -139,22 +147,109 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
+    await this.prepareTabStatusIdMap(json.jobStatus)
   }
 
-  /**Matches device time with server time,
+  /**
+   * 
+   * @param {*} jobListCustomization 
+   * prepares HashMap<JobMasterId,HashMap<AppListMasterId,CustomizationListDTO>
+     CustomizationListDTO - {
+      jobMasterId
+      appJobListMasterId
+      separator
+      referenceNo
+      runsheetNo
+      noOfAttempts
+      slot
+      delimiterType
+      startTime
+      endTime
+      jobAttr: [
+        {
+          jobAttributeMasterId
+          fieldAttributeMasterId
+        }
+      ]
+      fieldAttr: [
+        {
+          jobAttributeMasterId
+          fieldAttributeMasterId
+        }
+      ]
+      trackKm
+      trackHalt
+      trackCallCount
+      trackCallDuration
+      trackSmsCount
+      trackTransactionTimeSpent
+     }
+   */
+  prepareCustomizationListMap(jobListCustomization) {
+    if (!jobListCustomization) {
+      return
+    }
+    let jobMasterIdCustomizationMap = {}
+    jobListCustomization.forEach(jobListCustomizationObject => {
+      const jobMasterId = jobListCustomizationObject.jobMasterId
+      const appListMasterId = jobListCustomizationObject.appJobListMasterId
+      if (!jobMasterIdCustomizationMap[jobMasterId]) {
+        const jobListMasterIdMap = {}
+        jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
+        jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
+      } else {
+        const jobListMasterIdMap = {}
+        jobListMasterIdMap = jobMasterIdCustomizationMap[jobMasterId]
+        jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
+        jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
+      }
+    })
+    keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP, jobMasterIdCustomizationMap)
+  }
+
+  /**
+   * 
+   * @param {*} jobStatus 
+   * prepares HashMap<TabId,ArrayList<StatusIds>
+   */
+  prepareTabStatusIdMap(jobStatus) {
+    if (!jobStatus) {
+      return
+    }
+    let tabIdStatusIdsMap = {}
+    jobStatus.forEach(jobStatusObject => {
+      if (!tabIdStatusIdsMap[jobStatusObject.tabId]) {
+        tabIdStatusIdsMap[jobStatusObject.tabId] = []
+      }
+      tabIdStatusIdsMap[jobStatusObject.tabId].push(jobStatusObject.id)
+    })
+    keyValueDBService.validateAndSaveData(TABIDMAP, tabIdStatusIdsMap)
+  }
+
+  async validateAndSortTabList(schemaName,tabs) {
+    if(!tabs) {
+      return
+    }
+    tabs.sort(function(x,y){
+      return (x.isDefault === y.isDefault)? 0 : x.isDefault? -1 : 1;
+    })
+    await keyValueDBService.validateAndSaveData(TAB, tabs)
+  }
+
+  /**Matches device time with server time (format 2017-07-05 16:30:02),
    * throw error if server time format is invalid 
    * or if difference >=15 minutes
    * 
    * @param {*} serverTime 
    */
   matchServerTimeWithMobileTime(serverTime) {
-    const serverTimeInMillis = moment(serverTime)
+    const serverTimeInMillis = moment(serverTime, 'YYYY-MM-DD HH:mm:ss')
     if (!serverTimeInMillis.isValid()) {
-      throw new Error("Server Time format incorrect")
+      throw new Error("Server time format incorrect")
     }
     const currentTimeInMillis = moment()
-    if (currentTimeInMillis - serverTimeInMillis > 15 * 60 * 1000) {
-      throw new Error("Server Time not same as mobile time")
+    if (Math.abs(currentTimeInMillis - serverTimeInMillis) > 15 * 60 * 1000) {
+      throw new Error("Time mismatch. Please correct time on Device")
     }
     return true
   }

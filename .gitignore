@@ -33,8 +33,12 @@ local.properties
 # node.js
 #
 node_modules/
+realm-object-server/
 npm-debug.log
 yarn-error.log
+default.realm.lock
+default.realm
+default.realm.note
 
 # BUCK
 buck-out/

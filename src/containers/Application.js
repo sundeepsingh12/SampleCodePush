@@ -76,7 +76,7 @@ class Application extends Component {
             () => {
                 this.props.actions.getSessionToken()
             },
-            100 //change 100 to 2500
+            1000 //change 100 to 2500
         )
     }
 

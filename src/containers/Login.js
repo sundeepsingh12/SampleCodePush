@@ -12,7 +12,7 @@ import {
 }
   from 'react-native'
 import Scanner from "../components/Scanner"
-import { Container, Body, InputGroup, Button, Input, Item, ListItem, CheckBox } from 'native-base';
+import { Container, Body, InputGroup, Button, Input, Item, ListItem, CheckBox, Spinner } from 'native-base';
 
 import feTheme from '../themes/feTheme';
 import sha256 from 'sha256';
@@ -21,6 +21,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf';
+import codePush from "react-native-code-push";
+
 
 var styles = StyleSheet.create({
   container: {
@@ -79,18 +81,17 @@ class Login extends Component {
     this.props.actions.checkRememberMe()
   }
 
-  onChangeUsername(username){
+  onChangeUsername(username) {
     this.props.actions.onChangeUsername(username)
   }
 
-  onChangePassword(password){
+  onChangePassword(password) {
     this.props.actions.onChangePassword(password)
   }
 
-  loginButtonPress(){
+  loginButtonPress() {
     const password = this.props.auth.form.password;
-    console.log(password.length)
-    if(password.length > 50) {
+    if (password.length > 50) {
       this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
     } else {
       this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe);
@@ -103,15 +104,25 @@ class Login extends Component {
     this.props.actions.stopScanner();
     this.onChangeUsername(username);
     this.onChangePassword(password);
-    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password,this.props.auth.form.rememberMe);
+    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe);
   }
 
-  _onScaningCancelled(){
+  _onScaningCancelled() {
     this.props.actions.stopScanner();
   }
 
-  rememberMe(){
+  rememberMe() {
     this.props.actions.toggleCheckbox()
+  }
+
+  codepushSync() {
+    codePush.sync({
+      updateDialog: true,
+      installMode: codePush.InstallMode.IMMEDIATE
+    }, (status) => {
+      console.log("====Code push update=====");
+      console.log(status);
+    });
   }
 
   render() {
@@ -120,10 +131,15 @@ class Login extends Component {
         {renderIf(!this.props.auth.form.isCameraScannerActive,
           <View style={styles.container}>
             <View style={styles.logoContainer}>
-              <Image
-                style={styles.logoStyle}
-                source={require('../../images/fareye-logo.png')}
-              />
+              {renderIf(!this.props.auth.form.authenticationService,
+                <Image
+                  style={styles.logoStyle}
+                  source={require('../../images/fareye-logo.png')}
+                />
+              )}
+              {renderIf(this.props.auth.form.authenticationService,
+                <Spinner />
+              )}
             </View>
             <View style={styles.width70}>
               <Item style={{ borderWidth: 0 }}>
@@ -132,8 +148,8 @@ class Login extends Component {
                   placeholder='Username'
                   style={feTheme.roundedInput}
                   onChangeText={value => this.onChangeUsername(value)}
-                  disabled = {this.props.auth.form.isEditTextDisabled}
-                   />
+                  disabled={this.props.auth.form.isEditTextDisabled}
+                />
               </Item>
               <Item style={{ borderWidth: 0, marginTop: 15 }}>
                 <Input
@@ -141,31 +157,38 @@ class Login extends Component {
                   placeholder='Password'
                   style={feTheme.roundedInput}
                   secureTextEntry={true}
-                  onChangeText={value =>  this.onChangePassword(value) }
-                  disabled = {this.props.auth.form.isEditTextDisabled}
+                  onChangeText={value => this.onChangePassword(value)}
+                  disabled={this.props.auth.form.isEditTextDisabled}
                 />
               </Item>
+
               <Button
                 rounded success style={{ width: '100%', marginTop: 15 }}
                 disabled={this.props.auth.form.isButtonDisabled}
-                onPress={()=>this.loginButtonPress()}
+                onPress={() => this.loginButtonPress()}
               >
                 <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Log In</Text>
               </Button>
 
               <View style={{ flexDirection: 'row', flexGrow: 1, justifyContent: 'flex-start', marginTop: 15 }}>
-                <CheckBox checked={this.props.auth.form.rememberMe} 
-                  onPress = {()=>this.rememberMe()} />
+                <CheckBox checked={this.props.auth.form.rememberMe}
+                  onPress={() => this.rememberMe()} />
                 <Text style={{ marginLeft: 20 }}>Remember Me</Text>
               </View>
 
               <View style={{ marginTop: 35 }}>
-                <Text style={{ textAlign: 'center', color: '#333333', marginBottom: 10 }}>
+                <Text style={{ textAlign: 'center', color: '#CC3333', marginBottom: 10 }}>
                   {this.props.auth.form.displayMessage}
-                  </Text>
-                <Button 
+                </Text>
+                <Button
                   onPress={() => this.props.actions.startScanner()} rounded style={{ width: '100%', }}>
                   <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Scanner</Text>
+                </Button>
+              </View>
+              <View style={{ marginTop: 15 }}>
+                <Button
+                  onPress={() => this.codepushSync()} rounded style={{ width: '100%', }}>
+                  <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Code Push Sync</Text>
                 </Button>
               </View>
             </View>

@@ -37,6 +37,7 @@ const {
   PRE_LOGOUT_SUCCESS,
   PRE_LOGOUT_FAILURE,
 
+  ERROR_400_403_LOGOUT,
   ON_MOBILE_NO_CHANGE,
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS,
@@ -45,7 +46,6 @@ const {
 } = require('../../lib/constants').default
 
 import { Actions } from 'react-native-router-flux'
-import { keyValueDB } from '../../repositories/keyValueDb'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
@@ -53,6 +53,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { deleteSessionToken } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
+import { logoutService } from '../../services/classes/Logout'
 
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
@@ -203,6 +204,15 @@ export function otpValidationFailure(error) {
 
   }
 }
+
+//This action is dispatched is IMEI verification throws 400/403 or Logout throws 500
+export function error_400_403_Logout(error) {
+  return {
+    type: ERROR_400_403_LOGOUT,
+    payload: error
+  }
+}
+
 //This hits JOB Master Api and gets the response 
 export function downloadJobMaster() {
   return async function (dispatch) {
@@ -219,11 +229,12 @@ export function downloadJobMaster() {
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
     } catch (error) {
-      dispatch(jobMasterDownloadFailure(error.message))
-      if (error.code == 403 || error.code == 400) { //clear user session 
-        dispatch(preLogoutSuccess())
-        dispatch(deleteSessionToken())
-        Actions.InitialLoginForm()
+      if (error.code == 403 || error.code == 400) { 
+        // clear user session WITHOUT Logout API call
+        // Logout API will return 500 as the session is pre-cleared on Server
+        dispatch(error_400_403_Logout(error.message))
+      } else {
+        dispatch(jobMasterDownloadFailure(error.message))
       }
     }
   }
@@ -239,12 +250,23 @@ export function invalidateUserSession() {
       dispatch(preLogoutRequest())
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await authenticationService.logout(token)
+      await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
       Actions.InitialLoginForm()
     } catch (error) {
-      dispatch(preLogoutFailure(error.message))
+      dispatch(error_400_403_Logout(error.message))
     }
+  }
+}
+/**
+ * This methods logs out the user without calling the Logout API as the session is already invalidated on Server
+ */
+export function startLoginScreenWithoutLogout() {
+  return async function (dispatch) {
+    dispatch(preLogoutSuccess())
+    dispatch(deleteSessionToken())
+    Actions.InitialLoginForm()
   }
 }
 
@@ -309,13 +331,14 @@ export function checkAsset() {
       const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
       const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
       const user = await keyValueDBService.getValueFromStore(USER)
-      const isVerified = await deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
+      const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
       if (isVerified) {
+         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         Actions.Tabbar()
       } else {
-        dispatch(checkIfSimValidOnServer())
+        await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
+        dispatch(checkIfSimValidOnServer());
       }
     } catch (error) {
       dispatch(checkAssetFailure(error.message))
@@ -355,11 +378,12 @@ export function checkIfSimValidOnServer() {
         dispatch(showMobileNumber())
       }
     } catch (error) {
-      dispatch(checkAssetFailure(error.message))
-      if (error.code == 403 || error.code == 400) { //clear user session 
-        dispatch(preLogoutSuccess())
-        dispatch(deleteSessionToken())
-        Actions.InitialLoginForm()
+      if (error.code == 403 || error.code == 400) {
+        // clear user session without Logout API call
+        // Logout API will return 500 as the session is pre-cleared on Server
+        dispatch(error_400_403_Logout(error.message))
+      } else {
+        dispatch(checkAssetFailure(error.message))
       }
     }
   }

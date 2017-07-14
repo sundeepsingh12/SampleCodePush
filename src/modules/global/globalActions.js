@@ -28,6 +28,8 @@ import CONFIG from '../../lib/config'
 
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 
+import { clearHomeState } from '../home/homeActions'
+
 
 /**
  * ## set the store
@@ -56,6 +58,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       dispatch(onChangePassword(''))
       dispatch(onChangeUsername(''))
+      dispatch(clearHomeState())
     } catch (error) {
       throw error
     }

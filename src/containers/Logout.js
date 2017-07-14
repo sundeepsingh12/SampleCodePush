@@ -20,25 +20,25 @@ import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 
-import {Button} from 'react-native'
+
+import { Button, Spinner } from 'native-base';
 
 /**
  * The necessary React components
  */
-import React, {Component} from 'react'
-import
-{
+import React, { Component } from 'react'
+import {
   StyleSheet,
-  View
-}
-from 'react-native'
-import { Container, Content, Tab, Tabs,Body, Header, Title, Left, Right} from 'native-base';
+  View,
+  Text
+} from 'react-native'
+import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right } from 'native-base';
 
 var styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     flex: 1,
-    backgroundColor : '#f7f7f7',
+    backgroundColor: '#f7f7f7',
     paddingTop: 15
   },
 })
@@ -46,7 +46,7 @@ var styles = StyleSheet.create({
  * ## Redux boilerplate
  */
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   return {
     auth: {
       form: {
@@ -61,7 +61,7 @@ function mapStateToProps (state) {
   }
 };
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({ ...authActions, ...globalActions, ...preloaderActions }, dispatch)
   }
@@ -73,30 +73,27 @@ class Logout extends Component {
    * ### render
    * Setup some default presentations and render
    */
-  render () {
-    let self = this
-
-    let onButtonPress = () => {
-      this.props.actions.invalidateUserSession()
-    }
-
+  onButtonPress() {
+    this.props.actions.invalidateUserSession()
+  }
+  render() {
     return (
       <Container>
         <Header>
-            <Left/>
-            <Body>
-                <Title>Logout</Title>
-            </Body>
-            <Right/>
+          <Left />
+          <Body>
+            <Title>Logout</Title>
+          </Body>
+          <Right />
         </Header>
         <View style={styles.container}>
-          <Button
-            onPress={onButtonPress.bind(self)}
-            title="Logout" />
+          <Button success onPress={() => this.onButtonPress()}>
+            <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Logout</Text>
+          </Button>
         </View>
       </Container>
-     
-      )
+
+    )
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Logout)

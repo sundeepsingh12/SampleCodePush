@@ -1,5 +1,5 @@
 'use strict'
-import React from 'react'
+import React, { Component } from 'react'
 import {
   AppRegistry,
   StyleSheet,
@@ -42,7 +42,7 @@ import Message from './containers/Message'
 import Login from './containers/Login'
 import Preloader from './containers/Preloader'
 // import Subview from './containers/Subview'
-
+import ResyncLoader from './components/ResyncLoader'
 /**
  * ### icons
  *
@@ -56,8 +56,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
  * ## Actions
  *  The necessary actions for dispatching our bootstrap values
  */
-import {setPlatform, setVersion} from './modules/device/deviceActions'
-import {setStore} from './modules/global/globalActions'
+import { setPlatform, setVersion } from './modules/device/deviceActions'
+import { setStore } from './modules/global/globalActions'
+import { onResyncPress } from './modules/home/homeActions'
 
 /**
  * ## States
@@ -68,6 +69,7 @@ import AuthInitialState from './modules/login/loginInitialState'
 import DeviceInitialState from './modules/device/deviceInitialState'
 import GlobalInitialState from './modules/global/globalInitialState'
 import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
+import HomeInititalState from './modules/home/homeInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
@@ -87,7 +89,8 @@ function getInitialState() {
     auth: new AuthInitialState(),
     device: (new DeviceInitialState()).set('isMobile', true),
     global: (new GlobalInitialState()),
-    preloader: (new PreloaderInitiaState())
+    preloader: (new PreloaderInitiaState()),
+    home: (new HomeInititalState())
   }
   return _initState
 }
@@ -136,6 +139,7 @@ class TabIcon extends React.Component {
  */
 
 export default function native(platform) {
+
   let Fareye = React.createClass({
     render() {
       const store = configureStore(getInitialState())
@@ -165,20 +169,20 @@ export default function native(platform) {
                 component={Login}
                 hideNavBar
                 type='replace'
-                 />
+              />
 
               <Scene key='Preloader'
                 component={Preloader}
                 hideNavBar
                 title='Preloader'
                 type='replace'
-                 />
+              />
 
               <Scene key='Tabbar'
                 tabs
                 hideNavBar
                 tabBarStyle={styles.tabBar}
-                type = 'replace'
+                type='replace'
                 default='Main'>
 
                 <Scene key='Main'
@@ -191,9 +195,8 @@ export default function native(platform) {
 
                 <Scene key='ReSync'
                   title='Re-sync'
-                  icon={TabIcon}
-                  iconName={"ios-sync-outline"}
-                  onPress={() => { }} />
+                  icon={ResyncLoader}
+                  onPress={() => { store.dispatch(onResyncPress()) }} />
 
                 <Scene key='Message'
                   title='Message'

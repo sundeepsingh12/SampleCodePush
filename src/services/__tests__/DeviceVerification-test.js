@@ -191,7 +191,7 @@ describe('device verification', () => {
         }
     })
 
-    it('should check asset and throw user value misssing error', () => {
+    it('should check asset and throw user value missing error', () => {
         try {
             const deviceIMEI = {
                 test: 'test'
@@ -202,7 +202,7 @@ describe('device verification', () => {
             const user = null
             keyValueDBService.validateAndSaveData = jest.fn()
             deviceVerificationService.populateDeviceImeiAndDeviceSim = jest.fn()
-            deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user)
+            deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
         } catch (error) {
             expect(error.message).toEqual('Value of user missing')
             expect(deviceVerificationService.populateDeviceImeiAndDeviceSim).not.toHaveBeenCalled()
@@ -232,7 +232,7 @@ describe('device verification', () => {
         }
         keyValueDBService.validateAndSaveData = jest.fn()
         deviceVerificationService.populateDeviceImeiAndDeviceSim = jest.fn()
-        return (deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user))
+        return (deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user))
             .then((data) => {
                 expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(1)
                 expect(deviceVerificationService.populateDeviceImeiAndDeviceSim).not.toHaveBeenCalled()
@@ -262,7 +262,7 @@ describe('device verification', () => {
         }
         keyValueDBService.validateAndSaveData = jest.fn()
         deviceVerificationService.populateDeviceImeiAndDeviceSim = jest.fn()
-        return (deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user))
+        return (deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user))
             .then((data) => {
                 expect(keyValueDBService.validateAndSaveData).not.toHaveBeenCalledTimes(1)
                 expect(deviceVerificationService.populateDeviceImeiAndDeviceSim).not.toHaveBeenCalled()
@@ -292,7 +292,7 @@ describe('device verification', () => {
         }
         keyValueDBService.validateAndSaveData = jest.fn()
         deviceVerificationService.populateDeviceImeiAndDeviceSim = jest.fn()
-        return (deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user))
+        return (deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user))
             .then((data) => {
                 expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(1)
                 expect(deviceVerificationService.populateDeviceImeiAndDeviceSim).toHaveBeenCalledTimes(1)
@@ -322,7 +322,7 @@ describe('device verification', () => {
         }
         keyValueDBService.validateAndSaveData = jest.fn()
         deviceVerificationService.populateDeviceImeiAndDeviceSim = jest.fn()
-        return (deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user))
+        return (deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user))
             .then((data) => {
                 expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(1)
                 expect(deviceVerificationService.populateDeviceImeiAndDeviceSim).toHaveBeenCalledTimes(1)
@@ -348,7 +348,7 @@ describe('device verification', () => {
         }
         keyValueDBService.validateAndSaveData = jest.fn()
         deviceVerificationService.populateDeviceImeiAndDeviceSim = jest.fn()
-        return (deviceVerificationService.checkAsset(deviceIMEI, deviceSIM, user))
+        return (deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user))
             .then((data) => {
                 expect(keyValueDBService.validateAndSaveData).not.toHaveBeenCalledTimes(1)
                 expect(deviceVerificationService.populateDeviceImeiAndDeviceSim).toHaveBeenCalledTimes(1)

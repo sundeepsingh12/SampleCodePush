@@ -39,9 +39,9 @@ export default keyMirror({
     OTP_GENERATION_SUCCESS: null,
     OTP_GENERATION_FAILURE: null,
 
-    OTP_VALIDATION_START:null,
-    OTP_VALIDATION_SUCCESS:null,
-    OTP_VALIDATION_FAILURE:null,
+    OTP_VALIDATION_START: null,
+    OTP_VALIDATION_SUCCESS: null,
+    OTP_VALIDATION_FAILURE: null,
 
     SESSION_TOKEN_REQUEST: null,
     SESSION_TOKEN_SUCCESS: null,
@@ -54,18 +54,27 @@ export default keyMirror({
     ON_LOGIN_USERNAME_CHANGE: null,
     ON_LOGIN_PASSWORD_CHANGE: null,
 
-    PRELOADER_SUCCESS:null,
-    SHOW_MOBILE_NUMBER:null,
-    SHOW_OTP_SCREEN:null,
-    SHOW_MOBILE_NUMBER_SCREEN:null,
-    ON_MOBILE_NO_CHANGE:null,
-    ON_OTP_CHANGE:null,
+    PRELOADER_SUCCESS: null,
+    SHOW_MOBILE_NUMBER: null,
+    SHOW_OTP_SCREEN: null,
+    SHOW_MOBILE_NUMBER_SCREEN: null,
+    ON_MOBILE_NO_CHANGE: null,
+    ON_OTP_CHANGE: null,
+    ERROR_400_403_LOGOUT: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
     PRE_LOGOUT_FAILURE: null,
     TOGGLE_CHECKBOX: null,
-    REMEMBER_ME_SET_TRUE:null,
+    REMEMBER_ME_SET_TRUE: null,
+
+    //Home Actions
+    JOB_FETCHING_START: null,
+    JOB_FETCHING_END: null,
+    SET_TABS_LIST: null,
+    SET_FETCHING_FALSE:null,
+    CLEAR_HOME_STATE:null,
+    SET_REFRESHING_TRUE:null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,
@@ -74,8 +83,8 @@ export default keyMirror({
     SERVICE_FAILED: null,
 
     //Login Credentials
-    
-    USERNAME:null,
+
+    USERNAME: null,
     PASSWORD: null,
     REMEMBER_ME: null,
 
@@ -106,7 +115,25 @@ export default keyMirror({
     DEVICE_IMEI:null,
     DEVICE_SIM:null,
     USER:null,
-    IS_PRELOADER_COMPLETE:null
+    IS_PRELOADER_COMPLETE:null,
+    CUSTOMIZATION_LIST_MAP:null,
+    TABIDMAP:null,
+    SET_TABS_TRANSACTIONS:null,
+
+    //Realm Tables
+    TABLE_JOB_TRANSACTION:null,
+    TABLE_JOB:null,
+    TABLE_JOB_DATA:null,
+    TABLE_RUNSHEET:null,
+    TABLE_FIELD_DATA:null,
+    TABLE_JOB_TRANSACTION_CUSTOMIZATION:null,
+
+    //Home Actions
+    IS_LAST_PAGE:null,
+
+    //Status Codes
+    UNSEEN:null,
+    PENDING:null
 })
 
 
