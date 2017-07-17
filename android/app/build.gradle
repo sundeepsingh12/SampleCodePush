@@ -105,6 +105,9 @@ android {
             include "armeabi-v7a", "x86"
         }
     }
+    dexOptions {
+        jumboMode true
+    }
     buildTypes {
         release {
             minifyEnabled enableProguardInReleaseBuilds
@@ -127,6 +130,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-mqtt')
     compile project(':react-native-code-push')
     compile project(':react-native-device-info')
     compile project(':react-native-camera')

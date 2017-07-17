@@ -1,14 +1,14 @@
 'use strict'
 
 
- import fareye from './src/fareye'
+//  import fareye from './src/fareye'
 
- fareye('android')
-/*import React, {
+//  fareye('android')
+import React, {
   Component
 } from 'react';
-import _ from "underscore";
-import Realm from 'realm';
+
+var mqtt    = require('react-native-mqtt');
 
 import {
   AppRegistry,
@@ -18,48 +18,32 @@ import {
 
 export default class Fareye extends Component {
   render() {
-    let realm = new Realm({
-            schemaVersion: 39,
-            schema: [
-                {
-                    name: 'People',
-                    properties: {
-                         albumId: { type: 'int' },
-    id: { type: 'int' },
-    title: { type: 'string' },
-    url: { type: 'string' },
-    thumbnailUrl: { type: 'string' }
- 
-                    }
-                }
-            ]
-        });
+mqtt.createClient({
+  uri: 'mqtt://mqttstaging.fareye.co:1883', 
+  clientId: 'FE_4954'
+}).then(client=> {
 
-   
-        let dataForInsert = [
-  {
-    "albumId": 1,
-    "id": 1,
-    "title": "accusamus beatae ad facilis cum similique qui sunt",
-    "url": "http://placehold.it/600/92c952",
-    "thumbnailUrl": "http://placehold.it/150/92c952"
-  },
-  {
-    "albumId": 1,
-    "id": 2,
-    "title": "reprehenderit est deserunt velit ipsam",
-    "url": "http://placehold.it/600/771796",
-    "thumbnailUrl": "http://placehold.it/150/771796"
-  },
-]
+  client.on('closed', ()=> { console.log('mqtt.event.closed');});
+  
+  client.on('error',msg=> {
+    console.log('mqtt.event.error', msg);
+    
+  });
 
-  console.log('before insert')
-  console.log(new Date())
-        realm.write(() => {
-            dataForInsert.forEach(data => realm.create('undefined', data, true));
-        });
-        console.log('after insert')
-       console.log(new Date())
+  client.on('message', msg=> {
+    console.log('mqtt.event.message', msg);
+  });
+
+  client.on('connect', ()=>{
+    console.log('connected');
+    client.subscribe('FE_4954/#',2);
+  });
+
+  client.connect();
+}).catch(err=>{
+  console.log('inside catch')
+  console.log(err);
+});
         return (
             <View>
                 <Text>Hello</Text>
@@ -70,4 +54,4 @@ export default class Fareye extends Component {
   }
 
 
-  AppRegistry.registerComponent('FareyeReact', () => Fareye)*/
+  AppRegistry.registerComponent('FareyeReact', () => Fareye)
