@@ -25,9 +25,12 @@ import { sync } from '../../../services/classes/Sync'
 import { jobStatusService } from '../../../services/classes/JobStatus'
 import { jobTransactionService } from '../../../services/classes/JobTransaction'
 import { jobSummaryService } from '../../../services/classes/JobSummary'
-import { tabsService } from '../../../services/classes/Tabs'
 import * as realm from '../../../repositories/realmdb'
 import _ from 'underscore'
+
+const middlewares = [thunk]
+const mockStore = configureStore(middlewares)
+
 
 describe('home actions', () => {
 

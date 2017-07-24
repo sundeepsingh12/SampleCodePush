@@ -153,28 +153,28 @@ class JobMaster {
    * @param {*} jobListCustomization 
    * prepares HashMap<JobMasterId,HashMap<AppListMasterId,CustomizationListDTO>
      CustomizationListDTO - {
-      jobMasterId
       appJobListMasterId
-      separator
-      referenceNo
-      runsheetNo
-      noOfAttempts
-      slot
       delimiterType
-      startTime
       endTime
-      jobAttr: [
-        {
-          jobAttributeMasterId
-          fieldAttributeMasterId
-        }
-      ]
       fieldAttr: [
         {
           jobAttributeMasterId
           fieldAttributeMasterId
         }
       ]
+      jobAttr: [
+        {
+          jobAttributeMasterId
+          fieldAttributeMasterId
+        }
+      ]
+      jobMasterId
+      noOfAttempts
+      referenceNo
+      runsheetNo
+      separator
+      slot
+      startTime      
       trackKm
       trackHalt
       trackCallCount
@@ -240,7 +240,7 @@ class JobMaster {
     })
     await keyValueDBService.validateAndSaveData(TAB, tabs)
   }
-  
+
 
   /**Matches device time with server time (format 2017-07-05 16:30:02),
    * throw error if server time format is invalid 

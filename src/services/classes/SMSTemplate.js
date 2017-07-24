@@ -2,6 +2,12 @@
 
 class SMSTemplate {
 
+    /**
+     * 
+     * @param {*} smsTemplateList 
+     * @returns
+     * Map <JobMasterId,[SMSTemplate]>
+     */
     getSMSTemplateMap(smsTemplateList) {
         let smsTemplateMap = {}
         smsTemplateList.forEach(smsTemplate => {
