@@ -43,7 +43,7 @@ import {
   from 'react-native'
 
 import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, ScrollableTab, Icon, Fab, Button } from 'native-base';
-import Jobs from './Jobs';
+import Jobs from '../components/Jobs';
 import * as homeActions from '../modules/home/homeActions'
 import renderIf from '../lib/renderIf';
 
@@ -54,7 +54,8 @@ import renderIf from '../lib/renderIf';
  */
 function mapStateToProps(state) {
   return {
-    tabsList: state.home.tabsList
+    tabsList: state.home.tabsList,
+    tabIdStatusIdMap: state.home.tabIdStatusIdMap
   }
 };
 
@@ -87,6 +88,8 @@ class Main extends Component {
   }
 
   renderTabs() {
+    console.log('render tabs home container')
+    console.log(this.props)
     const tabs = this.props.tabsList
     const renderTabList = []
     tabs.forEach(tab => {
@@ -96,6 +99,7 @@ class Main extends Component {
           heading={tab.name}>
           <Jobs
             tabId={tab.id}
+            statusIdList={this.props.tabIdStatusIdMap[tab.id]}
           />
         </Tab>
       )
@@ -120,7 +124,7 @@ class Main extends Component {
           </Right>
       </Header>
       
-      <Tabs 
+      <Tabs locked
       renderTabBar={()=> <ScrollableTab />}
       >
         {viewTabList}

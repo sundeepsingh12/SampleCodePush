@@ -16,7 +16,16 @@ const {
   TABLE_RUNSHEET,
   TABLE_JOB_TRANSACTION_CUSTOMIZATION,
   CLEAR_HOME_STATE,
-  SET_TABS_TRANSACTIONS
+  SET_TABS_TRANSACTIONS,
+  JOB_STATUS,
+  JOB_LISTING_START,
+  JOB_LISTING_END,
+  CUSTOMIZATION_LIST_MAP,
+  JOB_ATTRIBUTE,
+  JOB_ATTRIBUTE_STATUS,
+  CUSTOMER_CARE,
+  SMS_TEMPLATE,
+
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
@@ -25,40 +34,39 @@ import { sync } from '../../services/classes/Sync'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobSummaryService } from '../../services/classes/JobSummary'
-import { tabsService } from '../../services/classes/Tabs'
+import { jobMasterService } from '../../services/classes/JobMaster'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 
-export function jobFetchingEnd(pageData, tabId) {
+export function jobFetchingEnd(jobTransactionCustomizationList) {
   return {
-    type: JOB_FETCHING_END,
+    type: JOB_LISTING_END,
     payload: {
-      jobTransactionCustomizationList: pageData.pageJobTransactionCustomizationList,
-      pageNumber: pageData.pageNumber,
-      isLastPage: pageData.isLastPage,
-      tabId,
+      jobTransactionCustomizationList
     }
   }
 }
 
-export function jobFetchingStart(tabId, isRefresh) {
+export function jobFetchingStart(isRefresh) {
   return {
     type: JOB_FETCHING_START,
     payload: {
-      tabId,
-      isRefresh
+      isRefresh,
     }
   }
 }
 
-export function setTabsList(tabsList) {
+export function setTabsList(tabsList, tabIdStatusIdMap) {
   return {
     type: SET_TABS_LIST,
-    payload: tabsList
+    payload: {
+      tabsList,
+      tabIdStatusIdMap
+    }
   }
 }
 
-export function setFetchingFalse(tabId,message) {
+export function setFetchingFalse(tabId, message) {
   return {
     type: SET_FETCHING_FALSE,
     payload: {
@@ -78,7 +86,9 @@ export function fetchTabs() {
   return async function (dispatch) {
     try {
       const tabs = await keyValueDBService.getValueFromStore(TAB)
-      dispatch(setTabsList(tabs.value))
+      const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+      const tabIdStatusIdMap = jobMasterService.prepareTabStatusIdMap(statusList.value)
+      dispatch(setTabsList(tabs.value, tabIdStatusIdMap))
     } catch (error) {
       console.log(error)
     }
@@ -93,21 +103,21 @@ export function setRefereshingTrue() {
 
 export function setTabIdsJobTransactions(tabIdJobs) {
   return {
-    type : SET_TABS_TRANSACTIONS,
-    payload:tabIdJobs
+    type: SET_TABS_TRANSACTIONS,
+    payload: tabIdJobs
   }
 }
 
-export function fetchJobs(tabId, pageNumber) {
+export function fetchJobs() {
   return async function (dispatch) {
     try {
-      dispatch(jobFetchingStart(tabId))
-      var pageData = await jobTransactionService.getJobTransactions(tabId, pageNumber)
-      if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
-        dispatch(jobFetchingEnd(pageData, tabId))
-      } else {
-        dispatch(setFetchingFalse(tabId,pageData.message))
-      }
+      const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+      const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+      const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
+      const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+      const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
+      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value)
+      dispatch(jobFetchingEnd(jobTransactionCustomizationList))
     } catch (error) {
       console.log(error)
     }
@@ -147,10 +157,14 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
-      if(isJobsPresent) {
-        let tabIdJobs = await jobTransactionService.refreshJobs()
-        console.log(tabIdJobs)
-        dispatch(setTabIdsJobTransactions(tabIdJobs))
+      if (isJobsPresent) {
+        const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+        const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+        const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
+        const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+        const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
+        let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value)
+        dispatch(jobFetchingEnd(jobTransactionCustomizationList))
       }
     } catch (error) {
       console.log(error)

@@ -36,7 +36,7 @@ import configureStore from './lib/configureStore'
 import Application from './containers/Application'
 import Logout from './containers/Logout'
 
-import Main from './containers/Main'
+import Home from './containers/Home'
 import Utilities from './containers/Utilities'
 import Message from './containers/Message'
 import Login from './containers/Login'
@@ -70,6 +70,7 @@ import DeviceInitialState from './modules/device/deviceInitialState'
 import GlobalInitialState from './modules/global/globalInitialState'
 import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
 import HomeInititalState from './modules/home/homeInitialState'
+import ListingInitialState from './modules/listing/listingInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
@@ -90,7 +91,8 @@ function getInitialState() {
     device: (new DeviceInitialState()).set('isMobile', true),
     global: (new GlobalInitialState()),
     preloader: (new PreloaderInitiaState()),
-    home: (new HomeInititalState())
+    home: (new HomeInititalState()),
+    listing: (new ListingInitialState()),
   }
   return _initState
 }
@@ -183,14 +185,14 @@ export default function native(platform) {
                 hideNavBar
                 tabBarStyle={styles.tabBar}
                 type='replace'
-                default='Main'>
+                default='Home'>
 
-                <Scene key='Main'
+                <Scene key='Home'
                   title='Home'
                   iconName={"ios-home-outline"}
                   icon={TabIcon}
                   hideNavBar
-                  component={Main}
+                  component={Home}
                   initial />
 
                 <Scene key='ReSync'

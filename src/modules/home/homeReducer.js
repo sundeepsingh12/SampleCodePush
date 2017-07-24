@@ -1,8 +1,6 @@
 'use strict'
 
 const InitialState = require('./homeInitialState').default
-import { ListView } from 'react-native'
-
 
 const initialState = new InitialState()
 const {
@@ -39,24 +37,26 @@ export default function homeReducer(state = initialState, action) {
         .set('isRefreshing', false)
 
     case JOB_FETCHING_END:
-      let jobTransactions, jobTransactionCustomization
-      console.log('action.payload')
-      console.log(action.payload)
-      tempTabIdJobTransactions = { ...state.tabIdJobTransactions }
-      if (tempTabIdJobTransactions[action.payload.tabId] && tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization) {
-        jobTransactionCustomization = tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization
-        jobTransactionCustomization = jobTransactionCustomization.concat(action.payload.jobTransactionCustomizationList)
-      } else {
-        jobTransactionCustomization = []
-        jobTransactionCustomization = jobTransactionCustomization.concat(action.payload.jobTransactionCustomization)
-      }
-      tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization = jobTransactionCustomization
-      tempTabIdJobTransactions[action.payload.tabId].pageNumber = action.payload.pageNumber
-      tempTabIdJobTransactions[action.payload.tabId].isFetching = false
-      tempTabIdJobTransactions[action.payload.tabId].isLastPage = action.payload.isLastPage
-      tempTabIdJobTransactions[action.payload.tabId].message = ''
-      return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
-        .set('isRefreshing', false)
+    console.log('JOB_FETCHING_END of home reducer')
+      // let jobTransactions, jobTransactionCustomization
+      // console.log('action.payload')
+      // console.log(action.payload)
+      // tempTabIdJobTransactions = { ...state.tabIdJobTransactions }
+      // if (tempTabIdJobTransactions[action.payload.tabId] && tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization) {
+      //   jobTransactionCustomization = tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization
+      //   jobTransactionCustomization = jobTransactionCustomization.concat(action.payload.jobTransactionCustomizationList)
+      // } else {
+      //   jobTransactionCustomization = []
+      //   jobTransactionCustomization = jobTransactionCustomization.concat(action.payload.jobTransactionCustomization)
+      // }
+      // tempTabIdJobTransactions[action.payload.tabId].jobTransactionCustomization = jobTransactionCustomization
+      // tempTabIdJobTransactions[action.payload.tabId].pageNumber = action.payload.pageNumber
+      // tempTabIdJobTransactions[action.payload.tabId].isFetching = false
+      // tempTabIdJobTransactions[action.payload.tabId].isLastPage = action.payload.isLastPage
+      // tempTabIdJobTransactions[action.payload.tabId].message = ''
+      // return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
+      //   .set('isRefreshing', false)
+      return state
 
     case SET_FETCHING_FALSE:
       console.log(action.payload.tabId)
@@ -72,7 +72,8 @@ export default function homeReducer(state = initialState, action) {
       return state.set('tabIdJobTransactions', tempTabIdJobTransactions)
 
     case SET_TABS_LIST:
-      return state.set('tabsList', action.payload)
+      return state.set('tabsList', action.payload.tabsList)
+                  .set('tabIdStatusIdMap',action.payload.tabIdStatusIdMap)
     
     case CLEAR_HOME_STATE:
       return state.set('tabIdJobTransactions',{})

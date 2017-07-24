@@ -42,7 +42,28 @@ const {
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS,
   IS_SHOW_MOBILE_NUMBER_SCREEN,
-  IS_SHOW_OTP_SCREEN
+  IS_SHOW_OTP_SCREEN,
+  JOB_MASTER,
+  JOB_ATTRIBUTE,
+  JOB_ATTRIBUTE_VALUE,
+  FIELD_ATTRIBUTE,
+  FIELD_ATTRIBUTE_VALUE,
+  JOB_STATUS,
+  TAB,
+  CUSTOMER_CARE,
+  SMS_TEMPLATE,
+  USER_SUMMARY,
+  JOB_SUMMARY,
+  SMS_JOB_STATUS,
+  JOB_MASTER_MONEY_TRANSACTION_MODE,
+  FIELD_ATTRIBUTE_STATUS,
+  FIELD_ATTRIBUTE_VALIDATION,
+  FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+  JOB_LIST_CUSTOMIZATION,
+  CUSTOMIZATION_APP_MODULE,
+  CUSTOMIZATION_LIST_MAP,
+  TABIDMAP,
+  JOB_ATTRIBUTE_STATUS,
 } = require('../../lib/constants').default
 
 import { Actions } from 'react-native-router-flux'
@@ -229,7 +250,7 @@ export function downloadJobMaster() {
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
     } catch (error) {
-      if (error.code == 403 || error.code == 400) { 
+      if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
         dispatch(error_400_403_Logout(error.message))
@@ -314,6 +335,31 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
+      const keys = [
+        JOB_MASTER,
+        JOB_ATTRIBUTE,
+        JOB_ATTRIBUTE_VALUE,
+        FIELD_ATTRIBUTE,
+        FIELD_ATTRIBUTE_VALUE,
+        JOB_STATUS,
+        TAB,
+        CUSTOMER_CARE,
+        SMS_TEMPLATE,
+        USER_SUMMARY,
+        JOB_SUMMARY,
+        SMS_JOB_STATUS,
+        JOB_MASTER_MONEY_TRANSACTION_MODE,
+        FIELD_ATTRIBUTE_STATUS,
+        FIELD_ATTRIBUTE_VALIDATION,
+        FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+        JOB_LIST_CUSTOMIZATION,
+        CUSTOMIZATION_APP_MODULE,
+        USER,
+        CUSTOMIZATION_LIST_MAP,
+        TABIDMAP,
+        JOB_ATTRIBUTE_STATUS,
+      ]
+      await keyValueDBService.deleteValueFromStore(keys)
       dispatch(jobMasterSavingFailure(error.message))
     }
   }
@@ -333,7 +379,7 @@ export function checkAsset() {
       const user = await keyValueDBService.getValueFromStore(USER)
       const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
       if (isVerified) {
-         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+        await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
         Actions.Tabbar()
       } else {

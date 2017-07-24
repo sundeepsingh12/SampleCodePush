@@ -7,13 +7,13 @@ import Job from './schema/Job'
 import JobData from './schema/JobData'
 import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
-import JobTransactionCustomization from './schema/jobTransactionCustomization'
+// import JobTransactionCustomization from './schema/jobTransactionCustomization'
 
 
 import _ from 'underscore'
 
 const schemaVersion = 27;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, JobTransactionCustomization];
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet];
 
 let realm = new Realm({
   schemaVersion,
@@ -27,7 +27,6 @@ const {
   TABLE_JOB_DATA,
   USER,
   TABLE_RUNSHEET,
-  TABLE_JOB_TRANSACTION_CUSTOMIZATION
 } = require('../lib/constants').default
 
 export function save(tableName, object) {
@@ -69,7 +68,6 @@ export function deleteRecords() {
     realm.delete(realm.objects(TABLE_JOB))
     realm.delete(realm.objects(TABLE_JOB_DATA))
     realm.delete(realm.objects(TABLE_FIELD_DATA))
-    realm.delete(realm.objects(TABLE_JOB_TRANSACTION_CUSTOMIZATION))
     realm.delete(realm.objects(TABLE_RUNSHEET))
   });
 }

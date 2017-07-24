@@ -31,6 +31,7 @@ const {
   USER,
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
+  JOB_ATTRIBUTE_STATUS,
 } = require('../../lib/constants').default
 
 
@@ -122,10 +123,6 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
-    console.log('json')
-    console.log(json)
-    console.log('json.jobMaster')
-    console.log(json.jobMaster)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(USER, json.user)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
@@ -136,6 +133,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
     // await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
     await this.prepareCustomizationListMap(json.jobListCustomization)
+    await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_STATUS, json.jobAttributeMasterStatuses)
     // await keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
     await this.validateAndSortTabList(TAB, json.appJobStatusTabs)
     await keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)
@@ -147,7 +145,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
-    await this.prepareTabStatusIdMap(json.jobStatus)
+    // await this.prepareTabStatusIdMap(json.jobStatus)
   }
 
   /**
@@ -210,7 +208,7 @@ class JobMaster {
   /**
    * 
    * @param {*} jobStatus 
-   * prepares HashMap<TabId,ArrayList<StatusIds>
+   * Map<TabId,[StatusIds]>
    */
   prepareTabStatusIdMap(jobStatus) {
     if (!jobStatus) {
@@ -223,18 +221,26 @@ class JobMaster {
       }
       tabIdStatusIdsMap[jobStatusObject.tabId].push(jobStatusObject.id)
     })
-    keyValueDBService.validateAndSaveData(TABIDMAP, tabIdStatusIdsMap)
+    return tabIdStatusIdsMap
   }
 
-  async validateAndSortTabList(schemaName,tabs) {
-    if(!tabs) {
+  /**
+   * 
+   * @param {*} schemaName 
+   * @param {*} tabs 
+   * validates ,sort and save tabs list 
+   * sort on basis of isDefault
+   */
+  async validateAndSortTabList(schemaName, tabs) {
+    if (!tabs) {
       return
     }
-    tabs.sort(function(x,y){
-      return (x.isDefault === y.isDefault)? 0 : x.isDefault? -1 : 1;
+    tabs.sort(function (x, y) {
+      return (x.isDefault === y.isDefault) ? 0 : x.isDefault ? -1 : 1;
     })
     await keyValueDBService.validateAndSaveData(TAB, tabs)
   }
+  
 
   /**Matches device time with server time (format 2017-07-05 16:30:02),
    * throw error if server time format is invalid 

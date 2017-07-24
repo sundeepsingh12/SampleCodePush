@@ -76,6 +76,10 @@ export default keyMirror({
     CLEAR_HOME_STATE:null,
     SET_REFRESHING_TRUE:null,
 
+    //Listing Actions
+    JOB_LISTING_START:null,
+    JOB_LISTING_END:null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
@@ -119,6 +123,7 @@ export default keyMirror({
     CUSTOMIZATION_LIST_MAP:null,
     TABIDMAP:null,
     SET_TABS_TRANSACTIONS:null,
+    JOB_ATTRIBUTE_STATUS:null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION:null,
@@ -126,7 +131,6 @@ export default keyMirror({
     TABLE_JOB_DATA:null,
     TABLE_RUNSHEET:null,
     TABLE_FIELD_DATA:null,
-    TABLE_JOB_TRANSACTION_CUSTOMIZATION:null,
 
     //Home Actions
     IS_LAST_PAGE:null,

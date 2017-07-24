@@ -5,7 +5,7 @@ const {
 import _ from 'underscore'
 
 class Job {
-    
+
     getAllJobs() {
         const allJobs = realm.getAll(TABLE_JOB)
         return allJobs
@@ -15,6 +15,21 @@ class Job {
         let allJobs = this.getAllJobs()
         filteredData = allJobs.filtered(`id = ${jobId}`)
         return filteredData
+    }
+
+    /**
+     * 
+     * @param {*} jobsList 
+     * @returns
+     * Map<JobId,Job>
+     */
+    getJobMap(jobsList) {
+        let jobMap = {}
+        jobsList.forEach(job => {
+            let jobObj = {...job}
+            jobMap[jobObj.id] = jobObj
+        })
+        return jobMap
     }
 }
 

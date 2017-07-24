@@ -31,6 +31,8 @@ export class keyValueDb {
       case 'JOB_ATTRIBUTE_VALUE':
         schemaInstance = require('../repositories/schema/jobAttributeValue');
         break;
+      case 'JOB_ATTRIBUTE_STATUS':
+        schemaInstance = require('../repositories/schema/jobAttributeStatus')
       case 'FIELD_ATTRIBUTE':
         schemaInstance = require('../repositories/schema/fieldAttribute');
         break;
@@ -122,6 +124,7 @@ export class keyValueDb {
     }
 
   }
+
 }
 // The singleton variable
 export let keyValueDB = new keyValueDb()
