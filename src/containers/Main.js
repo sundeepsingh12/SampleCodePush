@@ -15,7 +15,6 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Preloader from '../containers/Preloader'
@@ -63,7 +62,7 @@ function mapStateToProps(state) {
  */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...authActions, ...globalActions, ...homeActions }, dispatch)
+    actions: bindActionCreators({...globalActions, ...homeActions }, dispatch)
   }
 }
 
@@ -81,9 +80,10 @@ class Main extends Component {
     };
   }
 
-  componentDidMount() {
-    this.props.actions.onResyncPress()
-    this.props.actions.fetchTabs()
+   componentDidMount() {
+    this.props.actions.startMqttService()
+     this.props.actions.fetchTabs()
+     
   }
 
   renderTabs() {

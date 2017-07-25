@@ -18,17 +18,31 @@ const {
   JOB_SUMMARY,
   IS_SHOW_MOBILE_NUMBER_SCREEN,
   IS_SHOW_OTP_SCREEN,
-  IS_PRELOADER_COMPLETE
+  IS_PRELOADER_COMPLETE,
+  USER
 
 } = require('../../lib/constants').default
 
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import {
+  keyValueDBService
+} from '../../services/classes/KeyValueDBService'
 
 import CONFIG from '../../lib/config'
 
-import { onChangePassword, onChangeUsername } from '../login/loginActions'
+import {
+  onChangePassword,
+  onChangeUsername
+} from '../login/loginActions'
 
-import { clearHomeState } from '../home/homeActions'
+import {
+  onResyncPress
+} from '../home/homeActions'
+
+import {
+  clearHomeState
+} from '../home/homeActions'
+
+var mqtt = require('react-native-mqtt');
 
 
 /**
@@ -63,5 +77,58 @@ export function deleteSessionToken() {
       throw error
     }
   }
+}
 
+export function startMqttService() {
+  return async function (dispatch) {
+    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+    //Check if user session is alive
+    if (token) { 
+      console.log('registerMqttClient')
+      const uri = `mqtt://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}`
+      console.log('uri', uri)
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const clientId = `FE_${userObject.value.id}`
+      console.log('clientId', clientId)
+      console.log('mqtt', mqtt)
+      mqtt.createClient({
+        uri,
+        clientId
+      }).then(client => {
+
+        client.on('closed', () => {
+          console.log('mqtt.event.closed');
+        });
+
+        client.on('error', msg => {
+          console.log('mqtt.event.error', msg);
+
+        });
+
+        client.on('message', msg => {
+          console.log('mqtt.event.message', msg);
+          dispatch(onResyncPress())
+        });
+
+        client.on('connect', () => {
+          console.log('connected');
+          const test = `${clientId}/#`
+          console.log('test', test)
+          client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
+        });
+
+        client.connect();
+      }).catch(err => {
+        console.log('inside catch')
+        console.log(err);
+      });
+    }
+  }
+}
+
+export function stopMqttService() {
+  return async function (dispatch) {
+    const client = mqtt.clients[0];
+    client.disconnect()
+  }
 }
