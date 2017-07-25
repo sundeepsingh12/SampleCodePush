@@ -212,7 +212,7 @@ class JobTransaction {
   }
 
   setTransactionCustomizationJobAttributes(customizationObject, jobDataForJobId, finalText) {
-    const jobAttributeMasterList = customizationObject.jobAttr
+    let jobAttributeMasterList = customizationObject.jobAttr
     if (!jobAttributeMasterList) {
       jobAttributeMasterList = []
     }
@@ -232,7 +232,7 @@ class JobTransaction {
   }
 
   setTransactionCustomizationFieldAttributes(customizationObject, fieldDataForJobTransactionId, finalText) {
-    const fieldAttributeMasterList = customizationObject.fieldAttr
+    let fieldAttributeMasterList = customizationObject.fieldAttr
     if (!fieldAttributeMasterList) {
       fieldAttributeMasterList = []
     }
