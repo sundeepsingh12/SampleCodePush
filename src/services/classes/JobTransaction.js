@@ -213,6 +213,9 @@ class JobTransaction {
 
   setTransactionCustomizationJobAttributes(customizationObject, jobDataForJobId, finalText) {
     const jobAttributeMasterList = customizationObject.jobAttr
+    if (!jobAttributeMasterList) {
+      jobAttributeMasterList = []
+    }
     jobAttributeMasterList.forEach(object => {
       jobData = jobDataForJobId[object.jobAttributeMasterId]
       if (!jobData || _.isUndefined(jobData.value) || _.isNull(jobData.value)) {
@@ -230,6 +233,9 @@ class JobTransaction {
 
   setTransactionCustomizationFieldAttributes(customizationObject, fieldDataForJobTransactionId, finalText) {
     const fieldAttributeMasterList = customizationObject.fieldAttr
+    if (!fieldAttributeMasterList) {
+      fieldAttributeMasterList = []
+    }
     fieldAttributeMasterList.forEach(object => {
       fieldData = fieldDataForJobTransactionId[object.fieldAttributeMasterId]
       if (!fieldData || _.isUndefined(fieldData.value) || _.isNull(fieldData.value)) {
@@ -247,9 +253,6 @@ class JobTransaction {
   }
 
   setTransactionCustomizationDynamicParameters(customizationObject, jobTransaction, job, finalText) {
-    if (!customizationObject) {
-      return finalText
-    }
     finalText += this.appendText(customizationObject.referenceNo, jobTransaction.referenceNumber, '', customizationObject.separator, finalText)
     finalText += this.appendText(customizationObject.runsheetNo, jobTransaction.runsheetNo, '', customizationObject.separator, finalText)
     finalText += this.appendText(customizationObject.noOfAttempts, job.attemptCount, "Attempt: ", customizationObject.separator, finalText)
@@ -320,21 +323,26 @@ class JobTransaction {
       tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id]
     }
 
+    if (!_.isUndefined(job.latitude) && !_.isUndefined(job.longitude) && !_.isNull(job.latitude) && !_.isNull(job.longitude) && (job.latitude != 0.0 || job.longitude != 0.0)) {
+      combinedAddressList.push(job.latitude + ',' + job.longitude)
+    }
+
     tempAddressDataForJob.forEach(address => {
-      if (jobAttributeMap[address.jobAttributeMasterId]) {
-        if (!addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence]) {
-          addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] = {}
-        }
-        addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence][jobAttributeMasterMap[address.jobAttributeMasterId].attributeTypeId] = address.value
+      if (!jobAttributeMap[address.jobAttributeMasterId]) {
+        return
       }
+      if (!addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence]) {
+        addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] = {}
+      }
+      addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence][jobAttributeMasterMap[address.jobAttributeMasterId].attributeTypeId] = address.value
     })
 
     for (let index in addressDataForJob) {
       let combinedAddress = ''
       combinedAddress += this.appendText(addressDataForJob[index][28], addressDataForJob[index][28], '', null, null)
-      combinedAddress += this.appendText(addressDataForJob[index][29], addressDataForJob[index][29], '', null, null)
-      combinedAddress += this.appendText(addressDataForJob[index][30], addressDataForJob[index][30], '', null, null)
-      combinedAddress += this.appendText(addressDataForJob[index][31], addressDataForJob[index][31], '', null, null)
+      combinedAddress += this.appendText(addressDataForJob[index][29], addressDataForJob[index][29], '', ',', combinedAddress)
+      combinedAddress += this.appendText(addressDataForJob[index][30], addressDataForJob[index][30], '', ',', combinedAddress)
+      combinedAddress += this.appendText(addressDataForJob[index][31], addressDataForJob[index][31], '', ',', combinedAddress)
       combinedAddressList.push(combinedAddress)
     }
 

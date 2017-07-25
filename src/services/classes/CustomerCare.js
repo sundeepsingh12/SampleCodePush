@@ -10,8 +10,11 @@ class CustomerCare {
      */
     getCustomerCareMap(customerCareList) {
         let customerCareMap = {}
+        if (!customerCareList) {
+            customerCareList = {}
+        }
         customerCareList.forEach(customerCare => {
-            if(!customerCareMap[customerCare.jobMasterId]) {
+            if (!customerCareMap[customerCare.jobMasterId]) {
                 customerCareMap[customerCare.jobMasterId] = []
             }
             customerCareMap[customerCare.jobMasterId].push(customerCare)

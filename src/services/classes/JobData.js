@@ -46,6 +46,9 @@ class JobData {
      * @param {*} jobAttributeMasterMap 
      */
     checkContacNumber(jobData,jobAttributeMasterMap) {
+        if(!jobAttributeMasterMap[jobData.jobAttributeMasterId]) {
+            return false
+        }
         if(jobAttributeMasterMap[jobData.jobAttributeMasterId].hidden || 
         jobAttributeMasterMap[jobData.jobAttributeMasterId].attributeTypeId !== 27 || 
         _.isNull(jobData.value) || _.isUndefined(jobData.value) || jobData.value.trim() === '' || 
@@ -56,6 +59,9 @@ class JobData {
     }
 
     checkAddressField(jobData,jobAttributeMasterMap) {
+        if(!jobAttributeMasterMap[jobData.jobAttributeMasterId]) {
+            return false
+        }
         if(jobAttributeMasterMap[jobData.jobAttributeMasterId].hidden || 
         _.isNull(jobData.value) || _.isUndefined(jobData.value) || jobData.value.trim() === '' ) {
             return false

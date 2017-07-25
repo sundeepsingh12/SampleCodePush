@@ -10,8 +10,11 @@ class SMSTemplate {
      */
     getSMSTemplateMap(smsTemplateList) {
         let smsTemplateMap = {}
+        if (!smsTemplateList) {
+            smsTemplateList = {}
+        }
         smsTemplateList.forEach(smsTemplate => {
-            if(!smsTemplateMap[smsTemplate.jobMasterId]) {
+            if (!smsTemplateMap[smsTemplate.jobMasterId]) {
                 smsTemplateMap[smsTemplate.jobMasterId] = []
             }
             smsTemplateMap[smsTemplate.jobMasterId].push(smsTemplate)
