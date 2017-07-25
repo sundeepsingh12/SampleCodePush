@@ -18,7 +18,7 @@ class JobAttributeMaster {
     }
 
     /**
-     * 
+     * This function traverses job attribute status list
      * @param {*} jobAttributeStatusList
      * @returns
      * Map<StatusId,Map<JobAttributeMasterId,JobAttributeStatus>>
@@ -26,7 +26,7 @@ class JobAttributeMaster {
     getJobAttributeStatusMap(jobAttributeStatusList) {
         let jobAttributeStatusMap = {}
         jobAttributeStatusList.forEach(jobAttributeStatus => {
-            if(!jobAttributeStatusMap[jobAttributeStatus.statusId]) {
+            if (!jobAttributeStatusMap[jobAttributeStatus.statusId]) {
                 jobAttributeStatusMap[jobAttributeStatus.statusId] = {}
             }
             jobAttributeStatusMap[jobAttributeStatus.statusId][jobAttributeStatus.jobAttributeId] = jobAttributeStatus
@@ -35,6 +35,23 @@ class JobAttributeMaster {
 
         return jobAttributeStatusMap
     }
+
+    /**
+     * This function traverse job status list (as there is no job attribute status list)
+     */
+
+    getAllJobAttributeStatusMap(statusList, jobAttributeMasterMap) {
+        let jobAttributeStatusMap = {}
+        statusList.forEach(status => {
+            if(!jobAttributeStatusMap[status.id]) {
+                jobAttributeStatusMap[status.id] = {}
+            }
+            jobAttributeStatusMap[status.id] = jobAttributeMasterMap
+        })
+
+        return jobAttributeStatusMap
+    }
+
 }
 
 export let jobAttributeMasterService = new JobAttributeMaster()

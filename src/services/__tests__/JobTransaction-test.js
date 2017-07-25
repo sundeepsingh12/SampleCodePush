@@ -9,24 +9,48 @@ import { smsTemplateService } from '../classes/SMSTemplate'
 
 import * as realm from '../../repositories/realmdb'
 
-describe('test cases for prepareJobCustomizationList', () => {
-  const jobTransactionMap = {
-    1: {
-      id: 1,
-      jobId: 2,
-      jobMasterId: 3,
-      seqSelected: 10,
-      jobStatusId: 11
-    },
-    2: {
-      id: 2,
-      jobId: 3,
-      jobMasterId: 3,
-      seqSelected: 12,
-      jobStatusId: 11
-    }
-  }
+// describe('test cases for setTransactionCustomizationDynamicParameters', () => {
+//   const jobTransaction = null
+//   const job = null
+//   const finaltext = ''
+//   it('should not set any dynamic parameters', () => {
+//     jobTransactionService
+//   })
+// })
 
+describe('test cases for setTransactionDisplayDetails', () => {
+  const customizationObject = null
+  const jobTransaction = null
+  const job = null
+  const jobDataForJobId = null
+  const fieldDataForJobTransactionId = null
+  const finalText = null
+
+  it('should set display details empty', () => {
+    jobTransactionService.setTransactionCustomizationDynamicParameters = jest.fn()
+    jobTransactionService.setTransactionCustomizationDynamicParameters.mockReturnValue('dynamic parameters')
+    jobTransactionService.setTransactionCustomizationJobAttributes = jest.fn()
+    jobTransactionService.setTransactionCustomizationJobAttributes.mockReturnValue('job attributes')
+    jobTransactionService.setTransactionCustomizationFieldAttributes = jest.fn()
+    jobTransactionService.setTransactionCustomizationFieldAttributes.mockReturnValue('field attributes')
+    expect(jobTransactionService.setTransactionDisplayDetails(customizationObject, jobTransaction, job, finalText)).toEqual('')
+  })
+
+  it('should set display details ', () => {
+    const customizationObject1 = {}
+    jobTransactionService.setTransactionCustomizationDynamicParameters = jest.fn()
+    jobTransactionService.setTransactionCustomizationDynamicParameters.mockReturnValue('dynamic parameters')
+    jobTransactionService.setTransactionCustomizationJobAttributes = jest.fn()
+    jobTransactionService.setTransactionCustomizationJobAttributes.mockReturnValue('job attributes')
+    jobTransactionService.setTransactionCustomizationFieldAttributes = jest.fn()
+    jobTransactionService.setTransactionCustomizationFieldAttributes.mockReturnValue('field attributes')
+    const result = 'field attributes'
+    expect(jobTransactionService.setTransactionDisplayDetails(customizationObject1, jobTransaction, job, finalText)).toEqual(result)
+  })
+
+})
+
+describe('test cases for prepareJobCustomizationList', () => {
   const jobMap = {
     2: {
       id: 2,
@@ -39,88 +63,107 @@ describe('test cases for prepareJobCustomizationList', () => {
   }
 
   const jobDataDetailsForListing = {
-      jobDataMap: {
-        2: {
-          30: {
-            id: 21,
-            jobId: 2,
-            value: 'xyz',
-            jobAttributeMasterId: 30
-          },
-          31: {
-            id: 22,
-            jobId: 2,
-            value: 'abc',
-            jobAttributeMasterId: 31
-          }
+    jobDataMap: {
+      2: {
+        30: {
+          id: 21,
+          jobId: 2,
+          value: 'xyz',
+          jobAttributeMasterId: 30
         },
-        3: {
-          30: {
-            id: 31,
-            jobId: 3,
-            value: 'xyz',
-            jobAttributeMasterId: 30
-          },
-          31: {
-            id: 32,
-            jobId: 3,
-            value: 'abc',
-            jobAttributeMasterId: 31
-          }
-        }
-      }
-    }
-
-    const fieldDataMap = {
-      1: {
-        40: {
-          id: 100,
-          jobTransactionId: 1,
-          fieldAttributeMasterId: 40
-        },
-        41: {
-          id: 101,
-          jobTransactionId: 1,
-          fieldAttributeMasterId: 41
+        31: {
+          id: 22,
+          jobId: 2,
+          value: 'abc',
+          jobAttributeMasterId: 31
         }
       },
-      2: {
-        40: {
-          id: 102,
-          jobTransactionId: 2,
-          fieldAttributeMasterId: 40
+      3: {
+        30: {
+          id: 31,
+          jobId: 3,
+          value: 'xyz',
+          jobAttributeMasterId: 30
         },
-        41: {
-          id: 103,
-          jobTransactionId: 2,
-          fieldAttributeMasterId: 41
+        31: {
+          id: 32,
+          jobId: 3,
+          value: 'abc',
+          jobAttributeMasterId: 31
         }
       }
     }
+  }
 
-    const jobMasterIdCustomizationMap = {
-      3: {
-        1: {
-          jobMasterId: 3,
-          appJobListMasterId: 1,
-        },
-        2: {
-          jobMasterId: 3,
-          appJobListMasterId: 2,
-        },
-        3: {
-          jobMasterId: 3,
-          appJobListMasterId: 3,
-        },
+  const fieldDataMap = {
+    1: {
+      40: {
+        id: 100,
+        jobTransactionId: 1,
+        fieldAttributeMasterId: 40
+      },
+      41: {
+        id: 101,
+        jobTransactionId: 1,
+        fieldAttributeMasterId: 41
+      }
+    },
+    2: {
+      40: {
+        id: 102,
+        jobTransactionId: 2,
+        fieldAttributeMasterId: 40
+      },
+      41: {
+        id: 103,
+        jobTransactionId: 2,
+        fieldAttributeMasterId: 41
       }
     }
-    const jobAttributeMasterMap = {}
-    const jobAttributeStatusMap = {}
-    const customerCareMap = {}
-    const smsTemplateMap = {}
+  }
+
+  const jobMasterIdCustomizationMap = {
+    3: {
+      1: {
+        jobMasterId: 3,
+        appJobListMasterId: 1,
+      },
+      2: {
+        jobMasterId: 3,
+        appJobListMasterId: 2,
+      },
+      3: {
+        jobMasterId: 3,
+        appJobListMasterId: 3,
+      },
+    }
+  }
+  const jobAttributeMasterMap = {}
+  const jobAttributeStatusMap = {}
+  const customerCareMap = {}
+  const smsTemplateMap = {}
 
 
   it('should prepare job customization list', () => {
+    const jobTransactionMap = {
+      1: {
+        id: 1,
+        jobId: 2,
+        jobMasterId: 3,
+        seqSelected: 10,
+        jobStatusId: 11,
+        referenceNumber: 'refno'
+      },
+      2: {
+        id: 2,
+        jobId: 3,
+        jobMasterId: 3,
+        seqSelected: 12,
+        jobStatusId: 11,
+        referenceNumber: 'refno'
+      }
+    }
+
     const result = [
       {
         line1: 'xyz',
@@ -156,6 +199,61 @@ describe('test cases for prepareJobCustomizationList', () => {
     expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(8)
     expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
   })
+
+  it('should prepare job customization list', () => {
+    const jobTransactionMap = {
+      1: {
+        id: 1,
+        jobId: 2,
+        jobMasterId: 3,
+        seqSelected: 10,
+        jobStatusId: 11,
+        referenceNumber: 'refno'
+      },
+      2: {
+        id: 2,
+        jobId: 3,
+        jobMasterId: 4,
+        seqSelected: 12,
+        jobStatusId: 11,
+        referenceNumber: 'refno'
+      }
+    }
+    const result = [
+      {
+        line1: 'xyz',
+        line2: 'abc',
+        circleLine1: 'lmn',
+        circleLine2: 'def',
+        id: 1,
+        jobSwipableDetails: 'test1',
+        seqSelected: 10,
+        statusId: 11
+      },
+      {
+        line1: 'refno',
+        line2: '',
+        circleLine1: '',
+        circleLine2: '',
+        id: 2,
+        jobSwipableDetails: 'test2',
+        seqSelected: 12,
+        statusId: 11
+      }
+    ]
+    jobTransactionService.setTransactionDisplayDetails = jest.fn()
+    jobTransactionService.setTransactionDisplayDetails.mockReturnValueOnce('xyz')
+    jobTransactionService.setTransactionDisplayDetails.mockReturnValueOnce('abc')
+    jobTransactionService.setTransactionDisplayDetails.mockReturnValueOnce('lmn')
+    jobTransactionService.setTransactionDisplayDetails.mockReturnValueOnce('def')
+    jobTransactionService.setTransactionDisplayDetails.mockReturnValue('test')
+    jobTransactionService.setJobSwipableDetails = jest.fn()
+    jobTransactionService.setJobSwipableDetails.mockReturnValueOnce('test1')
+    jobTransactionService.setJobSwipableDetails.mockReturnValueOnce('test2')
+    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap)).toEqual(result)
+    expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(4)
+    expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
+  })
 })
 
 describe('test Job Transaction services', () => {
@@ -171,27 +269,27 @@ describe('test Job Transaction services', () => {
     expect(jobTransactionService.getUnseenTransactionsJobMasterIds(unseenTransactions)).toEqual(jobMasterIds)
   })
 
-  it('should get job transactions on basis of status ids', () => {
-    const allJobTransactions = [{
-      id: 1,
-      jobStatusId: 12
-    }, {
-      id: 2,
-      jobStatusId: 13
-    }, {
-      id: 3,
-      jobStatusId: 14
-    }]
-    const jobStatusIds = [12, 13]
-    const filteredJobTransactions = [{
-      id: 1,
-      jobStatusId: 12
-    }, {
-      id: 2,
-      jobStatusId: 13
-    }]
-    expect(jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, jobStatusIds)).toEqual(filteredJobTransactions)
-  })
+  // it('should get job transactions on basis of status ids', () => {
+  //   const allJobTransactions = [{
+  //     id: 1,
+  //     jobStatusId: 12
+  //   }, {
+  //     id: 2,
+  //     jobStatusId: 13
+  //   }, {
+  //     id: 3,
+  //     jobStatusId: 14
+  //   }]
+  //   const jobStatusIds = [12, 13]
+  //   const filteredJobTransactions = [{
+  //     id: 1,
+  //     jobStatusId: 12
+  //   }, {
+  //     id: 2,
+  //     jobStatusId: 13
+  //   }]
+  //   expect(jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, jobStatusIds)).toEqual(filteredJobTransactions)
+  // })
 
   it('should get JobMasterIdJobStatusIdTransactionIdDtoMap', () => {
     const unseenTransactions = [{

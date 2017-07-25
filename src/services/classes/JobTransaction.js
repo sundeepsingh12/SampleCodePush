@@ -131,10 +131,13 @@ class JobTransaction {
     const jobMasterIds = unseenTransactions.map(unseenTransactionObject => unseenTransactionObject.jobMasterId)
     return jobMasterIds
   }
-  
-  getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList) {
+
+  getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList, statusList) {
     let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobAttributeMasterList)
     let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
+    if (_.isEmpty(jobAttributeStatusMap)) {
+      jobAttributeStatusMap = jobAttributeMasterService.getAllJobAttributeStatusMap(statusList, jobAttributeMasterMap)
+    }
     let customerCareMap = customerCareService.getCustomerCareMap(customerCareList)
     let smsTemplateMap = smsTemplateService.getSMSTemplateMap(smsTemplateList)
     let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION)
@@ -182,7 +185,7 @@ class JobTransaction {
         jobTransactionCustomization.circleLine2 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][4], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobTransaction.jobId], fieldDataMap[jobTransaction.id])
         jobTransactionCustomization.id = jobTransaction.id
       } else {
-        jobTransactionCustomization.line1 = ''
+        jobTransactionCustomization.line1 = jobTransaction.referenceNumber
         jobTransactionCustomization.line2 = ''
         jobTransactionCustomization.circleLine1 = ''
         jobTransactionCustomization.circleLine2 = ''
@@ -245,7 +248,7 @@ class JobTransaction {
 
   setTransactionCustomizationDynamicParameters(customizationObject, jobTransaction, job, finalText) {
     if (!customizationObject) {
-      return ''
+      return finalText
     }
     finalText += this.appendText(customizationObject.referenceNo, jobTransaction.referenceNumber, '', customizationObject.separator, finalText)
     finalText += this.appendText(customizationObject.runsheetNo, jobTransaction.runsheetNo, '', customizationObject.separator, finalText)
@@ -290,7 +293,9 @@ class JobTransaction {
 
   setContactDetails(jobDataDetailsForListing, jobAttributeMap, job) {
     let tempContactDataForJob = [], contactDataForJob = []
-
+    if (!jobAttributeMap) {
+      jobAttributeMap = {}
+    }
     if (jobDataDetailsForListing.contactMap[job.id]) {
       tempContactDataForJob = jobDataDetailsForListing.contactMap[job.id]
     }
@@ -306,6 +311,10 @@ class JobTransaction {
 
   setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job) {
     let tempAddressDataForJob = [], addressDataForJob = {}, combinedAddressList = []
+
+    if (!jobAttributeMap) {
+      jobAttributeMap = {}
+    }
 
     if (jobDataDetailsForListing.addressMap[job.id]) {
       tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id]

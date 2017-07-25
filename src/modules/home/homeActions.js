@@ -111,12 +111,13 @@ export function setTabIdsJobTransactions(tabIdJobs) {
 export function fetchJobs() {
   return async function (dispatch) {
     try {
+      const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
       const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
       const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
       const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
       const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
       const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value)
+      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value,statusList.value)
       dispatch(jobFetchingEnd(jobTransactionCustomizationList))
     } catch (error) {
       console.log(error)
@@ -158,12 +159,13 @@ export function onResyncPress() {
         }
       }
       if (isJobsPresent) {
+        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
         const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
         const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
         const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
         const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
         const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-        let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value)
+        let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value,statusList.value)
         dispatch(jobFetchingEnd(jobTransactionCustomizationList))
       }
     } catch (error) {
