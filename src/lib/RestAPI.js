@@ -13,9 +13,10 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
+import Upload from 'react-native-background-upload'
+import RNFS from 'react-native-fs';
 
 const fetch = require('react-native-cancelable-fetch');
-
 class RestAPI {
   /**
    * ## API.js client
@@ -99,23 +100,23 @@ class RestAPI {
     return prune(obj);
   }
 
-   /** 
-   * Parameters (Request Body, URL, Method (enum type POST, LOGIN, GET))
-   * 
-   * Success response JSON object
-   * {
-   *   status,
-   *   code,
-   *   headers,
-   *   json: {}
-   * }
-   * 
-   * Failure response JSON object
-   * {
-   *   code: xxx,
-   *   message: 'error message'
-   * }
-   */
+  /** 
+  * Parameters (Request Body, URL, Method (enum type POST, LOGIN, GET))
+  * 
+  * Success response JSON object
+  * {
+  *   status,
+  *   code,
+  *   headers,
+  *   json: {}
+  * }
+  * 
+  * Failure response JSON object
+  * {
+  *   code: xxx,
+  *   message: 'error message'
+  * }
+  */
   serviceCall(body, url, method) {
     let opts;
     if (method === 'POST') {
@@ -156,7 +157,7 @@ class RestAPI {
       })
       .catch((e) => {
         //Aborting the Fetch API call
-        fetch.abort(fetchRequestId); 
+        fetch.abort(fetchRequestId);
 
         //Throw custom error instance
         if (e instanceof Error) {
@@ -176,6 +177,38 @@ class RestAPI {
       promise.then(resolve, reject);
       setTimeout(reject.bind(null, err), timeout);
     });
+  }
+
+
+  uploadZipFile() {
+    var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
+    console.log("====here 1======");
+    const options = {
+      url: this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API,
+      path: PATH + '/sync.zip',
+      method: 'POST',
+      headers: {},
+      // Below are options only supported on Android
+      notification: {
+        // enabled: true
+      }
+    }
+    options.headers['Cookie'] = this._sessionToken
+
+    Upload.startUpload(options).then((uploadId) => {
+      console.log('Upload started')
+      Upload.addListener('progress', uploadId, (data) => {
+        console.log('Progress: ${data.progress}%')
+      })
+      Upload.addListener('error', uploadId, (data) => {
+        console.log('Error: ${data.error}%')
+      })
+      Upload.addListener('completed', uploadId, (data) => {
+        console.log('Completed!')
+      })
+    }).catch((err) => {
+      console.log('Upload error!', err)
+    })
   }
 
 }

@@ -127,13 +127,15 @@ export default keyMirror({
     TABLE_RUNSHEET:null,
     TABLE_FIELD_DATA:null,
     TABLE_JOB_TRANSACTION_CUSTOMIZATION:null,
+    TABLE_TRACK_LOGS:null,
 
     //Home Actions
     IS_LAST_PAGE:null,
 
     //Status Codes
     UNSEEN:null,
-    PENDING:null
+    PENDING:null,
+    
 })
 
 

@@ -3,6 +3,11 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.vydia.RNUploader.UploaderReactPackage;
+import com.rnziparchive.RNZipArchivePackage;
+import com.rnfs.RNFSPackage;
+import com.pilloxa.backgroundjob.BackgroundJobPackage;
+import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
 import com.microsoft.codepush.react.CodePush;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
@@ -35,6 +40,11 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new UploaderReactPackage(),
+            new RNZipArchivePackage(),
+            new RNFSPackage(),
+            new BackgroundJobPackage(),
+            new RNBackgroundGeolocation(),
             new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
             new RNDeviceInfo(),
             new RCTCameraPackage(),

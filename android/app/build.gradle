@@ -127,6 +127,11 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-background-upload')
+    compile project(':react-native-zip-archive')
+    compile project(':react-native-fs')
+    compile project(':react-native-background-job')
+    compile project(':react-native-background-geolocation')
     compile project(':react-native-code-push')
     compile project(':react-native-device-info')
     compile project(':react-native-camera')

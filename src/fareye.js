@@ -70,7 +70,11 @@ import DeviceInitialState from './modules/device/deviceInitialState'
 import GlobalInitialState from './modules/global/globalInitialState'
 import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
 import HomeInititalState from './modules/home/homeInitialState'
-// import ProfileInitialState from './modules/profile/profileInitialState'
+
+/**
+ * Initiate a background service to execute every 15 mintues
+ */
+import { backgroundServiceEvery15mins } from './services/background/'
 
 /**
  *  The version of the app but not  displayed yet
@@ -112,6 +116,9 @@ const styles = StyleSheet.create({
   }
 })
 
+
+
+
 /**
  * ## TabIcon
  *
@@ -141,6 +148,11 @@ class TabIcon extends React.Component {
 export default function native(platform) {
 
   let Fareye = React.createClass({
+
+    // componentDidMount() {
+    //   backgroundServiceEvery15mins();
+    // },
+
     render() {
       const store = configureStore(getInitialState())
 

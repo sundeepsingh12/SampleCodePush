@@ -1,6 +1,7 @@
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import * as realm from '../../repositories/realmdb'
+import { createZip } from './SyncZip'
 import {
   keyValueDBService
 } from './KeyValueDBService'
@@ -31,6 +32,15 @@ const {
 } = require('../../lib/constants').default
 
 class Sync {
+
+  async createAndUploadZip() {
+    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+    if (!token) {
+      throw new Error('Token Missing')
+    }
+    await createZip();
+    RestAPIFactory(token.value).uploadZipFile();
+  }
 
   /**GET API (Pagination)
    * This downloads jobTransactions,Job,Field Data etc from server
