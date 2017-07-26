@@ -88,8 +88,6 @@ class Main extends Component {
   }
 
   renderTabs() {
-    console.log('render tabs home container')
-    console.log(this.props)
     const tabs = this.props.tabsList
     const renderTabList = []
     tabs.forEach(tab => {

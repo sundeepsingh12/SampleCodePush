@@ -14,22 +14,29 @@ class JobData {
      */
     getJobDataDetailsForListing(jobDataList,jobAttributeMasterMap) {
         let jobDataDetailsForListing = {}, jobDataMap = {},contactMap = {},addressMap = {}
-        jobDataList.forEach(jobData => {
-            let jobDataObj = { ...jobData }
-            if (!jobDataMap[jobDataObj.jobId]) {
-                jobDataMap[jobDataObj.jobId] = {}
+        jobDataList.forEach(jobDataObj => {
+            let jobId = jobDataObj.jobId
+            let jobAttributeMasterId = jobDataObj.jobAttributeMasterId
+            let value = jobDataObj.value
+            let jobData = {
+                jobId,
+                jobAttributeMasterId,
+                value
             }
-            jobDataMap[jobDataObj.jobId][jobDataObj.jobAttributeMasterId] = jobDataObj
-            if(this.checkContacNumber(jobDataObj,jobAttributeMasterMap)) {
-                if(!contactMap[jobDataObj.jobId]) {
-                    contactMap[jobDataObj.jobId] = []
+            if (!jobDataMap[jobId]) {
+                jobDataMap[jobId] = {}
+            }
+            jobDataMap[jobId][jobAttributeMasterId] = value
+            if(this.checkContacNumber(jobAttributeMasterId,value,jobAttributeMasterMap)) {
+                if(!contactMap[jobId]) {
+                    contactMap[jobId] = []
                 }
-                contactMap[jobDataObj.jobId].push(jobDataObj)
-            } else if (this.checkAddressField(jobDataObj,jobAttributeMasterMap)) {
-                if(!addressMap[jobDataObj.jobId]) {
-                    addressMap[jobDataObj.jobId] = []
+                contactMap[jobId].push(jobData)
+            } else if (this.checkAddressField(jobAttributeMasterId,value,jobAttributeMasterMap)) {
+                if(!addressMap[jobId]) {
+                    addressMap[jobId] = []
                 }
-                addressMap[jobDataObj.jobId].push(jobDataObj)
+                addressMap[jobId].push(jobData)
             }
         })
         jobDataDetailsForListing.jobDataMap = jobDataMap
@@ -45,31 +52,31 @@ class JobData {
      * @param {*} jobData 
      * @param {*} jobAttributeMasterMap 
      */
-    checkContacNumber(jobData,jobAttributeMasterMap) {
-        if(!jobAttributeMasterMap[jobData.jobAttributeMasterId]) {
+    checkContacNumber(jobAttributeMasterId,value,jobAttributeMasterMap) {
+        if(!jobAttributeMasterMap[jobAttributeMasterId]) {
             return false
         }
-        if(jobAttributeMasterMap[jobData.jobAttributeMasterId].hidden || 
-        jobAttributeMasterMap[jobData.jobAttributeMasterId].attributeTypeId !== 27 || 
-        _.isNull(jobData.value) || _.isUndefined(jobData.value) || jobData.value.trim() === '' || 
-        jobData.value.length < 6 || /(.)\\1+/.test(jobData.value)) {
+        if(jobAttributeMasterMap[jobAttributeMasterId].hidden || 
+        jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId !== 27 || 
+        _.isNull(value) || _.isUndefined(value) || value.trim() === '' || 
+        value.length < 6 || /(.)\\1+/.test(value)) {
             return false
         }
         return true
     }
 
-    checkAddressField(jobData,jobAttributeMasterMap) {
-        if(!jobAttributeMasterMap[jobData.jobAttributeMasterId]) {
+    checkAddressField(jobAttributeMasterId,value,jobAttributeMasterMap) {
+        if(!jobAttributeMasterMap[jobAttributeMasterId]) {
             return false
         }
-        if(jobAttributeMasterMap[jobData.jobAttributeMasterId].hidden || 
-        _.isNull(jobData.value) || _.isUndefined(jobData.value) || jobData.value.trim() === '' ) {
+        if(jobAttributeMasterMap[jobAttributeMasterId].hidden || 
+        _.isNull(value) || _.isUndefined(value) || value.trim() === '' ) {
             return false
         }
-        if(jobAttributeMasterMap[jobData.jobAttributeMasterId].attributeTypeId == 28 || 
-        jobAttributeMasterMap[jobData.jobAttributeMasterId].attributeTypeId == 29 || 
-        jobAttributeMasterMap[jobData.jobAttributeMasterId].attributeTypeId == 30 ||
-        jobAttributeMasterMap[jobData.jobAttributeMasterId].attributeTypeId == 31) {
+        if(jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 28 || 
+        jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 29 || 
+        jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 30 ||
+        jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 31) {
             return true
         }
         return false

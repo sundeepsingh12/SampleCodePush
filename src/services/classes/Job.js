@@ -26,8 +26,24 @@ class Job {
     getJobMap(jobsList) {
         let jobMap = {}
         jobsList.forEach(job => {
-            let jobObj = {...job}
-            jobMap[jobObj.id] = jobObj
+            const id = job.id
+            const latitude = job.latitude
+            const longitude = job.longitude
+            const attemptCount = job.attemptCount
+            const slot = job.slot
+            const jobStartTime = job.jobStartTime
+            const jobEndTime = job.jobEndTime
+            const jobMasterId = job.jobMasterId
+            jobMap[id] = {
+                attemptCount,
+                id,
+                jobEndTime,
+                jobMasterId,
+                jobStartTime,
+                latitude,
+                longitude,
+                slot
+            }
         })
         return jobMap
     }

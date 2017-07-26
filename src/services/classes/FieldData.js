@@ -10,12 +10,19 @@ class FieldData {
      */
     getFieldDataMap(fieldDataList) {
         let fieldDataMap = {}
-        fieldDataList.forEach(fieldData => {
-            let fieldDataObj = {...fieldData}
-            if (!fieldDataMap[fieldDataObj.jobTransactionId]) {
-                fieldDataMap[fieldDataObj.jobTransactionId] = {}
+        fieldDataList.forEach(fieldDataObj => {
+            let jobTransactionId = fieldDataObj.jobTransactionId
+            let fieldAttributeMasterId = fieldDataObj.fieldAttributeMasterId
+            let value = fieldDataObj.value
+            let fieldData = {
+                jobTransactionId,
+                fieldAttributeMasterId,
+                value
             }
-            fieldDataMap[fieldDataObj.jobTransactionId][fieldDataObj.fieldAttributeMasterId] = fieldDataObj
+            if (!fieldDataMap[jobTransactionId]) {
+                fieldDataMap[jobTransactionId] = {}
+            }
+            fieldDataMap[jobTransactionId][fieldAttributeMasterId] = fieldData
         })
         return fieldDataMap
     }

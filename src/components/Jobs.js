@@ -166,13 +166,10 @@ class Jobs extends Component {
     list.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
-    console.log(list)
     return list
   }
 
   render() {
-    console.log('render jobs component')
-    console.log(this.props)
     return (
       <Container>
         <View style={styles.container}>

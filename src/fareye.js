@@ -142,7 +142,7 @@ class TabIcon extends React.Component {
 
 export default function native(platform) {
 
-  let Fareye = React.createClass({
+  class Fareye extends React.Component {
     render() {
       const store = configureStore(getInitialState())
 
@@ -226,7 +226,7 @@ export default function native(platform) {
         </Provider>
       )
     }
-  })
+  }
   /**
    * registerComponent to the AppRegistery and off we go....
    */
