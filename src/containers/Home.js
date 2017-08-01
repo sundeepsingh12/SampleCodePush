@@ -15,7 +15,6 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Preloader from '../containers/Preloader'
@@ -64,7 +63,7 @@ function mapStateToProps(state) {
  */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...authActions, ...globalActions, ...homeActions }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...homeActions }, dispatch)
   }
 }
 
@@ -83,24 +82,27 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.onResyncPress()
+    this.props.actions.startMqttService()
     this.props.actions.fetchTabs()
+
   }
 
   renderTabs() {
     const tabs = this.props.tabsList
     const renderTabList = []
     tabs.forEach(tab => {
-      renderTabList.push(
-        <Tab
-          key={tab.id}
-          heading={tab.name}>
-          <Jobs
-            tabId={tab.id}
-            statusIdList={this.props.tabIdStatusIdMap[tab.id]}
-          />
-        </Tab>
-      )
+      if (this.props.tabIdStatusIdMap[tab.id]) {
+        renderTabList.push(
+          <Tab
+            key={tab.id}
+            heading={tab.name}>
+            <Jobs
+              tabId={tab.id}
+              statusIdList={this.props.tabIdStatusIdMap[tab.id]}
+            />
+          </Tab>
+        )
+      }
     })
     return renderTabList
   }
@@ -120,14 +122,14 @@ class Main extends Component {
               <Text>Cancel</Text>
             </TouchableHighlight>
           </Right>
-      </Header>
-      
-      <Tabs locked
-      renderTabBar={()=> <ScrollableTab />}
-      >
-        {viewTabList}
-      </Tabs>
-      <Fab
+        </Header>
+
+        <Tabs locked
+          renderTabBar={() => <ScrollableTab />}
+        >
+          {viewTabList}
+        </Tabs>
+        <Fab
           active={this.state.active}
           direction="up"
           style={{ backgroundColor: '#5067FF' }}

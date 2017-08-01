@@ -6,17 +6,6 @@ import _ from 'underscore'
 
 class Job {
 
-    getAllJobs() {
-        const allJobs = realm.getAll(TABLE_JOB)
-        return allJobs
-    }
-
-    getJobForJobId(jobId) {
-        let allJobs = this.getAllJobs()
-        filteredData = allJobs.filtered(`id = ${jobId}`)
-        return filteredData
-    }
-
     /**
      * 
      * @param {*} jobsList 

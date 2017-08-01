@@ -26,7 +26,7 @@ class JobData {
             if (!jobDataMap[jobId]) {
                 jobDataMap[jobId] = {}
             }
-            jobDataMap[jobId][jobAttributeMasterId] = value
+            jobDataMap[jobId][jobAttributeMasterId] = jobData
             if(this.checkContacNumber(jobAttributeMasterId,value,jobAttributeMasterMap)) {
                 if(!contactMap[jobId]) {
                     contactMap[jobId] = []
@@ -58,7 +58,7 @@ class JobData {
         }
         if(jobAttributeMasterMap[jobAttributeMasterId].hidden || 
         jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId !== 27 || 
-        _.isNull(value) || _.isUndefined(value) || value.trim() === '' || 
+        value == undefined || value == null || value.trim() === '' || 
         value.length < 6 || /(.)\\1+/.test(value)) {
             return false
         }
@@ -70,7 +70,7 @@ class JobData {
             return false
         }
         if(jobAttributeMasterMap[jobAttributeMasterId].hidden || 
-        _.isNull(value) || _.isUndefined(value) || value.trim() === '' ) {
+         value == undefined || value == null || value.trim() === '' ) {
             return false
         }
         if(jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 28 || 

@@ -99,7 +99,6 @@ class JobTransaction {
     let jobQuery = '', jobTransactionQuery = '', jobDataQuery = '', fieldDataQuery = '', jobTransactionMap = {}
     for (let index in jobTransactionList) {
       let transaction = jobTransactionList[index]
-      // let transaction = { ...jobTransactionList[index] }
       const jobTransactionId = transaction.id
       const jobId = transaction.jobId
       const referenceNumber = transaction.referenceNumber
@@ -125,7 +124,7 @@ class JobTransaction {
         fieldDataQuery += ' OR jobTransactionId = ' + jobTransactionId
       }
       jobTransactionMap[jobTransactionId] = {
-        id: index,
+        id: jobTransactionId,
         jobId,
         jobMasterId,
         jobStatusId,
@@ -204,22 +203,22 @@ class JobTransaction {
       if (!jobDataDetailsForListing.jobDataMap[jobId]) {
         jobDataDetailsForListing.jobDataMap[jobId] = {}
       }
-      if (!fieldDataMap[index]) {
-        fieldDataMap[index] = {}
+      if (!fieldDataMap[jobTransaction.id]) {
+        fieldDataMap[jobTransaction.id] = {}
       }
 
       if (jobMasterIdCustomizationMap[jobMasterId]) {
-        jobTransactionCustomization.line1 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][1], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[index])
-        jobTransactionCustomization.line2 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][2], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[index])
-        jobTransactionCustomization.circleLine1 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][3], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[index])
-        jobTransactionCustomization.circleLine2 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][4], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[index])
+        jobTransactionCustomization.line1 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][1], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
+        jobTransactionCustomization.line2 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][2], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
+        jobTransactionCustomization.circleLine1 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][3], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
+        jobTransactionCustomization.circleLine2 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][4], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
         jobTransactionCustomization.id = jobTransaction.id
       } else {
         jobTransactionCustomization.line1 = jobTransaction.referenceNumber
         jobTransactionCustomization.line2 = ''
         jobTransactionCustomization.circleLine1 = ''
         jobTransactionCustomization.circleLine2 = ''
-        jobTransactionCustomization.id = index
+        jobTransactionCustomization.id = jobTransaction.id
       }
       let jobSwipableDetails = this.setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap)
       jobTransactionCustomization.jobSwipableDetails = jobSwipableDetails
@@ -243,6 +242,9 @@ class JobTransaction {
 
   setTransactionCustomizationJobAttributes(customizationObject, jobDataForJobId, finalText) {
     let jobAttributeMasterList = customizationObject.jobAttr
+    if(!customizationObject.separator) {
+      customizationObject.separator = ''
+    }
     if (!jobAttributeMasterList) {
       jobAttributeMasterList = []
     }
@@ -263,6 +265,9 @@ class JobTransaction {
 
   setTransactionCustomizationFieldAttributes(customizationObject, fieldDataForJobTransactionId, finalText) {
     let fieldAttributeMasterList = customizationObject.fieldAttr
+    if(!customizationObject.separator) {
+      customizationObject.separator = ''
+    }
     if (!fieldAttributeMasterList) {
       fieldAttributeMasterList = []
     }
@@ -300,7 +305,7 @@ class JobTransaction {
 
   appendText(condition, property, extraString, seperator, finalText) {
     let text = ''
-    if (condition) {
+    if (condition && !_.isUndefined(property) && !_.isNull(property)) {
       if (seperator && !_.isUndefined(finalText) && !_.isNull(finalText) && finalText !== '') {
         text = seperator + extraString + property
       } else {
@@ -375,7 +380,7 @@ class JobTransaction {
       combinedAddress += this.appendText(addressDataForJob[index][31], addressDataForJob[index][31], '', ',', combinedAddress)
       combinedAddressList.push(combinedAddress)
     }
-
+    
     return combinedAddressList
   }
 
@@ -392,28 +397,6 @@ class JobTransaction {
     let smsTemplateListForJob = smsTemplateMap[job.jobMasterId]
     return smsTemplateListForJob
   }
-
-
-  // async refreshJobs() {
-  //   const tabsList = await keyValueDBService.getValueFromStore(TAB)
-  //   let tabIdJobs = {}
-  //   for (let tab in tabsList.value) {
-  //     let pageData = await this.getJobTransactions(tabsList.value[tab].id, 0)
-  //     let tabJob = {}
-  //     //   const pageData = {
-  //     //   pageJobTransactionCustomizationList: [],
-  //     //   pageNumber: 0,
-  //     //   isLastPage: false,
-  //     //   message: '',
-  //     // }
-  //     tabJob.isLastPage = pageData.isLastPage
-  //     tabJob.jobTransactionCustomization = pageData.pageJobTransactionCustomizationList
-  //     tabJob.message = pageData.message
-  //     tabJob.pageNumber = pageData.pageNumber
-  //     tabIdJobs[tabsList.value[tab].id] = tabJob
-  //   }
-  //   return tabIdJobs
-  // }
 }
 
 export let jobTransactionService = new JobTransaction()

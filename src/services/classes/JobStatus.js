@@ -70,11 +70,6 @@ class JobStatus {
     return jobMasterIdStatusIdMap
   }
 
-  getStatusIdsForTabId(tabId) {
-    const tabIdMap = keyValueDBService.getValueFromStore()
-    return tabIdMap.value[tabId]
-  }
-
 }
 
 export let jobStatusService = new JobStatus()

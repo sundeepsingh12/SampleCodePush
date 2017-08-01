@@ -66,16 +66,6 @@ export function setTabsList(tabsList, tabIdStatusIdMap) {
   }
 }
 
-export function setFetchingFalse(tabId, message) {
-  return {
-    type: SET_FETCHING_FALSE,
-    payload: {
-      tabId,
-      message
-    }
-  }
-}
-
 export function clearHomeState() {
   return {
     type: CLEAR_HOME_STATE
@@ -92,19 +82,6 @@ export function fetchTabs() {
     } catch (error) {
       console.log(error)
     }
-  }
-}
-
-export function setRefereshingTrue() {
-  return {
-    type: SET_REFRESHING_TRUE
-  }
-}
-
-export function setTabIdsJobTransactions(tabIdJobs) {
-  return {
-    type: SET_TABS_TRANSACTIONS,
-    payload: tabIdJobs
   }
 }
 

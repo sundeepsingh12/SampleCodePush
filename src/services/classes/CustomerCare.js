@@ -11,7 +11,7 @@ class CustomerCare {
     getCustomerCareMap(customerCareList) {
         let customerCareMap = {}
         if (!customerCareList) {
-            customerCareList = {}
+            customerCareList = []
         }
         customerCareList.forEach(customerCare => {
             if (!customerCareMap[customerCare.jobMasterId]) {

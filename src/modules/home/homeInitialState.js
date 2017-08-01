@@ -6,10 +6,9 @@ var InitialState = Record({
     revertService: '',
     downloadService: '',
     searchText: '',
-    tabIdJobTransactions: {},
-    isRefreshing:false,
+    isRefreshing: false,
     tabsList: [],
-    tabIdStatusIdMap : {}
+    tabIdStatusIdMap: {}
 })
 
 export default InitialState

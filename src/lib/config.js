@@ -12,10 +12,8 @@ module.exports = {
     staging: {
       url: 'https://staging.fareye.co/app'
     },
-    // staging: {
-    //   url: 'http://192.168.1.169:8080/app'
-    // }
-
+    port:1883,
+    PUSH_QOS:2
   },
     API:{
         AUTHENTICATION_API:'/authentication',
@@ -25,6 +23,7 @@ module.exports = {
         SIM_VERIFICATION_API:'/rest/device/sim_verified',
         LOGOUT_API:'/logout',
         DOWNLOAD_DATA_API:'/rest/device/get_sync_table_job_with_pagination',
-        DELETE_DATA_API:'/rest/device/delete_synch_job'
+        DELETE_DATA_API:'/rest/device/delete_synch_job',
+        PUSH_BROKER:'mqttstaging.fareye.co'
     }
 }
