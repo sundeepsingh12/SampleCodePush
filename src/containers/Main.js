@@ -82,7 +82,7 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.onResyncPress()
+    // this.props.actions.onResyncPress()
     this.props.actions.fetchTabs()
   }
 

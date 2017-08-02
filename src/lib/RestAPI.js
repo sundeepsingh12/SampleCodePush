@@ -182,18 +182,20 @@ class RestAPI {
 
   uploadZipFile() {
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
+     console.log('RNFS.DocumentDirectoryPath>>>>>>>>',RNFS.DocumentDirectoryPath)
     console.log("====here 1======");
+    console.log('PATH>>>>>>>>',PATH)
     const options = {
       url: this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API,
-      path: PATH + '/sync.zip',
-      method: 'POST',
-      headers: {},
+      path: PATH+'/sync.zip',
+      method: 'POST'
+      // headers:{
+      //   'Content-Type': 'multipart/form-data;boundary=1234444'
+      // }
       // Below are options only supported on Android
-      notification: {
-        // enabled: true
-      }
     }
-    options.headers['Cookie'] = this._sessionToken
+    console.log('options url >>>>>>>>',options.url)
+    // options.headers['Cookie'] = this._sessionToken
 
     Upload.startUpload(options).then((uploadId) => {
       console.log('Upload started')
@@ -201,7 +203,7 @@ class RestAPI {
         console.log('Progress: ${data.progress}%')
       })
       Upload.addListener('error', uploadId, (data) => {
-        console.log('Error: ${data.error}%')
+        console.log(`${data.error}`)
       })
       Upload.addListener('completed', uploadId, (data) => {
         console.log('Completed!')
