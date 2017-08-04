@@ -28,12 +28,14 @@ export async function createZip() {
     SYNC_RESULTS.runSheetSummary = [];
     SYNC_RESULTS.scannedReferenceNumberLog = [];
     SYNC_RESULTS.serverSmsLog = [];
-    SYNC_RESULTS.trackLog = await realm.getAll(TABLE_TRACK_LOGS) || [];
+    SYNC_RESULTS.trackLog = [];
     SYNC_RESULTS.transactionLog = [];
     SYNC_RESULTS.userCommunicationLog = [];
     SYNC_RESULTS.userEventsLog = [];
     SYNC_RESULTS.userExceptionLog = [];
-    SYNC_RESULTS.userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY) || {}
+    const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+    const userSummaryValue = userSummary.value
+    SYNC_RESULTS.userSummary = userSummaryValue || {}
     console.log(JSON.stringify(SYNC_RESULTS));
 
     //Writing Object to File at TEMP location

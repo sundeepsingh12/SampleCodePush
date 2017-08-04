@@ -13,8 +13,8 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
-import Upload from 'react-native-background-upload'
 import RNFS from 'react-native-fs';
+import RNFetchBlob from 'react-native-fetch-blob'
 
 const fetch = require('react-native-cancelable-fetch');
 class RestAPI {
@@ -179,38 +179,27 @@ class RestAPI {
     });
   }
 
-
   uploadZipFile() {
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
-     console.log('RNFS.DocumentDirectoryPath>>>>>>>>',RNFS.DocumentDirectoryPath)
-    console.log("====here 1======");
-    console.log('PATH>>>>>>>>',PATH)
-    const options = {
-      url: this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API,
-      path: PATH+'/sync.zip',
-      method: 'POST'
-      // headers:{
-      //   'Content-Type': 'multipart/form-data;boundary=1234444'
-      // }
-      // Below are options only supported on Android
+  RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
+    Authorization :this._sessionToken,
+    'Content-Type' : 'multipart/form-data',
+  }, [
+    { name : 'file', filename : 'sync.zip', type:'*/*', data: RNFetchBlob.wrap(PATH+'/sync.zip')},
+  ]).uploadProgress((written, total) => {
+        console.log('uploaded', written / total)
+    }).then((resp) => {
+    const responseBody = resp.text()
+    console.log('responseBody>>>>>',responseBody)
+    const message = responseBody.split(",")[0]
+    console.log('message >>>>>',message);
+    const syncCount = responseBody.split(",")[1]
+    if(message=='success'){
+      //do something
     }
-    console.log('options url >>>>>>>>',options.url)
-    // options.headers['Cookie'] = this._sessionToken
-
-    Upload.startUpload(options).then((uploadId) => {
-      console.log('Upload started')
-      Upload.addListener('progress', uploadId, (data) => {
-        console.log('Progress: ${data.progress}%')
-      })
-      Upload.addListener('error', uploadId, (data) => {
-        console.log(`${data.error}`)
-      })
-      Upload.addListener('completed', uploadId, (data) => {
-        console.log('Completed!')
-      })
-    }).catch((err) => {
-      console.log('Upload error!', err)
-    })
+  }).catch((err) => {
+    console.log(err)
+  })
   }
 
 }
