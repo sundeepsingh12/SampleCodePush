@@ -118,7 +118,7 @@ class Main extends Component {
           </Body>
           <Right>
 
-            <TouchableHighlight underlayColor='#e7e7e7' onPress={Actions.Preloader}>
+            <TouchableHighlight underlayColor='#e7e7e7' onPress={Actions.JobDetails}>
               <Text>Cancel</Text>
             </TouchableHighlight>
           </Right>

@@ -37,6 +37,9 @@ export default {
     fontDarkGray: {
         color: '#a3a3a3'
     },
+    fontYellow: {
+        color: '#FEDC14'
+    },
     fontSuccess: {
         color: '#28bf54'
     },
@@ -298,6 +301,15 @@ export default {
     flexBasis25: {
         flexBasis: '25%'
     },
+    flexBasis15: {
+        flexBasis: '15%'
+    },
+    flexBasis20: {
+        flexBasis: '20%'
+    },
+    flexBasis35: {
+        flexBasis: '35%'
+    },
     flexBasis40: {
         flexBasis: '40%'
     },
@@ -312,6 +324,12 @@ export default {
     },
     flexBasis75: {
         flexBasis: '75%'
+    },
+    flexBasis80: {
+        flexBasis: '80%'
+    },
+    flexBasis85: {
+        flexBasis: '85%'
     },
     flexBasis100: {
         flexBasis: '100%'
@@ -335,7 +353,7 @@ export default {
         justifyContent: 'space-around'
     },
     justifySpaceBetween: {
-        justifyContent: 'space-beetween'
+        justifyContent: 'space-between'
     },
     alignCenter: {
         alignItems: 'center'
@@ -427,7 +445,7 @@ export default {
       justifyContent : 'space-around'
   },
   justifySpaceBetween : {
-      justifyContent : 'space-beetween'
+      justifyContent : 'space-between'
   },
   alignCenter : {
       alignItems : 'center'

@@ -16,33 +16,33 @@ const schemaVersion = 27;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet];
 
 let realm = new Realm({
-  schemaVersion,
-  schema
+    schemaVersion,
+    schema
 });
 
 const {
-  TABLE_JOB_TRANSACTION,
-  TABLE_FIELD_DATA,
-  TABLE_JOB,
-  TABLE_JOB_DATA,
-  USER,
-  TABLE_RUNSHEET,
+    TABLE_JOB_TRANSACTION,
+    TABLE_FIELD_DATA,
+    TABLE_JOB,
+    TABLE_JOB_DATA,
+    USER,
+    TABLE_RUNSHEET,
 } = require('../lib/constants').default
 
 export function save(tableName, object) {
-  return realm.write(() => {
-    //removing existing entry from Table
-    realm.delete(realm.objects(tableName));
-    //writing new record
-    realm.create(tableName, object);
-  });
+    return realm.write(() => {
+        //removing existing entry from Table
+        realm.delete(realm.objects(tableName));
+        //writing new record
+        realm.create(tableName, object);
+    });
 }
 
 export function saveList(tableName, array) {
-  return realm.write(() => {
-    //writing new record
-    array.forEach(data => realm.create(tableName, data));
-  });
+    return realm.write(() => {
+        //writing new record
+        array.forEach(data => realm.create(tableName, data));
+    });
 }
 
 /**Generic method for batch insertions in Realm
@@ -50,26 +50,26 @@ export function saveList(tableName, array) {
  * @param {*} tableNamesVsDataList 
  */
 export function performBatchSave(...tableNamesVsDataList) {
-  return realm.write(() => {
-    tableNamesVsDataList.forEach(record => {
-      try {
-        if (!_.isEmpty(record.value) && !_.isUndefined(record.value))
-          record.value.forEach(data => realm.create(record.tableName, data, true))
-      } catch (error) {
-        console.log(error)
-      }
-    })
-  });
+    return realm.write(() => {
+        tableNamesVsDataList.forEach(record => {
+            try {
+                if (!_.isEmpty(record.value) && !_.isUndefined(record.value))
+                    record.value.forEach(data => realm.create(record.tableName, data, true))
+            } catch (error) {
+                console.log(error)
+            }
+        })
+    });
 }
 
 export function deleteRecords() {
-  return realm.write(() => {
-    realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
-    realm.delete(realm.objects(TABLE_JOB))
-    realm.delete(realm.objects(TABLE_JOB_DATA))
-    realm.delete(realm.objects(TABLE_FIELD_DATA))
-    realm.delete(realm.objects(TABLE_RUNSHEET))
-  });
+    return realm.write(() => {
+        realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
+        realm.delete(realm.objects(TABLE_JOB))
+        realm.delete(realm.objects(TABLE_JOB_DATA))
+        realm.delete(realm.objects(TABLE_FIELD_DATA))
+        realm.delete(realm.objects(TABLE_RUNSHEET))
+    });
 }
 
 /**
@@ -77,14 +77,14 @@ export function deleteRecords() {
  * @param {*} tableNameVsDataList 
  */
 export function deleteRecordsInBatch(...tableNameVsDataList) {
-  return realm.write(() => {
-    tableNameVsDataList.forEach(record => {
-      if (!_.isUndefined(record.valueList) && !_.isEmpty(record.valueList)) {
-        let filteredRecords = realm.objects(record.tableName).filtered(record.valueList.map(value => record.propertyName + ' = "' + value + '"').join(' OR '));
-        realm.delete(filteredRecords)
-      }
-    })
-  });
+    return realm.write(() => {
+        tableNameVsDataList.forEach(record => {
+            if (!_.isUndefined(record.valueList) && !_.isEmpty(record.valueList)) {
+                let filteredRecords = realm.objects(record.tableName).filtered(record.valueList.map(value => record.propertyName + ' = "' + value + '"').join(' OR '));
+                realm.delete(filteredRecords)
+            }
+        })
+    });
 }
 
 /**A generic method for filtering out records which are in ValueList and then updating 'property'
@@ -95,10 +95,10 @@ export function deleteRecordsInBatch(...tableNameVsDataList) {
  * @param {*} value 
  */
 export function updateTableRecordOnProperty(tableName, property, valueList, newValue) {
-  let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
-  realm.write(() => {
-    _.forEach(filteredRecords, record => record[property] = newValue)
-  });
+    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
+    realm.write(() => {
+        _.forEach(filteredRecords, record => record[property] = newValue)
+    });
 }
 
 /**A generic method for filtering out records from a table 
@@ -109,10 +109,10 @@ export function updateTableRecordOnProperty(tableName, property, valueList, newV
  * @param {*} property 
  */
 export function deleteRecordList(tableName, valueList, property) {
-  let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => property + ' = "' + value + '"').join(' OR '));
-  realm.write(() => {
-    realm.delete(filteredRecords)
-  });
+    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => property + ' = "' + value + '"').join(' OR '));
+    realm.write(() => {
+        realm.delete(filteredRecords)
+    });
 }
 
 /**
@@ -120,7 +120,7 @@ export function deleteRecordList(tableName, valueList, property) {
  * @param {*} tableName 
  */
 export function getAll(tableName) {
-  return realm.objects(tableName);
+    return realm.objects(tableName);
 }
 
 /**A generic method for getting value list based on particular property in Table
@@ -129,19 +129,24 @@ export function getAll(tableName) {
  * @param {*} property 
  */
 export function getRecordListOnProperty(tableName, property) {
-  let records = realm.objects(tableName).map(data => data[property])
-  return records
+    let records = realm.objects(tableName).map(data => data[property])
+    return records
+}
+
+export function filterRecordList(recordList, query) {
+    let records = recordList.filtered(query)
+    return records
 }
 
 export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
-  let records
-  if (query) {
-    records = realm.objects(tableName).filtered(query)
-  } else {
-    records = realm.objects(tableName)
-  }
-  if (isSorted && sortProperty) {
-    records = records.sorted(`${sortProperty}`)
-  }
-  return records
+    let records
+    if (query) {
+        records = realm.objects(tableName).filtered(query)
+    } else {
+        records = realm.objects(tableName)
+    }
+    if (isSorted && sortProperty) {
+        records = records.sorted(`${sortProperty}`)
+    }
+    return records
 }

@@ -110,10 +110,7 @@ class Jobs extends Component {
   }
 
   toggleStatus() {
-    this.setState({
-      status: !this.state.status
-    });
-    console.log('toggle button handler: ' + this.state.status);
+    console.log('toggle button handler:')
   }
 
   renderData = (item) => {
@@ -139,7 +136,7 @@ class Jobs extends Component {
           </Button>,
         ]}
       >
-        <ListItem avatar>
+        <ListItem avatar button onPress = {Actions.JobDetails}>
           <Left>
             <TouchableHighlight underlayColor='#e7e7e7' style={[styles.listCircle]} onPress={() => this.toggleStatus()}>
               <View>

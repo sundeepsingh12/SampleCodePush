@@ -43,6 +43,8 @@ import Login from './containers/Login'
 import Preloader from './containers/Preloader'
 // import Subview from './containers/Subview'
 import ResyncLoader from './components/ResyncLoader'
+import JobDetails from './containers/JobDetails'
+import FormLayout from './containers/FormLayout'
 /**
  * ### icons
  *
@@ -180,6 +182,19 @@ export default function native(platform) {
                 type='replace'
               />
 
+              <Scene key='JobDetails'
+                component={JobDetails}
+                hideNavBar
+                title='JobDetails'
+              />
+
+              <Scene key='FormLayout'
+                component={FormLayout}
+                hideNavBar
+                title='FormLayout'
+                type='replace'
+              />
+
               <Scene key='Tabbar'
                 tabs
                 hideNavBar
@@ -222,6 +237,7 @@ export default function native(platform) {
                   component={Logout} />
               </Scene>
             </Scene>
+
           </Router>
         </Provider>
       )
