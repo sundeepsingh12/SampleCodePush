@@ -80,6 +80,10 @@ export default keyMirror({
     JOB_LISTING_START:null,
     JOB_LISTING_END:null,
 
+    //Job Details Actions
+    JOB_DETAILS_FETCHING_START:null,
+    JOB_DETAILS_FETCHING_END:null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,

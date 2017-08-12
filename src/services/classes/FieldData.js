@@ -1,5 +1,7 @@
 'use strict'
 
+import { jobDetailsService } from './JobDetails'
+
 class FieldData {
 
     /**
@@ -34,11 +36,14 @@ class FieldData {
         return fieldDataMap
     }
 
-    prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMasterMap, fieldAttributeMap, fieldAttributeMasterList, fieldAttributeStatusList) {
+    prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMasterMap, fieldAttributeMap) {
         const fieldAttributeMapQuery = Object.keys(fieldAttributeMap).map(fieldAttributeMasterId => 'fieldAttributeMasterId == ' + fieldAttributeMasterId).join(' OR ')
-        let fieldDataQuery = 'jobTransactionId = ' + jobTransactionId + ' AND (' + fieldAttributeMapQuery + ')'
+        let fieldDataQuery = 'jobTransactionId = ' + jobTransactionId
+        if (fieldAttributeMapQuery !== undefined && fieldAttributeMapQuery !== null && fieldAttributeMapQuery.length !== 0) {
+            fieldDataQuery += ' AND (' + fieldAttributeMapQuery + ')'
+        }
         let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery)
-        let fieldDataObject = this.prepareJobDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap)
+        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false)
         return fieldDataObject
     }
 }

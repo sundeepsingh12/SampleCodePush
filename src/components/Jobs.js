@@ -134,9 +134,8 @@ class Jobs extends Component {
           <Button style={[styles.swipeItem, { backgroundColor: '#062d4c' }]}>
             <Ionicons name='ios-call-outline' style={{ fontSize: 34, color: '#ffffff', marginLeft: 25 }} />
           </Button>,
-        ]}
-      >
-        <ListItem avatar button onPress = {Actions.JobDetails}>
+        ]}>
+        <ListItem avatar button onPress={() => { Actions.JobDetails({ jobTransactionId: item.id }) }}>
           <Left>
             <TouchableHighlight underlayColor='#e7e7e7' style={[styles.listCircle]} onPress={() => this.toggleStatus()}>
               <View>

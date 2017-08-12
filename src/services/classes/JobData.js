@@ -2,13 +2,14 @@
 
 import { jobAttributeMasterService } from './JobAttributeMaster'
 import * as realm from '../../repositories/realmdb'
+import { jobDetailsService } from './JobDetails'
 const {
     TABLE_JOB_DATA,
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
     TABLE_RUNSHEET,
     TABLE_FIELD_DATA,
-} = require('../../lib/constants')
+} = require('../../lib/constants').default
 
 class JobData {
 
@@ -102,86 +103,14 @@ class JobData {
         return false
     }
 
-
-
-
-    /**
-     * 
-     * @param {*} jobId 
-     * @param {*} positionId 
-     * @param {*} jobDataList 
-     * @param {*} jobAttributeMasterMap 
-     * @param {*} jobAttributeMap 
-     * @returns jobDataObject {
-     *              jobDataList : [
-     *                  {
-     *                      jobData,
-     *                      sequence
-     *                      label,
-     *                      attributeTypeId,
-     *                      childJobDataList : [jobDataList]
-     *                  }
-     *               ]
-     *              jobDataMap : {
-     *                  jobAttributeMasterId : {
-     *                                              jobData,
-     *                                              childJobDataMap
-     *                                         }
-     *              }
-     * }
-     */
-    prepareJobDataObject(jobId, positionId, realmJobDataList, jobAttributeMasterMap, jobAttributeMap) {
-        let jobDataMap = {},
-            jobDataList = [],
-            contactList = [],
-            addressList = []
-        let jobDataQuery = 'jobId = ' + jobId + ' AND parentId = ' + positionId
-        let filteredJobDataList = realm.filterRecordList(realmJobDataList, jobDataQuery)
-
-        for (let index in filteredJobDataList) {
-            let jobData = {...filteredJobDataList[index] }
-            let jobAttributeMaster = jobAttributeMasterMap[jobData.jobAttributeMasterId]
-            let jobAttributeStatus = jobAttributeMap[jobData.jobAttributeMasterId]
-            if (!jobAttributeMaster.hidden && jobData.value !== undefined && jobData.value !== null) {
-                let jobDataObject = {}
-                    // jobDataMap[jobAttributeMaster.attributeTypeId] = {}
-                jobDataMap[jobData.jobAttributeMasterId] = {}
-                jobDataObject.jobData = jobData
-                jobDataObject.sequence = jobAttributeStatus.sequence
-                jobDataObject.label = jobAttributeMaster.label
-                jobDataObject.attributeTypeId = jobAttributeMaster.attributeTypeId
-                    // jobDataList[jobAttributeStatus.sequence] = {}
-                    // jobDataList[jobAttributeStatus.sequence].jobData = []
-                if (jobData.value.toLocaleLowerCase() == 'objectsarojfareye' || jobData.value.toLocaleLowerCase() == 'arraysarojfareye') {
-                    let childJobDataObject = prepareJobDataMap(jobId, jobData.positionId, jobDataList, jobAttributeMasterMap)
-                    jobDataMap[jobData.jobAttributeMasterId].childJobDataMap = jobDataObject.jobDataMap
-                    jobDataObject.childJobDataList = childJobDataObject.jobDataList
-                        // sequenceJobDataMap[jobAttributeStatus.sequence].childJobDataMap = sequenceJobDataMap
-                }
-                jobDataList.push(jobDataObject)
-                jobDataMap[jobData.jobAttributeMasterId] = jobDataObject
-                    // sequenceJobDataMap[jobAttributeStatus.sequence].jobData.push(jobData)
-                if (parentId !== 0) {
-                    continue
-                } else if (this.checkContacNumber(jobData.jobAttributeMasterId, jobData.value, jobAttributeMasterMap)) {
-                    contactList.push(jobData)
-                } else if (this.checkAddressField(jobData.jobAttributeMasterId, jobData.value, jobAttributeMasterMap)) {
-                    addressList.push(jobData)
-                }
-            }
-        }
-        jobDataList = jobDataList.sort((x, y) => x.sequence - y.sequence)
-        return {
-            jobDataMap,
-            jobDataList
-        }
-    }
-
     prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap) {
-        const jobAttributeMapQuery = Object.keys(jobAttributeMap).map(jobAttributeMasterId => 'jobAttributeMasterId == ' + jobAttributeMasterId).join(' OR ')
-        let jobDataQuery = 'jobId = ' + jobId + ' AND (' + jobAttributeMapQuery + ')'
+        const jobAttributeMapQuery = Object.keys(jobAttributeMap).map(jobAttributeMasterId => 'jobAttributeMasterId = ' + jobAttributeMasterId).join(' OR ')
+        let jobDataQuery = 'jobId = ' + jobId
+        if(jobAttributeMapQuery !== undefined && jobAttributeMapQuery !== null && jobAttributeMapQuery.length !== 0) {
+            jobDataQuery += ' AND (' + jobAttributeMapQuery + ')'
+        }
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
-        let jobDataObject = this.prepareJobDataObject(jobId, 0, jobDataList, jobAttributeMasterMap, jobAttributeMap)
+        let jobDataObject = jobDetailsService.prepareDataObject(jobId, 0, jobDataList, jobAttributeMasterMap, jobAttributeMap, true)
         return jobDataObject
     }
 

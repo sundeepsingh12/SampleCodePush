@@ -73,6 +73,7 @@ import GlobalInitialState from './modules/global/globalInitialState'
 import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
 import HomeInititalState from './modules/home/homeInitialState'
 import ListingInitialState from './modules/listing/listingInitialState'
+import JobDetailsInitialState from './modules/job-details/jobDetailsInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
@@ -95,6 +96,7 @@ function getInitialState() {
     preloader: (new PreloaderInitiaState()),
     home: (new HomeInititalState()),
     listing: (new ListingInitialState()),
+    jobDetails: new JobDetailsInitialState(),
   }
   return _initState
 }

@@ -16,6 +16,7 @@ import global from './global/globalReducer'
 import preloader from './pre-loader/preloaderReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
+import jobDetails from './job-details/jobDetailsReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -32,7 +33,8 @@ const rootReducer = combineReducers({
   global,
   preloader,
   home,
-  listing
+  listing,
+  jobDetails,
 })
 
 export default rootReducer

@@ -70,6 +70,37 @@ class JobStatus {
     return jobMasterIdStatusIdMap
   }
 
+  /**
+   * 
+   * @param {*} statusList 
+   * @param {*} jobAttributeStatusMap 
+   * @returns
+   * JobMasterIdJobAttributeStatusMap : {
+   *                                      jobMasterId : {
+   *                                                      statusId : {
+   *                                                                    jobAttributeMasterId : {jobAttributeStatus}
+   *                                                                 }
+   *                                                    }
+   *                                    }
+   */
+  getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap) {
+    let jobMasterIdJobAttributeStatusMap = {}
+    if (!statusList) {
+      statusList = []
+    }
+    statusList.forEach(status => {
+      if (!jobAttributeStatusMap[status.id]) {
+        return
+      }
+
+      if (!jobMasterIdJobAttributeStatusMap[status.jobMasterId]) {
+        jobMasterIdJobAttributeStatusMap[status.jobMasterId] = {}
+      }
+
+      jobMasterIdJobAttributeStatusMap[status.jobMasterId][status.id] = jobAttributeStatusMap[status.id]
+    })
+  }
+
 }
 
 export let jobStatusService = new JobStatus()

@@ -1,8 +1,40 @@
 'use strict'
 
+import * as realm from '../../repositories/realmdb'
+import { jobDataService } from './JobData'
+
 class JobDetails {
 
-    prepareDataObject(id, positionId, dataList, attributeMasterMap, attributeMap, isJob) {
+    /**
+     * common method for getting job data and field data details
+     * @param {*} id 
+     * @param {*} positionId 
+     * @param {*} realmDBDataList 
+     * @param {*} attributeMasterMap 
+     * @param {*} attributeMap 
+     * @param {*} isJob 
+     * @returns dataObject {
+     *              dataList : [
+     *                              {
+     *                                  data,
+     *                                  sequence
+     *                                  label,
+     *                                  attributeTypeId,
+     *                                  childDataList : [dataList]
+     *                              }
+     *                         ]
+     *              dataMap : {
+     *                          attributeMasterId : {
+     *                                                  data,
+     *                                                  childdDataMap,
+     *                                                  sequence,
+     *                                                  label,
+     *                                                  attributeTypeId
+     *                                              }
+     *                         }
+     * }
+     */
+    prepareDataObject(id, positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob) {
         let dataMap = {},
             dataList = [],
             contactList = [],
@@ -13,57 +45,63 @@ class JobDetails {
         } else {
             dataQuery = 'jobTransactionId = ' + id + ' AND parentId = ' + positionId
         }
-        let filteredDataList = realm.filterRecordList(dataList, dataQuery)
+        let filteredDataList = realm.filterRecordList(realmDBDataList, dataQuery)
 
         for (let index in filteredDataList) {
-            let data = {...filteredDataList[index] }
+            let data = { ...filteredDataList[index] }
             let attributeMaster, attributeStatus
+
             if (isJob) {
                 attributeMaster = attributeMasterMap[data.jobAttributeMasterId]
             } else {
                 attributeMaster = attributeMasterMap[data.fieldAttributeMasterId]
             }
-            // let attributeMaster = attributeMasterMap[data.jobAttributeMasterId]
+
             if (isJob) {
                 attributeStatus = attributeMap[data.jobAttributeMasterId]
             } else {
                 attributeStatus = attributeMap[data.fieldAttributeMasterId]
             }
+
             if (!attributeMaster.hidden && data.value !== undefined && data.value !== null) {
                 let dataObject = {}
-                    // jobDataMap[jobAttributeMaster.attributeTypeId] = {}
-                dataMap[jobData.jobAttributeMasterId] = {}
+                dataMap[data.jobAttributeMasterId] = {}
                 dataObject.data = data
                 dataObject.sequence = attributeStatus.sequence
                 dataObject.label = attributeMaster.label
                 dataObject.attributeTypeId = attributeMaster.attributeTypeId
-                    // jobDataList[jobAttributeStatus.sequence] = {}
-                    // jobDataList[jobAttributeStatus.sequence].jobData = []
                 if (data.value.toLocaleLowerCase() == 'objectsarojfareye' || data.value.toLocaleLowerCase() == 'arraysarojfareye') {
-                    let childDataObject = prepareJobDataMap(id, data.positionId, dataList, attributeMasterMap)
+                    let childDataObject = {}
+                    // let childDataObject = prepareJobDataMap(id, data.positionId, realmDBDataList, attributeMasterMap)
                     if (isJob) {
                         dataMap[data.jobAttributeMasterId].childDataMap = dataObject.dataMap
                     } else {
                         dataMap[data.fieldAttributeMasterId].childDataMap = dataObject.dataMap
                     }
                     dataObject.childDataList = childDataObject.dataList
-                        // sequenceJobDataMap[jobAttributeStatus.sequence].childJobDataMap = sequenceJobDataMap
                 }
                 dataList.push(dataObject)
-                dataMap[data.jobAttributeMasterId] = dataObject
-                    // sequenceJobDataMap[jobAttributeStatus.sequence].jobData.push(jobData)
-                if (parentId !== 0 || !isJob) {
+
+                if(isJob) {
+                    dataMap[data.jobAttributeMasterId] = dataObject
+                } else {
+                    dataMap[data.fieldAttributeMasterId] = dataObject
+                }
+
+                if (data.parentId !== 0 || !isJob) {
                     continue
-                } else if (this.checkContacNumber(jobData.jobAttributeMasterId, jobData.value, jobAttributeMasterMap)) {
-                    contactList.push(jobData)
-                } else if (this.checkAddressField(jobData.jobAttributeMasterId, jobData.value, jobAttributeMasterMap)) {
-                    addressList.push(jobData)
+                } else if (jobDataService.checkContacNumber(data.jobAttributeMasterId, data.value, attributeMasterMap)) {
+                    contactList.push(data)
+                } else if (jobDataService.checkAddressField(data.jobAttributeMasterId, data.value, attributeMasterMap)) {
+                    addressList.push(data)
                 }
             }
         }
         dataList = dataList.sort((x, y) => x.sequence - y.sequence)
         return {
             dataMap,
+            dataList,
+            contactList,
             dataList
         }
     }

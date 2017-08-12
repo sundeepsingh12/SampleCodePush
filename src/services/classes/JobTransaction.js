@@ -20,6 +20,7 @@ import { fieldDataService } from './FieldData'
 import { jobAttributeMasterService } from './JobAttributeMaster'
 import { customerCareService } from './CustomerCare'
 import { smsTemplateService } from './SMSTemplate'
+import { fieldAttributeMasterService } from './FieldAttributeMaster'
 
 class JobTransaction {
 
@@ -407,21 +408,38 @@ class JobTransaction {
         return smsTemplateListForJob
     }
 
-    prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList) {
+    prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, customerCareList, smsTemplateList,statusList) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
-        let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
-        const statusId = jobTransaction.jobStatusId
-        const jobId = jobTransaction.jobId
+        const jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
+        const statusId = jobTransaction[0].jobStatusId
+        const jobId = jobTransaction[0].jobId
+        const jobMasterId = jobTransaction[0].jobMasterId
         const jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobAttributeMasterList)
         const jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
-        if (_.isEmpty(jobAttributeStatusMap)) {
+        const jobMasterIdJobAttributeStatusMap = jobStatusService.getJobMasterIdStatusIdMap(statusList,jobAttributeStatusMap)
+        const fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList)
+        let jobAttributeMap,fieldAttributeMap
+        fieldAttributeMap = fieldAttributeMasterMap[jobMasterId]
+        if (!jobMasterIdJobAttributeStatusMap[jobMasterId]) {
             jobAttributeMap = jobAttributeMasterMap
         } else {
-            jobAttributeMap = jobAttributeStatusMap[statusId]
+            jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobMasterId][statusId]
         }
+
+        if(!jobAttributeMap) {
+            jobAttributeMap = {}
+        }
+
+        if(!fieldAttributeMap) {
+            fieldAttributeMap = {}
+        }
+
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
-        let fieldData = jobDataService.prepareJobDataForTransactionParticularStatus()
-        let nextJobStatus = jobStatus
+        // let fieldDataObject = fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId,fieldAttributeMasterMap,fieldAttributeMap)
+        // return {
+        //     jobDataObject,
+        //     fieldDataObject
+        // }
     }
 
 }
