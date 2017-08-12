@@ -28,6 +28,8 @@ import { jobSummaryService } from '../../../services/classes/JobSummary'
 import { tabsService } from '../../../services/classes/Tabs'
 import * as realm from '../../../repositories/realmdb'
 import _ from 'underscore'
+const middlewares = [thunk]
+const mockStore = configureStore(middlewares)
 
 describe('home actions', () => {
 
@@ -148,4 +150,136 @@ describe('home actions', () => {
                 expect(store.getActions[1].payload).toEqual(expectedActions[0].payload)
             })
     })
+
+    it('should not delete in case of null response', () => {
+    jobStatusService.getAllIdsForCode = jest.fn()
+    sync.downloadDataFromServer = jest.fn()
+    sync.downloadDataFromServer.mockReturnValue(null)
+    sync.getSyncIdFromResponse = jest.fn()
+    sync.processTdcResponse = jest.fn()
+    realm.getAll = jest.fn()
+    jobTransactionService.getJobTransactionsForStatusIds = jest.fn()
+    jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap = jest.fn()
+    sync.getSummaryAndTransactionIdDTO = jest.fn()
+    sync.deleteDataFromServer = jest.fn()
+    jobTransactionService.updateJobTransactionStatusId = jest.fn()
+    jobSummaryService.updateJobSummary = jest.fn()
+    const store = mockStore({})
+    return store.dispatch(actions.onResyncPress()).then(() => {
+      expect(jobStatusService.getAllIdsForCode).toHaveBeenCalledTimes(1)
+      expect(sync.downloadDataFromServer).toHaveBeenCalledTimes(1)
+      expect(sync.getSyncIdFromResponse).not.toHaveBeenCalled()
+      expect(sync.processTdcResponse).not.toHaveBeenCalled()
+      expect(realm.getAll).not.toHaveBeenCalled()
+      expect(jobTransactionService.getJobTransactionsForStatusIds).not.toHaveBeenCalled()
+      expect(jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap).not.toHaveBeenCalled()
+      expect(sync.getSummaryAndTransactionIdDTO).not.toHaveBeenCalled()
+      expect(sync.deleteDataFromServer).not.toHaveBeenCalled()
+      expect(jobTransactionService.updateJobTransactionStatusId).not.toHaveBeenCalled()
+      expect(jobSummaryService.updateJobSummary).not.toHaveBeenCalled()
+
+    })
+  })
+
+  it('should not hit delete api if sync ids empty', () => {
+    jobStatusService.getAllIdsForCode = jest.fn()
+    sync.downloadDataFromServer = jest.fn()
+    const tdcResponse = {
+      "json": {
+        content: [{
+          "job": [],
+          "jobTransactions": [],
+          "jobData": [],
+          "fieldData": [],
+          "runSheet": []
+        }],
+        "last": true
+      }
+    }
+    sync.downloadDataFromServer.mockReturnValue(tdcResponse)
+    sync.processTdcResponse = jest.fn()
+    sync.getSyncIdFromResponse = jest.fn()
+    const syncIds = []
+    sync.getSyncIdFromResponse.mockReturnValue(syncIds)
+    realm.getAll = jest.fn()
+    jobTransactionService.getJobTransactionsForStatusIds = jest.fn()
+    jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap = jest.fn()
+    sync.getSummaryAndTransactionIdDTO = jest.fn()
+    sync.deleteDataFromServer = jest.fn()
+    jobTransactionService.updateJobTransactionStatusId = jest.fn()
+    jobSummaryService.updateJobSummary = jest.fn()
+    const store = mockStore({})
+    return store.dispatch(actions.onResyncPress()).then(() => {
+      expect(jobStatusService.getAllIdsForCode).toHaveBeenCalledTimes(1)
+      expect(sync.downloadDataFromServer).toHaveBeenCalledTimes(1)
+      expect(sync.processTdcResponse).toHaveBeenCalledTimes(1)
+      expect(sync.getSyncIdFromResponse).toHaveBeenCalledTimes(1)
+      expect(realm.getAll).not.toHaveBeenCalled()
+      expect(jobTransactionService.getJobTransactionsForStatusIds).not.toHaveBeenCalled()
+      expect(jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap).not.toHaveBeenCalled()
+      expect(sync.getSummaryAndTransactionIdDTO).not.toHaveBeenCalled()
+      expect(sync.deleteDataFromServer).not.toHaveBeenCalled()
+      expect(jobTransactionService.updateJobTransactionStatusId).not.toHaveBeenCalled()
+      expect(jobSummaryService.updateJobSummary).not.toHaveBeenCalled()
+    })
+  })
+
+   it('should download jobs and hit delete api', () => {
+    const store = mockStore({})
+    const unseenStatusIds = [12]
+    jobStatusService.getAllIdsForCode = jest.fn()
+    jobStatusService.getAllIdsForCode.mockReturnValue(unseenStatusIds)
+    sync.downloadDataFromServer = jest.fn()
+    const tdcResponse = {
+      "json": {
+        content: [{
+          "id": 234,
+          "type": "insert",
+          "query": {
+            "job": [],
+            "jobTransactions": [],
+            "jobData": [],
+            "fieldData": [],
+            "runSheet": []
+          }
+
+        }],
+        "last": true
+      }
+    },syncIds = [234]
+    sync.downloadDataFromServer.mockReturnValue(tdcResponse)
+    sync.processTdcResponse = jest.fn()
+    sync.getSyncIdFromResponse = jest.fn()
+    sync.getSyncIdFromResponse.mockReturnValue(syncIds)
+    realm.getAll = jest.fn()
+    jobTransactionService.getJobTransactionsForStatusIds = jest.fn()
+    jobTransactionService.getJobTransactionsForStatusIds.mockReturnValue([{
+      "id": 1
+    }])
+    jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap = jest.fn()
+    sync.getSummaryAndTransactionIdDTO = jest.fn()
+    sync.getSummaryAndTransactionIdDTO.mockReturnValue({
+      "jobSummaries":[],
+       "transactionIdDtos":[]
+    })
+    sync.deleteDataFromServer = jest.fn()
+    jobTransactionService.updateJobTransactionStatusId = jest.fn()
+    jobSummaryService.updateJobSummary = jest.fn()
+    return store.dispatch(actions.onResyncPress()).then(() => {
+      expect(jobStatusService.getAllIdsForCode).toHaveBeenCalledTimes(1)
+      expect(sync.downloadDataFromServer).toHaveBeenCalledTimes(1)
+      expect(sync.processTdcResponse).toHaveBeenCalledTimes(1)
+      expect(sync.getSyncIdFromResponse).toHaveBeenCalledTimes(1)
+      expect(realm.getAll).toHaveBeenCalledTimes(1)
+      expect(jobTransactionService.getJobTransactionsForStatusIds).toHaveBeenCalledTimes(1)
+      expect(jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap).toHaveBeenCalledTimes(1)
+      expect(sync.getSummaryAndTransactionIdDTO).toHaveBeenCalledTimes(1)
+      expect(sync.deleteDataFromServer).toHaveBeenCalledTimes(1)
+      expect(jobTransactionService.updateJobTransactionStatusId).toHaveBeenCalledTimes(1)
+      expect(jobSummaryService.updateJobSummary).toHaveBeenCalledTimes(1)
+
+    })
+
+  })
+
 })
