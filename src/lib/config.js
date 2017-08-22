@@ -1,5 +1,6 @@
 module.exports = {
   SESSION_TOKEN_KEY: 'SESSION_TOKEN_KEY',
+  SYNC_SERVICE_DELAY:20000,
   
   backend: {
     fareyeProduction: false,
@@ -11,11 +12,8 @@ module.exports = {
     },
     staging: {
       url: 'https://staging.fareye.co/app'
-    },
-    // staging: {
-    //   url: 'http://192.168.1.169:8080/app'
-    // }
-
+    }
+    
   },
     API:{
         AUTHENTICATION_API:'/authentication',

@@ -30,6 +30,7 @@ import { onChangePassword, onChangeUsername } from '../login/loginActions'
 
 import { clearHomeState } from '../home/homeActions'
 
+import BackgroundTimer from 'react-native-background-timer';
 
 /**
  * ## set the store
@@ -56,6 +57,9 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      //TODO
+      //This should come in another method
+      BackgroundTimer.stop();
       dispatch(onChangePassword(''))
       dispatch(onChangeUsername(''))
       dispatch(clearHomeState())

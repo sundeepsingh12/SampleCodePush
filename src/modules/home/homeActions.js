@@ -20,14 +20,34 @@ const {
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { sync } from '../../services/classes/Sync'
-import { jobStatusService } from '../../services/classes/JobStatus'
-import { jobTransactionService } from '../../services/classes/JobTransaction'
-import { jobSummaryService } from '../../services/classes/JobSummary'
-import { tabsService } from '../../services/classes/Tabs'
+import {
+  keyValueDBService
+} from '../../services/classes/KeyValueDBService'
+import {
+  sync
+} from '../../services/classes/Sync'
+import {
+  jobStatusService
+} from '../../services/classes/JobStatus'
+import {
+  jobTransactionService
+} from '../../services/classes/JobTransaction'
+import {
+  jobSummaryService
+} from '../../services/classes/JobSummary'
+import {
+  tabsService
+} from '../../services/classes/Tabs'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
+
+import {
+  DeviceEventEmitter,
+  NativeAppEventEmitter,
+  Platform,
+} from 'react-native';
+
+import BackgroundTimer from 'react-native-background-timer';
 
 export function jobFetchingEnd(pageData, tabId) {
   return {
@@ -58,7 +78,7 @@ export function setTabsList(tabsList) {
   }
 }
 
-export function setFetchingFalse(tabId,message) {
+export function setFetchingFalse(tabId, message) {
   return {
     type: SET_FETCHING_FALSE,
     payload: {
@@ -93,8 +113,8 @@ export function setRefereshingTrue() {
 
 export function setTabIdsJobTransactions(tabIdJobs) {
   return {
-    type : SET_TABS_TRANSACTIONS,
-    payload:tabIdJobs
+    type: SET_TABS_TRANSACTIONS,
+    payload: tabIdJobs
   }
 }
 
@@ -106,7 +126,7 @@ export function fetchJobs(tabId, pageNumber) {
       if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
         dispatch(jobFetchingEnd(pageData, tabId))
       } else {
-        dispatch(setFetchingFalse(tabId,pageData.message))
+        dispatch(setFetchingFalse(tabId, pageData.message))
       }
     } catch (error) {
       console.log(error)
@@ -117,7 +137,17 @@ export function fetchJobs(tabId, pageNumber) {
 export function onResyncPress() {
   return async function (dispatch) {
     try {
-      const pageNumber = 0, pageSize = 3
+      const EventEmitter = Platform.select({
+        android: () => DeviceEventEmitter,
+      })();
+      BackgroundTimer.start(CONFIG.SYNC_SERVICE_DELAY); // delay in milliseconds
+      // listen for event
+      EventEmitter.addListener('backgroundTimer', async () => {
+        // this will be executed every 120 seconds
+        // even when app is the the background
+
+        //download jobs from server code 
+         const pageNumber = 0, pageSize = 3
       let isLastPageReached = false, json, isJobsPresent = false
       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
       while (!isLastPageReached) {
@@ -152,6 +182,7 @@ export function onResyncPress() {
         console.log(tabIdJobs)
         dispatch(setTabIdsJobTransactions(tabIdJobs))
       }
+      });
     } catch (error) {
       console.log(error)
     }
