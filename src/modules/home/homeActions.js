@@ -40,13 +40,6 @@ import {
 } from '../../services/classes/Tabs'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
-
-import {
-  DeviceEventEmitter,
-  NativeAppEventEmitter,
-  Platform,
-} from 'react-native';
-
 import BackgroundTimer from 'react-native-background-timer';
 
 export function jobFetchingEnd(pageData, tabId) {
@@ -137,18 +130,17 @@ export function fetchJobs(tabId, pageNumber) {
 export function onResyncPress() {
   return async function (dispatch) {
     try {
-      const EventEmitter = Platform.select({
-        android: () => DeviceEventEmitter,
-      })();
-      BackgroundTimer.start(CONFIG.SYNC_SERVICE_DELAY); // delay in milliseconds
-      // listen for event
-      EventEmitter.addListener('backgroundTimer', async () => {
-        // this will be executed every 120 seconds
+
+      // Start a timer that runs continuous after X milliseconds
+      const intervalId = BackgroundTimer.setInterval(async () => {
+        // this will be executed every X ms
         // even when app is the the background
 
-        //download jobs from server code 
-         const pageNumber = 0, pageSize = 3
-      let isLastPageReached = false, json, isJobsPresent = false
+      //download jobs from server code 
+      const pageNumber = 0,
+        pageSize = 3
+      let isLastPageReached = false,
+        json, isJobsPresent = false
       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
       while (!isLastPageReached) {
         const tdcResponse = await sync.downloadDataFromServer(pageNumber, pageSize)
@@ -177,12 +169,12 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
-      if(isJobsPresent) {
+      if (isJobsPresent) {
         let tabIdJobs = await jobTransactionService.refreshJobs()
         console.log(tabIdJobs)
         dispatch(setTabIdsJobTransactions(tabIdJobs))
       }
-      });
+      }, CONFIG.SYNC_SERVICE_DELAY);
     } catch (error) {
       console.log(error)
     }
