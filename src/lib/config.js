@@ -1,6 +1,6 @@
 module.exports = {
   SESSION_TOKEN_KEY: 'SESSION_TOKEN_KEY',
-  SYNC_SERVICE_DELAY:20000,
+  SYNC_SERVICE_DELAY:120000,
   
   backend: {
     fareyeProduction: false,
