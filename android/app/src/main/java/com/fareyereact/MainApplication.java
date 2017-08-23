@@ -6,7 +6,6 @@ import com.facebook.react.ReactApplication;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import io.realm.react.RealmReactPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
-import com.pilloxa.backgroundjob.BackgroundJobPackage;
 import com.rnziparchive.RNZipArchivePackage;
 import com.rnfs.RNFSPackage;
 import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
@@ -43,7 +42,6 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFetchBlobPackage(),
             new RealmReactPackage(),
             new RNDeviceInfo(),
-            new BackgroundJobPackage(),
             new RNZipArchivePackage(),
             new RNFSPackage(),
             new RNBackgroundGeolocation(),

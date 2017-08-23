@@ -129,13 +129,6 @@ android {
             }
         }
     }
-
-    configurations.all {
-    resolutionStrategy {
-        force 'com.android.support:support-v4:23.+'
-        force 'com.android.support:appcompat-v7:23.+'
-    }
-}
 }
 
 repositories {
@@ -148,7 +141,6 @@ dependencies {
     compile project(':react-native-fetch-blob')
     compile project(':realm')
     compile project(':react-native-device-info')
-    compile project(':react-native-background-job')
     compile project(':react-native-zip-archive')
     compile project(':react-native-fs')
     compile project(':react-native-background-geolocation')

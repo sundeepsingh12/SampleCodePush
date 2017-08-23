@@ -19,7 +19,6 @@
     "react-native": "0.46.4",
     "react-native-background-fetch": "^2.0.8",
     "react-native-background-geolocation": "^2.8.4",
-    "react-native-background-job": "^2.0.0-1",
     "react-native-camera": "^0.9.4",
     "react-native-cancelable-fetch": "^0.1.1",
     "react-native-code-push": "^4.1.0-beta",
