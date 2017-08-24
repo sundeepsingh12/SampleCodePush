@@ -274,7 +274,6 @@ export function invalidateUserSession() {
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
-      dispatch(stopMqttService())
       Actions.InitialLoginForm()
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))

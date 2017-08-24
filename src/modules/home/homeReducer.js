@@ -11,6 +11,7 @@ const {
   CLEAR_HOME_STATE,
   SET_REFRESHING_TRUE,
   SET_TABS_TRANSACTIONS,
+  JOB_DOWNLOADING_STATUS,
 } = require('../../lib/constants').default
 
 
@@ -20,6 +21,7 @@ export default function homeReducer(state = initialState, action) {
 
   switch (action.type) {
     case JOB_FETCHING_START:
+      return state.set('isRefreshing',action.payload.isRefreshing)
 
     case SET_TABS_LIST:
       return state.set('tabsList', action.payload.tabsList)
@@ -28,6 +30,9 @@ export default function homeReducer(state = initialState, action) {
     case CLEAR_HOME_STATE:
       return state.set('tabsList', [])
         .set('isRefreshing', false)
+    
+    case JOB_DOWNLOADING_STATUS:
+      return state.set('downloadingJobs',action.payload.isDownloadingjobs)
   }
   
   return state

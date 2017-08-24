@@ -3,6 +3,7 @@
 import { Record } from 'immutable'
 
 var InitialState = Record({
+    jobDetailsLoading: false,
     jobDataList: [],
     fieldDataList: [],
     messageList: [],

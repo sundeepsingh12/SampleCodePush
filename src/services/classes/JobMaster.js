@@ -123,7 +123,7 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
-    await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
+    await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster)
     await keyValueDBService.validateAndSaveData(USER, json.user)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_VALUE, json.jobAttributeValueMaster)
@@ -131,7 +131,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster)
     await keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus)
     await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
-    let jobMasterIdCustomizationMap = await this.prepareCustomizationListMap(json.jobListCustomization)
+    let jobMasterIdCustomizationMap = this.prepareCustomizationListMap(json.jobListCustomization)
     await keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP, jobMasterIdCustomizationMap)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_STATUS, json.jobAttributeMasterStatuses)
     let tabs = await this.validateAndSortTabList(json.appJobStatusTabs)
@@ -184,7 +184,7 @@ class JobMaster {
    */
   prepareCustomizationListMap(jobListCustomization) {
     if (!jobListCustomization) {
-      return {}
+      return null
     }
     let jobMasterIdCustomizationMap = {}
     jobListCustomization.forEach(jobListCustomizationObject => {
@@ -223,7 +223,7 @@ class JobMaster {
    */
   validateAndSortTabList(tabs) {
     if (!tabs) {
-      return []
+      return null
     }
     tabs = tabs.filter(tab => tab.name.toLocaleLowerCase() !== 'hidden')
       .sort((x, y) => x.isDefault === y.isDefault ? 0 : x.isDefault ? -1 : 1);

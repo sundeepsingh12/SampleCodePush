@@ -18,6 +18,9 @@ import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Preloader from '../containers/Preloader'
+import Loader from '../components/Loader'
+import styles from '../themes/FeStyle'
+import theme from '../themes/feTheme'
 
 /**
  * Router
@@ -45,6 +48,8 @@ import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, Scroll
 import Jobs from '../components/Jobs';
 import * as homeActions from '../modules/home/homeActions'
 import renderIf from '../lib/renderIf';
+import TitleHeader from '../components/TitleHeader'
+
 
 /**
  *  Instead of including all app states via ...state
@@ -82,7 +87,7 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.startMqttService()
+    this.props.actions.onResyncPress()
     this.props.actions.fetchTabs()
 
   }
@@ -95,7 +100,14 @@ class Main extends Component {
         renderTabList.push(
           <Tab
             key={tab.id}
-            heading={tab.name}>
+            heading={tab.name}
+            tabStyle={{backgroundColor: '#ffffff'}}
+            activeTabStyle={{backgroundColor: '#ffffff'}}
+            
+            textStyle={{color: '#a0a0a0'}}
+            activeTextStyle={styles.fontPrimary}
+            
+            >
             <Jobs
               tabId={tab.id}
               statusIdList={this.props.tabIdStatusIdMap[tab.id]}
@@ -106,25 +118,29 @@ class Main extends Component {
     })
     return renderTabList
   }
+  
 
   render() {
     const viewTabList = this.renderTabs()
+    if(viewTabList.length > 0 ) {
     return (
       <Container>
-        <Header hasTabs>
-          <Left />
-          <Body>
-            <Title>Home</Title>
-          </Body>
-          <Right>
-
-            <TouchableHighlight underlayColor='#e7e7e7' onPress={Actions.JobDetails}>
-              <Text>Cancel</Text>
-            </TouchableHighlight>
-          </Right>
+        <Header hasTabs style={StyleSheet.flatten([theme.bgPrimary])}>
+            <Left style={StyleSheet.flatten([styles.flexBasis15])}>
+            </Left>
+            <Body style={StyleSheet.flatten([styles.alignCenter, styles.flexBasis70])}>
+                <Text style={StyleSheet.flatten([styles.fontWhite, styles.bold, styles.fontLg, styles.fontCenter])}>Home</Text>
+            </Body>
+            <Right style={StyleSheet.flatten([styles.flexBasis15])}>
+              
+            </Right>
         </Header>
+        {/* <TitleHeader */}
+        {/* homeStyle = {}/> */}
 
         <Tabs locked
+          tabBarUnderlineStyle={styles.bgPrimary}
+          
           renderTabBar={() => <ScrollableTab />}
         >
           {viewTabList}
@@ -149,6 +165,25 @@ class Main extends Component {
         </Fab>
       </Container>
     );
+  } else {
+    return (
+      <Container>
+      <Header hasTabs>
+      <Left />
+      <Body>
+        <Title>Home</Title>
+      </Body>
+      <Right>
+
+        <TouchableHighlight underlayColor='#e7e7e7' onPress={Actions.JobDetails}>
+          <Text>Cancel</Text>
+        </TouchableHighlight>
+      </Right>
+    </Header>
+     <Loader/>
+     </Container>
+    )
+  }
   }
 
 

@@ -435,11 +435,11 @@ class JobTransaction {
         }
 
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
-        // let fieldDataObject = fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId,fieldAttributeMasterMap,fieldAttributeMap)
-        // return {
-        //     jobDataObject,
-        //     fieldDataObject
-        // }
+        let fieldDataObject = fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId,fieldAttributeMasterMap,fieldAttributeMap)
+        return {
+            jobDataObject,
+            fieldDataObject
+        }
     }
 
 }

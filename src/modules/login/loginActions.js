@@ -164,10 +164,11 @@ export function rememberMeSetTrue() {
 export function authenticateUser(username, password,rememberMe) {
   return async function (dispatch) {
     try {
+      let j_sessionid = null , xsrfToken = null
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
-      const j_sessionid = (authenticationResponse.headers.map['set-cookie'][0]).split("; ")[0];
-      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
+      let cookie = authenticationResponse.headers.map['set-cookie'][0]
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,cookie)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess())
       Actions.Preloader()

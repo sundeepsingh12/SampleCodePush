@@ -99,6 +99,7 @@ class JobStatus {
 
       jobMasterIdJobAttributeStatusMap[status.jobMasterId][status.id] = jobAttributeStatusMap[status.id]
     })
+    return jobMasterIdJobAttributeStatusMap
   }
 
 }

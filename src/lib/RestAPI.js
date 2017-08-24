@@ -51,9 +51,19 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = this.API_BASE_URL + opts.url
-    console.log(url)
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
+      let cookies = this._sessionToken.split(",")
+      let xsrfToken = null
+      for(let cookie in cookies) {
+        let headers = cookies[cookie].split(";")
+        headers.forEach(header => {
+          if(header.includes('XSRF-TOKEN')) {
+            xsrfToken = header
+          }
+        })
+      }
+      opts.headers['XSRF-TOKEN'] = xsrfToken.split("=")[1]
     }
     const response = await fetch(url, opts, fetchRequestId)
     const { status, code, headers } = response;

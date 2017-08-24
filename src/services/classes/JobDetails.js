@@ -71,8 +71,7 @@ class JobDetails {
                 dataObject.label = attributeMaster.label
                 dataObject.attributeTypeId = attributeMaster.attributeTypeId
                 if (data.value.toLocaleLowerCase() == 'objectsarojfareye' || data.value.toLocaleLowerCase() == 'arraysarojfareye') {
-                    let childDataObject = {}
-                    // let childDataObject = prepareJobDataMap(id, data.positionId, realmDBDataList, attributeMasterMap)
+                    let childDataObject = this.prepareDataObject(id, data.positionId, realmDBDataList, attributeMasterMap,attributeMap,isJob)
                     if (isJob) {
                         dataMap[data.jobAttributeMasterId].childDataMap = dataObject.dataMap
                     } else {
@@ -102,7 +101,6 @@ class JobDetails {
             dataMap,
             dataList,
             contactList,
-            dataList
         }
     }
 }

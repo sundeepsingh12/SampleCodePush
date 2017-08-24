@@ -16,7 +16,7 @@
     "native-base": "^2.3.0",
     "react": "16.0.0-alpha.12",
     "react-mixin": "^3.0.5",
-    "react-native": "0.45.1",
+    "react-native": "0.46.4",
     "react-native-camera": "^0.9.4",
     "react-native-cancelable-fetch": "^0.1.1",
     "react-native-code-push": "^4.1.0-beta",

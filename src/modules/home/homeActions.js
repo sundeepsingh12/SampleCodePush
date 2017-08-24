@@ -5,6 +5,7 @@ const {
   JOB_FETCHING_END,
   SET_FETCHING_FALSE,
   SET_REFRESHING_TRUE,
+  JOB_DOWNLOADING_STATUS,
   UNSEEN,
   TABLE_JOB_TRANSACTION,
   TAB,
@@ -25,7 +26,6 @@ const {
   JOB_ATTRIBUTE_STATUS,
   CUSTOMER_CARE,
   SMS_TEMPLATE,
-
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
@@ -47,12 +47,18 @@ export function jobFetchingEnd(jobTransactionCustomizationList) {
   }
 }
 
-export function jobFetchingStart(isRefresh) {
+export function jobDownloadingStatus(isDownloadingjobs) {
   return {
-    type: JOB_FETCHING_START,
+    type : JOB_DOWNLOADING_STATUS,
     payload: {
-      isRefresh,
+      isDownloadingjobs
     }
+  }
+}
+
+export function jobFetchingStart() {
+  return {
+    type: JOB_LISTING_START
   }
 }
 
@@ -88,6 +94,7 @@ export function fetchTabs() {
 export function fetchJobs() {
   return async function (dispatch) {
     try {
+      dispatch(jobFetchingStart())
       const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
       const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
       const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
@@ -105,6 +112,7 @@ export function fetchJobs() {
 export function onResyncPress() {
   return async function (dispatch) {
     try {
+      dispatch(jobDownloadingStatus(true))
       const pageNumber = 0, pageSize = 3
       let isLastPageReached = false, json, isJobsPresent = false
       const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
@@ -135,7 +143,9 @@ export function onResyncPress() {
           isLastPageReached = true
         }
       }
+      dispatch(jobDownloadingStatus(false))
       if (isJobsPresent) {
+        dispatch(jobFetchingStart())
         const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
         const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
         const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)

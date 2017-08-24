@@ -1,6 +1,11 @@
 'use strict'
 
 import { jobDetailsService } from './JobDetails'
+import * as realm from '../../repositories/realmdb'
+
+const {
+    TABLE_FIELD_DATA
+} = require('../../lib/constants').default
 
 class FieldData {
 
