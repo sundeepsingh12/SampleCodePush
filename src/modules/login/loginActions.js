@@ -27,16 +27,20 @@ const {
   REMEMBER_ME,
   REMEMBER_ME_SET_TRUE,
 
-  IS_PRELOADER_COMPLETE
+  IS_PRELOADER_COMPLETE,
+  Login,
+  Main,
+  Preloader
 
 } = require('../../lib/constants').default
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 
-import { Actions } from 'react-native-router-flux'
+// import { Actions } from 'react-native-router-flux'
 import { authenticationService } from '../../services/classes/Authentication'
 import CONFIG from '../../lib/config'
 import {keyValueDBService} from '../../services/classes/KeyValueDBService'
+import { NavigationActions } from 'react-navigation'
 
 /**
  * ## State actions
@@ -170,9 +174,11 @@ export function authenticateUser(username, password,rememberMe) {
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess())
-      Actions.Preloader()
+      // Actions.Preloader()
+       dispatch(NavigationActions.navigate({ routeName: Preloader }))
     }
     catch (error) {
+
       dispatch(loginFailure(error.message))
     }
   }
@@ -208,18 +214,22 @@ export function getSessionToken() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
-        Actions.Tabbar()
+        // Actions.Tabbar()
+         dispatch(NavigationActions.navigate({ routeName: Main }))
       } else if(token) {
-          Actions.Preloader()
+          // Actions.Preloader()
+          dispatch(NavigationActions.navigate({ routeName: Preloader }))
       }
       else {
-          Actions.InitialLoginForm()
+          // Actions.InitialLoginForm()
+          dispatch(NavigationActions.navigate({ routeName: Login }))
       }
     }
     catch (error) {
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())
-      Actions.InitialLoginForm()
+      // Actions.InitialLoginForm()
+       dispatch(NavigationActions.navigate({ routeName: Login }))
     }
   }
 }

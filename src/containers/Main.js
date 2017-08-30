@@ -17,13 +17,14 @@ import { connect } from 'react-redux'
  */
 import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
+import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Preloader from '../containers/Preloader'
 
 /**
  * Router
  */
-import { Actions } from 'react-native-router-flux'
+// import { Actions } from 'react-native-router-flux'
 
 /**
  * The components needed from React
@@ -42,7 +43,7 @@ import {
 }
   from 'react-native'
 
-import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, ScrollableTab, Icon, Fab, Button } from 'native-base';
+import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, ScrollableTab, Icon, Fab, Button,Footer,FooterTab } from 'native-base';
 import Jobs from './Jobs';
 import * as homeActions from '../modules/home/homeActions'
 import renderIf from '../lib/renderIf';
@@ -63,7 +64,7 @@ function mapStateToProps(state) {
  */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...authActions, ...globalActions, ...homeActions }, dispatch)
+    actions: bindActionCreators({ ...authActions, ...globalActions, ...homeActions,...preloaderActions }, dispatch)
   }
 }
 
@@ -107,24 +108,43 @@ class Main extends Component {
     const viewTabList = this.renderTabs()
     return (
       <Container>
-        <Header hasTabs>
-          <Left />
-          <Body>
-            <Title>Home</Title>
-          </Body>
-          <Right>
-
-            <TouchableHighlight underlayColor='#e7e7e7' onPress={Actions.Preloader}>
-              <Text>Cancel</Text>
-            </TouchableHighlight>
-          </Right>
-      </Header>
       
       <Tabs 
       renderTabBar={()=> <ScrollableTab />}
       >
         {viewTabList}
       </Tabs>
+
+        
+      <Footer>
+        <FooterTab  style={{ backgroundColor: 'white' }}>
+        <Button vertical>
+              <Icon name={"ios-home-outline"} />
+              <Text>Home</Text>
+            </Button>
+              <Button 
+              onPress={()=>{ this.props.actions.onResyncPress()}}
+              vertical>
+              <Icon name={"ios-sync-outline"} />
+              <Text>Re-sync</Text>
+            </Button>
+              <Button 
+              vertical
+              >
+              <Icon name={"ios-chatboxes-outline"} />
+              <Text>Message</Text>
+            </Button>
+              <Button vertical>
+              <Icon name={"ios-apps-outline"} />
+              <Text>Utilities</Text>
+            </Button>
+              <Button onPress = {()=>{this.props.actions.invalidateUserSession()}}
+              vertical>
+              <Icon name={"ios-power-outline"}/>
+              <Text>Logout</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
       <Fab
           active={this.state.active}
           direction="up"

@@ -22,7 +22,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 /**
  * Router
  */
-import {Actions} from 'react-native-router-flux'
+// import {Actions} from 'react-native-router-flux'
 
 /**
  * The components needed from React
@@ -121,10 +121,10 @@ var styles = StyleSheet.create({
 class Utilities extends Component {
 
   handlePress () {
-    Actions.Subview({
-      title: 'Subview'
-      // you can add additional props to be passed to Subview here...
-    })
+    // Actions.Subview({
+    //   title: 'Subview'
+    //   // you can add additional props to be passed to Subview here...
+    // })
   }
 
   render () {

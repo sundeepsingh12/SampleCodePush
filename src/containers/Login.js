@@ -16,7 +16,6 @@ import { Container, Body, InputGroup, Button, Input, Item, ListItem, CheckBox, S
 
 import feTheme from '../themes/feTheme';
 import sha256 from 'sha256';
-import { Actions } from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
@@ -126,6 +125,7 @@ class Login extends Component {
   }
 
   render() {
+    console.log('render of Login')
     return (
       <Container>
         {renderIf(!this.props.auth.form.isCameraScannerActive,
