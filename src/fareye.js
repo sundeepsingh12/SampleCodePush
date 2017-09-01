@@ -11,7 +11,8 @@ import {
  *
  * Necessary components from Router-Flux
  */
-import { Router, Scene, Actions } from 'react-native-router-flux'
+// import { Router, Scene, Actions } from 'react-native-router-flux'
+
 
 /**
  * ### Redux
@@ -26,7 +27,6 @@ import { Provider } from 'react-redux'
  *
  */
 import configureStore from './lib/configureStore'
-
 /**
  * ### containers
  *
@@ -34,14 +34,7 @@ import configureStore from './lib/configureStore'
  *
  */
 import Application from './containers/Application'
-import Logout from './containers/Logout'
 
-import Main from './containers/Main'
-import Utilities from './containers/Utilities'
-import Message from './containers/Message'
-import Login from './containers/Login'
-import Preloader from './containers/Preloader'
-// import Subview from './containers/Subview'
 import ResyncLoader from './components/ResyncLoader'
 /**
  * ### icons
@@ -80,6 +73,8 @@ import { backgroundServiceEvery15mins } from './services/background/'
  *  The version of the app but not  displayed yet
  */
 import pack from '../package'
+import AppWithNavigationState from './modules/navigators/AppNavigator'
+ 
 var VERSION = pack.version
 
 /**
@@ -146,97 +141,25 @@ class TabIcon extends React.Component {
  */
 
 export default function native(platform) {
-
-  let Fareye = React.createClass({
-
-    // componentDidMount() {
-    //   backgroundServiceEvery15mins();
-    // },
-
-    render() {
-      const store = configureStore(getInitialState())
-
-      // configureStore will combine modules from FarEye and Main application
+  // configureStore will combine modules from FarEye and Main application
       // it will then create the store based on aggregate state from all modules
+ const store = configureStore(getInitialState())
+
       store.dispatch(setPlatform(platform))
       store.dispatch(setVersion(VERSION))
       store.dispatch(setStore(store))
 
-      // setup the router table with App selected as the initial component
-      // note: See https://github.com/aksonov/react-native-router-flux/issues/948
-      return (
+  class Fareye extends Component {
 
-        <Provider store={store}>
-          <Router sceneStyle={{ backgroundColor: 'white' }}>
-
-            <Scene key='root'
-              hideNavBar={false} >
-              <Scene key='App'
-                component={Application}
-                hideNavBar
-                type='replace'
-                initial />
-
-              <Scene key='InitialLoginForm'
-                component={Login}
-                hideNavBar
-                type='replace'
-              />
-
-              <Scene key='Preloader'
-                component={Preloader}
-                hideNavBar
-                title='Preloader'
-                type='replace'
-              />
-
-              <Scene key='Tabbar'
-                tabs
-                hideNavBar
-                tabBarStyle={styles.tabBar}
-                type='replace'
-                default='Main'>
-
-                <Scene key='Main'
-                  title='Home'
-                  iconName={"ios-home-outline"}
-                  icon={TabIcon}
-                  hideNavBar
-                  component={Main}
-                  initial />
-
-                <Scene key='ReSync'
-                  title='Re-sync'
-                  icon={ResyncLoader}
-                  onPress={() => { store.dispatch(onResyncPress()) }} />
-
-                <Scene key='Message'
-                  title='Message'
-                  icon={TabIcon}
-                  iconName={"ios-chatboxes-outline"}
-                  hideNavBar
-                  component={Message} />
-
-                <Scene key='<Utilitie></Utilitie>s'
-                  title='Utilities'
-                  icon={TabIcon}
-                  hideNavBar
-                  iconName={"ios-apps-outline"}
-                  component={Utilities} />
-
-                <Scene key='Logout'
-                  title='Logout'
-                  icon={TabIcon}
-                  iconName={"ios-power-outline"}
-                  hideNavBar
-                  component={Logout} />
-              </Scene>
-            </Scene>
-          </Router>
-        </Provider>
-      )
+    render() {
+        return (
+            <Provider store={store}>
+                <AppWithNavigationState />
+            </Provider>
+        );
     }
-  })
+  }
+
   /**
    * registerComponent to the AppRegistery and off we go....
    */

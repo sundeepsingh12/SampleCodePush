@@ -19,7 +19,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as homeActions from '../modules/home/homeActions'
-import { Actions } from 'react-native-router-flux';
+// import { Actions } from 'react-native-router-flux';
 import _ from 'underscore'
 import renderIf from '../lib/renderIf';
 
@@ -161,19 +161,7 @@ class Jobs extends Component {
   }
 
   checkIfTransactionsPresent() {
-    console.log('checkIfTransactionsPresent')
-    if (this.props.tabIdJobTransactions[this.props.tabId]) {
-      console.log(this.props.tabIdJobTransactions[this.props.tabId])
-      if (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) {
-        console.log(this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization)
-        if (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0) {
-          console.log(this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0)
-          if (this.props.tabIdJobTransactions[this.props.tabId].isFetching) {
-            console.log(this.props.tabIdJobTransactions[this.props.tabId].isFetching)
-          }
-        }
-      }
-    }
+  
     if (this.props.tabIdJobTransactions[this.props.tabId] &&
       this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization &&
       (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0 || this.props.tabIdJobTransactions[this.props.tabId].isFetching)) {

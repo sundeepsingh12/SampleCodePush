@@ -9,10 +9,10 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.rnziparchive.RNZipArchivePackage;
 import com.rnfs.RNFSPackage;
 import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
-import com.microsoft.codepush.react.CodePush;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
-import com.horcrux.svg.SvgPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.microsoft.codepush.react.CodePush;
+import com.horcrux.svg.SvgPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -40,15 +40,15 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new RNFetchBlobPackage(),
-            new RealmReactPackage(),
-            new RNDeviceInfo(),
             new RNZipArchivePackage(),
             new RNFSPackage(),
             new RNBackgroundGeolocation(),
-            new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
             new RCTCameraPackage(),
+            new VectorIconsPackage(),
+            new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
+            new RNDeviceInfo(),
             new SvgPackage(),
-            new VectorIconsPackage() ,
+            new RealmReactPackage() ,
             new RNIMEIPackage()
       );
     }

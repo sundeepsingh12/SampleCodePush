@@ -135,7 +135,12 @@ export default keyMirror({
     //Status Codes
     UNSEEN:null,
     PENDING:null,
-    
+
+    //Route names (Used in React Navigation)
+    Application:null,
+    Login:null,
+    Preloader:null,
+    Main:null,
 })
 
 
