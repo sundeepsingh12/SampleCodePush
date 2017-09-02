@@ -847,6 +847,7 @@ describe('test cases for prepareJobCustomizationList', () => {
         circleLine1: 'lmn',
         circleLine2: 'def',
         id: 1,
+        jobMasterId: 3,
         jobSwipableDetails: 'test1',
         seqSelected: 10,
         statusId: 11
@@ -857,6 +858,7 @@ describe('test cases for prepareJobCustomizationList', () => {
         circleLine1: 'test',
         circleLine2: 'test',
         id: 2,
+        jobMasterId: 3,
         jobSwipableDetails: 'test2',
         seqSelected: 12,
         statusId: 11
@@ -893,6 +895,7 @@ describe('test cases for prepareJobCustomizationList', () => {
         circleLine1: 'lmn',
         circleLine2: 'def',
         id: 1,
+        jobMasterId: 3,
         jobSwipableDetails: 'test1',
         seqSelected: 10,
         statusId: 11
@@ -903,6 +906,7 @@ describe('test cases for prepareJobCustomizationList', () => {
         circleLine1: '',
         circleLine2: '',
         id: 2,
+        jobMasterId: 4,
         jobSwipableDetails: 'test2',
         seqSelected: 12,
         statusId: 11

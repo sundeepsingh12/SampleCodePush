@@ -68,7 +68,6 @@ class ExpandableHeader extends Component {
                     <ExpandableDetailsList
                         dataList = {this.props.dataList} />
                 )}
-
             </View>
 
         )

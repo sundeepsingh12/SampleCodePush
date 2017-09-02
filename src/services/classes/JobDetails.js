@@ -34,59 +34,33 @@ class JobDetails {
      *                         }
      * }
      */
-    prepareDataObject(id, positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob) {
+    prepareDataObject(id, positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId, isObject) {
         let dataMap = {},
-            dataList = [],
             contactList = [],
             addressList = []
-        let dataQuery
-        if (isJob) {
-            dataQuery = 'jobId = ' + id + ' AND parentId = ' + positionId
-        } else {
-            dataQuery = 'jobTransactionId = ' + id + ' AND parentId = ' + positionId
-        }
+        let dataQuery = isJob ? 'jobId = ' + id + ' AND parentId = ' + positionId : 'jobTransactionId = ' + id + ' AND parentId = ' + positionId
+        let dataList = isObject ? {} : []
         let filteredDataList = realm.filterRecordList(realmDBDataList, dataQuery)
-
         for (let index in filteredDataList) {
             let data = { ...filteredDataList[index] }
-            let attributeMaster, attributeStatus
-
-            if (isJob) {
-                attributeMaster = attributeMasterMap[data.jobAttributeMasterId]
-            } else {
-                attributeMaster = attributeMasterMap[data.fieldAttributeMasterId]
-            }
-
-            if (isJob) {
-                attributeStatus = attributeMap[data.jobAttributeMasterId]
-            } else {
-                attributeStatus = attributeMap[data.fieldAttributeMasterId]
-            }
-
-            if (!attributeMaster.hidden && data.value !== undefined && data.value !== null) {
+            let attributeMaster = isJob ? attributeMasterMap[data.jobAttributeMasterId] : attributeMasterMap[data.fieldAttributeMasterId]
+            let attributeStatus = attributeMaster ? attributeMap[attributeMaster.id] : undefined
+            if (attributeMaster && attributeStatus && !attributeMaster.hidden && data.value !== undefined && data.value !== null && data.value.trim() != '') {
                 let dataObject = {}
-                dataMap[data.jobAttributeMasterId] = {}
-                dataObject.data = data
-                dataObject.sequence = attributeStatus.sequence
-                dataObject.label = attributeMaster.label
+                dataMap[attributeMaster.attributeTypeId] = dataMap[attributeMaster.attributeTypeId] ? dataMap[attributeMaster.attributeTypeId] : {}
+                dataMap[attributeMaster.attributeTypeId][attributeMaster.id] = dataMap[attributeMaster.attributeTypeId][attributeMaster.id] ? dataMap[attributeMaster.attributeTypeId][attributeMaster.id] : {}
+                dataMap[attributeMaster.attributeTypeId][attributeMaster.id].data = dataObject.data = data
+                dataMap[attributeMaster.attributeTypeId][attributeMaster.id].sequence = dataObject.sequence = attributeStatus.sequence
+                dataMap[attributeMaster.attributeTypeId][attributeMaster.id].label = dataObject.label = attributeMaster.label
                 dataObject.attributeTypeId = attributeMaster.attributeTypeId
+                dataObject.id = ++autoIncrementId
                 if (data.value.toLocaleLowerCase() == 'objectsarojfareye' || data.value.toLocaleLowerCase() == 'arraysarojfareye') {
-                    let childDataObject = this.prepareDataObject(id, data.positionId, realmDBDataList, attributeMasterMap,attributeMap,isJob)
-                    if (isJob) {
-                        dataMap[data.jobAttributeMasterId].childDataMap = dataObject.dataMap
-                    } else {
-                        dataMap[data.fieldAttributeMasterId].childDataMap = dataObject.dataMap
-                    }
+                    let childDataObject = this.prepareDataObject(id, data.positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId)
+                    autoIncrementId = childDataObject.autoIncrementId
+                    dataMap[attributeMaster.attributeTypeId][attributeMaster.id].childDataMap = childDataObject.dataMap
                     dataObject.childDataList = childDataObject.dataList
                 }
-                dataList.push(dataObject)
-
-                if(isJob) {
-                    dataMap[data.jobAttributeMasterId] = dataObject
-                } else {
-                    dataMap[data.fieldAttributeMasterId] = dataObject
-                }
-
+                isObject ? isJob && attributeMaster.attributeTypeId == 27 ? true : dataList[attributeMaster.id] = dataObject : dataList.push(dataObject)
                 if (data.parentId !== 0 || !isJob) {
                     continue
                 } else if (jobDataService.checkContacNumber(data.jobAttributeMasterId, data.value, attributeMasterMap)) {
@@ -96,11 +70,15 @@ class JobDetails {
                 }
             }
         }
-        dataList = dataList.sort((x, y) => x.sequence - y.sequence)
+        if (!isObject) {
+            dataList = dataList.sort((x, y) => x.sequence - y.sequence)
+        }
         return {
             dataMap,
             dataList,
             contactList,
+            addressList,
+            autoIncrementId
         }
     }
 }

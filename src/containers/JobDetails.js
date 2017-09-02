@@ -20,7 +20,6 @@ import ExpandableHeader from '../components/ExpandableHeader'
 import MessageHeader from '../components/MessageHeader'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
-import TitleHeader from '../components/TitleHeader'
 
 function mapStateToProps(state) {
     return {
@@ -44,52 +43,25 @@ function mapDispatchToProps(dispatch) {
 
 class JobDetails extends Component {
 
-    constructor() {
-        super();
-        this.state = {
-            active: false,
-            parentActive: false,
-            childActive: false,
-            childActive2: false,
-        };
-    }
-
     componentWillMount() {
         this.props.actions.getJobDetails(this.props.jobTransactionId)
     }
 
-    renderData = (item) => {
-        return (
-            <View style={StyleSheet.flatten([styles.row, styles.padding10, styles.bgWhite, { borderTopWidth: .5, borderColor: '#C5C5C5' }])}>
-                <View style={StyleSheet.flatten([styles.row, styles.justifyStart, styles.alignCenter, { flex: .5 }])}>
-                    <Text style={StyleSheet.flatten([styles.bold, styles.fontSm])}>
-                        Child List
-                    </Text>
-                </View>
-                <View style={StyleSheet.flatten([styles.row, styles.justifyStart, styles.alignCenter, { flex: .5 }])}>
-                    <Text style={StyleSheet.flatten([styles.fontSm])}>
-                        Child String Content
-                    </Text>
-                </View>
-            </View>
-        )
-    }
-
-    renderList() {
-        let list = []
-        for (var i = 0; i < 100; i++) {
-            let obj = {
-                id: i,
-                name: 'xyz'
-            }
-            list.push(obj)
+    renderStatusList(statusList) {
+        let statusView = []
+        for (let index in statusList) {
+            statusView.push(
+                <Button key={statusList[index].id} small primary style={{ margin: 2 }}>
+                    <Text style={{ color: 'white' }}>{statusList[index].name}</Text>
+                </Button>
+            )
         }
-        console.log(list)
-        return list
+        return statusView
     }
 
     render() {
         console.log('props render >>>> ', this.props)
+        const statusView = this.renderStatusList(this.props.nextStatusList)
         if (this.props.jobDetailsLoading) {
             return (
                 <Loader />
@@ -110,35 +82,12 @@ class JobDetails extends Component {
                         <Right style={StyleSheet.flatten([styles.flexBasis15])}>
                         </Right>
                     </Header>
-                    {/* <TitleHeader/> */}
-                    <Content style={StyleSheet.flatten([styles.padding5])} scrollEnabled={!this.state.parentActive}>
+                    <Content style={StyleSheet.flatten([styles.padding5])}>
                         <Card>
                             <ExpandableHeader
                                 title={'Job Details'}
                                 dataList={this.props.jobDataList}
                             />
-                            {/* <CardItem button onPress={() => { this.setState({ active: !this.state.active }) }}>
-                            <Body style={StyleSheet.flatten([styles.padding10])}>
-                                <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                                    <View style={StyleSheet.flatten([styles.marginRight15])}>
-                                        <Icon name='ios-list-outline' style={StyleSheet.flatten([styles.fontXl, theme.textPrimary])} />
-                                    </View>
-                                    <Text style={StyleSheet.flatten([styles.marginRightAuto, styles.fontLg])}>
-                                        Job Details
-                                    </Text>
-                                    <View>
-                                        <Icon name={this.state.active ? 'ios-arrow-up-outline' : 'ios-arrow-down-outline'} style={StyleSheet.flatten([styles.fontXl, theme.textPrimary, styles.justifyEnd])} />
-                                    </View>
-                                </View>
-                            </Body>
-                        </CardItem> */}
-
-
-                            {/*Job detail list*/}
-                            {/* {renderIf(this.state.active, */}
-
-                            {/* )} */}
-                            {/*End job detail list*/}
                         </Card>
                         <Card>
                             <ExpandableHeader
@@ -156,18 +105,7 @@ class JobDetails extends Component {
                     </View>
                     <View style={StyleSheet.flatten([styles.column, styles.bgWhite, styles.padding5, { borderTopWidth: 1, borderTopColor: '#d3d3d3' }])}>
                         <View style={StyleSheet.flatten([styles.row, styles.flexWrap, styles.justifyCenter, styles.alignCenter])}>
-                            <Button small primary style={{ margin: 2 }}>
-                                <Text style={{ color: 'white' }}>Success</Text>
-                            </Button>
-                            <Button small primary style={{ margin: 2 }}>
-                                <Text style={{ color: 'white' }}>Fail</Text>
-                            </Button>
-                            <Button small primary style={{ margin: 2 }}>
-                                <Text style={{ color: 'white' }}>Pickup</Text>
-                            </Button>
-                            <Button small primary style={{ margin: 2 }}>
-                                <Text style={{ color: 'white' }}>Status</Text>
-                            </Button>
+                            {statusView}
                         </View>
                     </View>
                     <Footer>

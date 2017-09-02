@@ -22,12 +22,7 @@ class ExpandableDetailsList extends Component {
     renderChildList(dataList) {
         let childListView = []
         for (let index in dataList) {
-            childListView.push(
-                <NonExpandableDetailsView
-                    key={dataList[index].data.id}
-                    label={dataList[index].label}
-                    value={dataList[index].data.value} />
-            )
+            childListView.push(this.renderData(dataList[index]))
         }
         return childListView
     }
@@ -36,7 +31,8 @@ class ExpandableDetailsList extends Component {
         if (item.data.value == 'ArraySarojFareye' && item.childDataList) {
             return (
                 <ExpandableDetailsView
-                    key={item.data.id}
+                    key={item.id}
+                    id={item.id}
                     label={item.label}
                     value={item.data.value}
                     childDataList={item.childDataList} />
@@ -47,7 +43,7 @@ class ExpandableDetailsList extends Component {
         } else {
             return (
                 <NonExpandableDetailsView
-                    key={item.data.id}
+                    key={item.id}
                     label={item.label}
                     value={item.data.value} />
             )
@@ -55,16 +51,17 @@ class ExpandableDetailsList extends Component {
     }
 
     render() {
+        console.log(this.props)
         return (
-            <Content style={StyleSheet.flatten([{ flex: 1, maxHeight: '100%' }])}>
+            <View style={StyleSheet.flatten([{ flex: 1,minHeight:'50%', maxHeight: '100%' }])}>
                 <List>
                     <FlatList
                         data={this.props.dataList}
                         renderItem={({ item }) => this.renderData(item)}
-                        keyExtractor={item => item.data.id}
+                        keyExtractor={item => item.id}
                     />
                 </List>
-            </Content>
+            </View>
         )
     }
 }

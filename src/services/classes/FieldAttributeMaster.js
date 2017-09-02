@@ -40,10 +40,10 @@ class FieldAttributeMaster {
             fieldAttributeStatusList = []
         }
         fieldAttributeStatusList.forEach(fieldAttributeStatus => {
-            if (!fieldAttributeStatusMap[fieldAttributeStatus.statusId]) {
-                fieldAttributeStatusMap[fieldbAttributeStatus.statusId] = {}
-            }
-            fieldAttributeStatusMap[fieldAttributeStatus.statusId][fieldAttributeStatus.fieldAttributeId] = fieldAttributeStatus
+            // if (!fieldAttributeStatusMap[fieldAttributeStatus.statusId]) {
+            //     fieldAttributeStatusMap[fieldbAttributeStatus.statusId] = {}
+            // }
+            fieldAttributeStatusMap[fieldAttributeStatus.fieldAttributeId] = fieldAttributeStatus
             // jobAttributeStatus[statusId].push(jobAttributeStatus.jobAttributeId)
         })
 

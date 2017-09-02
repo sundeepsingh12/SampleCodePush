@@ -20,6 +20,7 @@ export default function jobDetailsReducer(state = initialState, action) {
             return state.set('jobDataList',action.payload.jobDataList)
                         .set('fieldDataList',action.payload.fieldDataList)
                         .set('jobDetailsLoading',false)
+                        .set('nextStatusList',action.payload.nextStatusList)
     }
     return state
 }

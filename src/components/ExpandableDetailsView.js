@@ -43,6 +43,7 @@ class ExpandableDetailsView extends Component {
                 </TouchableOpacity>
                 {renderIf(this.state.showDropdown,
                     <ExpandableDetailsList
+                        key={this.props.id}
                         dataList={this.props.childDataList} />
                 )}
             </View>

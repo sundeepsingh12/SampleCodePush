@@ -31,57 +31,68 @@ describe('test cases for getJobDataDetailsForListing', () => {
         {
             jobId: 1,
             jobAttributeMasterId: 10,
-            value: 'xyz'
+            value: 'xyz',
+            parentId: 0
         },
         {
             jobId: 1,
             jobAttributeMasterId: 11,
-            value: 'testaddress'
+            value: 'testaddress',
+            parentId: 1
         },
         {
             jobId: 1,
             jobAttributeMasterId: 12,
-            value: '989869182'
+            value: '989869182',
+            parentId: 0
         },
         {
             jobId: 2,
             jobAttributeMasterId: 10,
-            value: 'xyz'
+            value: 'xyz',
+            parentId: 0
         },
         {
             jobId: 2,
             jobAttributeMasterId: 13,
-            value: '98898723'
+            value: '98898723',
+            parentId: 0
         },
         {
             jobId: 3,
             jobAttributeMasterId: 11,
-            value: 'testaddress2'
+            value: 'testaddress2',
+            parentId: 0
         },
         {
             jobId: 3,
             jobAttributeMasterId: 14,
-            value: '98898723'
+            value: '98898723',
+            parentId: 0
         },
         {
             jobId: 4,
             jobAttributeMasterId: 12,
-            value: '988'
+            value: '988',
+            parentId: 0
         },
         {
             jobId: 4,
             jobAttributeMasterId: 15,
-            value: null
+            value: null,
+            parentId: 0
         },
         {
             jobId: 5,
             jobAttributeMasterId: 12,
-            value: null
+            value: null,
+            parentId: 0
         },
         {
             jobId: 5,
             jobAttributeMasterId: 15,
-            value: 'testaddress3'
+            value: 'testaddress3',
+            parentId: 0
         },
     ]
 
@@ -91,11 +102,6 @@ describe('test cases for getJobDataDetailsForListing', () => {
                 jobId: 1,
                 jobAttributeMasterId: 10,
                 value: 'xyz'
-            },
-            11: {
-                jobId: 1,
-                jobAttributeMasterId: 11,
-                value: 'testaddress'
             },
             12: {
                 jobId: 1,
@@ -164,13 +170,6 @@ describe('test cases for getJobDataDetailsForListing', () => {
     }
 
     const addressMap = {
-        1: [
-            {
-                jobId: 1,
-                jobAttributeMasterId: 11,
-                value: 'testaddress'
-            },
-        ],
         3: [
             {
                 jobId: 3,

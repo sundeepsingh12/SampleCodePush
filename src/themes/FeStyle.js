@@ -194,6 +194,9 @@ export default {
     marginRight30: {
         marginRight: 30
     },
+    marginRightAuto : {
+        marginRight: 'auto'
+    },
 
 //  Padding Objects
     padding5: {
@@ -424,6 +427,9 @@ export default {
   },
   flexBasis100 : {
       flexBasis: '100%'
+  },
+  flexWrap : {
+    flexWrap: 'wrap'
   },
   width100 : {
     width : '100%'

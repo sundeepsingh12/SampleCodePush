@@ -42,13 +42,15 @@ class FieldData {
     }
 
     prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMasterMap, fieldAttributeMap) {
-        const fieldAttributeMapQuery = Object.keys(fieldAttributeMap).map(fieldAttributeMasterId => 'fieldAttributeMasterId == ' + fieldAttributeMasterId).join(' OR ')
+        console.log('sadsa',fieldAttributeMap)
+        const fieldAttributeMapQuery = Object.keys(fieldAttributeMasterMap).map(fieldAttributeMasterId => 'fieldAttributeMasterId = ' + fieldAttributeMasterId).join(' OR ')
         let fieldDataQuery = 'jobTransactionId = ' + jobTransactionId
         if (fieldAttributeMapQuery !== undefined && fieldAttributeMapQuery !== null && fieldAttributeMapQuery.length !== 0) {
             fieldDataQuery += ' AND (' + fieldAttributeMapQuery + ')'
         }
+        console.log('fieldData query',fieldDataQuery)
         let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery)
-        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false)
+        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false, 0,true)
         return fieldDataObject
     }
 }

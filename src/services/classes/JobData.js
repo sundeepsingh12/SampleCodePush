@@ -106,11 +106,11 @@ class JobData {
     prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap) {
         const jobAttributeMapQuery = Object.keys(jobAttributeMap).map(jobAttributeMasterId => 'jobAttributeMasterId = ' + jobAttributeMasterId).join(' OR ')
         let jobDataQuery = 'jobId = ' + jobId
-        if(jobAttributeMapQuery !== undefined && jobAttributeMapQuery !== null && jobAttributeMapQuery.length !== 0) {
+        if (jobAttributeMapQuery !== undefined && jobAttributeMapQuery !== null && jobAttributeMapQuery.length !== 0) {
             jobDataQuery += ' AND (' + jobAttributeMapQuery + ')'
         }
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
-        let jobDataObject = jobDetailsService.prepareDataObject(jobId, 0, jobDataList, jobAttributeMasterMap, jobAttributeMap, true)
+        let jobDataObject = jobDetailsService.prepareDataObject(jobId, 0, jobDataList, jobAttributeMasterMap, jobAttributeMap, true, 0, true)
         return jobDataObject
     }
 

@@ -80,7 +80,7 @@ class Jobs extends Component {
             <Ionicons name='ios-call-outline' style={{ fontSize: 34, color: '#ffffff', marginLeft: 25 }} />
           </Button>,
         ]}>
-        <ListItem style={StyleSheet.flatten([styles.bgGray, {marging: 0, padding: 0}])} avatar button onPress={() => { Actions.JobDetails({ jobTransactionId: item.id }) }}>
+        <ListItem style={StyleSheet.flatten([styles.bgGray, { margin: 0, padding: 0 }])} avatar button onPress={() => { Actions.JobDetails({ jobTransactionId: item.id }) }}>
           <Left>
             <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this.toggleStatus()}>
               <View>
@@ -116,16 +116,15 @@ class Jobs extends Component {
     } else {
       return (
         <Container>
-          <View>
-            <List
-              style={{ marging: 0, padding: 0}}>
-              <FlatList
-                data={this.renderList()}
-                renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => item.id}
-              />
-            </List>
-            <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 5, marginLeft: 5, marginRight: 5 }}>
+          <View style={{ flex: 1, flexDirection: 'column', bottom: 5, marginLeft: 5, marginRight: 5 }}>
+              <List>
+                <FlatList
+                  data={this.renderList()}
+                  renderItem={({ item }) => this.renderData(item)}
+                  keyExtractor={item => item.id}
+                />
+              </List>
+            <View style={{ flex: 2, flexDirection: 'row' }}>
               <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
                 <Input bordered='true' rounded style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
                   placeholder="Search Reference No." />

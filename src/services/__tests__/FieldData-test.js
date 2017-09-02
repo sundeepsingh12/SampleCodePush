@@ -13,17 +13,26 @@ describe('test cases for getFieldDataMap', () => {
             {
                 jobTransactionId: 1,
                 fieldAttributeMasterId: 10,
-                value: 'abc'
+                value: 'abc',
+                parentId : 0
             },
             {
                 jobTransactionId: 1,
                 fieldAttributeMasterId: 11,
-                value: 1
+                value: 1,
+                parentId : 0
+            },
+            {
+                jobTransactionId: 1,
+                fieldAttributeMasterId: 12,
+                value: 1,
+                parentId : 1
             },
             {
                 jobTransactionId: 2,
                 fieldAttributeMasterId: 10,
-                value: 'xyz'
+                value: 'xyz',
+                parentId : 0
             }
         ]
 
@@ -32,7 +41,7 @@ describe('test cases for getFieldDataMap', () => {
                 10: {
                     jobTransactionId: 1,
                     fieldAttributeMasterId: 10,
-                    value: 'abc'
+                    value: 'abc',
                 },
                 11: {
                     jobTransactionId: 1,
