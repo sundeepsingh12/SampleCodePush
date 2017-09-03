@@ -3,16 +3,17 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.RNFetchBlob.RNFetchBlobPackage;
-import io.realm.react.RealmReactPackage;
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
 import com.rnziparchive.RNZipArchivePackage;
 import com.rnfs.RNFSPackage;
-import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
+import io.realm.react.RealmReactPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
-import com.microsoft.codepush.react.CodePush;
 import com.horcrux.svg.SvgPackage;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.microsoft.codepush.react.CodePush;
+import com.ocetnik.timer.BackgroundTimerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -39,16 +40,17 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNFetchBlobPackage(),
+            new RNBackgroundGeolocation(),
             new RNZipArchivePackage(),
             new RNFSPackage(),
-            new RNBackgroundGeolocation(),
+            new RNFetchBlobPackage(),
             new RCTCameraPackage(),
+            new RealmReactPackage(),
             new VectorIconsPackage(),
-            new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
-            new RNDeviceInfo(),
             new SvgPackage(),
-            new RealmReactPackage() ,
+            new RNDeviceInfo(),
+            new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),
+            new BackgroundTimerPackage() ,
             new RNIMEIPackage()
       );
     }

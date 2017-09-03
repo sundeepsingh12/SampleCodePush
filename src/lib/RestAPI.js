@@ -52,7 +52,6 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = this.API_BASE_URL + opts.url
-    console.log(url)
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }

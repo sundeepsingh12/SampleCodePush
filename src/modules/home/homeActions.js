@@ -20,14 +20,26 @@ const {
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { sync } from '../../services/classes/Sync'
-import { jobStatusService } from '../../services/classes/JobStatus'
-import { jobTransactionService } from '../../services/classes/JobTransaction'
-import { jobSummaryService } from '../../services/classes/JobSummary'
-import { tabsService } from '../../services/classes/Tabs'
-import * as realm from '../../repositories/realmdb'
+import {
+  keyValueDBService
+} from '../../services/classes/KeyValueDBService'
+import {
+  sync
+} from '../../services/classes/Sync'
+
+import {
+  jobTransactionService
+} from '../../services/classes/JobTransaction'
+
+import {
+  tabsService
+} from '../../services/classes/Tabs'
 import _ from 'underscore'
+import {
+  Platform
+} from 'react-native';
+import BackgroundTimer from 'react-native-background-timer';
+
 
 export function jobFetchingEnd(pageData, tabId) {
   return {
@@ -58,7 +70,7 @@ export function setTabsList(tabsList) {
   }
 }
 
-export function setFetchingFalse(tabId,message) {
+export function setFetchingFalse(tabId, message) {
   return {
     type: SET_FETCHING_FALSE,
     payload: {
@@ -93,8 +105,8 @@ export function setRefereshingTrue() {
 
 export function setTabIdsJobTransactions(tabIdJobs) {
   return {
-    type : SET_TABS_TRANSACTIONS,
-    payload:tabIdJobs
+    type: SET_TABS_TRANSACTIONS,
+    payload: tabIdJobs
   }
 }
 
@@ -106,7 +118,7 @@ export function fetchJobs(tabId, pageNumber) {
       if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
         dispatch(jobFetchingEnd(pageData, tabId))
       } else {
-        dispatch(setFetchingFalse(tabId,pageData.message))
+        dispatch(setFetchingFalse(tabId, pageData.message))
       }
     } catch (error) {
       console.log(error)
@@ -118,44 +130,25 @@ export function onResyncPress() {
   return async function (dispatch) {
     try {
       await sync.createAndUploadZip();
-
-      // const pageNumber = 0, pageSize = 3
-      // let isLastPageReached = false, json, isJobsPresent = false
-      // const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
-      // while (!isLastPageReached) {
-      //   const tdcResponse = await sync.downloadDataFromServer(pageNumber, pageSize)
-      //   if (tdcResponse) {
-      //     json = await tdcResponse.json
-      //     isLastPageReached = json.last
-      //     if (!_.isNull(json.content) && !_.isUndefined(json.content) && !_.isEmpty(json.content)) {
-      //       await sync.processTdcResponse(json.content)
-      //     } else {
-      //       isLastPageReached = true
-      //     }
-      //     const successSyncIds = await sync.getSyncIdFromResponse(json.content)
-      //     //Dont hit delete sync API if successSyncIds empty
-      //     if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
-      //       isJobsPresent = true
-      //       const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
-      //       const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
-      //       const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
-      //       const dataList = await sync.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
-      //       const messageIdDTOs = []
-      //       await sync.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
-      //       await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
-      //       jobSummaryService.updateJobSummary(dataList.jobSummaries)
-      //     }
-      //   } else {
-      //     isLastPageReached = true
-      //   }
-      // }
-      // if(isJobsPresent) {
-      //   let tabIdJobs = await jobTransactionService.refreshJobs()
-      //   console.log(tabIdJobs)
-      //   dispatch(setTabIdsJobTransactions(tabIdJobs))
-      // }
+      if (Platform.OS === 'android') {
+        const intervalId = BackgroundTimer.setInterval(async () => {
+          const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+          if (isJobsPresent) {
+            let tabIdJobs = await jobTransactionService.refreshJobs()
+            dispatch(setTabIdsJobTransactions(tabIdJobs))
+          }
+        }, CONFIG.SYNC_SERVICE_DELAY);
+      }
+      else{
+        //Write ios background service code here
+      }
     } catch (error) {
+      //Update UI here
       console.log(error)
     }
   }
+}
+
+export function downloadAndDeleteDataFromServer() {
+
 }

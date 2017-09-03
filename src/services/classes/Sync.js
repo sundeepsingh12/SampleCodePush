@@ -31,6 +31,7 @@ const {
   TABLE_JOB_TRANSACTION_CUSTOMIZATION
 } = require('../../lib/constants').default
 
+
 class Sync {
 
   async createAndUploadZip() {
@@ -317,6 +318,51 @@ class Sync {
       transactionIdDtos
     }
     return dataList
+  }
+
+/**This method first download data from server and then 
+ * requests server to delete entries from sync table
+ * 
+ * @Return type
+ * boolean 
+ * 
+ * Returns true if any job present in sync table on server side
+ */
+  async downloadAndDeleteDataFromServer() {
+        const pageNumber = 0,
+          pageSize = 3
+        let isLastPageReached = false,
+          json, isJobsPresent = false
+        const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
+        while (!isLastPageReached) {
+          const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize)
+          if (tdcResponse) {
+            json = await tdcResponse.json
+            isLastPageReached = json.last
+            if (!_.isNull(json.content) && !_.isUndefined(json.content) && !_.isEmpty(json.content)) {
+              await this.processTdcResponse(json.content)
+            } else {
+              isLastPageReached = true
+            }
+            const successSyncIds = await this.getSyncIdFromResponse(json.content)
+            //Dont hit delete sync API if successSyncIds empty
+            //Delete Data from server code starts here
+            if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
+              isJobsPresent = true
+              const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
+              const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
+              const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
+              const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
+              const messageIdDTOs = []
+              await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+              await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
+              jobSummaryService.updateJobSummary(dataList.jobSummaries)
+            }
+          } else {
+            isLastPageReached = true
+          }
+        }
+    return isJobsPresent
   }
 }
 
