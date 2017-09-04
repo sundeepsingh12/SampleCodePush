@@ -13,9 +13,9 @@ import { connect } from 'react-redux'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf';
-import OtpScreen from '../components/OtpScreen'
-import MobileNoScreen from '../components/MobileNoScreen'
-import InitialSetup from '../components/InitialSetup'
+import OtpScreen from './OtpScreen'
+import MobileNoScreen from './MobileNoScreen'
+import InitialSetup from './InitialSetup'
 
 function mapStateToProps(state) {
     return {
