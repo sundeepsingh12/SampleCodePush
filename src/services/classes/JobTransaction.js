@@ -165,12 +165,20 @@ class JobTransaction {
         return jobMasterIds
     }
 
+    /**
+     * 
+     * @param {*} jobMasterIdCustomizationMap 
+     * @param {*} jobAttributeMasterList 
+     * @param {*} jobAttributeStatusList 
+     * @param {*} customerCareList 
+     * @param {*} smsTemplateList 
+     * @param {*} statusList 
+     */
     getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList, statusList) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
-        if (_.isEmpty(jobAttributeStatusMap)) {
-            jobAttributeStatusMap = jobAttributeMasterService.getAllJobAttributeStatusMap(statusList, jobAttributeMasterMap)
-        }
+        const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)
+        const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap 
         let customerCareMap = customerCareService.getCustomerCareMap(customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(smsTemplateList)
         let runsheetQuery = 'isClosed = false'
@@ -189,7 +197,7 @@ class JobTransaction {
         let jobMap = jobService.getJobMap(jobsList)
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
         let fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
-        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap)
+        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap)
         return jobTransactionCustomizationList
     }
 
@@ -201,7 +209,19 @@ class JobTransaction {
         }
     }
 
-    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap) {
+    /**
+     * 
+     * @param {*} jobTransactionMap 
+     * @param {*} jobMap 
+     * @param {*} jobDataDetailsForListing 
+     * @param {*} fieldDataMap 
+     * @param {*} jobMasterIdCustomizationMap 
+     * @param {*} jobAttributeMasterMap 
+     * @param {*} jobAttributeStatusMap 
+     * @param {*} customerCareMap 
+     * @param {*} smsTemplateMap 
+     */
+    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap) {
         let jobTransactionCustomizationList = []
         for (var index in jobTransactionMap) {
             let jobTransaction = jobTransactionMap[index]
@@ -232,7 +252,7 @@ class JobTransaction {
                 jobTransactionCustomization.id = jobTransaction.id
                 jobTransactionCustomization.jobMasterId = jobMasterId
             }
-            let jobSwipableDetails = this.setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap)
+            let jobSwipableDetails = this.setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap)
             jobTransactionCustomization.jobSwipableDetails = jobSwipableDetails
             jobTransactionCustomization.seqSelected = jobTransaction.seqSelected
             jobTransactionCustomization.statusId = jobTransaction.jobStatusId
@@ -241,6 +261,14 @@ class JobTransaction {
         return jobTransactionCustomizationList
     }
 
+    /**
+     * 
+     * @param {*} customizationObject 
+     * @param {*} jobTransaction 
+     * @param {*} job 
+     * @param {*} jobDataForJobId 
+     * @param {*} fieldDataForJobTransactionId 
+     */
     setTransactionDisplayDetails(customizationObject, jobTransaction, job, jobDataForJobId, fieldDataForJobTransactionId) {
         if (!customizationObject) {
             return ''
@@ -252,6 +280,12 @@ class JobTransaction {
         return finalText
     }
 
+    /**
+     * 
+     * @param {*} customizationObject 
+     * @param {*} jobDataForJobId 
+     * @param {*} finalText 
+     */
     setTransactionCustomizationJobAttributes(customizationObject, jobDataForJobId, finalText) {
         let jobAttributeMasterList = customizationObject.jobAttr
         if (!customizationObject.separator) {
@@ -275,6 +309,12 @@ class JobTransaction {
         return finalText
     }
 
+    /**
+     * 
+     * @param {*} customizationObject 
+     * @param {*} fieldDataForJobTransactionId 
+     * @param {*} finalText 
+     */
     setTransactionCustomizationFieldAttributes(customizationObject, fieldDataForJobTransactionId, finalText) {
         let fieldAttributeMasterList = customizationObject.fieldAttr
         if (!customizationObject.separator) {
@@ -299,6 +339,13 @@ class JobTransaction {
         return finalText
     }
 
+    /**
+     * 
+     * @param {*} customizationObject 
+     * @param {*} jobTransaction 
+     * @param {*} job 
+     * @param {*} finalText 
+     */
     setTransactionCustomizationDynamicParameters(customizationObject, jobTransaction, job, finalText) {
         finalText += this.appendText(customizationObject.referenceNo, jobTransaction.referenceNumber, '', customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.runsheetNo, jobTransaction.runsheetNo, '', customizationObject.separator, finalText)
@@ -315,6 +362,14 @@ class JobTransaction {
         return finalText
     }
 
+    /**
+     * 
+     * @param {*} condition 
+     * @param {*} property 
+     * @param {*} extraString 
+     * @param {*} seperator 
+     * @param {*} finalText 
+     */
     appendText(condition, property, extraString, seperator, finalText) {
         let text = ''
         if (condition && !_.isUndefined(property) && !_.isNull(property)) {
@@ -327,8 +382,18 @@ class JobTransaction {
         return text
     }
 
-    setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap) {
-        let jobAttributeMap = jobAttributeStatusMap[jobTransaction.jobStatusId]
+    /**
+     * 
+     * @param {*} jobDataDetailsForListing 
+     * @param {*} jobAttributeMasterMap 
+     * @param {*} jobMasterIdJobAttributeStatusMap 
+     * @param {*} jobTransaction 
+     * @param {*} job 
+     * @param {*} customerCareMap 
+     * @param {*} smsTemplateMap 
+     */
+    setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap) {
+        let jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobTransaction.jobMasterId] ? jobMasterIdJobAttributeStatusMap[jobTransaction.jobMasterId][jobTransaction.jobStatusId] : jobAttributeMasterMap
         let contactData = this.setContactDetails(jobDataDetailsForListing, jobAttributeMap, job)
         let addressData = this.setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job)
         let customerCareData = this.setCustomerCareDetails(customerCareMap, job)
@@ -341,6 +406,12 @@ class JobTransaction {
         }
     }
 
+    /**
+     * 
+     * @param {*} jobDataDetailsForListing 
+     * @param {*} jobAttributeMap 
+     * @param {*} job 
+     */
     setContactDetails(jobDataDetailsForListing, jobAttributeMap, job) {
         let tempContactDataForJob = [],
             contactDataForJob = []
@@ -360,18 +431,19 @@ class JobTransaction {
         return contactDataForJob
     }
 
+    /**
+     * 
+     * @param {*} jobDataDetailsForListing 
+     * @param {*} jobAttributeMasterMap 
+     * @param {*} jobAttributeMap 
+     * @param {*} job 
+     */
     setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job) {
-        let tempAddressDataForJob = [],
-            addressDataForJob = {},
+        let addressDataForJob = {},
             combinedAddressList = []
 
-        if (!jobAttributeMap) {
-            jobAttributeMap = {}
-        }
-
-        if (jobDataDetailsForListing.addressMap[job.id]) {
-            tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id]
-        }
+        jobAttributeMap = jobAttributeMap ? jobAttributeMap : {}
+        let tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id] ? jobDataDetailsForListing.addressMap[job.id] : []
 
         if (!_.isUndefined(job.latitude) && !_.isUndefined(job.longitude) && !_.isNull(job.latitude) && !_.isNull(job.longitude) && (job.latitude != 0.0 || job.longitude != 0.0)) {
             combinedAddressList.push(job.latitude + ',' + job.longitude)
@@ -389,27 +461,42 @@ class JobTransaction {
 
         for (let index in addressDataForJob) {
             let combinedAddress = ''
-            combinedAddress += this.appendText(addressDataForJob[index][28], addressDataForJob[index][28], '', null, null)
-            combinedAddress += this.appendText(addressDataForJob[index][29], addressDataForJob[index][29], '', ',', combinedAddress)
-            combinedAddress += this.appendText(addressDataForJob[index][30], addressDataForJob[index][30], '', ',', combinedAddress)
-            combinedAddress += this.appendText(addressDataForJob[index][31], addressDataForJob[index][31], '', ',', combinedAddress)
+            combinedAddress += this.appendText(true, addressDataForJob[index][28], '', null, null)
+            combinedAddress += this.appendText(true, addressDataForJob[index][29], '', ',', combinedAddress)
+            combinedAddress += this.appendText(true, addressDataForJob[index][30], '', ',', combinedAddress)
+            combinedAddress += this.appendText(true, addressDataForJob[index][31], '', ',', combinedAddress)
             combinedAddressList.push(combinedAddress)
         }
 
         return combinedAddressList
     }
 
+    /**
+     * 
+     * @param {*} customerCareMap 
+     * @param {*} job 
+     */
     setCustomerCareDetails(customerCareMap, job) {
         let customerCareListForJob = customerCareMap[job.jobMasterId]
+        // To do
+        // customer care url case to be handled
         return customerCareListForJob
     }
 
+    /**
+     * 
+     * @param {*} smsTemplateMap 
+     * @param {*} job 
+     * @param {*} contactData 
+     */
     setSMSDetails(smsTemplateMap, job, contactData) {
         if (_.isEmpty(contactData)) {
             return []
         }
-
         let smsTemplateListForJob = smsTemplateMap[job.jobMasterId]
+
+        // To do 
+        // prepare message body to send
         return smsTemplateListForJob
     }
 

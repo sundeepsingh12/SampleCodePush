@@ -91,20 +91,14 @@ class JobStatus {
   getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap) {
     let jobMasterIdJobAttributeStatusMap = {}
     let statusIdNextStatusMap = {}
-    if (!statusList) {
-      statusList = []
-    }
+    statusList = statusList ? statusList : []
     statusList.forEach(status => {
+      statusIdNextStatusMap[status.id] = status.nextStatusList
       if (!jobAttributeStatusMap[status.id]) {
         return
       }
-
-      if (!jobMasterIdJobAttributeStatusMap[status.jobMasterId]) {
-        jobMasterIdJobAttributeStatusMap[status.jobMasterId] = {}
-      }
-
+      jobMasterIdJobAttributeStatusMap[status.jobMasterId] = jobMasterIdJobAttributeStatusMap[status.jobMasterId] ? jobMasterIdJobAttributeStatusMap[status.jobMasterId] : {}
       jobMasterIdJobAttributeStatusMap[status.jobMasterId][status.id] = jobAttributeStatusMap[status.id]
-      statusIdNextStatusMap[status.id] = status.nextStatusList
     })
     return {
       jobMasterIdJobAttributeStatusMap,

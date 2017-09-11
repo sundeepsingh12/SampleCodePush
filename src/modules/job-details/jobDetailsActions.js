@@ -42,6 +42,8 @@ export function getJobDetails(jobTransactionId) {
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.nextStatusList))
         } catch (error) {
+            // To do
+            // Handle exceptions and change state accordingly
             console.log(error)
         }
     }

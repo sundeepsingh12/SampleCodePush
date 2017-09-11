@@ -1,6 +1,8 @@
 'use strict'
 
 import { fieldDataService } from '../classes/FieldData'
+import * as realm from '../../repositories/realmdb'
+import { jobDetailsService } from '../classes/JobDetails'
 
 describe('test cases for getFieldDataMap', () => {
 
@@ -61,4 +63,20 @@ describe('test cases for getFieldDataMap', () => {
         expect(fieldDataService.getFieldDataMap(fieldDataList)).toEqual(fieldDataMap)
     })
 
+})
+
+describe('test cases for prepareFieldDataForTransactionParticularStatus', () => {
+    const jobTransactionId = 2
+    const fieldAttributeMasterMap = {
+        1 : {}
+    }
+    const fieldAttributeMap = {}
+    it('should return fieldDataObject for particular transaction', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        jobDetailsService.prepareDataObject = jest.fn()
+        jobDetailsService.prepareDataObject.mockReturnValue({})
+        expect(fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId,fieldAttributeMasterMap,fieldAttributeMap)).toEqual({})
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+        expect(jobDetailsService.prepareDataObject).toHaveBeenCalledTimes(1)
+    })
 })
