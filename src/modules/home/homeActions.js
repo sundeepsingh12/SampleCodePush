@@ -148,7 +148,3 @@ export function onResyncPress() {
     }
   }
 }
-
-export function downloadAndDeleteDataFromServer() {
-
-}

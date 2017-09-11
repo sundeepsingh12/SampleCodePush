@@ -6,7 +6,7 @@ const {
     SET_TABS_LIST,
     SET_FETCHING_FALSE,
     CLEAR_HOME_STATE,
-} = require('../../lib/constants').default
+} = require('../../../lib/constants').default
 
 import homeReducer from '../homeReducer'
 

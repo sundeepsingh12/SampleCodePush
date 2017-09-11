@@ -10,7 +10,7 @@ import { deviceVerificationService } from '../../../services/classes/DeviceVerif
 var actions = require('../loginActions')
 const {
 
-  LOGOUT,
+    LOGOUT,
     LOGIN,
 
     LOGOUT_START,
@@ -38,8 +38,32 @@ const {
     TABLE_USER_SUMMARY,
 } = require('../../../lib/constants').default
 
-jest.mock('react-native-router-flux')
 
+import { NavigationActions,StackNavigator } from 'react-navigation'
+
+ const Application = () => {}
+ const Login = () =>{}
+ const Preloader = () => {}
+ const Main = () => {}
+
+ const NavigationContainer = StackNavigator(
+   {
+     application: {
+       screen: Application,
+     },
+     login: {
+       screen: Login,
+     },
+    preloader: {
+      screen: Preloader,
+     },
+     main: {
+       screen: Main,
+     }
+   }
+ );
+
+jest.mock('react-navigation')
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
@@ -279,6 +303,7 @@ describe('loginActions', () => {
         const password = 'test'
         const expectedActions = [
             { type: SESSION_TOKEN_REQUEST },
+           
         ]
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValueOnce({
@@ -288,10 +313,12 @@ describe('loginActions', () => {
                 value: true
             })
         const store = mockStore({})
+         const navigationContainer = renderer.create(<NavigationContainer />).getInstance();
         return store.dispatch(actions.getSessionToken())
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(navigationContainer.dispatch(NavigationActions.navigate({ routeName: 'main' }))).toEqual(true);
             })
     })
 

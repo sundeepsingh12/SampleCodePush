@@ -82,5 +82,4 @@ describe('auth service', () => {
         expect(keyValueDBService.deleteValueFromStore).toHaveBeenCalledTimes(3)
     })
 
-
 })
