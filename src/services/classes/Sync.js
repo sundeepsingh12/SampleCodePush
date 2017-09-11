@@ -164,12 +164,12 @@ class Sync {
       tableName: TABLE_RUNSHEET,
       value: contentQuery.runSheet
     }
-    const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
-    const jobTransactionCustomizationList = {
-      tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
-      value: jobTransactionCustomizationListValues
-    }
-    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets, jobTransactionCustomizationList)
+    // const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
+    // const jobTransactionCustomizationList = {
+    //   tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+    //   value: jobTransactionCustomizationListValues
+    // }
+    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
   }
 
   /**

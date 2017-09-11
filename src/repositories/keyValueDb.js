@@ -31,6 +31,9 @@ export class keyValueDb {
       case 'JOB_ATTRIBUTE_VALUE':
         schemaInstance = require('../repositories/schema/jobAttributeValue');
         break;
+      case 'JOB_ATTRIBUTE_STATUS':
+        schemaInstance = require('../repositories/schema/jobAttributeStatus')
+        break;
       case 'FIELD_ATTRIBUTE':
         schemaInstance = require('../repositories/schema/fieldAttribute');
         break;
@@ -79,7 +82,7 @@ export class keyValueDb {
       default:
         checkCondition = true;
     }
-    if (value && (checkCondition || validate(value, schemaInstance))) {
+    if (value && (checkCondition || validate(value, schemaInstance).valid)) {
       return store.save(schemaName, {
         value
       }).then(() => {
@@ -122,6 +125,7 @@ export class keyValueDb {
     }
 
   }
+
 }
 // The singleton variable
 export let keyValueDB = new keyValueDb()

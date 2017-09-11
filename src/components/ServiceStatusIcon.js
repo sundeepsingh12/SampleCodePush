@@ -26,7 +26,7 @@ const {
 } = require('../lib/constants').default
 
 
-var ServiceStatusIcon = React.createClass({
+class ServiceStatusIcon extends React.Component {
 
   getIconBasedOnState(status) {
     console.log(status);
@@ -40,7 +40,7 @@ var ServiceStatusIcon = React.createClass({
       case SERVICE_FAILED:
         return <Ionicons name="ios-information-circle-outline" style={[feStyle.fontDanger, feStyle.fontXxl]} />;
     }
-  },
+  }
 
   /**
    * ### render
@@ -55,6 +55,6 @@ var ServiceStatusIcon = React.createClass({
       </View>
     )
   }
-})
+}
 
 module.exports = ServiceStatusIcon

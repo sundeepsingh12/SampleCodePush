@@ -42,7 +42,7 @@ describe('job status services ', () => {
   //     expect(data).toEqual(message)
   //   })
   //   }catch(errror){
-      
+
   //   }
   // })
 
@@ -79,9 +79,9 @@ describe('job status services ', () => {
 
 it('should return jobMasterId vs jobStatusIdMap', () => {
   const jobMasterIdJobStatusIdMap = {
-      930: 12,
-      897: 14
-    },
+    930: 12,
+    897: 14
+  },
     statusCode = 'UNSEEN',
     jobMasterIdList = [930, 897]
   keyValueDBService.getValueFromStore = jest.fn()
@@ -103,4 +103,133 @@ it('should return jobMasterId vs jobStatusIdMap', () => {
   return jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdList, statusCode).then(data => {
     expect(data).toEqual(jobMasterIdJobStatusIdMap)
   })
+})
+
+describe('test cases for getJobMasterIdStatusIdMap', () => {
+  const jobAttributeStatusMap = {
+    1: {
+      10: {
+        jobAttributeId: 10
+      }
+    },
+    2: {
+      10: {
+        jobAttributeId: 10
+      }
+    },
+    3: {
+      10: {
+        jobAttributeId: 10
+      }
+    },
+    4: {
+      10: {
+        jobAttributeId: 10
+      }
+    },
+    5: {
+      10: {
+        jobAttributeId: 10
+      }
+    }
+  }
+  const statusList = [
+    {
+      id: 1,
+      jobMasterId: 1,
+      nextStatusList: []
+    },
+    {
+      id: 2,
+      jobMasterId: 1,
+    },
+    {
+      id: 3,
+      jobMasterId: 2,
+      nextStatusList: [
+        {
+          id: 4,
+          jobMasterId: 2,
+          nextStatusList: []
+        }
+      ]
+    },
+    {
+      id: 4,
+      jobMasterId: 2,
+      nextStatusList: []
+    },
+    {
+      id: 5,
+      jobMasterId: 2,
+    }
+  ]
+
+  const jobMasterIdJobAttributeStatusMap = {
+    1: {
+      1: {
+        10: {
+          jobAttributeId: 10
+        }
+      },
+      2: {
+        10: {
+          jobAttributeId: 10
+        }
+      }
+    },
+    2: {
+      3: {
+        10: {
+          jobAttributeId: 10
+        }
+      },
+      4: {
+        10: {
+          jobAttributeId: 10
+        }
+      },
+      5: {
+        10: {
+          jobAttributeId: 10
+        }
+      }
+    }
+  }
+
+  const statusIdNextStatusMap = {
+    1: [],
+    2: undefined,
+    3: [
+      {
+        id: 4,
+        jobMasterId: 2,
+        nextStatusList: []
+      }
+    ],
+    4: [],
+    5: undefined
+  }
+
+  it('should return empty jobMasterIdJobAttributeStatusMap and empty statusIdNextStatusMap for undefined statusList', () => {
+    expect(jobStatusService.getJobMasterIdStatusIdMap(undefined, {})).toEqual({
+      jobMasterIdJobAttributeStatusMap: {},
+      statusIdNextStatusMap: {}
+    })
+  })
+
+  it('should return empty jobMasterIdJobAttributeStatusMap and statusIdNextStatusMap for statusList and empty jobAttributeStatusMap', () => {
+    expect(jobStatusService.getJobMasterIdStatusIdMap(statusList, {})).toEqual({
+      jobMasterIdJobAttributeStatusMap: {},
+      statusIdNextStatusMap
+    })
+  })
+
+  it('should return empty jobMasterIdJobAttributeStatusMap and statusIdNextStatusMap for statusList and jobAttributeStatusMap', () => {
+    expect(jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)).toEqual({
+      jobMasterIdJobAttributeStatusMap,
+      statusIdNextStatusMap
+    })
+  })
+
 })

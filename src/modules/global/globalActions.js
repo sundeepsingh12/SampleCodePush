@@ -18,17 +18,29 @@ const {
   JOB_SUMMARY,
   IS_SHOW_MOBILE_NUMBER_SCREEN,
   IS_SHOW_OTP_SCREEN,
-  IS_PRELOADER_COMPLETE
+  IS_PRELOADER_COMPLETE,
+  USER
 
 } = require('../../lib/constants').default
 
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import {
+  keyValueDBService
+} from '../../services/classes/KeyValueDBService'
 
 import CONFIG from '../../lib/config'
 
-import { onChangePassword, onChangeUsername } from '../login/loginActions'
+import {
+  onChangePassword,
+  onChangeUsername
+} from '../login/loginActions'
 
-import { clearHomeState } from '../home/homeActions'
+import {
+  onResyncPress
+} from '../home/homeActions'
+
+import {
+  clearHomeState
+} from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer';
 
@@ -66,5 +78,5 @@ export function deleteSessionToken() {
       throw error
     }
   }
-
 }
+

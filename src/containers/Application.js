@@ -28,7 +28,6 @@ import
 function mapStateToProps(state) {
     return {
         deviceVersion: state.device.version,
-    
     }
 };
 

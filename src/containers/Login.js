@@ -125,7 +125,6 @@ class Login extends Component {
   }
 
   render() {
-    console.log('render of Login')
     return (
       <Container>
         {renderIf(!this.props.auth.form.isCameraScannerActive,

@@ -44,16 +44,36 @@ const {
   IS_SHOW_MOBILE_NUMBER_SCREEN,
   IS_SHOW_OTP_SCREEN,
 
-  Main,
-  Login
+  Home,
+  Login,
+  JOB_MASTER,
+  JOB_ATTRIBUTE,
+  JOB_ATTRIBUTE_VALUE,
+  FIELD_ATTRIBUTE,
+  FIELD_ATTRIBUTE_VALUE,
+  JOB_STATUS,
+  TAB,
+  CUSTOMER_CARE,
+  SMS_TEMPLATE,
+  USER_SUMMARY,
+  JOB_SUMMARY,
+  SMS_JOB_STATUS,
+  JOB_MASTER_MONEY_TRANSACTION_MODE,
+  FIELD_ATTRIBUTE_STATUS,
+  FIELD_ATTRIBUTE_VALIDATION,
+  FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+  JOB_LIST_CUSTOMIZATION,
+  CUSTOMIZATION_APP_MODULE,
+  CUSTOMIZATION_LIST_MAP,
+  TABIDMAP,
+  JOB_ATTRIBUTE_STATUS,
 } = require('../../lib/constants').default
 
-// import { Actions } from 'react-native-router-flux'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken } from '../global/globalActions'
+import { deleteSessionToken,stopMqttService } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -233,7 +253,7 @@ export function downloadJobMaster() {
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
     } catch (error) {
-      if (error.code == 403 || error.code == 400) { 
+      if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
         dispatch(error_400_403_Logout(error.message))
@@ -257,8 +277,7 @@ export function invalidateUserSession() {
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
-      // Actions.InitialLoginForm()
-       dispatch(NavigationActions.navigate({ routeName: Login }))
+      dispatch(NavigationActions.navigate({ routeName: Login }))
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))
     }
@@ -271,8 +290,7 @@ export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
     dispatch(preLogoutSuccess())
     dispatch(deleteSessionToken())
-    // Actions.InitialLoginForm()
-      dispatch(NavigationActions.navigate({ routeName: Login }))
+    dispatch(NavigationActions.navigate({ routeName: Login }))
   }
 }
 
@@ -320,6 +338,31 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
+      const keys = [
+        JOB_MASTER,
+        JOB_ATTRIBUTE,
+        JOB_ATTRIBUTE_VALUE,
+        FIELD_ATTRIBUTE,
+        FIELD_ATTRIBUTE_VALUE,
+        JOB_STATUS,
+        TAB,
+        CUSTOMER_CARE,
+        SMS_TEMPLATE,
+        USER_SUMMARY,
+        JOB_SUMMARY,
+        SMS_JOB_STATUS,
+        JOB_MASTER_MONEY_TRANSACTION_MODE,
+        FIELD_ATTRIBUTE_STATUS,
+        FIELD_ATTRIBUTE_VALIDATION,
+        FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+        JOB_LIST_CUSTOMIZATION,
+        CUSTOMIZATION_APP_MODULE,
+        USER,
+        CUSTOMIZATION_LIST_MAP,
+        TABIDMAP,
+        JOB_ATTRIBUTE_STATUS,
+      ]
+      await keyValueDBService.deleteValueFromStore(keys)
       dispatch(jobMasterSavingFailure(error.message))
     }
   }
@@ -339,10 +382,9 @@ export function checkAsset() {
       const user = await keyValueDBService.getValueFromStore(USER)
       const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
       if (isVerified) {
-         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
+        await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        // Actions.Tabbar()
-         dispatch(NavigationActions.navigate({ routeName: Main }))
+        dispatch(NavigationActions.navigate({ routeName: Home }))
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer());
@@ -379,8 +421,7 @@ export function checkIfSimValidOnServer() {
       if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        // Actions.Tabbar()
-         dispatch(NavigationActions.navigate({ routeName: Main }))
+        dispatch(NavigationActions.navigate({ routeName: Home }))
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
         dispatch(showMobileNumber())
@@ -439,8 +480,7 @@ export function validateOtp(otpNumber) {
       const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM.value, token)
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
-      // Actions.Tabbar()
-       dispatch(NavigationActions.navigate({ routeName: Main }))
+      dispatch(NavigationActions.navigate({ routeName: Home }))
     } catch (error) {
       dispatch(otpValidationFailure(error.message))
     }

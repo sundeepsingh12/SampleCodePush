@@ -10,7 +10,8 @@ import {
   Platform,
   TouchableHighlight,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
+  TouchableOpacity,
 }
   from 'react-native'
 
@@ -19,73 +20,22 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as homeActions from '../modules/home/homeActions'
-// import { Actions } from 'react-native-router-flux';
 import _ from 'underscore'
 import renderIf from '../lib/renderIf';
+import Swipeable from 'react-native-swipeable';
+import Loader from '../components/Loader'
+import styles from '../themes/FeStyle'
+import theme from '../themes/feTheme'
+import { NavigationActions } from 'react-navigation'
+const {
+JobDetails
+} = require('../lib/constants').default
 
-var styles = StyleSheet.create({
-  container: {
-    flexDirection: 'column',
-    flex: 2,
-    backgroundColor: '#f7f7f7',
-    marginBottom: Platform.OS === 'ios' ? 60 : 50,
-  },
-  style_row_view: {
-    flex: 1,
-    flexDirection: 'row',
-    height: 70,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderColor: '#f7f7f7',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingLeft: 5,
-    paddingRight: 5
-  },
-  listCircle: {
-    width: 64,
-    height: 64,
-    backgroundColor: 'green',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-
-  },
-  listCircleCheckbox: {
-    width: 64,
-    height: 64,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 15
-  },
-  hidden: {
-    width: 0,
-    height: 0
-  },
-  testsad: {
-    borderBottomWidth: 0
-  },
-  circleLine1: {
-    fontSize: 14,
-    color: '#ffffff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    backgroundColor: 'transparent'
-  },
-  circleLine2: {
-    fontSize: 11,
-    marginTop: 5,
-    textAlign: 'center',
-    color: '#ffffff',
-    width: 60
-  }
-})
 
 function mapStateToProps(state) {
   return {
-    tabIdJobTransactions: state.home.tabIdJobTransactions,
-    isRefreshing: state.home.isRefreshing
+    jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
+    isRefreshing: state.listing.isRefreshing
   }
 }
 
@@ -102,96 +52,82 @@ class Jobs extends Component {
   }
 
   componentWillMount() {
-    console.log('componentWillMount')
-    console.log(this.props.tabId)
-    this.props.actions.fetchJobs(this.props.tabId, 0)
+    if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
+      this.props.actions.fetchJobs()
+    }
   }
 
   toggleStatus() {
-    this.setState({
-      status: !this.state.status
-    });
-    console.log('toggle button handler: ' + this.state.status);
+    console.log('toggle button handler:')
   }
 
   renderData = (item) => {
     return (
-      <ListItem avatar>
-        <Left>
-          <TouchableHighlight underlayColor='#e7e7e7' style={[styles.listCircle]} onPress={() => this.toggleStatus()}>
-            <View>
-              <Text style={StyleSheet.flatten(styles.circleLine1)}>{`${item.circleLine1}`}</Text>
-              <Text style={StyleSheet.flatten(styles.circleLine2)}>{`${item.circleLine2}`}</Text>
-            </View>
-          </TouchableHighlight>
-        </Left>
-        <Body >
-          <Text adjustsFontSizeToFit>
-            {`${item.line1}`}
-          </Text>
-          <Text note adjustsFontSizeToFit>
-            {`${item.line2}`}
-          </Text>
-        </Body>
-      </ListItem>
+      <Swipeable
+        leftButtons={[
+          <Button style={[{ backgroundColor: 'red' }]}>
+            <Ionicons name='ios-trash' style={{ fontSize: 34, color: '#ffffff', textAlign: 'right' }} />
+          </Button>
+        ]}
+        rightButtons={[
+          <Button style={[{ backgroundColor: '#062d4c' }]}>
+            <Ionicons name='ios-call-outline' style={{ fontSize: 34, color: '#ffffff', marginLeft: 25 }} />
+          </Button>,
+          <Button style={[{ backgroundColor: '#395270' }]}>
+            <Ionicons name='ios-pin-outline' style={{ fontSize: 34, color: '#ffffff', marginLeft: 25 }} />
+          </Button>,
+          <Button style={[{ backgroundColor: '#062d4c' }]}>
+            <Ionicons name='ios-call-outline' style={{ fontSize: 34, color: '#ffffff', marginLeft: 25 }} />
+          </Button>,
+          <Button style={[{ backgroundColor: '#062d4c' }]}>
+            <Ionicons name='ios-call-outline' style={{ fontSize: 34, color: '#ffffff', marginLeft: 25 }} />
+          </Button>,
+        ]}>
+        <ListItem style={StyleSheet.flatten([styles.bgGray, { margin: 0, padding: 0 }])} avatar button onPress={() => { dispatch(NavigationActions.navigate({ routeName: JobDetails,params: { jobTransactionId: item.id }})) }}>
+          <Left>
+            <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this.toggleStatus()}>
+              <View>
+                <Text>{`${item.circleLine1}`}</Text>
+                <Text>{`${item.circleLine2}`}</Text>
+              </View>
+            </TouchableHighlight>
+          </Left>
+          <Body >
+            <Text adjustsFontSizeToFit>
+              {`${item.line1}`}
+            </Text>
+            <Text note adjustsFontSizeToFit>
+              {`${item.line2}`}
+            </Text>
+          </Body>
+        </ListItem>
+      </Swipeable>
     )
   }
 
-  renderFooter = () => {
-    if (this.props.tabIdJobTransactions[this.props.tabId] && !this.props.tabIdJobTransactions[this.props.tabId].isFetching) {
-      return null
-    }
-
-    return (
-      <View
-        style={{
-          paddingVertical: 20,
-          borderTopWidth: 1,
-          borderColor: '#CED0CE'
-        }}>
-        <ActivityIndicator animating size='large' />
-      </View>
-    )
-  }
-
-  handleLoadMore = () => {
-    if (!this.props.tabIdJobTransactions[this.props.tabId].isLastPage) {
-      this.props.actions.fetchJobs(this.props.tabId, this.props.tabIdJobTransactions[this.props.tabId].pageNumber)
-    }
-  }
-
-  checkIfTransactionsPresent() {
-  
-    if (this.props.tabIdJobTransactions[this.props.tabId] &&
-      this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization &&
-      (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization.length > 0 || this.props.tabIdJobTransactions[this.props.tabId].isFetching)) {
-      console.log('return true')
-      return true
-    }
-    console.log('return false')
-    return false
+  renderList() {
+    const list = this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId))
+    list.sort(function (transaction1, transaction2) {
+      return transaction1.seqSelected - transaction2.seqSelected
+    })
+    return list
   }
 
   render() {
-    console.log('render jobs')
-    console.log(this.props)
-    return (
-      <Container>
-        {renderIf(this.checkIfTransactionsPresent(),
-          <View style={styles.container}>
-            <List
-              style={{ marginTop: 5, marginBottom: 50 }}>
-              <FlatList
-                data={
-                  (this.props.tabIdJobTransactions[this.props.tabId]) ? (this.props.tabIdJobTransactions[this.props.tabId].jobTransactionCustomization) : []
-                }
-                renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => item.id}
-                ListFooterComponent={this.renderFooter}
-                onEndReached={this.handleLoadMore}
-              />
-            </List>
-            <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 5, marginLeft: 5, marginRight: 5 }}>
+    if (this.props.isRefreshing) {
+      return <Loader />
+    } else {
+      return (
+        <Container>
+          <View style={{ flex: 1, flexDirection: 'column', bottom: 5, marginLeft: 5, marginRight: 5 }}>
+              <List>
+                <FlatList
+                  data={this.renderList()}
+                  renderItem={({ item }) => this.renderData(item)}
+                  keyExtractor={item => item.id}
+                />
+              </List>
+            <View style={{ flex: 2, flexDirection: 'row' }}>
               <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
                 <Input bordered='true' rounded style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
                   placeholder="Search Reference No." />
@@ -201,51 +137,9 @@ class Jobs extends Component {
               </View>
             </View>
           </View>
-        )}
-        {renderIf(!this.checkIfTransactionsPresent(),
-          <View>
-            <Text>
-
-            </Text>
-          </View>
-        )}
-      </Container>
-    )
-  }
-
-  _renderRow(rowData: string, sectionID: number, rowID: number) {
-
-    return (
-      <View style={styles.style_row_view}>
-        <TouchableHighlight underlayColor='#e7e7e7' style={[styles.listCircle, this.state.status ? styles.hidden : {}]} onPress={() => this.toggleStatus()}>
-          <View>
-            <Text style={{ fontSize: 14, color: '#ffffff', textAlign: 'center', fontWeight: 'bold', backgroundColor: 'transparent' }}>Del</Text>
-            <Text style={{ fontSize: 11, marginTop: 5, textAlign: 'center', color: '#ffffff', width: 60 }}>Run1234asd56</Text>
-          </View>
-        </TouchableHighlight>
-
-        <View style={[styles.listCircleCheckbox, !this.state.status ? styles.hidden : {}]} >
-          <CheckBox
-            size={36}
-            icon_check='ios-checkmark-circle-outline'
-            icon_open='ios-radio-button-off'
-            text=''
-          />
-        </View>
-
-        <TouchableHighlight underlayColor='#e7e7e7' style={{ flex: 1, height: 64 }} onPress={this._onPressRow.bind(this.rowID, rowData)}>
-          <View style={{ padding: 5, paddingTop: 10, paddingLeft: 10 }}>
-            <Text style={{ fontSize: 14, color: '#000000' }}>{rowData.row}</Text>
-            <Text style={{ marginTop: 10, color: '#666666' }}>{rowData.isSelect ? 'true' : 'false'}</Text>
-          </View>
-        </TouchableHighlight>
-      </View>
-    );
-  }
-
-  _onPressRow(rowID, rowData) {
-    console.log(rowID);
-    console.log(rowData);
+        </Container>
+      )
+    }
   }
 
 };

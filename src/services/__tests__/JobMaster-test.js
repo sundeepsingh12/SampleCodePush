@@ -8,6 +8,179 @@ import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import moment from 'moment'
 
+describe('test cases for prepareCustomizationListMap', () => {
+
+  it('should return null for undefined jobListCustomizationList', () => {
+    expect(jobMasterService.prepareCustomizationListMap(undefined)).toEqual(null)
+  })
+
+  it('should return empty jobMasterIdCustomizationMap for empty jobListCustomizationList', () => {
+    expect(jobMasterService.prepareCustomizationListMap([])).toEqual({})
+  })
+
+  it('should return jobMasterIdCustomizationMap for specified jobListCustomizationList', () => {
+    const jobListCustomization = [
+      {
+        appJobListMasterId: 1,
+        jobMasterId: 10,
+        value: 'xyz'
+      },
+      {
+        appJobListMasterId: 2,
+        jobMasterId: 10,
+        value: 'abc'
+      },
+      {
+        appJobListMasterId: 1,
+        jobMasterId: 11,
+        value: 'iop'
+      },
+      {
+        appJobListMasterId: 3,
+        jobMasterId: 11,
+        value: 'xyz'
+      },
+    ]
+
+    const jobMasterIdCustomizationMap = {
+      10: {
+        1: {
+          appJobListMasterId: 1,
+          jobMasterId: 10,
+          value: 'xyz'
+        },
+        2: {
+          appJobListMasterId: 2,
+          jobMasterId: 10,
+          value: 'abc'
+        }
+      },
+      11: {
+        1: {
+          appJobListMasterId: 1,
+          jobMasterId: 11,
+          value: 'iop'
+        },
+        3: {
+          appJobListMasterId: 3,
+          jobMasterId: 11,
+          value: 'xyz'
+        }
+      }
+    }
+    expect(jobMasterService.prepareCustomizationListMap(jobListCustomization)).toEqual(jobMasterIdCustomizationMap)
+  })
+
+})
+
+describe('test cases for prepareTabStatusIdMap', () => {
+
+  it('should return empty tabIdStatusIdsMap for undefined statusList', () => {
+    expect(jobMasterService.prepareTabStatusIdMap(undefined)).toEqual({})
+  })
+
+  it('should return empty tabIdStatusIdsMap for empty statusList', () => {
+    expect(jobMasterService.prepareTabStatusIdMap([])).toEqual({})
+  })
+
+  it('should return tabIdStatusIdsMap for statusList', () => {
+    const jobStatusList = [
+      {
+        id: 1,
+        tabId: 1
+      },
+      {
+        id: 2,
+        tabId: 1
+      },
+      {
+        id: 3,
+        tabId: 2
+      },
+      {
+        id: 4,
+        tabId: 2
+      },
+      {
+        id: 5,
+        tabId: 2
+      },
+    ]
+
+    const tabIdStatusIdsMap = {
+      1: [
+        1,
+        2
+      ],
+      2: [
+        3,
+        4,
+        5
+      ]
+    }
+    expect(jobMasterService.prepareTabStatusIdMap(jobStatusList)).toEqual(tabIdStatusIdsMap)
+  })
+
+})
+
+describe('test cases for validateAndSortTabList', () => {
+
+  it('should return null for undefined tab list ', () => {
+    expect(jobMasterService.validateAndSortTabList(undefined)).toEqual(null)
+  })
+
+  it('should return empty tab list for empty tab list ', () => {
+    expect(jobMasterService.validateAndSortTabList([])).toEqual([])
+  })
+
+  it('should filter and sort tab list', () => {
+    const tabList = [
+      {
+        name: 'XYZ',
+        isDefault: false
+      },
+      {
+        name: 'ABC',
+        isDefault: false
+      },
+      {
+        name: 'HIDDEN',
+        isDefault: false
+      },
+      {
+        name: 'JKL',
+        isDefault: true
+      },
+      {
+        name: 'IOT',
+        isDefault: false
+      }
+    ]
+
+    const result = [
+      {
+        name: 'JKL',
+        isDefault: true
+      },
+      {
+        name: 'XYZ',
+        isDefault: false
+      },
+      {
+        name: 'ABC',
+        isDefault: false
+      },
+      {
+        name: 'IOT',
+        isDefault: false
+      }
+    ]
+
+    expect(jobMasterService.validateAndSortTabList(tabList)).toEqual(result)
+  })
+
+})
+
 describe('job master services', () => {
 
   it('download job master with empty request', () => {
@@ -68,8 +241,8 @@ describe('job master services', () => {
   it('download job master with request body of only user when deviceSIM null', () => {
     const deviceSIM = null
     const deviceIMEI = {
-      value : {
-        test : 'test'
+      value: {
+        test: 'test'
       }
     }
     const user = {
@@ -95,8 +268,8 @@ describe('job master services', () => {
   it('download job master with request body of only user when deviceSIM null', () => {
     const deviceIMEI = null
     const deviceSIM = {
-      value : {
-        test : 'test'
+      value: {
+        test: 'test'
       }
     }
     const user = {
@@ -122,12 +295,12 @@ describe('job master services', () => {
   it('download job master with request body', () => {
     const deviceSIM = {
       value: {
-        test : 'test'
+        test: 'test'
       }
     }
     const deviceIMEI = {
       value: {
-        test : 'test'
+        test: 'test'
       }
     }
     const user = {
@@ -191,31 +364,35 @@ describe('job master services', () => {
 
   it('should save job master', () => {
     const json = {
-      jobMaster: {},
+      jobMaster: [],
       user: {},
-      jobAttributeMaster: {},
-      jobAttributeValueMaster: {},
-      fieldAttributeMaster: {},
-      fieldAttributeValueMaster: {},
-      jobStatus: {},
-      modulesCustomization: {},
-      jobListCustomization: {},
-      appJobStatusTabs: {},
-      jobMasterMoneyTransactionModes: {},
-      customerCareList: {},
-      smsTemplatesList: {},
-      fieldAttributeMasterStatuses: {},
-      fieldAttributeMasterValidations: {},
-      fieldAttributeMasterValidationConditions: {},
-      smsJobStatuses: {},
+      jobAttributeMaster: [],
+      jobAttributeValueMaster: [],
+      fieldAttributeMaster: [],
+      fieldAttributeValueMaster: [],
+      jobStatus: [],
+      modulesCustomization: [],
+      jobListCustomization: [],
+      appJobStatusTabs: [],
+      jobMasterMoneyTransactionModes: [],
+      customerCareList: [],
+      smsTemplatesList: [],
+      fieldAttributeMasterStatuses: [],
+      fieldAttributeMasterValidations: [],
+      fieldAttributeMasterValidationConditions: [],
+      smsJobStatuses: [],
       userSummary: {},
-      jobSummary: {},
+      jobSummary: [],
     }
     keyValueDBService.validateAndSaveData = jest.fn()
     keyValueDBService.validateAndSaveData.mockReturnValue(null)
+    jobMasterService.prepareCustomizationListMap = jest.fn()
+    jobMasterService.validateAndSortTabList = jest.fn()
     return jobMasterService.saveJobMaster(json)
       .then(() => {
-        expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(19)
+        expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(20)
+        expect(jobMasterService.prepareCustomizationListMap).toHaveBeenCalledTimes(1)
+        expect(jobMasterService.validateAndSortTabList).toHaveBeenCalledTimes(1)
       })
   })
 

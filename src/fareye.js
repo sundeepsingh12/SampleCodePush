@@ -6,13 +6,6 @@ import {
   View,
   Text
 } from 'react-native'
-/**
- * ### Router-Flux
- *
- * Necessary components from Router-Flux
- */
-// import { Router, Scene, Actions } from 'react-native-router-flux'
-
 
 /**
  * ### Redux
@@ -34,8 +27,9 @@ import configureStore from './lib/configureStore'
  *
  */
 import Application from './containers/Application'
-
 import ResyncLoader from './components/ResyncLoader'
+import JobDetails from './containers/JobDetails'
+import FormLayout from './containers/FormLayout'
 /**
  * ### icons
  *
@@ -63,11 +57,9 @@ import DeviceInitialState from './modules/device/deviceInitialState'
 import GlobalInitialState from './modules/global/globalInitialState'
 import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
 import HomeInititalState from './modules/home/homeInitialState'
-
-/**
- * Initiate a background service to execute every 15 mintues
- */
-import { backgroundServiceEvery15mins } from './services/background/'
+import ListingInitialState from './modules/listing/listingInitialState'
+import JobDetailsInitialState from './modules/job-details/jobDetailsInitialState'
+// import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
  *  The version of the app but not  displayed yet
@@ -89,7 +81,9 @@ function getInitialState() {
     device: (new DeviceInitialState()).set('isMobile', true),
     global: (new GlobalInitialState()),
     preloader: (new PreloaderInitiaState()),
-    home: (new HomeInititalState())
+    home: (new HomeInititalState()),
+    listing: (new ListingInitialState()),
+    jobDetails: new JobDetailsInitialState(),
   }
   return _initState
 }

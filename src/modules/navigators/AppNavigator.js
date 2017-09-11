@@ -5,10 +5,11 @@ import { addNavigationHelpers, StackNavigator,TabNavigator } from 'react-navigat
 import Login from '../../containers/Login'
 import Preloader from '../../containers/Preloader'
 import Application from '../../containers/Application'
-import Main from '../../containers/Main'
+import Home from '../../containers/Home'
 import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
+import JobDetails from '../../containers/JobDetails'
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -85,8 +86,8 @@ export const AppNavigator = StackNavigator({
     screen: Preloader,
     navigationOptions: { header: null }
   },
-  Main: {
-    screen: Main,
+  Home: {
+    screen: Home,
     navigationOptions: {
       title: 'Home',
       headerLeft: null
@@ -100,6 +101,9 @@ export const AppNavigator = StackNavigator({
   },
   Logout: {
     screen: Logout,
+  },
+  JobDetails:{
+    screen: JobDetails,
   }
 },
   {

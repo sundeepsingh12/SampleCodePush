@@ -15,16 +15,14 @@ import { connect } from 'react-redux'
 /**
  * The actions we need
  */
-import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Preloader from '../containers/Preloader'
+import Loader from '../components/Loader'
+import styles from '../themes/FeStyle'
+import theme from '../themes/feTheme'
 
-/**
- * Router
- */
-// import { Actions } from 'react-native-router-flux'
 
 /**
  * The components needed from React
@@ -47,6 +45,8 @@ import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, Scroll
 import Jobs from './Jobs';
 import * as homeActions from '../modules/home/homeActions'
 import renderIf from '../lib/renderIf';
+import TitleHeader from '../components/TitleHeader'
+
 
 /**
  *  Instead of including all app states via ...state
@@ -55,7 +55,8 @@ import renderIf from '../lib/renderIf';
  */
 function mapStateToProps(state) {
   return {
-    tabsList: state.home.tabsList
+    tabsList: state.home.tabsList,
+    tabIdStatusIdMap: state.home.tabIdStatusIdMap
   }
 };
 
@@ -64,7 +65,7 @@ function mapStateToProps(state) {
  */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...authActions, ...globalActions, ...homeActions,...preloaderActions }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...homeActions,...preloaderActions }, dispatch)
   }
 }
 
@@ -85,37 +86,50 @@ class Main extends Component {
   componentDidMount() {
     // this.props.actions.onResyncPress()
     this.props.actions.fetchTabs()
+
   }
 
   renderTabs() {
     const tabs = this.props.tabsList
     const renderTabList = []
     tabs.forEach(tab => {
-      renderTabList.push(
-        <Tab
-          key={tab.id}
-          heading={tab.name}>
-          <Jobs
-            tabId={tab.id}
-          />
-        </Tab>
-      )
+      if (this.props.tabIdStatusIdMap[tab.id]) {
+        renderTabList.push(
+          <Tab
+            key={tab.id}
+            heading={tab.name}
+            tabStyle={{backgroundColor: '#ffffff'}}
+            activeTabStyle={{backgroundColor: '#ffffff'}}
+            
+            textStyle={{color: '#a0a0a0'}}
+            activeTextStyle={styles.fontPrimary}
+            
+            >
+            <Jobs
+              tabId={tab.id}
+              statusIdList={this.props.tabIdStatusIdMap[tab.id]}
+            />
+          </Tab>
+        )
+      }
     })
     return renderTabList
   }
+  
 
   render() {
     const viewTabList = this.renderTabs()
+    if(viewTabList.length > 0 ) {
     return (
       <Container>
-      
-      <Tabs 
-      renderTabBar={()=> <ScrollableTab />}
-      >
-        {viewTabList}
-      </Tabs>
+      <Tabs locked
+          tabBarUnderlineStyle={styles.bgPrimary}
+          
+          renderTabBar={() => <ScrollableTab />}
+        >
+          {viewTabList}
+        </Tabs>
 
-        
       <Footer>
         <FooterTab  style={{ backgroundColor: 'white' }}>
         <Button vertical>
@@ -165,6 +179,13 @@ class Main extends Component {
         </Fab>
       </Container>
     );
+  } else {
+    return (
+      <Container>
+     <Loader/>
+     </Container>
+    )
+  }
   }
 
 

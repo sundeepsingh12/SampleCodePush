@@ -105,6 +105,9 @@ android {
             include "armeabi-v7a", "x86"
         }
     }
+    dexOptions {
+        jumboMode true
+    }
     buildTypes {
         release {
             minifyEnabled enableProguardInReleaseBuilds
@@ -138,9 +141,9 @@ repositories {
 }
 
 dependencies {
+    compile project(':realm')
     compile project(':react-native-svg')
     compile project(':react-native-fetch-blob')
-    compile project(':realm')
     compile project(':react-native-zip-archive')
     compile project(':react-native-fs')
     compile project(':react-native-background-geolocation')

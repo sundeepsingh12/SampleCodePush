@@ -5,6 +5,7 @@ const {
   JOB_FETCHING_END,
   SET_FETCHING_FALSE,
   SET_REFRESHING_TRUE,
+  JOB_DOWNLOADING_STATUS,
   UNSEEN,
   TABLE_JOB_TRANSACTION,
   TAB,
@@ -16,7 +17,15 @@ const {
   TABLE_RUNSHEET,
   TABLE_JOB_TRANSACTION_CUSTOMIZATION,
   CLEAR_HOME_STATE,
-  SET_TABS_TRANSACTIONS
+  SET_TABS_TRANSACTIONS,
+  JOB_STATUS,
+  JOB_LISTING_START,
+  JOB_LISTING_END,
+  CUSTOMIZATION_LIST_MAP,
+  JOB_ATTRIBUTE,
+  JOB_ATTRIBUTE_STATUS,
+  CUSTOMER_CARE,
+  SMS_TEMPLATE,
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
@@ -26,14 +35,19 @@ import {
 import {
   sync
 } from '../../services/classes/Sync'
-
+import {
+  jobStatusService
+} from '../../services/classes/JobStatus'
 import {
   jobTransactionService
 } from '../../services/classes/JobTransaction'
-
 import {
-  tabsService
-} from '../../services/classes/Tabs'
+  jobSummaryService
+} from '../../services/classes/JobSummary'
+import {
+  jobMasterService
+} from '../../services/classes/JobMaster'
+import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 import {
   Platform
@@ -41,41 +55,36 @@ import {
 import BackgroundTimer from 'react-native-background-timer';
 
 
-export function jobFetchingEnd(pageData, tabId) {
+export function jobFetchingEnd(jobTransactionCustomizationList) {
   return {
-    type: JOB_FETCHING_END,
+    type: JOB_LISTING_END,
     payload: {
-      jobTransactionCustomizationList: pageData.pageJobTransactionCustomizationList,
-      pageNumber: pageData.pageNumber,
-      isLastPage: pageData.isLastPage,
-      tabId,
+      jobTransactionCustomizationList
     }
   }
 }
 
-export function jobFetchingStart(tabId, isRefresh) {
+export function jobDownloadingStatus(isDownloadingjobs) {
   return {
-    type: JOB_FETCHING_START,
+    type: JOB_DOWNLOADING_STATUS,
     payload: {
-      tabId,
-      isRefresh
+      isDownloadingjobs
     }
   }
 }
 
-export function setTabsList(tabsList) {
+export function jobFetchingStart() {
+  return {
+    type: JOB_LISTING_START
+  }
+}
+
+export function setTabsList(tabsList, tabIdStatusIdMap) {
   return {
     type: SET_TABS_LIST,
-    payload: tabsList
-  }
-}
-
-export function setFetchingFalse(tabId, message) {
-  return {
-    type: SET_FETCHING_FALSE,
     payload: {
-      tabId,
-      message
+      tabsList,
+      tabIdStatusIdMap
     }
   }
 }
@@ -90,36 +99,27 @@ export function fetchTabs() {
   return async function (dispatch) {
     try {
       const tabs = await keyValueDBService.getValueFromStore(TAB)
-      dispatch(setTabsList(tabs.value))
+      const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+      const tabIdStatusIdMap = jobMasterService.prepareTabStatusIdMap(statusList.value)
+      dispatch(setTabsList(tabs.value, tabIdStatusIdMap))
     } catch (error) {
       console.log(error)
     }
   }
 }
 
-export function setRefereshingTrue() {
-  return {
-    type: SET_REFRESHING_TRUE
-  }
-}
-
-export function setTabIdsJobTransactions(tabIdJobs) {
-  return {
-    type: SET_TABS_TRANSACTIONS,
-    payload: tabIdJobs
-  }
-}
-
-export function fetchJobs(tabId, pageNumber) {
+export function fetchJobs() {
   return async function (dispatch) {
     try {
-      dispatch(jobFetchingStart(tabId))
-      var pageData = await jobTransactionService.getJobTransactions(tabId, pageNumber)
-      if (pageData.pageJobTransactionCustomizationList && !_.isEmpty(pageData.pageJobTransactionCustomizationList)) {
-        dispatch(jobFetchingEnd(pageData, tabId))
-      } else {
-        dispatch(setFetchingFalse(tabId, pageData.message))
-      }
+      dispatch(jobFetchingStart())
+      const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+      const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+      const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+      const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
+      const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+      const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
+      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value)
+      dispatch(jobFetchingEnd(jobTransactionCustomizationList))
     } catch (error) {
       console.log(error)
     }
@@ -129,19 +129,25 @@ export function fetchJobs(tabId, pageNumber) {
 export function onResyncPress() {
   return async function (dispatch) {
     try {
-      await sync.createAndUploadZip();
-      if (Platform.OS === 'android') {
-        const intervalId = BackgroundTimer.setInterval(async () => {
-          const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
-          if (isJobsPresent) {
-            let tabIdJobs = await jobTransactionService.refreshJobs()
-            dispatch(setTabIdsJobTransactions(tabIdJobs))
-          }
-        }, CONFIG.SYNC_SERVICE_DELAY);
-      }
-      else{
-        //Write ios background service code here
-      }
+      const intervalId = BackgroundTimer.setInterval(async() => {
+        //Start resync loader here
+         dispatch(jobDownloadingStatus(true))
+        await sync.createAndUploadZip();
+        const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+        //Stop resync loader here
+        dispatch(jobDownloadingStatus(false))
+        if (isJobsPresent) {
+          dispatch(jobFetchingStart())
+          const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+          const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+          const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+          const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
+          const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+          const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
+          let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value)
+          dispatch(jobFetchingEnd(jobTransactionCustomizationList))
+        }
+      }, CONFIG.SYNC_SERVICE_DELAY);
     } catch (error) {
       //Update UI here
       console.log(error)

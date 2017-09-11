@@ -10,8 +10,11 @@ import auth from './login/loginReducer'
 import device from './device/deviceReducer'
 import global from './global/globalReducer'
 import preloader from './pre-loader/preloaderReducer'
-import  home from './home/homeReducer'
 import nav from './navigators/navigatorReducer'
+import home from './home/homeReducer'
+import listing from './listing/listingReducer'
+import jobDetails from './job-details/jobDetailsReducer'
+// import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
 
@@ -27,7 +30,9 @@ const rootReducer = combineReducers({
   device,
   global,
   preloader,
-  home
+  home,
+  listing,
+  jobDetails,
 })
 
 export default rootReducer

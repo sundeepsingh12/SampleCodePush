@@ -6,7 +6,8 @@ const {
     Application,
     Login,
     Preloader,
-    Main
+    Home,
+    JobDetails
 } = require('../../lib/constants').default
 
 export default function nav(state = initialNavState, action) {
@@ -26,7 +27,13 @@ export default function nav(state = initialNavState, action) {
     break;
     case Preloader:
        nextState = AppNavigator.router.getStateForAction(
-        NavigationActions.navigate({ routeName:  Main }),
+        NavigationActions.navigate({ routeName:  Home }),
+        state
+      );
+      break;
+      case Home:
+       nextState = AppNavigator.router.getStateForAction(
+        NavigationActions.navigate({ routeName:  JobDetails }),
         state
       );
       break;
