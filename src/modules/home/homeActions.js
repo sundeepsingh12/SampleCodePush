@@ -65,6 +65,7 @@ export function jobFetchingEnd(jobTransactionCustomizationList) {
 }
 
 export function jobDownloadingStatus(isDownloadingjobs) {
+  console.log('jobDownloadingStatus called >')
   return {
     type: JOB_DOWNLOADING_STATUS,
     payload: {
@@ -129,7 +130,7 @@ export function fetchJobs() {
 export function onResyncPress() {
   return async function (dispatch) {
     try {
-      const intervalId = BackgroundTimer.setInterval(async() => {
+      CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
         //Start resync loader here
          dispatch(jobDownloadingStatus(true))
         await sync.createAndUploadZip();
@@ -147,6 +148,7 @@ export function onResyncPress() {
           let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value)
           dispatch(jobFetchingEnd(jobTransactionCustomizationList))
         }
+        
       }, CONFIG.SYNC_SERVICE_DELAY);
     } catch (error) {
       //Update UI here

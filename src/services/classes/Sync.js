@@ -40,7 +40,7 @@ class Sync {
       throw new Error('Token Missing')
     }
     await createZip();
-    RestAPIFactory(token.value).uploadZipFile();
+    await RestAPIFactory(token.value).uploadZipFile();
   }
 
   /**GET API (Pagination)

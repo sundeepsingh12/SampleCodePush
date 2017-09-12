@@ -10,7 +10,7 @@ const user = {
         "login":{"type":"string","required":true},
         "firstName":{"type":"string","required":true},
         "lastName":{"type":"string","required":true},
-        "email":{"type":"string","required":true},
+        "email":{"type":["string",null],"required":true},
         "mobileNumber":{"type":"string","required":true},
         "employeeCode":{"type":"string","required":true},
         "cityId":{"type":"number","required":true},

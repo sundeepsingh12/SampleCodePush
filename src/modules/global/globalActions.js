@@ -69,8 +69,8 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-      //TODO
-      //Write code for stopping background service
+       BackgroundTimer.clearTimeout(CONFIG.intervalId);
+
       dispatch(onChangePassword(''))
       dispatch(onChangeUsername(''))
       dispatch(clearHomeState())
