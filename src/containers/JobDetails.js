@@ -22,14 +22,15 @@ import Loader from '../components/Loader'
 
 function mapStateToProps(state) {
     return {
+        addressList: state.jobDetails.addressList,
+        contactList: state.jobDetails.contactList,
+        customerCareList: state.jobDetails.customerCareList,
+        currentStatus: state.jobDetails.currentStatus,
+        fieldDataList: state.jobDetails.fieldDataList,
         jobDetailsLoading: state.jobDetails.jobDetailsLoading,
         jobDataList: state.jobDetails.jobDataList,
-        fieldDataList: state.jobDetails.fieldDataList,
+        jobTransaction: state.jobDetails.jobTransaction,
         messageList: state.jobDetails.messageList,
-        nextStatusList: state.jobDetails.nextStatusList,
-        contactList: state.jobDetails.contactList,
-        addressList: state.jobDetails.addressList,
-        customerCareList: state.jobDetails.customerCareList,
         smsTemplateList: state.jobDetails.smsTemplateList
     }
 }
@@ -43,7 +44,13 @@ function mapDispatchToProps(dispatch) {
 class JobDetails extends Component {
 
     componentWillMount() {
-        this.props.actions.getJobDetails(this.props.jobTransactionId)
+        this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransactionId)
+    }
+
+    static navigationOptions = ({ navigation }) => {
+        return {
+            header: null
+        }
     }
 
     renderStatusList(statusList) {
@@ -59,8 +66,8 @@ class JobDetails extends Component {
     }
 
     render() {
-        console.log('props render >>>> ', this.props)
-        const statusView = this.renderStatusList(this.props.nextStatusList)
+        console.log('this.props', this.props)
+        const statusView = this.props.currentStatus ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
         if (this.props.jobDetailsLoading) {
             return (
                 <Loader />
@@ -70,13 +77,13 @@ class JobDetails extends Component {
                 <Container style={StyleSheet.flatten([theme.mainBg])}>
                     <Header style={StyleSheet.flatten([theme.bgPrimary])}>
                         <Left style={StyleSheet.flatten([styles.flexBasis15])}>
-                            <Button transparent onPress={() => { Actions.pop() }}>
+                            <Button transparent onPress={() => { this.props.navigation.goBack(null) }}>
                                 <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])} />
                             </Button>
                         </Left>
                         <Body style={StyleSheet.flatten([styles.alignCenter, styles.flexBasis70])}>
-                            <Text style={StyleSheet.flatten([styles.fontSm, styles.fontWhite, styles.fontCenter])}>Ref12345676565</Text>
-                            <Text style={StyleSheet.flatten([styles.fontSm, styles.fontWhite, styles.bold, styles.fontYellow, styles.fontCenter])}>Pending</Text>
+                            <Text style={StyleSheet.flatten([styles.fontSm, styles.fontWhite, styles.fontCenter])}>{this.props.jobTransaction ? this.props.jobTransaction.referenceNumber : null}</Text>
+                            <Text style={StyleSheet.flatten([styles.fontSm, styles.fontWhite, styles.bold, styles.fontYellow, styles.fontCenter])}>{this.props.currentStatus ? this.props.currentStatus.name : null}</Text>
                         </Body>
                         <Right style={StyleSheet.flatten([styles.flexBasis15])}>
                         </Right>

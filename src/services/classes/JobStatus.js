@@ -83,17 +83,17 @@ class JobStatus {
    *                                                                 }
    *                                                    }
    *                                    }
-   * StatusIdNextStatusList : {
-   *                            statusId : [nextStatusList]
+   * StatusIdStatusList : {
+   *                            statusId : status
    *                          }
    * }
    */
   getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap) {
     let jobMasterIdJobAttributeStatusMap = {}
-    let statusIdNextStatusMap = {}
+    let statusIdStatusMap = {}
     statusList = statusList ? statusList : []
     statusList.forEach(status => {
-      statusIdNextStatusMap[status.id] = status.nextStatusList
+      statusIdStatusMap[status.id] = status
       if (!jobAttributeStatusMap[status.id]) {
         return
       }
@@ -102,7 +102,7 @@ class JobStatus {
     })
     return {
       jobMasterIdJobAttributeStatusMap,
-      statusIdNextStatusMap
+      statusIdStatusMap
     }
   }
 

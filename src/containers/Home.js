@@ -84,7 +84,7 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    // this.props.actions.onResyncPress()
+    this.props.actions.onResyncPress()
     this.props.actions.fetchTabs()
 
   }
@@ -177,8 +177,10 @@ class Main extends Component {
             <Icon name="mail" />
           </Button>
         </Fab>
+           
       </Container>
     );
+    
   } else {
     return (
       <Container>

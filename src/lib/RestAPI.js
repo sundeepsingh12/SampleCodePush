@@ -178,9 +178,9 @@ class RestAPI {
     });
   }
 
-  uploadZipFile() {
+  async uploadZipFile() {
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
-  RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
+  await RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
     Authorization :this._sessionToken,
     'Content-Type' : 'multipart/form-data',
   }, [

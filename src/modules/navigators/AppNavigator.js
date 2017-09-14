@@ -1,6 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { addNavigationHelpers, StackNavigator,TabNavigator } from 'react-navigation'
+import { addNavigationHelpers, StackNavigator, TabNavigator } from 'react-navigation'
+import {
+  StyleSheet,
+  View,
+  Text,
+  Platform,
+  FlatList,
+  TouchableOpacity
+} from 'react-native'
 
 import Login from '../../containers/Login'
 import Preloader from '../../containers/Preloader'
@@ -10,64 +18,20 @@ import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
+import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
+import styles from '../../themes/FeStyle'
+import theme from '../../themes/feTheme'
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// const TabNav = TabNavigator(
-//   {
-//     Home: {
-//       screen: Main,
-//       navigationOptions: {
-//         tabBarLabel: 'Home',
-//       },
-//     },
-//     Resync: {
-//       screen: Main,
-//      tabBarLabel: 'Re-sync',
-//       navigationOptions:{
-//          header: null,
-//          tabBarIcon: ({ tintColor }) => <Ionicons name='ios-home-outline' size={26} style={{ color: tintColor }} />
-//         },
-//       },
-//       Message:{
-//           screen: Message,
-//      tabBarLabel: 'Message',
-//        navigationOptions:{
-//          header: null,
-//          tabBarIcon: ({ tintColor }) => <Ionicons name='ios-chatboxes-outline' size={26} style={{ color: tintColor }} />
-//         },
-//       },
-//       Utilties:{
-//               screen: Utilties,
-//      tabBarLabel: 'Utilities',
-//      navigationOptions:{
-//        header: null,
-//        tabBarIcon: ({ tintColor }) => <Ionicons name='ios-apps-outline' size={26} style={{ color: tintColor }} />
-//       },
-//       },
-//       Logout:{
-//          screen: Logout,
-//      tabBarLabel: 'Logout',
-//      navigationOptions:{
-//        header: null,
-//         tabBarIcon: ({ tintColor }) => <Ionicons name='ios-power-outline' size={26} style={{ color: tintColor }} />
-//       },
-//       }
-//   },
-//   {
-//     tabBarPosition: 'bottom',
-//     animationEnabled: false,
-//     swipeEnabled: false,
-//      tabBarOptions : {
-//         activeTintColor: '#000000',
-//         inactiveTintColor: '#000000',
-//         showIcon: 'true',
-//     style: {
-//       backgroundColor: 'white',
-//     }
-//   }
-//   }
-// );
+
+class AppWithNavigationState extends React.Component {
+  render() {
+    return (
+      <AppNavigator navigation={addNavigationHelpers({ dispatch : this.props.dispatch, state: this.props.nav })} />
+    )
+  }
+}
 
 export const AppNavigator = StackNavigator({
   Application: {
@@ -90,7 +54,8 @@ export const AppNavigator = StackNavigator({
     screen: Home,
     navigationOptions: {
       title: 'Home',
-      headerLeft: null
+      headerLeft: null,
+      headerBackTitle: null
     }
   },
   Message: {
@@ -102,7 +67,7 @@ export const AppNavigator = StackNavigator({
   Logout: {
     screen: Logout,
   },
-  JobDetails:{
+  JobDetails: {
     screen: JobDetails,
   }
 },
@@ -112,12 +77,14 @@ export const AppNavigator = StackNavigator({
     }
   });
 
-const AppWithNavigationState = ({ dispatch, nav }) => (
-  <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />
-);
+// const AppWithNavigationState = ({ dispatch, nav }) => (
+//   <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />
+// );
 
-const mapStateToProps = state => ({
-  nav: state.nav,
-});
+const mapStateToProps = state => (
+  console.log('mapStateToProps navigation', state),
+  {
+    nav: state.nav,
+  });
 
 export default connect(mapStateToProps)(AppWithNavigationState);

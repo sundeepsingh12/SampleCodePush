@@ -3,14 +3,15 @@
 import { Record } from 'immutable'
 
 var InitialState = Record({
+    addressList: [],
+    contactList: [],
+    customerCareList: [],
+    fieldDataList: [],
     jobDetailsLoading: false,
     jobDataList: [],
-    fieldDataList: [],
+    jobTransaction : null,
     messageList: [],
-    nextStatusList: [],
-    contactList: [],
-    addressList: [],
-    customerCareList: [],
+    currentStatus: null,
     smsTemplateList: [],
 })
 

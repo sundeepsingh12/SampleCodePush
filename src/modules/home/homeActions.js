@@ -53,6 +53,7 @@ import {
   Platform
 } from 'react-native';
 import BackgroundTimer from 'react-native-background-timer';
+import { NavigationActions } from 'react-navigation'
 
 
 export function jobFetchingEnd(jobTransactionCustomizationList) {
@@ -95,6 +96,14 @@ export function clearHomeState() {
   }
 }
 
+export function navigateToScene(sceneName,id) {
+  return async function (dispatch) {
+    console.log('sceneName',sceneName)
+    console.log('id',id)
+    dispatch(NavigationActions.navigate({ routeName: sceneName,params: { jobTransactionId: id }}))
+  }
+}
+
 export function fetchTabs() {
   return async function (dispatch) {
     try {
@@ -129,24 +138,26 @@ export function fetchJobs() {
 export function onResyncPress() {
   return async function (dispatch) {
     try {
-      const intervalId = BackgroundTimer.setInterval(async() => {
-        //Start resync loader here
-         dispatch(jobDownloadingStatus(true))
-        await sync.createAndUploadZip();
-        const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
-        //Stop resync loader here
-        dispatch(jobDownloadingStatus(false))
-        if (isJobsPresent) {
-          dispatch(jobFetchingStart())
-          const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-          const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
-          const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-          const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
-          const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
-          const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-          let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value)
-          dispatch(jobFetchingEnd(jobTransactionCustomizationList))
-        }
+      console.log('onResync`Pre`ss called')
+      const intervalId = BackgroundTimer.setInterval(async () => {
+      console.log('inside service ')
+      //Start resync loader here
+      dispatch(jobDownloadingStatus(true))
+      await sync.createAndUploadZip();
+      const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+      //Stop resync loader here
+      dispatch(jobDownloadingStatus(false))
+      if (isJobsPresent) {
+        dispatch(jobFetchingStart())
+        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+        const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+        const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+        const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
+        const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+        const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
+        let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value)
+        dispatch(jobFetchingEnd(jobTransactionCustomizationList))
+      }
       }, CONFIG.SYNC_SERVICE_DELAY);
     } catch (error) {
       //Update UI here

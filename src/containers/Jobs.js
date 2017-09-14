@@ -62,6 +62,7 @@ class Jobs extends Component {
   }
 
   renderData = (item) => {
+    console.log('renderData', this.props)
     return (
       <Swipeable
         leftButtons={[
@@ -83,7 +84,7 @@ class Jobs extends Component {
             <Ionicons name='ios-call-outline' style={{ fontSize: 34, color: '#ffffff', marginLeft: 25 }} />
           </Button>,
         ]}>
-        <ListItem style={StyleSheet.flatten([styles.bgGray, { margin: 0, padding: 0 }])} avatar button onPress={() => { dispatch(NavigationActions.navigate({ routeName: JobDetails,params: { jobTransactionId: item.id }})) }}>
+        <ListItem style={StyleSheet.flatten([styles.bgGray, { margin: 0, padding: 0 }])} avatar button onPress={() => { this.props.actions.navigateToScene('JobDetails', item.id) }}>
           <Left>
             <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this.toggleStatus()}>
               <View>
@@ -120,13 +121,13 @@ class Jobs extends Component {
       return (
         <Container>
           <View style={{ flex: 1, flexDirection: 'column', bottom: 5, marginLeft: 5, marginRight: 5 }}>
-              <List>
-                <FlatList
-                  data={this.renderList()}
-                  renderItem={({ item }) => this.renderData(item)}
-                  keyExtractor={item => item.id}
-                />
-              </List>
+            <List>
+              <FlatList
+                data={this.renderList()}
+                renderItem={({ item }) => this.renderData(item)}
+                keyExtractor={item => item.id}
+              />
+            </List>
             <View style={{ flex: 2, flexDirection: 'row' }}>
               <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
                 <Input bordered='true' rounded style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}

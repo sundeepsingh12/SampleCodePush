@@ -40,7 +40,7 @@ class Sync {
       throw new Error('Token Missing')
     }
     await createZip();
-    RestAPIFactory(token.value).uploadZipFile();
+    await RestAPIFactory(token.value).uploadZipFile();
   }
 
   /**GET API (Pagination)
@@ -164,6 +164,7 @@ class Sync {
       tableName: TABLE_RUNSHEET,
       value: contentQuery.runSheet
     }
+    console.log('runsheets',contentQuery.runSheet)
     // const jobTransactionCustomizationListValues = await jobTransactionService.prepareJobCustomizationList(contentQuery)
     // const jobTransactionCustomizationList = {
     //   tableName: TABLE_JOB_TRANSACTION_CUSTOMIZATION,
@@ -329,6 +330,7 @@ class Sync {
  * Returns true if any job present in sync table on server side
  */
   async downloadAndDeleteDataFromServer() {
+    console.log('downloadAndDeleteDataFromServer')
         const pageNumber = 0,
           pageSize = 3
         let isLastPageReached = false,

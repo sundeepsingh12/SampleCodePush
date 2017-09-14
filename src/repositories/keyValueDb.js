@@ -82,6 +82,7 @@ export class keyValueDb {
       default:
         checkCondition = true;
     }
+    console.log(schemaName,validate(value, schemaInstance))
     if (value && (checkCondition || validate(value, schemaInstance).valid)) {
       return store.save(schemaName, {
         value

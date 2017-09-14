@@ -17,10 +17,11 @@ export default function jobDetailsReducer(state = initialState, action) {
             return state.set('jobDetailsLoading',true)
 
         case JOB_DETAILS_FETCHING_END :
-            return state.set('jobDataList',action.payload.jobDataList)
-                        .set('fieldDataList',action.payload.fieldDataList)
+            return state.set('fieldDataList',action.payload.fieldDataList)
+                        .set('jobDataList',action.payload.jobDataList)
+                        .set('jobTransaction',action.payload.jobTransaction)
                         .set('jobDetailsLoading',false)
-                        .set('nextStatusList',action.payload.nextStatusList)
+                        .set('currentStatus',action.payload.currentStatus)
     }
     return state
 }
