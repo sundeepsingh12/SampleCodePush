@@ -66,6 +66,7 @@ export function jobFetchingEnd(jobTransactionCustomizationList) {
 }
 
 export function jobDownloadingStatus(isDownloadingjobs) {
+  console.log('jobDownloadingStatus called >')
   return {
     type: JOB_DOWNLOADING_STATUS,
     payload: {
