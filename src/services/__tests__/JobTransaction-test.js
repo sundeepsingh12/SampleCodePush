@@ -926,7 +926,6 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
   beforeEach(() => {
     jobAttributeMasterService.getJobAttributeMasterMap = jest.fn()
     jobAttributeMasterService.getJobAttributeStatusMap = jest.fn()
-    jobAttributeMasterService.getAllJobAttributeStatusMap = jest.fn()
     customerCareService.getCustomerCareMap = jest.fn()
     smsTemplateService.getSMSTemplateMap = jest.fn()
     jobService.getJobMap = jest.fn()

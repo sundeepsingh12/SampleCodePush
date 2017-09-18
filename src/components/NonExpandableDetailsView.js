@@ -15,7 +15,6 @@ import theme from '../themes/feTheme'
 
 export default class NonExpandableDetailsView extends Component {
     render() {
-        console.log('NonExpandableDetails', this.props)
         return (
             <View style={StyleSheet.flatten([styles.column, { backgroundColor: '#F2F2F2' }])}>
                 <View style={StyleSheet.flatten([styles.row, styles.padding10, { borderTopWidth: .5, borderColor: '#C5C5C5' }])}>

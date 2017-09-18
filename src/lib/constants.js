@@ -131,27 +131,27 @@ export default keyMirror({
     JOB_ATTRIBUTE_STATUS: null,
 
     //Realm Tables
-    TABLE_JOB_TRANSACTION:null,
-    TABLE_JOB:null,
-    TABLE_JOB_DATA:null,
-    TABLE_RUNSHEET:null,
-    TABLE_FIELD_DATA:null,
-    TABLE_JOB_TRANSACTION_CUSTOMIZATION:null,
-    TABLE_TRACK_LOGS:null,
+    TABLE_JOB_TRANSACTION: null,
+    TABLE_JOB: null,
+    TABLE_JOB_DATA: null,
+    TABLE_RUNSHEET: null,
+    TABLE_FIELD_DATA: null,
+    TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
+    TABLE_TRACK_LOGS: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
 
     //Status Codes
-    UNSEEN:null,
-    PENDING:null,
+    UNSEEN: null,
+    PENDING: null,
 
     //Route names (Used in React Navigation)
-    Application:null,
-    Login:null,
-    Preloader:null,
-    Home:null,
-    JobDetails:null
+    Application: null,
+    Login: null,
+    Preloader: null,
+    Home: null,
+    JobDetails: null,
 })
 
 

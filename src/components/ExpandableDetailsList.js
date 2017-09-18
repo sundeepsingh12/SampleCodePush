@@ -12,7 +12,6 @@ import {
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../themes/FeStyle'
 import theme from '../themes/feTheme'
-import ChildDetails from './ChildDetails'
 import renderIf from '../lib/renderIf'
 import ExpandableDetailsView from './ExpandableDetailsView'
 import NonExpandableDetailsView from './NonExpandableDetailsView'
@@ -51,7 +50,6 @@ class ExpandableDetailsList extends Component {
     }
 
     render() {
-        console.log(this.props)
         return (
             <View style={StyleSheet.flatten([{ flex: 1,minHeight:'50%', maxHeight: '100%' }])}>
                 <List>

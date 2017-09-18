@@ -2,6 +2,7 @@
 
 import * as realm from '../../repositories/realmdb'
 import { jobDataService } from './JobData'
+import { CONTACT_NUMBER } from '../../lib/AttributeConstants'
 
 class JobDetails {
 
@@ -14,15 +15,16 @@ class JobDetails {
      * @param {*} attributeMap 
      * @param {*} isJob 
      * @returns dataObject {
-     *              dataList : [
-     *                              {
-     *                                  data,
-     *                                  sequence
-     *                                  label,
-     *                                  attributeTypeId,
-     *                                  childDataList : [dataList]
-     *                              }
-     *                         ]
+     *              dataList : {
+     *                              attributeMasterId : {
+     *                                                      data,
+     *                                                      sequence
+     *                                                      label,
+     *                                                      attributeTypeId,
+     *                                                      childDataList : [dataList]
+     *                                                   }
+     *                          }
+     *                         
      *              dataMap : {
      *                          attributeMasterId : {
      *                                                  data,
@@ -35,9 +37,7 @@ class JobDetails {
      * }
      */
     prepareDataObject(id, positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId, isObject) {
-        let dataMap = {},
-            contactList = [],
-            addressList = []
+        let dataMap = {}
         let dataQuery = isJob ? 'jobId = ' + id + ' AND parentId = ' + positionId : 'jobTransactionId = ' + id + ' AND parentId = ' + positionId
         let dataList = isObject ? {} : []
         let filteredDataList = realm.filterRecordList(realmDBDataList, dataQuery)
@@ -60,14 +60,7 @@ class JobDetails {
                     dataMap[attributeMaster.attributeTypeId][attributeMaster.id].childDataMap = childDataObject.dataMap
                     dataObject.childDataList = childDataObject.dataList
                 }
-                isObject ? isJob && attributeMaster.attributeTypeId == 27 ? true : dataList[attributeMaster.id] = dataObject : dataList.push(dataObject)
-                if (data.parentId !== 0 || !isJob) {
-                    continue
-                } else if (jobDataService.checkContacNumber(data.jobAttributeMasterId, data.value, attributeMasterMap)) {
-                    contactList.push(data)
-                } else if (jobDataService.checkAddressField(data.jobAttributeMasterId, data.value, attributeMasterMap)) {
-                    addressList.push(data)
-                }
+                isObject ? isJob && attributeMaster.attributeTypeId == CONTACT_NUMBER ? true : dataList[attributeMaster.id] = dataObject : dataList.push(dataObject)
             }
         }
         if (!isObject) {
@@ -76,8 +69,6 @@ class JobDetails {
         return {
             dataMap,
             dataList,
-            contactList,
-            addressList,
             autoIncrementId
         }
     }

@@ -2,7 +2,6 @@
 
 class FieldAttributeMaster {
     /**
-     * 
      * @param {*} fieldAttributeMasterList 
      * @returns
      * FieldAttributeMasterMap : {
@@ -24,10 +23,11 @@ class FieldAttributeMaster {
     }
 
     /**
-     * This function traverses field attribute status list
      * @param {*} fieldAttributeStatusList
      * @returns
-     * Map<StatusId,Map<FieldAttributeMasterId,FieldAttributeStatus>>
+     * FieldAttributeStatusMap : {
+     *                              fieldAttributeId : { fieldAttributeStatus }
+     *                         }
      */
     getFieldAttributeStatusMap(fieldAttributeStatusList) {
         let fieldAttributeStatusMap = {}

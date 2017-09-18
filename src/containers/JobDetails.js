@@ -66,7 +66,6 @@ class JobDetails extends Component {
     }
 
     render() {
-        console.log('this.props', this.props)
         const statusView = this.props.currentStatus ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
         if (this.props.jobDetailsLoading) {
             return (

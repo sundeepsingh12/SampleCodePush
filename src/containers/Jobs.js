@@ -62,7 +62,6 @@ class Jobs extends Component {
   }
 
   renderData = (item) => {
-    console.log('renderData', this.props)
     return (
       <Swipeable
         leftButtons={[

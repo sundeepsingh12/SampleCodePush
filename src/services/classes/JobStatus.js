@@ -83,7 +83,7 @@ class JobStatus {
    *                                                                 }
    *                                                    }
    *                                    }
-   * StatusIdStatusList : {
+   * StatusIdStatusMap : {
    *                            statusId : status
    *                          }
    * }

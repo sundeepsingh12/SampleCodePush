@@ -6,17 +6,15 @@ class SMSTemplate {
      * 
      * @param {*} smsTemplateList 
      * @returns
-     * Map <JobMasterId,[SMSTemplate]>
+     * SmsTemplateMap : {
+     *                      JobMasterId : [SMSTemplate]
+     *                   }
      */
     getSMSTemplateMap(smsTemplateList) {
         let smsTemplateMap = {}
-        if (!smsTemplateList) {
-            smsTemplateList = []
-        }
+        smsTemplateList = smsTemplateList ? smsTemplateList : []
         smsTemplateList.forEach(smsTemplate => {
-            if (!smsTemplateMap[smsTemplate.jobMasterId]) {
-                smsTemplateMap[smsTemplate.jobMasterId] = []
-            }
+            smsTemplateMap[smsTemplate.jobMasterId] = smsTemplateMap[smsTemplate.jobMasterId] ? smsTemplateMap[smsTemplate.jobMasterId] : []
             smsTemplateMap[smsTemplate.jobMasterId].push(smsTemplate)
         })
 

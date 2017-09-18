@@ -24,28 +24,6 @@ class ExpandableHeader extends Component {
         }
     }
 
-    renderDetailsView() {
-        let detailsView = []
-        this.props.dataList.forEach((data) => {
-            if (data.childDataList) {
-                detailsView.push(
-                    <ExpandableDetails
-                        key={data.data.id}
-                        label={data.label}
-                        value={data.data.value} />
-                )
-            } else {
-                detailsView.push(
-                    <NonExpandableDetails
-                        key={data.data.id}
-                        label={data.label}
-                        value={data.data.value} />
-                )
-            }
-        })
-        return detailsView
-    }
-
     render() {
         return (
             <View>

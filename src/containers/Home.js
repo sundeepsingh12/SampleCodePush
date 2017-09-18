@@ -22,6 +22,7 @@ import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import theme from '../themes/feTheme'
+import ResyncLoader from '../components/ResyncLoader'
 
 
 /**
@@ -41,7 +42,7 @@ import {
 }
   from 'react-native'
 
-import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, ScrollableTab, Icon, Fab, Button,Footer,FooterTab } from 'native-base';
+import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, ScrollableTab, Icon, Fab, Button, Footer, FooterTab } from 'native-base';
 import Jobs from './Jobs';
 import * as homeActions from '../modules/home/homeActions'
 import renderIf from '../lib/renderIf';
@@ -56,7 +57,8 @@ import TitleHeader from '../components/TitleHeader'
 function mapStateToProps(state) {
   return {
     tabsList: state.home.tabsList,
-    tabIdStatusIdMap: state.home.tabIdStatusIdMap
+    tabIdStatusIdMap: state.home.tabIdStatusIdMap,
+    downloadingJobs: state.home.downloadingJobs
   }
 };
 
@@ -65,7 +67,7 @@ function mapStateToProps(state) {
  */
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...homeActions,...preloaderActions }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...homeActions, ...preloaderActions }, dispatch)
   }
 }
 
@@ -84,7 +86,7 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.onResyncPress()
+    this.props.actions.syncService()
     this.props.actions.fetchTabs()
 
   }
@@ -98,13 +100,13 @@ class Main extends Component {
           <Tab
             key={tab.id}
             heading={tab.name}
-            tabStyle={{backgroundColor: '#ffffff'}}
-            activeTabStyle={{backgroundColor: '#ffffff'}}
-            
-            textStyle={{color: '#a0a0a0'}}
+            tabStyle={{ backgroundColor: '#ffffff' }}
+            activeTabStyle={{ backgroundColor: '#ffffff' }}
+
+            textStyle={{ color: '#a0a0a0' }}
             activeTextStyle={styles.fontPrimary}
-            
-            >
+
+          >
             <Jobs
               tabId={tab.id}
               statusIdList={this.props.tabIdStatusIdMap[tab.id]}
@@ -115,79 +117,76 @@ class Main extends Component {
     })
     return renderTabList
   }
-  
+
 
   render() {
     const viewTabList = this.renderTabs()
-    if(viewTabList.length > 0 ) {
-    return (
-      <Container>
-      <Tabs locked
-          tabBarUnderlineStyle={styles.bgPrimary}
-          
-          renderTabBar={() => <ScrollableTab />}
-        >
-          {viewTabList}
-        </Tabs>
+    if (viewTabList.length > 0) {
+      return (
+        <Container>
+          <Tabs locked
+            tabBarUnderlineStyle={styles.bgPrimary}
+            renderTabBar={() => <ScrollableTab />}
+          >
+            {viewTabList}
+          </Tabs>
 
-      <Footer>
-        <FooterTab  style={{ backgroundColor: 'white' }}>
-        <Button vertical>
-              <Icon name={"ios-home-outline"} />
-              <Text>Home</Text>
-            </Button>
-              <Button 
-              onPress={()=>{ this.props.actions.onResyncPress()}}
-              vertical>
-              <Icon name={"ios-sync-outline"} />
-              <Text>Re-sync</Text>
-            </Button>
-              <Button 
-              vertical
-              >
-              <Icon name={"ios-chatboxes-outline"} />
-              <Text>Message</Text>
-            </Button>
+          <Footer>
+            <FooterTab style={{ backgroundColor: 'white' }}>
               <Button vertical>
-              <Icon name={"ios-apps-outline"} />
-              <Text>Utilities</Text>
+                <Icon name={"ios-home-outline"} />
+                <Text>Home</Text>
+              </Button>
+              <Button
+                disabled = {this.props.downloadingJobs}
+                onPress={() => { this.props.actions.onResyncPress() }}
+                vertical>
+                <ResyncLoader
+                downloadingJobs = {this.props.downloadingJobs} />
+              </Button>
+              <Button vertical>
+                <Icon name={"ios-chatboxes-outline"} />
+                <Text>Message</Text>
+              </Button>
+              <Button vertical>
+                <Icon name={"ios-apps-outline"} />
+                <Text>Utilities</Text>
+              </Button>
+              <Button onPress={() => { this.props.actions.invalidateUserSession() }} vertical>
+                <Icon name={"ios-power-outline"} />
+                <Text>Logout</Text>
+              </Button>
+            </FooterTab>
+          </Footer>
+          <Fab
+            active={this.state.active}
+            direction="up"
+            style={{ backgroundColor: '#5067FF' }}
+            position="bottomRight"
+            containerStyle={{ bottom: 125 }}
+            onPress={() => this.setState({ active: !this.state.active })}>
+            <Ionicons name="md-add" />
+            <Button style={{ backgroundColor: '#34A34F' }}>
+              <Icon name="logo-whatsapp" />
             </Button>
-              <Button onPress = {()=>{this.props.actions.invalidateUserSession()}}
-              vertical>
-              <Icon name={"ios-power-outline"}/>
-              <Text>Logout</Text>
+            <Button style={{ backgroundColor: '#3B5998' }}>
+              <Icon name="logo-facebook" />
             </Button>
-          </FooterTab>
-        </Footer>
-      <Fab
-          active={this.state.active}
-          direction="up"
-          style={{ backgroundColor: '#5067FF' }}
-          position="bottomRight"
-          containerStyle={{ bottom: 125 }}
-          onPress={() => this.setState({ active: !this.state.active })}>
-          <Ionicons name="md-add" />
-          <Button style={{ backgroundColor: '#34A34F' }}>
-            <Icon name="logo-whatsapp" />
-          </Button>
-          <Button style={{ backgroundColor: '#3B5998' }}>
-            <Icon name="logo-facebook" />
-          </Button>
-          <Button disabled style={{ backgroundColor: '#DD5144' }}>
-            <Icon name="mail" />
-          </Button>
-        </Fab>
-           
-      </Container>
-    );
-    
-  } else {
-    return (
-      <Container>
-     <Loader/>
-     </Container>
-    )
-  }
+            <Button disabled style={{ backgroundColor: '#DD5144' }}>
+              <Icon name="mail" />
+            </Button>
+          </Fab>
+
+        </Container>
+      );
+
+    } else {
+      return (
+        <Container>
+          <Loader />
+        </Container>
+      )
+    }
   }
 
 

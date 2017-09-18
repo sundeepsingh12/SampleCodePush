@@ -3,16 +3,15 @@
 class JobAttributeMaster {
 
     /**
-     * 
      * @param {*} jobAttributeMasterList 
      * @returns
-     * Map<JobAttributeMasterId,JobAttributeMaster>
+     * JobAttributeMasterMap : {
+     *                              jobAttributeMasterId : {jobAttributeMaster}
+     *                         }
      */
     getJobAttributeMasterMap(jobAttributeMasterList) {
         let jobAttributeMasterMap = {}
-        if (!jobAttributeMasterList) {
-            jobAttributeMasterList = []
-        }
+        jobAttributeMasterList = jobAttributeMasterList ? jobAttributeMasterList : []
         jobAttributeMasterList.forEach(jobAttributeMaster => {
             jobAttributeMasterMap[jobAttributeMaster.id] = jobAttributeMaster
         })
@@ -21,43 +20,40 @@ class JobAttributeMaster {
     }
 
     /**
-     * This function traverses job attribute status list
-     * @param {*} jobAttributeStatusList
+     * @param {*} jobAttributeMasterList 
      * @returns
-     * Map<StatusId,Map<JobAttributeMasterId,JobAttributeStatus>>
+     * JobMasterJobAttributeMasterMap : {
+     *                                      jobMasterId : {
+     *                                                      jobAttributeMasterId : {jobAttributeMaster}
+     *                                                    }
+     *                                  }
      */
-    getJobAttributeStatusMap(jobAttributeStatusList) {
-        let jobAttributeStatusMap = {}
-        if (!jobAttributeStatusList) {
-            jobAttributeStatusList = []
-        }
-        jobAttributeStatusList.forEach(jobAttributeStatus => {
-            if (!jobAttributeStatusMap[jobAttributeStatus.statusId]) {
-                jobAttributeStatusMap[jobAttributeStatus.statusId] = {}
-            }
-            jobAttributeStatusMap[jobAttributeStatus.statusId][jobAttributeStatus.jobAttributeId] = jobAttributeStatus
-            // jobAttributeStatus[statusId].push(jobAttributeStatus.jobAttributeId)
+    getJobMasterJobAttributeMasterMap(jobAttributeMasterList) {
+        let jobMasterJobAttributeMasterMap = {}
+        jobAttributeMasterList = jobAttributeMasterList ? jobAttributeMasterList : []
+        jobAttributeMasterList.forEach(jobAttributeMaster => {
+            jobMasterJobAttributeMasterMap[jobAttributeMaster.jobMasterId] = jobMasterJobAttributeMasterMap[jobAttributeMaster.jobMasterId] ? jobMasterJobAttributeMasterMap[jobAttributeMaster.jobMasterId] : {}
+            jobMasterJobAttributeMasterMap[jobAttributeMaster.jobMasterId][jobAttributeMaster.id] = jobAttributeMaster
         })
 
-        return jobAttributeStatusMap
+        return jobMasterJobAttributeMasterMap
     }
 
     /**
-     * This function traverse job status list (as there is no job attribute status list)
-     * @param {*} statusList 
-     * @param {*} jobAttributeMasterMap 
-     * @returns Map<StatusId,Map<JobAttributeMasterId,JobAttributeMaster>>
+     * @param {*} jobAttributeStatusList
+     * @returns
+     * JobAttributeStatusMap : {
+     *                              statusId : {
+     *                                              jobAttributeMasterId : {jobAttributeStatus}
+     *                                         }
+     *                         }
      */
-    getAllJobAttributeStatusMap(statusList, jobAttributeMasterMap) {
+    getJobAttributeStatusMap(jobAttributeStatusList) {
         let jobAttributeStatusMap = {}
-        if (!statusList) {
-            statusList = []
-        }
-        statusList.forEach(status => {
-            if (!jobAttributeStatusMap[status.id]) {
-                jobAttributeStatusMap[status.id] = {}
-            }
-            jobAttributeStatusMap[status.id] = jobAttributeMasterMap
+        jobAttributeStatusList = jobAttributeStatusList ? jobAttributeStatusList : []
+        jobAttributeStatusList.forEach(jobAttributeStatus => {
+            jobAttributeStatusMap[jobAttributeStatus.statusId] = jobAttributeStatusMap[jobAttributeStatus.statusId] ? jobAttributeStatusMap[jobAttributeStatus.statusId] : {}
+            jobAttributeStatusMap[jobAttributeStatus.statusId][jobAttributeStatus.jobAttributeId] = jobAttributeStatus
         })
 
         return jobAttributeStatusMap

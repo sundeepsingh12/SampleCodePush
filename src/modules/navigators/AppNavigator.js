@@ -82,7 +82,6 @@ export const AppNavigator = StackNavigator({
 // );
 
 const mapStateToProps = state => (
-  console.log('mapStateToProps navigation', state),
   {
     nav: state.nav,
   });

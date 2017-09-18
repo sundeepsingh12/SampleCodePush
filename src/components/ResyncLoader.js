@@ -9,14 +9,7 @@ import {
 
 import Icon from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { connect } from 'react-redux'
 import { Spinner } from 'native-base';
-
-function mapStateToProps(state) {
-    return {
-        downloadingJobs: state.home.downloadingJobs
-    }
-};
 
 class ResyncLoader extends Component {
     render() {
@@ -27,12 +20,11 @@ class ResyncLoader extends Component {
                     <Text style={{ textAlign: 'center', fontSize: 12, color: '#878787'}}>
                         Re-Sync
                     </Text>
-
                 </View>
            </View>
         )
     }
 }
 
-export default connect(mapStateToProps, null)(ResyncLoader)
+export default ResyncLoader
 

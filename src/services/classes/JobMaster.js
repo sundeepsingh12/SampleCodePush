@@ -123,8 +123,6 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
-
-    console.log('inside job master',json)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(USER, json.user)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)

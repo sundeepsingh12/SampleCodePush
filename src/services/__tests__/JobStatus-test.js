@@ -197,38 +197,56 @@ describe('test cases for getJobMasterIdStatusIdMap', () => {
     }
   }
 
-  const statusIdNextStatusMap = {
-    1: [],
-    2: undefined,
-    3: [
-      {
-        id: 4,
-        jobMasterId: 2,
-        nextStatusList: []
-      }
-    ],
-    4: [],
-    5: undefined
+  const statusIdStatusMap = {
+    1: {
+      id: 1,
+      jobMasterId: 1,
+      nextStatusList: []
+    },
+    2: {
+      id: 2,
+      jobMasterId: 1,
+    },
+    3: {
+      id: 3,
+      jobMasterId: 2,
+      nextStatusList: [
+        {
+          id: 4,
+          jobMasterId: 2,
+          nextStatusList: []
+        }
+      ]
+    },
+    4: {
+      id: 4,
+      jobMasterId: 2,
+      nextStatusList: []
+    },
+    5: {
+      id: 5,
+      jobMasterId: 2,
+    }
   }
 
   it('should return empty jobMasterIdJobAttributeStatusMap and empty statusIdNextStatusMap for undefined statusList', () => {
     expect(jobStatusService.getJobMasterIdStatusIdMap(undefined, {})).toEqual({
       jobMasterIdJobAttributeStatusMap: {},
-      statusIdNextStatusMap: {}
+      statusIdStatusMap: {}
     })
   })
 
   it('should return empty jobMasterIdJobAttributeStatusMap and statusIdNextStatusMap for statusList and empty jobAttributeStatusMap', () => {
     expect(jobStatusService.getJobMasterIdStatusIdMap(statusList, {})).toEqual({
       jobMasterIdJobAttributeStatusMap: {},
-      statusIdNextStatusMap
+      statusIdStatusMap
     })
   })
 
   it('should return empty jobMasterIdJobAttributeStatusMap and statusIdNextStatusMap for statusList and jobAttributeStatusMap', () => {
     expect(jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)).toEqual({
       jobMasterIdJobAttributeStatusMap,
-      statusIdNextStatusMap
+      statusIdStatusMap
     })
   })
 
