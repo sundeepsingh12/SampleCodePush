@@ -70,9 +70,40 @@ class JobStatus {
     return jobMasterIdStatusIdMap
   }
 
-  getStatusIdsForTabId(tabId) {
-    const tabIdMap = keyValueDBService.getValueFromStore()
-    return tabIdMap.value[tabId]
+  /**
+   * 
+   * @param {*} statusList 
+   * @param {*} jobAttributeStatusMap 
+   * @returns 
+   * {
+   * JobMasterIdJobAttributeStatusMap : {
+   *                                      jobMasterId : {
+   *                                                      statusId : {
+   *                                                                    jobAttributeMasterId : {jobAttributeStatus}
+   *                                                                 }
+   *                                                    }
+   *                                    }
+   * StatusIdStatusMap : {
+   *                            statusId : status
+   *                          }
+   * }
+   */
+  getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap) {
+    let jobMasterIdJobAttributeStatusMap = {}
+    let statusIdStatusMap = {}
+    statusList = statusList ? statusList : []
+    statusList.forEach(status => {
+      statusIdStatusMap[status.id] = status
+      if (!jobAttributeStatusMap[status.id]) {
+        return
+      }
+      jobMasterIdJobAttributeStatusMap[status.jobMasterId] = jobMasterIdJobAttributeStatusMap[status.jobMasterId] ? jobMasterIdJobAttributeStatusMap[status.jobMasterId] : {}
+      jobMasterIdJobAttributeStatusMap[status.jobMasterId][status.id] = jobAttributeStatusMap[status.id]
+    })
+    return {
+      jobMasterIdJobAttributeStatusMap,
+      statusIdStatusMap
+    }
   }
 
 }

@@ -2,10 +2,11 @@
 var actions = require('../homeActions')
 const {
   JOB_FETCHING_START,
-    JOB_FETCHING_END,
+    JOB_LISTING_END,
     JOB_REFRESHING_START,
     JOB_REFRESHING_WAIT,
     SET_FETCHING_FALSE,
+    CLEAR_HOME_STATE,
     UNSEEN,
     TABLE_JOB_TRANSACTION,
     TAB,
@@ -25,87 +26,107 @@ import { sync } from '../../../services/classes/Sync'
 import { jobStatusService } from '../../../services/classes/JobStatus'
 import { jobTransactionService } from '../../../services/classes/JobTransaction'
 import { jobSummaryService } from '../../../services/classes/JobSummary'
-import { tabsService } from '../../../services/classes/Tabs'
+import { jobMasterService } from '../../../services/classes/JobMaster'
 import * as realm from '../../../repositories/realmdb'
 import _ from 'underscore'
 
-describe('home actions', () => {
+const middlewares = [thunk]
+const mockStore = configureStore(middlewares)
+
+
+describe('home actions for reducers', () => {
 
     it('should start job fetching', () => {
-        const tabId = 2
         const isRefresh = false
-        expect(actions.jobFetchingStart(tabId, isRefresh)).toEqual({
+        expect(actions.jobFetchingStart(isRefresh)).toEqual({
             type: JOB_FETCHING_START,
             payload: {
-                tabId,
                 isRefresh
             }
         })
     })
 
     it('should start job ending', () => {
-        const tabId = 2
-        const pageData = {
-            pageJobTransactionCustomizationList: 'xyz',
-            pageNumber: 2,
-            isLastPage: false
-        }
-        expect(actions.jobFetchingEnd(pageData, tabId)).toEqual({
-            type: JOB_FETCHING_END,
+        const jobTransactionCustomizationList = [
+            {
+                id: 1,
+                line1: 'xyz'
+            },
+            {
+                id: 2,
+                line1: 'abc'
+            }
+        ]
+        expect(actions.jobFetchingEnd(jobTransactionCustomizationList)).toEqual({
+            type: JOB_LISTING_END,
             payload: {
-                jobTransactionCustomizationList: pageData.pageJobTransactionCustomizationList,
-                pageNumber: pageData.pageNumber,
-                isLastPage: pageData.isLastPage,
-                tabId,
+                jobTransactionCustomizationList
             }
         })
     })
 
     it('should set tabs list', () => {
         const tabsList = 'test'
-        expect(actions.setTabsList(tabsList)).toEqual({
+        const tabIdStatusIdMap = 'teststatus'
+        expect(actions.setTabsList(tabsList, tabIdStatusIdMap)).toEqual({
             type: SET_TABS_LIST,
-            payload: tabsList
-        })
-    })
-
-    it('should set fetching false', () => {
-        const tabId = 13
-        expect(actions.setFetchingFalse(tabId)).toEqual({
-            type: SET_FETCHING_FALSE,
             payload: {
-                tabId
+                tabsList,
+                tabIdStatusIdMap
             }
         })
     })
 
     it('should clear home state', () => {
-        expect(actions.clearHomeState(tabId)).toEqual({
+        expect(actions.clearHomeState()).toEqual({
             type: CLEAR_HOME_STATE
         })
     })
 
+})
+
+describe('test cases for action fetchTabs', () => {
     it('should fetch tabs', () => {
-        const tabsList = [{
-            tabId: 12
-        }]
+        const tabsList = {
+            value: [
+                {
+                    tabId: 12
+                }
+            ]
+        }
+        const tabsListResult = [
+            {
+                tabId: 12
+            }
+        ]
+        const tabIdStatusIdMap = {
+            12: [1, 2]
+        }
         const expectedActions = [
             {
                 type: SET_TABS_LIST,
-                payload: tabsList
+                payload: {
+                    tabsList : tabsListResult,
+                    tabIdStatusIdMap
+                }
             },
         ]
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue(tabsList)
+        jobMasterService.prepareTabStatusIdMap = jest.fn()
+        jobMasterService.prepareTabStatusIdMap.mockReturnValue(tabIdStatusIdMap)
         const store = mockStore({})
         return store.dispatch(actions.fetchTabs())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
+                expect(jobMasterService.prepareTabStatusIdMap).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
     })
+})
 
+describe('test cases for action fetchJobs', () => {
     it('should fetch jobs', () => {
         const tabId = 12, pageNumber = 0
         const pageData = {
@@ -116,7 +137,7 @@ describe('home actions', () => {
                 }
             ],
             pageNumber: 0,
-            isLastPage : true,
+            isLastPage: true,
         }
         const expectedActions = [
             {

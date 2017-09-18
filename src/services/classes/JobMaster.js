@@ -31,6 +31,7 @@ const {
   USER,
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
+  JOB_ATTRIBUTE_STATUS,
 } = require('../../lib/constants').default
 
 
@@ -122,10 +123,6 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
-    console.log('json')
-    console.log(json)
-    console.log('json.jobMaster')
-    console.log(json.jobMaster)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(USER, json.user)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
@@ -134,10 +131,11 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster)
     await keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus)
     await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
-    // await keyValueDBService.validateAndSaveData(JOB_LIST_CUSTOMIZATION, json.jobListCustomization)
-    await this.prepareCustomizationListMap(json.jobListCustomization)
-    // await keyValueDBService.validateAndSaveData(TAB, json.appJobStatusTabs)
-    await this.validateAndSortTabList(TAB, json.appJobStatusTabs)
+    let jobMasterIdCustomizationMap = this.prepareCustomizationListMap(json.jobListCustomization)
+    await keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP, jobMasterIdCustomizationMap)
+    await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_STATUS, json.jobAttributeMasterStatuses)
+    let tabs = await this.validateAndSortTabList(json.appJobStatusTabs)
+    await keyValueDBService.validateAndSaveData(TAB, tabs)
     await keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)
     await keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList)
     await keyValueDBService.validateAndSaveData(SMS_TEMPLATE, json.smsTemplatesList)
@@ -147,7 +145,6 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
-    await this.prepareTabStatusIdMap(json.jobStatus)
   }
 
   /**
@@ -155,28 +152,28 @@ class JobMaster {
    * @param {*} jobListCustomization 
    * prepares HashMap<JobMasterId,HashMap<AppListMasterId,CustomizationListDTO>
      CustomizationListDTO - {
-      jobMasterId
       appJobListMasterId
-      separator
-      referenceNo
-      runsheetNo
-      noOfAttempts
-      slot
       delimiterType
-      startTime
       endTime
-      jobAttr: [
-        {
-          jobAttributeMasterId
-          fieldAttributeMasterId
-        }
-      ]
       fieldAttr: [
         {
           jobAttributeMasterId
           fieldAttributeMasterId
         }
       ]
+      jobAttr: [
+        {
+          jobAttributeMasterId
+          fieldAttributeMasterId
+        }
+      ]
+      jobMasterId
+      noOfAttempts
+      referenceNo
+      runsheetNo
+      separator
+      slot
+      startTime      
       trackKm
       trackHalt
       trackCallCount
@@ -187,34 +184,26 @@ class JobMaster {
    */
   prepareCustomizationListMap(jobListCustomization) {
     if (!jobListCustomization) {
-      return
+      return null
     }
     let jobMasterIdCustomizationMap = {}
     jobListCustomization.forEach(jobListCustomizationObject => {
-      const jobMasterId = jobListCustomizationObject.jobMasterId
-      const appListMasterId = jobListCustomizationObject.appJobListMasterId
-      if (!jobMasterIdCustomizationMap[jobMasterId]) {
-        const jobListMasterIdMap = {}
-        jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
-        jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
-      } else {
-        const jobListMasterIdMap = {}
-        jobListMasterIdMap = jobMasterIdCustomizationMap[jobMasterId]
-        jobListMasterIdMap[appListMasterId] = jobListCustomizationObject
-        jobMasterIdCustomizationMap[jobMasterId] = jobListMasterIdMap
+      if(!jobMasterIdCustomizationMap[jobListCustomizationObject.jobMasterId]) {
+        jobMasterIdCustomizationMap[jobListCustomizationObject.jobMasterId] = {}
       }
+      jobMasterIdCustomizationMap[jobListCustomizationObject.jobMasterId][jobListCustomizationObject.appJobListMasterId] = jobListCustomizationObject
     })
-    keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP, jobMasterIdCustomizationMap)
+    return jobMasterIdCustomizationMap
   }
 
   /**
    * 
    * @param {*} jobStatus 
-   * prepares HashMap<TabId,ArrayList<StatusIds>
+   * Map<TabId,[StatusIds]>
    */
   prepareTabStatusIdMap(jobStatus) {
     if (!jobStatus) {
-      return
+      return {}
     }
     let tabIdStatusIdsMap = {}
     jobStatus.forEach(jobStatusObject => {
@@ -223,18 +212,24 @@ class JobMaster {
       }
       tabIdStatusIdsMap[jobStatusObject.tabId].push(jobStatusObject.id)
     })
-    keyValueDBService.validateAndSaveData(TABIDMAP, tabIdStatusIdsMap)
+    return tabIdStatusIdsMap
   }
 
-  async validateAndSortTabList(schemaName,tabs) {
-    if(!tabs) {
-      return
+  /**
+   * 
+   * @param {*} tabs 
+   * validates ,sort and save tabs list 
+   * sort on basis of isDefault
+   */
+  validateAndSortTabList(tabs) {
+    if (!tabs) {
+      return null
     }
-    tabs.sort(function(x,y){
-      return (x.isDefault === y.isDefault)? 0 : x.isDefault? -1 : 1;
-    })
-    await keyValueDBService.validateAndSaveData(TAB, tabs)
+    tabs = tabs.filter(tab => tab.name.toLocaleLowerCase() !== 'hidden')
+      .sort((x, y) => x.isDefault === y.isDefault ? 0 : x.isDefault ? -1 : 1);
+    return tabs
   }
+
 
   /**Matches device time with server time (format 2017-07-05 16:30:02),
    * throw error if server time format is invalid 

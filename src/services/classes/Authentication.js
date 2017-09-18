@@ -12,8 +12,6 @@ const {
 
 } = require('../../lib/constants').default
 
-import * as realm from '../../repositories/realmdb'
-
 class Authentication {
 
     /**

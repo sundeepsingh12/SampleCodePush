@@ -1,4 +1,14 @@
 export default {
+
+  bgPrimary: {
+    backgroundColor: '#338FFC'
+  },
+  textPrimary: {
+    color: '#338FFC'
+  },
+  mainBg: {
+    backgroundColor : '#F7F8FA'
+  },
   
   roundedInput: {
     backgroundColor : '#F7F8FA',
