@@ -17,7 +17,6 @@ const {
 
 export default function homeReducer(state = initialState, action) {
   if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
-  let tempTabIdJobTransactions
 
   switch (action.type) {
     case JOB_FETCHING_START:

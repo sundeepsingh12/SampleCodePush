@@ -74,8 +74,39 @@ class FieldData {
             fieldDataQuery += ' AND (' + fieldAttributeMapQuery + ')'
         }
         let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery)
-        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false, 0,true)
+        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false, 0, true)
         return fieldDataObject
+    }
+
+    /**
+     * This function prepares field data of a transaction for saving in form layout state.It sets position id, parent id , transaction id 
+     * @param {*} fieldDataListDTO 
+     * @param {*} parentId 
+     * @param {*} latestPositionId 
+     */
+    prepareFieldDataForTransactionSavingInState(fieldDataListDTO, jobTransactionId, parentId, latestPositionId) {
+        let fieldDataList = []
+        for (let index in fieldDataListDTO) {
+            let fieldData = {}
+            fieldData.attributeTypeId = fieldDataListDTO[index].attributeTypeId
+            fieldData.fieldAttributeMasterId = fieldDataListDTO[index].fieldAttributeMasterId
+            fieldData.jobTransactionId = jobTransactionId
+            fieldData.parentId = parentId
+            fieldData.positionId = latestPositionId
+            fieldData.value = fieldDataListDTO[index].value
+            latestPositionId++
+            if (fieldDataListDTO[index].childDataList) {
+                let fieldDataDTO = this.prepareFieldDataForTransactionSavingInState(fieldDataListDTO[index].childDataList, jobTransactionId, fieldData.positionId, latestPositionId)
+                fieldData.childDataList = fieldDataDTO.fieldDataList
+                latestPositionId = fieldDataDTO.latestPositionId
+            }
+            fieldDataList.push(fieldData)
+        }
+
+        return {
+            fieldDataList,
+            latestPositionId
+        }
     }
 }
 

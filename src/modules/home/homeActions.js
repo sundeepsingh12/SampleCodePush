@@ -96,9 +96,9 @@ export function clearHomeState() {
   }
 }
 
-export function navigateToScene(sceneName,id) {
+export function navigateToScene(sceneName,paramaters) {
   return async function (dispatch) {
-    dispatch(NavigationActions.navigate({ routeName: sceneName,params: { jobTransactionId: id }}))
+    dispatch(NavigationActions.navigate({ routeName: sceneName,params: paramaters}))
   }
 }
 

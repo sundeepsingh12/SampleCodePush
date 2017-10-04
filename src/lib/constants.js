@@ -85,6 +85,16 @@ export default keyMirror({
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
 
+    //Payment Actions
+    SET_PAYMENT_CHANGED_PARAMETERS: null,
+    SET_PAYMENT_INITIAL_PARAMETERS: null,
+
+    //UPIPaymentActions
+    SET_UPI_PAYMENT_CUSTOMER_CONTACT: null,
+    SET_UPI_PAYMENT_CUSTOMER_NAME: null,
+    SET_UPI_PAYMENT_PARAMETERS: null,
+    SET_UPI_PAYMENT_PAYER_VPA: null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,

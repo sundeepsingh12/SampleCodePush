@@ -18,6 +18,8 @@ import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
+import Payment from '../../containers/Payment'
+import UPIPayment from '../../containers/UPIPayment'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
 import theme from '../../themes/feTheme'
@@ -55,7 +57,6 @@ export const AppNavigator = StackNavigator({
     navigationOptions: {
       title: 'Home',
       headerLeft: null,
-      headerBackTitle: null
     }
   },
   Message: {
@@ -64,11 +65,17 @@ export const AppNavigator = StackNavigator({
   Utilties: {
     screen: Utilties,
   },
+  Payment: {
+    screen: Payment
+  },
   Logout: {
     screen: Logout,
   },
   JobDetails: {
     screen: JobDetails,
+  },
+  UPIPayment: {
+    screen: UPIPayment
   }
 },
   {

@@ -83,7 +83,7 @@ class Jobs extends Component {
             <Ionicons name='ios-call-outline' style={{ fontSize: 34, color: '#ffffff', marginLeft: 25 }} />
           </Button>,
         ]}>
-        <ListItem style={StyleSheet.flatten([styles.bgGray, { margin: 0, padding: 0 }])} avatar button onPress={() => { this.props.actions.navigateToScene('JobDetails', item.id) }}>
+        <ListItem style={StyleSheet.flatten([styles.bgGray, { margin: 0, padding: 0 }])} avatar button onPress={() => { this.props.actions.navigateToScene('JobDetails', { jobTransactionId: item.id }) }}>
           <Left>
             <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this.toggleStatus()}>
               <View>

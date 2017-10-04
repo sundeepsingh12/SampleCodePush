@@ -14,6 +14,8 @@ import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
+import payment from './payment/paymentReducer'
+import upiPayment from './cardTypePaymentModules/upiPayment/upiPaymentReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -25,14 +27,16 @@ import { combineReducers } from 'redux'
  * EVERY TIME there is a basic action
  */
 const rootReducer = combineReducers({
-  nav,
   auth,
   device,
   global,
-  preloader,
   home,
-  listing,
   jobDetails,
+  listing,
+  nav,
+  payment,
+  preloader,
+  upiPayment,
 })
 
 export default rootReducer

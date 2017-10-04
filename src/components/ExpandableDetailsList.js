@@ -16,6 +16,10 @@ import renderIf from '../lib/renderIf'
 import ExpandableDetailsView from './ExpandableDetailsView'
 import NonExpandableDetailsView from './NonExpandableDetailsView'
 
+import {
+    ARRAYSAROJFAREYE,
+} from '../lib/AttributeConstants'
+
 class ExpandableDetailsList extends Component {
 
     renderChildList(dataList) {
@@ -27,7 +31,7 @@ class ExpandableDetailsList extends Component {
     }
 
     renderData = (item) => {
-        if (item.data.value == 'ArraySarojFareye' && item.childDataList) {
+        if (item.data.value == ARRAYSAROJFAREYE && item.childDataList) {
             return (
                 <ExpandableDetailsView
                     key={item.id}
