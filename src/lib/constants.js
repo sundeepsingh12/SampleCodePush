@@ -128,6 +128,7 @@ export default keyMirror({
     TABIDMAP:null,
     SET_TABS_TRANSACTIONS:null,
     JOB_ATTRIBUTE_STATUS:null,
+    HUB:null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION:null,
@@ -141,7 +142,16 @@ export default keyMirror({
 
     //Status Codes
     UNSEEN:null,
-    PENDING:null
+    PENDING:null,
+
+    //Form Layout
+    GET_SORTED_ROOT_FIELD_ATTRIBUTES : null,
+    DISABLE_SAVE : null,
+    UPDATE_FIELD_DATA : null,
+    STATUS_NAME : null,
+    BASIC_INFO : null,
+    ON_BLUR : null,
+    TOOGLE_HELP_TEXT : null
 })
 
 

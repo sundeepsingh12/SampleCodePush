@@ -17,6 +17,7 @@ import preloader from './pre-loader/preloaderReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
+import formLayout from './form-layout/formLayoutReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -35,6 +36,7 @@ const rootReducer = combineReducers({
   home,
   listing,
   jobDetails,
+  formLayout,
 })
 
 export default rootReducer

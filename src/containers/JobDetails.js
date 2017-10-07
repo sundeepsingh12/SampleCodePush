@@ -250,7 +250,7 @@ class JobDetails extends Component {
                 </View>
                 <View style={StyleSheet.flatten([styles.column, styles.bgWhite, styles.padding5, { borderTopWidth: 1, borderTopColor: '#d3d3d3' }])}>
                     <View style={StyleSheet.flatten([styles.row, styles.flexWrap, styles.justifyCenter, styles.alignCenter])}>
-                        <Button small primary style={{ margin: 2 }}>
+                        <Button small primary style={{ margin: 2 }} onPress={()=>Actions.FormLayout({statusId : 15,status:'success','jobTransactionId':15})} >
                             <Text style={{ color: 'white' }}>Success</Text>
                         </Button>
                         <Button small primary style={{ margin: 2 }}>

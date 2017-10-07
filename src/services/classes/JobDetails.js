@@ -101,8 +101,7 @@ class JobDetails {
         return {
             dataMap,
             dataList,
-            contactList,
-            dataList
+            contactList
         }
     }
 }

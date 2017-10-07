@@ -1,144 +1,105 @@
 'use strict'
 import React, {Component} from 'react'
-import
+import 
 {
   StyleSheet,
   View,
   Text,
-  Platform
+  Platform,
+  FlatList
 }
 from 'react-native'
 import { Container, Content,Footer, Thumbnail, FooterTab,Input, Card, CardItem, Button, Body, Header, Left, Right, Icon} from 'native-base';
 import styles from '../themes/FeStyle'
 import theme from '../themes/feTheme'
 import imageFile from '../../images/fareye-logo.png'
+import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import BasicFormElement from '../components/FormLayoutBasicComponent.js'
+import renderIf from '../lib/renderIf.js'
+import { Actions } from 'react-native-router-flux'
 
+
+function mapStateToProps(state){
+  return{
+    formElement : state.formLayout.formElement,
+    nextEditable : state.formLayout.nextEditable,
+    isSaveDisabled : state.formLayout.isSaveDisabled,
+    statusName : state.formLayout.statusName,
+  }
+}
+
+function mapDispatchToProps(dispatch){
+  return {
+    actions : bindActionCreators({ ...formLayoutActions}, dispatch)
+  }
+}
 class FormLayout extends Component {
 
+  componentWillMount() {
+    console.log('inside component will mount with statusId', this.props.statusId);
+    this.props.actions.getSortedRootFieldAttributes(this.props.statusId,this.props.status,this.props.jobTransactionId);  
+}
+
+renderData = (item) => {
+  console.log('formlayout container item',item);
+  console.log('form layout container state', this.props.nextEditable);
+  console.log('isSaveDisabled',this.props.isSaveDisabled);
+  return (
+    <BasicFormElement item={item} nextEditable = {this.props.nextEditable} formElement = {this.props.formElement} isSaveDisabled = {this.props.isSaveDisabled}/>
+  )
+}
+
+saveJobTransaction(){
+  this.props.actions.saveJobTransaction(this.props.formElement,this.props.jobTransactionId,this.props.statusId);
+}
+
+_keyExtractor = (item,index) => item[1].key;
+
   render () {
+    console.log('render of form', this.props);
     return (
       <Container style={StyleSheet.flatten([theme.mainBg])}>
         <Header style={StyleSheet.flatten([theme.bgPrimary])}>
           <Left>
-            <Button transparent>
+            <Button transparent onPress={() => { Actions.pop() }}>
               <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])}/>
-            </Button>
+            </Button> 
           </Left>
           <Body>
-            <Text style={StyleSheet.flatten([styles.fontWhite])}>Status Name</Text>
+            <Text style={StyleSheet.flatten([styles.fontWhite])}>{this.props.statusName}</Text>
           </Body>
           <Right>
             
           </Right>
         </Header>
         <Content style={StyleSheet.flatten([styles.padding5])}>
-          <Card>
-            <CardItem>
-              <Body style={StyleSheet.flatten([styles.padding0])}>
-                <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                  <View style={StyleSheet.flatten([{flexBasis: '12%', paddingTop: 2}])}>
-                    <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, {marginTop: -5}])}/>
-                  </View>
-                  <View style={StyleSheet.flatten([styles.marginRightAuto, {flexBasis: '88%'}])}>
-                    <View  style={StyleSheet.flatten([styles.row])}>
-                        <View style={StyleSheet.flatten([{flexBasis: '80%'}])}>
-                            <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
-                                Label
-                            </Text>
-                            <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, {color: '#999999'}])}>
-                                Sub Label
-                            </Text>
-                        </View>
-
-                        <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, {flexBasis: '20%'}])}>
-                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, {marginTop: -5}])}/>
-                            <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])}/>
-                        </View>
-                    </View>
-                    <View>
-                        <Input placeholder='Regular Textbox' style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, {borderWidth: 1, height: 30, borderColor: '#BDBDBD', borderRadius: 4}])} />
-                    </View>
-                  </View>
-                </View>
-              </Body>
-            </CardItem>
-         </Card>
-         <Card>
-            <CardItem>
-              <Body style={StyleSheet.flatten([styles.padding0])}>
-                <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                  <View style={StyleSheet.flatten([{flexBasis: '12%', paddingTop: 2}])}>
-                    <Icon name='ios-camera-outline' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, {marginTop: -5}])}/>
-                  </View>
-                  <View style={StyleSheet.flatten([styles.marginRightAuto, {flexBasis: '88%'}])}>
-                    <View  style={StyleSheet.flatten([styles.row])}>
-                        <View style={StyleSheet.flatten([{flexBasis: '80%'}])}>
-                            <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
-                                Image
-                            </Text>
-                            <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, {color: '#999999'}])}>
-                                Take Picture
-                            </Text>
-                        </View>
-
-                        <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, {flexBasis: '20%'}])}>
-                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, {marginTop: -5}])}/>
-                            <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])}/>
-                        </View>
-                    </View>
-                    <View>
-                        <View style={StyleSheet.flatten([styles.marginTop10, styles.row, styles.justifyStart, styles.alignCenter])}>
-                            <Icon name='ios-image-outline' style={StyleSheet.flatten([styles.fontXl, styles.fontDarkGray, styles.marginRight5])}/>
-                            <Text style={StyleSheet.flatten([styles.fontSm, styles.fontDarkGray])}>No Picture</Text>
-                        </View>
-                    </View>
-                  </View>
-                </View> 
-              </Body>
-            </CardItem>
-         </Card>
-         
-         <Card style={StyleSheet.flatten([{backgroundColor: '#EFFEEC'}])}>
-            <CardItem style={StyleSheet.flatten([{backgroundColor: '#EFFEEC', borderWidth: .5, borderColor: '#00B22A'}])}>
-              <Body style={StyleSheet.flatten([styles.padding0])}>
-                <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                  <View style={StyleSheet.flatten([{flexBasis: '12%', paddingTop: 2}])}>
-                    <Icon name='ios-create-outline' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, {marginTop: -5}])}/>
-                  </View>
-                  <View style={StyleSheet.flatten([styles.marginRightAuto, {flexBasis: '88%'}])}>
-                    <View  style={StyleSheet.flatten([styles.row])}>
-                        <View style={StyleSheet.flatten([{flexBasis: '80%'}])}>
-                            <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
-                                Customer Signature
-                            </Text>
-                            <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, {color: '#999999'}])}>
-                                Sign
-                            </Text>
-                        </View>
-
-                        <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, {flexBasis: '20%'}])}>
-                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, {marginTop: -5}])}/>
-                            <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])}/>
-                        </View>
-                    </View>
-                    <View>
-                        <View style={StyleSheet.flatten([styles.marginTop10, styles.row, styles.justifyStart, styles.alignCenter])}>
-                            <Thumbnail style={StyleSheet.flatten([styles.bgDanger])} square source={{uri: 'http://www.apdconsumo.pt/person.png'}} />
-                        </View>
-                    </View>
-                  </View>
-                </View>
-              </Body>
-            </CardItem>
-         </Card>
+          <FlatList
+                data = {Array.from(this.props.formElement)}
+                extraData={this.state}
+                renderItem={(item) => this.renderData(item.item[1])} //TODO add comments for item[1] 
+                keyExtractor={this._keyExtractor}>
+          </FlatList>
         </Content>
        
-        <Button full success>
-            <Text style={{color: 'white'}}>Success</Text>
+        <Button full success 
+          disabled={this.props.isSaveDisabled} onPress = {() => this.saveJobTransaction()}>
+          <Text style={{color: 'white'}}>{this.props.statusName}</Text>
         </Button>
+        
       </Container>
     )
   }
 };
 
-export default FormLayout
+export default connect(mapStateToProps, mapDispatchToProps)(FormLayout)
+
+//TODO
+//3) Spinner
+//5) Test with non required
+  //7) Parent, positionId and latest positionID
+//8) Add comments for every methods
+//9) Remove todos and logs
+//10) End to end testing
+//11) Commit ans push changes
