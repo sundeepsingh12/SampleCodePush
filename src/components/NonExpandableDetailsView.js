@@ -13,28 +13,23 @@ import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, He
 import styles from '../themes/FeStyle'
 import theme from '../themes/feTheme'
 
-class ExpandableDetails extends Component {
+export default class NonExpandableDetailsView extends Component {
     render() {
         return (
-            <View>
-                <TouchableOpacity style={StyleSheet.flatten([styles.row, styles.padding10, { borderTopWidth: .5, borderColor: '#C5C5C5' }])} onPress={() => { console.log('details') }}>
+            <View style={StyleSheet.flatten([styles.column, { backgroundColor: '#F2F2F2' }])}>
+                <View style={StyleSheet.flatten([styles.row, styles.padding10, { borderTopWidth: .5, borderColor: '#C5C5C5' }])}>
                     <View style={StyleSheet.flatten([styles.row, styles.justifyStart, styles.alignCenter, { flex: .5 }])}>
                         <Text style={StyleSheet.flatten([styles.bold, styles.fontSm])} >
-                            Parent List
+                            {this.props.label}
                         </Text>
                     </View>
                     <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, styles.alignCenter, { flex: .5 }])}>
                         <Text style={StyleSheet.flatten([styles.fontSm])}>
-                            String Content
-                        </Text>
-                        <Text>
-                            <Icon name='md-arrow-dropdown' style={StyleSheet.flatten([styles.alignSelfEnd, styles.fontBlack, styles.fontXl])} />
+                            {this.props.value}
                         </Text>
                     </View>
-                </TouchableOpacity>
+                </View>
             </View>
         )
     }
 }
-
-export default ExpandableDetails

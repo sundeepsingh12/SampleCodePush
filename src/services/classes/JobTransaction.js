@@ -9,8 +9,11 @@ const {
     TABLE_FIELD_DATA,
     TABLE_JOB_DATA,
     TAB,
-    JOB_ATTRIBUTE
+    JOB_ATTRIBUTE,
+    TABLE_RUNSHEET,
 } = require('../../lib/constants').default
+
+import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE } from '../../lib/AttributeConstants'
 import _ from 'underscore'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
@@ -91,8 +94,11 @@ class JobTransaction {
      * 
      * @param {*} jobTransactionList 
      * @returns
-     * Map<JobTransactionId,JobTransaction>
+     * JobTransactionMap : {
+     *                        JobTransactionId :   JobTransaction
+     *                     }
      * JobQuery
+     * JobTransactionQuery
      * JobDataQuery
      * FieldDataQuery
      */
@@ -103,33 +109,35 @@ class JobTransaction {
             fieldDataQuery = '',
             jobTransactionMap = {}
         for (let index in jobTransactionList) {
-            let transaction = jobTransactionList[index]
-            const jobTransactionId = transaction.id
-            const jobId = transaction.jobId
-            const referenceNumber = transaction.referenceNumber
-            const runsheetNo = transaction.runsheetNo
-            const trackKm = transaction.trackKm
-            const trackHalt = transaction.trackHalt
-            const trackCallCount = transaction.trackCallCount
-            const trackCallDuration = transaction.trackCallDuration
-            const trackSmsCount = transaction.trackSmsCount
-            const trackTransactionTimeSpent = transaction.trackTransactionTimeSpent
-            const jobMasterId = transaction.jobMasterId
-            const seqSelected = transaction.seqSelected
-            const jobStatusId = transaction.jobStatusId
+            const transaction = jobTransactionList[index]
+            const {
+                id,
+                jobId,
+                jobMasterId,
+                jobStatusId,
+                referenceNumber,
+                runsheetNo,
+                seqSelected,
+                trackCallCount,
+                trackCallDuration,
+                trackHalt,
+                trackKm,
+                trackSmsCount,
+                trackTransactionTimeSpent
+            } = transaction
             if (index == 0) {
                 jobQuery += 'id = ' + jobId
-                jobTransactionQuery += 'id = ' + jobTransactionId
+                jobTransactionQuery += 'id = ' + id
                 jobDataQuery += 'jobId = ' + jobId
-                fieldDataQuery += 'jobTransactionId = ' + jobTransactionId
+                fieldDataQuery += 'jobTransactionId = ' + id
             } else {
                 jobQuery += ' OR id = ' + jobId
-                jobTransactionQuery += ' OR id = ' + jobTransactionId
+                jobTransactionQuery += ' OR id = ' + id
                 jobDataQuery += ' OR jobId = ' + jobId
-                fieldDataQuery += ' OR jobTransactionId = ' + jobTransactionId
+                fieldDataQuery += ' OR jobTransactionId = ' + id
             }
-            jobTransactionMap[jobTransactionId] = {
-                id: jobTransactionId,
+            jobTransactionMap[id] = {
+                id,
                 jobId,
                 jobMasterId,
                 jobStatusId,
@@ -164,15 +172,46 @@ class JobTransaction {
         return jobMasterIds
     }
 
+    /**
+     * This function fetch records from db and  call services that prepares different maps required to prepare JobTransactionCustomizationList
+     * @param {*} jobMasterIdCustomizationMap 
+     * @param {*} jobAttributeMasterList 
+     * @param {*} jobAttributeStatusList 
+     * @param {*} customerCareList 
+     * @param {*} smsTemplateList 
+     * @param {*} statusList 
+     * @returns 
+     * JobTransactionCustomizationList : [
+     *                                      {
+     *                                          circleLine1
+     *                                          circleLine2
+     *                                          id
+     *                                          jobMasterId
+     *                                          jobSwipableDetails : {
+     *                                                                  addressData : []
+     *                                                                  contactData : []
+     *                                                                  customerCareData : []
+     *                                                                  smsTemplateData : []
+     *                                                               }
+     *                                          jobStatusId
+     *                                          line1
+     *                                          line2
+     *                                          seqSelected
+     *                                      }
+     *                                  ]
+     */
     getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList, statusList) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
-        if (_.isEmpty(jobAttributeStatusMap)) {
-            jobAttributeStatusMap = jobAttributeMasterService.getAllJobAttributeStatusMap(statusList, jobAttributeMasterMap)
-        }
+        const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)
+        const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         let customerCareMap = customerCareService.getCustomerCareMap(customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(smsTemplateList)
-        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION)
+        let runsheetQuery = 'isClosed = false'
+        const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+        let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
+        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
+        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION,  )
         if (jobTransactionList.length == 0) {
             return []
         }
@@ -184,7 +223,7 @@ class JobTransaction {
         let jobMap = jobService.getJobMap(jobsList)
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
         let fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
-        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap)
+        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap)
         return jobTransactionCustomizationList
     }
 
@@ -196,7 +235,38 @@ class JobTransaction {
         }
     }
 
-    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap) {
+    /**
+     * This function prepares jobTransactionCustomizationList for list of job transactions
+     * @param {*} jobTransactionMap 
+     * @param {*} jobMap 
+     * @param {*} jobDataDetailsForListing 
+     * @param {*} fieldDataMap 
+     * @param {*} jobMasterIdCustomizationMap 
+     * @param {*} jobAttributeMasterMap 
+     * @param {*} jobAttributeStatusMap 
+     * @param {*} customerCareMap 
+     * @param {*} smsTemplateMap 
+     * @returns
+     * JobTransactionCustomizationList : [
+     *                                      {
+     *                                          circleLine1
+     *                                          circleLine2
+     *                                          id
+     *                                          jobMasterId
+     *                                          jobSwipableDetails : {
+     *                                                                  addressData : []
+     *                                                                  contactData : []
+     *                                                                  customerCareData : []
+     *                                                                  smsTemplateData : []
+     *                                                               }
+     *                                          jobStatusId
+     *                                          line1
+     *                                          line2
+     *                                          seqSelected
+     *                                      }
+     *                                   ]
+     */
+    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap) {
         let jobTransactionCustomizationList = []
         for (var index in jobTransactionMap) {
             let jobTransaction = jobTransactionMap[index]
@@ -204,30 +274,20 @@ class JobTransaction {
             let job = jobMap[jobId]
             const jobMasterId = jobTransaction.jobMasterId
             let jobTransactionCustomization = {}
-
-            if (!jobDataDetailsForListing.jobDataMap[jobId]) {
-                jobDataDetailsForListing.jobDataMap[jobId] = {}
-            }
-            if (!fieldDataMap[jobTransaction.id]) {
-                fieldDataMap[jobTransaction.id] = {}
-            }
-
+            jobDataDetailsForListing.jobDataMap[jobId] = jobDataDetailsForListing.jobDataMap[jobId] ? jobDataDetailsForListing.jobDataMap[jobId] : {}
+            fieldDataMap[jobTransaction.id] = fieldDataMap[jobTransaction.id] ? fieldDataMap[jobTransaction.id] : {}
             if (jobMasterIdCustomizationMap[jobMasterId]) {
                 jobTransactionCustomization.line1 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][1], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
                 jobTransactionCustomization.line2 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][2], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
                 jobTransactionCustomization.circleLine1 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][3], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
                 jobTransactionCustomization.circleLine2 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][4], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
-                jobTransactionCustomization.id = jobTransaction.id
-                jobTransactionCustomization.jobMasterId = jobMasterId
             } else {
                 jobTransactionCustomization.line1 = jobTransaction.referenceNumber
-                jobTransactionCustomization.line2 = ''
-                jobTransactionCustomization.circleLine1 = ''
-                jobTransactionCustomization.circleLine2 = ''
-                jobTransactionCustomization.id = jobTransaction.id
-                jobTransactionCustomization.jobMasterId = jobMasterId
+                jobTransactionCustomization.line2 = jobTransactionCustomization.circleLine1 = jobTransactionCustomization.circleLine2 = ''
             }
-            let jobSwipableDetails = this.setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap)
+            let jobSwipableDetails = this.setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap)
+            jobTransactionCustomization.id = jobTransaction.id
+            jobTransactionCustomization.jobMasterId = jobMasterId
             jobTransactionCustomization.jobSwipableDetails = jobSwipableDetails
             jobTransactionCustomization.seqSelected = jobTransaction.seqSelected
             jobTransactionCustomization.statusId = jobTransaction.jobStatusId
@@ -236,6 +296,15 @@ class JobTransaction {
         return jobTransactionCustomizationList
     }
 
+    /** This function prepares string for line1, line2, circleLine1, circleLine2
+     * @param {*} customizationObject 
+     * @param {*} jobTransaction 
+     * @param {*} job 
+     * @param {*} jobDataForJobId 
+     * @param {*} fieldDataForJobTransactionId
+     * @returns
+     * finalText : String
+     */
     setTransactionDisplayDetails(customizationObject, jobTransaction, job, jobDataForJobId, fieldDataForJobTransactionId) {
         if (!customizationObject) {
             return ''
@@ -247,53 +316,58 @@ class JobTransaction {
         return finalText
     }
 
+    /**
+     * This function prepares string on basis of job attributes
+     * @param {*} customizationObject 
+     * @param {*} jobDataForJobId 
+     * @param {*} finalText
+     * @returns 
+     * finalText : String made by job attributes list in customization object
+     */
     setTransactionCustomizationJobAttributes(customizationObject, jobDataForJobId, finalText) {
         let jobAttributeMasterList = customizationObject.jobAttr
-        if (!customizationObject.separator) {
-            customizationObject.separator = ''
-        }
-        if (!jobAttributeMasterList) {
-            jobAttributeMasterList = []
-        }
+        customizationObject.separator = customizationObject.separator ? customizationObject.separator : ''
+        jobAttributeMasterList = jobAttributeMasterList ? jobAttributeMasterList : []
         jobAttributeMasterList.forEach(object => {
             jobData = jobDataForJobId[object.jobAttributeMasterId]
-            if (!jobData || _.isUndefined(jobData.value) || _.isNull(jobData.value)) {
+            if (!jobData || jobData.value == undefined || jobData.value == null) {
                 return
             }
-
-            if (finalText == '') {
-                finalText += jobData.value
-            } else {
-                finalText += customizationObject.separator + jobData.value
-            }
+            finalText += finalText == '' ? jobData.value : customizationObject.separator + jobData.value
         })
         return finalText
     }
 
+    /**
+     * This function prepares string on basis of field attributes
+     * @param {*} customizationObject 
+     * @param {*} fieldDataForJobTransactionId 
+     * @param {*} finalText 
+     * @returns
+     * finalText : String made by field attributes list in customization object
+     */
     setTransactionCustomizationFieldAttributes(customizationObject, fieldDataForJobTransactionId, finalText) {
         let fieldAttributeMasterList = customizationObject.fieldAttr
-        if (!customizationObject.separator) {
-            customizationObject.separator = ''
-        }
-        if (!fieldAttributeMasterList) {
-            fieldAttributeMasterList = []
-        }
+        customizationObject.separator = customizationObject.separator ? customizationObject.separator : ''
+        fieldAttributeMasterList = fieldAttributeMasterList ? fieldAttributeMasterList : []
         fieldAttributeMasterList.forEach(object => {
             fieldData = fieldDataForJobTransactionId[object.fieldAttributeMasterId]
-            if (!fieldData || _.isUndefined(fieldData.value) || _.isNull(fieldData.value)) {
+            if (!fieldData || fieldData.value == undefined || fieldData.value == null) {
                 return
             }
-
-            if (finalText == '') {
-                finalText += fieldData.value
-            } else {
-                finalText += customizationObject.separator + fieldData.value
-            }
+            finalText += finalText == '' ? fieldData.value : customizationObject.separator + fieldData.value
         })
-
         return finalText
     }
 
+    /** This function prepares string on basis of fixed attributes
+     * @param {*} customizationObject 
+     * @param {*} jobTransaction 
+     * @param {*} job 
+     * @param {*} finalText 
+     * @returns 
+     * finalText : String made by fixed attributes in customization object
+     */
     setTransactionCustomizationDynamicParameters(customizationObject, jobTransaction, job, finalText) {
         finalText += this.appendText(customizationObject.referenceNo, jobTransaction.referenceNumber, '', customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.runsheetNo, jobTransaction.runsheetNo, '', customizationObject.separator, finalText)
@@ -310,10 +384,20 @@ class JobTransaction {
         return finalText
     }
 
+    /**
+     * This function prepares a string to be appended to a text based on conditions
+     * @param {*} condition 
+     * @param {*} property 
+     * @param {*} extraString 
+     * @param {*} seperator 
+     * @param {*} finalText 
+     * @returns
+     * text : String to be appended
+     */
     appendText(condition, property, extraString, seperator, finalText) {
         let text = ''
-        if (condition && !_.isUndefined(property) && !_.isNull(property)) {
-            if (seperator && !_.isUndefined(finalText) && !_.isNull(finalText) && finalText !== '') {
+        if (condition && property !== undefined && property !== null) {
+            if (seperator && finalText !== undefined && finalText !== null && finalText !== '') {
                 text = seperator + extraString + property
             } else {
                 text = extraString + property
@@ -322,8 +406,25 @@ class JobTransaction {
         return text
     }
 
-    setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap) {
-        let jobAttributeMap = jobAttributeStatusMap[jobTransaction.jobStatusId]
+    /**
+     * This function prepares swipable details of job transaction
+     * @param {*} jobDataDetailsForListing 
+     * @param {*} jobAttributeMasterMap 
+     * @param {*} jobMasterIdJobAttributeStatusMap 
+     * @param {*} jobTransaction 
+     * @param {*} job 
+     * @param {*} customerCareMap 
+     * @param {*} smsTemplateMap 
+     * @returns 
+     * jobSwipableDetails : {
+     *                          addressData : []
+     *                          contactData : []
+     *                          customerCareData : []
+     *                          smsTemplateData : []
+     *                      }
+     */
+    setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap) {
+        let jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobTransaction.jobMasterId] ? jobMasterIdJobAttributeStatusMap[jobTransaction.jobMasterId][jobTransaction.jobStatusId] : jobAttributeMasterMap
         let contactData = this.setContactDetails(jobDataDetailsForListing, jobAttributeMap, job)
         let addressData = this.setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job)
         let customerCareData = this.setCustomerCareDetails(customerCareMap, job)
@@ -336,110 +437,159 @@ class JobTransaction {
         }
     }
 
+    /**
+     * This function prepares contact details list for job transaction
+     * @param {*} jobDataDetailsForListing 
+     * @param {*} jobAttributeMap 
+     * @param {*} job 
+     * @returns
+     * ContactDataForJob : [String(number)]
+     */
     setContactDetails(jobDataDetailsForListing, jobAttributeMap, job) {
-        let tempContactDataForJob = [],
-            contactDataForJob = []
-        if (!jobAttributeMap) {
-            jobAttributeMap = {}
-        }
-        if (jobDataDetailsForListing.contactMap[job.id]) {
-            tempContactDataForJob = jobDataDetailsForListing.contactMap[job.id]
-        }
-
+        let contactDataForJob = []
+        jobAttributeMap = jobAttributeMap ? jobAttributeMap : {}
+        let tempContactDataForJob = jobDataDetailsForListing.contactMap[job.id] ? jobDataDetailsForListing.contactMap[job.id] : []
         tempContactDataForJob.forEach(contact => {
             if (jobAttributeMap[contact.jobAttributeMasterId]) {
                 contactDataForJob.push(contact.value)
             }
         })
-
         return contactDataForJob
     }
 
+    /**
+     * This function prepares address details list for job transaction
+     * @param {*} jobDataDetailsForListing 
+     * @param {*} jobAttributeMasterMap 
+     * @param {*} jobAttributeMap 
+     * @param {*} job 
+     * @returns
+     * CombinedAddressList : [String(complete address ie combination of address line 1 , address line 2, landmark, pincode))]
+     */
     setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job) {
-        let tempAddressDataForJob = [],
-            addressDataForJob = {},
+        let addressDataForJob = {},
             combinedAddressList = []
-
-        if (!jobAttributeMap) {
-            jobAttributeMap = {}
-        }
-
-        if (jobDataDetailsForListing.addressMap[job.id]) {
-            tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id]
-        }
-
-        if (!_.isUndefined(job.latitude) && !_.isUndefined(job.longitude) && !_.isNull(job.latitude) && !_.isNull(job.longitude) && (job.latitude != 0.0 || job.longitude != 0.0)) {
+        jobAttributeMap = jobAttributeMap ? jobAttributeMap : {}
+        let tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id] ? jobDataDetailsForListing.addressMap[job.id] : []
+        if (job.latitude !== undefined && job.longitude !== undefined && job.latitude !== null && job.longitude !== null && (job.latitude != 0.0 || job.longitude != 0.0)) {
             combinedAddressList.push(job.latitude + ',' + job.longitude)
         }
-
         tempAddressDataForJob.forEach(address => {
             if (!jobAttributeMap[address.jobAttributeMasterId]) {
                 return
             }
-            if (!addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence]) {
-                addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] = {}
-            }
+            addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] = addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] ? addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] : {}
             addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence][jobAttributeMasterMap[address.jobAttributeMasterId].attributeTypeId] = address.value
         })
-
         for (let index in addressDataForJob) {
             let combinedAddress = ''
-            combinedAddress += this.appendText(addressDataForJob[index][28], addressDataForJob[index][28], '', null, null)
-            combinedAddress += this.appendText(addressDataForJob[index][29], addressDataForJob[index][29], '', ',', combinedAddress)
-            combinedAddress += this.appendText(addressDataForJob[index][30], addressDataForJob[index][30], '', ',', combinedAddress)
-            combinedAddress += this.appendText(addressDataForJob[index][31], addressDataForJob[index][31], '', ',', combinedAddress)
+            combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_1], '', null, null)
+            combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_2], '', ',', combinedAddress)
+            combinedAddress += this.appendText(true, addressDataForJob[index][LANDMARK], '', ',', combinedAddress)
+            combinedAddress += this.appendText(true, addressDataForJob[index][PINCODE], '', ',', combinedAddress)
             combinedAddressList.push(combinedAddress)
         }
-
         return combinedAddressList
     }
 
+    /**
+     * This function prepares customer care list for job transaction
+     * @param {*} customerCareMap 
+     * @param {*} job 
+     * @returns
+     * CustomerCareListForJob : [CustomerCare]
+     */
     setCustomerCareDetails(customerCareMap, job) {
         let customerCareListForJob = customerCareMap[job.jobMasterId]
+        // To do
+        // customer care url case to be handled
         return customerCareListForJob
     }
 
+    /**
+     * This function prepares sms template list for job transaction
+     * @param {*} smsTemplateMap 
+     * @param {*} job 
+     * @param {*} contactData 
+     * @returns
+     * SmsTemplateListForJob : [SmsTemplate]
+     */
     setSMSDetails(smsTemplateMap, job, contactData) {
         if (_.isEmpty(contactData)) {
             return []
         }
-
         let smsTemplateListForJob = smsTemplateMap[job.jobMasterId]
+
+        // To do 
+        // prepare message body to send
         return smsTemplateListForJob
     }
 
-    prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, customerCareList, smsTemplateList,statusList) {
+    /**
+     * This function prepares transaction details for a particular transaction
+     * @param {*} jobTransactionId 
+     * @param {*} jobAttributeMasterList 
+     * @param {*} jobAttributeStatusList 
+     * @param {*} fieldAttributeMasterList 
+     * @param {*} fieldAttributeStatusList 
+     * @param {*} customerCareList 
+     * @param {*} smsTemplateList 
+     * @param {*} statusList
+     * @returns 
+     * {
+     *      currentStatus : {
+     *                          statusSchema
+     *                      }
+     *      jobDataObject
+     *      fieldDataObject
+     *      jobTransactionDisplay : {
+     *                                  id: jobTransactionId,
+     *                                  jobId,
+     *                                  jobMasterId,
+     *                                  jobStatusId,
+     *                                  referenceNumber,
+     *                              }
+     * } 
+     */
+    prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
-        const statusId = jobTransaction[0].jobStatusId
-        const jobId = jobTransaction[0].jobId
-        const jobMasterId = jobTransaction[0].jobMasterId
-        const jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobAttributeMasterList)
+        const { jobStatusId, jobId, jobMasterId, referenceNumber } = jobTransaction[0]
+        const jobMasterJobAttributeMasterMap = jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)
+        const jobAttributeMasterMap = jobMasterJobAttributeMasterMap[jobMasterId] ? jobMasterJobAttributeMasterMap[jobMasterId] : {}
         const jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
-        const jobMasterIdJobAttributeStatusMap = jobStatusService.getJobMasterIdStatusIdMap(statusList,jobAttributeStatusMap)
+        const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)
+        const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
+        const statusIdStatusMap = jobStatusObject.statusIdStatusMap
         const fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList)
-        let jobAttributeMap,fieldAttributeMap
-        fieldAttributeMap = fieldAttributeMasterMap[jobMasterId]
-        if (!jobMasterIdJobAttributeStatusMap[jobMasterId]) {
-            jobAttributeMap = jobAttributeMasterMap
-        } else {
-            jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobMasterId][statusId]
-        }
-
-        if(!jobAttributeMap) {
-            jobAttributeMap = {}
-        }
-
-        if(!fieldAttributeMap) {
-            fieldAttributeMap = {}
-        }
-
+        const fieldAttributeStatusMap = fieldAttributeMasterService.getFieldAttributeStatusMap(fieldAttributeStatusList)
+        let jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobMasterId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] : {} : jobAttributeMasterMap
+        let fieldAttributeMap = fieldAttributeMasterMap[jobMasterId] ? fieldAttributeMasterMap[jobMasterId] : {}
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
-        // let fieldDataObject = fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId,fieldAttributeMasterMap,fieldAttributeMap)
-        // return {
-        //     jobDataObject,
-        //     fieldDataObject
-        // }
+        let fieldDataObject = fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMap, fieldAttributeStatusMap)
+        let skuMap = fieldDataObject.dataMap[SKU_ARRAY]
+        for (let index in skuMap) {
+            let fieldAttributeMaster = fieldAttributeMap[index]
+            if (jobDataObject.dataList[fieldAttributeMaster.jobAttributeMasterId]) {
+                delete jobDataObject.dataList[fieldAttributeMaster.jobAttributeMasterId]
+            }
+        }
+        let currentStatus = statusIdStatusMap[jobStatusId]
+        jobDataObject.dataList = Object.values(jobDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
+        fieldDataObject.dataList = Object.values(fieldDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
+        const jobTransactionDisplay = {
+            id: jobTransactionId,
+            jobId,
+            jobMasterId,
+            jobStatusId,
+            referenceNumber,
+        }
+        return {
+            currentStatus,
+            fieldDataObject,
+            jobDataObject,
+            jobTransactionDisplay,
+        }
     }
 
 }

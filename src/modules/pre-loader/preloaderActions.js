@@ -43,6 +43,9 @@ const {
   PRELOADER_SUCCESS,
   IS_SHOW_MOBILE_NUMBER_SCREEN,
   IS_SHOW_OTP_SCREEN,
+
+  Home,
+  Login,
   JOB_MASTER,
   JOB_ATTRIBUTE,
   JOB_ATTRIBUTE_VALUE,
@@ -66,7 +69,6 @@ const {
   JOB_ATTRIBUTE_STATUS,
 } = require('../../lib/constants').default
 
-import { Actions } from 'react-native-router-flux'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
@@ -75,6 +77,7 @@ import { deleteSessionToken,stopMqttService } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
+import { NavigationActions } from 'react-navigation'
 
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
@@ -274,8 +277,7 @@ export function invalidateUserSession() {
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
-      dispatch(stopMqttService())
-      Actions.InitialLoginForm()
+      dispatch(NavigationActions.navigate({ routeName: Login }))
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))
     }
@@ -288,7 +290,7 @@ export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
     dispatch(preLogoutSuccess())
     dispatch(deleteSessionToken())
-    Actions.InitialLoginForm()
+    dispatch(NavigationActions.navigate({ routeName: Login }))
   }
 }
 
@@ -382,7 +384,7 @@ export function checkAsset() {
       if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        Actions.Tabbar()
+        dispatch(NavigationActions.navigate({ routeName: Home }))
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer());
@@ -419,7 +421,7 @@ export function checkIfSimValidOnServer() {
       if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        Actions.Tabbar()
+        dispatch(NavigationActions.navigate({ routeName: Home }))
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
         dispatch(showMobileNumber())
@@ -478,7 +480,7 @@ export function validateOtp(otpNumber) {
       const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM.value, token)
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
-      Actions.Tabbar()
+      dispatch(NavigationActions.navigate({ routeName: Home }))
     } catch (error) {
       dispatch(otpValidationFailure(error.message))
     }

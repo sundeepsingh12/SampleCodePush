@@ -7,13 +7,12 @@ import Job from './schema/Job'
 import JobData from './schema/JobData'
 import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
-// import JobTransactionCustomization from './schema/jobTransactionCustomization'
-
+import TrackLogs from './schema/trackLogs'
 
 import _ from 'underscore'
 
-const schemaVersion = 27;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet];
+const schemaVersion = 28;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs];
 
 let realm = new Realm({
     schemaVersion,
@@ -21,12 +20,14 @@ let realm = new Realm({
 });
 
 const {
-    TABLE_JOB_TRANSACTION,
-    TABLE_FIELD_DATA,
-    TABLE_JOB,
-    TABLE_JOB_DATA,
-    USER,
-    TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION,
+  TABLE_FIELD_DATA,
+  TABLE_JOB,
+  TABLE_JOB_DATA,
+  USER,
+  TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+  TABLE_TRACK_LOGS
 } = require('../lib/constants').default
 
 export function save(tableName, object) {
@@ -63,13 +64,14 @@ export function performBatchSave(...tableNamesVsDataList) {
 }
 
 export function deleteRecords() {
-    return realm.write(() => {
-        realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
-        realm.delete(realm.objects(TABLE_JOB))
-        realm.delete(realm.objects(TABLE_JOB_DATA))
-        realm.delete(realm.objects(TABLE_FIELD_DATA))
-        realm.delete(realm.objects(TABLE_RUNSHEET))
-    });
+  return realm.write(() => {
+    realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
+    realm.delete(realm.objects(TABLE_JOB))
+    realm.delete(realm.objects(TABLE_JOB_DATA))
+    realm.delete(realm.objects(TABLE_FIELD_DATA))
+    realm.delete(realm.objects(TABLE_RUNSHEET))
+    realm.delete(realm.objects(TABLE_TRACK_LOGS))
+  });
 }
 
 /**

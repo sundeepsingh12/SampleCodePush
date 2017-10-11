@@ -5,16 +5,14 @@ const {
     JOB_MASTER,
     JOB_STATUS,
     HUB,
-    DEVICE_IMEI
+    USER,
+    DEVICE_IMEI,
 } = require('../../../lib/constants').default
 
 
 import * as realm from '../../../repositories/realmdb'
 import {keyValueDBService} from '../KeyValueDBService.js'
 import moment from 'moment'
-// import DeviceBattery from 'react-native-battery'
-// const BatteryManager = require('../../../../node_modules').BatteryManager;
-
 
 export default class FormLayoutEventImpl {
 
@@ -78,16 +76,16 @@ export default class FormLayoutEventImpl {
         return formLayoutObject;
     }
     
-    saveData(formLayoutObject,jobTransactionId,statusId){
+    async saveData(formLayoutObject,jobTransactionId,statusId){
         //TODO remove this hard coded line to get json for childData
-        let formLayoutObject1 = this.getTempFormLayoutObject(formLayoutObject.get(238));
-        formLayoutObject.set(238,formLayoutObject1);
+        // let formLayoutObject1 = this.getTempFormLayoutObject(formLayoutObject.get(238));
+        // formLayoutObject.set(238,formLayoutObject1);
 
         if(!formLayoutObject && Object.keys(formLayoutObject).length == 0){
             return formLayoutObject; // return undefined or empty object if formLayoutObject is empty
         }
         let fieldData = this._saveFieldData(formLayoutObject,jobTransactionId);
-        let jobTransaction = this._saveJobTransaction(jobTransactionId,statusId);
+        let jobTransaction = await this._saveJobTransaction(jobTransactionId,statusId);
         realm.performBatchSave(fieldData,jobTransaction);
     }
 
@@ -137,24 +135,22 @@ export default class FormLayoutEventImpl {
     }
 
     async _saveJobTransaction(jobTransactionId, statusId){
-        jobTransactionId = 19051; //TODO remove hard coded value
-        // query = `id = ${jobTransactionId}`;
         let jobTransactionArray = [];
         let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION,'id = ' +jobTransactionId, false)[0]; // to get the first transaction, as query is on id and it returns list
-        console.log('jobTransaction db before update',jobTransaction);
-        let user = realm.getRecordListOnQuery(USER,'id = ' +jobTransactionId.userId, false);
-        let jobMaster = (await keyValueDBService.getValueFromStore(JOB_MASTER)).value.filter(jobMasterObject => jobMasterObject.id == jobTransaction.jobMasterId);
-        let status = (await keyValueDBService.getValueFromStore(JOB_STATUS)).value.filter(jobStatus => jobStatus.id == statusId);
-        let hub = (await keyValueDBService.getValueFromStore(HUB)).value.filter(hub => hub.id == jobTransaction.hubId);
-        let imei = (await keyValueDBService.getValueFromStore(DEVICE_IMEI)).value.filter(imei => imei.imeiNumber == jobTransaction.userId);
-        jobTransaction =  _setJobTransactionValues(jobTransaction,status,jobMaster,user,hub,imei);
+        let user = await keyValueDBService.getValueFromStore(USER);
+        let hub =  await keyValueDBService.getValueFromStore(HUB);
+        let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI);
+        let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => {return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobTransaction.jobMasterId)});
+        let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus =>{ return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId)});
+        jobTransaction =  this._setJobTransactionValues(jobTransaction,status[0],jobMaster[0],user.value,hub.value,imei.value);
         return {
             tableName: TABLE_JOB_TRANSACTION,
             value: jobTransactionArray.push(jobTransaction)
         };
     }
 
-    _setJobTransactionValues(jobTransaction,status,jobMaster,user,hub,imei){
+    _setJobTransactionValues(jobTransaction1,status,jobMaster,user,hub,imei){
+        let jobTransaction = Object.assign({},jobTransaction1);
         jobTransaction.syncFlag = 1;
         jobTransaction.jobType = jobMaster.code;
         jobTransaction.jobStatusId = status.id;

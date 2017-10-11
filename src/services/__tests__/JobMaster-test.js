@@ -10,8 +10,8 @@ import moment from 'moment'
 
 describe('test cases for prepareCustomizationListMap', () => {
 
-  it('should return empty jobMasterIdCustomizationMap for undefined jobListCustomizationList', () => {
-    expect(jobMasterService.prepareCustomizationListMap(undefined)).toEqual({})
+  it('should return null for undefined jobListCustomizationList', () => {
+    expect(jobMasterService.prepareCustomizationListMap(undefined)).toEqual(null)
   })
 
   it('should return empty jobMasterIdCustomizationMap for empty jobListCustomizationList', () => {
@@ -125,8 +125,8 @@ describe('test cases for prepareTabStatusIdMap', () => {
 
 describe('test cases for validateAndSortTabList', () => {
 
-  it('should return empty tab list for undefined tab list ', () => {
-    expect(jobMasterService.validateAndSortTabList(undefined)).toEqual([])
+  it('should return null for undefined tab list ', () => {
+    expect(jobMasterService.validateAndSortTabList(undefined)).toEqual(null)
   })
 
   it('should return empty tab list for empty tab list ', () => {

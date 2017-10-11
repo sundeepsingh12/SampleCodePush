@@ -9,7 +9,7 @@ const fieldAttributeValidationCondition = {
         "type":"object",
         "properties": {
             "id": {"type": "number","required":true},
-            "key": {"type": "string","required":true},
+            "key": {"type": "string"},
             "assignValue": {"type": "string"},
             "type": {"type": "string"},//Don't add required here
             "conditionType": {"type": "string"},

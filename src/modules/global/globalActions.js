@@ -42,8 +42,7 @@ import {
   clearHomeState
 } from '../home/homeActions'
 
-var mqtt = require('react-native-mqtt');
-
+import BackgroundTimer from 'react-native-background-timer';
 
 /**
  * ## set the store
@@ -70,6 +69,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      BackgroundTimer.clearInterval(CONFIG.intervalId);
       dispatch(onChangePassword(''))
       dispatch(onChangeUsername(''))
       dispatch(clearHomeState())
@@ -79,56 +79,3 @@ export function deleteSessionToken() {
   }
 }
 
-export function startMqttService() {
-  return async function (dispatch) {
-    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    //Check if user session is alive
-    if (token) { 
-      console.log('registerMqttClient')
-      const uri = `mqtt://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}`
-      console.log('uri', uri)
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      const clientId = `FE_${userObject.value.id}`
-      console.log('clientId', clientId)
-      console.log('mqtt', mqtt)
-      mqtt.createClient({
-        uri,
-        clientId
-      }).then(client => {
-
-        client.on('closed', () => {
-          console.log('mqtt.event.closed');
-        });
-
-        client.on('error', msg => {
-          console.log('mqtt.event.error', msg);
-
-        });
-
-        client.on('message', msg => {
-          console.log('mqtt.event.message', msg);
-          dispatch(onResyncPress())
-        });
-
-        client.on('connect', () => {
-          console.log('connected');
-          const test = `${clientId}/#`
-          console.log('test', test)
-          client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
-        });
-
-        client.connect();
-      }).catch(err => {
-        console.log('inside catch')
-        console.log(err);
-      });
-    }
-  }
-}
-
-export function stopMqttService() {
-  return async function (dispatch) {
-    const client = mqtt.clients[0];
-    client.disconnect()
-  }
-}

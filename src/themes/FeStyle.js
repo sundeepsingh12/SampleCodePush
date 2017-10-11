@@ -23,7 +23,7 @@ export default {
         backgroundColor: '#51adfd'
     },
     bgPrimary: {
-        backgroundColor: '#006bff'
+        backgroundColor: '#338FFC'
     },
     fontWhite: {
         color: '#ffffff'
@@ -53,7 +53,7 @@ export default {
         color: '#51adfd'
     },
     fontPrimary: {
-        color: '#006bff'
+        color: '#338FFC'
     },
     fontSm: {
         fontSize: 12
@@ -82,7 +82,6 @@ export default {
     fontRight: {
         textAlign: 'right'
     },
-
     bold: {
         fontWeight: 'bold'
     },
@@ -194,6 +193,9 @@ export default {
     },
     marginRight30: {
         marginRight: 30
+    },
+    marginRightAuto : {
+        marginRight: 'auto'
     },
 
 //  Padding Objects
@@ -425,6 +427,9 @@ export default {
   },
   flexBasis100 : {
       flexBasis: '100%'
+  },
+  flexWrap : {
+    flexWrap: 'wrap'
   },
   width100 : {
     width : '100%'

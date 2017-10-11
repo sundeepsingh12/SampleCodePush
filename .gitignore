@@ -45,6 +45,9 @@ buck-out/
 \.buckd/
 *.keystore
 
+# VSCODE
+.vscode/
+
 
 # Jest coverage report
 coverage

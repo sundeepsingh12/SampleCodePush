@@ -87,56 +87,62 @@ describe('test cases for getJobAttributeStatusMap', () => {
 
 })
 
-describe('test cases for getAllJobAttributeStatusMap', () => {
+describe('test cases for getJobMasterJobAttributeMasterMap', () => {
+    const jobAttributeMasterList = [
+        {
+            id: 1,
+            jobMasterId: 1,
+            label: 'xyz',
+        },
+        {
+            id: 2,
+            jobMasterId: 1,
+            label: 'abc'
+        },
+        {
+            id: 3,
+            jobMasterId: 1,
+            label: 'abc'
+        },
+        {
+            id: 4,
+            jobMasterId: 2,
+            label: 'abc'
+        }
+    ]
 
-    const jobAttributeMasterMap = {
-        10: {
-            id: 10,
-            label: 'xyz'
+    const jobMasterJobAttributeMasterMap = {
+        1: {
+            1: {
+                id: 1,
+                jobMasterId: 1,
+                label: 'xyz',
+            },
+            2: {
+                id: 2,
+                jobMasterId: 1,
+                label: 'abc'
+            },
+            3: {
+                id: 3,
+                jobMasterId: 1,
+                label: 'abc'
+            },
+        },
+        2: {
+            4: {
+                id: 4,
+                jobMasterId: 2,
+                label: 'abc'
+            }
         }
     }
 
-    it('should return empty jobAttributeStatusMap for undefined list', () => {
-        expect(jobAttributeMasterService.getAllJobAttributeStatusMap(undefined, jobAttributeMasterMap)).toEqual({})
+    it('should return empty jobMasterJobAttributeMasterMap for undefined list', () => {
+        expect(jobAttributeMasterService.getJobMasterJobAttributeMasterMap(undefined)).toEqual({})
     })
 
-    it('should return jobAttributeStatuMap for statusList', () => {
-        const statusList = [
-            {
-                id: 1,
-                name: 'xyz'
-            },
-            {
-                id: 2,
-                name: 'abc'
-            },
-            {
-                id: 3,
-                name: 'jkl'
-            },
-        ]
-
-        const jobAttributeStatusMap = {
-            1: {
-                10: {
-                    id: 10,
-                    label: 'xyz'
-                }
-            },
-            2: {
-                10: {
-                    id: 10,
-                    label: 'xyz'
-                }
-            },
-            3: {
-                10: {
-                    id: 10,
-                    label: 'xyz'
-                }
-            }
-        }
-        expect(jobAttributeMasterService.getAllJobAttributeStatusMap(statusList,jobAttributeMasterMap)).toEqual(jobAttributeStatusMap)
+    it('should return jobMasterJobAttributeMasterMap for jobAttributeMasterList', () => {
+        expect(jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)).toEqual(jobMasterJobAttributeMasterMap)
     })
-
 })

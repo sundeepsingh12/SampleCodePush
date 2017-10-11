@@ -1,8 +1,8 @@
 'use strict'
 
-import { Actions } from 'react-native-router-flux'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
+import { NavigationActions } from 'react-navigation'
 const {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -10,7 +10,8 @@ const {
     FIELD_ATTRIBUTE_STATUS,
     JOB_STATUS,
     JOB_DETAILS_FETCHING_START,
-    JOB_DETAILS_FETCHING_END
+    JOB_DETAILS_FETCHING_END,
+    FormLayout
 } = require('../../lib/constants').default
 
 export function startFetchingJobDetails() {
@@ -19,12 +20,14 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function setJobDetails(jobDataList,fieldDataList) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
+            fieldDataList,
             jobDataList,
-            fieldDataList
+            jobTransaction,
+            currentStatus,
         }
     }
 }
@@ -32,17 +35,24 @@ export function setJobDetails(jobDataList,fieldDataList) {
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
+            dispatch(startFetchingJobDetails())
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
-            const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, statusList.value)
-            // console.log(details)
-            // const jobDataList = details.jobDataObject.dataList
-            // const fieldDataList = details.fieldDataObject.dataList
+            const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay))
         } catch (error) {
+            // To do
+            // Handle exceptions and change state accordingly
             console.log(error)
         }
     }
+}
+
+export function navigateToFormLayout(statusId,statusName,jobTransactionId){
+    return async function (dispatch) {
+        dispatch(NavigationActions.navigate({ routeName: FormLayout,params :{statusId:statusId,statusName:statusName,jobTransactionId:jobTransactionId} }))
+      }
 }

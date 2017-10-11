@@ -681,7 +681,10 @@ describe('test cases for setJobSwipableDetails', () => {
   const jobDataDetailsForListing = {}
   const jobAttributeMasterMap = {}
   const jobAttributeStatusMap = {}
-  const jobTransaction = {}
+  const jobTransaction = {
+    jobMasterId : 1,
+    jobStatusId : 1
+  }
   const job = {}
   const customerCareMap = {}
   const smsTemplateMap = {}
@@ -847,6 +850,7 @@ describe('test cases for prepareJobCustomizationList', () => {
         circleLine1: 'lmn',
         circleLine2: 'def',
         id: 1,
+        jobMasterId: 3,
         jobSwipableDetails: 'test1',
         seqSelected: 10,
         statusId: 11
@@ -857,6 +861,7 @@ describe('test cases for prepareJobCustomizationList', () => {
         circleLine1: 'test',
         circleLine2: 'test',
         id: 2,
+        jobMasterId: 3,
         jobSwipableDetails: 'test2',
         seqSelected: 12,
         statusId: 11
@@ -893,6 +898,7 @@ describe('test cases for prepareJobCustomizationList', () => {
         circleLine1: 'lmn',
         circleLine2: 'def',
         id: 1,
+        jobMasterId: 3,
         jobSwipableDetails: 'test1',
         seqSelected: 10,
         statusId: 11
@@ -903,6 +909,7 @@ describe('test cases for prepareJobCustomizationList', () => {
         circleLine1: '',
         circleLine2: '',
         id: 2,
+        jobMasterId: 4,
         jobSwipableDetails: 'test2',
         seqSelected: 12,
         statusId: 11
@@ -919,7 +926,6 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
   beforeEach(() => {
     jobAttributeMasterService.getJobAttributeMasterMap = jest.fn()
     jobAttributeMasterService.getJobAttributeStatusMap = jest.fn()
-    jobAttributeMasterService.getAllJobAttributeStatusMap = jest.fn()
     customerCareService.getCustomerCareMap = jest.fn()
     smsTemplateService.getSMSTemplateMap = jest.fn()
     jobService.getJobMap = jest.fn()
@@ -927,6 +933,11 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
     fieldDataService.getFieldDataMap = jest.fn()
     jobTransactionService.getJobTransactionMapAndQuery = jest.fn()
     jobTransactionService.prepareJobCustomizationList = jest.fn()
+    jobStatusService.getJobMasterIdStatusIdMap = jest.fn()
+    jobStatusService.getJobMasterIdStatusIdMap.mockReturnValue({
+      jobMasterIdJobAttributeStatusMap : {},
+      statusIdNextStatusMap : {},
+    })
     realm.getRecordListOnQuery = jest.fn()
     realm.getRecordListOnQuery.mockReturnValue([])
   })
@@ -941,9 +952,10 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
     expect(jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList, statusList)).toEqual([])
     expect(jobAttributeMasterService.getJobAttributeMasterMap).toHaveBeenCalledTimes(1)
     expect(jobAttributeMasterService.getJobAttributeStatusMap).toHaveBeenCalledTimes(1)
+    expect(jobStatusService.getJobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
     expect(customerCareService.getCustomerCareMap).toHaveBeenCalledTimes(1)
     expect(smsTemplateService.getSMSTemplateMap).toHaveBeenCalledTimes(1)
-    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(2)
     expect(jobTransactionService.getJobTransactionMapAndQuery).not.toHaveBeenCalled()
     expect(jobTransactionService.prepareJobCustomizationList).not.toHaveBeenCalled()
     expect(jobService.getJobMap).not.toHaveBeenCalled()
@@ -972,8 +984,9 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
       line2: 'abc',
       seqSelected: 1
     }]
-    realm.getRecordListOnQuery.mockReturnValueOnce(jobTransactionList)
-    realm.getRecordListOnQuery.mockReturnValue([])
+    realm.getRecordListOnQuery.mockReturnValueOnce([])
+                              .mockReturnValueOnce(jobTransactionList)
+                              .mockReturnValue([])
     jobTransactionService.getJobTransactionMapAndQuery = jest.fn()
     jobTransactionService.getJobTransactionMapAndQuery.mockReturnValue(jobTransactionObject)
     jobTransactionService.prepareJobCustomizationList = jest.fn()
@@ -982,9 +995,10 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
     expect(jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList)).toEqual(jobTransactionCustomizationList)
     expect(jobAttributeMasterService.getJobAttributeMasterMap).toHaveBeenCalledTimes(1)
     expect(jobAttributeMasterService.getJobAttributeStatusMap).toHaveBeenCalledTimes(1)
+    expect(jobStatusService.getJobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
     expect(customerCareService.getCustomerCareMap).toHaveBeenCalledTimes(1)
     expect(smsTemplateService.getSMSTemplateMap).toHaveBeenCalledTimes(1)
-    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(4)
+    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(5)
     expect(jobTransactionService.getJobTransactionMapAndQuery).toHaveBeenCalledTimes(1)
     expect(jobTransactionService.prepareJobCustomizationList).toHaveBeenCalledTimes(1)
     expect(jobService.getJobMap).toHaveBeenCalledTimes(1)

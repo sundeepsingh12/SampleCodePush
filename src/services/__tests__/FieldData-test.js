@@ -1,6 +1,8 @@
 'use strict'
 
 import { fieldDataService } from '../classes/FieldData'
+import * as realm from '../../repositories/realmdb'
+import { jobDetailsService } from '../classes/JobDetails'
 
 describe('test cases for getFieldDataMap', () => {
 
@@ -13,17 +15,26 @@ describe('test cases for getFieldDataMap', () => {
             {
                 jobTransactionId: 1,
                 fieldAttributeMasterId: 10,
-                value: 'abc'
+                value: 'abc',
+                parentId : 0
             },
             {
                 jobTransactionId: 1,
                 fieldAttributeMasterId: 11,
-                value: 1
+                value: 1,
+                parentId : 0
+            },
+            {
+                jobTransactionId: 1,
+                fieldAttributeMasterId: 12,
+                value: 1,
+                parentId : 1
             },
             {
                 jobTransactionId: 2,
                 fieldAttributeMasterId: 10,
-                value: 'xyz'
+                value: 'xyz',
+                parentId : 0
             }
         ]
 
@@ -32,7 +43,7 @@ describe('test cases for getFieldDataMap', () => {
                 10: {
                     jobTransactionId: 1,
                     fieldAttributeMasterId: 10,
-                    value: 'abc'
+                    value: 'abc',
                 },
                 11: {
                     jobTransactionId: 1,
@@ -52,4 +63,20 @@ describe('test cases for getFieldDataMap', () => {
         expect(fieldDataService.getFieldDataMap(fieldDataList)).toEqual(fieldDataMap)
     })
 
+})
+
+describe('test cases for prepareFieldDataForTransactionParticularStatus', () => {
+    const jobTransactionId = 2
+    const fieldAttributeMasterMap = {
+        1 : {}
+    }
+    const fieldAttributeMap = {}
+    it('should return fieldDataObject for particular transaction', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        jobDetailsService.prepareDataObject = jest.fn()
+        jobDetailsService.prepareDataObject.mockReturnValue({})
+        expect(fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId,fieldAttributeMasterMap,fieldAttributeMap)).toEqual({})
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+        expect(jobDetailsService.prepareDataObject).toHaveBeenCalledTimes(1)
+    })
 })

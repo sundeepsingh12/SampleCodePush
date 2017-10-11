@@ -11,6 +11,8 @@ const {
     TABLE_FIELD_DATA,
 } = require('../../lib/constants').default
 
+import { ADDRESS_LINE_1, ADDRESS_LINE_2, CONTACT_NUMBER, LANDMARK, PINCODE } from '../../lib/AttributeConstants'
+
 class JobData {
 
     /**
@@ -18,9 +20,17 @@ class JobData {
      * @param {*} jobDataList 
      * @returns 
      * {
-     *  JobDataMap : Map<JobId,Map<JobAttributeMasterId,JobData>>
-     *  ContactMap : Map<JobId,[JobData]>
-     *  AddressMap : Map<JobId,[JobData]>
+     *  JobDataMap : { 
+     *                  JobId : {
+     *                              JobAttributeMasterId :JobData 
+     *                          } 
+     *               }
+     *  ContactMap : {
+     *                  JobId : JobData
+     *               }
+     *  AddressMap : {
+     *                  JobId : [JobData]
+     *               }
      * }
      */
     getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap) {
@@ -29,10 +39,12 @@ class JobData {
             contactMap = {},
             addressMap = {}
         jobDataList.forEach(jobDataObj => {
-            const jobId = jobDataObj.jobId
-            const jobAttributeMasterId = jobDataObj.jobAttributeMasterId
-            const value = jobDataObj.value
-            const parentId = jobDataObj.parentId
+            const {
+                jobAttributeMasterId,
+                jobId,
+                parentId,
+                value
+            } = jobDataObj
             let jobData = {
                 jobId,
                 jobAttributeMasterId,
@@ -43,20 +55,14 @@ class JobData {
                 return
             }
 
-            if (!jobDataMap[jobId]) {
-                jobDataMap[jobId] = {}
-            }
+            jobDataMap[jobId] = jobDataMap[jobId] ? jobDataMap[jobId] : {}
 
             jobDataMap[jobId][jobAttributeMasterId] = jobData
             if (this.checkContacNumber(jobAttributeMasterId, value, jobAttributeMasterMap)) {
-                if (!contactMap[jobId]) {
-                    contactMap[jobId] = []
-                }
+                contactMap[jobId] = contactMap[jobId] ? contactMap[jobId] : []
                 contactMap[jobId].push(jobData)
             } else if (this.checkAddressField(jobAttributeMasterId, value, jobAttributeMasterMap)) {
-                if (!addressMap[jobId]) {
-                    addressMap[jobId] = []
-                }
+                addressMap[jobId] = addressMap[jobId] ? addressMap[jobId] : []
                 addressMap[jobId].push(jobData)
             }
         })
@@ -78,7 +84,7 @@ class JobData {
             return false
         }
         if (jobAttributeMasterMap[jobAttributeMasterId].hidden ||
-            jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId !== 27 ||
+            jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId !== CONTACT_NUMBER ||
             value == undefined || value == null || value.trim() === '' ||
             value.length < 6 || /(.)\\1+/.test(value)) {
             return false
@@ -86,6 +92,12 @@ class JobData {
         return true
     }
 
+    /**
+     * This method checks if job attrinute is of address type
+     * @param {*} jobAttributeMasterId 
+     * @param {*} value 
+     * @param {*} jobAttributeMasterMap 
+     */
     checkAddressField(jobAttributeMasterId, value, jobAttributeMasterMap) {
         if (!jobAttributeMasterMap[jobAttributeMasterId]) {
             return false
@@ -94,23 +106,51 @@ class JobData {
             value == undefined || value == null || value.trim() === '') {
             return false
         }
-        if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 28 ||
-            jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 29 ||
-            jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 30 ||
-            jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == 31) {
+        if (jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == ADDRESS_LINE_1 ||
+            jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == ADDRESS_LINE_2 ||
+            jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == LANDMARK ||
+            jobAttributeMasterMap[jobAttributeMasterId].attributeTypeId == PINCODE) {
             return true
         }
         return false
     }
 
+    /**
+     * This method fetch data from db and prepares job data object for display
+     * @param {*} jobId 
+     * @param {*} jobAttributeMasterMap 
+     * @param {*} jobAttributeMap 
+     * @returns 
+     * dataObject {
+     *              dataList : {
+     *                              attributeMasterId : {
+     *                                                      data,
+     *                                                      sequence
+     *                                                      label,
+     *                                                      attributeTypeId,
+     *                                                      childDataList : [dataList]
+     *                                                   }
+     *                          }
+     *                         
+     *              dataMap : {
+     *                          attributeMasterId : {
+     *                                                  data,
+     *                                                  childdDataMap,
+     *                                                  sequence,
+     *                                                  label,
+     *                                                  attributeTypeId
+     *                                              }
+     *                         }
+     * 
+     */
     prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap) {
         const jobAttributeMapQuery = Object.keys(jobAttributeMap).map(jobAttributeMasterId => 'jobAttributeMasterId = ' + jobAttributeMasterId).join(' OR ')
         let jobDataQuery = 'jobId = ' + jobId
-        if(jobAttributeMapQuery !== undefined && jobAttributeMapQuery !== null && jobAttributeMapQuery.length !== 0) {
+        if (jobAttributeMapQuery !== undefined && jobAttributeMapQuery !== null && jobAttributeMapQuery.length !== 0) {
             jobDataQuery += ' AND (' + jobAttributeMapQuery + ')'
         }
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
-        let jobDataObject = jobDetailsService.prepareDataObject(jobId, 0, jobDataList, jobAttributeMasterMap, jobAttributeMap, true)
+        let jobDataObject = jobDetailsService.prepareDataObject(jobId, 0, jobDataList, jobAttributeMasterMap, jobAttributeMap, true, 0, true)
         return jobDataObject
     }
 

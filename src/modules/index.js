@@ -5,15 +5,12 @@
  *
  */
 'use strict'
-/**
- * ## Imports
- *
- * our 4 modules
- */
+
 import auth from './login/loginReducer'
 import device from './device/deviceReducer'
 import global from './global/globalReducer'
 import preloader from './pre-loader/preloaderReducer'
+import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
@@ -29,6 +26,7 @@ import { combineReducers } from 'redux'
  * EVERY TIME there is a basic action
  */
 const rootReducer = combineReducers({
+  nav,
   auth,
   device,
   global,

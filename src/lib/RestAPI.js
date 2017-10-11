@@ -13,9 +13,10 @@
  */
 import CONFIG from './config'
 import _ from 'underscore'
+import RNFS from 'react-native-fs';
+import RNFetchBlob from 'react-native-fetch-blob'
 
 const fetch = require('react-native-cancelable-fetch');
-
 class RestAPI {
   /**
    * ## API.js client
@@ -51,7 +52,6 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = this.API_BASE_URL + opts.url
-    console.log(url)
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
@@ -99,23 +99,23 @@ class RestAPI {
     return prune(obj);
   }
 
-   /** 
-   * Parameters (Request Body, URL, Method (enum type POST, LOGIN, GET))
-   * 
-   * Success response JSON object
-   * {
-   *   status,
-   *   code,
-   *   headers,
-   *   json: {}
-   * }
-   * 
-   * Failure response JSON object
-   * {
-   *   code: xxx,
-   *   message: 'error message'
-   * }
-   */
+  /** 
+  * Parameters (Request Body, URL, Method (enum type POST, LOGIN, GET))
+  * 
+  * Success response JSON object
+  * {
+  *   status,
+  *   code,
+  *   headers,
+  *   json: {}
+  * }
+  * 
+  * Failure response JSON object
+  * {
+  *   code: xxx,
+  *   message: 'error message'
+  * }
+  */
   serviceCall(body, url, method) {
     let opts;
     if (method === 'POST') {
@@ -156,7 +156,7 @@ class RestAPI {
       })
       .catch((e) => {
         //Aborting the Fetch API call
-        fetch.abort(fetchRequestId); 
+        fetch.abort(fetchRequestId);
 
         //Throw custom error instance
         if (e instanceof Error) {
@@ -176,6 +176,29 @@ class RestAPI {
       promise.then(resolve, reject);
       setTimeout(reject.bind(null, err), timeout);
     });
+  }
+
+  async uploadZipFile() {
+    var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
+  await RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
+    Authorization :this._sessionToken,
+    'Content-Type' : 'multipart/form-data',
+  }, [
+    { name : 'file', filename : 'sync.zip', type:'*/*', data: RNFetchBlob.wrap(PATH+'/sync.zip')},
+  ]).uploadProgress((written, total) => {
+        console.log('uploaded', written / total)
+    }).then((resp) => {
+    const responseBody = resp.text()
+    console.log('responseBody>>>>>',responseBody)
+    const message = responseBody.split(",")[0]
+    console.log('message >>>>>',message);
+    const syncCount = responseBody.split(",")[1]
+    if(message=='success'){
+      //do something
+    }
+  }).catch((err) => {
+    console.log(err)
+  })
   }
 
 }
