@@ -55,7 +55,7 @@ class Payment {
      */
     getPaymentParameters(jobMasterId, fieldAttributeMasterId, jobMasterMoneyTransactionModesList, fieldAttributeMasterList, formData, jobId) {
         // TODO : remove harcoded fieldAttributeMasterId
-        fieldAttributeMasterId = 6590
+        fieldAttributeMasterId = 22843
         jobMasterMoneyTransactionModesList = jobMasterMoneyTransactionModesList ? jobMasterMoneyTransactionModesList : []
         const paymentModeList = jobMasterMoneyTransactionModesList.filter(jobMasterMoneyTransactionMode => jobMasterMoneyTransactionMode.jobMasterId == jobMasterId)
         const fieldAttributeMasterMapWithParentId = fieldAttributeMasterService.getFieldAttributeMasterMapWithParentId(fieldAttributeMasterList)

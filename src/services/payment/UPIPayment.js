@@ -28,13 +28,31 @@ class UPIPayment {
         return jobData[0].value
     }
 
-    approveTransactionUPI(customerName, customerContact, payerVPA, upiConfigJSON, token, deviceIMEI) {
-        let approveTransactionURL = upiConfigJSON.approveTransactionURL
-        console.log('approveTransactionURL', approveTransactionURL)
+    approveTransactionUPI(amount, customerName, customerContact, deviceIMEI, payerVPA, referenceNumber, upiConfigJSON, token) {
+        let referenceList = []
+        referenceList.push({
+            awbNumber: referenceNumber,
+            amount
+        })
         let body = {
-            deviceId : deviceIMEI.imeiNumber
+            deviceId: deviceIMEI.imeiNumber,
+            customerName,
+            customerContact,
+            totalAmount: amount,
+            payerAddress: payerVPA,
+            referenceList,
         }
-        const approveTransactionResponse = RestAPIFactory(token).serviceCall()
+        const approveTransactionResponse = RestAPIFactory(token).serviceCall(body, upiConfigJSON.approveTransactionURL, 'POST')
+        return approveTransactionResponse
+    }
+
+    queryTransactionUPI(token, transactionId, upiConfigJson) {
+        let body = {
+            txnID: transactionId,
+            entity: ''
+        }
+        const queryTransactionResponse = RestAPIFactory(token).serviceCall(body, upiConfigJSON.transactionQueryURL, 'POST')
+        return queryTransactionResponse
     }
 }
 

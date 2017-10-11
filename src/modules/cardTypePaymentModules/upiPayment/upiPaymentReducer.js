@@ -2,6 +2,7 @@
 
 const InitialState = require('./upiPaymentInitialState').default
 const {
+    SET_UPI_APPROVAL,
     SET_UPI_PAYMENT_CUSTOMER_CONTACT,
     SET_UPI_PAYMENT_CUSTOMER_NAME,
     SET_UPI_PAYMENT_PARAMETERS,
@@ -25,6 +26,8 @@ export default function upiPaymentReducer(state = initialState, action) {
             return state.set('customerName', action.payload.customerName)
         case SET_UPI_PAYMENT_CUSTOMER_CONTACT:
             return state.set('customerContact', action.payload.customerContact)
+        case SET_UPI_APPROVAL: 
+            return state.set('upiApproval',action.payload.upiApproval)
     }
 
     return state

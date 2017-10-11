@@ -16,6 +16,7 @@ import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
 import payment from './payment/paymentReducer'
 import upiPayment from './cardTypePaymentModules/upiPayment/upiPaymentReducer'
+import payByLinkPayment from './cardTypePaymentModules/payByLinkPayment/payByLinkPaymentReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
   payment,
   preloader,
   upiPayment,
+  payByLinkPayment
 })
 
 export default rootReducer

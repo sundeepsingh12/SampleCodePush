@@ -3,10 +3,11 @@
 const { Record } = require('immutable')
 
 var InitialState = Record({
-    approveTransactionAPIResponse: null,
     customerContact: null,
     customerName: null,
     payerVPA: null,
+    transactionId: null,
+    upiApproval: false,
     upiConfigJSON: null,
 })
 

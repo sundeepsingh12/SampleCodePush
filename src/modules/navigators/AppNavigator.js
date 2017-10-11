@@ -20,6 +20,7 @@ import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
 import Payment from '../../containers/Payment'
 import UPIPayment from '../../containers/UPIPayment'
+import PayByLink from '../../containers/PayByLink'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
 import theme from '../../themes/feTheme'
@@ -76,6 +77,9 @@ export const AppNavigator = StackNavigator({
   },
   UPIPayment: {
     screen: UPIPayment
+  },
+  PayByLink: {
+    screen: PayByLink
   }
 },
   {

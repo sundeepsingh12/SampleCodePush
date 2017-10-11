@@ -43,11 +43,9 @@ export function getPaymentParameters(jobMasterId, jobId, fieldAttributeMasterId)
 export function saveMoneyCollectObject(actualAmount, jobMasterId, jobId, jobTransactionId, latestPositionId, moneyCollectMaster, originalAmount, selectedIndex, transactionNumber, remarks, receipt) {
     return async function (dispatch) {
         try {
-            console.log('jobTransactionId', jobTransactionId)
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedIndex, transactionNumber, remarks, receipt)
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransactionId, 0, latestPositionId)
-            console.log('fieldDataListObject', fieldDataListObject)
-            dispatch(navigateToScene('UPIPayment', { jobMasterId, jobId, jobTransactionId }))
+            dispatch(navigateToScene('PayByLink', { actualAmount, jobMasterId, jobId, jobTransactionId }))
         } catch (error) {
             console.log(error)
         }

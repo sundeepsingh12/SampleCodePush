@@ -111,6 +111,7 @@ module.exports = {
     OBJECTSAROJFAREYE: 'objectsarojfareye',
 
     //App Module Customization Constants
-    UPIMODULE : 21 ,
+    UPIMODULE: 21,
+    PAYBYLINKMODULE: 22,
 
 }

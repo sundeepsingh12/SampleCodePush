@@ -89,11 +89,15 @@ export default keyMirror({
     SET_PAYMENT_CHANGED_PARAMETERS: null,
     SET_PAYMENT_INITIAL_PARAMETERS: null,
 
-    //UPIPaymentActions
+    //UPI PaymentActions
+    SET_UPI_APPROVAL:null,
     SET_UPI_PAYMENT_CUSTOMER_CONTACT: null,
     SET_UPI_PAYMENT_CUSTOMER_NAME: null,
     SET_UPI_PAYMENT_PARAMETERS: null,
     SET_UPI_PAYMENT_PAYER_VPA: null,
+
+    //Pay By Link Payment Actions
+    SET_PAY_BY_LINK_PARAMETERS:null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,

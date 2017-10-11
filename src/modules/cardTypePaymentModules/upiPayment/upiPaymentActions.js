@@ -8,8 +8,11 @@ import { upiPaymentService } from '../../../services/payment/UPIPayment'
 const {
     CUSTOMIZATION_APP_MODULE,
     DEVICE_IMEI,
-    SET_UPI_PAYMENT_PARAMETERS
+    SET_UPI_PAYMENT_PARAMETERS,
+    SET_UPI_APPROVAL,
 } = require('../../../lib/constants').default
+
+import CONFIG from '../../../lib/config'
 
 import {
     UPIMODULE
@@ -33,15 +36,42 @@ export function getUPIPaymentParameters(jobMasterId, jobId) {
     }
 }
 
-export function approveTransactionAPIRequest(customerName, customerContact, payerVPA, upiConfigJSON) {
+export function approveTransactionAPIRequest(amount, customerName, customerContact, payerVPA, referenceNumber, upiConfigJSON) {
     return async function (dispatch) {
         try {
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
             console.log(customerName, customerContact, payerVPA, upiConfigJSON)
             if (!customerName || !customerContact || !payerVPA || !upiConfigJSON) {
                 throw new Exception('Invalid Parameters')
             }
-            upiPaymentService.approveTransactionUPI(customerName, customerContact, payerVPA, upiConfigJSON, deviceIMEI.value)
+            const approveTransactionResponse = await upiPaymentService.approveTransactionUPI(amount, customerName, customerContact, deviceIMEI.value, payerVPA, referenceNumber, upiConfigJSON, token.value)
+            const approveTransactionResponseJson = await approveTransactionResponse.json
+            if (approveTransactionResponseJson.status && approveTransactionResponseJson.status == '00') {
+                dispatch(setState(SET_UPI_APPROVAL,
+                    {
+                        upiApproval: true
+                    }
+                ))
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+
+export function queryTransactionAPIRequest(transactionId) {
+    return async function (dispatch) {
+        try {
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            if (!transactionId) {
+                throw new Exception('Invalid Transaction Id')
+            }
+            const queryTransactionResponse = await upiPaymentService.queryTransactionUPI(token.value, transactionId, upiConfigJSON)
+            const queryTransactionResponseJson = await queryTransactionResponse.json
+            if (queryTransactionResponseJson.responseStatus && queryTransactionResponseJson.responseStatus == 'COMPLETED') {
+                //TODO : update and save fielddatalist in form layout state
+            }
         } catch (error) {
             console.log(error)
         }
