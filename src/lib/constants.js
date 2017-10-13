@@ -152,6 +152,11 @@ export default keyMirror({
     Preloader: null,
     Home: null,
     JobDetails: null,
+
+    //FixedSKU Actions
+    IS_LOADER_RUNNING: null,
+    INFLATE_FIXEDSKU_CHILD: null,
+    CHANGE_QUANTITY: null,
 })
 
 

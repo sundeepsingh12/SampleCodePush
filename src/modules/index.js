@@ -14,6 +14,7 @@ import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
+import fixedSKU from './fixedSKU/fixedSKUReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -33,6 +34,7 @@ const rootReducer = combineReducers({
   home,
   listing,
   jobDetails,
+  fixedSKU,
 })
 
 export default rootReducer

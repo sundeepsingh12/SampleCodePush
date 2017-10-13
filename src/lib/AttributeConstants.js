@@ -5,4 +5,8 @@ module.exports = {
     LANDMARK: 30,
     PINCODE: 31,
     SKU_ARRAY: 17,
+    FIXED_SKU_QUANTITY: 6,
+    FIXED_SKU_UNIT_PRICE: 13,
+    FIXED_SKU_CODE: 1,
+    FIXED_SKU_OBJECT: 11
 }

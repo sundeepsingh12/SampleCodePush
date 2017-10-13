@@ -18,6 +18,7 @@ import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
+import FixedSKUListing from '../../containers/FixedSKUListing'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
 import theme from '../../themes/feTheme'
@@ -69,6 +70,12 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
+  },
+  FixedSKUListing:{
+    screen: FixedSKUListing,
+    navigationOptions: {
+      title: 'FixedSKU',
+    }
   }
 },
   {

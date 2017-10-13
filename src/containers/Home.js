@@ -24,7 +24,6 @@ import styles from '../themes/FeStyle'
 import theme from '../themes/feTheme'
 import ResyncLoader from '../components/ResyncLoader'
 
-
 /**
  * The components needed from React
  */
@@ -148,7 +147,9 @@ class Main extends Component {
                 <Icon name={"ios-chatboxes-outline"} />
                 <Text>Message</Text>
               </Button>
-              <Button vertical>
+              <Button vertical onPress={() => { 
+                this.props.actions.navigateToScene('FixedSKUListing',{}) 
+                }} >
                 <Icon name={"ios-apps-outline"} />
                 <Text>Utilities</Text>
               </Button>

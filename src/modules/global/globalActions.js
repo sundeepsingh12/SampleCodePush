@@ -41,7 +41,7 @@ import {
 import {
   clearHomeState
 } from '../home/homeActions'
-
+import { NavigationActions } from 'react-navigation'
 import BackgroundTimer from 'react-native-background-timer';
 
 /**
@@ -56,6 +56,15 @@ export function setStore(store) {
   return {
     type: SET_STORE,
     payload: store
+  }
+}
+
+//Use to navigate to other scene
+export function navigateToScene(sceneName, params) {
+  console.log("In navigateToScene")
+  return async function (dispatch) {
+    console.log("In navigateToScene")
+    dispatch(NavigationActions.navigate({ routeName: sceneName, params: params }))
   }
 }
 
