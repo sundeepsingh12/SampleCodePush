@@ -16,6 +16,7 @@ import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
 import checkBox from './checkBox/checkBoxReducer'
 
+import formLayout from './form-layout/formLayoutReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -35,7 +36,11 @@ const rootReducer = combineReducers({
   home,
   listing,
   jobDetails,
+<<<<<<< HEAD
   checkBox,
+=======
+  formLayout,
+>>>>>>> origin/form_layout_screen
 })
 
 export default rootReducer

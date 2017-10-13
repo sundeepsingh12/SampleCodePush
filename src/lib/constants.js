@@ -129,6 +129,7 @@ export default keyMirror({
     TABIDMAP: null,
     SET_TABS_TRANSACTIONS: null,
     JOB_ATTRIBUTE_STATUS: null,
+    HUB:null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -143,6 +144,17 @@ export default keyMirror({
     IS_LAST_PAGE: null,
 
     //Status Codes
+    UNSEEN:null,
+    PENDING:null,
+
+    //Form Layout
+    GET_SORTED_ROOT_FIELD_ATTRIBUTES : null,
+    DISABLE_SAVE : null,
+    UPDATE_FIELD_DATA : null,
+    STATUS_NAME : null,
+    BASIC_INFO : null,
+    ON_BLUR : null,
+    TOOGLE_HELP_TEXT : null,
     UNSEEN: null,
     PENDING: null,
 
@@ -157,6 +169,7 @@ export default keyMirror({
     SET_VALUE_IN_CHECKBOX:null,
     SET_OR_REMOVE_FROM_STATE_ARRAY:null,
     CHECKBOX_BUTTON_CLICKED:null,
+    FormLayout: null
 })
 
 
