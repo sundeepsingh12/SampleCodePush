@@ -7,7 +7,8 @@ const {
     Login,
     Preloader,
     Home,
-    JobDetails
+    JobDetails,
+    FormLayout
 } = require('../../lib/constants').default
 
 export default function nav(state = initialNavState, action) {
@@ -37,6 +38,12 @@ export default function nav(state = initialNavState, action) {
         state
       );
       break;
+      case JobDetails:
+      nextState = AppNavigator.router.getStateForAction(
+       NavigationActions.navigate({ routeName:  FormLayout }),
+       state
+     );
+     break;
     default:
       nextState = AppNavigator.router.getStateForAction(action, state);
       break;

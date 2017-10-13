@@ -79,6 +79,8 @@ export class keyValueDb {
       case 'JOB_SUMMARY':
         schemaInstance = require('../repositories/schema/jobSummary');
         break;
+      case 'HUB': 
+      schemaInstance = require('../repositories/schema/hub');
       default:
         checkCondition = true;
     }
