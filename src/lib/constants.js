@@ -152,6 +152,10 @@ export default keyMirror({
     Preloader: null,
     Home: null,
     JobDetails: null,
+
+    //Signature Actions
+    SET_FIELD_DATA_LIST: null,
+    SAVE_SIGNATURE: null,
 })
 
 
