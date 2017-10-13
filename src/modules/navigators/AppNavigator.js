@@ -19,6 +19,7 @@ import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
 import Signature from '../../containers/Signature'
+import FormLayout from '../../containers/FormLayout'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
 import theme from '../../themes/feTheme'
@@ -73,6 +74,9 @@ export const AppNavigator = StackNavigator({
   },
   Signature: {
     screen: Signature,
+  },
+  FormLayout: {
+    screen: FormLayout
   }
 },
   {
