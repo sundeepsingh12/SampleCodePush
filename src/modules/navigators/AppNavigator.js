@@ -23,7 +23,7 @@ import styles from '../../themes/FeStyle'
 import theme from '../../themes/feTheme'
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import CheckBoxAttribute from '../../containers/CheckBoxAttribute';
 
 class AppWithNavigationState extends React.Component {
   render() {
@@ -69,6 +69,9 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
+     },
+  CheckBoxAttribute: {
+    screen: CheckBoxAttribute,
   }
 },
   {

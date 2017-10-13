@@ -79,3 +79,8 @@ export function deleteSessionToken() {
   }
 }
 
+export function navigateToScene(sceneName,params) {
+ return async function (dispatch) {
+   dispatch(NavigationActions.navigate({ routeName: sceneName,params: params }))
+ }
+}

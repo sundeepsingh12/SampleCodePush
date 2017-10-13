@@ -14,6 +14,8 @@ import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
+import checkBox from './checkBox/checkBoxReducer'
+
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -33,6 +35,7 @@ const rootReducer = combineReducers({
   home,
   listing,
   jobDetails,
+  checkBox,
 })
 
 export default rootReducer
