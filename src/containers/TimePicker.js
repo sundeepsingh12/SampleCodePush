@@ -46,6 +46,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
  class TimePicker extends Component {
    _handleDatePicked = (date) => {
     this.props.actions.handleTimePicker(date);
+    this.props.navigation.goBack();
   };
 //    lapsList() {
 
@@ -59,17 +60,19 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
   
   _hideDateTimePicker = () => {
       this.props.actions.hideDateTimePicker();
+      this.props.navigation.goBack();
   }
     componentDidMount(){
         const attributeID = this.props.navigation.state.params.id;
-        if(attributeID===1 || attributeID===2){
+        if(attributeID===3 || attributeID===5){
           this.props.actions.getDateTimePicker();
         }
     }
   render () {
       const l=this.props.timevalue;
+    //   const {goBack} = this.props.navigation;
       console.log("suisfif",l);
-      const m=(this.props.navigation.state.params.id===1) ?'time' :'date';
+      const m=(this.props.navigation.state.params.id===5) ?'time' :'date';
           return(
               <View>
               <DateTimePicker 
@@ -87,7 +90,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 function mapStateToProps(state) {
     return {
         isTimePickerVisible: state.timePicker.isComponentVisible,
-        timevalue: state.timePicker.value[4],
+        timevalue: state.timePicker.value,
     }
 }
 

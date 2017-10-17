@@ -20,6 +20,7 @@ import TimePicker from '../../containers/TimePicker'
 import DatePicker from '../../containers/DatePicker'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
+import FormLayout from '../../containers/FormLayout'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
 import theme from '../../themes/feTheme'
@@ -77,12 +78,13 @@ export const AppNavigator = StackNavigator({
   },
   DatePicker:{
     screen: DatePicker,
-  }
-},
-  {
-    cardStyle: {
-      backgroundColor: 'white'
-    }
+  },
+  FormLayout: {
+    screen: FormLayout
+   },
+    // cardStyle: {
+    //   backgroundColor: 'white'
+    // },
   });
 
 // const AppWithNavigationState = ({ dispatch, nav }) => (

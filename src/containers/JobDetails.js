@@ -57,7 +57,8 @@ class JobDetails extends Component {
         let statusView = []
         for (let index in statusList) {
             statusView.push(
-                <Button key={statusList[index].id} small primary style={{ margin: 2 }}>
+                <Button key={statusList[index].id} small primary style={{ margin: 2 }}
+                    onPress={()=> this.props.actions.navigateToFormLayout(statusList[index].id,statusList[index].name,this.props.jobTransaction.id)}>
                     <Text style={{ color: 'white' }}>{statusList[index].name}</Text>
                 </Button>
             )
@@ -134,6 +135,7 @@ class JobDetails extends Component {
         }
     }
 };
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDetails)
 

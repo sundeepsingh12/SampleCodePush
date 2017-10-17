@@ -144,7 +144,7 @@ class Main extends Component {
                 <ResyncLoader
                 downloadingJobs = {this.props.downloadingJobs} />
               </Button>
-              <Button onPress={() => { this.props.actions.nextStatusScenes('TimePicker',1) }} vertical>
+              <Button vertical>
                 <Icon name={"ios-chatboxes-outline"} />
                 <Text>Message</Text>
               </Button>
