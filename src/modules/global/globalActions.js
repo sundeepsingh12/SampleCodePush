@@ -19,7 +19,9 @@ const {
   IS_SHOW_MOBILE_NUMBER_SCREEN,
   IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
-  USER
+  USER,
+  TimePicker,
+  DatePicker
 
 } = require('../../lib/constants').default
 
@@ -43,6 +45,7 @@ import {
 } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer';
+import { NavigationActions } from 'react-navigation'
 
 /**
  * ## set the store
@@ -78,4 +81,14 @@ export function deleteSessionToken() {
     }
   }
 }
-
+ 
+export function nextStatusScenes(sceneName,id){
+  return async function (dispatch) {
+    dispatch(NavigationActions.navigate({ routeName: sceneName,params:{id:id}}))
+  }
+}
+export function nextStatusScene(){
+  return async function (dispatch) {
+    dispatch(NavigationActions.navigate({ routeName: DatePicker}))
+  }
+}

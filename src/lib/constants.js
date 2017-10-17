@@ -152,6 +152,14 @@ export default keyMirror({
     Preloader: null,
     Home: null,
     JobDetails: null,
+    TimePicker:null,
+    DatePicker:null,
+     
+    //Date-Time-Picker Actions
+    SHOW_DATETIME_PICKER:null,
+    HIDE_DATETIME_PICKER:null,
+    HANDLE_TIME_PICKED:null,
+    HANDLE_DATE_PICKED:null,
 })
 
 

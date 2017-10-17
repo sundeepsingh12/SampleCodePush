@@ -144,11 +144,11 @@ class Main extends Component {
                 <ResyncLoader
                 downloadingJobs = {this.props.downloadingJobs} />
               </Button>
-              <Button vertical>
+              <Button onPress={() => { this.props.actions.nextStatusScenes('TimePicker',1) }} vertical>
                 <Icon name={"ios-chatboxes-outline"} />
                 <Text>Message</Text>
               </Button>
-              <Button vertical>
+              <Button onPress={() => { this.props.actions.nextStatusScene() }} vertical>
                 <Icon name={"ios-apps-outline"} />
                 <Text>Utilities</Text>
               </Button>
