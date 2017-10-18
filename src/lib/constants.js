@@ -165,14 +165,13 @@ export default keyMirror({
     Home: null,
     JobDetails: null,
     TimePicker:null,
-    DatePicker:null,
+    FormLayout: null,
      
     //Date-Time-Picker Actions
     SHOW_DATETIME_PICKER:null,
     HIDE_DATETIME_PICKER:null,
     HANDLE_TIME_PICKED:null,
     
-    FormLayout: null
 })
 
 

@@ -20,7 +20,7 @@ export default function timePickerReducers(state = initialState, action) {
             return state.set('isComponentVisible',false)
                 
         case HANDLE_TIME_PICKED:
-            return state.set('value',action.payload.time)
+            return state.set('value',action.payload)
                         .set('isComponentVisible',false)
     }
     return state

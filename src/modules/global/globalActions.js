@@ -21,7 +21,6 @@ const {
   IS_PRELOADER_COMPLETE,
   USER,
   TimePicker,
-  DatePicker
 
 } = require('../../lib/constants').default
 
@@ -85,10 +84,5 @@ export function deleteSessionToken() {
 export function nextStatusScenes(sceneName,id){
   return async function (dispatch) {
     dispatch(NavigationActions.navigate({ routeName: sceneName,params:{id:id}}))
-  }
-}
-export function nextStatusScene(){
-  return async function (dispatch) {
-    dispatch(NavigationActions.navigate({ routeName: DatePicker}))
   }
 }
