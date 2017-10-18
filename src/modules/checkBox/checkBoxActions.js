@@ -2,6 +2,8 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { checkBoxDataService } from '../../services/classes/CheckBoxService'
+import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import { CHECKBOX, RADIOBUTTON } from '../../lib/AttributeConstants'
 
 // import { } from '../../services/classes/CheckBoxService'
 
@@ -35,18 +37,19 @@ export function setOrRemoveStates(checkBoxValues, id, attributeTypeId) {
     }
 }
 
-export function checkBoxButtonDone(checkBoxValues, params, jobTransactionId, latestPositionId) {
+export function checkBoxButtonDone(checkBoxValues, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, nextEditable) {
     return async function (dispatch) {
         try {
             checkBoxValues = checkBoxDataService.checkBoxDoneButtonClicked(checkBoxValues)
             await dispatch(actionDispatch(CHECKBOX_BUTTON_CLICKED, checkBoxValues))
-            const fieldDataListData = await checkBoxDataService.prepareFieldDataForTransactionSavingInState(checkBoxValues, jobTransactionId, params.parentId,  latestPositionId)
+            if(params.attributeTypeId == CHECKBOX){
+            const fieldDataListData = await checkBoxDataService.prepareFieldDataForTransactionSavingInState(checkBoxValues, jobTransactionId, params.parentId, latestPositionId)
             console.log("fieldDataList", fieldDataListData)
-            params.value = "ArraySarojFareye"
-            params.childDataList = fieldDataListData.fieldDataList
-            params.latestPositionId = fieldDataListData.latestPositionId
             //LatestpositionId and change form layout state
             console.log("paramss", params)
+
+            dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, "ArraySarojFareye", fieldDataListData))
+            }
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

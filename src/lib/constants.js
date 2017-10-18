@@ -157,6 +157,7 @@ export default keyMirror({
     TOOGLE_HELP_TEXT : null,
     UNSEEN: null,
     PENDING: null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
 
     //Route names (Used in React Navigation)
     Application: null,

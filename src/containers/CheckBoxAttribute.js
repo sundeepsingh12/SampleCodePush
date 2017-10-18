@@ -41,6 +41,7 @@ import {
 
 import { Container, Button, Picker, Title, Option, List, ListItem, Icon, Form, Item, CheckBox, Radio, Content, Card } from 'native-base';
 import * as checkBoxActions from '../modules/checkBox/checkBoxActions'
+import { CHECKBOX, RADIOBUTTON } from '../lib/AttributeConstants'
 
 const {
   SET_VALUE_IN_CHECKBOX,
@@ -99,6 +100,9 @@ class CheckBoxAttribute extends Component {
     this.params = Object.values(Object.values(this.props.navigation.state)[0])[0]
     this.latestPositionId = Object.values(Object.values(this.props.navigation.state)[0])[1]
     this.jobTransactionId = Object.values(Object.values(this.props.navigation.state)[0])[2]
+    this.isSaveDisabled = Object.values(Object.values(this.props.navigation.state)[0])[3]
+    this.formElement = Object.values(Object.values(this.props.navigation.state)[0])[4]
+    this.nextEditable = Object.values(Object.values(this.props.navigation.state)[0])[5]
     console.log("helloparamslatestPositionId", this.latestPositionId)
     console.log("helloparamsjobTransactionId", this.jobTransactionId)
     console.log("helloparams", this.params)
@@ -134,7 +138,7 @@ class CheckBoxAttribute extends Component {
     console.log("componentWillMount()")
     console.log(this.params)
     const attributeID = this.params.attributeTypeId;
-        if(attributeID===3 || attributeID===5){
+        if(attributeID == 3 || attributeID == 5){
           this.props.actions.actionDispatch(SHOW_DATETIME_PICKER,null);
         }
         else{
@@ -178,7 +182,7 @@ class CheckBoxAttribute extends Component {
     console.log("renderMethodCheckBox", this.props.checkBoxValues)
     //Todo
     //Add loader &constant instead of 8
-    if (this.params.attributeTypeId === 8) {
+    if (this.params.attributeTypeId == CHECKBOX) {
       return (
         <Container>
           <View style={styles.container}>
@@ -187,13 +191,14 @@ class CheckBoxAttribute extends Component {
               renderItem={({ item }) => this.renderDataCheckBox(item)}
               keyExtractor={item => item.id}
             />
-            <Button onPress={() => { this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId) }}>
+            <Button onPress={() => { this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId, this.isSaveDisabled, this.formElement, this.nextEditable) 
+                                    this.props.navigation.goBack()}}>
               <Text> DONE </Text>
             </Button>
           </View>
         </Container>
       )
-    } else if(this.params.attributeTypeId === 9) {
+    } else if(this.params.attributeTypeId == RADIOBUTTON) {
       return (
         <Container>
           <View style={styles.container}>
@@ -202,7 +207,8 @@ class CheckBoxAttribute extends Component {
               renderItem={({ item }) => this.renderDataRadioButton(item)}
               keyExtractor={item => item.id}
             />
-            <Button onPress={() => { this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId) }}>
+            <Button onPress={() => { this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId, this.isSaveDisabled, this.formElement, this.nextEditable) 
+                                   this.props.navigation.goBack()}}>
               <Text> DONE </Text>
             </Button>
           </View>

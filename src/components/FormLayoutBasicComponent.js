@@ -160,7 +160,7 @@ class BasicFormElement extends Component {
 
             default:
                 return (
-                    <Text onPress={() => { this.props.actions.navigateToScene('CheckBoxAttribute',{params: this.props.item, latestPositionId: this.props.latestPositionId, jobTransactionId: this.props.jobTransactionId}) }} vertical style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                    <Text onPress={() => { this.props.actions.navigateToScene('CheckBoxAttribute',{params: this.props.item, latestPositionId: this.props.latestPositionId, jobTransactionId: this.props.jobTransactionId, isSaveDisabled:this.props.isSaveDisabled, formElement:this.props.formElement, nextEditable:this.props.nextEditable}) }} vertical style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
                         Under construction  {this.props.item.label} - attributeTypeId {this.props.item.attributeTypeId}
                     </Text>
                 )

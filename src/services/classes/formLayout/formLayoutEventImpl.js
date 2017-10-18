@@ -16,11 +16,13 @@ import moment from 'moment'
 
 export default class FormLayoutEventImpl {
 
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value){
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value,childDataList){
         console.log('inside interface impl with attributeMasterId', attributeMasterId);
         this.updateFieldInfo(attributeMasterId,value,formLayoutObject);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
 
+        console.log("childDataList",childDataList)
+        formLayoutObject.get(attributeMasterId).childDataList = childDataList;
         const nextEditableElements = nextEditable[attributeMasterId];
         if(!nextEditableElements || nextEditableElements.length == 0){
             return {formLayoutObject,nextEditable,isSaveDisabled} // there is no next element so return
