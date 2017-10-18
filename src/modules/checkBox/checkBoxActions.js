@@ -1,7 +1,7 @@
 'use strict'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { checkBoxDataLists } from '../../services/classes/CheckBoxService'
+import { checkBoxDataService } from '../../services/classes/CheckBoxService'
 
 // import { } from '../../services/classes/CheckBoxService'
 
@@ -13,7 +13,7 @@ const {
 } = require('../../lib/constants').default
 
 
-export function actionDispatch(type,payload) {
+export function actionDispatch(type, payload) {
     return {
         type: type,
         payload: payload
@@ -22,11 +22,11 @@ export function actionDispatch(type,payload) {
 
 
 
-export function setOrRemoveStates(checkBoxValues,id){
-     return async function (dispatch) {
+export function setOrRemoveStates(checkBoxValues, id, attributeTypeId) {
+    return async function (dispatch) {
         try {
-            checkBoxValues =  checkBoxDataLists.setOrRemoveState(checkBoxValues,id)
-            dispatch(actionDispatch(SET_OR_REMOVE_FROM_STATE_ARRAY,checkBoxValues))
+            checkBoxValues = checkBoxDataService.setOrRemoveState(checkBoxValues, id, attributeTypeId)
+            dispatch(actionDispatch(SET_OR_REMOVE_FROM_STATE_ARRAY, checkBoxValues))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
@@ -35,11 +35,18 @@ export function setOrRemoveStates(checkBoxValues,id){
     }
 }
 
-export function checkBoxButtonDone(checkBoxValues){
-     return async function (dispatch) {
+export function checkBoxButtonDone(checkBoxValues, params, jobTransactionId, latestPositionId) {
+    return async function (dispatch) {
         try {
-            checkBoxValues =  checkBoxDataLists.checkBoxDoneButtonClicked(checkBoxValues)
-            dispatch(actionDispatch(CHECKBOX_BUTTON_CLICKED,checkBoxValues))
+            checkBoxValues = checkBoxDataService.checkBoxDoneButtonClicked(checkBoxValues)
+            await dispatch(actionDispatch(CHECKBOX_BUTTON_CLICKED, checkBoxValues))
+            const fieldDataListData = await checkBoxDataService.prepareFieldDataForTransactionSavingInState(checkBoxValues, jobTransactionId, params.parentId,  latestPositionId)
+            console.log("fieldDataList", fieldDataListData)
+            params.value = "ArraySarojFareye"
+            params.childDataList = fieldDataListData.fieldDataList
+            params.latestPositionId = fieldDataListData.latestPositionId
+            //LatestpositionId and change form layout state
+            console.log("paramss", params)
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
@@ -49,14 +56,14 @@ export function checkBoxButtonDone(checkBoxValues){
 }
 
 
-export function getCheckBoxData() {
+export function getCheckBoxData(fieldAttributeMasterId) {
     console.log("entered getcheckboxdata")
     return async function (dispatch) {
         try {
-            const wholeData = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
-            console.log("wholeData")
-            const checkBoxDataList = await checkBoxDataLists.getcheckBoxDataList(wholeData.value, '43159')
-            dispatch(actionDispatch(SET_VALUE_IN_CHECKBOX,checkBoxDataList))
+            const wholeDataFromMaster = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
+            console.log("wholeDataFromMaster", wholeDataFromMaster)
+            const checkBoxDataList = await checkBoxDataService.getcheckBoxDataList(wholeDataFromMaster.value, fieldAttributeMasterId)
+            dispatch(actionDispatch(SET_VALUE_IN_CHECKBOX, checkBoxDataList))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

@@ -5,4 +5,6 @@ module.exports = {
     LANDMARK: 30,
     PINCODE: 31,
     SKU_ARRAY: 17,
+    CHECKBOX: 8,
+    RADIOBUTTON:9,
 }

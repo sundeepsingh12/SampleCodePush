@@ -169,7 +169,12 @@ export default keyMirror({
     SET_VALUE_IN_CHECKBOX:null,
     SET_OR_REMOVE_FROM_STATE_ARRAY:null,
     CHECKBOX_BUTTON_CLICKED:null,
-    FormLayout: null
+    FormLayout: null,
+
+    //Date Time Picker
+    SHOW_DATETIME_PICKER:null,
+    HIDE_DATETIME_PICKER:null,
+    HANDLE_TIME_PICKED:null,
 })
 
 

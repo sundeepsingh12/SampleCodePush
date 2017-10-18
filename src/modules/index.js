@@ -36,11 +36,8 @@ const rootReducer = combineReducers({
   home,
   listing,
   jobDetails,
-<<<<<<< HEAD
   checkBox,
-=======
   formLayout,
->>>>>>> origin/form_layout_screen
 })
 
 export default rootReducer
