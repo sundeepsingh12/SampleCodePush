@@ -19,16 +19,20 @@ import {
     TOTAL_ORIGINAL_QUANTITY,
     TOTAL_ACTUAL_QUANTITY,
     MONEY_COLLECT,
-    MONEY_PAY
+    MONEY_PAY,
+    ACTUAL_AMOUNT
 } from '../../lib/AttributeConstants'
 class SignatureRemarks {
 
-    getRemarksList(fieldDataList) {
-        var checkCondition;
+    filterRemarksList(fieldDataList) { //TODO add javadoc
+        if (fieldDataList == undefined)
+            return []
+
+        let checkCondition;
         let dataList = []
         for (var [key, fieldDataObject] of fieldDataList.entries()) {
             let dataObject = {}
-            switch (key) {
+            switch (fieldDataObject.attributeTypeId) {
                 case CAMERA_HIGH:
                 case CAMERA_MEDIUM:
                 case CAMERA:
@@ -49,36 +53,27 @@ class SignatureRemarks {
                 default:
                     checkCondition = true;
             }
-            if (!fieldDataObject.hidden && fieldDataObject.value !== undefined && fieldDataObject.value !== null && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
-                dataObject.label = fieldDataObject.label
-                dataObject.value = fieldDataObject.value
-                dataList.push(dataObject)
+            if (fieldDataObject && !fieldDataObject.hidden && fieldDataObject.value && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
+                let { label, value } = fieldDataObject
+                dataList.push({ label, value })
             }
-            if (fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) {
-
-                if (fieldDataObject.childFieldDataList.length > 0) {
-                    for (let childFieldData of fieldDataObject.childFieldDataList) {
-                        if (childFieldData.attributeTypeId == 26) {
-                            dataObject.label = childFieldData.label
-                            dataObject.value = childFieldData.value
-                            dataList.push(dataObject)
-                        }
+            if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childFieldDataList != null) {
+                for (let childFieldData of fieldDataObject.childFieldDataList) {
+                    if (childFieldData.attributeTypeId == ACTUAL_AMOUNT) {
+                        let { label, value } = childFieldData
+                        dataList.push({ label, value })
                     }
                 }
             }
-
         }
         return dataList
     }
     async saveFile(result) {
-       // console.log('===' + result.encoded)
         const currentTimeInMillis = moment()
-       // var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
-       var PATH_TEMP = 'storage/emulated/0/'
-        //RNFS.mkdir(PATH_TEMP);        
-        await RNFS.writeFile(PATH_TEMP + 'sign_' + currentTimeInMillis + '.jpg', result.encoded, 'base64');
-        var stat = await RNFS.stat(PATH_TEMP + 'sign_' + currentTimeInMillis + '.jpg');
-         console.log('=====img size '+stat.size);
+        var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP'; //TODO update variable name
+        var image_name = 'sign_' + currentTimeInMillis + '.jpg'
+        await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
+        return image_name
     }
 }
 

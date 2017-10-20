@@ -43,7 +43,7 @@ import {
 } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer';
-
+import { NavigationActions } from 'react-navigation'
 /**
  * ## set the store
  *

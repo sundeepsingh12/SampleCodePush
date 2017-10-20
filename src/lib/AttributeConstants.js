@@ -20,6 +20,7 @@ module.exports = {
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
     MONEY_COLLECT: 18,
-    MONEY_PAY: 19
+    MONEY_PAY: 19,
+    ACTUAL_AMOUNT: 26
     
 }

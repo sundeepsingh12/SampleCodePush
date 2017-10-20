@@ -9,9 +9,6 @@ import {
     from 'react-native'
 import SignatureCapture from 'react-native-signature-capture';
 class SignatureView extends Component {
-    constructor(props) {
-        super(props);
-      }
     render() {
         return (
             <View style={{ flex: 1, flexDirection: "column" }}>
@@ -19,11 +16,11 @@ class SignatureView extends Component {
                     style={[{ flex: 1 }, styles.signature]}
                     ref="sign"
                     onSaveEvent={this.onSaveEvent}
-                    onDragEvent={this._onDragEvent}
+                    onDragEvent={this.onDragEvent}
                     saveImageFileInExtStorage={false}
                     showNativeButtons={false}
                     showTitleLabel={false}
-                    viewMode={"landscape"} />
+                    viewMode='landscape' />
 
                 <View style={{ flexDirection: "row" }}>
                     <TouchableHighlight style={styles.buttonStyle}
@@ -50,10 +47,10 @@ class SignatureView extends Component {
         this.refs["sign"].resetImage();
     }
 
-     onSaveEvent = (result) => {
-         this.props.onSaveEvent(result)
+    onSaveEvent = (result) => {
+        this.props.onSaveEvent(result)
     }
-    _onDragEvent() {
+    onDragEvent() {
         // This callback will be called when the user enters signature
         console.log("dragged");
     }

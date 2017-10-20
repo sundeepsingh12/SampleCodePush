@@ -2,10 +2,14 @@
 const {
     SET_FIELD_DATA_LIST,
     SAVE_SIGNATURE,
+    USER,
+    FormLayout
 } = require('../../lib/constants').default
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
+import moment from 'moment'
+import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 
 export function setFieldDataList(fieldDataList) {
     return {
@@ -14,20 +18,22 @@ export function setFieldDataList(fieldDataList) {
     }
 }
 
-export function saveSignature(result) {
-  //  console.log('in onsave' + result.encoded)
+export function saveSignature(result, fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled) {
     return async function (dispatch) {
-        await signatureService.saveFile(result);
+        const image_name = await signatureService.saveFile(result);
+        const user = await keyValueDBService.getValueFromStore(USER);
+        const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
+        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value))
     }
 }
 
-export function getRemarksValidationList(fieldAttributeMasterId, fieldDataList) {
+export function getRemarksList(fieldDataList) {
     return async function (dispatch) {
         try {
-            // dispatch(setFieldDataList(signatureService.getRemarksList(fieldDataList.get(fieldAttributeMasterId))))
-            dispatch(setFieldDataList(fieldDataList.get(6)))
+            const remarksList = signatureService.filterRemarksList(fieldDataList)
+            dispatch(setFieldDataList(remarksList))
         } catch (error) {
-            console.log(error)
+            console.log(error) // TODo handle UI
         }
     }
 }
