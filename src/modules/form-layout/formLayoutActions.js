@@ -7,7 +7,8 @@ const {
     STATUS_NAME,
     ON_BLUR,
     TOOGLE_HELP_TEXT,
-    BASIC_INFO
+    BASIC_INFO,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA
 } = require('../../lib/constants').default
 
 import {formLayoutService} from '../../services/classes/formLayout/FormLayout.js'
@@ -52,6 +53,13 @@ export function _toogleHelpText(formLayout){
     return {
         type : TOOGLE_HELP_TEXT,
         payload :formLayout
+    }
+}
+
+export function setState(type, payload) {
+    return {
+        type: type,
+        payload: payload
     }
 }
 
@@ -105,3 +113,19 @@ export function saveJobTransaction(formElement,jobTransactionId,statusId){
         formLayoutEventsInterface.saveDataInDb(formElement,jobTransactionId,statusId);
     }
 }  
+
+export function updateFieldDataWithChildData(attributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListObject) {
+    return function (dispatch) {
+        const cloneFormElement = new Map(formElement);
+        console.log('cloneFormElement', cloneFormElement);
+        const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList);
+        dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+            {
+                formElement: updatedFieldDataObject.formLayoutObject,
+                latestPositionId: fieldDataListObject.latestPositionId,
+                nextEditable: updatedFieldDataObject.nextEditable,
+                isSaveDisabled: updatedFieldDataObject.isSaveDisabled
+            }
+        ));
+    }
+}

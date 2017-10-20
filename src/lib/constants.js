@@ -157,6 +157,8 @@ export default keyMirror({
     TOOGLE_HELP_TEXT : null,
     UNSEEN: null,
     PENDING: null,
+    FormLayout: null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
 
     //Route names (Used in React Navigation)
     Application: null,
@@ -167,9 +169,8 @@ export default keyMirror({
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
-    INFLATE_FIXEDSKU_CHILD: null,
     CHANGE_QUANTITY: null,
-    FormLayout: null
+    SET_FIXED_SKU:null
 })
 
 

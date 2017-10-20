@@ -16,9 +16,9 @@ import moment from 'moment'
 
 export default class FormLayoutEventImpl {
 
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value){
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value,fieldDataList){
         console.log('inside interface impl with attributeMasterId', attributeMasterId);
-        this.updateFieldInfo(attributeMasterId,value,formLayoutObject);
+        this.updateFieldInfo(attributeMasterId,value,formLayoutObject,null,fieldDataList);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
 
         const nextEditableElements = nextEditable[attributeMasterId];
@@ -60,8 +60,9 @@ export default class FormLayoutEventImpl {
         return isSaveDisabled;
     }
 
-    updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom){
+    updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom,fieldDataList){
         formLayoutObject.get(attributeMasterId).value = value;
+        formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
         if(value && value.length > 0 && calledFrom == ON_BLUR){
             formLayoutObject.get(attributeMasterId).showCheckMark = true;
         }

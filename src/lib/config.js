@@ -12,8 +12,8 @@ module.exports = {
       url: 'https://www.fareye.co/app'
     },
     staging: {
-      // url: 'https://staging.fareye.co/app'
-      url: 'http://192.168.1.206:8080/app'
+      url: 'https://staging.fareye.co/app'
+      // url: 'http://192.168.1.206:8080/app'
     },
     port:1883,
     PUSH_QOS:2

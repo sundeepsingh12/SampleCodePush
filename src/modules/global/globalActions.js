@@ -60,11 +60,9 @@ export function setStore(store) {
 }
 
 //Use to navigate to other scene
-export function navigateToScene(sceneName, params) {
-  console.log("In navigateToScene")
+export function navigateToScene(routeName, params) {
   return async function (dispatch) {
-    console.log("In navigateToScene")
-    dispatch(NavigationActions.navigate({ routeName: sceneName, params: params }))
+    dispatch(NavigationActions.navigate({ routeName, params }))
   }
 }
 

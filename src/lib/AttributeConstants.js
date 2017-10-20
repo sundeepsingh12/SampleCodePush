@@ -8,5 +8,9 @@ module.exports = {
     FIXED_SKU_QUANTITY: 6,
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,
-    FIXED_SKU_OBJECT: 11
+    OBJECT_ATTR_ID: 11,
+    FIXED_SKU: 50,
+    OBJECT_SAROJ_FAREYE: 'ObjectSarojFareye',
+    TOTAL_AMOUNT: 'TotalAmount',
+    ARRAY_SAROJ_FAREYE:'ArraySarojFareye'
 }

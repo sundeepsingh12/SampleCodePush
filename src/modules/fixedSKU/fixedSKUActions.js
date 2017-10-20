@@ -1,65 +1,45 @@
 'use strict'
 
-import { FixedSKUDetailsService } from '../../services/classes/FixedSKUListing'
-import {
-    keyValueDBService,
-} from '../../services/classes/KeyValueDBService'
+import { fixedSKUDetailsService } from '../../services/classes/FixedSKUListing'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import { fieldAttributeService } from '../../services/classes/FieldAttribute'
 const {
     FIELD_ATTRIBUTE_VALUE,
     FIELD_ATTRIBUTE,
     IS_LOADER_RUNNING,
-    INFLATE_FIXEDSKU_CHILD,
     CHANGE_QUANTITY,
+    SET_FIXED_SKU,
 } = require('../../lib/constants').default
 import {
-    FIXED_SKU_QUANTITY,
-    FIXED_SKU_UNIT_PRICE,
-    FIXED_SKU_CODE
+    ARRAY_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
-import { navigateToScene } from '../global/globalActions'
+
+
 export function actionDispatch(type, payload) {
     return {
         type: type,
         payload: payload
     }
 }
-export function onSave(fixedSKUList) {
+
+export function onSave(parentObject, formElement, nextEditable, fixedSKUList, isSaveDisabled, latestPositionId, jobTransactionId) {
     return async function (dispatch) {
         try {
-            dispatch(actionDispatch(IS_LOADER_RUNNING, true))
-            fixedSKUList = FixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
-            let payload = {
-                fixedSKUList: fixedSKUList,
-                isLoaderRunning: false
-            }
-            // console.log('divyanshu',payload)
-            dispatch(actionDispatch(INFLATE_FIXEDSKU_CHILD, payload))
+            fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
+            let fieldDataListWithLatestPositionId = await fieldAttributeService.prepareFieldDataForTransactionSavingInState(Object.values(fixedSKUList), jobTransactionId, parentObject.parentId, latestPositionId)
+            dispatch(actionDispatch(SET_FIXED_SKU, fixedSKUList))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
         } catch (error) {
             console.log(error)
         }
     }
 }
 
-export function onChangeQuantity(fixedSKUList, payload) {
-    return function (dispatch) {
+export function onChangeQuantity(fixedSKUList, totalQuantity, payload) {
+    return async function (dispatch) {
         try {
-            let tempFixedSKUList = { ...fixedSKUList }
-            if (payload.quantity != undefined) {
-                tempFixedSKUList[payload.id].childDataList[FIXED_SKU_QUANTITY].value = parseInt(payload.quantity)
-            } else {
-                tempFixedSKUList[payload.id].childDataList[FIXED_SKU_QUANTITY].value = 0
-            }
-            let totalQuantity = 0
-            for (let fixedSKUObjectCounter in tempFixedSKUList) {
-                let fixedSKUChildDataList = tempFixedSKUList[fixedSKUObjectCounter].childDataList
-                if (fixedSKUChildDataList && fixedSKUChildDataList[FIXED_SKU_QUANTITY].value) {
-                    totalQuantity = totalQuantity + parseInt(fixedSKUChildDataList[FIXED_SKU_QUANTITY].value)
-                }
-            }
-            let payload1 = {
-                tempFixedSKUList,
-                totalQuantity
-            }
+            let payload1 = await fixedSKUDetailsService.calculateQuantity(fixedSKUList, totalQuantity, payload)
             dispatch(actionDispatch(CHANGE_QUANTITY, payload1))
         } catch (error) {
             console.log(error)
@@ -67,19 +47,15 @@ export function onChangeQuantity(fixedSKUList, payload) {
     }
 }
 
-export function fetchFixedSKU(attributeTypeId, fieldAttributeMasterId) {
+export function fetchFixedSKU(fieldAttributeMasterId) {
     return async function (dispatch) {
         try {
             dispatch(actionDispatch(IS_LOADER_RUNNING, true))
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const fieldAttributeValueDataArray = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
-            const fixedSKUChildList = await FixedSKUDetailsService.prepareFixedSKUChild(fieldAttributeValueDataArray.value, fieldAttributeMasterId)
-            const fixedSKUList = await FixedSKUDetailsService.prepareFixedSKU(fieldAttributeMasterList.value, fixedSKUChildList, fieldAttributeMasterId)
-            let payload = {
-                fixedSKUList: fixedSKUList,
-                isLoaderRunning: false
-            }
-            dispatch(actionDispatch(INFLATE_FIXEDSKU_CHILD, payload))
+            const fixedSKUList = await fixedSKUDetailsService.prepareFixedSKU(fieldAttributeMasterList.value, fieldAttributeValueDataArray.value, fieldAttributeMasterId)
+            dispatch(actionDispatch(SET_FIXED_SKU, fixedSKUList))
+            dispatch(actionDispatch(IS_LOADER_RUNNING, false))
         } catch (error) {
             console.log(error)
         }

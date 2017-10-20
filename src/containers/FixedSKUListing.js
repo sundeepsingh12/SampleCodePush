@@ -1,28 +1,16 @@
 'use strict'
 import React, { Component } from 'react'
-import {
-  StyleSheet,
-  View,
-  Text,
-  Platform,
-  FlatList,
-  Slider,
-  TextInput,
-}
-  from 'react-native'
-import { Container, Content, Tab, Tabs, Body, Button, Header, Title, Left, Right, Card, CardItem } from 'native-base';
+import { StyleSheet, View, Text, FlatList } from 'react-native'
+import { Container, Button } from 'native-base';
 import * as fixedSKUActions from '../modules/fixedSKU/fixedSKUActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import Loader from '../components/Loader'
-import {
-  FIXED_SKU_QUANTITY,
-  FIXED_SKU_UNIT_PRICE,
-  FIXED_SKU_CODE
-} from '../lib/AttributeConstants'
+import { ARRAY_SAROJ_FAREYE } from '../lib/AttributeConstants'
 import * as globalActions from '../modules/global/globalActions'
+import FixedSKUListItem from '../components/FixedSKUListItem'
 
-var styles = StyleSheet.create({
+let styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     flex: 1,
@@ -48,12 +36,20 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FixedSKUListing extends Component {
+  constructor(props) {
+    super(props)
+    let navigationState = this.props.navigation.state.params
+    this.parentObject = navigationState['params']
+    this.jobTransactionId = navigationState['jobTransactionId']
+    this.latestPositionId = navigationState['latestPositionId']
+    this.formElement = navigationState['formElement']
+    this.nextEditable = navigationState['nextEditable']
+    this.isSaveDisabled = navigationState['isSaveDisabled']
+  }
 
   componentWillMount() {
-    if (Object.keys(this.props.fixedSKUList).length === 0) {
-      let attributeTypeId = 1;
-      let fieldAttributeMasterId = 42133;
-      this.props.actions.fetchFixedSKU(attributeTypeId, fieldAttributeMasterId)
+    if (this.parentObject.value != ARRAY_SAROJ_FAREYE) {
+      this.props.actions.fetchFixedSKU(this.parentObject.fieldAttributeMasterId)
     }
   }
 
@@ -61,54 +57,12 @@ class FixedSKUListing extends Component {
   renderData = (item) => {
     if (item.childDataList) {
       return (
-        <View>
-          <Content>
-            <Card>
-              <CardItem >
-                <Text>Code : {item.childDataList[FIXED_SKU_CODE].value}</Text>
-              </CardItem>
-              <CardItem >
-                <Text>Unit Price : {item.childDataList[FIXED_SKU_UNIT_PRICE].value}</Text>
-              </CardItem>
-              <CardItem>
-                <Slider style={{
-                  width: 300, flex: 9,
-                  flexDirection: 'column',
-                }}
-                  maximumValue={9999}
-                  minimumValue={0}
-                  onSlidingComplete={(quantity) => {
-                    let payload = {
-                      id: item.id,
-                      quantity: quantity
-                    }
-                    this.props.actions.onChangeQuantity(this.props.fixedSKUList, payload)
-                  }}
-                />
-                <TextInput style={{ flex: 1 }}
-                  editable={true}
-                  maxLength={4}
-                  placeholder={'0'}
-                  keyboardType={'numeric'}
-                  onChangeText={(quantity) => {
-                    let payload = {
-                      id: item.id,
-                      quantity
-                    }
-                    this.props.actions.onChangeQuantity(this.props.fixedSKUList, payload)
-                  }}
-                >{item.childDataList[FIXED_SKU_QUANTITY].value}
-                </TextInput>
-              </CardItem>
-            </Card>
-          </Content>
-        </View>
+        <FixedSKUListItem item={item} />
       )
     }
   }
 
   render() {
-    console.log('render called after save'+this.props.isLoaderRunning);
     if (this.props.isLoaderRunning) {
       return (
         <Loader />
@@ -123,13 +77,13 @@ class FixedSKUListing extends Component {
             keyExtractor={item => item.id}
           />
           <Text style={{ marginBottom: 10, marginTop: 10 }}>
-            Total Qauntity : {this.props.totalQuantity}
+            Total Quantity : {parseInt(this.props.totalQuantity)}
           </Text>
           <Button>
             <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}
               onPress={() => {
-                this.props.actions.onSave(this.props.fixedSKUList)
-                this.props.actions.navigateToScene('Home', {})
+                this.props.actions.onSave(this.parentObject, this.formElement, this.nextEditable, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransactionId)
+                this.props.navigation.goBack()
               }}>
               Save
               </Text>
@@ -138,7 +92,7 @@ class FixedSKUListing extends Component {
       </Container>
     )
   }
-};
+}
 
 /**
  * Connect the properties
