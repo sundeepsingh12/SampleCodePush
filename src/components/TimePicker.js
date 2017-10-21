@@ -40,6 +40,7 @@ import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
 import { connect } from 'react-redux'
+import { DatePickerAndroid, TimePickerAndroid } from 'react-native';
 import styles from '../themes/FeStyle'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -91,27 +92,61 @@ export const payloadElement = (attributeMasterId,formElement) => {
  class TimePicker extends Component {
  
   
-  _hideDateTimePicker = () => {
+ _hideDateTimePicker = () => {
         const payload = payloadElement(this.props.item.fieldAttributeMasterId,this.props.elements);
         this.props.actions.actionDispatch(HIDE_DATETIME_PICKER,payload);
   }
+
  _handleDatePicked = (date) => {
         const payload = payloadElement(this.props.item.fieldAttributeMasterId,this.props.element);
         this.props.actions.actionDispatch(HIDE_DATETIME_PICKER,payload);
         this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId,this.props.element,this.props.element.nextEditable,this.props.element.isSaveDisabled,date.toString());    
   }
 
+ _minimumDate = () => {
+    const leftValidation = (!this.props.item.validation) ? null : this.props.item.validation[0].leftKey
+    let date = (leftValidation) ? new Date() : undefined;
+       if(leftValidation && date){
+           let leftKey = leftValidation.split(',')
+           if(leftKey[1] == "+"){
+               date.setDate(date.getDate() + parseInt(leftKey[2]));
+           }else{
+               date.setDate(date.getDate() - parseInt(leftKey[2]));
+           }
+       }
+    return date;
+    }
+
+ _maximumDate = () => {
+    const leftValidation = (!this.props.item.validation) ? null : this.props.item.validation[0].rightKey
+    let date = (leftValidation) ? new Date() : undefined;
+      if(leftValidation && date){
+          let leftKey = leftValidation.split(',')
+          if(leftKey[1] == "+"){
+               date.setDate(date.getDate() + parseInt(leftKey[2]));
+          }else{
+               date.setDate(date.getDate() - parseInt(leftKey[2]));
+            }
+        }
+    return date;
+    }
+
+
   render () {
       console.log('render time',this.props.item)
-      const mode=(this.props.item.attributeTypeId == 5) ?'time' :'date';
-          return(
-              <DateTimePicker 
-              isVisible={this.props.item.isVisible}
-              onConfirm={this._handleDatePicked}
-              onCancel={this._hideDateTimePicker}
-              mode={mode}
-              />
-          )
+      const mode = (this.props.item.attributeTypeId == 5) ?'time' :'date';
+      const minimum = (this.props.item.isVisible) ? this._minimumDate() : undefined ;
+      const maximum = (this.props.item.isVisible) ? this._maximumDate() : undefined ;
+      return(
+        <DateTimePicker 
+        isVisible = {this.props.item.isVisible}
+        onConfirm = {this._handleDatePicked}
+        onCancel = {this._hideDateTimePicker}
+        mode = {mode}
+        minimumDate = { minimum}
+        maximumDate = { maximum}
+        />
+        )
       }     
        }
 /**

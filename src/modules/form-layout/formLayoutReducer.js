@@ -60,9 +60,7 @@ export default function formLayoutReducer(state = initialState, action){
         }
         case HIDE_DATETIME_PICKER :{
             return state.set('formElement',action.payload);
-        }
-        
-                
+        }            
     }
     return state;
 }

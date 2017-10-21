@@ -14,7 +14,6 @@ import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
-import timePicker from './date-time-picker/dateTimePickerReducer'
 import formLayout from './form-layout/formLayoutReducer'
 // import profile from './profile/profileReducer'
 
@@ -35,7 +34,6 @@ const rootReducer = combineReducers({
   home,
   listing,
   jobDetails,
-  timePicker,
   formLayout,
 })
 
