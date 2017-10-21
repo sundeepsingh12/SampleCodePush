@@ -11,8 +11,18 @@ const {
     BASIC_INFO
   } = require('../../lib/constants').default
   
+const {
+    SHOW_DATETIME_PICKER,
+    HIDE_DATETIME_PICKER,
+} = require('../../lib/constants').default
 
-
+const _onPressVisible= (element,Id)=>{
+        element.forEach(element => {
+                    if (element.attributeTypeId == Id) {
+                      element.isVisible = true;
+                    }})
+        return element;
+    }
 const initialState = new InitialState();
 
 export default function formLayoutReducer(state = initialState, action){
@@ -45,6 +55,14 @@ export default function formLayoutReducer(state = initialState, action){
         case TOOGLE_HELP_TEXT : {
             return state.set('formElement',action.payload)
         }
+        case SHOW_DATETIME_PICKER:{
+            return state.set('formElement',action.payload)
+        }
+        case HIDE_DATETIME_PICKER :{
+            return state.set('formElement',action.payload);
+        }
+        
+                
     }
     return state;
 }

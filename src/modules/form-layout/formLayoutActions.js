@@ -7,11 +7,12 @@ const {
     STATUS_NAME,
     ON_BLUR,
     TOOGLE_HELP_TEXT,
-    BASIC_INFO
+    BASIC_INFO,
 } = require('../../lib/constants').default
 
 import {formLayoutService} from '../../services/classes/formLayout/FormLayout.js'
 import {formLayoutEventsInterface} from '../../services/classes/formLayout/FormLayoutEventInterface.js'
+import {actionDispatch} from '../global/globalActions'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {

@@ -21,7 +21,7 @@ export default class FormLayoutEventImpl {
         this.updateFieldInfo(attributeMasterId,value,formLayoutObject);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
 
-        const nextEditableElements = nextEditable[attributeMasterId];
+        const nextEditableElements = (!nextEditable) ? null : nextEditable[attributeMasterId];
         if(!nextEditableElements || nextEditableElements.length == 0){
             return {formLayoutObject,nextEditable,isSaveDisabled} // there is no next element so return
         }

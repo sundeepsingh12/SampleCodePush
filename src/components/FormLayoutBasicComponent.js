@@ -19,8 +19,10 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
-
-
+import TimePicker,{payloadElement} from '../components/TimePicker'
+const {
+    SHOW_DATETIME_PICKER,
+} = require('../lib/constants').default
 
 
 function mapStateToProps(state){
@@ -72,10 +74,7 @@ class BasicFormElement extends Component {
               }
         }
     }
-    _timePicker(){
-
-    }
-
+   
     render(){
         switch(this.props.item.attributeTypeId){
             case this.STRING : 
@@ -85,7 +84,7 @@ class BasicFormElement extends Component {
             return (
                 renderIf (!this.props.item.hidden, 
                     <Card>
-                    <CardItem>
+                    <CardItem onPress={()=> this.props.actions.setVisible(SHOW_DATETIME_PICKER,Id,this.props.formElement)}>
                         <Body style={StyleSheet.flatten([styles.padding0])}>
                         <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                             <View style={StyleSheet.flatten([{flexBasis: '12%', paddingTop: 2}])}>
@@ -131,11 +130,9 @@ class BasicFormElement extends Component {
                                     
                                 />
                             </View>
-                            {
-                                renderIf(this.props.item.helpText && this.props.item.showHelpText,
-                                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, {color: '#999999'}])}>
-                                        {this.props.item.helpText} </Text>
-                            )}
+                            <View>
+                                <TimePicker  item= {this.props.item} element ={this.props.formElement}/>
+                            </View>
                         </View>
                         </View>
                         </Body>
@@ -145,10 +142,27 @@ class BasicFormElement extends Component {
             )
 
             default :
+            console.log("fsvjfs",this.props.item)
+            console.log("hfv",this.props.formElement)
             return (
-                <Text onPress={() => { this.props.actions.nextStatusScenes('TimePicker',this.props.item.attributeTypeId) }}>
-                  Under construction  {this.props.item.label} - attributeTypeId {this.props.item.attributeTypeId}
-                  </Text>
+                renderIf((this.props.item.attributeTypeId == 3 || this.props.item.attributeTypeId == 5 || this.props.item.attributeTypeId == 33),
+                <View>
+                    <View  style={StyleSheet.flatten([styles.row])}>
+                            <View style={StyleSheet.flatten([{flexBasis: '80%'}])}>
+                                <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}  onPress={()=> this.props.actions.actionDispatch(SHOW_DATETIME_PICKER, payloadElement(this.props.item.fieldAttributeMasterId,this.props.formElement))} >
+                                    {this.props.item.label}
+                                </Text>
+                                <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, {color: '#999999'}])}>
+                                    {this.props.item.subLabel}
+                                </Text>
+                                
+                            </View>
+                    </View>
+                     <View>
+                        <TimePicker  item= {this.props.item} element ={this.props.formElement}/>
+                    </View>
+                </View>
+                )
             )
         }
     }

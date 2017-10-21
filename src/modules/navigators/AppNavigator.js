@@ -16,7 +16,6 @@ import Application from '../../containers/Application'
 import Home from '../../containers/Home'
 import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
-import TimePicker from '../../containers/TimePicker'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
 import FormLayout from '../../containers/FormLayout'
@@ -71,9 +70,6 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
-  },
-  TimePicker: {
-    screen: TimePicker,
   },
   FormLayout: {
     screen: FormLayout

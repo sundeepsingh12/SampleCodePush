@@ -80,9 +80,10 @@ export function deleteSessionToken() {
     }
   }
 }
- 
-export function nextStatusScenes(sceneName,id){
-  return async function (dispatch) {
-    dispatch(NavigationActions.navigate({ routeName: sceneName,params:{id:id}}))
-  }
+
+export function actionDispatch(type,payload) {
+    return {
+        type: type,
+        payload:payload,
+    }
 }
