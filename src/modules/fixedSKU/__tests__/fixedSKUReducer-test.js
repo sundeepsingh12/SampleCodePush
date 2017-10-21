@@ -5,9 +5,21 @@ const {
     CHANGE_QUANTITY,
     SET_FIXED_SKU
 } = require('../../../lib/constants').default
+
 import fixedSKUReducer from '../fixedSKUReducer'
+const InitialState = require('../fixedSKUInitialState').default
 
 describe('FixedSKU reducer', () => {
+
+    it('should set return initial state', () => {
+        const action = {
+            type: 'DEFAULT',
+        }
+        const result = new InitialState()
+        let nextState = fixedSKUReducer(undefined, action)
+        expect(nextState).toEqual(result)
+    })
+
     it('should set loader', () => {
         const action = {
             type: IS_LOADER_RUNNING,

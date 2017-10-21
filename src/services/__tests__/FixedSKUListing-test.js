@@ -407,6 +407,9 @@ describe('test cases for prepareFixedSKU', () => {
 
         fixedSKUDetailsService.prepareObjectWithFieldAttributeData = jest.fn()
         fixedSKUDetailsService.prepareObjectWithFieldAttributeData.mockReturnValue({
+            attributeTypeId: 11,
+            fieldAttributeMasterId: 123,
+            label: 'sample_label'
         })
         fixedSKUDetailsService.prepareFixedSKUObjectsFromTemplate = jest.fn()
         fixedSKUDetailsService.prepareFixedSKUObjectsFromTemplate.mockReturnValue({

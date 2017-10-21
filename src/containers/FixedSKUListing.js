@@ -79,12 +79,12 @@ class FixedSKUListing extends Component {
           <Text style={{ marginBottom: 10, marginTop: 10 }}>
             Total Quantity : {parseInt(this.props.totalQuantity)}
           </Text>
-          <Button>
-            <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}
-              onPress={() => {
-                this.props.actions.onSave(this.parentObject, this.formElement, this.nextEditable, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransactionId)
-                this.props.navigation.goBack()
-              }}>
+          <Button
+            onPress={() => {
+              this.props.actions.onSave(this.parentObject, this.formElement, this.nextEditable, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransactionId)
+              this.props.navigation.goBack()
+            }}>
+            <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
               Save
               </Text>
           </Button>
