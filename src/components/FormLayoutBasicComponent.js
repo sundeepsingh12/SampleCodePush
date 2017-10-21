@@ -84,7 +84,7 @@ class BasicFormElement extends Component {
             return (
                 renderIf (!this.props.item.hidden, 
                     <Card>
-                    <CardItem onPress={()=> this.props.actions.setVisible(SHOW_DATETIME_PICKER,Id,this.props.formElement)}>
+                    <CardItem >
                         <Body style={StyleSheet.flatten([styles.padding0])}>
                         <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                             <View style={StyleSheet.flatten([{flexBasis: '12%', paddingTop: 2}])}>
@@ -130,9 +130,11 @@ class BasicFormElement extends Component {
                                     
                                 />
                             </View>
-                            <View>
-                                <TimePicker  item= {this.props.item} element ={this.props.formElement}/>
-                            </View>
+                            {
+                                renderIf(this.props.item.helpText && this.props.item.showHelpText,
+                                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, {color: '#999999'}])}>
+                                        {this.props.item.helpText} </Text>
+                            )}
                         </View>
                         </View>
                         </Body>
@@ -142,8 +144,7 @@ class BasicFormElement extends Component {
             )
 
             default :
-            console.log("fsvjfs",this.props.item)
-            console.log("hfv",this.props.formElement)
+            if(this.props.item.attributeTypeId == 3 || this.props.item.attributeTypeId == 5 || this.props.item.attributeTypeId == 33){
             return (
                 renderIf((this.props.item.attributeTypeId == 3 || this.props.item.attributeTypeId == 5 || this.props.item.attributeTypeId == 33),
                 <View>
@@ -164,6 +165,14 @@ class BasicFormElement extends Component {
                 </View>
                 )
             )
+            }
+        else {
+            return (
+                <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, {color: '#999999'}])}>
+                  Under construction  {this.props.item.label} - attributeTypeId {this.props.item.attributeTypeId}
+                </Text>
+            )
+        }
         }
     }
 }
