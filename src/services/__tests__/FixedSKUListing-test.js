@@ -234,7 +234,7 @@ describe('test cases for prepareFixedSKUObjectsFromTemplate', () => {
                 }
             }
         }
-        expect(fixedSKUDetailsService.prepareFixedSKUObjectsFromTemplate(fixedSKUTemplate, fiedlAttributeValueDataArray, fixedSKUList, 0, fieldAttributeMasterId)).toEqual(result)
+        expect(fixedSKUDetailsService.prepareFixedSKUObjectsFromTemplate(fixedSKUTemplate, fiedlAttributeValueDataArray, fixedSKUList, fieldAttributeMasterId)).toEqual(result)
     })
     it('should return updated fixedSKUList and TotalAmount present', () => {
         let fixedSKUTemplate = {
@@ -311,7 +311,7 @@ describe('test cases for prepareFixedSKUObjectsFromTemplate', () => {
                 }
             }
         }
-        expect(fixedSKUDetailsService.prepareFixedSKUObjectsFromTemplate(fixedSKUTemplate, fiedlAttributeValueDataArray, fixedSKUList, 1, fieldAttributeMasterId)).toEqual(result)
+        expect(fixedSKUDetailsService.prepareFixedSKUObjectsFromTemplate(fixedSKUTemplate, fiedlAttributeValueDataArray, fixedSKUList, fieldAttributeMasterId)).toEqual(result)
     })
 })
 
@@ -331,7 +331,7 @@ describe('test cases for prepareFixedSKU', () => {
                 fieldAttributeMasterId: 123,
                 value: 0,
                 label: 'sample_label',
-                id: 0
+                id: 2
             }
         }
         fixedSKUDetailsService.prepareObjectWithFieldAttributeData = jest.fn()

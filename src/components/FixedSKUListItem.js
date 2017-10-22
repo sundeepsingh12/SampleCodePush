@@ -57,6 +57,7 @@ class FixedSKUListItem extends Component {
                                 maxLength={4}
                                 placeholder={'0'}
                                 keyboardType={'numeric'}
+                                value={(this.props.item.childDataList[FIXED_SKU_QUANTITY].value).toString()}
                                 onChangeText={(quantity) => {
                                     let payload = {
                                         id: this.props.item.id,
@@ -64,8 +65,7 @@ class FixedSKUListItem extends Component {
                                     }
                                     this.props.actions.onChangeQuantity(this.props.fixedSKUList, this.props.totalQuantity, payload)
                                 }}
-                            >{this.props.item.childDataList[FIXED_SKU_QUANTITY].value}
-                            </TextInput>
+                            />
                         </CardItem>
                     </Card>
                 </Content>

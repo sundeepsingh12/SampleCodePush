@@ -33,11 +33,13 @@ describe('FixedSKU reducer', () => {
         const action = {
             type: SET_FIXED_SKU,
             payload: {
-                id: 1
+                fixedSKUList: { id: 1 },
+                isLoaderRunning: false
             }
         }
         let nextState = fixedSKUReducer(undefined, action)
-        expect(nextState.fixedSKUList).toBe(action.payload)
+        expect(nextState.fixedSKUList).toBe(action.payload.fixedSKUList)
+        expect(nextState.isLoaderRunning).toBe(action.payload.isLoaderRunning)
     })
 
     it('should set fixedSKUList and totalQuantity', () => {

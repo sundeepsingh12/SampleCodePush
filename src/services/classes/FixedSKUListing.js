@@ -14,6 +14,10 @@ import {
 
 class FixedSKUListing {
 
+    constructor() {
+        this.id = 0
+    }
+
     prepareObjectWithFieldAttributeData(fieldAttributeData) {
         if (fieldAttributeData != undefined) {
             let { id, label, attributeTypeId } = fieldAttributeData
@@ -30,12 +34,11 @@ class FixedSKUListing {
 
     prepareFixedSKU(fieldAttributeMasterList, fieldAttributeValueDataArray, fieldAttributeMasterId) {
         let fixedSKUList = {}
-        let id = 0
         for (let fieldAttributeData of fieldAttributeMasterList) {
             if (fieldAttributeData.parentId == fieldAttributeMasterId) {
                 let fieldAttributeDataObject = this.prepareObjectWithFieldAttributeData(fieldAttributeData)
                 if (fieldAttributeData.attributeTypeId == FIXED_SKU_UNIT_PRICE) {
-                    fieldAttributeDataObject.id = id++
+                    fieldAttributeDataObject.id = this.id++
                     fieldAttributeDataObject.value = 0
                     fixedSKUList[TOTAL_AMOUNT] = fieldAttributeDataObject
                 } else if (fieldAttributeData.attributeTypeId == OBJECT_ATTR_ID) {
@@ -48,18 +51,18 @@ class FixedSKUListing {
                         }
                     }
                     fieldAttributeDataObject.childDataList = fixedSKUObjectChildListTemplate
-                    fixedSKUList = this.prepareFixedSKUObjectsFromTemplate(fieldAttributeDataObject, fieldAttributeValueDataArray, fixedSKUList, id, fieldAttributeMasterId)
+                    fixedSKUList = this.prepareFixedSKUObjectsFromTemplate(fieldAttributeDataObject, fieldAttributeValueDataArray, fixedSKUList, fieldAttributeMasterId)
                 }
             }
         }
         return fixedSKUList;
     }
 
-    prepareFixedSKUObjectsFromTemplate(fixedSKUObjectTemplate, fieldAttributeValueDataArray, fixedSKUList, id, fieldAttributeMasterId) {
+    prepareFixedSKUObjectsFromTemplate(fixedSKUObjectTemplate, fieldAttributeValueDataArray, fixedSKUList, fieldAttributeMasterId) {
         fieldAttributeValueDataArray.filter(fieldAttributeValueDataObject => fieldAttributeValueDataObject.fieldAttributeMasterId == fieldAttributeMasterId).forEach(fieldAttrObject => {
             let { name, code } = fieldAttrObject
             let fixedSKUObject = JSON.parse(JSON.stringify(fixedSKUObjectTemplate))
-            fixedSKUObject.id = id++
+            fixedSKUObject.id = this.id++
             fixedSKUObject.childDataList[FIXED_SKU_CODE].value = name
             fixedSKUObject.childDataList[FIXED_SKU_UNIT_PRICE].value = code
             fixedSKUObject.childDataList[FIXED_SKU_QUANTITY].value = ''

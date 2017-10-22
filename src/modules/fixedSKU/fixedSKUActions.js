@@ -28,7 +28,10 @@ export function onSave(parentObject, formElement, nextEditable, fixedSKUList, is
         try {
             fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
             let fieldDataListWithLatestPositionId = await fieldAttributeService.prepareFieldDataForTransactionSavingInState(Object.values(fixedSKUList), jobTransactionId, parentObject.parentId, latestPositionId)
-            dispatch(actionDispatch(SET_FIXED_SKU, fixedSKUList))
+            dispatch(actionDispatch(SET_FIXED_SKU, {
+                fixedSKUList,
+                isLoaderRunning: false
+            }))
             dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
         } catch (error) {
             console.log(error)
@@ -54,8 +57,10 @@ export function fetchFixedSKU(fieldAttributeMasterId) {
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const fieldAttributeValueDataArray = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
             const fixedSKUList = await fixedSKUDetailsService.prepareFixedSKU(fieldAttributeMasterList.value, fieldAttributeValueDataArray.value, fieldAttributeMasterId)
-            dispatch(actionDispatch(SET_FIXED_SKU, fixedSKUList))
-            dispatch(actionDispatch(IS_LOADER_RUNNING, false))
+            dispatch(actionDispatch(SET_FIXED_SKU, {
+                fixedSKUList: fixedSKUList,
+                isLoaderRunning: false
+            }))
         } catch (error) {
             console.log(error)
         }

@@ -18,7 +18,8 @@ export default function fixedSKUReducer(state = initialState, action) {
             return state.set('fixedSKUList', action.payload.fixedSKUList)
                 .set('totalQuantity', action.payload.totalQuantity)
         case SET_FIXED_SKU:
-            return state.set('fixedSKUList', action.payload)
+            return state.set('fixedSKUList', action.payload.fixedSKUList)
+                .set('isLoaderRunning', action.payload.isLoaderRunning)
     }
     return state
 }

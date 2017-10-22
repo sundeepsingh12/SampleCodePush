@@ -7,6 +7,7 @@ import { fixedSKUDetailsService } from '../../../services/classes/FixedSKUListin
 import { updateFieldDataWithChildData } from '../../form-layout/formLayoutActions'
 import { fieldAttributeService } from '../../../services/classes/FieldAttribute'
 var actions = require('../fixedSKUActions')
+var formLayoutActions = require('../../form-layout/formLayoutActions')
 const {
     IS_LOADER_RUNNING,
     CHANGE_QUANTITY,
@@ -65,18 +66,15 @@ describe('FixedSKU Actions', () => {
         }, {
             type: SET_FIXED_SKU,
             payload: {
-                fixedSKUList: {}
+                fixedSKUList: {},
+                isLoaderRunning: false
             }
         }]
         let fieldAttributeMasterId = 12345
         keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({
-            value: {}
-        })
+        keyValueDBService.getValueFromStore.mockReturnValue({})
         fixedSKUDetailsService.prepareFixedSKU = jest.fn()
-        fixedSKUDetailsService.prepareFixedSKU.mockReturnValue({
-            fixedSKUList: {}
-        })
+        fixedSKUDetailsService.prepareFixedSKU.mockReturnValue({})
         const store = mockStore({})
         return store.dispatch(actions.fetchFixedSKU(fieldAttributeMasterId))
             .then(() => {
@@ -85,7 +83,6 @@ describe('FixedSKU Actions', () => {
                 expect(store.getActions()[0].type).toEqual(expectedAction[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedAction[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedAction[1].payload)
-                expect(store.getActions()[0].type).toEqual(expectedAction[0].type)
             })
     })
 
@@ -93,7 +90,8 @@ describe('FixedSKU Actions', () => {
         const expectedAction = [{
             type: SET_FIXED_SKU,
             payload: {
-                fixedSKUList: {}
+                fixedSKUList: {},
+                isLoaderRunning: false
             }
         }]
         let parameters = {
@@ -106,18 +104,17 @@ describe('FixedSKU Actions', () => {
             jobTransactionId: 123
         }
         fixedSKUDetailsService.calculateTotalAmount = jest.fn()
-        fixedSKUDetailsService.calculateTotalAmount.mockReturnValue({
-            fixedSKUList: {}
-        })
+        fixedSKUDetailsService.calculateTotalAmount.mockReturnValue({})
         fieldAttributeService.prepareFieldDataForTransactionSavingInState = jest.fn()
-        fieldAttributeService.prepareFieldDataForTransactionSavingInState.mockReturnValue({
-            fixedSKUList: {}
-        })
+        fieldAttributeService.prepareFieldDataForTransactionSavingInState.mockReturnValue({})
+        formLayoutActions.updateFieldDataWithChildData = jest.fn()
+        formLayoutActions.updateFieldDataWithChildData.mockReturnValue({})
         const store = mockStore({})
         return store.dispatch(actions.onSave(parameters.parentObject, parameters.formElement, parameters.nextEditable, parameters.fixedSKUList, parameters.isSaveDisabled, parameters.latestPositionId, parameters.jobTransactionId))
             .then(() => {
                 expect(fixedSKUDetailsService.calculateTotalAmount).toHaveBeenCalled()
                 expect(fieldAttributeService.prepareFieldDataForTransactionSavingInState).toHaveBeenCalled()
+                expect(formLayoutActions.updateFieldDataWithChildData).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedAction[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedAction[0].payload)
             })
