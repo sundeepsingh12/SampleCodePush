@@ -19,6 +19,7 @@ import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
 import FixedSKUListing from '../../containers/FixedSKUListing'
+import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
@@ -77,6 +78,9 @@ export const AppNavigator = StackNavigator({
     navigationOptions: {
       title: 'FixedSKU',
     }
+  },
+  Signature: {
+    screen: Signature,
   },
   FormLayout: {
     screen: FormLayout

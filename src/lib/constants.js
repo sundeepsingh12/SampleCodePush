@@ -129,7 +129,7 @@ export default keyMirror({
     TABIDMAP: null,
     SET_TABS_TRANSACTIONS: null,
     JOB_ATTRIBUTE_STATUS: null,
-    HUB:null,
+    HUB: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -144,17 +144,17 @@ export default keyMirror({
     IS_LAST_PAGE: null,
 
     //Status Codes
-    UNSEEN:null,
-    PENDING:null,
+    UNSEEN: null,
+    PENDING: null,
 
     //Form Layout
-    GET_SORTED_ROOT_FIELD_ATTRIBUTES : null,
-    DISABLE_SAVE : null,
-    UPDATE_FIELD_DATA : null,
-    STATUS_NAME : null,
-    BASIC_INFO : null,
-    ON_BLUR : null,
-    TOOGLE_HELP_TEXT : null,
+    GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
+    DISABLE_SAVE: null,
+    UPDATE_FIELD_DATA: null,
+    STATUS_NAME: null,
+    BASIC_INFO: null,
+    ON_BLUR: null,
+    TOOGLE_HELP_TEXT: null,
     UNSEEN: null,
     PENDING: null,
     FormLayout: null,
@@ -170,7 +170,13 @@ export default keyMirror({
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
     CHANGE_QUANTITY: null,
-    SET_FIXED_SKU:null
+    SET_FIXED_SKU:null,
+    
+    //Signature Actions
+    SET_FIELD_DATA_LIST: null,
+    SET_REMARKS_VALIDATION: null,
+    SAVE_SIGNATURE: null,
+    FormLayout: null,
 })
 
 

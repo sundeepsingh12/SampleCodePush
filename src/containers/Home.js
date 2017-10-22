@@ -137,19 +137,17 @@ class Main extends Component {
                 <Text>Home</Text>
               </Button>
               <Button
-                disabled = {this.props.downloadingJobs}
+                disabled={this.props.downloadingJobs}
                 onPress={() => { this.props.actions.onResyncPress() }}
                 vertical>
                 <ResyncLoader
-                downloadingJobs = {this.props.downloadingJobs} />
+                  downloadingJobs={this.props.downloadingJobs} />
               </Button>
               <Button vertical>
                 <Icon name={"ios-chatboxes-outline"} />
                 <Text>Message</Text>
               </Button>
-              <Button vertical onPress={() => { 
-                this.props.actions.navigateToScene('FixedSKUListing',{}) 
-                }} >
+              <Button onPress={() => { }} vertical>
                 <Icon name={"ios-apps-outline"} />
                 <Text>Utilities</Text>
               </Button>

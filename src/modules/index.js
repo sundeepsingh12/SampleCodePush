@@ -15,6 +15,7 @@ import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
 import fixedSKU from './fixedSKU/fixedSKUReducer'
+import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
 // import profile from './profile/profileReducer'
 
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   listing,
   jobDetails,
   fixedSKU,
+  signature,
   formLayout,
 })
 

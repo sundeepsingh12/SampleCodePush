@@ -41,9 +41,8 @@ import {
 import {
   clearHomeState
 } from '../home/homeActions'
-import { NavigationActions } from 'react-navigation'
 import BackgroundTimer from 'react-native-background-timer';
-
+import { NavigationActions } from 'react-navigation'
 /**
  * ## set the store
  *
@@ -85,4 +84,5 @@ export function deleteSessionToken() {
     }
   }
 }
+
 
