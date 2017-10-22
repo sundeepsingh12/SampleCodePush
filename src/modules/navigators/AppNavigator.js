@@ -18,6 +18,7 @@ import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
+import FixedSKUListing from '../../containers/FixedSKUListing'
 import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
@@ -30,7 +31,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 class AppWithNavigationState extends React.Component {
   render() {
     return (
-      <AppNavigator navigation={addNavigationHelpers({ dispatch : this.props.dispatch, state: this.props.nav })} />
+      <AppNavigator navigation={addNavigationHelpers({ dispatch: this.props.dispatch, state: this.props.nav })} />
     )
   }
 }
@@ -71,6 +72,12 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
+  },
+  FixedSKUListing: {
+    screen: FixedSKUListing,
+    navigationOptions: {
+      title: 'FixedSKU',
+    }
   },
   Signature: {
     screen: Signature,

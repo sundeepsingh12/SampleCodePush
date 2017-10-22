@@ -27,7 +27,8 @@ function mapStateToProps(state){
     isSaveDisabled : state.formLayout.isSaveDisabled,
     statusName : state.formLayout.statusName,
     jobTransactionId : state.formLayout.jobTransactionId,
-    statusId : state.formLayout.statusId
+    statusId : state.formLayout.statusId,
+    latestPositionId :state.formLayout.latestPositionId
   }
 }
 
@@ -48,7 +49,7 @@ renderData = (item) => {
   console.log('form layout container state', this.props.nextEditable);
   console.log('isSaveDisabled',this.props.isSaveDisabled);
   return (
-    <BasicFormElement item={item} nextEditable = {this.props.nextEditable} formElement = {this.props.formElement} isSaveDisabled = {this.props.isSaveDisabled}/>
+    <BasicFormElement item={item} nextEditable = {this.props.nextEditable} formElement = {this.props.formElement} isSaveDisabled = {this.props.isSaveDisabled} jobTransactionId = {this.props.jobTransactionId} latestPositionId = {this.props.latestPositionId}/>
   )
 }
 

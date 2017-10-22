@@ -41,7 +41,6 @@ import {
 import {
   clearHomeState
 } from '../home/homeActions'
-
 import BackgroundTimer from 'react-native-background-timer';
 import { NavigationActions } from 'react-navigation'
 /**
@@ -56,6 +55,13 @@ export function setStore(store) {
   return {
     type: SET_STORE,
     payload: store
+  }
+}
+
+//Use to navigate to other scene
+export function navigateToScene(routeName, params) {
+  return async function (dispatch) {
+    dispatch(NavigationActions.navigate({ routeName, params }))
   }
 }
 
@@ -79,9 +85,4 @@ export function deleteSessionToken() {
   }
 }
 
-export function navigateToScene(sceneName,params) {
-  return async function (dispatch) {
-    dispatch(NavigationActions.navigate({ routeName: sceneName,params: params }))
-  }
-}
 

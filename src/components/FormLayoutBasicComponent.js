@@ -17,7 +17,9 @@ import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
+import { FIXED_SKU } from '../lib/AttributeConstants.js'
 import * as globalActions from '../modules/global/globalActions'
+
 
 
 function mapStateToProps(state) {
@@ -135,10 +137,19 @@ class BasicFormElement extends Component {
                         </Card>
                     )
                 )
-            case this.SIGNATURE:
+            case FIXED_SKU:
                 return (
                     renderIf(!this.props.item.hidden,
-                        <TouchableHighlight onPress={() => { this.props.actions.navigateToScene('Signature', { item: this.props.item, formElement: this.props.formElement,nextEditable: this.props.nextEditable,isSaveDisabled: this.props.isSaveDisabled }) }} >
+                        <TouchableHighlight onPress={() => {
+                            this.props.actions.navigateToScene('FixedSKUListing', {
+                                params: this.props.item,
+                                jobTransactionId: this.props.jobTransactionId,
+                                latestPositionId: this.props.latestPositionId,
+                                formElement: this.props.formElement,
+                                nextEditable: this.props.nextEditable,
+                                isSaveDisabled: this.props.isSaveDisabled
+                            })
+                        }} >
                             <Card>
                                 <CardItem>
                                     <Body style={StyleSheet.flatten([styles.padding0])}>
@@ -188,6 +199,60 @@ class BasicFormElement extends Component {
                         </TouchableHighlight>
                     )
                 )
+            case this.SIGNATURE:
+                return (
+                    renderIf(!this.props.item.hidden,
+                        <TouchableHighlight onPress={() => { this.props.actions.navigateToScene('Signature', { item: this.props.item, formElement: this.props.formElement, nextEditable: this.props.nextEditable, isSaveDisabled: this.props.isSaveDisabled }) }} >
+                            <Card>
+                                <CardItem>
+                                    <Body style={StyleSheet.flatten([styles.padding0])}>
+                                        <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
+                                            <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
+                                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, { marginTop: -5 }])} />
+                                            </View>
+                                            <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
+                                                <View style={StyleSheet.flatten([styles.row])}>
+                                                    <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
+                                                        <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
+                                                            {this.props.item.label}
+                                                        </Text>
+                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                                                            {this.props.item.subLabel}
+                                                        </Text>
+
+                                                    </View>
+
+                                                    <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
+
+                                                        {renderIf(this.props.item.showCheckMark,
+                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
+                                                        )}
+
+                                                        {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
+                                                            <View>
+                                                                <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(this.props.item.fieldAttributeMasterId)}>
+                                                                    <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
+                                                                </TouchableHighlight>
+                                                            </View>
+                                                        )}
+
+
+                                                    </View>
+                                                </View>
+                                                {
+                                                    renderIf(this.props.item.helpText && this.props.item.showHelpText,
+                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                                                            {this.props.item.helpText} </Text>
+                                                    )}
+                                            </View>
+                                        </View>
+                                    </Body>
+                                </CardItem>
+                            </Card>
+                        </TouchableHighlight>
+                    )
+                )
+
             default:
                 return (
                     <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
