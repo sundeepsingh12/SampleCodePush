@@ -17,6 +17,7 @@ import renderIf from '../lib/renderIf'
 
 function mapStateToProps(state) {
     return {
+        isRemarksValidation : state.signature.isRemarksValidation,
         fieldDataList: state.signature.fieldDataList,
     }
 }
@@ -30,7 +31,6 @@ class Signature extends Component {
 
     constructor(props) {
         super(props)
-        console.log('props', this.props.navigation.state.params.params)
         this.params = this.props.navigation.state.params.item;
         this.formElement = this.props.navigation.state.params.formElement;
         this.nextEditable = this.props.navigation.state.params.nextEditable;
@@ -39,29 +39,18 @@ class Signature extends Component {
 
     componentWillMount() {
         this.props.actions.getRemarksList(this.formElement)
+        this.props.actions.setIsRemarksValidation(this.params.validation)
     }
 
-    getValidation() {
-        console.log(this.params)
-        if (this.params.validation != null && this.params.validation.length > 0) {
-            for (let value of this.params.validation) {
-                if (value.timeOfExecution == 'MINMAX') {
-                    console.log('===condition', value.condition)
-                    return value.condition
-                }
-            }
-        }
-    }
     onSaveEvent = async (result) => {
         if (result != null) {
             await this.props.actions.saveSignature(result, this.params.fieldAttributeMasterId, this.formElement, this.nextEditable, this.isSaveDisabled)
         }
-        console.log('before goback')
         this.props.navigation.goBack()
     }
 
     render() {
-        if (this.getValidation() == 'TRUE' && this.props.fieldDataList.length > 0) { //TODO add constants
+        if (this.props.isRemarksValidation && this.props.fieldDataList.length > 0) { 
             return (
                 <View style={{ flex: 1, flexDirection: 'row' }}>
                     <View style={{ flex: 1 }}>

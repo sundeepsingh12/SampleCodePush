@@ -27,10 +27,9 @@ class SignatureRemarks {
     filterRemarksList(fieldDataList) { //TODO add javadoc
         if (fieldDataList == undefined)
             return []
-
         let checkCondition;
         let dataList = []
-        for (var [key, fieldDataObject] of fieldDataList.entries()) {
+        for (let [key, fieldDataObject] of fieldDataList.entries()) {
             let dataObject = {}
             switch (fieldDataObject.attributeTypeId) {
                 case CAMERA_HIGH:
@@ -57,7 +56,7 @@ class SignatureRemarks {
                 let { label, value } = fieldDataObject
                 dataList.push({ label, value })
             }
-            if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childFieldDataList != null) {
+            if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childFieldDataList != null && fieldDataObject.childFieldDataList.length > 0) {
                 for (let childFieldData of fieldDataObject.childFieldDataList) {
                     if (childFieldData.attributeTypeId == ACTUAL_AMOUNT) {
                         let { label, value } = childFieldData
@@ -68,12 +67,22 @@ class SignatureRemarks {
         }
         return dataList
     }
+
     async saveFile(result) {
         const currentTimeInMillis = moment()
-        var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP'; //TODO update variable name
-        var image_name = 'sign_' + currentTimeInMillis + '.jpg'
+        let PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP'; //TODO update variable name
+        let image_name = 'sign_' + currentTimeInMillis + '.jpg'
         await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
         return image_name
+    }
+
+    getRemarksValidation(validation) {
+        if (validation != null && validation.length > 0) {
+            let value = validation.filter((value) => value.timeOfExecution == 'MINMAX')
+            if (value[0].condition == 'TRUE')
+                return true
+        }
+        return false
     }
 }
 
