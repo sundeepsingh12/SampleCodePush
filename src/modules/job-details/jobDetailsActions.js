@@ -10,7 +10,8 @@ const {
     FIELD_ATTRIBUTE_STATUS,
     JOB_STATUS,
     JOB_DETAILS_FETCHING_START,
-    JOB_DETAILS_FETCHING_END
+    JOB_DETAILS_FETCHING_END,
+    FormLayout
 } = require('../../lib/constants').default
 
 export function startFetchingJobDetails() {
@@ -48,4 +49,10 @@ export function getJobDetails(jobTransactionId) {
             console.log(error)
         }
     }
+}
+
+export function navigateToFormLayout(statusId,statusName,jobTransactionId){
+    return async function (dispatch) {
+        dispatch(NavigationActions.navigate({ routeName: FormLayout,params :{statusId:statusId,statusName:statusName,jobTransactionId:jobTransactionId} }))
+      }
 }
