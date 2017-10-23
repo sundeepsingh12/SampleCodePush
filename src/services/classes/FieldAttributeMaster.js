@@ -1,5 +1,7 @@
 'use strict'
-
+import {
+    keyValueDBService
+} from './KeyValueDBService'
 class FieldAttributeMaster {
     /**
      * @param {*} fieldAttributeMasterList 

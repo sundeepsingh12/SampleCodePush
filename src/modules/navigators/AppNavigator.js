@@ -18,9 +18,14 @@ import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
+<<<<<<< HEAD
 import Payment from '../../containers/Payment'
 import UPIPayment from '../../containers/UPIPayment'
 import PayByLink from '../../containers/PayByLink'
+=======
+import FixedSKUListing from '../../containers/FixedSKUListing'
+import Signature from '../../containers/Signature'
+>>>>>>> master
 import FormLayout from '../../containers/FormLayout'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
@@ -32,7 +37,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 class AppWithNavigationState extends React.Component {
   render() {
     return (
-      <AppNavigator navigation={addNavigationHelpers({ dispatch : this.props.dispatch, state: this.props.nav })} />
+      <AppNavigator navigation={addNavigationHelpers({ dispatch: this.props.dispatch, state: this.props.nav })} />
     )
   }
 }
@@ -81,6 +86,15 @@ export const AppNavigator = StackNavigator({
   },
   PayByLink: {
     screen: PayByLink
+  },
+  FixedSKUListing: {
+    screen: FixedSKUListing,
+    navigationOptions: {
+      title: 'FixedSKU',
+    }
+  },
+  Signature: {
+    screen: Signature,
   },
   FormLayout: {
     screen: FormLayout,

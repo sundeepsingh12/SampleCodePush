@@ -17,6 +17,8 @@ import jobDetails from './job-details/jobDetailsReducer'
 import payment from './payment/paymentReducer'
 import upiPayment from './cardTypePaymentModules/upiPayment/upiPaymentReducer'
 import payByLinkPayment from './cardTypePaymentModules/payByLinkPayment/payByLinkPaymentReducer'
+import fixedSKU from './fixedSKU/fixedSKUReducer'
+import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
 // import profile from './profile/profileReducer'
 
@@ -40,6 +42,8 @@ const rootReducer = combineReducers({
   preloader,
   upiPayment,
   payByLinkPayment,
+  fixedSKU,
+  signature,
   formLayout,
 })
 

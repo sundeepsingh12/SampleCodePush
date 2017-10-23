@@ -170,8 +170,6 @@ export default keyMirror({
     BASIC_INFO: null,
     ON_BLUR: null,
     TOOGLE_HELP_TEXT: null,
-    UNSEEN: null,
-    PENDING: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
 
@@ -181,7 +179,17 @@ export default keyMirror({
     Preloader: null,
     Home: null,
     JobDetails: null,
-    FormLayout: null
+
+    //FixedSKU Actions
+    IS_LOADER_RUNNING: null,
+    CHANGE_QUANTITY: null,
+    SET_FIXED_SKU:null,
+    
+    //Signature Actions
+    SET_FIELD_DATA_LIST: null,
+    SET_REMARKS_VALIDATION: null,
+    SAVE_SIGNATURE: null,
+    FormLayout: null,
 })
 
 

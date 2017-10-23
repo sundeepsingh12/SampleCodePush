@@ -58,6 +58,13 @@ export default function formLayoutReducer(state = initialState, action){
         case TOOGLE_HELP_TEXT : {
             return state.set('formElement',action.payload)
         }
+
+        case UPDATE_FIELD_DATA_WITH_CHILD_DATA : {
+            return state.set('formElement',action.payload.formElement)
+                        .set('latestPositionId',action.payload.latestPositionId)
+                        .set('nextEditable',action.payload.nextEditable)
+                        .set('isSaveDisabled',action.payload.isSaveDisabled ? true : false)
+        }
     }
     return state;
 }
