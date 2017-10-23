@@ -123,19 +123,3 @@ export function saveJobTransaction(formElement, jobTransactionId, statusId) {
         formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId);
     }
 }  
-
-export function updateFieldDataWithChildData(attributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListObject) {
-    return function (dispatch) {
-        const cloneFormElement = new Map(formElement);
-        console.log('cloneFormElement', cloneFormElement);
-        const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList);
-        dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
-            {
-                formElement: updatedFieldDataObject.formLayoutObject,
-                latestPositionId: fieldDataListObject.latestPositionId,
-                nextEditable: updatedFieldDataObject.nextEditable,
-                isSaveDisabled: updatedFieldDataObject.isSaveDisabled
-            }
-        ));
-    }
-}

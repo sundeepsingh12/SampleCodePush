@@ -20,7 +20,6 @@ const {
   IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
   USER
-
 } = require('../../lib/constants').default
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -38,7 +37,6 @@ import { clearHomeState } from '../home/homeActions'
 import { NavigationActions } from 'react-navigation'
 
 import BackgroundTimer from 'react-native-background-timer';
-import { NavigationActions } from 'react-navigation'
 /**
  * ## set the store
  *

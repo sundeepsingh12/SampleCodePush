@@ -68,7 +68,7 @@ export default class FormLayoutEventImpl {
         }
         return formLayoutObject;
     }
-``
+
     toogleHelpText(attributeMasterId, formLayoutObject) {
         if (!attributeMasterId || !formLayoutObject) {
             return;
