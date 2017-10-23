@@ -79,22 +79,36 @@ class FieldData {
     }
 
     /**
-     * This function prepares field data of a transaction for saving in form layout state.It sets position id, parent id , transaction id 
+     * This function prepares field data of a transaction for saving in form layout state.It sets position id, parent id , transaction id  of field data
      * @param {*} fieldDataListDTO 
      * @param {*} parentId 
      * @param {*} latestPositionId 
+     * @returns
+     * {
+     *      fieldDataList : [
+     *                          {
+     *                              attributeTypeId,
+     *                              fieldAttributeMasterId,
+     *                              jobTransactionId,
+     *                              parentId,
+     *                              positionId,
+     *                              value
+     *                          }
+     *                      ],
+     *      latestPositionId : integer
+     * }
      */
     prepareFieldDataForTransactionSavingInState(fieldDataListDTO, jobTransactionId, parentId, latestPositionId) {
         let fieldDataList = []
         for (let index in fieldDataListDTO) {
             let fieldData = {}
+            latestPositionId++
             fieldData.attributeTypeId = fieldDataListDTO[index].attributeTypeId
             fieldData.fieldAttributeMasterId = fieldDataListDTO[index].fieldAttributeMasterId
             fieldData.jobTransactionId = jobTransactionId
             fieldData.parentId = parentId
             fieldData.positionId = latestPositionId
             fieldData.value = fieldDataListDTO[index].value
-            latestPositionId++
             if (fieldDataListDTO[index].childDataList) {
                 let fieldDataDTO = this.prepareFieldDataForTransactionSavingInState(fieldDataListDTO[index].childDataList, jobTransactionId, fieldData.positionId, latestPositionId)
                 fieldData.childDataList = fieldDataDTO.fieldDataList

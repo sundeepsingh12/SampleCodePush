@@ -288,6 +288,7 @@ export function invalidateUserSession() {
  */
 export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
+    await logoutService.deleteDataBase()
     dispatch(preLogoutSuccess())
     dispatch(deleteSessionToken())
     dispatch(NavigationActions.navigate({ routeName: Login }))

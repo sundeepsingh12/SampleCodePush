@@ -5,7 +5,8 @@ const {
     Login,
     Preloader,
     Home,
-    JobDetails
+    JobDetails,
+    FormLayout
 } = require('../../lib/constants').default
 
 const applicationAction = AppNavigator.router.getActionForPathAndParams(Application);
@@ -22,12 +23,16 @@ const homeState = AppNavigator.router.getStateForAction(homeAction)
 const jobDetailsAction = AppNavigator.router.getActionForPathAndParams(JobDetails)
 const jobDetailsState = AppNavigator.router.getStateForAction(jobDetailsAction)
 
+const formLayoutAction = AppNavigator.router.getActionForPathAndParams(FormLayout)
+const formLayoutState = AppNavigator.router.getStateForAction(formLayoutAction)
+
 const initialNavState = AppNavigator.router.getStateForAction(
   applicationAction,
   loginState,
   preloaderState,
   homeState,
-  jobDetailsState
+  jobDetailsState,
+  formLayoutState
 );
 
 export default initialNavState

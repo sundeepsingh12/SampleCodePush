@@ -17,6 +17,7 @@ import jobDetails from './job-details/jobDetailsReducer'
 import payment from './payment/paymentReducer'
 import upiPayment from './cardTypePaymentModules/upiPayment/upiPaymentReducer'
 import payByLinkPayment from './cardTypePaymentModules/payByLinkPayment/payByLinkPaymentReducer'
+import formLayout from './form-layout/formLayoutReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -38,7 +39,8 @@ const rootReducer = combineReducers({
   payment,
   preloader,
   upiPayment,
-  payByLinkPayment
+  payByLinkPayment,
+  formLayout,
 })
 
 export default rootReducer

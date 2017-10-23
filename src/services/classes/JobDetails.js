@@ -58,7 +58,7 @@ class JobDetails {
                 dataMap[attributeMaster.attributeTypeId][attributeMaster.id].label = dataObject.label = attributeMaster.label
                 dataObject.attributeTypeId = attributeMaster.attributeTypeId
                 dataObject.id = ++autoIncrementId
-                if (data.value.toLocaleLowerCase() == OBJECTSAROJFAREYE || data.value.toLocaleLowerCase() == ARRAYSAROJFAREYE) {
+                if (data.value == OBJECTSAROJFAREYE || data.value == ARRAYSAROJFAREYE) {
                     let childDataObject = this.prepareDataObject(id, data.positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId)
                     autoIncrementId = childDataObject.autoIncrementId
                     dataMap[attributeMaster.attributeTypeId][attributeMaster.id].childDataMap = childDataObject.dataMap

@@ -6,13 +6,13 @@ import {
     View,
     Text,
     Platform,
-    TextInput,
 } from 'react-native'
 import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';
 import styles from '../themes/FeStyle'
 import theme from '../themes/feTheme'
 import PopOver from '../components/PopOver'
 import * as paymentActions from '../modules/payment/paymentActions'
+import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 const {
@@ -26,6 +26,9 @@ const {
     MPAY,
     M_SWIPE,
     NET_BANKING,
+    NET_BANKING_LINK,
+    NET_BANKING_CARD_LINK,
+    NET_BANKING_UPI_LINK,
     NOT_PAID,
     PAYNEAR,
     PAYO,
@@ -58,43 +61,49 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...paymentActions }, dispatch)
+        actions: bindActionCreators({ ...paymentActions, ...globalActions }, dispatch)
     }
 }
 
 class Payment extends Component {
 
     componentWillMount() {
-        this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobId)
+        this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction.jobMasterId, this.props.navigation.state.params.jobTransaction.jobId, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.jobStatusId)
     }
 
-    renderPaymentModeId(modeId) {
+    renderPaymentModeId(modeId, type) {
         switch (modeId) {
-            case CASH.id: return 'Cash'
-            case CHEQUE.id: return 'Cheque'
-            case DEMAND_DRAFT.id: return 'Demand-Draft'
-            case DISCOUNT.id: return 'Discount'
-            case EZE_TAP.id: return 'Eze-Tap'
-            case MOSAMBEE.id: return 'Mosambee'
-            case MOSAMBEE_WALLET.id: return 'Mosambee Wallet'
-            case MPAY.id: return 'MPAY'
-            case M_SWIPE.id: return 'M-Swipe '
-            case NET_BANKING.id: return 'Net Banking'
-            case NOT_PAID.id: return 'Not paid'
-            case PAYNEAR.id: return 'PayNear'
-            case PAYO.id: return 'PAYO'
-            case PAYTM.id: return 'PAYTM'
-            case POS.id: return 'POS device payment'
-            case RAZOR_PAY.id: return 'Razor pay'
-            case SODEXO.id: return 'Sodexo'
-            case SPLIT.id: return 'Split'
-            case TICKET_RESTAURANT.id: return 'Ticket Restaurant'
-            case UPI.id: return 'UPI'
+            case CASH.id: return CASH.displayName
+            case CHEQUE.id: return CHEQUE.displayName
+            case DEMAND_DRAFT.id: return DEMAND_DRAFT.displayName
+            case DISCOUNT.id: return DISCOUNT.displayName
+            case EZE_TAP.id: return EZE_TAP.displayName
+            case MOSAMBEE.id: return MOSAMBEE.displayName
+            case MOSAMBEE_WALLET.id: return MOSAMBEE_WALLET.displayName
+            case MPAY.id: return MPAY.displayName
+            case M_SWIPE.id: return M_SWIPE.displayName
+            case NET_BANKING.id: {
+                switch (type) {
+                    case NET_BANKING_LINK.id: return NET_BANKING_LINK.displayName
+                    case NET_BANKING_CARD_LINK.id: return NET_BANKING_CARD_LINK.displayName
+                    case NET_BANKING_UPI_LINK.id: return NET_BANKING_UPI_LINK.displayName
+                }
+            }
+            case NOT_PAID.id: return NOT_PAID.displayName
+            case PAYNEAR.id: return PAYNEAR.displayName
+            case PAYO.id: return PAYO.displayName
+            case PAYTM.id: return PAYTM.displayName
+            case POS.id: return POS.displayName
+            case RAZOR_PAY.id: return RAZOR_PAY.displayName
+            case SODEXO.id: return SODEXO.displayName
+            case SPLIT.id: return SPLIT.displayName
+            case TICKET_RESTAURANT.id: return TICKET_RESTAURANT.displayName
+            case UPI.id: return UPI.displayName
         }
     }
 
-    onTextChange(type,payload) {
-        this.props.actions.setPaymentState(type, payload)
+    onTextChange(type, payload) {
+        this.props.actions.setState(SET_PAYMENT_CHANGED_PARAMETERS, payload)
     }
 
     renderPaymentModeSelected(modeId) {
@@ -106,6 +115,7 @@ class Payment extends Component {
                 <Text> Cheque Number </Text>
                 <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
                     <Input
+                        defaultValue={this.props.transactionNumber}
                         placeholder='Regular Textbox'
                         onChangeText={value => this.onTextChange(
                             SET_PAYMENT_CHANGED_PARAMETERS,
@@ -125,6 +135,7 @@ class Payment extends Component {
                 <Text> DD Number </Text>
                 <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
                     <Input
+                        defaultValue={this.props.transactionNumber}
                         placeholder='Regular Textbox'
                         onChangeText={value => this.onTextChange(
                             SET_PAYMENT_CHANGED_PARAMETERS,
@@ -163,31 +174,46 @@ class Payment extends Component {
         return paymentModeSelectedView
     }
 
+    paymentItemView = (actualAmount, id, moneyTransactionModeId, selectedIndex, transactionNumber, type) => {
+        return (
+            <ListItem
+                key={id}
+                icon style={StyleSheet.flatten([{ marginLeft: 0 }])}
+                onPress={() => {
+                    selectedIndex !== moneyTransactionModeId ? 
+                    this.props.actions.setState(
+                        SET_PAYMENT_CHANGED_PARAMETERS,
+                        {
+                            actualAmount,
+                            selectedIndex: type ? type : moneyTransactionModeId,
+                            transactionNumber
+                        }
+                    ) : null
+                }}>
+                <Body>
+                    <Text>{this.renderPaymentModeId(moneyTransactionModeId, type)}</Text>
+                </Body>
+                <Right>
+                    <Radio selected={selectedIndex == (type ? type : moneyTransactionModeId)} style={([styles.marginRight20])} />
+                </Right>
+            </ListItem>
+        )
+    }
+
     renderPaymentModeList(paymentModeList) {
         let paymentModeView = []
         for (let index in paymentModeList) {
-            paymentModeView.push(
-                <ListItem
-                    key={paymentModeList[index].id}
-                    icon style={StyleSheet.flatten([{ marginLeft: 0 }])}
-                    onPress={() => {
-                        this.props.actions.setPaymentState(
-                            SET_PAYMENT_CHANGED_PARAMETERS,
-                            {
-                                actualAmount: this.props.actualAmount,
-                                selectedIndex: paymentModeList[index].moneyTransactionModeId,
-                                transactionNumber: this.props.transactionNumber
-                            }
-                        )
-                    }}>
-                    <Body>
-                        <Text>{this.renderPaymentModeId(paymentModeList[index].moneyTransactionModeId)}</Text>
-                    </Body>
-                    <Right>
-                        <Radio selected={this.props.selectedIndex == paymentModeList[index].moneyTransactionModeId} style={([styles.marginRight20])} />
-                    </Right>
-                </ListItem>
-            )
+            if (paymentModeList[index].moneyTransactionModeId == NET_BANKING.id) {
+                for (let type = 97; type < 100; type++) {
+                    paymentModeView.push(
+                        this.paymentItemView(this.props.actualAmount, type, paymentModeList[index].moneyTransactionModeId, this.props.selectedIndex, null, type)
+                    )
+                }
+            } else {
+                paymentModeView.push(
+                    this.paymentItemView(this.props.actualAmount, paymentModeList[index].id, paymentModeList[index].moneyTransactionModeId, this.props.selectedIndex, null)
+                )
+            }
         }
         return paymentModeView
     }
@@ -196,7 +222,7 @@ class Payment extends Component {
         if (this.props.isAmountEditable) {
             return (
                 <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
-                    <TextInput
+                    <Input
                         keyboardType='numeric'
                         placeholder='Regular Textbox'
                         onChangeText={value => this.onTextChange(
@@ -208,6 +234,7 @@ class Payment extends Component {
                             }
                         )}
                         style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
+                        value={this.props.actualAmount}
                     />
                     {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
                     <PopOver visible={this.checkValidation()} /> */}
@@ -221,7 +248,6 @@ class Payment extends Component {
     }
 
     render() {
-        console.log('props', this.props)
         const amountTobeCollectedView = this.renderAmountToBeCollected()
         const paymentModeView = this.renderPaymentModeList(this.props.paymentModeList)
         const paymentModeSelectedView = this.renderPaymentModeSelected(this.props.selectedIndex)
@@ -256,11 +282,15 @@ class Payment extends Component {
                             onPress={() => {
                                 this.props.actions.saveMoneyCollectObject(
                                     this.props.actualAmount,
-                                    this.props.navigation.state.params.jobMasterId,
-                                    this.props.navigation.state.params.jobId,
-                                    this.props.navigation.state.params.jobTransactionId,
-                                    0,
+                                    this.props.navigation.state.params.currentElement,
+                                    this.props.navigation.state.params.formElements,
+                                    this.props.navigation.state.params.jobTransaction.jobMasterId,
+                                    this.props.navigation.state.params.jobTransaction.jobId,
+                                    this.props.navigation.state.params.jobTransaction.id,
+                                    this.props.navigation.state.params.latestPositionId,
                                     this.props.moneyCollectMaster,
+                                    this.props.navigation.state.params.nextEditable,
+                                    this.props.navigation.state.params.isSaveDisabled,
                                     this.props.originalAmount,
                                     this.props.selectedIndex,
                                     this.props.transactionNumber,

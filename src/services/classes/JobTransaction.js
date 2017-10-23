@@ -592,6 +592,11 @@ class JobTransaction {
         }
     }
 
+    getTransactionContactNumber(jobAttributeMasterList, jobMasterId, jobId) {
+        const jobMasterJobAttributeMasterMap = jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)
+        let jobAttributeMap = jobMasterJobAttributeMasterMap[jobMasterId]
+    }
+
 }
 
 export let jobTransactionService = new JobTransaction()

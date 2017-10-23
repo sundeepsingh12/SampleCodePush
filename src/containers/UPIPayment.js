@@ -46,7 +46,8 @@ function mapDispatchToProps(dispatch) {
 class UPIPayment extends Component {
 
     componentWillMount() {
-        this.props.actions.getUPIPaymentParameters(this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobId)
+        console.log(this.props)
+        this.props.actions.getUPIPaymentParameters(this.props.navigation.state.params.jobTransaction.jobMasterId, this.props.navigation.state.params.jobTransaction.jobId)
     }
 
     onTextChange(type, payload) {

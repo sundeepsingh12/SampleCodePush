@@ -28,6 +28,7 @@ import { connect } from 'react-redux'
 
 function mapStateToProps(state) {
     return {
+        customerContact: state.payByLinkPayment.customerContact,
         payByLinkConfigJSON: state.payByLinkPayment.payByLinkConfigJSON
     }
 }
@@ -41,7 +42,7 @@ function mapDispatchToProps(dispatch) {
 class PayByLink extends Component {
 
     componentWillMount() {
-        this.props.actions.getPayByLinkPaymentParameters()
+        this.props.actions.getPayByLinkPaymentParameters(this.props.navigation.state.params.contactData)
     }
 
     onTextChange(type, payload) {
@@ -52,43 +53,12 @@ class PayByLink extends Component {
         console.log('PayByLink props', this.props)
         return (
             <Container>
-                {/* <Modal animationType={"slide"}
-                    transparent={false}
-                    onRequestClose={() => { }}
-                    visible={false}
-                >
-                    <View style={[styles.bgWhite, styles.flex1, styles.column, { paddingTop: 70 }]}>
-                        <View style={[styles.alignCenter, styles.column]}>
-                            <Text style={[styles.fontWeight500, styles.fontXxl, styles.fontBlack]}>
-                                Payment Collection request initiated
-                                Ask Customer to approve request
-                            </Text>
-                        </View>
-                        <View style={[styles.row, styles.justifyCenter, styles.marginTop30]}>
-                            <Button onPress={() => console.log()}
-                                full rounded style={StyleSheet.flatten(styles.margin10)}
-                            >
-                                <Text style={[styles.fontWhite]}>Proceed</Text>
-                            </Button>
-                            <Button
-                                onPress={() => this.props.actions.setState(
-                                    SET_UPI_APPROVAL,
-                                    {
-                                        upiApproval: false
-                                    }
-                                )}
-                                full rounded danger
-                                style={StyleSheet.flatten(styles.margin10, styles.bgDanger)}>
-                                <Text style={[styles.fontWhite]}>Cancel</Text>
-                            </Button>
-                        </View>
-                    </View>
-                </Modal> */}
                 <Content style={StyleSheet.flatten([styles.padding10])}>
                     <View>
                         <Text> Customer Contact </Text>
                         <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
                             <Input
+                                defaultValue={this.props.customerContact}
                                 placeholder='Regular Textbox'
                                 onChangeText={value => this.onTextChange(
                                     SET_UPI_PAYMENT_CUSTOMER_CONTACT,
@@ -101,30 +71,6 @@ class PayByLink extends Component {
                             {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
                         <PopOver visible={this.checkValidation()} /> */}
                         </View>
-                        <ListItem
-                            key={1}
-                            icon style={StyleSheet.flatten([{ marginLeft: 0 }])}
-                            onPress={() => { }}>
-                            <Body>
-                                <Text>{this.props.payByLinkConfigJSON ? this.props.payByLinkConfigJSON.cardCustomName && this.props.payByLinkConfigJSON.cardCustomName.trim() !== '' ? this.props.payByLinkConfigJSON.cardCustomName : 'Card Link' : 'Card Link'}</Text>
-                            </Body>
-                        </ListItem>
-                        <ListItem
-                            key={2}
-                            icon style={StyleSheet.flatten([{ marginLeft: 0 }])}
-                            onPress={() => { }}>
-                            <Body>
-                                <Text>{this.props.payByLinkConfigJSON ? this.props.payByLinkConfigJSON.netBankingCustomName && this.props.payByLinkConfigJSON.netBankingCustomName.trim() !== '' ? this.props.payByLinkConfigJSON.netBankingCustomName : 'Net Banking Link' : 'Net Banking Link'}</Text>
-                            </Body>
-                        </ListItem>
-                        <ListItem
-                            key={3}
-                            icon style={StyleSheet.flatten([{ marginLeft: 0 }])}
-                            onPress={() => { }}>
-                            <Body>
-                                <Text>{this.props.payByLinkConfigJSON ? this.props.payByLinkConfigJSON.upiCustomName && this.props.payByLinkConfigJSON.upiCustomName.trim() !== '' ? this.props.payByLinkConfigJSON.upiCustomName : 'UPI Link' : 'UPI Link'}</Text>
-                            </Body>
-                        </ListItem>
                     </View>
                 </Content>
                 <Footer>

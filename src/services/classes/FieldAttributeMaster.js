@@ -59,7 +59,6 @@ class FieldAttributeMaster {
             fieldAttributeMasterMap[fieldAttributeMaster.jobMasterId][fieldAttributeMaster.parentId] = fieldAttributeMasterMap[fieldAttributeMaster.jobMasterId][fieldAttributeMaster.parentId] ? fieldAttributeMasterMap[fieldAttributeMaster.jobMasterId][fieldAttributeMaster.parentId] : {}
             fieldAttributeMasterMap[fieldAttributeMaster.jobMasterId][fieldAttributeMaster.parentId][fieldAttributeMaster.id] = fieldAttributeMaster
         }
-        console.log(fieldAttributeMasterMap)
         return fieldAttributeMasterMap;
     }
 
@@ -67,6 +66,11 @@ class FieldAttributeMaster {
      * This function returns child field attribute master of a field attribute master
      * @param {*} childObjectList 
      * @param {*} map 
+     * @returns
+     * childObject : {
+     *                      fielAttributeMaster,
+     *                      childObject : { fielAttributeMaster } 
+     *                   }
      */
     setChildFieldAttributeMaster(childObjectList, map) {
         for (let index in childObjectList) {

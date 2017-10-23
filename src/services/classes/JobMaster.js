@@ -32,6 +32,7 @@ const {
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
+  HUB
 } = require('../../lib/constants').default
 
 
@@ -145,6 +146,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
+    await keyValueDBService.validateAndSaveData(HUB,json.hub)
   }
 
   /**
@@ -203,7 +205,7 @@ class JobMaster {
    */
   prepareTabStatusIdMap(jobStatus) {
     if (!jobStatus) {
-      return {}
+      return null
     }
     let tabIdStatusIdsMap = {}
     jobStatus.forEach(jobStatusObject => {
