@@ -17,10 +17,13 @@ import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
-import { FIXED_SKU } from '../lib/AttributeConstants.js'
 import * as globalActions from '../modules/global/globalActions'
-
-
+import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
+import {
+    MONEY_COLLECT,
+    MONEY_PAY
+} from '../lib/AttributeConstants'
+import { FIXED_SKU } from '../lib/AttributeConstants.js'
 
 function mapStateToProps(state) {
     return {
@@ -43,6 +46,30 @@ class BasicFormElement extends Component {
         this.NUMBER = 6;
         this.DECIMAL = 13;
         this.SIGNATURE = 21;
+    }
+
+    navigateToScene = (item) => {
+        let screenName = ''
+        switch (item.attributeTypeId) {
+            case MONEY_PAY:
+            case MONEY_COLLECT: {
+                screenName = 'Payment'
+                break
+            }
+        }
+
+        this.props.actions.navigateToScene(screenName,
+            {
+                currentElement: item,
+                formElements: this.props.formElement,
+                jobStatusId: this.props.jobStatusId,
+                jobTransaction: this.props.jobTransaction,
+                latestPositionId: this.props.latestPositionId,
+                nextEditable: this.props.nextEditable,
+                isSaveDisabled: this.props.isSaveDisabled
+            }
+        )
+
     }
 
     _onBlurEvent(attributeId) {
@@ -96,7 +123,6 @@ class BasicFormElement extends Component {
                                                     <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
                                                         {this.props.item.subLabel}
                                                     </Text>
-
                                                 </View>
 
                                                 <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
@@ -137,6 +163,10 @@ class BasicFormElement extends Component {
                         </Card>
                     )
                 )
+            case MONEY_PAY:
+            case MONEY_COLLECT: return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+                break;
+
             case FIXED_SKU:
                 return (
                     renderIf(!this.props.item.hidden,

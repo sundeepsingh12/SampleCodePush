@@ -85,6 +85,21 @@ export default keyMirror({
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
 
+    //Payment Actions
+    CLEAR_PAYMENT_STATE: null,
+    SET_PAYMENT_CHANGED_PARAMETERS: null,
+    SET_PAYMENT_INITIAL_PARAMETERS: null,
+
+    //UPI PaymentActions
+    SET_UPI_APPROVAL: null,
+    SET_UPI_PAYMENT_CUSTOMER_CONTACT: null,
+    SET_UPI_PAYMENT_CUSTOMER_NAME: null,
+    SET_UPI_PAYMENT_PARAMETERS: null,
+    SET_UPI_PAYMENT_PAYER_VPA: null,
+
+    //Pay By Link Payment Actions
+    SET_PAY_BY_LINK_PARAMETERS: null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
@@ -155,10 +170,8 @@ export default keyMirror({
     BASIC_INFO: null,
     ON_BLUR: null,
     TOOGLE_HELP_TEXT: null,
-    UNSEEN: null,
-    PENDING: null,
-    FormLayout: null,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
+    UPDATE_PAYMENT_AT_END: null,
 
     //Route names (Used in React Navigation)
     Application: null,

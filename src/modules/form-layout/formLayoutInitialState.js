@@ -13,6 +13,7 @@ var InitialState = Record({
     statusName : '',
     formElement : {},
     nextEditable : {},
+    paymentAtEnd : {}
     
     /*
     // this formElement contains basic fieldAttributeElements and it also contains

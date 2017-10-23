@@ -18,6 +18,9 @@ import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
+import Payment from '../../containers/Payment'
+import UPIPayment from '../../containers/UPIPayment'
+import PayByLink from '../../containers/PayByLink'
 import FixedSKUListing from '../../containers/FixedSKUListing'
 import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
@@ -58,7 +61,6 @@ export const AppNavigator = StackNavigator({
     navigationOptions: {
       title: 'Home',
       headerLeft: null,
-      headerBackTitle: null
     }
   },
   Message: {
@@ -67,11 +69,20 @@ export const AppNavigator = StackNavigator({
   Utilties: {
     screen: Utilties,
   },
+  Payment: {
+    screen: Payment
+  },
   Logout: {
     screen: Logout,
   },
   JobDetails: {
     screen: JobDetails,
+  },
+  UPIPayment: {
+    screen: UPIPayment
+  },
+  PayByLink: {
+    screen: PayByLink
   },
   FixedSKUListing: {
     screen: FixedSKUListing,
@@ -83,8 +94,9 @@ export const AppNavigator = StackNavigator({
     screen: Signature,
   },
   FormLayout: {
-    screen: FormLayout
-  }
+    screen: FormLayout,
+    navigationOptions: { header: null }
+  },
 },
   {
     cardStyle: {

@@ -50,9 +50,3 @@ export function getJobDetails(jobTransactionId) {
         }
     }
 }
-
-export function navigateToFormLayout(statusId,statusName,jobTransactionId){
-    return async function (dispatch) {
-        dispatch(NavigationActions.navigate({ routeName: FormLayout,params :{statusId:statusId,statusName:statusName,jobTransactionId:jobTransactionId} }))
-      }
-}
