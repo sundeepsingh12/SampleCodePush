@@ -18,11 +18,10 @@ export default class FormLayoutEventImpl {
 
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value,childDataList){
         console.log('inside interface impl with attributeMasterId', attributeMasterId);
-        this.updateFieldInfo(attributeMasterId,value,formLayoutObject);
+        this.updateFieldInfo(attributeMasterId,value,formLayoutObject,null,childDataList);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
 
         console.log("childDataList",childDataList)
-        formLayoutObject.get(attributeMasterId).childDataList = childDataList;
         const nextEditableElements = nextEditable[attributeMasterId];
         if(!nextEditableElements || nextEditableElements.length == 0){
             return {formLayoutObject,nextEditable,isSaveDisabled} // there is no next element so return
@@ -62,8 +61,10 @@ export default class FormLayoutEventImpl {
         return isSaveDisabled;
     }
 
-    updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom){
+    updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, childDataList){
         formLayoutObject.get(attributeMasterId).value = value;
+        formLayoutObject.get(attributeMasterId).childDataList = childDataList;      
+        console.log('formLayoutObject',childDataList)  
         if(value && value.length > 0 && calledFrom == ON_BLUR){
             formLayoutObject.get(attributeMasterId).showCheckMark = true;
         }

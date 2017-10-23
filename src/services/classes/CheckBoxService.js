@@ -5,13 +5,19 @@ class CheckBoxService {
     sortArrayAsc(array) {
         console.log("InsideSort")
 
-        return array.sort((a, b)=> {
+        return array.sort((a, b) => {
             console.info(b.sequence)
             return b.sequence < a.sequence ? 1
                 : b.sequence > a.sequence ? -1
                     : 0
         })
     }
+
+     arrayToObject = (array) =>
+            array.reduce((obj, item) => {
+                obj[item.id] = item
+                return obj
+            }, {})
 
     setOrRemoveState(checkBoxValues, id, attributeTypeId) {
         let tempCheckBoxValues = { ...checkBoxValues }
@@ -23,11 +29,12 @@ class CheckBoxService {
             if (radioBox != undefined)
                 radioBox.isChecked = false
         }
-//remove this
-//todo
-        let checkBox = Object.values(tempCheckBoxValues).filter(item => item.id == id)[0]
+        //remove this
+        //todo
+        let checkBox = tempCheckBoxValues[id]
+        console.log('tempCheckBoxValuess',tempCheckBoxValues[id])
         checkBox.isChecked = !checkBox.isChecked
-            checkBox.attributeTypeId = (attributeTypeId == 9)?9:2
+        checkBox.attributeTypeId = (attributeTypeId == 9) ? 9 : 2
         console.log(checkBox)
         console.log(tempCheckBoxValues)
         return tempCheckBoxValues
@@ -43,28 +50,21 @@ class CheckBoxService {
     }
 
     getcheckBoxDataList(wholeDataFromMaster, fieldAttributeMasterId) {
-        //todo use es6 filter
-        let checkBoxDataList = {}
+        let checkBoxDataList = []
         console.log("ServiceCheckBoxServiceWholeData")
         console.log(wholeDataFromMaster)
-        for (let list in wholeDataFromMaster) {
-            let attributeValue = wholeDataFromMaster[list]
-            if (attributeValue.fieldAttributeMasterId == fieldAttributeMasterId) {
-                attributeValue.isChecked = false
-                checkBoxDataList[attributeValue.id] = attributeValue
-                console.log(attributeValue)
-            }
-        }
-// checkBoxDataList = Object.values(wholeDataFromMaster).filter(item => item.fieldAttributeMasterId == fieldAttributeMasterId)
-        
-        console.log("checkBoxDataList")
+        checkBoxDataList = Object.values(wholeDataFromMaster).filter(item => item.fieldAttributeMasterId == fieldAttributeMasterId)
+
+        console.log("checkBoxDataListt")
         console.log(checkBoxDataList)
-        checkBoxDataList = this.sortArrayAsc(Object.values(checkBoxDataList))
+        checkBoxDataList = this.sortArrayAsc(checkBoxDataList)
         console.log("checkBoxDataListSorted")
         console.log(checkBoxDataList)
-        
+        let checkBoxDataLists = {}
+        checkBoxDataLists = this.arrayToObject(checkBoxDataList)
+        console.log("checkBoxDataLists",checkBoxDataLists)        
         console.log("attributeValue.isChecked")
-        return checkBoxDataList
+        return checkBoxDataLists
     }
 
     prepareFieldDataForTransactionSavingInState(fieldDataListDTO, jobTransactionId, parentId, latestPositionId) {

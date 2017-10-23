@@ -18,8 +18,6 @@ import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import DateTimePicker from 'react-native-modal-datetime-picker'
-
 
 /**
  * Router
@@ -43,14 +41,7 @@ import { Container, Button, Picker, Title, Option, List, ListItem, Icon, Form, I
 import * as checkBoxActions from '../modules/checkBox/checkBoxActions'
 import { CHECKBOX, RADIOBUTTON } from '../lib/AttributeConstants'
 
-const {
-  SET_VALUE_IN_CHECKBOX,
-  SET_OR_REMOVE_FROM_STATE_ARRAY,
-  CHECKBOX_BUTTON_CLICKED,
-  SHOW_DATETIME_PICKER,
-  HIDE_DATETIME_PICKER,
-  HANDLE_TIME_PICKED,
-} = require('../lib/constants').default
+
 
 var styles = StyleSheet.create({
   container: {
@@ -82,7 +73,6 @@ function mapStateToProps(state) {
   console.log(state.checkBox.checkBoxValues)
   return {
     checkBoxValues: state.checkBox.checkBoxValues,
-    isTimePickerVisible: state.checkBox.isComponentVisible,
   }
 }
 
@@ -110,7 +100,7 @@ class CheckBoxAttribute extends Component {
 
   // headerRightFunction() {
   //   console.log("headerRightFunction")
-  //   this.props.actions.actionDispatch(CHECKBOX_BUTTON_CLICKED,{})
+  //   this.props.actions.actionDispatch({})
   // }
 
 
@@ -124,26 +114,11 @@ class CheckBoxAttribute extends Component {
   //     )
   //   }
   // };
-  _handleDatePicked = (date) => {
-    this.props.actions.actionDispatch(HANDLE_TIME_PICKED,date);
-    this.props.navigation.goBack();
-  };
-  
-  _hideDateTimePicker = () => {
-      this.props.actions.actionDispatch(HIDE_DATETIME_PICKER,null);
-      this.props.navigation.goBack();
-  }
 
   componentWillMount() {
     console.log("componentWillMount()")
     console.log(this.params)
-    const attributeID = this.params.attributeTypeId;
-        if(attributeID == 3 || attributeID == 5){
-          this.props.actions.actionDispatch(SHOW_DATETIME_PICKER,null);
-        }
-        else{
-          this.props.actions.getCheckBoxData(this.params.fieldAttributeMasterId)
-        }
+    this.props.actions.getCheckBoxData(this.params.fieldAttributeMasterId)
   }
 
   renderDataCheckBox = (item) => {
@@ -191,14 +166,16 @@ class CheckBoxAttribute extends Component {
               renderItem={({ item }) => this.renderDataCheckBox(item)}
               keyExtractor={item => item.id}
             />
-            <Button onPress={() => { this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId, this.isSaveDisabled, this.formElement, this.nextEditable) 
-                                    this.props.navigation.goBack()}}>
+            <Button onPress={() => {
+              this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId, this.isSaveDisabled, this.formElement, this.nextEditable)
+              this.props.navigation.goBack()
+            }}>
               <Text> DONE </Text>
             </Button>
           </View>
         </Container>
       )
-    } else if(this.params.attributeTypeId == RADIOBUTTON) {
+    } else if (this.params.attributeTypeId == RADIOBUTTON) {
       return (
         <Container>
           <View style={styles.container}>
@@ -207,26 +184,15 @@ class CheckBoxAttribute extends Component {
               renderItem={({ item }) => this.renderDataRadioButton(item)}
               keyExtractor={item => item.id}
             />
-            <Button onPress={() => { this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId, this.isSaveDisabled, this.formElement, this.nextEditable) 
-                                   this.props.navigation.goBack()}}>
+            <Button onPress={() => {
+              this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId, this.isSaveDisabled, this.formElement, this.nextEditable)
+              this.props.navigation.goBack()
+            }}>
               <Text> DONE </Text>
             </Button>
           </View>
         </Container>
       )
-    }
-    else{
-      const mode=(this.params.attributeTypeId===5) ?'time' :'date';
-          return(
-              <View>
-              <DateTimePicker 
-              isVisible={this.props.isTimePickerVisible}
-              onConfirm={this._handleDatePicked}
-              onCancel={this._hideDateTimePicker}
-              mode={mode}
-              />
-              </View>
-          )
     }
   }
 }

@@ -10,14 +10,12 @@ import { CHECKBOX, RADIOBUTTON } from '../../lib/AttributeConstants'
 const {
     FIELD_ATTRIBUTE_VALUE,
     SET_VALUE_IN_CHECKBOX,
-    SET_OR_REMOVE_FROM_STATE_ARRAY,
-    CHECKBOX_BUTTON_CLICKED,
 } = require('../../lib/constants').default
 
 
-export function actionDispatch(type, payload) {
+export function actionDispatch(payload) {
     return {
-        type: type,
+        type: SET_VALUE_IN_CHECKBOX,
         payload: payload
     }
 }
@@ -27,8 +25,9 @@ export function actionDispatch(type, payload) {
 export function setOrRemoveStates(checkBoxValues, id, attributeTypeId) {
     return async function (dispatch) {
         try {
+            console.log("checkID", id)
             checkBoxValues = checkBoxDataService.setOrRemoveState(checkBoxValues, id, attributeTypeId)
-            dispatch(actionDispatch(SET_OR_REMOVE_FROM_STATE_ARRAY, checkBoxValues))
+            dispatch(actionDispatch(checkBoxValues))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
@@ -41,7 +40,8 @@ export function checkBoxButtonDone(checkBoxValues, params, jobTransactionId, lat
     return async function (dispatch) {
         try {
             checkBoxValues = checkBoxDataService.checkBoxDoneButtonClicked(checkBoxValues)
-            await dispatch(actionDispatch(CHECKBOX_BUTTON_CLICKED, checkBoxValues))
+            await dispatch(actionDispatch(Object.values(checkBoxValues)))
+            console.log("checkBoxValuesafterDone", checkBoxValues)            
             if(params.attributeTypeId == CHECKBOX){
             const fieldDataListData = await checkBoxDataService.prepareFieldDataForTransactionSavingInState(checkBoxValues, jobTransactionId, params.parentId, latestPositionId)
             console.log("fieldDataList", fieldDataListData)
@@ -66,7 +66,7 @@ export function getCheckBoxData(fieldAttributeMasterId) {
             const wholeDataFromMaster = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
             console.log("wholeDataFromMaster", wholeDataFromMaster)
             const checkBoxDataList = await checkBoxDataService.getcheckBoxDataList(wholeDataFromMaster.value, fieldAttributeMasterId)
-            dispatch(actionDispatch(SET_VALUE_IN_CHECKBOX, checkBoxDataList))
+            dispatch(actionDispatch(checkBoxDataList))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

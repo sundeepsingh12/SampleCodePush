@@ -3,7 +3,6 @@
 const { Record } = require('immutable')
 
 const InitialState = Record({
-    isComponentVisible: false,
     checkBoxValues: {}
 })
 
