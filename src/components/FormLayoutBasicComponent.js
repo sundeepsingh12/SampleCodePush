@@ -21,7 +21,8 @@ import * as globalActions from '../modules/global/globalActions'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import {
     MONEY_COLLECT,
-    MONEY_PAY
+    MONEY_PAY,
+    NPS_FEEDBACK
 } from '../lib/AttributeConstants'
 import { FIXED_SKU } from '../lib/AttributeConstants.js'
 
@@ -282,7 +283,13 @@ class BasicFormElement extends Component {
                         </TouchableHighlight>
                     )
                 )
-
+            case NPS_FEEDBACK:
+                return (
+                    <TouchableHighlight onPress={() => { this.props.actions.navigateToScene('OverlayAttributes', { item: this.props.item, formElement: this.props.formElement, nextEditable: this.props.nextEditable, isSaveDisabled: this.props.isSaveDisabled }) }} >
+                        <Text> {this.props.item.label}
+                        </Text>
+                    </TouchableHighlight>
+                )
             default:
                 return (
                     <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
