@@ -155,8 +155,10 @@ export default keyMirror({
     BASIC_INFO : null,
     ON_BLUR : null,
     TOOGLE_HELP_TEXT : null,
-    UNSEEN: null,
-    PENDING: null,
+    IS_LOADING : null,
+    PENDING_SYNC_TRANSACTION_IDS : null,
+    RESET_STATE : null,
+    ERROR_MESSAGE : null,
 
     //Route names (Used in React Navigation)
     Application: null,

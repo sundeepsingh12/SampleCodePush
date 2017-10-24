@@ -72,7 +72,8 @@ export const AppNavigator = StackNavigator({
     screen: JobDetails,
   },
   FormLayout: {
-    screen: FormLayout
+    screen: FormLayout,
+    navigationOptions : {header : null}
   }
 },
   {
