@@ -17,10 +17,16 @@ import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
+import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
+import {
+    MONEY_COLLECT,
+    MONEY_PAY,
+    CHECKBOX,
+    RADIOBUTTON,
+} from '../lib/AttributeConstants'
+import { FIXED_SKU } from '../lib/AttributeConstants.js'
 
 import * as globalActions from '../modules/global/globalActions'
-
-import { CHECKBOX, RADIOBUTTON } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
     return {
@@ -42,6 +48,32 @@ class BasicFormElement extends Component {
         this.TEXT = 2;
         this.NUMBER = 6;
         this.DECIMAL = 13;
+        this.SIGNATURE = 21;
+    }
+
+    navigateToScene = (item) => {
+        let screenName = ''
+        switch (item.attributeTypeId) {
+            case MONEY_PAY:
+            case MONEY_COLLECT: {
+                screenName = 'Payment'
+                break
+            }
+            case CHECKBOX: 'CheckBoxAttribute'
+            case RADIOBUTTON: 'CheckBoxAttribute'
+        }
+
+        this.props.actions.navigateToScene(screenName,
+            {
+                currentElement: item,
+                formElements: this.props.formElement,
+                jobStatusId: this.props.jobStatusId,
+                jobTransaction: this.props.jobTransaction,
+                latestPositionId: this.props.latestPositionId,
+                nextEditable: this.props.nextEditable,
+                isSaveDisabled: this.props.isSaveDisabled
+            }
+        )
 
     }
 
@@ -73,8 +105,6 @@ class BasicFormElement extends Component {
     }
 
     render() {
-        console.log("FormLayoutCheckbox")
-         console.log(this.props.item)
         switch (this.props.item.attributeTypeId) {
             case this.STRING:
             case this.TEXT:
@@ -98,7 +128,6 @@ class BasicFormElement extends Component {
                                                     <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
                                                         {this.props.item.subLabel}
                                                     </Text>
-
                                                 </View>
 
                                                 <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
@@ -141,28 +170,129 @@ class BasicFormElement extends Component {
                         </Card>
                     )
                 )
+            case MONEY_PAY:
+            case MONEY_COLLECT: return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+                break;
 
-            // case CHECKBOX:
-            //     return (
-            //         <Button onPress={() => { this.props.actions.navigateToScene('CheckBoxAttribute',{params: this.props.item, latestPositionId: this.props.latestPositionId, jobTransactionId: this.props.jobTransactionId}) }} vertical>
-            //     <Icon name={"ios-apps-outline"} />
-            //     <Text> CHECKBOX </Text>
-            //   </Button>
-            //     )
+            case FIXED_SKU:
+                return (
+                    renderIf(!this.props.item.hidden,
+                        <TouchableHighlight onPress={() => {
+                            this.props.actions.navigateToScene('FixedSKUListing', {
+                                params: this.props.item,
+                                jobTransactionId: this.props.jobTransactionId,
+                                latestPositionId: this.props.latestPositionId,
+                                formElement: this.props.formElement,
+                                nextEditable: this.props.nextEditable,
+                                isSaveDisabled: this.props.isSaveDisabled
+                            })
+                        }} >
+                            <Card>
+                                <CardItem>
+                                    <Body style={StyleSheet.flatten([styles.padding0])}>
+                                        <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
+                                            <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
+                                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, { marginTop: -5 }])} />
+                                            </View>
+                                            <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
+                                                <View style={StyleSheet.flatten([styles.row])}>
+                                                    <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
+                                                        <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
+                                                            {this.props.item.label}
+                                                        </Text>
+                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                                                            {this.props.item.subLabel}
+                                                        </Text>
 
-            // case RADIOBUTTON:
-            //     return (
-            //         <Button onPress={() => { this.props.actions.navigateToScene('CheckBoxAttribute',{params: this.props.item, latestPositionId: this.props.latestPositionId, jobTransactionId: this.props.jobTransactionId}) }} vertical>
-            //     <Icon name={"ios-apps-outline"} />
-            //     <Text> RADIOBUTTON </Text>
-            //   </Button>
-            //     )
+                                                    </View>
+
+                                                    <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
+
+                                                        {renderIf(this.props.item.showCheckMark,
+                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
+                                                        )}
+
+                                                        {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
+                                                            <View>
+                                                                <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(this.props.item.fieldAttributeMasterId)}>
+                                                                    <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
+                                                                </TouchableHighlight>
+                                                            </View>
+                                                        )}
+
+
+                                                    </View>
+                                                </View>
+                                                {
+                                                    renderIf(this.props.item.helpText && this.props.item.showHelpText,
+                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                                                            {this.props.item.helpText} </Text>
+                                                    )}
+                                            </View>
+                                        </View>
+                                    </Body>
+                                </CardItem>
+                            </Card>
+                        </TouchableHighlight>
+                    )
+                )
+            case this.SIGNATURE:
+                return (
+                    renderIf(!this.props.item.hidden,
+                        <TouchableHighlight onPress={() => { this.props.actions.navigateToScene('Signature', { item: this.props.item, formElement: this.props.formElement, nextEditable: this.props.nextEditable, isSaveDisabled: this.props.isSaveDisabled }) }} >
+                            <Card>
+                                <CardItem>
+                                    <Body style={StyleSheet.flatten([styles.padding0])}>
+                                        <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
+                                            <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
+                                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, { marginTop: -5 }])} />
+                                            </View>
+                                            <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
+                                                <View style={StyleSheet.flatten([styles.row])}>
+                                                    <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
+                                                        <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
+                                                            {this.props.item.label}
+                                                        </Text>
+                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                                                            {this.props.item.subLabel}
+                                                        </Text>
+
+                                                    </View>
+
+                                                    <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
+
+                                                        {renderIf(this.props.item.showCheckMark,
+                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
+                                                        )}
+
+                                                        {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
+                                                            <View>
+                                                                <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(this.props.item.fieldAttributeMasterId)}>
+                                                                    <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
+                                                                </TouchableHighlight>
+                                                            </View>
+                                                        )}
+
+
+                                                    </View>
+                                                </View>
+                                                {
+                                                    renderIf(this.props.item.helpText && this.props.item.showHelpText,
+                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                                                            {this.props.item.helpText} </Text>
+                                                    )}
+                                            </View>
+                                        </View>
+                                    </Body>
+                                </CardItem>
+                            </Card>
+                        </TouchableHighlight>
+                    )
+                )
 
             default:
                 return (
-                    <Text onPress={() => { this.props.actions.navigateToScene('CheckBoxAttribute',{params: this.props.item, latestPositionId: this.props.latestPositionId, jobTransactionId: this.props.jobTransactionId, isSaveDisabled:this.props.isSaveDisabled, formElement:this.props.formElement, nextEditable:this.props.nextEditable}) }} vertical style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                        Under construction  {this.props.item.label} - attributeTypeId {this.props.item.attributeTypeId}
-                    </Text>
+                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
         }
     }

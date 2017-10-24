@@ -117,8 +117,6 @@ export default {
     margin30: {
         margin: 30
     },
-
-
     marginTop5: {
         marginTop: 5
     },
@@ -469,6 +467,16 @@ export default {
   },
   alignSelfEnd : {
       alignSelf : 'flex-end'
+  },
+
+  positionAbsolute : {
+      position: 'absolute'
+  },
+  positionRelative : {
+      position: 'relative'
+  },
+  positionFixed : {
+      position: 'fixed'
   }
 
 }
