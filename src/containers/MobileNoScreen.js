@@ -6,7 +6,6 @@ import {
     Modal
 } from 'react-native'
 import { Button, Input } from 'native-base';
-import feTheme from '../themes/feTheme'
 import feStyle from '../themes/FeStyle'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -58,7 +57,7 @@ class MobileNoScreen extends Component{
                                 <View style={[feStyle.flex1, { height: 50 }]}>
                                     <Input
                                         placeholder='Mobile Number'
-                                        style={feTheme.roundedInput}
+                                        style={feStyle.roundedInput}
                                         value={this.props.mobileNumber}
                                         keyboardType='numeric'
                                         onChangeText={value => this.onChangeMobileNo(value)}

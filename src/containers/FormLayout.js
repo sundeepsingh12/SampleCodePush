@@ -10,15 +10,14 @@ import
 from 'react-native'
 import { Container, Content,Footer, Thumbnail, FooterTab,Input, Card, CardItem, Button, Body, Header, Left, Right, Icon} from 'native-base';
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import imageFile from '../../images/fareye-logo.png'
 
 class FormLayout extends Component {
 
   render () {
     return (
-      <Container style={StyleSheet.flatten([theme.mainBg])}>
-        <Header style={StyleSheet.flatten([theme.bgPrimary])}>
+      <Container style={StyleSheet.flatten([styles.mainBg])}>
+        <Header style={StyleSheet.flatten([styles.bgPrimary])}>
           <Left>
             <Button transparent>
               <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])}/>
@@ -37,7 +36,7 @@ class FormLayout extends Component {
               <Body style={StyleSheet.flatten([styles.padding0])}>
                 <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                   <View style={StyleSheet.flatten([{flexBasis: '12%', paddingTop: 2}])}>
-                    <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, {marginTop: -5}])}/>
+                    <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.textPrimary, {marginTop: -5}])}/>
                   </View>
                   <View style={StyleSheet.flatten([styles.marginRightAuto, {flexBasis: '88%'}])}>
                     <View  style={StyleSheet.flatten([styles.row])}>
@@ -68,7 +67,7 @@ class FormLayout extends Component {
               <Body style={StyleSheet.flatten([styles.padding0])}>
                 <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                   <View style={StyleSheet.flatten([{flexBasis: '12%', paddingTop: 2}])}>
-                    <Icon name='ios-camera-outline' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, {marginTop: -5}])}/>
+                    <Icon name='ios-camera-outline' style={StyleSheet.flatten([styles.fontXxl, styles.textPrimary, {marginTop: -5}])}/>
                   </View>
                   <View style={StyleSheet.flatten([styles.marginRightAuto, {flexBasis: '88%'}])}>
                     <View  style={StyleSheet.flatten([styles.row])}>
@@ -103,7 +102,7 @@ class FormLayout extends Component {
               <Body style={StyleSheet.flatten([styles.padding0])}>
                 <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                   <View style={StyleSheet.flatten([{flexBasis: '12%', paddingTop: 2}])}>
-                    <Icon name='ios-create-outline' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, {marginTop: -5}])}/>
+                    <Icon name='ios-create-outline' style={StyleSheet.flatten([styles.fontXxl, styles.textPrimary, {marginTop: -5}])}/>
                   </View>
                   <View style={StyleSheet.flatten([styles.marginRightAuto, {flexBasis: '88%'}])}>
                     <View  style={StyleSheet.flatten([styles.row])}>

@@ -6,7 +6,6 @@ import {
     from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import feStyle from '../themes/FeStyle'
-import feTheme from '../themes/feTheme'
 import { Container, Right } from 'native-base';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'

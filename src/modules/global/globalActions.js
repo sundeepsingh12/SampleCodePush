@@ -59,6 +59,12 @@ export function setStore(store) {
   }
 }
 
+export function navigateToScene(sceneName, paramaters) {
+  return async function (dispatch) {
+    dispatch(NavigationActions.navigate({ routeName: sceneName, params: paramaters }))
+  }
+}
+
 //Deletes values from store
 export function deleteSessionToken() {
   return async function (dispatch) {

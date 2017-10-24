@@ -384,7 +384,7 @@ export function checkAsset() {
       if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        dispatch(NavigationActions.navigate({ routeName: Home }))
+        dispatch(NavigationActions.navigate({ routeName: 'HomeUI' }))
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer());
@@ -421,7 +421,7 @@ export function checkIfSimValidOnServer() {
       if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        dispatch(NavigationActions.navigate({ routeName: Home }))
+        dispatch(NavigationActions.navigate({ routeName: 'HomeUI' }))
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
         dispatch(showMobileNumber())
@@ -480,7 +480,7 @@ export function validateOtp(otpNumber) {
       const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM.value, token)
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
-      dispatch(NavigationActions.navigate({ routeName: Home }))
+      dispatch(NavigationActions.navigate({ routeName: 'HomeUI' }))
     } catch (error) {
       dispatch(otpValidationFailure(error.message))
     }

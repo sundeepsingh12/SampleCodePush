@@ -18,9 +18,10 @@ import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
+import HomeUI from '../../containers/HomeUI'
+import JobDetailsV2 from '../../containers/JobDetailsV2'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
-import theme from '../../themes/feTheme'
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -69,6 +70,12 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
+  },
+  HomeUI: {
+    screen : HomeUI
+  },
+  JobDetailsV2: {
+    screen : JobDetailsV2
   }
 },
   {

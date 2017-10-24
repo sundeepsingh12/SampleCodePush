@@ -11,7 +11,6 @@ import {
     from 'react-native'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import renderIf from '../lib/renderIf'
@@ -73,8 +72,8 @@ class JobDetails extends Component {
             )
         } else {
             return (
-                <Container style={StyleSheet.flatten([theme.mainBg])}>
-                    <Header style={StyleSheet.flatten([theme.bgPrimary])}>
+                <Container style={StyleSheet.flatten([styles.mainBg])}>
+                    <Header style={StyleSheet.flatten([styles.bgPrimary])}>
                         <Left style={StyleSheet.flatten([styles.flexBasis15])}>
                             <Button transparent onPress={() => { this.props.navigation.goBack(null) }}>
                                 <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])} />

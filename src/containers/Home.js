@@ -21,7 +21,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import ResyncLoader from '../components/ResyncLoader'
 
 
