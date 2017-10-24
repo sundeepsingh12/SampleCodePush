@@ -183,13 +183,14 @@ export default keyMirror({
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
     CHANGE_QUANTITY: null,
-    SET_FIXED_SKU:null,
-    
+    SET_FIXED_SKU: null,
+
     //Signature Actions
     SET_FIELD_DATA_LIST: null,
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
     FormLayout: null,
+    TimePicker: null,
 })
 
 

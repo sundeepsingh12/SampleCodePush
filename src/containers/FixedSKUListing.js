@@ -39,10 +39,10 @@ class FixedSKUListing extends Component {
   constructor(props) {
     super(props)
     let navigationState = this.props.navigation.state.params
-    this.parentObject = navigationState['params']
+    this.parentObject = navigationState['currentElement']
     this.jobTransactionId = navigationState['jobTransactionId']
     this.latestPositionId = navigationState['latestPositionId']
-    this.formElement = navigationState['formElement']
+    this.formElement = navigationState['formElements']
     this.nextEditable = navigationState['nextEditable']
     this.isSaveDisabled = navigationState['isSaveDisabled']
   }

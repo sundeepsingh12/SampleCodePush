@@ -24,6 +24,10 @@ module.exports = {
     SKU_ACTUAL_AMOUNT: 32,
     SKU_ARRAY: 17,
     TRANSACTION_NUMBER: 'transaction_number',
+    NPS_FEEDBACK: 23,
+    RE_ATTEMPT_DATE: 33,
+    DATE: 3,
+    TIME: 5,
 
     // Money Collect Mode Type Constants
     CASH: {
