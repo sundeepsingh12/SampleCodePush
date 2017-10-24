@@ -20,10 +20,10 @@ import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
+import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
 import theme from '../themes/feTheme'
 import ResyncLoader from '../components/ResyncLoader'
-
 
 /**
  * The components needed from React
@@ -58,7 +58,9 @@ function mapStateToProps(state) {
   return {
     tabsList: state.home.tabsList,
     tabIdStatusIdMap: state.home.tabIdStatusIdMap,
-    downloadingJobs: state.home.downloadingJobs
+    downloadingJobs: state.home.downloadingJobs,
+    errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
+    isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
   }
 };
 
@@ -89,6 +91,10 @@ class Main extends Component {
     this.props.actions.syncService()
     this.props.actions.fetchTabs()
 
+  }
+
+  startLoginScreenWithoutLogout() {
+    this.props.actions.startLoginScreenWithoutLogout()
   }
 
   renderTabs() {
@@ -124,6 +130,13 @@ class Main extends Component {
     if (viewTabList.length > 0) {
       return (
         <Container>
+          {renderIf(this.props.isErrorType_403_400_Logout,
+            <CustomAlert
+              title="Unauthorised Device"
+              message={this.props.errorMessage_403_400_Logout}
+              onCancelPressed={this.startLoginScreenWithoutLogout.bind(this)} />
+
+          )}
           <Tabs locked
             tabBarUnderlineStyle={styles.bgPrimary}
             renderTabBar={() => <ScrollableTab />}
@@ -138,17 +151,17 @@ class Main extends Component {
                 <Text>Home</Text>
               </Button>
               <Button
-                disabled = {this.props.downloadingJobs}
+                disabled={this.props.downloadingJobs}
                 onPress={() => { this.props.actions.onResyncPress() }}
                 vertical>
                 <ResyncLoader
-                downloadingJobs = {this.props.downloadingJobs} />
+                  downloadingJobs={this.props.downloadingJobs} />
               </Button>
               <Button vertical>
                 <Icon name={"ios-chatboxes-outline"} />
                 <Text>Message</Text>
               </Button>
-              <Button vertical>
+              <Button onPress={() => { }} vertical>
                 <Icon name={"ios-apps-outline"} />
                 <Text>Utilities</Text>
               </Button>

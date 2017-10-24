@@ -21,8 +21,12 @@ import {
     SKU_ACTUAL_QUANTITY,
     TOTAL_ORIGINAL_QUANTITY,
     TOTAL_ACTUAL_QUANTITY,
-    SKU_ACTUAL_AMOUNT
+    SKU_ACTUAL_AMOUNT,
+    ARRAY_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
+
+import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import { fieldAttributeService } from '../../services/classes/FieldAttribute'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {
     return async function (dispatch) {
@@ -110,17 +114,19 @@ export function updateSkuListItem(skuListItems, skuRootChildElements) {
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId,jobTransactionId,latestPositionId,parentObject,formElement,nextEditable,isSaveDisabled) {
     return async function (dispatch) {
         try {
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation,skuRootChildItems)
             console.log('message',message)
-            if (!message) {
+            // if (!message) {
                 const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId)
-            }
-            else{
-                //Show Toast or Modal here according to message string returned
-            }
+                let fieldDataListWithLatestPositionId = await fieldAttributeService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.parentId, latestPositionId)
+                 dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+            // }
+            // else{
+            //     //Show Toast or Modal here according to message string returned
+            // }
         } catch (error) {
             console.log(error)
             //UI needs updating here

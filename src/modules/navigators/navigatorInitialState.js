@@ -6,7 +6,8 @@ const {
     Preloader,
     Home,
     JobDetails,
-    SkuListing
+    SkuListing,
+    FormLayout
 } = require('../../lib/constants').default
 
 const applicationAction = AppNavigator.router.getActionForPathAndParams(Application);
@@ -25,6 +26,8 @@ const jobDetailsState = AppNavigator.router.getStateForAction(jobDetailsAction)
 
 const skuListingAction = AppNavigator.router.getActionForPathAndParams(SkuListing)
 const skuListingState = AppNavigator.router.getStateForAction(skuListingAction)
+const formLayoutAction = AppNavigator.router.getActionForPathAndParams(FormLayout)
+const formLayoutState = AppNavigator.router.getStateForAction(formLayoutAction)
 
 const initialNavState = AppNavigator.router.getStateForAction(
   applicationAction,
@@ -32,7 +35,8 @@ const initialNavState = AppNavigator.router.getStateForAction(
   preloaderState,
   homeState,
   jobDetailsState,
-  skuListingState
+  skuListingState,
+  formLayoutState
 );
 
 export default initialNavState

@@ -20,10 +20,11 @@ import _ from 'underscore';
 class SkuListing extends Component {
 
     componentWillMount(){
-      const skuFieldDataObject = this.props.skuFieldDataObject
-        const fieldAttributeMasterId = 19864
-        const jobId = 4087357
-        this.props.actions.prepareSkuList(fieldAttributeMasterId,jobId)
+        const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
+        console.log('fieldAttributeMasterId',fieldAttributeMasterId)
+        const jobId = this.props.navigation.state.params.jobTransaction.jobId
+        console.log('jobId',jobId)
+        this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId,this.props.navigation.state.params.jobTransaction.jobId)
     }
 
     renderData(item){
@@ -86,15 +87,22 @@ class SkuListing extends Component {
     }
 
     scanSkuItem(){
+      //Code incomplete
       const searchTerm = this.props.skuSearchTerm;
-      console.log('searchTerm>>>>',searchTerm)
       if(skuSearchTerm){
         this.props.actions.scanSkuItem(this.props.skuListItems,searchTerm)
       }
     }
 
     saveSkuList(){
-      this.props.actions.saveSkuListItems(this.props.skuListItems,this.props.skuObjectValidation,this.props.skuChildItems,this.props.skuObjectAttributeId)
+      this.props.actions.saveSkuListItems(
+        this.props.skuListItems,this.props.skuObjectValidation,this.props.skuChildItems,
+        this.props.skuObjectAttributeId,this.props.navigation.state.params.jobTransaction.id,this.props.navigation.state.params.latestPositionId,
+        this.props.navigation.state.params.currentElement,this.props.navigation.state.params.formElements,
+        this.props.navigation.state.params.nextEditable,
+        this.props.navigation.state.params.isSaveDisabled
+      )
+      this.props.navigation.goBack()
     }
 
 

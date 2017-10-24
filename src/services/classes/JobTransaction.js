@@ -211,7 +211,7 @@ class JobTransaction {
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
-        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION,  )
+        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         if (jobTransactionList.length == 0) {
             return []
         }
@@ -590,6 +590,11 @@ class JobTransaction {
             jobDataObject,
             jobTransactionDisplay,
         }
+    }
+
+    getTransactionContactNumber(jobAttributeMasterList, jobMasterId, jobId) {
+        const jobMasterJobAttributeMasterMap = jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)
+        let jobAttributeMap = jobMasterJobAttributeMasterMap[jobMasterId]
     }
 
 }

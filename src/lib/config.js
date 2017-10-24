@@ -26,7 +26,7 @@ module.exports = {
     LOGOUT_API: '/logout',
     DOWNLOAD_DATA_API: '/rest/device/get_sync_table_job_with_pagination',
     DELETE_DATA_API: '/rest/device/delete_synch_job',
-    PUSH_BROKER:'mqttstaging.fareye.co',
+    PUSH_BROKER:'mqttdev.fareye.co',
     UPLOAD_DATA_API : '/rest/device/sync'
   }
 }
