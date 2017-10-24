@@ -59,6 +59,7 @@ import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
 import HomeInititalState from './modules/home/homeInitialState'
 import ListingInitialState from './modules/listing/listingInitialState'
 import JobDetailsInitialState from './modules/job-details/jobDetailsInitialState'
+import SkuListingInitialState from './modules/skulisting/skuListingInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
@@ -84,6 +85,7 @@ function getInitialState() {
     home: (new HomeInititalState()),
     listing: (new ListingInitialState()),
     jobDetails: new JobDetailsInitialState(),
+    skuListing: new SkuListingInitialState()
   }
   return _initState
 }

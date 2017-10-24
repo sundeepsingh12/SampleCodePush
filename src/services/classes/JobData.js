@@ -1,8 +1,12 @@
 'use strict'
 
-import { jobAttributeMasterService } from './JobAttributeMaster'
+import {
+    jobAttributeMasterService
+} from './JobAttributeMaster'
 import * as realm from '../../repositories/realmdb'
-import { jobDetailsService } from './JobDetails'
+import {
+    jobDetailsService
+} from './JobDetails'
 const {
     TABLE_JOB_DATA,
     TABLE_JOB_TRANSACTION,
@@ -11,7 +15,13 @@ const {
     TABLE_FIELD_DATA,
 } = require('../../lib/constants').default
 
-import { ADDRESS_LINE_1, ADDRESS_LINE_2, CONTACT_NUMBER, LANDMARK, PINCODE } from '../../lib/AttributeConstants'
+import {
+    ADDRESS_LINE_1,
+    ADDRESS_LINE_2,
+    CONTACT_NUMBER,
+    LANDMARK,
+    PINCODE
+} from '../../lib/AttributeConstants'
 
 class JobData {
 
@@ -154,6 +164,20 @@ class JobData {
         return jobDataObject
     }
 
+
+/**Returns parentId Vs JobData List
+ * 
+ * @param {*} jobDatas 
+ */
+    getParentIdJobDataListMap(jobDatas) {
+        let parentIdJobDataListMap = {}
+        jobDatas.forEach(jobData => {
+            let jobDataList = (parentIdJobDataListMap[jobData.parentId])?parentIdJobDataListMap[jobData.parentId]:[]
+            jobDataList.push(jobData)
+            parentIdJobDataListMap[jobData.parentId] = jobDataList
+        })
+        return parentIdJobDataListMap
+    }
 }
 
 export let jobDataService = new JobData()

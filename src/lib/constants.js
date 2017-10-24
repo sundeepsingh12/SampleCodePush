@@ -142,6 +142,7 @@ export default keyMirror({
     //Home Actions
     IS_LAST_PAGE: null,
 
+
     //Status Codes
     UNSEEN: null,
     PENDING: null,
@@ -152,6 +153,15 @@ export default keyMirror({
     Preloader: null,
     Home: null,
     JobDetails: null,
+    SkuListing:null,
+
+    //Skulisting Actions
+    SKU_LIST_FETCHING_STOP:null,
+    SKU_LIST_FETCHING_START:null,
+    SHOW_SEARCH_BAR:null,
+    SKU_CODE_CHANGE:null,
+    UPDATE_SKU_ACTUAL_QUANTITY:null
+
 })
 
 
