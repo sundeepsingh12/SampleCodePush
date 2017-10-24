@@ -31,8 +31,8 @@ class Signature extends Component {
 
     constructor(props) {
         super(props)
-        this.params = this.props.navigation.state.params.item;
-        this.formElement = this.props.navigation.state.params.formElement;
+        this.params = this.props.navigation.state.params.currentElement;
+        this.formElement = this.props.navigation.state.params.formElements;
         this.nextEditable = this.props.navigation.state.params.nextEditable;
         this.isSaveDisabled = this.props.navigation.state.params.isSaveDisabled;
     }

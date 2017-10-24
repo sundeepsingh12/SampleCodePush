@@ -1,32 +1,54 @@
 import React, { Component } from 'react'
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
 import {
-    NPS_FEEDBACK
+    NPS_FEEDBACK,
+    TIME,
+    DATE,
+    RE_ATTEMPT_DATE
 } from '../lib/AttributeConstants'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import StarRating from 'react-native-star-rating';
+import TimePicker from '../components/TimePicker'
+import NPSFeedback from '../components/NPSFeedback'
+import { getNextFocusableAndEditableElements } from '../modules/form-layout/formLayoutActions'
+
 function mapStateToProps(state) {
     return {
     }
 }
 function mapDispatchToProps(dispatch) {
     return {
+        actions: bindActionCreators({ getNextFocusableAndEditableElements }, dispatch)
     }
 }
 class OverlayAttributes extends Component {
 
+    onSave = (value) => {
+        this.props.actions.getNextFocusableAndEditableElements(this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
+            this.props.navigation.state.params.formElements,
+            this.props.navigation.state.params.nextEditable,
+            this.props.navigation.state.params.isSaveDisabled,
+            value)
+        this.props.navigation.goBack()
+    }
+
+    onCancel = () => {
+        this.props.navigation.goBack()
+    }
+
     render() {
-        console.log('==', this.props.navigation.state.params.item.attributeTypeId)
-        switch (this.props.navigation.state.params.item.attributeTypeId) {
+        switch (this.props.navigation.state.params.currentElement.attributeTypeId) {
             case NPS_FEEDBACK:
                 return (
-                    <StarRating
-                        disabled={false}
-                        maxStars={5}
-                        rating={0}
-                        selectedStar={(rating) => console.log(rating)}
+                    <NPSFeedback
+                        onSave={this.onSave} onCancel={this.onCancel}
                     />
+                )
+            case DATE:
+            case RE_ATTEMPT_DATE:
+            case TIME:
+                return (
+                    <TimePicker onSave={this.onSave} onCancel={this.onCancel} item={this.props.navigation.state.params.currentElement} />
                 )
             default:
                 return (

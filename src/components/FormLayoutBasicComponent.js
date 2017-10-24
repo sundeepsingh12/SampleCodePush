@@ -22,9 +22,13 @@ import FormLayoutActivityComponent from '../components/FormLayoutActivityCompone
 import {
     MONEY_COLLECT,
     MONEY_PAY,
-    NPS_FEEDBACK
+    NPS_FEEDBACK,
+    TIME,
+    RE_ATTEMPT_DATE,
+    DATE,
+    FIXED_SKU,
+    SIGNATURE
 } from '../lib/AttributeConstants'
-import { FIXED_SKU } from '../lib/AttributeConstants.js'
 
 function mapStateToProps(state) {
     return {
@@ -46,7 +50,6 @@ class BasicFormElement extends Component {
         this.TEXT = 2;
         this.NUMBER = 6;
         this.DECIMAL = 13;
-        this.SIGNATURE = 21;
     }
 
     navigateToScene = (item) => {
@@ -56,6 +59,17 @@ class BasicFormElement extends Component {
             case MONEY_COLLECT: {
                 screenName = 'Payment'
                 break
+            }
+            case FIXED_SKU: {
+                screenName = 'FixedSKUListing'
+                break
+            }
+            case SIGNATURE: {
+                screenName = 'Signature'
+                break
+            }
+            default: {
+                screenName = 'OverlayAttributes'
             }
         }
 
@@ -170,125 +184,18 @@ class BasicFormElement extends Component {
 
             case FIXED_SKU:
                 return (
-                    renderIf(!this.props.item.hidden,
-                        <TouchableHighlight onPress={() => {
-                            this.props.actions.navigateToScene('FixedSKUListing', {
-                                params: this.props.item,
-                                jobTransactionId: this.props.jobTransactionId,
-                                latestPositionId: this.props.latestPositionId,
-                                formElement: this.props.formElement,
-                                nextEditable: this.props.nextEditable,
-                                isSaveDisabled: this.props.isSaveDisabled
-                            })
-                        }} >
-                            <Card>
-                                <CardItem>
-                                    <Body style={StyleSheet.flatten([styles.padding0])}>
-                                        <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                                            <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
-                                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, { marginTop: -5 }])} />
-                                            </View>
-                                            <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
-                                                <View style={StyleSheet.flatten([styles.row])}>
-                                                    <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
-                                                        <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
-                                                            {this.props.item.label}
-                                                        </Text>
-                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                            {this.props.item.subLabel}
-                                                        </Text>
-
-                                                    </View>
-
-                                                    <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
-
-                                                        {renderIf(this.props.item.showCheckMark,
-                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
-                                                        )}
-
-                                                        {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
-                                                            <View>
-                                                                <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(this.props.item.fieldAttributeMasterId)}>
-                                                                    <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
-                                                                </TouchableHighlight>
-                                                            </View>
-                                                        )}
-
-
-                                                    </View>
-                                                </View>
-                                                {
-                                                    renderIf(this.props.item.helpText && this.props.item.showHelpText,
-                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                            {this.props.item.helpText} </Text>
-                                                    )}
-                                            </View>
-                                        </View>
-                                    </Body>
-                                </CardItem>
-                            </Card>
-                        </TouchableHighlight>
-                    )
+                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
-            case this.SIGNATURE:
+            case SIGNATURE:
                 return (
-                    renderIf(!this.props.item.hidden,
-                        <TouchableHighlight onPress={() => { this.props.actions.navigateToScene('Signature', { item: this.props.item, formElement: this.props.formElement, nextEditable: this.props.nextEditable, isSaveDisabled: this.props.isSaveDisabled }) }} >
-                            <Card>
-                                <CardItem>
-                                    <Body style={StyleSheet.flatten([styles.padding0])}>
-                                        <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                                            <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
-                                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, theme.textPrimary, { marginTop: -5 }])} />
-                                            </View>
-                                            <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
-                                                <View style={StyleSheet.flatten([styles.row])}>
-                                                    <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
-                                                        <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
-                                                            {this.props.item.label}
-                                                        </Text>
-                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                            {this.props.item.subLabel}
-                                                        </Text>
-
-                                                    </View>
-
-                                                    <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
-
-                                                        {renderIf(this.props.item.showCheckMark,
-                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
-                                                        )}
-
-                                                        {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
-                                                            <View>
-                                                                <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(this.props.item.fieldAttributeMasterId)}>
-                                                                    <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
-                                                                </TouchableHighlight>
-                                                            </View>
-                                                        )}
-
-
-                                                    </View>
-                                                </View>
-                                                {
-                                                    renderIf(this.props.item.helpText && this.props.item.showHelpText,
-                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                            {this.props.item.helpText} </Text>
-                                                    )}
-                                            </View>
-                                        </View>
-                                    </Body>
-                                </CardItem>
-                            </Card>
-                        </TouchableHighlight>
-                    )
+                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />                    
                 )
             case NPS_FEEDBACK:
+            case TIME:
+            case RE_ATTEMPT_DATE:
+            case DATE:
                 return (
-                    <TouchableHighlight onPress={() => { this.props.actions.navigateToScene('OverlayAttributes', { item: this.props.item, formElement: this.props.formElement, nextEditable: this.props.nextEditable, isSaveDisabled: this.props.isSaveDisabled }) }} >
-                        <Text> {this.props.item.label}
-                        </Text>
-                    </TouchableHighlight>
+                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
             default:
                 return (
@@ -299,6 +206,7 @@ class BasicFormElement extends Component {
         }
     }
 }
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(BasicFormElement)
 
