@@ -53,14 +53,15 @@ class BasicFormElement extends Component {
 
     navigateToScene = (item) => {
         let screenName = ''
+        console.log("attrrrr",item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
                 screenName = 'Payment'
                 break
             }
-            case CHECKBOX: 'CheckBoxAttribute'
-            case RADIOBUTTON: 'CheckBoxAttribute'
+            case CHECKBOX: screenName = 'CheckBoxAttribute'
+            case RADIOBUTTON: screenName = 'CheckBoxAttribute'
         }
 
         this.props.actions.navigateToScene(screenName,
@@ -290,10 +291,11 @@ class BasicFormElement extends Component {
                     )
                 )
 
-            default:
+            default: console.log("FormLayoutActivityComponent")
                 return (
                      <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
+                     break;
         }
     }
 }

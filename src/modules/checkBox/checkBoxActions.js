@@ -2,7 +2,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { checkBoxDataService } from '../../services/classes/CheckBoxService'
-import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import { updateFieldDataWithChildData, getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 import { CHECKBOX, RADIOBUTTON } from '../../lib/AttributeConstants'
 
 // import { } from '../../services/classes/CheckBoxService'
@@ -49,6 +49,9 @@ export function checkBoxButtonDone(checkBoxValues, params, jobTransactionId, lat
             console.log("paramss", params)
 
             dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, "ArraySarojFareye", fieldDataListData))
+            } else{
+                console.log("getNextFocusableAndEditableElementssss",checkBoxValues[0].code)
+                dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, checkBoxValues[0].code))
             }
         } catch (error) {
             // To do

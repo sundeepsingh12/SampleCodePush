@@ -74,6 +74,7 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = new Map(formElement);
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value);
         dispatch(_setFormList(sortedFormAttributeDto));
+        console.log("getNextFocusableAndEditableElements",value)
     }
 }
 
@@ -98,6 +99,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, nex
         const cloneFormElement = new Map(formElement);
         console.log('cloneFormElement', cloneFormElement);
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList);
+        console.log("updateFieldDataWithChildData",updatedFieldDataObject)
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
                 formElement: updatedFieldDataObject.formLayoutObject,

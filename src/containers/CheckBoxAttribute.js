@@ -87,14 +87,13 @@ class CheckBoxAttribute extends Component {
 
   constructor(props) {
     super(props);
-    this.params = Object.values(Object.values(this.props.navigation.state)[0])[0]
-    this.latestPositionId = Object.values(Object.values(this.props.navigation.state)[0])[1]
-    this.jobTransactionId = Object.values(Object.values(this.props.navigation.state)[0])[2]
-    this.isSaveDisabled = Object.values(Object.values(this.props.navigation.state)[0])[3]
-    this.formElement = Object.values(Object.values(this.props.navigation.state)[0])[4]
-    this.nextEditable = Object.values(Object.values(this.props.navigation.state)[0])[5]
-    console.log("helloparamslatestPositionId", this.latestPositionId)
-    console.log("helloparamsjobTransactionId", this.jobTransactionId)
+    console.log("navigatioooo",this.props.navigation.state)
+    this.params = this.props.navigation.state.params.currentElement
+    this.latestPositionId = this.props.navigation.state.params.latestPositionId
+    this.jobTransactionId = this.props.navigation.state.params.jobTransaction.id
+    this.isSaveDisabled = this.props.navigation.state.params.isSaveDisabled
+    this.formElement = this.props.navigation.state.params.formElements
+    this.nextEditable = this.props.navigation.state.params.nextEditable
     console.log("helloparams", this.params)
   }
 
