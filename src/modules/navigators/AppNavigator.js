@@ -27,6 +27,8 @@ import FormLayout from '../../containers/FormLayout'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
 import theme from '../../themes/feTheme'
+import SkuListing from '../../containers/SkuListing'
+
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -77,6 +79,12 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
+  },
+    SkuListing:{
+    screen:SkuListing,
+     navigationOptions: {
+      title: 'SKU Listing',
+    }
   },
   UPIPayment: {
     screen: UPIPayment

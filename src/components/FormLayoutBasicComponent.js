@@ -27,7 +27,8 @@ import {
     RE_ATTEMPT_DATE,
     DATE,
     FIXED_SKU,
-    SIGNATURE
+    SIGNATURE,
+    SKU_ARRAY
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -66,6 +67,10 @@ class BasicFormElement extends Component {
             }
             case SIGNATURE: {
                 screenName = 'Signature'
+                break
+            }
+            case SKU_ARRAY:{
+                screenName='SkuListing'
                 break
             }
             default: {
@@ -178,18 +183,12 @@ class BasicFormElement extends Component {
                         </Card>
                     )
                 )
-            case MONEY_PAY:
-            case MONEY_COLLECT: return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-                break;
 
             case FIXED_SKU:
-                return (
-                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-                )
             case SIGNATURE:
-                return (
-                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />                    
-                )
+            case MONEY_PAY:
+            case SKU_ARRAY:
+            case MONEY_COLLECT: 
             case NPS_FEEDBACK:
             case TIME:
             case RE_ATTEMPT_DATE:
