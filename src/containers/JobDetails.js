@@ -18,6 +18,7 @@ import renderIf from '../lib/renderIf'
 import ExpandableHeader from '../components/ExpandableHeader'
 import MessageHeader from '../components/MessageHeader'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
+import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 
 function mapStateToProps(state) {
@@ -37,7 +38,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...jobDetailsActions }, dispatch)
+        actions: bindActionCreators({ ...jobDetailsActions, ...globalActions }, dispatch)
     }
 }
 
@@ -58,7 +59,15 @@ class JobDetails extends Component {
         for (let index in statusList) {
             statusView.push(
                 <Button key={statusList[index].id} small primary style={{ margin: 2 }}
-                    onPress={()=> this.props.actions.navigateToFormLayout(statusList[index].id,statusList[index].name,this.props.jobTransaction.id)}>
+                    onPress={() => this.props.actions.navigateToScene('FormLayout', {
+                        contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+                        jobTransactionId: this.props.jobTransaction.id,
+                        jobTransaction: this.props.jobTransaction,
+                        statusId: statusList[index].id,
+                        statusName: statusList[index].name,
+                    }
+                    )
+                    }>
                     <Text style={{ color: 'white' }}>{statusList[index].name}</Text>
                 </Button>
             )

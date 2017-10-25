@@ -37,7 +37,8 @@ var InitialState = Record({
     formElement : {},
     nextEditable : {},
     isLoading : false,
-    errorMessage : ''
+    errorMessage : '',
+    paymentAtEnd : {}
 })
 
 export default InitialState

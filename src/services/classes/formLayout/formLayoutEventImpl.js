@@ -13,7 +13,7 @@ const {
 
 
 import * as realm from '../../../repositories/realmdb'
-import {keyValueDBService} from '../KeyValueDBService.js'
+import { keyValueDBService } from '../KeyValueDBService.js'
 import moment from 'moment'
 
 export default class FormLayoutEventImpl {
@@ -32,18 +32,18 @@ export default class FormLayoutEventImpl {
         this.updateFieldInfo(attributeMasterId,value,formLayoutObject);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
         const nextEditableElements = nextEditable[attributeMasterId];
-        if(!nextEditableElements || nextEditableElements.length == 0){
-            return {formLayoutObject,nextEditable,isSaveDisabled} // there is no next element so return
+        if (!nextEditableElements || nextEditableElements.length == 0) {
+            return { formLayoutObject, nextEditable, isSaveDisabled } // there is no next element so return
         }
         nextEditableElements.forEach((nextElement) => {
-            if((typeof(nextElement) == 'string')){
+            if ((typeof (nextElement) == 'string')) {
                 nextElement = Number(nextElement.split('$$')[1]);
                 formLayoutObject.get(nextElement).focus = true;
             }
             formLayoutObject.get(nextElement).editable = true;
         });
 
-        return {formLayoutObject,nextEditable,isSaveDisabled}
+        return { formLayoutObject, nextEditable, isSaveDisabled }
     }
 
     /**
@@ -58,8 +58,8 @@ export default class FormLayoutEventImpl {
         }
         let saveEnabled = true;
 
-        for(let key in nextEditable){
-            if(!formLayoutObject.get(Number(key)).value || formLayoutObject.get(Number(key)).value.length == 0){
+        for (let key in nextEditable) {
+            if (!formLayoutObject.get(Number(key)).value || formLayoutObject.get(Number(key)).value.length == 0) {
                 saveEnabled = false; // if any required attribute does not contain value then disable save and break 
                 break;
             }
@@ -93,16 +93,17 @@ export default class FormLayoutEventImpl {
      * @param {*} formLayoutObject 
      * @param {*} calledFrom 
      */
-    updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom){
+    updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList){
         formLayoutObject.get(attributeMasterId).value = value;
-        if(value && value.length > 0 && calledFrom == ON_BLUR){
+        formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
+        if (value && value.length > 0 && calledFrom == ON_BLUR) {
             formLayoutObject.get(attributeMasterId).showCheckMark = true;
         }
         return formLayoutObject;
     }
 
-    toogleHelpText(attributeMasterId, formLayoutObject){
-        if(!attributeMasterId || !formLayoutObject){
+    toogleHelpText(attributeMasterId, formLayoutObject) {
+        if (!attributeMasterId || !formLayoutObject) {
             return;
         }
         formLayoutObject.get(attributeMasterId).showHelpText = !formLayoutObject.get(attributeMasterId).showHelpText;
@@ -137,14 +138,14 @@ export default class FormLayoutEventImpl {
      */
     _saveFieldData(formLayoutObject, jobTransactionId){
         let currentFieldDataObject = {}; // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
-        currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA,null,true, 'id').length;
+        currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length;
         let fieldDataArray = [];
         for (var [key, value] of formLayoutObject) {
-            let fieldDataObject = this._convertFormLayoutToFieldData(value,jobTransactionId,++currentFieldDataObject.currentFieldDataId);
+            let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId);
             fieldDataArray.push(fieldDataObject);
-            if(value.childDataList && value.childDataList.length > 0){
+            if (value.childDataList && value.childDataList.length > 0) {
                 currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(value.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId);
-            }  
+            }
         }
         return {
             tableName: TABLE_FIELD_DATA,
@@ -164,27 +165,27 @@ export default class FormLayoutEventImpl {
     _recursivelyFindChildData(childDataList, fieldDataArray, currentFieldDataObject,jobTransactionId){
         for(let i = 0; i <= childDataList.length ; i++){
             let childObject = childDataList[i];
-            if(!childObject){
+            if (!childObject) {
                 return currentFieldDataObject.currentFieldDataId;
             }
-            let fieldDataObject = this._convertFormLayoutToFieldData(childObject,jobTransactionId,++currentFieldDataObject.currentFieldDataId);
+            let fieldDataObject = this._convertFormLayoutToFieldData(childObject, jobTransactionId, ++currentFieldDataObject.currentFieldDataId);
             fieldDataArray.push(fieldDataObject);
-            if(!childObject.childDataList || childObject.childDataList.length == 0){
+            if (!childObject.childDataList || childObject.childDataList.length == 0) {
                 continue;
-            }else{
-                this._recursivelyFindChildData(childObject.childDataList , fieldDataArray, currentFieldDataObject,jobTransactionId);
+            } else {
+                this._recursivelyFindChildData(childObject.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId);
             }
         }
     }
 
-    _convertFormLayoutToFieldData(formLayoutObject,jobTransactionId,id){
+    _convertFormLayoutToFieldData(formLayoutObject, jobTransactionId, id) {
         return {
-            id : id, 
-            value : formLayoutObject.value,
-            jobTransactionId : jobTransactionId,
-            positionId : formLayoutObject.positionId,
-            parentId : formLayoutObject.parentId,
-            fieldAttributeMasterId : formLayoutObject.fieldAttributeMasterId
+            id: id,
+            value: formLayoutObject.value,
+            jobTransactionId: jobTransactionId,
+            positionId: formLayoutObject.positionId,
+            parentId: formLayoutObject.parentId,
+            fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId
         };
     }
 
@@ -198,7 +199,7 @@ export default class FormLayoutEventImpl {
     async _getDbObjects(jobTransactionId, statusId){
         let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION,'id = ' +jobTransactionId, false)[0]; // to get the first transaction, as query is on id and it returns list
         let user = await keyValueDBService.getValueFromStore(USER);
-        let hub =  await keyValueDBService.getValueFromStore(HUB);
+        let hub = await keyValueDBService.getValueFromStore(HUB);
         let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI);
         let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => {return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobTransaction.jobMasterId)});
         let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus =>{ return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId)});

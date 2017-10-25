@@ -54,10 +54,9 @@ export async function createZip() {
     await zip(sourcePath, targetPath);
     console.log('zip completed at ' + targetPath);
 
-    //Size of ZIP file created
+   // Size of ZIP file created
     // var stat = await RNFS.stat(PATH + '/sync.zip');
-    // console.log(stat);
-
+    // console.log('=====zip '+stat.size);
     //Deleting TEMP folder location
     await RNFS.unlink(PATH_TEMP);
     // console.log(PATH_TEMP+' removed');

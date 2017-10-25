@@ -18,45 +18,47 @@ import {formLayoutService} from '../../services/classes/formLayout/FormLayout.js
 import {formLayoutEventsInterface} from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
+import { setState } from '../global/globalActions'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
-      type: GET_SORTED_ROOT_FIELD_ATTRIBUTES,
-      payload: sortedFormAttributesDto
-      
-    }
-  }
+        type: GET_SORTED_ROOT_FIELD_ATTRIBUTES,
+        payload: sortedFormAttributesDto
 
-  export function _setBasicInfo(statusId,statusName,jobTransactionId,latestPositionId) {
-    return {
-      type: BASIC_INFO,
-      payload: {
-        statusId,
-        statusName,
-        jobTransactionId,
-        latestPositionId
-      }
-    }
-  }
-
-  export function _disableSave(isSaveDisabled){
-      return {
-          type : DISABLE_SAVE,
-          payload :isSaveDisabled
-      }
-  }
-
-  export function _updateFieldData(updatedFieldData){
-    return {
-        type : UPDATE_FIELD_DATA,
-        payload :updatedFieldData
     }
 }
 
-export function _toogleHelpText(formLayout){
+export function _setBasicInfo(statusId, statusName, jobTransactionId, latestPositionId) {
     return {
-        type : TOOGLE_HELP_TEXT,
-        payload :formLayout
+        type: BASIC_INFO,
+        payload: {
+            statusId,
+            statusName,
+            jobTransactionId,
+            latestPositionId
+        }
+
+    }
+}
+
+export function _disableSave(isSaveDisabled) {
+    return {
+        type: DISABLE_SAVE,
+        payload: isSaveDisabled
+    }
+}
+
+export function _updateFieldData(updatedFieldData) {
+    return {
+        type: UPDATE_FIELD_DATA,
+        payload: updatedFieldData
+    }
+}
+
+export function _toogleHelpText(formLayout) {
+    return {
+        type: TOOGLE_HELP_TEXT,
+        payload: formLayout
     }
 }
 
@@ -117,15 +119,31 @@ export function updateFieldData(attributeId, value, formElement){
         const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId,value,cloneFormElement,ON_BLUR);
         dispatch(_updateFieldData(updatedFieldData));
     }
-}   
+}
 
-export function toogleHelpText(attributeId, formElement){
+export function updateFieldDataWithChildData(attributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListObject) {
+    return function (dispatch) {
+        const cloneFormElement = new Map(formElement);
+        console.log('cloneFormElement', cloneFormElement);
+        const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList);
+        dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+            {
+                formElement: updatedFieldDataObject.formLayoutObject,
+                latestPositionId: fieldDataListObject.latestPositionId,
+                nextEditable: updatedFieldDataObject.nextEditable,
+                isSaveDisabled: updatedFieldDataObject.isSaveDisabled
+            }
+        ));
+    }
+}
+
+export function toogleHelpText(attributeId, formElement) {
     return async function (dispatch) {
-        const cloneFormElement = new Map(formElement); 
-        const toogledHelpText = formLayoutEventsInterface.toogleHelpTextView(attributeId, cloneFormElement);  
+        const cloneFormElement = new Map(formElement);
+        const toogledHelpText = formLayoutEventsInterface.toogleHelpTextView(attributeId, cloneFormElement);
         dispatch(_toogleHelpText(toogledHelpText));
     }
-}  
+}
 
 export function saveJobTransaction(formElement,jobTransactionId,statusId){
     return async function (dispatch) {

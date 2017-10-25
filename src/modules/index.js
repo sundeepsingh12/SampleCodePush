@@ -14,6 +14,11 @@ import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
+import payment from './payment/paymentReducer'
+import upiPayment from './cardTypePaymentModules/upiPayment/upiPaymentReducer'
+import payByLinkPayment from './cardTypePaymentModules/payByLinkPayment/payByLinkPaymentReducer'
+import fixedSKU from './fixedSKU/fixedSKUReducer'
+import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
 // import profile from './profile/profileReducer'
 
@@ -26,14 +31,19 @@ import { combineReducers } from 'redux'
  * EVERY TIME there is a basic action
  */
 const rootReducer = combineReducers({
-  nav,
   auth,
   device,
   global,
-  preloader,
   home,
-  listing,
   jobDetails,
+  listing,
+  nav,
+  payment,
+  preloader,
+  upiPayment,
+  payByLinkPayment,
+  fixedSKU,
+  signature,
   formLayout,
 })
 

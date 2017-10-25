@@ -11,11 +11,23 @@ const {
     BASIC_INFO,
     IS_LOADING,
     RESET_STATE,
-    ERROR_MESSAGE
+    ERROR_MESSAGE,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+    UPDATE_PAYMENT_AT_END
   } = require('../../lib/constants').default
   
+const {
+    SHOW_DATETIME_PICKER,
+    HIDE_DATETIME_PICKER,
+} = require('../../lib/constants').default
 
-
+const _onPressVisible= (element,Id)=>{
+        element.forEach(element => {
+                    if (element.attributeTypeId == Id) {
+                      element.isVisible = true;
+                    }})
+        return element;
+    }
 const initialState = new InitialState();
 
 export default function formLayoutReducer(state = initialState, action){
@@ -43,6 +55,18 @@ export default function formLayoutReducer(state = initialState, action){
          */
         case UPDATE_FIELD_DATA : {
             return state.set('formElement',action.payload)
+        }
+
+        
+        case UPDATE_FIELD_DATA_WITH_CHILD_DATA : {
+            return state.set('formElement',action.payload.formElement)
+                        .set('latestPositionId',action.payload.latestPositionId)
+                        .set('nextEditable',action.payload.nextEditable)
+                        .set('isSaveDisabled',action.payload.isSaveDisabled ? true : false)
+        }
+
+        case UPDATE_PAYMENT_AT_END : {
+            return state.set('paymentAtEnd',action.payload.paymentAtEnd)
         }
 
         /**
