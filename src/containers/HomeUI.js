@@ -72,7 +72,7 @@ class HomeUI extends Component {
     return(
         <View>
             <Button success
-             onPress= {() => this.props.actions.navigateToScene('JobDetailsV2')}><Text>Click Me! </Text></Button>
+             onPress= {() => this.props.actions.navigateToScene('Sequence')}><Text>Click Me! </Text></Button>
             </View>
     )
   }

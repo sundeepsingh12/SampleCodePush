@@ -103,6 +103,9 @@ export default {
     bold : {
         fontWeight: 'bold'
     },
+    italic: {
+        fontStyle: 'italic'
+    },
     fontWeight100 : {
         fontWeight: '100'
     },
@@ -117,6 +120,12 @@ export default {
     },
     fontWeight500 : {
         fontWeight: '500'
+    },
+    lineHeight20: {
+        lineHeight: 20
+    },
+    lineHeight25: {
+        lineHeight: 25
     },
 
     // Margin object

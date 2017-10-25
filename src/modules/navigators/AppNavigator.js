@@ -20,6 +20,7 @@ import Logout from '../../containers/Logout'
 import JobDetails from '../../containers/JobDetails'
 import HomeUI from '../../containers/HomeUI'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
+import Sequence from '../../containers/Sequence'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../../themes/FeStyle'
 
@@ -76,6 +77,9 @@ export const AppNavigator = StackNavigator({
   },
   JobDetailsV2: {
     screen : JobDetailsV2
+  },
+  Sequence: {
+    screen : Sequence
   }
 },
   {
