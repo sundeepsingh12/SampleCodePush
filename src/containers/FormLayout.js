@@ -131,6 +131,6 @@ class FormLayout extends Component {
       </Container>
     )
   }
-};
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(FormLayout)
