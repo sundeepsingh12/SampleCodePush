@@ -160,17 +160,21 @@ export default keyMirror({
 
 
     //Status Codes
-    UNSEEN: null,
-    PENDING: null,
+    UNSEEN:null,
+    PENDING:null,
 
     //Form Layout
-    GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
-    DISABLE_SAVE: null,
-    UPDATE_FIELD_DATA: null,
-    STATUS_NAME: null,
-    BASIC_INFO: null,
-    ON_BLUR: null,
-    TOOGLE_HELP_TEXT: null,
+    GET_SORTED_ROOT_FIELD_ATTRIBUTES : null,
+    DISABLE_SAVE : null,
+    UPDATE_FIELD_DATA : null,
+    STATUS_NAME : null,
+    BASIC_INFO : null,
+    ON_BLUR : null,
+    TOOGLE_HELP_TEXT : null,
+    IS_LOADING : null,
+    PENDING_SYNC_TRANSACTION_IDS : null,
+    RESET_STATE : null,
+    ERROR_MESSAGE : null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
 

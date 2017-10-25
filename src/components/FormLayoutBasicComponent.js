@@ -28,6 +28,10 @@ import {
     DATE,
     FIXED_SKU,
     SIGNATURE,
+    STRING,
+    TEXT,
+    NUMBER,
+    DECIMAL,
     SKU_ARRAY
 } from '../lib/AttributeConstants'
 
@@ -47,10 +51,6 @@ class BasicFormElement extends Component {
     constructor(props) {
         super(props);
         this.formElementValue = {}
-        this.STRING = 1;
-        this.TEXT = 2;
-        this.NUMBER = 6;
-        this.DECIMAL = 13;
     }
 
     navigateToScene = (item) => {
@@ -121,10 +121,10 @@ class BasicFormElement extends Component {
 
     render() {
         switch (this.props.item.attributeTypeId) {
-            case this.STRING:
-            case this.TEXT:
-            case this.NUMBER:
-            case this.DECIMAL:
+            case STRING:
+            case TEXT:
+            case NUMBER:
+            case DECIMAL:
                 return (
                     renderIf(!this.props.item.hidden,
                         <Card>
