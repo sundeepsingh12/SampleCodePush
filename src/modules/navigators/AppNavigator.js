@@ -28,7 +28,7 @@ import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, He
 import styles from '../../themes/FeStyle'
 import theme from '../../themes/feTheme'
 import SkuListing from '../../containers/SkuListing'
-
+import SignatureAndNps from '../../containers/SignatureAndNps'
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -108,6 +108,9 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
+  SignatureAndNps: {
+    screen: SignatureAndNps
+  }
 },
   {
     cardStyle: {

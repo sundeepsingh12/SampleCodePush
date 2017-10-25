@@ -28,7 +28,8 @@ import {
     DATE,
     FIXED_SKU,
     SIGNATURE,
-    SKU_ARRAY
+    SKU_ARRAY,
+    SIGNATURE_AND_NPS
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -69,8 +70,12 @@ class BasicFormElement extends Component {
                 screenName = 'Signature'
                 break
             }
-            case SKU_ARRAY:{
-                screenName='SkuListing'
+            case SKU_ARRAY: {
+                screenName = 'SkuListing'
+                break
+            }
+            case SIGNATURE_AND_NPS: {
+                screenName = 'SignatureAndNps'
                 break
             }
             default: {
@@ -188,11 +193,12 @@ class BasicFormElement extends Component {
             case SIGNATURE:
             case MONEY_PAY:
             case SKU_ARRAY:
-            case MONEY_COLLECT: 
+            case MONEY_COLLECT:
             case NPS_FEEDBACK:
             case TIME:
             case RE_ATTEMPT_DATE:
             case DATE:
+            case SIGNATURE_AND_NPS:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
