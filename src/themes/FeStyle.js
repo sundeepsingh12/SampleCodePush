@@ -16,6 +16,9 @@ export default {
         paddingRight: 20,
         fontSize: 14
     },
+    heightAuto: {
+        height: 'auto'
+    },
     bgWhite : {
         backgroundColor: '#ffffff'
     },
@@ -406,5 +409,11 @@ export default {
     },
     flexWrap : {
         flexWrap: 'wrap'
+    },
+    relative: {
+        position: 'relative'
+    },
+    absolute: {
+        position: 'absolute'
     }
 }
