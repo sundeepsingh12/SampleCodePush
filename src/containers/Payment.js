@@ -9,7 +9,6 @@ import {
 } from 'react-native'
 import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import PopOver from '../components/PopOver'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'

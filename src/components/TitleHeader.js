@@ -6,13 +6,12 @@ import {
 } from 'react-native'
 import { Spinner } from 'native-base'
 import {Button, Body, Header, Left, Right, Icon } from 'native-base'
-import theme from '../themes/feTheme'
 import styles from '../themes/FeStyle'
 
 class TitleHeader extends Component {
     render() {
         return (
-            <Header style={StyleSheet.flatten([theme.bgPrimary])}>
+            <Header style={StyleSheet.flatten([styles.bgPrimary])}>
                 <Left style={StyleSheet.flatten([styles.flexBasis15])}>
                     <Button transparent onPress={() => { }}>
                         <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])} />

@@ -13,7 +13,7 @@ import Loader from '../components/Loader'
 import SkuListItem from '../components/SkuListItem'
 import {  Container, Content, ListItem, List,Text,Footer,FooterTab,Button,Input} from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import theme from '../themes/feTheme'
+import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf';
 import _ from 'underscore';
 
@@ -48,7 +48,7 @@ class SkuListing extends Component {
         }
         else{
             return (
-                 <Container style={StyleSheet.flatten([theme.mainBg])}>
+                 <Container style={StyleSheet.flatten([styles.mainBg])}>
                     <View style={StyleSheet.flatten([{ flex: 1,minHeight:'50%', maxHeight: '100%' }])}>
                 <List>
         <FlatList

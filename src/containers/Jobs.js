@@ -25,7 +25,6 @@ import renderIf from '../lib/renderIf';
 import Swipeable from 'react-native-swipeable';
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import { NavigationActions } from 'react-navigation'
 const {
 JobDetails

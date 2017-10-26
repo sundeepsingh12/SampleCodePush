@@ -3945,6 +3945,12 @@ react-native-cancelable-fetch@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/react-native-cancelable-fetch/-/react-native-cancelable-fetch-0.1.1.tgz#aab030b44b426f19d558cebe1cd910397572380d"
 
+react-native-circular-progress@0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/react-native-circular-progress/-/react-native-circular-progress-0.0.8.tgz#53ccdbe57357ce2459f8ab1b67119a3e2a5014b4"
+  dependencies:
+    art "^0.10.0"
+
 react-native-code-push@^4.1.0-beta:
   version "4.1.0-beta"
   resolved "https://registry.yarnpkg.com/react-native-code-push/-/react-native-code-push-4.1.0-beta.tgz#2692c62a7b93a639fc57c1dd9a3502fa6d497952"
@@ -4010,6 +4016,12 @@ react-native-fs@^2.3.3:
     prop-types "^15.5.10"
     react-timer-mixin "^0.13.3"
 
+react-native-linear-gradient@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.3.0.tgz#757997197e35edf52e290891a11566e462845da1"
+  dependencies:
+    prop-types "^15.5.10"
+
 react-native-modal-datetime-picker@^4.11.0:
   version "4.13.0"
   resolved "https://registry.yarnpkg.com/react-native-modal-datetime-picker/-/react-native-modal-datetime-picker-4.13.0.tgz#bcf9f62c691befb133bf6fd6e5d6189d397608ef"
@@ -4036,6 +4048,10 @@ react-native-simple-store@^1.3.0:
   resolved "https://registry.yarnpkg.com/react-native-simple-store/-/react-native-simple-store-1.3.0.tgz#84953a7b007b8e3c50ec768478e98dc3636ef092"
   dependencies:
     lodash.merge "4.6.0"
+
+react-native-sortable-listview@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/react-native-sortable-listview/-/react-native-sortable-listview-0.2.6.tgz#d1ed6bb552fa5190994e507c03de5a2921688ca6"
 
 react-native-star-rating@^1.0.8:
   version "1.0.8"

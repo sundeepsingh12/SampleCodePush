@@ -10,7 +10,6 @@ import {
   from 'react-native'
 import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon } from 'native-base';
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import imageFile from '../../images/fareye-logo.png'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
@@ -100,8 +99,8 @@ class FormLayout extends Component {
   render() {
     if(this.props.isLoading){ return <Loader/>}
     return (
-      <Container style={StyleSheet.flatten([theme.mainBg])}>
-        <Header style={StyleSheet.flatten([theme.bgPrimary])}>
+      <Container style={StyleSheet.flatten([styles.mainBg])}>
+        <Header style={StyleSheet.flatten([styles.bgPrimary])}>
           <Left>
             <Button transparent onPress={() => { this.props.navigation.goBack(null) }}>
               <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])} />
