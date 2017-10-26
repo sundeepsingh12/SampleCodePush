@@ -15,6 +15,10 @@ import CONFIG from './config'
 import _ from 'underscore'
 import RNFS from 'react-native-fs';
 import RNFetchBlob from 'react-native-fetch-blob'
+import {keyValueDBService} from '../services/classes/KeyValueDBService.js'
+const {
+  PENDING_SYNC_TRANSACTION_IDS
+} = require('./constants').default
 
 const fetch = require('react-native-cancelable-fetch');
 class RestAPI {
@@ -187,7 +191,7 @@ class RestAPI {
     { name : 'file', filename : 'sync.zip', type:'*/*', data: RNFetchBlob.wrap(PATH+'/sync.zip')},
   ]).uploadProgress((written, total) => {
         console.log('uploaded', written / total)
-    }).then((resp) => {
+    }).then(async(resp) => {
     const responseBody = resp.text()
     console.log('responseBody>>>>>',responseBody)
     const message = responseBody.split(",")[0]
@@ -195,6 +199,8 @@ class RestAPI {
     const syncCount = responseBody.split(",")[1]
     if(message=='success'){
       //do something
+      let storeValue =await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+      let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
     }
   }).catch((err) => {
     console.log(err)

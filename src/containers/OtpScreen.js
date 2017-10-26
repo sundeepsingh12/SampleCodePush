@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import {
     StyleSheet,
     Text,
-    View
+    View,
+    Modal
 } from 'react-native';
 import { Button, Input } from 'native-base';
 import feStyle from '../themes/FeStyle'

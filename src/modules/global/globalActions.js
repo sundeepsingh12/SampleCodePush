@@ -20,12 +20,9 @@ const {
   IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
   USER
-
 } = require('../../lib/constants').default
 
-import {
-  keyValueDBService
-} from '../../services/classes/KeyValueDBService'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 
 import CONFIG from '../../lib/config'
 
@@ -34,16 +31,12 @@ import {
   onChangeUsername
 } from '../login/loginActions'
 
-import {
-  onResyncPress
-} from '../home/homeActions'
+import { onResyncPress } from '../home/homeActions'
 
-import {
-  clearHomeState
-} from '../home/homeActions'
+import { clearHomeState } from '../home/homeActions'
+import { NavigationActions } from 'react-navigation'
 
 import BackgroundTimer from 'react-native-background-timer';
-
 /**
  * ## set the store
  *
@@ -52,6 +45,14 @@ import BackgroundTimer from 'react-native-background-timer';
  * this is here to support Hot Loading
  *
  */
+
+export function setState(type, payload) {
+  return {
+    type,
+    payload
+  }
+}
+
 export function setStore(store) {
   return {
     type: SET_STORE,
@@ -59,9 +60,10 @@ export function setStore(store) {
   }
 }
 
-export function navigateToScene(sceneName, paramaters) {
+//Use to navigate to other scene
+export function navigateToScene(routeName, params) {
   return async function (dispatch) {
-    dispatch(NavigationActions.navigate({ routeName: sceneName, params: paramaters }))
+    dispatch(NavigationActions.navigate({ routeName, params }))
   }
 }
 

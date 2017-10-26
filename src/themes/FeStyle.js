@@ -150,8 +150,7 @@ export default {
     margin30 : {
         margin: 30
     },
-
-    marginTop5 : {
+    marginTop5: {
         marginTop: 5
     },
     marginTop10 : {
