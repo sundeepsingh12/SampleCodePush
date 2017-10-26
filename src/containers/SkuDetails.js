@@ -81,7 +81,7 @@ class SkuDetails extends Component {
             <Body>
               <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}/>
+                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }}/>
                 <Text
                   style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
                 <View/>

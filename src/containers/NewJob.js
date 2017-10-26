@@ -84,7 +84,7 @@ class NewJob extends Component {
             }
           ])}>
             <Left>
-              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}/>
+              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}  onPress={() => { this.props.navigation.goBack(null) }}/>
             </Left>
             <Body>
               <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>New Task</Text>
