@@ -186,5 +186,6 @@ module.exports = {
     STRING: 1,
     TEXT: 2,
     NUMBER: 6,
-    DECIMAL: 13
+    DECIMAL: 13,
+    PASSWORD: 61,
 }

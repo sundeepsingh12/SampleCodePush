@@ -9,6 +9,8 @@ import {
     formLayoutEventsInterface
 } from '../classes/formLayout/FormLayoutEventInterface'
 
+import sha256 from 'sha256';
+
 import {
     keyValueDBService
   } from '../classes/KeyValueDBService'
@@ -106,6 +108,7 @@ describe('update field info', () => {
     formLayoutMap.get(1).showCheckMark = false;
     expect(formLayoutEventsInterface.updateFieldData(1, "1", formLayoutMap, 'dd').get(1).showCheckMark).toEqual(false);
     expect(formLayoutEventsInterface.updateFieldData(1, "1", formLayoutMap, 'dd').get(1).value).toEqual("1");
+    expect(formLayoutEventsInterface.updateFieldData(1, sha256("1"), formLayoutMap, 'dd').get(1).value).toEqual(sha256("1"));
 })
 
 describe('toogle help text', () => {

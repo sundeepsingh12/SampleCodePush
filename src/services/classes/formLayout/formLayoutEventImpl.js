@@ -14,7 +14,8 @@ const {
 
 import * as realm from '../../../repositories/realmdb'
 import { keyValueDBService } from '../KeyValueDBService.js'
-import moment from 'moment'
+import moment from 'moment';
+import sha256 from 'sha256';
 
 export default class FormLayoutEventImpl {
 
@@ -94,7 +95,8 @@ export default class FormLayoutEventImpl {
      * @param {*} calledFrom 
      */
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
-        formLayoutObject.get(attributeMasterId).value = value;
+        formLayoutObject.get(attributeMasterId).value = (value && value.length < 64 && 
+            formLayoutObject.get(attributeMasterId).attributeTypeId == 61 )? sha256(value) :value;
         formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
         if (value && value.length > 0 && calledFrom == ON_BLUR) {
             formLayoutObject.get(attributeMasterId).showCheckMark = true;
@@ -141,6 +143,9 @@ export default class FormLayoutEventImpl {
         currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length;
         let fieldDataArray = [];
         for (var [key, value] of formLayoutObject) {
+            if(value.attributeTypeId == 61){
+                continue;
+            }
             let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId);
             fieldDataArray.push(fieldDataObject);
             if (value.childDataList && value.childDataList.length > 0) {
