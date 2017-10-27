@@ -179,15 +179,15 @@ class Payment extends Component {
                 key={id}
                 icon style={StyleSheet.flatten([{ marginLeft: 0 }])}
                 onPress={() => {
-                    selectedIndex !== moneyTransactionModeId ? 
-                    this.props.actions.setState(
-                        SET_PAYMENT_CHANGED_PARAMETERS,
-                        {
-                            actualAmount,
-                            selectedIndex: type ? type : moneyTransactionModeId,
-                            transactionNumber
-                        }
-                    ) : null
+                    selectedIndex !== moneyTransactionModeId ?
+                        this.props.actions.setState(
+                            SET_PAYMENT_CHANGED_PARAMETERS,
+                            {
+                                actualAmount,
+                                selectedIndex: type ? type : moneyTransactionModeId,
+                                transactionNumber
+                            }
+                        ) : null
                 }}>
                 <Body>
                     <Text>{this.renderPaymentModeId(moneyTransactionModeId, type)}</Text>
@@ -233,7 +233,7 @@ class Payment extends Component {
                             }
                         )}
                         style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
-                        value={this.props.actualAmount}
+                        value={this.props.actualAmount != null && this.props.actualAmount != undefined ? '' + this.props.actualAmount : null}
                     />
                     {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
                     <PopOver visible={this.checkValidation()} /> */}

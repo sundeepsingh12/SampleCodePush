@@ -36,7 +36,7 @@ function mapStateToProps(state) {
     statusId: state.formLayout.statusId,
     latestPositionId: state.formLayout.latestPositionId,
     paymentAtEnd: state.formLayout.paymentAtEnd,
-    isLoading : state.formLayout.isLoading
+    isLoading: state.formLayout.isLoading
   }
 }
 
@@ -66,10 +66,10 @@ class FormLayout extends Component {
   }
 
   paymentSceneFromModeTypeId(modeTypeId) {
-    if(!modeTypeId) {
+    if (!modeTypeId) {
       return null
     }
-    switch(modeTypeId) {
+    switch (modeTypeId) {
       case NET_BANKING.id:
       case NET_BANKING_LINK.id:
       case NET_BANKING_CARD_LINK.id:
@@ -97,7 +97,7 @@ class FormLayout extends Component {
   _keyExtractor = (item, index) => item[1].key;
 
   render() {
-    if(this.props.isLoading){ return <Loader/>}
+    if (this.props.isLoading) { return <Loader /> }
     return (
       <Container style={StyleSheet.flatten([styles.mainBg])}>
         <Header style={StyleSheet.flatten([styles.bgPrimary])}>
