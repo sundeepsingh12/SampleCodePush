@@ -30,6 +30,7 @@ import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
+import DataStore from '../../containers/DataStore'
 import {
   Container,
   Content,
@@ -61,14 +62,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 class AppWithNavigationState extends React.Component {
   render() {
-    return ( <
-      AppNavigator navigation = {
+    return (<
+      AppNavigator navigation={
         addNavigationHelpers({
           dispatch: this.props.dispatch,
           state: this.props.nav
         })
       }
-      />
+    />
     )
   }
 }
@@ -162,11 +163,14 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
+  DataStore: {
+    screen: DataStore,
+  },
 }, {
-  cardStyle: {
-    backgroundColor: 'white'
-  }
-});
+    cardStyle: {
+      backgroundColor: 'white'
+    }
+  });
 
 // const AppWithNavigationState = ({ dispatch, nav }) => (
 //   <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />

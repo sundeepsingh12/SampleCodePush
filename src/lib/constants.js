@@ -205,7 +205,10 @@ export default keyMirror({
     SET_FIELD_DATA_LIST: null,
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
-   
+    
+    //Data Store Actions
+    SET_VALIDATIONS: null,
+    SET_DATA_STORE_ATTR_MAP:null,
    
 })
 

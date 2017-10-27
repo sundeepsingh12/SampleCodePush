@@ -163,7 +163,7 @@ class FormLayout {
      * @param {*positionId} positionId 
      */
     getFieldAttributeObject(fieldAttribute, validationArray, positionId){
-        const {label,subLabel,helpText,key,required,hidden,attributeTypeId} = fieldAttribute
+        const {label,subLabel,helpText,key,required,hidden,attributeTypeId,dataStoreAttributeId,dataStoreMasterId} = fieldAttribute
         return {
             label,
             subLabel,
@@ -178,7 +178,9 @@ class FormLayout {
             showHelpText : false,
             editable : fieldAttribute.editable ? fieldAttribute.editable : false,
             focus : fieldAttribute.focus ? fieldAttribute.focus : false,
-            validation : (validationArray && validationArray.length > 0) ? validationArray : null
+            validation : (validationArray && validationArray.length > 0) ? validationArray : null,
+            dataStoreMasterId,
+            dataStoreAttributeId,
         };
     }
 

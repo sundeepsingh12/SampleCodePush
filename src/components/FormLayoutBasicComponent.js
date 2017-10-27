@@ -31,7 +31,8 @@ import {
     TEXT,
     NUMBER,
     DECIMAL,
-    SKU_ARRAY
+    SKU_ARRAY,
+    DATA_STORE
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -68,8 +69,12 @@ class BasicFormElement extends Component {
                 screenName = 'Signature'
                 break
             }
-            case SKU_ARRAY:{
-                screenName='SkuListing'
+            case SKU_ARRAY: {
+                screenName = 'SkuListing'
+                break
+            }
+            case DATA_STORE: {
+                screenName = 'DataStore'
                 break
             }
             default: {
@@ -187,7 +192,7 @@ class BasicFormElement extends Component {
             case SIGNATURE:
             case MONEY_PAY:
             case SKU_ARRAY:
-            case MONEY_COLLECT: 
+            case MONEY_COLLECT:
             case NPS_FEEDBACK:
             case TIME:
             case RE_ATTEMPT_DATE:
@@ -195,6 +200,8 @@ class BasicFormElement extends Component {
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
+            case DATA_STORE:
+                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             default:
                 return (
                     <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>

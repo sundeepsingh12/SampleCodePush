@@ -11,7 +11,8 @@ const {
     IS_LOADING,
     Home,
     RESET_STATE,
-    ERROR_MESSAGE
+    ERROR_MESSAGE,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA,
 } = require('../../lib/constants').default
 
 import {formLayoutService} from '../../services/classes/formLayout/FormLayout.js'
