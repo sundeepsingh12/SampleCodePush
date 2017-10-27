@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { Button, Input } from 'native-base';
 import feStyle from '../themes/FeStyle'
-import feTheme from '../themes/feTheme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
@@ -65,7 +64,7 @@ class OtpScreen extends Component{
                                 <View style={[feStyle.flexBasis70, { height: 50 }]}>
                                     <Input
                                         placeholder='OTP'
-                                        style={StyleSheet.flatten([feStyle.fontCenter, feTheme.roundedInput])}
+                                        style={StyleSheet.flatten([feStyle.fontCenter, feStyle.roundedInput])}
                                         value={this.props.otpNumber}
                                         keyboardType='numeric'
                                         maxLength={6}

@@ -22,7 +22,6 @@ import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import ResyncLoader from '../components/ResyncLoader'
 
 /**

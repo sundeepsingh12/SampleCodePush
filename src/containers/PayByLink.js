@@ -19,7 +19,6 @@ const {
 
 import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import PopOver from '../components/PopOver'
 import * as payByLinkPaymentActions from '../modules/cardTypePaymentModules/payByLinkPayment/payByLinkPaymentActions'
 import * as globalActions from '../modules/global/globalActions'
