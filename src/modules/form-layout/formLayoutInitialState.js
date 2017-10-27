@@ -2,6 +2,29 @@
 
 import {Record} from 'immutable'
 
+/**
+ * Initial state of formLayout
+ * It contains formElement which is an es6 map containing masterId wise fieldAttributeDto, elements of dto are as follows
+ *          label,
+            subLabel,
+            helpText,
+            key,
+            required,
+            hidden,
+            attributeTypeId,
+            fieldAttributeMasterId,
+            positionId,
+            parentId,
+            showHelpText,
+            editable,
+            focus,
+            validation // it is an array containing all nested validation and validation conditions object
+    
+    nextEditable is an object containing attributeMasterId wise array of next required and non required elements 
+            1:[2,3,'required$$4']
+
+    other elements are as per their names
+ */
 var InitialState = Record({
     currentElement : 0,
     noOfElements : 0,
@@ -13,12 +36,9 @@ var InitialState = Record({
     statusName : '',
     formElement : {},
     nextEditable : {},
+    isLoading : false,
+    errorMessage : '',
     paymentAtEnd : {}
-    
-    /*
-    // this formElement contains basic fieldAttributeElements and it also contains
-    // validationMaster array and inside validationMaster it contains validationConditions Array
-    */
 })
 
 export default InitialState

@@ -25,7 +25,17 @@ module.exports = {
     SKU_ARRAY: 17,
     CHECKBOX: 8,
     RADIOBUTTON:9,
+    SKU_ORIGINAL_QUANTITY:15,
+    SKU_CODE:51,
+    SKU_ACTUAL_QUANTITY:16,
+    TOTAL_ORIGINAL_QUANTITY:35,
+    TOTAL_ACTUAL_QUANTITY:36,
+    SKU_UNIT_PRICE:14,
     TRANSACTION_NUMBER: 'transaction_number',
+    NPS_FEEDBACK: 23,
+    RE_ATTEMPT_DATE: 33,
+    DATE: 3,
+    TIME: 5,
 
     // Money Collect Mode Type Constants
     CASH: {
@@ -161,7 +171,6 @@ module.exports = {
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,
     OBJECT_ATTR_ID: 11,
-    FIXED_SKU: 50,
     OBJECT_SAROJ_FAREYE: 'ObjectSarojFareye',
     TOTAL_AMOUNT: 'TotalAmount',
     ARRAY_SAROJ_FAREYE: 'ArraySarojFareye',
@@ -176,4 +185,8 @@ module.exports = {
     MULTIPLE_SCANNER: 48,
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
+    STRING: 1,
+    TEXT: 2,
+    NUMBER: 6,
+    DECIMAL: 13
 }

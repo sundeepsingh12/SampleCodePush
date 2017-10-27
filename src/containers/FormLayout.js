@@ -10,13 +10,13 @@ import {
   from 'react-native'
 import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon } from 'native-base';
 import styles from '../themes/FeStyle'
-import theme from '../themes/feTheme'
 import imageFile from '../../images/fareye-logo.png'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import BasicFormElement from '../components/FormLayoutBasicComponent.js'
+import Loader from '../components/Loader'
 import renderIf from '../lib/renderIf.js'
 import {
   NET_BANKING,
@@ -35,7 +35,8 @@ function mapStateToProps(state) {
     jobTransactionId: state.formLayout.jobTransactionId,
     statusId: state.formLayout.statusId,
     latestPositionId: state.formLayout.latestPositionId,
-    paymentAtEnd: state.formLayout.paymentAtEnd
+    paymentAtEnd: state.formLayout.paymentAtEnd,
+    isLoading : state.formLayout.isLoading
   }
 }
 
@@ -48,15 +49,10 @@ function mapDispatchToProps(dispatch) {
 class FormLayout extends Component {
 
   componentWillMount() {
-    console.log('inside component will mount with statusId', this.props.statusId);
     this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId);
   }
 
   renderData = (item) => {
-    console.log('item of renderdata formlayout', item)
-    // console.log('formlayout container item', item);
-    // console.log('form layout container state', this.props.nextEditable);
-    // console.log('isSaveDisabled', this.props.isSaveDisabled);
     return (
       <BasicFormElement
         item={item}
@@ -101,10 +97,10 @@ class FormLayout extends Component {
   _keyExtractor = (item, index) => item[1].key;
 
   render() {
-    console.log('render of form', this.props);
+    if(this.props.isLoading){ return <Loader/>}
     return (
-      <Container style={StyleSheet.flatten([theme.mainBg])}>
-        <Header style={StyleSheet.flatten([theme.bgPrimary])}>
+      <Container style={StyleSheet.flatten([styles.mainBg])}>
+        <Header style={StyleSheet.flatten([styles.bgPrimary])}>
           <Left>
             <Button transparent onPress={() => { this.props.navigation.goBack(null) }}>
               <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])} />
@@ -134,15 +130,6 @@ class FormLayout extends Component {
       </Container>
     )
   }
-};
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(FormLayout)
-
-//TODO
-//3) Spinner
-//5) Test with non required
-  //7) Parent, positionId and latest positionID
-//8) Add comments for every methods
-//9) Remove todos and logs
-//10) End to end testing
-//11) Commit ans push changes

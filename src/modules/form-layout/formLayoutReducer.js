@@ -9,34 +9,55 @@ const {
     STATUS_NAME,
     TOOGLE_HELP_TEXT,
     BASIC_INFO,
+    IS_LOADING,
+    RESET_STATE,
+    ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     UPDATE_PAYMENT_AT_END
   } = require('../../lib/constants').default
   
+const {
+    SHOW_DATETIME_PICKER,
+    HIDE_DATETIME_PICKER,
+} = require('../../lib/constants').default
 
-
+const _onPressVisible= (element,Id)=>{
+        element.forEach(element => {
+                    if (element.attributeTypeId == Id) {
+                      element.isVisible = true;
+                    }})
+        return element;
+    }
 const initialState = new InitialState();
 
 export default function formLayoutReducer(state = initialState, action){
-    console.log('inside form layout reducer');
     if(!(state instanceof InitialState)) return initialState.mergeDeep(state);
 
     switch(action.type){
+        /**
+         * sets sorted fieldAttributes, nextEditable and isSaveDisabled
+         */
         case GET_SORTED_ROOT_FIELD_ATTRIBUTES : {
-            console.log(action.payload);
             return state.set('formElement',action.payload.formLayoutObject)
                         .set('nextEditable',action.payload.nextEditable)
-                        .set('isSaveDisabled',action.payload.isSaveDisabled ? true : false)
+                        .set('isSaveDisabled',action.payload.isSaveDisabled ? true : false) // applied ternary condition to set null, undefined to false
         }
 
+        /**
+         * disabled save if all required elements are not filled
+         */
         case DISABLE_SAVE : {
             return state.set('isSaveDisabled', action.payload)
         }
 
+        /**
+         * set field data of the form element
+         */
         case UPDATE_FIELD_DATA : {
             return state.set('formElement',action.payload)
         }
 
+        
         case UPDATE_FIELD_DATA_WITH_CHILD_DATA : {
             return state.set('formElement',action.payload.formElement)
                         .set('latestPositionId',action.payload.latestPositionId)
@@ -48,6 +69,9 @@ export default function formLayoutReducer(state = initialState, action){
             return state.set('paymentAtEnd',action.payload.paymentAtEnd)
         }
 
+        /**
+         * set basic info like statusId, statusName, jobTransactionId, latestPositionId
+         */
         case BASIC_INFO : {
             return state.set('statusId',action.payload.statusId)
                         .set('statusName',action.payload.statusName)
@@ -55,14 +79,32 @@ export default function formLayoutReducer(state = initialState, action){
                         .set('latestPositionId',action.payload.latestPositionId)
         }
 
+        /**
+         * toogle's help text, sets to true if previous was false and vice versa
+         */
         case TOOGLE_HELP_TEXT : {
             return state.set('formElement',action.payload)
         }
-        case UPDATE_FIELD_DATA_WITH_CHILD_DATA : {
-            return state.set('formElement',action.payload.formElement)
-                        .set('latestPositionId',action.payload.latestPositionId)
-                        .set('nextEditable',action.payload.nextEditable)
-                        .set('isSaveDisabled',action.payload.isSaveDisabled ? true : false)
+        
+        /**
+         * for showing loader
+         */
+        case IS_LOADING : {
+            return state.set('isLoading',action.payload);
+        }
+
+        /**
+         * resets state to initial state
+         */
+        case RESET_STATE : {
+            return initialState;
+        }
+
+        /**
+         * sets error message
+         */
+        case ERROR_MESSAGE : {
+            return state.set('errorMessage',action.payload);
         }
     }
     return state;

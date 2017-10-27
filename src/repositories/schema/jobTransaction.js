@@ -51,7 +51,6 @@ JobTransaction.schema = {
               imeiNumber  : { type: 'string',optional:true},
               npsFeedBack  : { type: 'string',optional:true},
               id  : { type: 'int' },
-              syncFlag : {type : 'int',optional : true,default : 0},
               jobType : {type : 'string', optional : true},
               statusCode : {type : 'string', optional : true},
               employeeCode : {type : 'string', optional : true},

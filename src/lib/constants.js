@@ -158,19 +158,24 @@ export default keyMirror({
     //Home Actions
     IS_LAST_PAGE: null,
 
+
     //Status Codes
     UNSEEN: null,
     PENDING: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
 
     //Form Layout
-    GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
-    DISABLE_SAVE: null,
-    UPDATE_FIELD_DATA: null,
-    STATUS_NAME: null,
-    BASIC_INFO: null,
-    ON_BLUR: null,
-    TOOGLE_HELP_TEXT: null,
+    GET_SORTED_ROOT_FIELD_ATTRIBUTES : null,
+    DISABLE_SAVE : null,
+    UPDATE_FIELD_DATA : null,
+    STATUS_NAME : null,
+    BASIC_INFO : null,
+    ON_BLUR : null,
+    TOOGLE_HELP_TEXT : null,
+    IS_LOADING : null,
+    PENDING_SYNC_TRANSACTION_IDS : null,
+    RESET_STATE : null,
+    ERROR_MESSAGE : null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
 
@@ -180,6 +185,17 @@ export default keyMirror({
     Preloader: null,
     Home: null,
     JobDetails: null,
+    FormLayout: null,
+     TimePicker: null,
+    SkuListing:null,
+
+    //Skulisting Actions
+    SKU_LIST_FETCHING_STOP:null,
+    SKU_LIST_FETCHING_START:null,
+    SHOW_SEARCH_BAR:null,
+    SKU_CODE_CHANGE:null,
+    UPDATE_SKU_ACTUAL_QUANTITY:null,
+
 
     //CheckBox
     SET_VALUE_IN_CHECKBOX:null,
@@ -187,13 +203,14 @@ export default keyMirror({
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
     CHANGE_QUANTITY: null,
-    SET_FIXED_SKU:null,
-    
+    SET_FIXED_SKU: null,
+
     //Signature Actions
     SET_FIELD_DATA_LIST: null,
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
-    FormLayout: null,
+   
+   
 })
 
 

@@ -1,7 +1,7 @@
 module.exports = {
   SESSION_TOKEN_KEY: 'SESSION_TOKEN_KEY',
   APP_FOLDER: 'FAREYE',
-  SYNC_SERVICE_DELAY:120000,
+  SYNC_SERVICE_DELAY:12000000,
   intervalId:0,
   backend: {
     fareyeProduction: false,
@@ -27,7 +27,7 @@ module.exports = {
     LOGOUT_API: '/logout',
     DOWNLOAD_DATA_API: '/rest/device/get_sync_table_job_with_pagination',
     DELETE_DATA_API: '/rest/device/delete_synch_job',
-    PUSH_BROKER:'mqttstaging.fareye.co',
+    PUSH_BROKER:'mqttdev.fareye.co',
     UPLOAD_DATA_API : '/rest/device/sync'
   }
 }

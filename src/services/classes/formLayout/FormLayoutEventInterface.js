@@ -22,7 +22,11 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
         return this.saveData(formElement, jobTransactionId, statusId)
     }
 
-    executeBeforeValidations(attributeMasterId) { }
+    addTransactionsToSyncList(jobTransactionId){
+        return this.addToSyncList(jobTransactionId);
+    }
+
+    executeBeforeValidations(attributeMasterId){}
 
     executeAfterValidations(attributeMasterId) { }
 
