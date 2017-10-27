@@ -27,6 +27,7 @@ import {
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldAttributeService } from '../../services/classes/FieldAttribute'
+import { fieldDataService } from '../../services/classes/FieldData'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {
     return async function (dispatch) {
@@ -35,7 +36,7 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
             const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMasterId)
             const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId[0])
             const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation)
-            const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap,skuData.attributeTypeIdValueMap)
+            const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap, skuData.attributeTypeIdValueMap)
             dispatch(stopFetchingSkuList(skuData.skuObjectListDto, skuObjectValidation, skuArrayChildAttributes, skuListingDto.childFieldAttributeId[0]))
             if (skuListingDto.isSkuCodePresent)
                 dispatch(showSearchBar())
@@ -88,10 +89,10 @@ export function scanSkuItem(skuListItems, skuCode) {
  */
 export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItems, skuChildElements) {
     return async function (dispatch) {
-        try{
-        const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, parentId, skuListItems, skuChildElements)
-        dispatch(updateSkuListItem(updatedSkuArray.updatedObject, updatedSkuArray.updatedChildElements))
-        }catch(error){
+        try {
+            const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, parentId, skuListItems, skuChildElements)
+            dispatch(updateSkuListItem(updatedSkuArray.updatedObject, updatedSkuArray.updatedChildElements))
+        } catch (error) {
             console.log(error)
         }
     }
@@ -114,15 +115,15 @@ export function updateSkuListItem(skuListItems, skuRootChildElements) {
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId,jobTransactionId,latestPositionId,parentObject,formElement,nextEditable,isSaveDisabled) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionId, latestPositionId, parentObject, formElement, nextEditable, isSaveDisabled) {
     return async function (dispatch) {
         try {
-            const message = skuListing.getFinalCheckForValidation(skuObjectValidation,skuRootChildItems)
-            console.log('message',message)
+            const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
+            console.log('message', message)
             // if (!message) {
-                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId)
-                let fieldDataListWithLatestPositionId = await fieldAttributeService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.parentId, latestPositionId)
-                 dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+            const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId)
+            let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.positionId, latestPositionId)
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
             // }
             // else{
             //     //Show Toast or Modal here according to message string returned
