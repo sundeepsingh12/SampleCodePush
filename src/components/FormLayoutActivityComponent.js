@@ -7,8 +7,9 @@ import {
     Platform,
     TouchableHighlight
 } from 'react-native'
-import { Container, Card, CardItem, Body, Icon } from 'native-base'
+import { Container, Card, CardItem, Body, Icon, Right } from 'native-base'
 import styles from '../themes/FeStyle'
+import renderIf from '../lib/renderIf'
 
 class FormLayoutActivityComponent extends Component {
 
@@ -16,7 +17,7 @@ class FormLayoutActivityComponent extends Component {
         console.log('props of FormLayoutActivityComponent', this.props)
         return (
             <Card>
-                <CardItem button onPress = {() => this.props.press(this.props.item)}>
+                <CardItem style={this.props.item.focus ? { backgroundColor: 'blue' } : null} button={this.props.item.editable} onPress={() => this.props.press(this.props.item)}>
                     <Body style={StyleSheet.flatten([styles.padding0])}>
                         <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                             <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
@@ -40,6 +41,9 @@ class FormLayoutActivityComponent extends Component {
                             </View>
                         </View>
                     </Body>
+                    <Right>{renderIf(this.props.item.showCheckMark,
+                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
+                    )}</Right>
                 </CardItem>
             </Card>
         )

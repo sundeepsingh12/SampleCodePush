@@ -28,8 +28,8 @@ export default class FormLayoutEventImpl {
      * @param {*isSaveDisabled} isSaveDisabled 
      * @param {*fieldAttribute value} value 
      */
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value, fieldDataList) {
-        this.updateFieldInfo(attributeMasterId, value, formLayoutObject, null, fieldDataList);
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value, fieldDataList, event) {
+        this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
         const nextEditableElements = nextEditable[attributeMasterId];
         if (!nextEditableElements || nextEditableElements.length == 0) {
@@ -181,7 +181,11 @@ export default class FormLayoutEventImpl {
     _convertFormLayoutToFieldData(formLayoutObject, jobTransactionId, id) {
         return {
             id: id,
+<<<<<<< HEAD
             value: formLayoutObject.value != null && formLayoutObject.value != undefined ? '' + formLayoutObject.value : null,
+=======
+            value: formLayoutObject.value != undefined && formLayoutObject.value != null ? '' + formLayoutObject.value : null, // to make value as string
+>>>>>>> master
             jobTransactionId: jobTransactionId,
             positionId: formLayoutObject.positionId,
             parentId: formLayoutObject.parentId,
