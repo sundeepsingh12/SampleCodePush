@@ -3,18 +3,14 @@ import {
     StyleSheet,
     View,
     Text,
-    FlatList,
-    TouchableOpacity
 }
     from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureView from '../components/SignatureView'
-import SignatureRemarks from '../components/SignatureRemarks'
-//import * as signatureAndNpsActions from '../modules/signature-and-nps/signatureAndNpsActions'
-import SignatureCapture from 'react-native-signature-capture';
-import renderIf from '../lib/renderIf'
 import StarRating from 'react-native-star-rating';
+import Signature from '../containers/Signature'
+import * as signatureActions from '../modules/signature/signatureActions'
 
 function mapStateToProps(state) {
     return {
@@ -24,7 +20,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
     return {
-        //  actions: bindActionCreators({ ...signatureActions }, dispatch)
+        actions: bindActionCreators({ ...signatureActions }, dispatch)
     }
 }
 
@@ -32,10 +28,6 @@ class SignatureAndNps extends Component {
 
     constructor(props) {
         super(props)
-        // this.params = this.props.navigation.state.params.currentElement;
-        // this.formElement = this.props.navigation.state.params.formElements;
-        // this.nextEditable = this.props.navigation.state.params.nextEditable;
-        // this.isSaveDisabled = this.props.navigation.state.params.isSaveDisabled;
         this.state = {
             starCount: 0
         };
@@ -46,43 +38,25 @@ class SignatureAndNps extends Component {
             starCount: rating
         });
     }
-    componentWillMount() {
-        // this.props.actions.getRemarksList(this.formElement)
-        // this.props.actions.setIsRemarksValidation(this.params.validation)
-    }
 
-    onSaveEvent = async (result) => {
-        // if (result != null) {
-        //     await this.props.actions.saveSignature(result, this.params.fieldAttributeMasterId, this.formElement, this.nextEditable, this.isSaveDisabled)
-        // }
-        // this.props.navigation.goBack()
+    onRatingSaveEvent = (result) => {
+        console.log('==rating', this.state.starCount)
+        this.props.actions.saveSignatureAndRating(result,
+            this.state.starCount,
+            this.props.navigation.state.params.currentElement,
+            this.props.navigation.state.params.formElements,
+            this.props.navigation.state.params.nextEditable,
+            this.props.navigation.state.params.isSaveDisabled,
+            this.props.navigation.state.params.jobTransaction,
+            this.props.navigation.state.params.latestPositionId)
+        this.props.navigation.goBack()
+
     }
 
     render() {
-        // if (this.props.isRemarksValidation && this.props.fieldDataList.length > 0) { 
-        //     return (
-        //         <View style={{ flex: 1, flexDirection: 'row' }}>
-        //             <View style={{ flex: 1 }}>
-        //                 <SignatureRemarks fieldDataList={this.props.fieldDataList} />
-        //             </View>
-        //             <View
-        //                 style={{
-        //                     width: 1,
-        //                     height: 1000,
-        //                     backgroundColor: 'black',
-        //                     borderBottomColor: 'black',
-        //                     borderBottomWidth: 1,
-        //                 }}
-        //             />
-        //             <View style={{ flex: 2 }}>
-        //                 <SignatureView onSaveEvent={this.onSaveEvent} />
-        //             </View>
-        //         </View>
-        //     );
-        // } else {
         return (
             <View style={{ flex: 1, flexDirection: 'column' }}>
-                <SignatureView onSaveEvent={this.onSaveEvent} />
+                <Signature navigation={this.props.navigation} onRatingSaveEvent={this.onRatingSaveEvent} />
                 <StarRating
                     disabled={false}
                     maxStars={5}

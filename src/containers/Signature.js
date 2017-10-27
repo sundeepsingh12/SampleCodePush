@@ -17,7 +17,7 @@ import renderIf from '../lib/renderIf'
 
 function mapStateToProps(state) {
     return {
-        isRemarksValidation : state.signature.isRemarksValidation,
+        isRemarksValidation: state.signature.isRemarksValidation,
         fieldDataList: state.signature.fieldDataList,
     }
 }
@@ -46,11 +46,14 @@ class Signature extends Component {
         if (result != null) {
             await this.props.actions.saveSignature(result, this.params.fieldAttributeMasterId, this.formElement, this.nextEditable, this.isSaveDisabled)
         }
+        if (this.props.onRatingSaveEvent) {
+            this.props.onRatingSaveEvent(result)
+        }
         this.props.navigation.goBack()
     }
 
     render() {
-        if (this.props.isRemarksValidation && this.props.fieldDataList.length > 0) { 
+        if (this.props.isRemarksValidation && this.props.fieldDataList.length > 0) {
             return (
                 <View style={{ flex: 1, flexDirection: 'row' }}>
                     <View style={{ flex: 1 }}>

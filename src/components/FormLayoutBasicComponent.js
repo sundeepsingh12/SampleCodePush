@@ -29,7 +29,11 @@ import {
     FIXED_SKU,
     SIGNATURE,
     SKU_ARRAY,
-    SIGNATURE_AND_NPS
+    SIGNATURE_AND_NPS,
+    STRING,
+    TEXT,
+    NUMBER,
+    DECIMAL,
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -48,10 +52,6 @@ class BasicFormElement extends Component {
     constructor(props) {
         super(props);
         this.formElementValue = {}
-        this.STRING = 1;
-        this.TEXT = 2;
-        this.NUMBER = 6;
-        this.DECIMAL = 13;
     }
 
     navigateToScene = (item) => {
@@ -126,10 +126,10 @@ class BasicFormElement extends Component {
 
     render() {
         switch (this.props.item.attributeTypeId) {
-            case this.STRING:
-            case this.TEXT:
-            case this.NUMBER:
-            case this.DECIMAL:
+            case STRING:
+            case TEXT:
+            case NUMBER:
+            case DECIMAL:
                 return (
                     renderIf(!this.props.item.hidden,
                         <Card>
