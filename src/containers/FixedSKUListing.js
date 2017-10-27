@@ -40,7 +40,7 @@ class FixedSKUListing extends Component {
     super(props)
     let navigationState = this.props.navigation.state.params
     this.parentObject = navigationState['currentElement']
-    this.jobTransactionId = navigationState['jobTransactionId']
+    this.jobTransaction = navigationState['jobTransaction']
     this.latestPositionId = navigationState['latestPositionId']
     this.formElement = navigationState['formElements']
     this.nextEditable = navigationState['nextEditable']
@@ -63,6 +63,7 @@ class FixedSKUListing extends Component {
   }
 
   render() {
+    console.log('render fixed sku',this.jobTransaction)
     if (this.props.isLoaderRunning) {
       return (
         <Loader />
@@ -81,7 +82,7 @@ class FixedSKUListing extends Component {
           </Text>
           <Button
             onPress={() => {
-              this.props.actions.onSave(this.parentObject, this.formElement, this.nextEditable, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransactionId)
+              this.props.actions.onSave(this.parentObject, this.formElement, this.nextEditable, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction.id)
               this.props.navigation.goBack()
             }}>
             <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
