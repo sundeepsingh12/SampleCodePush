@@ -96,6 +96,11 @@ class BasicFormElement extends Component {
 
     }
 
+    onFocusEvent(currentElement) {
+        this.props.actions.fieldValidations(currentElement,this.props.formElement,'Before')          
+    }
+        
+
     _onBlurEvent(attributeId) {
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
     }
