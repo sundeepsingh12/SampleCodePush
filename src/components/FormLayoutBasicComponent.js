@@ -6,7 +6,8 @@ import {
     Text,
     Platform,
     FlatList,
-    TouchableHighlight
+    TouchableHighlight,
+    ActivityIndicator
 }
     from 'react-native'
 import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput } from 'native-base';
@@ -26,12 +27,13 @@ import {
     RE_ATTEMPT_DATE,
     DATE,
     FIXED_SKU,
-    SIGNATURE,
+    SIGNATURE, 
     STRING,
     TEXT,
     NUMBER,
     DECIMAL,
-    SKU_ARRAY
+    SKU_ARRAY,
+    SEQUENCE,
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -51,7 +53,14 @@ class BasicFormElement extends Component {
         super(props);
         this.formElementValue = {}
     }
-
+   componentDidMount = () => {
+     if(this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value ){
+        this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, 
+            this.props.isSaveDisabled,this.props.item.sequenceMasterId)
+     }
+   }
+   
+    
     navigateToScene = (item) => {
         let screenName = ''
         switch (item.attributeTypeId) {
@@ -98,6 +107,11 @@ class BasicFormElement extends Component {
 
     _onBlurEvent(attributeId) {
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
+        const nextElement = ( (this.props.nextEditable[attributeId])[0] != null || (this.props.nextEditable[attributeId])[0] != undefined) 
+             ? this.props.formElement.get(parseInt((this.props.nextEditable[attributeId])[0].split('$$')[1])) : null;
+        if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
+           this.props.actions.setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, this.props.isSaveDisabled,nextElement.sequenceMasterId)
+        }
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, nextEditable, value, isSaveDisabled) {
@@ -129,6 +143,7 @@ class BasicFormElement extends Component {
             case TEXT:
             case NUMBER:
             case DECIMAL:
+            case SEQUENCE:
                 return (
                     renderIf(!this.props.item.hidden,
                         <Card>
@@ -151,8 +166,10 @@ class BasicFormElement extends Component {
 
                                                 <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
 
-                                                    {renderIf(this.props.item.showCheckMark,
-                                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
+                                                    {renderIf(this.props.item.showCheckMark || (this.props.item.isLoading !== undefined && this.props.item.isLoading), (this.props.item.isLoading !== undefined && this.props.item.isLoading) ?
+                                                      <ActivityIndicator animating={this.props.item.isLoading} style={StyleSheet.flatten([ { marginTop: -20 }])} size="small" /> :
+                                                      this.props.item.showCheckMark  ?
+                                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} /> : null
                                                     )}
 
                                                     {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
@@ -171,8 +188,8 @@ class BasicFormElement extends Component {
                                                     multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                                     placeholder='Regular Textbox'
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
-                                                    onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
-
+                                                    onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId, this.props.item.attributeTypeId)}
+                                                    value = { this.props.item.attributeTypeId == 62 ? this.props.item.value : null}
                                                 />
                                             </View>
                                             {

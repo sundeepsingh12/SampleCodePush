@@ -10,6 +10,10 @@ import {
 } from '../classes/formLayout/FormLayoutEventInterface'
 
 import {
+  restAPI
+} from '../../lib/RestAPI'
+
+import {
     keyValueDBService
   } from '../classes/KeyValueDBService'
 
@@ -106,6 +110,37 @@ describe('update field info', () => {
     formLayoutMap.get(1).showCheckMark = false;
     expect(formLayoutEventsInterface.updateFieldData(1, "1", formLayoutMap, 'dd').get(1).showCheckMark).toEqual(false);
     expect(formLayoutEventsInterface.updateFieldData(1, "1", formLayoutMap, 'dd').get(1).value).toEqual("1");
+})
+
+describe('get sequence field data', () => {
+    it('should get sequence  data without error', () => {
+
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValueOnce({
+        value: 'testtoken'
+        })
+        restAPI.initialize = jest.fn()
+        restAPI.serviceCall = jest.fn((data) => {
+        return "Success"
+        })
+        const sequenceId = 4;
+        return formLayoutEventsInterface.getSequenceAttrData(sequenceId).then(data => {
+        expect(data).toEqual(null)
+        expect(restAPI.initialize).toHaveBeenCalledTimes(1)
+        expect(restAPI.serviceCall).toHaveBeenCalledTimes(1)
+        })
+    })
+    it('should not get data from server and throw error', () => {
+    const message = 'masterId unavailable'
+    try {
+      keyValueDBService.getValueFromStore = jest.fn()
+      keyValueDBService.getValueFromStore.mockReturnValue(null)
+      const sequenceId = null;
+      formLayoutEventsInterface.getSequenceAttrData(sequenceId)
+    } catch (error) {
+      expect(error.message).toEqual(message)
+    }
+    })
 })
 
 describe('toogle help text', () => {

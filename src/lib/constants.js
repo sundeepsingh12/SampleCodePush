@@ -185,7 +185,7 @@ export default keyMirror({
     Home: null,
     JobDetails: null,
     FormLayout: null,
-     TimePicker: null,
+    TimePicker: null,
     SkuListing:null,
 
     //Skulisting Actions

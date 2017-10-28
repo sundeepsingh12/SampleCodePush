@@ -107,6 +107,26 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
     }
 }
 
+export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled,sequenceId) {
+    return async function (dispatch) {
+        try{
+            formElement.get(attributeMasterId).isLoading =true;
+            const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
+            if( sequenceData ){
+                const cloneFormElement = new Map(formElement);
+                const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeMasterId, sequenceData, cloneFormElement, ON_BLUR);
+                const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, "");
+                sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).editable = false;
+                sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
+                dispatch(_updateFieldData(updatedFieldData));
+                dispatch(_setFormList(sortedFormAttributeDto));
+            }
+        }catch(error){
+            dispatch(_setErrorMessage(error));
+        }
+    }
+}
+
 export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
     return async function (dispatch) {
         const saveDisabled = formLayoutEventsInterface.disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value)
@@ -165,3 +185,4 @@ export function fieldValidations(currentElement, formElement, timeOfExecution) {
         fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution)
     }
 }
+

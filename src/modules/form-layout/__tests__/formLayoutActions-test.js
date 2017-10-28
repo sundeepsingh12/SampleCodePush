@@ -35,7 +35,8 @@ const formLayoutObject = {
         showHelpText : false,
         editable : false,
         focus : false,
-        validation : []
+        validation : [],
+        sequenceMasterId :null,
     },
     2 : {
         label : "ds",
@@ -51,8 +52,27 @@ const formLayoutObject = {
         showHelpText : true,
         editable : false,
         focus : false,
-        validation : []
+        validation : [],
+        sequenceMasterId : null,
+    },
+    3 : {
+        label : "ds",
+        subLabel : "d",
+        helpText : "w",
+        key : "dd",
+        required:true,
+        hidden:true,
+        attributeTypeId:62,
+        fieldAttributeMasterId : 1,
+        positionId : 0,
+        parentId : 0,
+        showHelpText : true,
+        editable : false,
+        focus : false,
+        validation : [],
+        sequenceMasterId : 4,
     }
+
 
 }
 const nextEditable = {
@@ -211,6 +231,22 @@ describe('test form layout events', ()=>{
                 expect(formLayoutEventsInterface.findNextFocusableAndEditableElement).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
+            })        
+
+    })
+    
+    it('should get sequence data and  find next editable and focusable element', ()=>{
+        formLayoutEventsInterface.getSequenceData = jest.fn()
+        formLayoutEventsInterface.getSequenceData.mockReturnValue('1');
+        formLayoutEventsInterface.findNextFocusableAndEditableElement = jest.fn()
+        formLayoutEventsInterface.findNextFocusableAndEditableElement.mockReturnValue(formLayoutInitialState);
+        formLayoutEventsInterface.updateFieldData = jest.fn();
+        formLayoutEventsInterface.updateFieldData.mockReturnValue(formLayoutMap);
+        const store = mockStore({})
+        return store.dispatch(actions.setSequenceDataAndNextFocus())
+            .then(()=>{
+                expect(formLayoutEventsInterface.findNextFocusableAndEditableElement).toHaveBeenCalledTimes(0)
+                expect(formLayoutEventsInterface.updateFieldData).toHaveBeenCalledTimes(0)
             })        
 
     })

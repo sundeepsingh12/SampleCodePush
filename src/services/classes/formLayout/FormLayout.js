@@ -178,7 +178,8 @@ class FormLayout {
             showHelpText : false,
             editable : fieldAttribute.editable ? fieldAttribute.editable : false,
             focus : fieldAttribute.focus ? fieldAttribute.focus : false,
-            validation : (validationArray && validationArray.length > 0) ? validationArray : null
+            validation : (validationArray && validationArray.length > 0) ? validationArray : null,
+            sequenceMasterId: fieldAttribute.sequenceMasterId,
         };
     }
 

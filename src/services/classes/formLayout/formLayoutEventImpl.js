@@ -11,11 +11,13 @@ const {
     PENDING_SYNC_TRANSACTION_IDS
 } = require('../../../lib/constants').default
 
+import CONFIG from '../.././../lib/config'
 
 import * as realm from '../../../repositories/realmdb'
 import { keyValueDBService } from '../KeyValueDBService.js'
 import moment from 'moment'
-
+import RestAPIFactory from '../../../lib/RestAPIFactory'
+import _ from 'underscore'
 export default class FormLayoutEventImpl {
 
     /**
@@ -29,7 +31,9 @@ export default class FormLayoutEventImpl {
      * @param {*fieldAttribute value} value 
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value, fieldDataList, event) {
-        this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        if(!(formLayoutObject.get(attributeMasterId).attributeTypeId == 62 )){
+             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        }
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
         const nextEditableElements = nextEditable[attributeMasterId];
         if (!nextEditableElements || nextEditableElements.length == 0) {
@@ -40,7 +44,7 @@ export default class FormLayoutEventImpl {
                 nextElement = Number(nextElement.split('$$')[1]);
                 formLayoutObject.get(nextElement).focus = true;
             }
-            formLayoutObject.get(nextElement).editable = true;
+            formLayoutObject.get(nextElement).editable =!(formLayoutObject.get(nextElement).attributeTypeId == 62) ? true : false;
         });
 
         return { formLayoutObject, nextEditable, isSaveDisabled }
@@ -108,6 +112,29 @@ export default class FormLayoutEventImpl {
         }
         formLayoutObject.get(attributeMasterId).showHelpText = !formLayoutObject.get(attributeMasterId).showHelpText;
         return formLayoutObject;
+    }
+
+   async getSequenceAttrData(sequenceMasterId){
+        let data = null;
+        let masterData = null;
+        const token =  await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        if (!token) {
+           throw new Error('Token Missing')
+        }
+        if( !_.isNull(sequenceMasterId) && !_.isUndefined(sequenceMasterId) ){
+            masterData = 'sequenceMasterId=' + sequenceMasterId + '&count=' + 1;
+            const url = (masterData == null) ? CONFIG.API.GET_SEQUENCE_NEXT_COUNT : CONFIG.API.GET_SEQUENCE_NEXT_COUNT + "?" + masterData
+            console.log("url is",url);
+            let getSequenceData = await RestAPIFactory(token.value).serviceCall(null, url, 'GET')
+            console.log("url data is",getSequenceData);
+            if (getSequenceData && getSequenceData.status == 200) {
+                json = await getSequenceData.json
+                data =(!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null ;
+            }
+        }else{
+            throw new Error('masterId unavailable')
+        }
+        return data;  
     }
 
     /**
