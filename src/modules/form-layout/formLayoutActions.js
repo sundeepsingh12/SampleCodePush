@@ -116,7 +116,6 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, next
                 const cloneFormElement = new Map(formElement);
                 const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeMasterId, sequenceData, cloneFormElement, ON_BLUR);
                 const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, "");
-                sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).editable = false;
                 sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
                 dispatch(_updateFieldData(updatedFieldData));
                 dispatch(_setFormList(sortedFormAttributeDto));
