@@ -181,11 +181,7 @@ export default class FormLayoutEventImpl {
     _convertFormLayoutToFieldData(formLayoutObject, jobTransactionId, id) {
         return {
             id: id,
-<<<<<<< HEAD
-            value: formLayoutObject.value != null && formLayoutObject.value != undefined ? '' + formLayoutObject.value : null,
-=======
             value: formLayoutObject.value != undefined && formLayoutObject.value != null ? '' + formLayoutObject.value : null, // to make value as string
->>>>>>> master
             jobTransactionId: jobTransactionId,
             positionId: formLayoutObject.positionId,
             parentId: formLayoutObject.parentId,

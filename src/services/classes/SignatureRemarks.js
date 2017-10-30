@@ -36,6 +36,7 @@ class SignatureRemarks {
         let checkCondition;
         let dataList = []
         for (let [key, fieldDataObject] of fieldDataList.entries()) {
+            console.log('==in service', fieldDataObject)
             let dataObject = {}
             switch (fieldDataObject.attributeTypeId) {
                 case CAMERA_HIGH:
@@ -58,7 +59,8 @@ class SignatureRemarks {
                 default:
                     checkCondition = true;
             }
-            if (fieldDataObject && !fieldDataObject.hidden && fieldDataObject.value && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
+            if (fieldDataObject && !fieldDataObject.hidden && fieldDataObject.value != undefined && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
+                console.log('values', fieldDataObject.value)
                 let { label, value } = fieldDataObject
                 dataList.push({ label, value })
             }
@@ -74,15 +76,13 @@ class SignatureRemarks {
         return dataList
     }
 
-    async saveFile(result) {       
+    async saveFile(result) {
         const PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/'; //TODO update variable name
         RNFS.mkdir(PATH_TEMP);
         const image_name = 'sign_' + moment() + '.jpg'
         await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
-        // var stat = await RNFS.stat(PATH_TEMP + image_name);
-        // console.log('==image', stat.isFile())
-       // var content = await RNFS.readFile(PATH_TEMP + image_name, 'base64')
         const user = await keyValueDBService.getValueFromStore(USER);
+        console.log('user',user)
         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
         return value
     }
@@ -96,6 +96,8 @@ class SignatureRemarks {
         return false
     }
     prepareSignAndNpsFieldData(signatureValue, npsValue, currentElement, fieldAttributeMasterList, jobTransactionId, latestPositionId) {
+        console.log('==', fieldAttributeMasterList)
+        if (!fieldAttributeMasterList || fieldAttributeMasterList.length <= 0) return []
         let fieldAttributeList = fieldAttributeMasterList.value.filter((fieldAttribute) => fieldAttribute.parentId == currentElement.fieldAttributeMasterId)
         let childDataList = []
         for (let fieldAttribute of fieldAttributeList) {
@@ -103,7 +105,7 @@ class SignatureRemarks {
             let { id, attributeTypeId, value } = fieldAttribute
             childDataList.push({ fieldAttributeMasterId: id, attributeTypeId, value })
         }
-        let fieldDataObject = fieldDataService.prepareFieldDataForTransactionSavingInState(childDataList, jobTransactionId, currentElement.fieldAttributeMasterId, latestPositionId)
+        let fieldDataObject = fieldDataService.prepareFieldDataForTransactionSavingInState(childDataList, jobTransactionId, currentElement.positionId, latestPositionId)
         return fieldDataObject
     }
 }

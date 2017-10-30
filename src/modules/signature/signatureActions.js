@@ -9,7 +9,7 @@ const {
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
-import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import { getNextFocusableAndEditableElements, updateFieldDataWithChildData, updateFieldData } from '../form-layout/formLayoutActions'
 import {
     OBJECTSAROJFAREYE
 } from '../../lib/AttributeConstants'
@@ -31,6 +31,7 @@ export function saveSignature(result, fieldAttributeMasterId, formElement, nextE
     return async function (dispatch) {
         const value = await signatureService.saveFile(result);
         dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value))
+        dispatch(updateFieldData(fieldAttributeMasterId, value, formElement))
     }
 }
 

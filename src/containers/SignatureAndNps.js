@@ -12,12 +12,6 @@ import StarRating from 'react-native-star-rating';
 import Signature from '../containers/Signature'
 import * as signatureActions from '../modules/signature/signatureActions'
 
-function mapStateToProps(state) {
-    return {
-        // isRemarksValidation : state.signature.isRemarksValidation,
-        // fieldDataList: state.signature.fieldDataList,
-    }
-}
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...signatureActions }, dispatch)
@@ -33,9 +27,9 @@ class SignatureAndNps extends Component {
         };
     }
 
-    onStarRatingPress(rating) {
+    onStarRatingPress(starCount) {
         this.setState({
-            starCount: rating
+            starCount
         });
     }
 
@@ -58,14 +52,13 @@ class SignatureAndNps extends Component {
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <Signature navigation={this.props.navigation} onRatingSaveEvent={this.onRatingSaveEvent} />
                 <StarRating
-                    disabled={false}
                     maxStars={5}
                     rating={this.state.starCount}
-                    selectedStar={(rating) => this.onStarRatingPress(rating)}
+                    selectedStar={rating => this.onStarRatingPress(rating)}
                 />
             </View>
         );
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SignatureAndNps)
+export default connect(null, mapDispatchToProps)(SignatureAndNps)

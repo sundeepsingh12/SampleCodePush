@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
-import { getNextFocusableAndEditableElements } from '../modules/form-layout/formLayoutActions'
+import { getNextFocusableAndEditableElements, updateFieldData } from '../modules/form-layout/formLayoutActions'
 
 function mapStateToProps(state) {
     return {
@@ -18,7 +18,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ getNextFocusableAndEditableElements }, dispatch)
+        actions: bindActionCreators({ getNextFocusableAndEditableElements, updateFieldData }, dispatch)
     }
 }
 class OverlayAttributes extends Component {
@@ -29,6 +29,8 @@ class OverlayAttributes extends Component {
             this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled,
             value)
+        this.props.actions.updateFieldData(this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
+            value + '', this.props.navigation.state.params.formElements)
         this.props.navigation.goBack()
     }
 
