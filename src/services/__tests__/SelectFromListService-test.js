@@ -1,9 +1,9 @@
 'use strict'
 
-import { checkBoxDataService } from '../classes/CheckBoxService'
+import { selectFromListDataService } from '../classes/selectFromListService'
 import { CHECKBOX, RADIOBUTTON } from '../../lib/AttributeConstants'
 
-describe('test cases for checkBoxService setorRemovestates', () => {
+describe('test cases for selectFromListService setorRemovestates', () => {
     let checkBoxValues = {
         1: {
             isChecked: false,
@@ -20,6 +20,18 @@ describe('test cases for checkBoxService setorRemovestates', () => {
             id: 3,
             attributeTypeId: 8,
         }
+    }
+
+    let checkBoxValue = {1:
+        {
+            fieldAttributeMasterId:43159,
+            id: 1,            
+            isChecked: true,
+            attributeTypeId: 8,
+            name:'abc',
+            sequence:8,
+            code:'123',
+    }
     }
 
     let wholeDataFromMaster = [
@@ -42,7 +54,7 @@ describe('test cases for checkBoxService setorRemovestates', () => {
 
         let id = 1
         let attributeTypeId = CHECKBOX
-        expect(checkBoxDataService.setOrRemoveState(checkBoxValues, id, attributeTypeId)).toEqual({
+        expect(selectFromListDataService.setOrRemoveState(checkBoxValues, id, attributeTypeId)).toEqual({
             1: {
                 isChecked: true,
                 id: 1,
@@ -65,7 +77,7 @@ describe('test cases for checkBoxService setorRemovestates', () => {
 
         let id = 1
         let attributeTypeId = CHECKBOX
-        expect(checkBoxDataService.getcheckBoxDataList(wholeDataFromMaster, '43159')).toEqual({
+        expect(selectFromListDataService.getcheckBoxDataList(wholeDataFromMaster, '43159')).toEqual({
              '34043':
                 {
                     id: 34043,
@@ -81,10 +93,13 @@ describe('test cases for checkBoxService setorRemovestates', () => {
 
         let id = 1
         let attributeTypeId = CHECKBOX
-        expect(checkBoxDataService.checkBoxDoneButtonClicked(checkBoxValues)[0]).toEqual({
+        expect(selectFromListDataService.checkBoxDoneButtonClicked(CHECKBOX, checkBoxValue)[0]).toEqual({
+            name:'abc',
+            value:'123',
+            sequence:8,
+            fieldAttributeMasterId:43159,
+            id: 1,            
             isChecked: true,
-            id: 1,
-            attributeTypeId: 2
         })
     })
 

@@ -57,7 +57,7 @@ import SkuListing from '../../containers/SkuListing'
 
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import CheckBoxAttribute from '../../containers/CheckBoxAttribute';
+import SelectFromList from '../../containers/SelectFromList';
 
 class AppWithNavigationState extends React.Component {
   render() {
@@ -114,8 +114,8 @@ export const AppNavigator = StackNavigator({
   JobDetails: {
     screen: JobDetails,
      },
-  CheckBoxAttribute: {
-    screen: CheckBoxAttribute,
+  SelectFromList: {
+    screen: SelectFromList,
   },
   HomeUI: {
     screen: HomeUI

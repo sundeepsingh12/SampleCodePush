@@ -127,6 +127,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, nex
     return function (dispatch) {
         const cloneFormElement = new Map(formElement);
         console.log('cloneFormElement', cloneFormElement);
+        console.log('fieldDataListObject', fieldDataListObject);        
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList, ON_BLUR);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {

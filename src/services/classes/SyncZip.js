@@ -76,6 +76,7 @@ function _getSyncDataFromDb(transactionIdsObject){
     let transactionIds = transactionIdsObject.value;
     let fieldDataQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId).join(' OR ')
     fieldDataList = _getDataFromRealm([],fieldDataQuery,TABLE_FIELD_DATA);
+    console.log('==fielddatalist',fieldDataList)
     let transactionListQuery = fieldDataQuery.replace(/jobTransactionId/g,'id'); // regex expression to replace all jobTransactionId with id
     transactionList = _getDataFromRealm([],transactionListQuery,TABLE_JOB_TRANSACTION);
     let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table

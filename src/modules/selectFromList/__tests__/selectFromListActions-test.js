@@ -2,9 +2,9 @@
 'use strict'
 
 
-var actions = require('../checkBoxActions')
+var actions = require('../selectFromListActions')
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
-import { checkBoxDataService } from '../../../services/classes/CheckBoxService'
+import { selectFromListDataService } from '../../../services/classes/selectFromListService'
 import { updateFieldDataWithChildData } from '../../form-layout/formLayoutActions'
 import { CHECKBOX, RADIOBUTTON } from '../../../lib/AttributeConstants'
 
@@ -19,7 +19,7 @@ SET_VALUE_IN_CHECKBOX
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
-describe('checkBoxActions', () => {
+describe('selectFromListActions', () => {
 
     it('should dispatch action', () => {
         let platform = {
@@ -38,8 +38,8 @@ describe('checkBoxActions', () => {
             code: 122,
         }
         const store = mockStore({})
-        checkBoxDataService.setOrRemoveState = jest.fn()
-        checkBoxDataService.setOrRemoveState.mockReturnValue({ checkBoxValues: 'testToken' })
+        selectFromListDataService.setOrRemoveState = jest.fn()
+        selectFromListDataService.setOrRemoveState.mockReturnValue({ checkBoxValues: 'testToken' })
         return store.dispatch(actions.setOrRemoveStates())
             .then(() => {
                 expect(actions.actionDispatch(platform)).toEqual({
@@ -55,10 +55,10 @@ describe('checkBoxActions', () => {
             code: 122,
         }
         const store = mockStore({})
-        checkBoxDataService.checkBoxDoneButtonClicked = jest.fn()
-        checkBoxDataService.checkBoxDoneButtonClicked.mockReturnValue({ checkBoxValues: 'testToken' })
-        checkBoxDataService.prepareFieldDataForTransactionSavingInState = jest.fn()
-        checkBoxDataService.prepareFieldDataForTransactionSavingInState.mockReturnValue({fieldDataListData: 'test'})
+        selectFromListDataService.checkBoxDoneButtonClicked = jest.fn()
+        selectFromListDataService.checkBoxDoneButtonClicked.mockReturnValue({ checkBoxValues: 'testToken' })
+        selectFromListDataService.prepareFieldDataForTransactionSavingInState = jest.fn()
+        selectFromListDataService.prepareFieldDataForTransactionSavingInState.mockReturnValue({fieldDataListData: 'test'})
         return store.dispatch(actions.checkBoxButtonDone())
             .then(() => {
                 expect(actions.actionDispatch(platform)).toEqual({
@@ -76,8 +76,8 @@ it('should set all checkBoxData', () => {
         const store = mockStore({})
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue({wholeDataFromMaster: 'testToken' })
-        checkBoxDataService.getcheckBoxDataList = jest.fn()
-        checkBoxDataService.getcheckBoxDataList.mockReturnValue({checkBoxDataList: 'tests'})
+        selectFromListDataService.getcheckBoxDataList = jest.fn()
+        selectFromListDataService.getcheckBoxDataList.mockReturnValue({checkBoxDataList: 'tests'})
         return store.dispatch(actions.getCheckBoxData())
             .then(() => {
                 expect(actions.actionDispatch(platform)).toEqual({

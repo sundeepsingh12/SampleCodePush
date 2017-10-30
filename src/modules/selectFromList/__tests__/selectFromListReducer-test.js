@@ -5,8 +5,8 @@ const {
     SET_VALUE_IN_CHECKBOX,
 } = require('../../../lib/constants').default
 
-const InitialState = require('../checkBoxInitialState').default
-import checkBoxReducer from '../checkBoxReducer'
+const InitialState = require('../selectFromListInitialState').default
+import selectFromListReducer from '../selectFromListReducer'
 
 describe('checkBox Reducer ', () => {
 
@@ -15,7 +15,7 @@ describe('checkBox Reducer ', () => {
             type: 'DEFAULT',
         }
         const result = new InitialState()
-        let nextState = checkBoxReducer(undefined, action)
+        let nextState = selectFromListReducer(undefined, action)
         expect(nextState).toEqual(result)
     })
 
@@ -29,7 +29,7 @@ describe('checkBox Reducer ', () => {
             type: SET_VALUE_IN_CHECKBOX,
             payload: payload
         }
-        let nextState = checkBoxReducer(undefined, action)
+        let nextState = selectFromListReducer(undefined, action)
         expect(nextState.checkBoxValues).toBe(payload)
     })
 })

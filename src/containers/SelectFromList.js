@@ -1,8 +1,4 @@
-/**
- * # Main.js
- *  This is the main app screen
- *
- */
+//This class works for checkBox, RadioButton, DropDown.
 'use strict'
 /*
  * ## Imports
@@ -38,8 +34,8 @@ import {
   from 'react-native'
 
 import { Container, Button, Picker, Title, Option, List, ListItem, Icon, Form, Item, CheckBox, Radio, Content, Card } from 'native-base';
-import * as checkBoxActions from '../modules/checkBox/checkBoxActions'
-import { CHECKBOX, RADIOBUTTON } from '../lib/AttributeConstants'
+import * as selectFromListActions from '../modules/selectFromList/selectFromListActions'
+import { CHECKBOX, RADIOBUTTON, DROPDOWN } from '../lib/AttributeConstants'
 
 
 
@@ -69,8 +65,7 @@ var styles = StyleSheet.create({
  */
 
 function mapStateToProps(state) {
-  console.log("mapStateToProps")
-  console.log(state.checkBox.checkBoxValues)
+  console.log("mapStateToProps",state.checkBox.checkBoxValues)
   return {
     checkBoxValues: state.checkBox.checkBoxValues,
   }
@@ -79,56 +74,30 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...checkBoxActions }, dispatch)
+    actions: bindActionCreators({ ...selectFromListActions }, dispatch)
   }
 }
 
-class CheckBoxAttribute extends Component {
+class SelectFromList extends Component {
 
   constructor(props) {
     super(props);
-    console.log("navigatioooo",this.props.navigation.state)
-    this.params = this.props.navigation.state.params.currentElement
-    this.latestPositionId = this.props.navigation.state.params.latestPositionId
-    this.jobTransactionId = this.props.navigation.state.params.jobTransaction.id
-    this.isSaveDisabled = this.props.navigation.state.params.isSaveDisabled
-    this.formElement = this.props.navigation.state.params.formElements
-    this.nextEditable = this.props.navigation.state.params.nextEditable
-    console.log("helloparams", this.params)
   }
 
-  // headerRightFunction() {
-  //   console.log("headerRightFunction")
-  //   this.props.actions.actionDispatch({})
-  // }
-
-
-  // static navigationOptions = (props) => {
-  //   return {
-  //     title: 'Check',
-  //     headerRight: (
-  //       <Button onPress={() => console.log(props)}>
-  //         <Text> DONE </Text>
-  //       </Button>
-  //     )
-  //   }
-  // };
 
   componentWillMount() {
     console.log("componentWillMount()")
-    console.log(this.params)
-    this.props.actions.getCheckBoxData(this.params.fieldAttributeMasterId)
+    console.log(this.props.navigation.state.params.currentElement)
+    this.props.actions.getCheckBoxData(this.props.navigation.state.params.currentElement.fieldAttributeMasterId)
   }
 
   renderDataCheckBox = (item) => {
-    console.log("renderData")
-    console.log(this.params)
     console.log(item)
     return (
       <View>
         <Content>
           <Card style={{ flexDirection: 'row', height: 40 }}  >
-            <CheckBox checked={item.isChecked} onPress={() => { this.props.actions.setOrRemoveStates(this.props.checkBoxValues, item.id, this.params.attributeTypeId) }} />
+            <CheckBox checked={item.isChecked} onPress={() => { this.props.actions.setOrRemoveStates(this.props.checkBoxValues, item.id, this.props.navigation.state.params.currentElement.attributeTypeId) }} />
             <Text>     {item.name}</Text>
           </Card>
         </Content>
@@ -141,7 +110,7 @@ class CheckBoxAttribute extends Component {
       <View>
         <Content>
           <Card style={{ flexDirection: 'row', height: 40 }}  >
-            <Radio selected={item.isChecked} onPress={() => { this.props.actions.setOrRemoveStates(this.props.checkBoxValues, item.id, this.params.attributeTypeId) }} />
+            <Radio selected={item.isChecked} onPress={() => { this.props.actions.setOrRemoveStates(this.props.checkBoxValues, item.id, this.props.navigation.state.params.currentElement.attributeTypeId) }} />
             <Text>     {item.name}</Text>
           </Card>
         </Content>
@@ -152,11 +121,8 @@ class CheckBoxAttribute extends Component {
 
   render() {
     console.log('renderprops', this.props)
-    console.log('render')
     console.log("renderMethodCheckBox", this.props.checkBoxValues)
-    //Todo
-    //Add loader &constant instead of 8
-    if (this.params.attributeTypeId == CHECKBOX) {
+    if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX) {
       return (
         <Container>
           <View style={styles.container}>
@@ -166,7 +132,7 @@ class CheckBoxAttribute extends Component {
               keyExtractor={item => item.id}
             />
             <Button onPress={() => {
-              this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId, this.isSaveDisabled, this.formElement, this.nextEditable)
+              this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.props.navigation.state.params.currentElement,this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
               this.props.navigation.goBack()
             }}>
               <Text> DONE </Text>
@@ -174,7 +140,7 @@ class CheckBoxAttribute extends Component {
           </View>
         </Container>
       )
-    } else if (this.params.attributeTypeId == RADIOBUTTON) {
+    } else if (this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON) {
       return (
         <Container>
           <View style={styles.container}>
@@ -184,7 +150,7 @@ class CheckBoxAttribute extends Component {
               keyExtractor={item => item.id}
             />
             <Button onPress={() => {
-              this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.params, this.jobTransactionId, this.latestPositionId, this.isSaveDisabled, this.formElement, this.nextEditable)
+              this.props.actions.checkBoxButtonDone(this.props.checkBoxValues, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
               this.props.navigation.goBack()
             }}>
               <Text> DONE </Text>
@@ -196,4 +162,4 @@ class CheckBoxAttribute extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CheckBoxAttribute)
+export default connect(mapStateToProps, mapDispatchToProps)(SelectFromList)

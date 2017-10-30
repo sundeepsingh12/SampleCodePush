@@ -65,11 +65,11 @@ class BasicFormElement extends Component {
                 break
             }
             case CHECKBOX: {
-                screenName = 'CheckBoxAttribute'
+                screenName = 'SelectFromList'
                 break
             }
             case RADIOBUTTON: {
-                screenName = 'CheckBoxAttribute'
+                screenName = 'SelectFromList'
                 break
             }
             case FIXED_SKU: {
