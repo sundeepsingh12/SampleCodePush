@@ -76,13 +76,13 @@ class SignatureRemarks {
         return dataList
     }
 
-    async saveFile(result) {
+    async saveFile(result, currentTimeInMillis) {
         const PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/'; //TODO update variable name
         RNFS.mkdir(PATH_TEMP);
-        const image_name = 'sign_' + moment() + '.jpg'
+        const image_name = 'sign_' + currentTimeInMillis + '.jpg'
         await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
         const user = await keyValueDBService.getValueFromStore(USER);
-        console.log('user',user)
+        console.log('user', user)
         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
         return value
     }

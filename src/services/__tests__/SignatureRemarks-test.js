@@ -41,31 +41,34 @@ describe('test cases for getFieldAttributeMasterMap', () => {
         expect(signatureService.filterRemarksList(fieldDataMap)).toEqual(fieldDataList)
     })
 })
-// describe('test cases for saveFile', () => {
-//     const user = {
-//         value:
-//         {
-//             company: {
-//                 id: 1
-//             }
-//         }
 
-//     }
-//     it('should return image name', () => {
-//         const result = 'test'
-//         const currentTimeInMillis = moment()
-//         const imagename = 'sign_' + currentTimeInMillis + '.jpg'
-//         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + imagename
-//         RNFS.writeFile = jest.fn()
-//         RNFS.mkdir = jest.fn()
-//         keyValueDBService.getValueFromStore = jest.fn()
-//         keyValueDBService.getValueFromStore.mockReturnValue(user)
-//         expect(signatureService.saveFile(result)).toEqual(value)
-//         expect(RNFS.mkdir).toHaveBeenCalled()
-//         expect(RNFS.writeFile).toHaveBeenCalledTimes(1)
-//         expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
-//     })
-// })
+describe('test cases for saveFile', () => {
+    const user = {
+        value:
+        {
+            company: {
+                id: 1
+            }
+        }
+
+    }
+    it('should return image name', () => {
+        const result = 'test'
+        const currentTimeInMillis = moment()
+        const imagename = 'sign_' + currentTimeInMillis + '.jpg'
+        const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + imagename
+        RNFS.writeFile = jest.fn()
+        RNFS.mkdir = jest.fn()
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(user)
+        signatureService.saveFile(result, currentTimeInMillis).then(() => {
+            expect(RNFS.mkdir).toHaveBeenCalled()
+            expect(RNFS.writeFile).toHaveBeenCalledTimes(1)
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+            expect(result).toEqual(value)
+        })
+    })
+})
 
 
 describe('test cases for prepareSignAndNpsFieldData', () => {
