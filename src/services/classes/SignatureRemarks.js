@@ -23,7 +23,7 @@ import {
     ACTUAL_AMOUNT,
 } from '../../lib/AttributeConstants'
 const {
- USER,
+    USER,
     FIELD_ATTRIBUTE
 } = require('../../lib/constants').default
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -54,6 +54,8 @@ class SignatureRemarks {
                 case SKU_ACTUAL_AMOUNT:
                 case TOTAL_ORIGINAL_QUANTITY:
                 case TOTAL_ACTUAL_QUANTITY:
+                case MONEY_COLLECT:
+                case MONEY_PAY:
                     checkCondition = false;
                     break;
                 default:
@@ -64,10 +66,12 @@ class SignatureRemarks {
                 let { label, value } = fieldDataObject
                 dataList.push({ label, value })
             }
-            if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childFieldDataList != null && fieldDataObject.childFieldDataList.length > 0) {
-                for (let childFieldData of fieldDataObject.childFieldDataList) {
+            if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childDataList != null && fieldDataObject.childDataList.length > 0) {
+                for (let childFieldData of fieldDataObject.childDataList) {
+                    console.log('==childfielddata', childFieldData)
                     if (childFieldData.attributeTypeId == ACTUAL_AMOUNT) {
-                        let { label, value } = childFieldData
+                        let { label } = fieldDataObject
+                        let { value } = childFieldData
                         dataList.push({ label, value })
                     }
                 }
@@ -96,8 +100,7 @@ class SignatureRemarks {
         return false
     }
     prepareSignAndNpsFieldData(signatureValue, npsValue, currentElement, fieldAttributeMasterList, jobTransactionId, latestPositionId) {
-        console.log('==', fieldAttributeMasterList)
-        if (!fieldAttributeMasterList || fieldAttributeMasterList.length <= 0) return []
+        if (!fieldAttributeMasterList.value || fieldAttributeMasterList.value.length <= 0) return []
         let fieldAttributeList = fieldAttributeMasterList.value.filter((fieldAttribute) => fieldAttribute.parentId == currentElement.fieldAttributeMasterId)
         let childDataList = []
         for (let fieldAttribute of fieldAttributeList) {

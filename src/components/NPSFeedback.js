@@ -7,6 +7,7 @@ import {
 }
     from 'react-native'
 import React, { Component } from 'react';
+import renderIf from '../lib/renderIf'
 
 class NPSFeedback extends Component {
 
@@ -21,6 +22,10 @@ class NPSFeedback extends Component {
         this.setState({
             starCount: rating
         });
+        if (this.props.onStarPress) {
+            console.log()
+            this.props.onStarPress(this.state.starCount)
+        }
     }
 
     render() {
@@ -32,18 +37,20 @@ class NPSFeedback extends Component {
                     rating={this.state.starCount}
                     selectedStar={(rating) => this.onStarRatingPress(rating)}
                 />
-                <View style={{ flexDirection: "row" }}>
-                    <TouchableHighlight style={styles.buttonStyle}
-                        onPress={() => { this.props.onSave(this.state.starCount) }} >
-                        <Text>Save</Text>
-                    </TouchableHighlight>
+                {renderIf(!this.props.showSave,
+                    <View style={{ flexDirection: "row" }}>
+                        <TouchableHighlight style={styles.buttonStyle}
+                            onPress={() => { this.props.onSave(this.state.starCount) }} >
+                            <Text>Save</Text>
+                        </TouchableHighlight>
 
-                    <TouchableHighlight style={styles.buttonStyle}
-                        onPress={() => { this.props.onCancel() }} >
-                        <Text>Cancel</Text>
-                    </TouchableHighlight>
-                </View>
+                        <TouchableHighlight style={styles.buttonStyle}
+                            onPress={() => { this.props.onCancel() }} >
+                            <Text>Cancel</Text>
+                        </TouchableHighlight>
+                    </View>)}
             </View>
+
         );
     }
 }

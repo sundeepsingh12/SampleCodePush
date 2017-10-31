@@ -4,15 +4,18 @@ const {
     SAVE_SIGNATURE,
     USER,
     FormLayout,
-    SET_REMARKS_VALIDATION, FIELD_ATTRIBUTE
+    SET_REMARKS_VALIDATION,
+    FIELD_ATTRIBUTE,
+    ON_BLUR
 } = require('../../lib/constants').default
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
-import { getNextFocusableAndEditableElements, updateFieldDataWithChildData, updateFieldData } from '../form-layout/formLayoutActions'
+import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import {
     OBJECTSAROJFAREYE
 } from '../../lib/AttributeConstants'
+
 export function setFieldDataList(fieldDataList) {
     return {
         type: SET_FIELD_DATA_LIST,
@@ -30,8 +33,7 @@ export function _setIsRemarksValidation(isRemarksValidation) {
 export function saveSignature(result, fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled) {
     return async function (dispatch) {
         const value = await signatureService.saveFile(result, moment());
-        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value))
-        dispatch(updateFieldData(fieldAttributeMasterId, value, formElement))
+        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value, ON_BLUR))
     }
 }
 

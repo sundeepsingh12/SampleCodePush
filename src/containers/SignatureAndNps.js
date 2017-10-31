@@ -8,8 +8,8 @@ import {
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureView from '../components/SignatureView'
-import StarRating from 'react-native-star-rating';
 import Signature from '../containers/Signature'
+import NPSFeedback from '../components/NPSFeedback'
 import * as signatureActions from '../modules/signature/signatureActions'
 
 function mapDispatchToProps(dispatch) {
@@ -34,7 +34,6 @@ class SignatureAndNps extends Component {
     }
 
     onRatingSaveEvent = (result) => {
-        console.log('==rating', this.state.starCount)
         this.props.actions.saveSignatureAndRating(result,
             this.state.starCount,
             this.props.navigation.state.params.currentElement,
@@ -51,11 +50,7 @@ class SignatureAndNps extends Component {
         return (
             <View style={{ flex: 1, flexDirection: 'column' }}>
                 <Signature navigation={this.props.navigation} onRatingSaveEvent={this.onRatingSaveEvent} />
-                <StarRating
-                    maxStars={5}
-                    rating={this.state.starCount}
-                    selectedStar={rating => this.onStarRatingPress(rating)}
-                />
+                <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
             </View>
         );
     }
