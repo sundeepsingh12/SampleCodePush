@@ -33,6 +33,8 @@ import {
     TEXT,
     NUMBER,
     DECIMAL,
+    SKU_ARRAY,
+    PASSWORD,
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -113,6 +115,7 @@ class BasicFormElement extends Component {
         }
         if (value.length == 0) {
             this.props.actions.disableSaveIfRequired(fieldAttributeMasterId, isSaveDisabled, formElement, value);
+            this.props.actions.updateFieldData(fieldAttributeMasterId, this.formElementValue[fieldAttributeMasterId], formElement);
         }
     }
 
@@ -134,6 +137,7 @@ class BasicFormElement extends Component {
             case TEXT:
             case NUMBER:
             case DECIMAL:
+            case PASSWORD:
                 return (
                     renderIf(!this.props.item.hidden,
                         <Card>
@@ -177,6 +181,8 @@ class BasicFormElement extends Component {
                                                     placeholder='Regular Textbox'
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
+                                                    secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
+                                                    value={(this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) ? this.props.item.value : null}
 
                                                 />
                                             </View>

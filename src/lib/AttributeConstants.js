@@ -192,5 +192,6 @@ module.exports = {
     DECIMAL: 13,
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
-    IMAGE_EXTENSION: '.jpg'
+    IMAGE_EXTENSION: '.jpg',
+    PASSWORD: 61,
 }
