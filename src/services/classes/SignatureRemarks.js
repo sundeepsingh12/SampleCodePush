@@ -91,7 +91,7 @@ class SignatureRemarks {
             */
     async saveFile(result, currentTimeInMillis) {
         RNFS.mkdir(PATH_TEMP);
-        const image_name = SIGN + currentTimeInMillis +
+        const image_name = SIGN + currentTimeInMillis + IMAGE_EXTENSION
             await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
         const user = await keyValueDBService.getValueFromStore(USER);
         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
