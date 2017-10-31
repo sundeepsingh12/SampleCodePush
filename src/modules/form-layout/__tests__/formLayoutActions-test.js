@@ -46,7 +46,7 @@ const formLayoutObject = {
         required:true,
         hidden:true,
         attributeTypeId:1,
-        fieldAttributeMasterId : 1,
+        fieldAttributeMasterId : 2,
         positionId : 0,
         parentId : 0,
         showHelpText : true,
@@ -63,7 +63,24 @@ const formLayoutObject = {
         required:true,
         hidden:true,
         attributeTypeId:62,
-        fieldAttributeMasterId : 1,
+        fieldAttributeMasterId : 3,
+        positionId : 0,
+        parentId : 0,
+        showHelpText : true,
+        editable : false,
+        focus : false,
+        validation : [],
+        sequenceMasterId : 4,
+    },
+    4 : {
+        label : "dt",
+        subLabel : "s",
+        helpText : "w",
+        key : "qd",
+        required:true,
+        hidden:true,
+        attributeTypeId:62,
+        fieldAttributeMasterId : 4,
         positionId : 0,
         parentId : 0,
         showHelpText : true,
@@ -76,11 +93,12 @@ const formLayoutObject = {
 
 }
 const nextEditable = {
-    "1": ['required$$1','required$$2']
+    "1": ['required$$1','required$$2','required$$3','required$$4']
 }
 const latestPositionId = 2;
+const isSaveDisabled = true;
 const formLayoutMap = getMapFromObject(formLayoutObject);
-const formLayoutInitialState = {formLayoutMap,nextEditable,latestPositionId};
+const formLayoutInitialState = {formLayoutMap,nextEditable,latestPositionId,isSaveDisabled};
 
 describe('formLayout actions for reducer', () => {
     it('should set save to false', () => {
@@ -237,7 +255,7 @@ describe('test form layout events', ()=>{
     
     it('should get sequence data and  find next editable and focusable element', ()=>{
         formLayoutEventsInterface.getSequenceData = jest.fn()
-        formLayoutEventsInterface.getSequenceData.mockReturnValue('1');
+        formLayoutEventsInterface.getSequenceData.mockReturnValue('4');
         formLayoutEventsInterface.findNextFocusableAndEditableElement = jest.fn()
         formLayoutEventsInterface.findNextFocusableAndEditableElement.mockReturnValue(formLayoutInitialState);
         formLayoutEventsInterface.updateFieldData = jest.fn();
@@ -247,9 +265,10 @@ describe('test form layout events', ()=>{
             .then(()=>{
                 expect(formLayoutEventsInterface.findNextFocusableAndEditableElement).toHaveBeenCalledTimes(0)
                 expect(formLayoutEventsInterface.updateFieldData).toHaveBeenCalledTimes(0)
-            })        
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
 
-    })
+    })})
 
     it('should disable save if required', ()=>{
         formLayoutEventsInterface.disableSaveIfRequired = jest.fn();

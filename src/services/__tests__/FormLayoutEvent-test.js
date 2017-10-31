@@ -141,6 +141,16 @@ describe('get sequence field data', () => {
       expect(error.message).toEqual(message)
     }
     })
+      it('should not get data from server and throw token error', () => {
+    const message = 'Token Missing'
+    try {
+      keyValueDBService.getValueFromStore = jest.fn()
+      keyValueDBService.getValueFromStore.mockReturnValue(null)
+      formLayoutEventsInterface.getSequenceAttrData()
+    } catch (error) {
+      expect(error.message).toEqual(message)
+    }
+  })
 })
 
 describe('toogle help text', () => {
