@@ -33,7 +33,6 @@ import {
     TEXT,
     NUMBER,
     DECIMAL,
-    SKU_ARRAY,
     PASSWORD,
 } from '../lib/AttributeConstants'
 
