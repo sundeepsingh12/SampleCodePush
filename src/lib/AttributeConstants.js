@@ -1,3 +1,5 @@
+import RNFS from 'react-native-fs';
+import CONFIG from '../lib/config'
 module.exports = {
 
     /**
@@ -23,12 +25,12 @@ module.exports = {
     REMARKS: 'remarks',
     SKU_ACTUAL_AMOUNT: 32,
     SKU_ARRAY: 17,
-    SKU_ORIGINAL_QUANTITY:15,
-    SKU_CODE:51,
-    SKU_ACTUAL_QUANTITY:16,
-    TOTAL_ORIGINAL_QUANTITY:35,
-    TOTAL_ACTUAL_QUANTITY:36,
-    SKU_UNIT_PRICE:14,
+    SKU_ORIGINAL_QUANTITY: 15,
+    SKU_CODE: 51,
+    SKU_ACTUAL_QUANTITY: 16,
+    TOTAL_ORIGINAL_QUANTITY: 35,
+    TOTAL_ACTUAL_QUANTITY: 36,
+    SKU_UNIT_PRICE: 14,
     TRANSACTION_NUMBER: 'transaction_number',
     NPS_FEEDBACK: 23,
     RE_ATTEMPT_DATE: 33,
@@ -187,5 +189,8 @@ module.exports = {
     STRING: 1,
     TEXT: 2,
     NUMBER: 6,
-    DECIMAL: 13
+    DECIMAL: 13,
+    PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
+    SIGN: 'sign_',
+    IMAGE_EXTENSION: '.jpg'
 }

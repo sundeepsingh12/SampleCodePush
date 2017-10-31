@@ -22,9 +22,8 @@ class NPSFeedback extends Component {
         this.setState({
             starCount: rating
         });
-        if (this.props.onStarPress) {
-            console.log()
-            this.props.onStarPress(this.state.starCount)
+        if (this.props.showSave) {
+            this.props.onStarPress(rating)
         }
     }
 

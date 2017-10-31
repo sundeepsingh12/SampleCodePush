@@ -27,7 +27,7 @@ class SignatureAndNps extends Component {
         };
     }
 
-    onStarRatingPress(starCount) {
+    onStarRatingPress= (starCount) => {
         this.setState({
             starCount
         });

@@ -21,15 +21,22 @@ import {
     MONEY_COLLECT,
     MONEY_PAY,
     ACTUAL_AMOUNT,
+    PATH_TEMP,
+    SIGN,
+    IMAGE_EXTENSION
 } from '../../lib/AttributeConstants'
 const {
     USER,
-    FIELD_ATTRIBUTE
+    FIELD_ATTRIBUTE,
 } = require('../../lib/constants').default
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { fieldDataService } from '../../services/classes/FieldData'
 class SignatureRemarks {
 
+    /**
+        * creates remarks DataList object, which contains value and label of all remarks
+        * @param {*formElement Map} nextEditable 
+        */
     filterRemarksList(fieldDataList) { //TODO add javadoc
         if (fieldDataList == undefined)
             return []
@@ -62,13 +69,11 @@ class SignatureRemarks {
                     checkCondition = true;
             }
             if (fieldDataObject && !fieldDataObject.hidden && fieldDataObject.value != undefined && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
-                console.log('values', fieldDataObject.value)
                 let { label, value } = fieldDataObject
                 dataList.push({ label, value })
             }
             if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childDataList != null && fieldDataObject.childDataList.length > 0) {
                 for (let childFieldData of fieldDataObject.childDataList) {
-                    console.log('==childfielddata', childFieldData)
                     if (childFieldData.attributeTypeId == ACTUAL_AMOUNT) {
                         let { label } = fieldDataObject
                         let { value } = childFieldData
@@ -79,18 +84,23 @@ class SignatureRemarks {
         }
         return dataList
     }
-
+    /**
+            * saves signature image and returns image name
+            * @param {*} result result from signature save
+            * @param {*} currentTimeInMillis current time 
+            */
     async saveFile(result, currentTimeInMillis) {
-        const PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/'; //TODO update variable name
         RNFS.mkdir(PATH_TEMP);
-        const image_name = 'sign_' + currentTimeInMillis + '.jpg'
-        await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
+        const image_name = SIGN + currentTimeInMillis +
+            await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
         const user = await keyValueDBService.getValueFromStore(USER);
-        console.log('user', user)
         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
         return value
     }
-
+    /**
+                * returns remarks validation
+                * @param {*} validation validation array
+                */
     getRemarksValidation(validation) {
         if (validation != null && validation.length > 0) {
             let value = validation.filter((value) => value.timeOfExecution == 'MINMAX')
@@ -99,6 +109,15 @@ class SignatureRemarks {
         }
         return false
     }
+    /**
+   * creates fieldDataObject , which contains childFieldDataList for sign and nps attribute
+   * @param {*} signatureValue
+   * @param {*} npsValue
+   * @param {*} currentElement 
+   * @param {*} fieldAttributeMasterList 
+   * @param {*} jobTransactionId 
+   * @param {*} latestPositionId 
+   */
     prepareSignAndNpsFieldData(signatureValue, npsValue, currentElement, fieldAttributeMasterList, jobTransactionId, latestPositionId) {
         if (!fieldAttributeMasterList.value || fieldAttributeMasterList.value.length <= 0) return []
         let fieldAttributeList = fieldAttributeMasterList.value.filter((fieldAttribute) => fieldAttribute.parentId == currentElement.fieldAttributeMasterId)
