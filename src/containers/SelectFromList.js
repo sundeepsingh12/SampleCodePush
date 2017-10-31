@@ -123,8 +123,8 @@ class SelectFromList extends Component {
               <Picker mode="dropdown"
                 onValueChange={value => this.props.actions.setOrRemoveStates(this.props.selectFromListState, value, this.props.navigation.state.params.currentElement.attributeTypeId)}
               >
-                {Object.keys(this.props.selectFromListState).map((key) => {
-                  return (<Item label={this.props.selectFromListState[key].name} value={this.props.selectFromListState[key].id} key={key} />) //if you have a bunch of keys value pair
+                {Object.values(this.props.selectFromListState).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence).map((object) => {
+                  return (<Item label={object.name} value={object.id} key={object.id} />) //if you have a bunch of keys value pair
                 })}
               </Picker>
             </Form>

@@ -10,9 +10,37 @@ import selectFromListReducer from '../selectFromListReducer'
 
 describe('selectFromList Reducer ', () => {
 
+    let selectFromListValues = {
+        1: {
+            isChecked: false,
+            id: 1,
+            attributeTypeId: 8,
+        },
+        2: {
+            isChecked: false,
+            id: 2,
+            attributeTypeId: 8,
+        },
+        3: {
+            isChecked: false,
+            id: 3,
+            attributeTypeId: 8,
+        }
+    }
+
     it('should set return initial state', () => {
         const action = {
             type: 'DEFAULT',
+        }
+        const result = new InitialState()
+        let nextState = selectFromListReducer(undefined, action)
+        expect(nextState).toEqual(result)
+    })
+
+    it('should set return initial state', () => {
+        const action = {
+            type: 'DEFAULT',
+            payload: selectFromListValues,
         }
         const result = new InitialState()
         let nextState = selectFromListReducer(undefined, action)

@@ -4,7 +4,7 @@
 
 var actions = require('../selectFromListActions')
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
-import { selectFromListDataService } from '../../../services/classes/selectFromListService'
+import { selectFromListDataService } from '../../../services/classes/SelectFromListService'
 import { updateFieldDataWithChildData } from '../../form-layout/formLayoutActions'
 import { CHECKBOX, RADIOBUTTON } from '../../../lib/AttributeConstants'
 import { setState } from '../../global/globalActions'
@@ -25,17 +25,20 @@ describe('selectFromListActions', () => {
     it('should dispatch action', () => {
         let platform = {
             id: 80,
-            code: 122,
+            code: 4322,
         }
         expect(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, platform)).toEqual({
             type: SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
             payload: platform
         })
     })
+})
+
+describe('selectFromListActions  setOrRemoveStates', () => {
 
     it('should set or remove values from state', () => {
         let platform = {
-            id: 80,
+            id: 830,
             code: 122,
         }
         const store = mockStore({})
@@ -49,11 +52,14 @@ describe('selectFromListActions', () => {
                 })
             })
     })
+})
+
+describe('selectFromListActions  selectFromListButton', () => {
 
     it('should set or remove values from state after DONE button clicked', () => {
         let platform = {
-            id: 80,
-            code: 122,
+            id: 8990,
+            code: 32,
         }
         const store = mockStore({})
         selectFromListDataService.selectFromListDoneButtonClicked = jest.fn()
@@ -68,11 +74,13 @@ describe('selectFromListActions', () => {
                 })
             })
     })
+})
 
+describe('selectFromListActions  gettingDataSelectFromList', () => {
     it('should set all selectFromListData', () => {
         let platform = {
-            id: 80,
-            code: 122,
+            id: 4580,
+            code: 12,
         }
         const store = mockStore({})
         keyValueDBService.getValueFromStore = jest.fn()

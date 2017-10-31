@@ -1,5 +1,5 @@
 import { CHECKBOX, RADIOBUTTON, DROPDOWN, TEXT } from '../../lib/AttributeConstants'
-class selectFromListService {
+class SelectFromListService {
 
     arrayToObject = (array) =>
         array.reduce((obj, item) => {
@@ -11,38 +11,37 @@ class selectFromListService {
         let tempSelectFromListValues = { ...selectFromListState }
         if (attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN) {
             let previousObject = Object.values(tempSelectFromListValues).filter(item => item.isChecked == true)[0]
-            if (previousObject != undefined)
+            if (previousObject != undefined || previousObject != null)
                 previousObject.isChecked = false
         }
-
         tempSelectFromListValues[id].isChecked = !tempSelectFromListValues[id].isChecked
-        tempSelectFromListValues[id].attributeTypeId = (attributeTypeId == CHECKBOX) ? TEXT : RADIOBUTTON
+        if (attributeTypeId == CHECKBOX) {
+            tempSelectFromListValues[id].attributeTypeId = TEXT
+        } else if (attributeTypeId == RADIOBUTTON) {
+            tempSelectFromListValues[id].attributeTypeId = RADIOBUTTON
+        } else if (attributeTypeId == DROPDOWN) {
+            tempSelectFromListValues[id].attributeTypeId = DROPDOWN
+        }
         return tempSelectFromListValues
     }
 
     selectFromListDoneButtonClicked(attributeTypeId, selectFromListState) {
         let checkedTrueInSelectFromListArray = []
         let selectFromListValue = Object.values(selectFromListState)
-        if (attributeTypeId == CHECKBOX) {
-            for (let item of selectFromListValue) {
-                if (item.isChecked == true) {
-                    let { name, code, id, fieldAttributeMasterId, sequence, isChecked } = item
-                    let itemList = {
-                        name,
-                        value: code,
-                        sequence,
-                        fieldAttributeMasterId,
-                        id,
-                        isChecked
-                    }
-                    checkedTrueInSelectFromListArray.push(itemList)
+        for (let item of selectFromListValue) {
+            if (item.isChecked == true) {
+                let itemList = {
+                    name: item.name,
+                    value: item.code,
+                    sequence: item.sequence,
+                    fieldAttributeMasterId: item.fieldAttributeMasterId,
+                    id: item.id,
+                    isChecked: item.isChecked
                 }
+                checkedTrueInSelectFromListArray.push(itemList)
             }
         }
         //Radio button or drop down case
-        else {
-            checkedTrueInSelectFromListArray = Object.values(selectFromListValue).filter(item => item.isChecked == true)
-        }
         return checkedTrueInSelectFromListArray
     }
 
@@ -54,4 +53,4 @@ class selectFromListService {
     }
 }
 
-export let selectFromListDataService = new selectFromListService()
+export let selectFromListDataService = new SelectFromListService()

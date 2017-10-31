@@ -1,7 +1,7 @@
 'use strict'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { selectFromListDataService } from '../../services/classes/selectFromListService'
+import { selectFromListDataService } from '../../services/classes/SelectFromListService'
 import { updateFieldDataWithChildData, getNextFocusableAndEditableElements, updateFieldData } from '../form-layout/formLayoutActions'
 import { CHECKBOX, RADIOBUTTON, ARRAYSAROJFAREYE } from '../../lib/AttributeConstants'
 import { fieldDataService } from '../../services/classes/FieldData'
@@ -33,7 +33,7 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
 
                 dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAYSAROJFAREYE, fieldDataListData))
             } else {
-                dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, selectFromListState[0].code, ON_BLUR))
+                dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
             }
         } catch (error) {
             console.log(error)
