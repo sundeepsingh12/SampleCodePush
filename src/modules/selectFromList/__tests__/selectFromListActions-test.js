@@ -7,13 +7,14 @@ import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { selectFromListDataService } from '../../../services/classes/selectFromListService'
 import { updateFieldDataWithChildData } from '../../form-layout/formLayoutActions'
 import { CHECKBOX, RADIOBUTTON } from '../../../lib/AttributeConstants'
+import { setState } from '../../global/globalActions'
 
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 jest.mock('react-native-router-flux')
 
 const {
-SET_VALUE_IN_CHECKBOX
+SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE
 } = require('../../../lib/constants').default
 
 const middlewares = [thunk]
@@ -26,8 +27,8 @@ describe('selectFromListActions', () => {
             id: 80,
             code: 122,
         }
-        expect(actions.actionDispatch(platform)).toEqual({
-            type: SET_VALUE_IN_CHECKBOX,
+        expect(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, platform)).toEqual({
+            type: SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
             payload: platform
         })
     })
@@ -39,11 +40,11 @@ describe('selectFromListActions', () => {
         }
         const store = mockStore({})
         selectFromListDataService.setOrRemoveState = jest.fn()
-        selectFromListDataService.setOrRemoveState.mockReturnValue({ checkBoxValues: 'testToken' })
+        selectFromListDataService.setOrRemoveState.mockReturnValue({ selectFromListState: 'testToken' })
         return store.dispatch(actions.setOrRemoveStates())
             .then(() => {
-                expect(actions.actionDispatch(platform)).toEqual({
-                    type: SET_VALUE_IN_CHECKBOX,
+                expect(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, platform)).toEqual({
+                    type: SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
                     payload: platform
                 })
             })
@@ -55,33 +56,33 @@ describe('selectFromListActions', () => {
             code: 122,
         }
         const store = mockStore({})
-        selectFromListDataService.checkBoxDoneButtonClicked = jest.fn()
-        selectFromListDataService.checkBoxDoneButtonClicked.mockReturnValue({ checkBoxValues: 'testToken' })
+        selectFromListDataService.selectFromListDoneButtonClicked = jest.fn()
+        selectFromListDataService.selectFromListDoneButtonClicked.mockReturnValue({ selectFromListState: 'testToken' })
         selectFromListDataService.prepareFieldDataForTransactionSavingInState = jest.fn()
-        selectFromListDataService.prepareFieldDataForTransactionSavingInState.mockReturnValue({fieldDataListData: 'test'})
-        return store.dispatch(actions.checkBoxButtonDone())
+        selectFromListDataService.prepareFieldDataForTransactionSavingInState.mockReturnValue({ fieldDataListData: 'test' })
+        return store.dispatch(actions.selectFromListButton())
             .then(() => {
-                expect(actions.actionDispatch(platform)).toEqual({
-                    type: SET_VALUE_IN_CHECKBOX,
+                expect(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, platform)).toEqual({
+                    type: SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
                     payload: platform
                 })
             })
     })
 
-it('should set all checkBoxData', () => {
+    it('should set all selectFromListData', () => {
         let platform = {
             id: 80,
             code: 122,
         }
         const store = mockStore({})
         keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({wholeDataFromMaster: 'testToken' })
-        selectFromListDataService.getcheckBoxDataList = jest.fn()
-        selectFromListDataService.getcheckBoxDataList.mockReturnValue({checkBoxDataList: 'tests'})
-        return store.dispatch(actions.getCheckBoxData())
+        keyValueDBService.getValueFromStore.mockReturnValue({ wholeDataFromMaster: 'testToken' })
+        selectFromListDataService.getListSelectFromListAttribute = jest.fn()
+        selectFromListDataService.getListSelectFromListAttribute.mockReturnValue({ selectFromListData: 'tests' })
+        return store.dispatch(actions.gettingDataSelectFromList())
             .then(() => {
-                expect(actions.actionDispatch(platform)).toEqual({
-                    type: SET_VALUE_IN_CHECKBOX,
+                expect(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, platform)).toEqual({
+                    type: SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
                     payload: platform
                 })
             })

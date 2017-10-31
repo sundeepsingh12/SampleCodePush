@@ -4,7 +4,7 @@ import { selectFromListDataService } from '../classes/selectFromListService'
 import { CHECKBOX, RADIOBUTTON } from '../../lib/AttributeConstants'
 
 describe('test cases for selectFromListService setorRemovestates', () => {
-    let checkBoxValues = {
+    let selectFromListValues = {
         1: {
             isChecked: false,
             id: 1,
@@ -22,16 +22,17 @@ describe('test cases for selectFromListService setorRemovestates', () => {
         }
     }
 
-    let checkBoxValue = {1:
+    let selectFromListValue = {
+        1:
         {
-            fieldAttributeMasterId:43159,
-            id: 1,            
+            fieldAttributeMasterId: 43159,
+            id: 1,
             isChecked: true,
             attributeTypeId: 8,
-            name:'abc',
-            sequence:8,
-            code:'123',
-    }
+            name: 'abc',
+            sequence: 8,
+            code: '123',
+        }
     }
 
     let wholeDataFromMaster = [
@@ -54,7 +55,7 @@ describe('test cases for selectFromListService setorRemovestates', () => {
 
         let id = 1
         let attributeTypeId = CHECKBOX
-        expect(selectFromListDataService.setOrRemoveState(checkBoxValues, id, attributeTypeId)).toEqual({
+        expect(selectFromListDataService.setOrRemoveState(selectFromListValues, id, attributeTypeId)).toEqual({
             1: {
                 isChecked: true,
                 id: 1,
@@ -73,32 +74,32 @@ describe('test cases for selectFromListService setorRemovestates', () => {
         })
     })
 
-    it('to get check box data list', () => {
+    it('to get data list', () => {
 
         let id = 1
         let attributeTypeId = CHECKBOX
-        expect(selectFromListDataService.getcheckBoxDataList(wholeDataFromMaster, '43159')).toEqual({
-             '34043':
-                {
-                    id: 34043,
-                    name: '2000',
-                    code: '2000',
-                    fieldAttributeMasterId: 43159,
-                    sequence: 5
-                }
-            })
+        expect(selectFromListDataService.getListSelectFromListAttribute(wholeDataFromMaster, '43159')).toEqual({
+            '34043':
+            {
+                id: 34043,
+                name: '2000',
+                code: '2000',
+                fieldAttributeMasterId: 43159,
+                sequence: 5
+            }
+        })
     })
 
     it('after clicking done button', () => {
 
         let id = 1
         let attributeTypeId = CHECKBOX
-        expect(selectFromListDataService.checkBoxDoneButtonClicked(CHECKBOX, checkBoxValue)[0]).toEqual({
-            name:'abc',
-            value:'123',
-            sequence:8,
-            fieldAttributeMasterId:43159,
-            id: 1,            
+        expect(selectFromListDataService.selectFromListDoneButtonClicked(CHECKBOX, selectFromListValue)[0]).toEqual({
+            name: 'abc',
+            value: '123',
+            sequence: 8,
+            fieldAttributeMasterId: 43159,
+            id: 1,
             isChecked: true,
         })
     })

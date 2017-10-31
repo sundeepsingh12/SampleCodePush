@@ -25,6 +25,8 @@ module.exports = {
     SKU_ARRAY: 17,
     CHECKBOX: 8,
     RADIOBUTTON:9,
+    DROPDOWN:10,
+    TEXT:2,
     SKU_ORIGINAL_QUANTITY:15,
     SKU_CODE:51,
     SKU_ACTUAL_QUANTITY:16,

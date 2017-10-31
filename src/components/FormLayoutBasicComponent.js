@@ -22,6 +22,7 @@ import {
     MONEY_PAY,
     CHECKBOX,
     RADIOBUTTON,
+    DROPDOWN,
     NPS_FEEDBACK,
     TIME,
     RE_ATTEMPT_DATE,
@@ -69,6 +70,10 @@ class BasicFormElement extends Component {
                 break
             }
             case RADIOBUTTON: {
+                screenName = 'SelectFromList'
+                break
+            }
+            case DROPDOWN: {
                 screenName = 'SelectFromList'
                 break
             }

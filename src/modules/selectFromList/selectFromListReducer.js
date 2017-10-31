@@ -3,17 +3,16 @@
 const InitialState = require('./selectFromListInitialState').default
 
 const {
-    SET_VALUE_IN_CHECKBOX,
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
 } = require('../../lib/constants').default
 
 const initialState = new InitialState()
 
-export default function jobDetailsReducer(state = initialState, action) {
+export default function selectFromListReducer(state = initialState, action) {
 
     switch (action.type) {
-        case SET_VALUE_IN_CHECKBOX:
-            console.log("InReducer",action.payload)
-            return state.set('checkBoxValues', action.payload)
+        case SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:
+            return state.set('selectFromListState', action.payload)
     }
     return state
 }

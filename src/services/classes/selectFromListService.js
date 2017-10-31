@@ -1,13 +1,5 @@
-import { CHECKBOX, RADIOBUTTON } from '../../lib/AttributeConstants'
+import { CHECKBOX, RADIOBUTTON, DROPDOWN, TEXT } from '../../lib/AttributeConstants'
 class selectFromListService {
-    sortArrayInAscending(array) {
-        return array.sort((a, b) => {
-            console.info(b.sequence)
-            return b.sequence < a.sequence ? 1
-                : b.sequence > a.sequence ? -1
-                    : 0
-        })
-    }
 
     arrayToObject = (array) =>
         array.reduce((obj, item) => {
@@ -15,56 +7,51 @@ class selectFromListService {
             return obj
         }, {})
 
-    setOrRemoveState(checkBoxValues, id, attributeTypeId) {
-        let tempCheckBoxValues = { ...checkBoxValues }
-        if (attributeTypeId == RADIOBUTTON) {
-            let radioBox = Object.values(tempCheckBoxValues).filter(item => item.isChecked == true)[0]
-            if (radioBox != undefined)
-                radioBox.isChecked = false
+    setOrRemoveState(selectFromListState, id, attributeTypeId) {
+        let tempSelectFromListValues = { ...selectFromListState }
+        if (attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN) {
+            let previousObject = Object.values(tempSelectFromListValues).filter(item => item.isChecked == true)[0]
+            if (previousObject != undefined)
+                previousObject.isChecked = false
         }
 
-        let checkBox = tempCheckBoxValues[id]
-        checkBox.isChecked = !checkBox.isChecked
-        checkBox.attributeTypeId = (attributeTypeId == CHECKBOX) ? 2 : 9
-        console.log('tempCheckBoxValues', tempCheckBoxValues)        
-        return tempCheckBoxValues
+        tempSelectFromListValues[id].isChecked = !tempSelectFromListValues[id].isChecked
+        tempSelectFromListValues[id].attributeTypeId = (attributeTypeId == CHECKBOX) ? TEXT : RADIOBUTTON
+        return tempSelectFromListValues
     }
 
-    checkBoxDoneButtonClicked(attributeTypeId,checkBoxValues) {
-        let checkedTrueInCheckBoxArray = []
-        let checkBoxValue = { ...checkBoxValues }
-        if(attributeTypeId == CHECKBOX){
-        for (let item of Object.values(checkBoxValue)) {
-            if(item.isChecked == true){
-                let { name, code, id, fieldAttributeMasterId, sequence, isChecked } = item
-                let itemList = {
-                    name: name,
-                    value: code,
-                    sequence: sequence,
-                    fieldAttributeMasterId: fieldAttributeMasterId,
-                    id: id,
-                    isChecked: isChecked
+    selectFromListDoneButtonClicked(attributeTypeId, selectFromListState) {
+        let checkedTrueInSelectFromListArray = []
+        let selectFromListValue = Object.values(selectFromListState)
+        if (attributeTypeId == CHECKBOX) {
+            for (let item of selectFromListValue) {
+                if (item.isChecked == true) {
+                    let { name, code, id, fieldAttributeMasterId, sequence, isChecked } = item
+                    let itemList = {
+                        name,
+                        value: code,
+                        sequence,
+                        fieldAttributeMasterId,
+                        id,
+                        isChecked
+                    }
+                    checkedTrueInSelectFromListArray.push(itemList)
                 }
-                checkedTrueInCheckBoxArray.push(itemList)
+            }
         }
+        //Radio button or drop down case
+        else {
+            checkedTrueInSelectFromListArray = Object.values(selectFromListValue).filter(item => item.isChecked == true)
         }
-        } else {
-        checkedTrueInCheckBoxArray = Object.values(checkBoxValue).filter(item => item.isChecked == true)     
-        }
-        console.log("checkedTrueInCheckBoxArray",checkedTrueInCheckBoxArray)
-        return checkedTrueInCheckBoxArray
+        return checkedTrueInSelectFromListArray
     }
 
-    getcheckBoxDataList(fieldAttributeValueList, fieldAttributeMasterId) {
-        let checkBoxDataList = []
-        checkBoxDataList = Object.values(fieldAttributeValueList).filter(item => item.fieldAttributeMasterId == fieldAttributeMasterId)
-        checkBoxDataList = this.sortArrayInAscending(checkBoxDataList)
-        let checkBoxDataLists = {}
-        checkBoxDataLists = this.arrayToObject(checkBoxDataList)
-        console.log("checkBoxDataLists", checkBoxDataLists)
-        return checkBoxDataLists
+    getListSelectFromListAttribute(fieldAttributeValueList, fieldAttributeMasterId) {
+        let selectFromListData = (fieldAttributeValueList.filter(item => item.fieldAttributeMasterId == fieldAttributeMasterId))
+        let selectFromListsData = {}
+        selectFromListsData = this.arrayToObject(selectFromListData)
+        return selectFromListsData
     }
-
 }
 
 export let selectFromListDataService = new selectFromListService()

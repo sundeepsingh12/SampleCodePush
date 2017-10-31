@@ -99,10 +99,10 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
     }
 }
 
-export function getNextFocusableAndEditableElements(attributeMasterId, formElement, nextEditable, isSaveDisabled, value) {
+export function getNextFocusableAndEditableElements(attributeMasterId, formElement, nextEditable, isSaveDisabled, value, event) {
     return async function (dispatch) {
         const cloneFormElement = new Map(formElement);
-        const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value);
+        const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, null, event);
         dispatch(_setFormList(sortedFormAttributeDto));
         console.log("getNextFocusableAndEditableElements",value)
     }

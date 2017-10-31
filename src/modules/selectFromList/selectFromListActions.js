@@ -5,70 +5,54 @@ import { selectFromListDataService } from '../../services/classes/selectFromList
 import { updateFieldDataWithChildData, getNextFocusableAndEditableElements, updateFieldData } from '../form-layout/formLayoutActions'
 import { CHECKBOX, RADIOBUTTON, ARRAYSAROJFAREYE } from '../../lib/AttributeConstants'
 import { fieldDataService } from '../../services/classes/FieldData'
+import { setState } from '../global/globalActions'
 
 const {
     FIELD_ATTRIBUTE_VALUE,
-    SET_VALUE_IN_CHECKBOX,
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
+    ON_BLUR,
 } = require('../../lib/constants').default
 
-
-export function actionDispatch(payload) {
-    return {
-        type: SET_VALUE_IN_CHECKBOX,
-        payload: payload
-    }
-}
-
-
-
-export function setOrRemoveStates(checkBoxValues, id, attributeTypeId) {
+export function setOrRemoveStates(selectFromListState, id, attributeTypeId) {
     return async function (dispatch) {
         try {
-            checkBoxValues = selectFromListDataService.setOrRemoveState(checkBoxValues, id, attributeTypeId)
-            dispatch(actionDispatch(checkBoxValues))
+            selectFromListState = selectFromListDataService.setOrRemoveState(selectFromListState, id, attributeTypeId)
+            dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListState))
         } catch (error) {
             console.log(error)
         }
     }
 }
 
-export function checkBoxButtonDone(checkBoxValues, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, nextEditable) {
+export function selectFromListButton(selectFromListState, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, nextEditable) {
     return async function (dispatch) {
         try {
-            checkBoxValues = selectFromListDataService.checkBoxDoneButtonClicked(params.attributeTypeId,checkBoxValues)
-            await dispatch(actionDispatch(Object.values(checkBoxValues)))
+            selectFromListState = Object.values(selectFromListDataService.selectFromListDoneButtonClicked(params.attributeTypeId, selectFromListState))
             if (params.attributeTypeId == CHECKBOX) {
-                const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(checkBoxValues, jobTransactionId, params.positionId, latestPositionId)
-                console.log("fieldDataList", fieldDataListData)
+                const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransactionId, params.positionId, latestPositionId)
 
                 dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAYSAROJFAREYE, fieldDataListData))
             } else {
-                console.log("getNextFocusableAndEditableElementssss", checkBoxValues[0].code)
-                dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, checkBoxValues[0].code))
-                dispatch(updateFieldData(params.fieldAttributeMasterId, checkBoxValues[0].code, formElement));
+                dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, selectFromListState[0].code, ON_BLUR))
             }
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
             console.log(error)
         }
     }
 }
 
 
-export function getCheckBoxData(fieldAttributeMasterId) {
-    console.log("entered getcheckboxdata")
+export function gettingDataSelectFromList(fieldAttributeMasterId) {
     return async function (dispatch) {
         try {
             const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
-            console.log("fieldAttributeValueList", fieldAttributeValueList)
-            const checkBoxDataList = await selectFromListDataService.getcheckBoxDataList(fieldAttributeValueList.value, fieldAttributeMasterId)
-            dispatch(actionDispatch(checkBoxDataList))
+            if (!fieldAttributeValueList || !fieldAttributeValueList.value) {
+                throw new Error('Field attributes missing in store')
+            }
+            const selectFromListData = await selectFromListDataService.getListSelectFromListAttribute(fieldAttributeValueList.value, fieldAttributeMasterId)
+            dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListData))
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
             console.log(error)
-            console.log('checkBoxAction getcheckboxdata')
         }
     }
 }

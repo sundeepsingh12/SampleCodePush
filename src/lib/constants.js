@@ -198,7 +198,7 @@ export default keyMirror({
 
 
     //CheckBox
-    SET_VALUE_IN_CHECKBOX:null,
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
