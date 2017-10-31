@@ -1,3 +1,5 @@
+import RNFS from 'react-native-fs';
+import CONFIG from '../lib/config'
 module.exports = {
 
     /**
@@ -185,10 +187,15 @@ module.exports = {
     OPTION_CHECKBOX: 8,
     OPTION_RADIO_FOR_MASTER: 39,
     MULTIPLE_SCANNER: 48,
+    SIGNATURE_AND_NPS: 58,
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
     STRING: 1,
     TEXT: 2,
     NUMBER: 6,
-    DECIMAL: 13
+    DECIMAL: 13,
+    PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
+    SIGN: 'sign_',
+    IMAGE_EXTENSION: '.jpg',
+    PASSWORD: 61,
 }
