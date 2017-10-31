@@ -95,7 +95,7 @@ export default class FormLayoutEventImpl {
      * @param {*} calledFrom 
      */
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
-        formLayoutObject.get(attributeMasterId).value = (value && value.length < 64 && 
+        formLayoutObject.get(attributeMasterId).value = (value != null && value != undefined && value.length != 0  && value.length < 64 && 
             formLayoutObject.get(attributeMasterId).attributeTypeId == 61 )? sha256(value) :value;
         formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
         if (value && value.length > 0 && calledFrom == ON_BLUR) {
