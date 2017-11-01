@@ -44,7 +44,8 @@ import {
   Right,
   Icon,
   List,
-  ListItem
+  ListItem,
+  Root
 } from 'native-base';
 import styles from '../../themes/FeStyle'
 import Payment from '../../containers/Payment'
@@ -61,14 +62,15 @@ import SelectFromList from '../../containers/SelectFromList';
 
 class AppWithNavigationState extends React.Component {
   render() {
-    return ( <
+    return (<Root> 
+      <
       AppNavigator navigation = {
         addNavigationHelpers({
           dispatch: this.props.dispatch,
           state: this.props.nav
         })
       }
-      />
+      /></Root>
     )
   }
 }

@@ -107,6 +107,39 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         console.log("getNextFocusableAndEditableElements",value)
     }
 }
+export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled,sequenceId) {
+    return async function (dispatch) {
+        try{
+            const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
+            if( sequenceData ){
+                const cloneFormElement = new Map(formElement);
+                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, sequenceData,null,ON_BLUR);
+                sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
+                dispatch(_setFormList(sortedFormAttributeDto));
+                const nextEditableElement = nextEditable[attributeMasterId];
+                if(nextEditableElement != null && nextEditableElement.length != 0){
+                    nextEditableElement.forEach((nextElement) => {
+                        if ((typeof (nextElement) == 'string')) {
+                            nextElement = formElement.get(Number(nextElement.split('$$')[1]));
+                            if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
+                                const newFormElement = new Map(sortedFormAttributeDto.formLayoutObject);
+                                newFormElement.get(nextElement.fieldAttributeMasterId).isLoading = true;
+                                    dispatch(_updateFieldData(newFormElement))
+                                    dispatch(setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, newFormElement, nextEditable, 
+                                        isSaveDisabled,nextElement.sequenceMasterId))
+                            }
+                        }
+                    })
+                }
+            }
+        }catch(error){
+            formElement.get(attributeMasterId).isLoading = false;
+            dispatch(_setErrorMessage(error.message));
+            dispatch(_updateFieldData(formElement))
+            dispatch(_setErrorMessage(''));
+        }
+    }
+}
 
 export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
     return async function (dispatch) {

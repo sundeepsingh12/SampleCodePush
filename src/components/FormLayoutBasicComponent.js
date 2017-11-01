@@ -6,10 +6,11 @@ import {
     Text,
     Platform,
     FlatList,
-    TouchableHighlight
+    TouchableHighlight,
+    ActivityIndicator
 }
     from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput } from 'native-base';
+import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base';
 import styles from '../themes/FeStyle'
 import imageFile from '../../images/fareye-logo.png'
 import renderIf from '../lib/renderIf'
@@ -29,12 +30,13 @@ import {
     DATE,
     FIXED_SKU,
     SIGNATURE,
-    SKU_ARRAY,
     SIGNATURE_AND_NPS,
     STRING,
     TEXT,
     NUMBER,
     DECIMAL,
+    SKU_ARRAY,
+    SEQUENCE,
     PASSWORD,
 } from '../lib/AttributeConstants'
 
@@ -57,7 +59,15 @@ class BasicFormElement extends Component {
         super(props);
         this.formElementValue = {}
     }
-
+   componentWillMount = () => {
+     if(this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value ){
+        this.props.item.isLoading = true
+        this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, 
+            this.props.isSaveDisabled,this.props.item.sequenceMasterId)
+     }
+   }
+   
+    
     navigateToScene = (item) => {
         let screenName = ''
         console.log("attrrrr",item.attributeTypeId)
@@ -115,12 +125,25 @@ class BasicFormElement extends Component {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement,this.props.formElement,'Before')          
+       this.props.actions.fieldValidations(currentElement,this.props.formElement,'Before')          
     }
         
 
     _onBlurEvent(attributeId) {
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
+        const nextEditableElement = this.props.nextEditable[attributeId];
+        if(nextEditableElement != null && nextEditableElement.length != 0){
+            nextEditableElement.forEach((nextElement) => {
+                if ((typeof (nextElement) == 'string')) {
+                    nextElement = this.props.formElement.get(Number(nextElement.split('$$')[1]));
+                    if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
+                        nextElement.isLoading = true;
+                            this.props.actions.setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, 
+                                this.props.isSaveDisabled,nextElement.sequenceMasterId)
+                    }
+                }
+            })
+        }
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, nextEditable, value, isSaveDisabled) {
@@ -153,6 +176,7 @@ class BasicFormElement extends Component {
             case TEXT:
             case NUMBER:
             case DECIMAL:
+            case SEQUENCE:
             case PASSWORD:
                 return (
                     renderIf(!this.props.item.hidden,
@@ -176,9 +200,12 @@ class BasicFormElement extends Component {
 
                                                 <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
 
-                                                    {renderIf(this.props.item.showCheckMark,
-                                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
-                                                    )}
+                                                    {renderIf(this.props.item.showCheckMark || (this.props.item.attributeTypeId == 62 && this.props.item.isLoading !== undefined && this.props.item.isLoading),
+                                                      this.props.item.showCheckMark  ?
+                                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} /> : 
+                                                         (this.props.item.isLoading !== undefined && this.props.item.isLoading) ?
+                                                      <ActivityIndicator animating={this.props.item.isLoading} style={StyleSheet.flatten([ { marginTop: -20 }])} size="small" color = "green"/> : null
+                                                      )}
 
                                                     {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
                                                         <View>
@@ -200,7 +227,7 @@ class BasicFormElement extends Component {
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
                                                     secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                                    value={(this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) ? this.props.item.value : null}
+                                                    value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62 ) ? this.props.item.value : null}
 
                                                 />
                                             </View>
