@@ -206,6 +206,9 @@ export default keyMirror({
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
    
+    //New Job
+    NEW_JOB_MASTER : null,
+    NEW_JOB_STATUS : null,
    
 })
 

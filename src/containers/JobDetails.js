@@ -64,6 +64,7 @@ class JobDetails extends Component {
                         jobTransaction: this.props.jobTransaction,
                         statusId: statusList[index].id,
                         statusName: statusList[index].name,
+                        jobMasterId : jobTransaction.jobMasterId
                     }
                     )
                     }>

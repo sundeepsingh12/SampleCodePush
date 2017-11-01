@@ -108,7 +108,7 @@ function _getDataFromRealm(dataType,query,table){
         return Object.assign(dataType,data);
     }
     if(table == TABLE_FIELD_DATA){
-        return data.map(x => Object.assign({}, x,{id:null})) // send id as null in case of field data
+        return data.map(x => Object.assign({}, x,{id:0})) // send id as 0 in case of field data
     }else{
         return data.map(x => Object.assign({}, x))
     }
