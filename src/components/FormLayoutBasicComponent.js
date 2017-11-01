@@ -17,11 +17,13 @@ import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
-import * as globalActions from '../modules/global/globalActions'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import {
     MONEY_COLLECT,
     MONEY_PAY,
+    CHECKBOX,
+    RADIOBUTTON,
+    DROPDOWN,
     NPS_FEEDBACK,
     TIME,
     RE_ATTEMPT_DATE,
@@ -37,6 +39,8 @@ import {
     SEQUENCE,
     PASSWORD,
 } from '../lib/AttributeConstants'
+
+import * as globalActions from '../modules/global/globalActions'
 
 function mapStateToProps(state) {
     return {
@@ -66,10 +70,23 @@ class BasicFormElement extends Component {
     
     navigateToScene = (item) => {
         let screenName = ''
+        console.log("attrrrr",item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
                 screenName = 'Payment'
+                break
+            }
+            case CHECKBOX: {
+                screenName = 'SelectFromList'
+                break
+            }
+            case RADIOBUTTON: {
+                screenName = 'SelectFromList'
+                break
+            }
+            case DROPDOWN: {
+                screenName = 'SelectFromList'
                 break
             }
             case FIXED_SKU: {
@@ -197,6 +214,8 @@ class BasicFormElement extends Component {
                                                             </TouchableHighlight>
                                                         </View>
                                                     )}
+
+
                                                 </View>
                                             </View>
                                             <View style={this._styleNextFocusable(this.props.item.focus)}>
@@ -238,12 +257,12 @@ class BasicFormElement extends Component {
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
-            default:
+
+            default: console.log("FormLayoutActivityComponent")
                 return (
-                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                        Under construction  {this.props.item.label} - attributeTypeId {this.props.item.attributeTypeId}
-                    </Text>
+                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
+                     break;
         }
     }
 }

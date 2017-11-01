@@ -104,6 +104,7 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = new Map(formElement);
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, null, event);
         dispatch(_setFormList(sortedFormAttributeDto));
+        console.log("getNextFocusableAndEditableElements",value)
     }
 }
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled,sequenceId) {
@@ -159,6 +160,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, nex
     return function (dispatch) {
         const cloneFormElement = new Map(formElement);
         console.log('cloneFormElement', cloneFormElement);
+        console.log('fieldDataListObject', fieldDataListObject);        
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList, ON_BLUR);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
@@ -198,4 +200,3 @@ export function fieldValidations(currentElement, formElement, timeOfExecution) {
         fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution)
     }
 }
-
