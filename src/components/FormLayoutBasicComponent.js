@@ -27,13 +27,15 @@ import {
     RE_ATTEMPT_DATE,
     DATE,
     FIXED_SKU,
-    SIGNATURE, 
+    SIGNATURE,
+    SIGNATURE_AND_NPS,
     STRING,
     TEXT,
     NUMBER,
     DECIMAL,
     SKU_ARRAY,
     SEQUENCE,
+    PASSWORD,
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -78,8 +80,12 @@ class BasicFormElement extends Component {
                 screenName = 'Signature'
                 break
             }
-            case SKU_ARRAY:{
-                screenName='SkuListing'
+            case SKU_ARRAY: {
+                screenName = 'SkuListing'
+                break
+            }
+            case SIGNATURE_AND_NPS: {
+                screenName = 'SignatureAndNps'
                 break
             }
             default: {
@@ -131,6 +137,7 @@ class BasicFormElement extends Component {
         }
         if (value.length == 0) {
             this.props.actions.disableSaveIfRequired(fieldAttributeMasterId, isSaveDisabled, formElement, value);
+            this.props.actions.updateFieldData(fieldAttributeMasterId, this.formElementValue[fieldAttributeMasterId], formElement);
         }
     }
 
@@ -153,6 +160,7 @@ class BasicFormElement extends Component {
             case NUMBER:
             case DECIMAL:
             case SEQUENCE:
+            case PASSWORD:
                 return (
                     renderIf(!this.props.item.hidden,
                         <Card>
@@ -198,8 +206,10 @@ class BasicFormElement extends Component {
                                                     multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                                     placeholder='Regular Textbox'
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
-                                                    onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId, this.props.item.attributeTypeId)}
-                                                    value = { this.props.item.attributeTypeId == 62 ? this.props.item.value : null}
+                                                    onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
+                                                    secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
+                                                    value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62 ) ? this.props.item.value : null}
+
                                                 />
                                             </View>
                                             {
@@ -219,11 +229,12 @@ class BasicFormElement extends Component {
             case SIGNATURE:
             case MONEY_PAY:
             case SKU_ARRAY:
-            case MONEY_COLLECT: 
+            case MONEY_COLLECT:
             case NPS_FEEDBACK:
             case TIME:
             case RE_ATTEMPT_DATE:
             case DATE:
+            case SIGNATURE_AND_NPS:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )

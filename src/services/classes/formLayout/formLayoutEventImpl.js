@@ -15,9 +15,11 @@ import CONFIG from '../.././../lib/config'
 
 import * as realm from '../../../repositories/realmdb'
 import { keyValueDBService } from '../KeyValueDBService.js'
-import moment from 'moment'
 import RestAPIFactory from '../../../lib/RestAPIFactory'
 import _ from 'underscore'
+import moment from 'moment';
+import sha256 from 'sha256';
+
 export default class FormLayoutEventImpl {
 
     /**
@@ -96,7 +98,8 @@ export default class FormLayoutEventImpl {
      * @param {*} calledFrom 
      */
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
-        formLayoutObject.get(attributeMasterId).value = value;
+        formLayoutObject.get(attributeMasterId).value = (value != null && value != undefined && value.length != 0  && value.length < 64 && 
+            formLayoutObject.get(attributeMasterId).attributeTypeId == 61 )? sha256(value) :value;
         formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
         if (value && value.length > 0 && calledFrom == ON_BLUR) {
             formLayoutObject.get(attributeMasterId).showCheckMark = true;
@@ -116,16 +119,14 @@ export default class FormLayoutEventImpl {
         let data = null;
         let masterData = null;
         const token =  await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        if (!token) {
+        if (!token && token.value != null && token.value != undefined) {
            throw new Error('Token Missing')
         }
         if( !_.isNull(sequenceMasterId) && !_.isUndefined(sequenceMasterId) ){
             masterData = 'sequenceMasterId=' + sequenceMasterId + '&count=' + 1;
             const url = (masterData == null) ? CONFIG.API.GET_SEQUENCE_NEXT_COUNT : CONFIG.API.GET_SEQUENCE_NEXT_COUNT + "?" + masterData
-            console.log("url is",url);
             let getSequenceData = await RestAPIFactory(token.value).serviceCall(null, url, 'GET')
-            console.log("url data is",getSequenceData);
-            if (getSequenceData && getSequenceData.status == 200) {
+            if (getSequenceData) {
                 json = await getSequenceData.json
                 data =(!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null ;
             }
@@ -166,6 +167,9 @@ export default class FormLayoutEventImpl {
         currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length;
         let fieldDataArray = [];
         for (var [key, value] of formLayoutObject) {
+            if(value.attributeTypeId == 61){
+                continue;
+            }
             let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId);
             fieldDataArray.push(fieldDataObject);
             if (value.childDataList && value.childDataList.length > 0) {
