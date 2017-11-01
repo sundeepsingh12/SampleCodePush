@@ -100,6 +100,8 @@ class FieldData {
      */
     prepareFieldDataForTransactionSavingInState(fieldDataListDTO, jobTransactionId, parentId, latestPositionId) {
         let fieldDataList = []
+            console.log("prepareFieldDataForTransactionSavingInStatesss",fieldDataListDTO)
+        
         for (let index in fieldDataListDTO) {
             let fieldData = {}
             latestPositionId++

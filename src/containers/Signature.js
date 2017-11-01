@@ -17,7 +17,7 @@ import renderIf from '../lib/renderIf'
 
 function mapStateToProps(state) {
     return {
-        isRemarksValidation : state.signature.isRemarksValidation,
+        isRemarksValidation: state.signature.isRemarksValidation,
         fieldDataList: state.signature.fieldDataList,
     }
 }
@@ -29,28 +29,27 @@ function mapDispatchToProps(dispatch) {
 
 class Signature extends Component {
 
-    constructor(props) {
-        super(props)
-        this.params = this.props.navigation.state.params.currentElement;
-        this.formElement = this.props.navigation.state.params.formElements;
-        this.nextEditable = this.props.navigation.state.params.nextEditable;
-        this.isSaveDisabled = this.props.navigation.state.params.isSaveDisabled;
-    }
-
     componentWillMount() {
-        this.props.actions.getRemarksList(this.formElement)
-        this.props.actions.setIsRemarksValidation(this.params.validation)
+        this.props.actions.getRemarksList(this.props.navigation.state.params.formElements)
+        this.props.actions.setIsRemarksValidation(this.props.navigation.state.params.currentElement.validation)
     }
 
     onSaveEvent = async (result) => {
         if (result != null) {
-            await this.props.actions.saveSignature(result, this.params.fieldAttributeMasterId, this.formElement, this.nextEditable, this.isSaveDisabled)
+            await this.props.actions.saveSignature(result,
+                this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
+                this.props.navigation.state.params.formElements,
+                this.props.navigation.state.params.nextEditable,
+                this.props.navigation.state.params.isSaveDisabled)
+        }
+        if (this.props.onRatingSaveEvent) {
+            this.props.onRatingSaveEvent(result)
         }
         this.props.navigation.goBack()
     }
 
     render() {
-        if (this.props.isRemarksValidation && this.props.fieldDataList.length > 0) { 
+        if (this.props.isRemarksValidation && this.props.fieldDataList.length > 0) {
             return (
                 <View style={{ flex: 1, flexDirection: 'row' }}>
                     <View style={{ flex: 1 }}>

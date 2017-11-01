@@ -44,7 +44,8 @@ import {
   Right,
   Icon,
   List,
-  ListItem
+  ListItem,
+  Root
 } from 'native-base';
 import styles from '../../themes/FeStyle'
 import Payment from '../../containers/Payment'
@@ -54,21 +55,22 @@ import FixedSKUListing from '../../containers/FixedSKUListing'
 import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
 import SkuListing from '../../containers/SkuListing'
-
+import SignatureAndNps from '../../containers/SignatureAndNps'
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import SelectFromList from '../../containers/SelectFromList';
 
 class AppWithNavigationState extends React.Component {
   render() {
-    return ( <
+    return (<Root> 
+      <
       AppNavigator navigation = {
         addNavigationHelpers({
           dispatch: this.props.dispatch,
           state: this.props.nav
         })
       }
-      />
+      /></Root>
     )
   }
 }
@@ -113,6 +115,9 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
+     },
+  SelectFromList: {
+    screen: SelectFromList,
   },
   HomeUI: {
     screen: HomeUI
@@ -162,11 +167,15 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
-}, {
-  cardStyle: {
-    backgroundColor: 'white'
+  SignatureAndNps: {
+    screen: SignatureAndNps
   }
-});
+},
+  {
+    cardStyle: {
+      backgroundColor: 'white'
+    }
+  });
 
 // const AppWithNavigationState = ({ dispatch, nav }) => (
 //   <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />

@@ -33,6 +33,10 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
         return this.addToSyncList(jobTransactionId);
     }
 
+    getSequenceData(sequenceMasterId){
+        return this.getSequenceAttrData(sequenceMasterId)
+    }
+
     executeBeforeValidations(attributeMasterId) {}
 
     executeAfterValidations(attributeMasterId) {}

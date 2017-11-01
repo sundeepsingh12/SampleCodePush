@@ -4,13 +4,17 @@ const {
     SAVE_SIGNATURE,
     USER,
     FormLayout,
-    SET_REMARKS_VALIDATION
+    SET_REMARKS_VALIDATION,
+    FIELD_ATTRIBUTE,
+    ON_BLUR
 } = require('../../lib/constants').default
-
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
-import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
+import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import {
+    OBJECTSAROJFAREYE
+} from '../../lib/AttributeConstants'
 
 export function setFieldDataList(fieldDataList) {
     return {
@@ -28,10 +32,8 @@ export function _setIsRemarksValidation(isRemarksValidation) {
 
 export function saveSignature(result, fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled) {
     return async function (dispatch) {
-        const image_name = await signatureService.saveFile(result);
-        const user = await keyValueDBService.getValueFromStore(USER);
-        const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
-        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value))
+        const value = await signatureService.saveFile(result, moment());
+        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value, ON_BLUR))
     }
 }
 
@@ -52,5 +54,14 @@ export function setIsRemarksValidation(validation) {
         if (isRemarksValidation) {
             dispatch(_setIsRemarksValidation(true))
         }
+    }
+}
+
+export function saveSignatureAndRating(result, rating, currentElement, formElement, nextEditable, isSaveDisabled, jobTransactionId, latestPositionId) {
+    return async function (dispatch) {
+        const signatureValue = await signatureService.saveFile(result, moment());
+        const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+        const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransactionId, latestPositionId)
+        dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECTSAROJFAREYE, fieldDataListObject))
     }
 }
