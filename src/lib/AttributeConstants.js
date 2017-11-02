@@ -23,12 +23,12 @@ module.exports = {
     REMARKS: 'remarks',
     SKU_ACTUAL_AMOUNT: 32,
     SKU_ARRAY: 17,
-    SKU_ORIGINAL_QUANTITY:15,
-    SKU_CODE:51,
-    SKU_ACTUAL_QUANTITY:16,
-    TOTAL_ORIGINAL_QUANTITY:35,
-    TOTAL_ACTUAL_QUANTITY:36,
-    SKU_UNIT_PRICE:14,
+    SKU_ORIGINAL_QUANTITY: 15,
+    SKU_CODE: 51,
+    SKU_ACTUAL_QUANTITY: 16,
+    TOTAL_ORIGINAL_QUANTITY: 35,
+    TOTAL_ACTUAL_QUANTITY: 36,
+    SKU_UNIT_PRICE: 14,
     TRANSACTION_NUMBER: 'transaction_number',
     NPS_FEEDBACK: 23,
     RE_ATTEMPT_DATE: 33,
@@ -187,5 +187,12 @@ module.exports = {
     TEXT: 2,
     NUMBER: 6,
     DECIMAL: 13,
-    DATA_STORE: 44
+    DATA_STORE: 44,
+
+    //REST API 
+    SEARCH_VALUE: '?searchValue=',
+    DATA_STORE_MASTER_ID: '&dataStoreMasterId=',
+    DATA_STORE_ATTR_MASTER_ID: '&dataStoreMasterAttributeId=',
+    GET: 'GET'
+
 }

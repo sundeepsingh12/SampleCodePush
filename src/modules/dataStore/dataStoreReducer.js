@@ -1,16 +1,23 @@
 'use strict'
 
 const InitialState = require('./dataStoreInitialState').default
-
 const {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
+    SHOW_LOADER,
+    SHOW_ERROR_MESSAGE,
+    SET_SEARCH_TEXT,
+    SHOW_DETAILS
 } = require('../../lib/constants').default
-
 const initialState = new InitialState()
 
 export default function dataStoreReducer(state = initialState, action) {
     switch (action.type) {
+
+        case SHOW_LOADER:
+            return state.set('loaderRunning', action.payload)
+                .set('errorMessage', '')
+
         case SET_VALIDATIONS:
             return state.set('isScannerEnabled', action.payload.isScannerEnabled)
                 .set('isAutoStartScannerEnabled', action.payload.isAutoStartScannerEnabled)
@@ -19,7 +26,20 @@ export default function dataStoreReducer(state = initialState, action) {
 
         case SET_DATA_STORE_ATTR_MAP:
             return state.set('dataStoreAttrValueMap', action.payload)
+                .set('loaderRunning', false)
+                .set('errorMessage', '')
 
+        case SHOW_ERROR_MESSAGE:
+            return state.set('errorMessage', action.payload.errorMessage)
+                .set('loaderRunning', false)
+                .set('dataStoreAttrValueMap', action.payload.dataStoreAttrValueMap)
+
+        case SET_SEARCH_TEXT:
+            return state.set('searchText', action.payload)
+
+        case SHOW_DETAILS:
+            return state.set('detailsVisibleFor', action.payload.itemId)
+                .set('searchText', action.payload.searchText)
     }
     return state
 }

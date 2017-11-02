@@ -160,21 +160,21 @@ export default keyMirror({
 
 
     //Status Codes
-    UNSEEN:null,
-    PENDING:null,
+    UNSEEN: null,
+    PENDING: null,
 
     //Form Layout
-    GET_SORTED_ROOT_FIELD_ATTRIBUTES : null,
-    DISABLE_SAVE : null,
-    UPDATE_FIELD_DATA : null,
-    STATUS_NAME : null,
-    BASIC_INFO : null,
-    ON_BLUR : null,
-    TOOGLE_HELP_TEXT : null,
-    IS_LOADING : null,
-    PENDING_SYNC_TRANSACTION_IDS : null,
-    RESET_STATE : null,
-    ERROR_MESSAGE : null,
+    GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
+    DISABLE_SAVE: null,
+    UPDATE_FIELD_DATA: null,
+    STATUS_NAME: null,
+    BASIC_INFO: null,
+    ON_BLUR: null,
+    TOOGLE_HELP_TEXT: null,
+    IS_LOADING: null,
+    PENDING_SYNC_TRANSACTION_IDS: null,
+    RESET_STATE: null,
+    ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
 
@@ -185,15 +185,15 @@ export default keyMirror({
     Home: null,
     JobDetails: null,
     FormLayout: null,
-     TimePicker: null,
-    SkuListing:null,
+    TimePicker: null,
+    SkuListing: null,
 
     //Skulisting Actions
-    SKU_LIST_FETCHING_STOP:null,
-    SKU_LIST_FETCHING_START:null,
-    SHOW_SEARCH_BAR:null,
-    SKU_CODE_CHANGE:null,
-    UPDATE_SKU_ACTUAL_QUANTITY:null,
+    SKU_LIST_FETCHING_STOP: null,
+    SKU_LIST_FETCHING_START: null,
+    SHOW_SEARCH_BAR: null,
+    SKU_CODE_CHANGE: null,
+    UPDATE_SKU_ACTUAL_QUANTITY: null,
 
 
     //FixedSKU Actions
@@ -205,11 +205,19 @@ export default keyMirror({
     SET_FIELD_DATA_LIST: null,
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
-    
-    //Data Store Actions
+
+    //Data Store
     SET_VALIDATIONS: null,
-    SET_DATA_STORE_ATTR_MAP:null,
-   
+    SET_DATA_STORE_ATTR_MAP: null,
+    SHOW_LOADER: null,
+    SHOW_ERROR_MESSAGE: null,
+    SET_SEARCH_TEXT: null,
+    SHOW_DETAILS: null,
+    REMARKS: null,
+    SPECIAL: null,
+    MINMAX: null,
+    _id: null,
+
 })
 
 

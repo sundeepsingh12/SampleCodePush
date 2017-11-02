@@ -55,10 +55,9 @@ import FixedSKUListing from '../../containers/FixedSKUListing'
 import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
 import SkuListing from '../../containers/SkuListing'
-
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 
 class AppWithNavigationState extends React.Component {
   render() {
@@ -165,6 +164,9 @@ export const AppNavigator = StackNavigator({
   },
   DataStore: {
     screen: DataStore,
+  },
+  DataStoreItemDetails: {
+    screen: DataStoreItemDetails
   },
 }, {
     cardStyle: {

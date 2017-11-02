@@ -1,36 +1,33 @@
 'use strict'
 import React, { Component } from 'react'
-// import { StyleSheet, View, FlatList } from 'react-native'
 import * as dataStoreActions from '../modules/dataStore/dataStoreActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SearchBar from '../components/SearchBar'
-import { ARRAY_SAROJ_FAREYE } from '../lib/AttributeConstants'
 import * as globalActions from '../modules/global/globalActions'
-import FixedSKUListItem from '../components/FixedSKUListItem'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
+import DataStoreItemDetails from '../components/DataStoreItemDetails'
+import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
+const {
+    SET_DATA_STORE_ATTR_MAP,
+    SET_SEARCH_TEXT,
+    SHOW_DETAILS,
+    _id,
+} = require('../lib/constants').default
 import {
+    FooterTab,
+    Card,
     Container,
     Content,
-    Header,
     Button,
     Text,
-    Input,
-    List,
-    ListItem,
-    Left,
-    Body,
-    Right,
-    Icon,
     Footer,
-    CheckBox,
-    StyleProvider
 } from 'native-base';
+import _ from 'underscore'
 
 function mapStateToProps(state) {
     return {
@@ -38,7 +35,11 @@ function mapStateToProps(state) {
         isAutoStartScannerEnabled: state.dataStore.isAutoStartScannerEnabled,
         isScannerEnabled: state.dataStore.isScannerEnabled,
         isAllowFromField: state.dataStore.isAllowFromField,
-        dataStoreAttrValueMap: state.dataStore.dataStoreAttrValueMap
+        dataStoreAttrValueMap: state.dataStore.dataStoreAttrValueMap,
+        loaderRunning: state.dataStore.loaderRunning,
+        errorMessage: state.dataStore.errorMessage,
+        searchText: state.dataStore.searchText,
+        detailsVisibleFor: state.dataStore.detailsVisibleFor,
     }
 };
 
@@ -56,10 +57,15 @@ class DataStore extends Component {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
+
+    componentWillMount() {
+        this.props.actions.setValidation(this.props.navigation.state.params.currentElement.validation)
+    }
+
     getTextData(item) {
         let firstValue = item.dataStoreAttributeValueMap[item.matchKey]
         let secondValue
-        if (item.matchKey == item.uniqueKey) {
+        if (item.matchKey == item.uniqueKey || item.uniqueKey == _id) {
             for (let singleItem in item.dataStoreAttributeValueMap) {
                 if (item.dataStoreAttributeValueMap[singleItem] != firstValue) {
                     secondValue = item.dataStoreAttributeValueMap[singleItem]
@@ -78,72 +84,119 @@ class DataStore extends Component {
     renderData = (item) => {
         let { firstValue, secondValue } = this.getTextData(item)
         return (
-            <View>
-                <Card>
-                    {renderIf(firstValue,
-                        <Text>{firstValue}</Text>)}
-                    {renderIf(secondValue,
-                        <Text>{secondValue}</Text>)}
-                </Card>
-            </View>
+            <Card>
+                <TouchableOpacity
+                    onPress={() => {
+                        this.props.actions.setState(SHOW_DETAILS, {
+                            itemId: item.id,
+                            searchText: firstValue
+                        })
+                    }}>
+                    <View style={[style.cardLeft]}>
+                        {renderIf(firstValue, <View style={[style.cardLeftTopRow]}>
+                            <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight500, styles.fontDefault]}>{firstValue}</Text>
+                        </View>)}
+                        {renderIf(secondValue, <View style={[styles.row]}>
+                            <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight400, styles.fontSm]}>{secondValue}</Text>
+                        </View>)}
+                    </View>
+                </TouchableOpacity>
+            </Card>
+
         )
     }
 
-
-    componentWillMount() {
-        console.log('abhishek', this.props.navigation.state.params.currentElement)
-        this.props.actions.setValidation(this.props.navigation.state.params.currentElement.validation)
+    setSearchText = (searchText) => {
+        this.props.actions.setState(SET_SEARCH_TEXT, searchText)
     }
 
-    fetchDataStoreAttrValueMap = (searchText) => {
-        console.log('searchText', searchText)
-        this.props.actions.getDataStoreAttrValueMap(searchText, this.props.navigation.state.params.currentElement.dataStoreMasterId, this.props.navigation.state.params.currentElement.dataStoreAttributeId)
+    fetchDataStoreAttrValueMap = _.debounce((searchText, manualSearch) => {
+        if ((this.props.isSearchEnabled || manualSearch) && searchText.length > 2) {
+            this.props.actions.getDataStoreAttrValueMap(searchText,
+                this.props.navigation.state.params.currentElement.dataStoreMasterId,
+                this.props.navigation.state.params.currentElement.dataStoreAttributeId)
+        }
+        if (searchText.length <= 2) {
+            this.props.actions.setState(SET_DATA_STORE_ATTR_MAP, {})
+        }
+    }, 500)
+
+
+    _goBack = () => {
+        this.props.navigation.goBack(null)
+    }
+
+    onSave = (dataStoreAttributeValueMap) => {
+        this.props.actions.fillKeysAndSave(dataStoreAttributeValueMap,
+            this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
+            this.props.navigation.state.params.formElements,
+            this.props.navigation.state.params.nextEditable,
+            this.props.navigation.state.params.isSaveDisabled,
+            this.props.searchText)
+        this.setDetailsFor()
+        this._goBack()
+    }
+
+    setDetailsFor = () => {
+        this.props.actions.setState(SHOW_DETAILS, {
+            itemId: -1,
+            searchText: this.props.searchText
+        })
     }
 
     render() {
-        console.log('render', this.props)
+        if (this.props.detailsVisibleFor == -1) {
+            return (
+                < Container >
+                    <SearchBar
+                        isScannerEnabled={this.props.isScannerEnabled}
+                        fetchDataStoreAttrValueMap={this.fetchDataStoreAttrValueMap}
+                        goBack={this._goBack}
+                        searchText={this.props.searchText}
+                        setSearchText={this.setSearchText} />
+                    <Content style={[styles.marginLeft10]}>
+                        {renderIf(this.props.loaderRunning,
+                            <Loader />)}
+                        {renderIf(!_.isEmpty(this.props.dataStoreAttrValueMap),
+                            <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>Suggestions</Text>)}
+                        {renderIf(this.props.errorMessage != '',
+                            <Text style={[styles.fontDarkGray, styles.alignSelfCenter, styles.justifyCenter, styles.marginTop25]}>{this.props.errorMessage}{this.props.searchText}</Text>)}
+                        {renderIf(!this.props.loaderRunning,
+                            < FlatList
+                                data={Object.values(this.props.dataStoreAttrValueMap)}
+                                renderItem={({ item }) => this.renderData(item)}
+                                keyExtractor={item => item.id}
+                            />)}
+                    </Content>
+                    {renderIf(this.props.isAllowFromField && this.props.searchText.length > 2,
+                        <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
+                            <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
+                                <Button success full style={styles.bgPrimary}
+                                    onPress={() => {
+                                        this.props.actions.onSave(
+                                            this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
+                                            this.props.navigation.state.params.formElements,
+                                            this.props.navigation.state.params.nextEditable,
+                                            this.props.navigation.state.params.isSaveDisabled,
+                                            this.props.searchText
+                                        )
+                                        this._goBack()
+                                    }}>
+                                    <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
+                                </Button>
+                            </FooterTab>
+                        </Footer>)
+                    }
+                </Container >
+            )
+        }
         return (
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
-                        <Text
-                            style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Search Merchant Name</Text>
-                        <View />
-                    </View>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.relative]}>
-                        <Input
-                            placeholder="Filter Reference Numbers"
-                            placeholderTextColor={'rgba(255,255,255,.4)'}
-                            style={[style.headerSearch]} />
-                        <Button small transparent style={[style.headerQRButton]}>
-                            <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXl]} />
-                        </Button>
-                    </View>
-                </Body>
-            </Header>
-
-            // <Container>
-            //     <View>
-            //         <SearchBar isSearchEnabled={this.props.isSearchEnabled} isScannerEnabled={this.props.isScannerEnabled} isAllowFromField={this.props.isAllowFromField} getDataStoreAttrValueMap={this.fetchDataStoreAttrValueMap} />
-            //         {/* <FlatList
-            //             data={Object.values(this.props.dataStoreAttrValueMap)}
-            //             renderItem={({ item }) => this.renderData(item)}
-            //             keyExtractor={item => item.id}
-            //         />
-            //         {renderIf(this.props.isAllowFromField,
-            //             <Button>
-            //                 <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Save</Text>
-            //             </Button>)} */}
-
-            //     </View>
-            // </Container>
+            < DataStoreItemDetails details={(this.props.dataStoreAttrValueMap[this.props.detailsVisibleFor]).dataStoreAttributeValueMap}
+                goBack={this.setDetailsFor}
+                onSave={this.onSave} />
         )
     }
 }
-
 
 const style = StyleSheet.create({
     header: {
@@ -160,9 +213,9 @@ const style = StyleSheet.create({
         paddingRight: 30,
         backgroundColor: '#1260be',
         borderRadius: 2,
-        height: 30,
+        height: 40,
         color: '#fff',
-        fontSize: 10
+        fontSize: 14
     },
     headerQRButton: {
         position: 'absolute',
@@ -207,7 +260,6 @@ const style = StyleSheet.create({
         borderRadius: 0,
         left: 0
     }
-
 });
 
 /**

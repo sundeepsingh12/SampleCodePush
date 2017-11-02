@@ -1,39 +1,42 @@
 'use strict'
-import {
-    keyValueDBService,
-} from './KeyValueDBService'
-
-import {
-    FIXED_SKU_QUANTITY,
-    FIXED_SKU_UNIT_PRICE,
-    FIXED_SKU_CODE,
-    OBJECT_ATTR_ID,
-    OBJECT_SAROJ_FAREYE,
-    TOTAL_AMOUNT
-} from '../../lib/AttributeConstants'
-
 import CONFIG from '../../lib/config'
 import RestAPIFactory from '../../lib/RestAPIFactory'
+const {
+    REMARKS,
+    MINMAX,
+    SPECIAL
+} = require('../../lib/constants').default
+
+import {
+    DATA_STORE_ATTR_MASTER_ID,
+    DATA_STORE_MASTER_ID,
+    SEARCH_VALUE,
+    GET
+} from '../../lib/AttributeConstants'
 
 class DataStoreService {
 
-    getValidationsArray(validationArray) {
+    getValidations(validationArray) {
+        if (!validationArray) {
+            throw new Error('Validation Array Missing')
+        }
         let validationObject = {}
         for (let validation of validationArray) {
             if (validation.timeOfExecution) {
                 switch (validation.timeOfExecution) {
-                    case 'REMARKS':
+                    case REMARKS:
                         if (validationObject.isScannerEnabled) {
-                            validationObject.isAutoStartScannerEnabled = (validation.condition == 'true') ? true : false
+                            validationObject.isAutoStartScannerEnabled = (validation.condition == 'true')
                         } else {
-                            validationObject.isScannerEnabled = (validation.condition == 'true') ? true : false
+                            validationObject.isScannerEnabled = (validation.condition == 'true')
                             validationObject.isAutoStartScannerEnabled = false
                         }
-                    case 'SPECIAL':
-                        validationObject.isSearchEnabled = validation.condition == 'true' ? true : false
                         break
-                    case 'MINMAX':
-                        validationObject.isAllowFromField = (validation.condition == 'true') ? true : false
+                    case SPECIAL:
+                        validationObject.isSearchEnabled = (validation.condition == 'true')
+                        break
+                    case MINMAX:
+                        validationObject.isAllowFromField = (validation.condition == 'true')
                         break
                 }
             }
@@ -42,30 +45,55 @@ class DataStoreService {
     }
 
     fetchJson(token, searchText, dataStoreMasterId, dataStoreMasterAttributeId) {
-        const url = CONFIG.API.SERVICE_DSA + "?searchValue=" + encodeURIComponent(searchText) + "&dataStoreMasterId=" + dataStoreMasterId + "&dataStoreMasterAttributeId=" + dataStoreMasterAttributeId
-        const dataStoreResponse = RestAPIFactory(token.value).serviceCall(null, url, 'GET')
+        if (!token) {
+            throw new Error('Token Missing')
+        }
+        if (!dataStoreMasterAttributeId) {
+            throw new Error('DataStoreMasterAttributeId missing in currentElement')
+        }
+        if (!dataStoreMasterId) {
+            throw new Error('DataStoreMasterId missing in currentElement')
+        }
+        if (!searchText) {
+            throw new Error('Search Text not present')
+        }
+        const url = CONFIG.API.SERVICE_DSA + SEARCH_VALUE + encodeURIComponent(searchText) + DATA_STORE_MASTER_ID + dataStoreMasterId + DATA_STORE_ATTR_MASTER_ID + dataStoreMasterAttributeId
+        const dataStoreResponse = RestAPIFactory(token.value).serviceCall(null, url, GET)
         return dataStoreResponse
     }
 
-    async getDataStoreAttrValueMapFromJson(dataStoreResponse) {
-        if (dataStoreResponse && dataStoreResponse.status == 200) {
-            let dataStoreAttrValueMap = {}
-            let jsonResponse = await dataStoreResponse.json
-            for (let itemCounter in jsonResponse.items) {
-                let itemObject = jsonResponse.items[itemCounter]
-                let { matchKey, uniqueKey, details } = itemObject
-                delete details.dataStoreAttributeValueMap._id;
-                let dataStoreObject = {
-                    id: itemCounter,
-                    uniqueKey,
-                    matchKey,
-                    dataStoreAttributeValueMap: details.dataStoreAttributeValueMap
-                }
-                dataStoreAttrValueMap[itemCounter] = dataStoreObject
-            }
-            return dataStoreAttrValueMap
+    getDataStoreAttrValueMapFromJson(dataStoreResponse) {
+        if (!dataStoreResponse) {
+            throw new Error('dataStoreResponse is missing')
         }
-        return null
+        let dataStoreAttrValueMap = {}
+        for (let itemCounter in dataStoreResponse.items) {
+            let itemObject = dataStoreResponse.items[itemCounter]
+            delete itemObject.details.dataStoreAttributeValueMap._id;
+            let dataStoreObject = {
+                id: itemCounter,
+                uniqueKey: itemObject.uniqueKey,
+                matchKey: itemObject.matchKey,
+                dataStoreAttributeValueMap: itemObject.details.dataStoreAttributeValueMap
+            }
+            dataStoreAttrValueMap[itemCounter] = dataStoreObject
+        }
+        return dataStoreAttrValueMap
+    }
+
+    fillKeysInFormElement(dataStoreAttributeValueMap, formElements) {
+        if (!dataStoreAttributeValueMap) {
+            throw new Error('dataStoreAttributeValueMap not present')
+        }
+        if (!formElements) {
+            throw new Error('formElements not present')
+        }
+        for (let [id, currentObject] of formElements.entries()) {
+            if (dataStoreAttributeValueMap[currentObject.key]) {
+                currentObject.value = dataStoreAttributeValueMap[currentObject.key]
+            }
+        }
+        return formElements
     }
 }
 

@@ -8,7 +8,11 @@ var InitialState = Record({
     isSearchEnabled: false,
     isAllowFromField: false,
     dataStoreValue: '',
-    dataStoreAttrValueMap: {}
+    dataStoreAttrValueMap: {},
+    loaderRunning: false,
+    errorMessage: '',
+    searchText: '',
+    detailsVisibleFor: -1,
 })
 
 export default InitialState
