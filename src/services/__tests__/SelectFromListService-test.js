@@ -2,6 +2,11 @@
 
 import { selectFromListDataService } from '../classes/SelectFromListService'
 import { CHECKBOX, RADIOBUTTON, DROPDOWN, TEXT } from '../../lib/AttributeConstants'
+import { keyValueDBService } from '../classes/KeyValueDBService'
+const {
+    FIELD_ATTRIBUTE,
+    TABLE_JOB_DATA
+} = require('../../lib/constants').default
 
 describe('test cases for selectFromListService setorRemovestates', () => {
 
@@ -181,5 +186,31 @@ it('after clicking done button with incorrect values', () => {
     let id = 1
     let attributeTypeId = RADIOBUTTON
     expect(selectFromListDataService.selectFromListDoneButtonClicked(CHECKBOX, selectFromListValue)[0]).toEqual(undefined)
+})
+})
+
+
+describe('OptionRadioMaster for getting and setting data', () => {
+it('it should get data for radio master', () => {
+    const fieldAttributeMasterId = [123]
+     keyValueDBService.getValueFromStore = jest.fn()
+     keyValueDBService.getValueFromStore.mockReturnValueOnce(FIELD_ATTRIBUTE)
+     const fieldAttributeMasterList = [
+            {
+                id: 34044,
+                name: '1',
+                code: '1',
+                fieldAttributeMasterId: 42124,
+                sequence: 1
+            },
+            {
+                id: 34043,
+                name: '2000',
+                code: '2000',
+                fieldAttributeMasterId: 43159,
+                sequence: 5
+            }]
+     console.log("s1234",keyValueDBService.getValueFromStore.mockReturnValueOnce(FIELD_ATTRIBUTE).value)
+     expect(selectFromListDataService.getRadioForMasterDto(fieldAttributeMasterId)).toEqual({})
 })
 })

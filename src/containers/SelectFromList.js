@@ -19,7 +19,7 @@ import {
 
 import { Container, Button, Picker, Title, List, ListItem, Form, Item, CheckBox, Radio, Content, Card } from 'native-base';
 import * as selectFromListActions from '../modules/selectFromList/selectFromListActions'
-import { CHECKBOX, RADIOBUTTON, DROPDOWN } from '../lib/AttributeConstants'
+import { CHECKBOX, RADIOBUTTON, DROPDOWN, OPTION_RADIO_FOR_MASTER} from '../lib/AttributeConstants'
 
 
 var styles = StyleSheet.create({
@@ -60,7 +60,12 @@ function mapDispatchToProps(dispatch) {
 class SelectFromList extends Component {
 
   componentWillMount() {
-    this.props.actions.gettingDataSelectFromList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId)
+    if(this.props.navigation.state.params.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER )
+      {
+        this.props.actions.gettingDataForRadioMaster(this.props.navigation.state.params.currentElement.fieldAttributeMasterId,this.props.navigation.state.params.jobTransaction.jobId)
+    }else{
+        this.props.actions.gettingDataSelectFromList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId)
+      }
   }
 
   getViewOfFieldAttribute(id, isChecked) {
@@ -73,7 +78,7 @@ class SelectFromList extends Component {
           }} />
       )
     }
-    else if (this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON) {
+    else if (this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON || this.props.navigation.state.params.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
       return (
         <Radio selected={isChecked}
           onPress={() => {
@@ -85,7 +90,7 @@ class SelectFromList extends Component {
   }
 
   render() {
-    if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX || this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON) {
+    if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX || this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON ) {
       return (
         <Container>
           <View style={styles.container}>
@@ -140,6 +145,39 @@ class SelectFromList extends Component {
         </Container>
       )
     }
+     else if (this.props.navigation.state.params.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
+
+    console.log("123",this.props.selectFromListState);
+    const listData = (this.props.selectFromListState.selectFromListData != null && this.props.selectFromListState.selectFromListData != undefined ) ? this.props.selectFromListState.selectFromListData :this.props.selectFromListState
+        return (
+        <Container>
+          <View style={styles.container}>
+            <FlatList
+              data={(Object.values(listData))}
+              renderItem={({ item }) => {
+                return (
+                  <View>
+                    <Content>
+                      <Card style={{ flexDirection: 'row', height: 40 }}  >
+                        {this.getViewOfFieldAttribute(item.id, item.isChecked)}
+                        <Text>       {item.optionValue}</Text>
+                      </Card>
+                    </Content>
+                  </View>
+                )
+              }}
+              keyExtractor={item => item.id}
+            />
+            <Button onPress={() => {
+              this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
+              this.props.navigation.goBack()
+            }}>
+              <Text> DONE </Text>
+            </Button>
+          </View>
+        </Container>
+      )
+     }
   }
 }
 
