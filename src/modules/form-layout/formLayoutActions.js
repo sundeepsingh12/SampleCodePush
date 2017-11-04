@@ -181,11 +181,11 @@ export function toogleHelpText(attributeId, formElement) {
     }
 }
 
-export function saveJobTransaction(formElement, jobTransactionId, statusId) {
+export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId) {
     return async function (dispatch) {
         dispatch(_toogleLoader(true));
         let cloneFormElement = new Map(formElement);
-        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId);
+        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId);
         await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId);
         dispatch(_toogleLoader(false));
         dispatch(_setInitialState());

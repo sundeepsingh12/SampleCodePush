@@ -21,13 +21,6 @@ const {
     HIDE_DATETIME_PICKER,
 } = require('../../lib/constants').default
 
-const _onPressVisible= (element,Id)=>{
-        element.forEach(element => {
-                    if (element.attributeTypeId == Id) {
-                      element.isVisible = true;
-                    }})
-        return element;
-    }
 const initialState = new InitialState();
 
 export default function formLayoutReducer(state = initialState, action){
