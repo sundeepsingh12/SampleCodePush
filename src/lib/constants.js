@@ -72,9 +72,33 @@ export default keyMirror({
     JOB_FETCHING_START: null,
     JOB_FETCHING_END: null,
     SET_TABS_LIST: null,
-    SET_FETCHING_FALSE:null,
-    CLEAR_HOME_STATE:null,
-    SET_REFRESHING_TRUE:null,
+    SET_FETCHING_FALSE: null,
+    CLEAR_HOME_STATE: null,
+    SET_REFRESHING_TRUE: null,
+    JOB_DOWNLOADING_STATUS: null,
+
+    //Listing Actions
+    JOB_LISTING_START: null,
+    JOB_LISTING_END: null,
+
+    //Job Details Actions
+    JOB_DETAILS_FETCHING_START: null,
+    JOB_DETAILS_FETCHING_END: null,
+
+    //Payment Actions
+    CLEAR_PAYMENT_STATE: null,
+    SET_PAYMENT_CHANGED_PARAMETERS: null,
+    SET_PAYMENT_INITIAL_PARAMETERS: null,
+
+    //UPI PaymentActions
+    SET_UPI_APPROVAL: null,
+    SET_UPI_PAYMENT_CUSTOMER_CONTACT: null,
+    SET_UPI_PAYMENT_CUSTOMER_NAME: null,
+    SET_UPI_PAYMENT_PARAMETERS: null,
+    SET_UPI_PAYMENT_PAYER_VPA: null,
+
+    //Pay By Link Payment Actions
+    SET_PAY_BY_LINK_PARAMETERS: null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,
@@ -94,46 +118,99 @@ export default keyMirror({
 
     //Schema (Store keys)
 
-    JOB_MASTER:null,
-    JOB_ATTRIBUTE:null,
-    JOB_ATTRIBUTE_VALUE:null,
-    FIELD_ATTRIBUTE:null,
-    FIELD_ATTRIBUTE_VALUE:null,
-    JOB_STATUS:null,
-    TAB:null,
-    CUSTOMER_CARE:null,
-    SMS_TEMPLATE:null,
-    USER_SUMMARY:null,
-    JOB_SUMMARY:null,
-    SMS_JOB_STATUS:null,
-    JOB_MASTER_MONEY_TRANSACTION_MODE:null,
-    FIELD_ATTRIBUTE_STATUS:null,
-    FIELD_ATTRIBUTE_VALIDATION:null,
-    FIELD_ATTRIBUTE_VALIDATION_CONDITION:null,
-    JOB_LIST_CUSTOMIZATION:null,
-    CUSTOMIZATION_APP_MODULE:null,
-    DEVICE_IMEI:null,
-    DEVICE_SIM:null,
-    USER:null,
-    IS_PRELOADER_COMPLETE:null,
-    CUSTOMIZATION_LIST_MAP:null,
-    TABIDMAP:null,
-    SET_TABS_TRANSACTIONS:null,
+    JOB_MASTER: null,
+    JOB_ATTRIBUTE: null,
+    JOB_ATTRIBUTE_VALUE: null,
+    FIELD_ATTRIBUTE: null,
+    FIELD_ATTRIBUTE_VALUE: null,
+    JOB_STATUS: null,
+    TAB: null,
+    CUSTOMER_CARE: null,
+    SMS_TEMPLATE: null,
+    USER_SUMMARY: null,
+    JOB_SUMMARY: null,
+    SMS_JOB_STATUS: null,
+    JOB_MASTER_MONEY_TRANSACTION_MODE: null,
+    FIELD_ATTRIBUTE_STATUS: null,
+    FIELD_ATTRIBUTE_VALIDATION: null,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION: null,
+    JOB_LIST_CUSTOMIZATION: null,
+    CUSTOMIZATION_APP_MODULE: null,
+    DEVICE_IMEI: null,
+    DEVICE_SIM: null,
+    USER: null,
+    IS_PRELOADER_COMPLETE: null,
+    CUSTOMIZATION_LIST_MAP: null,
+    TABIDMAP: null,
+    SET_TABS_TRANSACTIONS: null,
+    JOB_ATTRIBUTE_STATUS: null,
+    HUB: null,
 
     //Realm Tables
-    TABLE_JOB_TRANSACTION:null,
-    TABLE_JOB:null,
-    TABLE_JOB_DATA:null,
-    TABLE_RUNSHEET:null,
-    TABLE_FIELD_DATA:null,
-    TABLE_JOB_TRANSACTION_CUSTOMIZATION:null,
+    TABLE_JOB_TRANSACTION: null,
+    TABLE_JOB: null,
+    TABLE_JOB_DATA: null,
+    TABLE_RUNSHEET: null,
+    TABLE_FIELD_DATA: null,
+    TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
+    TABLE_TRACK_LOGS: null,
 
     //Home Actions
-    IS_LAST_PAGE:null,
+    IS_LAST_PAGE: null,
+
 
     //Status Codes
-    UNSEEN:null,
-    PENDING:null
+    UNSEEN: null,
+    PENDING: null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
+
+    //Form Layout
+    GET_SORTED_ROOT_FIELD_ATTRIBUTES : null,
+    DISABLE_SAVE : null,
+    UPDATE_FIELD_DATA : null,
+    STATUS_NAME : null,
+    BASIC_INFO : null,
+    ON_BLUR : null,
+    TOOGLE_HELP_TEXT : null,
+    IS_LOADING : null,
+    PENDING_SYNC_TRANSACTION_IDS : null,
+    RESET_STATE : null,
+    ERROR_MESSAGE : null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
+    UPDATE_PAYMENT_AT_END: null,
+
+    //Route names (Used in React Navigation)
+    Application: null,
+    Login: null,
+    Preloader: null,
+    Home: null,
+    JobDetails: null,
+    FormLayout: null,
+    TimePicker: null,
+    SkuListing:null,
+
+    //Skulisting Actions
+    SKU_LIST_FETCHING_STOP:null,
+    SKU_LIST_FETCHING_START:null,
+    SHOW_SEARCH_BAR:null,
+    SKU_CODE_CHANGE:null,
+    UPDATE_SKU_ACTUAL_QUANTITY:null,
+
+
+    //CheckBox
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:null,
+
+    //FixedSKU Actions
+    IS_LOADER_RUNNING: null,
+    CHANGE_QUANTITY: null,
+    SET_FIXED_SKU: null,
+
+    //Signature Actions
+    SET_FIELD_DATA_LIST: null,
+    SET_REMARKS_VALIDATION: null,
+    SAVE_SIGNATURE: null,
+   
+   
 })
 
 

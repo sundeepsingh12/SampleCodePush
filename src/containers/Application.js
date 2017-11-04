@@ -28,15 +28,6 @@ import
 function mapStateToProps(state) {
     return {
         deviceVersion: state.device.version,
-        auth: {
-            form: {
-                isFetching: state.auth.form.authenticationService
-            }
-        },
-        global: {
-            currentState: state.global.currentState,
-            showState: state.global.showState
-        }
     }
 };
 

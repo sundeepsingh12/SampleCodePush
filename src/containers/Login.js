@@ -14,9 +14,8 @@ import {
 import Scanner from "../components/Scanner"
 import { Container, Body, InputGroup, Button, Input, Item, ListItem, CheckBox, Spinner } from 'native-base';
 
-import feTheme from '../themes/feTheme';
+import feStyle from '../themes/FeStyle';
 import sha256 from 'sha256';
-import { Actions } from 'react-native-router-flux';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
@@ -146,7 +145,7 @@ class Login extends Component {
                 <Input
                   value={this.props.auth.form.username}
                   placeholder='Username'
-                  style={feTheme.roundedInput}
+                  style={feStyle.roundedInput}
                   onChangeText={value => this.onChangeUsername(value)}
                   disabled={this.props.auth.form.isEditTextDisabled}
                 />
@@ -155,7 +154,7 @@ class Login extends Component {
                 <Input
                   value={this.props.auth.form.password}
                   placeholder='Password'
-                  style={feTheme.roundedInput}
+                  style={feStyle.roundedInput}
                   secureTextEntry={true}
                   onChangeText={value => this.onChangePassword(value)}
                   disabled={this.props.auth.form.isEditTextDisabled}

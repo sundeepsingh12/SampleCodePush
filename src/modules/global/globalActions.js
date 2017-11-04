@@ -20,7 +20,6 @@ const {
   IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
   USER
-
 } = require('../../lib/constants').default
 
 import {
@@ -46,6 +45,8 @@ import {
   Client
 } from 'react-native-paho-mqtt'
 
+import BackgroundTimer from 'react-native-background-timer';
+import { NavigationActions } from 'react-navigation'
 
 /**
  * ## set the store
@@ -55,10 +56,25 @@ import {
  * this is here to support Hot Loading
  *
  */
+
+export function setState(type, payload) {
+  return {
+    type,
+    payload
+  }
+}
+
 export function setStore(store) {
   return {
     type: SET_STORE,
     payload: store
+  }
+}
+
+//Use to navigate to other scene
+export function navigateToScene(routeName, params) {
+  return async function (dispatch) {
+    dispatch(NavigationActions.navigate({ routeName, params }))
   }
 }
 
@@ -72,6 +88,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      BackgroundTimer.clearInterval(CONFIG.intervalId);
       dispatch(onChangePassword(''))
       dispatch(onChangeUsername(''))
       dispatch(clearHomeState())
@@ -79,7 +96,6 @@ export function deleteSessionToken() {
       throw error
     }
   }
-
 }
 
 export function startMqttService() {

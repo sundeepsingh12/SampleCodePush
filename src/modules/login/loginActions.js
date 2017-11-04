@@ -27,16 +27,19 @@ const {
   REMEMBER_ME,
   REMEMBER_ME_SET_TRUE,
 
-  IS_PRELOADER_COMPLETE
+  IS_PRELOADER_COMPLETE,
+  Login,
+  Home,
+  Preloader
 
 } = require('../../lib/constants').default
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 
-import { Actions } from 'react-native-router-flux'
 import { authenticationService } from '../../services/classes/Authentication'
 import CONFIG from '../../lib/config'
 import {keyValueDBService} from '../../services/classes/KeyValueDBService'
+import { NavigationActions } from 'react-navigation'
 
 /**
  * ## State actions
@@ -164,13 +167,14 @@ export function rememberMeSetTrue() {
 export function authenticateUser(username, password,rememberMe) {
   return async function (dispatch) {
     try {
+      let j_sessionid = null , xsrfToken = null
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
-      const j_sessionid = (authenticationResponse.headers.map['set-cookie'][0]).split("; ")[0];
-      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,j_sessionid)
+      let cookie = authenticationResponse.headers.map['set-cookie'][0]
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,cookie)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess())
-      Actions.Preloader()
+      dispatch(NavigationActions.navigate({ routeName: Preloader }))
     }
     catch (error) {
       dispatch(loginFailure(error.message))
@@ -208,18 +212,18 @@ export function getSessionToken() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
-        Actions.Tabbar()
+         dispatch(NavigationActions.navigate({ routeName: 'Home' }))
       } else if(token) {
-          Actions.Preloader()
+          dispatch(NavigationActions.navigate({ routeName: Preloader }))
       }
       else {
-          Actions.InitialLoginForm()
+          dispatch(NavigationActions.navigate({ routeName: Login }))
       }
     }
     catch (error) {
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())
-      Actions.InitialLoginForm()
+       dispatch(NavigationActions.navigate({ routeName: Login }))
     }
   }
 }

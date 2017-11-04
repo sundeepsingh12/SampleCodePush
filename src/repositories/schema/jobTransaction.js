@@ -7,7 +7,7 @@ export default class JobTransaction extends Realm.Object {}
 //Properties are in chronological order.
 //Default value for each property is mandatory
 //Every Schema must have atleast 1 Primary key index
-JobTransaction. schema = {
+JobTransaction.schema = {
   name: TABLE_JOB_TRANSACTION,
   primaryKey: 'id',
   properties: {
@@ -50,6 +50,10 @@ JobTransaction. schema = {
               merchantCode  : { type: 'string',optional:true},
               imeiNumber  : { type: 'string',optional:true},
               npsFeedBack  : { type: 'string',optional:true},
-              id  : { type: 'int' }
+              id  : { type: 'int' },
+              jobType : {type : 'string', optional : true},
+              statusCode : {type : 'string', optional : true},
+              employeeCode : {type : 'string', optional : true},
+              hubCode : {type : 'string', optional : true},
   }
 }
