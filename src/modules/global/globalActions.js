@@ -34,9 +34,10 @@ import {
 import { onResyncPress } from '../home/homeActions'
 
 import { clearHomeState } from '../home/homeActions'
-import { NavigationActions } from 'react-navigation'
 
 import BackgroundTimer from 'react-native-background-timer';
+import { NavigationActions } from 'react-navigation'
+
 /**
  * ## set the store
  *

@@ -13,7 +13,6 @@ module.exports = {
     },
     staging: {
       url: 'https://staging.fareye.co/app'
-      // url: 'http://192.168.1.206:8080/app'
     },
     port:1883,
     PUSH_QOS:2
@@ -29,6 +28,7 @@ module.exports = {
     DELETE_DATA_API: '/rest/device/delete_synch_job',
     PUSH_BROKER:'mqttdev.fareye.co',
     UPLOAD_DATA_API : '/rest/device/sync',
-    SERVICE_DSA: "/rest/data_search_api"
+    SERVICE_DSA: "/rest/data_search_api",
+    GET_SEQUENCE_NEXT_COUNT : '/rest/get_sequence_next_count'
   }
 }

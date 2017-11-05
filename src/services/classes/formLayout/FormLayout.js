@@ -174,14 +174,15 @@ class FormLayout {
             attributeTypeId,
             fieldAttributeMasterId: fieldAttribute.id,
             positionId: positionId,
-            parentId: 0,
-            showHelpText: false,
-            editable: fieldAttribute.editable ? fieldAttribute.editable : false,
-            focus: fieldAttribute.focus ? fieldAttribute.focus : false,
-            validation: (validationArray && validationArray.length > 0) ? validationArray : null,
+            parentId : 0,
+            showHelpText : false,
+            editable : !(fieldAttribute.editable) || (fieldAttribute.attributeTypeId == 62)? false: fieldAttribute.editable,
+            focus : fieldAttribute.focus ? fieldAttribute.focus : false,
+            validation : (validationArray && validationArray.length > 0) ? validationArray : null,
+            sequenceMasterId: fieldAttribute.sequenceMasterId,
             dataStoreMasterId,
             dataStoreAttributeId,
-            externalDataStoreMasterUrl
+            externalDataStoreMasterUrl,
         };
     }
     

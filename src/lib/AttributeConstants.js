@@ -1,3 +1,5 @@
+import RNFS from 'react-native-fs';
+import CONFIG from '../lib/config'
 module.exports = {
 
     /**
@@ -29,11 +31,22 @@ module.exports = {
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
     SKU_UNIT_PRICE: 14,
+    CHECKBOX: 8,
+    RADIOBUTTON:9,
+    DROPDOWN:10,
+    TEXT:2,
+    SKU_ORIGINAL_QUANTITY:15,
+    SKU_CODE:51,
+    SKU_ACTUAL_QUANTITY:16,
+    TOTAL_ORIGINAL_QUANTITY:35,
+    TOTAL_ACTUAL_QUANTITY:36,
+    SKU_UNIT_PRICE:14,
     TRANSACTION_NUMBER: 'transaction_number',
     NPS_FEEDBACK: 23,
     RE_ATTEMPT_DATE: 33,
     DATE: 3,
     TIME: 5,
+    
 
     // Money Collect Mode Type Constants
     CASH: {
@@ -180,7 +193,10 @@ module.exports = {
     CASH_TENDERING: 38,
     OPTION_CHECKBOX: 8,
     OPTION_RADIO_FOR_MASTER: 39,
+    OPTION_RADIO_VALUE: 41,
+    OPTION_RADIO_KEY: 40,
     MULTIPLE_SCANNER: 48,
+    SIGNATURE_AND_NPS: 58,
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
     STRING: 1,
@@ -196,5 +212,11 @@ module.exports = {
     DATA_STORE_ATTR_MASTER_ID: '&dataStoreMasterAttributeId=',
     GET: 'GET',
     EXTERNAL_DATA_STORE_URL: "&externalDataStoreUrl=",
-    DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey="
+    DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey=",
+   
+    SEQUENCE: 62,
+    PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
+    SIGN: 'sign_',
+    IMAGE_EXTENSION: '.jpg',
+    PASSWORD: 61,
 }

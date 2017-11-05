@@ -8,7 +8,7 @@ import {
   FlatList
 }
   from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon } from 'native-base';
+import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon,Toast } from 'native-base';
 import styles from '../themes/FeStyle'
 import imageFile from '../../images/fareye-logo.png'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
@@ -36,7 +36,8 @@ function mapStateToProps(state) {
     statusId: state.formLayout.statusId,
     latestPositionId: state.formLayout.latestPositionId,
     paymentAtEnd: state.formLayout.paymentAtEnd,
-    isLoading: state.formLayout.isLoading
+    isLoading: state.formLayout.isLoading,
+    errorMessage: state.formLayout.errorMessage
   }
 }
 
@@ -90,13 +91,18 @@ class FormLayout extends Component {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
-      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId);
+      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId,this.props.navigation.state.params.jobMasterId);
     }
   }
 
   _keyExtractor = (item, index) => item[1].key;
-
   render() {
+    console.log("schsgdc",this.props.errorMessage.length)
+    if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
+        text: this.props.errorMessage,
+        position: 'bottom',
+        buttonText: 'Okay'
+         })}
     if (this.props.isLoading) { return <Loader /> }
     return (
       <Container style={StyleSheet.flatten([styles.mainBg])}>
@@ -121,7 +127,6 @@ class FormLayout extends Component {
             keyExtractor={this._keyExtractor}>
           </FlatList>
         </Content>
-
         <Button full success
           disabled={this.props.isSaveDisabled} onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}>
           <Text style={{ color: 'white' }}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>

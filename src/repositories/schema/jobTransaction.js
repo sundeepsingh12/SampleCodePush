@@ -31,7 +31,7 @@ JobTransaction.schema = {
               originalAmount  : { type: 'double',default:0.0,optional:true},
               moneyTransactionType  :  { type: 'string',optional:true},
               referenceNumber  :    { type: 'string' }  ,
-              runsheetId  :  { type: 'int' },
+              runsheetId  :  { type: 'int',optional:true },
               hubId  : { type: 'int' },
               cityId  : { type: 'int' },
               trackKm  : { type: 'double' },
@@ -55,5 +55,6 @@ JobTransaction.schema = {
               statusCode : {type : 'string', optional : true},
               employeeCode : {type : 'string', optional : true},
               hubCode : {type : 'string', optional : true},
+              negativeJobTransactionId : {type : 'int',optional:true}
   }
 }

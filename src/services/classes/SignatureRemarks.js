@@ -20,16 +20,30 @@ import {
     TOTAL_ACTUAL_QUANTITY,
     MONEY_COLLECT,
     MONEY_PAY,
-    ACTUAL_AMOUNT
+    ACTUAL_AMOUNT,
+    PATH_TEMP,
+    SIGN,
+    IMAGE_EXTENSION
 } from '../../lib/AttributeConstants'
+const {
+    USER,
+    FIELD_ATTRIBUTE,
+} = require('../../lib/constants').default
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { fieldDataService } from '../../services/classes/FieldData'
 class SignatureRemarks {
 
+    /**
+        * creates remarks DataList object, which contains value and label of all remarks
+        * @param {*formElement Map} nextEditable 
+        */
     filterRemarksList(fieldDataList) { //TODO add javadoc
         if (fieldDataList == undefined)
             return []
         let checkCondition;
         let dataList = []
         for (let [key, fieldDataObject] of fieldDataList.entries()) {
+            console.log('==in service', fieldDataObject)
             let dataObject = {}
             switch (fieldDataObject.attributeTypeId) {
                 case CAMERA_HIGH:
@@ -47,19 +61,22 @@ class SignatureRemarks {
                 case SKU_ACTUAL_AMOUNT:
                 case TOTAL_ORIGINAL_QUANTITY:
                 case TOTAL_ACTUAL_QUANTITY:
+                case MONEY_COLLECT:
+                case MONEY_PAY:
                     checkCondition = false;
                     break;
                 default:
                     checkCondition = true;
             }
-            if (fieldDataObject && !fieldDataObject.hidden && fieldDataObject.value && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
+            if (fieldDataObject && !fieldDataObject.hidden && fieldDataObject.value != undefined && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
                 let { label, value } = fieldDataObject
                 dataList.push({ label, value })
             }
-            if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childFieldDataList != null && fieldDataObject.childFieldDataList.length > 0) {
-                for (let childFieldData of fieldDataObject.childFieldDataList) {
+            if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childDataList != null && fieldDataObject.childDataList.length > 0) {
+                for (let childFieldData of fieldDataObject.childDataList) {
                     if (childFieldData.attributeTypeId == ACTUAL_AMOUNT) {
-                        let { label, value } = childFieldData
+                        let { label } = fieldDataObject
+                        let { value } = childFieldData
                         dataList.push({ label, value })
                     }
                 }
@@ -67,15 +84,23 @@ class SignatureRemarks {
         }
         return dataList
     }
-
-    async saveFile(result) {
-        const currentTimeInMillis = moment()
-        let PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP'; //TODO update variable name
-        let image_name = 'sign_' + currentTimeInMillis + '.jpg'
-        await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
-        return image_name
+    /**
+            * saves signature image and returns image name
+            * @param {*} result result from signature save
+            * @param {*} currentTimeInMillis current time 
+            */
+    async saveFile(result, currentTimeInMillis) {
+        RNFS.mkdir(PATH_TEMP);
+        const image_name = SIGN + currentTimeInMillis + IMAGE_EXTENSION
+            await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
+        const user = await keyValueDBService.getValueFromStore(USER);
+        const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
+        return value
     }
-
+    /**
+                * returns remarks validation
+                * @param {*} validation validation array
+                */
     getRemarksValidation(validation) {
         if (validation != null && validation.length > 0) {
             let value = validation.filter((value) => value.timeOfExecution == 'MINMAX')
@@ -83,6 +108,27 @@ class SignatureRemarks {
                 return true
         }
         return false
+    }
+    /**
+   * creates fieldDataObject , which contains childFieldDataList for sign and nps attribute
+   * @param {*} signatureValue
+   * @param {*} npsValue
+   * @param {*} currentElement 
+   * @param {*} fieldAttributeMasterList 
+   * @param {*} jobTransactionId 
+   * @param {*} latestPositionId 
+   */
+    prepareSignAndNpsFieldData(signatureValue, npsValue, currentElement, fieldAttributeMasterList, jobTransactionId, latestPositionId) {
+        if (!fieldAttributeMasterList.value || fieldAttributeMasterList.value.length <= 0) return []
+        let fieldAttributeList = fieldAttributeMasterList.value.filter((fieldAttribute) => fieldAttribute.parentId == currentElement.fieldAttributeMasterId)
+        let childDataList = []
+        for (let fieldAttribute of fieldAttributeList) {
+            fieldAttribute.value = (fieldAttribute.attributeTypeId == SIGNATURE) ? signatureValue : npsValue + ''
+            let { id, attributeTypeId, value } = fieldAttribute
+            childDataList.push({ fieldAttributeMasterId: id, attributeTypeId, value })
+        }
+        let fieldDataObject = fieldDataService.prepareFieldDataForTransactionSavingInState(childDataList, jobTransactionId, currentElement.positionId, latestPositionId)
+        return fieldDataObject
     }
 }
 

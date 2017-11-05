@@ -45,7 +45,8 @@ import {
   Right,
   Icon,
   List,
-  ListItem
+  ListItem,
+  Root
 } from 'native-base';
 import styles from '../../themes/FeStyle'
 import Payment from '../../containers/Payment'
@@ -58,17 +59,20 @@ import SkuListing from '../../containers/SkuListing'
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
+import SignatureAndNps from '../../containers/SignatureAndNps'
+import SelectFromList from '../../containers/SelectFromList';
 
 class AppWithNavigationState extends React.Component {
   render() {
-    return (<
-      AppNavigator navigation={
+    return (<Root> 
+      <
+      AppNavigator navigation = {
         addNavigationHelpers({
           dispatch: this.props.dispatch,
           state: this.props.nav
         })
       }
-    />
+      /></Root>
     )
   }
 }
@@ -113,6 +117,9 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
+     },
+  SelectFromList: {
+    screen: SelectFromList,
   },
   HomeUI: {
     screen: HomeUI
@@ -169,6 +176,11 @@ export const AppNavigator = StackNavigator({
     screen: DataStoreItemDetails
   },
 }, {
+  SignatureAndNps: {
+    screen: SignatureAndNps
+  }
+},
+  {
     cardStyle: {
       backgroundColor: 'white'
     }
