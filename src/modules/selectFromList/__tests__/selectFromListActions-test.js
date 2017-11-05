@@ -11,7 +11,6 @@ import { setState } from '../../global/globalActions'
 
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-jest.mock('react-native-router-flux')
 
 const {
 SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE

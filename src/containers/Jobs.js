@@ -16,13 +16,13 @@ import {
   from 'react-native'
 
 import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Text, Header, Icon, Button } from 'native-base';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as homeActions from '../modules/home/homeActions'
 import _ from 'underscore'
-import renderIf from '../lib/renderIf';
-import Swipeable from 'react-native-swipeable';
+import renderIf from '../lib/renderIf'
+import Swipeable from 'react-native-swipeable'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import { NavigationActions } from 'react-navigation'

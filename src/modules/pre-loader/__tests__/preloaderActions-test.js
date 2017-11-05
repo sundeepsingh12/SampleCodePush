@@ -8,8 +8,6 @@ import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { authenticationService } from '../../../services/classes/Authentication'
 import { deviceVerificationService } from '../../../services/classes/DeviceVerification'
 
-jest.mock('react-native-router-flux')
-
 var actions = require('../preloaderActions')
 const {
 

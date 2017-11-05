@@ -7,7 +7,7 @@ import {
 } from 'react-native'
 import { Container, Button, List, ListItem, Body, Left, Right, Input } from 'native-base';
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import feStyle from '../themes/FeStyle'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -23,9 +23,6 @@ function mapStateToProps(state) {
   }
 };
 
-/*
- * Bind all the actions
- */
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({  ...preloaderActions }, dispatch)
@@ -34,11 +31,11 @@ function mapDispatchToProps(dispatch) {
 
 class InitialSetup extends Component{
 
-     invalidateSession() {
+     invalidateSession = () => {
         this.props.actions.invalidateUserSession()
     }
 
-    retry() {
+    retry = () => {
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
 
@@ -110,10 +107,10 @@ class InitialSetup extends Component{
         if (this.props.isError) {
             return (
                 <View style={feStyle.row}>
-                    <Button onPress={() => this.invalidateSession()} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
+                    <Button onPress={this.invalidateSession} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
                         <Text style={{ color: '#ffffff' }}>Cancel</Text>
                     </Button>
-                    <Button onPress={() => this.retry()} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
+                    <Button onPress={this.retry} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
                         <Text style={{ color: '#ffffff' }}>Retry</Text>
                     </Button>
                 </View>

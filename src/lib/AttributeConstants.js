@@ -169,8 +169,6 @@ module.exports = {
         appModuleId: 21
     },
     // Field Data Value Constants
-    ARRAYSAROJFAREYE: 'ArraySarojFareye',
-    OBJECTSAROJFAREYE: 'ObjectSarojFareye',
     FIXED_SKU_QUANTITY: 6,
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,

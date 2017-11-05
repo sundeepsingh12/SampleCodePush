@@ -3,7 +3,7 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { selectFromListDataService } from '../../services/classes/SelectFromListService'
 import { updateFieldDataWithChildData, getNextFocusableAndEditableElements, updateFieldData } from '../form-layout/formLayoutActions'
-import { CHECKBOX, RADIOBUTTON, ARRAYSAROJFAREYE } from '../../lib/AttributeConstants'
+import { CHECKBOX, RADIOBUTTON, ARRAY_SAROJ_FAREYE } from '../../lib/AttributeConstants'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { setState } from '../global/globalActions'
 
@@ -31,7 +31,7 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
             if (params.attributeTypeId == CHECKBOX) {
                 const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransactionId, params.positionId, latestPositionId)
 
-                dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAYSAROJFAREYE, fieldDataListData))
+                dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListData))
             } else {
                 dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
             }

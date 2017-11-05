@@ -1,29 +1,13 @@
-/**
- * # Main.js
- *  This is the main app screen
- *
- */
+
 'use strict'
-/*
- * ## Imports
- *
- * Imports from redux
- */
+
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-
-/**
- * The actions we need
- */
-import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 
-/**
- * The components needed from React
- */
 import React, {Component} from 'react'
 import {StyleSheet, View, Image, TouchableHighlight, PanResponder} from 'react-native'
 
@@ -68,9 +52,7 @@ function mapDispatchToProps(dispatch) {
 }
 const MAX_POINTS = 200;
 
-/**
- * ## App class
- */
+
 class JobDetailsV2 extends Component {
 
   constructor(props) {
@@ -323,7 +305,5 @@ const style = StyleSheet.create({
   }
 });
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(JobDetailsV2)
