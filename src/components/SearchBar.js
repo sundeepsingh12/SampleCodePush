@@ -37,7 +37,7 @@ export default class SearchBar extends Component {
                         style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
                         <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.goBack() }} />
                         <Text
-                            style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Search</Text>
+                            style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.title}</Text>
                         <View />
                     </View>
                     <View style={[styles.row,]}>
@@ -76,9 +76,6 @@ const style = StyleSheet.create({
         paddingTop: 10,
         paddingBottom: 10
     },
-    headerIcon: {
-        width: 24
-    },
     headerSearch: {
         paddingLeft: 10,
         paddingRight: 30,
@@ -94,42 +91,4 @@ const style = StyleSheet.create({
         paddingLeft: 0,
         paddingRight: 0
     },
-    card: {
-        paddingLeft: 10,
-        marginBottom: 10,
-        backgroundColor: '#ffffff',
-        elevation: 1,
-        shadowColor: '#d3d3d3',
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 2
-    },
-    cardLeft: {
-        flex: 0.85,
-        borderRightColor: '#f3f3f3',
-        borderRightWidth: 1
-    },
-    cardLeftTopRow: {
-        flexDirection: 'row',
-        borderBottomColor: '#f3f3f3',
-        borderBottomWidth: 1
-    },
-    cardRight: {
-        width: 40,
-        position: 'relative',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    cardCheckbox: {
-        alignSelf: 'center',
-        backgroundColor: 'green',
-        position: 'absolute',
-        marginLeft: 10,
-        borderRadius: 0,
-        left: 0
-    }
-
 });

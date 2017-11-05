@@ -4,22 +4,34 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 const {
     REMARKS,
     MINMAX,
-    SPECIAL
+    SPECIAL,
+    TABLE_FIELD_DATA
 } = require('../../lib/constants').default
 
 import {
     DATA_STORE_ATTR_MASTER_ID,
     DATA_STORE_MASTER_ID,
     SEARCH_VALUE,
-    GET
+    GET,
+    EXTERNAL_DATA_STORE_URL,
+    DATA_STORE_ATTR_KEY
 } from '../../lib/AttributeConstants'
+import * as realm from '../../repositories/realmdb'
 
 class DataStoreService {
 
+    /**
+    * This function returns validation object
+    * @param {*} validationArray 
+    * @returns 
+    * {
+        isScannerEnabled : boolean
+        isAutoStartScannerEnabled : boolean
+        isSearchEnabled : boolean
+        isMinMaxValidation : boolean
+    * }
+    */
     getValidations(validationArray) {
-        if (!validationArray) {
-            throw new Error('Validation Array Missing')
-        }
         let validationObject = {}
         for (let validation of validationArray) {
             if (validation.timeOfExecution) {
@@ -36,7 +48,7 @@ class DataStoreService {
                         validationObject.isSearchEnabled = (validation.condition == 'true')
                         break
                     case MINMAX:
-                        validationObject.isAllowFromField = (validation.condition == 'true')
+                        validationObject.isMinMaxValidation = (validation.condition == 'true')
                         break
                 }
             }
@@ -44,7 +56,16 @@ class DataStoreService {
         return validationObject;
     }
 
-    fetchJson(token, searchText, dataStoreMasterId, dataStoreMasterAttributeId) {
+    /**
+   * This function fetch for data store search value
+   * @param {*} token
+   * @param {*} searchText
+   * @param {*} dataStoreMasterId
+   * @param {*} dataStoreMasterAttributeId
+   * @returns 
+   * jsonReponse from Server
+   */
+    fetchJsonForDS(token, searchText, dataStoreMasterId, dataStoreMasterAttributeId) {
         if (!token) {
             throw new Error('Token Missing')
         }
@@ -62,11 +83,27 @@ class DataStoreService {
         return dataStoreResponse
     }
 
+    /** 
+     * This function returns data store attribute Map
+        * @param {*} dataStoreResponse 
+        * @returns 
+        * {
+            id:{
+                id :integer,
+                matchKey : string,
+                uniqueKey : string,
+                dataStoreAttributeValueMap :{
+                    matchKey : string,
+                    uniqueKey : string
+                }
+            }
+        * }
+        */
     getDataStoreAttrValueMapFromJson(dataStoreResponse) {
-        if (!dataStoreResponse) {
-            throw new Error('dataStoreResponse is missing')
-        }
         let dataStoreAttrValueMap = {}
+        if (!dataStoreResponse) {
+            return dataStoreAttrValueMap
+        }
         for (let itemCounter in dataStoreResponse.items) {
             let itemObject = dataStoreResponse.items[itemCounter]
             delete itemObject.details.dataStoreAttributeValueMap._id;
@@ -81,6 +118,14 @@ class DataStoreService {
         return dataStoreAttrValueMap
     }
 
+
+    /**
+        * This function returns data store attribute Map
+        * @param {*} dataStoreAttributeValueMap
+        * @param {*} formElements
+        * @returns 
+        * formElements having mapped keys value changed
+        */
     fillKeysInFormElement(dataStoreAttributeValueMap, formElements) {
         if (!dataStoreAttributeValueMap) {
             throw new Error('dataStoreAttributeValueMap not present')
@@ -94,6 +139,58 @@ class DataStoreService {
             }
         }
         return formElements
+    }
+
+    /**
+  * This function fetch for external data store search value
+  * @param {*} token
+  * @param {*} searchText
+  * @param {*} externalDataStoreUrl
+  * @param {*} attributeKey
+  * @returns 
+  * jsonReponse from Server
+  */
+    fetchJsonForExternalDS(token, searchText, externalDataStoreUrl, attributeKey) {
+        if (!token) {
+            throw new Error('Token Missing')
+        }
+        if (!externalDataStoreUrl) {
+            throw new Error('ExternalDataStoreUrl missing in currentElement')
+        }
+        if (!attributeKey) {
+            throw new Error('AttributeKey missing in currentElement')
+        }
+        if (!searchText) {
+            throw new Error('Search Text not present')
+        }
+        const url = CONFIG.API.SERVICE_DSA_EXTERNAL + SEARCH_VALUE + encodeURIComponent(searchText) + EXTERNAL_DATA_STORE_URL + encodeURIComponent(externalDataStoreUrl) + DATA_STORE_ATTR_KEY + attributeKey
+        const dataStoreResponse = RestAPIFactory(token.value).serviceCall(null, url, GET)
+        return dataStoreResponse
+    }
+
+    /**
+      * This function checks for dataStoreValue present in TABLE_FIELD_DATA for external data store fieldAttributeMasterId
+      * @param {*} dataStoreValue
+      * @param {*} fieldAttributeMasterId
+      * @returns 
+      * boolean
+      */
+    dataStoreValuePresentInFieldData(dataStoreValue, fieldAttributeMasterId) {
+        if (!dataStoreValue) {
+            throw new Error('dataStorevalue missing in currentElement')
+        }
+        if (!fieldAttributeMasterId) {
+            throw new Error('fieldAttributeMasterId missing in currentElement')
+        }
+        let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttributeMasterId}`
+        let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
+        for (let index in fieldDataList) {
+            let fieldData = { ...fieldDataList[index] }
+            if (fieldData.value == dataStoreValue) {
+                return true
+            }
+        }
+        return false
     }
 }
 

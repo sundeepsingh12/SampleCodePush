@@ -32,7 +32,8 @@ import {
     NUMBER,
     DECIMAL,
     SKU_ARRAY,
-    DATA_STORE
+    DATA_STORE,
+    EXTERNAL_DATA_STORE
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -73,6 +74,7 @@ class BasicFormElement extends Component {
                 screenName = 'SkuListing'
                 break
             }
+            case EXTERNAL_DATA_STORE:
             case DATA_STORE: {
                 screenName = 'DataStore'
                 break
@@ -97,9 +99,9 @@ class BasicFormElement extends Component {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement,this.props.formElement,'Before')          
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before')
     }
-        
+
 
     _onBlurEvent(attributeId) {
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
@@ -205,6 +207,7 @@ class BasicFormElement extends Component {
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
+            case EXTERNAL_DATA_STORE:
             case DATA_STORE:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             default:

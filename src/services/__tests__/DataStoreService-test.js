@@ -6,6 +6,7 @@ const {
     SPECIAL
 } = require('../../lib/constants').default
 import RestAPIFactory from '../../lib/RestAPIFactory'
+import * as realm from '../../repositories/realmdb'
 
 describe('test getValidationsArray', () => {
     it('should return validation array having all validations', () => {
@@ -30,18 +31,18 @@ describe('test getValidationsArray', () => {
             isScannerEnabled: true,
             isAutoStartScannerEnabled: false,
             isSearchEnabled: true,
-            isAllowFromField: true
+            isMinMaxValidation: true
         }
         expect(dataStoreService.getValidations(validationArray)).toEqual(validationsResult)
     })
 
-    it('should throw Validation Array missing error', () => {
-        const message = 'Validation Array Missing'
-        try {
-            dataStoreService.getValidations(null)
-        } catch (error) {
-            expect(error.message).toEqual(message)
-        }
+    it('should return empty Object', () => {
+        const validationArray = [{
+            condition: 'true'
+        }]
+
+        const validationsResult = {}
+        expect(dataStoreService.getValidations(validationArray)).toEqual(validationsResult)
     })
 })
 
@@ -131,11 +132,11 @@ describe('test fillKeysInFormElement', () => {
         b: 'pqr'
     }
 
-    it('should return formElement having mapped value set for mapped keys with dataStoreAttributeValueMap', () => {
+    it('should return FormElement having mapped value set for mapped keys with dataStoreAttributeValueMap', () => {
         expect(dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutMap)).toEqual(formLayoutMapResult)
     })
 
-    it('should return same formElement', () => {
+    it('should return same FormElement', () => {
         expect(dataStoreService.fillKeysInFormElement(unmatchedDataStoreAttributeValueMap, formLayoutMap)).toEqual(formLayoutMap)
     })
 
@@ -150,7 +151,7 @@ describe('test fillKeysInFormElement', () => {
         }
     })
 
-    it('should throw formElements missing error', () => {
+    it('should throw FormElements missing error', () => {
         const message = 'formElements not present'
         try {
             dataStoreService.fillKeysInFormElement({
@@ -162,42 +163,45 @@ describe('test fillKeysInFormElement', () => {
     })
 })
 
-describe('test fetchJson', () => {
+describe('test fetchJsonForDS', () => {
     it('should return jsonResponse', () => {
         RestAPIFactory().serviceCall = jest.fn()
         RestAPIFactory().serviceCall.mockReturnValue(null);
-        dataStoreService.fetchJson(1, 'abhi', 123, 234)
+        dataStoreService.fetchJsonForDS(1, 'abhi', 123, 234)
         expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
     })
 
-    it('should throw token missing error', () => {
+    it('should throw Token missing error', () => {
         const message = 'Token Missing'
         try {
-            dataStoreService.fetchJson(null, 'abhi', 123, 234)
+            dataStoreService.fetchJsonForDS(null, 'abhi', 123, 234)
         } catch (error) {
             expect(error.message).toEqual(message)
         }
     })
+
     it('should throw DataStoreMasterAttributeId missing error', () => {
         const message = 'DataStoreMasterAttributeId missing in currentElement'
         try {
-            dataStoreService.fetchJson(1, 'abhi', 123, null)
+            dataStoreService.fetchJsonForDS(1, 'abhi', 123, null)
         } catch (error) {
             expect(error.message).toEqual(message)
         }
     })
+
     it('should throw DataStoreMasterId missing error', () => {
         const message = 'DataStoreMasterId missing in currentElement'
         try {
-            dataStoreService.fetchJson(1, 'abhi', null, 234)
+            dataStoreService.fetchJsonForDS(1, 'abhi', null, 234)
         } catch (error) {
             expect(error.message).toEqual(message)
         }
     })
+
     it('should throw Search Text missing error', () => {
         const message = 'Search Text not present'
         try {
-            dataStoreService.fetchJson(1, null, 123, 234)
+            dataStoreService.fetchJsonForDS(1, null, 123, 234)
         } catch (error) {
             expect(error.message).toEqual(message)
         }
@@ -232,12 +236,12 @@ describe('test getDataStoreAttrValueMapFromJson', () => {
         }
     }
 
-    it('should return dataStoreAttrValueMap', () => {
+    it('should return DataStoreAttrValueMap', () => {
         expect(dataStoreService.getDataStoreAttrValueMapFromJson(dataStoreResponse)).toEqual(attrValueMap)
     })
 
-    it('should throw dataStoreResponse missing error', () => {
-        const message = 'dataStoreResponse is missing'
+    it('should throw DataStoreResponse missing error', () => {
+        const message = 'DataStoreResponse is missing'
         try {
             dataStoreService.getDataStoreAttrValueMapFromJson(null)
         } catch (error) {
@@ -245,6 +249,99 @@ describe('test getDataStoreAttrValueMapFromJson', () => {
         }
     })
 })
+
+describe('test fetchJsonForExternalDS', () => {
+    it('should return jsonResponse', () => {
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(null);
+        dataStoreService.fetchJsonForExternalDS(1, 'abhi', 123, 234)
+        expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+    })
+
+    it('should throw Token missing error', () => {
+        const message = 'Token Missing'
+        try {
+            dataStoreService.fetchJsonForExternalDS(null, 'abhi', 123, 234)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw ExternalDataStoreUrl missing error', () => {
+        const message = 'ExternalDataStoreUrl missing in currentElement'
+        try {
+            dataStoreService.fetchJsonForExternalDS(1, 'abhi', null, 123)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw AttributeKey missing error', () => {
+        const message = 'AttributeKey missing in currentElement'
+        try {
+            dataStoreService.fetchJsonForExternalDS(1, 'abhi', 234, null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw Search Text missing error', () => {
+        const message = 'Search Text not present'
+        try {
+            dataStoreService.fetchJsonForExternalDS(1, null, 123, 234)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+})
+
+describe('test dataStoreValuePresentInFieldData', () => {
+
+    it('should throw DataStorevalue missing error', () => {
+        const message = 'dataStorevalue missing in currentElement'
+        try {
+            dataStoreService.dataStoreValuePresentInFieldData(null, 123)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw FieldAttributeMasterId missing error', () => {
+        const message = 'fieldAttributeMasterId missing in currentElement'
+        try {
+            dataStoreService.dataStoreValuePresentInFieldData('abhi', null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should return true as dataStoreValue is present is FieldData Table', () => {
+        realm.getRecordListOnQuery = jest.fn();
+        realm.getRecordListOnQuery.mockReturnValue([{
+            fieldAttributeMasterId: 123,
+            id: 234,
+            jobTransactionId: 2345,
+            parentId: 0,
+            positionId: 0,
+            value: 'abhi'
+        }]);
+        expect(dataStoreService.dataStoreValuePresentInFieldData('abhi', 123)).toEqual(true)
+    })
+
+    it('should return false as dataStoreValue is not present is FieldData Table', () => {
+        realm.getRecordListOnQuery = jest.fn();
+        realm.getRecordListOnQuery.mockReturnValue([{
+            fieldAttributeMasterId: 123,
+            id: 234,
+            jobTransactionId: 2345,
+            parentId: 0,
+            positionId: 0,
+            value: 'abhi'
+        }]);
+        expect(dataStoreService.dataStoreValuePresentInFieldData('xyz', 989)).toEqual(false)
+    })
+})
+
 
 function getMapFromObject(obj) {
     let strMap = new Map();

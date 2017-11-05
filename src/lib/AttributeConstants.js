@@ -188,11 +188,13 @@ module.exports = {
     NUMBER: 6,
     DECIMAL: 13,
     DATA_STORE: 44,
+    EXTERNAL_DATA_STORE: 63,
 
     //REST API 
     SEARCH_VALUE: '?searchValue=',
     DATA_STORE_MASTER_ID: '&dataStoreMasterId=',
     DATA_STORE_ATTR_MASTER_ID: '&dataStoreMasterAttributeId=',
-    GET: 'GET'
-
+    GET: 'GET',
+    EXTERNAL_DATA_STORE_URL: "&externalDataStoreUrl=",
+    DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey="
 }

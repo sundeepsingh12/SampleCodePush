@@ -61,7 +61,7 @@ export default class DataStoreItemDetails extends Component {
                 </Header>
                 <Content style={[styles.margin5]}>
                     < FlatList
-                        data={this.createDetails(this.props.details)}
+                        data={this.createDetails(this.props.selectedElement.dataStoreAttributeValueMap)}
                         renderItem={({ item }) => this.renderData(item)}
                         keyExtractor={item => item.id}
                     />
@@ -70,7 +70,7 @@ export default class DataStoreItemDetails extends Component {
                     <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
                         <Button success full style={styles.bgPrimary}
                             onPress={() => {
-                                this.props.onSave(this.props.details)
+                                this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.matchKey])
                             }}>
                             <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                         </Button>
@@ -87,60 +87,9 @@ const style = StyleSheet.create({
         paddingTop: 10,
         paddingBottom: 10
     },
-    headerIcon: {
-        width: 24
-    },
-    headerSearch: {
-        paddingLeft: 10,
-        paddingRight: 30,
-        backgroundColor: '#1260be',
-        borderRadius: 2,
-        height: 40,
-        color: '#fff',
-        fontSize: 14
-    },
-    headerQRButton: {
-        position: 'absolute',
-        right: 5,
-        paddingLeft: 0,
-        paddingRight: 0
-    },
-    card: {
-        paddingLeft: 10,
-        marginBottom: 10,
-        backgroundColor: '#ffffff',
-        elevation: 1,
-        shadowColor: '#d3d3d3',
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 2
-    },
     cardLeft: {
         flex: 0.85,
         borderRightColor: '#f3f3f3',
         borderRightWidth: 1
     },
-    cardLeftTopRow: {
-        flexDirection: 'row',
-        borderBottomColor: '#f3f3f3',
-        borderBottomWidth: 1
-    },
-    cardRight: {
-        width: 40,
-        position: 'relative',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    cardCheckbox: {
-        alignSelf: 'center',
-        backgroundColor: 'green',
-        position: 'absolute',
-        marginLeft: 10,
-        borderRadius: 0,
-        left: 0
-    }
-
 });

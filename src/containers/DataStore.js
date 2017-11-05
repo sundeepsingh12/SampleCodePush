@@ -7,8 +7,6 @@ import SearchBar from '../components/SearchBar'
 import * as globalActions from '../modules/global/globalActions'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import DataStoreItemDetails from '../components/DataStoreItemDetails'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
@@ -17,6 +15,7 @@ const {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     _id,
+    SET_INITIAL_STATE
 } = require('../lib/constants').default
 import {
     FooterTab,
@@ -34,12 +33,13 @@ function mapStateToProps(state) {
         isSearchEnabled: state.dataStore.isSearchEnabled,
         isAutoStartScannerEnabled: state.dataStore.isAutoStartScannerEnabled,
         isScannerEnabled: state.dataStore.isScannerEnabled,
-        isAllowFromField: state.dataStore.isAllowFromField,
+        isMinMaxValidation: state.dataStore.isMinMaxValidation,
         dataStoreAttrValueMap: state.dataStore.dataStoreAttrValueMap,
         loaderRunning: state.dataStore.loaderRunning,
         errorMessage: state.dataStore.errorMessage,
         searchText: state.dataStore.searchText,
         detailsVisibleFor: state.dataStore.detailsVisibleFor,
+        // isSaveSuccessful: state.dataStore.isSaveSuccessful,
     }
 };
 
@@ -59,8 +59,15 @@ class DataStore extends Component {
     }
 
     componentWillMount() {
+        this.props.actions.setState(SET_INITIAL_STATE)
         this.props.actions.setValidation(this.props.navigation.state.params.currentElement.validation)
     }
+
+    // componentWillReceiveProps(){
+    //     if (this.props.isSaveSuccessful) {
+    //         this._goBack()
+    //     }
+    // }
 
     getTextData(item) {
         let firstValue = item.dataStoreAttributeValueMap[item.matchKey]
@@ -87,10 +94,7 @@ class DataStore extends Component {
             <Card>
                 <TouchableOpacity
                     onPress={() => {
-                        this.props.actions.setState(SHOW_DETAILS, {
-                            itemId: item.id,
-                            searchText: firstValue
-                        })
+                        this.props.actions.setState(SHOW_DETAILS, item.id)
                     }}>
                     <View style={[style.cardLeft]}>
                         {renderIf(firstValue, <View style={[style.cardLeftTopRow]}>
@@ -101,8 +105,7 @@ class DataStore extends Component {
                         </View>)}
                     </View>
                 </TouchableOpacity>
-            </Card>
-
+            </Card >
         )
     }
 
@@ -114,7 +117,9 @@ class DataStore extends Component {
         if ((this.props.isSearchEnabled || manualSearch) && searchText.length > 2) {
             this.props.actions.getDataStoreAttrValueMap(searchText,
                 this.props.navigation.state.params.currentElement.dataStoreMasterId,
-                this.props.navigation.state.params.currentElement.dataStoreAttributeId)
+                this.props.navigation.state.params.currentElement.dataStoreAttributeId,
+                this.props.navigation.state.params.currentElement.externalDataStoreMasterUrl,
+                this.props.navigation.state.params.currentElement.key)
         }
         if (searchText.length <= 2) {
             this.props.actions.setState(SET_DATA_STORE_ATTR_MAP, {})
@@ -126,22 +131,21 @@ class DataStore extends Component {
         this.props.navigation.goBack(null)
     }
 
-    onSave = (dataStoreAttributeValueMap) => {
+    onSave = (dataStoreAttributeValueMap, dataStoreValue) => {
         this.props.actions.fillKeysAndSave(dataStoreAttributeValueMap,
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled,
-            this.props.searchText)
+            dataStoreValue,
+            this.props.isMinMaxValidation,
+            this.props.navigation.state.params.currentElement.attributeTypeId)
         this.setDetailsFor()
-        this._goBack()
+        // this._goBack()
     }
 
     setDetailsFor = () => {
-        this.props.actions.setState(SHOW_DETAILS, {
-            itemId: -1,
-            searchText: this.props.searchText
-        })
+        this.props.actions.setState(SHOW_DETAILS, -1)
     }
 
     render() {
@@ -149,6 +153,7 @@ class DataStore extends Component {
             return (
                 < Container >
                     <SearchBar
+                        title={this.props.navigation.state.params.currentElement.label}
                         isScannerEnabled={this.props.isScannerEnabled}
                         fetchDataStoreAttrValueMap={this.fetchDataStoreAttrValueMap}
                         goBack={this._goBack}
@@ -160,7 +165,9 @@ class DataStore extends Component {
                         {renderIf(!_.isEmpty(this.props.dataStoreAttrValueMap),
                             <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>Suggestions</Text>)}
                         {renderIf(this.props.errorMessage != '',
-                            <Text style={[styles.fontDarkGray, styles.alignSelfCenter, styles.justifyCenter, styles.marginTop25]}>{this.props.errorMessage}{this.props.searchText}</Text>)}
+                            <Text style={[styles.fontDarkGray, styles.alignSelfCenter, styles.justifyCenter, styles.marginTop25]}>
+                                {this.props.errorMessage}
+                            </Text>)}
                         {renderIf(!this.props.loaderRunning,
                             < FlatList
                                 data={Object.values(this.props.dataStoreAttrValueMap)}
@@ -168,7 +175,9 @@ class DataStore extends Component {
                                 keyExtractor={item => item.id}
                             />)}
                     </Content>
-                    {renderIf(this.props.isAllowFromField && this.props.searchText.length > 2,
+                    {renderIf(this.props.isMinMaxValidation &&
+                        this.props.searchText.length > 2 &&
+                        this.props.navigation.state.params.currentElement.attributeTypeId != 63,
                         <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                             <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
                                 <Button success full style={styles.bgPrimary}
@@ -191,7 +200,8 @@ class DataStore extends Component {
             )
         }
         return (
-            < DataStoreItemDetails details={(this.props.dataStoreAttrValueMap[this.props.detailsVisibleFor]).dataStoreAttributeValueMap}
+            < DataStoreItemDetails
+                selectedElement={this.props.dataStoreAttrValueMap[this.props.detailsVisibleFor]}
                 goBack={this.setDetailsFor}
                 onSave={this.onSave} />
         )
@@ -199,43 +209,6 @@ class DataStore extends Component {
 }
 
 const style = StyleSheet.create({
-    header: {
-        borderBottomWidth: 0,
-        height: 'auto',
-        paddingTop: 10,
-        paddingBottom: 10
-    },
-    headerIcon: {
-        width: 24
-    },
-    headerSearch: {
-        paddingLeft: 10,
-        paddingRight: 30,
-        backgroundColor: '#1260be',
-        borderRadius: 2,
-        height: 40,
-        color: '#fff',
-        fontSize: 14
-    },
-    headerQRButton: {
-        position: 'absolute',
-        right: 5,
-        paddingLeft: 0,
-        paddingRight: 0
-    },
-    card: {
-        paddingLeft: 10,
-        marginBottom: 10,
-        backgroundColor: '#ffffff',
-        elevation: 1,
-        shadowColor: '#d3d3d3',
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.5,
-        shadowRadius: 2
-    },
     cardLeft: {
         flex: 0.85,
         borderRightColor: '#f3f3f3',
@@ -246,20 +219,6 @@ const style = StyleSheet.create({
         borderBottomColor: '#f3f3f3',
         borderBottomWidth: 1
     },
-    cardRight: {
-        width: 40,
-        position: 'relative',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    cardCheckbox: {
-        alignSelf: 'center',
-        backgroundColor: 'green',
-        position: 'absolute',
-        marginLeft: 10,
-        borderRadius: 0,
-        left: 0
-    }
 });
 
 /**

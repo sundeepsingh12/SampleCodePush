@@ -8,11 +8,15 @@ const {
     SHOW_LOADER,
     SHOW_ERROR_MESSAGE,
     SET_SEARCH_TEXT,
-    SHOW_DETAILS
+    SHOW_DETAILS,
+    SAVE_SUCCESSFUL,
+    SET_INITIAL_STATE
 } = require('../../../lib/constants').default
+const InitialState = require('../dataStoreInitialState').default
 
 describe('data Store reducer', () => {
 
+    const resultState = new InitialState()
     it('should set loaderRunning to true and errorMessage to empty', () => {
         const action = {
             type: SHOW_LOADER,
@@ -29,14 +33,14 @@ describe('data Store reducer', () => {
             payload: {
                 isScannerEnabled: true,
                 isAutoStartScannerEnabled: false,
-                isAllowFromField: true,
+                isMinMaxValidation: true,
                 isSearchEnabled: false
             }
         }
         let nextState = dataStoreReducer(undefined, action)
         expect(nextState.isScannerEnabled).toBe(action.payload.isScannerEnabled)
         expect(nextState.isAutoStartScannerEnabled).toBe(action.payload.isAutoStartScannerEnabled)
-        expect(nextState.isAllowFromField).toBe(action.payload.isAllowFromField)
+        expect(nextState.isMinMaxValidation).toBe(action.payload.isMinMaxValidation)
         expect(nextState.isSearchEnabled).toBe(action.payload.isSearchEnabled)
     })
 
@@ -84,13 +88,34 @@ describe('data Store reducer', () => {
     it('should set detailsVisibleFor, and searchText', () => {
         const action = {
             type: SHOW_DETAILS,
-            payload: {
-                itemId: 1,
-                searchText: 'temp_searchText'
-            }
+            payload: 1,
         }
         let nextState = dataStoreReducer(undefined, action)
-        expect(nextState.detailsVisibleFor).toBe(action.payload.itemId)
-        expect(nextState.searchText).toBe(action.payload.searchText)
+        expect(nextState.detailsVisibleFor).toBe(action.payload)
+    })
+
+    it('should set isSaveSuccessful to true', () => {
+        const action = {
+            type: SAVE_SUCCESSFUL,
+            payload: true,
+        }
+        let nextState = dataStoreReducer(undefined, action)
+        expect(nextState.isSaveSuccessful).toBe(action.payload)
+    })
+
+    it('should set initialState', () => {
+        const action = {
+            type: SET_INITIAL_STATE,
+        }
+        let nextState = dataStoreReducer(undefined, action)
+        expect(nextState).toEqual(resultState)
+    })
+
+    it('default case', () => {
+        const action = {
+            type: 'DEFAULT',
+        }
+        let nextState = dataStoreReducer(undefined, action)
+        expect(nextState).toEqual(resultState)
     })
 })

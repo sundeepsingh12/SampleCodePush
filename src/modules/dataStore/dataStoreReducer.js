@@ -7,7 +7,9 @@ const {
     SHOW_LOADER,
     SHOW_ERROR_MESSAGE,
     SET_SEARCH_TEXT,
-    SHOW_DETAILS
+    SHOW_DETAILS,
+    SET_INITIAL_STATE,
+    SAVE_SUCCESSFUL
 } = require('../../lib/constants').default
 const initialState = new InitialState()
 
@@ -21,7 +23,7 @@ export default function dataStoreReducer(state = initialState, action) {
         case SET_VALIDATIONS:
             return state.set('isScannerEnabled', action.payload.isScannerEnabled)
                 .set('isAutoStartScannerEnabled', action.payload.isAutoStartScannerEnabled)
-                .set('isAllowFromField', action.payload.isAllowFromField)
+                .set('isMinMaxValidation', action.payload.isMinMaxValidation)
                 .set('isSearchEnabled', action.payload.isSearchEnabled)
 
         case SET_DATA_STORE_ATTR_MAP:
@@ -38,8 +40,13 @@ export default function dataStoreReducer(state = initialState, action) {
             return state.set('searchText', action.payload)
 
         case SHOW_DETAILS:
-            return state.set('detailsVisibleFor', action.payload.itemId)
-                .set('searchText', action.payload.searchText)
+            return state.set('detailsVisibleFor', action.payload)
+
+        case SET_INITIAL_STATE:
+            return initialState
+
+        case SAVE_SUCCESSFUL:
+            return state.set('isSaveSuccessful', action.payload)
     }
     return state
 }

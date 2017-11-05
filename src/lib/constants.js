@@ -217,7 +217,8 @@ export default keyMirror({
     SPECIAL: null,
     MINMAX: null,
     _id: null,
-
+    SET_INITIAL_STATE :null,
+    SAVE_SUCCESSFUL: null,
 })
 
 

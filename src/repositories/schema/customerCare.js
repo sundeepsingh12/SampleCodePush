@@ -21,7 +21,7 @@ const customerCare ={
                 "required":true
             },
             "mobileNumber":{
-                "type":["string"],
+                "type":["string", null],
                 "required":true
             }
         }
