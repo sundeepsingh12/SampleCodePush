@@ -3,7 +3,8 @@
 const { Record } = require('immutable')
 
 const InitialState = Record({
-    selectFromListState: {}
+    selectFromListState: {},
+    errorMessage: ''
 })
 
 export default InitialState

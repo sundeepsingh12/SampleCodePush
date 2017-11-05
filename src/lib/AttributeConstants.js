@@ -40,6 +40,7 @@ module.exports = {
     RE_ATTEMPT_DATE: 33,
     DATE: 3,
     TIME: 5,
+    
 
     // Money Collect Mode Type Constants
     CASH: {
@@ -184,6 +185,8 @@ module.exports = {
     CASH_TENDERING: 38,
     OPTION_CHECKBOX: 8,
     OPTION_RADIO_FOR_MASTER: 39,
+    OPTION_RADIO_VALUE: 41,
+    OPTION_RADIO_KEY: 40,
     MULTIPLE_SCANNER: 48,
     SIGNATURE_AND_NPS: 58,
     TOTAL_ORIGINAL_QUANTITY: 35,
