@@ -28,7 +28,6 @@ import {
   FooterTab,
   StyleProvider
 } from 'native-base';
-import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import LinearGradient from 'react-native-linear-gradient';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
@@ -140,23 +139,6 @@ class JobDetailsV2 extends Component {
               colors={['#262da0', '#205dbe', '#2c83c9']}
               style={style.chartBlock}>
               <View style={style.chartContainer} {...this._panResponder.panHandlers}>
-                <AnimatedCircularProgress
-                  size={140}
-                  width={5}
-                  fill={fill}
-                  tintColor="#ffffff"
-                  backgroundColor="#4d62c3">
-                  {(fill) => (
-                    <View style={style.pieData}>
-                      <Text style={[style.chartCenterData, style.pieNumber]}>
-                        {Math.round(MAX_POINTS * fill / 100)}
-                      </Text>
-                      <Text style={[style.chartCenterData, style.pieText]}>
-                        pending
-                      </Text>
-                    </View>
-                  )}
-                </AnimatedCircularProgress>
               </View>
               <View style={[styles.row, styles.justifySpaceAround]}>
                 <View>
