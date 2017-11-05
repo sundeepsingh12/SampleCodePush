@@ -26,9 +26,7 @@ function mapStateToProps(state) {
   }
 };
 
-/*
- * Bind all the actions
- */
+
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({ ...fixedSKUActions, ...globalActions }, dispatch)
@@ -63,7 +61,6 @@ class FixedSKUListing extends Component {
   }
 
   render() {
-    console.log('render fixed sku',this.jobTransaction)
     if (this.props.isLoaderRunning) {
       return (
         <Loader />
@@ -95,7 +92,4 @@ class FixedSKUListing extends Component {
   }
 }
 
-/**
- * Connect the properties
- */
 export default connect(mapStateToProps, mapDispatchToProps)(FixedSKUListing)

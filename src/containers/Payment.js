@@ -6,8 +6,9 @@ import {
     View,
     Text,
     Platform,
+    TextInput
 } from 'react-native'
-import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base';
+import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base'
 import styles from '../themes/FeStyle'
 import PopOver from '../components/PopOver'
 import * as paymentActions from '../modules/payment/paymentActions'
@@ -105,15 +106,14 @@ class Payment extends Component {
         this.props.actions.setState(SET_PAYMENT_CHANGED_PARAMETERS, payload)
     }
 
-    renderPaymentModeSelected(modeId) {
-        let paymentModeSelectedView = null
-        switch (modeId) {
-            case CASH.id: paymentModeSelectedView = null
-                break
-            case CHEQUE.id: paymentModeSelectedView = <View>
-                <Text> Cheque Number </Text>
+    renderChequeOrDD(type){
+        return (
+            <View>
+                <Text> {type} </Text>
                 <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
                     <Input
+                        keyboardType="numeric"
+                        KeyboardTypeIOS="number-pad"
                         defaultValue={this.props.transactionNumber}
                         placeholder='Regular Textbox'
                         onChangeText={value => this.onTextChange(
@@ -125,31 +125,20 @@ class Payment extends Component {
                             }
                         )}
                         style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])} />
-                    {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
-                <PopOver visible={this.checkValidation()} /> */}
+                    
                 </View>
             </View>
+        )
+    }
+
+    renderPaymentModeSelected(modeId) {
+        let paymentModeSelectedView = null
+        switch (modeId) {
+            case CASH.id: paymentModeSelectedView = null
                 break
-            case DEMAND_DRAFT.id: paymentModeSelectedView = <View>
-                <Text> DD Number </Text>
-                <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
-                    <Input
-                        defaultValue={this.props.transactionNumber}
-                        placeholder='Regular Textbox'
-                        onChangeText={value => this.onTextChange(
-                            SET_PAYMENT_CHANGED_PARAMETERS,
-                            {
-                                actualAmount: this.props.actualAmount,
-                                selectedIndex: this.props.selectedIndex,
-                                transactionNumber: value
-                            }
-                        )}
-                        style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
-                    />
-                    {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
-                <PopOver visible={this.checkValidation()} /> */}
-                </View>
-            </View>
+            case CHEQUE.id: paymentModeSelectedView = this.renderChequeOrDD('Cheque Number')
+                break
+            case DEMAND_DRAFT.id: paymentModeSelectedView = this.renderChequeOrDD('DD Number')
                 break
             case DISCOUNT.id:
             case EZE_TAP.id:
@@ -222,7 +211,8 @@ class Payment extends Component {
             return (
                 <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
                     <Input
-                        keyboardType='numeric'
+                        keyboardType="numeric"
+                        KeyboardTypeIOS="number-pad"
                         placeholder='Regular Textbox'
                         onChangeText={value => this.onTextChange(
                             'SET_ACTUAL_AMOUNT',
@@ -235,8 +225,7 @@ class Payment extends Component {
                         style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
                         value={this.props.actualAmount != null && this.props.actualAmount != undefined ? '' + this.props.actualAmount : null}
                     />
-                    {/* <Icon size={12} name='ios-information-circle-outline' style={StyleSheet.flatten([styles.positionAbsolute, styles.fontDanger, styles.fontLg, { right: 8, top: 17 }])} onPress={() => { alert('hello') }} />
-                    <PopOver visible={this.checkValidation()} /> */}
+                  
                 </View>
             )
         } else {

@@ -3,7 +3,7 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { selectFromListDataService } from '../../services/classes/SelectFromListService'
 import { updateFieldDataWithChildData, getNextFocusableAndEditableElements, updateFieldData } from '../form-layout/formLayoutActions'
-import { CHECKBOX, RADIOBUTTON, ARRAYSAROJFAREYE ,OPTION_RADIO_FOR_MASTER,OBJECTSAROJFAREYE} from '../../lib/AttributeConstants'
+import { CHECKBOX, RADIOBUTTON, ARRAY_SAROJ_FAREYE ,OPTION_RADIO_FOR_MASTER,OBJECT_SAROJ_FAREYE} from '../../lib/AttributeConstants'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { setState } from '../global/globalActions'
 import * as realm from '../../repositories/realmdb'
@@ -49,7 +49,7 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
             selectFromListState = Object.values(selectFromListDataService.selectFromListDoneButtonClicked(params.attributeTypeId, selectFromListState))
             if (params.attributeTypeId == CHECKBOX || params.attributeTypeId ==  OPTION_RADIO_FOR_MASTER) {
                 const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransactionId, params.positionId, latestPositionId)
-                const value = params.attributeTypeId == OPTION_RADIO_FOR_MASTER ? OBJECTSAROJFAREYE : ARRAYSAROJFAREYE
+                const value = params.attributeTypeId == OPTION_RADIO_FOR_MASTER ? OBJECT_SAROJ_FAREYE : ARRAY_SAROJ_FAREYE
                 dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))
                 dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListData))
             } else {

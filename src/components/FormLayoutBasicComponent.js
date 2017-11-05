@@ -10,9 +10,8 @@ import {
     ActivityIndicator
 }
     from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base';
+import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base'
 import styles from '../themes/FeStyle'
-import imageFile from '../../images/fareye-logo.png'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -232,6 +231,7 @@ class BasicFormElement extends Component {
                                             </View>
                                             <View style={this._styleNextFocusable(this.props.item.focus)}>
                                                 <Input
+                                                    autoCapitalize="none"
                                                     keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                                     editable={this.props.item.editable}
                                                     multiline={this.props.item.attributeTypeId == 2 ? true : false}

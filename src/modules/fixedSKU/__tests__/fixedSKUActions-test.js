@@ -13,7 +13,6 @@ const {
     CHANGE_QUANTITY,
     SET_FIXED_SKU,
 } = require('../../../lib/constants').default
-jest.mock('react-native-router-flux')
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 

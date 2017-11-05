@@ -1,31 +1,15 @@
-/**
- * # Main.js
- *  This is the main app screen
- *
- */
+
 'use strict'
-/*
- * ## Imports
- *
- * Imports from redux
- */
+
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
-/**
- * The actions we need
- */
-import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
-import ResyncLoader from '../components/ResyncLoader'
 
-/**
- * The components needed from React
- */
 import React, {Component} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight, FlatList} from 'react-native'
+import {StyleSheet, View, TouchableHighlight, FlatList} from 'react-native'
 
 import {
   Container,
@@ -38,12 +22,11 @@ import {
   Body,
   Right,
   Icon,
-  Title,
   StyleProvider
 } from 'native-base';
 
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as newJobActions from '../modules/newJob/newJobActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -67,9 +50,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-/**
- * ## App class
- */
+
 class NewJobStatus extends Component {
 
   static navigationOptions = ({navigation}) => {
@@ -152,7 +133,5 @@ const style = StyleSheet.create({
   }
 });
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(NewJobStatus)
