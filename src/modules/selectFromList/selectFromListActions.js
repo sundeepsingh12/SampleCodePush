@@ -6,29 +6,39 @@ import { updateFieldDataWithChildData, getNextFocusableAndEditableElements, upda
 import { CHECKBOX, RADIOBUTTON, ARRAYSAROJFAREYE ,OPTION_RADIO_FOR_MASTER,OBJECTSAROJFAREYE} from '../../lib/AttributeConstants'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { setState } from '../global/globalActions'
-
+import * as realm from '../../repositories/realmdb'
+import {jobDataService} from '../../services/classes/JobData'
 const {
     FIELD_ATTRIBUTE_VALUE,
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
     ON_BLUR,
     TABLE_JOB_DATA,
     FIELD_ATTRIBUTE,
+    ERROR_MESSAGE,
 } = require('../../lib/constants').default
+
+export function _setErrorMessage(message) {
+    return {
+        type: ERROR_MESSAGE,
+        payload: message
+    }
+}
 
 export function setOrRemoveStates(selectFromListState, id, attributeTypeId) {
     return async function (dispatch) {
         try {
             if(attributeTypeId == OPTION_RADIO_FOR_MASTER){
-                let selectFromListStates = new Map()
-                selectFromListStates.fieldAttributeMasterList = selectFromListState.fieldAttributeMasterList
-                selectFromListStates.selectFromListData = selectFromListDataService.setOrRemoveState(selectFromListState.selectFromListData, id, attributeTypeId)
+                const selectFromListStates= {}
+                selectFromListStates.radioMasterDto = selectFromListState.radioMasterDto
+                selectFromListStates.selectListData = selectFromListDataService.setOrRemoveState(selectFromListState.selectListData, id, attributeTypeId)
                 dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListStates))
             }else{
                 selectFromListState = selectFromListDataService.setOrRemoveState(selectFromListState, id, attributeTypeId)
                 dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListState))
             }
         } catch (error) {
-            console.log(error)
+            dispatch(setState(ERROR_MESSAGE, error.message))
+            dispatch(setState(ERROR_MESSAGE, ''))
         }
     }
 }
@@ -40,13 +50,14 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
             if (params.attributeTypeId == CHECKBOX || params.attributeTypeId ==  OPTION_RADIO_FOR_MASTER) {
                 const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransactionId, params.positionId, latestPositionId)
                 const value = params.attributeTypeId == OPTION_RADIO_FOR_MASTER ? OBJECTSAROJFAREYE : ARRAYSAROJFAREYE
-                dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListData))
                 dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))
+                dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListData))
             } else {
                 dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
             }
         } catch (error) {
-            console.log(error)
+          dispatch(setState(ERROR_MESSAGE, error.message))
+          dispatch(setState(ERROR_MESSAGE, ''))
         }
     }
 }
@@ -62,25 +73,35 @@ export function gettingDataSelectFromList(fieldAttributeMasterId) {
             const selectFromListData = await selectFromListDataService.getListSelectFromListAttribute(fieldAttributeValueList.value, fieldAttributeMasterId)
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListData))
         } catch (error) {
-            console.log(error)
+           dispatch(setState(ERROR_MESSAGE, error.message))
+           dispatch(setState(ERROR_MESSAGE, ''))
         }
     }
 }
 
-export function gettingDataForRadioMaster(fieldAttributeMasterId,jobId) {
+export function gettingDataForRadioMaster(currentElement,jobId) {
     return async function (dispatch) {
         try {
-           const fieldAttributeMasterList = await selectFromListDataService.getRadioForMasterDto(fieldAttributeMasterId)
-             if (!fieldAttributeMasterList && fieldAttributeMasterList.jobFieldAttributeMapId != null && fieldAttributeMasterList.jobFieldAttributeMapId != undefined) {
-                throw new Error('Field attributes missing in store')
+           const selectFromListState = {}
+           const fieldAttributeList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+           if (!fieldAttributeList || !fieldAttributeList.value) {
+                throw new Error('Field Attributes missing in store')
             }
-            const selectFromListData =await selectFromListDataService.getListDataForRadioMasterAttr(fieldAttributeMasterList.jobFieldAttributeMapId,jobId)
-            const selectFromListState = new Map()
-            selectFromListState.fieldAttributeMasterList = fieldAttributeMasterList
-            selectFromListState.selectFromListData = selectFromListData
+            const jobFieldAttributeMapId =  selectFromListDataService.getRadioForMasterDto(currentElement.fieldAttributeMasterId,fieldAttributeList)
+            let query = Array.from(jobFieldAttributeMapId.map(item => `jobAttributeMasterId = ${item.jobAttributeMasterId}`)).join(' OR ')
+            query = `(${query}) AND jobId = ${jobId}`
+            const jobDatas = realm.getRecordListOnQuery(TABLE_JOB_DATA, query)
+            const parentIdJobDataListMap = jobDataService.getParentIdJobDataListMap(jobDatas)
+            const selectFromListData  =  selectFromListDataService.getListDataForRadioMasterAttr(parentIdJobDataListMap,currentElement)
+            if (!jobFieldAttributeMapId || (Object.keys(selectFromListData).length === 0 && selectFromListData.constructor === Object)) {
+                throw new Error('mapping of radioForMaster error')
+            }
+            selectFromListState.radioMasterDto = jobFieldAttributeMapId
+            selectFromListState.selectListData = selectFromListData
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListState))
         } catch (error) {
-            console.log(error)
+            dispatch(setState(ERROR_MESSAGE, error.message))
+            dispatch(setState(ERROR_MESSAGE, ''))
         }
     }
 }

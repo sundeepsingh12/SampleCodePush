@@ -8,13 +8,16 @@ import { selectFromListDataService } from '../../../services/classes/SelectFromL
 import { updateFieldDataWithChildData } from '../../form-layout/formLayoutActions'
 import { CHECKBOX, RADIOBUTTON } from '../../../lib/AttributeConstants'
 import { setState } from '../../global/globalActions'
+import * as realm from '../../../repositories/realmdb'
+import {jobDataService} from '../../../services/classes/JobData'
 
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 jest.mock('react-native-router-flux')
 
 const {
-SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE
+SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
+ERROR_MESSAGE
 } = require('../../../lib/constants').default
 
 const middlewares = [thunk]
@@ -98,3 +101,151 @@ describe('selectFromListActions  gettingDataSelectFromList', () => {
 
 })
 
+describe('getting DataForRadioMaster Action', () => {
+    const fieldAttributeList = [
+                {
+                attributeTypeId:39,
+                id:1,
+                jobAttributeMasterId:30311,
+                jobMasterId:3212,
+                parentId:'123',
+                },
+                {
+                attributeTypeId:40,
+                id:2,
+                jobAttributeMasterId:30310,
+                jobMasterId:3212,
+                parentId:1,
+                },
+                {
+                attributeTypeId:41,
+                id:3,
+                jobAttributeMasterId:30309,
+                jobMasterId:3212,
+                parentId:1,
+                }
+            ]
+        const  radioMasterDto =  [
+                {
+                attributeTypeId:40,
+                id:2,
+                jobAttributeMasterId:30310,
+                },
+                {
+                attributeTypeId:41,
+                id:3,
+                jobAttributeMasterId:30309,
+                },
+            
+            ]
+        const  innerObject =  {
+                0:{
+                id:0,
+                optionKey: "v",
+                optionValue:'3',
+                isChecked:true
+                },
+                1:{
+                id:1,
+                optionKey: "f",
+                optionValue:'5',
+                },
+            
+    }
+    const parentIdJobDataListMap = {
+             0 : [
+                {
+                attributeTypeId:40,
+                id:2,
+                jobAttributeMasterId:30310,
+                jobMasterId:3212,
+                parentId:1,
+                value:"v"
+                },
+            ],
+            1 : [
+                {
+                attributeTypeId:40,
+                id:4,
+                jobAttributeMasterId:30310,
+                jobMasterId:3212,
+                parentId:1,
+                value:"f"
+                },
+            ]
+    }
+        const currentElement = {
+                attributeTypeId:39,
+                id:1,
+                jobAttributeMasterId:30311,
+                jobMasterId:3212,
+                parentId:'123',
+        }
+    it('should set data for RadioMaster', () => {
+        
+        const jobId = '1234' 
+        const selectDataForList = {}
+        selectDataForList.radioMasterDto = radioMasterDto
+        selectDataForList.selectListData = innerObject
+        const store = mockStore({})
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(fieldAttributeList)
+        selectFromListDataService.getRadioForMasterDto = jest.fn()
+        selectFromListDataService.getRadioForMasterDto.mockReturnValue(radioMasterDto)
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue({})
+        jobDataService.getParentIdJobDataListMap = jest.fn()
+        jobDataService.getParentIdJobDataListMap.mockReturnValue(parentIdJobDataListMap)
+        selectFromListDataService.getListDataForRadioMasterAttr = jest.fn()
+        selectFromListDataService.getListDataForRadioMasterAttr.mockReturnValue(innerObject)
+        return store.dispatch(actions.gettingDataForRadioMaster(currentElement,jobId))
+            .then(() => {
+               expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+               expect(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectDataForList)).toEqual({
+                    type: SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
+                    payload: selectDataForList
+                })
+            })
+    })
+    it('should set error throw when mapping mismatch', () => {
+        const message = "Field Attributes missing in store"
+        const expectedActions = [
+            {
+                type: ERROR_MESSAGE,
+                payload: message
+            },
+        ]
+        
+        const jobId = '' 
+        const selectDataForList = {}
+        selectDataForList.radioMasterDto = radioMasterDto
+        selectDataForList.selectListData = innerObject
+        const store = mockStore({})
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(fieldAttributeList)
+        selectFromListDataService.getRadioForMasterDto = jest.fn()
+        selectFromListDataService.getRadioForMasterDto.mockReturnValue(radioMasterDto)
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue({})
+        jobDataService.getParentIdJobDataListMap = jest.fn()
+        jobDataService.getParentIdJobDataListMap.mockReturnValue(parentIdJobDataListMap)
+        selectFromListDataService.getListDataForRadioMasterAttr = jest.fn()
+        selectFromListDataService.getListDataForRadioMasterAttr.mockReturnValue(innerObject)
+        return store.dispatch(actions.gettingDataForRadioMaster(currentElement,jobId))
+            .then(() => {
+               expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+
+})
+describe('Error actions', () => {
+    it('should set error message', () => {
+        const message = 'Field Attributes missing in store'
+        expect(actions._setErrorMessage(message)).toEqual({
+            type: ERROR_MESSAGE,
+            payload: message
+        })
+    })
+})

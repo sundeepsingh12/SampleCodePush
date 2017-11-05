@@ -197,7 +197,7 @@ export default keyMirror({
     UPDATE_SKU_ACTUAL_QUANTITY:null,
 
 
-    //CheckBox
+    //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:null,
 
     //FixedSKU Actions

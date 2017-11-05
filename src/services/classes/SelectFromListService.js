@@ -1,14 +1,5 @@
 import { CHECKBOX, RADIOBUTTON, DROPDOWN, TEXT, OPTION_RADIO_KEY, OPTION_RADIO_VALUE ,OPTION_RADIO_FOR_MASTER } from '../../lib/AttributeConstants'
-import * as realm from '../../repositories/realmdb'
-const {
-    FIELD_ATTRIBUTE,
-    FIELD_ATTRIBUTE_STATUS,
-    TABLE_JOB_DATA
-} = require('../../lib/constants').default
-import {jobDataService} from './JobData'
-import {
-    keyValueDBService
-} from './KeyValueDBService'
+
 class SelectFromListService {
 
     arrayToObject = (array) =>
@@ -39,17 +30,14 @@ class SelectFromListService {
         let checkedTrueInSelectFromListArray = []
         
         if(attributeTypeId == OPTION_RADIO_FOR_MASTER){
-            let selectFromListValue = Object.values(selectFromListState.selectFromListData)
+            let selectFromListValue = Object.values(selectFromListState.selectListData)
             for (let list of selectFromListValue) {
                 if (list.isChecked == true) {
-                    selectFromListState.fieldAttributeMasterList.jobFieldAttributeMapId.forEach((item) => {
+                    selectFromListState.radioMasterDto.forEach((item) => {
                         let itemList = {}
                         itemList.fieldAttributeMasterId = item.id,
                         itemList.attributeTypeId = item.attributeTypeId,
-                        itemList.key = item.key,
                         itemList.value = (item.attributeTypeId == OPTION_RADIO_KEY) ? list.optionKey : list.optionValue,
-                        itemList.id = selectFromListState.id,
-                        itemList.isChecked = true
                         checkedTrueInSelectFromListArray.push(itemList)
                     })
 
@@ -83,47 +71,61 @@ class SelectFromListService {
         return selectFromListsData
     }
 
-    async getRadioForMasterDto(fieldAttributeMasterId) {
-        const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-        let jobFieldAttributeMapId = new Map()
-        if (!fieldAttributeMasterList || !fieldAttributeMasterList.value) {
-            throw new Error('Field Attributes missing in store')
-        }
-        const objectFieldAttribute = fieldAttributeMasterList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == fieldAttributeMasterId &&
-            fieldAttributeObject.attributeTypeId == 11)
+    /** return radioMasterDto which has 40 and 41 attributeTypeId as child
+     * 
+     getRadioForMasterDto(fieldAttributeMasterId,fieldAttributeMasterList) {
+     * @param {*} fieldAttributeValueList 
+     * @param {*} fieldAttributeMasterId 
+     * 
+     */
+
+     getRadioForMasterDto(fieldAttributeMasterId,fieldAttributeMasterList) {
+        let radioMasterDto = []
+        const objectFieldAttribute = fieldAttributeMasterList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == fieldAttributeMasterId)
 
         fieldAttributeMasterList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == objectFieldAttribute[0].id)
             .forEach(fieldAttribute => {
-                const id = (fieldAttribute.jobAttributeMasterId == 0 || fieldAttribute.jobAttributeMasterId == null) ?fieldAttribute.attributeTypeId : fieldAttribute.jobAttributeMasterId
-                if(fieldAttribute.attributeTypeId == OPTION_RADIO_VALUE){
-                    jobFieldAttributeMapId.set(id,fieldAttribute)
-                }else if(fieldAttribute.attributeTypeId == OPTION_RADIO_KEY){
-                    jobFieldAttributeMapId.set(id,fieldAttribute)
+                if(fieldAttribute.attributeTypeId == OPTION_RADIO_VALUE || fieldAttribute.attributeTypeId == OPTION_RADIO_KEY){
+                    const fieldData = { 
+                        id: fieldAttribute.id,
+                        jobAttributeMasterId : fieldAttribute.jobAttributeMasterId,
+                        attributeTypeId : fieldAttribute.attributeTypeId
+                    }
+                    radioMasterDto.push(fieldData)
                 }
             })
-             radioMasterDto = {
-                jobFieldAttributeMapId,
-                objectFieldAttribute
-            }
         return radioMasterDto
     }
+    /** return array of jobdata mapped with optionRadioMaster
+     * 
+      getListDataForRadioMasterAttr(parentIdJobDataListMap,currentElement) {
+     * @param {*} parentIdJobDataListMap 
+     * @param {*} currentElement 
+     * 
+     * 
+     */
 
-    getListDataForRadioMasterAttr(jobFieldAttributeMapId,jobId){
-        let query = Array.from(jobFieldAttributeMapId.keys()).map(jobAttributeId => `jobAttributeMasterId = ${jobAttributeId}`).join(' OR ')
-        query = `(${query}) AND jobId = ${jobId}`
-        const jobDatas = realm.getRecordListOnQuery(TABLE_JOB_DATA, query)
-        const parentIdJobDataListMap = jobDataService.getParentIdJobDataListMap(jobDatas)
-        let radioMasterObjectDto = {}, increment = 0 , innerArray = []
+    getListDataForRadioMasterAttr(parentIdJobDataListMap,currentElement){
+        let  increment = 0 , innerObject = {}, value, key
+        if(currentElement.childDataList != null && currentElement.childDataList.length > 0){
+            value = (currentElement.childDataList[0].attributeTypeId == OPTION_RADIO_VALUE) ? currentElement.childDataList[0].value : currentElement.childDataList[1].value
+            key = (currentElement.childDataList[0].attributeTypeId == OPTION_RADIO_KEY) ? currentElement.childDataList[0].value : currentElement.childDataList[1].value
+        }
             for (let id in parentIdJobDataListMap) {
-                let  object = {
-                       id : increment++ ,
-                       optionKey: jobFieldAttributeMapId.get(parentIdJobDataListMap[id][1].jobAttributeMasterId).attributeTypeId == OPTION_RADIO_KEY ? parentIdJobDataListMap[id][1].value : parentIdJobDataListMap[id][0].value,
-                       optionValue: jobFieldAttributeMapId.get(parentIdJobDataListMap[id][0].jobAttributeMasterId).attributeTypeId == OPTION_RADIO_VALUE ? parentIdJobDataListMap[id][0].value : parentIdJobDataListMap[id][1].value,
+                if(parentIdJobDataListMap[id].length == 2){
+                    let  object = {
+                        id : increment,
+                        optionKey: parentIdJobDataListMap[id][1].attributeTypeId == OPTION_RADIO_KEY ? parentIdJobDataListMap[id][1].value :  parentIdJobDataListMap[id][0].value ,
+                        optionValue:parentIdJobDataListMap[id][0].attributeTypeId == OPTION_RADIO_VALUE ? parentIdJobDataListMap[id][0].value :parentIdJobDataListMap[id][1].value ,
+                    }
+                    if(value != undefined && object.optionKey == key && object.optionValue ==  value){
+                        object.isChecked = true;    
+                        value = undefined
+                    }
+                    innerObject[increment++] = object
                 }
-                 innerArray.push(object)
             }
-        radioMasterObjectDto = this.arrayToObject(innerArray)
-        return radioMasterObjectDto;
+        return innerObject;
     }
 }
 
