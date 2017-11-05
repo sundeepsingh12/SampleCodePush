@@ -17,10 +17,9 @@ import {
 }
   from 'react-native'
 
-import { Container, Button, Picker, Title, List, ListItem, Form, Item, CheckBox, Radio, Content, Card } from 'native-base';
+import { Container, Button, Picker, Title, List, ListItem, Form, Item, CheckBox, Radio, Content, Card, Toast } from 'native-base';
 import * as selectFromListActions from '../modules/selectFromList/selectFromListActions'
-import { CHECKBOX, RADIOBUTTON, DROPDOWN } from '../lib/AttributeConstants'
-
+import { CHECKBOX, RADIOBUTTON, DROPDOWN, OPTION_RADIO_FOR_MASTER} from '../lib/AttributeConstants'
 
 var styles = StyleSheet.create({
   container: {
@@ -47,6 +46,7 @@ var styles = StyleSheet.create({
 function mapStateToProps(state) {
   return {
     selectFromListState: state.selectFromList.selectFromListState,
+    errorMessage: state.selectFromList.errorMessage,
   }
 }
 
@@ -58,13 +58,16 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SelectFromList extends Component {
-
   componentWillMount() {
-    this.props.actions.gettingDataSelectFromList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId)
+    if(this.props.navigation.state.params.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER ){
+        this.props.actions.gettingDataForRadioMaster(this.props.navigation.state.params.currentElement,this.props.navigation.state.params.jobTransaction.jobId)
+    }else{
+        this.props.actions.gettingDataSelectFromList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId)
+      }
   }
 
   getViewOfFieldAttribute(id, isChecked) {
-    if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX) {
+    if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX ) {
       return (
         <CheckBox checked={isChecked}
           onPress={() => {
@@ -73,7 +76,7 @@ class SelectFromList extends Component {
           }} />
       )
     }
-    else if (this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON) {
+    else if (this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON || this.props.navigation.state.params.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
       return (
         <Radio selected={isChecked}
           onPress={() => {
@@ -85,12 +88,19 @@ class SelectFromList extends Component {
   }
 
   render() {
-    if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX || this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON) {
+    if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
+        text: this.props.errorMessage,
+        position: 'bottom',
+        buttonText: 'Okay'
+         })}
+
+    if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX || this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON ){
+      const listData = (!this.props.selectFromListState.selectListData) ? this.props.selectFromListState : {}
       return (
         <Container>
           <View style={styles.container}>
             <FlatList
-              data={(Object.values(this.props.selectFromListState)).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence)}
+              data={(Object.values(listData)).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence)}
               renderItem={({ item }) => {
                 return (
                   <View>
@@ -98,6 +108,63 @@ class SelectFromList extends Component {
                       <Card style={{ flexDirection: 'row', height: 40 }}  >
                         {this.getViewOfFieldAttribute(item.id, item.isChecked)}
                         <Text>       {item.name}</Text>
+                      </Card>
+                    </Content>
+                  </View>
+                )
+              }}
+              keyExtractor={item => item.id}
+            />
+            <Button onPress={() => {
+              this.props.actions.selectFromListButton(listData, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
+              this.props.navigation.goBack()
+            }}>
+              <Text> DONE </Text>
+            </Button>
+          </View>
+        </Container>
+      )
+    }
+    else if (this.props.navigation.state.params.currentElement.attributeTypeId == DROPDOWN) {
+      const listData = (!this.props.selectFromListState.selectListData) ? this.props.selectFromListState : {}
+      return (
+        <Container>
+          <Content>
+            <Form>
+              <Picker mode="dropdown"
+                onValueChange={value => this.props.actions.setOrRemoveStates(listData, value, this.props.navigation.state.params.currentElement.attributeTypeId)}
+              >
+                {Object.values(listData).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence).map((object) => {
+                  return (<Item label={object.name} value={object.id} key={object.id} />) //if you have a bunch of keys value pair
+                })}
+              </Picker>
+            </Form>
+          </Content>
+          <View>
+            <Button onPress={() => {
+              this.props.actions.selectFromListButton(listData, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
+              this.props.navigation.goBack()
+            }}>
+              <Text> DONE </Text>
+            </Button>
+          </View>
+        </Container>
+      )
+    }
+    else if (this.props.navigation.state.params.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
+    const listData = (this.props.selectFromListState.selectListData != null && this.props.selectFromListState.selectListData != undefined ) ? this.props.selectFromListState.selectListData : {}
+        return (
+        <Container>
+          <View style={styles.container}>
+            <FlatList
+              data={(Object.values(listData))}
+              renderItem={({ item }) => {
+                return (
+                  <View>
+                    <Content>
+                      <Card style={{ flexDirection: 'row', height: 40 }}  >
+                        {this.getViewOfFieldAttribute(item.id, item.isChecked)}
+                        <Text>       {item.optionValue}</Text>
                       </Card>
                     </Content>
                   </View>
@@ -114,32 +181,7 @@ class SelectFromList extends Component {
           </View>
         </Container>
       )
-    }
-    else if (this.props.navigation.state.params.currentElement.attributeTypeId == DROPDOWN) {
-      return (
-        <Container>
-          <Content>
-            <Form>
-              <Picker mode="dropdown"
-                onValueChange={value => this.props.actions.setOrRemoveStates(this.props.selectFromListState, value, this.props.navigation.state.params.currentElement.attributeTypeId)}
-              >
-                {Object.values(this.props.selectFromListState).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence).map((object) => {
-                  return (<Item label={object.name} value={object.id} key={object.id} />) //if you have a bunch of keys value pair
-                })}
-              </Picker>
-            </Form>
-          </Content>
-          <View>
-            <Button onPress={() => {
-              this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
-              this.props.navigation.goBack()
-            }}>
-              <Text> DONE </Text>
-            </Button>
-          </View>
-        </Container>
-      )
-    }
+     }
   }
 }
 

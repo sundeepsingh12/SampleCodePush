@@ -38,6 +38,7 @@ import {
     SKU_ARRAY,
     SEQUENCE,
     PASSWORD,
+    OPTION_RADIO_FOR_MASTER,
 } from '../lib/AttributeConstants'
 
 import * as globalActions from '../modules/global/globalActions'
@@ -86,6 +87,10 @@ class BasicFormElement extends Component {
                 break
             }
             case DROPDOWN: {
+                screenName = 'SelectFromList'
+                break
+            }
+            case OPTION_RADIO_FOR_MASTER: {
                 screenName = 'SelectFromList'
                 break
             }
