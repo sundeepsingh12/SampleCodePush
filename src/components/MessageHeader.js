@@ -5,11 +5,9 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    FlatList,
-    TouchableOpacity
+    Platform
 } from 'react-native'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
+import { Card, CardItem, Button, Body, Header, Left, Right, Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 
 class MessageHeader extends Component {

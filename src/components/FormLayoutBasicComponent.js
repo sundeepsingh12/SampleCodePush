@@ -10,9 +10,8 @@ import {
     ActivityIndicator
 }
     from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base';
+import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base'
 import styles from '../themes/FeStyle'
-import imageFile from '../../images/fareye-logo.png'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -36,8 +35,11 @@ import {
     NUMBER,
     DECIMAL,
     SKU_ARRAY,
+    DATA_STORE,
+    EXTERNAL_DATA_STORE,
     SEQUENCE,
     PASSWORD,
+    OPTION_RADIO_FOR_MASTER,
 } from '../lib/AttributeConstants'
 
 import * as globalActions from '../modules/global/globalActions'
@@ -59,18 +61,18 @@ class BasicFormElement extends Component {
         super(props);
         this.formElementValue = {}
     }
-   componentWillMount = () => {
-     if(this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value ){
-        this.props.item.isLoading = true
-        this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, 
-            this.props.isSaveDisabled,this.props.item.sequenceMasterId)
-     }
-   }
-   
-    
+    componentWillMount = () => {
+        if (this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value) {
+            this.props.item.isLoading = true
+            this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable,
+                this.props.isSaveDisabled, this.props.item.sequenceMasterId)
+        }
+    }
+
+
     navigateToScene = (item) => {
         let screenName = ''
-        console.log("attrrrr",item.attributeTypeId)
+        console.log("attrrrr", item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
@@ -89,6 +91,10 @@ class BasicFormElement extends Component {
                 screenName = 'SelectFromList'
                 break
             }
+            case OPTION_RADIO_FOR_MASTER: {
+                screenName = 'SelectFromList'
+                break
+            }
             case FIXED_SKU: {
                 screenName = 'FixedSKUListing'
                 break
@@ -99,6 +105,11 @@ class BasicFormElement extends Component {
             }
             case SKU_ARRAY: {
                 screenName = 'SkuListing'
+                break
+            }
+            case EXTERNAL_DATA_STORE:
+            case DATA_STORE: {
+                screenName = 'DataStore'
                 break
             }
             case SIGNATURE_AND_NPS: {
@@ -132,14 +143,14 @@ class BasicFormElement extends Component {
     _onBlurEvent(attributeId) {
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
         const nextEditableElement = this.props.nextEditable[attributeId];
-        if(nextEditableElement != null && nextEditableElement.length != 0){
+        if (nextEditableElement != null && nextEditableElement.length != 0) {
             nextEditableElement.forEach((nextElement) => {
                 if ((typeof (nextElement) == 'string')) {
                     nextElement = this.props.formElement.get(Number(nextElement.split('$$')[1]));
-                    if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
+                    if (nextElement && !nextElement.value && nextElement.attributeTypeId == 62) {
                         nextElement.isLoading = true;
-                            this.props.actions.setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, 
-                                this.props.isSaveDisabled,nextElement.sequenceMasterId)
+                        this.props.actions.setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable,
+                            this.props.isSaveDisabled, nextElement.sequenceMasterId)
                     }
                 }
             })
@@ -201,11 +212,11 @@ class BasicFormElement extends Component {
                                                 <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
 
                                                     {renderIf(this.props.item.showCheckMark || (this.props.item.attributeTypeId == 62 && this.props.item.isLoading !== undefined && this.props.item.isLoading),
-                                                      this.props.item.showCheckMark  ?
-                                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} /> : 
-                                                         (this.props.item.isLoading !== undefined && this.props.item.isLoading) ?
-                                                      <ActivityIndicator animating={this.props.item.isLoading} style={StyleSheet.flatten([ { marginTop: -20 }])} size="small" color = "green"/> : null
-                                                      )}
+                                                        this.props.item.showCheckMark ?
+                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} /> :
+                                                            (this.props.item.isLoading !== undefined && this.props.item.isLoading) ?
+                                                                <ActivityIndicator animating={this.props.item.isLoading} style={StyleSheet.flatten([{ marginTop: -20 }])} size="small" color="green" /> : null
+                                                    )}
 
                                                     {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
                                                         <View>
@@ -220,6 +231,7 @@ class BasicFormElement extends Component {
                                             </View>
                                             <View style={this._styleNextFocusable(this.props.item.focus)}>
                                                 <Input
+                                                    autoCapitalize="none"
                                                     keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                                     editable={this.props.item.editable}
                                                     multiline={this.props.item.attributeTypeId == 2 ? true : false}
@@ -228,7 +240,7 @@ class BasicFormElement extends Component {
                                                     onFocus={() => { this.onFocusEvent(this.props.item) }}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
                                                     secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                                    value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62 ) ? this.props.item.value : null}
+                                                    value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62) ? this.props.item.value : null}
 
                                                 />
                                             </View>
@@ -258,12 +270,15 @@ class BasicFormElement extends Component {
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
+            case EXTERNAL_DATA_STORE:
+            case DATA_STORE:
+                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
 
             default: console.log("FormLayoutActivityComponent")
                 return (
-                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
-                     break;
+                break;
         }
     }
 }

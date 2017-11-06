@@ -4,7 +4,6 @@ import {
     View,
     Text
 } from 'react-native'
-import { Spinner } from 'native-base'
 import {Button, Body, Header, Left, Right, Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 

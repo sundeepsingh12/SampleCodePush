@@ -8,7 +8,7 @@ import {
 } from 'react-native'
 
 import Icon from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Spinner } from 'native-base';
 
 class ResyncLoader extends Component {

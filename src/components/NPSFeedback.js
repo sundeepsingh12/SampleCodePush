@@ -1,4 +1,4 @@
-import StarRating from 'react-native-star-rating';
+import StarRating from 'react-native-star-rating'
 import {
     StyleSheet,
     View,
@@ -6,7 +6,7 @@ import {
     TouchableHighlight
 }
     from 'react-native'
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import renderIf from '../lib/renderIf'
 
 class NPSFeedback extends Component {

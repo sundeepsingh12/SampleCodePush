@@ -18,8 +18,10 @@ module.exports = {
     CHECKBOX: 8,
     CONTACT_NUMBER: 27,
     DATE: 3,
+    DATA_STORE: 44,
     DECIMAL: 13,
     DROPDOWN: 10,
+    EXTERNAL_DATA_STORE: 63,
     FIXED_SKU: 50,
     FIXED_SKU_QUANTITY: 6,
     FIXED_SKU_UNIT_PRICE: 13,
@@ -34,6 +36,8 @@ module.exports = {
     OBJECT: 11,
     OPTION_CHECKBOX: 8,
     OPTION_RADIO_FOR_MASTER: 39,
+    OPTION_RADIO_KEY: 40,
+    OPTION_RADIO_VALUE: 41,
     ORIGINAL_AMOUNT: 25,
     PASSWORD: 61,
     PINCODE: 31,
@@ -57,7 +61,7 @@ module.exports = {
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
     TOTAL_AMOUNT: 'TotalAmount',
-    TRANSACTION_NUMBER: 'transaction_number',    
+    TRANSACTION_NUMBER: 'transaction_number', 
 
     // Money Collect Mode Type Constants
     CASH: {
@@ -215,6 +219,13 @@ module.exports = {
     THEN: 'then',
     TIME_COMPARATOR: 'timeComparator',
 
+    //REST API 
+    SEARCH_VALUE: '?searchValue=',
+    DATA_STORE_MASTER_ID: '&dataStoreMasterId=',
+    DATA_STORE_ATTR_MASTER_ID: '&dataStoreMasterAttributeId=',
+    GET: 'GET',
+    EXTERNAL_DATA_STORE_URL: "&externalDataStoreUrl=",
+    DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey=",
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',

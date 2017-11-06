@@ -12,7 +12,7 @@ import {
 }
   from 'react-native'
 import Scanner from "../components/Scanner"
-import { Container, Body, InputGroup, Button, Input, Item, ListItem, CheckBox, Spinner } from 'native-base';
+import { Container, Button, Input, Item, CheckBox, Spinner } from 'native-base'
 
 import feStyle from '../themes/FeStyle';
 import sha256 from 'sha256';
@@ -80,24 +80,24 @@ class Login extends Component {
     this.props.actions.checkRememberMe()
   }
 
-  onChangeUsername(username) {
-    this.props.actions.onChangeUsername(username)
+  onChangeUsername = (value) => {
+    this.props.actions.onChangeUsername(value)
   }
 
-  onChangePassword(password) {
-    this.props.actions.onChangePassword(password)
+  onChangePassword = (value) => {
+    this.props.actions.onChangePassword(value)
   }
 
-  loginButtonPress() {
+  loginButtonPress = () => {
     const password = this.props.auth.form.password;
     if (password.length > 50) {
       this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
     } else {
-      this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe);
+      this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
     }
   }
 
-  _onBarCodeRead(result) {
+  _onBarCodeRead = (result) => {
     const username = result.data.split("/")[0];
     const password = result.data.split("/")[1];
     this.props.actions.stopScanner();
@@ -106,15 +106,15 @@ class Login extends Component {
     this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe);
   }
 
-  _onScaningCancelled() {
-    this.props.actions.stopScanner();
+  _onScaningCancelled = () => {
+    this.props.actions.stopScanner()
   }
 
-  rememberMe() {
+  rememberMe = () => {
     this.props.actions.toggleCheckbox()
   }
 
-  codepushSync() {
+  codepushSync = () => {
     codePush.sync({
       updateDialog: true,
       installMode: codePush.InstallMode.IMMEDIATE
@@ -144,9 +144,10 @@ class Login extends Component {
               <Item style={{ borderWidth: 0 }}>
                 <Input
                   value={this.props.auth.form.username}
+                  autoCapitalize="none"
                   placeholder='Username'
                   style={feStyle.roundedInput}
-                  onChangeText={value => this.onChangeUsername(value)}
+                  onChangeText={this.onChangeUsername}
                   disabled={this.props.auth.form.isEditTextDisabled}
                 />
               </Item>
@@ -156,7 +157,7 @@ class Login extends Component {
                   placeholder='Password'
                   style={feStyle.roundedInput}
                   secureTextEntry={true}
-                  onChangeText={value => this.onChangePassword(value)}
+                  onChangeText={this.onChangePassword}
                   disabled={this.props.auth.form.isEditTextDisabled}
                 />
               </Item>
@@ -164,14 +165,14 @@ class Login extends Component {
               <Button
                 rounded success style={{ width: '100%', marginTop: 15 }}
                 disabled={this.props.auth.form.isButtonDisabled}
-                onPress={() => this.loginButtonPress()}
+                onPress={this.loginButtonPress}
               >
                 <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Log In</Text>
               </Button>
 
               <View style={{ flexDirection: 'row', flexGrow: 1, justifyContent: 'flex-start', marginTop: 15 }}>
                 <CheckBox checked={this.props.auth.form.rememberMe}
-                  onPress={() => this.rememberMe()} />
+                  onPress={this.rememberMe} />
                 <Text style={{ marginLeft: 20 }}>Remember Me</Text>
               </View>
 
@@ -186,7 +187,7 @@ class Login extends Component {
               </View>
               <View style={{ marginTop: 15 }}>
                 <Button
-                  onPress={() => this.codepushSync()} rounded style={{ width: '100%', }}>
+                  onPress={this.codepushSync} rounded style={{ width: '100%', }}>
                   <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Code Push Sync</Text>
                 </Button>
               </View>
@@ -194,7 +195,7 @@ class Login extends Component {
           </View>
         )}
         {renderIf(this.props.auth.form.isCameraScannerActive,
-          <Scanner onBarCodeRead={this._onBarCodeRead.bind(this)} onBackPress={this._onScaningCancelled.bind(this)} />
+          <Scanner onBarCodeRead={this._onBarCodeRead} onBackPress={this._onScaningCancelled} />
         )}
       </Container>
     )
