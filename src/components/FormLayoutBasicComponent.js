@@ -68,8 +68,8 @@ class BasicFormElement extends Component {
                 screenName = 'Signature'
                 break
             }
-            case SKU_ARRAY:{
-                screenName='SkuListing'
+            case SKU_ARRAY: {
+                screenName = 'SkuListing'
                 break
             }
             default: {
@@ -92,9 +92,9 @@ class BasicFormElement extends Component {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement,this.props.formElement,'Before')          
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction)
     }
-        
+
 
     _onBlurEvent(attributeId) {
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
@@ -171,6 +171,7 @@ class BasicFormElement extends Component {
                                                     multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                                     placeholder='Regular Textbox'
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
+                                                    onFocus={() => { this.onFocusEvent(this.props.item) }}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
 
                                                 />
@@ -192,7 +193,7 @@ class BasicFormElement extends Component {
             case SIGNATURE:
             case MONEY_PAY:
             case SKU_ARRAY:
-            case MONEY_COLLECT: 
+            case MONEY_COLLECT:
             case NPS_FEEDBACK:
             case TIME:
             case RE_ATTEMPT_DATE:
