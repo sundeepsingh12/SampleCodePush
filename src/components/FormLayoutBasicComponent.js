@@ -6,33 +6,41 @@ import {
     Text,
     Platform,
     FlatList,
-    TouchableHighlight
+    TouchableHighlight,
+    ActivityIndicator
 }
     from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput } from 'native-base';
+import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base';
 import styles from '../themes/FeStyle'
 import imageFile from '../../images/fareye-logo.png'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
-import * as globalActions from '../modules/global/globalActions'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import {
     MONEY_COLLECT,
     MONEY_PAY,
+    CHECKBOX,
+    RADIOBUTTON,
+    DROPDOWN,
     NPS_FEEDBACK,
     TIME,
     RE_ATTEMPT_DATE,
     DATE,
     FIXED_SKU,
     SIGNATURE,
+    SIGNATURE_AND_NPS,
     STRING,
     TEXT,
     NUMBER,
     DECIMAL,
-    SKU_ARRAY
+    SKU_ARRAY,
+    SEQUENCE,
+    PASSWORD,
 } from '../lib/AttributeConstants'
+
+import * as globalActions from '../modules/global/globalActions'
 
 function mapStateToProps(state) {
     return {
@@ -51,13 +59,34 @@ class BasicFormElement extends Component {
         super(props);
         this.formElementValue = {}
     }
-
+   componentWillMount = () => {
+     if(this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value ){
+        this.props.item.isLoading = true
+        this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, 
+            this.props.isSaveDisabled,this.props.item.sequenceMasterId)
+     }
+   }
+   
+    
     navigateToScene = (item) => {
         let screenName = ''
+        console.log("attrrrr",item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
                 screenName = 'Payment'
+                break
+            }
+            case CHECKBOX: {
+                screenName = 'SelectFromList'
+                break
+            }
+            case RADIOBUTTON: {
+                screenName = 'SelectFromList'
+                break
+            }
+            case DROPDOWN: {
+                screenName = 'SelectFromList'
                 break
             }
             case FIXED_SKU: {
@@ -70,6 +99,10 @@ class BasicFormElement extends Component {
             }
             case SKU_ARRAY: {
                 screenName = 'SkuListing'
+                break
+            }
+            case SIGNATURE_AND_NPS: {
+                screenName = 'SignatureAndNps'
                 break
             }
             default: {
@@ -98,6 +131,19 @@ class BasicFormElement extends Component {
 
     _onBlurEvent(attributeId) {
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
+        const nextEditableElement = this.props.nextEditable[attributeId];
+        if(nextEditableElement != null && nextEditableElement.length != 0){
+            nextEditableElement.forEach((nextElement) => {
+                if ((typeof (nextElement) == 'string')) {
+                    nextElement = this.props.formElement.get(Number(nextElement.split('$$')[1]));
+                    if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
+                        nextElement.isLoading = true;
+                            this.props.actions.setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, 
+                                this.props.isSaveDisabled,nextElement.sequenceMasterId)
+                    }
+                }
+            })
+        }
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, nextEditable, value, isSaveDisabled) {
@@ -108,6 +154,7 @@ class BasicFormElement extends Component {
         }
         if (value.length == 0) {
             this.props.actions.disableSaveIfRequired(fieldAttributeMasterId, isSaveDisabled, formElement, value);
+            this.props.actions.updateFieldData(fieldAttributeMasterId, this.formElementValue[fieldAttributeMasterId], formElement);
         }
     }
 
@@ -129,6 +176,8 @@ class BasicFormElement extends Component {
             case TEXT:
             case NUMBER:
             case DECIMAL:
+            case SEQUENCE:
+            case PASSWORD:
                 return (
                     renderIf(!this.props.item.hidden,
                         <Card>
@@ -151,9 +200,12 @@ class BasicFormElement extends Component {
 
                                                 <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
 
-                                                    {renderIf(this.props.item.showCheckMark,
-                                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
-                                                    )}
+                                                    {renderIf(this.props.item.showCheckMark || (this.props.item.attributeTypeId == 62 && this.props.item.isLoading !== undefined && this.props.item.isLoading),
+                                                      this.props.item.showCheckMark  ?
+                                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} /> : 
+                                                         (this.props.item.isLoading !== undefined && this.props.item.isLoading) ?
+                                                      <ActivityIndicator animating={this.props.item.isLoading} style={StyleSheet.flatten([ { marginTop: -20 }])} size="small" color = "green"/> : null
+                                                      )}
 
                                                     {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
                                                         <View>
@@ -162,6 +214,8 @@ class BasicFormElement extends Component {
                                                             </TouchableHighlight>
                                                         </View>
                                                     )}
+
+
                                                 </View>
                                             </View>
                                             <View style={this._styleNextFocusable(this.props.item.focus)}>
@@ -173,6 +227,8 @@ class BasicFormElement extends Component {
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
                                                     onFocus={() => { this.onFocusEvent(this.props.item) }}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
+                                                    secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
+                                                    value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62 ) ? this.props.item.value : null}
 
                                                 />
                                             </View>
@@ -198,15 +254,16 @@ class BasicFormElement extends Component {
             case TIME:
             case RE_ATTEMPT_DATE:
             case DATE:
+            case SIGNATURE_AND_NPS:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
-            default:
+
+            default: console.log("FormLayoutActivityComponent")
                 return (
-                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                        Under construction  {this.props.item.label} - attributeTypeId {this.props.item.attributeTypeId}
-                    </Text>
+                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
+                     break;
         }
     }
 }
