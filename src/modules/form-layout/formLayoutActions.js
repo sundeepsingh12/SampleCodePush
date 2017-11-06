@@ -12,13 +12,15 @@ const {
     Home,
     RESET_STATE,
     ERROR_MESSAGE,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+    UPDATE_FIELD_DATA_VALIDATION
 } = require('../../lib/constants').default
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
+import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState } from '../global/globalActions'
 
 export function _setFormList(sortedFormAttributesDto) {
@@ -194,9 +196,12 @@ export function saveJobTransaction(formElement, jobTransactionId, statusId, jobM
     }
 }
 
-export function fieldValidations(currentElement, formElement, timeOfExecution) {
+export function fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction) {
     return function (dispatch) {
-        // dispatch(runningValidation)
-        fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution)
+        let alertMessageList = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
+        dispatch(setState(UPDATE_FIELD_DATA_VALIDATION, {
+            formElement,
+            message: alertMessageList[0]
+        }))
     }
 }

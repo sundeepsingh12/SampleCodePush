@@ -178,6 +178,7 @@ export default keyMirror({
     ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
+    UPDATE_FIELD_DATA_VALIDATION:null,
 
     //Route names (Used in React Navigation)
     Application: null,

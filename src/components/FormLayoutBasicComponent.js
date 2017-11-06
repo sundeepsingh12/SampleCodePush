@@ -136,7 +136,7 @@ class BasicFormElement extends Component {
     }
 
     onFocusEvent(currentElement) {
-       this.props.actions.fieldValidations(currentElement,this.props.formElement,'Before')
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction)
     }
 
 
@@ -237,6 +237,7 @@ class BasicFormElement extends Component {
                                                     multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                                     placeholder='Regular Textbox'
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
+                                                    onFocus={() => { this.onFocusEvent(this.props.item) }}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
                                                     secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                                     value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62) ? this.props.item.value : null}
