@@ -9,12 +9,8 @@ const {
     SHOW_LOADER,
     SHOW_ERROR_MESSAGE,
     ON_BLUR,
-    SAVE_SUCCESSFUL
+    SHOW_DETAILS
 } = require('../../lib/constants').default
-import {
-    EXTERNAL_DATA_STORE,
-    DATA_STORE
-} from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
 import _ from 'underscore'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
@@ -122,12 +118,35 @@ export function onSave(fieldAttributeMasterId, formElements, nextEditable, isSav
     }
 }
 
-/**This is called when save button is clicked 
- * Fills all the corresponding matched key fieldAttributes from dataStoreAttributeMap 
- * 
+/**
  * In case of External Data Store and minMaxvalidation{i.e. unique is allowed} 
- * it first check dataStoreValue is present in FieldData or not 
- * than act accordingly by throwing error or saving
+ * it checks dataStoreValue is present in FieldData or not 
+ * than act accordingly by throwing error or show details
+ * 
+ * @param {*} dataStorevalue 
+ * @param {*} fieldAttributeMasterId 
+ * @param {*} itemId 
+ * 
+ */
+export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, itemId) {
+    return async function (dispatch) {
+        try {
+            if (!await dataStoreService.dataStoreValuePresentInFieldData(dataStorevalue, fieldAttributeMasterId)) {
+                dispatch(setState(SHOW_DETAILS, itemId))
+            } else {
+                throw new Error('This value is already added')
+            }
+        } catch (error) {
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
+        }
+    }
+}
+
+/**This is called when save button is clicked 
+ * Fills all the corresponding matched key fieldAttributes from dataStoreAttributeMap and update formLayout state
  * 
  * @param {*} dataStoreAttributeValueMap 
  * @param {*} fieldAttributeMasterId 
@@ -135,24 +154,11 @@ export function onSave(fieldAttributeMasterId, formElements, nextEditable, isSav
  * @param {*} nextEditable 
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
- * @param {*} isMinMaxValidation 
- * @param {*} attributeTypeId 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, isMinMaxValidation, attributeTypeId) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue) {
     return async function (dispatch) {
         try {
-            let formElementResult = {}
-            if (attributeTypeId == EXTERNAL_DATA_STORE && isMinMaxValidation) {
-                if (!await dataStoreService.dataStoreValuePresentInFieldData(dataStorevalue, fieldAttributeMasterId)) {
-                    formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
-                } else {
-                    throw new Error('This value is already added')
-                }
-            }
-            if (attributeTypeId == DATA_STORE) {
-                formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
-            }
-            dispatch(setState(SAVE_SUCCESSFUL, true))
+            let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
             dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {

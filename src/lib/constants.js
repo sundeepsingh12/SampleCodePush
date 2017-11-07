@@ -222,7 +222,6 @@ export default keyMirror({
     MINMAX: null,
     _id: null,
     SET_INITIAL_STATE :null,
-    SAVE_SUCCESSFUL: null,
    
     //New Job
     NEW_JOB_MASTER : null,
