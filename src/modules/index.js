@@ -22,6 +22,7 @@ import payByLinkPayment from './cardTypePaymentModules/payByLinkPayment/payByLin
 import fixedSKU from './fixedSKU/fixedSKUReducer'
 import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
+import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -49,6 +50,7 @@ const rootReducer = combineReducers({
   fixedSKU,
   signature,
   formLayout,
+  cashTenderingReducer,
 })
 
 export default rootReducer

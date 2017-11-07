@@ -59,6 +59,8 @@ import SignatureAndNps from '../../containers/SignatureAndNps'
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SelectFromList from '../../containers/SelectFromList';
+import CashTendering from '../../containers/CashTendering'
+
 
 class AppWithNavigationState extends React.Component {
   render() {
@@ -169,7 +171,13 @@ export const AppNavigator = StackNavigator({
   },
   SignatureAndNps: {
     screen: SignatureAndNps
-  }
+  },
+  CashTendering: {
+    screen: CashTendering,
+    navigationOptions: {
+      title: 'Collect Cash',
+    }
+  },
 },
   {
     cardStyle: {

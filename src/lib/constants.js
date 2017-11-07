@@ -209,7 +209,14 @@ export default keyMirror({
     SET_FIELD_DATA_LIST: null,
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
-   
+
+    //CashTendering
+    CHANGE_AMOUNT: null,
+    IS_CASH_TENDERING_LOADER_RUNNING: null,
+    SET_CASH_TENDERING: null,
+    IS_RECEIVE_TOGGLE: null,
+    FETCH_CASH_TENDERING_LIST_RETURN: null,
+    CHANGE_AMOUNT_RETURN: null,
    
 })
 

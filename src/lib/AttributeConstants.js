@@ -12,7 +12,6 @@ module.exports = {
     AMOUNT: 'amount',
     ARRAY: 12,
     CONTACT_NUMBER: 27,
-    DECIMAL: 13,
     FIXED_SKU: 50,
     LANDMARK: 30,
     MODE: 'mode_type',
@@ -199,4 +198,5 @@ module.exports = {
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
     PASSWORD: 61,
+    ZERO: 0,
 }
