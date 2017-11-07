@@ -13,7 +13,7 @@ const {
 } = require('../../lib/constants').default
 
 
-export default function jobDetailsReducer(state = initialState, action) {
+export default function skuListingReducer(state = initialState, action) {
     if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
 
     switch (action.type) {

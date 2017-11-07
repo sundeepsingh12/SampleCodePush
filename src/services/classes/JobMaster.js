@@ -250,6 +250,13 @@ class JobMaster {
     }
     return true
   }
+
+  getIdJobMasterMap(jobMasterList){
+    const idJobMasterMap = {}
+    jobMasterList.forEach(jobMaster=>idJobMasterMap[jobMaster.id] = jobMaster)
+    console.log('idJobMasterMap',idJobMasterMap)
+    return idJobMasterMap
+  }
 }
 
 export let jobMasterService = new JobMaster()

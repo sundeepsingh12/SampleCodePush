@@ -188,6 +188,7 @@ export default keyMirror({
     FormLayout: null,
     TimePicker: null,
     SkuListing:null,
+    Sequence:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP:null,
@@ -210,6 +211,10 @@ export default keyMirror({
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
    
+    //Sequence Module Actions
+    SEQUENCE_LIST_FETCHING_START:null,
+    SEQUENCE_LIST_FETCHING_STOP:null,
+    TOGGLE_RESEQUENCE_BUTTON:null
    
 })
 

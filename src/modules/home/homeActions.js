@@ -26,6 +26,7 @@ const {
   JOB_ATTRIBUTE_STATUS,
   CUSTOMER_CARE,
   SMS_TEMPLATE,
+  JOB_MASTER
 } = require('../../lib/constants').default
 
 import CONFIG from '../../lib/config'
@@ -125,7 +126,8 @@ export function fetchJobs() {
       const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
       const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
       const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value)
+      const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value,jobMasterList.value)
       dispatch(jobFetchingEnd(jobTransactionCustomizationList))
     } catch (error) {
       console.log(error)
@@ -151,7 +153,7 @@ export function onResyncPress() {
     try {
       //Start resync loader here
       dispatch(jobDownloadingStatus(true))
-      await sync.createAndUploadZip();
+      await sync.createAndUploadZip()
       const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
       //Stop resync loader here
       dispatch(jobDownloadingStatus(false))

@@ -199,4 +199,10 @@ module.exports = {
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
     PASSWORD: 61,
+
+    //Status Category
+    PENDING:1,
+    FAIL:2,
+    SUCCESS:3,
+
 }

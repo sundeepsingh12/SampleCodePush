@@ -28,6 +28,7 @@ module.exports = {
     DELETE_DATA_API: '/rest/device/delete_synch_job',
     PUSH_BROKER:'mqttdev.fareye.co',
     UPLOAD_DATA_API : '/rest/device/sync',
-    GET_SEQUENCE_NEXT_COUNT : '/rest/get_sequence_next_count'
+    GET_SEQUENCE_NEXT_COUNT : '/rest/get_sequence_next_count',
+    SEQUENCE_USING_ROUTING_API:'/rest/order/sequence_using_routing'
   }
 }
