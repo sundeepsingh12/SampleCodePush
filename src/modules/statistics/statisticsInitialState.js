@@ -2,9 +2,7 @@
 
 import { Record } from 'immutable'
 
-var 
-
-InitialState = Record({
+var InitialState = Record({
    statisticsListItems:{},
 })
 

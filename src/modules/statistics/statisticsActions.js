@@ -3,11 +3,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { statisticsListService } from '../../services/classes/statistics'
-import { fieldDataService } from '../../services/classes/FieldData'
 import { setState } from '../global/globalActions'
-import * as realm from '../../repositories/realmdb'
-import {jobDataService} from '../../services/classes/JobData'
-
 const {
     SET_DATA_IN_STATISTICS_LIST,USER_SUMMARY
 } = require('../../lib/constants').default

@@ -3,32 +3,19 @@ import {
     StyleSheet,
     View,
     FlatList,
-    TouchableOpacity,
     TouchableHighlight,
 }
     from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as statisticsActions from '../modules/statistics/statisticsActions'
-import SignatureCapture from 'react-native-signature-capture';
-import renderIf from '../lib/renderIf'
 import styles from '../themes/FeStyle'
 import {
   Container,
-  Content,
-  Header,
-  Button,
   Text,
   List,
   ListItem,
-  Left,
-  Body,
-  Right,
   Icon,
-  Title,
-  Footer,
-  FooterTab,
-  StyleProvider
 } from 'native-base';
 function mapStateToProps(state) {
     return {
@@ -54,37 +41,19 @@ class Statistics extends Component {
               renderItem={({ item }) => {
                 return (
                   <TouchableHighlight underlayColor={'#eee'}>
-        <View style={style.seqCard}>
-          {/* <View style={style.seqCircle}>
-            <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-                PKUP
-            </Text>
-          </View> */}
-          <View style={style.seqCardDetail}>
-            <View>
-            <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                {item.label}
-              </Text>
-            <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                {item.value}
-              </Text>
-            </View>
-            {/* <View
-              style={{
-              width: 30,
-              alignSelf: 'center'
-            }}>
-              <Icon
-                name="ios-menu"
-                style={[
-                styles.fontXl, {
-                  color: '#c9c9c9'
-                }
-              ]}/>
-            </View> */}
-          </View>
-        </View>
-      </TouchableHighlight>
+                    <View style={style.seqCard}>
+                      <View style={style.seqCardDetail}>
+                        <View>
+                        <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+                            {item.label}
+                        </Text>
+                        <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+                            {item.value}
+                        </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </TouchableHighlight>
                 )
               }}
               keyExtractor={item => item.id}
