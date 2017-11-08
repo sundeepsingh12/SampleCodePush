@@ -1,32 +1,20 @@
-/**
- * # Main.js
- *  This is the main app screen
- *
- */
+
 'use strict'
-/*
- * ## Imports
- *
- * Imports from redux
- */
+
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-/**
- * The actions we need
- */
+
 import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
 import ResyncLoader from '../components/ResyncLoader'
 
-/**
- * The components needed from React
- */
+
 import React, { Component } from 'react'
 import {
   StyleSheet,
@@ -63,9 +51,7 @@ function mapStateToProps(state) {
   }
 };
 
-/*
- * Bind all the actions
- */
+
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({ ...globalActions, ...homeActions, ...preloaderActions }, dispatch)
@@ -73,10 +59,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-
-/**
- * ## App class
- */
 class Main extends Component {
 
   constructor() {
@@ -92,7 +74,7 @@ class Main extends Component {
 
   }
 
-  startLoginScreenWithoutLogout() {
+  startLoginScreenWithoutLogout = () => {
     this.props.actions.startLoginScreenWithoutLogout()
   }
 
@@ -133,7 +115,7 @@ class Main extends Component {
             <CustomAlert
               title="Unauthorised Device"
               message={this.props.errorMessage_403_400_Logout}
-              onCancelPressed={this.startLoginScreenWithoutLogout.bind(this)} />
+              onCancelPressed={this.startLoginScreenWithoutLogout} />
 
           )}
           <Tabs locked
@@ -200,11 +182,6 @@ class Main extends Component {
       )
     }
   }
-
-
 };
 
-/**
- * Connect the properties
- */
 export default connect(mapStateToProps, mapDispatchToProps)(Main)

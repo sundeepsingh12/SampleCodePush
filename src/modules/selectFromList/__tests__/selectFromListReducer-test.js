@@ -3,6 +3,7 @@
 
 const {
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
+    ERROR_MESSAGE
 } = require('../../../lib/constants').default
 
 const InitialState = require('../selectFromListInitialState').default
@@ -59,5 +60,15 @@ describe('selectFromList Reducer ', () => {
         }
         let nextState = selectFromListReducer(undefined, action)
         expect(nextState.selectFromListState).toBe(payload)
+    })
+
+    it('it should set field data list', () => {
+        const message = 'mapping of radioForMaster error'
+        const action = {
+            type: ERROR_MESSAGE,
+            payload: message
+        }
+        let nextState = selectFromListReducer(undefined, action)
+        expect(nextState.errorMessage).toBe(message)
     })
 })

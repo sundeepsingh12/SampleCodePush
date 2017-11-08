@@ -6,12 +6,12 @@ import {
     from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import feStyle from '../themes/FeStyle'
-import { Container, Right } from 'native-base';
+import { Container, Right } from 'native-base'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import renderIf from '../lib/renderIf';
+import renderIf from '../lib/renderIf'
 import OtpScreen from './OtpScreen'
 import MobileNoScreen from './MobileNoScreen'
 import InitialSetup from './InitialSetup'
@@ -37,7 +37,7 @@ class Preloader extends Component {
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
  
-    startLoginScreenWithoutLogout() {
+    startLoginScreenWithoutLogout = () => {
         this.props.actions.startLoginScreenWithoutLogout()
     }
 
@@ -51,7 +51,7 @@ class Preloader extends Component {
                     <CustomAlert
                         title = "Unauthorised Device" 
                         message = {this.props.errorMessage_403_400_Logout} 
-                        onCancelPressed = {this.startLoginScreenWithoutLogout.bind(this)} />
+                        onCancelPressed = {this.startLoginScreenWithoutLogout} />
 
                 )}                    
                 {renderIf(this.props.showMobileNumberScreen,
@@ -72,7 +72,6 @@ var styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f7f7f7'
     }
-
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Preloader)

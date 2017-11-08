@@ -9,7 +9,7 @@ import {
     FlatList,
     TouchableOpacity
 } from 'react-native'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
+import { Container, Content, Card, CardItem, Button, Body, Header, Icon} from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'

@@ -1,8 +1,8 @@
 'use strict'
 
-const { Record } = require('immutable')
+import {Record} from 'immutable'
 
-const InitialState = Record({
+var InitialState = Record({
     isCashTenderingLoaderRunning: false,
     cashTenderingList: {},
     totalAmount: 0,

@@ -19,7 +19,7 @@ const {
 } = require('../../lib/constants').default
 
 import {
-    OBJECTSAROJFAREYE
+    OBJECT_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
 
 export function getPaymentParameters(jobMasterId, jobId, fieldAttributeMasterId, formData, jobStatusId) {
@@ -60,7 +60,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
                 modeTypeId: selectedIndex,
                 isCardPayment
             }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECTSAROJFAREYE, fieldDataListObject))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
             dispatch(setState(UPDATE_PAYMENT_AT_END, {
                 paymentAtEnd
             }))

@@ -10,9 +10,8 @@ import {
     ActivityIndicator
 }
     from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base';
+import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base'
 import styles from '../themes/FeStyle'
-import imageFile from '../../images/fareye-logo.png'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -38,12 +37,15 @@ import {
     NUMBER,
     DECIMAL,
     SKU_ARRAY,
+    DATA_STORE,
+    EXTERNAL_DATA_STORE,
     SEQUENCE,
     PASSWORD,
     CASH_TENDERING,
     ARRAY,
     OBJECT,
-    CASH
+    CASH,
+    OPTION_RADIO_FOR_MASTER,
 } from '../lib/AttributeConstants'
 
 import * as globalActions from '../modules/global/globalActions'
@@ -96,6 +98,10 @@ class BasicFormElement extends Component {
                 screenName = 'SelectFromList'
                 break
             }
+            case OPTION_RADIO_FOR_MASTER: {
+                screenName = 'SelectFromList'
+                break
+            }
             case FIXED_SKU: {
                 screenName = 'FixedSKUListing'
                 break
@@ -105,7 +111,8 @@ class BasicFormElement extends Component {
                 if(cash  > 0){
                 screenName = 'CashTendering'
                 } else {
-                    screenName = null //Comment Toast
+                    screenName = null
+                    { Toast.show({ text: "Please enter amount in money collect", position: 'bottom', buttonText: 'Okay' }) }
                 }
                 break
             }
@@ -115,6 +122,11 @@ class BasicFormElement extends Component {
             }
             case SKU_ARRAY: {
                 screenName = 'SkuListing'
+                break
+            }
+            case EXTERNAL_DATA_STORE:
+            case DATA_STORE: {
+                screenName = 'DataStore'
                 break
             }
             case SIGNATURE_AND_NPS: {
@@ -141,7 +153,7 @@ class BasicFormElement extends Component {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before')
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction)
     }
 
 
@@ -236,11 +248,13 @@ class BasicFormElement extends Component {
                                             </View>
                                             <View style={this._styleNextFocusable(this.props.item.focus)}>
                                                 <Input
+                                                    autoCapitalize="none"
                                                     keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                                     editable={this.props.item.editable}
                                                     multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                                     placeholder='Regular Textbox'
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
+                                                    onFocus={() => { this.onFocusEvent(this.props.item) }}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
                                                     secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                                     value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62) ? this.props.item.value : null}
@@ -269,12 +283,13 @@ class BasicFormElement extends Component {
             case TIME:
             case RE_ATTEMPT_DATE:
             case DATE:
+            case CASH_TENDERING:
             case SIGNATURE_AND_NPS:
-                return (
-                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-                )
-
-            default: console.log("FormLayoutActivityComponent")
+            case EXTERNAL_DATA_STORE:
+            case DATA_STORE:
+                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+                        
+            default: 
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )

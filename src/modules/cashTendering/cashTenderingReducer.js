@@ -1,7 +1,6 @@
 'use strict'
 
-const InitialState = require('./cashTenderingInitialState').default
-
+import InitialState from './cashTenderingInitialState'
 const {
     CHANGE_AMOUNT,
     IS_CASH_TENDERING_LOADER_RUNNING,

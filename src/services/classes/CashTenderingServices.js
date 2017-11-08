@@ -11,7 +11,6 @@ import {
     OBJECT,
     CASH,
     STRING,
-    OBJECT_ATTR_ID,
     OBJECT_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
 
@@ -83,7 +82,7 @@ class CashTenderingServices {
                     fieldAttributeDataObject.id = counter++
                     fieldAttributeDataObject.value = 0
                     cashTenderinglist[TOTAL_AMOUNT] = fieldAttributeDataObject
-                } else if (fieldAttributeData.attributeTypeId == OBJECT_ATTR_ID) {
+                } else if (fieldAttributeData.attributeTypeId == OBJECT) {
                     let fixedSKUObjectChildListTemplate = {}
                     fieldAttributeDataObject.value = OBJECT_SAROJ_FAREYE
                     for (let fieldAttributeMaster of fieldAttributeMasterList) {

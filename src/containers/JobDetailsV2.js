@@ -1,29 +1,13 @@
-/**
- * # Main.js
- *  This is the main app screen
- *
- */
+
 'use strict'
-/*
- * ## Imports
- *
- * Imports from redux
- */
+
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-
-/**
- * The actions we need
- */
-import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 
-/**
- * The components needed from React
- */
 import React, {Component} from 'react'
 import {StyleSheet, View, Image, TouchableHighlight, PanResponder} from 'react-native'
 
@@ -44,7 +28,6 @@ import {
   FooterTab,
   StyleProvider
 } from 'native-base';
-import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import LinearGradient from 'react-native-linear-gradient';
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
@@ -68,9 +51,7 @@ function mapDispatchToProps(dispatch) {
 }
 const MAX_POINTS = 200;
 
-/**
- * ## App class
- */
+
 class JobDetailsV2 extends Component {
 
   constructor(props) {
@@ -158,23 +139,6 @@ class JobDetailsV2 extends Component {
               colors={['#262da0', '#205dbe', '#2c83c9']}
               style={style.chartBlock}>
               <View style={style.chartContainer} {...this._panResponder.panHandlers}>
-                <AnimatedCircularProgress
-                  size={140}
-                  width={5}
-                  fill={fill}
-                  tintColor="#ffffff"
-                  backgroundColor="#4d62c3">
-                  {(fill) => (
-                    <View style={style.pieData}>
-                      <Text style={[style.chartCenterData, style.pieNumber]}>
-                        {Math.round(MAX_POINTS * fill / 100)}
-                      </Text>
-                      <Text style={[style.chartCenterData, style.pieText]}>
-                        pending
-                      </Text>
-                    </View>
-                  )}
-                </AnimatedCircularProgress>
               </View>
               <View style={[styles.row, styles.justifySpaceAround]}>
                 <View>
@@ -323,7 +287,5 @@ const style = StyleSheet.create({
   }
 });
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(JobDetailsV2)
