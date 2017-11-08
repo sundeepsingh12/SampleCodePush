@@ -1,6 +1,6 @@
-const {
+import {
   JOB_SUMMARY
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
   keyValueDBService

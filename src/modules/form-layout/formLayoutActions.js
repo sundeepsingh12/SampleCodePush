@@ -1,6 +1,6 @@
 'use strict'
 
-const {
+import {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
     DISABLE_SAVE,
     UPDATE_FIELD_DATA,
@@ -14,7 +14,7 @@ const {
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     UPDATE_FIELD_DATA_VALIDATION
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'

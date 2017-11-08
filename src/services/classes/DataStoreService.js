@@ -1,12 +1,12 @@
 'use strict'
 import CONFIG from '../../lib/config'
 import RestAPIFactory from '../../lib/RestAPIFactory'
-const {
+import {
     REMARKS,
     MINMAX,
     SPECIAL,
     TABLE_FIELD_DATA
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
     DATA_STORE_ATTR_MASTER_ID,

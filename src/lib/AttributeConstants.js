@@ -230,4 +230,38 @@ module.exports = {
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
 
+    //App Modules Constants
+    BULK : {
+        appModuleId: 1,
+        displayName: ''
+    },
+    LIVE : {
+        appModuleId: 13,
+        displayName: ''
+    },
+    OFFLINEDATASTORE : {
+        appModuleId: 15,
+        displayName: ''
+    },
+    PIECHART : {
+        appModuleId: 5,
+        displayName: ''
+    },
+    STATISTIC : {
+        appModuleId: 7,
+        displayName: ''
+    },
+    SEQUENCE : {
+        appModuleId: 2,
+        displayName: ''
+    },
+    START : {
+        appModuleId: 4,
+        displayName: ''
+    },
+    SUMMARY : {
+        appModuleId: 8,
+        displayName: ''
+    },
+    
 }

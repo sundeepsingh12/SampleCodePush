@@ -1,38 +1,30 @@
 'use strict'
-const {
-  SET_CREDENTIALS,
-
-  LOGOUT,
+import {
+  Home,
+  IS_PRELOADER_COMPLETE,
+  Login,
   LOGIN,
-
-  LOGOUT_START,
-  LOGOUT_SUCCESS,
-  LOGOUT_FAILURE,
-
+  LOGIN_CAMERA_SCANNER,
+  LOGIN_FAILURE,
   LOGIN_START,
   LOGIN_SUCCESS,
-  LOGIN_FAILURE,
-  LOGIN_CAMERA_SCANNER,
-
+  LOGOUT,
+  LOGOUT_FAILURE,
+  LOGOUT_START,
+  LOGOUT_SUCCESS,
+  ON_LOGIN_USERNAME_CHANGE,
+  ON_LOGIN_PASSWORD_CHANGE,
+  PASSWORD,
+  Preloader,
+  REMEMBER_ME,
+  REMEMBER_ME_SET_TRUE,
+  SET_CREDENTIALS,
   SESSION_TOKEN_REQUEST,
   SESSION_TOKEN_SUCCESS,
   SESSION_TOKEN_FAILURE,
-
-  ON_LOGIN_USERNAME_CHANGE,
-  ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
-  
   USERNAME,
-  PASSWORD,
-  REMEMBER_ME,
-  REMEMBER_ME_SET_TRUE,
-
-  IS_PRELOADER_COMPLETE,
-  Login,
-  Home,
-  Preloader
-
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 
@@ -212,7 +204,7 @@ export function getSessionToken() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
-         dispatch(NavigationActions.navigate({ routeName: 'Home' }))
+         dispatch(NavigationActions.navigate({ routeName: Home }))
       } else if(token) {
           dispatch(NavigationActions.navigate({ routeName: Preloader }))
       }

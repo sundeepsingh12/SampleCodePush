@@ -5,12 +5,11 @@
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { keyValueDBService } from './KeyValueDBService'
 import CONFIG from '../../lib/config'
-const {
+import {
     USERNAME,
     PASSWORD,
     REMEMBER_ME,
-
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 class Authentication {
 

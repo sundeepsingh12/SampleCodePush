@@ -1,12 +1,12 @@
 'use strict'
 
-const {
+import {
   JOB_FETCHING_START,
     JOB_FETCHING_END,
     SET_TABS_LIST,
     SET_FETCHING_FALSE,
     CLEAR_HOME_STATE,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import homeReducer from '../homeReducer'
 

@@ -1,7 +1,7 @@
 'use strict'
 var actions = require('../dataStoreActions')
 var formLayoutActions = require('../../form-layout/formLayoutActions')
-const {
+import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER,
@@ -10,7 +10,7 @@ const {
     MINMAX,
     SPECIAL,
     SAVE_SUCCESSFUL
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 import CONFIG from '../../../lib/config'
 import {
     EXTERNAL_DATA_STORE,

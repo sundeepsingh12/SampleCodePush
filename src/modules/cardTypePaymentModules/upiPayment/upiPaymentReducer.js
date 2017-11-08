@@ -1,13 +1,13 @@
 'use strict'
 
 const InitialState = require('./upiPaymentInitialState').default
-const {
+import {
     SET_UPI_APPROVAL,
     SET_UPI_PAYMENT_CUSTOMER_CONTACT,
     SET_UPI_PAYMENT_CUSTOMER_NAME,
     SET_UPI_PAYMENT_PARAMETERS,
     SET_UPI_PAYMENT_PAYER_VPA,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 const initialState = new InitialState()
 

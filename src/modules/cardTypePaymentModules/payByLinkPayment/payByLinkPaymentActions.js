@@ -4,10 +4,10 @@ import { setState } from '../../global/globalActions'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { moduleCustomizationService } from '../../../services/classes/ModuleCustomization'
 import { payByLinkPaymentService } from '../../../services/payment/PayByLinkPayment'
-const {
+import {
     CUSTOMIZATION_APP_MODULE,
     SET_PAY_BY_LINK_PARAMETERS,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import {
     PAYBYLINKMODULE

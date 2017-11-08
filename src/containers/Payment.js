@@ -15,7 +15,7 @@ import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-const {
+import {
     CASH,
     CHEQUE,
     DEMAND_DRAFT,
@@ -39,11 +39,11 @@ const {
     SPLIT,
     TICKET_RESTAURANT,
     UPI,
-} = require('../lib/AttributeConstants')
+} from '../lib/AttributeConstants'
 
-const {
+import {
     SET_PAYMENT_CHANGED_PARAMETERS,
-} = require('../lib/constants').default
+} from '../lib/constants'
 
 function mapStateToProps(state) {
     return {

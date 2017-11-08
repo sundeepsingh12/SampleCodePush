@@ -8,11 +8,11 @@ import { updateFieldDataWithChildData } from '../../form-layout/formLayoutAction
 import { fieldAttributeService } from '../../../services/classes/FieldAttribute'
 var actions = require('../fixedSKUActions')
 var formLayoutActions = require('../../form-layout/formLayoutActions')
-const {
+import {
     IS_LOADER_RUNNING,
     CHANGE_QUANTITY,
     SET_FIXED_SKU,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
