@@ -30,7 +30,7 @@ function mapDispatchToProps(dispatch) {
 
 class Statistics extends Component {
 
-    componentWillMount() {
+    componentDidMount() {
         this.props.actions.getDataForStatisticsList()
     }
     render() {
@@ -68,14 +68,6 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingLeft: 10
-  },
-  seqCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#ffcc00',
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   seqCardDetail: {
     flex: 1,

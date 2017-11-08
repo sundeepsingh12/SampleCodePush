@@ -8,16 +8,19 @@ const {
     SET_DATA_IN_STATISTICS_LIST,USER_SUMMARY
 } = require('../../lib/constants').default
 
-
+/**This action is fire when statistics module is tap,
+ * 
+ * @param {*} userSummaryList // it return the user_summary which contains all user information 
+ * return data for view of statistics list 
+ */
 export function getDataForStatisticsList() {
     return async function (dispatch) {
         try {
-            const statisticsList = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-            console.log("data123",statisticsList)
-            if (!statisticsList) {
+            const userSummaryList = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+            if (!userSummaryList) {
                 throw new Error('User Summary not available')
             }
-            const selectedStatisticsList =  statisticsListService.setStatisticsList(statisticsList.value)
+            const selectedStatisticsList =  statisticsListService.setStatisticsList(userSummaryList.value)
             dispatch(setState(SET_DATA_IN_STATISTICS_LIST, selectedStatisticsList))
         } catch (error) {
            console.log("ErrorMessage",error)

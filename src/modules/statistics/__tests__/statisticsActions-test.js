@@ -10,7 +10,7 @@ const mockStore = configureStore(middlewares)
 
 const {
     SET_DATA_IN_STATISTICS_LIST
-} = require('../../lib/constants').default
+} = require('../../../lib/constants').default
 
 describe('statisticsActions', () => {
     const statisticsList = {
@@ -84,11 +84,11 @@ describe('statisticsActions', () => {
 
     it('should get Data For StatisticsList', () => {
         keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue(fieldAttributeMasterList)
+        keyValueDBService.getValueFromStore.mockReturnValue(statisticsList)
         statisticsListService.setStatisticsList = jest.fn()
         statisticsListService.setStatisticsList.mockReturnValue(returnData)
         const store = mockStore({})
-        return store.dispatch(actions.getDataForStatisticsList())
+        return store.dispatch(getDataForStatisticsList())
             .then(() => {
                     expect(statisticsListService.setStatisticsList).toHaveBeenCalled()
                     expect(store.getActions()[0].type).toEqual(expectedActions[0].type)

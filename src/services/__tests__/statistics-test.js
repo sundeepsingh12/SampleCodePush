@@ -67,7 +67,7 @@ const returnData = {
     });
     it('it should get data for statistics listView if one of them is null', () => {
         statisticsList.cashCollected = null
-        returnData[9] = null
+        returnData[9].value = 0
        expect(statisticsListService.setStatisticsList(statisticsList)).toEqual(returnData)
     });
 
