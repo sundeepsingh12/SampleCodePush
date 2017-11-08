@@ -4,7 +4,7 @@ import { CashTenderingService } from '../../services/classes/CashTenderingServic
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
-const {
+import {
     FIELD_ATTRIBUTE_VALUE,
     FIELD_ATTRIBUTE,
     CHANGE_AMOUNT,
@@ -13,7 +13,7 @@ const {
     IS_RECEIVE_TOGGLE,
     FETCH_CASH_TENDERING_LIST_RETURN,
     CHANGE_AMOUNT_RETURN,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import {
     ARRAY_SAROJ_FAREYE,
     ZERO,

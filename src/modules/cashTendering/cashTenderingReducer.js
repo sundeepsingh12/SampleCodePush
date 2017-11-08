@@ -1,14 +1,14 @@
 'use strict'
 
 import InitialState from './cashTenderingInitialState'
-const {
+import {
     CHANGE_AMOUNT,
     IS_CASH_TENDERING_LOADER_RUNNING,
     SET_CASH_TENDERING,
     IS_RECEIVE_TOGGLE,
     FETCH_CASH_TENDERING_LIST_RETURN,
     CHANGE_AMOUNT_RETURN,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 const initialState = new InitialState()
 

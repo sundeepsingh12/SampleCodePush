@@ -5,12 +5,12 @@ import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { moduleCustomizationService } from '../../../services/classes/ModuleCustomization'
 import { upiPaymentService } from '../../../services/payment/UPIPayment'
 
-const {
+import {
     CUSTOMIZATION_APP_MODULE,
     DEVICE_IMEI,
     SET_UPI_PAYMENT_PARAMETERS,
     SET_UPI_APPROVAL,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import CONFIG from '../../../lib/config'
 

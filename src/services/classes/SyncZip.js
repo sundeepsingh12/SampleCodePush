@@ -5,14 +5,14 @@ import { keyValueDBService } from './KeyValueDBService'
 import * as realm from '../../repositories/realmdb';
 import _ from 'underscore'
 
-const {
+import {
     TABLE_TRACK_LOGS,
     USER_SUMMARY,
     TABLE_FIELD_DATA,
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
     PENDING_SYNC_TRANSACTION_IDS
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;

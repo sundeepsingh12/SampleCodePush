@@ -109,7 +109,7 @@ class CashTenderingServices {
                 cashTenderingObject.sequence = fieldAttrObject.sequence
                 cashTenderingObject.childDataList[STRING].value = 'receive'
                 cashTenderingObject.childDataList[DECIMAL].value = fieldAttrObject.code
-                cashTenderingObject.childDataList[NUMBER].value = ''
+                cashTenderingObject.childDataList[NUMBER].value = 0
                 cashTenderingObject.view = fieldAttrObject.name
                 cashTenderinglist[cashTenderingObject.id] = cashTenderingObject
             })

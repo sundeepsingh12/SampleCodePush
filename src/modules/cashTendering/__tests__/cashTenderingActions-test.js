@@ -6,17 +6,17 @@ import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { CashTenderingService } from '../../../services/classes/CashTenderingServices'
 import { updateFieldDataWithChildData } from '../../form-layout/formLayoutActions'
 import { fieldAttributeService } from '../../../services/classes/FieldAttribute'
-var actions = require('../cashTenderingActions')
+import * as actions from '../cashTenderingActions'
 import { setState } from '../../global/globalActions'
-var formLayoutActions = require('../../form-layout/formLayoutActions')
-const {
+import * as formLayoutActions from '../../form-layout/formLayoutActions'
+import {
     CHANGE_AMOUNT,
     IS_CASH_TENDERING_LOADER_RUNNING,
     SET_CASH_TENDERING,
     IS_RECEIVE_TOGGLE,
     FETCH_CASH_TENDERING_LIST_RETURN,
     CHANGE_AMOUNT_RETURN,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 jest.mock('react-native-router-flux')
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)

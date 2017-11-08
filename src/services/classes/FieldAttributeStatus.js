@@ -1,7 +1,7 @@
 'use strict'
-const {
+import {
     FIELD_ATTRIBUTE_STATUS,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import _ from 'underscore'
 import {
     keyValueDBService

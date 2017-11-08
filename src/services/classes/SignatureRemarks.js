@@ -25,10 +25,10 @@ import {
     SIGN,
     IMAGE_EXTENSION
 } from '../../lib/AttributeConstants'
-const {
+import {
     USER,
     FIELD_ATTRIBUTE,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { fieldDataService } from '../../services/classes/FieldData'
 class SignatureRemarks {

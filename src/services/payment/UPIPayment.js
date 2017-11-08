@@ -2,9 +2,9 @@
 
 import * as realm from '../../repositories/realmdb'
 import RestAPIFactory from '../../lib/RestAPIFactory'
-const {
+import {
     TABLE_JOB_DATA
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 class UPIPayment {
 

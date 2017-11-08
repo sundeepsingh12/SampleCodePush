@@ -1,7 +1,7 @@
 'use strict'
-const {
+import {
     FIELD_ATTRIBUTE_VALIDATION
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import {
     keyValueDBService
 } from './KeyValueDBService'

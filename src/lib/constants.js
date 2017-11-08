@@ -2,7 +2,7 @@ import keyMirror from 'keymirror'
 
 //keyMirror is a simple utility for creating an object with values equal to its keys.
 
-export default keyMirror({
+module.exports = keyMirror({
     //Global Actions
     SET_STORE: null,
     SET_SESSION_TOKEN: null,
@@ -235,7 +235,7 @@ export default keyMirror({
     //New Job
     NEW_JOB_MASTER : null,
     NEW_JOB_STATUS : null,
-   
+    SET_DATA_IN_STATISTICS_LIST : null
 })
 
 

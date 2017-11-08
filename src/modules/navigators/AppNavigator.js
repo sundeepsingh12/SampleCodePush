@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment'
 import {
   connect
 } from 'react-redux'
@@ -63,6 +64,7 @@ import SignatureAndNps from '../../containers/SignatureAndNps'
 import SelectFromList from '../../containers/SelectFromList';
 import CashTendering from '../../containers/CashTendering'
 
+import Statistics from '../../containers/Statistics';
 
 class AppWithNavigationState extends React.Component {
   render() {
@@ -122,6 +124,12 @@ export const AppNavigator = StackNavigator({
   },
   SelectFromList: {
     screen: SelectFromList,
+  },
+  Statistics: {
+    screen : Statistics,
+    navigationOptions: {
+      title: 'STATISTICS : ' + moment(new Date()).format('DD-MM-YYYY'),
+    }
   },
   HomeUI: {
     screen: HomeUI

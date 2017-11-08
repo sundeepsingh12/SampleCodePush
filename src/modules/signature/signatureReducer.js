@@ -1,8 +1,8 @@
 'use strict'
-const {
+import {
     SET_FIELD_DATA_LIST,
     SET_REMARKS_VALIDATION
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 const InitialState = require('./signatureInitialState').default
 

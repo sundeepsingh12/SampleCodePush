@@ -1,7 +1,7 @@
 'use strict'
 
 
-const {
+import {
   LOGIN_START,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
@@ -12,7 +12,7 @@ const {
   ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
   REMEMBER_ME_SET_TRUE,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import authReducer from '../loginReducer'
 

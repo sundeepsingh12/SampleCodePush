@@ -10,7 +10,7 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import CashTenderingView from '../components/CashTenderingView'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
-const {IS_RECEIVE_TOGGLE, CHANGE_AMOUNT, CHANGE_AMOUNT_RETURN} = require('../lib/constants').default
+import {IS_RECEIVE_TOGGLE, CHANGE_AMOUNT, CHANGE_AMOUNT_RETURN} from '../lib/constants'
 
 let styles = StyleSheet.create({
     container: {

@@ -25,6 +25,7 @@ import formLayout from './form-layout/formLayoutReducer'
 import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
+import statistics from './statistics/statisticsReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -55,6 +56,7 @@ const rootReducer = combineReducers({
   cashTenderingReducer,
   dataStore,
   newJob,
+  statistics,
 })
 
 export default rootReducer
