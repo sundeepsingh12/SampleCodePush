@@ -228,6 +228,9 @@ export default keyMirror({
     //New Job
     NEW_JOB_MASTER : null,
     NEW_JOB_STATUS : null,
+
+    //statisticsModule
+    SET_DATA_IN_STATISTICS_LIST : null,
    
 })
 
