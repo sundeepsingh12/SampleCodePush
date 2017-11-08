@@ -1,12 +1,12 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
     StyleSheet,
     Text,
     View,
     Modal
 } from 'react-native';
-import { Button, Input } from 'native-base';
+import { Button, Input } from 'native-base'
 import feStyle from '../themes/FeStyle'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -22,9 +22,7 @@ function mapStateToProps(state) {
   }
 };
 
-/*
- * Bind all the actions
- */
+
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({  ...preloaderActions }, dispatch)
@@ -33,16 +31,16 @@ function mapDispatchToProps(dispatch) {
 
 class OtpScreen extends Component{
 
-     onChangeOtp(otpNumber) {
-        this.props.actions.onChangeOtp(otpNumber)
+     onChangeOtp = (value) => {
+        this.props.actions.onChangeOtp(value)
     }
 
 
-    validateOtp(otpNumber) {
-        this.props.actions.validateOtp(otpNumber)
+    validateOtp = ()=> {
+        this.props.actions.validateOtp(this.props.otpNumber)
     }
 
-      invalidateSession() {
+      invalidateSession = () => {
         this.props.actions.invalidateUserSession()
     }
 
@@ -68,7 +66,7 @@ class OtpScreen extends Component{
                                         value={this.props.otpNumber}
                                         keyboardType='numeric'
                                         maxLength={6}
-                                        onChangeText={value => this.onChangeOtp(value)}
+                                        onChangeText={this.onChangeOtp}
                                     />
                                 </View>
                             </View>
@@ -76,13 +74,13 @@ class OtpScreen extends Component{
                                 {this.props.otpDisplayMessage}
                             </Text>
                             <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop15]}>
-                                <Button onPress={() => this.validateOtp(this.props.otpNumber)} full rounded
+                                <Button onPress={this.validateOtp} full rounded
                                     style={StyleSheet.flatten(feStyle.margin10)}
                                     disabled={this.props.isOtpVerificationButtonDisabled}>
                                     <Text style={[feStyle.fontWhite]}>Verify</Text>
 
                                 </Button>
-                                <Button onPress={() => this.invalidateSession()} full rounded danger
+                                <Button onPress={this.invalidateSession} full rounded danger
                                     disabled={this.props.isOtpScreenLogoutDisabled}
                                     style={StyleSheet.flatten(feStyle.margin10)}>
                                     <Text style={[feStyle.fontWhite]}>Close</Text>

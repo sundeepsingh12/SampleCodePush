@@ -5,7 +5,6 @@ import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
 import * as sequenceActions from '../modules/sequence/sequenceActions'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Loader from '../components/Loader'
 
 import React, {Component} from 'react'

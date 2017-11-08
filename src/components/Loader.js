@@ -2,13 +2,9 @@
 
 import React, { Component } from 'react'
 import {
-  StyleSheet,
-  View,
-  Text
+  View
 } from 'react-native'
-import { Spinner } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Spinner } from 'native-base'
 
 export default class Loader extends Component {
     render() {

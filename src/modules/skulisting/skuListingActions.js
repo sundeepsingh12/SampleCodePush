@@ -26,7 +26,6 @@ import {
 } from '../../lib/AttributeConstants'
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
-import { fieldAttributeService } from '../../services/classes/FieldAttribute'
 import { fieldDataService } from '../../services/classes/FieldData'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {

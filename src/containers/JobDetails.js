@@ -9,7 +9,7 @@ import {
     TouchableOpacity
 }
     from 'react-native'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
+import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base'
 import styles from '../themes/FeStyle'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -64,6 +64,7 @@ class JobDetails extends Component {
                         jobTransaction: this.props.jobTransaction,
                         statusId: statusList[index].id,
                         statusName: statusList[index].name,
+                        jobMasterId : this.props.jobTransaction.jobMasterId
                     }
                     )
                     }>

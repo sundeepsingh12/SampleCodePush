@@ -163,7 +163,7 @@ class FormLayout {
      * @param {*positionId} positionId 
      */
     getFieldAttributeObject(fieldAttribute, validationArray, positionId){
-        const {label,subLabel,helpText,key,required,hidden,attributeTypeId} = fieldAttribute
+        const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl } = fieldAttribute
         return {
             label,
             subLabel,
@@ -172,17 +172,19 @@ class FormLayout {
             required,
             hidden,
             attributeTypeId,
-            fieldAttributeMasterId : fieldAttribute.id,
-            positionId : positionId,
+            fieldAttributeMasterId: fieldAttribute.id,
+            positionId: positionId,
             parentId : 0,
             showHelpText : false,
             editable : !(fieldAttribute.editable) || (fieldAttribute.attributeTypeId == 62)? false: fieldAttribute.editable,
             focus : fieldAttribute.focus ? fieldAttribute.focus : false,
             validation : (validationArray && validationArray.length > 0) ? validationArray : null,
             sequenceMasterId: fieldAttribute.sequenceMasterId,
+            dataStoreMasterId,
+            dataStoreAttributeId,
+            externalDataStoreMasterUrl,
         };
     }
-
     
 }
 

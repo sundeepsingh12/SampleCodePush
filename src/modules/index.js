@@ -23,6 +23,8 @@ import fixedSKU from './fixedSKU/fixedSKUReducer'
 import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
 import sequence from './sequence/sequenceReducer'
+import dataStore from './dataStore/dataStoreReducer'
+import newJob from './newJob/newJobReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -50,7 +52,9 @@ const rootReducer = combineReducers({
   fixedSKU,
   signature,
   formLayout,
-  sequence
+  sequence,
+  dataStore,
+  newJob,
 })
 
 export default rootReducer

@@ -1,29 +1,15 @@
-/**
- * # Main.js
- *  This is the main app screen
- *
- */
+
 'use strict'
-/*
- * ## Imports
- *
- * Imports from redux
- */
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
-/**
- * The actions we need
- */
-import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 
-/**
- * The components needed from React
- */
+
 import React, {Component} from 'react'
 import {StyleSheet, View, Image, TouchableHighlight} from 'react-native'
 
@@ -64,9 +50,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-/**
- * ## App class
- */
+
 class SkuDetails extends Component {
 
   static navigationOptions = ({navigation}) => {
@@ -226,7 +210,5 @@ const style = StyleSheet.create({
 
 });
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(SkuDetails)
