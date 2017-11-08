@@ -1,10 +1,10 @@
 'use strict'
 
-const {
+import {
     IS_LOADER_RUNNING,
     CHANGE_QUANTITY,
     SET_FIXED_SKU
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import fixedSKUReducer from '../fixedSKUReducer'
 const InitialState = require('../fixedSKUInitialState').default

@@ -5,7 +5,7 @@
  */
 'use strict'
 
-const {
+import {
   SET_SESSION_TOKEN,
   SET_STORE,
   ON_GLOBAL_USERNAME_CHANGE,
@@ -20,7 +20,7 @@ const {
   IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
   USER
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 

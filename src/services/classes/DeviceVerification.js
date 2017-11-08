@@ -7,10 +7,10 @@ import DeviceInfo from 'react-native-device-info'
 import { Platform } from 'react-native'
 let imei = require('../../wrapper/IMEI')
 
-const {
+import {
   DEVICE_IMEI,
   DEVICE_SIM
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 class DeviceVerification {
 

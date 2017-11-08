@@ -8,9 +8,7 @@ import {getDataForStatisticsList} from '../statisticsActions'
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
-const {
-    SET_DATA_IN_STATISTICS_LIST
-} = require('../../../lib/constants').default
+import {SET_DATA_IN_STATISTICS_LIST} from '../../../lib/constants'
 
 describe('statisticsActions', () => {
     const statisticsList = {

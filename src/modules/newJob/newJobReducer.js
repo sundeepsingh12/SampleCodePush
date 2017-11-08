@@ -2,10 +2,10 @@
 
 import InitialState from './newJobInitialState.js'
 
-const {
+import {
     NEW_JOB_MASTER,
     NEW_JOB_STATUS
-  } = require('../../lib/constants').default
+  } from '../../lib/constants'
 
 const initialState = new InitialState();
 

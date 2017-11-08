@@ -19,10 +19,10 @@ jest.autoMockOff()
  * These actions are sufficient to test the reducer as many of the
  * case statements are shared amongst the actions.
  */
-const {
+import {
   SET_PLATFORM,
   SET_VERSION
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 /**
  * ## Class under test

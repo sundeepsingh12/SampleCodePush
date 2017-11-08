@@ -1,10 +1,7 @@
 'use strict'
  
 import InitialState from './statisticsInitialState' 
-
-const {
-    SET_DATA_IN_STATISTICS_LIST
-} = require('../../lib/constants').default
+import {SET_DATA_IN_STATISTICS_LIST} from '../../lib/constants'
 
 const initialState = new InitialState()
 

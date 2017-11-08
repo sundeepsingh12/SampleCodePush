@@ -1,8 +1,8 @@
 'use strict'
 import * as realm from '../../repositories/realmdb'
-const {
+import {
     TABLE_JOB_DATA
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import moment from 'moment'
 
 import {

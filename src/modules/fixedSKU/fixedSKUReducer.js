@@ -2,11 +2,11 @@
 
 const InitialState = require('./fixedSKUInitialState').default
 
-const {
+import {
     IS_LOADER_RUNNING,
     CHANGE_QUANTITY,
     SET_FIXED_SKU
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 const initialState = new InitialState()
 

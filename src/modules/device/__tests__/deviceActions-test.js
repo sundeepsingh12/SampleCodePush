@@ -28,10 +28,10 @@ var actions = require('../deviceActions')
  *
  * actions under test
  */
-const {
+import {
   SET_PLATFORM,
   SET_VERSION
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 /**
  * ## Tests

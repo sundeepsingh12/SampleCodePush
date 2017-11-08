@@ -8,14 +8,14 @@ import { fieldDataService } from '../../services/classes/FieldData'
 import { setState } from '../global/globalActions'
 import * as realm from '../../repositories/realmdb'
 import {jobDataService} from '../../services/classes/JobData'
-const {
+import {
     FIELD_ATTRIBUTE_VALUE,
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
     ON_BLUR,
     TABLE_JOB_DATA,
     FIELD_ATTRIBUTE,
     ERROR_MESSAGE,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 export function _setErrorMessage(message) {
     return {
