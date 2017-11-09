@@ -51,7 +51,7 @@ class CashTenderingServices {
                     let cashDetailsArray = fieldDataObject.childDataList
                         .filter(item => item.attributeTypeId == ARRAY)[0].childDataList
                         .filter(item_1 => item_1.attributeTypeId == OBJECT)[0].childDataList
-                    if (cashDetailsArray.filter(item_2 => item_2.value == CASH.modeType)) {
+                    if (cashDetailsArray.filter(item_2 => item_2.value == CASH.modeType).length) {
                         cash = cashDetailsArray.filter(item_3 => item_3.attributeTypeId == DECIMAL)[0].value
                     }
                 }
@@ -61,16 +61,12 @@ class CashTenderingServices {
     }
 
     prepareObjectWithFieldAttributeData(fieldAttributeData) {
-        if (fieldAttributeData != undefined) {
-            let objectWithFieldData = {
-                fieldAttributeMasterId: fieldAttributeData.id,
-                label: fieldAttributeData.label,
-                attributeTypeId: fieldAttributeData.attributeTypeId
-            }
-            return objectWithFieldData
-        } else {
-            return null
+        let objectWithFieldData = {
+            fieldAttributeMasterId: fieldAttributeData.id,
+            label: fieldAttributeData.label,
+            attributeTypeId: fieldAttributeData.attributeTypeId
         }
+        return objectWithFieldData
     }
 
     prepareCashTenderingList(fieldAttributeMasterList, fieldAttributeValueDataArray, fieldAttributeMasterId, counter) {
@@ -94,6 +90,7 @@ class CashTenderingServices {
                     fieldAttributeDataObject.childDataList = fixedSKUObjectChildListTemplate
                     fieldAttributeDataObject.view = fixedSKUObjectChildListTemplate[1].value
                     cashTenderinglist = this.prepareCashTenderingListObjectsFromTemplate(fieldAttributeDataObject, fieldAttributeValueDataArray, cashTenderinglist, fieldAttributeMasterId, counter)
+                    break
                 }
             }
         }

@@ -39,10 +39,10 @@ function mapDispatchToProps(dispatch) {
 
 class CashTendering extends Component {
 
-    componentWillMount() {
-        if (this.props.isReceive == true) {
+    componentDidMount() {
+        if (this.props.isReceive) {
             this.props.actions.fetchCashTenderingList(this.props.navigation.state.params['currentElement'].fieldAttributeMasterId)
-        } else if (this.props.isReceive == false) {
+        } else {
             this.props.actions.getCashTenderingListReturn(JSON.parse(JSON.stringify(this.props.cashTenderingList)))
         }
     }

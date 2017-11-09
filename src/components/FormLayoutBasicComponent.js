@@ -112,7 +112,7 @@ class BasicFormElement extends Component {
                 screenName = 'CashTendering'
                 } else {
                     screenName = null
-                    { Toast.show({ text: "Please enter amount in money collect", position: 'bottom', buttonText: 'Okay' }) }
+                    { Toast.show({ text: "NOT REQUIRED", position: 'bottom', buttonText: 'Okay' }) }
                 }
                 break
             }

@@ -32,28 +32,18 @@ class CashTenderingView extends Component {
         return (
             <View>
                 <Content>
-                    <Card style = {{flexDirection: 'row'}}>
+                    <Card style={{ flexDirection: 'row' }}>
                         <CardItem >
                             <Text>{this.props.item.view}  -  </Text>
                         </CardItem>
                         <CardItem>
-                            <TextInput style={{justifyContent:'flex-end', alignItems:'flex-end'}}
+                            <TextInput style={{ justifyContent: 'flex-end', alignItems: 'flex-end' }}
                                 editable={true}
                                 maxLength={4}
                                 placeholder={'0'}
                                 keyboardType={'numeric'}
-                                value= {this._checkValueOfDenominations(this.props.item)}
-                                onChangeText={(quantity) => {
-                                    let payload = {
-                                        id: this.props.item.id,
-                                        quantity: quantity
-                                    }
-                                    if(this.props.isReceive == true){
-                                    this.props.actions.onChangeQuantity(this.props.cashTenderingList, this.props.totalAmount, payload, this.props.isReceive)
-                                    }else {
-                                    this.props.actions.onChangeQuantity(this.props.cashTenderingListReturn, this.props.totalAmountReturn, payload, this.props.isReceive)                                    
-                                    }
-                                }}
+                                value={this._checkValueOfDenominations(this.props.item)}
+                                onChangeText={this._onChangeText}
                             />
                         </CardItem>
                     </Card>
@@ -63,8 +53,23 @@ class CashTenderingView extends Component {
     }
 
     _checkValueOfDenominations = (item) => {
-        return (this.props.item.childDataList[NUMBER].value == 0) ? '' : (this.props.item.childDataList[NUMBER].value).toString() 
+        return (item.childDataList[NUMBER].value == 0) ? '' : (item.childDataList[NUMBER].value).toString()
     }
+
+    _onChangeText = (quantity) => {
+        {
+            let payload = {
+                id: this.props.item.id,
+                quantity
+            }
+            if (this.props.isReceive) {
+                this.props.actions.onChangeQuantity(this.props.cashTenderingList, this.props.totalAmount, payload, this.props.isReceive)
+            } else {
+                this.props.actions.onChangeQuantity(this.props.cashTenderingListReturn, this.props.totalAmountReturn, payload, this.props.isReceive)
+            }
+        }
+    }
+
 
 }
 export default connect(mapStateToProps, mapDispatchToProps)(CashTenderingView)
