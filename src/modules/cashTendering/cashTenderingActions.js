@@ -16,7 +16,6 @@ import {
 } from '../../lib/constants'
 import {
     ARRAY_SAROJ_FAREYE,
-    ZERO,
 } from '../../lib/AttributeConstants'
 
 import { setState } from '../global/globalActions'
@@ -101,7 +100,7 @@ export function fetchCashTenderingList(fieldAttributeMasterId) {
             dispatch(setState(IS_CASH_TENDERING_LOADER_RUNNING, true))
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const fieldAttributeValueDataArray = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
-            const cashTenderingList = await CashTenderingService.prepareCashTenderingList(fieldAttributeMasterList.value, fieldAttributeValueDataArray.value, fieldAttributeMasterId, ZERO)
+            const cashTenderingList = await CashTenderingService.prepareCashTenderingList(fieldAttributeMasterList.value, fieldAttributeValueDataArray.value, fieldAttributeMasterId, 0)
             dispatch(setState(SET_CASH_TENDERING, {
                 cashTenderingList: cashTenderingList,
                 isCashTenderingLoaderRunning: false
