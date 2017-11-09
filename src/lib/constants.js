@@ -232,6 +232,8 @@ export default keyMirror({
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST : null,
    
+    //profileModule
+    FETCH_USER_DETAILS : null,
 })
 
 

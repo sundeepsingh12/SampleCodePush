@@ -32,6 +32,7 @@ import SkuDetails from '../../containers/SkuDetails'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
+import Profile from '../../containers/Profile'
 import {
   Container,
   Content,
@@ -182,6 +183,9 @@ export const AppNavigator = StackNavigator({
   },
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
+  },
+  Profile: {
+    screen: Profile
   },
 }, {
   SignatureAndNps: {
