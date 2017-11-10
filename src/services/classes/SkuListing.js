@@ -1,9 +1,9 @@
 'use strict'
-const {
+import {
     FIELD_ATTRIBUTE,
     FIELD_ATTRIBUTE_STATUS,
     TABLE_JOB_DATA
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import {
     keyValueDBService
 } from './KeyValueDBService'

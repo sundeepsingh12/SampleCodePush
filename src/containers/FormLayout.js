@@ -8,9 +8,8 @@ import {
   FlatList
 }
   from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon,Toast } from 'native-base';
+import { Container, Content, Footer, Card, CardItem, Button, Body, Header, Left, Right, Icon,Toast } from 'native-base'
 import styles from '../themes/FeStyle'
-import imageFile from '../../images/fareye-logo.png'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
@@ -97,7 +96,6 @@ class FormLayout extends Component {
 
   _keyExtractor = (item, index) => item[1].key;
   render() {
-    console.log("schsgdc",this.props.errorMessage.length)
     if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',

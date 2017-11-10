@@ -4,8 +4,7 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    TouchableHighlight
+    Platform
 } from 'react-native'
 import { Container, Card, CardItem, Body, Icon, Right } from 'native-base'
 import styles from '../themes/FeStyle'

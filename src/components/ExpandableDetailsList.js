@@ -16,7 +16,7 @@ import ExpandableDetailsView from './ExpandableDetailsView'
 import NonExpandableDetailsView from './NonExpandableDetailsView'
 
 import {
-    ARRAYSAROJFAREYE,
+    ARRAY_SAROJ_FAREYE
 } from '../lib/AttributeConstants'
 
 class ExpandableDetailsList extends Component {
@@ -30,7 +30,7 @@ class ExpandableDetailsList extends Component {
     }
 
     renderData = (item) => {
-        if (item.data.value == ARRAYSAROJFAREYE && item.childDataList) {
+        if (item.data.value == ARRAY_SAROJ_FAREYE && item.childDataList) {
             return (
                 <ExpandableDetailsView
                     key={item.id}

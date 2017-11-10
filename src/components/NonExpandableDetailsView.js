@@ -5,11 +5,8 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    FlatList,
-    TouchableOpacity
+    Platform
 } from 'react-native'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
 import styles from '../themes/FeStyle'
 
 export default class NonExpandableDetailsView extends Component {

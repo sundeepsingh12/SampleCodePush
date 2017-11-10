@@ -5,17 +5,11 @@
  *
  */
 'use strict'
-/**
- * ## Imports
- *
- * Redux
- */
+
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-/**
- * The actions we need
- */
+
 import * as authActions from '../modules/login/loginActions'
 import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
@@ -23,9 +17,7 @@ import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 
 import { Button, Spinner } from 'native-base';
 
-/**
- * The necessary React components
- */
+
 import React, { Component } from 'react'
 import {
   StyleSheet,

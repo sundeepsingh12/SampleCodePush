@@ -10,9 +10,9 @@
  * fieldValidation for validating the fields
  * formValidation for setting the form's valid flag
  */
-const {
+import {
   SET_STORE,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import InitialState from './globalInitialState'
 

@@ -3,7 +3,7 @@
 const InitialState = require('./homeInitialState').default
 
 const initialState = new InitialState()
-const {
+import {
   JOB_FETCHING_START,
   JOB_FETCHING_END,
   SET_TABS_LIST,
@@ -12,7 +12,7 @@ const {
   SET_REFRESHING_TRUE,
   SET_TABS_TRANSACTIONS,
   JOB_DOWNLOADING_STATUS,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 export default function homeReducer(state = initialState, action) {

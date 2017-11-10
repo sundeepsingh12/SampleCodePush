@@ -3,7 +3,7 @@
 import React, { Component } from 'react'
 import { View, Text, Slider, TextInput } from 'react-native'
 import { connect } from 'react-redux'
-import { Content, Card, CardItem } from 'native-base';
+import { Content, Card, CardItem } from 'native-base'
 import {
     FIXED_SKU_QUANTITY, FIXED_SKU_UNIT_PRICE, FIXED_SKU_CODE,
 } from '../lib/AttributeConstants'

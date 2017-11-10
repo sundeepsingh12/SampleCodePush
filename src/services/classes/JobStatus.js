@@ -1,7 +1,7 @@
-const {
+import {
   JOB_STATUS,
   TABIDMAP
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
   keyValueDBService

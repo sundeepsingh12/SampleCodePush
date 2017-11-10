@@ -9,7 +9,7 @@ import {
     TouchableOpacity
 }
     from 'react-native'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
+import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base'
 import styles from '../themes/FeStyle'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'

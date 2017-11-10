@@ -1,6 +1,6 @@
 'use strict'
-const { TABLE_TRACK_LOGS } = require('../../lib/constants').default
-import Realm from 'realm';
+import { TABLE_TRACK_LOGS } from '../../lib/constants'
+import Realm from 'realm'
 
 export default class TrackLogs extends Realm.Object { }
 

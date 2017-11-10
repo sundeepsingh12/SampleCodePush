@@ -1,4 +1,4 @@
-const {
+import {
     ON_BLUR,
     TABLE_FIELD_DATA,
     TABLE_JOB_TRANSACTION,
@@ -9,7 +9,7 @@ const {
     DEVICE_IMEI,
     TABLE_JOB,
     PENDING_SYNC_TRANSACTION_IDS
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import CONFIG from '../.././../lib/config'
 
@@ -35,6 +35,7 @@ export default class FormLayoutEventImpl {
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value, fieldDataList, event) {
         this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        this.updateNextEditable(formLayoutObject);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
         const nextEditableElements = nextEditable[attributeMasterId];
         if (!nextEditableElements || nextEditableElements.length == 0) {
