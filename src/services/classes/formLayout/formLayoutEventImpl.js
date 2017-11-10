@@ -35,7 +35,7 @@ export default class FormLayoutEventImpl {
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value, fieldDataList, event) {
         this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
-        this.updateNextEditable(formLayoutObject);
+        nextEditable = this.updateNextEditable(formLayoutObject);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
         const nextEditableElements = nextEditable[attributeMasterId];
         if (!nextEditableElements || nextEditableElements.length == 0) {
