@@ -229,6 +229,7 @@ module.exports = {
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
+    TOKEN_MISSING : 'Token Missing',
 
     //App Modules Constants
     BULK : {
@@ -263,5 +264,13 @@ module.exports = {
         appModuleId: 8,
         displayName: ''
     },
-    
+
+
+
+    //Sorting module constants
+    REFERENCE_NO : 'referenceNo=',
+    REF_UNAVAILABLE : 'referenceNumber unavailable',
+    FAILURE_SORTING: 'Searching failed, Please try again !',
+    NA : 'N.A',
+    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package'
 }

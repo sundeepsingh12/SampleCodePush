@@ -63,6 +63,7 @@ import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
 import SelectFromList from '../../containers/SelectFromList';
 import Statistics from '../../containers/Statistics';
+import Sorting from '../../containers/Sorting';
 
 class AppWithNavigationState extends React.Component {
   render() {
@@ -127,6 +128,13 @@ export const AppNavigator = StackNavigator({
     screen : Statistics,
     navigationOptions: {
       title: 'STATISTICS : ' + moment(new Date()).format('DD-MM-YYYY'),
+    }
+  },
+  Sorting: {
+    screen : Sorting,
+    navigationOptions: {
+      title: 'Sorting',
+      header:null,
     }
   },
   HomeUI: {
