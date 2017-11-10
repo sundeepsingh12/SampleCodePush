@@ -13,7 +13,8 @@ const {
     RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
-    UPDATE_PAYMENT_AT_END
+    UPDATE_PAYMENT_AT_END,
+    UPDATE_NEXT_EDITABLE
   } = require('../../lib/constants').default
   
 const {
@@ -98,6 +99,10 @@ export default function formLayoutReducer(state = initialState, action){
          */
         case ERROR_MESSAGE : {
             return state.set('errorMessage',action.payload);
+        }
+
+        case UPDATE_NEXT_EDITABLE : {
+            return state.set('nextEditable',action.payload);
         }
     }
     return state;

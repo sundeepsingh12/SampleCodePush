@@ -57,6 +57,7 @@ function mapDispatchToProps(dispatch) {
 class BasicFormElement extends Component {
     constructor(props) {
         super(props);
+        //TODO this object can be removed if fieldData on updation is removed
         this.formElementValue = {}
     }
    componentWillMount = () => {
@@ -130,6 +131,7 @@ class BasicFormElement extends Component {
         
 
     _onBlurEvent(attributeId) {
+        //TODo remove the below code to update field data if performance remains fine on updation of value on onChangeText
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
         const nextEditableElement = this.props.nextEditable[attributeId];
         if(nextEditableElement != null && nextEditableElement.length != 0){
@@ -148,8 +150,15 @@ class BasicFormElement extends Component {
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, nextEditable, value, isSaveDisabled) {
         this.formElementValue[fieldAttributeMasterId] = value;
+        //TODO remove commented code, if performance with new code is fine
+        /*
         if (value && value.length == 1) {
-            // then fire action to get next editable and focusable elements
+            // then fire action to get next editable and focusable elements and update the value in store
+            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value);
+        }
+        */
+        if (value) {
+            // then fire action to get next editable and focusable elements and update the value in state
             this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value);
         }
         if (value.length == 0) {
@@ -227,7 +236,7 @@ class BasicFormElement extends Component {
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
                                                     secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                                    value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62 ) ? this.props.item.value : null}
+                                                    value={this.props.item.value}
 
                                                 />
                                             </View>

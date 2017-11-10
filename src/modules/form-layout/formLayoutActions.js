@@ -12,7 +12,8 @@ const {
     Home,
     RESET_STATE,
     ERROR_MESSAGE,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+    UPDATE_NEXT_EDITABLE,
 } = require('../../lib/constants').default
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -104,7 +105,6 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = new Map(formElement);
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, null, event);
         dispatch(_setFormList(sortedFormAttributeDto));
-        console.log("getNextFocusableAndEditableElements",value)
     }
 }
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled,sequenceId) {
