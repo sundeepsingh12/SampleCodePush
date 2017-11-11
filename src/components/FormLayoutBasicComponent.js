@@ -34,6 +34,7 @@ import {
     NUMBER,
     DECIMAL,
     PASSWORD,
+    ARRAY
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -78,6 +79,10 @@ class BasicFormElement extends Component {
                 screenName = 'SignatureAndNps'
                 break
             }
+            case ARRAY: {
+                screenName = 'ArrayFieldAttribute'
+                break
+            }
             default: {
                 screenName = 'OverlayAttributes'
             }
@@ -98,9 +103,9 @@ class BasicFormElement extends Component {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement,this.props.formElement,'Before')          
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before')
     }
-        
+
 
     _onBlurEvent(attributeId) {
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
@@ -208,6 +213,7 @@ class BasicFormElement extends Component {
             case RE_ATTEMPT_DATE:
             case DATE:
             case SIGNATURE_AND_NPS:
+            case ARRAY:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )

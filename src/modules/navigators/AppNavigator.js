@@ -57,6 +57,7 @@ import SkuListing from '../../containers/SkuListing'
 import SignatureAndNps from '../../containers/SignatureAndNps'
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
 
 
 class AppWithNavigationState extends React.Component {
@@ -152,6 +153,9 @@ export const AppNavigator = StackNavigator({
   },
   Signature: {
     screen: Signature,
+    navigationOptions: {
+      header: null
+    }
   },
   FormLayout: {
     screen: FormLayout,
@@ -164,6 +168,9 @@ export const AppNavigator = StackNavigator({
   },
   SignatureAndNps: {
     screen: SignatureAndNps
+  },
+  ArrayFieldAttribute: {
+    screen: ArrayFieldAttribute
   }
 },
   {
