@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
+import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
+
 import {
     MONEY_COLLECT,
     MONEY_PAY,
@@ -39,6 +41,10 @@ import {
     EXTERNAL_DATA_STORE,
     SEQUENCE,
     PASSWORD,
+    CASH_TENDERING,
+    ARRAY,
+    OBJECT,
+    CASH,
     OPTION_RADIO_FOR_MASTER,
 } from '../lib/AttributeConstants'
 
@@ -52,7 +58,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...formLayoutActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...formLayoutActions,...cashTenderingActions, ...globalActions }, dispatch)
     }
 }
 
@@ -72,6 +78,7 @@ class BasicFormElement extends Component {
 
     navigateToScene = (item) => {
         let screenName = ''
+        let cash = 0
         console.log("attrrrr", item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
@@ -97,6 +104,16 @@ class BasicFormElement extends Component {
             }
             case FIXED_SKU: {
                 screenName = 'FixedSKUListing'
+                break
+            }
+            case CASH_TENDERING: {
+                cash = this.props.actions.checkForCash(this.props.formElement,this.props.item)
+                if(cash  > 0){
+                screenName = 'CashTendering'
+                } else {
+                    screenName = null
+                    { Toast.show({ text: "NOT REQUIRED", position: 'bottom', buttonText: 'Okay' }) }
+                }
                 break
             }
             case SIGNATURE: {
@@ -129,10 +146,10 @@ class BasicFormElement extends Component {
                 jobTransaction: this.props.jobTransaction,
                 latestPositionId: this.props.latestPositionId,
                 nextEditable: this.props.nextEditable,
-                isSaveDisabled: this.props.isSaveDisabled
+                isSaveDisabled: this.props.isSaveDisabled,
+                cash: cash
             }
         )
-
     }
 
     onFocusEvent(currentElement) {
@@ -266,15 +283,13 @@ class BasicFormElement extends Component {
             case TIME:
             case RE_ATTEMPT_DATE:
             case DATE:
+            case CASH_TENDERING:
             case SIGNATURE_AND_NPS:
-                return (
-                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-                )
             case EXTERNAL_DATA_STORE:
             case DATA_STORE:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-
-            default: console.log("FormLayoutActivityComponent")
+                        
+            default: 
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )

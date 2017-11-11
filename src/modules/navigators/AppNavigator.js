@@ -62,18 +62,20 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
 import SelectFromList from '../../containers/SelectFromList';
+import CashTendering from '../../containers/CashTendering'
+
 import Statistics from '../../containers/Statistics';
 
 class AppWithNavigationState extends React.Component {
   render() {
-    return (<Root> 
+    return (<Root>
       <
-      AppNavigator navigation = {
-        addNavigationHelpers({
-          dispatch: this.props.dispatch,
-          state: this.props.nav
-        })
-      }
+        AppNavigator navigation={
+          addNavigationHelpers({
+            dispatch: this.props.dispatch,
+            state: this.props.nav
+          })
+        }
       /></Root>
     )
   }
@@ -119,7 +121,7 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
-     },
+  },
   SelectFromList: {
     screen: SelectFromList,
   },
@@ -183,11 +185,17 @@ export const AppNavigator = StackNavigator({
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
   },
+  CashTendering: {
+    screen: CashTendering,
+    navigationOptions: {
+      title: 'Collect Cash',
+    }
+  },
 }, {
-  SignatureAndNps: {
-    screen: SignatureAndNps
-  }
-},
+    SignatureAndNps: {
+      screen: SignatureAndNps
+    },
+  },
   {
     cardStyle: {
       backgroundColor: 'white'

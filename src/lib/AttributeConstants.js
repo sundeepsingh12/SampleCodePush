@@ -229,6 +229,7 @@ module.exports = {
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
+    PASSWORD: 61,
 
     //App Modules Constants
     BULK : {
