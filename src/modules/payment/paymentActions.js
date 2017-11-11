@@ -7,7 +7,7 @@ import { fieldDataService } from '../../services/classes/FieldData'
 import { navigateToScene } from '../../modules/global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { NavigationActions } from 'react-navigation'
-const {
+import {
     CLEAR_PAYMENT_STATE,
     CUSTOMIZATION_APP_MODULE,
     FIELD_ATTRIBUTE,
@@ -16,10 +16,10 @@ const {
     JOB_MASTER_MONEY_TRANSACTION_MODE,
     SET_PAYMENT_INITIAL_PARAMETERS,
     UPDATE_PAYMENT_AT_END
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
-    OBJECTSAROJFAREYE
+    OBJECT_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
 
 export function getPaymentParameters(jobMasterId, jobId, fieldAttributeMasterId, formData, jobStatusId) {
@@ -60,7 +60,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
                 modeTypeId: selectedIndex,
                 isCardPayment
             }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECTSAROJFAREYE, fieldDataListObject))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
             dispatch(setState(UPDATE_PAYMENT_AT_END, {
                 paymentAtEnd
             }))

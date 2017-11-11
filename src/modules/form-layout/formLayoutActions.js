@@ -1,6 +1,6 @@
 'use strict'
 
-const {
+import {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
     DISABLE_SAVE,
     UPDATE_FIELD_DATA,
@@ -12,13 +12,16 @@ const {
     Home,
     RESET_STATE,
     ERROR_MESSAGE,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA
-} = require('../../lib/constants').default
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+    UPDATE_FIELD_DATA_VALIDATION,
+    UPDATE_NEXT_EDITABLE
+} from '../../lib/constants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
+import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState } from '../global/globalActions'
 
 export function _setFormList(sortedFormAttributesDto) {
@@ -106,6 +109,39 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         dispatch(_setFormList(sortedFormAttributeDto));
     }
 }
+export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled,sequenceId) {
+    return async function (dispatch) {
+        try{
+            const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
+            if( sequenceData ){
+                const cloneFormElement = new Map(formElement);
+                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, sequenceData,null,ON_BLUR);
+                sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
+                dispatch(_setFormList(sortedFormAttributeDto));
+                const nextEditableElement = nextEditable[attributeMasterId];
+                if(nextEditableElement != null && nextEditableElement.length != 0){
+                    nextEditableElement.forEach((nextElement) => {
+                        if ((typeof (nextElement) == 'string')) {
+                            nextElement = formElement.get(Number(nextElement.split('$$')[1]));
+                            if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
+                                const newFormElement = new Map(sortedFormAttributeDto.formLayoutObject);
+                                newFormElement.get(nextElement.fieldAttributeMasterId).isLoading = true;
+                                    dispatch(_updateFieldData(newFormElement))
+                                    dispatch(setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, newFormElement, nextEditable, 
+                                        isSaveDisabled,nextElement.sequenceMasterId))
+                            }
+                        }
+                    })
+                }
+            }
+        }catch(error){
+            formElement.get(attributeMasterId).isLoading = false;
+            dispatch(_setErrorMessage(error.message));
+            dispatch(_updateFieldData(formElement))
+            dispatch(_setErrorMessage(''));
+        }
+    }
+}
 
 export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
     return async function (dispatch) {
@@ -126,6 +162,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, nex
     return function (dispatch) {
         const cloneFormElement = new Map(formElement);
         console.log('cloneFormElement', cloneFormElement);
+        console.log('fieldDataListObject', fieldDataListObject);        
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList, ON_BLUR);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
@@ -146,11 +183,11 @@ export function toogleHelpText(attributeId, formElement) {
     }
 }
 
-export function saveJobTransaction(formElement, jobTransactionId, statusId) {
+export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId) {
     return async function (dispatch) {
         dispatch(_toogleLoader(true));
         let cloneFormElement = new Map(formElement);
-        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId);
+        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId);
         await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId);
         dispatch(_toogleLoader(false));
         dispatch(_setInitialState());
@@ -159,9 +196,12 @@ export function saveJobTransaction(formElement, jobTransactionId, statusId) {
     }
 }
 
-export function fieldValidations(currentElement, formElement, timeOfExecution) {
+export function fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction) {
     return function (dispatch) {
-        // dispatch(runningValidation)
-        fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution)
+        let alertMessageList = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
+        dispatch(setState(UPDATE_FIELD_DATA_VALIDATION, {
+            formElement,
+            message: alertMessageList[0]
+        }))
     }
 }

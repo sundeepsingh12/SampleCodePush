@@ -20,11 +20,6 @@ import * as globalActions from '../modules/global/globalActions'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 /**
- * Router
- */
-// import {Actions} from 'react-native-router-flux'
-
-/**
  * The components needed from React
  */
 import React, {Component} from 'react'

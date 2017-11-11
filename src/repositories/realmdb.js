@@ -11,7 +11,7 @@ import TrackLogs from './schema/trackLogs'
 
 import _ from 'underscore'
 
-const schemaVersion = 28;
+const schemaVersion = 29;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs];
 
 let realm = new Realm({
@@ -19,7 +19,7 @@ let realm = new Realm({
     schema
 });
 
-const {
+import {
   TABLE_JOB_TRANSACTION,
   TABLE_FIELD_DATA,
   TABLE_JOB,
@@ -28,7 +28,7 @@ const {
   TABLE_RUNSHEET,
   TABLE_JOB_TRANSACTION_CUSTOMIZATION,
   TABLE_TRACK_LOGS
-} = require('../lib/constants').default
+} from '../lib/constants'
 
 export function save(tableName, object) {
     return realm.write(() => {

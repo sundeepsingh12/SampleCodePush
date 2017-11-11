@@ -2,7 +2,7 @@ import keyMirror from 'keymirror'
 
 //keyMirror is a simple utility for creating an object with values equal to its keys.
 
-export default keyMirror({
+module.exports = keyMirror({
     //Global Actions
     SET_STORE: null,
     SET_SESSION_TOKEN: null,
@@ -162,6 +162,7 @@ export default keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
@@ -177,7 +178,8 @@ export default keyMirror({
     ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
-
+    UPDATE_FIELD_DATA_VALIDATION:null,
+    UPDATE_NEXT_EDITABLE : null,
     //Route names (Used in React Navigation)
     Application: null,
     Login: null,
@@ -195,6 +197,8 @@ export default keyMirror({
     SKU_CODE_CHANGE: null,
     UPDATE_SKU_ACTUAL_QUANTITY: null,
 
+    //CheckBox 
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
@@ -210,6 +214,35 @@ export default keyMirror({
     SET_ARRAY_CHILD_LIST: null,
     SET_NEW_ARRAY_ROW: null,
     SET_ARRAY_ELEMENTS: null,
+    //CashTendering
+    CHANGE_AMOUNT: null,
+    IS_CASH_TENDERING_LOADER_RUNNING: null,
+    SET_CASH_TENDERING: null,
+    IS_RECEIVE_TOGGLE: null,
+    FETCH_CASH_TENDERING_LIST_RETURN: null,
+    CHANGE_AMOUNT_RETURN: null,
+    //Data Store
+    SET_VALIDATIONS: null,
+    SET_DATA_STORE_ATTR_MAP: null,
+    SHOW_LOADER: null,
+    SHOW_ERROR_MESSAGE: null,
+    SET_SEARCH_TEXT: null,
+    SHOW_DETAILS: null,
+    REMARKS: null,
+    SPECIAL: null,
+    MINMAX: null,
+    _id: null,
+    SET_INITIAL_STATE :null,
+    SAVE_SUCCESSFUL: null,
+   
+    //New Job
+    NEW_JOB_MASTER : null,
+    NEW_JOB_STATUS : null,
+    SET_DATA_IN_STATISTICS_LIST : null,
+
+    //Sorting And Printing
+    SORTING_SEARCH_VALUE : null,
+    SORTING_ITEM_DETAILS : null,
 })
 
 

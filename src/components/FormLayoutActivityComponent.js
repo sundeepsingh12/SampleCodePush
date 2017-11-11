@@ -4,8 +4,7 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    TouchableHighlight
+    Platform
 } from 'react-native'
 import { Container, Card, CardItem, Body, Icon, Right } from 'native-base'
 import styles from '../themes/FeStyle'
@@ -14,7 +13,6 @@ import renderIf from '../lib/renderIf'
 class FormLayoutActivityComponent extends Component {
 
     render() {
-        console.log('props of FormLayoutActivityComponent', this.props)
         return (
             <Card>
                 <CardItem style={this.props.item.focus ? { backgroundColor: 'blue' } : null} button={this.props.item.editable} onPress={() => this.props.press(this.props.item)}>

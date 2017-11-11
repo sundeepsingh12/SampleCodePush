@@ -3,9 +3,9 @@
 import { jobDetailsService } from './JobDetails'
 import * as realm from '../../repositories/realmdb'
 
-const {
+import {
     TABLE_FIELD_DATA
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 class FieldData {
 

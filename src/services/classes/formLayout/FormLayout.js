@@ -143,7 +143,7 @@ class FormLayout {
                 // find next editable and focusable elements of the required attribute
                 this.getNextEditableAndFocusableElements(fieldAttribute.id, i, sequenceWiseSortedFieldAttributesForStatus, nextEditable);
             }
-            formLayoutObject.set(fieldAttribute.id, this.getFieldAttributeObject(fieldAttribute, validationArr, i));
+            formLayoutObject.set(fieldAttribute.id,this.getFieldAttributeObject(fieldAttribute,validationArr,i+1));
         }
         let latestPositionId = sequenceWiseSortedFieldAttributesForStatus.length - 1;
         return { formLayoutObject, nextEditable, latestPositionId };
@@ -165,15 +165,14 @@ class FormLayout {
                 nextEditable[attributeMasterId] = [];
             }
             const fieldAttribute = formLayoutArr[i];
-            if (i < currentSequence || (i == currentSequence && attributeMasterId == fieldAttribute.id)) {
+            if(i < currentSequence || (i == currentSequence && (attributeMasterId == fieldAttribute.id || attributeMasterId == fieldAttribute.fieldAttributeMasterId))){
                 continue; // if parent iteration is less than child iteration then continue
             }
-            if (fieldAttribute.required) {
-                nextEditable[attributeMasterId].push('required$$' + fieldAttribute.id); //this is not necessary that required is always the last element in array, ex - if there are all non required. So instead of adding a new data structure, used a separator to know that this element is the required element
-                break; // as soon as next required attribute is found then break the loop
+            if(fieldAttribute.required && !fieldAttribute.value){
+                nextEditable[attributeMasterId].push('required$$'+(fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId)); //this is not necessary that required is always the last element in array, ex - if there are all non required. So instead of adding a new data structure, used a separator to know that this element is the required element
+               break; // as soon as next required attribute is found without value then break the loop
             }
-            nextEditable[attributeMasterId].push(fieldAttribute.id);
-
+            nextEditable[attributeMasterId].push(fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId);
         }
     }
 
@@ -183,8 +182,8 @@ class FormLayout {
      * @param {*validationArray} validationArray 
      * @param {*positionId} positionId 
      */
-    getFieldAttributeObject(fieldAttribute, validationArray, positionId) {
-        const { label, subLabel, helpText, key, required, hidden, attributeTypeId } = fieldAttribute
+    getFieldAttributeObject(fieldAttribute, validationArray, positionId){
+        const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl } = fieldAttribute
         return {
             label,
             subLabel,
@@ -195,15 +194,18 @@ class FormLayout {
             attributeTypeId,
             fieldAttributeMasterId: fieldAttribute.id,
             positionId: positionId,
-            parentId: 0,
-            showHelpText: false,
-            editable: fieldAttribute.editable ? fieldAttribute.editable : false,
-            focus: fieldAttribute.focus ? fieldAttribute.focus : false,
-            validation: (validationArray && validationArray.length > 0) ? validationArray : null
+            parentId : 0,
+            showHelpText : false,
+            editable : !(fieldAttribute.editable) || (fieldAttribute.attributeTypeId == 62)? false: fieldAttribute.editable,
+            focus : fieldAttribute.focus ? fieldAttribute.focus : false,
+            validation : (validationArray && validationArray.length > 0) ? validationArray : null,
+            sequenceMasterId: fieldAttribute.sequenceMasterId,
+            dataStoreMasterId,
+            dataStoreAttributeId,
+            externalDataStoreMasterUrl,
         };
     }
-
-
+    
 }
 
 export let formLayoutService = new FormLayout()

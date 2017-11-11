@@ -16,9 +16,9 @@ import _ from 'underscore'
 import RNFS from 'react-native-fs';
 import RNFetchBlob from 'react-native-fetch-blob'
 import {keyValueDBService} from '../services/classes/KeyValueDBService.js'
-const {
+import {
   PENDING_SYNC_TRANSACTION_IDS
-} = require('./constants').default
+} from './constants'
 
 const fetch = require('react-native-cancelable-fetch');
 class RestAPI {

@@ -61,6 +61,7 @@ import ListingInitialState from './modules/listing/listingInitialState'
 import JobDetailsInitialState from './modules/job-details/jobDetailsInitialState'
 import SkuListingInitialState from './modules/skulisting/skuListingInitialState'
 import FormLayoutInitialState from './modules/form-layout/formLayoutInitialState'
+import NewJobInitialState from './modules/newJob/newJobInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
@@ -88,6 +89,7 @@ function getInitialState() {
     jobDetails: new JobDetailsInitialState(),
     skuListing: new SkuListingInitialState(),
     formLayout : new FormLayoutInitialState(),
+    newJob : new NewJobInitialState(),
   }
   return _initState
 }

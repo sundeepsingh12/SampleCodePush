@@ -12,6 +12,10 @@ import {
 import sha256 from 'sha256';
 
 import {
+  restAPI
+} from '../../lib/RestAPI'
+
+import {
     keyValueDBService
   } from '../classes/KeyValueDBService'
 
@@ -109,6 +113,80 @@ describe('update field info', () => {
     expect(formLayoutEventsInterface.updateFieldData(1, "1", formLayoutMap, 'dd').get(1).showCheckMark).toEqual(false);
     expect(formLayoutEventsInterface.updateFieldData(1, "1", formLayoutMap, 'dd').get(1).value).toEqual("1");
     expect(formLayoutEventsInterface.updateFieldData(1, sha256("1"), formLayoutMap, 'dd').get(1).value).toEqual(sha256("1"));
+})
+
+describe('get sequence field data', () => {
+    it('should not get data from server if id is null and throw error', () => {
+    const message = 'masterId unavailable'
+    try {
+      keyValueDBService.getValueFromStore = jest.fn()
+      keyValueDBService.getValueFromStore.mockReturnValue('test')
+      const sequenceId = null;
+      formLayoutEventsInterface.getSequenceAttrData(sequenceId)
+    } catch (error) {
+      expect(error.message).toEqual(message)
+    }
+    })
+    it('should not get data from server if id is undefined and throw error', () => {
+    const message = 'masterId unavailable'
+    try {
+      keyValueDBService.getValueFromStore = jest.fn()
+      keyValueDBService.getValueFromStore.mockReturnValue('test')
+      const sequenceId = undefined;
+      formLayoutEventsInterface.getSequenceAttrData(sequenceId)
+    } catch (error) {
+      expect(error.message).toEqual(message)
+    }
+    })
+      it('should not get data from server if token value is null and throw token error', () => {
+    const message = 'Token Missing'
+    try {
+      keyValueDBService.getValueFromStore = jest.fn()
+      keyValueDBService.getValueFromStore.mockReturnValue(null)
+      formLayoutEventsInterface.getSequenceAttrData()
+    } catch (error) {
+      expect(error.message).toEqual(message)
+    }
+  })
+    
+   it('should not get data from server if token value is undefined and throw token error', () => {
+    const message = 'Token Missing'
+    try {
+      keyValueDBService.getValueFromStore = jest.fn()
+      keyValueDBService.getValueFromStore.mockReturnValue(undefined)
+      formLayoutEventsInterface.getSequenceAttrData()
+    } catch (error) {
+      expect(error.message).toEqual(message)
+    }
+  })
+it('should not get data from server and throw error', () => {
+    const message = 'masterId unavailable'
+    try {
+      keyValueDBService.getValueFromStore = jest.fn()
+      keyValueDBService.getValueFromStore.mockReturnValue('test')
+      const sequenceId = null;
+      formLayoutEventsInterface.getSequenceAttrData(sequenceId)
+    } catch (error) {
+      expect(error.message).toEqual(message)
+    }
+    })
+it('should get sequence  data without error', () => {
+
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValueOnce({
+        value: 'testtoken'
+        })
+        restAPI.initialize = jest.fn()
+        restAPI.serviceCall = jest.fn((data) => {
+        return "Success"
+        })
+        const sequenceId = '4';
+        return formLayoutEventsInterface.getSequenceAttrData(sequenceId).then(data => {
+        expect(data).toEqual(null)
+        expect(restAPI.initialize).toHaveBeenCalledTimes(1)
+        expect(restAPI.serviceCall).toHaveBeenCalledTimes(1)
+        })
+    })
 })
 
 describe('toogle help text', () => {

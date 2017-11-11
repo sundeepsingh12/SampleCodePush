@@ -1,7 +1,7 @@
 'use strict'
-const {
+import {
     SET_FIELD_DATA_LIST,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import signatureReducer from '../signatureReducer'
 

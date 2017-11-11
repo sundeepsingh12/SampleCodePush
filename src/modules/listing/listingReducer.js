@@ -3,10 +3,10 @@
 const InitialState = require('./listingInitialState').default
 
 const initialState = new InitialState()
-const {
+import {
     JOB_LISTING_START,
     JOB_LISTING_END,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 export default function listingReducer(state = initialState, action) {
     if (!(state instanceof InitialState)) return initialState.mergeDeep(state)

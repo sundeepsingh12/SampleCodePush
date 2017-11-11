@@ -13,7 +13,7 @@ import {
     Text,
     View
 } from 'react-native';
-import Camera from 'react-native-camera';
+import Camera from 'react-native-camera'
 
 
 class Scanner extends Component {

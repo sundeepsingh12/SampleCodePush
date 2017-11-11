@@ -18,12 +18,27 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
         return this.toogleHelpText(attributeMasterId, formElement);
     }
 
-    saveDataInDb(formElement, jobTransactionId, statusId) {
-        return this.saveData(formElement, jobTransactionId, statusId)
+    /**
+     * 
+     * @param {*} formElement 
+     * @param {*} jobTransactionId 
+     * @param {*} statusId 
+     * @param {*} jobMasterId
+     */
+    saveDataInDb(formElement, jobTransactionId, statusId,jobMasterId) {
+        return this.saveData(formElement, jobTransactionId, statusId, jobMasterId)
     }
 
     addTransactionsToSyncList(jobTransactionId) {
         return this.addToSyncList(jobTransactionId);
+    }
+
+    getSequenceData(sequenceMasterId){
+        return this.getSequenceAttrData(sequenceMasterId)
+    }
+
+    updateNextEditableObject(formLayoutObject) {
+        return this.updateNextEditable(formLayoutObject);
     }
 
     executeBeforeValidations(attributeMasterId) {}

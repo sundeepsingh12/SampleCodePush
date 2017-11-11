@@ -1,32 +1,10 @@
-/**
- * # Main.js
- *  This is the main app screen
- *
- */
+
 'use strict'
-/*
- * ## Imports
- *
- * Imports from redux
- */
-import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
 
-/**
- * The actions we need
- */
-import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Preloader from '../containers/Preloader'
-import Loader from '../components/Loader'
-import ResyncLoader from '../components/ResyncLoader'
-
-/**
- * The components needed from React
- */
-import React, {Component} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight, PanResponder} from 'react-native'
-
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import React, { Component } from 'react'
+import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
 import {
   Container,
   Content,
@@ -43,222 +21,152 @@ import {
   Footer,
   FooterTab,
   StyleProvider
-} from 'native-base';
-import {AnimatedCircularProgress} from 'react-native-circular-progress';
-import LinearGradient from 'react-native-linear-gradient';
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+} from 'native-base'
+import LinearGradient from 'react-native-linear-gradient'
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
-import renderIf from '../lib/renderIf';
+import renderIf from '../lib/renderIf'
 import TitleHeader from '../components/TitleHeader'
+import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
+import AllTaskIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
+import LiveTaskIcon from '../../images/fareye-default-iconset/homescreen/live.png'
+import BulkIcon from '../../images/fareye-default-iconset/homescreen/bulk.png'
+import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
 
 function mapStateToProps(state) {
-  return {}
-};
+  return {
+  }
+}
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({
-      ...globalActions,
-      ...homeActions
-    }, dispatch)
+    actions: bindActionCreators({...homeActions}, dispatch)
   }
 }
-const MAX_POINTS = 200;
 
-/**
- * ## App class
- */
+
 class JobDetailsV2 extends Component {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      isMoving: false,
-      pointsDelta: 0,
-      points: 67
-    }
-  }
-
-  static navigationOptions = ({navigation}) => {
-    return {header: null}
+  static navigationOptions = ({ navigation }) => {
+    return { header: null }
   }
 
   componentWillMount() {
-    this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+    this.props.actions.fetchModulesList()
+  }
 
-      onPanResponderGrant: (evt, gestureState) => {
-        this.setState({isMoving: true, pointsDelta: 0});
-      },
+  headerView() {
+    return (
+      <Header
+        style={StyleSheet.flatten([
+          styles.bgWhite, styles.bgPrimary, {
+            borderBottomColor: '#F2F2F2'
+          }
+        ])}>
+        <Left style={{
+          width: 90
+        }}>
+          <Image
+            style={StyleSheet.flatten([
+              styles.width100, {
+                resizeMode: 'contain'
+              }
+            ])}
+            source={FareyeLogo} />
+        </Left>
+        <Right>
+          <Button transparent>
+            <Icon style={style.headerIcon} name='ios-search' />
+          </Button>
+          <Button transparent>
+            <Icon style={style.headerIcon} name='ios-chatbubbles' />
+          </Button>
+          <Button transparent>
+            <Icon style={style.headerIcon} name='md-notifications' />
+          </Button>
+        </Right>
+      </Header>
+    )
+  }
 
-      onPanResponderMove: (evt, gestureState) => {
-        // For each 2 pixels add or subtract 1 point
-        this.setState({
-          pointsDelta: Math.round(-gestureState.dy / 2)
-        });
-      },
-      onPanResponderTerminationRequest: (evt, gestureState) => true,
-      onPanResponderRelease: (evt, gestureState) => {
-        let points = this.state.points + this.state.pointsDelta;
-        console.log(Math.min(points, MAX_POINTS));
-        this.setState({
-          isMoving: false,
-          points: points > 0
-            ? Math.min(points, MAX_POINTS)
-            : 0,
-          pointsDelta: 0
-        });
-      }
-    });
+  pieChartView() {
+    return (
+      <LinearGradient
+        colors={['#262da0', '#205dbe', '#2c83c9']}
+        style={style.chartBlock}>
+        <View style={style.chartContainer} >
+          <Text style={[style.chartCenterData, style.pieNumber]}>
+            1000
+        </Text>
+          <Text style={[style.chartCenterData, style.pieText]}>
+            pending
+        </Text>
+        </View>
+        <View style={[styles.row, styles.justifySpaceAround]}>
+          <View>
+            <Text
+              style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>200</Text>
+            <Text
+              style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>total</Text>
+          </View>
+          <View>
+            <Text
+              style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>165</Text>
+            <Text
+              style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>done</Text>
+          </View>
+        </View>
+      </LinearGradient>
+    )
+  }
+
+  moduleView() {
+    return (
+      <ListItem
+        style={[style.moduleList]}>
+        <Image
+          style={[style.moduleListIcon]}
+          source={AllTaskIcon} />
+        <Body>
+          <Text
+            style={[styles.fontWeight500, styles.fontLg]}>All Tasks</Text>
+        </Body>
+        <Right>
+          <Icon name="arrow-forward" />
+        </Right>
+      </ListItem>
+    )
   }
 
   render() {
-    const fill = this.state.points / MAX_POINTS * 100;
+    const headerView = this.headerView()
+    const pieChartView = this.pieChartView()
+    const moduleView = this.moduleView()
     return (
       <StyleProvider style={getTheme(platform)}>
-        <Container>
-          <Header
-            style={StyleSheet.flatten([
-            styles.bgWhite, {
-              borderBottomColor: '#F2F2F2'
-            }
-          ])}>
-            <Left style={{
-              width: 90
-            }}>
-              <Image
-                style={StyleSheet.flatten([
-                styles.width100, {
-                  resizeMode: 'contain'
-                }
-              ])}
-                source={require('../../images/fareye-default-iconset/fareyeLogoSm.png')}/>
-            </Left>
-            <Body></Body>
-            <Right>
-              <Button transparent>
-                <Icon style={style.headerIcon} name='ios-search'/>
-              </Button>
-              <Button transparent>
-                <Icon style={style.headerIcon} name='ios-chatbubbles'/>
-              </Button>
-              <Button transparent>
-                <Icon style={style.headerIcon} name='md-notifications'/>
-              </Button>
-            </Right>
-          </Header>
+        <Container style={StyleSheet.flatten([styles.bgWhite])}>
+          {headerView}
           <Content>
-            <LinearGradient
-              colors={['#262da0', '#205dbe', '#2c83c9']}
-              style={style.chartBlock}>
-              <View style={style.chartContainer} {...this._panResponder.panHandlers}>
-                <AnimatedCircularProgress
-                  size={140}
-                  width={5}
-                  fill={fill}
-                  tintColor="#ffffff"
-                  backgroundColor="#4d62c3">
-                  {(fill) => (
-                    <View style={style.pieData}>
-                      <Text style={[style.chartCenterData, style.pieNumber]}>
-                        {Math.round(MAX_POINTS * fill / 100)}
-                      </Text>
-                      <Text style={[style.chartCenterData, style.pieText]}>
-                        pending
-                      </Text>
-                    </View>
-                  )}
-                </AnimatedCircularProgress>
-              </View>
-              <View style={[styles.row, styles.justifySpaceAround]}>
-                <View>
-                  <Text
-                    style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>200</Text>
-                  <Text
-                    style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>total</Text>
-                </View>
-                <View>
-                  <Text
-                    style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>165</Text>
-                  <Text
-                    style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>done</Text>
-                </View>
-              </View>
-            </LinearGradient>
-
+            {pieChartView}
             <List>
-              <ListItem
-                style={[style.moduleList]}>
-                <Image
-                  style={[style.moduleListIcon]}
-                  source={require('../../images/fareye-default-iconset/homescreen/tasks.png')}/>
-                <Body>
-                  <Text
-                    style={[styles.fontWeight500, styles.fontLg]}>All Tasks</Text>
-                </Body>
-                <Right>
-                  <Icon name="arrow-forward"/>
-                </Right>
-              </ListItem>
-              <ListItem
-                style={[style.moduleList]}>
-                <Image
-                  style={[style.moduleListIcon]}
-                  source={require('../../images/fareye-default-iconset/homescreen/live.png')}/>
-                <Body>
-                  <Text
-                    style={[styles.fontWeight500, styles.fontLg]}>Live</Text>
-                </Body>
-                <Right>
-                  <Icon name="arrow-forward"/>
-                </Right>
-              </ListItem>
-              <ListItem
-                style={[style.moduleList]}>
-                <Image
-                  style={[style.moduleListIcon]}
-                  source={require('../../images/fareye-default-iconset/homescreen/bulk.png')}/>
-                <Body>
-                  <Text
-                    style={[styles.fontWeight500, styles.fontLg]}>Bulk Update</Text>
-                </Body>
-                <Right>
-                  <Icon name="arrow-forward"/>
-                </Right>
-              </ListItem>
-              <ListItem
-                style={[style.moduleList]}>
-                <Image
-                  style={[style.moduleListIcon]}
-                  source={require('../../images/fareye-default-iconset/homescreen/sequence.png')}/>
-                <Body>
-                  <Text
-                    style={[styles.fontWeight500, styles.fontLg]}>Sequence</Text>
-                </Body>
-                <Right>
-                  <Icon name="arrow-forward"/>
-                </Right>
-              </ListItem>
+              {moduleView}
             </List>
           </Content>
           <Footer>
             <FooterTab>
               <Button active>
-                <Icon name="ios-home"/>
+                <Icon name="ios-home" />
                 <Text>Home</Text>
               </Button>
               <Button>
-                <Icon name="ios-sync"/>
+                <Icon name="ios-sync" />
                 <Text>Sync</Text>
               </Button>
               <Button>
-                <Icon name="ios-menu"/>
+                <Icon name="ios-menu" />
                 <Text>Menu</Text>
               </Button>
             </FooterTab>
@@ -275,7 +183,6 @@ const style = StyleSheet.create({
   chartCenterData: {
     backgroundColor: 'transparent',
     textAlign: 'center',
-    color: '#ffffff'
 
   },
   headerIcon: {
@@ -323,7 +230,5 @@ const style = StyleSheet.create({
   }
 });
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(JobDetailsV2)

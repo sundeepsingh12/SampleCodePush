@@ -19,7 +19,7 @@ import {
 
 import _ from 'underscore'
 
-const {
+import {
   TABLE_JOB_TRANSACTION,
   TABLE_FIELD_DATA,
   TABLE_JOB,
@@ -29,7 +29,7 @@ const {
   UNSEEN,
   PENDING,
   TABLE_JOB_TRANSACTION_CUSTOMIZATION
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 class Sync {
@@ -175,7 +175,9 @@ class Sync {
     const contentQuery = await JSON.parse(query)
     const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
     const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
-
+    const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
+                                                               .map(newJobTransaction => newJobTransaction.negativeJobTransactionId);
+    
     const runsheets = {
       tableName: TABLE_RUNSHEET,
       valueList: runsheetIds,
@@ -186,10 +188,25 @@ class Sync {
       valueList: jobIds,
       propertyName: 'jobId'
     }
+    const newJobTransactions = {
+      tableName : TABLE_JOB_TRANSACTION,
+      valueList : newJobTransactionsIds,
+      propertyName : 'id'
+    }
+    const newJobs = {
+      tableName : TABLE_JOB,
+      valueList : newJobTransactionsIds,
+      propertyName : 'id'
+    }
+    const newJobFieldData = {
+      tableName : TABLE_FIELD_DATA,
+      valueList : newJobTransactionsIds,
+      propertyName : 'jobTransactionId'
+    }
 
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas, runsheets)
+    await realm.deleteRecordsInBatch(jobDatas, runsheets, newJobTransactions, newJobs, newJobFieldData)
     await this.saveDataFromServerInDB(query)
   }
 

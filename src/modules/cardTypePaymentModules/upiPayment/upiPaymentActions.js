@@ -5,17 +5,18 @@ import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { moduleCustomizationService } from '../../../services/classes/ModuleCustomization'
 import { upiPaymentService } from '../../../services/payment/UPIPayment'
 
-const {
+import {
     CUSTOMIZATION_APP_MODULE,
     DEVICE_IMEI,
     SET_UPI_PAYMENT_PARAMETERS,
     SET_UPI_APPROVAL,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import CONFIG from '../../../lib/config'
 
 import {
-    UPIMODULE
+    UPIMODULE,
+    OBJECT_SAROJ_FAREYE
 } from '../../../lib/AttributeConstants'
 
 export function getUPIPaymentParameters(jobMasterId, jobId) {
@@ -83,7 +84,7 @@ export function testSave(actualAmount, currentElement, formElement, jobMasterId,
         try {
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedIndex, transactionNumber, remarks, receipt)
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransactionId, currentElement.positionId, latestPositionId)
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECTSAROJFAREYE, fieldDataListObject))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
             dispatch()
         } catch (error) {
 

@@ -1,12 +1,12 @@
 'use strict'
 
-const {
+import {
     SKU_LIST_FETCHING_STOP,
     SKU_LIST_FETCHING_START,
     SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
     skuListing
@@ -26,7 +26,6 @@ import {
 } from '../../lib/AttributeConstants'
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
-import { fieldAttributeService } from '../../services/classes/FieldAttribute'
 import { fieldDataService } from '../../services/classes/FieldData'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {

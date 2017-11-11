@@ -1,15 +1,16 @@
 'use strict'
 var actions = require('../formLayoutActions')
 
-const {
+import {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
     IS_LOADING,
     DISABLE_SAVE,
     BASIC_INFO,
     UPDATE_FIELD_DATA,
     TOOGLE_HELP_TEXT,
-    Home
-} = require('../../../lib/constants').default
+    Home,
+    ERROR_MESSAGE
+} from '../../../lib/constants'
 
 import {formLayoutService} from '../../../services/classes/formLayout/FormLayout.js'
 import thunk from 'redux-thunk'
@@ -35,7 +36,8 @@ const formLayoutObject = {
         showHelpText : false,
         editable : false,
         focus : false,
-        validation : []
+        validation : [],
+        sequenceMasterId :null,
     },
     2 : {
         label : "ds",
@@ -45,22 +47,100 @@ const formLayoutObject = {
         required:true,
         hidden:true,
         attributeTypeId:1,
-        fieldAttributeMasterId : 1,
+        fieldAttributeMasterId : 2,
         positionId : 0,
         parentId : 0,
         showHelpText : true,
         editable : false,
         focus : false,
-        validation : []
+        validation : [],
+        sequenceMasterId : null,
+    },
+    3 : {
+        label : "ds",
+        subLabel : "d",
+        helpText : "w",
+        key : "dd",
+        required:true,
+        hidden:true,
+        attributeTypeId:62,
+        fieldAttributeMasterId : 3,
+        positionId : 0,
+        parentId : 0,
+        showHelpText : true,
+        editable : false,
+        focus : false,
+        validation : [],
+        sequenceMasterId : 4,
+    },
+    4   : {
+        label : "dt",
+        subLabel : "s",
+        helpText : "w",
+        key : "qd",
+        required:true,
+        hidden:true,
+        attributeTypeId:62,
+        fieldAttributeMasterId : 4,
+        positionId : 0,
+        parentId : 0,
+        showHelpText : true,
+        editable : false,
+        focus : false,
+        validation : [],
+        sequenceMasterId : 4,
+    }
+}
+const formElement = {
+    7831 : {
+        label : "ds",
+        subLabel : "d",
+        helpText : "w",
+        key : "dd",
+        required:true,
+        hidden:true,
+        attributeTypeId:62,
+        fieldAttributeMasterId : 7831,
+        positionId : 0,
+        parentId : 0,
+        showHelpText : true,
+        editable : false,
+        focus : false,
+        validation : [],
+        sequenceMasterId : 4,
+    },
+    7830 : {
+        label : "dt",
+        subLabel : "s",
+        helpText : "w",
+        key : "qd",
+        required:true,
+        hidden:true,
+        attributeTypeId:62,
+        fieldAttributeMasterId : 7830,
+        positionId : 0,
+        parentId : 0,
+        showHelpText : true,
+        editable : false,
+        focus : false,
+        validation : [],
+        sequenceMasterId : 4,
     }
 
+
 }
+
 const nextEditable = {
-    "1": ['required$$1','required$$2']
+    "1": ['required$$1','required$$2', 'required$$3','']
+}
+const nextEditables= {
+    "1" : ['required$$4','']
 }
 const latestPositionId = 2;
+const isSaveDisabled = true;
 const formLayoutMap = getMapFromObject(formLayoutObject);
-const formLayoutInitialState = {formLayoutMap,nextEditable,latestPositionId};
+const formElements = getMapFromObject(formElement)
+const formLayoutInitialState = {formLayoutMap,nextEditable,latestPositionId,isSaveDisabled};
 
 describe('formLayout actions for reducer', () => {
     it('should set save to false', () => {
@@ -214,6 +294,7 @@ describe('test form layout events', ()=>{
             })        
 
     })
+    
 
     it('should disable save if required', ()=>{
         formLayoutEventsInterface.disableSaveIfRequired = jest.fn();
@@ -282,7 +363,69 @@ describe('test form layout events', ()=>{
     })
 })
 
+describe('test form sequence field attribute', ()=>{
+    const message = "Cannot read property 'get' of undefined"
+    const expectedActions = [
+        {
+            type: UPDATE_FIELD_DATA,
+            payload: formElements
+        },
+        {
+            type : GET_SORTED_ROOT_FIELD_ATTRIBUTES,
+            payload :formLayoutInitialState
+        },
+        {
+            type : ERROR_MESSAGE,
+            payload : message
+        },
+        {
+            type: IS_LOADING,
+            payload: false
+        }
+    ]
+    it('should not get sequence data and throw error', ()=>{
+            formLayoutEventsInterface.getSequenceData = jest.fn()
+            formLayoutEventsInterface.getSequenceData.mockReturnValue({});
+            try {
+                actions.setSequenceDataAndNextFocus()
+            }catch(error) {
+                expect(error.message).toEqual(message)
+            }
 
+        })
+         it('should get sequence data and  and throw error', ()=>{
+            formLayoutEventsInterface.getSequenceData = jest.fn()
+            formLayoutEventsInterface.getSequenceData.mockReturnValue(4);
+            formLayoutEventsInterface.findNextFocusableAndEditableElement = jest.fn()
+            formLayoutEventsInterface.findNextFocusableAndEditableElement.mockReturnValue('7831',formElements,nextEditables,isSaveDisabled,'1.0',null,'ON_BLUR');
+            const store = mockStore({})
+            return store.dispatch(actions.setSequenceDataAndNextFocus('7831',formElements,nextEditables,isSaveDisabled,'4'))
+                .then(()=>{
+                    console.log("dgss",store.getActions())
+                    expect(formLayoutEventsInterface.findNextFocusableAndEditableElement).toHaveBeenCalledTimes(1)
+                    expect(formLayoutEventsInterface.updateFieldData).toHaveBeenCalledTimes(1)
+                    expect(store.getActions()[0].type).toEqual(expectedActions[2].type)
+                    expect(store.getActions()[0].payload).toEqual(expectedActions[2].payload)
+                    expect(store.getActions()[1].type).toEqual(expectedActions[0].type)
+                    expect(store.getActions()[1].payload).toEqual(expectedActions[0].payload)
+
+        })})
+                 it('should get sequence data and  find next editable and focusable element', ()=>{
+            formLayoutEventsInterface.getSequenceData = jest.fn()
+            formLayoutEventsInterface.getSequenceData.mockReturnValue(4);
+            formLayoutEventsInterface.findNextFocusableAndEditableElement = jest.fn()
+            formLayoutEventsInterface.findNextFocusableAndEditableElement.mockReturnValue('4',formLayoutMap,nextEditables,isSaveDisabled,'1.0',null,'ON_BLUR');
+            const store = mockStore({})
+            return store.dispatch(actions.setSequenceDataAndNextFocus('4',formLayoutMap,nextEditable,isSaveDisabled,'4'))
+                .then(()=>{
+                    console.log("dgss",store.getActions())
+                    expect(formLayoutEventsInterface.findNextFocusableAndEditableElement).toHaveBeenCalledTimes(1)
+                    expect(formLayoutEventsInterface.updateFieldData).toHaveBeenCalledTimes(1)
+                    expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
+                    expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
+
+        })})
+})
 
 function getMapFromObject(obj){
     let strMap = new Map();

@@ -1,7 +1,7 @@
 'use strict'
 
 
-const {
+import {
   SET_SESSION_TOKEN,
 
   GET_PROFILE_SUCCESS,
@@ -17,7 +17,7 @@ const {
   ON_GLOBAL_USERNAME_CHANGE,
   ON_GLOBAL_PASSWORD_CHANGE,
   SET_CREDENTIALS
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import globalReducer from '../globalReducer'
 

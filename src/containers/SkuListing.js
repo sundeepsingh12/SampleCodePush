@@ -76,7 +76,7 @@ class SkuListing extends Component {
 
           <Footer>
             <FooterTab>
-              <Button onPress={() => this.saveSkuList()}>
+              <Button onPress={this.saveSkuList}>
                 <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Proceed</Text>
               </Button>
             </FooterTab>
@@ -94,7 +94,7 @@ class SkuListing extends Component {
     }
   }
 
-  saveSkuList() {
+  saveSkuList = () => {
     this.props.actions.saveSkuListItems(
       this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
       this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId,

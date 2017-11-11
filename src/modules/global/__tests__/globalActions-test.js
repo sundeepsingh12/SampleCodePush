@@ -1,7 +1,7 @@
 'use strict'
 
 var actions = require('../globalActions')
-const {
+import {
     SET_SESSION_TOKEN,
     SET_STORE,
     ON_GLOBAL_USERNAME_CHANGE,
@@ -15,7 +15,7 @@ const {
     IS_SHOW_MOBILE_NUMBER_SCREEN,
     IS_SHOW_OTP_SCREEN,
     IS_PRELOADER_COMPLETE
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
