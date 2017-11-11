@@ -37,6 +37,10 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
         return this.getSequenceAttrData(sequenceMasterId)
     }
 
+    updateNextEditableObject(formLayoutObject) {
+        return this.updateNextEditable(formLayoutObject);
+    }
+
     executeBeforeValidations(attributeMasterId) {}
 
     executeAfterValidations(attributeMasterId) {}

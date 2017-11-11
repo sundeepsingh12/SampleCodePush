@@ -1,5 +1,5 @@
 'use strict'
-const { TABLE_JOB} = require('../../lib/constants').default
+import { TABLE_JOB} from '../../lib/constants'
 import Realm from 'realm';
 
 export default class Job extends Realm.Object {}

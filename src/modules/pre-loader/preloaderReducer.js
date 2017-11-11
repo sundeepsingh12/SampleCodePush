@@ -11,7 +11,7 @@
 import InitialState from './preloaderInitialState'
 
 const initialState = new InitialState()
-const {
+import {
 
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
@@ -54,7 +54,7 @@ const {
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS
 
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 /**
  * ## preloaderReducer function

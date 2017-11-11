@@ -8,7 +8,7 @@ import {
     jobStatusService
 } from './JobStatus'
 
-const {
+import {
     JOB_STATUS,
     CUSTOMIZATION_LIST_MAP,
     JOB_ATTRIBUTE,
@@ -18,7 +18,7 @@ const {
     JOB_MASTER,
     HUB,
     TABLE_JOB_TRANSACTION
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
     PENDING,

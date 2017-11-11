@@ -9,7 +9,7 @@ import { keyValueDBService } from './KeyValueDBService'
 
 import moment from 'moment'
 
-const {
+import {
   JOB_MASTER,
   JOB_ATTRIBUTE,
   JOB_ATTRIBUTE_VALUE,
@@ -33,7 +33,7 @@ const {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   HUB
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 class JobMaster {

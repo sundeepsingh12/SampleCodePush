@@ -1,5 +1,5 @@
 'use strict'
-const {
+import {
     SET_FIELD_DATA_LIST,
     SAVE_SIGNATURE,
     USER,
@@ -7,7 +7,7 @@ const {
     SET_REMARKS_VALIDATION,
     FIELD_ATTRIBUTE,
     ON_BLUR
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'

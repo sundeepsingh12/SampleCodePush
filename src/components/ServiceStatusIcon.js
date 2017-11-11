@@ -18,12 +18,12 @@ import
   View
 } from 'react-native'
 
-const {
+import {
   SERVICE_PENDING,
   SERVICE_RUNNING,
   SERVICE_SUCCESS,
   SERVICE_FAILED
-} = require('../lib/constants').default
+} from '../lib/constants'
 
 
 class ServiceStatusIcon extends React.Component {

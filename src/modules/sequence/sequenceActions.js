@@ -15,12 +15,12 @@ import {
 import {
     keyValueDBService
 } from '../../services/classes/KeyValueDBService'
-const {
+import {
     SEQUENCE_LIST_FETCHING_START,
     SEQUENCE_LIST_FETCHING_STOP,
     HUB,
     TOGGLE_RESEQUENCE_BUTTON
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import _ from 'underscore'
 import {
     setState

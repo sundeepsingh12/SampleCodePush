@@ -3,11 +3,11 @@
 const InitialState = require('./sequenceInitialState').default
 
 const initialState = new InitialState()
-const {
+import {
     SEQUENCE_LIST_FETCHING_STOP,
     SEQUENCE_LIST_FETCHING_START,
     TOGGLE_RESEQUENCE_BUTTON
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 export default function sequenceReducer(state = initialState, action) {

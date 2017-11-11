@@ -2,7 +2,7 @@
 
 import InitialState from './formLayoutInitialState.js'
 
-const {
+import {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
     DISABLE_SAVE,
     UPDATE_FIELD_DATA,
@@ -14,13 +14,11 @@ const {
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     UPDATE_PAYMENT_AT_END,
-    UPDATE_FIELD_DATA_VALIDATION
-  } = require('../../lib/constants').default
-
-const {
+    UPDATE_FIELD_DATA_VALIDATION,
     SHOW_DATETIME_PICKER,
     HIDE_DATETIME_PICKER,
-} = require('../../lib/constants').default
+    UPDATE_NEXT_EDITABLE
+  } from '../../lib/constants'
 
 const initialState = new InitialState();
 
@@ -104,6 +102,10 @@ export default function formLayoutReducer(state = initialState, action) {
         case UPDATE_FIELD_DATA_VALIDATION: {
             return state.set('formElement', action.payload.formElement)
                 .set('errorMessage', action.payload.message)
+        }
+
+        case UPDATE_NEXT_EDITABLE : {
+            return state.set('nextEditable',action.payload);
         }
     }
     return state;

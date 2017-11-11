@@ -1,10 +1,10 @@
 'use strict'
 
 
-const {
+import {
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
     ERROR_MESSAGE
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 const InitialState = require('../selectFromListInitialState').default
 import selectFromListReducer from '../selectFromListReducer'

@@ -23,8 +23,11 @@ import fixedSKU from './fixedSKU/fixedSKUReducer'
 import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
 import sequence from './sequence/sequenceReducer'
+import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
+import statistics from './statistics/statisticsReducer'
+import sorting from './sorting/sortingReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -53,8 +56,11 @@ const rootReducer = combineReducers({
   signature,
   formLayout,
   sequence,
+  cashTenderingReducer,
   dataStore,
   newJob,
+  statistics,
+  sorting,
 })
 
 export default rootReducer

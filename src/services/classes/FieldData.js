@@ -3,9 +3,9 @@
 import { jobDetailsService } from './JobDetails'
 import * as realm from '../../repositories/realmdb'
 
-const {
+import {
     TABLE_FIELD_DATA
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 class FieldData {
 
@@ -100,8 +100,6 @@ class FieldData {
      */
     prepareFieldDataForTransactionSavingInState(fieldDataListDTO, jobTransactionId, parentId, latestPositionId) {
         let fieldDataList = []
-            console.log("prepareFieldDataForTransactionSavingInStatesss",fieldDataListDTO)
-        
         for (let index in fieldDataListDTO) {
             let fieldData = {}
             latestPositionId++

@@ -14,10 +14,10 @@ import InitialState from './deviceInitialState'
 /**
  * Device actions to test
  */
-const {
+import {
   SET_PLATFORM,
   SET_VERSION
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 const initialState = new InitialState()
 

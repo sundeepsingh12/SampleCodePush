@@ -1,5 +1,5 @@
 'use strict'
-const {
+import {
 
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
@@ -67,7 +67,7 @@ const {
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'

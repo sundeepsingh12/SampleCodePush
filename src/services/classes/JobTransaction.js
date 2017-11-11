@@ -1,5 +1,5 @@
 import * as realm from '../../repositories/realmdb'
-const {
+import {
     TABLE_JOB_TRANSACTION,
     UNSEEN,
     PENDING,
@@ -11,7 +11,7 @@ const {
     TAB,
     JOB_ATTRIBUTE,
     TABLE_RUNSHEET,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE } from '../../lib/AttributeConstants'
 import _ from 'underscore'

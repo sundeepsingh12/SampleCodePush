@@ -19,7 +19,7 @@ import {
 
 import _ from 'underscore'
 
-const {
+import {
   TABLE_JOB_TRANSACTION,
   TABLE_FIELD_DATA,
   TABLE_JOB,
@@ -29,7 +29,7 @@ const {
   UNSEEN,
   PENDING,
   TABLE_JOB_TRANSACTION_CUSTOMIZATION
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 class Sync {

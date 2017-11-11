@@ -19,16 +19,16 @@ let realm = new Realm({
     schema
 });
 
-const {
-    TABLE_JOB_TRANSACTION,
-    TABLE_FIELD_DATA,
-    TABLE_JOB,
-    TABLE_JOB_DATA,
-    USER,
-    TABLE_RUNSHEET,
-    TABLE_JOB_TRANSACTION_CUSTOMIZATION,
-    TABLE_TRACK_LOGS
-} = require('../lib/constants').default
+import {
+  TABLE_JOB_TRANSACTION,
+  TABLE_FIELD_DATA,
+  TABLE_JOB,
+  TABLE_JOB_DATA,
+  USER,
+  TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+  TABLE_TRACK_LOGS
+} from '../lib/constants'
 
 export function save(tableName, object) {
     return realm.write(() => {

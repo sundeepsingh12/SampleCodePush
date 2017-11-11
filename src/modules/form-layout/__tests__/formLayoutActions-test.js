@@ -1,7 +1,7 @@
 'use strict'
 var actions = require('../formLayoutActions')
 
-const {
+import {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
     IS_LOADING,
     DISABLE_SAVE,
@@ -10,7 +10,7 @@ const {
     TOOGLE_HELP_TEXT,
     Home,
     ERROR_MESSAGE
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import {formLayoutService} from '../../../services/classes/formLayout/FormLayout.js'
 import thunk from 'redux-thunk'

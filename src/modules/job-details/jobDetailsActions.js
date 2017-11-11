@@ -3,7 +3,7 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { NavigationActions } from 'react-navigation'
-const {
+import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
     JOB_ATTRIBUTE_STATUS,
@@ -12,7 +12,7 @@ const {
     JOB_DETAILS_FETCHING_START,
     JOB_DETAILS_FETCHING_END,
     FormLayout
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 export function startFetchingJobDetails() {
     return {

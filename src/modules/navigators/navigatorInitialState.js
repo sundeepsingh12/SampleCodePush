@@ -1,6 +1,6 @@
 import { AppNavigator } from '../navigators/AppNavigator';
 
-const {
+import {
     Application,
     Login,
     Preloader,
@@ -9,12 +9,12 @@ const {
     SkuListing,
     FormLayout,
     Sequence
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 const applicationAction = AppNavigator.router.getActionForPathAndParams(Application);
 
-const loginAction = AppNavigator.router.getActionForPathAndParams(Login);
-const loginState = AppNavigator.router.getStateForAction(loginAction);
+const loginAction = AppNavigator.router.getActionForPathAndParams(Login)
+const loginState = AppNavigator.router.getStateForAction(loginAction)
 
 const preloaderAction = AppNavigator.router.getActionForPathAndParams(Preloader)
 const preloaderState = AppNavigator.router.getStateForAction(preloaderAction)
@@ -33,7 +33,6 @@ const formLayoutState = AppNavigator.router.getStateForAction(formLayoutAction)
 
 const sequenceAction = AppNavigator.router.getActionForPathAndParams(Sequence)
 const sequenceState = AppNavigator.router.getStateForAction(sequenceAction)
-
 
 const initialNavState = AppNavigator.router.getStateForAction(
   applicationAction,

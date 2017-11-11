@@ -4,13 +4,13 @@ import _ from 'underscore'
 const InitialState = require('./skuListingInitialState').default
 
 const initialState = new InitialState()
-const {
+import {
     SKU_LIST_FETCHING_STOP,
     SKU_LIST_FETCHING_START,
     SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 export default function skuListingReducer(state = initialState, action) {
@@ -28,7 +28,7 @@ export default function skuListingReducer(state = initialState, action) {
                         .set('skuObjectAttributeId',action.payload.skuObjectAttributeId)
 
         case  SHOW_SEARCH_BAR :
-            return state.set('isSearchBarVisible',action.payload)     
+            return state.set('isSearchBarVisible',true)     
         
         case SKU_CODE_CHANGE:
          return state.set('skuSearchTerm',action.payload)
