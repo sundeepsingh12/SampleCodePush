@@ -104,10 +104,13 @@ class HomeUI extends Component {
           <Text>ResetPassword
           </Text>  
         </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('ArrayScreen')}>
+          <Text>ArrayScreen
+          </Text>  
+        </Button>
       </View>
     )
   }
-
 };
 
 
