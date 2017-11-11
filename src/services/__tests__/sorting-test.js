@@ -13,6 +13,7 @@ describe('sorting services', () => {
                seqSelected: '1'
                },
                empHubCode : 'udyog12',
+               empCode : '25511-manu',
                addressData : undefined
          }
    const referenceNo = 'NITESH-1510252533058';
@@ -51,8 +52,8 @@ describe('sorting services', () => {
             const sortingList = {
                 0:{id: 0, value: "NITESH-1510252533058", label: ""},
                 1:{id: 1, value: "MANUPRA SINGH", label: "Name"},
-                2:{id: 2, value: "1/1", label: "Sequence Number"},
-                3:{id: 3, value: "udyog12", label: "Employee Code"},
+                2:{id: 2, value: "25511-manu/udyog12", label: "Employee Code"},
+                3:{id: 3, value: "1/1", label: "Sequence Number"},
                 4:{id: 4, value: "N.A"}
                }
            expect(sortingService.setSortingData(data,referenceNo)).toEqual(sortingList)

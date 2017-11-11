@@ -29,8 +29,8 @@ class sortingAndPrintingService {
     async getSortingData(referenceNumber,token){
         let data = null;
         let referenceData = null;
-        if( !_.isNull(referenceNumber) && !_.isUndefined(referenceNumber) ){
-            referenceData = REFERENCE_NO + referenceNumber.value;
+        if( !_.isNull(referenceNumber) && !_.isUndefined(referenceNumber)  && !_.isEmpty(referenceNumber)){
+            referenceData = REFERENCE_NO + referenceNumber;
             const url = (referenceData == null) ? CONFIG.API.SCAN_AND_SEARCH_SORTING : CONFIG.API.SCAN_AND_SEARCH_SORTING + "?" + referenceData
             let getSortingData = await RestAPIFactory(token).serviceCall(null, url, GET)
             if (getSortingData) {
@@ -65,12 +65,13 @@ class sortingAndPrintingService {
     setSortingData(jsonData,referenceNumber){
     let  sortingList = {}, id = 0;
       if(jsonData.jobTransaction != null && jsonData.jobTransaction != undefined){
-        label = ['','Name','Sequence Number','Employee Code','Address']
+        label = ['','Name','Employee Code','Sequence Number','Address']
         sortingList[id] = (jsonData.jobTransaction.referenceNumber) ? {id, value : jsonData.jobTransaction.referenceNumber , label : label[id++]} : {id: id++,value:NA}
         sortingList[id] = (jsonData.firstName != null && jsonData.lastName != null) ? {id, value : jsonData.firstName.toUpperCase() + ' ' + jsonData.lastName.toUpperCase(),label : label[id++] } :  {id: id++,value:NA};
+        sortingList[id] = (jsonData.empHubCode) && (jsonData.empCode) ? {id, value : jsonData.empCode + '/' + jsonData.empHubCode, label : label[id++] }: (jsonData.empCode) ? 
+                                  {id, value : jsonData.empCode , label : label[id++] } : {id: id++,value:NA}
         sortingList[id] = (jsonData.jobsInRunsheet) && (jsonData.jobTransaction.seqSelected)? {id, value : jsonData.jobTransaction.seqSelected + '/' + jsonData.jobsInRunsheet, label : label[id++]}: 
                                   (jsonData.jobTransaction.seqSelected) ? {id, value : jsonData.jobTransaction.seqSelected, label : label[id++] }: {id: id++,value:NA};
-        sortingList[id] = (jsonData.empHubCode) ? {id, value : jsonData.empHubCode, label : label[id++] }:  {id: id++,value:NA}
         sortingList[id] = (jsonData.addressData) ? {id, value : jsonData.addressData, label : label[id++] }:  {id: id++,value:NA}
       }else{
         throw new Error(FAILURE_SORTING)

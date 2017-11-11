@@ -269,8 +269,9 @@ module.exports = {
 
     //Sorting module constants
     REFERENCE_NO : 'referenceNo=',
-    REF_UNAVAILABLE : 'referenceNumber unavailable',
+    REF_UNAVAILABLE : 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     NA : 'N.A',
+    SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
     SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package'
 }

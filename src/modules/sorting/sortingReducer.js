@@ -25,6 +25,7 @@ export default function sortingReducer(state = initialState, action) {
        case ERROR_MESSAGE:
            return state.set('errorMessage',action.payload)
                        .set('loaderRunning', false)
+                       .set('searchRefereneceValue','')
    }
    return state
 }

@@ -49,5 +49,6 @@ describe('sortingReducer ', () => {
         let nextState = sortingReducer(undefined, action)
         expect(nextState.errorMessage).toBe(message)
         expect(nextState.loaderRunning).toBe(false)
+        expect(nextState.searchRefereneceValue).toBe('')
     })
 })
