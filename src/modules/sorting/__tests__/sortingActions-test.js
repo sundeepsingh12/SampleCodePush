@@ -54,14 +54,6 @@ describe('sorting actions', () => {
             }
         }
     ]
-
-    it('should set reference value', () => {
-        const referenceValue = 'NITESH-12136427487'
-        expect(actions.searchReferenceValue(referenceValue)).toEqual({
-            type: SORTING_SEARCH_VALUE,
-            payload: {value : referenceValue}
-        })
-    })
     
     it('should get data for sorting and Printing list', () => {
         const referenceValue = 'NITESH-1510252533058'

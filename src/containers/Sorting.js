@@ -5,14 +5,13 @@ import { connect } from 'react-redux'
 
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
-import ResyncLoader from '../components/ResyncLoader'
-import renderIf from '../lib/renderIf';
-import QRCode from 'react-native-qrcode-svg';
-import _ from 'underscore';
+import renderIf from '../lib/renderIf'
+import QRCode from 'react-native-qrcode-svg'
+import _ from 'underscore'
 import { NA, SORTING_PLACEHOLDER, SEARCH_INFO } from '../lib/AttributeConstants'
 import * as sortingActions from '../modules/sorting/sortingActions'
+import * as globalActions from '../modules/global/globalActions'
 
 import React, { Component } from 'react'
 import { StyleSheet, View, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native'
@@ -24,21 +23,18 @@ import {
     Button,
     Text,
     Input,
-    List,
-    ListItem,
     Left,
     Body,
     Right,
     Icon,
-    Footer,
-    CheckBox,
     StyleProvider,
     Toast
-} from 'native-base';
+} from 'native-base'
 
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
+import {SORTING_SEARCH_VALUE} from '../lib/constants'
 
 function mapStateToProps(state) {
     return {
@@ -50,7 +46,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...sortingActions }, dispatch)
+        actions: bindActionCreators({ ...sortingActions,...globalActions}, dispatch)
     }
 }
 class SortingListing extends Component {
@@ -111,12 +107,12 @@ class SortingListing extends Component {
 
 class Sorting extends Component {
 
-    _onChangeReferenceValue(value) {
-        this.props.actions.searchReferenceValue(value)
+    _onChangeReferenceValue = (value) => {
+        this.props.actions.setState(SORTING_SEARCH_VALUE, {value})
     }
 
-    _searchForReferenecceValue(referenceNumber) {
-        this.props.actions.getDataForSortingAndPrinting(referenceNumber)
+    _searchForReferenceValue = () => {
+        this.props.actions.getDataForSortingAndPrinting(this.props.searchRefereneceValue.value)
     }
 
     render() {
@@ -150,16 +146,16 @@ class Sorting extends Component {
                                 <View style={[styles.relative, { width: '85%', height: 33 }]}>
                                     <Input
                                         value={this.props.searchRefereneceValue.value}
-                                        onChangeText={value => this._onChangeReferenceValue(value)}
+                                        onChangeText={this._onChangeReferenceValue}
                                         placeholder={SORTING_PLACEHOLDER}
                                         placeholderTextColor={'rgba(255,255,255,.4)'}
                                         style={[style.headerSearch]} />
-                                    <Button small transparent style={[style.inputInnerBtn]} onPress={() => { this._searchForReferenecceValue(this.props.searchRefereneceValue.value) }}>
+                                    <Button small transparent style={[style.inputInnerBtn]} onPress={this._searchForReferenceValue}>
                                         <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
                                     </Button>
                                 </View>
                                 <View style={{ width: '15%' }}>
-                                    <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXxl, styles.fontRight]} onPress={() => { }} />
+                                    <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXxl, styles.fontRight]}  />
                                 </View>
                             </View>
                         </Body>

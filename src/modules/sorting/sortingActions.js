@@ -6,26 +6,11 @@ import {
     ERROR_MESSAGE,
     SHOW_LOADER
 } from '../../lib/constants'
-import { sortingService } from '../../services/classes/sorting'
+import { sortingService } from '../../services/classes/Sorting'
 import { setState } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '.././../lib/config'
 import {TOKEN_MISSING} from '../../lib/AttributeConstants'
-
-/**This is called when user type in search InputBox
- * 
- * @param {*} value 
- * It sets new value in state
- */
-
-export function searchReferenceValue(value) {
-    return {
-        type: SORTING_SEARCH_VALUE,
-        payload: {
-            value
-        }
-    }
-}
 
 
 /**This action is fire when search button or qr button is tap,
