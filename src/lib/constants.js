@@ -179,7 +179,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
     UPDATE_FIELD_DATA_VALIDATION:null,
-
+    UPDATE_NEXT_EDITABLE : null,
     //Route names (Used in React Navigation)
     Application: null,
     Login: null,

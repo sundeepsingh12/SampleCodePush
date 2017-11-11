@@ -19,6 +19,7 @@ import RestAPIFactory from '../../../lib/RestAPIFactory'
 import _ from 'underscore'
 import moment from 'moment';
 import sha256 from 'sha256';
+import {formLayoutService} from '../../classes/formLayout/FormLayout'
 
 export default class FormLayoutEventImpl {
 
@@ -34,6 +35,7 @@ export default class FormLayoutEventImpl {
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value, fieldDataList, event) {
         this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        nextEditable = this.updateNextEditable(formLayoutObject);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
         const nextEditableElements = nextEditable[attributeMasterId];
         if (!nextEditableElements || nextEditableElements.length == 0) {
@@ -134,6 +136,33 @@ export default class FormLayoutEventImpl {
             throw new Error('masterId unavailable')
         }
         return data;  
+    }
+
+   
+    /**
+     * accepts formLayoutObject map and
+     * returns nextEditable and required object
+     * 
+     * call this method when required and non required elements are changed
+     * for example via validations, otherwise it is already obtained initially
+     * 
+     * @param {*} formLayoutObject 
+     */
+    updateNextEditable(formLayoutObject){
+        if(!formLayoutObject){
+            return;
+        }
+        let nextEditable = {};
+        let mapData = JSON.stringify([...formLayoutObject]);// stringified map
+        let formLayoutArray = JSON.parse(mapData).map(d => d[1]); // to convert map to array
+
+        for(let i=0; i< formLayoutArray.length; i++){
+            let fieldAttribute = formLayoutArray[i]; //1st of formLayoutArray[i] contains the object as Array.from on map gives array in which 0th index is a key and 1st index is the object
+            if(fieldAttribute && fieldAttribute.required){
+                formLayoutService.getNextEditableAndFocusableElements(fieldAttribute.fieldAttributeMasterId,i,formLayoutArray,nextEditable);
+            }
+        }
+        return nextEditable;
     }
 
     /**
