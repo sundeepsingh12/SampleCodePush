@@ -29,6 +29,10 @@ import HomeUI from '../../containers/HomeUI'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
+import SortingResults from '../../containers/SortingResults'
+import Profile from '../../containers/Profile'
+import ProfileView from '../../containers/ProfileView'
+import ResetPassword from '../../containers/ResetPassword'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
@@ -65,6 +69,7 @@ import SelectFromList from '../../containers/SelectFromList';
 import CashTendering from '../../containers/CashTendering'
 
 import Statistics from '../../containers/Statistics';
+import Sorting from '../../containers/Sorting';
 
 class AppWithNavigationState extends React.Component {
   render() {
@@ -131,6 +136,13 @@ export const AppNavigator = StackNavigator({
       title: 'STATISTICS : ' + moment(new Date()).format('DD-MM-YYYY'),
     }
   },
+  Sorting: {
+    screen : Sorting,
+    navigationOptions: {
+      title: 'Sorting',
+      header:null,
+    }
+  },
   HomeUI: {
     screen: HomeUI
   },
@@ -139,6 +151,18 @@ export const AppNavigator = StackNavigator({
   },
   Sequence: {
     screen: Sequence
+  },
+  SortingResults: {
+    screen: SortingResults
+  },
+  Profile: {
+    screen: Profile
+  },
+  ProfileView: {
+    screen: ProfileView
+  },
+  ResetPassword: {
+    screen: ResetPassword
   },
   SkuDetails: {
     screen: SkuDetails

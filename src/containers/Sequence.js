@@ -142,7 +142,7 @@ class Sequence extends Component {
             </Body>
             <Right/>
           </Header>
-          <View style={[styles.flex1]}>
+          <View style={[styles.flex1, styles.bgWhite]}>
 
             <SortableListView
               style={{

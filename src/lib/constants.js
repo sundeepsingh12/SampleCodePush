@@ -235,7 +235,11 @@ module.exports = keyMirror({
     //New Job
     NEW_JOB_MASTER : null,
     NEW_JOB_STATUS : null,
-    SET_DATA_IN_STATISTICS_LIST : null
+    SET_DATA_IN_STATISTICS_LIST : null,
+
+    //Sorting And Printing
+    SORTING_SEARCH_VALUE : null,
+    SORTING_ITEM_DETAILS : null,
 })
 
 

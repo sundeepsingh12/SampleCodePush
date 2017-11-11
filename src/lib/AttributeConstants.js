@@ -229,6 +229,7 @@ module.exports = {
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
+    TOKEN_MISSING : 'Token Missing',
     PASSWORD: 61,
 
     //App Modules Constants
@@ -264,5 +265,14 @@ module.exports = {
         appModuleId: 8,
         displayName: ''
     },
-    
+
+
+
+    //Sorting module constants
+    REFERENCE_NO : 'referenceNo=',
+    REF_UNAVAILABLE : 'ReferenceNumber Unavailable',
+    FAILURE_SORTING: 'Searching failed, Please try again !',
+    NA : 'N.A',
+    SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
+    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package'
 }

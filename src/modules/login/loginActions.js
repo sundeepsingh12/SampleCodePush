@@ -204,7 +204,7 @@ export function getSessionToken() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
-         dispatch(NavigationActions.navigate({ routeName: Home }))
+         dispatch(NavigationActions.navigate({ routeName: 'Home' }))
       } else if(token) {
           dispatch(NavigationActions.navigate({ routeName: Preloader }))
       }

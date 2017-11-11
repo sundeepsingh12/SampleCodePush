@@ -58,6 +58,9 @@ export default {
     fontDarkGray : {
         color: '#a3a3a3'
     },
+    fontLightGray : {
+        color: '#e4e3e8'
+    },
     fontYellow : {
         color: '#FEDC14'
     },
@@ -75,6 +78,9 @@ export default {
     },
     fontPrimary : {
         color: '#338FFC'
+    },
+    fontXs : {
+        fontSize: 10
     },
     fontSm : {
         fontSize: 12
