@@ -22,6 +22,7 @@ import payByLinkPayment from './cardTypePaymentModules/payByLinkPayment/payByLin
 import fixedSKU from './fixedSKU/fixedSKUReducer'
 import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
+import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
 import statistics from './statistics/statisticsReducer'
@@ -53,6 +54,7 @@ const rootReducer = combineReducers({
   fixedSKU,
   signature,
   formLayout,
+  cashTenderingReducer,
   dataStore,
   newJob,
   statistics,

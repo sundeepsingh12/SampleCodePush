@@ -230,6 +230,7 @@ module.exports = {
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
     TOKEN_MISSING : 'Token Missing',
+    PASSWORD: 61,
 
     //App Modules Constants
     BULK : {
