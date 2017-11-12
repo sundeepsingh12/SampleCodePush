@@ -257,5 +257,4 @@ const style = StyleSheet.create({
   
 });
 
-
 export default connect(mapStateToProps, mapDispatchToProps)(Profile)

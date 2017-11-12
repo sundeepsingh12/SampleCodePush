@@ -34,6 +34,8 @@ import Profile from '../../containers/Profile'
 import ProfileView from '../../containers/ProfileView'
 import ArrayScreen from '../../containers/ArrayScreen'
 import ResetPassword from '../../containers/ResetPassword'
+import SyncScreen from '../../containers/SyncScreen'
+import TaskScreen from '../../containers/TaskScreen'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
@@ -155,8 +157,14 @@ export const AppNavigator = StackNavigator({
   ArrayScreen: {
     screen: ArrayScreen
   },
+  SyncScreen: {
+    screen: SyncScreen
+  },
   ResetPassword: {
     screen: ResetPassword
+  },
+  TaskScreen: {
+    screen: TaskScreen
   },
   SkuDetails: {
     screen: SkuDetails

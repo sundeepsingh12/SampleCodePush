@@ -98,15 +98,23 @@ class HomeUI extends Component {
         </Button>
         <Button success onPress= {() => this.props.actions.navigateToScene('ProfileView')}>
           <Text>ProfileView
-          </Text> 
+          </Text>
         </Button>
         <Button success onPress= {() => this.props.actions.navigateToScene('ResetPassword')}>
           <Text>ResetPassword
-          </Text>  
+          </Text>
         </Button>
         <Button success onPress= {() => this.props.actions.navigateToScene('ArrayScreen')}>
           <Text>ArrayScreen
-          </Text>  
+          </Text>
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('SyncScreen')}>
+          <Text>SyncScreen
+          </Text>
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('TaskScreen')}>
+          <Text>TaskScreen
+          </Text>
         </Button>
       </View>
     )
