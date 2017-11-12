@@ -69,7 +69,7 @@ class SortingResults extends Component {
                   <Icon  name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]}/>
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Sorting</Text>  
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Sorting 2</Text>  
                 </View>
                 <View style={[style.headerRight]}>
                 </View>
@@ -188,7 +188,7 @@ const style = StyleSheet.create({
   headerSearch: {
     paddingLeft: 10,
     paddingRight: 30,
-    backgroundColor: '#1260be',
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     borderRadius: 2,
     height: 55,
     color: '#fff',

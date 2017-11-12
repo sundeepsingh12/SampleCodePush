@@ -72,13 +72,13 @@ class TaskScreen extends Component {
                 </View>
                 <View/>
               </View>
-
+              
               <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10]}>
                 <View style={[styles.relative, {width: '85%', height: 30}]}>
                   <Input
                     placeholder="Filter Reference Numbers"
-                    placeholderTextColor={'rgba(255,255,255,.4)'}
+                    placeholderTextColor={'rgba(255,255,255,.6)'}
                     style={[style.headerSearch]}/>
                   <Button small transparent style={[style.inputInnerBtn]}>
                     <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]}/>
@@ -88,7 +88,7 @@ class TaskScreen extends Component {
                   <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXxl, styles.fontRight]} onPress={() => { this.props.navigation.goBack(null) }}/>
                 </View>
               </View>
-             
+
             </Body>
           </Header>
           <Tabs
@@ -168,7 +168,6 @@ class TaskScreen extends Component {
          
         </Container>
       </StyleProvider>
-
     )
   }
 
@@ -209,7 +208,7 @@ const style = StyleSheet.create({
   headerSearch: {
     paddingLeft: 10,
     paddingRight: 30,
-    backgroundColor: '#1260be',
+    backgroundColor: 'rgba(255, 255, 255, 0.20)',
     borderRadius: 2,
     height: 55,
     color: '#fff',

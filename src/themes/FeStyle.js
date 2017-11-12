@@ -1,20 +1,18 @@
+
+
+const themeColor = '#E91E63';
+
 export default {
-    textPrimary : {
-        color: '#338FFC'
+    
+    bgPrimary : {
+        backgroundColor: themeColor
     },
-    mainBg : {
-        backgroundColor: '#F7F8FA'
+    fontPrimary : {
+        color: themeColor
     },
 
-    roundedInput : {
-        backgroundColor: '#F7F8FA',
-        height: 50,
-        borderRadius: 25,
-        borderWidth: 1,
-        borderColor: '#D4DCE1',
-        paddingLeft: 20,
-        paddingRight: 20,
-        fontSize: 14
+    mainBg : {
+        backgroundColor: '#F7F8FA'
     },
     heightAuto: {
         height: 'auto'
@@ -42,9 +40,6 @@ export default {
     },
     bgInfo : {
         backgroundColor: '#51adfd'
-    },
-    bgPrimary : {
-        backgroundColor: '#338FFC'
     },
     fontWhite : {
         color: '#ffffff'
@@ -75,9 +70,6 @@ export default {
     },
     fontInfo : {
         color: '#51adfd'
-    },
-    fontPrimary : {
-        color: '#338FFC'
     },
     fontXs : {
         fontSize: 10
