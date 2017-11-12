@@ -4,6 +4,7 @@ const InitialState = require('./homeInitialState').default
 
 const initialState = new InitialState()
 import {
+  HOME_LOADING,
   JOB_FETCHING_START,
   JOB_FETCHING_END,
   SET_TABS_LIST,
@@ -32,6 +33,9 @@ export default function homeReducer(state = initialState, action) {
     
     case JOB_DOWNLOADING_STATUS:
       return state.set('downloadingJobs',action.payload.isDownloadingjobs)
+
+    case HOME_LOADING: 
+      return state.set('loading',action.payload.loading)
   }
   
   return state

@@ -30,24 +30,82 @@ class ModuleCustomization {
         return moduleCustomizationList.filter(moduleCustomization => moduleCustomization.appModulesId == appModuleId)
     }
 
-    getActiveModules(moduleCustomizationList) {
+    /**
+     * This function enables modules for user
+     * @param {*} moduleCustomizationList 
+     * @param {*} user 
+     * 
+     */
+    getActiveModules(moduleCustomizationList, user) {
         for (let index in moduleCustomizationList) {
-            switch (moduleCustomizationList[index].appModuleId) {
+            switch (moduleCustomizationList[index].appModulesId) {
                 case BULK.appModuleId: {
-                    console.log('bulk',moduleCustomizationList[index])
+                    this.setModuleDetails(BULK, moduleCustomizationList[index], user)
+                    break
                 }
-                case LIVE.appModuleId:
-                case OFFLINEDATASTORE.appModuleId:
-                case PIECHART.appModuleId:
-                case START.appModuleId:{
-                    console.log('start',moduleCustomizationList[index])
+                case LIVE.appModuleId: {
+                    this.setModuleDetails(LIVE, moduleCustomizationList[index], user)
+                    break
                 }
-                case STATISTIC.appModuleId:
-                case SEQUENCE.appModuleId:
-                case SUMMARY.appModuleId:
+                case OFFLINEDATASTORE.appModuleId: {
+                    this.setModuleDetails(OFFLINEDATASTORE, moduleCustomizationList[index], user)
+                    break
+                }
+                case PIECHART.appModuleId: {
+                    this.setModuleDetails(PIECHART, moduleCustomizationList[index], user)
+                    break
+                }
+                case START.appModuleId: {
+                    this.setModuleDetails(START, moduleCustomizationList[index], user)
+                    break
+                }
+                case STATISTIC.appModuleId: {
+                    this.setModuleDetails(STATISTIC, moduleCustomizationList[index], user)
+                    break
+                }
+                case SEQUENCE.appModuleId: {
+                    this.setModuleDetails(SEQUENCE, moduleCustomizationList[index], user)
+                    break
+                }
+                case SUMMARY.appModuleId: {
+                    this.setModuleDetails(SUMMARY, moduleCustomizationList[index], user)
+                    break
+                }
             }
         }
     }
+
+    /**
+     * This function enable module and sets display name
+     * @param {*} appModule 
+     * @param {*} moduleCustomization 
+     * @param {*} user 
+     */
+    setModuleDetails(appModule, moduleCustomization, user) {
+        let displayName = ''
+        if (!moduleCustomization.selectedUserType || moduleCustomization.selectedUserType.length == 0 || JSON.parse(moduleCustomization.selectedUserType).length == 0 || (displayName = this.checkSelectedUserType(JSON.parse(moduleCustomization.selectedUserType), user))) {
+            appModule.enabled = true
+            appModule.displayName = displayName.trim() ? displayName : moduleCustomization.displayName && (moduleCustomization.displayName + '').trim() ? moduleCustomization.displayName : appModule.displayName
+        }
+    }
+
+    /**
+     * This function checks if a module is enabled for usertype
+     * @param {*} selectedUserTypeList 
+     * @param {*} user 
+     * @returns
+     * boolean
+     */
+    checkSelectedUserType(selectedUserTypeList, user) {
+        for (let index in selectedUserTypeList) {
+            if(selectedUserTypeList[index].userTypeId == user.userType.id) {
+                return (selectedUserTypeList[index].displayText + ' ')
+            }
+        }
+        return false
+    }
+
+
 }
 
 export let moduleCustomizationService = new ModuleCustomization()

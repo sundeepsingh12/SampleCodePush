@@ -1,10 +1,10 @@
-
 'use strict'
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { Component } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
+import Loader from '../components/Loader'
 import {
   Container,
   Content,
@@ -28,22 +28,28 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
-import renderIf from '../lib/renderIf'
-import TitleHeader from '../components/TitleHeader'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
-import AllTaskIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
-import LiveTaskIcon from '../../images/fareye-default-iconset/homescreen/live.png'
-import BulkIcon from '../../images/fareye-default-iconset/homescreen/bulk.png'
-import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
+import {
+  BULK,
+  LIVE,
+  PIECHART,
+  SEQUENCE,
+  START,
+} from '../lib/AttributeConstants'
+
+import {
+  Home
+} from '../lib/constants'
 
 function mapStateToProps(state) {
   return {
+    loading: state.home.loading
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({...homeActions}, dispatch)
+    actions: bindActionCreators({ ...homeActions, ...globalActions }, dispatch)
   }
 }
 
@@ -54,8 +60,27 @@ class JobDetailsV2 extends Component {
     return { header: null }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.actions.fetchModulesList()
+  }
+
+  navigateToScene = (moduleName) => {
+    console.log(moduleName)
+    switch (moduleName) {
+      case BULK: {
+        break
+      }
+      case LIVE: {
+        break
+      }
+      case SEQUENCE: {
+        break
+      }
+      case START: {
+        this.props.actions.navigateToScene(Home)
+        break
+      }
+    }
   }
 
   headerView() {
@@ -93,6 +118,9 @@ class JobDetailsV2 extends Component {
   }
 
   pieChartView() {
+    if (!PIECHART.enabled) {
+      return null
+    }
     return (
       <LinearGradient
         colors={['#262da0', '#205dbe', '#2c83c9']}
@@ -123,28 +151,40 @@ class JobDetailsV2 extends Component {
     )
   }
 
-  moduleView() {
-    return (
-      <ListItem
-        style={[style.moduleList]}>
-        <Image
-          style={[style.moduleListIcon]}
-          source={AllTaskIcon} />
-        <Body>
-          <Text
-            style={[styles.fontWeight500, styles.fontLg]}>All Tasks</Text>
-        </Body>
-        <Right>
-          <Icon name="arrow-forward" />
-        </Right>
-      </ListItem>
-    )
+  moduleView(modulesList) {
+    let moduleView = []
+    for (let index in modulesList) {
+      if (!modulesList[index].enabled) {
+        continue
+      }
+      moduleView.push(
+        <ListItem button onPress={() => this.navigateToScene(modulesList[index])}
+          style={[style.moduleList]}
+          key={modulesList[index].appModuleId}
+        >
+          <Image
+            style={[style.moduleListIcon]}
+            source={modulesList[index].icon} />
+          <Body>
+            <Text
+              style={[styles.fontWeight500, styles.fontLg]}>{modulesList[index].displayName}</Text>
+          </Body>
+          <Right>
+            <Icon name="arrow-forward" />
+          </Right>
+        </ListItem>
+      )
+    }
+    return moduleView
   }
 
   render() {
     const headerView = this.headerView()
     const pieChartView = this.pieChartView()
-    const moduleView = this.moduleView()
+    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCE])
+    if (this.props.loading) {
+      return (<Loader />)
+    }
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={StyleSheet.flatten([styles.bgWhite])}>

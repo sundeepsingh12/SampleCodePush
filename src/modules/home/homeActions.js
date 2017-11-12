@@ -6,6 +6,7 @@ import {
   CUSTOMIZATION_APP_MODULE,
   CUSTOMIZATION_LIST_MAP,
   Home,
+  HOME_LOADING,
   JOB_ATTRIBUTE,
   JOB_ATTRIBUTE_STATUS,
   JOB_DOWNLOADING_STATUS,
@@ -86,19 +87,17 @@ export function clearHomeState() {
   }
 }
 
-export function navigateToScene(sceneName, paramaters) {
-  return async function (dispatch) {
-    dispatch(NavigationActions.navigate({ routeName: sceneName, params: paramaters }))
-  }
-}
-
+/**
+ * This action enables modules for particular user
+ */
 export function fetchModulesList() {
   return async function (dispatch) {
     try {
-      console.log('custom', CUSTOMIZATION_APP_MODULE)
+      dispatch(setState(HOME_LOADING, { loading: true }))
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
-      // let moduleCustomizationMap = moduleCustomizationService.getModuleCustomizationMapForAppModuleId(appModulesList.value)
-      moduleCustomizationService.getActiveModules(appModulesList.value)
+      const user = await keyValueDBService.getValueFromStore(USER)
+      moduleCustomizationService.getActiveModules(appModulesList.value, user.value)
+      dispatch(setState(HOME_LOADING, { loading: false }))
     } catch (error) {
       console.log(error)
     }
