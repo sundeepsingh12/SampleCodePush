@@ -337,14 +337,17 @@ export default {
     flex1 : {
         flex: 1
     },
-    flexBasis25 : {
-        flexBasis: '25%'
+    flexBasis10 : {
+        flexBasis: '10%'
     },
     flexBasis15 : {
         flexBasis: '15%'
     },
     flexBasis20 : {
         flexBasis: '20%'
+    },
+    flexBasis25 : { 
+        flexBasis: '25%'
     },
     flexBasis35 : {
         flexBasis: '35%'
@@ -369,6 +372,9 @@ export default {
     },
     flexBasis85 : {
         flexBasis: '85%'
+    },
+    flexBasis90 : {
+        flexBasis: '90%'
     },
     flexBasis100 : {
         flexBasis: '100%'

@@ -32,6 +32,7 @@ import SkuDetails from '../../containers/SkuDetails'
 import SortingResults from '../../containers/SortingResults'
 import Profile from '../../containers/Profile'
 import ProfileView from '../../containers/ProfileView'
+import ArrayScreen from '../../containers/ArrayScreen'
 import ResetPassword from '../../containers/ResetPassword'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
@@ -161,6 +162,9 @@ export const AppNavigator = StackNavigator({
   },
   ProfileView: {
     screen: ProfileView
+  },
+  ArrayScreen: {
+    screen: ArrayScreen
   },
   ResetPassword: {
     screen: ResetPassword

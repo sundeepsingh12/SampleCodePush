@@ -47,7 +47,6 @@ class ArrayFieldAttribute {
                 value: OBJECTSAROJFAREYE,
                 childDataList
             }
-            // cloneArrayElements[rowId].childDataList = arrayObject
             arrayChildDataList.push(arrayObject)
         }
         arrayParentItem.value = ARRAYSAROJFAREYE
