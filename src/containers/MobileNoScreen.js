@@ -54,7 +54,6 @@ class MobileNoScreen extends Component{
                                 <View style={[feStyle.flex1, { height: 50 }]}>
                                     <Input
                                         placeholder='Mobile Number'
-                                        style={feStyle.roundedInput}
                                         value={this.props.mobileNumber}
                                         keyboardType='numeric'
                                         onChangeText={this.onChangeMobileNo}

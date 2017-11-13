@@ -6,11 +6,10 @@ import {
     USER,
     PASSWORD,
     CLEAR_PASSWORD_TEXTINPUT,
-    TRY_AGAIN,
 } from '../../lib/constants'
 import sha256 from 'sha256'
 import CONFIG from '../../lib/config'
-import { Toast } from 'native-base';
+import { Toast } from 'native-base'
 import {
     UNSAVED_PASSWORD,
     PASSWORD_RESET_SUCCESSFULLY,
@@ -28,7 +27,6 @@ import { profileService } from '../../services/classes/ProfileService'
 export function fetchUserList() {
     return async function (dispatch) {
         try {
-
             const userList = await keyValueDBService.getValueFromStore(USER)
             let userDetails = {
                 nameOfUser: userList.value.firstName + ' ' + userList.value.lastName,
@@ -56,13 +54,17 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
             if (!userPassword) {
                 throw new Error(UNSAVED_PASSWORD)
             }
-            const userList = await keyValueDBService.getValueFromStore(USER)
+            const userObject = await keyValueDBService.getValueFromStore(USER)
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userList.value.username)
+            const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject.value.username)
             console.log("response", response)
 
+            // if (response != null && response.status == 200) {
+
+            // }
+
             if (response != null && response.status == 200) {
-                await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword))
+                await keyValueDBService.validateAndUpdateData(PASSWORD, sha256(newPassword))//change this to update
                 let allPasswords = {
                     currentPassword: '',
                     newPassword: '',
@@ -71,9 +73,6 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
                 Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: 'OK' })
 
                 dispatch(setState(CLEAR_PASSWORD_TEXTINPUT, allPasswords))
-            }
-            else if (response != 100) {
-                Toast.show({ text: TRY_AGAIN, position: 'bottom', buttonText: 'OK' })
             }
 
 

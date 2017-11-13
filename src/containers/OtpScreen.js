@@ -62,7 +62,6 @@ class OtpScreen extends Component{
                                 <View style={[feStyle.flexBasis70, { height: 50 }]}>
                                     <Input
                                         placeholder='OTP'
-                                        style={StyleSheet.flatten([feStyle.fontCenter, feStyle.roundedInput])}
                                         value={this.props.otpNumber}
                                         keyboardType='numeric'
                                         maxLength={6}
