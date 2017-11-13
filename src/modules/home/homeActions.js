@@ -41,7 +41,7 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 import { Platform } from 'react-native';
-import BackgroundTimer from 'react-native-background-timer';
+import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
 import { setState } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
