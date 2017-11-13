@@ -93,7 +93,8 @@ module.exports = {
         displayName: 'Eze-Tap',
         id: 2,
         modeType: 'EzeTap',
-        appModuleId: 10
+        appModuleId: 10,
+        enabled: false,
     },
     MOSAMBEE: {
         displayName: 'Mosambee',
@@ -117,7 +118,8 @@ module.exports = {
         displayName: 'M-Swipe',
         id: 3,
         modeType: 'MSwipe',
-        appModuleId: 9
+        appModuleId: 9,
+        enabled: false,
     },
     NET_BANKING: {
         displayName: 'Net Banking',
@@ -236,6 +238,16 @@ module.exports = {
     IMAGE_EXTENSION: '.jpg',
 
     //App Modules Constants
+    BACKUP: {
+        appModuleId: 17,
+        displayName: 'Backup',
+        enabled: false,
+    },
+    BLUETOOTH: {
+        appModuleId: 16,
+        displayName: 'Pair Bluetooth Device',
+        enabled: false,
+    },
     BULK: {
         appModuleId: 1,
         displayName: 'Bulk Update',
@@ -250,7 +262,7 @@ module.exports = {
     },
     OFFLINEDATASTORE: {
         appModuleId: 15,
-        displayName: '',
+        displayName: 'Sync Datastore',
         enabled: false,
     },
     PIECHART: {
@@ -258,10 +270,17 @@ module.exports = {
         displayName: 'Pie Chart',
         enabled: false,
     },
+    PROFILE: {
+        appModuleId: 14,
+        displayName: 'Profile',
+        enabled: false,
+        icon: 'md-person',
+    },
     STATISTIC: {
         appModuleId: 7,
-        displayName: '',
+        displayName: 'My Stats',
         enabled: false,
+        icon: 'md-trending-up',
     },
     SEQUENCE: {
         appModuleId: 2,
@@ -282,6 +301,6 @@ module.exports = {
     },
 
     //JobStatusConstants
-    UNSEEN : 'UNSEEN',
+    UNSEEN: 'UNSEEN',
 
 }

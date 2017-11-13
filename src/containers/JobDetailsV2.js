@@ -205,7 +205,7 @@ class JobDetailsV2 extends Component {
                 <Icon name="ios-sync" />
                 <Text>Sync</Text>
               </Button>
-              <Button>
+              <Button onPress = {() => {this.props.actions.navigateToScene('Profile')}}>
                 <Icon name="ios-menu" />
                 <Text>Menu</Text>
               </Button>

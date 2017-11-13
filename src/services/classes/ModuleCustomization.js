@@ -1,10 +1,15 @@
 'use strict'
 
 import {
+    BACKUP,
+    BLUETOOTH,
     BULK,
+    EZE_TAP,
     LIVE,
+    M_SWIPE,
     OFFLINEDATASTORE,
     PIECHART,
+    PROFILE,
     STATISTIC,
     START,
     SEQUENCE,
@@ -39,12 +44,28 @@ class ModuleCustomization {
     getActiveModules(moduleCustomizationList, user) {
         for (let index in moduleCustomizationList) {
             switch (moduleCustomizationList[index].appModulesId) {
+                case BACKUP.appModuleId: {
+                    this.setModuleDetails(BACKUP, moduleCustomizationList[index], user)
+                    break
+                }
+                case BLUETOOTH.appModuleId: {
+                    this.setModuleDetails(BLUETOOTH, moduleCustomizationList[index], user)
+                    break
+                }
                 case BULK.appModuleId: {
                     this.setModuleDetails(BULK, moduleCustomizationList[index], user)
                     break
                 }
+                case EZE_TAP.appModuleId: {
+                    this.setModuleDetails(EZE_TAP, moduleCustomizationList[index], user)
+                    break
+                }
                 case LIVE.appModuleId: {
                     this.setModuleDetails(LIVE, moduleCustomizationList[index], user)
+                    break
+                }
+                case M_SWIPE.appModuleId: {
+                    this.setModuleDetails(M_SWIPE, moduleCustomizationList[index], user)
                     break
                 }
                 case OFFLINEDATASTORE.appModuleId: {
@@ -98,7 +119,7 @@ class ModuleCustomization {
      */
     checkSelectedUserType(selectedUserTypeList, user) {
         for (let index in selectedUserTypeList) {
-            if(selectedUserTypeList[index].userTypeId == user.userType.id) {
+            if (selectedUserTypeList[index].userTypeId == user.userType.id) {
                 return (selectedUserTypeList[index].displayText + ' ')
             }
         }

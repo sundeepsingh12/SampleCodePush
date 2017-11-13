@@ -29,6 +29,11 @@ import HomeUI from '../../containers/HomeUI'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
+import SortingResults from '../../containers/SortingResults'
+import Profile from '../../containers/Profile'
+import ProfileView from '../../containers/ProfileView'
+import ArrayScreen from '../../containers/ArrayScreen'
+import ResetPassword from '../../containers/ResetPassword'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
@@ -137,6 +142,21 @@ export const AppNavigator = StackNavigator({
   },
   Sequence: {
     screen: Sequence
+  },
+  SortingResults: {
+    screen: SortingResults
+  },
+  Profile: {
+    screen: Profile
+  },
+  ProfileView: {
+    screen: ProfileView
+  },
+  ArrayScreen: {
+    screen: ArrayScreen
+  },
+  ResetPassword: {
+    screen: ResetPassword
   },
   SkuDetails: {
     screen: SkuDetails

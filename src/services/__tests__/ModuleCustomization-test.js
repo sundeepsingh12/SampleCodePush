@@ -10,4 +10,14 @@ import {
     SUMMARY,
 } from '../../lib/AttributeConstants'
 
-describe('test cases for getActiveModules')
+describe('test cases for setModuleDetails', () => {
+    const user = {
+        userType: {
+            id: 1
+        }
+    }
+
+    const moduleCustomization = {
+        selectedUserType : '[{userTypeId : }]'
+    }
+})
