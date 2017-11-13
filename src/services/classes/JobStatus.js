@@ -1,6 +1,7 @@
 import {
   JOB_STATUS,
-  TABIDMAP
+  TABIDMAP,
+  UNSEEN
 } from '../../lib/constants'
 
 import {

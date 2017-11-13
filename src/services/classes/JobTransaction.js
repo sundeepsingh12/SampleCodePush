@@ -24,6 +24,7 @@ import { jobAttributeMasterService } from './JobAttributeMaster'
 import { customerCareService } from './CustomerCare'
 import { smsTemplateService } from './SMSTemplate'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
+import {jobMasterService} from './JobMaster'
 
 class JobTransaction {
 
@@ -200,7 +201,7 @@ class JobTransaction {
      *                                      }
      *                                  ]
      */
-    getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList, statusList) {
+    getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList, statusList,jobMasterList,isCalledFromBulk,bulkData) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)
@@ -211,6 +212,10 @@ class JobTransaction {
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
+        if(isCalledFromBulk){
+            jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${bulkData.jobMasterId} AND jobStatusId = ${bulkData.statusId}`
+        }
+        console.log('jobTransactionQuery',jobTransactionQuery)
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         if (jobTransactionList.length == 0) {
             return []
@@ -223,7 +228,8 @@ class JobTransaction {
         let jobMap = jobService.getJobMap(jobsList)
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
         let fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
-        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap)
+        let idJobMasterMap = jobMasterService.getIdJobMasterMap(jobMasterList)
+        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap,idJobMasterMap)
         return jobTransactionCustomizationList
     }
 
@@ -266,7 +272,7 @@ class JobTransaction {
      *                                      }
      *                                   ]
      */
-    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap) {
+    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap,idJobMasterMap) {
         let jobTransactionCustomizationList = []
         for (var index in jobTransactionMap) {
             let jobTransaction = jobTransactionMap[index]
@@ -282,8 +288,7 @@ class JobTransaction {
                 jobTransactionCustomization.circleLine1 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][3], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
                 jobTransactionCustomization.circleLine2 = this.setTransactionDisplayDetails(jobMasterIdCustomizationMap[jobMasterId][4], jobTransaction, job, jobDataDetailsForListing.jobDataMap[jobId], fieldDataMap[jobTransaction.id])
             } else {
-                jobTransactionCustomization.line1 = jobTransaction.referenceNumber
-                jobTransactionCustomization.line2 = jobTransactionCustomization.circleLine1 = jobTransactionCustomization.circleLine2 = ''
+                jobTransactionCustomization.line1 = jobTransactionCustomization.line2 = jobTransactionCustomization.circleLine1 = jobTransactionCustomization.circleLine2 = ''
             }
             let jobSwipableDetails = this.setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap)
             jobTransactionCustomization.id = jobTransaction.id
@@ -291,6 +296,7 @@ class JobTransaction {
             jobTransactionCustomization.jobSwipableDetails = jobSwipableDetails
             jobTransactionCustomization.seqSelected = jobTransaction.seqSelected
             jobTransactionCustomization.statusId = jobTransaction.jobStatusId
+            jobTransactionCustomization.jobMasterIdentifier = idJobMasterMap[jobMasterId].identifier
             jobTransactionCustomizationList.push(jobTransactionCustomization)
         }
         return jobTransactionCustomizationList

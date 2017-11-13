@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import moment from 'moment'
 import {
   connect
@@ -32,6 +32,9 @@ import SkuDetails from '../../containers/SkuDetails'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
+import BulkListing from '../../containers/BulkListing'
+import BulkConfiguration from '../../containers/BulkConfiguration'
+
 import {
   Container,
   Content,
@@ -48,7 +51,8 @@ import {
   List,
   ListItem,
   Root
-} from 'native-base';
+} from 'native-base'
+
 import styles from '../../themes/FeStyle'
 import Payment from '../../containers/Payment'
 import UPIPayment from '../../containers/UPIPayment'
@@ -58,11 +62,11 @@ import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
 import SkuListing from '../../containers/SkuListing'
 import OverlayAttributes from '../../containers/OverlayAttributes'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
-import SelectFromList from '../../containers/SelectFromList';
-import Statistics from '../../containers/Statistics';
+import SelectFromList from '../../containers/SelectFromList'
+import Statistics from '../../containers/Statistics'
 
 class AppWithNavigationState extends React.Component {
   render() {
@@ -183,11 +187,16 @@ export const AppNavigator = StackNavigator({
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
   },
-}, {
-  SignatureAndNps: {
+   SignatureAndNps: {
     screen: SignatureAndNps
+  },
+  BulkConfiguration:{
+    screen: BulkConfiguration
+  },
+  BulkListing:{
+    screen:BulkListing
   }
-},
+}, 
   {
     cardStyle: {
       backgroundColor: 'white'
@@ -202,4 +211,4 @@ const mapStateToProps = state => ({
   nav: state.nav,
 });
 
-export default connect(mapStateToProps)(AppWithNavigationState);
+export default connect(mapStateToProps)(AppWithNavigationState)

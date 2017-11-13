@@ -189,6 +189,7 @@ module.exports = keyMirror({
     FormLayout: null,
     TimePicker: null,
     SkuListing: null,
+    BulkConfiguration:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -196,7 +197,6 @@ module.exports = keyMirror({
     SHOW_SEARCH_BAR: null,
     SKU_CODE_CHANGE: null,
     UPDATE_SKU_ACTUAL_QUANTITY: null,
-
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:null,
@@ -228,7 +228,14 @@ module.exports = keyMirror({
     //New Job
     NEW_JOB_MASTER : null,
     NEW_JOB_STATUS : null,
-    SET_DATA_IN_STATISTICS_LIST : null
+    SET_DATA_IN_STATISTICS_LIST : null,
+
+    //Bulk Module
+    START_FETCHING_BULK_CONFIG:null,
+    STOP_FETCHING_BULK_CONFIG:null,
+    START_FETCHING_BULK_TRANSACTIONS:null,
+    STOP_FETCHING_BULK_TRANSACTIONS:null
+
 })
 
 

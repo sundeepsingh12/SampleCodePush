@@ -25,6 +25,7 @@ import formLayout from './form-layout/formLayoutReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
 import statistics from './statistics/statisticsReducer'
+import bulk from './bulk/bulkReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -55,6 +56,7 @@ const rootReducer = combineReducers({
   dataStore,
   newJob,
   statistics,
+  bulk
 })
 
 export default rootReducer

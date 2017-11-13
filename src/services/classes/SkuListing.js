@@ -149,16 +149,16 @@ class SkuListing {
         let message
         if (rightKey.includes("1")) {
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value==skuRootChildElements[TOTAL_ORIGINAL_QUANTITY].value)
-                        message = "Quantity should be less than max quantity.Cannot proceed.";
+                        message = "Quantity should be less than max quantity.Cannot proceed."
                 } else if (rightKey.includes("2")) {
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value==0)
-                        message = "Quantity can't be 0.Cannot proceed.";
+                        message = "Quantity can't be 0.Cannot proceed."
                 } else if (rightKey.includes("3")) {
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value!=skuRootChildElements[TOTAL_ORIGINAL_QUANTITY].value)
-                        message = "Quantity should be equal to max quantity.Cannot proceed.";
+                        message = "Quantity should be equal to max quantity.Cannot proceed."
                 } else if (rightKey.includes("4")) {
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value!=0)
-                        message = "Quantity should be 0.Cannot proceed.";
+                        message = "Quantity should be 0.Cannot proceed."
                 }
                 return message
     }

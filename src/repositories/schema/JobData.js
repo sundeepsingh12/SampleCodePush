@@ -10,11 +10,11 @@ export default class JobData extends Realm.Object {}
 JobData.schema = {
   name: TABLE_JOB_DATA,
   properties: {
-    id: { type: 'int' },
-    value: { type: 'string',optional:true },
-    jobId: { type: 'int' },
-    positionId: { type: 'int' },
-    parentId: { type: 'int' },
-    jobAttributeMasterId: { type: 'int' }
+    id: 'int?',
+    value: 'string?',
+    jobId:  'int' ,
+    positionId: 'int' ,
+    parentId: 'int' ,
+    jobAttributeMasterId:  'int' 
   }
 }
