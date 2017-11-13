@@ -3,10 +3,10 @@
 const InitialState = require('./jobDetailsInitialState').default
 
 const initialState = new InitialState()
-const {
+import {
     JOB_DETAILS_FETCHING_START,
     JOB_DETAILS_FETCHING_END
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 export default function jobDetailsReducer(state = initialState, action) {

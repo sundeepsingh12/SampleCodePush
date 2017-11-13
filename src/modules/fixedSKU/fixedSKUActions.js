@@ -4,13 +4,13 @@ import { fixedSKUDetailsService } from '../../services/classes/FixedSKUListing'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
-const {
+import {
     FIELD_ATTRIBUTE_VALUE,
     FIELD_ATTRIBUTE,
     IS_LOADER_RUNNING,
     CHANGE_QUANTITY,
     SET_FIXED_SKU,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import {
     ARRAY_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'

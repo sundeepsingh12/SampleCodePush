@@ -9,7 +9,7 @@ import { authenticationService } from '../../../services/classes/Authentication'
 import { deviceVerificationService } from '../../../services/classes/DeviceVerification'
 
 var actions = require('../preloaderActions')
-const {
+import {
 
     ON_LOGIN_PASSWORD_CHANGE,
     ON_LOGIN_USERNAME_CHANGE,
@@ -60,7 +60,7 @@ const {
     PRELOADER_SUCCESS,
     IS_SHOW_MOBILE_NUMBER_SCREEN,
     IS_SHOW_OTP_SCREEN
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)

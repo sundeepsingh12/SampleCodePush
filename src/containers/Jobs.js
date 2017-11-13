@@ -26,9 +26,9 @@ import Swipeable from 'react-native-swipeable'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import { NavigationActions } from 'react-navigation'
-const {
-JobDetails
-} = require('../lib/constants').default
+import {
+  JobDetails
+} from '../lib/constants'
 
 
 function mapStateToProps(state) {
@@ -61,7 +61,7 @@ class Jobs extends Component {
   }
 
   renderData = (item) => {
-    console.log('render jobs',item)
+    console.log('render jobs', item)
     return (
       <Swipeable
         leftButtons={[
@@ -88,7 +88,7 @@ class Jobs extends Component {
           onPress={() => {
             this.props.actions.navigateToScene('JobDetails',
               {
-                jobSwipableDetails:item.jobSwipableDetails,
+                jobSwipableDetails: item.jobSwipableDetails,
                 jobTransactionId: item.id,
               }
             )

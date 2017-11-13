@@ -3,13 +3,13 @@
 const InitialState = require('./paymentInitialState').default
 
 const initialState = new InitialState()
-const {
+import {
   CLEAR_PAYMENT_STATE,
   SET_PAYMENT_CHANGED_PARAMETERS,
   SET_PAYMENT_INITIAL_PARAMETERS,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
-const {
+import {
   CASH,
   CHEQUE,
   DEMAND_DRAFT,
@@ -30,7 +30,7 @@ const {
   SPLIT,
   TICKET_RESTAURANT,
   UPI,
-} = require('../../lib/AttributeConstants')
+} from '../../lib/AttributeConstants'
 
 
 export default function paymentReducer(state = initialState, action) {

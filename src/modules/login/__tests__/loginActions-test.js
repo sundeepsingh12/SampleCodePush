@@ -8,7 +8,7 @@ import { authenticationService } from '../../../services/classes/Authentication'
 import { deviceVerificationService } from '../../../services/classes/DeviceVerification'
 
 var actions = require('../loginActions')
-const {
+import {
 
     LOGOUT,
     LOGIN,
@@ -36,7 +36,7 @@ const {
     REMEMBER_ME,
 
     TABLE_USER_SUMMARY,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 
 import { NavigationActions,StackNavigator } from 'react-navigation'

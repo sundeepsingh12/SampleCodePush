@@ -2,14 +2,14 @@ import { AppNavigator } from '../navigators/AppNavigator';
 import { NavigationActions } from 'react-navigation';
 const initialNavState = require('./navigatorInitialState').default   
 
-const {
+import {
     Application,
     Login,
     Preloader,
     Home,
     JobDetails,
     FormLayout
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 export default function nav(state = initialNavState, action) {
   let nextState;

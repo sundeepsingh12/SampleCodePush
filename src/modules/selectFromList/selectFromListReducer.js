@@ -2,9 +2,9 @@
 
 const InitialState = require('./selectFromListInitialState').default
 
-const {
+import {
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,ERROR_MESSAGE,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 const initialState = new InitialState()
 

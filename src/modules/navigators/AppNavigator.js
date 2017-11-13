@@ -33,6 +33,8 @@ import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import Profile from '../../containers/Profile'
+import ProfileReset from '../../containers/ProfileReset'
+
 import {
   Container,
   Content,
@@ -186,6 +188,9 @@ export const AppNavigator = StackNavigator({
   },
   Profile: {
     screen: Profile
+  },
+  ProfileReset: {
+    screen: ProfileReset
   },
 }, {
   SignatureAndNps: {

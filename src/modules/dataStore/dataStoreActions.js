@@ -3,14 +3,14 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { setState } from '../global/globalActions'
-const {
+import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER,
     SHOW_ERROR_MESSAGE,
     ON_BLUR,
     SAVE_SUCCESSFUL
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import {
     EXTERNAL_DATA_STORE,
     DATA_STORE

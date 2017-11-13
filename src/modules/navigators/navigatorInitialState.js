@@ -1,6 +1,6 @@
 import { AppNavigator } from '../navigators/AppNavigator';
 
-const {
+import {
     Application,
     Login,
     Preloader,
@@ -8,7 +8,7 @@ const {
     JobDetails,
     SkuListing,
     FormLayout
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 const applicationAction = AppNavigator.router.getActionForPathAndParams(Application);
 

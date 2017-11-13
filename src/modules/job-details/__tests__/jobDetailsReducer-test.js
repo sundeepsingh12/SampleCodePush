@@ -2,10 +2,10 @@
 
 import jobDetailsReducer from '../jobDetailsReducer'
 
-const {
+import {
     JOB_DETAILS_FETCHING_START,
     JOB_DETAILS_FETCHING_END
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 describe('job details reducer', () => {
 

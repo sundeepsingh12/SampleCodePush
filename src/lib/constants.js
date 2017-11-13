@@ -2,7 +2,7 @@ import keyMirror from 'keymirror'
 
 //keyMirror is a simple utility for creating an object with values equal to its keys.
 
-export default keyMirror({
+module.exports = keyMirror({
     //Global Actions
     SET_STORE: null,
     SET_SESSION_TOKEN: null,
@@ -231,9 +231,15 @@ export default keyMirror({
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST : null,
+    SET_DATA_IN_STATISTICS_LIST : null,
    
     //profileModule
-    FETCH_USER_DETAILS : null,
+    FETCH_USER_DETAILS: null,
+    CHECK_CURRENT_PASSWORD: null,
+    SET_NEW_PASSWORD: null,
+    SET_CONFIRM_NEW_PASSWORD: null,
+    CLEAR_PASSWORD_TEXTINPUT: null,
+    TOGGLE_SAVE_RESET_BUTTON: null,
 })
 
 

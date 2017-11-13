@@ -4,9 +4,9 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { statisticsListService } from '../../services/classes/statistics'
 import { setState } from '../global/globalActions'
-const {
+import {
     SET_DATA_IN_STATISTICS_LIST,USER_SUMMARY
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 /**This action is fire when statistics module is tap,
  * 
