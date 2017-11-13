@@ -17,6 +17,7 @@ import {
     UPDATE_FIELD_DATA_VALIDATION,
     SHOW_DATETIME_PICKER,
     HIDE_DATETIME_PICKER,
+    UPDATE_NEXT_EDITABLE
   } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -101,6 +102,10 @@ export default function formLayoutReducer(state = initialState, action) {
         case UPDATE_FIELD_DATA_VALIDATION: {
             return state.set('formElement', action.payload.formElement)
                 .set('errorMessage', action.payload.message)
+        }
+
+        case UPDATE_NEXT_EDITABLE : {
+            return state.set('nextEditable',action.payload);
         }
     }
     return state;

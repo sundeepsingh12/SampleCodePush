@@ -74,6 +74,9 @@ export default {
     fontXs : {
         fontSize: 10
     },
+    fontXs : {
+        fontSize: 10
+    },
     fontSm : {
         fontSize: 12
     },

@@ -180,7 +180,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
     UPDATE_FIELD_DATA_VALIDATION:null,
-
+    UPDATE_NEXT_EDITABLE : null,
     //Route names (Used in React Navigation)
     Application: null,
     Login: null,
@@ -189,7 +189,8 @@ module.exports = keyMirror({
     JobDetails: null,
     FormLayout: null,
     TimePicker: null,
-    SkuListing: null,
+    SkuListing:null,
+    Sequence:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -212,6 +213,13 @@ module.exports = keyMirror({
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
 
+    //CashTendering
+    CHANGE_AMOUNT: null,
+    IS_CASH_TENDERING_LOADER_RUNNING: null,
+    SET_CASH_TENDERING: null,
+    IS_RECEIVE_TOGGLE: null,
+    FETCH_CASH_TENDERING_LIST_RETURN: null,
+    CHANGE_AMOUNT_RETURN: null,
     //Data Store
     SET_VALIDATIONS: null,
     SET_DATA_STORE_ATTR_MAP: null,
@@ -226,10 +234,19 @@ module.exports = keyMirror({
     SET_INITIAL_STATE :null,
     SAVE_SUCCESSFUL: null,
    
+    //Sequence Module Actions
+    SEQUENCE_LIST_FETCHING_START:null,
+    SEQUENCE_LIST_FETCHING_STOP:null,
+    TOGGLE_RESEQUENCE_BUTTON:null,
+    
     //New Job
     NEW_JOB_MASTER : null,
     NEW_JOB_STATUS : null,
-    SET_DATA_IN_STATISTICS_LIST : null
+    SET_DATA_IN_STATISTICS_LIST : null,
+
+    //Sorting And Printing
+    SORTING_SEARCH_VALUE : null,
+    SORTING_ITEM_DETAILS : null,
 })
 
 

@@ -361,8 +361,7 @@ class Sync {
         //Delete Data from server code starts here
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
-          const allJobTransactions = await realm.getAll(TABLE_JOB_TRANSACTION)
-          const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(allJobTransactions, unseenStatusIds)
+          const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds( unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
           const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []

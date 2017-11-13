@@ -252,7 +252,6 @@ const style = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#f3f3f3'
   }
-
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile)

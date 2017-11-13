@@ -27,47 +27,30 @@ import {
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
+import {
+    setState
+} from '../global/globalActions'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {
     return async function (dispatch) {
         try {
-            dispatch(startFetchingSkuList())
+            dispatch(setState(SKU_LIST_FETCHING_START))
             const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMasterId)
             const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId[0])
             const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation)
             const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap, skuData.attributeTypeIdValueMap)
-            dispatch(stopFetchingSkuList(skuData.skuObjectListDto, skuObjectValidation, skuArrayChildAttributes, skuListingDto.childFieldAttributeId[0]))
+            dispatch(setState(SKU_LIST_FETCHING_STOP,{
+                skuListItems:skuData.skuObjectListDto,
+                skuObjectValidation,
+                skuArrayChildAttributes,
+                skuObjectAttributeId:skuListingDto.childFieldAttributeId[0]
+            }))
             if (skuListingDto.isSkuCodePresent)
-                dispatch(showSearchBar())
+            dispatch(setState(SHOW_SEARCH_BAR))
         } catch (error) {
             console.log(error)
-            dispatch(stopFetchingSkuList([]))
+             dispatch(setState(SKU_LIST_FETCHING_STOP))
         }
-    }
-}
-
-export function startFetchingSkuList() {
-    return {
-        type: SKU_LIST_FETCHING_START,
-    }
-}
-
-export function stopFetchingSkuList(skuListItems, skuObjectValidation, skuArrayChildAttributes, skuObjectAttributeId) {
-    return {
-        type: SKU_LIST_FETCHING_STOP,
-        payload: {
-            skuListItems,
-            skuObjectValidation,
-            skuArrayChildAttributes,
-            skuObjectAttributeId
-        }
-    }
-}
-
-export function showSearchBar() {
-    return {
-        type: SHOW_SEARCH_BAR,
-        payload: true
     }
 }
 
@@ -90,7 +73,10 @@ export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItem
     return async function (dispatch) {
         try {
             const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, parentId, skuListItems, skuChildElements)
-            dispatch(updateSkuListItem(updatedSkuArray.updatedObject, updatedSkuArray.updatedChildElements))
+            dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY,{
+                skuListItems:updatedSkuArray.updatedObject,
+                skuRootChildElements:updatedSkuArray.updatedChildElements
+            }))
         } catch (error) {
             console.log(error)
         }
@@ -98,15 +84,6 @@ export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItem
 
 }
 
-export function updateSkuListItem(skuListItems, skuRootChildElements) {
-    return {
-        type: UPDATE_SKU_ACTUAL_QUANTITY,
-        payload: {
-            skuListItems,
-            skuRootChildElements
-        }
-    }
-}
 /**This is called when Proceed button is clicked
  * 
  * @param {*} skuListItems 
