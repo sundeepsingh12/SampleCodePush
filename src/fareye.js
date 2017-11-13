@@ -61,8 +61,10 @@ import ListingInitialState from './modules/listing/listingInitialState'
 import JobDetailsInitialState from './modules/job-details/jobDetailsInitialState'
 import SkuListingInitialState from './modules/skulisting/skuListingInitialState'
 import FormLayoutInitialState from './modules/form-layout/formLayoutInitialState'
+import SequenceInitialState from './modules/sequence/sequenceInitialState'
 import NewJobInitialState from './modules/newJob/newJobInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
+
 
 /**
  *  The version of the app but not  displayed yet
@@ -89,6 +91,7 @@ function getInitialState() {
     jobDetails: new JobDetailsInitialState(),
     skuListing: new SkuListingInitialState(),
     formLayout : new FormLayoutInitialState(),
+    sequence: new SequenceInitialState(),
     newJob : new NewJobInitialState(),
   }
   return _initState

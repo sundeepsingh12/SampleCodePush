@@ -19,7 +19,7 @@ import _ from 'underscore';
 
 class SkuListing extends Component {
 
-  componentWillMount() {
+  componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     console.log('fieldAttributeMasterId', fieldAttributeMasterId)
     const jobId = this.props.navigation.state.params.jobTransaction.jobId

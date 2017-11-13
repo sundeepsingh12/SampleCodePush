@@ -28,6 +28,7 @@ import {
   TABLE_RUNSHEET,
   UNSEEN,
   USER,
+  JOB_MASTER
 } from '../../lib/constants'
 
 import CONFIG from '../../lib/config'
@@ -40,7 +41,7 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 import { Platform } from 'react-native';
-import BackgroundTimer from 'react-native-background-timer';
+import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
 import { setState } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
@@ -128,7 +129,8 @@ export function fetchJobs() {
       const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
       const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
       const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value)
+      const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value,jobMasterList.value)
       dispatch(jobFetchingEnd(jobTransactionCustomizationList))
     } catch (error) {
       console.log(error)
@@ -154,7 +156,7 @@ export function onResyncPress() {
     try {
       //Start resync loader here
       dispatch(jobDownloadingStatus(true))
-      await sync.createAndUploadZip();
+      await sync.createAndUploadZip()
       const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
       //Stop resync loader here
       dispatch(jobDownloadingStatus(false))

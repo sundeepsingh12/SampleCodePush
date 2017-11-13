@@ -266,7 +266,10 @@ module.exports = {
         displayName: ''
     },
 
-
+    //Status Category
+    PENDING:1,
+    FAIL:2,
+    SUCCESS:3,
 
     //Sorting module constants
     REFERENCE_NO : 'referenceNo=',
