@@ -1,5 +1,10 @@
-import RNFS from 'react-native-fs';
+import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
+import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
+import StartIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
+import LiveIcon from '../../images/fareye-default-iconset/homescreen/live.png'
+import BulkIcon from '../../images/fareye-default-iconset/homescreen/bulk.png'
+import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
 module.exports = {
 
     /**
@@ -61,7 +66,7 @@ module.exports = {
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
     TOTAL_AMOUNT: 'TotalAmount',
-    TRANSACTION_NUMBER: 'transaction_number', 
+    TRANSACTION_NUMBER: 'transaction_number',
 
     // Money Collect Mode Type Constants
     CASH: {
@@ -88,7 +93,8 @@ module.exports = {
         displayName: 'Eze-Tap',
         id: 2,
         modeType: 'EzeTap',
-        appModuleId: 10
+        appModuleId: 10,
+        enabled: false,
     },
     MOSAMBEE: {
         displayName: 'Mosambee',
@@ -112,7 +118,8 @@ module.exports = {
         displayName: 'M-Swipe',
         id: 3,
         modeType: 'MSwipe',
-        appModuleId: 9
+        appModuleId: 9,
+        enabled: false,
     },
     NET_BANKING: {
         displayName: 'Net Banking',
@@ -231,37 +238,69 @@ module.exports = {
     IMAGE_EXTENSION: '.jpg',
 
     //App Modules Constants
-    BULK : {
+    BACKUP: {
+        appModuleId: 17,
+        displayName: 'Backup',
+        enabled: false,
+    },
+    BLUETOOTH: {
+        appModuleId: 16,
+        displayName: 'Pair Bluetooth Device',
+        enabled: false,
+    },
+    BULK: {
         appModuleId: 1,
-        displayName: ''
+        displayName: 'Bulk Update',
+        enabled: false,
+        icon: BulkIcon,
     },
-    LIVE : {
+    LIVE: {
         appModuleId: 13,
-        displayName: ''
+        displayName: 'Live',
+        enabled: false,
+        icon: LiveIcon,
     },
-    OFFLINEDATASTORE : {
+    OFFLINEDATASTORE: {
         appModuleId: 15,
-        displayName: ''
+        displayName: 'Sync Datastore',
+        enabled: false,
     },
-    PIECHART : {
+    PIECHART: {
         appModuleId: 5,
-        displayName: ''
+        displayName: 'Pie Chart',
+        enabled: false,
     },
-    STATISTIC : {
+    PROFILE: {
+        appModuleId: 14,
+        displayName: 'Profile',
+        enabled: false,
+        icon: 'md-person',
+    },
+    STATISTIC: {
         appModuleId: 7,
-        displayName: ''
+        displayName: 'My Stats',
+        enabled: false,
+        icon: 'md-trending-up',
     },
-    SEQUENCE : {
+    SEQUENCE: {
         appModuleId: 2,
-        displayName: ''
+        displayName: 'Sequence',
+        enabled: false,
+        icon: SequenceIcon,
     },
-    START : {
+    START: {
         appModuleId: 4,
-        displayName: ''
+        displayName: 'All Tasks',
+        enabled: false,
+        icon: StartIcon
     },
-    SUMMARY : {
+    SUMMARY: {
         appModuleId: 8,
-        displayName: ''
+        displayName: '',
+        enabled: false,
     },
-    
+
+    //JobStatusConstants
+    UNSEEN: 'UNSEEN',
+
 }

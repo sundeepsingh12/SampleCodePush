@@ -69,6 +69,7 @@ module.exports = keyMirror({
     REMEMBER_ME_SET_TRUE: null,
 
     //Home Actions
+    HOME_LOADING: null,
     JOB_FETCHING_START: null,
     JOB_FETCHING_END: null,
     SET_TABS_LIST: null,
