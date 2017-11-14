@@ -41,6 +41,10 @@ class Preloader extends Component {
         this.props.actions.startLoginScreenWithoutLogout()
     }
 
+      invalidateSession = () => {
+        this.props.actions.invalidateUserSession()
+    }
+
     render() {
         return (
             <Container>
@@ -55,16 +59,16 @@ class Preloader extends Component {
 
                 )}                    
                 {renderIf(this.props.showMobileNumberScreen,
-                    <MobileNoScreen />
+                    <MobileNoScreen invalidateUserSession = {this.invalidateSession} />
                   )}
 
                 {renderIf(this.props.showOtpScreen,
-                    <OtpScreen />
+                    <OtpScreen invalidateUserSession = {this.invalidateSession}/>
                 )}
             </Container>
         )
     }
-};
+}
 
 var styles = StyleSheet.create({
     container: {
