@@ -13,7 +13,7 @@ import {
 } from '../../lib/constants'
 
 
-export default function jobDetailsReducer(state = initialState, action) {
+export default function skuListingReducer(state = initialState, action) {
     if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
 
     switch (action.type) {
@@ -28,7 +28,7 @@ export default function jobDetailsReducer(state = initialState, action) {
                         .set('skuObjectAttributeId',action.payload.skuObjectAttributeId)
 
         case  SHOW_SEARCH_BAR :
-            return state.set('isSearchBarVisible',action.payload)     
+            return state.set('isSearchBarVisible',true)     
         
         case SKU_CODE_CHANGE:
          return state.set('skuSearchTerm',action.payload)

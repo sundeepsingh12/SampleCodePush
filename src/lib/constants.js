@@ -188,7 +188,8 @@ module.exports = keyMirror({
     JobDetails: null,
     FormLayout: null,
     TimePicker: null,
-    SkuListing: null,
+    SkuListing:null,
+    Sequence:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -236,6 +237,12 @@ module.exports = keyMirror({
     SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
 
+   
+    //Sequence Module Actions
+    SEQUENCE_LIST_FETCHING_START:null,
+    SEQUENCE_LIST_FETCHING_STOP:null,
+    TOGGLE_RESEQUENCE_BUTTON:null,
+    
     //New Job
     NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
