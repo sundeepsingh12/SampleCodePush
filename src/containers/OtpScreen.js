@@ -5,7 +5,7 @@ import {
     Text,
     View,
     Modal
-} from 'react-native';
+} from 'react-native'
 import { Button, Input } from 'native-base'
 import feStyle from '../themes/FeStyle'
 import { bindActionCreators } from 'redux'
@@ -38,10 +38,6 @@ class OtpScreen extends Component{
 
     validateOtp = ()=> {
         this.props.actions.validateOtp(this.props.otpNumber)
-    }
-
-      invalidateSession = () => {
-        this.props.actions.invalidateUserSession()
     }
 
     render(){
@@ -79,7 +75,7 @@ class OtpScreen extends Component{
                                     <Text style={[feStyle.fontWhite]}>Verify</Text>
 
                                 </Button>
-                                <Button onPress={this.invalidateSession} full rounded danger
+                                <Button onPress={this.props.invalidateUserSession} full rounded danger
                                     disabled={this.props.isOtpScreenLogoutDisabled}
                                     style={StyleSheet.flatten(feStyle.margin10)}>
                                     <Text style={[feStyle.fontWhite]}>Close</Text>
