@@ -96,7 +96,6 @@ class FormLayout extends Component {
 
   _keyExtractor = (item, index) => item[1].key;
   render() {
-    console.log("schsgdc",this.props.errorMessage.length)
     if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',
@@ -122,7 +121,7 @@ class FormLayout extends Component {
           <FlatList
             data={Array.from(this.props.formElement)}
             extraData={this.state}
-            renderItem={(item) => this.renderData(item.item[1])} //TODO add comments for item[1] 
+            renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
             keyExtractor={this._keyExtractor}>
           </FlatList>
         </Content>

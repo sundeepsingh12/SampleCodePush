@@ -78,7 +78,7 @@ class ProfileView extends Component {
           </Header>
 
           <Content style={[styles.flex1, styles.bgWhite]}>
-            {/*card 1*/}
+            {/* card 1 */}
             <View style={[styles.bgWhite, styles.padding20, { borderBottomWidth: 25, borderBottomColor: '#f3f3f3' }]}>
               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, style.profilePic, styles.bgPrimary]}>
@@ -152,7 +152,6 @@ const style = StyleSheet.create({
     height: 72,
     borderRadius: 36,
   }
-
 });
 
 

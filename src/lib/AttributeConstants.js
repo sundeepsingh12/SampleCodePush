@@ -249,6 +249,8 @@ module.exports = {
     NEW_PASSWORD: 'New Password',
     CONFIRM_NEW_PASSWORD: 'Confirm New Password',
 
+    TOKEN_MISSING : 'Token Missing',
+    PASSWORD: 61,
 
     //App Modules Constants
     BULK : {
@@ -283,5 +285,17 @@ module.exports = {
         appModuleId: 8,
         displayName: ''
     },
-    
+
+    //Status Category
+    PENDING:1,
+    FAIL:2,
+    SUCCESS:3,
+
+    //Sorting module constants
+    REFERENCE_NO : 'referenceNo=',
+    REF_UNAVAILABLE : 'ReferenceNumber Unavailable',
+    FAILURE_SORTING: 'Searching failed, Please try again !',
+    NA : 'N.A',
+    SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
+    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package'
 }

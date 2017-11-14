@@ -142,7 +142,7 @@ class Main extends Component {
                 <Icon name={"ios-chatboxes-outline"} />
                 <Text>Message</Text>
               </Button>
-              <Button vertical>
+              <Button onPress={() => {this.props.actions.navigateToScene('ProfileView')}} vertical>
                 <Icon name={"ios-apps-outline"} />
                 <Text>Utilities</Text>
               </Button>
