@@ -107,7 +107,6 @@ class HomeUI extends Component {
       </View>
     )
   }
-
 };
 
 
