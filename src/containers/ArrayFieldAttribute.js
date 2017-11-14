@@ -11,6 +11,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as arrayActions from '../modules/array/arrayActions'
 import ArrayBasicComponent from '../components/ArrayBasicComponent.js'
+import CustomAlert from '../components/CustomAlert.js'
+
 import {
     Container,
     Content,
@@ -27,19 +29,22 @@ import {
     FooterTab,
     StyleProvider,
     Card,
-    CardItem
+    CardItem,
+    Toast
 } from 'native-base'
 import _ from 'lodash'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
+import renderIf from '../lib/renderIf'
 
 function mapStateToProps(state) {
     return {
         arrayElements: state.array.arrayElements,
         lastRowId: state.array.lastRowId,
         childElementsTemplate: state.array.childElementsTemplate,
-        isSaveDisabled: state.array.isSaveDisabled
+        isSaveDisabled: state.array.isSaveDisabled,
+        isValidConfiguration: state.array.isValidConfiguration
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -50,7 +55,7 @@ function mapDispatchToProps(dispatch) {
 
 class ArrayFieldAttribute extends Component {
 
-    componentWillMount() {
+    componentDidMount() {//Comment do in did mount
         this.props.actions.getSortedArrayChildElements(
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.jobStatusId,
@@ -69,6 +74,20 @@ class ArrayFieldAttribute extends Component {
             />
         )
     }
+    addPressed = () => {
+        if (this.props.isSaveDisabled) {
+            Toast.show({
+                text: 'Please fill required fields first',// Comment put this in Attribute Const
+                position: 'bottom',
+                buttonText: 'Okay',
+            })
+        }
+        else {
+            this.props.actions.addRowInArray(this.props.lastRowId,
+                this.props.childElementsTemplate,
+                this.props.arrayElements)
+        }
+    }
     savePressed = () => {
         this.props.actions.saveArray(this.props.arrayElements,
             this.props.navigation.state.params.currentElement,
@@ -84,53 +103,97 @@ class ArrayFieldAttribute extends Component {
     }
     render() {
         return (
-            <StyleProvider style={getTheme(platform)}>
+            < StyleProvider style={getTheme(platform)} >
                 <Container>
-                    <Header
-                        style={StyleSheet.flatten([
-                            styles.bgPrimary, {
-                                borderBottomWidth: 0
-                            }
-                        ])}>
-                        <Left>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
-                        </Left>
+                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
                         <Body>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Array</Text>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[style.headerBody]}>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.currentElement.label}</Text>
+                                </View>
+                                <View style={[style.headerRight]}>
+                                </View>
+                                <View />
+                            </View>
                         </Body>
-                        <Right />
                     </Header>
-                    <View style={[styles.flex1, styles.column]}>
-                        <View style={[styles.flex1]}>
-                            <FlatList
-                                data={Object.values(this.props.arrayElements)}
-                                renderItem={(item) => this.renderData(item)} //TODO add comments for item[1] 
-                                keyExtractor={item => item.rowId}>
-                            </FlatList>
-                        </View>
-                        <View style={[styles.row, styles.justifySpaceBetween]}>
-                            <Text style={[styles.padding5, styles.alignStart]} >
-                                Total Count : {_.size(this.props.arrayElements)}
-                            </Text>
-                            <Button disabled={this.props.isSaveDisabled} bordered style={[styles.padding5, styles.alignSelfEnd, styles.heightAuto]}
-                                onPress={() => this.props.actions.addRowInArray(this.props.lastRowId, this.props.childElementsTemplate, this.props.arrayElements)}>
-                                <Text> Add Row </Text>
+                    {renderIf(!this.props.isValidConfiguration,
+                        <CustomAlert title='Alert' message='Inavlid Configuration,please contact manager' onOkPressed={() => this.props.navigation.goBack()} />
+                    )}
+                    {/* {renderIf(this.props.isValidConfiguration,
+                        <View> */}
+                    <Content style={[styles.flex1, styles.bgWhite]}>
+                        <FlatList
+                            data={Object.values(this.props.arrayElements)}
+                            renderItem={(item) => this.renderData(item)} //TODO add comments for item[1] 
+                            keyExtractor={item => item.rowId}>
+                        </FlatList>
+                    </Content>
+                    <Footer
+                        style={[style.footer, styles.bgWhite]}>
+                        <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
+                            <Text
+                                style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>Total Count : {_.size(this.props.arrayElements)}</Text>
+                            <Button bordered success small onPress={this.addPressed}>
+                                <Text style={[styles.fontSuccess, styles.padding10]}>Add</Text>
                             </Button>
                         </View>
-                    </View>
-
-                    <Footer style={{
-                        height: 'auto'
-                    }}>
-                        <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
-                            <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed}>
+                        <View style={[styles.bgPrimary, styles.marginBottom15]}>
+                            <Button full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
                                 <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                             </Button>
-                        </FooterTab>
+                        </View>
                     </Footer>
                 </Container >
             </StyleProvider >
         )
     }
-}
+};
+const style = StyleSheet.create({// Comment Refactor these
+    header: {
+        borderBottomWidth: 0,
+        height: 'auto',
+        padding: 0,
+        paddingRight: 0,
+        paddingLeft: 0
+    },
+    headerLeft: {
+        width: '15%',
+        padding: 15
+    },
+    headerBody: {
+        width: '70%',
+        paddingTop: 15,
+        paddingBottom: 15,
+        paddingLeft: 10,
+        paddingRight: 10
+    },
+    headerRight: {
+        width: '15%',
+        padding: 15
+    },
+    footer: {
+        flexDirection: 'column',
+        height: 'auto',
+        borderTopWidth: 1,
+        borderTopColor: '#f3f3f3',
+        padding: 10
+    },
+    card: {
+        borderBottomWidth: 10,
+        borderBottomColor: '#f3f3f3'
+    },
+    inputType: {
+        height: 35,
+        fontSize: 14
+    },
+    listLeft: {
+        width: 50
+    }
+
+});
 export default connect(mapStateToProps, mapDispatchToProps)(ArrayFieldAttribute)

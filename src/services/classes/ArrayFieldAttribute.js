@@ -1,36 +1,44 @@
 'use strict'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import _ from 'lodash'
-import { formLayoutService } from './formLayout/FormLayout'
 import {
     OBJECTSAROJFAREYE,
     ARRAYSAROJFAREYE
 } from '../../lib/AttributeConstants'
+import {
+    ON_BLUR,
+} from '../../lib/constants'
 import { fieldDataService } from '../../services/classes/FieldData'
+import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 
 class ArrayFieldAttribute {
-    async getSortedArrayChildElements(statusId, fieldAttributeMasterId, lastRowId, arrayElements) {
+    getSortedArrayChildElements(lastRowId, arrayElements, arrayDTO) {
         if (_.isEmpty(arrayElements)) {
-            let arrayDTO = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, fieldAttributeMasterId)
-            console.log('arraydto', arrayDTO)
-            let arrayRowDTO = await this.addArrayRow(lastRowId, arrayDTO, arrayElements)
+            // let formLayoutMaptoArray =
+            let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required))
+            if (requiredFields.length <= 0) { return }
+            let arrayRowDTO = this.addArrayRow(lastRowId, arrayDTO, arrayElements)
             return { arrayRowDTO, childElementsTemplate: arrayDTO }
         }
     }
 
     addArrayRow(lastRowId, childElementsTemplate, arrayElements) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
+        //  let cloneChildElementsTemplate = _.cloneDeep(childElementsTemplate)
         cloneArrayElements[lastRowId] = childElementsTemplate
         cloneArrayElements[lastRowId].rowId = lastRowId
-        return { arrayElements: cloneArrayElements, lastRowId: (lastRowId + 1), isSaveDisabled: true }
+        cloneArrayElements[lastRowId].allRequiredFieldsFilled = false
+        return {
+            arrayElements: cloneArrayElements,
+            lastRowId: (lastRowId + 1),
+            isSaveDisabled: true
+        }
     }
 
-    deleteArrayRow(arrayElements, rowId, lastRowId, isSaveDisabled) {
+    deleteArrayRow(arrayElements, rowId, lastRowId) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
         let newArrayElements = _.omit(cloneArrayElements, [rowId])
-        if ((rowId == lastRowId - 1) || _.isEmpty(newArrayElements))
-            isSaveDisabled = false
-        return { newArrayElements, isSaveDisabled }
+        return newArrayElements
     }
     prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
@@ -54,5 +62,28 @@ class ArrayFieldAttribute {
         let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayParentItem.childDataList, jobTransactionId, arrayParentItem.positionId, latestPositionId)
         return fieldDataListWithLatestPositionId
     }
+    enableSaveIfRequired(arrayElements) {
+        let isSaveDisabled = false;
+        if (_.isEmpty(arrayElements))
+            return false
+        for (let rowId in arrayElements) {
+            if (!arrayElements[rowId].allRequiredFieldsFilled) {
+                isSaveDisabled = true
+            }
+        }
+        return isSaveDisabled
+    }
+    findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, nextEditable, isSaveDisabled, rowId, value) {
+        let cloneArrayElements = _.cloneDeep(arrayElements)
+        let arrayRow = cloneArrayElements[rowId]
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, nextEditable, isSaveDisabled, value, null, ON_BLUR);
+        arrayRow.allRequiredFieldsFilled = (!sortedArrayElements.isSaveDisabled) ? true : false
+        let _isSaveDisabled = this.enableSaveIfRequired(cloneArrayElements)
+        return {
+            newArrayElements: cloneArrayElements,
+            isSaveDisabled: _isSaveDisabled
+        }
+    }
 }
+
 export let arrayService = new ArrayFieldAttribute()

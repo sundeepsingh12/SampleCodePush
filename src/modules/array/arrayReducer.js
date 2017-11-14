@@ -1,9 +1,10 @@
 'use strict'
-const {
+import {
     SET_ARRAY_CHILD_LIST,
     SET_NEW_ARRAY_ROW,
-    SET_ARRAY_ELEMENTS
-  } = require('../../lib/constants').default
+    SET_ARRAY_ELEMENTS,
+    SET_ERROR_MSG
+} from '../../lib/constants'
 import InitialState from './arrayInitialState.js'
 
 const initialState = new InitialState()
@@ -22,6 +23,8 @@ export default function arrayReducer(state = initialState, action) {
         case SET_ARRAY_ELEMENTS:
             return state.set('arrayElements', action.payload.newArrayElements)
                 .set('isSaveDisabled', action.payload.isSaveDisabled)
+        case SET_ERROR_MSG:
+            return state.set('isValidConfiguration', action.payload)
     }
     return state
 }

@@ -1,13 +1,13 @@
 'use strict'
 import { arrayService } from '../../services/classes/ArrayFieldAttribute'
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
-import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
-const {
+import {
     SET_ARRAY_CHILD_LIST,
     SET_NEW_ARRAY_ROW,
     SET_ARRAY_ELEMENTS,
+    SET_ERROR_MSG,
     ON_BLUR,
-  } = require('../../lib/constants').default
+} from '../../lib/constants'
 import { ARRAYSAROJFAREYE } from '../../lib/AttributeConstants'
 import _ from 'lodash'
 import { setState } from '../global/globalActions'
@@ -16,35 +16,38 @@ import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 export function getSortedArrayChildElements(fieldAttributeMasterId, jobStatusId, lastrowId, arrayElements) {
     return async function (dispatch) {
         try {
-            console.log(fieldAttributeMasterId)
-            const arrayDTO = await arrayService.getSortedArrayChildElements(jobStatusId, fieldAttributeMasterId, lastrowId, arrayElements)
-            dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
+            const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, fieldAttributeMasterId)
+            const arrayDTO = await arrayService.getSortedArrayChildElements(lastrowId, arrayElements, sequenceWiseRootFieldAttributes)
+            if (!arrayDTO) {
+                dispatch(setState(SET_ERROR_MSG), false)
+            } else {
+                dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
+            }
         } catch (error) {
             console.log(error)
         }
     }
 }
 export function addRowInArray(lastrowId, childElementsTemplate, arrayElements) {
-    return async function (dispatch) {
+    return async function (dispatch) {//comment discuss this
         const newArrayRow = arrayService.addArrayRow(lastrowId, childElementsTemplate, arrayElements)
         dispatch(setState(SET_NEW_ARRAY_ROW, newArrayRow))
     }
 }
-export function deleteArrayRow(arrayElements, rowId, lastrowId, isSaveDisabled) {
-    return async function (dispatch) {
-        const newArrayElements = arrayService.deleteArrayRow(arrayElements, rowId, lastrowId, isSaveDisabled)
-        dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
+export function deleteArrayRow(arrayElements, rowId, lastrowId) {
+    return async function (dispatch) { //comment discuss this
+        let newArrayElements = arrayService.deleteArrayRow(arrayElements, rowId, lastrowId)
+        let isSaveDisabled = arrayService.enableSaveIfRequired(newArrayElements)
+        dispatch(setState(SET_ARRAY_ELEMENTS, {
+            newArrayElements,
+            isSaveDisabled
+        }))
     }
 }
 export function getNextFocusableAndEditableElement(attributeMasterId, nextEditable, isSaveDisabled, value, arrayElements, rowId) {
     return async function (dispatch) {
-        let cloneArrayElements = _.cloneDeep(arrayElements)
-        let arrayRow = cloneArrayElements[rowId]
-        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, nextEditable, isSaveDisabled, value, null, ON_BLUR);
-        dispatch(setState(SET_ARRAY_ELEMENTS, {
-            newArrayElements: cloneArrayElements,
-            isSaveDisabled: sortedArrayElements.isSaveDisabled
-        }))
+        let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, nextEditable, isSaveDisabled, rowId, value)
+        dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
     }
 }
 

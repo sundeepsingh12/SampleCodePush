@@ -1,4 +1,4 @@
-'use strict'
+'use strict' //Comment Review import
 import React, { Component } from 'react'
 import {
     StyleSheet,
@@ -9,7 +9,7 @@ import {
     TouchableHighlight
 }
     from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput } from 'native-base';
+import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Item } from 'native-base';
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
@@ -17,20 +17,11 @@ import { bindActionCreators } from 'redux'
 import * as arrayActions from '../modules/array/arrayActions'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import {
-    RE_ATTEMPT_DATE,
-    DATE,
-    FIXED_SKU,
-    SIGNATURE,
-    SKU_ARRAY,
-    SIGNATURE_AND_NPS,
     STRING,
     TEXT,
     NUMBER,
     DECIMAL,
-    PASSWORD,
-    ARRAY
 } from '../lib/AttributeConstants'
-
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -44,16 +35,14 @@ class ArrayBasicComponent extends Component {
         //  this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before')
     }
 
-    _getNextFocusableElement(fieldAttributeMasterId, nextEditable, value, isSaveDisabled, arrayElements, rowId) {
+    _getNextFocusableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, value, arrayElements, rowId) {
         // then fire action to get next editable and focusable elements
         this.props.actions.getNextFocusableAndEditableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, value, arrayElements, rowId);
     }
 
     _styleNextFocusable(isFocusable) {
         if (isFocusable) {
-            return {
-                backgroundColor: 'grey'
-            }
+            return [styles.bgLightGray]
         }
     }
     _renderData(item) {
@@ -64,62 +53,27 @@ class ArrayBasicComponent extends Component {
             case DECIMAL:
                 return (
                     renderIf(!item.hidden,
-                        <Card>
-                            <CardItem>
-                                <Body style={StyleSheet.flatten([styles.padding0])}>
-                                    <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                                        <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
-                                            <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.textPrimary, { marginTop: -5 }])} />
-                                        </View>
-                                        <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
-                                            <View style={StyleSheet.flatten([styles.row])}>
-                                                <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
-                                                    <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
-                                                        {item.label}
-                                                    </Text>
-                                                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                        {item.subLabel}
-                                                    </Text>
-                                                </View>
-
-                                                <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
-
-                                                    {renderIf(item.showCheckMark,
-                                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} />
-                                                    )}
-
-                                                    {renderIf((item.helpText && item.helpText.length > 0),
-                                                        <View>
-                                                            <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(item.fieldAttributeMasterId)}>
-                                                                <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
-                                                            </TouchableHighlight>
-                                                        </View>
-                                                    )}
-                                                </View>
-                                            </View>
-                                            <View style={this._styleNextFocusable(item.focus)}>
-                                                <Input
-                                                    keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
-                                                    editable={item.editable}
-                                                    multiline={item.attributeTypeId == 2 ? true : false}
-                                                    placeholder='Regular Textbox'
-                                                    onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.nextEditable, value, this.props.arrayRow.isSaveDisabled, this.props.arrayElements, this.props.arrayRow.rowId)}
-                                                    value={item.value}
-                                                />
-                                            </View>
-                                            {
-                                                renderIf(item.helpText && item.showHelpText,
-                                                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                        {item.helpText} </Text>
-                                                )}
-                                        </View>
-                                    </View>
-                                </Body>
-                            </CardItem>
-                        </Card>
+                        <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10, styles.marginBottom10]}>
+                            <View style={[style.listLeft, styles.justifyCenter, styles.alignStart, { height: 35 }]}>
+                                <Text style={[styles.fontSm]}>{item.label}</Text>
+                            </View>
+                            <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
+                                <View style={[styles.row, styles.paddingRight10, styles.justifySpaceBetween, styles.alignCenter]}>
+                                    <Item style={this._styleNextFocusable(item.focus)}>
+                                        <Input
+                                            style={[style.inputType]}
+                                            keyboardType={(item.attributeTypeId == NUMBER || item.attributeTypeId == DECIMAL) ? 'numeric' : 'default'}
+                                            editable={item.editable}
+                                            multiline={item.attributeTypeId == TEXT ? true : false}
+                                            onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.nextEditable, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
+                                            value={item.value}
+                                        />
+                                    </Item>
+                                </View>
+                            </View>
+                        </View>
                     )
                 )
-
             default:
                 return (
                     <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
@@ -130,26 +84,69 @@ class ArrayBasicComponent extends Component {
     }
     render() {
         return (
-            <View>
-                <Card>
-                    <CardItem>
-                        <FlatList
-                            data={Array.from(this.props.arrayRow.formLayoutObject)}
-                            extraData={this.state}
-                            renderItem={(item) => this._renderData(item.item[1])}
-                            keyExtractor={item => item.fieldAttributeMasterId}
-                        />
-                        <Button onPress={() => this.props.actions.deleteArrayRow(this.props.arrayElements, this.props.arrayRow.rowId, this.props.lastRowId, this.props.isSaveDisabled)}>
-                            <Text> Delete </Text>
-                        </Button>
-                    </CardItem>
-                </Card>
-            </View>
+            <View style={[style.card, styles.row, styles.bgWhite, styles.padding10]}>
+                <View style={[styles.flexBasis90]}>
+                    <FlatList style={[styles.flexBasis90]}
+                        data={Array.from(this.props.arrayRow.formLayoutObject)}
+                        extraData={this.state}
+                        renderItem={(item) => this._renderData(item.item[1])}
+                        keyExtractor={item => item.fieldAttributeMasterId}
+                    />
+                </View>
+                <View style={[styles.flexBasis10, styles.alignCenter, styles.justifyCenter]}>
+                    <Icon name="md-remove-circle" style={[styles.fontDanger, styles.fontXxl, styles.fontLeft]}
+                        onPress={() => this.props.actions.deleteArrayRow(this.props.arrayElements, this.props.arrayRow.rowId, this.props.lastRowId)} />
+                </View>
+            </View >
         );
     }
 }
 
 
+const style = StyleSheet.create({
+    header: {
+        borderBottomWidth: 0,
+        height: 'auto',
+        padding: 0,
+        paddingRight: 0,
+        paddingLeft: 0
+    },
+    headerLeft: {
+        width: '15%',
+        padding: 15
+    },
+    headerBody: {
+        width: '70%',
+        paddingTop: 15,
+        paddingBottom: 15,
+        paddingLeft: 10,
+        paddingRight: 10
+    },
+    headerRight: {
+        width: '15%',
+        padding: 15
+    },
+    footer: {
+        flexDirection: 'column',
+        height: 'auto',
+        borderTopWidth: 1,
+        borderTopColor: '#f3f3f3',
+        padding: 10
+    },
+    card: {
+        borderBottomWidth: 10,
+        borderBottomColor: '#f3f3f3'
+    },
+    inputType: {
+        height: 50,
+        fontSize: 16,
+        padding: 15
+    },
+    listLeft: {
+        width: 50
+    }
+
+});
 export default connect(null, mapDispatchToProps)(ArrayBasicComponent)
 
 

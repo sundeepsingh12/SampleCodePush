@@ -41,7 +41,6 @@ import {
     EXTERNAL_DATA_STORE,
     SEQUENCE,
     PASSWORD,
-    ARRAY,
     CASH_TENDERING,
     ARRAY,
     OBJECT,
