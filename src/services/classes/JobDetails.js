@@ -76,6 +76,52 @@ class JobDetails {
             autoIncrementId
         }
     }
+
+    /**
+     * ## convert degree to radians
+     * @param {string} angle - It contains data for form layout
+     *
+     *
+     * It return degree value in radians
+     */
+    toRadians(angle) {
+        return angle * (Math.PI / 180);
+    }
+
+    /**
+     * ## find aerial distance between user location and job location
+     * @param {string} jobLat - job location latitude
+     * @param {string} jobLat - job location longitude
+     * @param {string} userLat - user location latitud
+     * @param {string} userLong - user location longitude
+     * 
+     * @returns {string} - distance between user and job locations
+     */
+    distance(jobLat, jobLong, userLat, userLong) {
+        const theta = jobLong - userLong
+        let dist = Math.sin(this.toRadians(jobLat)) * Math.sin(this.toRadians(userLat)) + Math.cos(this.toRadians(jobLat)) * Math.cos(this.toRadians(userLat)) * Math.cos(this.toRadians(theta));
+        dist = (Math.acos(dist) * (180 / Math.PI)) * 60 * 1.1515 * 1.609344;
+        return dist;
+    }
+
+    /**
+     * ## check if distance between user and job is less than 100 m or not
+     * @param {string} jobLat - job location latitude
+     * @param {string} jobLat - job location longitude
+     * @param {string} userLat - user location latitud
+     * @param {string} userLong - user location longitude
+     * 
+     * @returns {boolean} - true if distance is greater than 100m else false
+     */
+    checkLatLong(jobLat, jobLong, userLat, userLong) {
+        if (!jobLat || !jobLong || !userLat || !userLong) {
+            return false
+        }
+        const dist = this.distance(jobLat, jobLong, userLat, userLong)
+        if (dist * 1000 >= 100)
+            return true
+        return false
+    }
 }
 
 export let jobDetailsService = new JobDetails()

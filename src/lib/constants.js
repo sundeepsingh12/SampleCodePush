@@ -84,7 +84,7 @@ module.exports = keyMirror({
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
-
+    IS_MISMATCHING_LOCATION: null,
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
