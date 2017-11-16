@@ -61,7 +61,7 @@ module.exports = {
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
     TOTAL_AMOUNT: 'TotalAmount',
-    TRANSACTION_NUMBER: 'transaction_number', 
+    TRANSACTION_NUMBER: 'transaction_number',
 
     // Money Collect Mode Type Constants
     CASH: {
@@ -229,53 +229,58 @@ module.exports = {
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
-    TOKEN_MISSING : 'Token Missing',
+    TOKEN_MISSING: 'Token Missing',
     PASSWORD: 61,
 
     //App Modules Constants
-    BULK : {
+    BULK: {
         appModuleId: 1,
         displayName: ''
     },
-    LIVE : {
+    LIVE: {
         appModuleId: 13,
         displayName: ''
     },
-    OFFLINEDATASTORE : {
+    OFFLINEDATASTORE: {
         appModuleId: 15,
         displayName: ''
     },
-    PIECHART : {
+    PIECHART: {
         appModuleId: 5,
         displayName: ''
     },
-    STATISTIC : {
+    STATISTIC: {
         appModuleId: 7,
         displayName: ''
     },
-    SEQUENCE : {
+    SEQUENCE: {
         appModuleId: 2,
         displayName: ''
     },
-    START : {
+    START: {
         appModuleId: 4,
         displayName: ''
     },
-    SUMMARY : {
+    SUMMARY: {
         appModuleId: 8,
         displayName: ''
     },
 
     //Status Category
-    PENDING:1,
-    FAIL:2,
-    SUCCESS:3,
+    PENDING: 1,
+    FAIL: 2,
+    SUCCESS: 3,
 
     //Sorting module constants
-    REFERENCE_NO : 'referenceNo=',
-    REF_UNAVAILABLE : 'ReferenceNumber Unavailable',
+    REFERENCE_NO: 'referenceNo=',
+    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
-    NA : 'N.A',
-    SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
-    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package'
+    NA: 'N.A',
+    SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
+    SORTING_PLACEHOLDER: 'Enter Reference Number To Scan Package',
+
+    // Array attribute constants
+    ADD_TOAST: 'Please fill required fields first',
+    INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
+
 }

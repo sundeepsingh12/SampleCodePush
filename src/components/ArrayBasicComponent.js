@@ -61,7 +61,6 @@ class ArrayBasicComponent extends Component {
                                 <View style={[styles.row, styles.paddingRight10, styles.justifySpaceBetween, styles.alignCenter]}>
                                     <Item style={this._styleNextFocusable(item.focus)}>
                                         <Input
-                                            style={[style.inputType]}
                                             keyboardType={(item.attributeTypeId == NUMBER || item.attributeTypeId == DECIMAL) ? 'numeric' : 'default'}
                                             editable={item.editable}
                                             multiline={item.attributeTypeId == TEXT ? true : false}
@@ -88,9 +87,8 @@ class ArrayBasicComponent extends Component {
                 <View style={[styles.flexBasis90]}>
                     <FlatList style={[styles.flexBasis90]}
                         data={Array.from(this.props.arrayRow.formLayoutObject)}
-                        extraData={this.state}
                         renderItem={(item) => this._renderData(item.item[1])}
-                        keyExtractor={item => item.fieldAttributeMasterId}
+                        keyExtractor={item => item[0]}
                     />
                 </View>
                 <View style={[styles.flexBasis10, styles.alignCenter, styles.justifyCenter]}>
@@ -136,11 +134,6 @@ const style = StyleSheet.create({
     card: {
         borderBottomWidth: 10,
         borderBottomColor: '#f3f3f3'
-    },
-    inputType: {
-        height: 50,
-        fontSize: 16,
-        padding: 15
     },
     listLeft: {
         width: 50

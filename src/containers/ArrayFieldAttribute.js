@@ -12,7 +12,7 @@ import { bindActionCreators } from 'redux'
 import * as arrayActions from '../modules/array/arrayActions'
 import ArrayBasicComponent from '../components/ArrayBasicComponent.js'
 import CustomAlert from '../components/CustomAlert.js'
-
+import { ADD_TOAST } from '../lib/AttributeConstants'
 import {
     Container,
     Content,
@@ -44,7 +44,7 @@ function mapStateToProps(state) {
         lastRowId: state.array.lastRowId,
         childElementsTemplate: state.array.childElementsTemplate,
         isSaveDisabled: state.array.isSaveDisabled,
-        isValidConfiguration: state.array.isValidConfiguration
+        errorMessage: state.array.errorMessage
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -70,14 +70,13 @@ class ArrayFieldAttribute extends Component {
                 arrayElements={this.props.arrayElements}
                 isSaveDisabled={this.props.isSaveDisabled}
                 lastRowId={this.props.lastRowId}
-            //  childElementsTemplate={this.props.childElementsTemplate}
             />
         )
     }
     addPressed = () => {
         if (this.props.isSaveDisabled) {
             Toast.show({
-                text: 'Please fill required fields first',// Comment put this in Attribute Const
+                text: ADD_TOAST,// Comment put this in Attribute Const
                 position: 'bottom',
                 buttonText: 'Okay',
             })
@@ -101,6 +100,10 @@ class ArrayFieldAttribute extends Component {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
+    backPressed = () => {
+        this.props.navigation.goBack()
+        this.props.actions.clearArrayState()
+    }
     render() {
         return (
             < StyleProvider style={getTheme(platform)} >
@@ -109,7 +112,7 @@ class ArrayFieldAttribute extends Component {
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={this.backPressed}>
                                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[style.headerBody]}>
@@ -121,11 +124,9 @@ class ArrayFieldAttribute extends Component {
                             </View>
                         </Body>
                     </Header>
-                    {renderIf(!this.props.isValidConfiguration,
-                        <CustomAlert title='Alert' message='Inavlid Configuration,please contact manager' onOkPressed={() => this.props.navigation.goBack()} />
+                    {renderIf(this.props.errorMessage != '',
+                        <CustomAlert title='Alert' message={this.props.errorMessage} onOkPressed={this.backPressed} />
                     )}
-                    {/* {renderIf(this.props.isValidConfiguration,
-                        <View> */}
                     <Content style={[styles.flex1, styles.bgWhite]}>
                         <FlatList
                             data={Object.values(this.props.arrayElements)}

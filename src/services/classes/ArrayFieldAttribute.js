@@ -3,7 +3,8 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import _ from 'lodash'
 import {
     OBJECTSAROJFAREYE,
-    ARRAYSAROJFAREYE
+    ARRAYSAROJFAREYE,
+    INVALID_CONFIG_ERROR
 } from '../../lib/AttributeConstants'
 import {
     ON_BLUR,
@@ -14,17 +15,19 @@ import { formLayoutEventsInterface } from '../../services/classes/formLayout/For
 class ArrayFieldAttribute {
     getSortedArrayChildElements(lastRowId, arrayElements, arrayDTO) {
         if (_.isEmpty(arrayElements)) {
-            // let formLayoutMaptoArray =
+            let errorMessage;
             let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required))
-            if (requiredFields.length <= 0) { return }
+            if (requiredFields.length <= 0) {
+                errorMessage = INVALID_CONFIG_ERROR
+            }
             let arrayRowDTO = this.addArrayRow(lastRowId, arrayDTO, arrayElements)
-            return { arrayRowDTO, childElementsTemplate: arrayDTO }
+            return { arrayRowDTO, childElementsTemplate: arrayDTO, errorMessage }
         }
+        return
     }
 
     addArrayRow(lastRowId, childElementsTemplate, arrayElements) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
-        //  let cloneChildElementsTemplate = _.cloneDeep(childElementsTemplate)
         cloneArrayElements[lastRowId] = childElementsTemplate
         cloneArrayElements[lastRowId].rowId = lastRowId
         cloneArrayElements[lastRowId].allRequiredFieldsFilled = false
@@ -41,17 +44,16 @@ class ArrayFieldAttribute {
         return newArrayElements
     }
     prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId) {
-        let cloneArrayElements = _.cloneDeep(arrayElements)
         let arrayChildDataList = []
-        for (let rowId in cloneArrayElements) {
+        for (let rowId in arrayElements) {
             let arrayObject = {}
             let childDataList = []
-            for (let [key, arrayRowElement] of cloneArrayElements[rowId].formLayoutObject) {
+            for (let [key, arrayRowElement] of arrayElements[rowId].formLayoutObject) {
                 childDataList.push({ fieldAttributeMasterId: arrayRowElement.fieldAttributeMasterId, attributeTypeId: arrayRowElement.attributeTypeId, value: arrayRowElement.value })
             }
             arrayObject = {
-                fieldAttributeMasterId: cloneArrayElements[rowId].arrayMainObject.id,
-                attributeTypeId: cloneArrayElements[rowId].arrayMainObject.attributeTypeId,
+                fieldAttributeMasterId: arrayElements[rowId].arrayMainObject.id,
+                attributeTypeId: arrayElements[rowId].arrayMainObject.attributeTypeId,
                 value: OBJECTSAROJFAREYE,
                 childDataList
             }

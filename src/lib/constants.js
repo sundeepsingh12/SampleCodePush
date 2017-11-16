@@ -188,8 +188,8 @@ module.exports = keyMirror({
     JobDetails: null,
     FormLayout: null,
     TimePicker: null,
-    SkuListing:null,
-    Sequence:null,
+    SkuListing: null,
+    Sequence: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -216,6 +216,7 @@ module.exports = keyMirror({
     SET_NEW_ARRAY_ROW: null,
     SET_ARRAY_ELEMENTS: null,
     SET_ERROR_MSG: null,
+    CLEAR_ARRAY_STATE: null,
     //CashTendering
     CHANGE_AMOUNT: null,
     IS_CASH_TENDERING_LOADER_RUNNING: null,
@@ -237,12 +238,12 @@ module.exports = keyMirror({
     SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
 
-   
+
     //Sequence Module Actions
-    SEQUENCE_LIST_FETCHING_START:null,
-    SEQUENCE_LIST_FETCHING_STOP:null,
-    TOGGLE_RESEQUENCE_BUTTON:null,
-    
+    SEQUENCE_LIST_FETCHING_START: null,
+    SEQUENCE_LIST_FETCHING_STOP: null,
+    TOGGLE_RESEQUENCE_BUTTON: null,
+
     //New Job
     NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,

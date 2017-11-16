@@ -62,7 +62,6 @@ class FormLayout {
             return sequenceWiseFormLayout
         }
         else {
-            console.log('')
             return sequenceWiseFormLayout
         }
 
