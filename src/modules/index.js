@@ -28,6 +28,7 @@ import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
 import statistics from './statistics/statisticsReducer'
+import profileReducer from './profile/profileReducer'
 import sorting from './sorting/sortingReducer'
 // import profile from './profile/profileReducer'
 
@@ -62,6 +63,7 @@ const rootReducer = combineReducers({
   dataStore,
   newJob,
   statistics,
+  profileReducer,
   sorting,
 })
 

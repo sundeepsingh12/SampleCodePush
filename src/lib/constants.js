@@ -245,9 +245,19 @@ module.exports = keyMirror({
     TOGGLE_RESEQUENCE_BUTTON: null,
 
     //New Job
-    NEW_JOB_MASTER: null,
-    NEW_JOB_STATUS: null,
-    SET_DATA_IN_STATISTICS_LIST: null,
+    NEW_JOB_MASTER : null,
+    NEW_JOB_STATUS : null,
+
+    //statisticsModule
+    SET_DATA_IN_STATISTICS_LIST : null,
+   
+    //profileModule
+    FETCH_USER_DETAILS: null,
+    CHECK_CURRENT_PASSWORD: null,
+    SET_NEW_PASSWORD: null,
+    SET_CONFIRM_NEW_PASSWORD: null,
+    CLEAR_PASSWORD_TEXTINPUT: null,
+    TOGGLE_SAVE_RESET_BUTTON: null,
 
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,

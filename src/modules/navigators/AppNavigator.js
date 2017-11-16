@@ -30,13 +30,16 @@ import JobDetailsV2 from '../../containers/JobDetailsV2'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
 import SortingResults from '../../containers/SortingResults'
-import Profile from '../../containers/Profile'
 import ProfileView from '../../containers/ProfileView'
 import ArrayScreen from '../../containers/ArrayScreen'
 import ResetPassword from '../../containers/ResetPassword'
+import SyncScreen from '../../containers/SyncScreen'
+import TaskScreen from '../../containers/TaskScreen'
+import Profile from '../../containers/Profile'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
+
 import {
   Container,
   Content,
@@ -165,6 +168,15 @@ export const AppNavigator = StackNavigator({
   },
   ArrayScreen: {
     screen: ArrayScreen
+  },
+  SyncScreen: {
+    screen: SyncScreen
+  },
+  ResetPassword: {
+    screen: ResetPassword
+  },
+  TaskScreen: {
+    screen: TaskScreen
   },
   ResetPassword: {
     screen: ResetPassword
