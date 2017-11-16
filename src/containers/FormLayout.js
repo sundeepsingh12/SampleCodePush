@@ -49,7 +49,7 @@ function mapDispatchToProps(dispatch) {
 class FormLayout extends Component {
 
   componentWillMount() {
-    this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId);
+    this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId)
   }
 
   renderData = (item) => {
@@ -90,13 +90,14 @@ class FormLayout extends Component {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
-      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId,this.props.navigation.state.params.jobMasterId);
+        this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId,this.props.navigation.state.params.jobMasterId,
+        this.props.navigation.state.params.transactionIdList
+      )
     }
   }
 
   _keyExtractor = (item, index) => item[1].key;
   render() {
-    console.log("schsgdc",this.props.errorMessage.length)
     if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',
@@ -122,7 +123,7 @@ class FormLayout extends Component {
           <FlatList
             data={Array.from(this.props.formElement)}
             extraData={this.state}
-            renderItem={(item) => this.renderData(item.item[1])} //TODO add comments for item[1] 
+            renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
             keyExtractor={this._keyExtractor}>
           </FlatList>
         </Content>

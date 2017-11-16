@@ -25,6 +25,7 @@ class SignatureRemarks extends Component {
     }
 
     render() {
+        console.log('this.props.fieldDataList',this.props.fieldDataList)
         return (
             <FlatList
                 data={this.props.fieldDataList}

@@ -36,10 +36,6 @@ class MobileNoScreen extends Component{
         this.props.actions.onChangeMobileNumber(value)
     }
 
-     invalidateSession = () => {
-        this.props.actions.invalidateUserSession()
-    }
-    
     render(){
         return (
               <Modal
@@ -54,7 +50,6 @@ class MobileNoScreen extends Component{
                                 <View style={[feStyle.flex1, { height: 50 }]}>
                                     <Input
                                         placeholder='Mobile Number'
-                                        style={feStyle.roundedInput}
                                         value={this.props.mobileNumber}
                                         keyboardType='numeric'
                                         onChangeText={this.onChangeMobileNo}
@@ -70,7 +65,7 @@ class MobileNoScreen extends Component{
                                     disabled={this.props.isGenerateOtpButtonDisabled}>
                                     <Text style={[feStyle.fontWhite]}>Send OTP</Text>
                                 </Button>
-                                <Button onPress={this.invalidateSession} full rounded danger
+                                <Button onPress={this.props.invalidateUserSession} full rounded danger
                                     disabled={this.props.isMobileScreenLogoutDisabled}
                                     style={StyleSheet.flatten(feStyle.margin10, feStyle.bgDanger)}>
                                     <Text style={[feStyle.fontWhite]}>Close</Text>

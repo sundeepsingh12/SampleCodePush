@@ -117,7 +117,7 @@ class FieldValidation {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == ELSE) : null
             }
             let validationActionResultList = validationActionList ? this.runValidationActions(validationActionList, formElement, jobTransaction) : null
-            validationActionResultList.alertMessage ? alertMessageList.push(validationActionResultList.alertMessage) : null
+            validationActionResultList ? validationActionResultList.alertMessage ? alertMessageList.push(validationActionResultList.alertMessage) : null : null
         }
         return alertMessageList
     }

@@ -163,6 +163,7 @@ export function authenticateUser(username, password,rememberMe) {
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]
+      console.log('cookie',cookie)
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,cookie)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess())
@@ -204,7 +205,7 @@ export function getSessionToken() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
-         dispatch(NavigationActions.navigate({ routeName: Home }))
+         dispatch(NavigationActions.navigate({ routeName: 'Home' }))
       } else if(token) {
           dispatch(NavigationActions.navigate({ routeName: Preloader }))
       }

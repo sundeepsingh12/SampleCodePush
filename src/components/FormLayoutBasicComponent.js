@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
+import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
+
 import {
     MONEY_COLLECT,
     MONEY_PAY,
@@ -39,6 +41,10 @@ import {
     EXTERNAL_DATA_STORE,
     SEQUENCE,
     PASSWORD,
+    CASH_TENDERING,
+    ARRAY,
+    OBJECT,
+    CASH,
     OPTION_RADIO_FOR_MASTER,
 } from '../lib/AttributeConstants'
 
@@ -52,13 +58,14 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...formLayoutActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...formLayoutActions,...cashTenderingActions, ...globalActions }, dispatch)
     }
 }
 
 class BasicFormElement extends Component {
     constructor(props) {
         super(props);
+        //TODO this object can be removed if fieldData on updation is removed
         this.formElementValue = {}
     }
     componentWillMount = () => {
@@ -72,6 +79,7 @@ class BasicFormElement extends Component {
 
     navigateToScene = (item) => {
         let screenName = ''
+        let cash = 0
         console.log("attrrrr", item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
@@ -97,6 +105,16 @@ class BasicFormElement extends Component {
             }
             case FIXED_SKU: {
                 screenName = 'FixedSKUListing'
+                break
+            }
+            case CASH_TENDERING: {
+                cash = this.props.actions.checkForCash(this.props.formElement,this.props.item)
+                if(cash  > 0){
+                screenName = 'CashTendering'
+                } else {
+                    screenName = null
+                    { Toast.show({ text: "NOT REQUIRED", position: 'bottom', buttonText: 'Okay' }) }
+                }
                 break
             }
             case SIGNATURE: {
@@ -129,10 +147,10 @@ class BasicFormElement extends Component {
                 jobTransaction: this.props.jobTransaction,
                 latestPositionId: this.props.latestPositionId,
                 nextEditable: this.props.nextEditable,
-                isSaveDisabled: this.props.isSaveDisabled
+                isSaveDisabled: this.props.isSaveDisabled,
+                cash: cash
             }
         )
-
     }
 
     onFocusEvent(currentElement) {
@@ -141,6 +159,7 @@ class BasicFormElement extends Component {
 
 
     _onBlurEvent(attributeId) {
+        //TODo remove the below code to update field data if performance remains fine on updation of value on onChangeText
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
         const nextEditableElement = this.props.nextEditable[attributeId];
         if (nextEditableElement != null && nextEditableElement.length != 0) {
@@ -159,8 +178,15 @@ class BasicFormElement extends Component {
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, nextEditable, value, isSaveDisabled) {
         this.formElementValue[fieldAttributeMasterId] = value;
+        //TODO remove commented code, if performance with new code is fine
+        /*
         if (value && value.length == 1) {
-            // then fire action to get next editable and focusable elements
+            // then fire action to get next editable and focusable elements and update the value in store
+            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value);
+        }
+        */
+        if (value) {
+            // then fire action to get next editable and focusable elements and update the value in state
             this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value);
         }
         if (value.length == 0) {
@@ -196,7 +222,7 @@ class BasicFormElement extends Component {
                                 <Body style={StyleSheet.flatten([styles.padding0])}>
                                     <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                                         <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
-                                            <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.textPrimary, { marginTop: -5 }])} />
+                                            <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.fontPrimary, { marginTop: -5 }])} />
                                         </View>
                                         <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
                                             <View style={StyleSheet.flatten([styles.row])}>
@@ -240,8 +266,7 @@ class BasicFormElement extends Component {
                                                     onFocus={() => { this.onFocusEvent(this.props.item) }}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
                                                     secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                                    value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62) ? this.props.item.value : null}
-
+                                                    value={this.props.item.value}
                                                 />
                                             </View>
                                             {
@@ -266,15 +291,13 @@ class BasicFormElement extends Component {
             case TIME:
             case RE_ATTEMPT_DATE:
             case DATE:
+            case CASH_TENDERING:
             case SIGNATURE_AND_NPS:
-                return (
-                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-                )
             case EXTERNAL_DATA_STORE:
             case DATA_STORE:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-
-            default: console.log("FormLayoutActivityComponent")
+                        
+            default: 
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )

@@ -41,7 +41,7 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
 import { Platform } from 'react-native';
-import BackgroundTimer from 'react-native-background-timer';
+import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
 import { setState } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
@@ -156,13 +156,14 @@ export function onResyncPress() {
     try {
       //Start resync loader here
       dispatch(jobDownloadingStatus(true))
-      await sync.createAndUploadZip();
+      await sync.createAndUploadZip()
       const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
       //Stop resync loader here
       dispatch(jobDownloadingStatus(false))
       if (isJobsPresent) {
         dispatch(fetchJobs())
       }
+      dispatch(syncService())
     } catch (error) {
       //Update UI here
       dispatch(jobDownloadingStatus(false))

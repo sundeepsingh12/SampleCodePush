@@ -27,8 +27,7 @@ export default function homeReducer(state = initialState, action) {
         .set('tabIdStatusIdMap', action.payload.tabIdStatusIdMap)
 
     case CLEAR_HOME_STATE:
-      return state.set('tabsList', [])
-        .set('isRefreshing', false)
+      return initialState
     
     case JOB_DOWNLOADING_STATUS:
       return state.set('downloadingJobs',action.payload.isDownloadingjobs)

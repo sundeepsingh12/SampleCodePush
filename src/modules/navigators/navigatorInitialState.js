@@ -7,13 +7,14 @@ import {
     Home,
     JobDetails,
     SkuListing,
-    FormLayout
+    FormLayout,
+    Sequence
 } from '../../lib/constants'
 
 const applicationAction = AppNavigator.router.getActionForPathAndParams(Application);
 
-const loginAction = AppNavigator.router.getActionForPathAndParams(Login);
-const loginState = AppNavigator.router.getStateForAction(loginAction);
+const loginAction = AppNavigator.router.getActionForPathAndParams(Login)
+const loginState = AppNavigator.router.getStateForAction(loginAction)
 
 const preloaderAction = AppNavigator.router.getActionForPathAndParams(Preloader)
 const preloaderState = AppNavigator.router.getStateForAction(preloaderAction)
@@ -26,8 +27,12 @@ const jobDetailsState = AppNavigator.router.getStateForAction(jobDetailsAction)
 
 const skuListingAction = AppNavigator.router.getActionForPathAndParams(SkuListing)
 const skuListingState = AppNavigator.router.getStateForAction(skuListingAction)
+
 const formLayoutAction = AppNavigator.router.getActionForPathAndParams(FormLayout)
 const formLayoutState = AppNavigator.router.getStateForAction(formLayoutAction)
+
+const sequenceAction = AppNavigator.router.getActionForPathAndParams(Sequence)
+const sequenceState = AppNavigator.router.getStateForAction(sequenceAction)
 
 const initialNavState = AppNavigator.router.getStateForAction(
   applicationAction,
@@ -36,7 +41,8 @@ const initialNavState = AppNavigator.router.getStateForAction(
   homeState,
   jobDetailsState,
   skuListingState,
-  formLayoutState
+  formLayoutState,
+  sequenceState
 );
 
 export default initialNavState

@@ -15,6 +15,7 @@ import {
     HUB,
     TABLE_JOB_TRANSACTION
 } from '../../lib/constants'
+import _ from 'underscore'
 
 class Bulk {
 
@@ -50,11 +51,15 @@ class Bulk {
         const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
         const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
         const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-        let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value, jobMasterList.value, true,bulkData)
-        // const idJobTransactionCustomizationListMap = await jobTransactionService.getIdJobTransactionCustomizationListMap(jobTransactionCustomizationList)
-        return jobTransactionCustomizationList
+        const jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value, jobMasterList.value,'Bulk',bulkData)
+        const idJobTransactionCustomizationListMap = await jobTransactionService.getIdJobTransactionCustomizationListMap(jobTransactionCustomizationList)
+        return idJobTransactionCustomizationListMap
+    }
+
+    getSelectedTransactionIds(jobTransactions){
+        const selectedTransactionIds = _.filter(jobTransactions,jobTransaction=>jobTransaction.isChecked==true).map(jobTransaction=>jobTransaction.id)
+        return selectedTransactionIds
     }
 }
-
 
 export let bulkService = new Bulk()

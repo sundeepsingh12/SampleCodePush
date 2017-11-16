@@ -56,6 +56,8 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = this.API_BASE_URL + opts.url
+    console.log('url',url)
+    console.log('this._sessionToken',this._sessionToken)
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
@@ -183,6 +185,8 @@ class RestAPI {
   }
 
   async uploadZipFile() {
+    // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
+    // console.log('jid',jid)
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
   await RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
     Authorization :this._sessionToken,

@@ -24,7 +24,7 @@ import { jobAttributeMasterService } from './JobAttributeMaster'
 import { customerCareService } from './CustomerCare'
 import { smsTemplateService } from './SMSTemplate'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
-import {jobMasterService} from './JobMaster'
+import { jobMasterService } from './JobMaster'
 
 class JobTransaction {
 
@@ -33,8 +33,9 @@ class JobTransaction {
      * @param {*} allJobTransactions 
      * @param {*} statusIds 
      */
-    getJobTransactionsForStatusIds(allJobTransactions, statusIds) {
-        const transactionList = _.filter(allJobTransactions, transaction => statusIds.includes(transaction.jobStatusId))
+    getJobTransactionsForStatusIds(statusIds) {
+        let query = statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+        const transactionList =  realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION,query)
         return transactionList
     }
 
@@ -76,18 +77,12 @@ class JobTransaction {
                 transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId + ":"
             transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId + unseenTransactionObject.id
             jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId] = transactionIdDtoObject
-            if (jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId]) {
-                if (!jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId][unseenTransactionObject.jobStatusId]) {
+            if (!jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId] || !jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId][unseenTransactionObject.jobStatusId]) {
                     let jobStatusIdTransactionIdDtoMap = {}
                     jobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobStatusId] = transactionIdDtoObject
                     jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId] = jobStatusIdTransactionIdDtoMap
-                }
-            } else {
-                let jobStatusIdTransactionIdDtoMap = {}
-                jobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobStatusId] = transactionIdDtoObject
-                jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId] = jobStatusIdTransactionIdDtoMap
-            }
-        });
+            } 
+        })
         return jobMasterIdJobStatusIdTransactionIdDtoMap
     }
 
@@ -201,7 +196,7 @@ class JobTransaction {
      *                                      }
      *                                  ]
      */
-    getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList, statusList,jobMasterList,isCalledFromBulk,bulkData) {
+    getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap, jobAttributeMasterList, jobAttributeStatusList, customerCareList, smsTemplateList, statusList, jobMasterList,callingActivity,callingActivityData) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)
@@ -212,8 +207,12 @@ class JobTransaction {
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
-        if(isCalledFromBulk){
-            jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${bulkData.jobMasterId} AND jobStatusId = ${bulkData.statusId}`
+        if(callingActivity=='Bulk'){
+            jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
+        }
+         else if(callingActivity=='Sequence'){
+            let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+            jobTransactionQuery = `${jobTransactionQuery} AND (${statusQuery})`
         }
         console.log('jobTransactionQuery',jobTransactionQuery)
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
@@ -297,6 +296,9 @@ class JobTransaction {
             jobTransactionCustomization.seqSelected = jobTransaction.seqSelected
             jobTransactionCustomization.statusId = jobTransaction.jobStatusId
             jobTransactionCustomization.jobMasterIdentifier = idJobMasterMap[jobMasterId].identifier
+            jobTransactionCustomization.jobLatitude = job.latitude
+            jobTransactionCustomization.jobLongitude = job.longitude
+            jobTransactionCustomization.jobId = jobTransaction.jobId
             jobTransactionCustomizationList.push(jobTransactionCustomization)
         }
         return jobTransactionCustomizationList
@@ -487,15 +489,16 @@ class JobTransaction {
             addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] = addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] ? addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] : {}
             addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence][jobAttributeMasterMap[address.jobAttributeMasterId].attributeTypeId] = address.value
         })
-        for (let index in addressDataForJob) {
-            let combinedAddress = ''
-            combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_1], '', null, null)
-            combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_2], '', ',', combinedAddress)
-            combinedAddress += this.appendText(true, addressDataForJob[index][LANDMARK], '', ',', combinedAddress)
-            combinedAddress += this.appendText(true, addressDataForJob[index][PINCODE], '', ',', combinedAddress)
-            combinedAddressList.push(combinedAddress)
-        }
-        return combinedAddressList
+        console.log('addressDataForJob',addressDataForJob)
+        return addressDataForJob
+        // for (let index in addressDataForJob) {
+        //     let combinedAddress = ''
+        //     combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_1], '', null, null)
+        //     combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_2], '', ',', combinedAddress)
+        //     combinedAddress += this.appendText(true, addressDataForJob[index][LANDMARK], '', ',', combinedAddress)
+        //     combinedAddress += this.appendText(true, addressDataForJob[index][PINCODE], '', ',', combinedAddress)
+        //     combinedAddressList.push(combinedAddress)
+        // }
     }
 
     /**
@@ -603,6 +606,11 @@ class JobTransaction {
         let jobAttributeMap = jobMasterJobAttributeMasterMap[jobMasterId]
     }
 
+    getIdJobTransactionCustomizationListMap(jobTransactionCustomizationList){
+        let idJobTransactionCustomizationListMap = {}
+        jobTransactionCustomizationList.forEach(jobTransactionCustomization=>idJobTransactionCustomizationListMap[jobTransactionCustomization.id]=jobTransactionCustomization)
+        return idJobTransactionCustomizationListMap
+    }
 }
 
 export let jobTransactionService = new JobTransaction()

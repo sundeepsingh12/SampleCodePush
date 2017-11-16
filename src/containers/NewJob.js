@@ -82,14 +82,24 @@ class NewJob extends Component {
               borderBottomWidth: 0
             }
           ])}>
-            <Left>
-              <Icon name="arrow-back" style={[styles.fontWhite, styles.fontXl]}  onPress={() => { this.props.navigation.goBack(null) }}/>
-            </Left>
             <Body>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>New Task</Text>
+              <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop10]}>
+                <View style={{width: '15%'}}>
+                  <Icon  name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} onPress={() => { this.props.navigation.goBack(null) }}/>
+                </View>
+                <View style={{width: '70%'}}>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>New Job</Text>  
+                </View>
+                <View style={{width: '15%'}}>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>New Job</Text>  
+                </View>
+                <View/>
+              </View>
             </Body>
+            
           </Header>
-          <Content>
+          <Content style={[styles.bgWhite]}>
             <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Type</Text>
               <List>
                 <FlatList
@@ -113,7 +123,8 @@ const style = StyleSheet.create({
     borderBottomColor: '#f2f2f2', 
     borderBottomWidth: 1, 
     paddingTop: 20, 
-    paddingBottom: 20
+    paddingBottom: 20,
+    justifyContent: 'space-between'
   }
 })
 

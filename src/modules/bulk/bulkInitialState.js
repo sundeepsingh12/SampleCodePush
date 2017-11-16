@@ -5,8 +5,8 @@ import { Record } from 'immutable'
 var InitialState = Record({
    isLoaderRunning:false,
    bulkConfigList:[],
-   bulktTransactionList:[]
-  
+   bulkTransactionList:{},
+   selectedItems : []
 })
 
 export default InitialState

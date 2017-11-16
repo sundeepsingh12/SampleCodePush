@@ -12,7 +12,7 @@ import {
 } from '../../lib/constants'
 
 export default function nav(state = initialNavState, action) {
-  let nextState;
+  let nextState
   switch (action.type) {
     case Application:
       nextState = AppNavigator.router.getStateForAction(

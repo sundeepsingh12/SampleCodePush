@@ -229,6 +229,28 @@ module.exports = {
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
+    LOGIN: '?login=',
+    POST: 'POST',
+
+    //Exceptions and Error
+    //Profile Service
+    REGEX_TO_VALIDATE_PASSWORD: /(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}/,
+    CHECK_IF_PASSWORD_ENTERED: "Please Enter Password",
+    CHECK_CURRENT_PASSWORD: "Current Password is wrong Please try again",
+    MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
+    CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
+    VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
+    //Profile Actions
+    UNSAVED_PASSWORD: 'Password not saved before',
+    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
+    TRY_AGAIN: "Please try again...",
+    //ProfileReset Container
+    CONFIRM_CURRENT_PASSWORD: 'Confirm Current Password',
+    NEW_PASSWORD: 'New Password',
+    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
+
+    TOKEN_MISSING : 'Token Missing',
+    PASSWORD: 61,
 
     //App Modules Constants
     BULK : {
@@ -263,5 +285,17 @@ module.exports = {
         appModuleId: 8,
         displayName: ''
     },
-   
+
+    //Status Category
+    PENDING:1,
+    FAIL:2,
+    SUCCESS:3,
+
+    //Sorting module constants
+    REFERENCE_NO : 'referenceNo=',
+    REF_UNAVAILABLE : 'ReferenceNumber Unavailable',
+    FAILURE_SORTING: 'Searching failed, Please try again !',
+    NA : 'N.A',
+    SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
+    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package'
 }

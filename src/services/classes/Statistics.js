@@ -9,7 +9,7 @@
      *          label : ''
      *        }}
      */
-class StatisticsService {
+class Statistics {
    setStatisticsList(statisticsList) {
         const labels = ['Distance', 'Halt Duration', 'Travel Duration', 'Average Speed', 'Maximum Speed', 'Official SMS', 'Personal SMS', 'Officials Calls', 'Personal Calls', 'Collection']
         let statisticsData = {}, id = 0, object = {} 
@@ -27,4 +27,4 @@ class StatisticsService {
         return statisticsData
     }
 }
-export let statisticsListService = new StatisticsService()
+export let statisticsListService = new Statistics()

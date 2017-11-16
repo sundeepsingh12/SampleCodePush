@@ -29,6 +29,13 @@ import HomeUI from '../../containers/HomeUI'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
+import SortingResults from '../../containers/SortingResults'
+import ProfileView from '../../containers/ProfileView'
+import ArrayScreen from '../../containers/ArrayScreen'
+import ResetPassword from '../../containers/ResetPassword'
+import SyncScreen from '../../containers/SyncScreen'
+import TaskScreen from '../../containers/TaskScreen'
+import Profile from '../../containers/Profile'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
@@ -66,18 +73,21 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
 import SelectFromList from '../../containers/SelectFromList'
+import CashTendering from '../../containers/CashTendering'
+
 import Statistics from '../../containers/Statistics'
+import Sorting from '../../containers/Sorting'
 
 class AppWithNavigationState extends React.Component {
   render() {
-    return (<Root> 
+    return (<Root>
       <
-      AppNavigator navigation = {
-        addNavigationHelpers({
-          dispatch: this.props.dispatch,
-          state: this.props.nav
-        })
-      }
+        AppNavigator navigation={
+          addNavigationHelpers({
+            dispatch: this.props.dispatch,
+            state: this.props.nav
+          })
+        }
       /></Root>
     )
   }
@@ -123,7 +133,7 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
-     },
+  },
   SelectFromList: {
     screen: SelectFromList,
   },
@@ -131,6 +141,13 @@ export const AppNavigator = StackNavigator({
     screen : Statistics,
     navigationOptions: {
       title: 'STATISTICS : ' + moment(new Date()).format('DD-MM-YYYY'),
+    }
+  },
+  Sorting: {
+    screen : Sorting,
+    navigationOptions: {
+      title: 'Sorting',
+      header:null,
     }
   },
   HomeUI: {
@@ -141,6 +158,30 @@ export const AppNavigator = StackNavigator({
   },
   Sequence: {
     screen: Sequence
+  },
+  SortingResults: {
+    screen: SortingResults
+  },
+  Profile: {
+    screen: Profile
+  },
+  ProfileView: {
+    screen: ProfileView
+  },
+  ArrayScreen: {
+    screen: ArrayScreen
+  },
+  SyncScreen: {
+    screen: SyncScreen
+  },
+  ResetPassword: {
+    screen: ResetPassword
+  },
+  TaskScreen: {
+    screen: TaskScreen
+  },
+  ResetPassword: {
+    screen: ResetPassword
   },
   SkuDetails: {
     screen: SkuDetails
@@ -195,7 +236,13 @@ export const AppNavigator = StackNavigator({
   },
   BulkListing:{
     screen:BulkListing
-  }
+  },
+   CashTendering: {
+    screen: CashTendering,
+    navigationOptions: {
+      title: 'Collect Cash',
+    }
+  },
 }, 
   {
     cardStyle: {

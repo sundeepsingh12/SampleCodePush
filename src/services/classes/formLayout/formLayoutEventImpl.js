@@ -19,6 +19,7 @@ import RestAPIFactory from '../../../lib/RestAPIFactory'
 import _ from 'underscore'
 import moment from 'moment';
 import sha256 from 'sha256';
+import {formLayoutService} from '../../classes/formLayout/FormLayout'
 
 export default class FormLayoutEventImpl {
 
@@ -34,6 +35,7 @@ export default class FormLayoutEventImpl {
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value, fieldDataList, event) {
         this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        nextEditable = this.updateNextEditable(formLayoutObject);
         isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
         const nextEditableElements = nextEditable[attributeMasterId];
         if (!nextEditableElements || nextEditableElements.length == 0) {
@@ -136,6 +138,33 @@ export default class FormLayoutEventImpl {
         return data;  
     }
 
+   
+    /**
+     * accepts formLayoutObject map and
+     * returns nextEditable and required object
+     * 
+     * call this method when required and non required elements are changed
+     * for example via validations, otherwise it is already obtained initially
+     * 
+     * @param {*} formLayoutObject 
+     */
+    updateNextEditable(formLayoutObject){
+        if(!formLayoutObject){
+            return;
+        }
+        let nextEditable = {}
+        let mapData = JSON.stringify([...formLayoutObject]);// stringified map
+        let formLayoutArray = JSON.parse(mapData).map(d => d[1]); // to convert map to array
+
+        for(let i=0; i< formLayoutArray.length; i++){
+            let fieldAttribute = formLayoutArray[i]; //1st of formLayoutArray[i] contains the object as Array.from on map gives array in which 0th index is a key and 1st index is the object
+            if(fieldAttribute && fieldAttribute.required){
+                formLayoutService.getNextEditableAndFocusableElements(fieldAttribute.fieldAttributeMasterId,i,formLayoutArray,nextEditable);
+            }
+        }
+        return nextEditable
+    }
+
     /**
      * called on saving button and saves Data in db or store
      * currently saving fieldData, jobTransaction and job
@@ -144,17 +173,32 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId
      */
-    async saveData(formLayoutObject, jobTransactionId, statusId,jobMasterId) {
+    async saveData(formLayoutObject, jobTransactionId, statusId,jobMasterId,jobTransactionIdList) {
+        try{
         if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
-            return formLayoutObject; // return undefined or empty object if formLayoutObject is empty
+            return formLayoutObject // return undefined or empty object if formLayoutObject is empty
         }
-        let fieldData = this._saveFieldData(formLayoutObject, jobTransactionId);
-        const dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId);
-        let jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value);
-        let job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId,jobMasterId,dbObjects.user.value, dbObjects.hub.value,dbObjects.jobTransaction.referenceNumber);
+        let fieldData,jobTransaction,job
+        if (jobTransactionIdList) {
+            fieldData = this._saveFieldDataForBulk(formLayoutObject,jobTransactionIdList)
+            const dbObjects = await this._getDbObjectForBulk(jobTransactionIdList,statusId,jobMasterId)
+            jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
+             job = this._setBulkJobDbValues(dbObjects.status[0],dbObjects.jobTransaction,jobMasterId,dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
+        }
+        else {
+            fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
+            const dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId)
+             jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
+             job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
+        }
+        
         //TODO add other dbs which needs updation
-        realm.performBatchSave(fieldData, jobTransaction, job);
+        realm.performBatchSave(fieldData, jobTransaction, job)
+        }catch(error){
+            console.log(error)
+        }
     }
+
 
     /**
      * creates fieldData db structure for current transaction
@@ -164,15 +208,15 @@ export default class FormLayoutEventImpl {
      * @param {*jobTransactionId} jobTransactionId 
      */
     _saveFieldData(formLayoutObject, jobTransactionId) {
-        let currentFieldDataObject = {}; // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
-        currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length;
-        let fieldDataArray = [];
+        let currentFieldDataObject = {} // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
+        currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length
+        let fieldDataArray = []
         for (var [key, value] of formLayoutObject) {
             if(value.attributeTypeId == 61){
-                continue;
+                continue
             }
-            let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId);
-            fieldDataArray.push(fieldDataObject);
+            let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
+            fieldDataArray.push(fieldDataObject)
             if (value.childDataList && value.childDataList.length > 0) {
                 currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(value.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId);
             }
@@ -180,7 +224,48 @@ export default class FormLayoutEventImpl {
         return {
             tableName: TABLE_FIELD_DATA,
             value: fieldDataArray
-        };
+        }
+    }
+
+    _saveFieldDataForBulk(formLayoutObject, jobTransactionIdList) {
+        let fieldDataArray = []
+        const fieldData = this._saveFieldData(formLayoutObject,jobTransactionIdList[0])//Get Field Data for first jobTransaction 
+        //Now copy this fieldData for all other job transactions,just change job transaction id
+        for(let i=1;i<jobTransactionIdList.length;i++){
+            let fieldDataForJobTransaction = []
+            fieldData.value.forEach(fieldDataObject=>{
+                fieldDataObject.jobTransactionId = jobTransactionIdList[i]
+                fieldDataArray.push(fieldDataObject)
+            })
+        }
+         return {
+            tableName: TABLE_FIELD_DATA,
+            value: fieldDataArray
+        }
+
+    }
+
+    async _getDbObjectForBulk(jobTransactionIdList,statusId,jobMasterId){
+        try {
+            let user = await keyValueDBService.getValueFromStore(USER)
+            let hub = await keyValueDBService.getValueFromStore(HUB)
+            let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+            let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus => { return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId) })
+            let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => { return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterId) })
+            let query = jobTransactionIdList.map(id => 'id = '+id).join(' OR ')
+            let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query, false)
+            //TODO add more db objects
+            return {
+                jobTransaction,
+                user,
+                hub,
+                imei,
+                jobMaster,
+                status
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     /**
@@ -194,29 +279,29 @@ export default class FormLayoutEventImpl {
      */
     _recursivelyFindChildData(childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId) {
         for (let i = 0; i <= childDataList.length; i++) {
-            let childObject = childDataList[i];
+            let childObject = childDataList[i]
             if (!childObject) {
-                return currentFieldDataObject.currentFieldDataId;
+                return currentFieldDataObject.currentFieldDataId
             }
             let fieldDataObject = this._convertFormLayoutToFieldData(childObject, jobTransactionId, ++currentFieldDataObject.currentFieldDataId);
-            fieldDataArray.push(fieldDataObject);
+            fieldDataArray.push(fieldDataObject)
             if (!childObject.childDataList || childObject.childDataList.length == 0) {
-                continue;
+                continue
             } else {
-                this._recursivelyFindChildData(childObject.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId);
+                this._recursivelyFindChildData(childObject.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId)
             }
         }
     }
 
     _convertFormLayoutToFieldData(formLayoutObject, jobTransactionId, id) {
         return {
-            id: id,
+            id,
             value: formLayoutObject.value != undefined && formLayoutObject.value != null ? '' + formLayoutObject.value : null, // to make value as string
-            jobTransactionId: jobTransactionId,
+            jobTransactionId,
             positionId: formLayoutObject.positionId,
             parentId: formLayoutObject.parentId,
             fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId
-        };
+        }
     }
 
     /**
@@ -228,18 +313,18 @@ export default class FormLayoutEventImpl {
      * @param {*jobMasterId} jobMasterId 
      */
      async _getDbObjects(jobTransactionId,statusId,jobMasterId) {
-        let user = await keyValueDBService.getValueFromStore(USER);
-        let hub = await keyValueDBService.getValueFromStore(HUB);
-        let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI);
-        let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus => { return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId) });
-        let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => { return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterId) });
-        let jobTransaction = null;
+        let user = await keyValueDBService.getValueFromStore(USER)
+        let hub = await keyValueDBService.getValueFromStore(HUB)
+        let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+        let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus => { return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId) })
+        let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => { return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterId) })
+        let jobTransaction = null
         if(jobTransactionId > 0){
             // case of normal job
-            jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0]; // to get the first transaction, as query is on id and it returns list
+            jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
         }else{
             // case of new job
-            jobTransaction = this._getDefaultValuesForJobTransaction(jobTransactionId,status[0],jobMaster[0],user.value,hub.value,imei.value);
+            jobTransaction = this._getDefaultValuesForJobTransaction(jobTransactionId,status[0],jobMaster[0],user.value,hub.value,imei.value)
         }
         //TODO add more db objects
         return {
@@ -253,21 +338,40 @@ export default class FormLayoutEventImpl {
     }
 
     _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei) {
-        let jobTransactionArray = [];
-        let jobTransaction = Object.assign({}, jobTransaction1); // no need to have null checks as it is called from a private method
-        jobTransaction.jobType = jobMaster.code;
-        jobTransaction.jobStatusId = status.id;
-        jobTransaction.statusCode = status.code;
-        jobTransaction.employeeCode = user.employeeCode;
-        jobTransaction.hubCode = hub.code;
-        jobTransaction.lastTransactionTimeOnMobile = moment().format('YYYY-MM-DD HH:mm:ss');
-        jobTransaction.imeiNumber = imei.imeiNumber;
-        jobTransactionArray.push(jobTransaction);
+        let jobTransactionArray = []
+        let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
+        jobTransaction.jobType = jobMaster.code
+        jobTransaction.jobStatusId = status.id
+        jobTransaction.statusCode = status.code
+        jobTransaction.employeeCode = user.employeeCode
+        jobTransaction.hubCode = hub.code
+        jobTransaction.lastTransactionTimeOnMobile = moment().format('YYYY-MM-DD HH:mm:ss')
+        jobTransaction.imeiNumber = imei.imeiNumber
+        jobTransactionArray.push(jobTransaction)
         return {
             tableName: TABLE_JOB_TRANSACTION,
             value: jobTransactionArray
         }
         //TODO only basic columns are set, some columns are not set which will be set as codebase progresses further
+    }
+
+    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei) {
+        let jobTransactionArray = []
+        for (let jobTransaction1 of jobTransactionList) {
+            let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
+            jobTransaction.jobType = jobMaster.code
+            jobTransaction.jobStatusId = status.id
+            jobTransaction.statusCode = status.code
+            jobTransaction.employeeCode = user.employeeCode
+            jobTransaction.hubCode = hub.code
+            jobTransaction.lastTransactionTimeOnMobile = moment().format('YYYY-MM-DD HH:mm:ss')
+            jobTransaction.imeiNumber = imei.imeiNumber
+            jobTransactionArray.push(jobTransaction)
+        }
+        return {
+            tableName: TABLE_JOB_TRANSACTION,
+            value: jobTransactionArray
+        }
     }
 
     /**
@@ -277,14 +381,14 @@ export default class FormLayoutEventImpl {
      * @param {*jobId} jobId 
      */
     _setJobDbValues(status, jobId, jobMasterId,user,hub,referenceNumber) {
-        let jobArray = [];
-        let realmJobObject = null;
+        let jobArray = []
+        let realmJobObject = null
         if(jobId > 0){
             realmJobObject = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0]; // to get the first job, as query is on id and it returns list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
         }else{
-            realmJobObject = this._getDefaultValuesForJob(jobMasterId,jobId,user,hub,referenceNumber);
+            realmJobObject = this._getDefaultValuesForJob(jobMasterId,jobId,user,hub,referenceNumber)
         }
-        let job = Object.assign({}, realmJobObject);
+        let job = Object.assign({}, realmJobObject)
         switch (status.actionOnStatus) {
             case 1: job.status = 3; // jobStatus 3 is for closed when actionOnStatus is success
                 break;
@@ -293,7 +397,34 @@ export default class FormLayoutEventImpl {
             case 3: job.status = 4;// jobStatus 4 is for fail when actionOnStatus is failed
                 break;
         }
-        jobArray.push(job);
+        jobArray.push(job)
+        return {
+            tableName: TABLE_JOB,
+            value: jobArray
+        }
+    }
+
+    _setBulkJobDbValues(status, jobTransactions, jobMasterId, user, hub, referenceNumber) {
+        try{
+        let jobArray = []
+        const query = jobTransactions.map(jobTransaction => 'id = ' + jobTransaction.jobId).join(' OR ')
+        console.log('query', query)
+        let realmJobObjects = realm.getRecordListOnQuery(TABLE_JOB, query)
+        for (let realmJobObject of realmJobObjects) {
+            let job = Object.assign({}, realmJobObject)
+            switch (status.actionOnStatus) {
+                case 1: job.status = 3; // jobStatus 3 is for closed when actionOnStatus is success
+                    break;
+                case 2: job.status = 1;// jobStatus 1 is for unassigned
+                    break;
+                case 3: job.status = 4;// jobStatus 4 is for fail when actionOnStatus is failed
+                    break;
+            }
+            jobArray.push(job)
+        }
+        }catch(error){
+            console.log(error)
+        }
         return {
             tableName: TABLE_JOB,
             value: jobArray
@@ -308,12 +439,12 @@ export default class FormLayoutEventImpl {
      */
     _getDefaultValuesForJob(jobMasterId, id, user, hub, referenceNumber){
         return job = {
-            id : id,
+            id ,
             referenceNo : referenceNumber,
             hubId : hub.id,
             cityId : user.cityId,
             companyId : user.company.id,
-            jobMasterId : jobMasterId,
+            jobMasterId ,
             status : 3,
             latitude : 0.0,
             longitude : 0.0,
@@ -331,7 +462,7 @@ export default class FormLayoutEventImpl {
     _getDefaultValuesForJobTransaction(id,status,jobMaster,user,hub,imei){
         //TODO some values like lat/lng and battery are not valid values, update them as their library is added
         return jobTransaction = {
-            id : id,
+            id ,
             runsheetNo : "AUTO-GEN",
             syncErp : false,
             userId : user.id,
@@ -384,12 +515,16 @@ export default class FormLayoutEventImpl {
      * 
      * @param {*jobTransactionId} jobTransactionId 
      */
-    async addToSyncList(jobTransactionId) {
-        let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+    async addToSyncList(jobTransactionId,jobTransactionIdList) {
+        let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-        transactionsToSync.push(jobTransactionId);
-        await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync);
-        return;
+        if (jobTransactionIdList) {
+            transactionsToSync.concat(jobTransactionIdList)
+        } else {
+            transactionsToSync.push(jobTransactionId)
+        }
+        await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync)
+        return
     }
 }
 

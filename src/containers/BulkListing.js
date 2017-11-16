@@ -4,6 +4,7 @@ import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
 import * as bulkActions from '../modules/bulk/bulkActions'
+import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 
 import React, {Component} from 'react'
@@ -25,7 +26,8 @@ import {
   Footer,
   FooterTab,
   StyleProvider,
-  Spinner
+  Spinner,
+  ActionSheet
 } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
@@ -39,24 +41,30 @@ import _ from 'underscore'
 
 function mapStateToProps(state) {
   return {
-    bulktTransactionList:state.bulk.bulktTransactionList,
-    isLoaderRunning:state.bulk.isLoaderRunning
+    bulkTransactionList:state.bulk.bulkTransactionList,
+    isLoaderRunning:state.bulk.isLoaderRunning,
+    selectedItems:state.bulk.selectedItems
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({...bulkActions}, dispatch)
+    actions: bindActionCreators({...bulkActions,...globalActions}, dispatch)
   }
 }
 
 class BulkListing extends Component {
 
   renderData = (item) => {
-    console.log('item',item)
     return (
-      <JobListItem data={item}/>
+      <JobListItem data={item}
+        onPressItem = {()=>this.onClickRowItem(item)}
+      />
     )
+  }
+
+  onClickRowItem(item){
+    this.props.actions.toggleListItemIsChecked(item.id,this.props.bulkTransactionList)
   }
 
     componentDidMount() {
@@ -64,31 +72,61 @@ class BulkListing extends Component {
     }
 
     render() {
-      console.log('this.props.isLoaderRunning', this.props.isLoaderRunning)
-      // if (this.props.isLoaderRunning || _.isEmpty(this.props.bulktTransactionList)) {
-      //   return <Loader />
-      // }
-      console.log('this.bulktTransactionList',this.props.bulktTransactionList)
+      if (this.props.isLoaderRunning || _.isEmpty(this.props.bulkTransactionList)) {
+        return <Loader />
+      }
+      else{
+        const nextStatusNames = this.props.navigation.state.params.nextStatusList.map(nextStatus=>nextStatus.name)
+        nextStatusNames.push('Cancel')
+        const nextStatusIds = this.props.navigation.state.params.nextStatusList.map(nextStatus=>nextStatus.id)
         return (
-          <View>
-            <StyleProvider style={getTheme(platform)}>
-              <Container>
-                <View style={[styles.flex1]}>
-                  <FlatList
-                    data={this.props.bulktTransactionList}
-                    renderItem={({ item }) => this.renderData(item)}
-                    keyExtractor={item => item.id}
-                  />
-                </View>
+          <StyleProvider style={getTheme(platform)}>
+            <Container>
+              <Content>
+                <FlatList
+                  data={Object.values(this.props.bulkTransactionList)}
+                  renderItem={({ item }) => this.renderData(item)}
+                  keyExtractor={item => item.id}
+                />
+              </Content>
 
-              </Container>
-            </StyleProvider>
-          </View>
+              <Footer
+                style={[{ height: 'auto' }, styles.column, styles.padding10]}>
+                <Text
+                  style={[styles.fontSm, styles.marginBottom10]}>Total Count : {this.props.selectedItems.length}</Text>
+                <Button
+                  onPress={() => ActionSheet.show(
+                    {
+                      options: nextStatusNames,
+                      cancelButtonIndex: nextStatusNames.length - 1,
+                      title: "Next possible status"
+                    },
+                    buttonIndex => { this.goToFormLayout(nextStatusIds[buttonIndex],nextStatusNames[buttonIndex]) }
+                  )}
+                  success full
+                  disabled={_.isEmpty(this.props.selectedItems)}
+                >
+                  <Text style={[styles.fontLg, styles.fontWhite]}>Update All Selected</Text>
+                </Button>
+              </Footer>
+            </Container>
+          </StyleProvider>
         )
+      }
+    }
+
+    goToFormLayout(statusId, statusName) {
+
+      this.props.actions.navigateToScene('FormLayout', {
+        statusId,
+        statusName,
+        jobMasterId: this.props.navigation.state.params.jobMasterId,
+        transactionIdList: this.props.selectedItems,
+        jobTransaction:{}
+      }
+      )
     }
 }
-
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(BulkListing)
 

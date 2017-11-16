@@ -7,7 +7,8 @@ import {
     START_FETCHING_BULK_CONFIG,
     STOP_FETCHING_BULK_CONFIG,
     START_FETCHING_BULK_TRANSACTIONS,
-    STOP_FETCHING_BULK_TRANSACTIONS
+    STOP_FETCHING_BULK_TRANSACTIONS,
+    TOGGLE_JOB_TRANSACTION_LIST_ITEM
 } from '../../lib/constants'
 
 
@@ -22,11 +23,15 @@ export default function bulkReducer(state = initialState, action) {
         
         case STOP_FETCHING_BULK_CONFIG:
             return state.set('isLoaderRunning',false)   
-                        .set('bulkConfigList',action.payload.jobMasterVsStatusList) 
+                        .set('bulkConfigList',action.payload) 
 
         case STOP_FETCHING_BULK_TRANSACTIONS:
             return state.set('isLoaderRunning',false)
-                            .set('bulktTransactionList',action.payload.bulkTransactions)
+                            .set('bulkTransactionList',action.payload)
+
+        case TOGGLE_JOB_TRANSACTION_LIST_ITEM:
+        return state.set('selectedItems',action.payload.selectedItems)
+                    .set('bulkTransactionList',action.payload.bulkTransactions)
     
     }
     return state

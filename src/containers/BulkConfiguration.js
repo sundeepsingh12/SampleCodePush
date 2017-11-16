@@ -21,7 +21,6 @@ import {
   Right,
   Icon,
   StyleProvider,
-  ActionSheet
 } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
@@ -71,8 +70,10 @@ class BulkConfiguration extends Component{
   }
 
   goToBulkListing(item) {
+    console.log('item',item)
     this.props.actions.navigateToScene('BulkListing',{jobMasterId : item.jobMasterId,
-      statusId:item.statusId
+      statusId:item.statusId,
+      nextStatusList:item.nextStatusList
     })
   }
 

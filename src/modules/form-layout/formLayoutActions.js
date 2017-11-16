@@ -13,7 +13,8 @@ import {
     RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
-    UPDATE_FIELD_DATA_VALIDATION
+    UPDATE_FIELD_DATA_VALIDATION,
+    UPDATE_NEXT_EDITABLE
 } from '../../lib/constants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -31,47 +32,6 @@ export function _setFormList(sortedFormAttributesDto) {
     }
 }
 
-export function _setBasicInfo(statusId, statusName, jobTransactionId, latestPositionId) {
-    return {
-        type: BASIC_INFO,
-        payload: {
-            statusId,
-            statusName,
-            jobTransactionId,
-            latestPositionId
-        }
-
-    }
-}
-
-export function _disableSave(isSaveDisabled) {
-    return {
-        type: DISABLE_SAVE,
-        payload: isSaveDisabled
-    }
-}
-
-export function _updateFieldData(updatedFieldData) {
-    return {
-        type: UPDATE_FIELD_DATA,
-        payload: updatedFieldData
-    }
-}
-
-export function _toogleHelpText(formLayout) {
-    return {
-        type: TOOGLE_HELP_TEXT,
-        payload: formLayout
-    }
-}
-
-export function _toogleLoader(loading) {
-    return {
-        type: IS_LOADING,
-        payload: loading
-    }
-}
-
 export function _setErrorMessage(message) {
     return {
         type: ERROR_MESSAGE,
@@ -79,34 +39,33 @@ export function _setErrorMessage(message) {
     }
 }
 
-export function _setInitialState() {
-    return {
-        type: RESET_STATE
-    }
-}
-
 export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId) {
     return async function (dispatch) {
         try {
-            dispatch(_toogleLoader(true));
+            dispatch(setState(IS_LOADING,true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId)
             Object.keys(sortedFormAttributesDto.nextEditable).length == 0 ? sortedFormAttributesDto.isSaveDisabled = false : sortedFormAttributesDto.isSaveDisabled = true;
-            dispatch(_setFormList(sortedFormAttributesDto));
-            dispatch(_setBasicInfo(statusId, statusName, jobTransactionId, sortedFormAttributesDto.latestPositionId));
-            dispatch(_toogleLoader(false));
+            dispatch(_setFormList(sortedFormAttributesDto))
+            dispatch(setState(BASIC_INFO,{
+                statusId,
+                statusName,
+                jobTransactionId,
+                latestPositionId:sortedFormAttributesDto.latestPositionId
+            }))
+            dispatch(setState(IS_LOADING,false))
         } catch (error) {
-            dispatch(_toogleLoader(false));
-            dispatch(_setErrorMessage(error));
+            console.log(error)
+             dispatch(setState(IS_LOADING,false))
+            dispatch(_setErrorMessage(error))
         }
     }
 }
 
 export function getNextFocusableAndEditableElements(attributeMasterId, formElement, nextEditable, isSaveDisabled, value, event) {
     return async function (dispatch) {
-        const cloneFormElement = new Map(formElement);
+        const cloneFormElement = new Map(formElement)
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, null, event);
-        dispatch(_setFormList(sortedFormAttributeDto));
-        console.log("getNextFocusableAndEditableElements",value)
+        dispatch(_setFormList(sortedFormAttributeDto))
     }
 }
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled,sequenceId) {
@@ -117,8 +76,8 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, next
                 const cloneFormElement = new Map(formElement);
                 let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, sequenceData,null,ON_BLUR);
                 sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
-                dispatch(_setFormList(sortedFormAttributeDto));
-                const nextEditableElement = nextEditable[attributeMasterId];
+                dispatch(_setFormList(sortedFormAttributeDto))
+                const nextEditableElement = nextEditable[attributeMasterId]
                 if(nextEditableElement != null && nextEditableElement.length != 0){
                     nextEditableElement.forEach((nextElement) => {
                         if ((typeof (nextElement) == 'string')) {
@@ -126,7 +85,7 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, next
                             if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
                                 const newFormElement = new Map(sortedFormAttributeDto.formLayoutObject);
                                 newFormElement.get(nextElement.fieldAttributeMasterId).isLoading = true;
-                                    dispatch(_updateFieldData(newFormElement))
+                                    dispatch(setState(UPDATE_FIELD_DATA,newFormElement))
                                     dispatch(setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, newFormElement, nextEditable, 
                                         isSaveDisabled,nextElement.sequenceMasterId))
                             }
@@ -135,10 +94,10 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, next
                 }
             }
         }catch(error){
-            formElement.get(attributeMasterId).isLoading = false;
-            dispatch(_setErrorMessage(error.message));
-            dispatch(_updateFieldData(formElement))
-            dispatch(_setErrorMessage(''));
+            formElement.get(attributeMasterId).isLoading = false
+            dispatch(_setErrorMessage(error.message))
+            dispatch(setState(UPDATE_FIELD_DATA,formElement))
+            dispatch(_setErrorMessage(''))
         }
     }
 }
@@ -146,23 +105,23 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, next
 export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
     return async function (dispatch) {
         const saveDisabled = formLayoutEventsInterface.disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value)
-        dispatch(_disableSave(saveDisabled));
+           dispatch(setState(DISABLE_SAVE,saveDisabled)) 
     }
 }
 
 export function updateFieldData(attributeId, value, formElement) {
     return async function (dispatch) {
-        const cloneFormElement = new Map(formElement);
-        const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement, ON_BLUR);
-        dispatch(_updateFieldData(updatedFieldData));
+        const cloneFormElement = new Map(formElement)
+        const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement, ON_BLUR)
+        dispatch(setState(UPDATE_FIELD_DATA,updatedFieldData))
     }
 }
 
 export function updateFieldDataWithChildData(attributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListObject) {
     return function (dispatch) {
-        const cloneFormElement = new Map(formElement);
-        console.log('cloneFormElement', cloneFormElement);
-        console.log('fieldDataListObject', fieldDataListObject);        
+        const cloneFormElement = new Map(formElement)
+        console.log('cloneFormElement', cloneFormElement)
+        console.log('fieldDataListObject', fieldDataListObject)      
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList, ON_BLUR);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
@@ -171,26 +130,26 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, nex
                 nextEditable: updatedFieldDataObject.nextEditable,
                 isSaveDisabled: updatedFieldDataObject.isSaveDisabled
             }
-        ));
+        ))
     }
 }
 
 export function toogleHelpText(attributeId, formElement) {
     return async function (dispatch) {
-        const cloneFormElement = new Map(formElement);
-        const toogledHelpText = formLayoutEventsInterface.toogleHelpTextView(attributeId, cloneFormElement);
-        dispatch(_toogleHelpText(toogledHelpText));
+        const cloneFormElement = new Map(formElement)
+        const toogledHelpText = formLayoutEventsInterface.toogleHelpTextView(attributeId, cloneFormElement)
+        dispatch(setState(TOOGLE_HELP_TEXT, toogledHelpText))
     }
 }
 
-export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId) {
+export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList) {
     return async function (dispatch) {
-        dispatch(_toogleLoader(true));
-        let cloneFormElement = new Map(formElement);
-        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId);
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId);
-        dispatch(_toogleLoader(false));
-        dispatch(_setInitialState());
+        dispatch(setState(IS_LOADING,true))
+        let cloneFormElement = new Map(formElement)
+        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
+        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId)
+        dispatch(setState(IS_LOADING, false))
+        dispatch(setState(RESET_STATE))
         dispatch(NavigationActions.navigate({ routeName: Home }))
 
     }

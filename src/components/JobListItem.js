@@ -21,30 +21,27 @@ import {
 } from 'native-base'
 
 export default class JobListItem extends Component{
+
     render(){
-      console.log('this.props',this.props)
          return (
-      <TouchableHighlight underlayColor={'#eee'} {...this.props.sortHandlers}>
-        <View style={style.seqCard}>
-          <View style={style.seqCircle}>
+      <TouchableHighlight 
+      onPress = {this.props.onPressItem}
+      underlayColor={'#eee'} {...this.props.sortHandlers}>
+        <View style={[style.seqCard, this.props.data.isChecked ? {backgroundColor: '#d3d3d3'}: null]}>
+          <View style={[style.seqCircle, styles.relative]}>
             <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
               {this.props.data.jobMasterIdentifier}
             </Text>
+            {this.props.data.isChecked? <View style={[styles.absolute, styles.bgSuccess, styles.justifyCenter, styles.alignCenter, style.selectedItemCircle]}>
+              <Icon name="ios-checkmark" style={[styles.bgTransparent, styles.fontWhite]}/>
+            </View>:null}
+           
           </View>
           <View style={style.seqCardDetail}>
-            <View>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                {this.props.data.line1}
-              </Text>
-              <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                {this.props.data.line2}
-              </Text>
-              <Text
-                style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-                {this.props.data.circleLine1} 
-              </Text>
-            </View>
-            <View
+            
+          {this.renderJobListItemDetails()}
+
+            {this.props.callingActivity == 'Sequence' ? <View
               style={{
               width: 30,
               alignSelf: 'center'
@@ -56,11 +53,32 @@ export default class JobListItem extends Component{
                   color: '#c9c9c9'
                 }
               ]}/>
-            </View>
+            </View>:<View/>}
+            
           </View>
         </View>
       </TouchableHighlight>
     )
+    }
+
+    /**This function shows Line1,Line2,Circle Line1,Circle Line 2
+     * 
+     */
+    renderJobListItemDetails(){
+      return (
+          <View>
+              <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+                {this.props.data.line1}
+              </Text>
+              <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+                {this.props.data.line2}
+              </Text>
+              <Text
+                style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
+                {this.props.data.circleLine1} 
+              </Text>
+            </View>
+      )
     }
 }
 
@@ -93,6 +111,15 @@ const style = StyleSheet.create({
     borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between'
+  },
+  selectedItemCircle : {
+    width: 24, 
+    bottom: 0, 
+    right: -5, 
+    height: 24, 
+    borderRadius: 12, 
+    borderWidth: 2, 
+    borderColor: '#ffffff'
   }
 
 })

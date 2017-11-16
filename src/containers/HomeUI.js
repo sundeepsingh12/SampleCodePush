@@ -88,10 +88,25 @@ class HomeUI extends Component {
           <Text>NewJob
           </Text> 
         </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('SortingResults')}>
+          <Text>SortingResults
+          </Text> 
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('Profile')}>
+          <Text>Profile
+          </Text> 
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('ProfileView')}>
+          <Text>ProfileView
+          </Text> 
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('ResetPassword')}>
+          <Text>ResetPassword
+          </Text>  
+        </Button>
       </View>
     )
   }
-
 };
 
 

@@ -5,7 +5,8 @@ import {
     JOB_MASTER,
     JOB_STATUS,
     START_FETCHING_BULK_TRANSACTIONS,
-    STOP_FETCHING_BULK_TRANSACTIONS
+    STOP_FETCHING_BULK_TRANSACTIONS,
+    TOGGLE_JOB_TRANSACTION_LIST_ITEM
 } from '../../lib/constants'
 import {
     setState
@@ -25,9 +26,7 @@ export function getJobMasterVsStatusNameList() {
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobStatusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobMasterVsStatusList = await bulkService.prepareJobMasterVsStatusList(jobMasterList.value, jobStatusList.value)
-            dispatch(setState(STOP_FETCHING_BULK_CONFIG, {
-                jobMasterVsStatusList
-            }))
+            dispatch(setState(STOP_FETCHING_BULK_CONFIG,jobMasterVsStatusList))
         } catch (error) {
             console.log(error)
         }
@@ -40,11 +39,26 @@ export function getBulkJobTransactions(bulkParams) {
         try {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS))
             const bulkTransactions = await bulkService.getJobListingForBulk(bulkParams)
-            dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS, {
-                bulkTransactions
-            }))
+            dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS,bulkTransactions))
         } catch (error) {
             console.log(error)
         }
     }
+}
+
+export function toggleListItemIsChecked(jobTransactionId,allTransactions){
+        return async function(dispatch){
+            try{
+                const bulkTransactions = await JSON.parse(JSON.stringify(allTransactions))
+                bulkTransactions[jobTransactionId].isChecked = !bulkTransactions[jobTransactionId].isChecked
+                const selectedItems = await bulkService.getSelectedTransactionIds(bulkTransactions)
+                console.log('selectedItems',selectedItems)
+                dispatch(setState(TOGGLE_JOB_TRANSACTION_LIST_ITEM,{
+                    selectedItems,
+                    bulkTransactions
+                }))
+            }catch(error){
+                console.log(error)
+            }
+        }
 }
