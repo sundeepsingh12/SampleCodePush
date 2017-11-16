@@ -162,7 +162,7 @@ module.exports = keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
@@ -178,8 +178,8 @@ module.exports = keyMirror({
     ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
-    UPDATE_FIELD_DATA_VALIDATION:null,
-    UPDATE_NEXT_EDITABLE : null,
+    UPDATE_FIELD_DATA_VALIDATION: null,
+    UPDATE_NEXT_EDITABLE: null,
     //Route names (Used in React Navigation)
     Application: null,
     Login: null,
@@ -188,8 +188,8 @@ module.exports = keyMirror({
     JobDetails: null,
     FormLayout: null,
     TimePicker: null,
-    SkuListing:null,
-    Sequence:null,
+    SkuListing: null,
+    Sequence: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -198,9 +198,8 @@ module.exports = keyMirror({
     SKU_CODE_CHANGE: null,
     UPDATE_SKU_ACTUAL_QUANTITY: null,
 
-
     //CheckBox 
-    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:null,
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
@@ -212,6 +211,12 @@ module.exports = keyMirror({
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
 
+    //array actions
+    SET_ARRAY_CHILD_LIST: null,
+    SET_NEW_ARRAY_ROW: null,
+    SET_ARRAY_ELEMENTS: null,
+    SET_ERROR_MSG: null,
+    CLEAR_ARRAY_STATE: null,
     //CashTendering
     CHANGE_AMOUNT: null,
     IS_CASH_TENDERING_LOADER_RUNNING: null,
@@ -230,14 +235,15 @@ module.exports = keyMirror({
     SPECIAL: null,
     MINMAX: null,
     _id: null,
-    SET_INITIAL_STATE :null,
+    SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
-   
+
+
     //Sequence Module Actions
-    SEQUENCE_LIST_FETCHING_START:null,
-    SEQUENCE_LIST_FETCHING_STOP:null,
-    TOGGLE_RESEQUENCE_BUTTON:null,
-    
+    SEQUENCE_LIST_FETCHING_START: null,
+    SEQUENCE_LIST_FETCHING_STOP: null,
+    TOGGLE_RESEQUENCE_BUTTON: null,
+
     //New Job
     NEW_JOB_MASTER : null,
     NEW_JOB_STATUS : null,
@@ -254,8 +260,8 @@ module.exports = keyMirror({
     TOGGLE_SAVE_RESET_BUTTON: null,
 
     //Sorting And Printing
-    SORTING_SEARCH_VALUE : null,
-    SORTING_ITEM_DETAILS : null,
+    SORTING_SEARCH_VALUE: null,
+    SORTING_ITEM_DETAILS: null,
 })
 
 
