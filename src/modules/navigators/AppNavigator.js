@@ -30,12 +30,16 @@ import JobDetailsV2 from '../../containers/JobDetailsV2'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
 import SortingResults from '../../containers/SortingResults'
-import Profile from '../../containers/Profile'
 import ProfileView from '../../containers/ProfileView'
+import ArrayScreen from '../../containers/ArrayScreen'
 import ResetPassword from '../../containers/ResetPassword'
+import SyncScreen from '../../containers/SyncScreen'
+import TaskScreen from '../../containers/TaskScreen'
+import Profile from '../../containers/Profile'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
+
 import {
   Container,
   Content,
@@ -63,6 +67,7 @@ import FormLayout from '../../containers/FormLayout'
 import SkuListing from '../../containers/SkuListing'
 import OverlayAttributes from '../../containers/OverlayAttributes'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
 import SelectFromList from '../../containers/SelectFromList';
@@ -131,16 +136,16 @@ export const AppNavigator = StackNavigator({
     screen: SelectFromList,
   },
   Statistics: {
-    screen : Statistics,
+    screen: Statistics,
     navigationOptions: {
       title: 'STATISTICS : ' + moment(new Date()).format('DD-MM-YYYY'),
     }
   },
   Sorting: {
-    screen : Sorting,
+    screen: Sorting,
     navigationOptions: {
       title: 'Sorting',
-      header:null,
+      header: null,
     }
   },
   HomeUI: {
@@ -160,6 +165,18 @@ export const AppNavigator = StackNavigator({
   },
   ProfileView: {
     screen: ProfileView
+  },
+  ArrayScreen: {
+    screen: ArrayScreen
+  },
+  SyncScreen: {
+    screen: SyncScreen
+  },
+  ResetPassword: {
+    screen: ResetPassword
+  },
+  TaskScreen: {
+    screen: TaskScreen
   },
   ResetPassword: {
     screen: ResetPassword
@@ -193,6 +210,9 @@ export const AppNavigator = StackNavigator({
   },
   Signature: {
     screen: Signature,
+    navigationOptions: {
+      header: null
+    }
   },
   FormLayout: {
     screen: FormLayout,
@@ -203,6 +223,13 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
+  SignatureAndNps: {
+    screen: SignatureAndNps
+  },
+  ArrayFieldAttribute: {
+    screen: ArrayFieldAttribute
+  }
+  ,
   DataStore: {
     screen: DataStore,
   },
@@ -215,11 +242,7 @@ export const AppNavigator = StackNavigator({
       title: 'Collect Cash',
     }
   },
-}, {
-    SignatureAndNps: {
-      screen: SignatureAndNps
-    },
-  },
+},
   {
     cardStyle: {
       backgroundColor: 'white'

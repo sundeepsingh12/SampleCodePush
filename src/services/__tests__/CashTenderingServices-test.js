@@ -12,7 +12,6 @@ import {
     CASH,
     STRING,
     OBJECT_SAROJ_FAREYE,
-    ZERO,
 } from '../../lib/AttributeConstants'
 import { CashTenderingService } from '../classes/CashTenderingServices'
 

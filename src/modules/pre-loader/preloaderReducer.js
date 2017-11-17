@@ -104,6 +104,7 @@ export default function preloaderReducer(state = initialState, action) {
     case OTP_VALIDATION_START:
       return state.set('otpDisplayMessage', 'Validating OTP')
         .set('isOtpVerificationButtonDisabled', true)
+        .set('showOtpScreen',false)
     case OTP_VALIDATION_FAILURE:
       return state.set('otpDisplayMessage', action.payload)
         .set('isOtpVerificationButtonDisabled', false)

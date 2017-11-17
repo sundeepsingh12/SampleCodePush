@@ -2,14 +2,6 @@
 'use strict'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-
-
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Preloader from '../containers/Preloader'
-import Loader from '../components/Loader'
-import ResyncLoader from '../components/ResyncLoader'
-
-
 import React, {Component} from 'react'
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native'
 
@@ -29,25 +21,38 @@ import {
   Footer,
   FooterTab,
   StyleProvider
-} from 'native-base';
+} from 'native-base'
 
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
+import * as profileActions from '../modules/profile/profileActions'
+import {
+    CHECK_CURRENT_PASSWORD,
+    SET_NEW_PASSWORD,
+    SET_CONFIRM_NEW_PASSWORD,
+    TOGGLE_SAVE_RESET_BUTTON,
+} from '../lib/constants'
+import {
+    CONFIRM_CURRENT_PASSWORD,
+    NEW_PASSWORD,
+    CONFIRM_NEW_PASSWORD,
+} from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
-  return {}
-};
+    return {
+        currentPassword: state.profileReducer.currentPassword,
+        newPassword: state.profileReducer.newPassword,
+        confirmNewPassword: state.profileReducer.confirmNewPassword,
+        isSaveResetButtonDisabled: state.profileReducer.isSaveResetButtonDisabled
+    }
+}
 
 function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators({
-      ...globalActions,
-      ...homeActions
-    }, dispatch)
-  }
+    return {
+        actions: bindActionCreators({ ...globalActions, ...profileActions }, dispatch)
+    }
 }
 
 
@@ -57,6 +62,33 @@ class ResetPassword extends Component {
     return {header: null}
   }
 
+   _setCurrentPassword = (text) => {
+        this.props.actions.setState(CHECK_CURRENT_PASSWORD, text)
+        if (text && this.props.newPassword && this.props.confirmNewPassword) {
+            this.props.actions.setState(TOGGLE_SAVE_RESET_BUTTON, false)
+        } else {
+            this.props.actions.setState(TOGGLE_SAVE_RESET_BUTTON, true)
+        }
+    }
+    _setNewPassword = (text) => {
+        this.props.actions.setState(SET_NEW_PASSWORD, text)
+        if (this.props.currentPassword && text && this.props.confirmNewPassword) {
+            this.props.actions.setState(TOGGLE_SAVE_RESET_BUTTON, false)
+        } else {
+            this.props.actions.setState(TOGGLE_SAVE_RESET_BUTTON, true)
+        }
+    }
+    _setConfirmNewPassword = (text) => {
+        this.props.actions.setState(SET_CONFIRM_NEW_PASSWORD, text)
+        if (this.props.currentPassword && this.props.newPassword && text) {
+            this.props.actions.setState(TOGGLE_SAVE_RESET_BUTTON, false)
+        } else {
+            this.props.actions.setState(TOGGLE_SAVE_RESET_BUTTON, true)
+        }
+    }
+    _onResetPress = () => {
+        this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword)
+    }
 
   render() {
     return (
@@ -85,23 +117,23 @@ class ResetPassword extends Component {
             <View style={[styles.bgWhite, styles.padding10, styles.marginTop30]}>
                 <Item stackedLabel style={[styles.marginBottom15]}>
                     <Label style={[styles.fontPrimary, styles.fontSm]}>Current Password</Label>
-                    <Input style={[style.inputType]} />
+                    <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setCurrentPassword} value={this.props.currentPassword}/>
                 </Item>
                 <Item stackedLabel style={[styles.marginBottom15]}>
                     <Label style={[styles.fontPrimary, styles.fontSm]}>New Password</Label>
                     <Label style={[styles.fontDarkGray, styles.fontXs]}>Minimum 8 characters, including a symbol and a number.</Label>
-                    <Input style={[style.inputType]} />
+                    <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setNewPassword} value={this.props.newPassword} />
                 </Item>
                 <Item stackedLabel style={[styles.marginBottom15]}>
                     <Label style={[styles.fontPrimary, styles.fontSm]}>Confirm New Password</Label>
-                    <Input style={[style.inputType]} />
+                    <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setConfirmNewPassword} value={this.props.confirmNewPassword}/>
                 </Item>
             </View>
 
           </Content>
           <Footer style={[style.footer]}>
             <FooterTab style={[styles.padding10]}>
-              <Button success full>
+              <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
                 <Text style={[styles.fontLg, styles.fontWhite]}>Reset Password</Text>
               </Button>
             </FooterTab>
@@ -142,7 +174,7 @@ const style = StyleSheet.create({
     borderTopColor: '#f3f3f3'
   },
   inputType : {
-    height: 30,
+    height: 50,
     fontSize: 14
   }
   
