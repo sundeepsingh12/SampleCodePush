@@ -1,4 +1,4 @@
-/**
+ /**
  * Created by udbhav on 12/4/17.
  */
 
@@ -256,6 +256,12 @@ class JobMaster {
     jobMasterList.forEach(jobMaster=>idJobMasterMap[jobMaster.id] = jobMaster)
     console.log('idJobMasterMap',idJobMasterMap)
     return idJobMasterMap
+  }
+
+  async getJobMaterFromJobMasterList(jobMasterId){
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+    return jobMaster;
   }
 }
 

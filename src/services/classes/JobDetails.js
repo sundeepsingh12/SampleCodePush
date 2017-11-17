@@ -6,7 +6,13 @@ import {
     ARRAY_SAROJ_FAREYE,
     CONTACT_NUMBER,
     OBJECT_SAROJ_FAREYE,
+
 } from '../../lib/AttributeConstants'
+
+
+import {
+    TABLE_JOB,
+} from '../../lib/constants'
 
 class JobDetails {
 
@@ -81,8 +87,7 @@ class JobDetails {
      * ## convert degree to radians
      * @param {string} angle - It contains data for form layout
      *
-     *
-     * It return degree value in radians
+     *@returns {string} radians value
      */
     toRadians(angle) {
         return angle * (Math.PI / 180);
@@ -106,21 +111,18 @@ class JobDetails {
 
     /**
      * ## check if distance between user and job is less than 100 m or not
-     * @param {string} jobLat - job location latitude
-     * @param {string} jobLat - job location longitude
+     * @param {string} jobId - job location latitude
      * @param {string} userLat - user location latitud
      * @param {string} userLong - user location longitude
      * 
      * @returns {boolean} - true if distance is greater than 100m else false
      */
-    checkLatLong(jobLat, jobLong, userLat, userLong) {
-        if (!jobLat || !jobLong || !userLat || !userLong) {
+    checkLatLong(jobId, userLat, userLong) {
+        let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0];
+        if (jobTransaction && jobTransaction.latitude && jobTransaction.longitude && userLat && userLong) 
             return false
-        }
-        const dist = this.distance(jobLat, jobLong, userLat, userLong)
-        if (dist * 1000 >= 100)
-            return true
-        return false
+        const dist = this.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
+        return (dist * 1000 >= 100)
     }
 }
 

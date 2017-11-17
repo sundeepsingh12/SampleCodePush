@@ -4,6 +4,7 @@ import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { NavigationActions } from 'react-navigation'
 import { setState, navigateToScene } from '../../global/globalActions'
 import { jobDetailsService } from '../../../services/classes/JobDetails'
+import { jobMasterService } from '../../../services/classes/JobMaster'
 import * as realm from '../../../repositories/realmdb'
 import {
     JOB_ATTRIBUTE,
@@ -31,8 +32,7 @@ const mockStore = configureStore(middlewares)
 
 describe('location mismatch actions', () => {
     let jobMasterList = {
-        value: [
-            {
+        0: {
                 id: 3447,
                 enableFormLayout: true,
                 enableLocationMismatch: true,
@@ -43,18 +43,17 @@ describe('location mismatch actions', () => {
                 enabled: true,
                 etaUpdateStatus: null,
             },
-            {
-                id: 3453,
-                enableFormLayout: true,
-                enableLocationMismatch: false,
-                enableManualBroadcast: false,
-                enableMultipartAssignment: false,
-                enableOutForDelivery: false,
-                enableResequenceRestriction: false,
-                enabled: true,
-                etaUpdateStatus: null,
-            }
-        ]
+            // {
+            //     id: 3453,
+            //     enableFormLayout: true,
+            //     enableLocationMismatch: false,
+            //     enableManualBroadcast: false,
+            //     enableMultipartAssignment: false,
+            //     enableOutForDelivery: false,
+            //     enableResequenceRestriction: false,
+            //     enabled: true,
+            //     etaUpdateStatus: null,
+            // }
     }
 
     let data = {
@@ -99,28 +98,34 @@ describe('location mismatch actions', () => {
     const expectedActions = [
 
     ]
-    it('should not check location mismatch ', () => {
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMasterList)
+    it('should not check location mismatch and throw error', () => {
+        try{
+        jobMasterService.getJobMaterFromJobMasterList = jest.fn()
+        jobMasterService.getJobMaterFromJobMasterList.mockReturnValueOnce(jobMasterList)
         const store = mockStore({})
         return store.dispatch(actions.checkForLocationMismatch())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(jobMasterService.getJobMaterFromJobMasterList).toHaveBeenCalledTimes(0)
             })
+        }catch(error){
+            expect(error.message).toEqual(message)
+        }
     })
     it('should check location mismatch ', () => {
+        try{
         data.jobTransaction.jobMasterId = 3447
         keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMasterList)
-        keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValueOnce(userSummary)
-        realm.getRecordListOnQuery = jest.fn()
-        realm.getRecordListOnQuery.mockReturnValue(jobTransaction)
+        jobDetailsService.checkLatLong = jest.fn()
+        jobDetailsService.checkLatLong.mockReturnValue(true)
         const store = mockStore({})
         return store.dispatch(actions.checkForLocationMismatch(data, 1))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
-                expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(0)
+                expect( jobDetailsService.checkLatLong).toHaveBeenCalledTimes(1)
             })
+        }catch(error){
+            expect(error.message).toEqual(message)
+        }
     })
 })

@@ -1,6 +1,8 @@
 'use strict'
 
 import { jobDetailsService } from '../classes/JobDetails'
+import * as realm from '../../repositories/realmdb'
+
 
 describe('test cases for prepareDataObject', () => {
     const realmDBDataList = [
@@ -187,26 +189,34 @@ describe('test cases for prepareDataObject', () => {
 
 describe('test cases for check Latitude and longitude', () => {
     const angle  = "28.2554334",radianValue = 0.493150344407976
-    let jobLat = "28.555",jobLong="77.2675",userLat="28.5551",userLong="77.26751"
+    let jobTransaction = {
+        id: 4294602,
+        latitude: 28.55542,
+        longitude: 77.267463
+    }
+    let jobId = 3447,userLat="28.5551",userLong="77.26751"
      it('should convert angle to radians', () => {
        expect(jobDetailsService.toRadians(angle)).toEqual(radianValue)
      })
      it('should find aerial distance between user and job location', () => {
-         const  dist  = 0.011161528835910397
-       expect(jobDetailsService.distance(jobLat,jobLong,userLat,userLong)).toEqual(dist)
+         const  dist  = 0.03587552758583335
+       expect(jobDetailsService.distance(jobTransaction.latitude,jobTransaction.longitude,userLat,userLong)).toEqual(dist)
      })
 
      it('should check aerial distance between user and job location and return false', () => {
-        jobLat = null
-      expect(jobDetailsService.checkLatLong(jobLat,jobLong,userLat,userLong)).toEqual(false)
+        realm.getRecordListOnQuery = jest.fn()
+        userLat = null
+        realm.getRecordListOnQuery.mockReturnValue(jobTransaction)
+      expect(jobDetailsService.checkLatLong(jobId,userLat,userLong)).toEqual(false)
     })
 
-    it('should check aerial distance between user and job location and return true', () => {
-        jobLat = "30.3143"
-      expect(jobDetailsService.checkLatLong(jobLat,jobLong,userLat,userLong)).toEqual(true)
-    })
-    it('should check aerial distance between user and job location and return false', () => {
-        jobLat = "28.555"
-      expect(jobDetailsService.checkLatLong(jobLat,jobLong,userLat,userLong)).toEqual(false)
+    it('should not check aerial distance between user and job location', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue([{
+            id: 4294602,
+            latitude: 28.55542,
+            longitude: 77.267463
+        }])
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(0)
     })
    })

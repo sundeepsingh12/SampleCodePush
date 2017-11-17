@@ -13,6 +13,7 @@ import {
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base'
 import styles from '../themes/FeStyle'
 import { connect } from 'react-redux'
+import CustomAlert from "../components/CustomAlert"
 import { bindActionCreators } from 'redux'
 import renderIf from '../lib/renderIf'
 import ExpandableHeader from '../components/ExpandableHeader'
@@ -83,16 +84,6 @@ class JobDetails extends Component {
     }
 
     renderStatusList(statusList) {
-        if (this.props.statusList && this.props.statusList.isLocationMismatch) {
-            Alert.alert(
-                "Details",
-                `You are not at location. Do you want to continue?`,
-                [
-                    { text: 'Cancel', onPress: this._onCancel, style: 'cancel' },
-                    { text: 'OK', onPress: this._onGoToNextStatus },
-                ],
-            )
-        }
         let statusView = []
         for (let index in statusList) {
             statusView.push(
@@ -114,6 +105,14 @@ class JobDetails extends Component {
         } else {
             return (
                 <Container style={StyleSheet.flatten([styles.mainBg])}>
+                    <View>
+                        {renderIf(this.props.statusList,
+                            <CustomAlert
+                                title="Details"
+                                message="You are not at location. Do you want to continue?"
+                                onOkPressed={this._onGoToNextStatus}
+                                onCancelPressed={this._onCancel} />)}
+                    </View>
                     <Header style={StyleSheet.flatten([styles.bgPrimary])}>
                         <Left style={StyleSheet.flatten([styles.flexBasis15])}>
                             <Button transparent onPress={() => { this.props.navigation.goBack(null) }}>

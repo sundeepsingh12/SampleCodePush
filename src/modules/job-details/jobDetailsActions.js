@@ -4,7 +4,9 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { NavigationActions } from 'react-navigation'
 import { setState, navigateToScene } from '..//global/globalActions'
-import {jobDetailsService} from '../../services/classes/JobDetails'
+import { jobDetailsService } from '../../services/classes/JobDetails'
+import { jobMasterService } from '../../services/classes/JobMaster'
+
 import * as realm from '../../repositories/realmdb'
 import {
     JOB_ATTRIBUTE,
@@ -27,7 +29,7 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -49,7 +51,7 @@ export function getJobDetails(jobTransactionId) {
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay))
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
@@ -63,25 +65,21 @@ export function getJobDetails(jobTransactionId) {
  * @param {object} data - It contains data for form layout
  * @param {string} currentStatusCategory - current status category
  *
- * It check that user location and job location are far than 100m or less,if it is far then 
- * it create a dialog to ensure user to go to next state or to current state
+ * It check that user location and job location are far than 100m or less 
  *
- * It only return action to change the state
  */
-export function checkForLocationMismatch(data,currentStatusCategory){
+export function checkForLocationMismatch(data, currentStatusCategory) {
     return async function (dispatch) {
         try {
-            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-            const FormLayoutData ={ contactData:data.contactData, jobTransactionId:data.jobTransaction.id, jobTransaction:data.jobTransaction, statusId:data.statusList.id, statusName:data.statusList.name, jobMasterId :data.jobTransaction.jobMasterId}
+            const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId }
             const nextStatusCategory = data.statusList.statusCategory
-            const jobMaster = jobMasterList.value.filter((data) => data.id == FormLayoutData.jobMasterId)
-            if(!(jobMaster[0].enableLocationMismatch) || currentStatusCategory != 1 || !nextStatusCategory || !(nextStatusCategory ==2 || nextStatusCategory ==3) ){
-                return dispatch(navigateToScene('FormLayout',FormLayoutData))
-            }
-            const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)           
-            const jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + data.jobTransaction.jobId, false)[0];
-            (jobDetailsService.checkLatLong(jobTransaction.latitude, jobTransaction.longitude, userSummary.value.lastLat, userSummary.value.lastLng)) ? dispatch(setState(IS_MISMATCHING_LOCATION,{ id:data.statusList.id , name:data.statusList.name , isLocationMismatch : true })) :
-                                                                                                                                                        dispatch(navigateToScene('FormLayout',FormLayoutData))
+            const jobMaster = await jobMasterService.getJobMaterFromJobMasterList(FormLayoutData.jobMasterId)
+            if (!(jobMaster[0].enableLocationMismatch) || currentStatusCategory != 1 || !nextStatusCategory || !(nextStatusCategory == 2 || nextStatusCategory == 3))
+                return dispatch(navigateToScene('FormLayout', FormLayoutData))
+            const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+            if (jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng))
+                return dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
+            dispatch(navigateToScene('FormLayout', FormLayoutData))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
