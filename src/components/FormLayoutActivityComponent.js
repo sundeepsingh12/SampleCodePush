@@ -4,8 +4,7 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    TouchableHighlight
+    Platform
 } from 'react-native'
 import { Container, Card, CardItem, Body, Icon, Right } from 'native-base'
 import styles from '../themes/FeStyle'
@@ -14,14 +13,13 @@ import renderIf from '../lib/renderIf'
 class FormLayoutActivityComponent extends Component {
 
     render() {
-        console.log('props of FormLayoutActivityComponent', this.props)
         return (
             <Card>
                 <CardItem style={this.props.item.focus ? { backgroundColor: 'blue' } : null} button={this.props.item.editable} onPress={() => this.props.press(this.props.item)}>
                     <Body style={StyleSheet.flatten([styles.padding0])}>
                         <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                             <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
-                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.textPrimary, { marginTop: -5 }])} />
+                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.fontPrimary, { marginTop: -5 }])} />
                             </View>
                             <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
                                 <View style={StyleSheet.flatten([styles.row])}>

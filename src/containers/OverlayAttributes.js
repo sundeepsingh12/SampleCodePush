@@ -11,9 +11,9 @@ import { bindActionCreators } from 'redux'
 import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
 import { getNextFocusableAndEditableElements, updateFieldData } from '../modules/form-layout/formLayoutActions'
-const {
+import {
     ON_BLUR
-} = require('../lib/constants').default
+} from '../lib/constants'
 
 function mapDispatchToProps(dispatch) {
     return {

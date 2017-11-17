@@ -1,20 +1,18 @@
+
+
+const themeColor = '#E91E63';
+
 export default {
-    textPrimary : {
-        color: '#338FFC'
+    
+    bgPrimary : {
+        backgroundColor: themeColor
     },
-    mainBg : {
-        backgroundColor: '#F7F8FA'
+    fontPrimary : {
+        color: themeColor
     },
 
-    roundedInput : {
-        backgroundColor: '#F7F8FA',
-        height: 50,
-        borderRadius: 25,
-        borderWidth: 1,
-        borderColor: '#D4DCE1',
-        paddingLeft: 20,
-        paddingRight: 20,
-        fontSize: 14
+    mainBg : {
+        backgroundColor: '#F7F8FA'
     },
     heightAuto: {
         height: 'auto'
@@ -43,9 +41,6 @@ export default {
     bgInfo : {
         backgroundColor: '#51adfd'
     },
-    bgPrimary : {
-        backgroundColor: '#338FFC'
-    },
     fontWhite : {
         color: '#ffffff'
     },
@@ -57,6 +52,9 @@ export default {
     },
     fontDarkGray : {
         color: '#a3a3a3'
+    },
+    fontLightGray : {
+        color: '#e4e3e8'
     },
     fontYellow : {
         color: '#FEDC14'
@@ -73,8 +71,11 @@ export default {
     fontInfo : {
         color: '#51adfd'
     },
-    fontPrimary : {
-        color: '#338FFC'
+    fontXs : {
+        fontSize: 10
+    },
+    fontXs : {
+        fontSize: 10
     },
     fontSm : {
         fontSize: 12
@@ -331,14 +332,17 @@ export default {
     flex1 : {
         flex: 1
     },
-    flexBasis25 : {
-        flexBasis: '25%'
+    flexBasis10 : {
+        flexBasis: '10%'
     },
     flexBasis15 : {
         flexBasis: '15%'
     },
     flexBasis20 : {
         flexBasis: '20%'
+    },
+    flexBasis25 : { 
+        flexBasis: '25%'
     },
     flexBasis35 : {
         flexBasis: '35%'
@@ -363,6 +367,9 @@ export default {
     },
     flexBasis85 : {
         flexBasis: '85%'
+    },
+    flexBasis90 : {
+        flexBasis: '90%'
     },
     flexBasis100 : {
         flexBasis: '100%'

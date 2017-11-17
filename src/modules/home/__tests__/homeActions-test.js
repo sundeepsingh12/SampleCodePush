@@ -1,6 +1,6 @@
 'use strict'
 var actions = require('../homeActions')
-const {
+import {
   JOB_FETCHING_START,
     JOB_LISTING_END,
     JOB_REFRESHING_START,
@@ -17,7 +17,7 @@ const {
     USER,
     TABLE_RUNSHEET,
     TABLE_JOB_TRANSACTION_CUSTOMIZATION
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'

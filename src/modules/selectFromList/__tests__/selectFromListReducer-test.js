@@ -1,9 +1,10 @@
 'use strict'
 
 
-const {
+import {
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
-} = require('../../../lib/constants').default
+    ERROR_MESSAGE
+} from '../../../lib/constants'
 
 const InitialState = require('../selectFromListInitialState').default
 import selectFromListReducer from '../selectFromListReducer'
@@ -59,5 +60,15 @@ describe('selectFromList Reducer ', () => {
         }
         let nextState = selectFromListReducer(undefined, action)
         expect(nextState.selectFromListState).toBe(payload)
+    })
+
+    it('it should set field data list', () => {
+        const message = 'mapping of radioForMaster error'
+        const action = {
+            type: ERROR_MESSAGE,
+            payload: message
+        }
+        let nextState = selectFromListReducer(undefined, action)
+        expect(nextState.errorMessage).toBe(message)
     })
 })

@@ -4,13 +4,13 @@ import thunk from 'redux-thunk'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 
 var actions = require('../signatureActions')
-const {
+import {
     SET_FIELD_DATA_LIST,
     SAVE_SIGNATURE,
     USER,
     FormLayout,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 import { signatureService } from '../../../services/classes/SignatureRemarks'
 import {
     SIGNATURE,

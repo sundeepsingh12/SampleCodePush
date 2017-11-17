@@ -25,10 +25,10 @@ import {
     SIGN,
     IMAGE_EXTENSION
 } from '../../lib/AttributeConstants'
-const {
+import {
     USER,
     FIELD_ATTRIBUTE,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { fieldDataService } from '../../services/classes/FieldData'
 class SignatureRemarks {
@@ -43,7 +43,6 @@ class SignatureRemarks {
         let checkCondition;
         let dataList = []
         for (let [key, fieldDataObject] of fieldDataList.entries()) {
-            console.log('==in service', fieldDataObject)
             let dataObject = {}
             switch (fieldDataObject.attributeTypeId) {
                 case CAMERA_HIGH:
@@ -69,15 +68,15 @@ class SignatureRemarks {
                     checkCondition = true;
             }
             if (fieldDataObject && !fieldDataObject.hidden && fieldDataObject.value != undefined && fieldDataObject.value.trim() != '' && (fieldDataObject.parentId == 0 || fieldDataObject.parentId == -1) && checkCondition) {
-                let { label, value } = fieldDataObject
-                dataList.push({ label, value })
+                let { label, value, fieldAttributeMasterId } = fieldDataObject
+                dataList.push({ label, value, fieldAttributeMasterId })
             }
             if ((fieldDataObject.attributeTypeId == MONEY_COLLECT || fieldDataObject.attributeTypeId == MONEY_PAY) && fieldDataObject.childDataList != null && fieldDataObject.childDataList.length > 0) {
                 for (let childFieldData of fieldDataObject.childDataList) {
                     if (childFieldData.attributeTypeId == ACTUAL_AMOUNT) {
-                        let { label } = fieldDataObject
+                        let { label, fieldAttributeMasterId } = fieldDataObject
                         let { value } = childFieldData
-                        dataList.push({ label, value })
+                        dataList.push({ label, value, fieldAttributeMasterId })
                     }
                 }
             }
@@ -92,7 +91,7 @@ class SignatureRemarks {
     async saveFile(result, currentTimeInMillis) {
         RNFS.mkdir(PATH_TEMP);
         const image_name = SIGN + currentTimeInMillis + IMAGE_EXTENSION
-            await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
+        await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
         const user = await keyValueDBService.getValueFromStore(USER);
         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
         return value

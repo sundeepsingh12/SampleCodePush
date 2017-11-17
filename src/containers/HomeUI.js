@@ -1,30 +1,18 @@
-/**
- * # Main.js
- *  This is the main app screen
- *
- */
+
 'use strict'
-/*
- * ## Imports
- *
- * Imports from redux
- */
+
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
-/**
- * The actions we need
- */
+
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import ResyncLoader from '../components/ResyncLoader'
 
-/**
- * The components needed from React
- */
+
 import React, {Component} from 'react'
 import {
   StyleSheet,
@@ -100,13 +88,26 @@ class HomeUI extends Component {
           <Text>NewJob
           </Text> 
         </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('SortingResults')}>
+          <Text>SortingResults
+          </Text> 
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('Profile')}>
+          <Text>Profile
+          </Text> 
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('ProfileView')}>
+          <Text>ProfileView
+          </Text> 
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('ResetPassword')}>
+          <Text>ResetPassword
+          </Text>  
+        </Button>
       </View>
     )
   }
-
 };
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(HomeUI)

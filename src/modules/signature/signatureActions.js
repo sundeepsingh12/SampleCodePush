@@ -1,5 +1,5 @@
 'use strict'
-const {
+import {
     SET_FIELD_DATA_LIST,
     SAVE_SIGNATURE,
     USER,
@@ -7,13 +7,13 @@ const {
     SET_REMARKS_VALIDATION,
     FIELD_ATTRIBUTE,
     ON_BLUR
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
 import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import {
-    OBJECTSAROJFAREYE
+    OBJECT_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
 
 export function setFieldDataList(fieldDataList) {
@@ -62,6 +62,6 @@ export function saveSignatureAndRating(result, rating, currentElement, formEleme
         const signatureValue = await signatureService.saveFile(result, moment());
         const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
         const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransactionId, latestPositionId)
-        dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECTSAROJFAREYE, fieldDataListObject))
+        dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
     }
 }

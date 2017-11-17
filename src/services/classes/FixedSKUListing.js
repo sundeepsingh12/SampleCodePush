@@ -7,7 +7,7 @@ import {
     FIXED_SKU_QUANTITY,
     FIXED_SKU_UNIT_PRICE,
     FIXED_SKU_CODE,
-    OBJECT_ATTR_ID,
+    OBJECT,
     OBJECT_SAROJ_FAREYE,
     TOTAL_AMOUNT
 } from '../../lib/AttributeConstants'
@@ -41,7 +41,7 @@ class FixedSKUListing {
                     fieldAttributeDataObject.id = this.id++
                     fieldAttributeDataObject.value = 0
                     fixedSKUList[TOTAL_AMOUNT] = fieldAttributeDataObject
-                } else if (fieldAttributeData.attributeTypeId == OBJECT_ATTR_ID) {
+                } else if (fieldAttributeData.attributeTypeId == OBJECT) {
                     let fixedSKUObjectChildListTemplate = {}
                     fieldAttributeDataObject.value = OBJECT_SAROJ_FAREYE
                     for (let fieldAttributeMaster of fieldAttributeMasterList) {

@@ -4,11 +4,11 @@ import { fieldAttributeMasterService } from '../classes/FieldAttributeMaster'
 import { fieldValidationService } from '../classes/FieldValidation'
 import { moduleCustomizationService } from '../classes/ModuleCustomization'
 import * as realm from '../../repositories/realmdb'
-const {
+import {
     ACTUAL_AMOUNT,
     AMOUNT,
     ARRAY,
-    ARRAYSAROJFAREYE,
+    ARRAY_SAROJ_FAREYE,
     CASH,
     CHEQUE,
     DECIMAL,
@@ -29,7 +29,7 @@ const {
     NET_BANKING_UPI_LINK,
     NOT_PAID,
     OBJECT,
-    OBJECTSAROJFAREYE,
+    OBJECT_SAROJ_FAREYE,
     ORIGINAL_AMOUNT,
     PAYNEAR,
     PAYO,
@@ -45,11 +45,11 @@ const {
     TICKET_RESTAURANT,
     TRANSACTION_NUMBER,
     UPI,
-} = require('../../lib/AttributeConstants')
+} from '../../lib/AttributeConstants'
 
-const {
+import {
     TABLE_JOB_DATA,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 class Payment {
 
@@ -237,7 +237,7 @@ class Payment {
                 let detailsData = {}
                 detailsData.attributeTypeId = fieldAttributeMaster.childObject[index].attributeTypeId
                 detailsData.fieldAttributeMasterId = fieldAttributeMaster.childObject[index].id
-                detailsData.value = fieldAttributeMaster.childObject[index].attributeTypeId == ARRAY ? ARRAYSAROJFAREYE : fieldAttributeMaster.childObject[index].attributeTypeId == OBJECT ? OBJECTSAROJFAREYE : null
+                detailsData.value = fieldAttributeMaster.childObject[index].attributeTypeId == ARRAY ? ARRAY_SAROJ_FAREYE : fieldAttributeMaster.childObject[index].attributeTypeId == OBJECT ? OBJECT_SAROJ_FAREYE : null
                 detailsData.childDataList = this.prepareMoneyCollectChildFieldDataListDTO(actualAmount, fieldAttributeMaster.childObject[index], originalAmount, selectedIndex, transactionNumber, remarks, receipt)
                 moneyCollectFieldDataChildList.push(detailsData)
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == MODE) {

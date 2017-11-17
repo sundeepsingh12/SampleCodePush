@@ -9,7 +9,7 @@ import { keyValueDBService } from './KeyValueDBService'
 
 import moment from 'moment'
 
-const {
+import {
   JOB_MASTER,
   JOB_ATTRIBUTE,
   JOB_ATTRIBUTE_VALUE,
@@ -33,7 +33,7 @@ const {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   HUB
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 class JobMaster {
@@ -249,6 +249,13 @@ class JobMaster {
       throw new Error("Time mismatch. Please correct time on Device")
     }
     return true
+  }
+
+  getIdJobMasterMap(jobMasterList){
+    const idJobMasterMap = {}
+    jobMasterList.forEach(jobMaster=>idJobMasterMap[jobMaster.id] = jobMaster)
+    console.log('idJobMasterMap',idJobMasterMap)
+    return idJobMasterMap
   }
 }
 

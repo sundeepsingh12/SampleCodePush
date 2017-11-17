@@ -1,59 +1,50 @@
 'use strict'
 
-const {
-  JOB_FETCHING_START,
+import {
+  CLEAR_HOME_STATE,
+  CUSTOMER_CARE,
+  CUSTOMIZATION_APP_MODULE,
+  CUSTOMIZATION_LIST_MAP,
+  Home,
+  JOB_ATTRIBUTE,
+  JOB_ATTRIBUTE_STATUS,
+  JOB_DOWNLOADING_STATUS,
   JOB_FETCHING_END,
+  JOB_FETCHING_START,
+  JOB_LISTING_START,
+  JOB_LISTING_END,
+  JOB_STATUS,
   SET_FETCHING_FALSE,
   SET_REFRESHING_TRUE,
-  JOB_DOWNLOADING_STATUS,
-  UNSEEN,
-  TABLE_JOB_TRANSACTION,
-  TAB,
   SET_TABS_LIST,
+  SET_TABS_TRANSACTIONS,
+  SMS_TEMPLATE,
+  TAB,
   TABLE_FIELD_DATA,
   TABLE_JOB,
   TABLE_JOB_DATA,
-  USER,
-  TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION,
   TABLE_JOB_TRANSACTION_CUSTOMIZATION,
-  CLEAR_HOME_STATE,
-  SET_TABS_TRANSACTIONS,
-  JOB_STATUS,
-  JOB_LISTING_START,
-  JOB_LISTING_END,
-  CUSTOMIZATION_LIST_MAP,
-  JOB_ATTRIBUTE,
-  JOB_ATTRIBUTE_STATUS,
-  CUSTOMER_CARE,
-  SMS_TEMPLATE,
-} = require('../../lib/constants').default
+  TABLE_RUNSHEET,
+  UNSEEN,
+  USER,
+  JOB_MASTER
+} from '../../lib/constants'
 
 import CONFIG from '../../lib/config'
-import {
-  keyValueDBService
-} from '../../services/classes/KeyValueDBService'
-import {
-  sync
-} from '../../services/classes/Sync'
-import {
-  jobStatusService
-} from '../../services/classes/JobStatus'
-import {
-  jobTransactionService
-} from '../../services/classes/JobTransaction'
-import {
-  jobSummaryService
-} from '../../services/classes/JobSummary'
-import {
-  jobMasterService
-} from '../../services/classes/JobMaster'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { sync } from '../../services/classes/Sync'
+import { jobStatusService } from '../../services/classes/JobStatus'
+import { jobTransactionService } from '../../services/classes/JobTransaction'
+import { jobSummaryService } from '../../services/classes/JobSummary'
+import { jobMasterService } from '../../services/classes/JobMaster'
 import * as realm from '../../repositories/realmdb'
 import _ from 'underscore'
-import {
-  Platform
-} from 'react-native';
-import BackgroundTimer from 'react-native-background-timer';
+import { Platform } from 'react-native';
+import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
+import { setState } from '../global/globalActions'
+import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 
 
 export function jobFetchingEnd(jobTransactionCustomizationList) {
@@ -96,9 +87,22 @@ export function clearHomeState() {
   }
 }
 
-export function navigateToScene(sceneName,paramaters) {
+export function navigateToScene(sceneName, paramaters) {
   return async function (dispatch) {
-    dispatch(NavigationActions.navigate({ routeName: sceneName,params: paramaters}))
+    dispatch(NavigationActions.navigate({ routeName: sceneName, params: paramaters }))
+  }
+}
+
+export function fetchModulesList() {
+  return async function (dispatch) {
+    try {
+      console.log('custom', CUSTOMIZATION_APP_MODULE)
+      const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
+      // let moduleCustomizationMap = moduleCustomizationService.getModuleCustomizationMapForAppModuleId(appModulesList.value)
+      moduleCustomizationService.getActiveModules(appModulesList.value)
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 
@@ -125,7 +129,8 @@ export function fetchJobs() {
       const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
       const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
       const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value)
+      const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value,jobMasterList.value)
       dispatch(jobFetchingEnd(jobTransactionCustomizationList))
     } catch (error) {
       console.log(error)
@@ -137,7 +142,7 @@ export function syncService() {
   return async (dispatch) => {
     try {
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
-      dispatch(onResyncPress())
+        dispatch(onResyncPress())
       }, CONFIG.SYNC_SERVICE_DELAY);
     } catch (error) {
       //Update UI here
@@ -151,7 +156,7 @@ export function onResyncPress() {
     try {
       //Start resync loader here
       dispatch(jobDownloadingStatus(true))
-      await sync.createAndUploadZip();
+      await sync.createAndUploadZip()
       const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
       //Stop resync loader here
       dispatch(jobDownloadingStatus(false))

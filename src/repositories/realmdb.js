@@ -11,7 +11,7 @@ import TrackLogs from './schema/trackLogs'
 
 import _ from 'underscore'
 
-const schemaVersion = 29;
+const schemaVersion = 30;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs];
 
 let realm = new Realm({
@@ -19,7 +19,7 @@ let realm = new Realm({
     schema
 });
 
-const {
+import {
   TABLE_JOB_TRANSACTION,
   TABLE_FIELD_DATA,
   TABLE_JOB,
@@ -28,7 +28,7 @@ const {
   TABLE_RUNSHEET,
   TABLE_JOB_TRANSACTION_CUSTOMIZATION,
   TABLE_TRACK_LOGS
-} = require('../lib/constants').default
+} from '../lib/constants'
 
 export function save(tableName, object) {
     return realm.write(() => {
@@ -64,14 +64,14 @@ export function performBatchSave(...tableNamesVsDataList) {
 }
 
 export function deleteRecords() {
-  return realm.write(() => {
-    realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
-    realm.delete(realm.objects(TABLE_JOB))
-    realm.delete(realm.objects(TABLE_JOB_DATA))
-    realm.delete(realm.objects(TABLE_FIELD_DATA))
-    realm.delete(realm.objects(TABLE_RUNSHEET))
-    realm.delete(realm.objects(TABLE_TRACK_LOGS))
-  });
+    return realm.write(() => {
+        realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
+        realm.delete(realm.objects(TABLE_JOB))
+        realm.delete(realm.objects(TABLE_JOB_DATA))
+        realm.delete(realm.objects(TABLE_FIELD_DATA))
+        realm.delete(realm.objects(TABLE_RUNSHEET))
+        realm.delete(realm.objects(TABLE_TRACK_LOGS))
+    });
 }
 
 /**
@@ -151,4 +151,11 @@ export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
         records = records.sorted(`${sortProperty}`)
     }
     return records
+}
+
+export function updateRealmDb(tableName, transactionIdSequenceMap) {
+    const filteredRecords = realm.objects(tableName).filtered(Object.keys(transactionIdSequenceMap).map(value => 'id = "' + value + '"').join(' OR '))
+    realm.write(() => {
+        filteredRecords.forEach(record => record.seqSelected = record.seqAssigned = transactionIdSequenceMap[record.id])
+    })
 }

@@ -7,13 +7,13 @@ import * as realm from '../../repositories/realmdb'
 import {
     jobDetailsService
 } from './JobDetails'
-const {
+import {
     TABLE_JOB_DATA,
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
     TABLE_RUNSHEET,
     TABLE_FIELD_DATA,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
     ADDRESS_LINE_1,

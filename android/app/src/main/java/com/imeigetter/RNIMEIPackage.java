@@ -20,8 +20,7 @@ public class RNIMEIPackage implements ReactPackage {
         );
     }
 
-    @Override
-    public List<Class<? extends JavaScriptModule>> createJSModules() {
+    public List createJSModules() {
         return Collections.emptyList();
     }
 

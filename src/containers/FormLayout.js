@@ -8,9 +8,8 @@ import {
   FlatList
 }
   from 'react-native'
-import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon,Toast } from 'native-base';
+import { Container, Content, Footer, Card, CardItem, Button, Body, Header, Left, Right, Icon,Toast } from 'native-base'
 import styles from '../themes/FeStyle'
-import imageFile from '../../images/fareye-logo.png'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
@@ -91,13 +90,12 @@ class FormLayout extends Component {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
-      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId);
+      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId,this.props.navigation.state.params.jobMasterId);
     }
   }
 
   _keyExtractor = (item, index) => item[1].key;
   render() {
-    console.log("schsgdc",this.props.errorMessage.length)
     if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',
@@ -123,7 +121,7 @@ class FormLayout extends Component {
           <FlatList
             data={Array.from(this.props.formElement)}
             extraData={this.state}
-            renderItem={(item) => this.renderData(item.item[1])} //TODO add comments for item[1] 
+            renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
             keyExtractor={this._keyExtractor}>
           </FlatList>
         </Content>

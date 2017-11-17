@@ -3,9 +3,9 @@
 import * as realm from '../../repositories/realmdb'
 import { jobDataService } from './JobData'
 import {
-    ARRAYSAROJFAREYE,
+    ARRAY_SAROJ_FAREYE,
     CONTACT_NUMBER,
-    OBJECTSAROJFAREYE,
+    OBJECT_SAROJ_FAREYE,
 } from '../../lib/AttributeConstants'
 
 class JobDetails {
@@ -58,7 +58,7 @@ class JobDetails {
                 dataMap[attributeMaster.attributeTypeId][attributeMaster.id].label = dataObject.label = attributeMaster.label
                 dataObject.attributeTypeId = attributeMaster.attributeTypeId
                 dataObject.id = ++autoIncrementId
-                if (data.value == OBJECTSAROJFAREYE || data.value == ARRAYSAROJFAREYE) {
+                if (data.value == OBJECT_SAROJ_FAREYE || data.value == ARRAY_SAROJ_FAREYE) {
                     let childDataObject = this.prepareDataObject(id, data.positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId)
                     autoIncrementId = childDataObject.autoIncrementId
                     dataMap[attributeMaster.attributeTypeId][attributeMaster.id].childDataMap = childDataObject.dataMap
