@@ -1,5 +1,5 @@
 'use strict'
-import _ from 'underscore'
+import _ from 'lodash'
 
 const InitialState = require('./skuListingInitialState').default
 

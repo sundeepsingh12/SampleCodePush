@@ -21,7 +21,6 @@ import {
     HUB,
     TOGGLE_RESEQUENCE_BUTTON
 } from '../../lib/constants'
-import _ from 'underscore'
 import {
     setState
 } from '../global/globalActions'

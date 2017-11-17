@@ -11,10 +11,10 @@ import {
     SKU_ACTUAL_QUANTITY
 } from '../lib/AttributeConstants'
 import {  CheckBox,Picker } from 'native-base'
-import renderIf from '../lib/renderIf';
-import _ from 'underscore'
+import renderIf from '../lib/renderIf'
+import _ from 'lodash'
 
-const Item = Picker.Item;
+const Item = Picker.Item
 
   
  export default class SkuListItem extends Component {

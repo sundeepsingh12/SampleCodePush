@@ -28,7 +28,6 @@ import { jobTransactionService } from '../../../services/classes/JobTransaction'
 import { jobSummaryService } from '../../../services/classes/JobSummary'
 import { jobMasterService } from '../../../services/classes/JobMaster'
 import * as realm from '../../../repositories/realmdb'
-import _ from 'underscore'
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
