@@ -58,7 +58,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...formLayoutActions,...cashTenderingActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions }, dispatch)
     }
 }
 
@@ -108,9 +108,9 @@ class BasicFormElement extends Component {
                 break
             }
             case CASH_TENDERING: {
-                cash = this.props.actions.checkForCash(this.props.formElement,this.props.item)
-                if(cash  > 0){
-                screenName = 'CashTendering'
+                cash = this.props.actions.checkForCash(this.props.formElement, this.props.item)
+                if (cash > 0) {
+                    screenName = 'CashTendering'
                 } else {
                     screenName = null
                     { Toast.show({ text: "NOT REQUIRED", position: 'bottom', buttonText: 'Okay' }) }
@@ -132,6 +132,10 @@ class BasicFormElement extends Component {
             }
             case SIGNATURE_AND_NPS: {
                 screenName = 'SignatureAndNps'
+                break
+            }
+            case ARRAY: {
+                screenName = 'ArrayFieldAttribute'
                 break
             }
             default: {
@@ -293,11 +297,12 @@ class BasicFormElement extends Component {
             case DATE:
             case CASH_TENDERING:
             case SIGNATURE_AND_NPS:
+            case ARRAY:
             case EXTERNAL_DATA_STORE:
             case DATA_STORE:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-                        
-            default: 
+
+            default:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )

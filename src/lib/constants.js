@@ -181,7 +181,6 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
-
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,
@@ -196,6 +195,8 @@ module.exports = keyMirror({
     SkuListing: null,
     TabScreen: null,
     TimePicker: null,
+    SkuListing: null,
+    Sequence: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -203,7 +204,6 @@ module.exports = keyMirror({
     SHOW_SEARCH_BAR: null,
     SKU_CODE_CHANGE: null,
     UPDATE_SKU_ACTUAL_QUANTITY: null,
-
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
@@ -218,6 +218,12 @@ module.exports = keyMirror({
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
 
+    //array actions
+    SET_ARRAY_CHILD_LIST: null,
+    SET_NEW_ARRAY_ROW: null,
+    SET_ARRAY_ELEMENTS: null,
+    SET_ERROR_MSG: null,
+    CLEAR_ARRAY_STATE: null,
     //CashTendering
     CHANGE_AMOUNT: null,
     IS_CASH_TENDERING_LOADER_RUNNING: null,
@@ -245,9 +251,19 @@ module.exports = keyMirror({
     TOGGLE_RESEQUENCE_BUTTON: null,
 
     //New Job
-    NEW_JOB_MASTER: null,
-    NEW_JOB_STATUS: null,
-    SET_DATA_IN_STATISTICS_LIST: null,
+    NEW_JOB_MASTER : null,
+    NEW_JOB_STATUS : null,
+
+    //statisticsModule
+    SET_DATA_IN_STATISTICS_LIST : null,
+   
+    //profileModule
+    FETCH_USER_DETAILS: null,
+    CHECK_CURRENT_PASSWORD: null,
+    SET_NEW_PASSWORD: null,
+    SET_CONFIRM_NEW_PASSWORD: null,
+    CLEAR_PASSWORD_TEXTINPUT: null,
+    TOGGLE_SAVE_RESET_BUTTON: null,
 
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,

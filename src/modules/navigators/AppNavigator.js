@@ -36,9 +36,11 @@ import ArrayScreen from '../../containers/ArrayScreen'
 import ResetPassword from '../../containers/ResetPassword'
 import SyncScreen from '../../containers/SyncScreen'
 import TabScreen from '../../containers/TabScreen'
+import TaskListScreen from '../../containers/TaskListScreen'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
+
 import {
   Container,
   Content,
@@ -65,7 +67,8 @@ import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
 import SkuListing from '../../containers/SkuListing'
 import OverlayAttributes from '../../containers/OverlayAttributes'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
 import SelectFromList from '../../containers/SelectFromList'
@@ -263,6 +266,9 @@ export const AppNavigator = StackNavigator({
   TabScreen: {
     screen: TabScreen
   },
+  ResetPassword: {
+    screen: ResetPassword
+  },
   SkuDetails: {
     screen: SkuDetails
   },
@@ -292,6 +298,9 @@ export const AppNavigator = StackNavigator({
   },
   Signature: {
     screen: Signature,
+    navigationOptions: {
+      header: null
+    }
   },
   FormLayout: {
     screen: FormLayout,
@@ -302,6 +311,13 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
+  SignatureAndNps: {
+    screen: SignatureAndNps
+  },
+  ArrayFieldAttribute: {
+    screen: ArrayFieldAttribute
+  }
+  ,
   DataStore: {
     screen: DataStore,
   },
@@ -314,9 +330,9 @@ export const AppNavigator = StackNavigator({
       title: 'Collect Cash',
     }
   },
-  SignatureAndNps: {
-    screen: SignatureAndNps
-  },
+  TaskListScreen: {
+    screen: TaskListScreen
+  }
 },
   {
     cardStyle: {

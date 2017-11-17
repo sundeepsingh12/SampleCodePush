@@ -8,7 +8,12 @@ const styles = StyleSheet.create({
         top: 0, left: 0, bottom: 0, right: 0,
         justifyContent: 'center',
         alignItems: 'center'
-    }
+    },
+    base: {
+        width: 150,
+        height: 150,
+        alignSelf: 'center'
+    },
 })
 
 function generateArc(percentage){
@@ -34,15 +39,15 @@ function generateArc(percentage){
 
 const CircularProgress = ({
     percentage = 95, 
-    blankColor = "rgba(254, 254, 254, 0.5)", 
+    blankColor = "#ffffff", 
     donutColor = "#ffffff",
     fillColor = "transparent",
-    progressWidth = 5,
+    progressWidth = 6,
     children
 }) => {
     return <View style={styles.base}>
-        <Svg width="200" height="200" viewBox='-8 -8 220 220'>
-            <Circle cx="100" cy="100" r="100" strokeWidth="3" fill='transparent' stroke={blankColor}/>
+        <Svg width="150" height="150" viewBox='-8 -8 220 220'>
+            <Circle cx="100" cy="100" r="100" strokeWidth="2" opacity="0.2" fill='transparent' stroke={blankColor}/>
             <Path 
                 d={`M100 00 L100 0 ${generateArc(percentage)}`}
                 stroke={donutColor}

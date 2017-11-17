@@ -87,11 +87,7 @@ class Home extends Component {
     return (
       <Header
         hasTabs
-        style={StyleSheet.flatten([
-          styles.bgWhite, styles.bgPrimary, {
-            borderBottomColor: '#F2F2F2'
-          }
-        ])}>
+        style={[styles.bgPrimary]}>
         <Left style={{
           width: 90
         }}>
@@ -118,19 +114,24 @@ class Home extends Component {
     )
   }
 
+
   pieChartView() {
     if (!PIECHART.enabled) {
       return null
     }
+    // console.log('color',this.shadeColor1())
     return (
       <LinearGradient
-        colors={['#262da0', '#205dbe', '#2c83c9']}
+        colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}
         style={style.chartBlock}>
-        <CircularProgress percentage={percentage}>
-            <View>
-              <Text>{percentage}%</Text>
-            </View>
-        </CircularProgress>
+        <View style={[styles.justifyCenter, styles.paddingTop15, styles.paddingBottom15]}>
+          <CircularProgress percentage={percentage} style={[{backgroundColor: '#green'}]}>
+              <View style={[styles.justifyCenter, styles.alignCenter]}>
+                <Text style={{fontSize: 40, color: '#ffffff', fontWeight: '500'}}>{percentage}</Text>
+                <Text style={{fontSize: 18, color: '#ffffff'}}>pending</Text>
+              </View>
+          </CircularProgress>
+        </View>
         <View style={[styles.row, styles.justifySpaceAround]}>
           <View>
             <Text
@@ -206,7 +207,8 @@ const style = StyleSheet.create({
 
   },
   headerIcon: {
-    fontSize: 18
+    fontSize: 18,
+    color: '#ffffff'
   },
   pieData: {
     position: 'absolute',

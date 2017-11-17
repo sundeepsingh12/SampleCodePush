@@ -11,7 +11,7 @@ import TrackLogs from './schema/trackLogs'
 
 import _ from 'underscore'
 
-const schemaVersion = 29;
+const schemaVersion = 30;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs];
 
 let realm = new Realm({

@@ -91,10 +91,6 @@ class HomeUI extends Component {
           <Text>SortingResults
           </Text> 
         </Button>
-        <Button success onPress= {() => this.props.actions.navigateToScene('Profile')}>
-          <Text>Profile
-          </Text> 
-        </Button>
         <Button success onPress= {() => this.props.actions.navigateToScene('ProfileView')}>
           <Text>ProfileView
           </Text>
