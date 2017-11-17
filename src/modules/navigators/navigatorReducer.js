@@ -1,12 +1,12 @@
 import { AppNavigator } from '../navigators/AppNavigator';
 import { NavigationActions } from 'react-navigation';
-const initialNavState = require('./navigatorInitialState').default   
+import initialNavState from './navigatorInitialState'
 
 import {
-    Application,
-    Login,
-    Preloader,
-    Home,
+    ApplicationScreen,
+    LoginScreen,
+    PreloaderScreen,
+    HomeScreen,
     JobDetails,
     FormLayout
 } from '../../lib/constants'
@@ -14,25 +14,25 @@ import {
 export default function nav(state = initialNavState, action) {
   let nextState;
   switch (action.type) {
-    case Application:
+    case ApplicationScreen:
       nextState = AppNavigator.router.getStateForAction(
          NavigationActions.back(),
         state
       );
       break;
-      case Login:
+      case LoginScreen:
       nextState = AppNavigator.router.getStateForAction(
         NavigationActions.navigate({ routeName: Preloader }),
         state
       );
     break;
-    case Preloader:
+    case PreloaderScreen:
        nextState = AppNavigator.router.getStateForAction(
         NavigationActions.navigate({ routeName:  Home }),
         state
       );
       break;
-      case Home:
+      case HomeScreen:
        nextState = AppNavigator.router.getStateForAction(
         NavigationActions.navigate({ routeName:  JobDetails }),
         state

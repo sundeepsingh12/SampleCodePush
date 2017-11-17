@@ -3,8 +3,9 @@ import CONFIG from '../lib/config'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import StartIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
 import LiveIcon from '../../images/fareye-default-iconset/homescreen/live.png'
-import BulkIcon from '../../images/fareye-default-iconset/homescreen/bulk.png'
+import SvgIcons from '../../src/svg_components/icons/BulkIcon'
 import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
+import React,{Component} from 'react'
 module.exports = {
 
     /**
@@ -254,13 +255,13 @@ module.exports = {
         appModuleId: 1,
         displayName: 'Bulk Update',
         enabled: false,
-        icon: BulkIcon,
+        icon: <SvgIcons/>,
     },
     LIVE: {
         appModuleId: 13,
         displayName: 'Live',
         enabled: false,
-        icon: LiveIcon,
+        icon: <SvgIcons/>,
     },
     OFFLINEDATASTORE: {
         appModuleId: 15,
@@ -288,13 +289,13 @@ module.exports = {
         appModuleId: 2,
         displayName: 'Sequence',
         enabled: false,
-        icon: SequenceIcon,
+        icon: <SvgIcons/>,
     },
     START: {
         appModuleId: 4,
         displayName: 'All Tasks',
         enabled: false,
-        icon: StartIcon
+        icon: <SvgIcons/>
     },
     SUMMARY: {
         appModuleId: 8,
@@ -316,5 +317,8 @@ module.exports = {
     FAILURE_SORTING: 'Searching failed, Please try again !',
     NA : 'N.A',
     SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
-    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package'
+    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package',
+
+    //Start Search PlaceHolder
+    SEARCH_PLACEHOLDER : 'Filter Reference Numbers',
 }

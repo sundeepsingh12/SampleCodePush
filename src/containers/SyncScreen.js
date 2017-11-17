@@ -50,8 +50,8 @@ function mapDispatchToProps(dispatch) {
 
 class SyncScreen extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    return {header: null}
+  componentDidMount() {
+    this.props.actions.onResyncPress()
   }
 
   render() {
@@ -88,7 +88,7 @@ class SyncScreen extends Component {
                       Can’t Connect to the internet
                   </Text>
                   <View style={[styles.paddingTop15]}>
-                    <Button  style={StyleSheet.flatten([styles.bgPrimary])} >
+                    <Button onPress = {() => {this.props.actions.onResyncPress()}}  style={StyleSheet.flatten([styles.bgPrimary])} >
                       <Text> Retry </Text>
                     </Button>
                   </View>
@@ -110,22 +110,6 @@ class SyncScreen extends Component {
                   </Text>
               </View>
           </Content>
-          <Footer style={[style.footer]}>
-            <FooterTab>
-              <Button>
-                <Icon name="ios-home" />
-                <Text>Home</Text>
-              </Button>
-              <Button>
-                <Icon name="ios-sync" />
-                <Text>SyncScreen</Text>
-              </Button>
-              <Button active>
-                <Icon name="ios-menu" />
-                <Text>Menu</Text>
-              </Button>
-            </FooterTab>
-          </Footer>
         </Container>
       </StyleProvider>
 

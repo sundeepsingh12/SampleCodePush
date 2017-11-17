@@ -3,7 +3,9 @@
 const { Record } = require('immutable')
 
 var InitialState = Record({
-    loading: false,
+    tabsList: [],
+    tabIdStatusIdMap: {},
+    downloadingJobs : false,
 })
 
 export default InitialState

@@ -27,6 +27,8 @@ import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
+import renderIf from '../lib/renderIf'
+import CustomAlert from '../components/CustomAlert'
 import {
   BACKUP,
   BLUETOOTH,
@@ -38,7 +40,11 @@ import {
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
-  return {}
+  return {
+    loading: state.home.loading,
+    errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
+    isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
+  }
 };
 
 function mapDispatchToProps(dispatch) {
@@ -51,11 +57,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class Profile extends Component {
-
-  static navigationOptions = ({ navigation }) => {
-    return { header: null }
-  }
+class Menu extends Component {
 
   renderModuleView(modulesList) {
     let moduleView = []
@@ -79,10 +81,10 @@ class Profile extends Component {
     return moduleView
   }
 
-  renderTextView(text, key) {
+  renderTextView(text, key, isLast, icon) {
     return (
-      <View key={key} style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
-        <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }]}>
+      <View key={key} style={[styles.justifySpaceBetween, icon ? styles.marginLeft10 : null, styles.flex1]}>
+        <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomWidth: isLast ? 0 : 1, borderBottomColor: '#f3f3f3' }]}>
           <Text style={[styles.fontDefault]}>
             {text}
           </Text>
@@ -102,11 +104,11 @@ class Profile extends Component {
 
   renderCardView(view, key) {
     return (
-      <View key={key} style={[styles.bgWhite, styles.marginBottom10]}>
-        <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-          {view}
+        <View key={key} style={[styles.bgWhite]}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            {view}
+          </View>
         </View>
-      </View>
     )
   }
 
@@ -114,17 +116,24 @@ class Profile extends Component {
     let moduleView, rowView = []
     for (let index in moduleList) {
       moduleView = []
+      if (!moduleList[index].enabled) {
+        continue
+      }
       if (moduleList[index].icon) {
         moduleView.push(
           this.renderIconView(moduleList[index].icon, key * (index + 1) * 100)
         )
       }
       moduleView.push(
-        this.renderTextView(moduleList[index].displayName, key * (index + 1) * 1000)
+        this.renderTextView(moduleList[index].displayName, key * (index + 1) * 1000, (index == moduleList.length - 1), moduleList[index].icon)
       )
       rowView.push(this.renderCardView(moduleView, key * (index + 1) * 10000))
     }
     return rowView
+  }
+
+  startLoginScreenWithoutLogout = () => {
+    this.props.actions.startLoginScreenWithoutLogout()
   }
 
 
@@ -132,6 +141,7 @@ class Profile extends Component {
     let profileView = this.renderModuleView([PROFILE, STATISTIC], 1)
     let paymentView = this.renderModuleView([EZE_TAP, M_SWIPE], 2)
     let deviceView = this.renderModuleView([BACKUP, OFFLINEDATASTORE, BLUETOOTH], 3)
+    console.log('paymentView',paymentView)
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -146,6 +156,12 @@ class Profile extends Component {
               </View>
             </Body>
           </Header>
+          {renderIf(this.props.isErrorType_403_400_Logout,
+            <CustomAlert
+              title="Unauthorised Device"
+              message={this.props.errorMessage_403_400_Logout}
+              onCancelPressed={this.startLoginScreenWithoutLogout} />
+          )}
 
           <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
             {/*card 1*/}
@@ -154,7 +170,7 @@ class Profile extends Component {
             </View>
 
             {/*Card 2*/}
-            <View style={[styles.bgWhite, styles.marginBottom10]}>
+            <View style={[styles.bgWhite, paymentView.length ? styles.marginBottom10 : null]}>
               {paymentView}
             </View>
 
@@ -202,7 +218,7 @@ class Profile extends Component {
               </View>
             </TouchableOpacity>
           </Content>
-          <Footer style={[style.footer]}>
+          {/* <Footer style={[style.footer]}>
             <FooterTab>
               <Button onPress={() => { this.props.actions.navigateToScene('JobDetailsV2') }}>
                 <Icon name="ios-home" />
@@ -217,7 +233,7 @@ class Profile extends Component {
                 <Text>Menu</Text>
               </Button>
             </FooterTab>
-          </Footer>
+          </Footer> */}
         </Container>
       </StyleProvider>
 
@@ -254,4 +270,4 @@ const style = StyleSheet.create({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Profile)
+export default connect(mapStateToProps, mapDispatchToProps)(Menu)

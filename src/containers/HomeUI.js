@@ -43,7 +43,6 @@ import {
   Footer,
   FooterTab
 } from 'native-base';
-import Jobs from './Jobs';
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
 import renderIf from '../lib/renderIf';

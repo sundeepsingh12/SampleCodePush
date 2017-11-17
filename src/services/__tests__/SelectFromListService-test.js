@@ -3,10 +3,10 @@
 import { selectFromListDataService } from '../classes/SelectFromListService'
 import { CHECKBOX, RADIOBUTTON, DROPDOWN, TEXT } from '../../lib/AttributeConstants'
 import { keyValueDBService } from '../classes/KeyValueDBService'
-const {
+import {
     FIELD_ATTRIBUTE,
     TABLE_JOB_DATA
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 describe('test cases for selectFromListService setorRemovestates', () => {
 

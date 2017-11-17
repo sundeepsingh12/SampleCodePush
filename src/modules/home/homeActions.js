@@ -105,41 +105,12 @@ export function fetchModulesList() {
   }
 }
 
-export function fetchTabs() {
-  return async function (dispatch) {
-    try {
-      const tabs = await keyValueDBService.getValueFromStore(TAB)
-      const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-      const tabIdStatusIdMap = jobMasterService.prepareTabStatusIdMap(statusList.value)
-      dispatch(setTabsList(tabs.value, tabIdStatusIdMap))
-    } catch (error) {
-      console.log(error)
-    }
-  }
-}
-
-export function fetchJobs() {
-  return async function (dispatch) {
-    try {
-      dispatch(jobFetchingStart())
-      const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-      const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
-      const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-      const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
-      const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
-      const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-      const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value,jobMasterList.value)
-      dispatch(jobFetchingEnd(jobTransactionCustomizationList))
-    } catch (error) {
-      console.log(error)
-    }
-  }
-}
-
 export function syncService() {
   return async (dispatch) => {
     try {
+      if(CONFIG.intervalId) {
+        throw new Error('Service Already Scheduled')
+      }
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
         dispatch(onResyncPress())
       }, CONFIG.SYNC_SERVICE_DELAY);
@@ -153,18 +124,18 @@ export function syncService() {
 export function onResyncPress() {
   return async function (dispatch) {
     try {
-      //Start resync loader here
       dispatch(jobDownloadingStatus(true))
       await sync.createAndUploadZip()
       const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
-      //Stop resync loader here
       dispatch(jobDownloadingStatus(false))
       if (isJobsPresent) {
         dispatch(fetchJobs())
       }
+      dispatch(syncService())
     } catch (error) {
       //Update UI here
       dispatch(jobDownloadingStatus(false))
+      dispatch(syncService())
       console.log(error)
     }
   }

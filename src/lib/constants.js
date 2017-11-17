@@ -163,7 +163,7 @@ module.exports = keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
@@ -179,18 +179,23 @@ module.exports = keyMirror({
     ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
-    UPDATE_FIELD_DATA_VALIDATION:null,
-    UPDATE_NEXT_EDITABLE : null,
+    UPDATE_FIELD_DATA_VALIDATION: null,
+    UPDATE_NEXT_EDITABLE: null,
+
     //Route names (Used in React Navigation)
-    Application: null,
-    Login: null,
-    Preloader: null,
-    Home: null,
-    JobDetails: null,
+    ApplicationScreen: null,
     FormLayout: null,
+    HardwareBackPress: null,
+    HomeScreen: null,
+    HomeTabNavigatorScreen: null,
+    JobDetails: null,
+    LoginScreen: null,
+    MenuScreen: null,
+    PreloaderScreen: null,
+    Sequence: null,
+    SkuListing: null,
+    TabScreen: null,
     TimePicker: null,
-    SkuListing:null,
-    Sequence:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -201,7 +206,7 @@ module.exports = keyMirror({
 
 
     //CheckBox 
-    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:null,
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
@@ -231,22 +236,22 @@ module.exports = keyMirror({
     SPECIAL: null,
     MINMAX: null,
     _id: null,
-    SET_INITIAL_STATE :null,
+    SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
-   
+
     //Sequence Module Actions
-    SEQUENCE_LIST_FETCHING_START:null,
-    SEQUENCE_LIST_FETCHING_STOP:null,
-    TOGGLE_RESEQUENCE_BUTTON:null,
-    
+    SEQUENCE_LIST_FETCHING_START: null,
+    SEQUENCE_LIST_FETCHING_STOP: null,
+    TOGGLE_RESEQUENCE_BUTTON: null,
+
     //New Job
-    NEW_JOB_MASTER : null,
-    NEW_JOB_STATUS : null,
-    SET_DATA_IN_STATISTICS_LIST : null,
+    NEW_JOB_MASTER: null,
+    NEW_JOB_STATUS: null,
+    SET_DATA_IN_STATISTICS_LIST: null,
 
     //Sorting And Printing
-    SORTING_SEARCH_VALUE : null,
-    SORTING_ITEM_DETAILS : null,
+    SORTING_SEARCH_VALUE: null,
+    SORTING_ITEM_DETAILS: null,
 })
 
 

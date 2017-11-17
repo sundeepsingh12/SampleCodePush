@@ -1,6 +1,6 @@
 
 
-const themeColor = '#E91E63';
+const themeColor = 'blue';
 
 export default {
     

@@ -42,6 +42,7 @@ class ModuleCustomization {
      * 
      */
     getActiveModules(moduleCustomizationList, user) {
+        console.log(moduleCustomizationList)
         for (let index in moduleCustomizationList) {
             switch (moduleCustomizationList[index].appModulesId) {
                 case BACKUP.appModuleId: {
@@ -74,6 +75,10 @@ class ModuleCustomization {
                 }
                 case PIECHART.appModuleId: {
                     this.setModuleDetails(PIECHART, moduleCustomizationList[index], user)
+                    break
+                }
+                case PROFILE.appModuleId: {
+                    this.setModuleDetails(START, moduleCustomizationList[index], user)
                     break
                 }
                 case START.appModuleId: {

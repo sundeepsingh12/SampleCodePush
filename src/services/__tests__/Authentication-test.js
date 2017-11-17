@@ -7,12 +7,12 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 import { restAPI } from '../../lib/RestAPI'
 
 
-const {
+import {
     USERNAME,
     PASSWORD,
     REMEMBER_ME,
 
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 describe('auth service', () => {
 

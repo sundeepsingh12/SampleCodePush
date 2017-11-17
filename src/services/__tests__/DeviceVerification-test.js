@@ -9,10 +9,10 @@ import { restAPI } from '../../lib/RestAPI'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 let imei = require('../../wrapper/IMEI')
 
-const {
+import {
     DEVICE_IMEI,
     DEVICE_SIM
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 describe('device verification', () => {
 
