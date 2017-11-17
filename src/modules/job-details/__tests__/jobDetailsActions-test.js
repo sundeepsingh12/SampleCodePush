@@ -43,17 +43,6 @@ describe('location mismatch actions', () => {
                 enabled: true,
                 etaUpdateStatus: null,
             },
-            // {
-            //     id: 3453,
-            //     enableFormLayout: true,
-            //     enableLocationMismatch: false,
-            //     enableManualBroadcast: false,
-            //     enableMultipartAssignment: false,
-            //     enableOutForDelivery: false,
-            //     enableResequenceRestriction: false,
-            //     enabled: true,
-            //     etaUpdateStatus: null,
-            // }
     }
 
     let data = {

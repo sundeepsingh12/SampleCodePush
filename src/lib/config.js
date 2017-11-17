@@ -12,19 +12,11 @@ module.exports = {
       url: 'https://www.fareye.co/app'
     },
     staging: {
-<<<<<<< HEAD
-      url: 'https://dev.fareye.co/app'
-    },      
-    port:1883,
-    PUSH_QOS:2
-    },
-=======
       url: 'https://staging.fareye.co/app'
     },
     port: 1883,
     PUSH_QOS: 2
   },
->>>>>>> master
   API: {
     AUTHENTICATION_API: '/authentication',
     JOB_MASTER_API: '/rest/device/job_master',
