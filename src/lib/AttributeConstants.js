@@ -301,4 +301,8 @@ module.exports = {
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
 
+    //Status_Code
+    UNSEEN: 'UNSEEN',
+    PENDING: 'PENDING',
+
 }

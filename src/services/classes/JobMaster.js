@@ -257,6 +257,12 @@ class JobMaster {
     console.log('idJobMasterMap',idJobMasterMap)
     return idJobMasterMap
   }
+
+  async getJobMaterFromJobMasterList(jobMasterId){
+        const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+        const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+        return jobMaster;
+      }
 }
 
 export let jobMasterService = new JobMaster()

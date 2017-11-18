@@ -31,7 +31,8 @@ function mapStateToProps(state) {
         jobDataList: state.jobDetails.jobDataList,
         jobTransaction: state.jobDetails.jobTransaction,
         messageList: state.jobDetails.messageList,
-        smsTemplateList: state.jobDetails.smsTemplateList
+        smsTemplateList: state.jobDetails.smsTemplateList,
+        isEnableOutForDelivery: state.jobDetails.isEnableOutForDelivery,
     }
 }
 
@@ -44,6 +45,7 @@ function mapDispatchToProps(dispatch) {
 class JobDetails extends Component {
 
     componentWillMount() {
+        // this.props.actions.checkOutForDelivery(this.props.navigation.state.params.jobTransactionId)
         this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransactionId)
     }
 
@@ -64,7 +66,7 @@ class JobDetails extends Component {
                         jobTransaction: this.props.jobTransaction,
                         statusId: statusList[index].id,
                         statusName: statusList[index].name,
-                        jobMasterId : this.props.jobTransaction.jobMasterId
+                        jobMasterId: this.props.jobTransaction.jobMasterId
                     }
                     )
                     }>
@@ -76,7 +78,7 @@ class JobDetails extends Component {
     }
 
     render() {
-        const statusView = this.props.currentStatus ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
+        const statusView = this.props.currentStatus && this.props.isEnableOutForDelivery ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
         if (this.props.jobDetailsLoading) {
             return (
                 <Loader />
@@ -97,6 +99,14 @@ class JobDetails extends Component {
                         <Right style={StyleSheet.flatten([styles.flexBasis15])}>
                         </Right>
                     </Header>
+                    {renderIf(this.props.isEnableOutForDelivery == false,
+                            <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
+                                <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+                                    Please Scan all Parcels First
+                                 </Text>
+                            </View>
+
+                        )}
                     <Content style={StyleSheet.flatten([styles.padding5])}>
                         <Card>
                             <ExpandableHeader

@@ -5,7 +5,7 @@ const InitialState = require('./jobDetailsInitialState').default
 const initialState = new InitialState()
 import {
     JOB_DETAILS_FETCHING_START,
-    JOB_DETAILS_FETCHING_END
+    JOB_DETAILS_FETCHING_END,
 } from '../../lib/constants'
 
 
@@ -22,6 +22,7 @@ export default function jobDetailsReducer(state = initialState, action) {
                         .set('jobTransaction',action.payload.jobTransaction)
                         .set('jobDetailsLoading',false)
                         .set('currentStatus',action.payload.currentStatus)
+                        .set('isEnableOutForDelivery',action.payload.isEnableOutForDelivery)
     }
     return state
 }
