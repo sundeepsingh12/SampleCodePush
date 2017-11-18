@@ -2,7 +2,6 @@
 import {
     FIELD_ATTRIBUTE_STATUS,
 } from '../../lib/constants'
-import _ from 'underscore'
 import {
     keyValueDBService
 } from './KeyValueDBService'

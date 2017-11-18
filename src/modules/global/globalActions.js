@@ -22,7 +22,9 @@ import {
   USER
 } from '../../lib/constants'
 
-import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import {
+  keyValueDBService
+} from '../../services/classes/KeyValueDBService'
 
 import CONFIG from '../../lib/config'
 
@@ -31,9 +33,17 @@ import {
   onChangeUsername
 } from '../login/loginActions'
 
-import { onResyncPress } from '../home/homeActions'
+import {
+  clearHomeState
+} from '../home/homeActions'
 
-import { clearHomeState } from '../home/homeActions'
+import {
+  onResyncPress
+} from '../home/homeActions'
+
+import {
+  Client
+} from 'react-native-paho-mqtt'
 
 import BackgroundTimer from 'react-native-background-timer';
 import { NavigationActions } from 'react-navigation'
@@ -88,3 +98,61 @@ export function deleteSessionToken() {
   }
 }
 
+export function startMqttService() {
+  return async function (dispatch) {
+    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+    console.log('token',token)
+    //Check if user session is alive
+    if (token && token.value) {
+      console.log('registerMqttClient')
+      const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
+      console.log('uri', uri)
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const clientId = `FE_${userObject.value.id}`
+      console.log('clientId', clientId)
+      const storage = {
+        setItem: (key, item) => {
+          storage[key] = item;
+        },
+        getItem: (key) => storage[key],
+        removeItem: (key) => {
+          delete storage[key];
+        },
+      };
+
+      // Create a client instance 
+      const client = new Client({
+        uri,
+        clientId,
+        storage
+      });
+
+      // set event handlers 
+      client.on('connectionLost', responseObject => {
+        console.log('connectionLost', responseObject)
+        if (responseObject.errorCode !== 0) {
+          console.log(responseObject.errorMessage);
+        }
+      });
+      client.on('messageReceived', message => {
+        console.log('message.payloadString',message.payloadString);
+        dispatch(onResyncPress())
+      });
+
+      // connect the client 
+      client.connect()
+        .then(() => {
+          // Once a connection has been made, make a subscription 
+          console.log('onConnect');
+          return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
+        })
+        .catch(responseObject => {
+          console.log('catch', responseObject)
+          if (responseObject.errorCode !== 0) {
+            console.log('onConnectionLost:' + responseObject.errorMessage);
+          }
+        });
+
+    }
+  }
+}

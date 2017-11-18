@@ -25,8 +25,8 @@ import {
     Button,
     Text,
     Footer,
-} from 'native-base';
-import _ from 'underscore'
+} from 'native-base'
+import _ from 'lodash'
 
 function mapStateToProps(state) {
     return {

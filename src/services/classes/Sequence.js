@@ -28,7 +28,7 @@ import {
     LANDMARK
 } from '../../lib/AttributeConstants'
 
-import _ from 'underscore'
+import _ from 'lodash'
 import * as realm from '../../repositories/realmdb'
 
 class Sequence {

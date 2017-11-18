@@ -16,9 +16,9 @@ import CONFIG from '../.././../lib/config'
 import * as realm from '../../../repositories/realmdb'
 import { keyValueDBService } from '../KeyValueDBService.js'
 import RestAPIFactory from '../../../lib/RestAPIFactory'
-import _ from 'underscore'
-import moment from 'moment';
-import sha256 from 'sha256';
+import _ from 'lodash'
+import moment from 'moment'
+import sha256 from 'sha256'
 import {formLayoutService} from '../../classes/formLayout/FormLayout'
 
 export default class FormLayoutEventImpl {
@@ -152,7 +152,7 @@ export default class FormLayoutEventImpl {
      */
     updateNextEditable(formLayoutObject){
         if(!formLayoutObject){
-            return;
+            return
         }
         let nextEditable = {};
         let mapData = JSON.stringify([...formLayoutObject]);// stringified map
