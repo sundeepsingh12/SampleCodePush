@@ -9,7 +9,7 @@ var InitialState = Record({
     isRefreshing: false,
     tabsList: [],
     tabIdStatusIdMap: {},
-    downloadingJobs : false
+    downloadingJobs : false,
 })
 
 export default InitialState

@@ -6,7 +6,8 @@ const initialState = new InitialState()
 import {
     SEQUENCE_LIST_FETCHING_STOP,
     SEQUENCE_LIST_FETCHING_START,
-    TOGGLE_RESEQUENCE_BUTTON
+    TOGGLE_RESEQUENCE_BUTTON,
+    RESET_STATE
 } from '../../lib/constants'
 
 
@@ -21,11 +22,9 @@ export default function sequenceReducer(state = initialState, action) {
         case SEQUENCE_LIST_FETCHING_STOP :
             return state.set('sequenceList',action.payload.sequenceList)
                         .set('isSequenceScreenLoading',false)
-
-        case TOGGLE_RESEQUENCE_BUTTON:
-            return state.set('isResequencingDisabled',action.payload.isResequencingDisabled)
-                        .set('isSequenceScreenLoading',action.payload.isSequenceScreenLoading)
-
+                        .set('unallocatedTransactionCount',action.payload.unallocatedTransactionCount)
+        case RESET_STATE:
+            return initialState                
 
     }
     return state

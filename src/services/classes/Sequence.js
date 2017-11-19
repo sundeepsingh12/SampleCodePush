@@ -89,11 +89,14 @@ class Sequence {
 
      processSequenceResponse(responseBody, sequenceList) {
         const transactionIdSequenceMap = responseBody.transactionIdSequenceMap
+          const updatedSequenceList = JSON.parse(JSON.stringify(sequenceList))
+          console.log('updatedSequenceList before',updatedSequenceList)
         let position  = 1
         if (transactionIdSequenceMap != null && transactionIdSequenceMap != undefined && !_.isEmpty(transactionIdSequenceMap)) {
             for (let index in sequenceList) {
                 if(transactionIdSequenceMap[sequenceList[index].id]){
                     position++
+                    updatedSequenceList[index].seqSelected = transactionIdSequenceMap[index]
                 }
             }
         }
@@ -102,10 +105,14 @@ class Sequence {
               for (let index in sequenceList) {
                 if(unAllocatedTransactionIds.includes(sequenceList[index].id)){
                     transactionIdSequenceMap[sequenceList[index].id] = position++
+                    updatedSequenceList[index].seqSelected = transactionIdSequenceMap[index]
                 }
             }
         }
-        realm.updateRealmDb(TABLE_JOB_TRANSACTION, test)
+        realm.updateRealmDb(TABLE_JOB_TRANSACTION, transactionIdSequenceMap)
+        console.log('updatedSequenceList after',updatedSequenceList)
+        return  updatedSequenceList
+
     }
 }
 

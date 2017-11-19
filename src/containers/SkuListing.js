@@ -21,9 +21,7 @@ class SkuListing extends Component {
 
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
-    console.log('fieldAttributeMasterId', fieldAttributeMasterId)
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    console.log('jobId', jobId)
     this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
   }
 

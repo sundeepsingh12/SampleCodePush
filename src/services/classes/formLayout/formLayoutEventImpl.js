@@ -17,8 +17,8 @@ import * as realm from '../../../repositories/realmdb'
 import { keyValueDBService } from '../KeyValueDBService.js'
 import RestAPIFactory from '../../../lib/RestAPIFactory'
 import _ from 'underscore'
-import moment from 'moment';
-import sha256 from 'sha256';
+import moment from 'moment'
+import sha256 from 'sha256'
 import {formLayoutService} from '../../classes/formLayout/FormLayout'
 
 export default class FormLayoutEventImpl {
@@ -87,7 +87,7 @@ export default class FormLayoutEventImpl {
             formLayoutObject.get(attributeMasterId).showCheckMark = false;
             return true;
         }
-        return isSaveDisabled;
+        return isSaveDisabled
     }
 
     /**
@@ -173,28 +173,29 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId
      */
-    async saveData(formLayoutObject, jobTransactionId, statusId,jobMasterId,jobTransactionIdList) {
-        try{
-        if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
-            return formLayoutObject // return undefined or empty object if formLayoutObject is empty
-        }
-        let fieldData,jobTransaction,job
-        if (jobTransactionIdList) {
-            fieldData = this._saveFieldDataForBulk(formLayoutObject,jobTransactionIdList)
-            const dbObjects = await this._getDbObjectForBulk(jobTransactionIdList,statusId,jobMasterId)
-            jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
-             job = this._setBulkJobDbValues(dbObjects.status[0],dbObjects.jobTransaction,jobMasterId,dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
-        }
-        else {
-            fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
-            const dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId)
-             jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
-             job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
-        }
-        
-        //TODO add other dbs which needs updation
-        realm.performBatchSave(fieldData, jobTransaction, job)
-        }catch(error){
+    async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
+        try {
+            if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
+                return formLayoutObject // return undefined or empty object if formLayoutObject is empty
+            }
+            let fieldData, jobTransaction, job
+
+            if (jobTransactionIdList) { //Case of bulk
+                fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
+                const dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
+                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
+                job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
+            }
+            else {
+                fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
+                const dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
+                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
+                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
+            }
+
+            //TODO add other dbs which needs updation
+            realm.performBatchSave(fieldData, jobTransaction, job)
+        } catch (error) {
             console.log(error)
         }
     }
@@ -245,29 +246,6 @@ export default class FormLayoutEventImpl {
 
     }
 
-    async _getDbObjectForBulk(jobTransactionIdList,statusId,jobMasterId){
-        try {
-            let user = await keyValueDBService.getValueFromStore(USER)
-            let hub = await keyValueDBService.getValueFromStore(HUB)
-            let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-            let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus => { return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId) })
-            let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => { return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterId) })
-            let query = jobTransactionIdList.map(id => 'id = '+id).join(' OR ')
-            let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query, false)
-            //TODO add more db objects
-            return {
-                jobTransaction,
-                user,
-                hub,
-                imei,
-                jobMaster,
-                status
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     /**
      * recursively iterates over childDataList in fieldData
      * and helps in preparing fieldData
@@ -312,20 +290,24 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId 
      */
-     async _getDbObjects(jobTransactionId,statusId,jobMasterId) {
+     async _getDbObjects(jobTransactionId,statusId,jobMasterId,jobTransactionIdList) {
         let user = await keyValueDBService.getValueFromStore(USER)
         let hub = await keyValueDBService.getValueFromStore(HUB)
         let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus => { return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId) })
         let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => { return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterId) })
+        
         let jobTransaction = null
-        if(jobTransactionId > 0){
-            // case of normal job
-            jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
-        }else{
-            // case of new job
-            jobTransaction = this._getDefaultValuesForJobTransaction(jobTransactionId,status[0],jobMaster[0],user.value,hub.value,imei.value)
+        if(jobTransactionIdList){
+            let query = jobTransactionIdList.map(id => 'id = '+id).join(' OR ')
+            jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query, false)
         }
+        else{
+            //JobTransactionId > 0 for Normal Job && <0 for New Job
+            jobTransaction = (jobTransactionId > 0) ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
+                : this._getDefaultValuesForJobTransaction(jobTransactionId,status[0],jobMaster[0],user.value,hub.value,imei.value)
+        }
+       
         //TODO add more db objects
         return {
             jobTransaction,

@@ -24,7 +24,13 @@ export function getJobMasterVsStatusNameList() {
         try {
             dispatch(setState(START_FETCHING_BULK_CONFIG))
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+            if(!jobMasterList || !jobMasterList.value){
+                throw new Error('Job master missing')
+            }
             const jobStatusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+            if(!jobStatusList || !jobStatusList.value){
+                throw new Error('Job status missing')
+            }
             const jobMasterVsStatusList = await bulkService.prepareJobMasterVsStatusList(jobMasterList.value, jobStatusList.value)
             dispatch(setState(STOP_FETCHING_BULK_CONFIG,jobMasterVsStatusList))
         } catch (error) {

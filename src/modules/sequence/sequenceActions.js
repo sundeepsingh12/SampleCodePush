@@ -38,6 +38,7 @@ export function prepareListForSequenceModule() {
             }))
         } catch (error) {
             //Update UI here
+            dispatch(setState(SEQUENCE_LIST_FETCHING_STOP))
         }
     }
 }
@@ -45,11 +46,7 @@ export function prepareListForSequenceModule() {
 export function resequenceJobsFromServer(sequenceList) {
     return async function (dispatch) {
         try {
-             dispatch(setState(TOGGLE_RESEQUENCE_BUTTON,{
-                 isSequenceScreenLoading:true,
-                 isResequencingDisabled:true
-             }))
-             
+            dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             const sequenceRequestDto = await sequenceService.prepareRequestBody(sequenceList)
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             if (!token) {
@@ -57,14 +54,17 @@ export function resequenceJobsFromServer(sequenceList) {
             }
             const sequenceResponse = await RestAPIFactory(token.value).serviceCall(JSON.stringify(sequenceRequestDto), CONFIG.API.SEQUENCE_USING_ROUTING_API, 'POST')
             const responseBody = await sequenceResponse.json
-            console.log('responseBody',responseBody)
-             await sequenceService.processSequenceResponse(responseBody,sequenceList)   
-            dispatch(setState(TOGGLE_RESEQUENCE_BUTTON,{
-                 isSequenceScreenLoading:false,
-                 isResequencingDisabled:false
+            console.log('responseBody', responseBody)
+            const unAllocatedTransactionIdsLength = responseBody.unAllocatedTransactionIds.length
+            console.log('unAllocatedTransactionIdsLength', unAllocatedTransactionIdsLength)
+            const sequenceList = await sequenceService.processSequenceResponse(responseBody, sequenceList)
+            dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
+                sequenceList,
+                unAllocatedTransactionIdsLength
             }))
         } catch (error) {
             console.log(error)
+            dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, sequenceList))
         }
     }
 }

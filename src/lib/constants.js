@@ -180,6 +180,7 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     UPDATE_FIELD_DATA_VALIDATION:null,
     UPDATE_NEXT_EDITABLE : null,
+
     //Route names (Used in React Navigation)
     Application: null,
     Login: null,
@@ -191,6 +192,7 @@ module.exports = keyMirror({
     SkuListing: null,
     Sequence:null,
     BulkConfiguration:null,
+    BulkListing:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,

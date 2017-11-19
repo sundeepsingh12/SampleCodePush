@@ -157,7 +157,7 @@ export const AppNavigator = StackNavigator({
     screen: JobDetailsV2
   },
   Sequence: {
-    screen: Sequence
+    screen: Sequence,
   },
   SortingResults: {
     screen: SortingResults

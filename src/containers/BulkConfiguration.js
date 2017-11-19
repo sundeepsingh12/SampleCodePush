@@ -29,6 +29,7 @@ import styles from '../themes/FeStyle'
 import {StyleSheet, View, TouchableHighlight,FlatList} from 'react-native'
 import Loader from '../components/Loader'
 import * as globalActions from '../modules/global/globalActions'
+import {BulkListing} from '../lib/constants'
 
 function mapStateToProps(state) {
   return {
@@ -71,7 +72,7 @@ class BulkConfiguration extends Component{
 
   goToBulkListing(item) {
     console.log('item',item)
-    this.props.actions.navigateToScene('BulkListing',{jobMasterId : item.jobMasterId,
+    this.props.actions.navigateToScene(BulkListing,{jobMasterId : item.jobMasterId,
       statusId:item.statusId,
       nextStatusList:item.nextStatusList
     })

@@ -37,6 +37,8 @@ import renderIf from '../lib/renderIf'
 import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
 import _ from 'underscore'
+import {NEXT_POSSIBLE_STATUS} from '../lib/AttributeConstants'
+import {FormLayout,RESET_STATE} from '../lib/constants'
 
 
 function mapStateToProps(state) {
@@ -71,53 +73,95 @@ class BulkListing extends Component {
       this.props.actions.getBulkJobTransactions(this.props.navigation.state.params)
     }
 
+    static navigationOptions = ({ navigation }) => {
+        return {
+            header: null
+        }
+    }
+
     render() {
-      if (this.props.isLoaderRunning || _.isEmpty(this.props.bulkTransactionList)) {
+      if (this.props.isLoaderRunning) {
         return <Loader />
       }
-      else{
-        const nextStatusNames = this.props.navigation.state.params.nextStatusList.map(nextStatus=>nextStatus.name)
-        nextStatusNames.push('Cancel')
-        const nextStatusIds = this.props.navigation.state.params.nextStatusList.map(nextStatus=>nextStatus.id)
-        return (
-          <StyleProvider style={getTheme(platform)}>
-            <Container>
-              <Content>
-                <FlatList
-                  data={Object.values(this.props.bulkTransactionList)}
-                  renderItem={({ item }) => this.renderData(item)}
-                  keyExtractor={item => item.id}
-                />
-              </Content>
+      else {
+        if (_.isEmpty(this.props.bulkTransactionList)) {
+          return (
+            <StyleProvider style={getTheme(platform)}>
+              <Container>
+                    <Header  style={StyleSheet.flatten([styles.bgPrimary])}>
+                  <Left>
+                     <Button transparent onPress={() => { this.props.actions.setState(RESET_STATE)
+                       this.props.navigation.goBack(null) }}>
+                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
+                    </Button>
+                  </Left>
+                  <Body>
+                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Bulk Update</Text>
+                  </Body>
+                  <Right />
+                </Header>
+                <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+                  <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>No jobs present</Text>
+                </View>
+              </Container>
+            </StyleProvider>
+          )
+        } else {
+          const nextStatusNames = this.props.navigation.state.params.nextStatusList.map(nextStatus => nextStatus.name)
+          nextStatusNames.push('Cancel')
+          const nextStatusIds = this.props.navigation.state.params.nextStatusList.map(nextStatus => nextStatus.id)
+          return (
+            <StyleProvider style={getTheme(platform)}>
+              <Container>
+                <Header  style={StyleSheet.flatten([styles.bgPrimary])}>
+                  <Left>
+                     <Button transparent onPress={() => { this.props.actions.setState(RESET_STATE)
+                       this.props.navigation.goBack(null) }}>
+                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
+                    </Button>
+                  </Left>
+                  <Body>
+                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Bulk Update</Text>
+                  </Body>
+                  <Right />
+                </Header>
+                  <FlatList
+                    data={Object.values(this.props.bulkTransactionList)}
+                    renderItem={({ item }) => this.renderData(item)}
+                    keyExtractor={item => item.id}
+                  />
 
-              <Footer
-                style={[{ height: 'auto' }, styles.column, styles.padding10]}>
-                <Text
-                  style={[styles.fontSm, styles.marginBottom10]}>Total Count : {this.props.selectedItems.length}</Text>
-                <Button
-                  onPress={() => ActionSheet.show(
-                    {
-                      options: nextStatusNames,
-                      cancelButtonIndex: nextStatusNames.length - 1,
-                      title: "Next possible status"
-                    },
-                    buttonIndex => { this.goToFormLayout(nextStatusIds[buttonIndex],nextStatusNames[buttonIndex]) }
-                  )}
-                  success full
-                  disabled={_.isEmpty(this.props.selectedItems)}
-                >
-                  <Text style={[styles.fontLg, styles.fontWhite]}>Update All Selected</Text>
-                </Button>
-              </Footer>
-            </Container>
-          </StyleProvider>
-        )
+                <Footer
+                  style={[{ height: 'auto' }, styles.column, styles.padding10]}>
+                  <Text
+                    style={[styles.fontSm, styles.marginBottom10]}>Total Count : {this.props.selectedItems.length}</Text>
+                  <Button
+                    onPress={() => {
+                      (nextStatusNames.length > 2) ? ActionSheet.show(
+                        {
+                          options: nextStatusNames,
+                          cancelButtonIndex: nextStatusNames.length,
+                          title: NEXT_POSSIBLE_STATUS
+                        },
+                        buttonIndex => { this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex]) }
+                      ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0])
+                    }}
+                    success full
+                    disabled={_.isEmpty(this.props.selectedItems)}
+                  >
+                    <Text style={[styles.fontLg, styles.fontWhite]}>Update All Selected</Text>
+                  </Button>
+                </Footer>
+
+              </Container>
+            </StyleProvider>
+          )
+        }
       }
     }
 
     goToFormLayout(statusId, statusName) {
-
-      this.props.actions.navigateToScene('FormLayout', {
+      this.props.actions.navigateToScene(FormLayout, {
         statusId,
         statusName,
         jobMasterId: this.props.navigation.state.params.jobMasterId,
