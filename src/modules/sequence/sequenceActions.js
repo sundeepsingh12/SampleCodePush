@@ -19,7 +19,9 @@ import {
     SEQUENCE_LIST_FETCHING_START,
     SEQUENCE_LIST_FETCHING_STOP,
     HUB,
-    TOGGLE_RESEQUENCE_BUTTON
+    TOGGLE_RESEQUENCE_BUTTON,
+    PREPARE_UPDATE_LIST
+
 } from '../../lib/constants'
 import _ from 'underscore'
 import {
@@ -34,7 +36,7 @@ export function prepareListForSequenceModule() {
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             const sequenceList = await sequenceService.getSequenceList()
             dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
-                sequenceList
+                sequenceList,
             }))
         } catch (error) {
             //Update UI here
@@ -54,17 +56,18 @@ export function resequenceJobsFromServer(sequenceList) {
             }
             const sequenceResponse = await RestAPIFactory(token.value).serviceCall(JSON.stringify(sequenceRequestDto), CONFIG.API.SEQUENCE_USING_ROUTING_API, 'POST')
             const responseBody = await sequenceResponse.json
-            console.log('responseBody', responseBody)
             const unAllocatedTransactionIdsLength = responseBody.unAllocatedTransactionIds.length
-            console.log('unAllocatedTransactionIdsLength', unAllocatedTransactionIdsLength)
             const sequenceList = await sequenceService.processSequenceResponse(responseBody, sequenceList)
-            dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
+            dispatch(setState(PREPARE_UPDATE_LIST, {
                 sequenceList,
-                unAllocatedTransactionIdsLength
+                unallocatedTransactionCount
             }))
         } catch (error) {
-            console.log(error)
-            dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, sequenceList))
+            dispatch(setState(PREPARE_UPDATE_LIST, {
+                sequenceList,
+                responseMessage:error.message,
+                unallocatedTransactionCount:0
+            }))
         }
     }
 }

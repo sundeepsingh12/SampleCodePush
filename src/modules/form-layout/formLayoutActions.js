@@ -9,7 +9,7 @@ import {
     TOOGLE_HELP_TEXT,
     BASIC_INFO,
     IS_LOADING,
-    Home,
+    HomeTabNavigatorScreen,
     RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
@@ -147,10 +147,10 @@ export function saveJobTransaction(formElement, jobTransactionId, statusId, jobM
         dispatch(setState(IS_LOADING,true))
         let cloneFormElement = new Map(formElement)
         await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId)
+        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId,jobTransactionIdList)
         dispatch(setState(IS_LOADING, false))
         dispatch(setState(RESET_STATE))
-        dispatch(NavigationActions.navigate({ routeName: Home }))
+        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
 
     }
 }

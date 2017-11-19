@@ -20,6 +20,7 @@ import {
   Body,
   Right,
   Icon,
+  Button,
   StyleProvider,
 } from 'native-base'
 
@@ -46,9 +47,9 @@ function mapDispatchToProps(dispatch) {
 
 class BulkConfiguration extends Component{
 
-  //   static navigationOptions = ({navigation}) => {
-  //   return {header: null}
-  // }
+    static navigationOptions = ({navigation}) => {
+    return {header: null}
+  }
 
     componentDidMount(){
         this.props.actions.getJobMasterVsStatusNameList()
@@ -71,7 +72,6 @@ class BulkConfiguration extends Component{
   }
 
   goToBulkListing(item) {
-    console.log('item',item)
     this.props.actions.navigateToScene(BulkListing,{jobMasterId : item.jobMasterId,
       statusId:item.statusId,
       nextStatusList:item.nextStatusList
@@ -85,8 +85,20 @@ class BulkConfiguration extends Component{
         return (
            <StyleProvider style={getTheme(platform)}>
         <Container>
+           <Header  style={StyleSheet.flatten([styles.bgPrimary])}>
+                  <Left>
+                     <Button transparent onPress={() => 
+                       this.props.navigation.goBack(null) }>
+                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
+                    </Button>
+                  </Left>
+                  <Body>
+                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Bulk Update</Text>
+                  </Body>
+                  <Right />
+                </Header>
           <Content>
-            <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Status for bulk update</Text>
+            <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Status you would like to Bulk Update</Text>
             <List>
                 <FlatList
                 data={this.props.bulkConfigList}

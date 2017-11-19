@@ -31,6 +31,8 @@ import statistics from './statistics/statisticsReducer'
 import bulk from './bulk/bulkReducer'
 import profileReducer from './profile/profileReducer'
 import sorting from './sorting/sortingReducer'
+import taskList from './taskList/taskListReducer'
+// import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
 import {PRE_LOGOUT_SUCCESS} from '../lib/constants'
@@ -67,6 +69,7 @@ const appReducer = combineReducers({
   bulk,
   profileReducer,
   sorting,
+  taskList,
 })
 
 const rootReducer = (state, action) => {

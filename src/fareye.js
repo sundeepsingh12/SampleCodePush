@@ -26,7 +26,6 @@ import configureStore from './lib/configureStore'
  * All the top level containers
  *
  */
-import Application from './containers/Application'
 import ResyncLoader from './components/ResyncLoader'
 import JobDetails from './containers/JobDetails'
 import FormLayout from './containers/FormLayout'

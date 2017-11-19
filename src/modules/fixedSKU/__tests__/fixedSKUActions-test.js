@@ -5,7 +5,7 @@ import thunk from 'redux-thunk'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { fixedSKUDetailsService } from '../../../services/classes/FixedSKUListing'
 import { updateFieldDataWithChildData } from '../../form-layout/formLayoutActions'
-import { fieldAttributeService } from '../../../services/classes/FieldAttribute'
+import { fieldDataService } from '../../../services/classes/FieldData'
 var actions = require('../fixedSKUActions')
 var formLayoutActions = require('../../form-layout/formLayoutActions')
 import {
@@ -104,15 +104,15 @@ describe('FixedSKU Actions', () => {
         }
         fixedSKUDetailsService.calculateTotalAmount = jest.fn()
         fixedSKUDetailsService.calculateTotalAmount.mockReturnValue({})
-        fieldAttributeService.prepareFieldDataForTransactionSavingInState = jest.fn()
-        fieldAttributeService.prepareFieldDataForTransactionSavingInState.mockReturnValue({})
+        fieldDataService.prepareFieldDataForTransactionSavingInState = jest.fn()
+        fieldDataService.prepareFieldDataForTransactionSavingInState.mockReturnValue({})
         formLayoutActions.updateFieldDataWithChildData = jest.fn()
         formLayoutActions.updateFieldDataWithChildData.mockReturnValue({})
         const store = mockStore({})
         return store.dispatch(actions.onSave(parameters.parentObject, parameters.formElement, parameters.nextEditable, parameters.fixedSKUList, parameters.isSaveDisabled, parameters.latestPositionId, parameters.jobTransactionId))
             .then(() => {
                 expect(fixedSKUDetailsService.calculateTotalAmount).toHaveBeenCalled()
-                expect(fieldAttributeService.prepareFieldDataForTransactionSavingInState).toHaveBeenCalled()
+                expect(fieldDataService.prepareFieldDataForTransactionSavingInState).toHaveBeenCalled()
                 expect(formLayoutActions.updateFieldDataWithChildData).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedAction[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedAction[0].payload)

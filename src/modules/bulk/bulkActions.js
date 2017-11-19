@@ -48,6 +48,7 @@ export function getBulkJobTransactions(bulkParams) {
             dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS,bulkTransactions))
         } catch (error) {
             console.log(error)
+            dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS))
         }
     }
 }

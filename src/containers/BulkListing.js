@@ -140,10 +140,13 @@ class BulkListing extends Component {
                       (nextStatusNames.length > 2) ? ActionSheet.show(
                         {
                           options: nextStatusNames,
-                          cancelButtonIndex: nextStatusNames.length,
+                          cancelButtonIndex: nextStatusNames.length-1,
                           title: NEXT_POSSIBLE_STATUS
                         },
-                        buttonIndex => { this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex]) }
+                        buttonIndex => { 
+                        if(buttonIndex!=nextStatusNames.length-1){
+                          this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex])
+                          } }
                       ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0])
                     }}
                     success full

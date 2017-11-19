@@ -181,7 +181,6 @@ export default class FormLayoutEventImpl {
                 return formLayoutObject // return undefined or empty object if formLayoutObject is empty
             }
             let fieldData, jobTransaction, job
-
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
                 const dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
@@ -233,19 +232,22 @@ export default class FormLayoutEventImpl {
     _saveFieldDataForBulk(formLayoutObject, jobTransactionIdList) {
         let fieldDataArray = []
         const fieldData = this._saveFieldData(formLayoutObject,jobTransactionIdList[0])//Get Field Data for first jobTransaction 
+        fieldDataArray.push(...fieldData.value)
+        let lastId = fieldData.value.length
         //Now copy this fieldData for all other job transactions,just change job transaction id
         for(let i=1;i<jobTransactionIdList.length;i++){
             let fieldDataForJobTransaction = []
             fieldData.value.forEach(fieldDataObject=>{
-                fieldDataObject.jobTransactionId = jobTransactionIdList[i]
-                fieldDataArray.push(fieldDataObject)
+                let newObject = {...fieldDataObject}
+                newObject.jobTransactionId = jobTransactionIdList[i]
+                newObject.id=++lastId
+                fieldDataArray.push(newObject)
             })
         }
          return {
             tableName: TABLE_FIELD_DATA,
             value: fieldDataArray
         }
-
     }
 
     /**
@@ -389,7 +391,6 @@ export default class FormLayoutEventImpl {
     }
 
     _setBulkJobDbValues(status, jobTransactions, jobMasterId, user, hub, referenceNumber) {
-        try{
         let jobArray = []
         const query = jobTransactions.map(jobTransaction => 'id = ' + jobTransaction.jobId).join(' OR ')
         console.log('query', query)
@@ -405,9 +406,6 @@ export default class FormLayoutEventImpl {
                     break;
             }
             jobArray.push(job)
-        }
-        }catch(error){
-            console.log(error)
         }
         return {
             tableName: TABLE_JOB,
@@ -503,7 +501,7 @@ export default class FormLayoutEventImpl {
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
         if (jobTransactionIdList) {
-            transactionsToSync.concat(jobTransactionIdList)
+            transactionsToSync.push(...jobTransactionIdList)
         } else {
             transactionsToSync.push(jobTransactionId)
         }

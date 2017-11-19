@@ -6,7 +6,9 @@ var InitialState = Record({
    sequenceList:{},
    isSequenceScreenLoading:false,
    isResequencingDisabled:false,
-   unallocatedTransactionCount:0
+   unallocatedTransactionCount:0,
+   responseMessage:''
+   
 })
 
 export default InitialState

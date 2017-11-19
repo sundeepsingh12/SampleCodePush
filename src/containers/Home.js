@@ -1,187 +1,258 @@
-
 'use strict'
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
-
-import * as globalActions from '../modules/global/globalActions'
-import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Preloader from '../containers/Preloader'
-import Loader from '../components/Loader'
-import CustomAlert from "../components/CustomAlert"
-import styles from '../themes/FeStyle'
-import ResyncLoader from '../components/ResyncLoader'
-
-
 import React, { Component } from 'react'
+import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
+import Loader from '../components/Loader'
+import HomeFooter from './HomeFooter'
 import {
-  StyleSheet,
-  View,
-  ScrollView,
+  Container,
+  Content,
+  Header,
+  Button,
   Text,
-  Image,
-  Dimensions,
-  ListView,
-  Platform,
-  TouchableHighlight
-}
-  from 'react-native'
-
-import { Container, Content, Tab, Tabs, Body, Header, Title, Left, Right, ScrollableTab, Icon, Fab, Button, Footer, FooterTab } from 'native-base';
-import Jobs from './Jobs';
+  List,
+  ListItem,
+  Left,
+  Body,
+  Right,
+  Icon,
+  Title,
+  Footer,
+  FooterTab,
+  StyleProvider
+} from 'native-base'
+import LinearGradient from 'react-native-linear-gradient'
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
+import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
-import renderIf from '../lib/renderIf';
-import TitleHeader from '../components/TitleHeader'
+import * as globalActions from '../modules/global/globalActions'
+import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
+import CircularProgress from '../svg_components/components/CircularProgress'
+import {
+  BULK,
+  LIVE,
+  PIECHART,
+  SEQUENCEMODULE,
+  START,
+} from '../lib/AttributeConstants'
 
+import {
+  TabScreen,
+  Sequence,
+  BulkConfiguration
+} from '../lib/constants'
 
-/**
- *  Instead of including all app states via ...state
- *  One could explicitly enumerate only those which Main.js will depend on.
- *
- */
 function mapStateToProps(state) {
   return {
-    tabsList: state.home.tabsList,
-    tabIdStatusIdMap: state.home.tabIdStatusIdMap,
-    downloadingJobs: state.home.downloadingJobs,
-    errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
-    isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
+    loading: state.home.loading
   }
-};
-
+}
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...homeActions, ...preloaderActions }, dispatch)
+    actions: bindActionCreators({ ...homeActions, ...globalActions }, dispatch)
   }
 }
 
+const percentage = 95;
 
-class Main extends Component {
 
-  constructor() {
-    super();
-    this.state = {
-      active: false
-    };
-  }
+class Home extends Component {
 
   componentDidMount() {
-    this.props.actions.syncService()
-    this.props.actions.fetchTabs()
-
+    this.props.actions.fetchModulesList()
   }
 
-  startLoginScreenWithoutLogout = () => {
-    this.props.actions.startLoginScreenWithoutLogout()
-  }
-
-  renderTabs() {
-    const tabs = this.props.tabsList
-    const renderTabList = []
-    tabs.forEach(tab => {
-      if (this.props.tabIdStatusIdMap[tab.id]) {
-        renderTabList.push(
-          <Tab
-            key={tab.id}
-            heading={tab.name}
-            tabStyle={{ backgroundColor: '#ffffff' }}
-            activeTabStyle={{ backgroundColor: '#ffffff' }}
-
-            textStyle={{ color: '#a0a0a0' }}
-            activeTextStyle={styles.fontPrimary}
-
-          >
-            <Jobs
-              tabId={tab.id}
-              statusIdList={this.props.tabIdStatusIdMap[tab.id]}
-            />
-          </Tab>
-        )
+  navigateToScene = (moduleName) => {
+    switch (moduleName) {
+      case BULK: {
+        this.props.actions.navigateToScene(BulkConfiguration)
+        break
       }
-    })
-    return renderTabList
-  }
-
-
-  render() {
-    const viewTabList = this.renderTabs()
-    if (viewTabList.length > 0) {
-      return (
-        <Container>
-          {renderIf(this.props.isErrorType_403_400_Logout,
-            <CustomAlert
-              title="Unauthorised Device"
-              message={this.props.errorMessage_403_400_Logout}
-              onCancelPressed={this.startLoginScreenWithoutLogout} />
-
-          )}
-          <Tabs locked
-            tabBarUnderlineStyle={styles.bgPrimary}
-            renderTabBar={() => <ScrollableTab />}
-          >
-            {viewTabList}
-          </Tabs>
-
-          <Footer>
-            <FooterTab style={{ backgroundColor: 'white' }}>
-              <Button vertical>
-                <Icon name={"ios-home-outline"} />
-                <Text>Home</Text>
-              </Button>
-              <Button
-                disabled={this.props.downloadingJobs}
-                onPress={() => { this.props.actions.onResyncPress() }}
-                vertical>
-                <ResyncLoader
-                  downloadingJobs={this.props.downloadingJobs} />
-              </Button>
-              <Button vertical>
-                <Icon name={"ios-chatboxes-outline"} />
-                <Text>Message</Text>
-              </Button>
-              <Button onPress={() => { this.props.actions.navigateToScene('Sequence')}} vertical>
-                <Icon name={"ios-apps-outline"} />
-                <Text>Utilities</Text>
-              </Button>
-              <Button onPress={() => { this.props.actions.invalidateUserSession() }} vertical>
-                <Icon name={"ios-power-outline"} />
-                <Text>Logout</Text>
-              </Button>
-            </FooterTab>
-          </Footer>
-          <Fab
-            active={this.state.active}
-            direction="up"
-            style={{ backgroundColor: '#5067FF' }}
-            position="bottomRight"
-            containerStyle={{ bottom: 125 }}
-            onPress={() => this.setState({ active: !this.state.active })}>
-            <Ionicons name="md-add" />
-            <Button style={{ backgroundColor: '#34A34F' }}>
-              <Icon name="logo-whatsapp" />
-            </Button>
-            <Button style={{ backgroundColor: '#3B5998' }}>
-              <Icon name="logo-facebook" />
-            </Button>
-            <Button disabled style={{ backgroundColor: '#DD5144' }}>
-              <Icon name="mail" />
-            </Button>
-          </Fab>
-
-        </Container>
-      );
-
-    } else {
-      return (
-        <Container>
-          <Loader />
-        </Container>
-      )
+      case LIVE: {
+        break
+      }
+      case SEQUENCEMODULE: { 
+        this.props.actions.navigateToScene(Sequence)
+        break
+      }
+      case START: {
+        this.props.actions.navigateToScene(TabScreen)
+        break
+      }
     }
   }
+
+  headerView() {
+    return (
+      <Header
+        hasTabs
+        style={[styles.bgPrimary]}>
+        <Left style={{
+          width: 90
+        }}>
+          <Image
+            style={StyleSheet.flatten([
+              styles.width100, {
+                resizeMode: 'contain'
+              }
+            ])}
+            source={FareyeLogo} />
+        </Left>
+        <Right>
+          <Button transparent>
+            <Icon style={style.headerIcon} name='ios-search' />
+          </Button>
+          <Button transparent>
+            <Icon style={style.headerIcon} name='ios-chatbubbles' />
+          </Button>
+          <Button transparent>
+            <Icon style={style.headerIcon} name='md-notifications' />
+          </Button>
+        </Right>
+      </Header>
+    )
+  }
+
+
+  pieChartView() {
+    if (!PIECHART.enabled) {
+      return null
+    }
+    return (
+      <LinearGradient
+        colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}
+        style={style.chartBlock}>
+        <View style={[styles.justifyCenter, styles.paddingTop15, styles.paddingBottom15]}>
+          <CircularProgress percentage={percentage} style={[{backgroundColor: '#green'}]}>
+              <View style={[styles.justifyCenter, styles.alignCenter]}>
+                <Text style={{fontSize: 40, color: '#ffffff', fontWeight: '500'}}>{percentage}</Text>
+                <Text style={{fontSize: 18, color: '#ffffff'}}>pending</Text>
+              </View>
+          </CircularProgress>
+        </View>
+        <View style={[styles.row, styles.justifySpaceAround]}>
+          <View>
+            <Text
+              style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>200</Text>
+            <Text
+              style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>total</Text>
+          </View>
+          <View>
+            <Text
+              style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>165</Text>
+            <Text
+              style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>done</Text>
+          </View>
+        </View>
+      </LinearGradient>
+    )
+  }
+
+  moduleView(modulesList) {
+    let moduleView = []
+    for (let index in modulesList) {
+      if (!modulesList[index].enabled) {
+        continue
+      }
+      moduleView.push(
+        <ListItem button onPress={() => this.navigateToScene(modulesList[index])}
+          style={[style.moduleList]}
+          key={modulesList[index].appModuleId}
+        >
+          {modulesList[index].icon}
+          <Body>
+            <Text
+              style={[styles.fontWeight500, styles.fontLg]}>{modulesList[index].displayName}</Text>
+          </Body>
+          <Right>
+            <Icon name="arrow-forward" />
+          </Right>
+        </ListItem>
+      )
+    }
+    return moduleView
+  }
+
+  render() {
+    const headerView = this.headerView()
+    const pieChartView = this.pieChartView()
+    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE])
+    if (this.props.loading) {
+      return (<Loader />)
+    }
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container style={StyleSheet.flatten([styles.bgWhite])}>
+          {headerView}
+          <Content>
+            {pieChartView}
+            <List>
+              {moduleView}
+            </List>
+          </Content>
+        </Container>
+      </StyleProvider>
+
+    )
+  }
+
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Main)
+const style = StyleSheet.create({
+  chartCenterData: {
+    backgroundColor: 'transparent',
+    textAlign: 'center',
+
+  },
+  headerIcon: {
+    fontSize: 18,
+    color: '#ffffff'
+  },
+  pieData: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  pieNumber: {
+    fontSize: 40,
+    fontWeight: "bold"
+  },
+  pieText: {
+    fontSize: 16
+  },
+  chartContainer: {
+    height: 190,
+    paddingTop: 25,
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  chartBlock: {
+    margin: 10,
+    height: 240,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 2
+  },
+  moduleList: {
+    height: 90,
+    borderBottomColor: '#F2F2F2'
+  },
+  moduleListIcon: {
+    width: 30,
+    height: 30,
+    marginRight: 15
+  }
+});
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

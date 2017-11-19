@@ -30,7 +30,7 @@ import {
   Footer,
   FooterTab,
   StyleProvider,
-  Spinner
+  Toast
 } from 'native-base'
 
 import {RESET_STATE} from '../lib/constants'
@@ -47,7 +47,8 @@ function mapStateToProps(state) {
   return {
     isSequenceScreenLoading:state.sequence.isSequenceScreenLoading,
     sequenceList:state.sequence.sequenceList,
-    isResequencingDisabled:state.sequence.isResequencingDisabled
+    isResequencingDisabled:state.sequence.isResequencingDisabled,
+    responseMessage:state.sequence.responseMessage
   }
 }
 
@@ -81,8 +82,6 @@ class Sequence extends Component {
     if(this.props.isSequenceScreenLoading){
         return <Loader />  
     }
-
-
     else {
       if (!_.isEmpty(this.props.sequenceList)) {
         let order = Object.keys(this.props.sequenceList)
@@ -121,7 +120,7 @@ class Sequence extends Component {
                     backgroundColor: '#f2f2f2'
                   }}
                   renderRow={row => <JobListItem data={row} callingActivity='Sequence' />} />
-                  {}
+                  {(this.props.responseMessage)?this.showToast():null}
               </View>
               <Footer style={{
                 height: 'auto'
@@ -171,10 +170,6 @@ class Sequence extends Component {
       }
     }
 
-   
-    
-    
-  
   }
 
   showAlert = () => {
@@ -186,6 +181,15 @@ class Sequence extends Component {
     {text: 'OK', onPress: this.OnOkButtonPressed},
   ],
     )
+  }
+
+  showToast() {
+    console.log('this.props',this.props)
+    Toast.show({
+              text: `${this.props.responseMessage}`,
+              position: 'bottom',
+              buttonText: 'OK'
+            })
   }
 
   OnOkButtonPressed = () => {

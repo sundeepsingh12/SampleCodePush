@@ -4,11 +4,8 @@
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
-
 import { keyValueDBService } from './KeyValueDBService'
-
 import moment from 'moment'
-
 import {
   JOB_MASTER,
   JOB_ATTRIBUTE,
@@ -34,6 +31,10 @@ import {
   JOB_ATTRIBUTE_STATUS,
   HUB
 } from '../../lib/constants'
+
+import {
+  UNSEEN,
+} from '../../lib/AttributeConstants'
 
 
 class JobMaster {
@@ -209,6 +210,9 @@ class JobMaster {
     }
     let tabIdStatusIdsMap = {}
     jobStatus.forEach(jobStatusObject => {
+      if(jobStatusObject.code == UNSEEN) {
+        return
+      }
       if (!tabIdStatusIdsMap[jobStatusObject.tabId]) {
         tabIdStatusIdsMap[jobStatusObject.tabId] = []
       }
@@ -251,11 +255,6 @@ class JobMaster {
     return true
   }
 
-   getIdJobMasterMap(jobMasterList){
-    const idJobMasterMap = {}
-    jobMasterList.forEach(jobMaster=>idJobMasterMap[jobMaster.id] = jobMaster)
-    return idJobMasterMap
-  }
 }
 
 
