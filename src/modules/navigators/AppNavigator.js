@@ -69,7 +69,8 @@ import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
 import SkuListing from '../../containers/SkuListing'
 import OverlayAttributes from '../../containers/OverlayAttributes'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
 import SelectFromList from '../../containers/SelectFromList'
@@ -138,16 +139,16 @@ export const AppNavigator = StackNavigator({
     screen: SelectFromList,
   },
   Statistics: {
-    screen : Statistics,
+    screen: Statistics,
     navigationOptions: {
       title: 'STATISTICS : ' + moment(new Date()).format('DD-MM-YYYY'),
     }
   },
   Sorting: {
-    screen : Sorting,
+    screen: Sorting,
     navigationOptions: {
       title: 'Sorting',
-      header:null,
+      header: null,
     }
   },
   HomeUI: {
@@ -212,6 +213,9 @@ export const AppNavigator = StackNavigator({
   },
   Signature: {
     screen: Signature,
+    navigationOptions: {
+      header: null
+    }
   },
   FormLayout: {
     screen: FormLayout,
@@ -222,6 +226,13 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
+  SignatureAndNps: {
+    screen: SignatureAndNps
+  },
+  ArrayFieldAttribute: {
+    screen: ArrayFieldAttribute
+  }
+  ,
   DataStore: {
     screen: DataStore,
   },
@@ -243,7 +254,7 @@ export const AppNavigator = StackNavigator({
       title: 'Collect Cash',
     }
   },
-}, 
+},
   {
     cardStyle: {
       backgroundColor: 'white'
