@@ -14,7 +14,7 @@ import {
 } from '../../lib/constants'
 
 import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE } from '../../lib/AttributeConstants'
-import _ from 'lodash'
+import _ from 'underscore'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'

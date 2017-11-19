@@ -15,7 +15,7 @@ import { Container, Content, ListItem, List, Text, Footer, FooterTab, Button, In
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
-import _ from 'lodash'
+import _ from 'underscore'
 
 class SkuListing extends Component {
 

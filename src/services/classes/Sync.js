@@ -17,7 +17,7 @@ import {
   jobSummaryService
 } from './JobSummary'
 
-import _ from 'lodash'
+import _ from 'underscore'
 
 import {
   TABLE_JOB_TRANSACTION,

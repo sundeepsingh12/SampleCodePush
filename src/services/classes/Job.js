@@ -2,6 +2,7 @@ import * as realm from '../../repositories/realmdb'
 import {
     TABLE_JOB,
 } from '../../lib/constants'
+import _ from 'underscore'
 
 class Job {
 
