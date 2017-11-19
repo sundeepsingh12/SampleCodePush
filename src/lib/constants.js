@@ -69,6 +69,7 @@ module.exports = keyMirror({
     REMEMBER_ME_SET_TRUE: null,
 
     //Home Actions
+    HOME_LOADING: null,
     JOB_FETCHING_START: null,
     JOB_FETCHING_END: null,
     SET_TABS_LIST: null,
@@ -181,16 +182,21 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     //Route names (Used in React Navigation)
-    Application: null,
-    Login: null,
-    Preloader: null,
-    Home: null,
-    JobDetails: null,
+    ApplicationScreen: null,
     FormLayout: null,
+    HardwareBackPress: null,
+    HomeScreen: null,
+    HomeTabNavigatorScreen: null,
+    JobDetails: null,
+    LoginScreen: null,
+    MenuScreen: null,
+    PreloaderScreen: null,
+    Sequence: null,
+    SkuListing: null,
+    TabScreen: null,
     TimePicker: null,
     SkuListing: null,
-    Sequence: null,
-
+    
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
     SKU_LIST_FETCHING_START: null,
@@ -237,7 +243,6 @@ module.exports = keyMirror({
     _id: null,
     SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
-
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,

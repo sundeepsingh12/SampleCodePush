@@ -188,7 +188,7 @@ const style = StyleSheet.create({
   headerSearch: {
     paddingLeft: 10,
     paddingRight: 30,
-    backgroundColor: '#1260be',
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     borderRadius: 2,
     height: 55,
     color: '#fff',

@@ -30,6 +30,7 @@ import newJob from './newJob/newJobReducer'
 import statistics from './statistics/statisticsReducer'
 import profileReducer from './profile/profileReducer'
 import sorting from './sorting/sortingReducer'
+import taskList from './taskList/taskListReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -65,6 +66,7 @@ const rootReducer = combineReducers({
   statistics,
   profileReducer,
   sorting,
+  taskList,
 })
 
 export default rootReducer

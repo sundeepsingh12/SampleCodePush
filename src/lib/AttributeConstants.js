@@ -1,5 +1,15 @@
-import RNFS from 'react-native-fs';
+import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
+import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
+import StartIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
+// import LiveIcon from '../../images/fareye-default-iconset/homescreen/live.png'
+
+import BulkIcon from '../../src/svg_components/icons/BulkIcon'
+import LiveIcon from '../../src/svg_components/icons/LiveIcon'
+import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
+import TaskIcon from '../../src/svg_components/icons/TaskIcon'
+// import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
+import React, { Component } from 'react'
 module.exports = {
 
     /**
@@ -88,7 +98,8 @@ module.exports = {
         displayName: 'Eze-Tap',
         id: 2,
         modeType: 'EzeTap',
-        appModuleId: 10
+        appModuleId: 10,
+        enabled: false,
     },
     MOSAMBEE: {
         displayName: 'Mosambee',
@@ -112,7 +123,8 @@ module.exports = {
         displayName: 'M-Swipe',
         id: 3,
         modeType: 'MSwipe',
-        appModuleId: 9
+        appModuleId: 9,
+        enabled: false,
     },
     NET_BANKING: {
         displayName: 'Net Banking',
@@ -251,38 +263,70 @@ module.exports = {
     CONFIRM_NEW_PASSWORD: 'Confirm New Password',
 
     //App Modules Constants
+    BACKUP: {
+        appModuleId: 17,
+        displayName: 'Backup',
+        enabled: false,
+    },
+    BLUETOOTH: {
+        appModuleId: 16,
+        displayName: 'Pair Bluetooth Device',
+        enabled: false,
+    },
     BULK: {
         appModuleId: 1,
-        displayName: ''
+        displayName: 'Bulk Update',
+        enabled: false,
+        icon: <BulkIcon />,
     },
     LIVE: {
         appModuleId: 13,
-        displayName: ''
+        displayName: 'Live',
+        enabled: false,
+        icon: <LiveIcon />,
     },
     OFFLINEDATASTORE: {
         appModuleId: 15,
-        displayName: ''
+        displayName: 'Sync Datastore',
+        enabled: false,
     },
     PIECHART: {
         appModuleId: 5,
-        displayName: ''
+        displayName: 'Pie Chart',
+        enabled: false,
+    },
+    PROFILE: {
+        appModuleId: 14,
+        displayName: 'Profile',
+        enabled: false,
+        icon: 'md-person',
     },
     STATISTIC: {
         appModuleId: 7,
-        displayName: ''
+        displayName: 'My Stats',
+        enabled: false,
+        icon: 'md-trending-up',
     },
-    SEQUENCE: {
+    SEQUENCEMODULE: {
         appModuleId: 2,
-        displayName: ''
+        displayName: 'Sequence',
+        enabled: false,
+        icon: <SequenceIcon />,
     },
     START: {
         appModuleId: 4,
-        displayName: ''
+        displayName: 'All Tasks',
+        enabled: false,
+        icon: <TaskIcon />
     },
     SUMMARY: {
         appModuleId: 8,
-        displayName: ''
+        displayName: '',
+        enabled: false,
     },
+
+    //JobStatusConstants
+    UNSEEN: 'UNSEEN',
 
     //Status Category
     PENDING: 1,
@@ -300,5 +344,12 @@ module.exports = {
     // Array attribute constants
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
+
+    //Start Search PlaceHolder
+    SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
+
+    //Error Messages
+    USER_NOT_FOUND: 'User Not Found',
+    SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
 
 }
