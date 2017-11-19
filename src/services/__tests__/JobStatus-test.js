@@ -10,6 +10,7 @@ import {
   jobStatusService
 } from '../classes/JobStatus'
 
+import _ from 'underscore'
 
 describe('job status services ', () => {
 

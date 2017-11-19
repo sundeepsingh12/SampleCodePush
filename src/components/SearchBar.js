@@ -10,6 +10,7 @@ import {
     Icon,
 } from 'native-base';
 import styles from '../themes/FeStyle'
+import _ from 'underscore'
 
 export default class SearchBar extends Component {
 

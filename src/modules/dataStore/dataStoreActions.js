@@ -16,7 +16,7 @@ import {
     DATA_STORE
 } from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
-import _ from 'lodash'
+import _ from 'underscore'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 
 
