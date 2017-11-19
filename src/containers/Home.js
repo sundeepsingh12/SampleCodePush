@@ -35,12 +35,13 @@ import {
   BULK,
   LIVE,
   PIECHART,
-  SEQUENCE,
+  SEQUENCEMODULE,
   START,
 } from '../lib/AttributeConstants'
 
 import {
   TabScreen,
+  Sequence
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -61,7 +62,6 @@ const percentage = 95;
 class Home extends Component {
 
   componentDidMount() {
-    console.log('componentDidMount of home')
     this.props.actions.fetchModulesList()
   }
 
@@ -73,7 +73,7 @@ class Home extends Component {
       case LIVE: {
         break
       }
-      case SEQUENCE: {
+      case SEQUENCEMODULE: {
         break
       }
       case START: {
@@ -119,7 +119,6 @@ class Home extends Component {
     if (!PIECHART.enabled) {
       return null
     }
-    // console.log('color',this.shadeColor1())
     return (
       <LinearGradient
         colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}
@@ -178,7 +177,7 @@ class Home extends Component {
   render() {
     const headerView = this.headerView()
     const pieChartView = this.pieChartView()
-    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCE])
+    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE])
     if (this.props.loading) {
       return (<Loader />)
     }

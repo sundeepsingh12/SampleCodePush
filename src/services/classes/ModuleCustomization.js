@@ -12,15 +12,18 @@ import {
     PROFILE,
     STATISTIC,
     START,
-    SEQUENCE,
+    SEQUENCEMODULE,
     SUMMARY,
+    USER_NOT_FOUND,
 } from '../../lib/AttributeConstants'
 
 class ModuleCustomization {
 
     /**
-     * 
      * @param {*} moduleCustomizationList 
+     * @returns moduleCustomizationMap : {
+     *                                      appModulesId : moduleCustomization
+     *                                   }
      */
     getModuleCustomizationMapForAppModuleId(moduleCustomizationList) {
         let moduleCustomizationMap = {}
@@ -30,6 +33,11 @@ class ModuleCustomization {
         return moduleCustomizationMap
     }
 
+    /**
+     * @param {*} moduleCustomizationList 
+     * @param {*} appModuleId 
+     * @returns moduleCustomization
+     */
     getModuleCustomizationForAppModuleId(moduleCustomizationList, appModuleId) {
         moduleCustomizationList = moduleCustomizationList ? moduleCustomizationList : []
         return moduleCustomizationList.filter(moduleCustomization => moduleCustomization.appModulesId == appModuleId)
@@ -42,7 +50,9 @@ class ModuleCustomization {
      * 
      */
     getActiveModules(moduleCustomizationList, user) {
-        console.log(moduleCustomizationList)
+        if(!user || !user.userType) {
+            throw new Error(USER_NOT_FOUND)
+        }
         for (let index in moduleCustomizationList) {
             switch (moduleCustomizationList[index].appModulesId) {
                 case BACKUP.appModuleId: {
@@ -89,8 +99,8 @@ class ModuleCustomization {
                     this.setModuleDetails(STATISTIC, moduleCustomizationList[index], user)
                     break
                 }
-                case SEQUENCE.appModuleId: {
-                    this.setModuleDetails(SEQUENCE, moduleCustomizationList[index], user)
+                case SEQUENCEMODULE.appModuleId: {
+                    this.setModuleDetails(SEQUENCEMODULE, moduleCustomizationList[index], user)
                     break
                 }
                 case SUMMARY.appModuleId: {
@@ -109,7 +119,10 @@ class ModuleCustomization {
      */
     setModuleDetails(appModule, moduleCustomization, user) {
         let displayName = ''
-        if (!moduleCustomization.selectedUserType || moduleCustomization.selectedUserType.length == 0 || JSON.parse(moduleCustomization.selectedUserType).length == 0 || (displayName = this.checkSelectedUserType(JSON.parse(moduleCustomization.selectedUserType), user))) {
+        if(!moduleCustomization) {
+            return
+        }
+        if (!moduleCustomization.selectedUserType || moduleCustomization.selectedUserType.length == 0 || (displayName = this.checkSelectedUserType(JSON.parse(moduleCustomization.selectedUserType), user))) {
             appModule.enabled = true
             appModule.displayName = displayName.trim() ? displayName : moduleCustomization.displayName && (moduleCustomization.displayName + '').trim() ? moduleCustomization.displayName : appModule.displayName
         }
@@ -123,6 +136,9 @@ class ModuleCustomization {
      * boolean
      */
     checkSelectedUserType(selectedUserTypeList, user) {
+        if(selectedUserTypeList.length == 0) {
+            return true
+        }
         for (let index in selectedUserTypeList) {
             if (selectedUserTypeList[index].userTypeId == user.userType.id) {
                 return (selectedUserTypeList[index].displayText + ' ')

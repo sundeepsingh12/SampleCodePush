@@ -9,7 +9,7 @@ import LiveIcon from '../../src/svg_components/icons/LiveIcon'
 import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
 import TaskIcon from '../../src/svg_components/icons/TaskIcon'
 // import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
-import React,{Component} from 'react'
+import React, { Component } from 'react'
 module.exports = {
 
     /**
@@ -277,13 +277,13 @@ module.exports = {
         appModuleId: 1,
         displayName: 'Bulk Update',
         enabled: false,
-        icon: <BulkIcon/>,
+        icon: <BulkIcon />,
     },
     LIVE: {
         appModuleId: 13,
         displayName: 'Live',
         enabled: false,
-        icon: <LiveIcon/>,
+        icon: <LiveIcon />,
     },
     OFFLINEDATASTORE: {
         appModuleId: 15,
@@ -307,17 +307,17 @@ module.exports = {
         enabled: false,
         icon: 'md-trending-up',
     },
-    SEQUENCE: {
+    SEQUENCEMODULE: {
         appModuleId: 2,
         displayName: 'Sequence',
         enabled: false,
-        icon: <SequenceIcon/>,
+        icon: <SequenceIcon />,
     },
     START: {
         appModuleId: 4,
         displayName: 'All Tasks',
         enabled: false,
-        icon: <TaskIcon/>
+        icon: <TaskIcon />
     },
     SUMMARY: {
         appModuleId: 8,
@@ -346,6 +346,10 @@ module.exports = {
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
 
     //Start Search PlaceHolder
-    SEARCH_PLACEHOLDER : 'Filter Reference Numbers',
+    SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
+
+    //Error Messages
+    USER_NOT_FOUND: 'User Not Found',
+    SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
 
 }

@@ -13,6 +13,18 @@ import {
 
 class TransactionCustomization {
 
+    /** This function fetch different values from store
+     * @returns 
+     * {
+     *      customerCareList
+     *      jobAttributeMasterList
+     *      jobAttributeStatusList
+     *      jobMasterList
+     *      jobMasterIdCustomizationMap
+     *      smsTemplateList
+     *      statusList
+     * }
+     */
     async getJobListingParameters() {
         const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
         const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)

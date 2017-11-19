@@ -5,19 +5,16 @@ import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
 import { setState } from '../global/globalActions'
 import {
-  CUSTOMER_CARE,
-  CUSTOMIZATION_LIST_MAP,
-  JOB_ATTRIBUTE,
-  JOB_ATTRIBUTE_STATUS,
   JOB_LISTING_START,
   JOB_LISTING_END,
-  JOB_MASTER,
   JOB_STATUS,
   SET_TABS_LIST,
-  SMS_TEMPLATE,
   TAB
 } from '../../lib/constants'
 
+/**
+ * This function fetches tabs list and set in state
+ */
 export function fetchTabs() {
   return async function (dispatch) {
     try {
@@ -30,20 +27,24 @@ export function fetchTabs() {
       }
       ))
     } catch (error) {
+      //TODO handle UI
       console.log(error)
     }
   }
 }
 
+/**
+ * This function fetches jobTransaction from db and set jobTransactionCustomizationListDTO in state
+ */
 export function fetchJobs() {
   return async function (dispatch) {
     try {
       dispatch(setState(JOB_LISTING_START))
       const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-      console.log('jobTransactionCustomizationListParametersDTO',jobTransactionCustomizationListParametersDTO)
       let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO)
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }))
     } catch (error) {
+      //TODO handle UI
       console.log(error)
     }
   }

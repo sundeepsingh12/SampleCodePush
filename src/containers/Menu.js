@@ -141,7 +141,6 @@ class Menu extends Component {
     let profileView = this.renderModuleView([PROFILE, STATISTIC], 1)
     let paymentView = this.renderModuleView([EZE_TAP, M_SWIPE], 2)
     let deviceView = this.renderModuleView([BACKUP, OFFLINEDATASTORE, BLUETOOTH], 3)
-    console.log('paymentView',paymentView)
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>

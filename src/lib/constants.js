@@ -196,8 +196,7 @@ module.exports = keyMirror({
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
-    Sequence: null,
-
+    
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
     SKU_LIST_FETCHING_START: null,

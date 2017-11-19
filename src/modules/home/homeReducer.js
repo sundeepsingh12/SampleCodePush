@@ -1,18 +1,10 @@
 'use strict'
 
-const InitialState = require('./homeInitialState').default
+import InitialState from './homeInitialState'
 
 const initialState = new InitialState()
 import {
   HOME_LOADING,
-  JOB_FETCHING_START,
-  JOB_FETCHING_END,
-  SET_TABS_LIST,
-  SET_FETCHING_FALSE,
-  CLEAR_HOME_STATE,
-  SET_REFRESHING_TRUE,
-  SET_TABS_TRANSACTIONS,
-  JOB_DOWNLOADING_STATUS,
 } from '../../lib/constants'
 
 

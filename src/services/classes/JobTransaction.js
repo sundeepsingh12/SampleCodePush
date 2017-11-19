@@ -212,8 +212,6 @@ class JobTransaction {
             let statusQuery = statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
             jobTransactionQuery = `${jobTransactionQuery} AND (${statusQuery})`
         }
-
-
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         if (jobTransactionList.length == 0) {
             return []
@@ -488,7 +486,6 @@ class JobTransaction {
             addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] = addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] ? addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence] : {}
             addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence][jobAttributeMasterMap[address.jobAttributeMasterId].attributeTypeId] = address.value
         })
-        console.log('addressDataForJob', addressDataForJob)
         return addressDataForJob
         // for (let index in addressDataForJob) {
         //     let combinedAddress = ''
@@ -598,11 +595,6 @@ class JobTransaction {
             jobDataObject,
             jobTransactionDisplay,
         }
-    }
-
-    getTransactionContactNumber(jobAttributeMasterList, jobMasterId, jobId) {
-        const jobMasterJobAttributeMasterMap = jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)
-        let jobAttributeMap = jobMasterJobAttributeMasterMap[jobMasterId]
     }
 
     getIdJobTransactionCustomizationListMap(jobTransactionCustomizationList) {
