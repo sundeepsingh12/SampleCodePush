@@ -20,7 +20,7 @@ import {
   Right,
   Icon,
   StyleProvider
-} from 'native-base';
+} from 'native-base'
 
 import * as profileActions from '../modules/profile/profileActions'
 import * as globalActions from '../modules/global/globalActions'

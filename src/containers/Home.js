@@ -41,7 +41,8 @@ import {
 
 import {
   TabScreen,
-  Sequence
+  Sequence,
+  BulkConfiguration
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -68,12 +69,14 @@ class Home extends Component {
   navigateToScene = (moduleName) => {
     switch (moduleName) {
       case BULK: {
+        this.props.actions.navigateToScene(BulkConfiguration)
         break
       }
       case LIVE: {
         break
       }
-      case SEQUENCEMODULE: {
+      case SEQUENCEMODULE: { 
+        this.props.actions.navigateToScene(Sequence)
         break
       }
       case START: {

@@ -1,5 +1,4 @@
 'use strict'
-import _ from 'underscore'
 
 const InitialState = require('./skuListingInitialState').default
 

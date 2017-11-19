@@ -43,6 +43,9 @@ export default {
     bgInfo : {
         backgroundColor: '#51adfd'
     },
+    bgTransparent : {
+        backgroundColor: 'transparent'
+    },
     fontWhite : {
         color: '#ffffff'
     },

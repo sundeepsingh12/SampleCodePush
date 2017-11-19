@@ -19,10 +19,10 @@ import {
   Footer,
   FooterTab,
   StyleProvider
-} from 'native-base';
+} from 'native-base'
 
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'

@@ -59,9 +59,6 @@ export function onResyncPress() {
       await sync.createAndUploadZip()
       const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
       dispatch(setState(JOB_DOWNLOADING_STATUS, { isDownloadingjobs: false }))
-      if (isJobsPresent) {
-        dispatch(fetchJobs())
-      }
       dispatch(syncService())
     } catch (error) {
       console.log(error)

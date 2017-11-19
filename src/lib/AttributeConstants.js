@@ -205,8 +205,6 @@ module.exports = {
     // Field Data Value Constants
     ARRAY_SAROJ_FAREYE: 'ArraySarojFareye',
     OBJECT_SAROJ_FAREYE: 'ObjectSarojFareye',
-    ARRAYSAROJFAREYE: 'ArraySarojFareye',
-    OBJECTSAROJFAREYE: 'ObjectSarojFareye',
 
     //Validation Condition Constants
     EQUAL_TO: '==',
@@ -337,10 +335,22 @@ module.exports = {
     REFERENCE_NO: 'referenceNo=',
     REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
-    NA: 'N.A',
-    SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
-    SORTING_PLACEHOLDER: 'Enter Reference Number To Scan Package',
+    NA : 'N.A',
+    SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
+    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package',
 
+    //SkuListing Service
+    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY : 'Quantity should be less than max quantity.Cannot proceed.',
+    QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
+    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY : 'Quantity should be equal to max quantity.Cannot proceed.',
+    QTY_ZERO : 'Quantity should be 0.Cannot proceed.',
+
+    //Sequence Container
+    ROUTE_OPTIMIZATION: 'Route optimisation',
+
+    //Bulk Listing Container
+    NEXT_POSSIBLE_STATUS:'Next possible status',
+    
     // Array attribute constants
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',

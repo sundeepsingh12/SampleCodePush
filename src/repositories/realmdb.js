@@ -142,7 +142,6 @@ export function filterRecordList(recordList, query) {
 
 export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
     let records
-    console.log(tableName)
     if (query) {
         records = realm.objects(tableName).filtered(query)
     } else {

@@ -1,7 +1,7 @@
 module.exports = {
   SESSION_TOKEN_KEY: 'SESSION_TOKEN_KEY',
   APP_FOLDER: 'FAREYE',
-  SYNC_SERVICE_DELAY: 12000000,
+  SYNC_SERVICE_DELAY: 1200000,
   intervalId: 0,
   backend: {
     fareyeProduction: false,

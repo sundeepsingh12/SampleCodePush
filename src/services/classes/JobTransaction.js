@@ -14,7 +14,6 @@ import {
 } from '../../lib/constants'
 
 import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE } from '../../lib/AttributeConstants'
-import _ from 'underscore'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'
@@ -25,6 +24,7 @@ import { customerCareService } from './CustomerCare'
 import { smsTemplateService } from './SMSTemplate'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
 import { jobMasterService } from './JobMaster'
+import _ from 'lodash'
 
 class JobTransaction {
 
@@ -196,7 +196,7 @@ class JobTransaction {
      *                                      }
      *                                  ]
      */
-    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, statusIds, isCalledFromSequence) {
+    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobTransactionCustomizationListParametersDTO.jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobTransactionCustomizationListParametersDTO.jobAttributeStatusList)
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(jobTransactionCustomizationListParametersDTO.statusList, jobAttributeStatusMap)
@@ -206,10 +206,13 @@ class JobTransaction {
         let runsheetQuery = 'isClosed = false'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
-        jobTransactionQuery = (jobTransactionQuery && jobTransactionQuery.trim() !== '') ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
-
-        if (isCalledFromSequence) {
-            let statusQuery = statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
+        if(callingActivity=='Bulk'){
+            jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
+        }
+         else if(callingActivity=='Sequence'){
+            let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+            //Fetch only pending status category job transactions for sequence listing
             jobTransactionQuery = `${jobTransactionQuery} AND (${statusQuery})`
         }
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
@@ -224,7 +227,7 @@ class JobTransaction {
         let jobMap = jobService.getJobMap(jobsList)
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
         let fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
-        let idJobMasterMap = jobMasterService.getIdJobMasterMap(jobTransactionCustomizationListParametersDTO.jobMasterList)
+        let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList,'id')
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap)
         return jobTransactionCustomizationList
     }
@@ -595,12 +598,6 @@ class JobTransaction {
             jobDataObject,
             jobTransactionDisplay,
         }
-    }
-
-    getIdJobTransactionCustomizationListMap(jobTransactionCustomizationList) {
-        let idJobTransactionCustomizationListMap = {}
-        jobTransactionCustomizationList.forEach(jobTransactionCustomization => idJobTransactionCustomizationListMap[jobTransactionCustomization.id] = jobTransactionCustomization)
-        return idJobTransactionCustomizationListMap
     }
 
 }

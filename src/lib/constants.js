@@ -196,7 +196,9 @@ module.exports = keyMirror({
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
-    
+    BulkConfiguration:null,
+    BulkListing:null,
+
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
     SKU_LIST_FETCHING_START: null,
@@ -248,10 +250,19 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
     TOGGLE_RESEQUENCE_BUTTON: null,
+    PREPARE_UPDATE_LIST:null,
 
     //New Job
     NEW_JOB_MASTER : null,
     NEW_JOB_STATUS : null,
+
+    //Bulk Module
+    START_FETCHING_BULK_CONFIG:null,
+    STOP_FETCHING_BULK_CONFIG:null,
+    START_FETCHING_BULK_TRANSACTIONS:null,
+    STOP_FETCHING_BULK_TRANSACTIONS:null,
+    TOGGLE_JOB_TRANSACTION_LIST_ITEM:null,
+
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST : null,

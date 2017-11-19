@@ -11,7 +11,6 @@ import {
     SKU_ACTUAL_QUANTITY
 } from '../lib/AttributeConstants'
 import {  CheckBox,Picker } from 'native-base'
-import renderIf from '../lib/renderIf';
 import _ from 'underscore'
 
 const Item = Picker.Item;

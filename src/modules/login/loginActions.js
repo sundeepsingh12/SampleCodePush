@@ -164,6 +164,7 @@ export function authenticateUser(username, password,rememberMe) {
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]
+      console.log('cookie',cookie)
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,cookie)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess())

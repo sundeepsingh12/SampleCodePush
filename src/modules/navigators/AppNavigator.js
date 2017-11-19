@@ -32,7 +32,6 @@ import SkuDetails from '../../containers/SkuDetails'
 import SortingResults from '../../containers/SortingResults'
 import Menu from '../../containers/Menu'
 import ProfileView from '../../containers/ProfileView'
-import ArrayScreen from '../../containers/ArrayScreen'
 import ResetPassword from '../../containers/ResetPassword'
 import SyncScreen from '../../containers/SyncScreen'
 import TabScreen from '../../containers/TabScreen'
@@ -40,6 +39,8 @@ import TaskListScreen from '../../containers/TaskListScreen'
 import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
+import BulkListing from '../../containers/BulkListing'
+import BulkConfiguration from '../../containers/BulkConfiguration'
 
 import {
   Container,
@@ -243,7 +244,7 @@ export const AppNavigator = StackNavigator({
     screen: HomeTabNavigator
   },
   Sequence: {
-    screen: Sequence
+    screen: Sequence,
   },
   SortingResults: {
     screen: SortingResults
@@ -253,9 +254,6 @@ export const AppNavigator = StackNavigator({
   },
   ProfileView: {
     screen: ProfileView
-  },
-  ArrayScreen: {
-    screen: ArrayScreen
   },
   SyncScreen: {
     screen: SyncScreen
@@ -324,7 +322,16 @@ export const AppNavigator = StackNavigator({
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
   },
-  CashTendering: {
+   SignatureAndNps: {
+    screen: SignatureAndNps
+  },
+  BulkConfiguration:{
+    screen: BulkConfiguration
+  },
+  BulkListing:{
+    screen:BulkListing
+  },
+   CashTendering: {
     screen: CashTendering,
     navigationOptions: {
       title: 'Collect Cash',
@@ -348,4 +355,4 @@ const mapStateToProps = state => ({
   nav: state.nav,
 });
 
-export default connect(mapStateToProps)(AppWithNavigationState);
+export default connect(mapStateToProps)(AppWithNavigationState)

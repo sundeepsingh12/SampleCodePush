@@ -12,6 +12,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 describe('test cases for getFieldAttributeMasterMap', () => {
     const fieldDataList = [
         {
+            fieldAttributeMasterId: 1,
             label: 'xyz',
             value: 'hello'
         }
