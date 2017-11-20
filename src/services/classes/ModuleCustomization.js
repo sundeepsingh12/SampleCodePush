@@ -15,6 +15,7 @@ import {
     SEQUENCEMODULE,
     SUMMARY,
     USER_NOT_FOUND,
+    SORTING
 } from '../../lib/AttributeConstants'
 
 class ModuleCustomization {
@@ -97,7 +98,7 @@ class ModuleCustomization {
                     }
                 case PROFILE.appModuleId:
                     {
-                        this.setModuleDetails(START, moduleCustomizationList[index], user)
+                        this.setModuleDetails(PROFILE, moduleCustomizationList[index], user)
                         break
                     }
                 case START.appModuleId:
@@ -118,6 +119,12 @@ class ModuleCustomization {
                 case SUMMARY.appModuleId:
                     {
                         this.setModuleDetails(SUMMARY, moduleCustomizationList[index], user)
+                        break
+                    }
+
+                case SORTING.appModuleId:
+                 {
+                        this.setModuleDetails(SORTING, moduleCustomizationList[index], user)
                         break
                     }
             }
