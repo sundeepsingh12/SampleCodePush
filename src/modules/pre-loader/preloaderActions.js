@@ -67,7 +67,8 @@ import {
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
-  HomeTabNavigatorScreen
+  HomeTabNavigatorScreen,
+  LoginScreen
 } from '../../lib/constants'
 
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -278,7 +279,7 @@ export function invalidateUserSession() {
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
-      dispatch(NavigationActions.navigate({ routeName: Login }))
+      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))
     }
@@ -292,7 +293,7 @@ export function startLoginScreenWithoutLogout() {
     await logoutService.deleteDataBase()
     dispatch(preLogoutSuccess())
     dispatch(deleteSessionToken())
-    dispatch(NavigationActions.navigate({ routeName: Login }))
+    dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
   }
 }
 

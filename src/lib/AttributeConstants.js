@@ -322,6 +322,12 @@ module.exports = {
         displayName: '',
         enabled: false,
     },
+    SORTING:{
+        appModuleId:26,
+         displayName: 'Sort Parcels',
+        enabled: false,
+        icon: <SequenceIcon />,
+    },
 
     //JobStatusConstants
     UNSEEN: 'UNSEEN',

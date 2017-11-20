@@ -192,12 +192,15 @@ module.exports = keyMirror({
     MenuScreen: null,
     PreloaderScreen: null,
     Sequence: null,
-    SkuListing: null,
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
     BulkConfiguration:null,
     BulkListing:null,
+    Sorting:null,
+    ProfileView:null,
+    Statistics:null,
+
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
