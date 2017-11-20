@@ -82,21 +82,21 @@ export default function formLayoutReducer(state = initialState, action) {
          * for showing loader
          */
         case IS_LOADING: {
-            return state.set('isLoading', action.payload);
+            return state.set('isLoading', action.payload)
         }
 
         /**
          * resets state to initial state
          */
         case RESET_STATE: {
-            return initialState;
+            return initialState
         }
 
         /**
          * sets error message
          */
         case ERROR_MESSAGE: {
-            return state.set('errorMessage', action.payload);
+            return state.set('errorMessage', action.payload)
         }
 
         case UPDATE_FIELD_DATA_VALIDATION: {
@@ -105,7 +105,7 @@ export default function formLayoutReducer(state = initialState, action) {
         }
 
         case UPDATE_NEXT_EDITABLE : {
-            return state.set('nextEditable',action.payload);
+            return state.set('nextEditable',action.payload)
         }
     }
     return state;

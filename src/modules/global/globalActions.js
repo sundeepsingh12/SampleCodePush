@@ -35,7 +35,7 @@ import { onResyncPress } from '../home/homeActions'
 
 import { clearHomeState } from '../home/homeActions'
 
-import BackgroundTimer from 'react-native-background-timer';
+import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
 
 /**
@@ -68,6 +68,25 @@ export function navigateToScene(routeName, params) {
   }
 }
 
+export async function getJobListingParameters() {
+  const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+  const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+  const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+  const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
+  const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
+  const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
+  const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+  return {
+    customerCareList: customerCareList.value,
+    jobAttributeMasterList: jobAttributeMasterList.value,
+    jobAttributeStatusList: jobAttributeStatusList.value,
+    jobMasterList: jobMasterList.value,
+    jobMasterIdCustomizationMap: jobMasterIdCustomizationMap.value,
+    smsTemplateList: smsTemplateList.value,
+    statusList: statusList.value
+  }
+}
+
 //Deletes values from store
 export function deleteSessionToken() {
   return async function (dispatch) {
@@ -79,9 +98,9 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       BackgroundTimer.clearInterval(CONFIG.intervalId);
+      CONFIG.intervalId = 0
       dispatch(onChangePassword(''))
       dispatch(onChangeUsername(''))
-      dispatch(clearHomeState())
     } catch (error) {
       throw error
     }

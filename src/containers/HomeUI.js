@@ -43,7 +43,6 @@ import {
   Footer,
   FooterTab
 } from 'native-base';
-import Jobs from './Jobs';
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
 import renderIf from '../lib/renderIf';
@@ -92,17 +91,25 @@ class HomeUI extends Component {
           <Text>SortingResults
           </Text> 
         </Button>
-        <Button success onPress= {() => this.props.actions.navigateToScene('Profile')}>
-          <Text>Profile
-          </Text> 
-        </Button>
         <Button success onPress= {() => this.props.actions.navigateToScene('ProfileView')}>
           <Text>ProfileView
-          </Text> 
+          </Text>
         </Button>
         <Button success onPress= {() => this.props.actions.navigateToScene('ResetPassword')}>
           <Text>ResetPassword
-          </Text>  
+          </Text>
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('ArrayScreen')}>
+          <Text>ArrayScreen
+          </Text>
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('SyncScreen')}>
+          <Text>SyncScreen
+          </Text>
+        </Button>
+        <Button success onPress= {() => this.props.actions.navigateToScene('TaskScreen')}>
+          <Text>TaskScreen
+          </Text>
         </Button>
       </View>
     )

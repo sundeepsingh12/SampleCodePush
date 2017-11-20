@@ -1,6 +1,6 @@
-const {
+import {
   JOB_STATUS
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
   keyValueDBService
@@ -12,7 +12,7 @@ import {
 
 import _ from 'underscore'
 
-describe('job status services ', () => {
+describe('test cases for getAllIdsForCode', () => {
 
   it('should fetch job status ids from store ', () => {
     const jobStatusIds = [12],
@@ -32,19 +32,20 @@ describe('job status services ', () => {
     })
   })
 
-  // it('should not fetch jobStatus ids',() => {
-  //   const statusCode = 'UNSEEN'
-  //   const message = 'Job status missing in store'
-  //   keyValueDBService.getValueFromStore = jest.fn()
-  //    keyValueDBService.getValueFromStore.mockReturnValue(null)
-  //   try{
-  //   return jobStatusService.getAllIdsForCode(statusCode).then(data => {
-  //     expect(data).toEqual(message)
-  //   })
-  //   }catch(errror){
+  it('should not fetch jobStatus ids', () => {
+    const statusCode = 'UNSEEN'
+    const message = 'Job status missing in store'
+    keyValueDBService.getValueFromStore = jest.fn()
+    keyValueDBService.getValueFromStore.mockReturnValue(null)
 
-  //   }
-  // })
+    return jobStatusService.getAllIdsForCode(statusCode).catch(error => {
+      expect(error.message).toEqual(message)
+    })
+
+  })
+})
+
+describe('test cases for getStatusIdForJobMasterIdAndCode', () => {
 
   it('should get statusId on basis of job master and a code', () => {
     const jobStatusId = 12,
@@ -66,22 +67,26 @@ describe('job status services ', () => {
       expect(data).toEqual(jobStatusId)
     })
   })
-})
 
-// it('should not get status id', () => {
-//   const jobStatusId = 12,
-//     statusCode = 'UNSEEN',
-//     jobMasterId = 930
-//   keyValueDBService.getValueFromStore = jest.fn()
-//   keyValueDBService.getValueFromStore.mockReturnValue(null)
-//   expect(jobStatusService.getStatusIdForJobMasterIdAndCode(jobMasterId, statusCode)).toThrow('Job status missing in store')
-// })
+  it('should not get status id', () => {
+    const message = 'Job status missing in store'
+    const jobStatusId = 12,
+      statusCode = 'UNSEEN',
+      jobMasterId = 930
+    keyValueDBService.getValueFromStore = jest.fn()
+    keyValueDBService.getValueFromStore.mockReturnValue(null)
+    return jobStatusService.getStatusIdForJobMasterIdAndCode(jobMasterId, statusCode).catch(error => {
+      expect(error.message).toEqual(message)
+    })
+
+  })
+})
 
 it('should return jobMasterId vs jobStatusIdMap', () => {
   const jobMasterIdJobStatusIdMap = {
-    930: 12,
-    897: 14
-  },
+      930: 12,
+      897: 14
+    },
     statusCode = 'UNSEEN',
     jobMasterIdList = [930, 897]
   keyValueDBService.getValueFromStore = jest.fn()
@@ -133,8 +138,7 @@ describe('test cases for getJobMasterIdStatusIdMap', () => {
       }
     }
   }
-  const statusList = [
-    {
+  const statusList = [{
       id: 1,
       jobMasterId: 1,
       nextStatusList: []
@@ -146,13 +150,11 @@ describe('test cases for getJobMasterIdStatusIdMap', () => {
     {
       id: 3,
       jobMasterId: 2,
-      nextStatusList: [
-        {
-          id: 4,
-          jobMasterId: 2,
-          nextStatusList: []
-        }
-      ]
+      nextStatusList: [{
+        id: 4,
+        jobMasterId: 2,
+        nextStatusList: []
+      }]
     },
     {
       id: 4,
@@ -210,13 +212,11 @@ describe('test cases for getJobMasterIdStatusIdMap', () => {
     3: {
       id: 3,
       jobMasterId: 2,
-      nextStatusList: [
-        {
-          id: 4,
-          jobMasterId: 2,
-          nextStatusList: []
-        }
-      ]
+      nextStatusList: [{
+        id: 4,
+        jobMasterId: 2,
+        nextStatusList: []
+      }]
     },
     4: {
       id: 4,
@@ -247,6 +247,44 @@ describe('test cases for getJobMasterIdStatusIdMap', () => {
     expect(jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)).toEqual({
       jobMasterIdJobAttributeStatusMap,
       statusIdStatusMap
+    })
+  })
+
+})
+
+describe('test cases for getNonUnseenStatusIdsForStatusCategory', () => {
+
+  it('should throw error job status missing', () => {
+    const statusCtegory = 1
+    const message = 'Job status missing in store'
+    keyValueDBService.getValueFromStore = jest.fn()
+    keyValueDBService.getValueFromStore.mockReturnValue(null)
+    return jobStatusService.getNonUnseenStatusIdsForStatusCategory(statusCtegory).catch(error => {
+      expect(error.message).toEqual(message)
+    })
+  })
+
+  it('should return status ids', () => {
+    const statusCategory = 1
+    keyValueDBService.getValueFromStore = jest.fn()
+    keyValueDBService.getValueFromStore.mockReturnValue({
+      value: [{
+        id: 1,
+        code: 'UNSEEN',
+        statusCategory: 1
+      }, {
+        id: 1,
+        code: 'PENDING',
+        statusCategory: 2
+      }, {
+        id: 1,
+        code: 'PENDING',
+        statusCategory: 1
+      }]
+    })
+    const filteredIds = [1]
+    return jobStatusService.getNonUnseenStatusIdsForStatusCategory(statusCategory).then(data => {
+      expect(data).toEqual(filteredIds)
     })
   })
 

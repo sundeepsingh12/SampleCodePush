@@ -19,7 +19,9 @@ import {
     SEQUENCE_LIST_FETCHING_START,
     SEQUENCE_LIST_FETCHING_STOP,
     HUB,
-    TOGGLE_RESEQUENCE_BUTTON
+    TOGGLE_RESEQUENCE_BUTTON,
+    PREPARE_UPDATE_LIST
+
 } from '../../lib/constants'
 import _ from 'underscore'
 import {
@@ -34,10 +36,11 @@ export function prepareListForSequenceModule() {
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             const sequenceList = await sequenceService.getSequenceList()
             dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
-                sequenceList
+                sequenceList,
             }))
         } catch (error) {
             //Update UI here
+            dispatch(setState(SEQUENCE_LIST_FETCHING_STOP))
         }
     }
 }
@@ -45,11 +48,7 @@ export function prepareListForSequenceModule() {
 export function resequenceJobsFromServer(sequenceList) {
     return async function (dispatch) {
         try {
-             dispatch(setState(TOGGLE_RESEQUENCE_BUTTON,{
-                 isSequenceScreenLoading:true,
-                 isResequencingDisabled:true
-             }))
-             
+            dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             const sequenceRequestDto = await sequenceService.prepareRequestBody(sequenceList)
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             if (!token) {
@@ -57,14 +56,18 @@ export function resequenceJobsFromServer(sequenceList) {
             }
             const sequenceResponse = await RestAPIFactory(token.value).serviceCall(JSON.stringify(sequenceRequestDto), CONFIG.API.SEQUENCE_USING_ROUTING_API, 'POST')
             const responseBody = await sequenceResponse.json
-            console.log('responseBody',responseBody)
-             await sequenceService.processSequenceResponse(responseBody,sequenceList)   
-            dispatch(setState(TOGGLE_RESEQUENCE_BUTTON,{
-                 isSequenceScreenLoading:false,
-                 isResequencingDisabled:false
+            const unAllocatedTransactionIdsLength = responseBody.unAllocatedTransactionIds.length
+            const sequenceList = await sequenceService.processSequenceResponse(responseBody, sequenceList)
+            dispatch(setState(PREPARE_UPDATE_LIST, {
+                sequenceList,
+                unallocatedTransactionCount
             }))
         } catch (error) {
-            console.log(error)
+            dispatch(setState(PREPARE_UPDATE_LIST, {
+                sequenceList,
+                responseMessage:error.message,
+                unallocatedTransactionCount:0
+            }))
         }
     }
 }
