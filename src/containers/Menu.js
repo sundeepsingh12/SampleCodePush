@@ -18,7 +18,8 @@ import {
   Icon,
   Footer,
   FooterTab,
-  StyleProvider
+  StyleProvider,
+  Toast
 } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
@@ -38,6 +39,11 @@ import {
   PROFILE,
   STATISTIC,
 } from '../lib/AttributeConstants'
+
+import {
+ ProfileView,
+ Statistics
+} from '../lib/constants'
 
 function mapStateToProps(state) {
   return {
@@ -102,14 +108,37 @@ class Menu extends Component {
     )
   }
 
-  renderCardView(view, key) {
+  renderCardView(view, key,moduleIndex) {
     return (
+      <TouchableOpacity onPress = {()=> this.navigateToScene(moduleIndex) }>
         <View key={key} style={[styles.bgWhite]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             {view}
           </View>
         </View>
+        </TouchableOpacity>
     )
+  }
+
+   navigateToScene = (moduleName) => {
+    console.log('modulename',moduleName)
+    switch (moduleName) {
+      case PROFILE: {
+        this.props.actions.navigateToScene(ProfileView)
+        break
+      }
+
+      case STATISTIC: {
+         this.props.actions.navigateToScene(Statistics)
+        break
+      }
+      default:
+       Toast.show({
+              text: `Under development!Coming Soon`,
+              position: 'bottom',
+              buttonText: 'OK'
+            })
+    }
   }
 
   renderModuleView(moduleList, key) {
@@ -127,7 +156,7 @@ class Menu extends Component {
       moduleView.push(
         this.renderTextView(moduleList[index].displayName, key * (index + 1) * 1000, (index == moduleList.length - 1), moduleList[index].icon)
       )
-      rowView.push(this.renderCardView(moduleView, key * (index + 1) * 10000))
+      rowView.push(this.renderCardView(moduleView, key * (index + 1) * 10000,moduleList[index]))
     }
     return rowView
   }

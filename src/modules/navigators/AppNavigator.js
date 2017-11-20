@@ -29,7 +29,6 @@ import HomeUI from '../../containers/HomeUI'
 import Home from '../../containers/Home'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
-import SortingResults from '../../containers/SortingResults'
 import Menu from '../../containers/Menu'
 import ProfileView from '../../containers/ProfileView'
 import ResetPassword from '../../containers/ResetPassword'
@@ -245,9 +244,6 @@ export const AppNavigator = StackNavigator({
   },
   Sequence: {
     screen: Sequence,
-  },
-  SortingResults: {
-    screen: SortingResults
   },
   Menu: {
     screen: Menu
