@@ -2,6 +2,7 @@
 
 import * as realm from '../../repositories/realmdb'
 import { jobDataService } from './JobData'
+import { jobTransactionService } from './JobTransaction'
 import {
     ARRAY_SAROJ_FAREYE,
     CONTACT_NUMBER,
@@ -76,6 +77,14 @@ class JobDetails {
             autoIncrementId
         }
     }
+
+
+     checkEnableResequence(jobMasterList,tabId,seqSelected,statusList){
+                const jobMasterIdWithEnableResequence  = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id) 
+                const statusMap = statusList.value.filter((status) => status.tabId == tabId).map(obj => obj.id)
+                const firstEnableSequenceValue = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence,statusMap)  
+                return  !(seqSelected > firstEnableSequenceValue)
+         }		  
 }
 
 export let jobDetailsService = new JobDetails()

@@ -2,9 +2,12 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
+import {jobMasterService} from '../../services/classes/JobMaster'
+import {jobDetailsService} from '../../services/classes/JobDetails'
 import { NavigationActions } from 'react-navigation'
 import {
     JOB_ATTRIBUTE,
+    JOB_MASTER,
     FIELD_ATTRIBUTE,
     JOB_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_STATUS,
@@ -20,7 +23,7 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction,isEnableRestriction) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -28,6 +31,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobDataList,
             jobTransaction,
             currentStatus,
+            isEnableRestriction
         }
     }
 }
@@ -42,10 +46,14 @@ export function getJobDetails(jobTransactionId) {
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay))
+            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+            const jobMaster =  jobMasterService.getJobMaterFromJobMasterList(details.jobTransactionDisplay.jobMasterId,jobMasterList)
+            const isEnableRestriction = (jobMaster[0].enableResequenceRestriction ) ? (await jobDetailsService.checkEnableResequence(jobMasterList,details.currentStatus.tabId,details.seqSelected,statusList)): true
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay,isEnableRestriction))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
+            console.log(error.message)
             console.log(error)
         }
     }

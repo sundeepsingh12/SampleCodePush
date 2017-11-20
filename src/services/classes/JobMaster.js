@@ -257,6 +257,11 @@ class JobMaster {
     console.log('idJobMasterMap',idJobMasterMap)
     return idJobMasterMap
   }
+
+   getJobMaterFromJobMasterList(jobMasterId,jobMasterList){
+            const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+            return jobMaster
+  }
 }
 
 export let jobMasterService = new JobMaster()
