@@ -40,6 +40,13 @@ import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
+import UIViews from '../../containers/UIViews'
+import JobDetailsV2 from '../../containers/JobDetailsV2'
+
+
+
+
+
 
 import {
   Container,
@@ -213,6 +220,12 @@ export const AppNavigator = StackNavigator({
   },
   Payment: {
     screen: Payment
+  },
+  UIViews: {
+    screen: UIViews
+  },
+  JobDetailsV2: {
+    screen: JobDetailsV2
   },
   Logout: {
     screen: Logout,
