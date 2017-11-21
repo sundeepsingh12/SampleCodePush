@@ -4,7 +4,6 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import {jobMasterService} from '../../services/classes/JobMaster'
 import {jobDetailsService} from '../../services/classes/JobDetails'
-import { NavigationActions } from 'react-navigation'
 import {
     JOB_ATTRIBUTE,
     JOB_MASTER,
@@ -48,12 +47,11 @@ export function getJobDetails(jobTransactionId) {
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobMaster =  jobMasterService.getJobMaterFromJobMasterList(details.jobTransactionDisplay.jobMasterId,jobMasterList)
-            const isEnableRestriction = (jobMaster[0].enableResequenceRestriction ) ? (await jobDetailsService.checkEnableResequence(jobMasterList,details.currentStatus.tabId,details.seqSelected,statusList)): true
+            const isEnableRestriction = (jobMaster[0].enableResequenceRestriction ) ? (jobDetailsService.checkEnableResequence(jobMasterList,details.currentStatus.tabId,details.seqSelected,statusList)): true
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay,isEnableRestriction))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
-            console.log(error.message)
             console.log(error)
         }
     }
