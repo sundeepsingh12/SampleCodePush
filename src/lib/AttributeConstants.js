@@ -364,8 +364,15 @@ module.exports = {
     //Start Search PlaceHolder
     SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
 
+    //NonExpandableDetailsView
+    VIEW_TEXT_LABEL: 'View',
+
     //Error Messages
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
+    //Error Message for NonExpandableDetailsView
+    IMAGE_LOADING_ERROR: 'An error occurred while loading image'
+
+
 
 }

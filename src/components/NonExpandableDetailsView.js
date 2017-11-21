@@ -5,11 +5,23 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform
+    Platform,
+    TouchableOpacity,
+    Linking
 } from 'react-native'
 import styles from '../themes/FeStyle'
+import renderIf from '../lib/renderIf'
+import { Icon } from 'native-base'
+import { IMAGE_LOADING_ERROR, VIEW_TEXT_LABEL } from '../lib/AttributeConstants'
 
 export default class NonExpandableDetailsView extends Component {
+
+    _openURL(url) {
+        Linking.openURL(url).
+            catch(error =>
+                console.error(IMAGE_LOADING_ERROR, error));
+    }
+
     render() {
         return (
             <View style={StyleSheet.flatten([styles.column, { backgroundColor: '#F2F2F2' }])}>
@@ -20,9 +32,19 @@ export default class NonExpandableDetailsView extends Component {
                         </Text>
                     </View>
                     <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, styles.alignCenter, { flex: .5 }])}>
-                        <Text style={StyleSheet.flatten([styles.fontSm])}>
-                            {this.props.value}
-                        </Text>
+                        {renderIf(this.props.attributeTypeId == 24,
+                            <TouchableOpacity onPress={() => this._openURL(this.props.value)}>
+                                <View style={[styles.row]}>
+                                    <Icon name={'ios-image'} style={StyleSheet.flatten([styles.alignSelfEnd, styles.fontBlack, styles.fontXl, styles.fontPrimary])} />
+                                    <Text style={StyleSheet.flatten([styles.fontSm, styles.paddingLeft5, styles.fontPrimary])}>
+                                        {VIEW_TEXT_LABEL}
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>)}
+                        {renderIf(this.props.attributeTypeId != 24,
+                            <Text style={StyleSheet.flatten([styles.fontSm])}>
+                                {this.props.value}
+                            </Text>)}
                     </View>
                 </View>
             </View>
