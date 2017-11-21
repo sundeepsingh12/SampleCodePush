@@ -12,7 +12,11 @@ import {
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import { Icon } from 'native-base'
-import { IMAGE_LOADING_ERROR, VIEW_TEXT_LABEL } from '../lib/AttributeConstants'
+import {
+    IMAGE_LOADING_ERROR,
+    VIEW_TEXT_LABEL,
+    IMAGE_URL
+} from '../lib/AttributeConstants'
 
 export default class NonExpandableDetailsView extends Component {
 
@@ -32,7 +36,7 @@ export default class NonExpandableDetailsView extends Component {
                         </Text>
                     </View>
                     <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, styles.alignCenter, { flex: .5 }])}>
-                        {renderIf(this.props.attributeTypeId == 24,
+                        {renderIf(this.props.attributeTypeId == IMAGE_URL,
                             <TouchableOpacity onPress={() => this._openURL(this.props.value)}>
                                 <View style={[styles.row]}>
                                     <Icon name={'ios-image'} style={StyleSheet.flatten([styles.alignSelfEnd, styles.fontBlack, styles.fontXl, styles.fontPrimary])} />
@@ -41,7 +45,7 @@ export default class NonExpandableDetailsView extends Component {
                                     </Text>
                                 </View>
                             </TouchableOpacity>)}
-                        {renderIf(this.props.attributeTypeId != 24,
+                        {renderIf(this.props.attributeTypeId != IMAGE_URL,
                             <Text style={StyleSheet.flatten([styles.fontSm])}>
                                 {this.props.value}
                             </Text>)}

@@ -36,6 +36,7 @@ module.exports = {
     FIXED_SKU_QUANTITY: 6,
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,
+    IMAGE_URL: 24,
     LANDMARK: 30,
     MODE: 'mode_type',
     MONEY_COLLECT: 18,
