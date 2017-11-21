@@ -62,6 +62,7 @@ import JobDetailsInitialState from './modules/job-details/jobDetailsInitialState
 import SkuListingInitialState from './modules/skulisting/skuListingInitialState'
 import FormLayoutInitialState from './modules/form-layout/formLayoutInitialState'
 import NewJobInitialState from './modules/newJob/newJobInitialState'
+import TransientStatusState from './modules/transient/transientInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
@@ -90,6 +91,7 @@ function getInitialState() {
     skuListing: new SkuListingInitialState(),
     formLayout : new FormLayoutInitialState(),
     newJob : new NewJobInitialState(),
+    transientStatus : new TransientStatusState(),
   }
   return _initState
 }

@@ -12,6 +12,7 @@
     "jest-cli": "^21.2.1",
     "jsonschema": "^1.2.0",
     "keymirror": "^0.1.1",
+    "lodash": "^4.17.4",
     "moment": "^2.19.1",
     "native-base": "^2.3.3",
     "react": "16.0.0",

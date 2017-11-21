@@ -68,6 +68,7 @@ function mapDispatchToProps(dispatch) {
 class Payment extends Component {
 
     componentWillMount() {
+        console.log('payemt',this.props.navigation.state.params)
         this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction.jobMasterId, this.props.navigation.state.params.jobTransaction.jobId, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.jobStatusId)
     }
 

@@ -9,7 +9,7 @@ import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 
 import React, {Component} from 'react'
-import {StyleSheet, View, TouchableHighlight, FlatList} from 'react-native'
+import {StyleSheet, View, TouchableOpacity, FlatList} from 'react-native'
 
 import {
   Container,
@@ -63,10 +63,17 @@ class NewJobStatus extends Component {
 
   renderData = (item)=>{
     return (
-        <ListItem style={[style.jobListItem]} onPress = {()=> this.props.actions.navigateToScene('FormLayout',
-          {statusId:item.id,statusName:item.name,
-          jobTransactionId:this.props.negativeId,
-          jobMasterId : this.props.navigation.state.params.jobMaster.id})}>
+      <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.navigateToScene('FormLayout',
+        {
+          statusId: item.id, statusName: item.name,
+          jobTransactionId: this.props.negativeId,
+          jobMasterId: this.props.navigation.state.params.jobMaster.id,
+          jobTransaction: {
+            id: this.props.negativeId,
+            jobMasterId: this.props.navigation.state.params.jobMaster.id,
+            jobId: this.props.negativeId,
+          }
+        })}>
           
           <View style={[styles.row, styles.alignCenter]}>
             <View style={item.statusCategory == 3  ? [style.statusCircle, {backgroundColor: '#4cd964'}] : 
@@ -75,7 +82,7 @@ class NewJobStatus extends Component {
             <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{item.name}</Text>
           </View>
           <Right>
-            <Icon name="arrow-forward" style={[styles.fontDefault, styles.fontBlack]} />
+            <Icon name="ios-arrow-forward" style={[styles.fontDefault, styles.fontBlack]} />
           </Right>
         </ListItem>
     )
@@ -87,21 +94,22 @@ class NewJobStatus extends Component {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <Header
-            style={StyleSheet.flatten([
-            styles.bgPrimary, {
-              borderBottomWidth: 0
-            }
-          ])}>
-            <Left>
-              <Icon name="arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }}/>
-            </Left>
+          <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
             <Body>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>New Task</Text>
+              <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                </TouchableOpacity>
+                <View style={[style.headerBody]}>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>New Task</Text>
+                </View>
+                <View style={[style.headerRight]}>
+                </View>
+              </View>
             </Body>
-            <Right/>
           </Header>
-          <Content>
+          <Content style={[styles.bgWhite]}>
             <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Type for {this.props.navigation.state.params.jobMaster.title}</Text>
             <List>
               <FlatList
@@ -120,11 +128,34 @@ class NewJobStatus extends Component {
 };
 
 const style = StyleSheet.create({
+  header: {
+    borderBottomWidth: 0,
+    height: 'auto',
+    padding: 0,
+    paddingRight: 0,
+    paddingLeft: 0
+  },
+  headerLeft: {
+    width: '15%',
+    padding: 15
+  },
+  headerBody: {
+    width: '70%',
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  headerRight: {
+    width: '15%',
+    padding: 15
+  },
   jobListItem: {
     borderBottomColor: '#f2f2f2', 
     borderBottomWidth: 1, 
     paddingTop: 20, 
-    paddingBottom: 20
+    paddingBottom: 20,
+    justifyContent: 'space-between'
   },
   statusCircle: {
     width: 6,

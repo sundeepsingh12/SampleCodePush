@@ -111,7 +111,9 @@ export function updateTableRecordOnProperty(tableName, property, valueList, newV
  * @param {*} property 
  */
 export function deleteRecordList(tableName, valueList, property) {
+    console.log('deleteRecordList',valueList)
     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => property + ' = "' + value + '"').join(' OR '));
+    console.log('filteredValues',filteredRecords)
     realm.write(() => {
         realm.delete(filteredRecords)
     });

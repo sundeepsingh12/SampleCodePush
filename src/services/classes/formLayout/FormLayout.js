@@ -19,7 +19,6 @@ class FormLayout {
         const fieldAttributeStatusList = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE_STATUS');
         const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE_VALIDATION');
         const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE_VALIDATION_CONDITION');
-
         if(!fieldAttributes || !fieldAttributes.value || !fieldAttributeStatusList || !fieldAttributeStatusList.value){
             throw new Error('Value of fieldAttributes or fieldAttribute Status missing')
         }
@@ -101,11 +100,15 @@ class FormLayout {
      * @param {*} fieldAttrMasterValidationConditionMap validation condition map
      */
     getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap){
-        if(!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0){
-            throw new Error('No field attribute mapped to this status');
-        }
         let formLayoutObject = new Map();
         let nextEditable = {};
+        if (!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0) {
+            return {
+                formLayoutObject,
+                nextEditable,
+                latestPositionId: 0
+            }
+        }
         let isRequiredAttributeFound = false;
         for(let i=0; i< sequenceWiseSortedFieldAttributesForStatus.length; i++){
             let fieldAttribute = sequenceWiseSortedFieldAttributesForStatus[i];
@@ -185,7 +188,18 @@ class FormLayout {
             externalDataStoreMasterUrl,
         };
     }
+
+    concatFormElementForTransientStatus(navigationFormLayoutStates, formElement) {
+        let combineMap = new Map()
+        for (let formLayoutCounter in navigationFormLayoutStates) {
+            let formElementForPreviousStatus = navigationFormLayoutStates[formLayoutCounter].formElement
+            combineMap = new Map([...combineMap, ...formElementForPreviousStatus])
+        }
+        combineMap = new Map([...combineMap, ...formElement])
+        return combineMap
+    }
     
+    save
 }
 
 export let formLayoutService = new FormLayout()

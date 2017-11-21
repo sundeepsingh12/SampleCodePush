@@ -34,16 +34,19 @@ class NewJob {
         if(!pendingStatus || !pendingStatus.nextStatusList){
             throw new Error('configuration issues with PENDING status')
         }
+        console.log('length',pendingStatus.nextStatusList.length)
         let nextStatusList = [];
         for(let i = 0; i< pendingStatus.nextStatusList.length; i++){
             let nextStatus = pendingStatus.nextStatusList[i];
-            if(nextStatus && nextStatus.transient){
-                //TODO not handled for transient status, if current status is transient then add their next status at the moment
-                //TODO chane this logic in future
-                nextStatusList = nextStatusList.concat(nextStatus.nextStatusList); // push next status of transient status
-                pendingStatus.nextStatusList.splice(i,1)// remove transient from array, to avoid being added again in the list
-            }
+            // console.log('nextStatus',nextStatus,nextStatusList)
+            // if(nextStatus && nextStatus.transient){
+            //     //TODO not handled for transient status, if current status is transient then add their next status at the moment
+            //     //TODO chane this logic in future
+            //     nextStatusList = nextStatusList.concat(nextStatus.nextStatusList); // push next status of transient status
+            //     // pendingStatus.nextStatusList.splice(i,1)// remove transient from array, to avoid being added again in the list
+            // }
         }
+        // console.log('pendingList before',nextStatusList)
         return nextStatusList.concat(pendingStatus.nextStatusList); // add next status of pending status to nextStatus list
     }
 

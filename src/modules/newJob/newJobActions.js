@@ -24,6 +24,7 @@ export function getStatusAndIdForJobMaster(jobMasterId) {
         //initially reset the statusList
         dispatch(setState(NEW_JOB_STATUS,[]));
         let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMasterId);
+        console.log('nextPending',nextPendingStatusWithId)
         dispatch(setState(NEW_JOB_STATUS,nextPendingStatusWithId));
     }
 }

@@ -12,7 +12,9 @@ const {
     Home,
     RESET_STATE,
     ERROR_MESSAGE,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+    JOB_STATUS,
+    TransientStatus,
 } = require('../../lib/constants').default
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -20,6 +22,9 @@ import { formLayoutEventsInterface } from '../../services/classes/formLayout/For
 import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
 import { setState } from '../global/globalActions'
+import { transientStatusService } from '../../services/classes/TransientStatusService'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { navigateToScene } from '../../modules/global/globalActions'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
@@ -104,35 +109,35 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = new Map(formElement);
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, null, event);
         dispatch(_setFormList(sortedFormAttributeDto));
-        console.log("getNextFocusableAndEditableElements",value)
+        console.log("getNextFocusableAndEditableElements", value)
     }
 }
-export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled,sequenceId) {
+export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled, sequenceId) {
     return async function (dispatch) {
-        try{
+        try {
             const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
-            if( sequenceData ){
+            if (sequenceData) {
                 const cloneFormElement = new Map(formElement);
-                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, sequenceData,null,ON_BLUR);
+                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, sequenceData, null, ON_BLUR);
                 sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
                 dispatch(_setFormList(sortedFormAttributeDto));
                 const nextEditableElement = nextEditable[attributeMasterId];
-                if(nextEditableElement != null && nextEditableElement.length != 0){
+                if (nextEditableElement != null && nextEditableElement.length != 0) {
                     nextEditableElement.forEach((nextElement) => {
                         if ((typeof (nextElement) == 'string')) {
                             nextElement = formElement.get(Number(nextElement.split('$$')[1]));
-                            if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
+                            if (nextElement && !nextElement.value && nextElement.attributeTypeId == 62) {
                                 const newFormElement = new Map(sortedFormAttributeDto.formLayoutObject);
                                 newFormElement.get(nextElement.fieldAttributeMasterId).isLoading = true;
-                                    dispatch(_updateFieldData(newFormElement))
-                                    dispatch(setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, newFormElement, nextEditable, 
-                                        isSaveDisabled,nextElement.sequenceMasterId))
+                                dispatch(_updateFieldData(newFormElement))
+                                dispatch(setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, newFormElement, nextEditable,
+                                    isSaveDisabled, nextElement.sequenceMasterId))
                             }
                         }
                     })
                 }
             }
-        }catch(error){
+        } catch (error) {
             formElement.get(attributeMasterId).isLoading = false;
             dispatch(_setErrorMessage(error.message));
             dispatch(_updateFieldData(formElement))
@@ -160,7 +165,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, nex
     return function (dispatch) {
         const cloneFormElement = new Map(formElement);
         console.log('cloneFormElement', cloneFormElement);
-        console.log('fieldDataListObject', fieldDataListObject);        
+        console.log('fieldDataListObject', fieldDataListObject);
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList, ON_BLUR);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
@@ -181,16 +186,55 @@ export function toogleHelpText(attributeId, formElement) {
     }
 }
 
-export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates) {
     return async function (dispatch) {
         dispatch(_toogleLoader(true));
-        let cloneFormElement = new Map(formElement);
-        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId);
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId);
-        dispatch(_toogleLoader(false));
-        dispatch(_setInitialState());
-        dispatch(NavigationActions.navigate({ routeName: Home }))
+        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
+        const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId);
+        console.log('jobTransactionId', formLayoutState.jobTransactionId, currentStatus)
 
+        if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
+            let formLayoutObject = formLayoutState.formElement
+            if (navigationFormLayoutStates) {
+                formLayoutObject = formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement);
+            }
+            let fieldData = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId);
+            // await formLayoutEventsInterface.addTransactionsToSyncList(formLayoutState.jobTransactionId);
+            dispatch(_setInitialState());
+            dispatch(_toogleLoader(false))
+            dispatch(navigateToScene(TransientStatus, {
+                saveActivated: currentStatus.saveActivated,
+                contactData,
+                jobTransaction,
+                jobMasterId,
+                formElement: formLayoutState.formElement
+            }))
+            jobTransaction.id--;
+            jobTransaction.jobId--;
+        }
+        else {
+            if (currentStatus.transient) {
+                dispatch(_toogleLoader(false));
+                dispatch(navigateToScene(TransientStatus, {
+                    currentStatus,
+                    formLayoutState,
+                    contactData,
+                    jobTransaction,
+                    jobMasterId
+                }))
+            }
+            else {
+                let formLayoutObject = formLayoutState.formElement
+                if (navigationFormLayoutStates) {
+                    formLayoutObject = formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement);
+                }
+                await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId);
+                await formLayoutEventsInterface.addTransactionsToSyncList(formLayoutState.jobTransactionId);
+                dispatch(_setInitialState());
+                dispatch(_toogleLoader(false));
+                dispatch(navigateToScene(Home, {}))
+            }
+        }
     }
 }
 

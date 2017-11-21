@@ -8,7 +8,7 @@ import {
   FlatList
 }
   from 'react-native'
-import { Container, Content, Footer, Card, CardItem, Button, Body, Header, Left, Right, Icon,Toast } from 'native-base'
+import { Container, Content, Footer, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast } from 'native-base'
 import styles from '../themes/FeStyle'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
@@ -36,7 +36,10 @@ function mapStateToProps(state) {
     latestPositionId: state.formLayout.latestPositionId,
     paymentAtEnd: state.formLayout.paymentAtEnd,
     isLoading: state.formLayout.isLoading,
-    errorMessage: state.formLayout.errorMessage
+    errorMessage: state.formLayout.errorMessage,
+    currentElement: state.formLayout.currentElement,
+    noOfElements: state.formLayout.noOfElements,
+    nextElement: state.formLayout.nextElement
   }
 }
 
@@ -49,6 +52,7 @@ function mapDispatchToProps(dispatch) {
 class FormLayout extends Component {
 
   componentWillMount() {
+    console.log('formLayout',this.props.navigation.state.params.navigationFormLayoutStates)
     this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId);
   }
 
@@ -81,6 +85,21 @@ class FormLayout extends Component {
   }
 
   saveJobTransaction() {
+    let formLayoutState = {
+      formElement: this.props.formElement,
+      nextEditable: this.props.nextEditable,
+      isSaveDisabled: this.props.isSaveDisabled,
+      statusName: this.props.statusName,
+      jobTransactionId: this.props.jobTransactionId,
+      statusId: this.props.statusId,
+      latestPositionId: this.props.latestPositionId,
+      paymentAtEnd: this.props.paymentAtEnd,
+      isLoading: this.props.isLoading,
+      errorMessage: this.props.errorMessage,
+      currentElement: this.props.currentElement,
+      noOfElements: this.props.noOfElements,
+      nextElement: this.props.nextElement,
+    }
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
         {
@@ -90,18 +109,24 @@ class FormLayout extends Component {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
-      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId,this.props.navigation.state.params.jobMasterId);
+      this.props.actions.saveJobTransaction(
+        formLayoutState,
+        this.props.navigation.state.params.jobMasterId,
+        this.props.navigation.state.params.contactData,
+        this.props.navigation.state.params.jobTransaction,
+        this.props.navigation.state.params.navigationFormLayoutStates,
+      );
     }
   }
 
   _keyExtractor = (item, index) => item[1].key;
   render() {
-    console.log("schsgdc",this.props.errorMessage.length)
-    if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
+    if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
+      Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',
         buttonText: 'Okay'
-         })}
+      })}
     if (this.props.isLoading) { return <Loader /> }
     return (
       <Container style={StyleSheet.flatten([styles.mainBg])}>
@@ -127,7 +152,7 @@ class FormLayout extends Component {
           </FlatList>
         </Content>
         <Button full success
-          disabled={this.props.isSaveDisabled} onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}>
+          disabled={this.props.isSaveDisabled} onPress={() => this.saveJobTransaction()}>
           <Text style={{ color: 'white' }}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
         </Button>
 

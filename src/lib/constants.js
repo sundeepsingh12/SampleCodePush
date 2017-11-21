@@ -178,6 +178,7 @@ export default keyMirror({
     ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
+    SET_FORM_LAYOUT_STATE: null,
 
     //Route names (Used in React Navigation)
     Application: null,
@@ -188,6 +189,7 @@ export default keyMirror({
     FormLayout: null,
     TimePicker: null,
     SkuListing: null,
+    TransientStatus: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -226,6 +228,13 @@ export default keyMirror({
     //New Job
     NEW_JOB_MASTER : null,
     NEW_JOB_STATUS : null,
+
+    //Transient
+    ADD_FORM_LAYOUT_STATE: null,
+    SET_SHOW_JOB_DETAILS: null,
+    LOADER_IS_RUNNING: null,
+    SHOW_CHECKOUT_DETAILS: null,
+    SET_INITIAL_STATE_TRANSIENT_STATUS: null,
    
 })
 

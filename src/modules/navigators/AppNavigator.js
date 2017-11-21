@@ -61,17 +61,17 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
 import SelectFromList from '../../containers/SelectFromList';
-
+import TransientStatus from '../../containers/TransientStatus'
 class AppWithNavigationState extends React.Component {
   render() {
-    return (<Root> 
+    return (<Root>
       <
-      AppNavigator navigation = {
-        addNavigationHelpers({
-          dispatch: this.props.dispatch,
-          state: this.props.nav
-        })
-      }
+        AppNavigator navigation={
+          addNavigationHelpers({
+            dispatch: this.props.dispatch,
+            state: this.props.nav
+          })
+        }
       /></Root>
     )
   }
@@ -117,7 +117,7 @@ export const AppNavigator = StackNavigator({
   },
   JobDetails: {
     screen: JobDetails,
-     },
+  },
   SelectFromList: {
     screen: SelectFromList,
   },
@@ -175,11 +175,14 @@ export const AppNavigator = StackNavigator({
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
   },
-}, {
-  SignatureAndNps: {
-    screen: SignatureAndNps
+  TransientStatus: {
+    screen: TransientStatus
   }
-},
+}, {
+    SignatureAndNps: {
+      screen: SignatureAndNps
+    }
+  },
   {
     cardStyle: {
       backgroundColor: 'white'

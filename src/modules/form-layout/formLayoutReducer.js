@@ -13,7 +13,8 @@ const {
     RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
-    UPDATE_PAYMENT_AT_END
+    UPDATE_PAYMENT_AT_END,
+    SET_FORM_LAYOUT_STATE
   } = require('../../lib/constants').default
   
 const {
@@ -98,6 +99,15 @@ export default function formLayoutReducer(state = initialState, action){
          */
         case ERROR_MESSAGE : {
             return state.set('errorMessage',action.payload);
+        }
+
+        /**
+         * sets formlayout state when
+         * back pressed from TransientStatus container
+         */
+        case SET_FORM_LAYOUT_STATE : {
+            state = action.payload
+            return state;
         }
     }
     return state;
