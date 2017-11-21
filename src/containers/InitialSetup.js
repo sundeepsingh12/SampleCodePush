@@ -98,11 +98,12 @@ class InitialSetup extends Component{
             return (
                 <Text
                     style={[feStyle.row, feStyle.justifyCenter, feStyle.fontDanger]}>{this.props.error}</Text>
-            );
+            )
         } else {
-            return null;
+            return null
         }
     }
+
      _renderButtons() {
         if (this.props.isError) {
             return (
@@ -114,7 +115,10 @@ class InitialSetup extends Component{
                         <Text style={{ color: '#ffffff' }}>Retry</Text>
                     </Button>
                 </View>
-            );
+            )
+        }
+        else{
+            return null
         }
     }
 }

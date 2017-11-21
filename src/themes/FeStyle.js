@@ -1,12 +1,14 @@
 
 
-const themeColor = '#E91E63';
+const themeColor = '#E91E63'; 
 
 export default {
-    
+    primaryColor : themeColor,
+
     bgPrimary : {
         backgroundColor: themeColor
     },
+    shadeColor: themeColor + '95',
     fontPrimary : {
         color: themeColor
     },
@@ -40,6 +42,9 @@ export default {
     },
     bgInfo : {
         backgroundColor: '#51adfd'
+    },
+    bgTransparent : {
+        backgroundColor: 'transparent'
     },
     fontWhite : {
         color: '#ffffff'

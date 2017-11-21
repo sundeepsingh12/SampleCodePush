@@ -50,7 +50,7 @@ export function getJobDetails(jobTransactionId) {
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
-            const jobMaster = await jobMasterService.getJobMaterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
+            const jobMaster =  jobMasterService.getJobMaterFromJobMasterList(details.jobTransactionDisplay.jobMasterId,jobMasterList)
             const isEnableOutForDelivery = (jobMaster[0].enableOutForDelivery ) ? (await jobDetailsService.checkOutForDelivery(jobMasterList)): true
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay,isEnableOutForDelivery))
         } catch (error) {
@@ -60,28 +60,3 @@ export function getJobDetails(jobTransactionId) {
         }
     }
 }
-
-//     export function checkOutForDelivery(jobTransactionId) {
-//         return async function (dispatch) {
-//             try {
-//                 const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-//                 let jobTransactionQuery = 'id = ' + jobTransactionId
-//                 const jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
-//                 const isEnableOutForDelivery = (await jobMasterService.getJobMaterFromJobMasterList(jobTransaction[0].jobMasterId) ) ? 
-//                                                (await jobDetailsService.checkOutForDelivery(jobMasterList) ) : true
-//                 // const x  = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) 
-//                 // const mapStatus = await jobStatusService.getjobMasterIdStatusIdMap(x,'UNSEEN')
-//                 // let result = Object.keys(mapStatus).map(function(key) {
-//                 //     return mapStatus[key];
-//                 //   });
-//                 // const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(result)  
-//                 // const isEnable = !(unseenTransactions.length>0)
-//                 dispatch(setState(ENABLE_OUT_FOR_DELIVERY,isEnableOutForDelivery))
-//             } catch (error) {
-//                 // To do
-//                 // Handle exceptions and change state accordingly
-//                 console.log(error)
-//             }
-//         }
-
-// }
