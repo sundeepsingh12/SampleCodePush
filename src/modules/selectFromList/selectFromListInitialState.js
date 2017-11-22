@@ -4,7 +4,8 @@ const { Record } = require('immutable')
 
 const InitialState = Record({
     selectFromListState: {},
-    errorMessage: ''
+    errorMessage: '',
+    dropdownValue: '',
 })
 
 export default InitialState

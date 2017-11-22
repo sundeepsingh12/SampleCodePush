@@ -200,6 +200,7 @@ module.exports = keyMirror({
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
+    SET_DROPDOWN_VALUE: null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
