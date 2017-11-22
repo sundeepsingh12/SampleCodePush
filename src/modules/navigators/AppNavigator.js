@@ -143,7 +143,7 @@ export const HomeTabNavigator = TabNavigator({
     screen: Home,
     navigationOptions: {
       header: null,
-      title: 'Home',
+      title: 'Home',  
       tabBarIcon: <Icon name='ios-home' style={{ fontSize: 18 }}></Icon>
     }
   },
@@ -225,7 +225,8 @@ export const AppNavigator = StackNavigator({
     screen: UIViews
   },
   JobDetailsV2: {
-    screen: JobDetailsV2
+    screen: JobDetailsV2,
+    header: null
   },
   Logout: {
     screen: Logout,
