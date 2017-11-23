@@ -6,10 +6,11 @@ import {
     Text,
     Platform,
     FlatList,
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
 }
     from 'react-native'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base'
+import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem, ActionSheet } from 'native-base'
 import styles from '../themes/FeStyle'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -19,7 +20,15 @@ import MessageHeader from '../components/MessageHeader'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
-
+import Communications from 'react-native-communications';
+import {
+    SELECT_NUMBER,
+    CANCEL,
+    SELECT_TEMPLATE,
+    SELECT_NUMBER_FOR_CALL,
+    CONFIRMATION,
+    OK
+} from '../lib/AttributeConstants'
 function mapStateToProps(state) {
     return {
         addressList: state.jobDetails.addressList,
@@ -45,6 +54,7 @@ class JobDetails extends Component {
 
     componentWillMount() {
         this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransactionId)
+        console.log(this.props.navigation.state.params.jobSwipableDetails)
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -64,7 +74,7 @@ class JobDetails extends Component {
                         jobTransaction: this.props.jobTransaction,
                         statusId: statusList[index].id,
                         statusName: statusList[index].name,
-                        jobMasterId : this.props.jobTransaction.jobMasterId
+                        jobMasterId: this.props.jobTransaction.jobMasterId
                     }
                     )
                     }>
@@ -73,6 +83,82 @@ class JobDetails extends Component {
             )
         }
         return statusView
+    }
+    chatButtonPressed = () => {
+        if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
+            let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
+            contactData.push(CANCEL)
+            ActionSheet.show(
+                {
+                    options: contactData,
+                    cancelButtonIndex: contactData.length - 1,
+                    title: SELECT_NUMBER
+                },
+                buttonIndex => {
+                    if (buttonIndex != contactData.length - 1) {
+                        this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
+                    }
+                }
+            )
+        }
+        else {
+            this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[0])
+        }
+    }
+    showSmsTemplateList = (contact) => {
+        setTimeout(() => {
+            if (this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 1) {
+                let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => sms.title)
+                msgTitles.push(CANCEL)
+                ActionSheet.show(
+                    {
+                        options: msgTitles,
+                        cancelButtonIndex: msgTitles.length - 1,
+                        title: SELECT_TEMPLATE
+                    },
+                    buttonIndex => {
+                        if (buttonIndex != msgTitles.length - 1) {
+                            this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[buttonIndex])
+                        }
+                    }
+                )
+            }
+            else {
+                this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[buttonIndex])
+            }
+        }, 500)
+    }
+
+    sendMessageToContact = (contact, smsTemplate) => {
+        this.props.actions.setSmsBodyAndSendMessage(contact, smsTemplate, this.props.jobTransaction, this.props.jobDataList, this.props.fieldDataList)
+    }
+
+    callButtonPressed = () => {
+        if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
+            let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
+            contactData.push(CANCEL)
+            ActionSheet.show(
+                {
+                    options: contactData,
+                    cancelButtonIndex: contactData.length - 1,
+                    title: SELECT_NUMBER_FOR_CALL
+                },
+                buttonIndex => {
+                    if (buttonIndex != contactData.length - 1) {
+                        this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
+                    }
+                }
+            )
+        }
+        else {
+            Alert.alert(CONFIRMATION + this.props.navigation.state.params.jobSwipableDetails.contactData[0], 'Do you want to proceed with the call?',
+                [{ text: CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                { text: OK, onPress: () => this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[0]) },],
+                { cancelable: false })
+        }
+    }
+    callContact = (contact) => {
+        Communications.phonecall(contact, false)
     }
 
     render() {
@@ -125,10 +211,10 @@ class JobDetails extends Component {
                     </View>
                     <Footer>
                         <FooterTab>
-                            <Button>
+                            <Button onPress={this.chatButtonPressed}>
                                 <Icon name="ios-chatbubbles-outline" />
                             </Button>
-                            <Button>
+                            <Button onPress={this.callButtonPressed}>
                                 <Icon name="ios-call-outline" />
                             </Button>
                             <Button active>

@@ -16,6 +16,7 @@ import {
 import {
   jobSummaryService
 } from './JobSummary'
+import { addServerSmsService } from './AddServerSms'
 
 import _ from 'underscore'
 
@@ -176,8 +177,8 @@ class Sync {
     const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
     const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
     const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
-                                                               .map(newJobTransaction => newJobTransaction.negativeJobTransactionId);
-    
+      .map(newJobTransaction => newJobTransaction.negativeJobTransactionId);
+
     const runsheets = {
       tableName: TABLE_RUNSHEET,
       valueList: runsheetIds,
@@ -189,19 +190,19 @@ class Sync {
       propertyName: 'jobId'
     }
     const newJobTransactions = {
-      tableName : TABLE_JOB_TRANSACTION,
-      valueList : newJobTransactionsIds,
-      propertyName : 'id'
+      tableName: TABLE_JOB_TRANSACTION,
+      valueList: newJobTransactionsIds,
+      propertyName: 'id'
     }
     const newJobs = {
-      tableName : TABLE_JOB,
-      valueList : newJobTransactionsIds,
-      propertyName : 'id'
+      tableName: TABLE_JOB,
+      valueList: newJobTransactionsIds,
+      propertyName: 'id'
     }
     const newJobFieldData = {
-      tableName : TABLE_FIELD_DATA,
-      valueList : newJobTransactionsIds,
-      propertyName : 'jobTransactionId'
+      tableName: TABLE_FIELD_DATA,
+      valueList: newJobTransactionsIds,
+      propertyName: 'jobTransactionId'
     }
 
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
@@ -361,12 +362,13 @@ class Sync {
         //Delete Data from server code starts here
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
-          const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds( unseenStatusIds)
+          const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
           const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
           await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
+          await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
           jobSummaryService.updateJobSummary(dataList.jobSummaries)
         }
       } else {

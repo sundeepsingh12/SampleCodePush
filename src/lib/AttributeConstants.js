@@ -301,4 +301,11 @@ module.exports = {
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
 
+    //job details constants
+    SELECT_NUMBER: 'Select number for message',
+    CANCEL: 'Cancel',
+    SELECT_TEMPLATE: 'Select template for message',
+    SELECT_NUMBER_FOR_CALL: 'Select number for call',
+    CONFIRMATION: 'Confirmation: ',
+    OK: 'Ok',
 }

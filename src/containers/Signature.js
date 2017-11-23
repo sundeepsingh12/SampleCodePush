@@ -48,6 +48,11 @@ class Signature extends Component {
         this.props.navigation.goBack()
     }
 
+    static navigationOptions = ({ navigation }) => {
+        return { header: null }
+    }
+
+
     render() {
         if (this.props.isRemarksValidation && this.props.fieldDataList.length > 0) {
             return (

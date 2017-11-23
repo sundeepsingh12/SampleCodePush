@@ -7,6 +7,12 @@ import {
     TouchableHighlight
 }
     from 'react-native'
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
+import styles from '../themes/FeStyle'
+import {
+    Icon,
+} from 'native-base';
 import SignatureCapture from 'react-native-signature-capture';
 
 class SignatureView extends Component {
@@ -29,30 +35,26 @@ class SignatureView extends Component {
                     showNativeButtons={false}
                     showTitleLabel={false}
                     viewMode={this.state.isLandscape} />
-
-                <View style={{ flexDirection: "row" }}>
-                    <TouchableHighlight style={styles.buttonStyle}
+                    {/* <TouchableHighlight style={[style.fabButton, styles.bgPrimary]}
                         onPress={() => { this.saveSign() }} >
-                        <Text>Save</Text>
-                    </TouchableHighlight>
+                        <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
+                    </TouchableHighlight> */}
 
-                    <TouchableHighlight style={styles.buttonStyle}
+                    {/* <TouchableHighlight style={[style.buttonStyle]}
                         onPress={() => { this.resetSign() }} >
                         <Text>Reset</Text>
-                    </TouchableHighlight>
-                </View>
-
+                    </TouchableHighlight> */}
             </View>
         );
     }
 
 
-    saveSign() {
+    saveSign = () => {
         this.refs["sign"].saveImage();
         this.refs["sign"].resetImage();
     }
 
-    resetSign() {
+    resetSign = () => {
         this.refs["sign"].resetImage();
     }
 
@@ -65,7 +67,7 @@ class SignatureView extends Component {
     }
 }
 
-const styles = StyleSheet.create({
+const style = StyleSheet.create({
     signature: {
         flex: 1,
         borderColor: '#000033',
@@ -75,6 +77,14 @@ const styles = StyleSheet.create({
         flex: 2, justifyContent: "center", alignItems: "center", height: 50,
         backgroundColor: "#eeeeee",
         margin: 10
+    },
+    fabButton: {
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
+
 });
 export default SignatureView

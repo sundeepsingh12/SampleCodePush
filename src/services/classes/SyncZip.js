@@ -11,7 +11,8 @@ import {
     TABLE_FIELD_DATA,
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
-    PENDING_SYNC_TRANSACTION_IDS
+    PENDING_SYNC_TRANSACTION_IDS,
+    TABLE_SERVER_SMS_LOG
 } from '../../lib/constants'
 
 
@@ -28,13 +29,21 @@ export async function createZip() {
     var SYNC_RESULTS = {};
     let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
     let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
+    //     if (realmDbData.serverSmsLogs != []) {
+    //     for (let sms of realmDbData.serverSmsLogs) {
+    //         sms.duration = null
+    //         sms.transactionType = null
+    //         sms.communicationType = null
+    //         sms.serverResponse = null
+    //     }
+    // }
     SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
     SYNC_RESULTS.job = realmDbData.jobList;
     SYNC_RESULTS.jobSummary = [];
     SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
     SYNC_RESULTS.runSheetSummary = [];
     SYNC_RESULTS.scannedReferenceNumberLog = [];
-    SYNC_RESULTS.serverSmsLog = [];
+    SYNC_RESULTS.serverSmsLog = realmDbData.serverSmsLogs;
     SYNC_RESULTS.trackLog = [];
     SYNC_RESULTS.transactionLog = [];
     SYNC_RESULTS.userCommunicationLog = [];
@@ -71,9 +80,9 @@ export async function createZip() {
  * @param {*} transactionIds whose data is to be synced
  */
 function _getSyncDataFromDb(transactionIdsObject) {
-    let transactionList = [], fieldDataList = [], jobList = [];
+    let transactionList = [], fieldDataList = [], jobList = [], serverSmsLogs = [];
     if (!transactionIdsObject || !transactionIdsObject.value) {
-        return { fieldDataList, transactionList, jobList };
+        return { fieldDataList, transactionList, jobList, serverSmsLogs };
     }
     let transactionIds = transactionIdsObject.value;
     let fieldDataQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId).join(' OR ')
@@ -82,10 +91,13 @@ function _getSyncDataFromDb(transactionIdsObject) {
     transactionList = _getDataFromRealm([], transactionListQuery, TABLE_JOB_TRANSACTION);
     let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
     jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB);
+    let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId).join(' OR ')
+    serverSmsLogs = _getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
     return {
         fieldDataList,
         transactionList,
-        jobList
+        jobList,
+        serverSmsLogs
     }
 }
 
@@ -109,9 +121,9 @@ function _getDataFromRealm(dataType, query, table) {
     if (!Array.isArray(dataType)) {
         return Object.assign(dataType, data);
     }
-    if(table == TABLE_FIELD_DATA){
-        return data.map(x => Object.assign({}, x,{id:0})) // send id as 0 in case of field data
-    }else{
+    if (table == TABLE_FIELD_DATA) {
+        return data.map(x => Object.assign({}, x, { id: 0 })) // send id as 0 in case of field data
+    } else {
         return data.map(x => Object.assign({}, x))
     }
 

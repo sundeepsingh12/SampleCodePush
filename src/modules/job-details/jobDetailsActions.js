@@ -1,6 +1,7 @@
 'use strict'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { addServerSmsService } from '../../services/classes/AddServerSms'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { NavigationActions } from 'react-navigation'
 import {
@@ -20,7 +21,7 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -42,11 +43,20 @@ export function getJobDetails(jobTransactionId) {
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay))
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
             console.log(error)
+        }
+    }
+}
+export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, jobData, fieldData) {
+    return async function (dispatch) {
+        try {
+            addServerSmsService.sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData)
+        } catch (error) {
+
         }
     }
 }

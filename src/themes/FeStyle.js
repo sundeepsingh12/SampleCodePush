@@ -407,6 +407,9 @@ export default {
     alignSelfCenter : {
         alignSelf: 'center'
     },
+    justifySelfCenter: {
+        justifySelf: 'center'
+    },
     alignSelfStart : {
         alignSelf: 'flex-start'
     },
