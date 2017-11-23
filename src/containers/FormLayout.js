@@ -49,7 +49,7 @@ function mapDispatchToProps(dispatch) {
 class FormLayout extends Component {
 
   componentWillMount() {
-    this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId);
+    this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId)
   }
 
   renderData = (item) => {
@@ -90,7 +90,9 @@ class FormLayout extends Component {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
-      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId,this.props.navigation.state.params.jobMasterId);
+        this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId,this.props.navigation.state.params.jobMasterId,
+        this.props.navigation.state.params.transactionIdList
+      )
     }
   }
 

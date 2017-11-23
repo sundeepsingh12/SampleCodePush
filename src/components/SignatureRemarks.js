@@ -23,6 +23,7 @@ class SignatureRemarks extends Component {
     }
 
     render() {
+        console.log('this.props.fieldDataList',this.props.fieldDataList)
         return (
             <StyleProvider>
                 <View style={[styles.padding10]}>

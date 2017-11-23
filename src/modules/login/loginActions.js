@@ -1,8 +1,9 @@
 'use strict'
 import {
-  Home,
+  HomeScreen,
+  HomeTabNavigatorScreen,
   IS_PRELOADER_COMPLETE,
-  Login,
+  LoginScreen,
   LOGIN,
   LOGIN_CAMERA_SCANNER,
   LOGIN_FAILURE,
@@ -15,7 +16,7 @@ import {
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
   PASSWORD,
-  Preloader,
+  PreloaderScreen,
   REMEMBER_ME,
   REMEMBER_ME_SET_TRUE,
   SET_CREDENTIALS,
@@ -163,10 +164,11 @@ export function authenticateUser(username, password,rememberMe) {
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]
+      console.log('cookie',cookie)
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,cookie)
       await authenticationService.saveLoginCredentials(username,password,rememberMe)
       dispatch(loginSuccess())
-      dispatch(NavigationActions.navigate({ routeName: Preloader }))
+      dispatch(NavigationActions.navigate({ routeName: PreloaderScreen }))
     }
     catch (error) {
       dispatch(loginFailure(error.message))
@@ -204,18 +206,18 @@ export function getSessionToken() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
-         dispatch(NavigationActions.navigate({ routeName: 'Home' }))
+         dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
       } else if(token) {
-          dispatch(NavigationActions.navigate({ routeName: Preloader }))
+          dispatch(NavigationActions.navigate({ routeName: PreloaderScreen }))
       }
       else {
-          dispatch(NavigationActions.navigate({ routeName: Login }))
+          dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       }
     }
     catch (error) {
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())
-       dispatch(NavigationActions.navigate({ routeName: Login }))
+       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     }
   }
 }

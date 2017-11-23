@@ -1,8 +1,12 @@
 'use strict'
 
-import { jobDataService } from '../classes/JobData'
+import {
+    jobDataService
+} from '../classes/JobData'
 import * as realm from '../../repositories/realmdb'
-import { jobDetailsService } from '../classes/JobDetails'
+import {
+    jobDetailsService
+} from '../classes/JobDetails'
 
 describe('test cases for getJobDataDetailsForListing', () => {
 
@@ -29,8 +33,7 @@ describe('test cases for getJobDataDetailsForListing', () => {
         }
     }
 
-    const jobDataList = [
-        {
+    const jobDataList = [{
             jobId: 1,
             jobAttributeMasterId: 10,
             value: 'xyz',
@@ -162,23 +165,19 @@ describe('test cases for getJobDataDetailsForListing', () => {
     }
 
     const contactMap = {
-        1: [
-            {
-                jobId: 1,
-                jobAttributeMasterId: 12,
-                value: '989869182'
-            }
-        ],
+        1: [{
+            jobId: 1,
+            jobAttributeMasterId: 12,
+            value: '989869182'
+        }],
     }
 
     const addressMap = {
-        3: [
-            {
-                jobId: 3,
-                jobAttributeMasterId: 11,
-                value: 'testaddress2'
-            }
-        ]
+        3: [{
+            jobId: 3,
+            jobAttributeMasterId: 11,
+            value: 'testaddress2'
+        }]
     }
 
     it('should return empty jobDataMap,contactMap,addressMap for empty jobDataList', () => {
@@ -204,15 +203,36 @@ describe('test cases for getJobDataDetailsForListing', () => {
 describe('test cases for prepareJobDataForTransactionParticularStatus', () => {
     const jobId = 2
     const jobAttributeMap = {
-        1 : {}
+        1: {}
     }
     const jobAttributeMasterMap = {}
     it('should return jobDataObject for particular transaction', () => {
         realm.getRecordListOnQuery = jest.fn()
         jobDetailsService.prepareDataObject = jest.fn()
         jobDetailsService.prepareDataObject.mockReturnValue({})
-        expect(jobDataService.prepareJobDataForTransactionParticularStatus(jobId,jobAttributeMasterMap,jobAttributeMap)).toEqual({})
+        expect(jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)).toEqual({})
         expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
         expect(jobDetailsService.prepareDataObject).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('test case for getParentIdJobDataListMap', () => {
+
+    it('should return parent id vs job data list', () => {
+        const parentIdJobDataListMap = {
+                12: [{
+                    id: 1,
+                    jobAttributeMasterId: 10233,
+                    parentId: 12
+                }]
+            },
+            jobDatas = [{
+                id: 1,
+                jobAttributeMasterId: 10233,
+                parentId: 12
+            }]
+
+        expect(jobDataService.getParentIdJobDataListMap(jobDatas)).toEqual(parentIdJobDataListMap)
+
     })
 })

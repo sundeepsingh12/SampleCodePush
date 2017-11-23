@@ -183,6 +183,8 @@ class RestAPI {
   }
 
   async uploadZipFile() {
+    // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
+    // console.log('jid',jid)
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
   await RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
     Authorization :this._sessionToken,
