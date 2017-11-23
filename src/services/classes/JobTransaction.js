@@ -13,7 +13,7 @@ import {
     TABLE_RUNSHEET,
 } from '../../lib/constants'
 
-import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE } from '../../lib/AttributeConstants'
+import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'
@@ -576,6 +576,7 @@ class JobTransaction {
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
         let fieldDataObject = fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMap, fieldAttributeStatusMap)
         let skuMap = fieldDataObject.dataMap[SKU_ARRAY]
+        let jobTime = jobDataObject.dataMap[JOB_EXPIRY_TIME]
         for (let index in skuMap) {
             let fieldAttributeMaster = fieldAttributeMap[index]
             if (jobDataObject.dataList[fieldAttributeMaster.jobAttributeMasterId]) {
@@ -597,6 +598,7 @@ class JobTransaction {
             fieldDataObject,
             jobDataObject,
             jobTransactionDisplay,
+            jobTime,
         }
     }
 

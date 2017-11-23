@@ -181,6 +181,29 @@ describe('test cases for prepareDataObject', () => {
         }
     }
     it('should return empty data list fo rempty data', () => {
-        
+
     })
+})
+
+describe('test cases for checkJobExpiryTime', () => {
+    const result = "Job Expired!"
+    const dataList = {
+        '4748': {
+            'data': {
+                id: 4477616,
+                jobAttributeMasterId: 4748,
+                jobId: 134814,
+                parentId: 0,
+                positionId: 2,
+                value: "2017-11-22 00:51:00",
+            },
+            label: "jobTime",
+            sequence: 3
+        }
+
+    }
+    it('should check whether jobExpire or not', () => {
+    expect(jobDetailsService.checkJobExpire(dataList)).toEqual(result)
+    })
+
 })

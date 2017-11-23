@@ -3,6 +3,7 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { NavigationActions } from 'react-navigation'
+import {jobDetailsService} from '../../services/classes/JobDetails'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -20,7 +21,7 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction,errorMessage) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -28,6 +29,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobDataList,
             jobTransaction,
             currentStatus,
+            errorMessage
         }
     }
 }
@@ -42,7 +44,8 @@ export function getJobDetails(jobTransactionId) {
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay))
+            const errorMessage = !(details.jobTime) ? null : jobDetailsService.checkJobExpire(details.jobTime)
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay,errorMessage))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

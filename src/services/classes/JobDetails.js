@@ -7,6 +7,7 @@ import {
     CONTACT_NUMBER,
     OBJECT_SAROJ_FAREYE,
 } from '../../lib/AttributeConstants'
+import moment from 'moment'
 
 class JobDetails {
 
@@ -75,6 +76,12 @@ class JobDetails {
             dataList,
             autoIncrementId
         }
+    }
+
+
+    checkJobExpire(jobDataList){      
+        const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
+        return ((jobAttributeTime != null && jobAttributeTime != undefined) &&  moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : null 
     }
 }
 

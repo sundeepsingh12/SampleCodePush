@@ -13,6 +13,7 @@ var InitialState = Record({
     messageList: [],
     currentStatus: null,
     smsTemplateList: [],
+    errorMessage: null,
 })
 
 export default InitialState
