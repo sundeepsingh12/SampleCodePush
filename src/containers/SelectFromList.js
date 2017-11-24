@@ -19,12 +19,13 @@ import {
 
 import { Button, List, ListItem, Form, Item, Icon, Input, CheckBox, Radio, Content, Body, Toast } from 'native-base'
 import * as selectFromListActions from '../modules/selectFromList/selectFromListActions'
-import { CHECKBOX, RADIOBUTTON, DROPDOWN, OPTION_RADIO_FOR_MASTER } from '../lib/AttributeConstants'
+import { CHECKBOX, RADIOBUTTON, DROPDOWN, OPTION_RADIO_FOR_MASTER, SEARCH, OK } from '../lib/AttributeConstants'
 
 import styles from '../themes/FeStyle'
 import {
   SET_FILTERED_DATA_SELECTFROMLIST,
   INPUT_TEXT_VALUE,
+  SELECTFROMLIST_ITEMS_LENGTH,
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -80,15 +81,16 @@ class SelectFromList extends Component {
   }
 
   _dropModal = () => {
+    this.props.actions.setState(SELECTFROMLIST_ITEMS_LENGTH, 0)
     this.setModalVisible(false)
     this.props.press()
-    this.props.actions.setState(INPUT_TEXT_VALUE, '')    
+    this.props.actions.setState(INPUT_TEXT_VALUE, '')
+    this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
   }
 
   _saveAndDropModal = () => {
+    this._dropModal()
     this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
-    this.setModalVisible(false),
-      this.props.press()
   }
 
   _setValueInInputText(valueOfInputText) {
@@ -98,10 +100,10 @@ class SelectFromList extends Component {
 
   searchBarView() {
     return (
-     <View>
+      <View>
         <View searchBar style={[styles.padding5]}>
           <Item rounded style={{ height: 30, backgroundColor: '#ffffff' }}>
-            <Input placeholder="Search"
+            <Input placeholder={SEARCH}
               style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 10 }]}
               value={this.props.searchBarInputText}
               onChangeText={(searchText) => {
@@ -109,7 +111,12 @@ class SelectFromList extends Component {
                 this.props.actions.setFilteredDataInDropdown(this.props.selectFromListState, searchText)
               }}
             />
-            <Icon style={[styles.fontSm]} name="md-close" />
+            <Icon style={[styles.fontSm]} name="md-close"
+              onPress={() => {
+                this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
+                this.props.actions.setState(INPUT_TEXT_VALUE, '')
+              }}
+            />
           </Item>
         </View>
       </View>
@@ -120,12 +127,20 @@ class SelectFromList extends Component {
     let fieldAttributeView = null
     if (this.props.currentElement.attributeTypeId == CHECKBOX) {
       fieldAttributeView = <CheckBox checked={item.isChecked}
+        onPress={() => {
+          this.props.actions.setOrRemoveStates(this.props.selectFromListState,
+            item.id, this.props.currentElement.attributeTypeId)
+        }}
       />
 
 
     }
     else if (this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER || (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 0)) {
       fieldAttributeView = <Radio selected={item.isChecked}
+        onPress={() => {
+          this.props.actions.setOrRemoveStates(this.props.selectFromListState,
+            item.id, this.props.currentElement.attributeTypeId)
+        }}
         style={([{ width: 20 }])}
       />
     }
@@ -143,7 +158,7 @@ class SelectFromList extends Component {
         {fieldAttributeView}
         <Body>
           <Text style={[styles.marginLeft10]}>{(this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) ? item.optionKey : item.name}</Text>
-          </Body>
+        </Body>
       </ListItem>
     )
     // }
@@ -154,7 +169,7 @@ class SelectFromList extends Component {
       Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',
-        buttonText: 'Okay'
+        buttonText: {OK}
       })
     }
     if ((this.props.currentElement.attributeTypeId == CHECKBOX || this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == DROPDOWN) && this.state.modalVisible) {

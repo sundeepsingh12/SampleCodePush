@@ -258,6 +258,9 @@ export default {
     paddingTop5 : {
         paddingTop: 5
     },
+    paddingTop0 : {
+        paddingTop: 0
+    },
     paddingTop10 : {
         paddingTop: 10
     },
@@ -274,6 +277,9 @@ export default {
         paddingTop: 30
     },
 
+    paddingBottom0 : {
+        paddingBottom: 0
+    },
     paddingBottom5 : {
         paddingBottom: 5
     },
@@ -296,6 +302,9 @@ export default {
     paddingLeft5 : {
         paddingLeft: 5
     },
+    paddingLeft0 : {
+        paddingLeft: 0
+    },
     paddingLeft10 : {
         paddingLeft: 10
     },
@@ -312,6 +321,9 @@ export default {
         paddingLeft: 30
     },
 
+    paddingRight0 : {
+        paddingRight: 0
+    },
     paddingRight5 : {
         paddingRight: 5
     },

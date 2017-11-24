@@ -38,7 +38,10 @@ const style = StyleSheet.create({
         paddingRight: 30,
         backgroundColor: 'rgba(255, 255, 255, 0.20)',
         borderRadius: 2,
-        height: 55,
+        lineHeight: 10,
+        paddingTop: 0,
+        paddingBottom: 0,
+        height: 30,
         color: '#fff',
         fontSize: 11
     },

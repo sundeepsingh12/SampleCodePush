@@ -19,6 +19,7 @@ import {
     ERROR_MESSAGE,
     INPUT_TEXT_VALUE,
 } from '../../lib/constants'
+import _ from 'lodash'
 
 export function _setErrorMessage(message) {
     return {
@@ -49,7 +50,7 @@ export function setOrRemoveStates(selectFromListState, id, attributeTypeId) {
 export function selectFromListButton(selectFromListState, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, nextEditable) {
     return async function (dispatch) {
         try {
-            selectFromListState = Object.values(selectFromListDataService.selectFromListDoneButtonClicked(params.attributeTypeId, selectFromListState))
+            selectFromListState = _.values(selectFromListDataService.selectFromListDoneButtonClicked(params.attributeTypeId, selectFromListState))
             if (params.attributeTypeId == CHECKBOX || params.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
                 const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransactionId, params.positionId, latestPositionId)
                 const value = params.attributeTypeId == OPTION_RADIO_FOR_MASTER ? OBJECT_SAROJ_FAREYE : ARRAY_SAROJ_FAREYE
@@ -79,7 +80,7 @@ export function gettingDataSelectFromList(fieldAttributeMasterId, formElement, a
                 for (let [key, fieldDataObject] of formElement.entries()) {
                     if (fieldDataObject.fieldAttributeMasterId == fieldAttributeMasterId && fieldDataObject.childDataList) {
                         let childDataListOfSelectFromListAttribute = fieldDataObject.childDataList
-                        let selectFromListDataValues = Object.values(selectFromListData.selectFromListsData)
+                        let selectFromListDataValues = _.values(selectFromListData.selectFromListsData)
                         for (let child of childDataListOfSelectFromListAttribute) {
                             for (let childOfCurrentState of selectFromListDataValues) {
                                 if (child.value == childOfCurrentState.code) {
@@ -89,7 +90,7 @@ export function gettingDataSelectFromList(fieldAttributeMasterId, formElement, a
                         }
                     }
                     else if (fieldDataObject.fieldAttributeMasterId == fieldAttributeMasterId && fieldDataObject.value) {
-                        let selectFromListDataValues = Object.values(selectFromListData.selectFromListsData)
+                        let selectFromListDataValues = _.values(selectFromListData.selectFromListsData)
                         for (let childOfCurrentState of selectFromListDataValues) {
                             if (fieldDataObject.value == childOfCurrentState.code) {
                                 childOfCurrentState.isChecked = true
@@ -125,7 +126,7 @@ export function gettingDataForRadioMaster(currentElement, jobId) {
             const jobDatas = realm.getRecordListOnQuery(TABLE_JOB_DATA, query)
             const parentIdJobDataListMap = jobDataService.getParentIdJobDataListMap(jobDatas)
             const selectFromListData = selectFromListDataService.getListDataForRadioMasterAttr(parentIdJobDataListMap, currentElement)
-            if (!jobFieldAttributeMapId || (Object.keys(selectFromListData).length === 0 && selectFromListData.constructor === Object)) {
+            if (!jobFieldAttributeMapId || (_.keys(selectFromListData).length === 0 && selectFromListData.constructor === Object)) {
                 throw new Error('mapping of radioForMaster error')
             }
             selectFromListState.radioMasterDto = jobFieldAttributeMapId

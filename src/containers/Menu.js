@@ -232,6 +232,20 @@ class Menu extends Component {
               </View>
             </View>
 
+            {/* only for UI Components */}
+            <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.navigateToScene('UIViews') }}>
+              <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+                <View style={[styles.justifySpaceBetween, styles.flex1]}>
+                  <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
+                    <Text style={[styles.fontDefault]}>
+                      UI
+                    </Text>
+                    <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+
             {/*Card 5*/}
             <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.invalidateUserSession() }}>
               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
