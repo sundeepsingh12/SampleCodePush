@@ -11,8 +11,8 @@ import TrackLogs from './schema/trackLogs'
 
 import _ from 'underscore'
 
-const schemaVersion = 30;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs];
+const schemaVersion = 32;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];
 
 let realm = new Realm({
     schemaVersion,
@@ -20,14 +20,14 @@ let realm = new Realm({
 });
 
 import {
-  TABLE_JOB_TRANSACTION,
-  TABLE_FIELD_DATA,
-  TABLE_JOB,
-  TABLE_JOB_DATA,
-  USER,
-  TABLE_RUNSHEET,
-  TABLE_JOB_TRANSACTION_CUSTOMIZATION,
-  TABLE_TRACK_LOGS
+    TABLE_JOB_TRANSACTION,
+    TABLE_FIELD_DATA,
+    TABLE_JOB,
+    TABLE_JOB_DATA,
+    USER,
+    TABLE_RUNSHEET,
+    TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+    TABLE_TRACK_LOGS
 } from '../lib/constants'
 
 export function save(tableName, object) {

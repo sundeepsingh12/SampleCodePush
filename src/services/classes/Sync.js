@@ -40,7 +40,7 @@ class Sync {
       throw new Error('Token Missing')
     }
     await createZip()
-    console.log('token before call',token.value)
+    console.log('token before call', token.value)
     await RestAPIFactory(token.value).uploadZipFile()
   }
 
@@ -101,7 +101,7 @@ class Sync {
    * 
    * @return tdcResponse object
    */
-  async downloadDataFromServer(pageNumber, pageSize) {
+  async downloadDataFromServer(pageNumber, pageSize, isLiveJob) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
@@ -115,7 +115,12 @@ class Sync {
     if (!isCustomErpPullActivated) {
       formData = 'pageNumber=' + pageNumber + '&pageSize=' + pageSize
     }
-    const url = (formData == null) ? CONFIG.API.DOWNLOAD_DATA_API : CONFIG.API.DOWNLOAD_DATA_API + "?" + formData
+    let url = ''
+    if (!isLiveJob)
+      url = (formData == null) ? CONFIG.API.DOWNLOAD_DATA_API : CONFIG.API.DOWNLOAD_DATA_API + "?" + formData
+    else
+      url = (formData == null) ? CONFIG.API.DOWNLOAD_LIVE_JOB_DATA : CONFIG.API.DOWNLOAD_LIVE_JOB_DATA + "?" + formData
+
     let downloadResponse = RestAPIFactory(token.value).serviceCall(null, url, 'GET')
     return downloadResponse
   }
@@ -341,14 +346,16 @@ class Sync {
    * 
    * Returns true if any job present in sync table on server side
    */
-  async downloadAndDeleteDataFromServer() {
-    const pageNumber = 0,
+  async downloadAndDeleteDataFromServer(isLiveJob) {
+    let pageNumber = 0,
       pageSize = 3
+    if (isLiveJob)
+      pageSize = 200
     let isLastPageReached = false,
       json, isJobsPresent = false
     const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
-      const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize)
+      const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob)
       if (tdcResponse) {
         json = await tdcResponse.json
         isLastPageReached = json.last
