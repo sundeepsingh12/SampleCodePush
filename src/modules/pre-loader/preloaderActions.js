@@ -67,6 +67,8 @@ import {
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
+  HomeTabNavigatorScreen,
+  LoginScreen
 } from '../../lib/constants'
 
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -277,7 +279,7 @@ export function invalidateUserSession() {
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
-      dispatch(NavigationActions.navigate({ routeName: Login }))
+      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))
     }
@@ -291,7 +293,7 @@ export function startLoginScreenWithoutLogout() {
     await logoutService.deleteDataBase()
     dispatch(preLogoutSuccess())
     dispatch(deleteSessionToken())
-    dispatch(NavigationActions.navigate({ routeName: Login }))
+    dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
   }
 }
 
@@ -385,7 +387,7 @@ export function checkAsset() {
       if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        dispatch(NavigationActions.navigate({ routeName: 'Home' }))
+        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer());
@@ -422,7 +424,7 @@ export function checkIfSimValidOnServer() {
       if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        dispatch(NavigationActions.navigate({ routeName: 'Home' }))
+        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
         dispatch(showMobileNumber())
@@ -481,7 +483,7 @@ export function validateOtp(otpNumber) {
       const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM.value, token)
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
-      dispatch(NavigationActions.navigate({ routeName: 'Home' }))
+      dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
     } catch (error) {
       dispatch(otpValidationFailure(error.message))
     }

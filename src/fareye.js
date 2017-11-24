@@ -26,7 +26,6 @@ import configureStore from './lib/configureStore'
  * All the top level containers
  *
  */
-import Application from './containers/Application'
 import ResyncLoader from './components/ResyncLoader'
 import JobDetails from './containers/JobDetails'
 import FormLayout from './containers/FormLayout'
@@ -63,6 +62,7 @@ import SkuListingInitialState from './modules/skulisting/skuListingInitialState'
 import FormLayoutInitialState from './modules/form-layout/formLayoutInitialState'
 import SequenceInitialState from './modules/sequence/sequenceInitialState'
 import NewJobInitialState from './modules/newJob/newJobInitialState'
+import BulkInitialState from './modules/bulk/bulkInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 
@@ -93,6 +93,7 @@ function getInitialState() {
     formLayout : new FormLayoutInitialState(),
     sequence: new SequenceInitialState(),
     newJob : new NewJobInitialState(),
+    bulk:new BulkInitialState(),
   }
   return _initState
 }

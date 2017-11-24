@@ -11,11 +11,11 @@ FieldData.schema = {
   name: TABLE_FIELD_DATA,
   primaryKey: 'id',
   properties: {
-    fieldAttributeMasterId: { type: 'int' },
-    id: { type: 'int' },
-    jobTransactionId: { type: 'int' },
-    parentId: { type: 'int' },
-    positionId: { type: 'int' },
-    value: { type: 'string', optional: true },
+    fieldAttributeMasterId: 'int' ,
+    id:  'int' ,
+    jobTransactionId:  'int' ,
+    parentId:  'int' ,
+    positionId:  'int' ,
+    value:  'string?',
   }
 }

@@ -1,5 +1,15 @@
-import RNFS from 'react-native-fs';
+import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
+import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
+import StartIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
+// import LiveIcon from '../../images/fareye-default-iconset/homescreen/live.png'
+
+import BulkIcon from '../../src/svg_components/icons/BulkIcon'
+import LiveIcon from '../../src/svg_components/icons/LiveIcon'
+import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
+import TaskIcon from '../../src/svg_components/icons/TaskIcon'
+// import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
+import React, { Component } from 'react'
 module.exports = {
 
     /**
@@ -88,7 +98,8 @@ module.exports = {
         displayName: 'Eze-Tap',
         id: 2,
         modeType: 'EzeTap',
-        appModuleId: 10
+        appModuleId: 10,
+        enabled: false,
     },
     MOSAMBEE: {
         displayName: 'Mosambee',
@@ -112,7 +123,8 @@ module.exports = {
         displayName: 'M-Swipe',
         id: 3,
         modeType: 'MSwipe',
-        appModuleId: 9
+        appModuleId: 9,
+        enabled: false,
     },
     NET_BANKING: {
         displayName: 'Net Banking',
@@ -193,8 +205,6 @@ module.exports = {
     // Field Data Value Constants
     ARRAY_SAROJ_FAREYE: 'ArraySarojFareye',
     OBJECT_SAROJ_FAREYE: 'ObjectSarojFareye',
-    ARRAYSAROJFAREYE: 'ArraySarojFareye',
-    OBJECTSAROJFAREYE: 'ObjectSarojFareye',
 
     //Validation Condition Constants
     EQUAL_TO: '==',
@@ -251,38 +261,76 @@ module.exports = {
     CONFIRM_NEW_PASSWORD: 'Confirm New Password',
 
     //App Modules Constants
+    BACKUP: {
+        appModuleId: 17,
+        displayName: 'Backup',
+        enabled: false,
+    },
+    BLUETOOTH: {
+        appModuleId: 16,
+        displayName: 'Pair Bluetooth Device',
+        enabled: false,
+    },
     BULK: {
         appModuleId: 1,
-        displayName: ''
+        displayName: 'Bulk Update',
+        enabled: false,
+        icon: <BulkIcon />,
     },
     LIVE: {
         appModuleId: 13,
-        displayName: ''
+        displayName: 'Live',
+        enabled: false,
+        icon: <LiveIcon />,
     },
     OFFLINEDATASTORE: {
         appModuleId: 15,
-        displayName: ''
+        displayName: 'Sync Datastore',
+        enabled: false,
     },
     PIECHART: {
         appModuleId: 5,
-        displayName: ''
+        displayName: 'Pie Chart',
+        enabled: false,
+    },
+    PROFILE: {
+        appModuleId: 14,
+        displayName: 'Profile',
+        enabled: false,
+        icon: 'md-person',
     },
     STATISTIC: {
         appModuleId: 7,
-        displayName: ''
+        displayName: 'My Stats',
+        enabled: false,
+        icon: 'md-trending-up',
     },
-    SEQUENCE: {
+    SEQUENCEMODULE: {
         appModuleId: 2,
-        displayName: ''
+        displayName: 'Sequence',
+        enabled: false,
+        icon: <SequenceIcon />,
     },
     START: {
         appModuleId: 4,
-        displayName: ''
+        displayName: 'All Tasks',
+        enabled: false,
+        icon: <TaskIcon />
     },
     SUMMARY: {
         appModuleId: 8,
-        displayName: ''
+        displayName: '',
+        enabled: false,
     },
+    SORTING:{
+        appModuleId:26,
+         displayName: 'Sort Parcels',
+        enabled: false,
+        icon: <SequenceIcon />,
+    },
+
+    //JobStatusConstants
+    UNSEEN: 'UNSEEN',
 
     //Status Category
     PENDING: 1,
@@ -293,12 +341,31 @@ module.exports = {
     REFERENCE_NO: 'referenceNo=',
     REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
-    NA: 'N.A',
-    SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
-    SORTING_PLACEHOLDER: 'Enter Reference Number To Scan Package',
+    NA : 'N.A',
+    SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
+    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package',
 
+    //SkuListing Service
+    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY : 'Quantity should be less than max quantity.Cannot proceed.',
+    QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
+    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY : 'Quantity should be equal to max quantity.Cannot proceed.',
+    QTY_ZERO : 'Quantity should be 0.Cannot proceed.',
+
+    //Sequence Container
+    ROUTE_OPTIMIZATION: 'Route optimisation',
+
+    //Bulk Listing Container
+    NEXT_POSSIBLE_STATUS:'Next possible status',
+    
     // Array attribute constants
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
+
+    //Start Search PlaceHolder
+    SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
+
+    //Error Messages
+    USER_NOT_FOUND: 'User Not Found',
+    SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
 
 }

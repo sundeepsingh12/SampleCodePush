@@ -14,8 +14,10 @@ import {
     ON_BLUR,
     TABLE_JOB_DATA,
     FIELD_ATTRIBUTE,
+    SELECTFROMLIST_ITEMS_LENGTH,
+    SET_FILTERED_DATA_SELECTFROMLIST,
     ERROR_MESSAGE,
-    SET_DROPDOWN_VALUE,
+    INPUT_TEXT_VALUE,
 } from '../../lib/constants'
 
 export function _setErrorMessage(message) {
@@ -55,7 +57,8 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
             } else {
                 dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
             }
-            dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))
+             dispatch(setState(INPUT_TEXT_VALUE, ''))
+             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))
         } catch (error) {
             dispatch(setState(ERROR_MESSAGE, error.message))
             dispatch(setState(ERROR_MESSAGE, ''))
@@ -64,7 +67,7 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
 }
 
 
-export function gettingDataSelectFromList(fieldAttributeMasterId, formElement) {
+export function gettingDataSelectFromList(fieldAttributeMasterId, formElement, attributeTypeIdOfCurrentElement) {
     return async function (dispatch) {
         try {
             const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
@@ -76,7 +79,7 @@ export function gettingDataSelectFromList(fieldAttributeMasterId, formElement) {
                 for (let [key, fieldDataObject] of formElement.entries()) {
                     if (fieldDataObject.fieldAttributeMasterId == fieldAttributeMasterId && fieldDataObject.childDataList) {
                         let childDataListOfSelectFromListAttribute = fieldDataObject.childDataList
-                        let selectFromListDataValues = Object.values(selectFromListData)
+                        let selectFromListDataValues = Object.values(selectFromListData.selectFromListsData)
                         for (let child of childDataListOfSelectFromListAttribute) {
                             for (let childOfCurrentState of selectFromListDataValues) {
                                 if (child.value == childOfCurrentState.code) {
@@ -86,19 +89,21 @@ export function gettingDataSelectFromList(fieldAttributeMasterId, formElement) {
                         }
                     }
                     else if (fieldDataObject.fieldAttributeMasterId == fieldAttributeMasterId && fieldDataObject.value) {
-                        let selectFromListDataValues = Object.values(selectFromListData)
+                        let selectFromListDataValues = Object.values(selectFromListData.selectFromListsData)
                         for (let childOfCurrentState of selectFromListDataValues) {
                             if (fieldDataObject.value == childOfCurrentState.code) {
                                 childOfCurrentState.isChecked = true
-                                console.log("ddcv",childOfCurrentState)
-                                if (fieldDataObject.attributeTypeId == DROPDOWN)
-                                dispatch(setState(SET_DROPDOWN_VALUE, childOfCurrentState.name))
+                                dispatch(setState(INPUT_TEXT_VALUE, childOfCurrentState.name))
+
                             }
                         }
                     }
                 }
             }
-            dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListData))
+            if (attributeTypeIdOfCurrentElement == DROPDOWN && selectFromListData.selectFromListsDataLength >= 30){
+                dispatch(setState(SELECTFROMLIST_ITEMS_LENGTH, 1))                
+            }
+            dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListData.selectFromListsData))
         } catch (error) {
             dispatch(setState(ERROR_MESSAGE, error.message))
             dispatch(setState(ERROR_MESSAGE, ''))
@@ -126,6 +131,23 @@ export function gettingDataForRadioMaster(currentElement, jobId) {
             selectFromListState.radioMasterDto = jobFieldAttributeMapId
             selectFromListState.selectListData = selectFromListData
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListState))
+        } catch (error) {
+            dispatch(setState(ERROR_MESSAGE, error.message))
+            dispatch(setState(ERROR_MESSAGE, ''))
+        }
+    }
+}
+
+
+export function setFilteredDataInDropdown(selectFromListState, searchText) {
+    return async function (dispatch) {
+        try {
+            if (searchText.length) {
+                let filteredDataDropdown = selectFromListDataService.getFilteredDataInDropDown(selectFromListState, searchText)
+                dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST, filteredDataDropdown))
+            } else{
+                dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST, {}))
+            }
         } catch (error) {
             dispatch(setState(ERROR_MESSAGE, error.message))
             dispatch(setState(ERROR_MESSAGE, ''))

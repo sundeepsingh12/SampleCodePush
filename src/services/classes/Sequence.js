@@ -8,6 +8,8 @@ import {
     jobStatusService
 } from './JobStatus'
 
+import { transactionCustomizationService } from './TransactionCustomization'
+
 import {
     JOB_STATUS,
     CUSTOMIZATION_LIST_MAP,
@@ -28,24 +30,17 @@ import {
     LANDMARK
 } from '../../lib/AttributeConstants'
 
-import _ from 'underscore'
+import _ from 'lodash'
 import * as realm from '../../repositories/realmdb'
 
 class Sequence {
 
     async getSequenceList() {
-       
-        console.log('getSequenceList of service')
-        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-        const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
-        const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-        const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
-        const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
-        const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-        const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
         const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
-        let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobMasterIdCustomizationMap.value, jobAttributeMasterList.value, jobAttributeStatusList.value, customerCareList.value, smsTemplateList.value, statusList.value, jobMasterList.value, statusIds, true)
-        const idJobTransactionCustomizationListMap = await jobTransactionService.getIdJobTransactionCustomizationListMap(jobTransactionCustomizationList)
+        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
+        const jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,'Sequence',statusIds)
+        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList,'id')
+        console.log('idJobTransactionCustomizationListMap',idJobTransactionCustomizationListMap)
         return idJobTransactionCustomizationListMap
     }
 
@@ -90,11 +85,13 @@ class Sequence {
 
      processSequenceResponse(responseBody, sequenceList) {
         const transactionIdSequenceMap = responseBody.transactionIdSequenceMap
+          const updatedSequenceList = JSON.parse(JSON.stringify(sequenceList))
         let position  = 1
         if (transactionIdSequenceMap != null && transactionIdSequenceMap != undefined && !_.isEmpty(transactionIdSequenceMap)) {
             for (let index in sequenceList) {
                 if(transactionIdSequenceMap[sequenceList[index].id]){
                     position++
+                    updatedSequenceList[index].seqSelected = transactionIdSequenceMap[index]
                 }
             }
         }
@@ -103,10 +100,13 @@ class Sequence {
               for (let index in sequenceList) {
                 if(unAllocatedTransactionIds.includes(sequenceList[index].id)){
                     transactionIdSequenceMap[sequenceList[index].id] = position++
+                    updatedSequenceList[index].seqSelected = transactionIdSequenceMap[index]
                 }
             }
         }
-        realm.updateRealmDb(TABLE_JOB_TRANSACTION, test)
+        realm.updateRealmDb(TABLE_JOB_TRANSACTION, transactionIdSequenceMap)
+        return  updatedSequenceList
+
     }
 }
 

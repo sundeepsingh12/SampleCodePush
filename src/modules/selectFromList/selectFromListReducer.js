@@ -3,21 +3,27 @@
 const InitialState = require('./selectFromListInitialState').default
 
 import {
-    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,ERROR_MESSAGE,
-    SET_DROPDOWN_VALUE,
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
+    ERROR_MESSAGE,
+    INPUT_TEXT_VALUE,
+    SELECTFROMLIST_ITEMS_LENGTH,
+    SET_FILTERED_DATA_SELECTFROMLIST,
 } from '../../lib/constants'
 
 const initialState = new InitialState()
 
 export default function selectFromListReducer(state = initialState, action) {
-
     switch (action.type) {
         case SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:
             return state.set('selectFromListState', action.payload)
         case ERROR_MESSAGE:
-            return state.set('errorMessage',action.payload)
-        case SET_DROPDOWN_VALUE:
-        return state.set('dropdownValue',action.payload)
+            return state.set('errorMessage', action.payload)
+        case INPUT_TEXT_VALUE:
+            return state.set('searchBarInputText', action.payload)
+        case SELECTFROMLIST_ITEMS_LENGTH:
+            return state.set('totalItemsInSelectFromList', action.payload)
+        case SET_FILTERED_DATA_SELECTFROMLIST:
+            return state.set('filteredDataSelectFromList', action.payload)
     }
     return state
 }

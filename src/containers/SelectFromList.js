@@ -12,28 +12,35 @@ import {
   View,
   Text,
   TouchableHighlight,
-  FlatList,
-  Modal
+  Modal,
+  ScrollView
 }
   from 'react-native'
 
-import { Container, Button, Picker, List, ListItem, Header, Form, Item, CheckBox, Radio, Content, Card, Footer, FooterTab, Right, Body, CardItem, Toast } from 'native-base'
+import { Button, List, ListItem, Form, Item, Icon, Input, CheckBox, Radio, Content, Body, Toast } from 'native-base'
 import * as selectFromListActions from '../modules/selectFromList/selectFromListActions'
-import { CHECKBOX, RADIOBUTTON, DROPDOWN,OPTION_RADIO_FOR_MASTER } from '../lib/AttributeConstants'
-import styles from '../themes/FeStyle'
+import { CHECKBOX, RADIOBUTTON, DROPDOWN, OPTION_RADIO_FOR_MASTER } from '../lib/AttributeConstants'
 
+import styles from '../themes/FeStyle'
+import {
+  SET_FILTERED_DATA_SELECTFROMLIST,
+  INPUT_TEXT_VALUE,
+} from '../lib/constants'
 
 function mapStateToProps(state) {
   return {
     selectFromListState: state.selectFromList.selectFromListState,
     errorMessage: state.selectFromList.errorMessage,
     dropdownValue: state.selectFromList.dropdownValue,
+    totalItemsInSelectFromList: state.selectFromList.totalItemsInSelectFromList,
+    searchBarInputText: state.selectFromList.searchBarInputText,
+    filteredDataSelectFromList: state.selectFromList.filteredDataSelectFromList,
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...selectFromListActions }, dispatch)
+    actions: bindActionCreators({ ...selectFromListActions, ...globalActions }, dispatch)
   }
 }
 
@@ -50,14 +57,14 @@ class SelectFromList extends Component {
     if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
       this.props.actions.gettingDataForRadioMaster(this.props.currentElement, this.props.jobTransaction.jobId)
     } else {
-      this.props.actions.gettingDataSelectFromList(this.props.currentElement.fieldAttributeMasterId, this.props.formElements)
+      this.props.actions.gettingDataSelectFromList(this.props.currentElement.fieldAttributeMasterId, this.props.formElements, this.props.currentElement.attributeTypeId)
     }
   }
 
   setModalVisible = (visible) => {
     this.setState(() => {
       return {
-        modalVisible: visible
+        modalVisible: visible,
       }
     })
   }
@@ -72,48 +79,74 @@ class SelectFromList extends Component {
     return view
   }
 
+  _dropModal = () => {
+    this.setModalVisible(false)
+    this.props.press()
+    this.props.actions.setState(INPUT_TEXT_VALUE, '')    
+  }
+
+  _saveAndDropModal = () => {
+    this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
+    this.setModalVisible(false),
+      this.props.press()
+  }
+
+  _setValueInInputText(valueOfInputText) {
+    if (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 1)
+      this.props.actions.setState(INPUT_TEXT_VALUE, valueOfInputText)
+  }
+
+  searchBarView() {
+    return (
+     <View>
+        <View searchBar style={[styles.padding5]}>
+          <Item rounded style={{ height: 30, backgroundColor: '#ffffff' }}>
+            <Input placeholder="Search"
+              style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 10 }]}
+              value={this.props.searchBarInputText}
+              onChangeText={(searchText) => {
+                this._setValueInInputText(searchText)
+                this.props.actions.setFilteredDataInDropdown(this.props.selectFromListState, searchText)
+              }}
+            />
+            <Icon style={[styles.fontSm]} name="md-close" />
+          </Item>
+        </View>
+      </View>
+    )
+  }
+
   listItemView = (item) => {
-    let fieldAttributeView
+    let fieldAttributeView = null
     if (this.props.currentElement.attributeTypeId == CHECKBOX) {
       fieldAttributeView = <CheckBox checked={item.isChecked}
       />
 
 
     }
-    else if (this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
+    else if (this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER || (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 0)) {
       fieldAttributeView = <Radio selected={item.isChecked}
         style={([{ width: 20 }])}
       />
     }
 
-    if (this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == CHECKBOX) {
-      return (
-        <ListItem
-          key={item.id}
-          icon
-          onPress={() => this.props.actions.setOrRemoveStates(this.props.selectFromListState,
-            item.id, this.props.currentElement.attributeTypeId)}>
-          {fieldAttributeView}
-          <Body>
-            <Text style={[styles.marginLeft10]}>{item.name}</Text>
+    return (
+      <ListItem
+        button
+        key={item.id}
+        onPress={() => {
+          this.props.actions.setOrRemoveStates(this.props.selectFromListState,
+            item.id, this.props.currentElement.attributeTypeId)
+          this._setValueInInputText(item.name)
+          this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
+        }}>
+        {fieldAttributeView}
+        <Body>
+          <Text style={[styles.marginLeft10]}>{(this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) ? item.optionKey : item.name}</Text>
           </Body>
-        </ListItem>
-      )
-    }
-    else if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
-      return (
-        <ListItem
-          key={item.id}
-          icon
-          onPress={() => this.props.actions.setOrRemoveStates(this.props.selectFromListState,
-            item.id, this.props.currentElement.attributeTypeId)}>
-          {fieldAttributeView}
-          <Body>
-            <Text style={[styles.marginLeft10]}>{item.optionKey}</Text>
-          </Body>
-        </ListItem>
-      )
-    }
+      </ListItem>
+    )
+    // }
   }
 
   render() {
@@ -124,50 +157,50 @@ class SelectFromList extends Component {
         buttonText: 'Okay'
       })
     }
-    if (this.props.currentElement.attributeTypeId == CHECKBOX || this.props.currentElement.attributeTypeId == RADIOBUTTON && this.state.modalVisible) {
-      const radioButtonData = this.renderListViewData(this.props.selectFromListState)
+    if ((this.props.currentElement.attributeTypeId == CHECKBOX || this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == DROPDOWN) && this.state.modalVisible) {
+      let radioButtonData
+      let searchBarViewData
+      if (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 1) {
+        searchBarViewData = this.searchBarView()
+        radioButtonData = this.renderListViewData(this.props.filteredDataSelectFromList)
+      }
+      else {
+        radioButtonData = this.renderListViewData(this.props.selectFromListState)
+        searchBarViewData = null
+      }
       return (
         <Modal
           animationType="slide"
           transparent={true}
           visible={this.state.modalVisible}
-          backdropPressToClose
-          onRequestClose={() => {
-            this.setModalVisible(false)
-            this.props.press()
-          }}
+          onRequestClose={this._dropModal}
         >
           <TouchableHighlight
-            onPress={() => {
-              this.setModalVisible(false),
-                this.props.press()
-            }}
+            onPress={this._dropModal}
             style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
             <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
               <View>
-                <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
-                  <Text style={[styles.padding10]}>{this.props.currentElement.label}</Text>
-
-                  <TouchableHighlight
-                    onPress={() => {
-                      this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
-                      this.setModalVisible(false),
-                        this.props.press()
-                    }}>
-                    <Text style={[styles.fontInfo, styles.padding10]}> DONE </Text>
-                  </TouchableHighlight>
+                <View style={[styles.bgLightGray]}>
+                  <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
+                    <Text style={[styles.padding10]}>{this.props.currentElement.label}</Text>
+                    <TouchableHighlight
+                      onPress={this._saveAndDropModal}>
+                      <Text style={[styles.fontInfo, styles.padding10]}> DONE </Text>
+                    </TouchableHighlight>
+                  </View>
+                  {searchBarViewData}
                 </View>
-                <View style={[styles.paddingBottom30]}>
-                  <Content style={[styles.flexBasis100
+                <ScrollView style={[styles.paddingBottom30]}>
+                  <View style={[styles.flexBasis100
                   ]}>
                     <List>
                       {radioButtonData}
                     </List>
                     {/*This view is empty because bottom sheet margin from bottom  */}
-                    <View style={{ height: 40 }} />
+                    <View style={{ height: 80 }} />
 
-                  </Content>
-                </View>
+                  </View>
+                </ScrollView>
               </View>
             </TouchableHighlight>
           </TouchableHighlight>
@@ -175,52 +208,6 @@ class SelectFromList extends Component {
       )
     }
 
-    else if (this.props.currentElement.attributeTypeId == DROPDOWN) {
-      console.log("dropdownss", this.props.dropdownValue)
-      const listData = (!this.props.selectFromListState.selectListData) ? this.props.selectFromListState : {}
-      return (
-
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={this.state.modalVisible}
-          backdropPressToClose
-          onRequestClose={() => {
-            this.setModalVisible(false)
-            this.props.press()
-          }}
-        >
-          <TouchableHighlight
-            onPress={() => {
-              this.setModalVisible(false),
-                this.props.press()
-            }}
-            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
-            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
-              <View>
-                <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
-                  <Text style={[styles.padding10]}>{this.props.currentElement.label}</Text>
-                </View>
-
-                <Form>
-                  <Picker mode="dropdown"
-                    selectedValue={this.props.dropdownValue}
-                    onValueChange={(value) => {
-                      this.props.actions.setOrRemoveStates(listData, value, this.props.currentElement.attributeTypeId),
-                      this.props.actions.selectFromListButton(listData, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
-                      this.setModalVisible(false),
-                        this.props.press()
-                    }}
-                  >
-                    {this.populateDropDown()}
-                  </Picker>
-                </Form>
-              </View>
-            </TouchableHighlight>
-          </TouchableHighlight>
-        </Modal>
-      )
-    }
     else if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
       const listData = (this.props.selectFromListState.selectListData != null && this.props.selectFromListState.selectListData != undefined) ? this.props.selectFromListState.selectListData : {}
       const optionRadioForMasterData = this.renderListViewData(listData)
@@ -230,16 +217,10 @@ class SelectFromList extends Component {
           transparent={true}
           visible={this.state.modalVisible}
           backdropPressToClose
-          onRequestClose={() => {
-            this.setModalVisible(false)
-            this.props.press()
-          }}
+          onRequestClose={this._dropModal}
         >
           <TouchableHighlight
-            onPress={() => {
-              this.setModalVisible(false),
-                this.props.press()
-            }}
+            onPress={this._dropModal}
             style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
             <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
               <View>
@@ -247,11 +228,7 @@ class SelectFromList extends Component {
                   <Text style={[styles.padding10]}>{this.props.currentElement.label}</Text>
 
                   <TouchableHighlight
-                    onPress={() => {
-                      this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
-                      this.setModalVisible(false),
-                        this.props.press()
-                    }}>
+                    onPress={this._saveAndDropModal}>
                     <Text style={[styles.fontInfo, styles.padding10]}> DONE </Text>
                   </TouchableHighlight>
                 </View>
@@ -274,69 +251,6 @@ class SelectFromList extends Component {
     }
     return null
   }
-
-  populateDropDown() {
-    return Object.values(this.props.selectFromListState).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence).map((object) => {
-      return (<Item label={object.name} value={object.id} key={object.id} />)
-    })
-  }
 }
-
-var style = StyleSheet.create({
-  header: {
-    borderBottomWidth: 0,
-    height: 'auto',
-    padding: 0,
-    paddingRight: 0,
-    paddingLeft: 0
-  },
-  headerBody: {
-    width: '800%',
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 10,
-    paddingRight: 10
-  },
-  headerRight: {
-    width: '20%',
-    padding: 15,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-    marginTop: 66
-  },
-  button: {
-    padding: 8,
-  },
-  loginButton: {
-    position: 'absolute',
-    bottom: 0,
-    height: 40,
-    backgroundColor: 'blue',
-    justifyContent: 'center',
-    width: 40
-  },
-  buttonText: {
-    fontSize: 17,
-    color: "#007AFF"
-  },
-  subView: {
-    flex: 1,
-    backgroundColor: "green",
-
-  },
-  containerStyle: {
-    backgroundColor: 'green',
-    borderRadius: 6,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    width: 100,
-    elevation: 5
-
-  },
-});
 
 export default connect(mapStateToProps, mapDispatchToProps)(SelectFromList)

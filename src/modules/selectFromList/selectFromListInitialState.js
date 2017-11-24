@@ -5,7 +5,9 @@ const { Record } = require('immutable')
 const InitialState = Record({
     selectFromListState: {},
     errorMessage: '',
-    dropdownValue: '',
+    totalItemsInSelectFromList: 0,
+    searchBarInputText: '',
+    filteredDataSelectFromList: {}
 })
 
 export default InitialState
