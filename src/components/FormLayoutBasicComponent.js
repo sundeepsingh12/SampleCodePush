@@ -86,26 +86,18 @@ class BasicFormElement extends Component {
     navigateToScene = (item) => {
         let screenName = ''
         let cash = 0
-        console.log("attrrrr", item.attributeTypeId)
+        console.log('item.attributeTypeId',item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
                 screenName = 'Payment'
                 break
             }
+
+            case OPTION_RADIO_FOR_MASTER:
+            case DROPDOWN:
+            case RADIOBUTTON:
             case CHECKBOX: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case RADIOBUTTON: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case DROPDOWN: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case OPTION_RADIO_FOR_MASTER: {
                 screenName = 'SelectFromList'
                 break
             }
@@ -332,23 +324,18 @@ class BasicFormElement extends Component {
             case CASH_TENDERING:
             case SIGNATURE_AND_NPS:
             case ARRAY:
-            case EXTERNAL_DATA_STORE:
-            case CHECKBOX:  
-                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
-            case RADIOBUTTON:  
-                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />           
-            case DROPDOWN:  
-                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
-            case OPTION_RADIO_FOR_MASTER:  
-                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />                
             case DATA_STORE:
-                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-
+            case EXTERNAL_DATA_STORE:
+             return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+            case CHECKBOX:  
+            case RADIOBUTTON:  
+            case DROPDOWN:  
+            case OPTION_RADIO_FOR_MASTER:
+                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />                
             default:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
-                break;
         }
     }
 }
