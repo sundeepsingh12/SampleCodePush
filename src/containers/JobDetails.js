@@ -37,11 +37,8 @@ function mapStateToProps(state) {
         jobTransaction: state.jobDetails.jobTransaction,
         messageList: state.jobDetails.messageList,
         smsTemplateList: state.jobDetails.smsTemplateList,
-<<<<<<< HEAD
         isEnableOutForDelivery: state.jobDetails.isEnableOutForDelivery,
-=======
         statusList: state.jobDetails.statusList,
->>>>>>> master
     }
 }
 
@@ -93,20 +90,7 @@ class JobDetails extends Component {
         for (let index in statusList) {
             statusView.push(
                 <Button key={statusList[index].id} small primary style={{ margin: 2 }}
-<<<<<<< HEAD
-                    onPress={() => this.props.actions.navigateToScene('FormLayout', {
-                        contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
-                        jobTransactionId: this.props.jobTransaction.id,
-                        jobTransaction: this.props.jobTransaction,
-                        statusId: statusList[index].id,
-                        statusName: statusList[index].name,
-                        jobMasterId: this.props.jobTransaction.jobMasterId
-                    }
-                    )
-                    }>
-=======
                     onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}>
->>>>>>> master
                     <Text style={{ color: 'white' }}>{statusList[index].name}</Text>
                 </Button>
             )
