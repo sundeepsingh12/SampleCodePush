@@ -31,7 +31,7 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction,isEnableOutForDelivery) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction,isEnableOutForDelivery,isEnableRestriction) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -39,7 +39,8 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobDataList,
             jobTransaction,
             currentStatus,
-            isEnableOutForDelivery
+            isEnableRestriction,
+            isEnableOutForDelivery,
         }
     }
 }
@@ -55,9 +56,10 @@ export function getJobDetails(jobTransactionId) {
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
-            const jobMaster =  jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId,jobMasterList)
+            const jobMaster =  jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId,jobMasterList)            
+            const isEnableRestriction = (jobMaster[0].enableResequenceRestriction ) ? (jobDetailsService.checkEnableResequence(jobMasterList,details.currentStatus.tabId,details.seqSelected,statusList)): true
             const isEnableOutForDelivery = (jobMaster[0].enableOutForDelivery ) ? (await jobDetailsService.checkOutForDelivery(jobMasterList)): true
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay,isEnableOutForDelivery))
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay,isEnableOutForDelivery,isEnableRestriction))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

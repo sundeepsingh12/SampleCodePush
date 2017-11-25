@@ -37,11 +37,7 @@ describe('job details reducer', () => {
                 fieldDataList: {
                     id: 2
                 },
-                nextStatusList: [
-                    {
-                        id: 3
-                    }
-                ],
+                nextStatusList: undefined,
                 isEnableOutForDelivery: true
             }
         }

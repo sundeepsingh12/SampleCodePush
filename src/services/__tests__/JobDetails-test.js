@@ -1,6 +1,7 @@
 'use strict'
 
 import { jobDetailsService } from '../classes/JobDetails'
+import { jobTransactionService } from '../classes/JobTransaction'
 import * as realm from '../../repositories/realmdb'
 
 
@@ -183,7 +184,84 @@ describe('test cases for prepareDataObject', () => {
         }
     }
     it('should return empty data list fo rempty data', () => {
-        
+
+    })
+})
+
+
+describe('test cases for checkEnableRestriction', () => {
+    const jobMasterList = {
+        value: [
+            {
+                id: 441,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: false,
+                enableResequenceRestriction: true
+            },
+            {
+                id: 442,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: false,
+                enableResequenceRestriction: false
+            }
+        ]
+    }
+
+    const tabId = 251
+    const seqSelected = 2
+    const statusList = {
+        value: [
+            {
+                code: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+                name: "Success",
+                saveActivated: null,
+                sequence: 3,
+                statusCategory: 3,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+                name: "Unseen",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+                name: "Pending12",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            }
+        ]
+    }
+    let firstEnableSequenceValue = 2
+    it('should check enable resequence if sequence is before', () => {
+        jobTransactionService.getFirstTransactionWithEnableSequence = jest.fn()
+        jobTransactionService.getFirstTransactionWithEnableSequence.mockReturnValue(firstEnableSequenceValue)
+        expect(jobDetailsService.checkEnableResequence(jobMasterList,tabId,seqSelected,statusList)).toEqual(true)
+    })
+
+    it('should check enable resequence if sequence is after', () => {
+        firstEnableSequenceValue = 1
+        jobTransactionService.getFirstTransactionWithEnableSequence = jest.fn()
+        jobTransactionService.getFirstTransactionWithEnableSequence.mockReturnValue(firstEnableSequenceValue)
+        expect(jobDetailsService.checkEnableResequence(jobMasterList,tabId,seqSelected,statusList)).toEqual(false)
     })
 })
 

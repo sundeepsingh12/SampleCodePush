@@ -2,8 +2,8 @@
 
 import * as realm from '../../repositories/realmdb'
 
-import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobDataService } from './JobData'
+import { jobTransactionService } from './JobTransaction'
 import {jobStatusService} from './JobStatus'
 import {
     ARRAY_SAROJ_FAREYE,
@@ -87,6 +87,13 @@ class JobDetails {
     }
 
 
+     checkEnableResequence(jobMasterList,tabId,seqSelected,statusList){
+                const jobMasterIdWithEnableResequence  = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id) 
+                const statusMap = statusList.value.filter((status) => status.tabId == tabId).map(obj => obj.id)
+                const firstEnableSequenceValue = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence,statusMap)  
+                return  !(seqSelected > firstEnableSequenceValue)
+         }
+         		  
     async checkOutForDelivery(jobMasterList){
         const jobListWithDelivery  = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) 
         const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobListWithDelivery,UNSEEN)

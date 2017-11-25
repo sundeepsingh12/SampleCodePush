@@ -362,6 +362,10 @@ module.exports = {
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
 
+
+    //enableSequence
+    SEQ_SELECTED: 'seqSelected',
+    
     //Status_Code
     UNSEEN: 'UNSEEN',
     PENDING: 'PENDING',
