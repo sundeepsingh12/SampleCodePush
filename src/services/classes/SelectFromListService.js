@@ -68,7 +68,11 @@ class SelectFromListService {
         let selectFromListData = (fieldAttributeValueList.filter(item => item.fieldAttributeMasterId == fieldAttributeMasterId))
         let selectFromListsData = {}
         selectFromListsData = this.arrayToObject(selectFromListData)
-        return selectFromListsData
+        
+        return {
+            selectFromListsData,
+            selectFromListsDataLength: selectFromListData.length 
+        }
     }
 
     /** return radioMasterDto which has 40 and 41 attributeTypeId as child
@@ -127,6 +131,13 @@ class SelectFromListService {
             }
         return innerObject;
     }
+
+    getFilteredDataInDropDown(selectFromListValues, searchText) {
+        let filteredData = Object.values(selectFromListValues).filter(item => (item.name).indexOf(searchText) == 0)
+        let filteredDataObject = this.arrayToObject(filteredData) 
+        return filteredDataObject
+    }
+
 }
 
 export let selectFromListDataService = new SelectFromListService()

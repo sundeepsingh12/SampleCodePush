@@ -7,10 +7,11 @@ import {
     Platform,
     FlatList,
     TouchableHighlight,
-    ActivityIndicator
+    ActivityIndicator,
+    Modal
 }
     from 'react-native'
-import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base'
+import { Container, Content, Input, Card, CardItem, Button, Body, Header,Footer, Left, Right, Icon, TextInput, Toast } from 'native-base'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
@@ -18,6 +19,7 @@ import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
+import SelectFromList from  '../containers/SelectFromList'
 
 import {
     MONEY_COLLECT,
@@ -63,11 +65,15 @@ function mapDispatchToProps(dispatch) {
 }
 
 class BasicFormElement extends Component {
-    constructor(props) {
-        super(props);
-        //TODO this object can be removed if fieldData on updation is removed
-        this.formElementValue = {}
+
+  constructor(props) {
+    super(props);
+        this.state = {
+        selectFromListEnable: false,
     }
+        this.formElementValue = {}
+  }
+
     componentWillMount = () => {
         if (this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value) {
             this.props.item.isLoading = true
@@ -80,26 +86,18 @@ class BasicFormElement extends Component {
     navigateToScene = (item) => {
         let screenName = ''
         let cash = 0
-        console.log("attrrrr", item.attributeTypeId)
+        console.log('item.attributeTypeId',item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
                 screenName = 'Payment'
                 break
             }
+
+            case OPTION_RADIO_FOR_MASTER:
+            case DROPDOWN:
+            case RADIOBUTTON:
             case CHECKBOX: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case RADIOBUTTON: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case DROPDOWN: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case OPTION_RADIO_FOR_MASTER: {
                 screenName = 'SelectFromList'
                 break
             }
@@ -211,7 +209,35 @@ class BasicFormElement extends Component {
         }
     }
 
+
+    _inflateModal=()=> {
+       this.setState(previousState => {
+            return {
+                selectFromListEnable: !this.state.selectFromListEnable
+            }
+        })
+  }
+
+
     render() {
+        if (this.state.selectFromListEnable) {
+            return (
+                <View>
+                <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal}/>
+                <SelectFromList
+                    currentElement={this.props.item}
+                    nextEditable={this.props.nextEditable}
+                    formElements={this.props.formElement}
+                    isSaveDisabled={this.props.isSaveDisabled}
+                    jobTransaction={this.props.jobTransaction}
+                    jobStatusId={this.props.jobStatusId}
+                    latestPositionId={this.props.latestPositionId}
+                    press= {this._inflateModal}
+                />
+                </View>
+            )
+        }
+
         switch (this.props.item.attributeTypeId) {
             case STRING:
             case TEXT:
@@ -298,15 +324,18 @@ class BasicFormElement extends Component {
             case CASH_TENDERING:
             case SIGNATURE_AND_NPS:
             case ARRAY:
-            case EXTERNAL_DATA_STORE:
             case DATA_STORE:
-                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-
+            case EXTERNAL_DATA_STORE:
+             return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+            case CHECKBOX:  
+            case RADIOBUTTON:  
+            case DROPDOWN:  
+            case OPTION_RADIO_FOR_MASTER:
+                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />                
             default:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
-                break;
         }
     }
 }

@@ -1,4 +1,4 @@
-/**
+ /**
  * Created by udbhav on 12/4/17.
  */
 
@@ -255,9 +255,14 @@ class JobMaster {
     return true
   }
 
-  getJobMaterFromJobMasterList(jobMasterId,jobMasterList){
+  getJobMaterFromJobMasterLists(jobMasterId,jobMasterList){
     const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
     return jobMaster
+  }
+  async getJobMaterFromJobMasterList(jobMasterId){
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+    return jobMaster;
   }
 }
 
