@@ -77,7 +77,7 @@ export function checkForLocationMismatch(data, currentStatusCategory) {
             if (!(jobMaster[0].enableLocationMismatch) || currentStatusCategory != 1 || !nextStatusCategory || !(nextStatusCategory == 2 || nextStatusCategory == 3))
                 return dispatch(navigateToScene('FormLayout', FormLayoutData))
             const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-            if (jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng))
+            if (data.jobTransaction.jobId != null && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng))
                 return dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
             dispatch(navigateToScene('FormLayout', FormLayoutData))
         } catch (error) {

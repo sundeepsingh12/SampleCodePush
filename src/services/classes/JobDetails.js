@@ -119,7 +119,7 @@ class JobDetails {
      */
     checkLatLong(jobId, userLat, userLong) {
         let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0];
-        if (jobTransaction && jobTransaction.latitude && jobTransaction.longitude && userLat && userLong) 
+        if ( !jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong) 
             return false
         const dist = this.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
         return (dist * 1000 >= 100)
