@@ -12,6 +12,6 @@ describe('statisticsReducer ', () => {
             payload: dataList
         }
         let nextState = statistics(undefined, action)
-        expect(nextState.statisticsListItems).toBe(dataList)
+        expect(nextState.statisticsListItems).toBe(action.payload)
     })
 })

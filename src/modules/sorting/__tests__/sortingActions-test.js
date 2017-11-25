@@ -2,7 +2,7 @@
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
-import { sortingService } from '../../../services/classes/sorting'
+import { sortingService } from '../../../services/classes/Sorting'
 var actions = require('../sortingActions')
 import CONFIG from '../../../lib/config'
 

@@ -200,6 +200,7 @@ module.exports = keyMirror({
     Sorting:null,
     ProfileView:null,
     Statistics:null,
+    CustomApp:null,
 
 
     //Skulisting Actions
@@ -281,6 +282,11 @@ module.exports = keyMirror({
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
+
+    //Custom App
+    START_FETCHING_URL: null,
+    END_FETCHING_URL:  null,
+    ON_CHANGE_STATE: null,
 })
 
 

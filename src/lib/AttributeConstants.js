@@ -329,6 +329,14 @@ module.exports = {
         enabled: false,
         icon: <SequenceIcon />,
     },
+    CUSTOMAPP:{
+        appModuleId:12,
+        displayName: 'Custom App',
+        enabled: false,
+        remark: null,
+        icon: <SequenceIcon />
+    },
+
 
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
@@ -372,8 +380,8 @@ module.exports = {
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
     //Error Message for NonExpandableDetailsView
-    IMAGE_LOADING_ERROR: 'An error occurred while loading image'
-
-
-
+    IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+   
+    //Custom App
+    WEBVIEW_REF : 'webview',
 }
