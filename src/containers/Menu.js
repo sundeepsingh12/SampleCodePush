@@ -18,7 +18,8 @@ import {
   Icon,
   Footer,
   FooterTab,
-  StyleProvider
+  StyleProvider,
+  Toast
 } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
@@ -38,6 +39,11 @@ import {
   PROFILE,
   STATISTIC,
 } from '../lib/AttributeConstants'
+
+import {
+ ProfileView,
+ Statistics
+} from '../lib/constants'
 
 function mapStateToProps(state) {
   return {
@@ -102,14 +108,37 @@ class Menu extends Component {
     )
   }
 
-  renderCardView(view, key) {
+  renderCardView(view, key,moduleIndex) {
     return (
+      <TouchableOpacity onPress = {()=> this.navigateToScene(moduleIndex) }>
         <View key={key} style={[styles.bgWhite]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             {view}
           </View>
         </View>
+        </TouchableOpacity>
     )
+  }
+
+   navigateToScene = (moduleName) => {
+    console.log('modulename',moduleName)
+    switch (moduleName) {
+      case PROFILE: {
+        this.props.actions.navigateToScene(ProfileView)
+        break
+      }
+
+      case STATISTIC: {
+         this.props.actions.navigateToScene(Statistics)
+        break
+      }
+      default:
+       Toast.show({
+              text: `Under development!Coming Soon`,
+              position: 'bottom',
+              buttonText: 'OK'
+            })
+    }
   }
 
   renderModuleView(moduleList, key) {
@@ -127,7 +156,7 @@ class Menu extends Component {
       moduleView.push(
         this.renderTextView(moduleList[index].displayName, key * (index + 1) * 1000, (index == moduleList.length - 1), moduleList[index].icon)
       )
-      rowView.push(this.renderCardView(moduleView, key * (index + 1) * 10000))
+      rowView.push(this.renderCardView(moduleView, key * (index + 1) * 10000,moduleList[index]))
     }
     return rowView
   }
@@ -202,6 +231,20 @@ class Menu extends Component {
                 </View>
               </View>
             </View>
+
+            {/* only for UI Components */}
+            <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.navigateToScene('UIViews') }}>
+              <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+                <View style={[styles.justifySpaceBetween, styles.flex1]}>
+                  <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
+                    <Text style={[styles.fontDefault]}>
+                      UI
+                    </Text>
+                    <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
 
             {/*Card 5*/}
             <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.invalidateUserSession() }}>

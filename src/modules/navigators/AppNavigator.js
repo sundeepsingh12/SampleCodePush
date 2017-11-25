@@ -29,7 +29,6 @@ import HomeUI from '../../containers/HomeUI'
 import Home from '../../containers/Home'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
-import SortingResults from '../../containers/SortingResults'
 import Menu from '../../containers/Menu'
 import ProfileView from '../../containers/ProfileView'
 import ResetPassword from '../../containers/ResetPassword'
@@ -41,6 +40,13 @@ import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
+import UIViews from '../../containers/UIViews'
+import JobDetailsV2 from '../../containers/JobDetailsV2'
+
+
+
+
+
 
 import {
   Container,
@@ -137,7 +143,7 @@ export const HomeTabNavigator = TabNavigator({
     screen: Home,
     navigationOptions: {
       header: null,
-      title: 'Home',
+      title: 'Home',  
       tabBarIcon: <Icon name='ios-home' style={{ fontSize: 18 }}></Icon>
     }
   },
@@ -215,6 +221,13 @@ export const AppNavigator = StackNavigator({
   Payment: {
     screen: Payment
   },
+  UIViews: {
+    screen: UIViews
+  },
+  JobDetailsV2: {
+    screen: JobDetailsV2,
+    header: null
+  },
   Logout: {
     screen: Logout,
   },
@@ -245,9 +258,6 @@ export const AppNavigator = StackNavigator({
   },
   Sequence: {
     screen: Sequence,
-  },
-  SortingResults: {
-    screen: SortingResults
   },
   Menu: {
     screen: Menu

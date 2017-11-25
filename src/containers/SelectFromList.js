@@ -12,173 +12,259 @@ import {
   View,
   Text,
   TouchableHighlight,
-  FlatList
+  Modal,
+  ScrollView
 }
   from 'react-native'
 
-import { Container, Button, Picker, List, ListItem, Form, Item, CheckBox, Radio, Content, Card,Footer,FooterTab,Right,Body,CardItem,Toast} from 'native-base'
+import { Button, List, ListItem, Form, Item, Icon, Input, CheckBox, Radio, Content, Body, Toast } from 'native-base'
 import * as selectFromListActions from '../modules/selectFromList/selectFromListActions'
-import { CHECKBOX, RADIOBUTTON, DROPDOWN,OPTION_RADIO_FOR_MASTER } from '../lib/AttributeConstants'
-import styles from '../themes/FeStyle'
+import { CHECKBOX, RADIOBUTTON, DROPDOWN, OPTION_RADIO_FOR_MASTER, SEARCH, OK } from '../lib/AttributeConstants'
 
+import styles from '../themes/FeStyle'
+import {
+  SET_FILTERED_DATA_SELECTFROMLIST,
+  INPUT_TEXT_VALUE,
+  SELECTFROMLIST_ITEMS_LENGTH,
+} from '../lib/constants'
 
 function mapStateToProps(state) {
   return {
     selectFromListState: state.selectFromList.selectFromListState,
     errorMessage: state.selectFromList.errorMessage,
+    dropdownValue: state.selectFromList.dropdownValue,
+    totalItemsInSelectFromList: state.selectFromList.totalItemsInSelectFromList,
+    searchBarInputText: state.selectFromList.searchBarInputText,
+    filteredDataSelectFromList: state.selectFromList.filteredDataSelectFromList,
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...selectFromListActions }, dispatch)
+    actions: bindActionCreators({ ...selectFromListActions, ...globalActions }, dispatch)
   }
 }
 
 class SelectFromList extends Component {
-  componentWillMount() {
-    if(this.props.navigation.state.params.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER ){
-        this.props.actions.gettingDataForRadioMaster(this.props.navigation.state.params.currentElement,this.props.navigation.state.params.jobTransaction.jobId)
-    }else{
-        this.props.actions.gettingDataSelectFromList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId)
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      modalVisible: true,
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
+      this.props.actions.gettingDataForRadioMaster(this.props.currentElement, this.props.jobTransaction.jobId)
+    } else {
+      this.props.actions.gettingDataSelectFromList(this.props.currentElement.fieldAttributeMasterId, this.props.formElements, this.props.currentElement.attributeTypeId)
+    }
+  }
+
+  setModalVisible = (visible) => {
+    this.setState(() => {
+      return {
+        modalVisible: visible,
       }
+    })
   }
 
-  renderListViewData(dataList){
-       let view = []
-       for (let index in dataList) {
-               view.push(
-                    this.listItemView(dataList[index])
-                )
-        }
-        return view
+  renderListViewData(dataList) {
+    let view = []
+    for (let index in dataList) {
+      view.push(
+        this.listItemView(dataList[index])
+      )
+    }
+    return view
   }
 
-      listItemView = (item) => {
-          let fieldAttributeView
-          if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX) {
-            fieldAttributeView =  <CheckBox checked={item.isChecked}
-         style={([styles.marginRight20])}
-           />
-          }
-           else if (this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON) {
-       fieldAttributeView =  <Radio selected={item.isChecked}
-        style={([styles.marginRight20])} 
-          />
+  _dropModal = () => {
+    this.props.actions.setState(SELECTFROMLIST_ITEMS_LENGTH, 0)
+    this.setModalVisible(false)
+    this.props.press()
+    this.props.actions.setState(INPUT_TEXT_VALUE, '')
+    this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
+  }
+
+  _saveAndDropModal = () => {
+    this._dropModal()
+    this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
+  }
+
+  _setValueInInputText(valueOfInputText) {
+    if (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 1)
+      this.props.actions.setState(INPUT_TEXT_VALUE, valueOfInputText)
+  }
+
+  searchBarView() {
+    return (
+      <View>
+        <View searchBar style={[styles.padding5]}>
+          <Item rounded style={{ height: 30, backgroundColor: '#ffffff' }}>
+            <Input placeholder={SEARCH}
+              style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 10 }]}
+              value={this.props.searchBarInputText}
+              onChangeText={(searchText) => {
+                this._setValueInInputText(searchText)
+                this.props.actions.setFilteredDataInDropdown(this.props.selectFromListState, searchText)
+              }}
+            />
+            <Icon style={[styles.fontSm]} name="md-close"
+              onPress={() => {
+                this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
+                this.props.actions.setState(INPUT_TEXT_VALUE, '')
+              }}
+            />
+          </Item>
+        </View>
+      </View>
+    )
+  }
+
+  listItemView = (item) => {
+    let fieldAttributeView = null
+    if (this.props.currentElement.attributeTypeId == CHECKBOX) {
+      fieldAttributeView = <CheckBox checked={item.isChecked}
+        onPress={() => {
+          this.props.actions.setOrRemoveStates(this.props.selectFromListState,
+            item.id, this.props.currentElement.attributeTypeId)
+        }}
+      />
+
+
+    }
+    else if (this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER || (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 0)) {
+      fieldAttributeView = <Radio selected={item.isChecked}
+        onPress={() => {
+          this.props.actions.setOrRemoveStates(this.props.selectFromListState,
+            item.id, this.props.currentElement.attributeTypeId)
+        }}
+        style={([{ width: 20 }])}
+      />
     }
 
-        return (
-            <ListItem
-                key={item.id}
-                icon style={StyleSheet.flatten([{ marginLeft: 0 }])}
-                onPress={() =>  this.props.actions.setOrRemoveStates(this.props.selectFromListState,
-              item.id, this.props.navigation.state.params.currentElement.attributeTypeId)}>
-                <Body>
-                    <Text>{item.name}</Text>
-                </Body>
-                <Right>
-                   {fieldAttributeView}
-                </Right>
-            </ListItem>
-        )
-      }
+    return (
+      <ListItem
+        button
+        key={item.id}
+        onPress={() => {
+          this.props.actions.setOrRemoveStates(this.props.selectFromListState,
+            item.id, this.props.currentElement.attributeTypeId)
+          this._setValueInInputText(item.name)
+          this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
+        }}>
+        {fieldAttributeView}
+        <Body>
+          <Text style={[styles.marginLeft10]}>{(this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) ? item.optionKey : item.name}</Text>
+        </Body>
+      </ListItem>
+    )
+    // }
+  }
 
   render() {
-    
- if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
+    if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
+      Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',
-        buttonText: 'Okay'
-         })}
-if (this.props.navigation.state.params.currentElement.attributeTypeId == CHECKBOX || this.props.navigation.state.params.currentElement.attributeTypeId == RADIOBUTTON) {
-      const radioButtonData = this.renderListViewData(this.props.selectFromListState)
-      return (
-        <Container>
-        <Content style={StyleSheet.flatten([styles.padding10])}>
-             <CardItem>
-                     <Content>
-                           <List>
-                               {radioButtonData}
-                                </List>
-                            </Content>
-                        </CardItem>
-            </Content>
-            <Footer>
-                    <FooterTab>
-            <Button success
-             style={StyleSheet.flatten([{ borderRadius: 0 }])}
-            onPress={() => {
-              this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
-              this.props.navigation.goBack()
-            }}>
-              <Text> DONE </Text>
-            </Button>
-            </FooterTab>
-                </Footer>
-        </Container>
-      )
-    }
-    else if (this.props.navigation.state.params.currentElement.attributeTypeId == DROPDOWN) {
-      const listData = (!this.props.selectFromListState.selectListData) ? this.props.selectFromListState : {}
-      return (
-        <Container>
-          <Content>
-            <Form>
-              <Picker mode="dropdown"
-                onValueChange={value => this.props.actions.setOrRemoveStates(listData, value, this.props.navigation.state.params.currentElement.attributeTypeId)}
-              >
-                {this.populateDropDown()}
-              </Picker>
-            </Form>
-          </Content>
-          <View>
-            <Button onPress={() => {
-              this.props.actions.selectFromListButton(listData, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
-              this.props.navigation.goBack()
-            }}>
-              <Text> DONE </Text>
-            </Button>
-          </View>
-        </Container>
-      )
-    }
-    else if (this.props.navigation.state.params.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
-    const listData = (this.props.selectFromListState.selectListData != null && this.props.selectFromListState.selectListData != undefined ) ? this.props.selectFromListState.selectListData : {}
-        return (
-        <Container>
-          <View style={styles.container}>
-            <FlatList
-              data={(Object.values(listData))}
-              renderItem={({ item }) => {
-                return (
-                  <View>
-                    <Content>
-                      <Card style={{ flexDirection: 'row', height: 40 }}  >
-                        {this.getViewOfFieldAttribute(item.id, item.isChecked)}
-                        <Text>       {item.optionValue}</Text>
-                      </Card>
-                    </Content>
-                  </View>
-                )
-              }}
-              keyExtractor={item => item.id}
-            />
-            <Button onPress={() => {
-              this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.navigation.state.params.currentElement, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.formElements, this.props.navigation.state.params.nextEditable)
-              this.props.navigation.goBack()
-            }}>
-              <Text> DONE </Text>
-            </Button>
-          </View>
-        </Container>
-      )
-     }
-  }
-
-  populateDropDown(){
-    return Object.values(this.props.selectFromListState).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence).map((object) => {
-                return (<Item label={object.name} value={object.id} key={object.id} />) 
+        buttonText: {OK}
       })
+    }
+    if ((this.props.currentElement.attributeTypeId == CHECKBOX || this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == DROPDOWN) && this.state.modalVisible) {
+      let radioButtonData
+      let searchBarViewData
+      if (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 1) {
+        searchBarViewData = this.searchBarView()
+        radioButtonData = this.renderListViewData(this.props.filteredDataSelectFromList)
+      }
+      else {
+        radioButtonData = this.renderListViewData(this.props.selectFromListState)
+        searchBarViewData = null
+      }
+      return (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.modalVisible}
+          onRequestClose={this._dropModal}
+        >
+          <TouchableHighlight
+            onPress={this._dropModal}
+            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
+            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+              <View>
+                <View style={[styles.bgLightGray]}>
+                  <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
+                    <Text style={[styles.padding10]}>{this.props.currentElement.label}</Text>
+                    <TouchableHighlight
+                      onPress={this._saveAndDropModal}>
+                      <Text style={[styles.fontInfo, styles.padding10]}> DONE </Text>
+                    </TouchableHighlight>
+                  </View>
+                  {searchBarViewData}
+                </View>
+                <ScrollView style={[styles.paddingBottom30]}>
+                  <View style={[styles.flexBasis100
+                  ]}>
+                    <List>
+                      {radioButtonData}
+                    </List>
+                    {/*This view is empty because bottom sheet margin from bottom  */}
+                    <View style={{ height: 80 }} />
+
+                  </View>
+                </ScrollView>
+              </View>
+            </TouchableHighlight>
+          </TouchableHighlight>
+        </Modal>
+      )
+    }
+
+    else if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
+      const listData = (this.props.selectFromListState.selectListData != null && this.props.selectFromListState.selectListData != undefined) ? this.props.selectFromListState.selectListData : {}
+      const optionRadioForMasterData = this.renderListViewData(listData)
+      return (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.modalVisible}
+          backdropPressToClose
+          onRequestClose={this._dropModal}
+        >
+          <TouchableHighlight
+            onPress={this._dropModal}
+            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
+            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+              <View>
+                <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
+                  <Text style={[styles.padding10]}>{this.props.currentElement.label}</Text>
+
+                  <TouchableHighlight
+                    onPress={this._saveAndDropModal}>
+                    <Text style={[styles.fontInfo, styles.padding10]}> DONE </Text>
+                  </TouchableHighlight>
+                </View>
+                <View style={[styles.paddingBottom30]}>
+                  <Content style={[styles.flexBasis100
+                  ]}>
+                    <List>
+                      {optionRadioForMasterData}
+                    </List>
+                    {/*This view is empty because bottom sheet margin from bottom  */}
+                    <View style={{ height: 40 }} />
+
+                  </Content>
+                </View>
+              </View>
+            </TouchableHighlight>
+          </TouchableHighlight>
+        </Modal>
+      )
+    }
+    return null
   }
 }
 

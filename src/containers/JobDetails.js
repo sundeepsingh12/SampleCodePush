@@ -6,12 +6,14 @@ import {
     Text,
     Platform,
     FlatList,
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
 }
     from 'react-native'
 import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base'
 import styles from '../themes/FeStyle'
 import { connect } from 'react-redux'
+import CustomAlert from "../components/CustomAlert"
 import { bindActionCreators } from 'redux'
 import renderIf from '../lib/renderIf'
 import ExpandableHeader from '../components/ExpandableHeader'
@@ -19,6 +21,9 @@ import MessageHeader from '../components/MessageHeader'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
+import {
+    IS_MISMATCHING_LOCATION
+} from '../lib/constants'
 
 function mapStateToProps(state) {
     return {
@@ -32,7 +37,9 @@ function mapStateToProps(state) {
         jobTransaction: state.jobDetails.jobTransaction,
         messageList: state.jobDetails.messageList,
         smsTemplateList: state.jobDetails.smsTemplateList,
-        isEnableRestriction:state.jobDetails.isEnableRestriction
+        isEnableRestriction:state.jobDetails.isEnableRestriction,
+        isEnableOutForDelivery: state.jobDetails.isEnableOutForDelivery,
+        statusList: state.jobDetails.statusList,
     }
 }
 
@@ -45,6 +52,7 @@ function mapDispatchToProps(dispatch) {
 class JobDetails extends Component {
 
     componentWillMount() {
+        // this.props.actions.checkOutForDelivery(this.props.navigation.state.params.jobTransactionId)
         this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransactionId)
     }
 
@@ -54,21 +62,36 @@ class JobDetails extends Component {
         }
     }
 
+    _onGoToNextStatus = () => {
+        this.props.actions.navigateToScene('FormLayout', {
+            contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+            jobTransactionId: this.props.jobTransaction.id,
+            jobTransaction: this.props.jobTransaction,
+            statusId: this.props.statusList.id,
+            statusName: this.props.statusList.name,
+            jobMasterId: this.props.jobTransaction.jobMasterId
+        }
+        )
+        this._onCancel();
+    }
+    _onCancel = () => {
+        this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
+    }
+    _onCheckLocationMismatch = (statusList, jobTransaction) => {
+        const FormLayoutObject = {
+            contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+            jobTransaction,
+            statusList
+        }
+        this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+    }
+
     renderStatusList(statusList) {
         let statusView = []
         for (let index in statusList) {
             statusView.push(
                 <Button key={statusList[index].id} small primary style={{ margin: 2 }}
-                    onPress={() => this.props.actions.navigateToScene('FormLayout', {
-                        contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
-                        jobTransactionId: this.props.jobTransaction.id,
-                        jobTransaction: this.props.jobTransaction,
-                        statusId: statusList[index].id,
-                        statusName: statusList[index].name,
-                        jobMasterId : this.props.jobTransaction.jobMasterId
-                    }
-                    )
-                    }>
+                    onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}>
                     <Text style={{ color: 'white' }}>{statusList[index].name}</Text>
                 </Button>
             )
@@ -77,7 +100,7 @@ class JobDetails extends Component {
     }
 
     render() {
-        const statusView = this.props.currentStatus && this.props.isEnableRestriction ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
+        const statusView = this.props.currentStatus && this.props.isEnableRestriction && this.props.isEnableOutForDelivery? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
         if (this.props.jobDetailsLoading) {
             return (
                 <Loader />
@@ -85,6 +108,14 @@ class JobDetails extends Component {
         } else {
             return (
                 <Container style={StyleSheet.flatten([styles.mainBg])}>
+                    <View>
+                        {renderIf(this.props.statusList,
+                            <CustomAlert
+                                title="Details"
+                                message="You are not at location. Do you want to continue?"
+                                onOkPressed={this._onGoToNextStatus}
+                                onCancelPressed={this._onCancel} />)}
+                    </View>
                     <Header style={StyleSheet.flatten([styles.bgPrimary])}>
                         <Left style={StyleSheet.flatten([styles.flexBasis15])}>
                             <Button transparent onPress={() => { this.props.navigation.goBack(null) }}>
@@ -101,11 +132,19 @@ class JobDetails extends Component {
                     {renderIf(this.props.isEnableRestriction == false,
                              <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
                                  <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
-                                    Please complete sequence job first
+                                    Please finish previous items first
                                   </Text>
                              </View>
  
                          )}
+                    {renderIf(this.props.isEnableOutForDelivery == false,
+                            <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
+                                <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+                                    Please Scan all Parcels First
+                                 </Text>
+                            </View>
+
+                        )}
                     <Content style={StyleSheet.flatten([styles.padding5])}>
                         <Card>
                             <ExpandableHeader

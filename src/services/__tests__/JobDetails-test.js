@@ -2,6 +2,8 @@
 
 import { jobDetailsService } from '../classes/JobDetails'
 import { jobTransactionService } from '../classes/JobTransaction'
+import * as realm from '../../repositories/realmdb'
+
 
 describe('test cases for prepareDataObject', () => {
     const realmDBDataList = [
@@ -262,3 +264,37 @@ describe('test cases for checkEnableRestriction', () => {
         expect(jobDetailsService.checkEnableResequence(jobMasterList,tabId,seqSelected,statusList)).toEqual(false)
     })
 })
+
+describe('test cases for check Latitude and longitude', () => {
+    const angle  = "28.2554334",radianValue = 0.493150344407976
+    let jobTransaction = {
+        id: 4294602,
+        latitude: 28.55542,
+        longitude: 77.267463
+    }
+    let jobId = 3447,userLat="28.5551",userLong="77.26751"
+     it('should convert angle to radians', () => {
+       expect(jobDetailsService.toRadians(angle)).toEqual(radianValue)
+     })
+     it('should find aerial distance between user and job location', () => {
+         const  dist  = 0.03587552758583335
+       expect(jobDetailsService.distance(jobTransaction.latitude,jobTransaction.longitude,userLat,userLong)).toEqual(dist)
+     })
+
+     it('should check aerial distance between user and job location and return false', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        userLat = null
+        realm.getRecordListOnQuery.mockReturnValue(jobTransaction)
+      expect(jobDetailsService.checkLatLong(jobId,userLat,userLong)).toEqual(false)
+    })
+
+    it('should not check aerial distance between user and job location', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue([{
+            id: 4294602,
+            latitude: 28.55542,
+            longitude: 77.267463
+        }])
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(0)
+    })
+   })

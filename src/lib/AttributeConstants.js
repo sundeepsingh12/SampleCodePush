@@ -36,6 +36,7 @@ module.exports = {
     FIXED_SKU_QUANTITY: 6,
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,
+    IMAGE_URL: 24,
     LANDMARK: 30,
     MODE: 'mode_type',
     MONEY_COLLECT: 18,
@@ -322,6 +323,12 @@ module.exports = {
         displayName: '',
         enabled: false,
     },
+    SORTING:{
+        appModuleId:26,
+         displayName: 'Sort Parcels',
+        enabled: false,
+        icon: <SequenceIcon />,
+    },
 
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
@@ -359,11 +366,27 @@ module.exports = {
     //enableSequence
     SEQ_SELECTED: 'seqSelected',
     
+    //Status_Code
+    UNSEEN: 'UNSEEN',
+    PENDING: 'PENDING',
+    
     //Start Search PlaceHolder
     SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
+
+    //NonExpandableDetailsView
+    VIEW_TEXT_LABEL: 'View',
 
     //Error Messages
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
+    //Error Message for NonExpandableDetailsView
+    IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+
+    //SelectFromList
+    SEARCH: 'Search',
+    OK: 'Ok'
+
+
+
 
 }

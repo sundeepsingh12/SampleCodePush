@@ -1,4 +1,4 @@
-/**
+ /**
  * Created by udbhav on 12/4/17.
  */
 
@@ -255,16 +255,14 @@ class JobMaster {
     return true
   }
 
-  getIdJobMasterMap(jobMasterList){
-    const idJobMasterMap = {}
-    jobMasterList.forEach(jobMaster=>idJobMasterMap[jobMaster.id] = jobMaster)
-    console.log('idJobMasterMap',idJobMasterMap)
-    return idJobMasterMap
+  getJobMaterFromJobMasterLists(jobMasterId,jobMasterList){
+    const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+    return jobMaster
   }
-
-   getJobMaterFromJobMasterList(jobMasterId,jobMasterList){
-            const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
-            return jobMaster
+  async getJobMaterFromJobMasterList(jobMasterId){
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+    return jobMaster;
   }
 }
 

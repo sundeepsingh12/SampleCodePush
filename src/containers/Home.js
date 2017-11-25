@@ -21,7 +21,8 @@ import {
   Title,
   Footer,
   FooterTab,
-  StyleProvider
+  StyleProvider,
+  Toast
 } from 'native-base'
 import LinearGradient from 'react-native-linear-gradient'
 import getTheme from '../../native-base-theme/components'
@@ -37,12 +38,14 @@ import {
   PIECHART,
   SEQUENCEMODULE,
   START,
+  SORTING
 } from '../lib/AttributeConstants'
 
 import {
   TabScreen,
   Sequence,
-  BulkConfiguration
+  BulkConfiguration,
+  Sorting
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -67,12 +70,18 @@ class Home extends Component {
   }
 
   navigateToScene = (moduleName) => {
+    console.log('modulename',moduleName)
     switch (moduleName) {
       case BULK: {
         this.props.actions.navigateToScene(BulkConfiguration)
         break
       }
       case LIVE: {
+          Toast.show({
+              text: `Under development!Coming Soon`,
+              position: 'bottom',
+              buttonText: 'OK'
+            })
         break
       }
       case SEQUENCEMODULE: { 
@@ -81,6 +90,11 @@ class Home extends Component {
       }
       case START: {
         this.props.actions.navigateToScene(TabScreen)
+        break
+      }
+
+      case SORTING: {
+        this.props.actions.navigateToScene(Sorting)
         break
       }
     }
@@ -116,7 +130,6 @@ class Home extends Component {
       </Header>
     )
   }
-
 
   pieChartView() {
     if (!PIECHART.enabled) {
@@ -155,6 +168,7 @@ class Home extends Component {
   moduleView(modulesList) {
     let moduleView = []
     for (let index in modulesList) {
+      
       if (!modulesList[index].enabled) {
         continue
       }
@@ -180,7 +194,7 @@ class Home extends Component {
   render() {
     const headerView = this.headerView()
     const pieChartView = this.pieChartView()
-    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE])
+    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE,SORTING])
     if (this.props.loading) {
       return (<Loader />)
     }
@@ -200,7 +214,7 @@ class Home extends Component {
     )
   }
 
-};
+}
 
 const style = StyleSheet.create({
   chartCenterData: {

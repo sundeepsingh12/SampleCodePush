@@ -85,7 +85,7 @@ module.exports = keyMirror({
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
-
+    IS_MISMATCHING_LOCATION: null,
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
@@ -192,12 +192,15 @@ module.exports = keyMirror({
     MenuScreen: null,
     PreloaderScreen: null,
     Sequence: null,
-    SkuListing: null,
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
     BulkConfiguration:null,
     BulkListing:null,
+    Sorting:null,
+    ProfileView:null,
+    Statistics:null,
+
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -208,6 +211,9 @@ module.exports = keyMirror({
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
+    SET_FILTERED_DATA_SELECTFROMLIST: null,
+    INPUT_TEXT_VALUE: null,
+    SELECTFROMLIST_ITEMS_LENGTH: null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,

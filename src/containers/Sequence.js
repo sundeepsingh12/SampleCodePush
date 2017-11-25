@@ -184,7 +184,6 @@ class Sequence extends Component {
   }
 
   showToast() {
-    console.log('this.props',this.props)
     Toast.show({
               text: `${this.props.responseMessage}`,
               position: 'bottom',
