@@ -1,12 +1,15 @@
 'use strict'
 
 import * as realm from '../../repositories/realmdb'
+
+import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobDataService } from './JobData'
+import {jobStatusService} from './JobStatus'
 import {
     ARRAY_SAROJ_FAREYE,
     CONTACT_NUMBER,
     OBJECT_SAROJ_FAREYE,
-
+    UNSEEN
 } from '../../lib/AttributeConstants'
 
 
@@ -83,6 +86,16 @@ class JobDetails {
         }
     }
 
+
+    async checkOutForDelivery(jobMasterList){
+        const jobListWithDelivery  = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) 
+        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobListWithDelivery,UNSEEN)
+        let statusIds = Object.keys(mapOfUnseenStatusWithJobMaster).map(function(key) {
+            return mapOfUnseenStatusWithJobMaster[key];
+          });
+        const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)  
+        return  !(unseenTransactions.length>0)
+    }
     /**
      * ## convert degree to radians
      * @param {string} angle - It contains data for form layout

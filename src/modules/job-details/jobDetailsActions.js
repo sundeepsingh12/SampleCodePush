@@ -2,10 +2,11 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
+import { jobMasterService } from '../../services/classes/JobMaster'
+import {jobDetailsService} from '../../services/classes/JobDetails'
+import {jobStatusService} from '../../services/classes/JobStatus'
 import { NavigationActions } from 'react-navigation'
 import { setState, navigateToScene } from '..//global/globalActions'
-import { jobDetailsService } from '../../services/classes/JobDetails'
-import { jobMasterService } from '../../services/classes/JobMaster'
 
 import * as realm from '../../repositories/realmdb'
 import {
@@ -17,6 +18,7 @@ import {
     JOB_DETAILS_FETCHING_START,
     JOB_DETAILS_FETCHING_END,
     FormLayout,
+    JOB_SUMMARY,
     IS_MISMATCHING_LOCATION,
     TABLE_JOB,
     USER_SUMMARY,
@@ -29,7 +31,7 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,jobTransaction,isEnableOutForDelivery) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -37,6 +39,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobDataList,
             jobTransaction,
             currentStatus,
+            isEnableOutForDelivery
         }
     }
 }
@@ -46,12 +49,15 @@ export function getJobDetails(jobTransactionId) {
         try {
             dispatch(startFetchingJobDetails())
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay))
+            const jobMaster =  jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId,jobMasterList)
+            const isEnableOutForDelivery = (jobMaster[0].enableOutForDelivery ) ? (await jobDetailsService.checkOutForDelivery(jobMasterList)): true
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus,details.jobTransactionDisplay,isEnableOutForDelivery))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
