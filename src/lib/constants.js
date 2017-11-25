@@ -211,6 +211,9 @@ module.exports = keyMirror({
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
+    SET_FILTERED_DATA_SELECTFROMLIST: null,
+    INPUT_TEXT_VALUE: null,
+    SELECTFROMLIST_ITEMS_LENGTH: null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
