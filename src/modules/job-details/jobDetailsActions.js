@@ -11,7 +11,6 @@ import { setState, navigateToScene } from '..//global/globalActions'
 import * as realm from '../../repositories/realmdb'
 import {
     JOB_ATTRIBUTE,
-    JOB_MASTER,
     FIELD_ATTRIBUTE,
     JOB_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_STATUS,
