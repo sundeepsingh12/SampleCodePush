@@ -168,7 +168,7 @@ class JobDetailsV2 extends Component {
         )
       }
       else {
-        this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[buttonIndex])
+        this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[0])
       }
     }, 500)
   }
