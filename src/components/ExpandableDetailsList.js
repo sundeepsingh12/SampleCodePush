@@ -46,6 +46,7 @@ class ExpandableDetailsList extends Component {
             return (
                 <NonExpandableDetailsView
                     key={item.id}
+                    attributeTypeId={item.attributeTypeId}
                     label={item.label}
                     value={item.data.value} />
             )

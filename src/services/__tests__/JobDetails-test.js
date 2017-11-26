@@ -1,6 +1,9 @@
 'use strict'
 
 import { jobDetailsService } from '../classes/JobDetails'
+import { jobTransactionService } from '../classes/JobTransaction'
+import * as realm from '../../repositories/realmdb'
+
 
 describe('test cases for prepareDataObject', () => {
     const realmDBDataList = [
@@ -207,3 +210,114 @@ describe('test cases for checkJobExpiryTime', () => {
     })
 
 })
+
+
+describe('test cases for checkEnableRestriction', () => {
+    const jobMasterList = {
+        value: [
+            {
+                id: 441,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: false,
+                enableResequenceRestriction: true
+            },
+            {
+                id: 442,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: false,
+                enableResequenceRestriction: false
+            }
+        ]
+    }
+
+    const tabId = 251
+    const seqSelected = 2
+    const statusList = {
+        value: [
+            {
+                code: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+                name: "Success",
+                saveActivated: null,
+                sequence: 3,
+                statusCategory: 3,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+                name: "Unseen",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+                name: "Pending12",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            }
+        ]
+    }
+    let firstEnableSequenceValue = 2
+    it('should check enable resequence if sequence is before', () => {
+        jobTransactionService.getFirstTransactionWithEnableSequence = jest.fn()
+        jobTransactionService.getFirstTransactionWithEnableSequence.mockReturnValue(firstEnableSequenceValue)
+        expect(jobDetailsService.checkEnableResequence(jobMasterList,tabId,seqSelected,statusList)).toEqual(true)
+    })
+
+    it('should check enable resequence if sequence is after', () => {
+        firstEnableSequenceValue = 1
+        jobTransactionService.getFirstTransactionWithEnableSequence = jest.fn()
+        jobTransactionService.getFirstTransactionWithEnableSequence.mockReturnValue(firstEnableSequenceValue)
+        expect(jobDetailsService.checkEnableResequence(jobMasterList,tabId,seqSelected,statusList)).toEqual(false)
+    })
+})
+
+describe('test cases for check Latitude and longitude', () => {
+    const angle  = "28.2554334",radianValue = 0.493150344407976
+    let jobTransaction = {
+        id: 4294602,
+        latitude: 28.55542,
+        longitude: 77.267463
+    }
+    let jobId = 3447,userLat="28.5551",userLong="77.26751"
+     it('should convert angle to radians', () => {
+       expect(jobDetailsService.toRadians(angle)).toEqual(radianValue)
+     })
+     it('should find aerial distance between user and job location', () => {
+         const  dist  = 0.03587552758583335
+       expect(jobDetailsService.distance(jobTransaction.latitude,jobTransaction.longitude,userLat,userLong)).toEqual(dist)
+     })
+
+     it('should check aerial distance between user and job location and return false', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        userLat = null
+        realm.getRecordListOnQuery.mockReturnValue(jobTransaction)
+      expect(jobDetailsService.checkLatLong(jobId,userLat,userLong)).toEqual(false)
+    })
+
+    it('should not check aerial distance between user and job location', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue([{
+            id: 4294602,
+            latitude: 28.55542,
+            longitude: 77.267463
+        }])
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(0)
+    })
+   })

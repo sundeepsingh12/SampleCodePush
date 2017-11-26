@@ -13,7 +13,7 @@ import {
     TABLE_RUNSHEET,
 } from '../../lib/constants'
 
-import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
+import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
 import { jobStatusService } from './JobStatus'
 import { keyValueDBService } from './KeyValueDBService'
 import { jobService } from './Job'
@@ -230,6 +230,13 @@ class JobTransaction {
         let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList,'id')
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap)
         return jobTransactionCustomizationList
+    }
+    getFirstTransactionWithEnableSequence(jobMasterIdList,statusMap){
+        let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+        let jobStatusQuery = statusMap.map(statusId => 'jobStatusId = '+statusId).join(' OR ')
+        const jobTransactionQuery = `${jobMasterQuery} AND (${jobStatusQuery})`
+        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery,true,SEQ_SELECTED)
+        return jobTransactionList[0].seqSelected
     }
 
     updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
@@ -562,7 +569,7 @@ class JobTransaction {
     prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
-        const { jobStatusId, jobId, jobMasterId, referenceNumber } = jobTransaction[0]
+        const { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected } = jobTransaction[0]
         const jobMasterJobAttributeMasterMap = jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)
         const jobAttributeMasterMap = jobMasterJobAttributeMasterMap[jobMasterId] ? jobMasterJobAttributeMasterMap[jobMasterId] : {}
         const jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
@@ -599,6 +606,7 @@ class JobTransaction {
             jobDataObject,
             jobTransactionDisplay,
             jobTime,
+            seqSelected,
         }
     }
 
