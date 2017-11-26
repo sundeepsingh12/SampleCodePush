@@ -8,11 +8,13 @@ import {
     SET_ERROR_MSG,
     ON_BLUR,
     CLEAR_ARRAY_STATE,
+    UPDATE_FIELD_DATA_VALIDATION
 } from '../../lib/constants'
 import { ARRAYSAROJFAREYE } from '../../lib/AttributeConstants'
 import _ from 'lodash'
 import { setState } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import { fieldValidationService } from '../../services/classes/FieldValidation'
 
 export function getSortedArrayChildElements(fieldAttributeMasterId, jobStatusId, lastrowId, arrayElements) {
     return async function (dispatch) {
@@ -82,5 +84,15 @@ export function saveArray(arrayElements, arrayParentItem, jobTransactionId, late
 export function clearArrayState() {
     return async function (dispatch) {
         dispatch(setState(CLEAR_ARRAY_STATE))
+    }
+}
+
+export function fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction) {
+    return function (dispatch) {
+        let alertMessageList = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
+        // dispatch(setState(UPDATE_FIELD_DATA_VALIDATION, {
+        //     formElement,
+        //     message: alertMessageList[0]
+        // }))
     }
 }

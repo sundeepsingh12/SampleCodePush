@@ -155,6 +155,7 @@ module.exports = keyMirror({
     TABLE_FIELD_DATA: null,
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
+    TABLE_SERVER_SMS_LOG: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -259,8 +260,8 @@ module.exports = keyMirror({
     PREPARE_UPDATE_LIST:null,
 
     //New Job
-    NEW_JOB_MASTER : null,
-    NEW_JOB_STATUS : null,
+    NEW_JOB_MASTER: null,
+    NEW_JOB_STATUS: null,
 
     //Bulk Module
     START_FETCHING_BULK_CONFIG:null,
@@ -271,8 +272,8 @@ module.exports = keyMirror({
 
 
     //statisticsModule
-    SET_DATA_IN_STATISTICS_LIST : null,
-   
+    SET_DATA_IN_STATISTICS_LIST: null,
+
     //profileModule
     FETCH_USER_DETAILS: null,
     CHECK_CURRENT_PASSWORD: null,
