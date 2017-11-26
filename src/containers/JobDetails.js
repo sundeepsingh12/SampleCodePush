@@ -27,7 +27,8 @@ import {
     SELECT_TEMPLATE,
     SELECT_NUMBER_FOR_CALL,
     CONFIRMATION,
-    OK
+    OK,
+    CALL_CONFIRM
 } from '../lib/AttributeConstants'
 function mapStateToProps(state) {
     return {
@@ -54,7 +55,6 @@ class JobDetails extends Component {
 
     componentWillMount() {
         this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransactionId)
-        console.log(this.props.navigation.state.params.jobSwipableDetails)
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -85,6 +85,8 @@ class JobDetails extends Component {
         return statusView
     }
     chatButtonPressed = () => {
+        if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
+            return
         if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
             let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
             contactData.push(CANCEL)
@@ -134,6 +136,8 @@ class JobDetails extends Component {
     }
 
     callButtonPressed = () => {
+        if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
+            return
         if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
             let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
             contactData.push(CANCEL)
@@ -151,7 +155,7 @@ class JobDetails extends Component {
             )
         }
         else {
-            Alert.alert(CONFIRMATION + this.props.navigation.state.params.jobSwipableDetails.contactData[0], 'Do you want to proceed with the call?',
+            Alert.alert(CONFIRMATION + this.props.navigation.state.params.jobSwipableDetails.contactData[0], CALL_CONFIRM,
                 [{ text: CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
                 { text: OK, onPress: () => this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[0]) },],
                 { cancelable: false })
