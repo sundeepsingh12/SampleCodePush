@@ -370,6 +370,14 @@ module.exports = {
     CONFIRMATION: 'Confirmation: ',
     OK: 'Ok',
     CALL_CONFIRM: 'Do you want to proceed with the call?',
+
+    //enableSequence
+    SEQ_SELECTED: 'seqSelected',
+
+    //Status_Code
+    UNSEEN: 'UNSEEN',
+    PENDING: 'PENDING',
+
     //Start Search PlaceHolder
     SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
 
@@ -380,5 +388,13 @@ module.exports = {
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
     //Error Message for NonExpandableDetailsView
-    IMAGE_LOADING_ERROR: 'An error occurred while loading image'
+    IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+
+    //SelectFromList
+    SEARCH: 'Search',
+    OK: 'Ok'
+
+
+
+
 }

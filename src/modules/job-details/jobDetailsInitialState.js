@@ -13,6 +13,9 @@ var InitialState = Record({
     messageList: [],
     currentStatus: null,
     smsTemplateList: [],
+    isEnableRestriction: true,
+    isEnableOutForDelivery: true,
+    statusList: null,
 })
 
 export default InitialState
