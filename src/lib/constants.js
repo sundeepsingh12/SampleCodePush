@@ -269,7 +269,7 @@ module.exports = keyMirror({
     START_FETCHING_BULK_TRANSACTIONS:null,
     STOP_FETCHING_BULK_TRANSACTIONS:null,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM:null,
-
+    TOGGLE_ALL_JOB_TRANSACTIONS:null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,

@@ -85,6 +85,7 @@ class JobDetailsV2 extends Component {
     for (let index in statusList) {
       statusView.push(
         <ListItem
+          key={statusList[index].id}
           style={[style.jobListItem, styles.justifySpaceBetween]}
           onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
         >
