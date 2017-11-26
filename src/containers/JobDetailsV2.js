@@ -1,8 +1,8 @@
 'use strict'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 
 import React, { Component } from 'react'
@@ -22,22 +22,41 @@ import {
   List,
   ListItem,
   Footer,
-  FooterTab
+  FooterTab,
+  Card
 } from 'native-base'
 
-import * as profileActions from '../modules/profile/profileActions'
 import * as globalActions from '../modules/global/globalActions'
+import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
+import Loader from '../components/Loader'
+import ExpandableHeader from '../components/ExpandableHeader'
+import {
+    IS_MISMATCHING_LOCATION
+} from '../lib/constants'
+import renderIf from '../lib/renderIf'
+import CustomAlert from "../components/CustomAlert"
 
 function mapStateToProps(state) {
   return {
-
+        addressList: state.jobDetails.addressList,
+        contactList: state.jobDetails.contactList,
+        customerCareList: state.jobDetails.customerCareList,
+        currentStatus: state.jobDetails.currentStatus,
+        fieldDataList: state.jobDetails.fieldDataList,
+        jobDetailsLoading: state.jobDetails.jobDetailsLoading,
+        jobDataList: state.jobDetails.jobDataList,
+        jobTransaction: state.jobDetails.jobTransaction,
+        messageList: state.jobDetails.messageList,
+        smsTemplateList: state.jobDetails.smsTemplateList,
+        errorMessage:state.jobDetails.errorMessage,
+        statusList: state.jobDetails.statusList
   }
-};
+}
 
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...profileActions }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions }, dispatch)
   }
 }
 
@@ -46,30 +65,97 @@ class JobDetailsV2 extends Component {
     return { header: null }
   }
 
+  componentDidMount(){
+    this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
+  }
+
+    renderStatusList(statusList) {
+        let statusView = []
+        for (let index in statusList) {
+            statusView.push(
+                  <ListItem 
+                  style={[style.jobListItem, styles.justifySpaceBetween]}
+                  onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
+                   >
+                  
+                  <View style={[styles.row, styles.alignCenter]}>
+                    <View style={[style.statusCircle, {backgroundColor: '#4cd964'}]}></View>
+                    <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
+                  </View>
+                  <Right>
+                    <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+                  </Right>
+                </ListItem>
+            )
+        }
+        return statusView
+    }
+
+      _onGoToNextStatus = () => {
+        this.props.actions.navigateToScene('FormLayout', {
+            contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+            jobTransactionId: this.props.jobTransaction.id,
+            jobTransaction: this.props.jobTransaction,
+            statusId: this.props.statusList.id,
+            statusName: this.props.statusList.name,
+            jobMasterId: this.props.jobTransaction.jobMasterId
+        }
+        )
+        this._onCancel()
+    }
+    _onCancel = () => {
+        this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
+    }
+
+      _onCheckLocationMismatch = (statusList, jobTransaction) => {
+        const FormLayoutObject = {
+            contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+            jobTransaction,
+            statusList
+        }
+        this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+    }
+
   render() {
+       if (this.props.jobDetailsLoading) {
+            return (
+                <Loader />
+            )
+        }
+          else{
+     const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={[styles.bgLightGray]}>
+          <View>
+                        {renderIf(this.props.statusList,
+                            <CustomAlert
+                                title="Details"
+                                message="You are not at location. Do you want to continue?"
+                                onOkPressed={this._onGoToNextStatus}
+                                onCancelPressed={this._onCancel} />)}
+                    </View>
           <Header style={[style.header]}>
             <View style={style.seqCard}>
               <View style={style.seqCircle}>
                 <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-                  PKUP
+                  {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
                 </Text>
               </View>
               <View style={style.seqCardDetail}>
                 <View>
                   <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                    dsaf
+                    {this.props.navigation.state.params.jobTransaction.line1}
                   </Text>
                   <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                    Plot 345, Saket
+                    {this.props.navigation.state.params.jobTransaction.line2}
                   </Text>
                   <Text
                     style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-                    Express Delivery · Paid
+                    {this.props.navigation.state.params.jobTransaction.circleLine1}
                   </Text>
                 </View>
+                <TouchableOpacity onPress={() => this.props.navigation.goBack(null) } >
                 <View
                   style={{
                   width: 30,
@@ -79,6 +165,7 @@ class JobDetailsV2 extends Component {
                     name="md-close"
                     style={[styles.fontXl, styles.fontBlack, styles.fontXxl]}/>
                 </View>
+                </TouchableOpacity >
               </View>
             </View>
           </Header>
@@ -86,131 +173,28 @@ class JobDetailsV2 extends Component {
           <Content>
             
             <View style={[styles.marginTop10, styles.bgWhite]}>
-              <List>
-                <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} >
-                  
-                  <View style={[styles.row, styles.alignCenter]}>
-                    <View style={[style.statusCircle, {backgroundColor: '#4cd964'}]}></View>
-                    <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>Deliver</Text>
-                  </View>
-                  <Right>
-                    <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-                  </Right>
-                </ListItem>
-              </List>
-              <List>
-                <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} >
-                  
-                  <View style={[styles.row, styles.alignCenter]}>
-                    <View style={[style.statusCircle, {backgroundColor: '#4cd964'}]}></View>
-                    <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>Fail</Text>
-                  </View>
-                  <Right>
-                    <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-                  </Right>
-                </ListItem>
-              </List>
-              <List>
-                <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} >
-                  
-                  <View style={[styles.row, styles.alignCenter]}>
-                    <View style={[style.statusCircle, {backgroundColor: '#4cd964'}]}></View>
-                    <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>Cancelled</Text>
-                  </View>
-                  <Right>
-                    <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-                  </Right>
-                </ListItem>
-              </List>
+              {this.props.errorMessage  ?  <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
+                                 <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+                                    {this.props.errorMessage}
+                                  </Text>
+                             </View>:null} 
+                      
+                 {statusView} 
             </View>
 
             {/*Basic Details*/}
             <View style={[styles.bgWhite, styles.marginTop10, styles.padding10]}>
-              <Text style={[styles.fontLg, styles.fontBlack, styles.bold]}>Basic Details</Text>
-              
-              
-              <List>
-                <View style={[styles.row]}>
-                  <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault]}>Customer Name</Text>
-                  </View>
-                  <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault, styles.fontBlack]}>Gaurav</Text>
-                  </View>
-                </View>
-                <View style={[styles.row]}>
-                  <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault]}>Customer Name</Text>
-                  </View>
-                  <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault, styles.fontBlack]}>Gaurav</Text>
-                  </View>
-                </View>
-                <View style={[styles.row]}>
-                  <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault]}>Customer Details</Text>
-                  </View>
-                  <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault, styles.fontPrimary]}>Tap to View</Text>
-                  </View>
-                </View>
-                <View style={[styles.marginTop5, styles.marginBottom5,]}>
-                  <View style={[styles.row, styles.paddingLeft5, styles.paddingRight5, styles.bgLightGray]}>
-                    <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                      <Text style={[styles.fontDefault]}>Customer Name</Text>
-                    </View>
-                    <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                      <Text style={[styles.fontDefault, styles.fontBlack]}>Rose Ballard</Text>
-                    </View>
-                  </View>
-                  <View style={[styles.row, styles.paddingLeft5, styles.paddingRight5, styles.bgLightGray]}>
-                    <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                      <Text style={[styles.fontDefault]}>Phone</Text>
-                    </View>
-                    <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                      <Text style={[styles.fontDefault, styles.fontBlack]}>9899999292</Text>
-                    </View>
-                  </View>
-                  <View style={[styles.row, styles.paddingLeft5, styles.paddingRight5, styles.bgLightGray]}>
-                    <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                      <Text style={[styles.fontDefault]}>Email</Text>
-                    </View>
-                    <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                      <Text style={[styles.fontDefault, styles.fontBlack]}>rose@fareye.in</Text>
-                    </View>
-                  </View>
-                </View>
-              </List>
+                 <ExpandableHeader
+                                title={'Basic Details'}
+                                dataList={this.props.jobDataList}
+                            />
             </View>
 
             {/*Payment Details*/}
             <View style={[styles.bgWhite, styles.marginTop10, styles.padding10]}>
-              <Text style={[styles.fontLg, styles.fontBlack, styles.bold]}>Payment Details</Text>
-              
-              <List style={[styles.row]}>
-                <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                  <Text style={[styles.fontDefault]}>Customer Name</Text>
-                </View>
-                <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                  <Text style={[styles.fontDefault]}>Rose Ballard</Text>
-                </View>
-              </List>
-              <List style={[styles.row]}>
-                <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                  <Text style={[styles.fontDefault]}>Customer Name</Text>
-                </View>
-                <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                  <Text style={[styles.fontDefault]}>Rose Ballard</Text>
-                </View>
-              </List>
-              <List style={[styles.row]}>
-                <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                  <Text style={[styles.fontDefault]}>Customer Name</Text>
-                </View>
-                <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                  <Text style={[styles.fontDefault]}>Rose Ballard</Text>
-                </View>
-              </List>
+                            <ExpandableHeader
+                                title={'Field Details'}
+                                dataList={this.props.fieldDataList} />
             </View>
           </Content>
           <Footer style={[style.footer]}>
@@ -229,6 +213,7 @@ class JobDetailsV2 extends Component {
         </Container>
       </StyleProvider>
     )
+          }
   }
 }
 
