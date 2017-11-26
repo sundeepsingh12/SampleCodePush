@@ -11,6 +11,7 @@ import {
     OBJECT_SAROJ_FAREYE,
     UNSEEN
 } from '../../lib/AttributeConstants'
+import moment from 'moment'
 
 
 import {
@@ -87,11 +88,16 @@ class JobDetails {
     }
 
 
+    checkJobExpire(jobDataList){      
+        const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
+        return ((jobAttributeTime != null && jobAttributeTime != undefined) &&  moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : null 
+    }
+
      checkEnableResequence(jobMasterList,tabId,seqSelected,statusList){
                 const jobMasterIdWithEnableResequence  = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id) 
                 const statusMap = statusList.value.filter((status) => status.tabId == tabId).map(obj => obj.id)
                 const firstEnableSequenceValue = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence,statusMap)  
-                return  !(seqSelected > firstEnableSequenceValue)
+                return  !(seqSelected > firstEnableSequenceValue) ? false : "Please finish previous items first" 
          }
          		  
     async checkOutForDelivery(jobMasterList){
@@ -101,7 +107,7 @@ class JobDetails {
             return mapOfUnseenStatusWithJobMaster[key];
           });
         const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)  
-        return  !(unseenTransactions.length>0)
+        return  !(unseenTransactions.length>0) ? false : "Please Scan all Parcels First" 
     }
     /**
      * ## convert degree to radians
