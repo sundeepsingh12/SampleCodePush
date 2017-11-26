@@ -6,7 +6,9 @@ var InitialState = Record({
    isLoaderRunning:false,
    bulkConfigList:[],
    bulkTransactionList:{},
-   selectedItems : []
+   selectedItems : [],
+   selectAllNone:'Select All',
+   isSelectAllVisible:false
 })
 
 export default InitialState
