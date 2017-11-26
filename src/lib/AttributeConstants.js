@@ -393,9 +393,15 @@ module.exports = {
 
     //SelectFromList
     SEARCH: 'Search',
-    OK: 'Ok'
+    OK: 'Ok',
 
-
-
-
+    //Add Server Sms 
+    BIKER_NAME: 'BIKER_NAME',
+    BIKER_MOBILE: 'BIKER_MOBILE',
+    REF_NO: 'REF_NO',
+    ATTEMPT_NO: 'ATTEMPT_NO',
+    RUNSHEET_NO: 'RUNSHEET_NO',
+    CREATION_DATE: 'CREATION_DATE',
+    TRANSACTION_DATE: 'TRANSACTION_DATE',
+    JOB_ETA: 'JOB_ETA',
 }

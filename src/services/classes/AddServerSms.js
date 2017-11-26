@@ -14,8 +14,29 @@ import {
 import * as realm from '../../repositories/realmdb'
 import moment from 'moment';
 import Communications from 'react-native-communications';
-
+import {
+    BIKER_NAME,
+    BIKER_MOBILE,
+    REF_NO,
+    ATTEMPT_NO,
+    RUNSHEET_NO,
+    CREATION_DATE,
+    TRANSACTION_DATE,
+    JOB_ETA
+} from '../../lib/AttributeConstants'
 class AddServerSms {
+    /**
+   * This function sets message body and returns server sms logs
+   * @param {*} statusId 
+   * @param {*} jobMasterId 
+   * @param {*} fieldData
+   * @param {*} jobTransaction
+   * @returns
+   * {
+   *      serverSmsLogs,
+   *      TABLE_NAME
+   * }
+   */
     async addServerSms(statusId, jobMasterId, fieldData, jobTransaction) {
         const smsJobStatuses = await keyValueDBService.getValueFromStore(SMS_JOB_STATUS);
         let smsForStatus = smsJobStatuses.value.filter(smsJobStatus => smsJobStatus.statusId == statusId)
@@ -43,12 +64,16 @@ class AddServerSms {
             } else if (fieldDataList && fieldDataList.length > 0) {
                 serverSmsLog.contact = fieldDataList[0].value
             }
+            let jobAttributesList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE);
+            let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+            let user = await keyValueDBService.getValueFromStore(USER);
+
             if (smsJobStatus.messageBody && smsJobStatus.messageBody.trim() != '') {
-                let messageBody = await this.setSmsBodyJobData(smsJobStatus.messageBody, jobData, jobTransaction)
-                messageBody = await this.setSmsBodyFixedAttribute(messageBody, jobTransaction)
+                let messageBody = await this.setSmsBodyJobData(smsJobStatus.messageBody, jobData, jobTransaction, jobAttributesList)
+                messageBody = await this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
                 if (fieldData && fieldData.value) {
-                    messageBody = await this.setSMSBodyFieldData(messageBody, fieldData.value, jobTransaction)
-                    messageBody = await this.checkForRecursiveData(messageBody, '', jobData, fieldData.value, jobTransaction)
+                    messageBody = await this.setSMSBodyFieldData(messageBody, fieldData.value, jobTransaction, fieldAttributesList)
+                    messageBody = await this.checkForRecursiveData(messageBody, '', jobData, fieldData.value, jobTransaction, jobAttributesList, fieldAttributesList, user)
                 }
                 serverSmsLog.smsBody = messageBody
                 serverSmsLog.dateTime = moment().format('YYYY-MM-DD HH:mm:ss') + ''
@@ -58,7 +83,16 @@ class AddServerSms {
         let serverSMSLogObject = this.saveServerSmsLog(serverSmsLogs)
         return serverSMSLogObject
     }
-
+    /**
+      * This function returns job data for given jobtransaction
+      * @param {*} jobAttributeMasterId 
+      * @param {*} jobTransaction
+      * @returns
+      * {
+      *      serverSmsLogs,
+      *      TABLE_NAME
+      * }
+      */
     getJobData(jobAttributeMasterId, jobTransaction) {
         let jobDataQuery = `jobId = ${jobTransaction.jobId}`
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery, null, null)
@@ -70,74 +104,93 @@ class AddServerSms {
         }
         return jobData
     }
-
-    async setSmsBodyJobData(messageBody, jobDataList, jobTransaction) {
+    /**
+     * This function sets message body with job data values
+     * @param {String} messageBody 
+     * @param {*} jobDataList
+     * @param {*} jobTransaction
+     * @param {*} jobAttributesList
+     * @returns
+     * messageBody: string
+     */
+    setSmsBodyJobData(messageBody, jobDataList, jobTransaction, jobAttributesList) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
-        let jobAttributesList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE);
         if (!keys || !jobDataList) return messageBody
         for (let key of keys) {
             let keyForJob = key.slice(1, key.length - 1)
             let jobAttributesWithSameKey = jobAttributesList.value.filter(jobAttribute => jobAttribute.key == keyForJob)
             if (jobAttributesWithSameKey[0]) {
                 let jobData = jobDataList.filter(data => data.jobAttributeMasterId == jobAttributesWithSameKey[0].id && data.jobId == jobTransaction.jobId)
-                if (jobData[0] && jobData[0].value)
-                    messageBody = messageBody.replace(key, jobData[0].value)
+                messageBody = (jobData[0] && jobData[0].value) ? messageBody.replace(key, jobData[0].value) : messageBody.replace(key, 'N.A.')
             }
-
         }
         return messageBody
     }
-    async setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction) {
+    /**
+    * This function sets message body with field data values
+    * @param {String} messageBody 
+    * @param {*} fieldDataList
+    * @param {*} jobTransaction
+    * @param {*} fieldAttributesList
+    * @returns
+    * messageBody: string
+    */
+    setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, fieldAttributesList) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
-        let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
         if (!keys || !fieldDataList || fieldDataList.length <= 0) return messageBody
         for (let key of keys) {
             let keyForJob = key.slice(1, key.length - 1)
             let fieldAttributesWithSameKey = fieldAttributesList.value.filter(fieldAttribute => fieldAttribute.key == keyForJob)
             if (fieldAttributesWithSameKey[0]) {
                 let fieldData = fieldDataList.filter(data => data.fieldAttributeMasterId == fieldAttributesWithSameKey[0].id && data.jobTransactionId == jobTransaction.id)
-                if (fieldData[0] && fieldData[0].value)
-                    messageBody = messageBody.replace(key, fieldData[0].value)
+                messageBody = (fieldData[0] && fieldData[0].value) ? messageBody.replace(key, fieldData[0].value) : messageBody.replace(key, 'N.A.')
             }
         }
         return messageBody
     }
-    async setSmsBodyFixedAttribute(messageBody, jobTransaction) {
+    /**
+    * This function sets message body with fixed attributes enclosed by <>
+    * @param {String} messageBody 
+    * @param {*} jobTransaction
+    * @param {*} user
+    * @returns
+    * messageBody: string
+    */
+    setSmsBodyFixedAttribute(messageBody, jobTransaction, user) {
         let reqEx = /\<.*?\>/g
         let keys = messageBody.match(reqEx)
         if (!keys) return messageBody
-        let user = await keyValueDBService.getValueFromStore(USER);
         for (let key of keys) {
             let keyForJob = key.slice(1, key.length - 1)
             switch (keyForJob) {
-                case 'BIKER_NAME':
+                case BIKER_NAME:
                     let bikerName = user.value.firstName + ' ' + user.value.lastName
                     messageBody = bikerName ? messageBody.replace(key, bikerName) : messageBody.replace(key, 'N.A.')
                     break
-                case 'BIKER_MOBILE':
+                case BIKER_MOBILE:
                     let bikerNumber = user.value.mobileNumber
                     messageBody = (bikerNumber && bikerNumber.length > 0) ? messageBody.replace(key, bikerNumber) : messageBody.replace(key, 'N.A.')
                     break
-                case 'REF_NO':
+                case REF_NO:
                     messageBody = messageBody.replace(key, jobTransaction.referenceNumber)
                     break
-                case 'ATTEMPT_NO':
+                case ATTEMPT_NO:
                     messageBody = messageBody.replace(key, jobTransaction.attemptCount + '')
                     break
-                case 'RUNSHEET_NO':
+                case RUNSHEET_NO:
                     messageBody = messageBody.replace(key, jobTransaction.runsheetNo)
                     break
-                case 'CREATION_DATE':
+                case CREATION_DATE:
                     let creationDate = moment(jobTransaction.jobCreatedAt).format('DD MMM')
                     messageBody = messageBody.replace(key, creationDate)
                     break
-                case 'TRANSACTION_DATE':
+                case TRANSACTION_DATE:
                     let transactionDate = moment(jobTransaction.lastUpdatedAtServer).format('DD MMM')
                     messageBody = messageBody.replace(key, transactionDate)
                     break
-                case 'JOB_ETA':
+                case JOB_ETA:
                     let jobEta = jobTransaction.jobEtaTime
                     messageBody = (jobEta && jobEta.length > 0) ? messageBody.replace(key, moment(jobEta).format('dd MMM')) : messageBody.replace(key, '')
                     break
@@ -157,42 +210,59 @@ class AddServerSms {
             value: serverSmsLogs
         };
     }
-    async checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction) {
+    /**
+    * This function recursively checks for keys and replaces with job or field data values
+    * @param {String} messageBody 
+    * @param {String} previousMessage 
+    * @param {*} jobData
+    * @param {*} fieldData
+    * @param {*} jobTransaction
+    * @param {*} jobAttributesList
+    * @param {*} fieldAttributesList
+    * @param {*} user
+    * @returns
+    * messageBody: string
+    */
+    checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, jobAttributesList, fieldAttributesList, user) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
         if (!keys || keys.length <= 0)
             return messageBody
         if (!previousMessage == messageBody) {
-            messageBody = await this.setSmsBodyJobData(messageBody, jobData, jobTransaction)
-            messageBody = await this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction)
-            messageBody = await this.setSmsBodyFixedAttribute(messageBody, jobTransaction)
+            messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, jobAttributesList)
+            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAttributesList)
+            messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
             previousMessage = messageBody
-            messageBody = await this.checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction)
+            messageBody = this.checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, jobAttributesList, fieldAttributesList)
         }
         else {
-            messageBody = await this.setSmsBodyJobData(messageBody, jobData, jobTransaction)
-            messageBody = await this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction)
-            messageBody = await this.setSmsBodyFixedAttribute(messageBody, jobTransaction)
+            messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, jobAttributesList)
+            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAttributesList)
+            messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
         }
         return messageBody
     }
-    async sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData) {
+    sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user) {
         if (smsTemplate.body && smsTemplate.body.trim() != '') {
             let fieldDataList;
             let messageBody = smsTemplate.body
             if (jobData != null) {
-                messageBody = await this.setSmsBodyJobData(smsTemplate.body, jobData, jobTransaction)
+                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobData, jobTransaction, jobAttributesList)
             }
             if (fieldData != null) {
                 fieldDataList = fieldData.map((dataList) => dataList.data)
-                messageBody = await this.setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction)
+                messageBody = this.setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, fieldAttributesList)
             }
-            messageBody = await this.setSmsBodyFixedAttribute(messageBody, jobTransaction)
+            messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
             if (messageBody && messageBody.length > 0 && contact && contact.length > 0) {
                 Communications.text(contact, messageBody)
             }
         }
     }
+    /**
+    * This function checks if a sms is mapped to transaction's pending status and saves server sms log
+    * @param {String} transactionIdDtos 
+    */
     async setServerSmsMapForPendingStatus(transactionIdDtos) {
         const smsJobStatuses = await keyValueDBService.getValueFromStore(SMS_JOB_STATUS);
         for (let transactionIdDto of transactionIdDtos) {
@@ -206,19 +276,18 @@ class AddServerSms {
                 let jobTransaction = { ...transactionList[index] }
                 if (jobTransaction) {
                     let serverSmsLog = await this.addServerSms(transactionIdDto.pendingStatusId, transactionIdDto.jobMasterId, null, jobTransaction)
-                    if (serverSmsLog) {
-                        realm.performBatchSave(serverSmsLog)
-                        let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-                        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-                        if (!transactionsToSync.includes(transactionIdDto.transactionId))
-                            transactionsToSync.push(transactionIdDto.transactionId);
-                        await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync);
-                    }
+                    realm.performBatchSave(serverSmsLog)
+                    let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+                    let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
+                    if (!transactionsToSync.includes(transactionIdDto.transactionId))
+                        transactionsToSync.push(transactionIdDto.transactionId);
+                    await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync);
                 }
             }
         }
     }
 }
+
 
 export let addServerSmsService = new AddServerSms()
 
