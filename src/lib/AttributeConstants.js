@@ -64,6 +64,7 @@ module.exports = {
     SKU_ACTUAL_QUANTITY: 16,
     SKU_ARRAY: 17,
     SKU_CODE: 51,
+    JOB_EXPIRY_TIME: 69,
     SKU_ORIGINAL_QUANTITY: 15,
     SKU_UNIT_PRICE: 14,
     STRING: 1,

@@ -24,8 +24,7 @@ export default function jobDetailsReducer(state = initialState, action) {
                         .set('jobTransaction',action.payload.jobTransaction)
                         .set('jobDetailsLoading',false)
                         .set('currentStatus',action.payload.currentStatus)
-                        .set('isEnableRestriction',action.payload.isEnableRestriction)
-                        .set('isEnableOutForDelivery',action.payload.isEnableOutForDelivery)
+                        .set('errorMessage',action.payload.errorMessage)
     }
     return state
 }

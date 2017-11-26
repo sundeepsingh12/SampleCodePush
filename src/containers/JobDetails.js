@@ -47,8 +47,7 @@ function mapStateToProps(state) {
         jobTransaction: state.jobDetails.jobTransaction,
         messageList: state.jobDetails.messageList,
         smsTemplateList: state.jobDetails.smsTemplateList,
-        isEnableRestriction: state.jobDetails.isEnableRestriction,
-        isEnableOutForDelivery: state.jobDetails.isEnableOutForDelivery,
+        errorMessage:state.jobDetails.errorMessage,
         statusList: state.jobDetails.statusList,
     }
 }
@@ -62,7 +61,6 @@ function mapDispatchToProps(dispatch) {
 class JobDetails extends Component {
 
     componentWillMount() {
-        // this.props.actions.checkOutForDelivery(this.props.navigation.state.params.jobTransactionId)
         this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransactionId)
     }
 
@@ -190,7 +188,7 @@ class JobDetails extends Component {
     }
 
     render() {
-        const statusView = this.props.currentStatus && this.props.isEnableRestriction && this.props.isEnableOutForDelivery ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
+        const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
         if (this.props.jobDetailsLoading) {
             return (
                 <Loader />
@@ -219,22 +217,14 @@ class JobDetails extends Component {
                         <Right style={StyleSheet.flatten([styles.flexBasis15])}>
                         </Right>
                     </Header>
-                    {renderIf(this.props.isEnableRestriction == false,
-                        <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
-                            <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
-                                Please finish previous items first
+                    {renderIf(this.props.errorMessage,
+                             <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
+                                 <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+                                    {this.props.errorMessage}
                                   </Text>
-                        </View>
-
-                    )}
-                    {renderIf(this.props.isEnableOutForDelivery == false,
-                        <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
-                            <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
-                                Please Scan all Parcels First
-                                 </Text>
-                        </View>
-
-                    )}
+                             </View>
+  
+                          )}
                     <Content style={StyleSheet.flatten([styles.padding5])}>
                         <Card>
                             <ExpandableHeader
