@@ -309,25 +309,32 @@ class JobDetailsV2 extends Component {
               </View>
             </Content>
             <Footer style={[style.footer]}>
-              <FooterTab>
-                <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
-                  <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>
-              </FooterTab>
-              <FooterTab>
-                <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-                  <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>
-              </FooterTab>
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData
+                && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0
+                && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData
+                && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
+                <FooterTab>
+                  <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
+                    <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>
+              )}
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
+                <FooterTab>
+                  <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
+                    <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>
+              )}
               <FooterTab>
                 <Button full>
                   <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
                 </Button>
               </FooterTab>
-              {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
-                    <CallIcon/>
+                    <CallIcon />
                   </Button>
                 </FooterTab>)}
             </Footer>
