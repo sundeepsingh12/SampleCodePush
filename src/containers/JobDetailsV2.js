@@ -46,6 +46,7 @@ import {
   CALL_CONFIRM
 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications';
+import CallIcon from '../svg_components/icons/CallIcon'
 
 function mapStateToProps(state) {
   return {
@@ -326,7 +327,7 @@ class JobDetailsV2 extends Component {
               {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
-                    <Icon name="md-help-buoy" style={[styles.fontLg, styles.fontBlack]} />
+                    <CallIcon/>
                   </Button>
                 </FooterTab>)}
             </Footer>
