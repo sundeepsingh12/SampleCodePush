@@ -4,7 +4,7 @@ import { Record } from 'immutable'
 
 var InitialState = Record({
    isLoaderRunning : false,
-   customUrl : null,
+   customUrl : '',
 })
 
 export default InitialState 
