@@ -330,6 +330,14 @@ module.exports = {
         enabled: false,
         icon: <SequenceIcon />,
     },
+    CUSTOMAPP:{
+        appModuleId:12,
+        displayName: 'Web URL',
+        enabled: false,
+        remark: null,
+        icon: <SequenceIcon />
+    },
+
 
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
@@ -390,6 +398,13 @@ module.exports = {
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+   
+    //Custom App
+    WEBVIEW_REF : 'webview',
+    URL : 'URL',
+    CHOOSE_WEB_URL : "Choose Web URL",
+    ENTER_URL_HERE : "Enter Url Here",
+    HTTP : 'http://',
 
     //SelectFromList
     SEARCH: 'Search',
