@@ -88,14 +88,25 @@ class SelectFromList extends Component {
     this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
   }
 
-  _saveAndDropModal = () => {
+  _saveAndDropModal() {
+    console.log("_saveAndDropModal")
     this._dropModal()
     this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
+    console.log("_saveAndDropModal")
   }
 
   _setValueInInputText(valueOfInputText) {
     if (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 1)
       this.props.actions.setState(INPUT_TEXT_VALUE, valueOfInputText)
+  }
+
+  getCheckboxDoneButtonView() {
+    return (
+      <TouchableHighlight
+        onPress={() => { this._saveAndDropModal() }} >
+        <Text style={[styles.fontInfo, styles.padding10]}> DONE </Text>
+      </TouchableHighlight>
+    )
   }
 
   searchBarView() {
@@ -113,7 +124,7 @@ class SelectFromList extends Component {
             />
             <Icon style={[styles.fontSm]} name="md-close"
               onPress={() => {
-                this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
+                this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, this.props.selectFromListState)
                 this.props.actions.setState(INPUT_TEXT_VALUE, '')
               }}
             />
@@ -140,6 +151,8 @@ class SelectFromList extends Component {
         onPress={() => {
           this.props.actions.setOrRemoveStates(this.props.selectFromListState,
             item.id, this.props.currentElement.attributeTypeId)
+          this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
+          this._saveAndDropModal()
         }}
         style={([{ width: 20 }])}
       />
@@ -152,8 +165,8 @@ class SelectFromList extends Component {
         onPress={() => {
           this.props.actions.setOrRemoveStates(this.props.selectFromListState,
             item.id, this.props.currentElement.attributeTypeId)
-          this._setValueInInputText(item.name)
           this.props.actions.setState(SET_FILTERED_DATA_SELECTFROMLIST, {})
+          if (this.props.currentElement.attributeTypeId != CHECKBOX) this._saveAndDropModal()
         }}>
         {fieldAttributeView}
         <Body>
@@ -169,17 +182,21 @@ class SelectFromList extends Component {
       Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',
-        buttonText: {OK}
+        buttonText: { OK }
       })
     }
     if ((this.props.currentElement.attributeTypeId == CHECKBOX || this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == DROPDOWN) && this.state.modalVisible) {
       let radioButtonData
       let searchBarViewData
+      let checkBoxDoneButtonView = null
       if (this.props.currentElement.attributeTypeId == DROPDOWN && this.props.totalItemsInSelectFromList == 1) {
         searchBarViewData = this.searchBarView()
         radioButtonData = this.renderListViewData(this.props.filteredDataSelectFromList)
       }
       else {
+        if (this.props.currentElement.attributeTypeId == CHECKBOX) {
+          checkBoxDoneButtonView = this.getCheckboxDoneButtonView()
+        }
         radioButtonData = this.renderListViewData(this.props.selectFromListState)
         searchBarViewData = null
       }
@@ -198,10 +215,7 @@ class SelectFromList extends Component {
                 <View style={[styles.bgLightGray]}>
                   <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
                     <Text style={[styles.padding10]}>{this.props.currentElement.label}</Text>
-                    <TouchableHighlight
-                      onPress={this._saveAndDropModal}>
-                      <Text style={[styles.fontInfo, styles.padding10]}> DONE </Text>
-                    </TouchableHighlight>
+                    {checkBoxDoneButtonView}
                   </View>
                   {searchBarViewData}
                 </View>
@@ -241,11 +255,6 @@ class SelectFromList extends Component {
               <View>
                 <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
                   <Text style={[styles.padding10]}>{this.props.currentElement.label}</Text>
-
-                  <TouchableHighlight
-                    onPress={this._saveAndDropModal}>
-                    <Text style={[styles.fontInfo, styles.padding10]}> DONE </Text>
-                  </TouchableHighlight>
                 </View>
                 <View style={[styles.paddingBottom30]}>
                   <Content style={[styles.flexBasis100
