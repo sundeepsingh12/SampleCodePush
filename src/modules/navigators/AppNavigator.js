@@ -40,6 +40,14 @@ import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
+import UIViews from '../../containers/UIViews'
+import JobDetailsV2 from '../../containers/JobDetailsV2'
+import CustomApp from '../../containers/CustomApp'
+
+
+
+
+
 
 import {
   Container,
@@ -136,7 +144,7 @@ export const HomeTabNavigator = TabNavigator({
     screen: Home,
     navigationOptions: {
       header: null,
-      title: 'Home',
+      title: 'Home',  
       tabBarIcon: <Icon name='ios-home' style={{ fontSize: 18 }}></Icon>
     }
   },
@@ -214,6 +222,13 @@ export const AppNavigator = StackNavigator({
   Payment: {
     screen: Payment
   },
+  UIViews: {
+    screen: UIViews
+  },
+  JobDetailsV2: {
+    screen: JobDetailsV2,
+    header: null
+  },
   Logout: {
     screen: Logout,
   },
@@ -283,6 +298,9 @@ export const AppNavigator = StackNavigator({
   },
   PayByLink: {
     screen: PayByLink
+  },
+  CustomApp: {
+    screen: CustomApp
   },
   FixedSKUListing: {
     screen: FixedSKUListing,

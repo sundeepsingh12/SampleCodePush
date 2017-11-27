@@ -68,6 +68,7 @@ export default function preloaderReducer(state = initialState, action) {
       return state.set('configDownloadService', SERVICE_RUNNING)
         .set('error', '')
         .set('configSaveService', SERVICE_PENDING)
+        .set('isError',false)
     case MASTER_DOWNLOAD_SUCCESS:
       return state.set('configDownloadService', SERVICE_SUCCESS)
     case MASTER_DOWNLOAD_FAILURE:

@@ -39,6 +39,7 @@ describe('sortingReducer ', () => {
         }
         let nextState = sortingReducer(undefined, action)
         expect(nextState.loaderRunning).toBe(dataList)
+        expect(nextState.sortingDetails).toEqual(details)
     })
     it('it should show Error-Message', () => {
         const message = 'test'
