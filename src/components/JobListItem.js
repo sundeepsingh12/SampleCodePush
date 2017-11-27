@@ -56,8 +56,8 @@ export default class JobListItem extends Component {
                   ]} />
               </View> : <View />}
           </View>
-          {this.props.job ?
-            <Text> {this.props.job.id}
+          {this.props.jobEndTime ?
+            <Text> {this.props.jobEndTime}
             </Text> : <View />}
         </View>
       </TouchableHighlight>

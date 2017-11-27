@@ -67,15 +67,19 @@ class LiveJobListing extends Component {
     renderData = (item) => {
         let time = this.getJobEtaTime(item.id)
         return (
-            <JobListItem data={item} job={time}
+            <JobListItem data={item} jobEndTime={time}
             />
         )
     }
     getJobEtaTime = (id) => {
-        let jobEndTime = moment(this.props.liveJobList.jobMap[id].jobEndTime)
-        let currentTime = moment().format('HH:mm:ss')
-        let diff = jobEndTime.diff(currentTime)
-        return moment(diff).format('HH:mm:ss')
+        let jobEndTime = moment(this.props.liveJobList.jobMap[id].jobEndTime, 'HH:mm:ss')
+        let currentTime = moment()
+        //  let diff = jobEndTime.diff(moment().format('HH:mm:ss'))
+        // let diff = moment().subtract(jobEndTime)
+        //  return diff
+        //  return moment(diff).format('HH:mm:ss')
+        //    
+        return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
     }
     render() {
         return (
@@ -84,7 +88,6 @@ class LiveJobListing extends Component {
                     <Header style={StyleSheet.flatten([styles.bgPrimary])}>
                         <Left>
                             <Button transparent onPress={() => {
-                                // this.props.actions.setState(RESET_STATE)
                                 this.props.navigation.goBack(null)
                             }}>
                                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />

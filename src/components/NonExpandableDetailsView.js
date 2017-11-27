@@ -27,14 +27,15 @@ export default class NonExpandableDetailsView extends Component {
 
     render() {
         return (
-            <View style={StyleSheet.flatten([styles.column, { backgroundColor: '#F2F2F2' }])}>
-                <View style={StyleSheet.flatten([styles.row, styles.padding10, { borderTopWidth: .5, borderColor: '#C5C5C5' }])}>
-                    <View style={StyleSheet.flatten([styles.row, styles.justifyStart, styles.alignCenter, { flex: .5 }])}>
-                        <Text style={StyleSheet.flatten([styles.bold, styles.fontSm])} >
+                <View style={[styles.row, styles.paddingLeft10, styles.paddingRight10]}>
+
+                    <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
+                        <Text style={[styles.fontDefault]} >
                             {this.props.label}
                         </Text>
                     </View>
-                    <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, styles.alignCenter, { flex: .5 }])}>
+
+                    <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
                         {renderIf(this.props.attributeTypeId == IMAGE_URL,
                             <TouchableOpacity onPress={() => this._openURL(this.props.value)}>
                                 <View style={[styles.row]}>
@@ -45,12 +46,11 @@ export default class NonExpandableDetailsView extends Component {
                                 </View>
                             </TouchableOpacity>)}
                         {renderIf(this.props.attributeTypeId != IMAGE_URL,
-                            <Text style={StyleSheet.flatten([styles.fontSm])}>
+                            <Text style={[styles.fontDefault, styles.fontBlack]}>
                                 {this.props.value}
                             </Text>)}
                     </View>
                 </View>
-            </View>
         )
     }
 }

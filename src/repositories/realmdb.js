@@ -8,11 +8,11 @@ import JobData from './schema/JobData'
 import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
 import TrackLogs from './schema/trackLogs'
-
+import ServerSmsLog from './schema/serverSmsLog'
 import _ from 'underscore'
 
 const schemaVersion = 32;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs];
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];
 
 let realm = new Realm({
     schemaVersion,
@@ -27,7 +27,8 @@ import {
     USER,
     TABLE_RUNSHEET,
     TABLE_JOB_TRANSACTION_CUSTOMIZATION,
-    TABLE_TRACK_LOGS
+    TABLE_TRACK_LOGS,
+    TABLE_SERVER_SMS_LOG,
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -71,6 +72,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_FIELD_DATA))
         realm.delete(realm.objects(TABLE_RUNSHEET))
         realm.delete(realm.objects(TABLE_TRACK_LOGS))
+        realm.delete(realm.objects(TABLE_SERVER_SMS_LOG))
     });
 }
 

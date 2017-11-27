@@ -45,7 +45,9 @@ function mapStateToProps(state) {
   return {
     bulkTransactionList:state.bulk.bulkTransactionList,
     isLoaderRunning:state.bulk.isLoaderRunning,
-    selectedItems:state.bulk.selectedItems
+    selectedItems:state.bulk.selectedItems,
+    selectAllNone:state.bulk.selectAllNone,
+    isSelectAllVisible:state.bulk.isSelectAllVisible
   }
 }
 
@@ -68,6 +70,10 @@ class BulkListing extends Component {
   onClickRowItem(item){
     this.props.actions.toggleListItemIsChecked(item.id,this.props.bulkTransactionList)
   }
+
+  selectAll = () =>{
+      this.props.actions.toggleAllItems(this.props.bulkTransactionList,this.props.selectAllNone)
+    }
 
     componentDidMount() {
       this.props.actions.getBulkJobTransactions(this.props.navigation.state.params)
@@ -110,6 +116,7 @@ class BulkListing extends Component {
           const nextStatusNames = this.props.navigation.state.params.nextStatusList.map(nextStatus => nextStatus.name)
           nextStatusNames.push('Cancel')
           const nextStatusIds = this.props.navigation.state.params.nextStatusList.map(nextStatus => nextStatus.id)
+          console.log('this.props.isSelectAllVisible',this.props.isSelectAllVisible)
           return (
             <StyleProvider style={getTheme(platform)}>
               <Container>
@@ -123,7 +130,12 @@ class BulkListing extends Component {
                   <Body>
                     <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Bulk Update</Text>
                   </Body>
-                  <Right />
+                  {this.props.isSelectAllVisible? <Right>
+                    <Text
+                    onPress={this.selectAll} 
+                    style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{this.props.selectAllNone}</Text>
+                  </Right>:<Right />}
+                 
                 </Header>
                   <FlatList
                     data={Object.values(this.props.bulkTransactionList)}
@@ -162,6 +174,8 @@ class BulkListing extends Component {
         }
       }
     }
+
+    
 
     goToFormLayout(statusId, statusName) {
       this.props.actions.navigateToScene(FormLayout, {
