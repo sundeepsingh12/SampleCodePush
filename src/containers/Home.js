@@ -120,7 +120,7 @@ class Home extends Component {
         destructiveButtonIndex: BUTTONS.length-1
       },
        buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length-1)) ? this.props.actions.setState(ON_CHANGE_CUSTOM_VALUE,null) &&
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length-1)) ? this.props.actions.setState(ON_CHANGE_STATE,null) &&
         this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[buttonIndex].customUrl)  : null
       }
     )}

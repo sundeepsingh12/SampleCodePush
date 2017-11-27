@@ -73,10 +73,10 @@ class CustomApp extends Component {
     onLoadEnd = () =>{
         this.props.actions.setState(END_FETCHING_URL,{})
     }
-    onCancel = () =>{
-        this.refs[WEBVIEW_REF].stopLoading();
-        this.props.actions.setState(END_FETCHING_URL,{})
-     } 
+    // onCancel = () =>{
+    //     this.refs[WEBVIEW_REF].stopLoading();
+    //     this.props.actions.setState(END_FETCHING_URL,{})
+    //  } 
     onSubmit(value){
         if(!/^[a-zA-Z-_]+:/.test(value)) {
             value = 'http://' + value;
@@ -88,7 +88,7 @@ class CustomApp extends Component {
         this.props.actions.setState(START_FETCHING_URL,this.props.customUrl)
     }
    
-    componentDidMount() {
+    componentWillMount() {
         if(this.props.navigation.state.params != null && this.props.navigation.state.params != undefined ){
             this.props.actions.setState(START_FETCHING_URL,this.props.navigation.state.params)
         }
@@ -102,7 +102,7 @@ class CustomApp extends Component {
                         <Body>
                         <View
                             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                            <TouchableOpacity style={[style.headerLeft]} onPress={ this.onCancel }>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
                                 <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                             </TouchableOpacity>
                             <View style={[style.headerBody]}t>
