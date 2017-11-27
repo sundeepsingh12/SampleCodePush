@@ -42,8 +42,7 @@ import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
-
-
+import LiveJobListing from '../../containers/LiveJobListing'
 
 
 
@@ -109,7 +108,7 @@ class AppWithNavigationState extends React.Component {
       case ApplicationScreen:
       case LoginScreen:
       case PreloaderScreen: return false
-      case HomeTabNavigatorScreen : {
+      case HomeTabNavigatorScreen: {
         if (route.routes[route.index].routeName == HomeScreen) {
           return false
         }
@@ -143,7 +142,7 @@ export const HomeTabNavigator = TabNavigator({
     screen: Home,
     navigationOptions: {
       header: null,
-      title: 'Home',  
+      title: 'Home',
       tabBarIcon: <Icon name='ios-home' style={{ fontSize: 18 }}></Icon>
     }
   },
@@ -332,16 +331,16 @@ export const AppNavigator = StackNavigator({
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
   },
-   SignatureAndNps: {
+  SignatureAndNps: {
     screen: SignatureAndNps
   },
-  BulkConfiguration:{
+  BulkConfiguration: {
     screen: BulkConfiguration
   },
-  BulkListing:{
-    screen:BulkListing
+  BulkListing: {
+    screen: BulkListing
   },
-   CashTendering: {
+  CashTendering: {
     screen: CashTendering,
     navigationOptions: {
       title: 'Collect Cash',
@@ -349,6 +348,9 @@ export const AppNavigator = StackNavigator({
   },
   TaskListScreen: {
     screen: TaskListScreen
+  },
+  LiveJobs: {
+    screen: LiveJobListing
   }
 },
   {

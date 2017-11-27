@@ -12,7 +12,7 @@ import TrackLogs from './schema/trackLogs'
 import _ from 'underscore'
 
 const schemaVersion = 32;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs];
 
 let realm = new Realm({
     schemaVersion,

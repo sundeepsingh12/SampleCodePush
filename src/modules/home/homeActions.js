@@ -16,7 +16,7 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { sync } from '../../services/classes/Sync'
 import _ from 'underscore'
 import BackgroundTimer from 'react-native-background-timer'
-import { setState } from '../global/globalActions'
+import { setState, navigateToScene } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 
 /**
@@ -63,6 +63,10 @@ export function onResyncPress() {
       const isLiveJobPresent = await sync.downloadAndDeleteDataFromServer(true)
       console.log(isLiveJobPresent)
       dispatch(setState(JOB_DOWNLOADING_STATUS, { isDownloadingjobs: false }))
+      if (isLiveJobPresent) {
+        dispatch(setState(SHOW_LIVE_JOB_LIST, true))
+        navigateToScene()
+      }
       dispatch(syncService())
     } catch (error) {
       console.log(error)

@@ -195,11 +195,12 @@ module.exports = keyMirror({
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
-    BulkConfiguration:null,
-    BulkListing:null,
-    Sorting:null,
-    ProfileView:null,
-    Statistics:null,
+    BulkConfiguration: null,
+    BulkListing: null,
+    Sorting: null,
+    ProfileView: null,
+    Statistics: null,
+    LiveJobs: null,
 
 
     //Skulisting Actions
@@ -253,23 +254,23 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
     TOGGLE_RESEQUENCE_BUTTON: null,
-    PREPARE_UPDATE_LIST:null,
+    PREPARE_UPDATE_LIST: null,
 
     //New Job
-    NEW_JOB_MASTER : null,
-    NEW_JOB_STATUS : null,
+    NEW_JOB_MASTER: null,
+    NEW_JOB_STATUS: null,
 
     //Bulk Module
-    START_FETCHING_BULK_CONFIG:null,
-    STOP_FETCHING_BULK_CONFIG:null,
-    START_FETCHING_BULK_TRANSACTIONS:null,
-    STOP_FETCHING_BULK_TRANSACTIONS:null,
-    TOGGLE_JOB_TRANSACTION_LIST_ITEM:null,
+    START_FETCHING_BULK_CONFIG: null,
+    STOP_FETCHING_BULK_CONFIG: null,
+    START_FETCHING_BULK_TRANSACTIONS: null,
+    STOP_FETCHING_BULK_TRANSACTIONS: null,
+    TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
 
 
     //statisticsModule
-    SET_DATA_IN_STATISTICS_LIST : null,
-   
+    SET_DATA_IN_STATISTICS_LIST: null,
+
     //profileModule
     FETCH_USER_DETAILS: null,
     CHECK_CURRENT_PASSWORD: null,
@@ -281,6 +282,10 @@ module.exports = keyMirror({
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
+
+    //Live Job actions
+    SHOW_LIVE_JOB_LIST: null,
+    SET_LIVE_JOB_LIST: null,
 })
 
 

@@ -14,9 +14,14 @@ class Job {
      *             JobId : Job
      *          }
      */
-    getJobMap(jobsList) {
-        let jobMap = {}
-        jobsList.forEach(job => {
+    getJobMapAndJobDataQuery(jobsList) {
+        let jobQuery = '',
+            jobTransactionQuery = '',
+            jobDataQuery = '',
+            fieldDataQuery = '',
+            jobMap = {}
+        for (let index in jobsList) {
+            const job = jobsList[index]
             const {
                 attemptCount,
                 id,
@@ -27,6 +32,11 @@ class Job {
                 longitude,
                 slot
             } = job
+            if (index == 0) {
+                jobDataQuery += 'jobId = ' + id
+            } else {
+                jobDataQuery += ' OR jobId = ' + id
+            }
             jobMap[id] = {
                 attemptCount,
                 id,
@@ -37,8 +47,8 @@ class Job {
                 longitude,
                 slot
             }
-        })
-        return jobMap
+        }
+        return { jobMap, jobDataQuery }
     }
 }
 

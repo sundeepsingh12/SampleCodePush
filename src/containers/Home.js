@@ -45,7 +45,8 @@ import {
   TabScreen,
   Sequence,
   BulkConfiguration,
-  Sorting
+  Sorting,
+  LiveJobs
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -70,21 +71,17 @@ class Home extends Component {
   }
 
   navigateToScene = (moduleName) => {
-    console.log('modulename',moduleName)
+    console.log('modulename', moduleName)
     switch (moduleName) {
       case BULK: {
         this.props.actions.navigateToScene(BulkConfiguration)
         break
       }
       case LIVE: {
-          Toast.show({
-              text: `Under development!Coming Soon`,
-              position: 'bottom',
-              buttonText: 'OK'
-            })
+        this.props.actions.navigateToScene(LiveJobs)
         break
       }
-      case SEQUENCEMODULE: { 
+      case SEQUENCEMODULE: {
         this.props.actions.navigateToScene(Sequence)
         break
       }
@@ -140,11 +137,11 @@ class Home extends Component {
         colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}
         style={style.chartBlock}>
         <View style={[styles.justifyCenter, styles.paddingTop15, styles.paddingBottom15]}>
-          <CircularProgress percentage={percentage} style={[{backgroundColor: '#green'}]}>
-              <View style={[styles.justifyCenter, styles.alignCenter]}>
-                <Text style={{fontSize: 40, color: '#ffffff', fontWeight: '500'}}>{percentage}</Text>
-                <Text style={{fontSize: 18, color: '#ffffff'}}>pending</Text>
-              </View>
+          <CircularProgress percentage={percentage} style={[{ backgroundColor: '#green' }]}>
+            <View style={[styles.justifyCenter, styles.alignCenter]}>
+              <Text style={{ fontSize: 40, color: '#ffffff', fontWeight: '500' }}>{percentage}</Text>
+              <Text style={{ fontSize: 18, color: '#ffffff' }}>pending</Text>
+            </View>
           </CircularProgress>
         </View>
         <View style={[styles.row, styles.justifySpaceAround]}>
@@ -168,7 +165,7 @@ class Home extends Component {
   moduleView(modulesList) {
     let moduleView = []
     for (let index in modulesList) {
-      
+
       if (!modulesList[index].enabled) {
         continue
       }
@@ -194,7 +191,7 @@ class Home extends Component {
   render() {
     const headerView = this.headerView()
     const pieChartView = this.pieChartView()
-    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE,SORTING])
+    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE, SORTING])
     if (this.props.loading) {
       return (<Loader />)
     }
