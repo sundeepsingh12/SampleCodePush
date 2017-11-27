@@ -110,8 +110,8 @@ class Menu extends Component {
 
   renderCardView(view, key,moduleIndex) {
     return (
-      <TouchableOpacity onPress = {()=> this.navigateToScene(moduleIndex) }>
-        <View key={key} style={[styles.bgWhite]}>
+      <TouchableOpacity key={key} onPress = {()=> this.navigateToScene(moduleIndex) }>
+        <View style={[styles.bgWhite]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             {view}
           </View>

@@ -46,6 +46,7 @@ import {
   CALL_CONFIRM
 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications';
+import CallIcon from '../svg_components/icons/CallIcon'
 
 function mapStateToProps(state) {
   return {
@@ -140,7 +141,7 @@ class JobDetailsV2 extends Component {
           title: SELECT_NUMBER
         },
         buttonIndex => {
-          if (buttonIndex != contactData.length - 1) {
+          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
             this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
           }
         }
@@ -162,7 +163,7 @@ class JobDetailsV2 extends Component {
             title: SELECT_TEMPLATE
           },
           buttonIndex => {
-            if (buttonIndex != msgTitles.length - 1) {
+            if (buttonIndex != msgTitles.length - 1 && buttonIndex >= 0) {
               this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[buttonIndex])
             }
           }
@@ -191,7 +192,7 @@ class JobDetailsV2 extends Component {
           title: SELECT_NUMBER_FOR_CALL
         },
         buttonIndex => {
-          if (buttonIndex != contactData.length - 1) {
+          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
             this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
           }
         }
@@ -207,6 +208,23 @@ class JobDetailsV2 extends Component {
   callContact = (contact) => {
     Communications.phonecall(contact, false)
   }
+  customerCareButtonPressed = () => {
+    let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => customerCare.name)
+    customerCareTitles.push(CANCEL)
+    ActionSheet.show(
+      {
+        options: customerCareTitles,
+        cancelButtonIndex: customerCareTitles.length - 1,
+        title: SELECT_NUMBER_FOR_CALL
+      },
+      buttonIndex => {
+        if (buttonIndex != customerCareTitles.length - 1 && buttonIndex >= 0) {
+          this.callContact(this.props.navigation.state.params.jobSwipableDetails.customerCareData[buttonIndex].mobileNumber)
+        }
+      }
+    )
+  }
+
   render() {
     if (this.props.jobDetailsLoading) {
       return (
@@ -246,21 +264,23 @@ class JobDetailsV2 extends Component {
                       {this.props.navigation.state.params.jobTransaction.circleLine1}
                     </Text>
                   </View>
-                  <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
-                    <View
-                      style={{
-                        width: 30,
-                        alignSelf: 'flex-start'
-                      }}>
-                      <Icon
-                        name="md-close"
-                        style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
-                    </View>
-                  </TouchableOpacity >
                 </View>
+                <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
+                  <View
+                    style={{
+                      width: 40,
+                      alignSelf: 'flex-start',
+                      alignItems: 'center',
+                      paddingTop: 10,
+                      flex: 1
+                    }}>
+                    <Icon
+                      name="md-close"
+                      style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
+                  </View>
+                </TouchableOpacity >
               </View>
             </Header>
-
             <Content>
 
               <View style={[styles.marginTop10, styles.bgWhite]}>
@@ -289,21 +309,34 @@ class JobDetailsV2 extends Component {
               </View>
             </Content>
             <Footer style={[style.footer]}>
-              <FooterTab>
-                <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
-                  <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>
-              </FooterTab>
-              <FooterTab>
-                <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-                  <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>
-              </FooterTab>
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData
+                && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0
+                && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData
+                && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
+                <FooterTab>
+                  <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
+                    <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>
+              )}
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
+                <FooterTab>
+                  <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
+                    <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>
+              )}
               <FooterTab>
                 <Button full>
                   <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
                 </Button>
               </FooterTab>
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
+                <FooterTab>
+                  <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
+                    <CallIcon />
+                  </Button>
+                </FooterTab>)}
             </Footer>
 
           </Container>
