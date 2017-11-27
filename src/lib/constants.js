@@ -85,7 +85,7 @@ module.exports = keyMirror({
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
-
+    IS_MISMATCHING_LOCATION: null,
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
@@ -155,6 +155,7 @@ module.exports = keyMirror({
     TABLE_FIELD_DATA: null,
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
+    TABLE_SERVER_SMS_LOG: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -212,6 +213,9 @@ module.exports = keyMirror({
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
+    SET_FILTERED_DATA_SELECTFROMLIST: null,
+    INPUT_TEXT_VALUE: null,
+    SELECTFROMLIST_ITEMS_LENGTH: null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
@@ -257,8 +261,8 @@ module.exports = keyMirror({
     PREPARE_UPDATE_LIST:null,
 
     //New Job
-    NEW_JOB_MASTER : null,
-    NEW_JOB_STATUS : null,
+    NEW_JOB_MASTER: null,
+    NEW_JOB_STATUS: null,
 
     //Bulk Module
     START_FETCHING_BULK_CONFIG:null,
@@ -266,11 +270,11 @@ module.exports = keyMirror({
     START_FETCHING_BULK_TRANSACTIONS:null,
     STOP_FETCHING_BULK_TRANSACTIONS:null,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM:null,
-
+    TOGGLE_ALL_JOB_TRANSACTIONS:null,
 
     //statisticsModule
-    SET_DATA_IN_STATISTICS_LIST : null,
-   
+    SET_DATA_IN_STATISTICS_LIST: null,
+
     //profileModule
     FETCH_USER_DETAILS: null,
     CHECK_CURRENT_PASSWORD: null,

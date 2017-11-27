@@ -7,6 +7,7 @@ import { jobDataService } from '../classes/JobData'
 import { fieldDataService } from '../classes/FieldData'
 import { customerCareService } from '../classes/CustomerCare'
 import { smsTemplateService } from '../classes/SMSTemplate'
+import {SEQ_SELECTED} from '../../lib/AttributeConstants'
 
 import * as realm from '../../repositories/realmdb'
 
@@ -1098,5 +1099,57 @@ describe('test Job Transaction services', () => {
     realm.updateTableRecordOnProperty = jest.fn()
     jobTransactionService.updateJobTransactionStatusId(jobMasterIdTransactionDtoMap)
     expect(realm.updateTableRecordOnProperty).toHaveBeenCalledTimes(1)
+  })
+})
+
+
+describe('test for enable resequence restriction ', () => {
+  const jobMasterIdList = [441,442]
+  const statusMap = [1999,2000,1998,2416,2001,2002]
+  const jobTransactionList = [
+    {
+      id: '1',
+      jobId: '1',
+      jobMasterId: 441,
+      jobStatusId: 1999,
+      referenceNumber: 'x',
+      runsheetNo: 'xyacz',
+      seqSelected: 2,
+    },
+    {
+      id: '2',
+      jobId: '2',
+      jobMasterId: 441,
+      jobStatusId: 1998,
+      referenceNumber: 'xyz',
+      runsheetNo: 'xyz',
+      seqSelected: 3,
+    },
+    {
+      id: '3',
+      jobId: '4',
+      jobMasterId: 441,
+      jobStatusId: 2000,
+      referenceNumber: 'xyz',
+      runsheetNo: 'xyz',
+      seqSelected: 4,
+    },
+    {
+      id: '6',
+      jobId: '10',
+      jobMasterId: 442,
+      jobStatusId: 2416,
+      referenceNumber: 'xyz',
+      runsheetNo: 'xyz',
+      seqSelected: 1,
+    }
+  ]
+  const result = 1
+  it('should get first sequence value with enable resequence restriction', () => {
+    realm.getRecordListOnQuery = jest.fn()
+    realm.getRecordListOnQuery.mockReturnValueOnce(jobTransactionList)
+    jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdList,statusMap)
+    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+    
   })
 })

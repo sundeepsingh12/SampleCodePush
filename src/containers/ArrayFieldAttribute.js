@@ -70,6 +70,7 @@ class ArrayFieldAttribute extends Component {
                 arrayElements={this.props.arrayElements}
                 isSaveDisabled={this.props.isSaveDisabled}
                 lastRowId={this.props.lastRowId}
+                jobTransaction={this.props.navigation.state.params.jobTransaction}
             />
         )
     }
