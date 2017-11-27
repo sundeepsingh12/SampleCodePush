@@ -41,6 +41,8 @@ import {
   START,
   SORTING,
   CUSTOMAPP,
+  URL,
+  CHOOSE_WEB_URL,
 } from '../lib/AttributeConstants'
 
 import {
@@ -103,25 +105,24 @@ class Home extends Component {
       }
 
       case CUSTOMAPP: {
-        (CUSTOMAPP.remark != null && CUSTOMAPP.remark != undefined && CUSTOMAPP.remark.length > 1) ?  this.customAppSelection() :  (CUSTOMAPP.remark != null && CUSTOMAPP.remark != undefined && CUSTOMAPP.remark.length == 1) 
+        ((CUSTOMAPP.remark) && CUSTOMAPP.remark.length > 1) ?  this.customAppSelection() :  ((CUSTOMAPP.remark ) && CUSTOMAPP.remark.length == 1) 
                                    ? this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[0].customUrl) : this.props.actions.navigateToScene(CustomApp) ;
         break
       }
     }
   }
   customAppSelection(){
-   let  BUTTONS = CUSTOMAPP.remark.map(id => (id.title == null || id.title == undefined) ? 'URL' : id.title)
+   let  BUTTONS = CUSTOMAPP.remark.map(id => !(id.title) ? URL : id.title)
    BUTTONS.push('Cancel')
     ActionSheet.show(
       {
         options: BUTTONS,
-        title: "Choose Web URL",
+        title: CHOOSE_WEB_URL,
         cancelButtonIndex: BUTTONS.length-1,
         destructiveButtonIndex: BUTTONS.length-1
       },
        buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length-1)) ? this.props.actions.setState(ON_CHANGE_STATE,null) &&
-        this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[buttonIndex].customUrl)  : null
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length-1)) ? this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[buttonIndex].customUrl)  : null
       }
     )}
   

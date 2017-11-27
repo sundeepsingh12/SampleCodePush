@@ -16,7 +16,7 @@ export default function customAppReducer(state = initialState, action) {
     switch (action.type) {
 
         case ON_CHANGE_STATE: 
-            return state.set('customUrl',null)
+            return initialState
 
         case START_FETCHING_URL:
             return state.set('isLoaderRunning',true) 

@@ -8,13 +8,13 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import QRIcon from '../svg_components/icons/QRIcon'
 import * as globalActions from '../modules/global/globalActions'
-import {WEBVIEW_REF} from '../lib/AttributeConstants'
+import {WEBVIEW_REF, ENTER_URL_HERE, HTTP} from '../lib/AttributeConstants'
 import renderIf from '../lib/renderIf'
 
 import {
     START_FETCHING_URL,
     END_FETCHING_URL,
-    ON_CHANGE_CUSTOM_VALUE
+    ON_CHANGE_STATE
 } from '../lib/constants'
 
 
@@ -79,7 +79,7 @@ class CustomApp extends Component {
     //  } 
     onSubmit(value){
         if(!/^[a-zA-Z-_]+:/.test(value)) {
-            value = 'http://' + value;
+            value = HTTP + value;
         }
         this.props.actions.setState(START_FETCHING_URL,value)
     }
@@ -87,11 +87,15 @@ class CustomApp extends Component {
     onLoadStart = () =>{
         this.props.actions.setState(START_FETCHING_URL,this.props.customUrl)
     }
-   
-    componentWillMount() {
+
+    componentDidMount() {
         if(this.props.navigation.state.params != null && this.props.navigation.state.params != undefined ){
             this.props.actions.setState(START_FETCHING_URL,this.props.navigation.state.params)
         }
+    }
+
+    componentWillUnmount() {
+        this.props.actions.setState(ON_CHANGE_STATE)
     }
         
     render(){
@@ -102,7 +106,7 @@ class CustomApp extends Component {
                         <Body>
                         <View
                             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
                                 <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                             </TouchableOpacity>
                             <View style={[style.headerBody]}t>
@@ -110,7 +114,7 @@ class CustomApp extends Component {
                                 <View style={[{height: 30 }]}>
                                     <Input
                                         onEndEditing = {(event) => this.onSubmit(event.nativeEvent.text)}
-                                        placeholder='Enter Url Here'
+                                        placeholder={ENTER_URL_HERE}
                                         placeholderTextColor={'rgba(255,255,255,.4)'}
                                         style={[style.headerSearch]} />
                                 </View> :

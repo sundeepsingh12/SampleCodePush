@@ -332,7 +332,7 @@ module.exports = {
     },
     CUSTOMAPP:{
         appModuleId:12,
-        displayName: 'Custom App',
+        displayName: 'Web URL',
         enabled: false,
         remark: null,
         icon: <SequenceIcon />
@@ -401,6 +401,10 @@ module.exports = {
    
     //Custom App
     WEBVIEW_REF : 'webview',
+    URL : 'URL',
+    CHOOSE_WEB_URL : "Choose Web URL",
+    ENTER_URL_HERE : "Enter Url Here",
+    HTTP : 'http://',
 
     //SelectFromList
     SEARCH: 'Search',
