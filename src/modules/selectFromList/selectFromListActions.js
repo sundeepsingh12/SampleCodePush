@@ -103,6 +103,7 @@ export function gettingDataSelectFromList(fieldAttributeMasterId, formElement, a
             }
             if (attributeTypeIdOfCurrentElement == DROPDOWN && selectFromListData.selectFromListsDataLength >= 30){
                 dispatch(setState(SELECTFROMLIST_ITEMS_LENGTH, 1))                
+                dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST,selectFromListData.selectFromListsData ))                
             }
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListData.selectFromListsData))
         } catch (error) {
@@ -147,7 +148,7 @@ export function setFilteredDataInDropdown(selectFromListState, searchText) {
                 let filteredDataDropdown = selectFromListDataService.getFilteredDataInDropDown(selectFromListState, searchText)
                 dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST, filteredDataDropdown))
             } else{
-                dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST, {}))
+                dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST, selectFromListState))
             }
         } catch (error) {
             dispatch(setState(ERROR_MESSAGE, error.message))
