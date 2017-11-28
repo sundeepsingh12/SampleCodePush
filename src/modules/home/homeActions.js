@@ -45,6 +45,7 @@ export function syncService() {
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
         dispatch(onResyncPress())
       }, CONFIG.SYNC_SERVICE_DELAY);
+      console.log(CONFIG.intervalId)
     } catch (error) {
       //Update UI here
       console.log(error)
@@ -58,8 +59,8 @@ export function onResyncPress() {
       dispatch(setState(JOB_DOWNLOADING_STATUS, { isDownloadingjobs: true }))
       await sync.createAndUploadZip()
       const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
-      dispatch(setState(JOB_DOWNLOADING_STATUS, { isDownloadingjobs: false }))
       dispatch(syncService())
+      dispatch(setState(JOB_DOWNLOADING_STATUS, { isDownloadingjobs: false }))
     } catch (error) {
       console.log(error)
       dispatch(setState(JOB_DOWNLOADING_STATUS, { isDownloadingjobs: false }))

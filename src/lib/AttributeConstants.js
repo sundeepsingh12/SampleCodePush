@@ -221,6 +221,8 @@ module.exports = {
     ASSIGN: 'assign',
     ASSIGN_BY_MATHEMATICAL_FORMULA: 'assignByMathematicalFormula',
     ASSIGN_DATE_TIME: 'assignDateTime',
+    AFTER: 'After',
+    BEFORE: 'Before',
     DATE_COMPARATOR: 'dateComparator',
     ELSE: 'else',
     REQUIRED_FALSE: 'requiredFalse',

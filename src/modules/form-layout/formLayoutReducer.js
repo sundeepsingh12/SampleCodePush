@@ -102,6 +102,7 @@ export default function formLayoutReducer(state = initialState, action) {
         case UPDATE_FIELD_DATA_VALIDATION: {
             return state.set('formElement', action.payload.formElement)
                 .set('errorMessage', action.payload.message)
+                .set('currentElement', action.payload.currentElement)
         }
 
         case UPDATE_NEXT_EDITABLE : {

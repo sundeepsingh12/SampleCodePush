@@ -10,7 +10,7 @@ import {
     ActivityIndicator
 }
     from 'react-native'
-import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base'
+import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast, Item, Label } from 'native-base'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
@@ -162,10 +162,11 @@ class BasicFormElement extends Component {
     }
 
 
-    _onBlurEvent(attributeId) {
-        //TODo remove the below code to update field data if performance remains fine on updation of value on onChangeText
-        this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
-        const nextEditableElement = this.props.nextEditable[attributeId];
+    _onBlurEvent(currentElement) {
+        //TODo remove the below commented code to update field data if performance remains fine on updation of value on onChangeText
+        // this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
+        this.props.actions.updateFieldData(currentElement.fieldAttributeMasterId, this.props.formElement.get(currentElement.fieldAttributeMasterId).value, this.props.formElement);
+        const nextEditableElement = this.props.nextEditable[currentElement.fieldAttributeMasterId];
         if (nextEditableElement != null && nextEditableElement.length != 0) {
             nextEditableElement.forEach((nextElement) => {
                 if ((typeof (nextElement) == 'string')) {
@@ -178,6 +179,7 @@ class BasicFormElement extends Component {
                 }
             })
         }
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, nextEditable, value, isSaveDisabled) {
@@ -221,68 +223,88 @@ class BasicFormElement extends Component {
             case PASSWORD:
                 return (
                     renderIf(!this.props.item.hidden,
-                        <Card>
-                            <CardItem>
-                                <Body style={StyleSheet.flatten([styles.padding0])}>
-                                    <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                                        <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
-                                            <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.fontPrimary, { marginTop: -5 }])} />
-                                        </View>
-                                        <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
-                                            <View style={StyleSheet.flatten([styles.row])}>
-                                                <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
-                                                    <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
-                                                        {this.props.item.label}
-                                                    </Text>
-                                                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                        {this.props.item.subLabel}
-                                                    </Text>
-                                                </View>
+                        <View style={[styles.bgWhite, styles.padding10]}>
+                            <View style={[styles.marginBottom15]}>
+                                <Item floatingLabel>
+                                    <Label style={[styles.fontPrimary]}>{this.props.item.label}</Label>
+                                    <Input
+                                        autoCapitalize="none"
+                                        placeholder= "abccc"
+                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
+                                        editable={this.props.item.editable}
+                                        multiline={this.props.item.attributeTypeId == 2 ? true : false}
+                                        onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
+                                        onFocus={() => { this.onFocusEvent(this.props.item) }}
+                                        onBlur={(e) => this._onBlurEvent(this.props.item)}
+                                        secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
+                                        value={this.props.item.value}
+                                    />
+                                </Item>
+                            </View>
 
-                                                <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
-
-                                                    {renderIf(this.props.item.showCheckMark || (this.props.item.attributeTypeId == 62 && this.props.item.isLoading !== undefined && this.props.item.isLoading),
-                                                        this.props.item.showCheckMark ?
-                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} /> :
-                                                            (this.props.item.isLoading !== undefined && this.props.item.isLoading) ?
-                                                                <ActivityIndicator animating={this.props.item.isLoading} style={StyleSheet.flatten([{ marginTop: -20 }])} size="small" color="green" /> : null
-                                                    )}
-
-                                                    {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
-                                                        <View>
-                                                            <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(this.props.item.fieldAttributeMasterId)}>
-                                                                <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
-                                                            </TouchableHighlight>
-                                                        </View>
-                                                    )}
-
-
-                                                </View>
+                            {/* <Card>
+                                <CardItem>
+                                    <Body style={StyleSheet.flatten([styles.padding0])}>
+                                        <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
+                                            <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
+                                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.fontPrimary, { marginTop: -5 }])} />
                                             </View>
-                                            <View style={this._styleNextFocusable(this.props.item.focus)}>
-                                                <Input
-                                                    autoCapitalize="none"
-                                                    keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
-                                                    editable={this.props.item.editable}
-                                                    multiline={this.props.item.attributeTypeId == 2 ? true : false}
-                                                    placeholder='Regular Textbox'
-                                                    onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
-                                                    onFocus={() => { this.onFocusEvent(this.props.item) }}
-                                                    onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
-                                                    secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                                    value={this.props.item.value}
-                                                />
+                                            <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
+                                                <View style={StyleSheet.flatten([styles.row])}>
+                                                    <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
+                                                        <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
+                                                            {this.props.item.label}
+                                                        </Text>
+                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                                                            {this.props.item.subLabel}
+                                                        </Text>
+                                                    </View>
+
+                                                    <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
+
+                                                        {renderIf(this.props.item.showCheckMark || (this.props.item.attributeTypeId == 62 && this.props.item.isLoading !== undefined && this.props.item.isLoading),
+                                                            this.props.item.showCheckMark ?
+                                                                <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} /> :
+                                                                (this.props.item.isLoading !== undefined && this.props.item.isLoading) ?
+                                                                    <ActivityIndicator animating={this.props.item.isLoading} style={StyleSheet.flatten([{ marginTop: -20 }])} size="small" color="green" /> : null
+                                                        )}
+
+                                                        {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
+                                                            <View>
+                                                                <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(this.props.item.fieldAttributeMasterId)}>
+                                                                    <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
+                                                                </TouchableHighlight>
+                                                            </View>
+                                                        )}
+
+
+                                                    </View>
+                                                </View>
+                                                <View style={this._styleNextFocusable(this.props.item.focus)}>
+                                                    <Input
+                                                        autoCapitalize="none"
+                                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
+                                                        editable={this.props.item.editable}
+                                                        multiline={this.props.item.attributeTypeId == 2 ? true : false}
+                                                        placeholder='Regular Textbox'
+                                                        onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
+                                                        onFocus={() => { this.onFocusEvent(this.props.item) }}
+                                                        onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
+                                                        secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
+                                                        value={this.props.item.value}
+                                                    />
+                                                </View>
+                                                {
+                                                    renderIf(this.props.item.helpText && this.props.item.showHelpText,
+                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+                                                            {this.props.item.helpText} </Text>
+                                                    )}
                                             </View>
-                                            {
-                                                renderIf(this.props.item.helpText && this.props.item.showHelpText,
-                                                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                        {this.props.item.helpText} </Text>
-                                                )}
                                         </View>
-                                    </View>
-                                </Body>
-                            </CardItem>
-                        </Card>
+                                    </Body>
+                                </CardItem>
+                            </Card> */}
+                        </View>
                     )
                 )
 

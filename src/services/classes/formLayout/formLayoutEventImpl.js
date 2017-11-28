@@ -508,5 +508,6 @@ export default class FormLayoutEventImpl {
         await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync)
         return
     }
+    
 }
 
