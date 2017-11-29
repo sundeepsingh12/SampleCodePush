@@ -12,8 +12,8 @@
  * Config for defaults and underscore for a couple of features
  */
 import CONFIG from './config'
-import _ from 'underscore'
-import RNFS from 'react-native-fs';
+import _ from 'lodash'
+import RNFS from 'react-native-fs'
 import RNFetchBlob from 'react-native-fetch-blob'
 import {keyValueDBService} from '../services/classes/KeyValueDBService.js'
 import {

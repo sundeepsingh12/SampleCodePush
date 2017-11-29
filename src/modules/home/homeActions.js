@@ -18,7 +18,6 @@ import {
 import {
   sync
 } from '../../services/classes/Sync'
-import _ from 'underscore'
 import BackgroundTimer from 'react-native-background-timer'
 import {
   setState

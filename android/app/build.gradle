@@ -141,9 +141,9 @@ repositories {
 }
 
 dependencies {
+    compile project(':realm')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-signature-capture')
-    compile project(':realm')
     compile project(':react-native-svg')
     compile project(':react-native-fetch-blob')
     compile project(':react-native-zip-archive')
