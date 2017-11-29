@@ -40,8 +40,8 @@ class Sync {
       throw new Error('Token Missing')
     }
     await createZip()
-    console.log('token before call',token.value)
-    await RestAPIFactory(token.value).uploadZipFile()
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile()
+    return responseBody
   }
 
   /**GET API (Pagination)
