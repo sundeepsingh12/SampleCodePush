@@ -1,6 +1,7 @@
 import {
   JOB_STATUS,
-  UNSEEN
+  UNSEEN,
+  TAB,
 } from '../../lib/constants'
 
 import {
@@ -123,6 +124,30 @@ class JobStatus {
     return filteredJobStatusIds
   }
 
+  /** Returns statusIds based on particular status category  and status_code  and also check that 
+   *  job_status_tab is not hidden
+   * 
+   * Possible values of statusCategory - 1,2,3
+   * @param {*} statusCategory 
+   * @param {*} code 
+   * Sample Return value
+   * [1,2,3]
+   */
+  
+  async getStatusIdsForStatusCategory(statusCategory,code) {
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    const tabs = await keyValueDBService.getValueFromStore(TAB)
+    if (!tabs || !tabs.value) {
+      throw new Error('tab missing in store')
+    }
+    const tabList = {}
+    tabs.value.forEach(key => tabList[key.id] = key)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error('Job status missing in store')
+    }
+    const filteredJobStatusIds = jobStatusArray.value.filter(jobStatus => jobStatus.statusCategory == statusCategory && jobStatus.code != code && tabList[jobStatus.tabId].name.toLocaleLowerCase() !== 'hidden').map(jobStatus => jobStatus.id)
+    return filteredJobStatusIds
+  }
 }
 
 export let jobStatusService = new JobStatus()
