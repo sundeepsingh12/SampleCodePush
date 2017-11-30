@@ -32,6 +32,7 @@ import bulk from './bulk/bulkReducer'
 import profileReducer from './profile/profileReducer'
 import sorting from './sorting/sortingReducer'
 import taskList from './taskList/taskListReducer'
+import customApp from './customApp/customAppReducers'
 // import profile from './profile/profileReducer'
 
 import {
@@ -74,6 +75,7 @@ const appReducer = combineReducers({
   profileReducer,
   sorting,
   taskList,
+  customApp,
 })
 
 const rootReducer = (state, action) => {

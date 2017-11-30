@@ -58,10 +58,10 @@ class TaskListScreen extends Component {
   }
 
   navigateToScene = (item) => {
-    this.props.actions.navigateToScene(JobDetails,
+    this.props.actions.navigateToScene('JobDetailsV2',
       {
         jobSwipableDetails: item.jobSwipableDetails,
-        jobTransactionId: item.id,
+        jobTransaction: item,
       }
     )
   }

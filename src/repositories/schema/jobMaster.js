@@ -19,6 +19,7 @@ const jobMaster = {
             "enableFormLayout": {"type": "boolean","required": true},
             "assignOrderToHub": {"type": "boolean","required": true},
             "mapReferenceNoWithFieldAttribute": {"type": ["number", null]},
+            "enableOutForDelivery": {"type": ["boolean", false]},
             "enableResequenceRestriction": {"type": "boolean","required": true},
             "enableEtaUpdateFromDevice": {"type": "boolean","required": true},
         }

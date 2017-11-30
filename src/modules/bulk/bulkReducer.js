@@ -9,7 +9,8 @@ import {
     START_FETCHING_BULK_TRANSACTIONS,
     STOP_FETCHING_BULK_TRANSACTIONS,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM,
-    RESET_STATE
+    RESET_STATE,
+    TOGGLE_ALL_JOB_TRANSACTIONS
 } from '../../lib/constants'
 
 
@@ -28,7 +29,8 @@ export default function bulkReducer(state = initialState, action) {
 
         case STOP_FETCHING_BULK_TRANSACTIONS:
             return state.set('isLoaderRunning',false)
-                            .set('bulkTransactionList',action.payload)
+                            .set('bulkTransactionList',action.payload.bulkTransactions)
+                            .set('isSelectAllVisible',action.payload.selectAll)
 
         case TOGGLE_JOB_TRANSACTION_LIST_ITEM:
         return state.set('selectedItems',action.payload.selectedItems)
@@ -38,6 +40,10 @@ export default function bulkReducer(state = initialState, action) {
              return state.set('selectedItems',[])
                     .set('bulkTransactionList',{})
     
+         case TOGGLE_ALL_JOB_TRANSACTIONS:
+                     return state.set('selectedItems',action.payload.selectedItems)
+                    .set('bulkTransactionList',action.payload.bulkTransactions)
+                    .set('selectAllNone',action.payload.displayText)
     }
     return state
 }
