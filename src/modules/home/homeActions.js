@@ -146,7 +146,7 @@ export function startMqttService() {
           console.log('catch', responseObject)
           if (responseObject.errorCode !== 0) {
             console.log('onConnectionLost:' + responseObject.errorMessage);
-            dispatch(startMqttService())
+            // dispatch(startMqttService())
           }
         })
     }

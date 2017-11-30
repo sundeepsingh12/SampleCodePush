@@ -368,4 +368,7 @@ module.exports = {
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
 
+    //Notification 
+    FAREYE_UPDATES: 'FarEye Updates',
+
 }

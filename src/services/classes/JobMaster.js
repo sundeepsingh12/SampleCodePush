@@ -255,6 +255,17 @@ class JobMaster {
     return true
   }
 
+  async getJobMasterTitleListFromIds(jobMasterIdList) {
+    const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    let jobMasterTitleList = []
+    jobMasters.value.forEach(jobMaster => {
+      if (jobMasterIdList.includes(jobMaster.id)) {
+        jobMasterTitleList.push(jobMaster.title)
+      }
+    })
+    return jobMasterTitleList
+  }
+
 }
 
 
