@@ -5,6 +5,7 @@ import { createZip } from './SyncZip'
 import {
   keyValueDBService
 } from './KeyValueDBService'
+import moment from 'moment'
 
 import {
   jobStatusService
@@ -29,7 +30,12 @@ import {
   USER,
   UNSEEN,
   PENDING,
-  TABLE_JOB_TRANSACTION_CUSTOMIZATION
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+  JOB_MASTER,
+  JOB_STATUS,
+  HUB,
+  DEVICE_IMEI,
+
 } from '../../lib/constants'
 
 
@@ -128,22 +134,130 @@ class Sync {
    */
   async processTdcResponse(tdcContentArray) {
     let tdcContentObject
+    console.log('tdcContentArray',tdcContentArray)
     for (tdcContentObject of tdcContentArray) {
+      let contentQuery = JSON.parse(tdcContentObject.query)
+      let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery)
+      console.log("allJobsToTransaction", allJobsToTransaction)
+
+      if (allJobsToTransaction.length) {
+        console.log("inside if", allJobsToTransaction)
+        //Change this
+        
+        contentQuery.jobTransactions = allJobsToTransaction
+        // let jsonQuery = JSON.stringify(contentQuery)
+        // tdcContentObject.query = jsonQuery
+      }
       const queryType = tdcContentObject.type
+      console.log('queryType',queryType)
       if (queryType == 'insert') {
-        await this.saveDataFromServerInDB(tdcContentObject.query)
+        await this.saveDataFromServerInDB(contentQuery)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
-        await this.updateDataInDB(tdcContentObject.query)
+        await this.updateDataInDB(contentQuery)
+      } else if (queryType == 'delete') {
+        let jobTransaction = contentQuery.jobTransactions
+        await realm.deleteRecordsInBatch(jobTransaction)
       }
     }
+  }
+
+  async getAssignOrderTohubEnabledJobs(query) {
+    let allJobsToTransactions = []
+    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    //optimize this
+    const jobMasterWithAssignOrderToHubEnabled = jobMaster.value.filter(id => id.assignOrderToHub).reduce((object, item) => {
+      object[item.id] = item.id
+      return object
+    }, {})
+    let transactionList = query.jobTransactions
+    let transactionListIdMap = _.values(transactionList).reduce((object, item) => {
+      object[item.jobId] = item.jobId
+      return object
+    }, {})
+
+    let jobsList = query.job
+    for (let jobs in jobsList) {
+      let jobMasterid = jobMasterWithAssignOrderToHubEnabled[jobsList[jobs].jobMasterId]
+      if ((!transactionListIdMap || !transactionListIdMap[jobsList[jobs].id]) && jobMasterWithAssignOrderToHubEnabled[jobsList[jobs].jobMasterId]) {
+        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobsList[jobs], jobMasterid)
+        allJobsToTransactions.push(unassignedTransactions)
+      }
+      console.log("allJobsToTransactions in getAssignOrderTohubEnabledJobs", allJobsToTransactions)
+    }
+    return allJobsToTransactions
+  }
+
+  async _createTransactionsOfUnassignedJobs(job, jobMasterid) {
+    const jobstatusFromDB = await keyValueDBService.getValueFromStore(JOB_STATUS)
+
+    let user = await keyValueDBService.getValueFromStore(USER)
+    let hub = await keyValueDBService.getValueFromStore(HUB)
+    let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+    let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => { return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterid) })
+    let jobstatus = jobstatusFromDB.value.filter(item => (item.code == "PENDING" && item.jobMasterId == job.jobMasterId))[0]
+
+    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatus, jobMaster[0], user.value, hub.value, imei.value)
+    jobtransaction.jobId = job.id
+    jobtransaction.seqSelected = -job.id
+    console.log('jobtransaction in _createTransactionsOfUnassignedJobs',jobtransaction)
+    return jobtransaction
+  }
+
+  _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei) {
+    //TODO some values like lat/lng and battery are not valid values, update them as their library is added
+    return jobTransaction = {
+      id,
+      runsheetNo: "AUTO-GEN",
+      syncErp: false,
+      userId: user.id,
+      jobId: id,
+      jobStatusId: status.id,
+      companyId: user.company.id,
+      actualAmount: 0.0,
+      originalAmount: 0.0,
+      moneyTransactionType: '',
+      referenceNumber: user.id + "/" + hub.id + "/" + moment().valueOf(),
+      runsheetId: null,
+      hubId: hub.id,
+      cityId: user.cityId,
+      trackKm: 0.0,
+      trackHalt: 0.0,
+      trackCallCount: 0,
+      trackCallDuration: 0,
+      trackSmsCount: 0,
+      trackTransactionTimeSpent: 0.0,
+      jobCreatedAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+      erpSyncTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      androidPushTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      lastUpdatedAtServer: moment().format('YYYY-MM-DD HH:mm:ss'),
+      lastTransactionTimeOnMobile: moment().format('YYYY-MM-DD HH:mm:ss'),
+      deleteFlag: 0,
+      attemptCount: 1,
+      jobType: jobMaster.code,
+      jobMasterId: jobMaster.id,
+      employeeCode: user.employeeCode,
+      hubCode: hub.code,
+      statusCode: status.code,
+      startTime: "00:00",
+      endTime: "00:00",
+      merchantCode: null,
+      seqSelected: 0,
+      seqAssigned: 0,
+      seqActual: 0,
+      latitude: 0.0,
+      longitude: 0.0,
+      trackBattery: 0,
+      imeiNumber: imei.imeiNumber
+    }
+
   }
 
   /**
    * 
    * @param {*} query 
    */
-  async saveDataFromServerInDB(query) {
-    const contentQuery = JSON.parse(query)
+  async saveDataFromServerInDB(contentQuery) {
+    // const contentQuery = JSON.parse(query)
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
@@ -173,8 +287,7 @@ class Sync {
    * 
    * @param {*} query 
    */
-  async updateDataInDB(query) {
-    const contentQuery = await JSON.parse(query)
+  async updateDataInDB(contentQuery) {
     const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
     const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
     const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
@@ -350,6 +463,7 @@ class Sync {
     const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize)
+      console.log('tdcResponse in tdcResponse',tdcResponse)
       if (tdcResponse) {
         json = await tdcResponse.json
         isLastPageReached = json.last
