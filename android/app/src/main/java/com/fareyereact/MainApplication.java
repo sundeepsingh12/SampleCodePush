@@ -3,8 +3,8 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.wix.reactnativenotifications.RNNotificationsPackage;
 import io.realm.react.RealmReactPackage;
+import com.wix.reactnativenotifications.RNNotificationsPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.rssignaturecapture.RSSignatureCapturePackage;
 import com.horcrux.svg.SvgPackage;
@@ -43,8 +43,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNNotificationsPackage(MainApplication.this),
             new RealmReactPackage(),
+            new RNNotificationsPackage(MainApplication.this),
             new LinearGradientPackage(),
             new RSSignatureCapturePackage(),
             new SvgPackage(),
