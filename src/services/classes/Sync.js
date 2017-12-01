@@ -38,7 +38,6 @@ import {
 
 } from '../../lib/constants'
 
-
 class Sync {
 
   async createAndUploadZip() {
@@ -134,29 +133,30 @@ class Sync {
    */
   async processTdcResponse(tdcContentArray) {
     let tdcContentObject
-    console.log('tdcContentArray',tdcContentArray)
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
       let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery)
-      console.log("allJobsToTransaction", allJobsToTransaction)
 
       if (allJobsToTransaction.length) {
-        console.log("inside if", allJobsToTransaction)
-        //Change this
-        
-        contentQuery.jobTransactions = allJobsToTransaction
-        // let jsonQuery = JSON.stringify(contentQuery)
-        // tdcContentObject.query = jsonQuery
+        if(contentQuery.jobTransactions){
+          contentQuery.jobTransactions = allJobsToTransaction.concat(contentQuery.jobTransactions)          
+        } else{
+        contentQuery.jobTransactions = allJobsToTransaction        
+        }
       }
       const queryType = tdcContentObject.type
-      console.log('queryType',queryType)
       if (queryType == 'insert') {
         await this.saveDataFromServerInDB(contentQuery)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
         await this.updateDataInDB(contentQuery)
       } else if (queryType == 'delete') {
-        let jobTransaction = contentQuery.jobTransactions
-        await realm.deleteRecordsInBatch(jobTransaction)
+        const jobIds = await contentQuery.job.map(jobObject => jobObject.id)        
+        const deleteJobTransactions = {
+          tableName: TABLE_JOB_TRANSACTION,
+          valueList: jobIds,
+          propertyName: 'jobId'
+        }
+        await realm.deleteRecordsInBatch(deleteJobTransactions)
       }
     }
   }
@@ -178,11 +178,10 @@ class Sync {
     let jobsList = query.job
     for (let jobs in jobsList) {
       let jobMasterid = jobMasterWithAssignOrderToHubEnabled[jobsList[jobs].jobMasterId]
-      if ((!transactionListIdMap || !transactionListIdMap[jobsList[jobs].id]) && jobMasterWithAssignOrderToHubEnabled[jobsList[jobs].jobMasterId]) {
+      if ((_.isEmpty(transactionListIdMap) || !transactionListIdMap[jobsList[jobs].id]) && jobMasterid) {
         let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobsList[jobs], jobMasterid)
         allJobsToTransactions.push(unassignedTransactions)
       }
-      console.log("allJobsToTransactions in getAssignOrderTohubEnabledJobs", allJobsToTransactions)
     }
     return allJobsToTransactions
   }
@@ -199,7 +198,6 @@ class Sync {
     let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatus, jobMaster[0], user.value, hub.value, imei.value)
     jobtransaction.jobId = job.id
     jobtransaction.seqSelected = -job.id
-    console.log('jobtransaction in _createTransactionsOfUnassignedJobs',jobtransaction)
     return jobtransaction
   }
 
@@ -463,7 +461,6 @@ class Sync {
     const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize)
-      console.log('tdcResponse in tdcResponse',tdcResponse)
       if (tdcResponse) {
         json = await tdcResponse.json
         isLastPageReached = json.last
