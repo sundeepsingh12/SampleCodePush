@@ -111,24 +111,24 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = new Map(formElement);
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, null, event);
         dispatch(_setFormList(sortedFormAttributeDto));
-        console.log("getNextFocusableAndEditableElements",value)
+        console.log("getNextFocusableAndEditableElements", value)
     }
 }
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled, sequenceId) {
     return async function (dispatch) {
-        try{
+        try {
             const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
-            if( sequenceData ){
+            if (sequenceData) {
                 const cloneFormElement = new Map(formElement);
-                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, sequenceData,null,ON_BLUR);
+                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, sequenceData, null, ON_BLUR);
                 sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
                 dispatch(_setFormList(sortedFormAttributeDto));
                 const nextEditableElement = nextEditable[attributeMasterId];
-                if(nextEditableElement != null && nextEditableElement.length != 0){
+                if (nextEditableElement != null && nextEditableElement.length != 0) {
                     nextEditableElement.forEach((nextElement) => {
                         if ((typeof (nextElement) == 'string')) {
                             nextElement = formElement.get(Number(nextElement.split('$$')[1]));
-                            if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
+                            if (nextElement && !nextElement.value && nextElement.attributeTypeId == 62) {
                                 const newFormElement = new Map(sortedFormAttributeDto.formLayoutObject);
                                 newFormElement.get(nextElement.fieldAttributeMasterId).isLoading = true;
                                 dispatch(_updateFieldData(newFormElement))
@@ -139,7 +139,7 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, next
                     })
                 }
             }
-        }catch(error){
+        } catch (error) {
             formElement.get(attributeMasterId).isLoading = false;
             dispatch(_setErrorMessage(error.message));
             dispatch(_updateFieldData(formElement))

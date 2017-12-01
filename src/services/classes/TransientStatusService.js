@@ -246,7 +246,7 @@ class TransientStatusService {
     * @param {*} differentData // save activated data
     * @param {*} navigationFormLayoutStates // data from previous states of save Activated
     * @param {*} mapToArray 
-    * @returns {
+    * @returns{
     * differentData,
     * navigationFormLayoutStates
     * }

@@ -8,7 +8,7 @@ import {
   FlatList
 }
   from 'react-native'
-import { Container, Content, Footer, Card, CardItem, Button, Body, Header, Left, Right, Icon,Toast } from 'native-base'
+import { Container, Content, Footer, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast } from 'native-base'
 import styles from '../themes/FeStyle'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
@@ -123,7 +123,6 @@ class FormLayout extends Component {
         this.props.navigation.state.params.contactData,
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
-        this.props.navigation.state.params.saveActivatedStatusData
       )
     }
   }
@@ -136,8 +135,7 @@ class FormLayout extends Component {
         text: this.props.errorMessage,
         position: 'bottom',
         buttonText: 'Okay'
-      })
-    }
+      })}
     if (this.props.isLoading) { return <Loader /> }
     return (
       <Container style={StyleSheet.flatten([styles.mainBg])}>

@@ -62,8 +62,8 @@ import JobDetailsInitialState from './modules/job-details/jobDetailsInitialState
 import SkuListingInitialState from './modules/skulisting/skuListingInitialState'
 import FormLayoutInitialState from './modules/form-layout/formLayoutInitialState'
 import NewJobInitialState from './modules/newJob/newJobInitialState'
-import TransientStatusState from './modules/transientStatus/transientInitialState'
 import SaveActivatedState from './modules/saveActivated/saveActivatedInitialState'
+import TransientStatusState from './modules/transientStatus/transientInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 /**
