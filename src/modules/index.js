@@ -32,6 +32,7 @@ import bulk from './bulk/bulkReducer'
 import profileReducer from './profile/profileReducer'
 import sorting from './sorting/sortingReducer'
 import taskList from './taskList/taskListReducer'
+import liveJobList from './liveJobListing/liveJobListingReducer'
 import liveJob from './liveJob/liveJobReducer'
 
 import { combineReducers } from 'redux'
@@ -70,6 +71,7 @@ const appReducer = combineReducers({
   profileReducer,
   sorting,
   taskList,
+  liveJobList,
   liveJob
 })
 

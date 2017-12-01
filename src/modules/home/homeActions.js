@@ -5,6 +5,7 @@ import {
   HOME_LOADING,
   JOB_DOWNLOADING_STATUS,
   USER,
+  LiveJobs
 } from '../../lib/constants'
 
 import {
@@ -64,8 +65,7 @@ export function onResyncPress() {
       console.log(isLiveJobPresent)
       dispatch(setState(JOB_DOWNLOADING_STATUS, { isDownloadingjobs: false }))
       if (isLiveJobPresent) {
-        dispatch(setState(SHOW_LIVE_JOB_LIST, true))
-        navigateToScene()
+        dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
       }
       dispatch(syncService())
     } catch (error) {

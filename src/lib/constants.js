@@ -288,8 +288,10 @@ module.exports = keyMirror({
     SORTING_ITEM_DETAILS: null,
 
     //Live Job actions
-    SHOW_LIVE_JOB_LIST: null,
     SET_LIVE_JOB_LIST: null,
+    END_LIVEJOB_DETAILD_FETCHING: null,
+    TOGGLE_LIVE_JOB_LIST_ITEM: null,
+    START_FETCHING_LIVE_JOB: null,
 })
 
 

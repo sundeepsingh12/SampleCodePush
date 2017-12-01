@@ -43,7 +43,7 @@ import BulkConfiguration from '../../containers/BulkConfiguration'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import LiveJobListing from '../../containers/LiveJobListing'
-
+import LiveJob from '../../containers/LiveJob'
 
 
 
@@ -351,6 +351,9 @@ export const AppNavigator = StackNavigator({
   },
   LiveJobs: {
     screen: LiveJobListing
+  },
+  LiveJob: {
+    screen: LiveJob
   }
 },
   {

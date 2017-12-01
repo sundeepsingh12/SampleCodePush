@@ -8,8 +8,8 @@ import * as liveJobActions from '../modules/liveJob/liveJobActions'
 import Loader from '../components/Loader'
 import moment from 'moment'
 import React, { Component } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList } from 'react-native'
-
+import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, Vibration } from 'react-native'
+import _ from 'lodash'
 import {
     Container,
     Content,
@@ -36,14 +36,13 @@ import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
-import _ from 'underscore'
-import { NEXT_POSSIBLE_STATUS } from '../lib/AttributeConstants'
-import { FormLayout, RESET_STATE } from '../lib/constants'
 
 
 function mapStateToProps(state) {
     return {
-        liveJobList: state.liveJob.liveJobList
+        liveJobList: state.liveJobList.liveJobList,
+        selectedItems: state.liveJobList.selectedItems,
+        loaderRunning: state.liveJobList.loaderRunning
     }
 }
 
@@ -55,8 +54,12 @@ function mapDispatchToProps(dispatch) {
 
 class LiveJobListing extends Component {
 
-    componentDidMount() {
+    componentWillMount() {
         this.props.actions.fetchAllLiveJobsList()
+        if (this.props.navigation.state.params && this.props.navigation.state.params.callAlarm == true) {
+            Vibration.vibrate()
+            this.props.navigation.state.params.callAlarm = false
+        }
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -64,48 +67,107 @@ class LiveJobListing extends Component {
             header: null
         }
     }
+    navigateToScene = (item) => {
+        if (item.isChecked == 'false' || !item.isChecked && this.props.selectedItems.length == 0) {
+            this.props.actions.navigateToScene('LiveJob',
+                {
+                    job: item,
+                    liveJobList: this.props.liveJobList
+                }
+            )
+        } else {
+            this.toggleLiveJobSelection(item.id)
+        }
+    }
     renderData = (item) => {
         let time = this.getJobEtaTime(item.id)
-        return (
-            <JobListItem data={item} jobEndTime={time}
-            />
-        )
+        if (time != 'TimeUp') {
+            return (
+                <JobListItem data={item.jobTransactionCustomization} jobEndTime={time}
+                    onPressItem={() => { this.navigateToScene(item.jobTransactionCustomization) }}
+                    onLongPressItem={() => this.toggleLiveJobSelection(item.id)}
+                />
+            )
+        }
     }
     getJobEtaTime = (id) => {
-        let jobEndTime = moment(this.props.liveJobList.jobMap[id].jobEndTime, 'HH:mm:ss')
-        let currentTime = moment()
-        //  let diff = jobEndTime.diff(moment().format('HH:mm:ss'))
-        // let diff = moment().subtract(jobEndTime)
-        //  return diff
-        //  return moment(diff).format('HH:mm:ss')
-        //    
-        return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
+        if (this.props.liveJobList[id]) {
+            let jobEndTime = moment(this.props.liveJobList[id].jobEndTime, 'HH:mm:ss')
+            let currentTime = moment()
+            if (moment(jobEndTime).diff(moment(currentTime)) <= 0) {
+                return 'TimeUp'
+            }
+            return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
+        }
+    }
+    toggleLiveJobSelection = (id) => {
+        this.props.actions.toggleLiveJobSelection(id, this.props.liveJobList)
+    }
+    acceptOrRejectMultiple = (status) => {
+        this.props.actions.acceptOrRejectMultiple(status, this.props.selectedItems, this.props.liveJobList)
     }
     render() {
-        return (
-            <StyleProvider style={getTheme(platform)}>
-                <Container>
-                    <Header style={StyleSheet.flatten([styles.bgPrimary])}>
-                        <Left>
-                            <Button transparent onPress={() => {
-                                this.props.navigation.goBack(null)
-                            }}>
-                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
-                            </Button>
-                        </Left>
-                        <Body>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Live Tasks</Text>
-                        </Body>
-                        <Right />
-                    </Header>
-                    <FlatList
-                        data={this.props.liveJobList.jobTransactionCustomizationList}
-                        renderItem={({ item }) => this.renderData(item)}
-                        keyExtractor={item => item.key}
-                    />
-                </Container>
-            </StyleProvider>
-        )
+        if (this.props.loaderRunning) {
+            return <Loader />
+        }
+        else {
+            if (_.isEmpty(this.props.liveJobList)) {
+                return (
+                    <StyleProvider style={getTheme(platform)}>
+                        <Container>
+                            <Header style={StyleSheet.flatten([styles.bgPrimary])}>
+                                <Left>
+                                    <Button transparent onPress={() => {
+                                        this.props.navigation.goBack(null)
+                                    }}>
+                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
+                                    </Button>
+                                </Left>
+                                <Body>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Live Tasks</Text>
+                                </Body>
+                                <Right />
+                            </Header>
+                            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+                                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>No jobs present</Text>
+                            </View>
+                        </Container>
+                    </StyleProvider>
+                )
+            } else {
+                return (
+                    <StyleProvider style={getTheme(platform)}>
+                        <Container>
+                            <Header style={StyleSheet.flatten([styles.bgPrimary])}>
+                                <Left>
+                                    <Button transparent onPress={() => {
+                                        this.props.navigation.goBack(null)
+                                    }}>
+                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
+                                    </Button>
+                                </Left>
+                                <Body>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Live Tasks</Text>
+                                </Body>
+                                <Right>
+                                    {renderIf(this.props.selectedItems && this.props.selectedItems.length > 0,
+                                        <View>
+                                            <Text onPress={() => this.acceptOrRejectMultiple(1)}> Accept </Text>
+                                            <Text onPress={() => this.acceptOrRejectMultiple(2)}> Reject </Text>
+                                        </View>
+                                    )}
+                                </Right>
+                            </Header>
+                            <FlatList
+                                data={Object.values(this.props.liveJobList)}
+                                renderItem={({ item }) => this.renderData(item)}
+                                keyExtractor={item => item.key}
+                            />
+                        </Container>
+                    </StyleProvider>
+                )
+            }
+        }
     }
 }
 

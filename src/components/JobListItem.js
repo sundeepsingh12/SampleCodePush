@@ -26,6 +26,7 @@ export default class JobListItem extends Component {
     return (
       <TouchableHighlight
         onPress={this.props.onPressItem}
+        onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
         <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : null]}>
           <View style={[style.seqCircle, styles.relative]}>

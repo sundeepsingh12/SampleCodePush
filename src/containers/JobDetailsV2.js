@@ -322,7 +322,6 @@ class JobDetailsV2 extends Component {
                 <Button full>
                   <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
                 </Button>
-
               </FooterTab>
               {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
                 <FooterTab>
