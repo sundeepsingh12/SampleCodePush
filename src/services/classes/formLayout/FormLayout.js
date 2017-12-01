@@ -23,10 +23,10 @@ class FormLayout {
         if(!fieldAttributes || !fieldAttributes.value || !fieldAttributeStatusList || !fieldAttributeStatusList.value){
             throw new Error('Value of fieldAttributes or fieldAttribute Status missing')
         }
-        let filedAttributesMappedToStatus = fieldAttributeStatusList.value.filter(fieldAttributeStatus => fieldAttributeStatus.statusId == statusId) 
-        .sort((a,b) => a.sequence - b.sequence)
-        .map(fieldAttributeStatus => fieldAttributeStatus.fieldAttributeId); // first find list of fieldAttributeStatus mapped to a status using filter, then sort them on their sequence and then get list of fieldAttributeIds using map
-       
+        let filedAttributesMappedToStatus = fieldAttributeStatusList.value.filter(fieldAttributeStatus => fieldAttributeStatus.statusId == statusId)
+            .sort((a,b) => a.sequence - b.sequence)
+            .map(fieldAttributeStatus => fieldAttributeStatus.fieldAttributeId); // first find list of fieldAttributeStatus mapped to a status using filter, then sort them on their sequence and then get list of fieldAttributeIds using map
+
         if(!filedAttributesMappedToStatus){
             throw new Error('No field attribute mapped to this status');
         }
@@ -92,7 +92,7 @@ class FormLayout {
         }
         return fieldAttributeValidationConditionMap;
     }
-    
+
     /**
      * constructs formLayoutDto in sorted order and nextEditable object and latest positionId 
      * also sets editable and focusable to true for first required element
@@ -101,11 +101,15 @@ class FormLayout {
      * @param {*} fieldAttrMasterValidationConditionMap validation condition map
      */
     getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap){
-        if(!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0){
-            throw new Error('No field attribute mapped to this status');
-        }
         let formLayoutObject = new Map();
         let nextEditable = {};
+        if (!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0) {
+            return {
+                formLayoutObject,
+                nextEditable,
+                latestPositionId: 0
+            }
+        }
         let isRequiredAttributeFound = false;
         for(let i=0; i< sequenceWiseSortedFieldAttributesForStatus.length; i++){
             let fieldAttribute = sequenceWiseSortedFieldAttributesForStatus[i];
@@ -149,10 +153,10 @@ class FormLayout {
             }
             if(fieldAttribute.required){
                 nextEditable[attributeMasterId].push('required$$'+fieldAttribute.id); //this is not necessary that required is always the last element in array, ex - if there are all non required. So instead of adding a new data structure, used a separator to know that this element is the required element
-               break; // as soon as next required attribute is found then break the loop
+                break; // as soon as next required attribute is found then break the loop
             }
             nextEditable[attributeMasterId].push(fieldAttribute.id);
-            
+
         }
     }
 
@@ -185,7 +189,15 @@ class FormLayout {
             externalDataStoreMasterUrl,
         };
     }
-    
+
+    concatFormElementForTransientStatus(navigationFormLayoutStates, formElement) {
+        let combineMap = new Map(formElement);
+        for (let formLayoutCounter in navigationFormLayoutStates) {
+            let formElementForPreviousStatus = navigationFormLayoutStates[formLayoutCounter].formElement
+            combineMap = new Map([...combineMap, ...formElementForPreviousStatus])
+        }
+        return combineMap
+    }
 }
 
 export let formLayoutService = new FormLayout()

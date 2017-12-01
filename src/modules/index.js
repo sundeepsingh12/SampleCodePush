@@ -24,6 +24,8 @@ import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
+import transientStatus from './transientStatus/transientReducer'
+import saveActivated from './saveActivated/saveActivatedReducer'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
@@ -53,6 +55,8 @@ const rootReducer = combineReducers({
   formLayout,
   dataStore,
   newJob,
+  transientStatus,
+  saveActivated,
 })
 
 export default rootReducer

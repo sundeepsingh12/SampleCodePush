@@ -145,6 +145,7 @@ export default keyMirror({
     SET_TABS_TRANSACTIONS: null,
     JOB_ATTRIBUTE_STATUS: null,
     HUB: null,
+    SAVE_ACTIVATED: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -162,7 +163,7 @@ export default keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA:null,
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
@@ -178,6 +179,7 @@ export default keyMirror({
     ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
+    SET_FORM_LAYOUT_STATE: null,
 
     //Route names (Used in React Navigation)
     Application: null,
@@ -188,6 +190,10 @@ export default keyMirror({
     FormLayout: null,
     TimePicker: null,
     SkuListing: null,
+    SaveActivated: null,
+    Transient: null,
+    CheckoutDetails: null,
+    NewJobStatus: null,    
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -198,7 +204,7 @@ export default keyMirror({
 
 
     //CheckBox 
-    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE:null,
+    SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
@@ -221,12 +227,33 @@ export default keyMirror({
     SPECIAL: null,
     MINMAX: null,
     _id: null,
-    SET_INITIAL_STATE :null,
-   
+    SET_INITIAL_STATE: null,
+
     //New Job
-    NEW_JOB_MASTER : null,
-    NEW_JOB_STATUS : null,
-   
+    NEW_JOB_MASTER: null,
+    NEW_JOB_STATUS: null,
+
+    //Transient
+    ADD_FORM_LAYOUT_STATE: null,
+    SET_SHOW_JOB_DETAILS: null,
+    LOADER_IS_RUNNING: null,
+    SHOW_CHECKOUT_DETAILS: null,
+    SET_INITIAL_STATE_TRANSIENT_STATUS: null,
+
+    //Save Activated
+    POPULATE_DATA: null,
+    SAVE_ACTIVATED_INITIAL_STATE: null,
+    LOADER_ACTIVE: null,
+    DELETE_ITEM_SAVE_ACTIVATED: null,
+    Edit: null,
+    Receipt: null,
+    Print: null,
+    SMS: null,
+    TotalAmount: null,
+    Discard: null,
+    Keep: null,
+    Cancel: null,
+    Checkout:null,
 })
 
 

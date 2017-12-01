@@ -217,4 +217,17 @@ module.exports = {
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
     PASSWORD: 61,
+
+    //SaveActivated & Transient Strings
+    EMAIL: 'E-mail',
+    Return_To_Home: 'Return To Home',
+    View_SignOff_Summary: 'View SignOff Summary',
+    View_Parcel_Summary: 'View Parcel Summary',
+    Sign_Off_Summary: 'Sign Off Summary',
+    Parcel_Summary: 'Parcel Summary',
+    Discard_these_jobs: 'Discard these jobs?',
+    Do_you_want_to_checkout: 'Do you want to checkout?',
+    Yes_Checkout: 'Yes,Checkout',
+    Total: 'Total :',
+    Select_Next_Status: 'Select Next Status'
 }

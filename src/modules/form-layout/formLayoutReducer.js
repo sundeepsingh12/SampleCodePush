@@ -1,6 +1,7 @@
 'use strict'
 
 import InitialState from './formLayoutInitialState.js'
+import _ from 'lodash'
 
 const {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
@@ -13,7 +14,8 @@ const {
     RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
-    UPDATE_PAYMENT_AT_END
+    UPDATE_PAYMENT_AT_END,
+    SET_FORM_LAYOUT_STATE
   } = require('../../lib/constants').default
   
 const {
@@ -98,6 +100,26 @@ export default function formLayoutReducer(state = initialState, action){
          */
         case ERROR_MESSAGE : {
             return state.set('errorMessage',action.payload);
+        }
+
+        /**
+         * sets formlayout state when
+         * back pressed from TransientStatus container
+         */
+        case SET_FORM_LAYOUT_STATE: {
+            return state.set('currentElement', action.payload.currentElement)
+                .set('noOfElements', action.payload.noOfElements)
+                .set('nextElement', action.payload.nextElement)
+                .set('latestPositionId', action.payload.latestPositionId)
+                .set('isSaveDisabled', action.payload.isSaveDisabled)
+                .set('statusId', action.payload.statusId)
+                .set('jobTransactionId', action.payload.jobTransactionId)
+                .set('statusName', action.payload.statusName)
+                .set('formElement', action.payload.formElement)
+                .set('nextEditable', action.payload.nextEditable)
+                .set('isLoading', action.payload.isLoading)
+                .set('errorMessage', action.payload.errorMessage)
+                .set('paymentAtEnd', action.payload.paymentAtEnd)
         }
     }
     return state;

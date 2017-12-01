@@ -12,7 +12,11 @@ const {
     Home,
     RESET_STATE,
     ERROR_MESSAGE,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA
+    UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+    JOB_STATUS,
+    SaveActivated,
+    Transient,
+    CheckoutDetails
 } = require('../../lib/constants').default
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -20,6 +24,9 @@ import { formLayoutEventsInterface } from '../../services/classes/formLayout/For
 import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
 import { setState } from '../global/globalActions'
+import { transientStatusService } from '../../services/classes/TransientStatusService'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { navigateToScene } from '../../modules/global/globalActions'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
@@ -107,7 +114,7 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         console.log("getNextFocusableAndEditableElements",value)
     }
 }
-export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled,sequenceId) {
+export function setSequenceDataAndNextFocus(attributeMasterId, formElement, nextEditable, isSaveDisabled, sequenceId) {
     return async function (dispatch) {
         try{
             const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
@@ -124,9 +131,9 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, next
                             if(nextElement && !nextElement.value && nextElement.attributeTypeId == 62){
                                 const newFormElement = new Map(sortedFormAttributeDto.formLayoutObject);
                                 newFormElement.get(nextElement.fieldAttributeMasterId).isLoading = true;
-                                    dispatch(_updateFieldData(newFormElement))
-                                    dispatch(setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, newFormElement, nextEditable, 
-                                        isSaveDisabled,nextElement.sequenceMasterId))
+                                dispatch(_updateFieldData(newFormElement))
+                                dispatch(setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, newFormElement, nextEditable,
+                                    isSaveDisabled,nextElement.sequenceMasterId))
                             }
                         }
                     })
@@ -160,7 +167,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, nex
     return function (dispatch) {
         const cloneFormElement = new Map(formElement);
         console.log('cloneFormElement', cloneFormElement);
-        console.log('fieldDataListObject', fieldDataListObject);        
+        console.log('fieldDataListObject', fieldDataListObject);
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, nextEditable, isSaveDisabled, value, fieldDataListObject.fieldDataList, ON_BLUR);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
@@ -181,16 +188,57 @@ export function toogleHelpText(attributeId, formElement) {
     }
 }
 
-export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated) {
     return async function (dispatch) {
-        dispatch(_toogleLoader(true));
-        let cloneFormElement = new Map(formElement);
-        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId);
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId);
+        let routeName, routeParam
+        dispatch(_toogleLoader(true))
+        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
+        const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId);
+        if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
+            routeName = SaveActivated
+            routeParam = {
+                formLayoutState,
+                contactData, currentStatus, jobTransaction, jobMasterId,
+                navigationFormLayoutStates
+            }
+        } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
+            let { elementsArray, amount } = await transientStatusService.getDataFromFormElement(formLayoutState.formElement)
+            let totalAmount = await transientStatusService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
+            routeName = CheckoutDetails
+            routeParam = { commonData: previousStatusSaveActivated.commonData.commonData, recurringData: previousStatusSaveActivated.recurringData, totalAmount, signOfData: elementsArray,jobMasterId }
+            let formLayoutObject = formLayoutState.formElement
+            if (navigationFormLayoutStates) {
+                formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement);
+            }
+            await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
+        }
+        else if (currentStatus.transient) {
+            routeName = Transient
+            routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, }
+        }
+        else {
+            routeName = Home
+            routeParam = {}
+            await dispatch(saveDataAndAddToSyncList(formLayoutState, navigationFormLayoutStates, jobMasterId))
+            dispatch(_setInitialState());
+        }
         dispatch(_toogleLoader(false));
-        dispatch(_setInitialState());
-        dispatch(NavigationActions.navigate({ routeName: Home }))
+        dispatch(navigateToScene(routeName, routeParam))
+    }
+}
 
+export function saveDataAndAddToSyncList(formLayoutState, navigationFormLayoutStates, jobMasterId) {
+    return async function (dispatch) {
+        try {
+            let formLayoutObject = formLayoutState.formElement
+            if (navigationFormLayoutStates) {
+                formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement);
+            }
+            await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId);
+            await formLayoutEventsInterface.addTransactionsToSyncList(formLayoutState.jobTransactionId);
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 
