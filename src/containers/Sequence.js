@@ -1,18 +1,18 @@
+
 'use strict'
 
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
+import * as sequenceActions from '../modules/sequence/sequenceActions'
+import * as globalActions from '../modules/global/globalActions'
 
-import * as preloaderActions from '../modules/pre-loader/preloaderActions'
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
-import ResyncLoader from '../components/ResyncLoader'
-
 
 import React, {Component} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight} from 'react-native'
+import {StyleSheet, View, Image, TouchableHighlight,Alert} from 'react-native'
+
+import {ROUTE_OPTIMIZATION} from '../lib/AttributeConstants'
 
 import {
   Container,
@@ -29,186 +29,172 @@ import {
   Title,
   Footer,
   FooterTab,
-  StyleProvider
-} from 'native-base';
+  StyleProvider,
+  Toast
+} from 'native-base'
 
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import {RESET_STATE} from '../lib/constants'
+
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import * as homeActions from '../modules/home/homeActions'
-import * as globalActions from '../modules/global/globalActions'
-import renderIf from '../lib/renderIf';
+import renderIf from '../lib/renderIf'
 import TitleHeader from '../components/TitleHeader'
 import SortableListView from 'react-native-sortable-listview'
-
-let data = {
-  hello: {
-    text: 'REF32546245 / Test 1 REF32'
-  },
-  how: {
-    text: 'REF32546245 / Test 2'
-  },
-  test: {
-    text: 'REF32546245 / Test 3'
-  },
-  this: {
-    text: 'REF32546245 / Test 4'
-  }
-}
-
-let order = Object.keys(data) //Array of keys
+import JobListItem from '../components/JobListItem'
 
 function mapStateToProps(state) {
-  return {}
-};
+  return {
+    isSequenceScreenLoading:state.sequence.isSequenceScreenLoading,
+    sequenceList:state.sequence.sequenceList,
+    isResequencingDisabled:state.sequence.isResequencingDisabled,
+    responseMessage:state.sequence.responseMessage
+  }
+}
 
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({
-      ...globalActions,
-      ...homeActions
+      ...sequenceActions,
+      ...globalActions
     }, dispatch)
   }
 }
 
-class RowComponent extends React.Component {
-  render() {
-    return (
-      <TouchableHighlight underlayColor={'#eee'} {...this.props.sortHandlers}>
-        <View style={style.seqCard}>
-          <View style={style.seqCircle}>
-            <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-              PKUP
-            </Text>
-          </View>
-          <View style={style.seqCardDetail}>
-            <View>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                {this.props.data.text}
-              </Text>
-              <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                Plot 345, Saket
-              </Text>
-              <Text
-                style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-                Express Delivery · Paid
-              </Text>
-            </View>
-            <View
-              style={{
-              width: 30,
-              alignSelf: 'center'
-            }}>
-              <Icon
-                name="ios-menu"
-                style={[
-                styles.fontXl, {
-                  color: '#c9c9c9'
-                }
-              ]}/>
-            </View>
-          </View>
-        </View>
-      </TouchableHighlight>
-    )
-  }
-}
-
-
 class Sequence extends Component {
-
-  // constructor(props) {   super(props)   this.state = {     isMoving: false,
-  // pointsDelta: 0,     points: 67   } }
 
   static navigationOptions = ({navigation}) => {
     return {header: null}
   }
 
+  componentDidMount(){
+    this.props.actions.prepareListForSequenceModule()
+  }
+
+  renderList() {
+    const list = Object.values(this.props.sequenceList).sort((transaction1, transaction2) =>
+       transaction1.seqSelected - transaction2.seqSelected
+    )
+    return list
+  }
+
   render() {
-    return (
-      <StyleProvider style={getTheme(platform)}>
-        <Container>
-          <Header
+    if(this.props.isSequenceScreenLoading){
+        return <Loader />  
+    }
+    else {
+      if (!_.isEmpty(this.props.sequenceList)) {
+        let order = Object.keys(this.props.sequenceList)
+        return (
+          <StyleProvider style={getTheme(platform)}>
+            <Container>
+               <Header
             style={StyleSheet.flatten([
             styles.bgPrimary, {
               borderBottomWidth: 0
             }
           ])}>
             <Left>
-              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}  onPress={() => { this.props.navigation.goBack(null) }}/>
+               <Button transparent onPress={() => { 
+                 this.props.actions.setState(RESET_STATE)
+                 this.props.navigation.goBack(null) }}>
+              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}/>
+              </Button>
             </Left>
             <Body>
               <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Sequence</Text>
             </Body>
             <Right/>
           </Header>
-          <View style={[styles.flex1]}>
+              <View style={[styles.flex1, styles.bgWhite]}>
+                <SortableListView
+                  style={{
+                    flex: 1
+                  }}
+                  data={this.renderList()}
+                  onRowMoved={e => {
+                    order.splice(e.to, 0, order.splice(e.from, 1)[0])
+                  }}
+                  activeOpacity={1}
+                  sortRowStyle={{
+                    backgroundColor: '#f2f2f2'
+                  }}
+                  renderRow={row => <JobListItem data={row} callingActivity='Sequence' />} />
+                  {(this.props.responseMessage)?this.showToast():null}
+              </View>
+              <Footer style={{
+                height: 'auto'
+              }}>
+                <FooterTab style={StyleSheet.flatten([styles.padding10])}>
+                  <Button
+                    onPress={this.showAlert}
+                    disabled={this.props.isResequencingDisabled}
+                    success full>
+                    <Text style={[styles.fontLg, styles.fontWhite]}>Update Sequence</Text>
+                  </Button>
+                </FooterTab>
+              </Footer>
+            </Container>
+          </StyleProvider>
 
-            <SortableListView
-              style={{
-              flex: 1
-            }}
-              data={data}
-              order={order}
-              onRowMoved={e => {
-              order.splice(e.to, 0, order.splice(e.from, 1)[0]) 
-              this.forceUpdate()
-            }}
-              activeOpacity={1}
-              sortRowStyle={{
-              backgroundColor: '#f2f2f2'
-            }}
-              renderRow={row => <RowComponent data={row}/>}/>
-          </View>
-          <Footer style={{
-            height: 'auto'
-          }}>
-            <FooterTab style={StyleSheet.flatten([styles.padding10])}>
-              <Button success full>
-                <Text style={[styles.fontLg, styles.fontWhite]}>Update Sequence</Text>
+        )
+      }
+      else {
+        return (
+          <StyleProvider style={getTheme(platform)}>
+            <Container>
+               <Header
+            style={StyleSheet.flatten([
+            styles.bgPrimary, {
+              borderBottomWidth: 0
+            }
+          ])}>
+            <Left>
+               <Button transparent onPress={() => { 
+                 this.props.actions.setState(RESET_STATE)
+                 this.props.navigation.goBack(null) }}>
+              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}/>
               </Button>
-            </FooterTab>
-          </Footer>
-        </Container>
-      </StyleProvider>
+            </Left>
+            <Body>
+              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Sequence</Text>
+            </Body>
+            <Right/>
+          </Header>
+              <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>No jobs present</Text>
+              </View>
+            </Container>
+          </StyleProvider>
+        )
+      }
+    }
 
+  }
+
+  showAlert = () => {
+    Alert.alert(
+       ROUTE_OPTIMIZATION ,
+         `This will run route optimization ${_.size(this.props.sequenceList)} job transactions`,
+         [
+    {text: 'Cancel', style: 'cancel'},
+    {text: 'OK', onPress: this.OnOkButtonPressed},
+  ],
     )
   }
 
-};
-
-const style = StyleSheet.create({
-  headerIcon: {
-    fontSize: 18
-  },
-  seqCard: {
-    minHeight: 70,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingLeft: 10
-  },
-  seqCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#ffcc00',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  seqCardDetail: {
-    flex: 1,
-    minHeight: 70,
-    paddingTop: 10,
-    paddingBottom: 10,
-    marginLeft: 15,
-    borderBottomColor: '#e4e4e4',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
+  showToast() {
+    Toast.show({
+              text: `${this.props.responseMessage}`,
+              position: 'bottom',
+              buttonText: 'OK'
+            })
   }
 
-});
+  OnOkButtonPressed = () => {
+     const requestBody = this.props.actions.resequenceJobsFromServer(this.props.sequenceList)
+  }
 
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sequence)

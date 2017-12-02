@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, BackHandler } from 'react-native'
 
 import {
     Container,
@@ -19,13 +19,13 @@ import {
     FooterTab
 } from 'native-base';
 
-const {
-    Home,
+import {
     Print,
     Receipt,
     SMS,
-    TotalAmount
-} = require('../lib/constants').default
+    TotalAmount,
+    HardwareBackPress
+} from '../lib/constants'
 
 import {
     EMAIL,
@@ -73,6 +73,10 @@ class CheckoutDetails extends Component {
                 totalAmount: this.props.navigation.state.params.totalAmount
             })
         }
+        BackHandler.addEventListener(HardwareBackPress, () => {
+            this.props.actions.clearStateAndStore(true)
+            return true
+        })
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -224,7 +228,7 @@ class CheckoutDetails extends Component {
                     <Footer style={[style.footer]}>
                         <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                             <Button onPress={() => {
-                                this.props.actions.clearStateAndStore()
+                                this.props.actions.clearStateAndStore(true)
                             }}>
                                 <Text style={[styles.fontPrimary, styles.fontDefault]}>{Return_To_Home}</Text>
                             </Button>

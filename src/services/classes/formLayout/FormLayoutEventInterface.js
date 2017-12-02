@@ -25,22 +25,25 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
      * @param {*} statusId 
      * @param {*} jobMasterId
      */
-    saveDataInDb(formElement, jobTransactionId, statusId,jobMasterId) {
-        return this.saveData(formElement, jobTransactionId, statusId, jobMasterId)
+    saveDataInDb(formElement, jobTransactionId, statusId,jobMasterId,jobTransactionIdList) {
+        return this.saveData(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
     }
 
-    addTransactionsToSyncList(jobTransactionId) {
-        return this.addToSyncList(jobTransactionId);
+    addTransactionsToSyncList(jobTransactionId,jobTransactionIdList) {
+        return this.addToSyncList(jobTransactionId,jobTransactionIdList)
     }
 
     getSequenceData(sequenceMasterId){
         return this.getSequenceAttrData(sequenceMasterId)
     }
 
+    updateNextEditableObject(formLayoutObject) {
+        return this.updateNextEditable(formLayoutObject)
+    }
+
     executeBeforeValidations(attributeMasterId) {}
 
     executeAfterValidations(attributeMasterId) {}
-
 
 }
 

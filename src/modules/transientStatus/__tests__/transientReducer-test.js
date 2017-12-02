@@ -2,10 +2,10 @@
 
 import transientReducer from '../transientReducer'
 
-const {
+import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_IS_RUNNING,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 const InitialState = require('../transientInitialState').default
 
 describe('transient reducer', () => {

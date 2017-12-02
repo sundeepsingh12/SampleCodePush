@@ -1,9 +1,9 @@
 'use strict'
 
-const {
+import {
     ON_BLUR,
     TABLE_FIELD_DATA
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {
     formLayoutEventsInterface

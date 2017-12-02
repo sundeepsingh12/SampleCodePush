@@ -3,14 +3,18 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { setState } from '../global/globalActions'
-const {
+import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER,
     SHOW_ERROR_MESSAGE,
     ON_BLUR,
-    SHOW_DETAILS
-} = require('../../lib/constants').default
+    SHOW_DETAILS,
+} from '../../lib/constants'
+import {
+    EXTERNAL_DATA_STORE,
+    DATA_STORE
+} from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
 import _ from 'underscore'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'

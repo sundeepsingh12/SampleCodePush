@@ -8,10 +8,10 @@ import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import { View, TouchableOpacity, FlatList, StyleSheet } from 'react-native'
-const {
+import {
     SET_FORM_LAYOUT_STATE,
     FormLayout,
-} = require('../lib/constants').default
+} from '../lib/constants'
 
 import {
     Select_Next_Status
@@ -73,10 +73,17 @@ class Transient extends Component {
 
     _goBack = () => {
         this.props.navigation.goBack()
-        this.props.actions.setState(SET_FORM_LAYOUT_STATE,this.props.formLayoutStates[this.props.navigation.state.params.currentStatus.id])
+        this.props.actions.setState(SET_FORM_LAYOUT_STATE, this.props.formLayoutStates[this.props.navigation.state.params.currentStatus.id])
     }
 
     renderData = (item) => {
+        // if (_.size(this.props.navigation.state.params.currentStatus.nextStatusList) == 1) {
+        //     //     return
+        //     //     (
+        //     //         <TouchableOpacity onPress={this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.nextStatusList[0].id, this.props.navigation.state.params.currentStatus.nextStatusList[0].name)} >
+        //     //             <Text>abc</Text>
+        //     //         </TouchableOpacity>)
+        //     // }
         return (
             <ListItem style={[style.jobListItem]} onPress={() => this.navigateToFormLayout(item.id, item.name)}>
                 <View style={[styles.row, styles.alignCenter]}>
@@ -99,6 +106,13 @@ class Transient extends Component {
                 <Loader />
             )
         }
+        // if (_.size(this.props.navigation.state.params.currentStatus.nextStatusList) == 1) {
+        //     return
+        //     (
+        //         <TouchableOpacity onPress={this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.nextStatusList[0].id, this.props.navigation.state.params.currentStatus.nextStatusList[0].name)} >
+        //             <Text>abc</Text>
+        //         </TouchableOpacity>)
+        // }
         return (
             <Container>
                 <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>

@@ -82,7 +82,7 @@ const style = StyleSheet.create({
         backgroundColor: '#1260be',
         borderRadius: 2,
         height: 40,
-        color: '#fff',
+        color: '#ffffff',
         fontSize: 14
     },
     headerQRButton: {

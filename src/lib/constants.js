@@ -2,7 +2,7 @@ import keyMirror from 'keymirror'
 
 //keyMirror is a simple utility for creating an object with values equal to its keys.
 
-export default keyMirror({
+module.exports = keyMirror({
     //Global Actions
     SET_STORE: null,
     SET_SESSION_TOKEN: null,
@@ -69,6 +69,7 @@ export default keyMirror({
     REMEMBER_ME_SET_TRUE: null,
 
     //Home Actions
+    HOME_LOADING: null,
     JOB_FETCHING_START: null,
     JOB_FETCHING_END: null,
     SET_TABS_LIST: null,
@@ -84,7 +85,7 @@ export default keyMirror({
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
-
+    IS_MISMATCHING_LOCATION: null,
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
@@ -155,6 +156,7 @@ export default keyMirror({
     TABLE_FIELD_DATA: null,
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
+    TABLE_SERVER_SMS_LOG: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -181,19 +183,33 @@ export default keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
 
+    UPDATE_FIELD_DATA_VALIDATION: null,
+    UPDATE_NEXT_EDITABLE: null,
     //Route names (Used in React Navigation)
-    Application: null,
-    Login: null,
-    Preloader: null,
-    Home: null,
-    JobDetails: null,
+    ApplicationScreen: null,
     FormLayout: null,
+    HardwareBackPress: null,
+    HomeScreen: null,
+    HomeTabNavigatorScreen: null,
+    JobDetails: null,
+    LoginScreen: null,
+    MenuScreen: null,
+    PreloaderScreen: null,
+    Sequence: null,
+    TabScreen: null,
     TimePicker: null,
     SkuListing: null,
     SaveActivated: null,
     Transient: null,
     CheckoutDetails: null,
     NewJobStatus: null,    
+    BulkConfiguration:null,
+    BulkListing:null,
+    Sorting:null,
+    ProfileView:null,
+    Statistics:null,
+    CustomApp:null,
+
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -202,9 +218,11 @@ export default keyMirror({
     SKU_CODE_CHANGE: null,
     UPDATE_SKU_ACTUAL_QUANTITY: null,
 
-
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
+    SET_FILTERED_DATA_SELECTFROMLIST: null,
+    INPUT_TEXT_VALUE: null,
+    SELECTFROMLIST_ITEMS_LENGTH: null,
 
     //FixedSKU Actions
     IS_LOADER_RUNNING: null,
@@ -216,6 +234,19 @@ export default keyMirror({
     SET_REMARKS_VALIDATION: null,
     SAVE_SIGNATURE: null,
 
+    //array actions
+    SET_ARRAY_CHILD_LIST: null,
+    SET_NEW_ARRAY_ROW: null,
+    SET_ARRAY_ELEMENTS: null,
+    SET_ERROR_MSG: null,
+    CLEAR_ARRAY_STATE: null,
+    //CashTendering
+    CHANGE_AMOUNT: null,
+    IS_CASH_TENDERING_LOADER_RUNNING: null,
+    SET_CASH_TENDERING: null,
+    IS_RECEIVE_TOGGLE: null,
+    FETCH_CASH_TENDERING_LIST_RETURN: null,
+    CHANGE_AMOUNT_RETURN: null,
     //Data Store
     SET_VALIDATIONS: null,
     SET_DATA_STORE_ATTR_MAP: null,
@@ -228,6 +259,13 @@ export default keyMirror({
     MINMAX: null,
     _id: null,
     SET_INITIAL_STATE: null,
+    SAVE_SUCCESSFUL: null,
+
+    //Sequence Module Actions
+    SEQUENCE_LIST_FETCHING_START: null,
+    SEQUENCE_LIST_FETCHING_STOP: null,
+    TOGGLE_RESEQUENCE_BUTTON: null,
+    PREPARE_UPDATE_LIST:null,
 
     //New Job
     NEW_JOB_MASTER: null,
@@ -254,6 +292,33 @@ export default keyMirror({
     Keep: null,
     Cancel: null,
     Checkout:null,
+    //Bulk Module
+    START_FETCHING_BULK_CONFIG:null,
+    STOP_FETCHING_BULK_CONFIG:null,
+    START_FETCHING_BULK_TRANSACTIONS:null,
+    STOP_FETCHING_BULK_TRANSACTIONS:null,
+    TOGGLE_JOB_TRANSACTION_LIST_ITEM:null,
+    TOGGLE_ALL_JOB_TRANSACTIONS:null,
+
+    //statisticsModule
+    SET_DATA_IN_STATISTICS_LIST: null,
+
+    //profileModule
+    FETCH_USER_DETAILS: null,
+    CHECK_CURRENT_PASSWORD: null,
+    SET_NEW_PASSWORD: null,
+    SET_CONFIRM_NEW_PASSWORD: null,
+    CLEAR_PASSWORD_TEXTINPUT: null,
+    TOGGLE_SAVE_RESET_BUTTON: null,
+
+    //Sorting And Printing
+    SORTING_SEARCH_VALUE: null,
+    SORTING_ITEM_DETAILS: null,
+
+    //Custom App
+    START_FETCHING_URL: null,
+    END_FETCHING_URL:  null,
+    ON_CHANGE_STATE: null,
 })
 
 

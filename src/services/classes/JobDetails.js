@@ -1,12 +1,22 @@
 'use strict'
 
 import * as realm from '../../repositories/realmdb'
+
 import { jobDataService } from './JobData'
+import { jobTransactionService } from './JobTransaction'
+import {jobStatusService} from './JobStatus'
 import {
     ARRAY_SAROJ_FAREYE,
     CONTACT_NUMBER,
     OBJECT_SAROJ_FAREYE,
+    UNSEEN
 } from '../../lib/AttributeConstants'
+import moment from 'moment'
+
+
+import {
+    TABLE_JOB,
+} from '../../lib/constants'
 
 class JobDetails {
 
@@ -75,6 +85,70 @@ class JobDetails {
             dataList,
             autoIncrementId
         }
+    }
+
+
+    checkJobExpire(jobDataList){      
+        const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
+        return ((jobAttributeTime != null && jobAttributeTime != undefined) &&  moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : null 
+    }
+
+     checkEnableResequence(jobMasterList,tabId,seqSelected,statusList){
+                const jobMasterIdWithEnableResequence  = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id) 
+                const statusMap = statusList.value.filter((status) => status.tabId == tabId).map(obj => obj.id)
+                const firstEnableSequenceValue = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence,statusMap)  
+                return  !(seqSelected > firstEnableSequenceValue) ? false : "Please finish previous items first" 
+         }
+         		  
+    async checkOutForDelivery(jobMasterList){
+        const jobListWithDelivery  = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) 
+        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobListWithDelivery,UNSEEN)
+        let statusIds = Object.keys(mapOfUnseenStatusWithJobMaster).map(function(key) {
+            return mapOfUnseenStatusWithJobMaster[key];
+          });
+        const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)  
+        return  !(unseenTransactions.length>0) ? false : "Please Scan all Parcels First" 
+    }
+    /**
+     * ## convert degree to radians
+     * @param {string} angle - It contains data for form layout
+     *
+     *@returns {string} radians value
+     */
+    toRadians(angle) {
+        return angle * (Math.PI / 180);
+    }
+
+    /**
+     * ## find aerial distance between user location and job location
+     * @param {string} jobLat - job location latitude
+     * @param {string} jobLat - job location longitude
+     * @param {string} userLat - user location latitud
+     * @param {string} userLong - user location longitude
+     * 
+     * @returns {string} - distance between user and job locations
+     */
+    distance(jobLat, jobLong, userLat, userLong) {
+        const theta = jobLong - userLong
+        let dist = Math.sin(this.toRadians(jobLat)) * Math.sin(this.toRadians(userLat)) + Math.cos(this.toRadians(jobLat)) * Math.cos(this.toRadians(userLat)) * Math.cos(this.toRadians(theta));
+        dist = (Math.acos(dist) * (180 / Math.PI)) * 60 * 1.1515 * 1.609344;
+        return dist;
+    }
+
+    /**
+     * ## check if distance between user and job is less than 100 m or not
+     * @param {string} jobId - job location latitude
+     * @param {string} userLat - user location latitud
+     * @param {string} userLong - user location longitude
+     * 
+     * @returns {boolean} - true if distance is greater than 100m else false
+     */
+    checkLatLong(jobId, userLat, userLong) {
+        let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0];
+        if ( !jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong) 
+            return false
+        const dist = this.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
+        return (dist * 1000 >= 100)
     }
 }
 

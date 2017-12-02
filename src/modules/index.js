@@ -22,13 +22,23 @@ import payByLinkPayment from './cardTypePaymentModules/payByLinkPayment/payByLin
 import fixedSKU from './fixedSKU/fixedSKUReducer'
 import signature from './signature/signatureReducer'
 import formLayout from './form-layout/formLayoutReducer'
+import array from './array/arrayReducer'
+import sequence from './sequence/sequenceReducer'
+import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
 import transientStatus from './transientStatus/transientReducer'
 import saveActivated from './saveActivated/saveActivatedReducer'
+import statistics from './statistics/statisticsReducer'
+import bulk from './bulk/bulkReducer'
+import profileReducer from './profile/profileReducer'
+import sorting from './sorting/sortingReducer'
+import taskList from './taskList/taskListReducer'
+import customApp from './customApp/customAppReducers'
 // import profile from './profile/profileReducer'
 
 import { combineReducers } from 'redux'
+import {PRE_LOGOUT_SUCCESS} from '../lib/constants'
 
 /**
  * ## CombineReducers
@@ -36,7 +46,7 @@ import { combineReducers } from 'redux'
  * the rootReducer will call each and every reducer with the state and action
  * EVERY TIME there is a basic action
  */
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   auth,
   device,
   global,
@@ -53,10 +63,27 @@ const rootReducer = combineReducers({
   fixedSKU,
   signature,
   formLayout,
+  array,
+  sequence,
+  cashTenderingReducer,
   dataStore,
   newJob,
   transientStatus,
   saveActivated,
+  statistics,
+  bulk,
+  profileReducer,
+  sorting,
+  taskList,
+  customApp,
 })
+
+const rootReducer = (state, action) => {
+  //Reset state of Redux Store
+  if (action.type == PRE_LOGOUT_SUCCESS) {
+    state = undefined
+  }
+  return appReducer(state, action)
+}
 
 export default rootReducer

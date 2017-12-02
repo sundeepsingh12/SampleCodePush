@@ -1,10 +1,10 @@
 'use strict'
 
 import { setState } from '../global/globalActions'
-const {
+import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_IS_RUNNING,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 
 /**This action is called from componentDidMount 

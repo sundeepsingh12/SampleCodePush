@@ -3,16 +3,16 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { setState, navigateToScene } from '../global/globalActions'
-const {
+import {
     LOADER_ACTIVE,
     POPULATE_DATA,
     CheckoutDetails,
     SAVE_ACTIVATED,
     SAVE_ACTIVATED_INITIAL_STATE,
     DELETE_ITEM_SAVE_ACTIVATED,
-    Home,
+    HomeTabNavigatorScreen,
     SaveActivated
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import _ from 'lodash'
 
 export function addTransactionAndPopulateView(formLayoutState, recurringData, commonData, statusName, navigationParams, navigationFormLayoutStates) {
@@ -66,7 +66,7 @@ export function storeState(saveActivatedState, screenName, jobMasterId, navigati
         try {
             let cloneSaveActivatedState = _.cloneDeep(saveActivatedState)
             let cloneNavigationFormLayoutStates = _.cloneDeep(navigationFormLayoutStates)
-            let { differentData, arrayFormElement } = await transientStatusService.convertMapToArrayAndArrayToMap(cloneSaveActivatedState.differentData, cloneNavigationFormLayoutStates, true)
+            let { differentData, arrayFormElement } = await transientStatusService.convertMapToArrayOrArrayToMap(cloneSaveActivatedState.differentData, cloneNavigationFormLayoutStates, true)
             cloneSaveActivatedState.differentData = differentData
             cloneNavigationFormLayoutStates = arrayFormElement
             await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, {
@@ -83,12 +83,16 @@ export function storeState(saveActivatedState, screenName, jobMasterId, navigati
 }
 
 
-export function clearStateAndStore() {
+export function clearStateAndStore(goToHome) {
     return async function (dispatch) {
         try {
+            dispatch(setState(LOADER_ACTIVE, true))
             dispatch(setState(SAVE_ACTIVATED_INITIAL_STATE, {}))
-            dispatch(navigateToScene(Home, {}))
             await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
+            dispatch(setState(LOADER_ACTIVE, false))
+            if (goToHome) {
+                dispatch(navigateToScene(HomeTabNavigatorScreen, {}))
+            }
         } catch (error) {
             console.log(error)
         }

@@ -6,12 +6,14 @@ import {
     Text,
     Platform,
     FlatList,
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
 }
     from 'react-native'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base'
+import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem, ActionSheet } from 'native-base'
 import styles from '../themes/FeStyle'
 import { connect } from 'react-redux'
+import CustomAlert from "../components/CustomAlert"
 import { bindActionCreators } from 'redux'
 import renderIf from '../lib/renderIf'
 import ExpandableHeader from '../components/ExpandableHeader'
@@ -19,6 +21,19 @@ import MessageHeader from '../components/MessageHeader'
 import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
+import Communications from 'react-native-communications';
+import {
+    SELECT_NUMBER,
+    CANCEL,
+    SELECT_TEMPLATE,
+    SELECT_NUMBER_FOR_CALL,
+    CONFIRMATION,
+    OK,
+    CALL_CONFIRM
+} from '../lib/AttributeConstants'
+import {
+    IS_MISMATCHING_LOCATION
+} from '../lib/constants'
 
 function mapStateToProps(state) {
     return {
@@ -31,7 +46,9 @@ function mapStateToProps(state) {
         jobDataList: state.jobDetails.jobDataList,
         jobTransaction: state.jobDetails.jobTransaction,
         messageList: state.jobDetails.messageList,
-        smsTemplateList: state.jobDetails.smsTemplateList
+        smsTemplateList: state.jobDetails.smsTemplateList,
+        errorMessage:state.jobDetails.errorMessage,
+        statusList: state.jobDetails.statusList,
     }
 }
 
@@ -53,30 +70,125 @@ class JobDetails extends Component {
         }
     }
 
+    _onGoToNextStatus = () => {
+        this.props.actions.navigateToScene('FormLayout', {
+            contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+            jobTransactionId: this.props.jobTransaction.id,
+            jobTransaction: this.props.jobTransaction,
+            statusId: this.props.statusList.id,
+            statusName: this.props.statusList.name,
+            jobMasterId: this.props.jobTransaction.jobMasterId
+        }
+        )
+        this._onCancel();
+    }
+    _onCancel = () => {
+        this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
+    }
+    _onCheckLocationMismatch = (statusList, jobTransaction) => {
+        const FormLayoutObject = {
+            contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+            jobTransaction,
+            statusList
+        }
+        this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+    }
+
     renderStatusList(statusList) {
         let statusView = []
         for (let index in statusList) {
             statusView.push(
                 <Button key={statusList[index].id} small primary style={{ margin: 2 }}
-                    onPress={() => this.props.actions.navigateToScene('FormLayout', {
-                        contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
-                        jobTransactionId: this.props.jobTransaction.id,
-                        jobTransaction: this.props.jobTransaction,
-                        statusId: statusList[index].id,
-                        statusName: statusList[index].name,
-                        jobMasterId : this.props.jobTransaction.jobMasterId
-                    }
-                    )
-                    }>
+                    onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}>
                     <Text style={{ color: 'white' }}>{statusList[index].name}</Text>
                 </Button>
             )
         }
         return statusView
     }
+    chatButtonPressed = () => {
+        if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
+            return
+        if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
+            let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
+            contactData.push(CANCEL)
+            ActionSheet.show(
+                {
+                    options: contactData,
+                    cancelButtonIndex: contactData.length - 1,
+                    title: SELECT_NUMBER
+                },
+                buttonIndex => {
+                    if (buttonIndex != contactData.length - 1) {
+                        this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
+                    }
+                }
+            )
+        }
+        else {
+            this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[0])
+        }
+    }
+    showSmsTemplateList = (contact) => {
+        setTimeout(() => {
+            if (this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 1) {
+                let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => sms.title)
+                msgTitles.push(CANCEL)
+                ActionSheet.show(
+                    {
+                        options: msgTitles,
+                        cancelButtonIndex: msgTitles.length - 1,
+                        title: SELECT_TEMPLATE
+                    },
+                    buttonIndex => {
+                        if (buttonIndex != msgTitles.length - 1) {
+                            this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[buttonIndex])
+                        }
+                    }
+                )
+            }
+            else {
+                this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[buttonIndex])
+            }
+        }, 500)
+    }
+
+    sendMessageToContact = (contact, smsTemplate) => {
+        this.props.actions.setSmsBodyAndSendMessage(contact, smsTemplate, this.props.jobTransaction, this.props.jobDataList, this.props.fieldDataList)
+    }
+
+    callButtonPressed = () => {
+        if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
+            return
+        if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
+            let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
+            contactData.push(CANCEL)
+            ActionSheet.show(
+                {
+                    options: contactData,
+                    cancelButtonIndex: contactData.length - 1,
+                    title: SELECT_NUMBER_FOR_CALL
+                },
+                buttonIndex => {
+                    if (buttonIndex != contactData.length - 1) {
+                        this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
+                    }
+                }
+            )
+        }
+        else {
+            Alert.alert(CONFIRMATION + this.props.navigation.state.params.jobSwipableDetails.contactData[0], CALL_CONFIRM,
+                [{ text: CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                { text: OK, onPress: () => this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[0]) },],
+                { cancelable: false })
+        }
+    }
+    callContact = (contact) => {
+        Communications.phonecall(contact, false)
+    }
 
     render() {
-        const statusView = this.props.currentStatus ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
+        const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
         if (this.props.jobDetailsLoading) {
             return (
                 <Loader />
@@ -84,6 +196,14 @@ class JobDetails extends Component {
         } else {
             return (
                 <Container style={StyleSheet.flatten([styles.mainBg])}>
+                    <View>
+                        {renderIf(this.props.statusList,
+                            <CustomAlert
+                                title="Details"
+                                message="You are not at location. Do you want to continue?"
+                                onOkPressed={this._onGoToNextStatus}
+                                onCancelPressed={this._onCancel} />)}
+                    </View>
                     <Header style={StyleSheet.flatten([styles.bgPrimary])}>
                         <Left style={StyleSheet.flatten([styles.flexBasis15])}>
                             <Button transparent onPress={() => { this.props.navigation.goBack(null) }}>
@@ -97,6 +217,14 @@ class JobDetails extends Component {
                         <Right style={StyleSheet.flatten([styles.flexBasis15])}>
                         </Right>
                     </Header>
+                    {renderIf(this.props.errorMessage,
+                             <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
+                                 <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+                                    {this.props.errorMessage}
+                                  </Text>
+                             </View>
+  
+                          )}
                     <Content style={StyleSheet.flatten([styles.padding5])}>
                         <Card>
                             <ExpandableHeader
@@ -125,10 +253,10 @@ class JobDetails extends Component {
                     </View>
                     <Footer>
                         <FooterTab>
-                            <Button>
+                            <Button onPress={this.chatButtonPressed}>
                                 <Icon name="ios-chatbubbles-outline" />
                             </Button>
-                            <Button>
+                            <Button onPress={this.callButtonPressed}>
                                 <Icon name="ios-call-outline" />
                             </Button>
                             <Button active>

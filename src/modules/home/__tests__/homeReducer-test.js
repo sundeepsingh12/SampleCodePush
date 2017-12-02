@@ -1,28 +1,20 @@
 'use strict'
 
-const {
-  JOB_FETCHING_START,
-    JOB_FETCHING_END,
-    SET_TABS_LIST,
-    SET_FETCHING_FALSE,
-    CLEAR_HOME_STATE,
-} = require('../../../lib/constants').default
+import {
+    HOME_LOADING,
+} from '../../../lib/constants'
 
 import homeReducer from '../homeReducer'
 
 describe('home reducer', () => {
-    it('it set tabs list',() => {
-        const tabsList = [
-            {
-                tabId : 1,
-                name : 'Pending'
-            }
-        ]
+    it('it should set loader',() => {
         const action = {
-            type : SET_TABS_LIST,
-            payload: tabsList
+            type : HOME_LOADING,
+            payload: {
+                loading : false
+            }
         }
         let nextState = homeReducer(undefined,action)
-        expect(nextState.tabsList).toBe(tabsList)
+        expect(nextState.loading).toBe(action.payload.loading)
     })
 })

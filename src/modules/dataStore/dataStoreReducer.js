@@ -1,15 +1,15 @@
 'use strict'
 
 const InitialState = require('./dataStoreInitialState').default
-const {
+import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER,
     SHOW_ERROR_MESSAGE,
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
-    SET_INITIAL_STATE
-} = require('../../lib/constants').default
+    SET_INITIAL_STATE,
+} from '../../lib/constants'
 const initialState = new InitialState()
 
 export default function dataStoreReducer(state = initialState, action) {

@@ -9,7 +9,7 @@ import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 
 
-import { StyleSheet, View, TouchableOpacity, FlatList, Alert } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, FlatList, Alert, BackHandler } from 'react-native'
 
 import {
     Container,
@@ -32,14 +32,15 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import CheckoutDetails from '../containers/CheckoutDetails'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
-const {
+import {
     SET_FORM_LAYOUT_STATE,
     FormLayout,
     Discard,
     Keep,
     Cancel,
-    Checkout
-} = require('../lib/constants').default
+    Checkout,
+    HardwareBackPress
+} from '../lib/constants'
 import {
     Discard_these_jobs,
     Do_you_want_to_checkout,
@@ -100,7 +101,7 @@ class SaveActivated extends Component {
                 this.props.navigation.state.params.navigationFormLayoutStates
             )
         }
-
+        BackHandler.addEventListener(HardwareBackPress, this._goBack)
     }
 
     signOff = (statusId) => {
@@ -135,24 +136,26 @@ class SaveActivated extends Component {
     }
 
     _discard = () => {
-        this.props.actions.clearStateAndStore()
+        if (!this.props.navigation.state.params.calledFromNewJob) {
+            this.props.actions.clearStateAndStore(false)
+            this.props.actions.setState(SET_FORM_LAYOUT_STATE,
+                _.values(this.props.navigation.state.params.navigationFormLayoutStates)[_.size(this.props.navigation.state.params.navigationFormLayoutStates) - 1])
+            this.props.navigation.goBack()
+        } else {
+            this.props.actions.clearStateAndStore(true)
+        }
     }
 
     _goBack = () => {
-        if (!this.props.navigation.state.params.calledFromNewJob) {
-            this.props.actions.setState(SET_FORM_LAYOUT_STATE,
-                _.values(this.props.navigation.state.params.navigationFormLayoutStates)[_.size(this.props.navigation.state.params.navigationFormLayoutStates) - 1])
-            this.props.navigation.goBack(null)
-        } else {
-            Alert.alert(
-                Discard_these_jobs,
-                '',
-                [
-                    { text: Discard, onPress: () => this._discard() },
-                    { text: Keep, style: 'cancel' },
-                ],
-            )
-        }
+        Alert.alert(
+            Discard_these_jobs,
+            '',
+            [
+                { text: Discard, onPress: () => this._discard() },
+                { text: Keep, style: 'cancel' },
+            ],
+        )
+        return true
     }
 
     _keyExtractor = (item, index) => item.id;
@@ -245,6 +248,7 @@ class SaveActivated extends Component {
     }
 
     _edit = (itemId) => {
+        this.review(false, {})
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: this.props.navigation.state.params.jobTransaction.id,

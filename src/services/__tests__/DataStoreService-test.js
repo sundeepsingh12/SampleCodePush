@@ -1,10 +1,10 @@
 
 import { dataStoreService } from '../classes/DataStoreService'
-const {
+import {
     REMARKS,
     MINMAX,
     SPECIAL
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import * as realm from '../../repositories/realmdb'
 

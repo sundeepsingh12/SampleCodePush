@@ -2,7 +2,7 @@
 
 import dataStoreReducer from '../dataStoreReducer'
 
-const {
+import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER,
@@ -10,7 +10,7 @@ const {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     SET_INITIAL_STATE
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 const InitialState = require('../dataStoreInitialState').default
 
 describe('data Store reducer', () => {

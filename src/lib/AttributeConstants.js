@@ -1,5 +1,15 @@
-import RNFS from 'react-native-fs';
+import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
+import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
+import StartIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
+// import LiveIcon from '../../images/fareye-default-iconset/homescreen/live.png'
+
+import BulkIcon from '../../src/svg_components/icons/BulkIcon'
+import LiveIcon from '../../src/svg_components/icons/LiveIcon'
+import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
+import TaskIcon from '../../src/svg_components/icons/TaskIcon'
+// import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
+import React, { Component } from 'react'
 module.exports = {
 
     /**
@@ -11,42 +21,59 @@ module.exports = {
     ADDRESS_LINE_2: 29,
     AMOUNT: 'amount',
     ARRAY: 12,
+    CAMERA: 20,
+    CAMERA_HIGH: 42,
+    CAMERA_MEDIUM: 43,
+    CASH_TENDERING: 38,
+    CHECKBOX: 8,
     CONTACT_NUMBER: 27,
+    DATE: 3,
+    DATA_STORE: 44,
     DECIMAL: 13,
+    DROPDOWN: 10,
+    EXTERNAL_DATA_STORE: 63,
     FIXED_SKU: 50,
+    FIXED_SKU_QUANTITY: 6,
+    FIXED_SKU_UNIT_PRICE: 13,
+    FIXED_SKU_CODE: 1,
+    IMAGE_URL: 24,
     LANDMARK: 30,
     MODE: 'mode_type',
     MONEY_COLLECT: 18,
     MONEY_PAY: 19,
+    MULTIPLE_SCANNER: 48,
+    NPS_FEEDBACK: 23,
+    NUMBER: 6,
     OBJECT: 11,
+    OPTION_CHECKBOX: 8,
+    OPTION_RADIO_FOR_MASTER: 39,
+    OPTION_RADIO_KEY: 40,
+    OPTION_RADIO_VALUE: 41,
     ORIGINAL_AMOUNT: 25,
+    PASSWORD: 61,
     PINCODE: 31,
+    RADIOBUTTON: 9,
     RECEIPT: 'receipt',
     REMARKS: 'remarks',
+    RE_ATTEMPT_DATE: 33,
+    SEQUENCE: 62,
+    SIGNATURE: 21,
+    SIGNATURE_AND_FEEDBACK: 58,
+    SIGNATURE_AND_NPS: 58,
     SKU_ACTUAL_AMOUNT: 32,
-    SKU_ARRAY: 17,
-    SKU_ORIGINAL_QUANTITY: 15,
-    SKU_CODE: 51,
     SKU_ACTUAL_QUANTITY: 16,
+    SKU_ARRAY: 17,
+    SKU_CODE: 51,
+    JOB_EXPIRY_TIME: 69,
+    SKU_ORIGINAL_QUANTITY: 15,
+    SKU_UNIT_PRICE: 14,
+    STRING: 1,
+    TEXT: 2,
+    TIME: 5,
     TOTAL_ORIGINAL_QUANTITY: 35,
     TOTAL_ACTUAL_QUANTITY: 36,
-    SKU_UNIT_PRICE: 14,
-    CHECKBOX: 8,
-    RADIOBUTTON:9,
-    DROPDOWN:10,
-    TEXT:2,
-    SKU_ORIGINAL_QUANTITY:15,
-    SKU_CODE:51,
-    SKU_ACTUAL_QUANTITY:16,
-    TOTAL_ORIGINAL_QUANTITY:35,
-    TOTAL_ACTUAL_QUANTITY:36,
-    SKU_UNIT_PRICE:14,
+    TOTAL_AMOUNT: 'TotalAmount',
     TRANSACTION_NUMBER: 'transaction_number',
-    NPS_FEEDBACK: 23,
-    RE_ATTEMPT_DATE: 33,
-    DATE: 3,
-    TIME: 5,
-    
 
     // Money Collect Mode Type Constants
     CASH: {
@@ -73,7 +100,8 @@ module.exports = {
         displayName: 'Eze-Tap',
         id: 2,
         modeType: 'EzeTap',
-        appModuleId: 10
+        appModuleId: 10,
+        enabled: false,
     },
     MOSAMBEE: {
         displayName: 'Mosambee',
@@ -97,7 +125,8 @@ module.exports = {
         displayName: 'M-Swipe',
         id: 3,
         modeType: 'MSwipe',
-        appModuleId: 9
+        appModuleId: 9,
+        enabled: false,
     },
     NET_BANKING: {
         displayName: 'Net Banking',
@@ -176,33 +205,31 @@ module.exports = {
         appModuleId: 21
     },
     // Field Data Value Constants
-    FIXED_SKU_QUANTITY: 6,
-    FIXED_SKU_UNIT_PRICE: 13,
-    FIXED_SKU_CODE: 1,
-    OBJECT_ATTR_ID: 11,
-    OBJECT_SAROJ_FAREYE: 'ObjectSarojFareye',
-    TOTAL_AMOUNT: 'TotalAmount',
     ARRAY_SAROJ_FAREYE: 'ArraySarojFareye',
-    CAMERA_HIGH: 42,
-    CAMERA_MEDIUM: 43,
-    CAMERA: 20,
-    SIGNATURE: 21,
-    SIGNATURE_AND_FEEDBACK: 58,
-    CASH_TENDERING: 38,
-    OPTION_CHECKBOX: 8,
-    OPTION_RADIO_FOR_MASTER: 39,
-    OPTION_RADIO_VALUE: 41,
-    OPTION_RADIO_KEY: 40,
-    MULTIPLE_SCANNER: 48,
-    SIGNATURE_AND_NPS: 58,
-    TOTAL_ORIGINAL_QUANTITY: 35,
-    TOTAL_ACTUAL_QUANTITY: 36,
-    STRING: 1,
-    TEXT: 2,
-    NUMBER: 6,
-    DECIMAL: 13,
-    DATA_STORE: 44,
-    EXTERNAL_DATA_STORE: 63,
+    OBJECT_SAROJ_FAREYE: 'ObjectSarojFareye',
+
+    //Validation Condition Constants
+    EQUAL_TO: '==',
+    CONTAINS: 'contains',
+    GREATER_THAN: '>',
+    GREATER_THAN_OR_EQUAL_TO: '>=',
+    LESS_THAN: '<',
+    LESS_THAN_OR_EQUAL_TO: '<=',
+    NOT_EQUAL_TO: '!=',
+    REGEX: 'regex',
+
+    //Validation Action Constants
+    ALERT_MESSAGE: 'alertMessage',
+    ASSIGN: 'assign',
+    ASSIGN_BY_MATHEMATICAL_FORMULA: 'assignByMathematicalFormula',
+    ASSIGN_DATE_TIME: 'assignDateTime',
+    DATE_COMPARATOR: 'dateComparator',
+    ELSE: 'else',
+    REQUIRED_FALSE: 'requiredFalse',
+    REQUIRED_TRUE: 'requiredTrue',
+    RETURN: 'return',
+    THEN: 'then',
+    TIME_COMPARATOR: 'timeComparator',
 
     //REST API 
     SEARCH_VALUE: '?searchValue=',
@@ -211,8 +238,6 @@ module.exports = {
     GET: 'GET',
     EXTERNAL_DATA_STORE_URL: "&externalDataStoreUrl=",
     DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey=",
-   
-    SEQUENCE: 62,
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
@@ -229,5 +254,185 @@ module.exports = {
     Do_you_want_to_checkout: 'Do you want to checkout?',
     Yes_Checkout: 'Yes,Checkout',
     Total: 'Total :',
-    Select_Next_Status: 'Select Next Status'
+    Select_Next_Status: 'Select Next Status',
+   
+   
+    TOKEN_MISSING: 'Token Missing',
+    LOGIN: '?login=',
+    POST: 'POST',
+
+    //Exceptions and Error
+    //Profile Service
+    REGEX_TO_VALIDATE_PASSWORD: /(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}/,
+    CHECK_IF_PASSWORD_ENTERED: "Please Enter Password",
+    CHECK_CURRENT_PASSWORD: "Current Password is wrong Please try again",
+    MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
+    CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
+    VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
+    //Profile Actions
+    UNSAVED_PASSWORD: 'Password not saved before',
+    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
+    TRY_AGAIN: "Please try again...",
+    //ProfileReset Container
+    CONFIRM_CURRENT_PASSWORD: 'Confirm Current Password',
+    NEW_PASSWORD: 'New Password',
+    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
+
+    //App Modules Constants
+    BACKUP: {
+        appModuleId: 17,
+        displayName: 'Backup',
+        enabled: false,
+    },
+    BLUETOOTH: {
+        appModuleId: 16,
+        displayName: 'Pair Bluetooth Device',
+        enabled: false,
+    },
+    BULK: {
+        appModuleId: 1,
+        displayName: 'Bulk Update',
+        enabled: false,
+        icon: <BulkIcon />,
+    },
+    LIVE: {
+        appModuleId: 13,
+        displayName: 'Live',
+        enabled: false,
+        icon: <LiveIcon />,
+    },
+    OFFLINEDATASTORE: {
+        appModuleId: 15,
+        displayName: 'Sync Datastore',
+        enabled: false,
+    },
+    PIECHART: {
+        appModuleId: 5,
+        displayName: 'Pie Chart',
+        enabled: false,
+    },
+    PROFILE: {
+        appModuleId: 14,
+        displayName: 'Profile',
+        enabled: false,
+        icon: 'md-person',
+    },
+    STATISTIC: {
+        appModuleId: 7,
+        displayName: 'My Stats',
+        enabled: false,
+        icon: 'md-trending-up',
+    },
+    SEQUENCEMODULE: {
+        appModuleId: 2,
+        displayName: 'Sequence',
+        enabled: false,
+        icon: <SequenceIcon />,
+    },
+    START: {
+        appModuleId: 4,
+        displayName: 'All Tasks',
+        enabled: false,
+        icon: <TaskIcon />
+    },
+    SUMMARY: {
+        appModuleId: 8,
+        displayName: '',
+        enabled: false,
+    },
+    SORTING: {
+        appModuleId: 26,
+        displayName: 'Sort Parcels',
+        enabled: false,
+        icon: <SequenceIcon />,
+    },
+    CUSTOMAPP:{
+        appModuleId:12,
+        displayName: 'Web URL',
+        enabled: false,
+        remark: null,
+        icon: <SequenceIcon />
+    },
+
+
+    //JobStatusConstants
+    UNSEEN: 'UNSEEN',
+
+    //Status Category
+    PENDING: 1,
+    FAIL: 2,
+    SUCCESS: 3,
+
+    //Sorting module constants
+    REFERENCE_NO: 'referenceNo=',
+    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
+    FAILURE_SORTING: 'Searching failed, Please try again !',
+    NA: 'N.A',
+    SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
+    SORTING_PLACEHOLDER: 'Enter Reference Number To Scan Package',
+
+    //SkuListing Service
+    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
+    QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
+    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
+    QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
+
+    //Sequence Container
+    ROUTE_OPTIMIZATION: 'Route optimisation',
+
+    //Bulk Listing Container
+    NEXT_POSSIBLE_STATUS: 'Next possible status',
+
+    // Array attribute constants
+    ADD_TOAST: 'Please fill required fields first',
+    INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
+
+    //job details constants
+    SELECT_NUMBER: 'Select number for message',
+    CANCEL: 'Cancel',
+    SELECT_TEMPLATE: 'Select template for message',
+    SELECT_NUMBER_FOR_CALL: 'Select number for call',
+    CONFIRMATION: 'Confirmation: ',
+    OK: 'Ok',
+    CALL_CONFIRM: 'Do you want to proceed with the call?',
+
+    //enableSequence
+    SEQ_SELECTED: 'seqSelected',
+
+    //Status_Code
+    UNSEEN: 'UNSEEN',
+    PENDING: 'PENDING',
+
+    //Start Search PlaceHolder
+    SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
+
+    //NonExpandableDetailsView
+    VIEW_TEXT_LABEL: 'View',
+
+    //Error Messages
+    USER_NOT_FOUND: 'User Not Found',
+    SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
+    //Error Message for NonExpandableDetailsView
+    IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+   
+    //Custom App
+    WEBVIEW_REF : 'webview',
+    URL : 'URL',
+    CHOOSE_WEB_URL : "Choose Web URL",
+    ENTER_URL_HERE : "Enter Url Here",
+    HTTP : 'http://',
+
+    //SelectFromList
+    SEARCH: 'Search',
+    OK: 'Ok',
+
+    //Add Server Sms 
+    BIKER_NAME: 'BIKER_NAME',
+    BIKER_MOBILE: 'BIKER_MOBILE',
+    REF_NO: 'REF_NO',
+    ATTEMPT_NO: 'ATTEMPT_NO',
+    RUNSHEET_NO: 'RUNSHEET_NO',
+    CREATION_DATE: 'CREATION_DATE',
+    TRANSACTION_DATE: 'TRANSACTION_DATE',
+    JOB_ETA: 'JOB_ETA',
 }

@@ -1,10 +1,10 @@
-const {
+import {
     JOB_MASTER,
     JOB_STATUS,
     PENDING,
     TABLE_JOB,
     NewJobStatus
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 import {keyValueDBService} from './KeyValueDBService.js'
 import * as realm from '../../repositories/realmdb'

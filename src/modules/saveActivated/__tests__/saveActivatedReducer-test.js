@@ -2,11 +2,11 @@
 
 import saveActivatedReducer from '../saveActivatedReducer'
 
-const {
+import {
     LOADER_ACTIVE,
     POPULATE_DATA,
     SAVE_ACTIVATED_INITIAL_STATE
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 const InitialState = require('../saveActivatedInitialState').default
 
 describe('data Store reducer', () => {

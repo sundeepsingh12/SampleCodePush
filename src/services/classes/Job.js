@@ -1,7 +1,7 @@
 import * as realm from '../../repositories/realmdb'
-const {
+import {
     TABLE_JOB,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import _ from 'underscore'
 
 class Job {

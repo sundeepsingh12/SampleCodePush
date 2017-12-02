@@ -251,7 +251,7 @@ class TransientStatusService {
     * navigationFormLayoutStates
     * }
     */
-    convertMapToArrayAndArrayToMap(differentData, navigationFormLayoutStates, mapToArray) {
+    convertMapToArrayOrArrayToMap(differentData, navigationFormLayoutStates, mapToArray) {
         for (let differentDataCounter in differentData) {
             let resultStructure
             let formElement = differentData[differentDataCounter].formLayoutState.formElement

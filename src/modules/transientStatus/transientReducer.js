@@ -4,10 +4,10 @@ const InitialState = require('./transientInitialState').default
 
 const initialState = new InitialState()
 
-const {
+import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_IS_RUNNING,
-} = require('../../lib/constants').default
+}  from '../../lib/constants'
 
 export default function transientStatusReducer(state = initialState, action) {
 

@@ -1,7 +1,7 @@
 'use strict'
-const {
+import {
     FIELD_ATTRIBUTE_VALIDATION
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 import {
     keyValueDBService
 } from './KeyValueDBService'
@@ -10,8 +10,12 @@ class FieldAttributeValidation {
 
     async getFieldAttributeValidationFromFieldAttributeId(fieldAttributeMasterId){
         const fieldAttributeValidations = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION)
-         if (!fieldAttributeValidations || !fieldAttributeValidations.value) {
+        if (!fieldAttributeValidations || !fieldAttributeValidations.value) {
             throw new Error('Field Attribute Validation missing in store')
+        }
+
+        if(!fieldAttributeMasterId){
+            throw new Error('Field attribute id missing')
         }
         const fieldAttributeValidationForFieldAttribute = fieldAttributeValidations.value.filter(fieldAttributeValidationObject=>fieldAttributeValidationObject.fieldAttributeMasterId==fieldAttributeMasterId)
         return fieldAttributeValidationForFieldAttribute[0]

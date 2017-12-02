@@ -2,9 +2,9 @@
 
 import InitialState from './payByLinkPaymentInitialState'
 
-const {
+import {
     SET_PAY_BY_LINK_PARAMETERS
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 
 const initialState = new InitialState()
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
 
 import {
     Container,
@@ -16,7 +16,7 @@ import {
     Footer,
 } from 'native-base';
 import {
-    Parcel_Summary    
+    Parcel_Summary
 } from '../lib/AttributeConstants'
 
 import getTheme from '../../native-base-theme/components';
@@ -52,37 +52,41 @@ export default class SummaryDetails extends Component {
 
     render() {
         return (
-            <StyleProvider style={getTheme(platform)}>
-                <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.showParcelSummary(false) }}>
-                                    <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{Parcel_Summary}</Text>
+            <Modal
+                animationType="slide"
+                onRequestClose={() => this.props.showParcelSummary(false)}>
+                <StyleProvider style={getTheme(platform)}>
+                    <Container>
+                        <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                            <Body>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.showParcelSummary(false) }}>
+                                        <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    </TouchableOpacity>
+                                    <View style={[style.headerBody]}>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{Parcel_Summary}</Text>
+                                    </View>
+                                    <View style={[style.headerRight]}>
+                                    </View>
+                                    <View />
                                 </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                            </Body>
+                        </Header>
 
-                    <Content style={[styles.bgLightGray]}>
-                        <FlatList
-                            style={[styles.marginTop10]}
-                            data={_.values(this.props.recurringData)}
-                            extraData={this.state}
-                            renderItem={(item) => this.renderParcelData(item.item)}
-                            keyExtractor={this._keyExtractor}>
-                        </FlatList>
-                    </Content>
+                        <Content style={[styles.bgLightGray]}>
+                            <FlatList
+                                style={[styles.marginTop10]}
+                                data={_.values(this.props.recurringData)}
+                                extraData={this.state}
+                                renderItem={(item) => this.renderParcelData(item.item)}
+                                keyExtractor={this._keyExtractor}>
+                            </FlatList>
+                        </Content>
 
-                </Container>
-            </StyleProvider>
+                    </Container>
+                </StyleProvider>
+            </Modal>
         )
     }
 }

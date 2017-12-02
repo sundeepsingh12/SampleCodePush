@@ -10,13 +10,13 @@ import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import DataStoreItemDetails from '../components/DataStoreItemDetails'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
-const {
+import {
     SET_DATA_STORE_ATTR_MAP,
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     _id,
     SET_INITIAL_STATE
-} = require('../lib/constants').default
+} from '../lib/constants'
 import {
     FooterTab,
     Card,

@@ -1,10 +1,10 @@
 'use strict'
 var actions = require('../transientActions')
 var formLayoutActions = require('../../form-layout/formLayoutActions')
-const {
+import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_IS_RUNNING,
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 import thunk from 'redux-thunk'
 import configureStore from 'redux-mock-store'
 const middlewares = [thunk]

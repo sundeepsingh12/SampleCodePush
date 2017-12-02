@@ -1,12 +1,12 @@
 'use strict'
-const {
+import {
     NEW_JOB_MASTER,
     NEW_JOB_STATUS,
     SAVE_ACTIVATED,
     SaveActivated,
     CheckoutDetails,
-    POPULATE_DATA
-} = require('../../lib/constants').default
+    POPULATE_DATA,
+} from '../../lib/constants'
 
 import {newJob} from '../../services/classes/NewJob'
 import { setState, navigateToScene } from '../global/globalActions'
@@ -41,7 +41,7 @@ export function redirectToContainer(jobMaster) {
             let returnParams = await newJob.checkForNextContainer(jobMaster, saveActivatedData)
             let navigationParams
             if (returnParams.screenName == SaveActivated) {
-                let result = await transientStatusService.convertMapToArrayAndArrayToMap(returnParams.saveActivatedState.differentData, returnParams.navigationFormLayoutStates, false)
+                let result = await transientStatusService.convertMapToArrayOrArrayToMap(returnParams.saveActivatedState.differentData, returnParams.navigationFormLayoutStates, false)
                 await dispatch(setState(POPULATE_DATA, {
                     commonData: returnParams.saveActivatedState.commonData,
                     statusName: returnParams.saveActivatedState.statusName,

@@ -146,7 +146,6 @@ class Login extends Component {
                   value={this.props.auth.form.username}
                   autoCapitalize="none"
                   placeholder='Username'
-                  style={feStyle.roundedInput}
                   onChangeText={this.onChangeUsername}
                   disabled={this.props.auth.form.isEditTextDisabled}
                 />
@@ -155,7 +154,6 @@ class Login extends Component {
                 <Input
                   value={this.props.auth.form.password}
                   placeholder='Password'
-                  style={feStyle.roundedInput}
                   secureTextEntry={true}
                   onChangeText={this.onChangePassword}
                   disabled={this.props.auth.form.isEditTextDisabled}

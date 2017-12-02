@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity } from 'react-native'
-const {
-   Edit
-} = require('../lib/constants').default
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
+import {
+    Edit
+} from '../lib/constants'
 import {
     Container,
     Content,
@@ -34,44 +34,49 @@ export default class ReviewSaveActivatedDetails extends Component {
             </View>
         )
     }
-    
+
     _keyExtractor = (item, index) => item.id;
 
     render() {
         return (
-            <StyleProvider style={getTheme(platform)}>
-                <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.reviewCommonData(false, {}) }}>
-                                    <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.headerTitle}</Text>
-                                </View>
-                                <View style={[style.headerRight]}>
-                                    {renderIf(this.props.isEditVisible,
-                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontDefault, styles.alignCenter]}
-                                            onPress={() => this.props.edit(this.props.itemId)}>
-                                            {Edit}
-                                        </Text>)}
-                                </View>
-                            </View>
-                        </Body>
-                    </Header>
 
-                    <Content style={[styles.flex1, styles.bgWhite]}>
-                        <FlatList
-                            data={this.props.commonData}
-                            extraData={this.state}
-                            renderItem={(item) => this.renderData(item.item)}
-                            keyExtractor={this._keyExtractor}>
-                        </FlatList>
-                    </Content>
-                </Container>
-            </StyleProvider>)
+            <Modal
+                animationType="slide"
+                onRequestClose={() => this.props.reviewCommonData(false, {})}>
+                <StyleProvider style={getTheme(platform)}>
+                    <Container>
+                        <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                            <Body>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.reviewCommonData(false, {}) }}>
+                                        <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    </TouchableOpacity>
+                                    <View style={[style.headerBody]}>
+                                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.headerTitle}</Text>
+                                    </View>
+                                    <View style={[style.headerRight]}>
+                                        {renderIf(this.props.isEditVisible,
+                                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontDefault, styles.alignCenter]}
+                                                onPress={() => this.props.edit(this.props.itemId)}>
+                                                {Edit}
+                                            </Text>)}
+                                    </View>
+                                </View>
+                            </Body>
+                        </Header>
+
+                        <Content style={[styles.flex1, styles.bgWhite]}>
+                            <FlatList
+                                data={this.props.commonData}
+                                extraData={this.state}
+                                renderItem={(item) => this.renderData(item.item)}
+                                keyExtractor={this._keyExtractor}>
+                            </FlatList>
+                        </Content>
+                    </Container>
+                </StyleProvider>
+            </Modal>)
     }
 }
 const style = StyleSheet.create({

@@ -4,12 +4,12 @@ const InitialState = require('./saveActivatedInitialState').default
 
 const initialState = new InitialState()
 
-const {
+import {
     LOADER_ACTIVE,
     POPULATE_DATA,
     SAVE_ACTIVATED_INITIAL_STATE,
     DELETE_ITEM_SAVE_ACTIVATED
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 export default function saveActivatedReducer(state = initialState, action) {
     switch (action.type) {

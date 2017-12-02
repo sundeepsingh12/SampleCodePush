@@ -1,7 +1,7 @@
 'use strict'
 var actions = require('../dataStoreActions')
 var formLayoutActions = require('../../form-layout/formLayoutActions')
-const {
+import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER,
@@ -9,8 +9,8 @@ const {
     REMARKS,
     MINMAX,
     SPECIAL,
-    SHOW_DETAILS
-} = require('../../../lib/constants').default
+    SHOW_DETAILS,
+} from '../../../lib/constants'
 import CONFIG from '../../../lib/config'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../../services/classes/DataStoreService'

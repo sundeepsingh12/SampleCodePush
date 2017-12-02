@@ -7,16 +7,20 @@ import {
     Platform,
     FlatList,
     TouchableHighlight,
-    ActivityIndicator
+    ActivityIndicator,
+    Modal
 }
     from 'react-native'
-import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast } from 'native-base'
+import { Container, Content, Input, Card, CardItem, Button, Body, Header,Footer, Left, Right, Icon, TextInput, Toast } from 'native-base'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
+import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
+import SelectFromList from  '../containers/SelectFromList'
+
 import {
     MONEY_COLLECT,
     MONEY_PAY,
@@ -39,6 +43,10 @@ import {
     EXTERNAL_DATA_STORE,
     SEQUENCE,
     PASSWORD,
+    CASH_TENDERING,
+    ARRAY,
+    OBJECT,
+    CASH,
     OPTION_RADIO_FOR_MASTER,
 } from '../lib/AttributeConstants'
 
@@ -52,15 +60,20 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...formLayoutActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions }, dispatch)
     }
 }
 
 class BasicFormElement extends Component {
-    constructor(props) {
-        super(props);
-        this.formElementValue = {}
+
+  constructor(props) {
+    super(props);
+        this.state = {
+        selectFromListEnable: false,
     }
+        this.formElementValue = {}
+  }
+
     componentWillMount = () => {
         if (this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value) {
             this.props.item.isLoading = true
@@ -72,31 +85,34 @@ class BasicFormElement extends Component {
 
     navigateToScene = (item) => {
         let screenName = ''
-        console.log("attrrrr", item.attributeTypeId)
+        let cash = 0
+        console.log('item.attributeTypeId',item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
                 screenName = 'Payment'
                 break
             }
+
+            case OPTION_RADIO_FOR_MASTER:
+            case DROPDOWN:
+            case RADIOBUTTON:
             case CHECKBOX: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case RADIOBUTTON: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case DROPDOWN: {
-                screenName = 'SelectFromList'
-                break
-            }
-            case OPTION_RADIO_FOR_MASTER: {
                 screenName = 'SelectFromList'
                 break
             }
             case FIXED_SKU: {
                 screenName = 'FixedSKUListing'
+                break
+            }
+            case CASH_TENDERING: {
+                cash = this.props.actions.checkForCash(this.props.formElement, this.props.item)
+                if (cash > 0) {
+                    screenName = 'CashTendering'
+                } else {
+                    screenName = null
+                    { Toast.show({ text: "NOT REQUIRED", position: 'bottom', buttonText: 'Okay' }) }
+                }
                 break
             }
             case SIGNATURE: {
@@ -116,6 +132,10 @@ class BasicFormElement extends Component {
                 screenName = 'SignatureAndNps'
                 break
             }
+            case ARRAY: {
+                screenName = 'ArrayFieldAttribute'
+                break
+            }
             default: {
                 screenName = 'OverlayAttributes'
             }
@@ -129,18 +149,19 @@ class BasicFormElement extends Component {
                 jobTransaction: this.props.jobTransaction,
                 latestPositionId: this.props.latestPositionId,
                 nextEditable: this.props.nextEditable,
-                isSaveDisabled: this.props.isSaveDisabled
+                isSaveDisabled: this.props.isSaveDisabled,
+                cash: cash
             }
         )
-
     }
 
     onFocusEvent(currentElement) {
-       this.props.actions.fieldValidations(currentElement,this.props.formElement,'Before')
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction)
     }
 
 
     _onBlurEvent(attributeId) {
+        //TODo remove the below code to update field data if performance remains fine on updation of value on onChangeText
         this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
         const nextEditableElement = this.props.nextEditable[attributeId];
         if (nextEditableElement != null && nextEditableElement.length != 0) {
@@ -159,8 +180,15 @@ class BasicFormElement extends Component {
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, nextEditable, value, isSaveDisabled) {
         this.formElementValue[fieldAttributeMasterId] = value;
+        //TODO remove commented code, if performance with new code is fine
+        /*
         if (value && value.length == 1) {
-            // then fire action to get next editable and focusable elements
+            // then fire action to get next editable and focusable elements and update the value in store
+            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value);
+        }
+        */
+        if (value) {
+            // then fire action to get next editable and focusable elements and update the value in state
             this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value);
         }
         if (value.length == 0) {
@@ -181,7 +209,35 @@ class BasicFormElement extends Component {
         }
     }
 
+
+    _inflateModal=()=> {
+       this.setState(previousState => {
+            return {
+                selectFromListEnable: !this.state.selectFromListEnable
+            }
+        })
+  }
+
+
     render() {
+        if (this.state.selectFromListEnable) {
+            return (
+                <View>
+                <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal}/>
+                <SelectFromList
+                    currentElement={this.props.item}
+                    nextEditable={this.props.nextEditable}
+                    formElements={this.props.formElement}
+                    isSaveDisabled={this.props.isSaveDisabled}
+                    jobTransaction={this.props.jobTransaction}
+                    jobStatusId={this.props.jobStatusId}
+                    latestPositionId={this.props.latestPositionId}
+                    press= {this._inflateModal}
+                />
+                </View>
+            )
+        }
+
         switch (this.props.item.attributeTypeId) {
             case STRING:
             case TEXT:
@@ -196,7 +252,7 @@ class BasicFormElement extends Component {
                                 <Body style={StyleSheet.flatten([styles.padding0])}>
                                     <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
                                         <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
-                                            <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.textPrimary, { marginTop: -5 }])} />
+                                            <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.fontPrimary, { marginTop: -5 }])} />
                                         </View>
                                         <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
                                             <View style={StyleSheet.flatten([styles.row])}>
@@ -237,10 +293,10 @@ class BasicFormElement extends Component {
                                                     multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                                     placeholder='Regular Textbox'
                                                     onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
+                                                    onFocus={() => { this.onFocusEvent(this.props.item) }}
                                                     onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
                                                     secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                                    value={((this.props.item.attributeTypeId == 61 && this.props.item.showCheckMark) || this.props.item.attributeTypeId == 62) ? this.props.item.value : null}
-
+                                                    value={this.props.item.value}
                                                 />
                                             </View>
                                             {
@@ -265,19 +321,21 @@ class BasicFormElement extends Component {
             case TIME:
             case RE_ATTEMPT_DATE:
             case DATE:
+            case CASH_TENDERING:
             case SIGNATURE_AND_NPS:
-                return (
-                    <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-                )
-            case EXTERNAL_DATA_STORE:
+            case ARRAY:
             case DATA_STORE:
-                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-
-            default: console.log("FormLayoutActivityComponent")
+            case EXTERNAL_DATA_STORE:
+             return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+            case CHECKBOX:  
+            case RADIOBUTTON:  
+            case DROPDOWN:  
+            case OPTION_RADIO_FOR_MASTER:
+                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />                
+            default:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
                 )
-                break;
         }
     }
 }

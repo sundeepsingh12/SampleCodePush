@@ -4,7 +4,6 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 
 import React, { Component } from 'react'
@@ -22,9 +21,9 @@ import {
   Right,
   Icon,
   StyleProvider
-} from 'native-base';
+} from 'native-base'
 
-import getTheme from '../../native-base-theme/components';
+import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as newJobActions from '../modules/newJob/newJobActions'
@@ -36,7 +35,7 @@ function mapStateToProps(state) {
     statusList: state.newJob.statusList,
     negativeId: state.newJob.negativeId
   }
-};
+}
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -71,7 +70,7 @@ class NewJob extends Component {
     )
   }
 
-  _keyExtractor = (item, index) => item.id;
+  _keyExtractor = (item, index) => item.id
 
   render() {
     return (
@@ -91,6 +90,7 @@ class NewJob extends Component {
                 </View>
               </View>
             </Body>
+            
           </Header>
           <Content style={[styles.bgWhite]}>
             <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Type</Text>
@@ -109,7 +109,7 @@ class NewJob extends Component {
     )
   }
 
-};
+}
 
 const style = StyleSheet.create({
   jobListItem: {

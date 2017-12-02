@@ -1,7 +1,7 @@
-const {
+import {
   JOB_STATUS,
-  TABIDMAP
-} = require('../../lib/constants').default
+  UNSEEN
+} from '../../lib/constants'
 
 import {
   keyValueDBService
@@ -22,7 +22,6 @@ class JobStatus {
   async getAllIdsForCode(statusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
     if (!jobStatusArray || !jobStatusArray.value) {
-      console.log('inside error >>>>')
       throw new Error('Job status missing in store')
     }
     const jobStatusIds = jobStatusArray.value.filter(jobStatusObject => jobStatusObject.code == statusCode)
@@ -104,6 +103,24 @@ class JobStatus {
       jobMasterIdJobAttributeStatusMap,
       statusIdStatusMap
     }
+  }
+
+  /** Returns statusIds based on particular status category 
+   * where code is not 'UNSEEN' 
+   * 
+   * Possible values of statusCategory - 1,2,3
+   * @param {*} statusCategory 
+   * 
+   * Sample Return value
+   * [1,2,3]
+   */
+  async getNonUnseenStatusIdsForStatusCategory(statusCategory) {
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error('Job status missing in store')
+    }
+    const filteredJobStatusIds = jobStatusArray.value.filter(jobStatus => jobStatus.statusCategory == statusCategory && jobStatus.code != UNSEEN).map(jobStatus => jobStatus.id)
+    return filteredJobStatusIds
   }
 
 }

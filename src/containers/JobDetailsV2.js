@@ -1,15 +1,12 @@
-
 'use strict'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
+import styles from '../themes/FeStyle'
 
-import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Preloader from '../containers/Preloader'
-import Loader from '../components/Loader'
-import ResyncLoader from '../components/ResyncLoader'
-
-import React, {Component} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight, PanResponder} from 'react-native'
+import React, { Component } from 'react'
+import { StyleSheet, View, TouchableOpacity } from 'react-native'
 
 import {
   Container,
@@ -17,275 +14,395 @@ import {
   Header,
   Button,
   Text,
-  List,
-  ListItem,
   Left,
   Body,
   Right,
   Icon,
-  Title,
+  StyleProvider,
+  List,
+  ListItem,
   Footer,
   FooterTab,
-  StyleProvider
-} from 'native-base';
-import LinearGradient from 'react-native-linear-gradient';
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
-import styles from '../themes/FeStyle'
-import * as homeActions from '../modules/home/homeActions'
+  Card,
+  ActionSheet
+} from 'native-base'
+
 import * as globalActions from '../modules/global/globalActions'
-import renderIf from '../lib/renderIf';
-import TitleHeader from '../components/TitleHeader'
+import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
+import Loader from '../components/Loader'
+import ExpandableHeader from '../components/ExpandableHeader'
+import {
+  IS_MISMATCHING_LOCATION
+} from '../lib/constants'
+import renderIf from '../lib/renderIf'
+import CustomAlert from "../components/CustomAlert"
+import {
+  SELECT_NUMBER,
+  CANCEL,
+  SELECT_TEMPLATE,
+  SELECT_NUMBER_FOR_CALL,
+  CONFIRMATION,
+  OK,
+  CALL_CONFIRM
+} from '../lib/AttributeConstants'
+import Communications from 'react-native-communications';
+import CallIcon from '../svg_components/icons/CallIcon'
 
 function mapStateToProps(state) {
-  return {}
-};
+  return {
+    addressList: state.jobDetails.addressList,
+    contactList: state.jobDetails.contactList,
+    customerCareList: state.jobDetails.customerCareList,
+    currentStatus: state.jobDetails.currentStatus,
+    fieldDataList: state.jobDetails.fieldDataList,
+    jobDetailsLoading: state.jobDetails.jobDetailsLoading,
+    jobDataList: state.jobDetails.jobDataList,
+    jobTransaction: state.jobDetails.jobTransaction,
+    messageList: state.jobDetails.messageList,
+    smsTemplateList: state.jobDetails.smsTemplateList,
+    errorMessage: state.jobDetails.errorMessage,
+    statusList: state.jobDetails.statusList
+  }
+}
+
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({
-      ...globalActions,
-      ...homeActions
-    }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions }, dispatch)
   }
 }
-const MAX_POINTS = 200;
-
 
 class JobDetailsV2 extends Component {
+  static navigationOptions = ({ navigation }) => {
+    return { header: null }
+  }
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      isMoving: false,
-      pointsDelta: 0,
-      points: 67
+  componentDidMount() {
+    this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
+  }
+
+  renderStatusList(statusList) {
+    let statusView = []
+    for (let index in statusList) {
+      statusView.push(
+        <ListItem
+          key={statusList[index].id}
+          style={[style.jobListItem, styles.justifySpaceBetween]}
+          onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
+        >
+
+          <View style={[styles.row, styles.alignCenter]}>
+            <View style={[style.statusCircle, { backgroundColor: '#4cd964' }]}></View>
+            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
+          </View>
+          <Right>
+            <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+          </Right>
+        </ListItem>
+      )
+    }
+    return statusView
+  }
+
+  _onGoToNextStatus = () => {
+    this.props.actions.navigateToScene('FormLayout', {
+      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      jobTransactionId: this.props.jobTransaction.id,
+      jobTransaction: this.props.jobTransaction,
+      statusId: this.props.statusList.id,
+      statusName: this.props.statusList.name,
+      jobMasterId: this.props.jobTransaction.jobMasterId
+    }
+    )
+    this._onCancel()
+  }
+  _onCancel = () => {
+    this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
+  }
+
+  _onCheckLocationMismatch = (statusList, jobTransaction) => {
+    const FormLayoutObject = {
+      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      jobTransaction,
+      statusList
+    }
+    this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+  }
+  chatButtonPressed = () => {
+    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
+      return
+    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
+      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
+      contactData.push(CANCEL)
+      ActionSheet.show(
+        {
+          options: contactData,
+          cancelButtonIndex: contactData.length - 1,
+          title: SELECT_NUMBER
+        },
+        buttonIndex => {
+          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
+            this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
+          }
+        }
+      )
+    }
+    else {
+      this.showSmsTemplateList(this.props.navigation.state.params.jobSwipableDetails.contactData[0])
     }
   }
-
-  static navigationOptions = ({navigation}) => {
-    return {header: null}
-  }
-
-  componentWillMount() {
-    this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-
-      onPanResponderGrant: (evt, gestureState) => {
-        this.setState({isMoving: true, pointsDelta: 0});
-      },
-
-      onPanResponderMove: (evt, gestureState) => {
-        // For each 2 pixels add or subtract 1 point
-        this.setState({
-          pointsDelta: Math.round(-gestureState.dy / 2)
-        });
-      },
-      onPanResponderTerminationRequest: (evt, gestureState) => true,
-      onPanResponderRelease: (evt, gestureState) => {
-        let points = this.state.points + this.state.pointsDelta;
-        console.log(Math.min(points, MAX_POINTS));
-        this.setState({
-          isMoving: false,
-          points: points > 0
-            ? Math.min(points, MAX_POINTS)
-            : 0,
-          pointsDelta: 0
-        });
-      }
-    });
-  }
-
-  render() {
-    const fill = this.state.points / MAX_POINTS * 100;
-    return (
-      <StyleProvider style={getTheme(platform)}>
-        <Container>
-          <Header
-            style={StyleSheet.flatten([
-            styles.bgWhite, {
-              borderBottomColor: '#F2F2F2'
+  showSmsTemplateList = (contact) => {
+    setTimeout(() => {
+      if (this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 1) {
+        let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => sms.title)
+        msgTitles.push(CANCEL)
+        ActionSheet.show(
+          {
+            options: msgTitles,
+            cancelButtonIndex: msgTitles.length - 1,
+            title: SELECT_TEMPLATE
+          },
+          buttonIndex => {
+            if (buttonIndex != msgTitles.length - 1 && buttonIndex >= 0) {
+              this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[buttonIndex])
             }
-          ])}>
-            <Left style={{
-              width: 90
-            }}>
-              <Image
-                style={StyleSheet.flatten([
-                styles.width100, {
-                  resizeMode: 'contain'
-                }
-              ])}
-                source={require('../../images/fareye-default-iconset/fareyeLogoSm.png')}/>
-            </Left>
-            <Body></Body>
-            <Right>
-              <Button transparent>
-                <Icon style={style.headerIcon} name='ios-search'/>
-              </Button>
-              <Button transparent>
-                <Icon style={style.headerIcon} name='ios-chatbubbles'/>
-              </Button>
-              <Button transparent>
-                <Icon style={style.headerIcon} name='md-notifications'/>
-              </Button>
-            </Right>
-          </Header>
-          <Content>
-            <LinearGradient
-              colors={['#262da0', '#205dbe', '#2c83c9']}
-              style={style.chartBlock}>
-              <View style={style.chartContainer} {...this._panResponder.panHandlers}>
-              </View>
-              <View style={[styles.row, styles.justifySpaceAround]}>
-                <View>
-                  <Text
-                    style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>200</Text>
-                  <Text
-                    style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>total</Text>
-                </View>
-                <View>
-                  <Text
-                    style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>165</Text>
-                  <Text
-                    style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>done</Text>
-                </View>
-              </View>
-            </LinearGradient>
+          }
+        )
+      }
+      else {
+        this.sendMessageToContact(contact, this.props.navigation.state.params.jobSwipableDetails.smsTemplateData[0])
+      }
+    }, 500)
+  }
 
-            <List>
-              <ListItem
-                style={[style.moduleList]}>
-                <Image
-                  style={[style.moduleListIcon]}
-                  source={require('../../images/fareye-default-iconset/homescreen/tasks.png')}/>
-                <Body>
-                  <Text
-                    style={[styles.fontWeight500, styles.fontLg]}>All Tasks</Text>
-                </Body>
-                <Right>
-                  <Icon name="arrow-forward"/>
-                </Right>
-              </ListItem>
-              <ListItem
-                style={[style.moduleList]}>
-                <Image
-                  style={[style.moduleListIcon]}
-                  source={require('../../images/fareye-default-iconset/homescreen/live.png')}/>
-                <Body>
-                  <Text
-                    style={[styles.fontWeight500, styles.fontLg]}>Live</Text>
-                </Body>
-                <Right>
-                  <Icon name="arrow-forward"/>
-                </Right>
-              </ListItem>
-              <ListItem
-                style={[style.moduleList]}>
-                <Image
-                  style={[style.moduleListIcon]}
-                  source={require('../../images/fareye-default-iconset/homescreen/bulk.png')}/>
-                <Body>
-                  <Text
-                    style={[styles.fontWeight500, styles.fontLg]}>Bulk Update</Text>
-                </Body>
-                <Right>
-                  <Icon name="arrow-forward"/>
-                </Right>
-              </ListItem>
-              <ListItem
-                style={[style.moduleList]}>
-                <Image
-                  style={[style.moduleListIcon]}
-                  source={require('../../images/fareye-default-iconset/homescreen/sequence.png')}/>
-                <Body>
-                  <Text
-                    style={[styles.fontWeight500, styles.fontLg]}>Sequence</Text>
-                </Body>
-                <Right>
-                  <Icon name="arrow-forward"/>
-                </Right>
-              </ListItem>
-            </List>
-          </Content>
-          <Footer>
-            <FooterTab>
-              <Button active>
-                <Icon name="ios-home"/>
-                <Text>Home</Text>
-              </Button>
-              <Button>
-                <Icon name="ios-sync"/>
-                <Text>Sync</Text>
-              </Button>
-              <Button>
-                <Icon name="ios-menu"/>
-                <Text>Menu</Text>
-              </Button>
-            </FooterTab>
-          </Footer>
-        </Container>
-      </StyleProvider>
+  sendMessageToContact = (contact, smsTemplate) => {
+    this.props.actions.setSmsBodyAndSendMessage(contact, smsTemplate, this.props.jobTransaction, this.props.jobDataList, this.props.fieldDataList)
+  }
 
+  callButtonPressed = () => {
+    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
+      return
+    if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
+      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
+      contactData.push(CANCEL)
+      ActionSheet.show(
+        {
+          options: contactData,
+          cancelButtonIndex: contactData.length - 1,
+          title: SELECT_NUMBER_FOR_CALL
+        },
+        buttonIndex => {
+          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
+            this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[buttonIndex])
+          }
+        }
+      )
+    }
+    else {
+      Alert.alert(CONFIRMATION + this.props.navigation.state.params.jobSwipableDetails.contactData[0], CALL_CONFIRM,
+        [{ text: CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        { text: OK, onPress: () => this.callContact(this.props.navigation.state.params.jobSwipableDetails.contactData[0]) },],
+        { cancelable: false })
+    }
+  }
+  callContact = (contact) => {
+    Communications.phonecall(contact, false)
+  }
+  customerCareButtonPressed = () => {
+    let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => customerCare.name)
+    customerCareTitles.push(CANCEL)
+    ActionSheet.show(
+      {
+        options: customerCareTitles,
+        cancelButtonIndex: customerCareTitles.length - 1,
+        title: SELECT_NUMBER_FOR_CALL
+      },
+      buttonIndex => {
+        if (buttonIndex != customerCareTitles.length - 1 && buttonIndex >= 0) {
+          this.callContact(this.props.navigation.state.params.jobSwipableDetails.customerCareData[buttonIndex].mobileNumber)
+        }
+      }
     )
   }
 
-};
+  render() {
+    if (this.props.jobDetailsLoading) {
+      return (
+        <Loader />
+      )
+    }
+    else {
+      const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
+      return (
+        <StyleProvider style={getTheme(platform)}>
+          <Container style={[styles.bgLightGray]}>
+            <View>
+              {renderIf(this.props.statusList,
+                <CustomAlert
+                  title="Details"
+                  message="You are not at location. Do you want to continue?"
+                  onOkPressed={this._onGoToNextStatus}
+                  onCancelPressed={this._onCancel} />)}
+            </View>
+            <Header style={[style.header]}>
+              <View style={style.seqCard}>
+                <View style={style.seqCircle}>
+                  <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
+                    {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
+                  </Text>
+                </View>
+                <View style={style.seqCardDetail}>
+                  <View>
+                    <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+                      {this.props.navigation.state.params.jobTransaction.line1}
+                    </Text>
+                    <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+                      {this.props.navigation.state.params.jobTransaction.line2}
+                    </Text>
+                    <Text
+                      style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
+                      {this.props.navigation.state.params.jobTransaction.circleLine1}
+                    </Text>
+                  </View>
+                </View>
+                <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
+                  <View
+                    style={{
+                      width: 40,
+                      alignSelf: 'flex-start',
+                      alignItems: 'center',
+                      paddingTop: 10,
+                      flex: 1
+                    }}>
+                    <Icon
+                      name="md-close"
+                      style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
+                  </View>
+                </TouchableOpacity >
+              </View>
+            </Header>
+            <Content>
+
+              <View style={[styles.marginTop10, styles.bgWhite]}>
+                {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
+                  <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
+                    {this.props.errorMessage}
+                  </Text>
+                </View> : null}
+
+                {statusView}
+              </View>
+
+              {/*Basic Details*/}
+              <View style={[styles.bgWhite, styles.marginTop10, styles.padding10]}>
+                <ExpandableHeader
+                  title={'Basic Details'}
+                  dataList={this.props.jobDataList}
+                />
+              </View>
+
+              {/*Payment Details*/}
+              <View style={[styles.bgWhite, styles.marginTop10, styles.padding10]}>
+                <ExpandableHeader
+                  title={'Field Details'}
+                  dataList={this.props.fieldDataList} />
+              </View>
+            </Content>
+            <Footer style={[style.footer]}>
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData
+                && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0
+                && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData
+                && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
+                <FooterTab>
+                  <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
+                    <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>
+              )}
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
+                <FooterTab>
+                  <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
+                    <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>
+              )}
+              <FooterTab>
+                <Button full>
+                  <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+                </Button>
+              </FooterTab>
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
+                <FooterTab>
+                  <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
+                    <CallIcon />
+                  </Button>
+                </FooterTab>)}
+            </Footer>
+
+          </Container>
+        </StyleProvider>
+      )
+    }
+  }
+}
+
 
 const style = StyleSheet.create({
-  chartCenterData: {
-    backgroundColor: 'transparent',
-    textAlign: 'center',
-    color: '#ffffff'
-
+  //  styles.column, styles.paddingLeft0, styles.paddingRight0, {height: 'auto'}
+  header: {
+    flexDirection: 'column',
+    paddingLeft: 0,
+    paddingRight: 0,
+    height: 'auto',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f3f3'
   },
   headerIcon: {
     fontSize: 18
   },
-  pieData: {
-    position: 'absolute',
-    width: 140,
-    height: 140,
+  seqCard: {
+    minHeight: 70,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: 10,
+    backgroundColor: '#ffffff'
+  },
+  seqCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#ffcc00',
     justifyContent: 'center',
     alignItems: 'center'
   },
-  pieNumber: {
-    fontSize: 40,
-    fontWeight: "bold"
+  seqCardDetail: {
+    flex: 1,
+    minHeight: 70,
+    paddingTop: 10,
+    paddingBottom: 10,
+    marginLeft: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
-  pieText: {
-    fontSize: 16
+  jobListItem: {
+    borderBottomColor: '#f2f2f2',
+    borderBottomWidth: 1,
+    paddingTop: 20,
+    paddingBottom: 20
   },
-  chartContainer: {
-    height: 190,
-    paddingTop: 25,
-    justifyContent: 'space-between',
-    alignItems: 'center'
+  statusCircle: {
+    width: 6,
+    height: 6,
+    borderRadius: 3
   },
-  chartBlock: {
-    margin: 10,
-    height: 240,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 2
-  },
-  moduleList: {
-    height: 90,
-    borderBottomColor: '#F2F2F2'
-  },
-  moduleListIcon: {
-    width: 30,
-    height: 30,
-    marginRight: 15
+  footer: {
+    height: 'auto',
+    backgroundColor: '#ffffff',
+    borderTopWidth: 1,
+    borderTopColor: '#f3f3f3',
   }
-});
 
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDetailsV2)

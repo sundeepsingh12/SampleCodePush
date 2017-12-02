@@ -16,9 +16,9 @@ import _ from 'underscore'
 import RNFS from 'react-native-fs';
 import RNFetchBlob from 'react-native-fetch-blob'
 import {keyValueDBService} from '../services/classes/KeyValueDBService.js'
-const {
+import {
   PENDING_SYNC_TRANSACTION_IDS
-} = require('./constants').default
+} from './constants'
 
 const fetch = require('react-native-cancelable-fetch');
 class RestAPI {
@@ -183,6 +183,8 @@ class RestAPI {
   }
 
   async uploadZipFile() {
+    // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
+    // console.log('jid',jid)
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
   await RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
     Authorization :this._sessionToken,

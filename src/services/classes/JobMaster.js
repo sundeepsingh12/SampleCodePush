@@ -1,15 +1,12 @@
-/**
+ /**
  * Created by udbhav on 12/4/17.
  */
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
-
 import { keyValueDBService } from './KeyValueDBService'
-
 import moment from 'moment'
-
-const {
+import {
   JOB_MASTER,
   JOB_ATTRIBUTE,
   JOB_ATTRIBUTE_VALUE,
@@ -33,7 +30,11 @@ const {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   HUB
-} = require('../../lib/constants').default
+} from '../../lib/constants'
+
+import {
+  UNSEEN,
+} from '../../lib/AttributeConstants'
 
 
 class JobMaster {
@@ -209,6 +210,9 @@ class JobMaster {
     }
     let tabIdStatusIdsMap = {}
     jobStatus.forEach(jobStatusObject => {
+      if(jobStatusObject.code == UNSEEN) {
+        return
+      }
       if (!tabIdStatusIdsMap[jobStatusObject.tabId]) {
         tabIdStatusIdsMap[jobStatusObject.tabId] = []
       }
@@ -250,6 +254,17 @@ class JobMaster {
     }
     return true
   }
+
+  getJobMaterFromJobMasterLists(jobMasterId,jobMasterList){
+    const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+    return jobMaster
+  }
+  async getJobMaterFromJobMasterList(jobMasterId){
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+    return jobMaster;
+  }
 }
+
 
 export let jobMasterService = new JobMaster()

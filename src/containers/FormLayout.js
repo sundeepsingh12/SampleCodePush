@@ -25,9 +25,9 @@ import {
   UPI,
 } from '../lib/AttributeConstants'
 
-const {
+import {
   SET_FORM_LAYOUT_STATE,
-} = require('../lib/constants').default
+} from '../lib/constants'
 
 function mapStateToProps(state) {
   return {
@@ -42,8 +42,6 @@ function mapStateToProps(state) {
     isLoading: state.formLayout.isLoading,
     errorMessage: state.formLayout.errorMessage,
     currentElement: state.formLayout.currentElement,
-    noOfElements: state.formLayout.noOfElements,
-    nextElement: state.formLayout.nextElement
   }
 }
 
@@ -92,6 +90,8 @@ class FormLayout extends Component {
     return null
   }
 
+ 
+
   saveJobTransaction() {
     let formLayoutState = {
       formElement: this.props.formElement,
@@ -105,8 +105,6 @@ class FormLayout extends Component {
       isLoading: this.props.isLoading,
       errorMessage: this.props.errorMessage,
       currentElement: this.props.currentElement,
-      noOfElements: this.props.noOfElements,
-      nextElement: this.props.nextElement,
     }
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
@@ -123,6 +121,7 @@ class FormLayout extends Component {
         this.props.navigation.state.params.contactData,
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
+        this.props.navigation.state.params.saveActivatedStatusData
       )
     }
   }
@@ -130,6 +129,7 @@ class FormLayout extends Component {
   _keyExtractor = (item, index) => item[1].key;
 
   render() {
+    console.log(this.props)
     if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
       Toast.show({
         text: this.props.errorMessage,
@@ -156,7 +156,7 @@ class FormLayout extends Component {
           <FlatList
             data={Array.from(this.props.formElement)}
             extraData={this.state}
-            renderItem={(item) => this.renderData(item.item[1])} //TODO add comments for item[1] 
+            renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
             keyExtractor={this._keyExtractor}>
           </FlatList>
         </Content>

@@ -1,6 +1,6 @@
 'use strict'
 var actions = require('../saveActivatedActions')
-const {
+import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_ACTIVE,
     POPULATE_DATA,
@@ -9,7 +9,7 @@ const {
     SAVE_ACTIVATED_INITIAL_STATE,
     DELETE_ITEM_SAVE_ACTIVATED,
     Home
-} = require('../../../lib/constants').default
+} from '../../../lib/constants'
 import CONFIG from '../../../lib/config'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { transientStatusService } from '../../../services/classes/TransientStatusService'

@@ -4,7 +4,7 @@ import { fieldAttributeMasterService } from '../classes/FieldAttributeMaster'
 import { fieldValidationService } from '../classes/FieldValidation'
 import { moduleCustomizationService } from '../classes/ModuleCustomization'
 import * as realm from '../../repositories/realmdb'
-const {
+import {
     ACTUAL_AMOUNT,
     AMOUNT,
     ARRAY,
@@ -45,11 +45,11 @@ const {
     TICKET_RESTAURANT,
     TRANSACTION_NUMBER,
     UPI,
-} = require('../../lib/AttributeConstants')
+} from '../../lib/AttributeConstants'
 
-const {
+import {
     TABLE_JOB_DATA,
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 class Payment {
 

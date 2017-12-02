@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 import React, { Component } from 'react'
 import {
   StyleSheet,
@@ -14,16 +14,14 @@ import SkuListItem from '../components/SkuListItem'
 import { Container, Content, ListItem, List, Text, Footer, FooterTab, Button, Input } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import styles from '../themes/FeStyle'
-import renderIf from '../lib/renderIf';
-import _ from 'underscore';
+import renderIf from '../lib/renderIf'
+import _ from 'underscore'
 
 class SkuListing extends Component {
 
-  componentWillMount() {
+  componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
-    console.log('fieldAttributeMasterId', fieldAttributeMasterId)
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    console.log('jobId', jobId)
     this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
   }
 
