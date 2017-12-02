@@ -46,7 +46,7 @@ class Sync {
       throw new Error('Token Missing')
     }
     await createZip()
-    console.log('token before call',token.value)
+    console.log('token before call', token.value)
     await RestAPIFactory(token.value).uploadZipFile()
   }
 
@@ -138,11 +138,7 @@ class Sync {
       let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery)
 
       if (allJobsToTransaction.length) {
-        if(contentQuery.jobTransactions){
-          contentQuery.jobTransactions = allJobsToTransaction.concat(contentQuery.jobTransactions)          
-        } else{
-        contentQuery.jobTransactions = allJobsToTransaction        
-        }
+        contentQuery.jobTransactions = (contentQuery.jobTransactions) ? allJobsToTransaction.concat(contentQuery.jobTransactions) : allJobsToTransaction
       }
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
@@ -150,7 +146,7 @@ class Sync {
       } else if (queryType == 'update' || queryType == 'updateStatus') {
         await this.updateDataInDB(contentQuery)
       } else if (queryType == 'delete') {
-        const jobIds = await contentQuery.job.map(jobObject => jobObject.id)        
+        const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
         const deleteJobTransactions = {
           tableName: TABLE_JOB_TRANSACTION,
           valueList: jobIds,
@@ -164,7 +160,6 @@ class Sync {
   async getAssignOrderTohubEnabledJobs(query) {
     let allJobsToTransactions = []
     const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
-    //optimize this
     const jobMasterWithAssignOrderToHubEnabled = jobMaster.value.filter(id => id.assignOrderToHub).reduce((object, item) => {
       object[item.id] = item.id
       return object
@@ -175,27 +170,30 @@ class Sync {
       return object
     }, {})
 
-    let jobsList = query.job
-    for (let jobs in jobsList) {
-      let jobMasterid = jobMasterWithAssignOrderToHubEnabled[jobsList[jobs].jobMasterId]
-      if ((_.isEmpty(transactionListIdMap) || !transactionListIdMap[jobsList[jobs].id]) && jobMasterid) {
-        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobsList[jobs], jobMasterid)
+    for (let jobs of query.job) {
+      let jobMasterid = jobMasterWithAssignOrderToHubEnabled[jobs.jobMasterId]
+      if ((_.isEmpty(transactionListIdMap) || !transactionListIdMap[jobs.id]) && jobMasterid) {
+        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobs, jobMaster.value)
         allJobsToTransactions.push(unassignedTransactions)
       }
     }
     return allJobsToTransactions
   }
 
-  async _createTransactionsOfUnassignedJobs(job, jobMasterid) {
-    const jobstatusFromDB = await keyValueDBService.getValueFromStore(JOB_STATUS)
-
+  async _createTransactionsOfUnassignedJobs(job, jobMaster) {
     let user = await keyValueDBService.getValueFromStore(USER)
     let hub = await keyValueDBService.getValueFromStore(HUB)
     let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    let jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER).then(jobMasterObject => { return jobMasterObject.value.filter(jobMasterObject1 => jobMasterObject1.id == jobMasterid) })
+    const jobstatusFromDB = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    let jobmaster
+    for( let jobMasterObject of jobMaster){
+      if(jobMasterObject.id == job.jobMasterId){
+        jobmaster = jobMasterObject
+        break
+      }
+    }
     let jobstatus = jobstatusFromDB.value.filter(item => (item.code == "PENDING" && item.jobMasterId == job.jobMasterId))[0]
-
-    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatus, jobMaster[0], user.value, hub.value, imei.value)
+    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatus, jobmaster, user.value, hub.value, imei.value)
     jobtransaction.jobId = job.id
     jobtransaction.seqSelected = -job.id
     return jobtransaction
@@ -255,7 +253,6 @@ class Sync {
    * @param {*} query 
    */
   async saveDataFromServerInDB(contentQuery) {
-    // const contentQuery = JSON.parse(query)
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
