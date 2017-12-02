@@ -52,13 +52,17 @@ class Transient extends Component {
     }
 
     componentDidMount() {
+        if (_.size(this.props.navigation.state.params.currentStatus.nextStatusList) == 1) {
+            this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.nextStatusList[0].id,
+                this.props.navigation.state.params.currentStatus.nextStatusList[0].name)
+        }
         this.props.actions.setStateFromNavigationParams(
             this.props.navigation.state.params.formLayoutState,
             this.props.formLayoutStates,
             this.props.navigation.state.params.currentStatus,
         )
     }
-
+   
     navigateToFormLayout(statusId, statusName) {
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
@@ -77,13 +81,6 @@ class Transient extends Component {
     }
 
     renderData = (item) => {
-        // if (_.size(this.props.navigation.state.params.currentStatus.nextStatusList) == 1) {
-        //     //     return
-        //     //     (
-        //     //         <TouchableOpacity onPress={this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.nextStatusList[0].id, this.props.navigation.state.params.currentStatus.nextStatusList[0].name)} >
-        //     //             <Text>abc</Text>
-        //     //         </TouchableOpacity>)
-        //     // }
         return (
             <ListItem style={[style.jobListItem]} onPress={() => this.navigateToFormLayout(item.id, item.name)}>
                 <View style={[styles.row, styles.alignCenter]}>
@@ -106,13 +103,6 @@ class Transient extends Component {
                 <Loader />
             )
         }
-        // if (_.size(this.props.navigation.state.params.currentStatus.nextStatusList) == 1) {
-        //     return
-        //     (
-        //         <TouchableOpacity onPress={this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.nextStatusList[0].id, this.props.navigation.state.params.currentStatus.nextStatusList[0].name)} >
-        //             <Text>abc</Text>
-        //         </TouchableOpacity>)
-        // }
         return (
             <Container>
                 <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
