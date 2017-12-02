@@ -46,7 +46,7 @@ class Sync {
       throw new Error('Token Missing')
     }
     await createZip()
-    console.log('token before call', token.value)
+    console.log('token before call',token.value)
     await RestAPIFactory(token.value).uploadZipFile()
   }
 
@@ -160,10 +160,12 @@ class Sync {
   async getAssignOrderTohubEnabledJobs(query) {
     let allJobsToTransactions = []
     const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
-    const jobMasterWithAssignOrderToHubEnabled = jobMaster.value.filter(id => id.assignOrderToHub).reduce((object, item) => {
-      object[item.id] = item.id
-      return object
-    }, {})
+    let jobMasterWithAssignOrderToHubEnabled = {}
+    jobMaster.value.forEach(jobMasterObject=>{
+    if(jobMasterObject.assignOrderToHub){
+      jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.id
+    }
+    })
     let transactionList = query.jobTransactions
     let transactionListIdMap = _.values(transactionList).reduce((object, item) => {
       object[item.jobId] = item.jobId
@@ -184,7 +186,6 @@ class Sync {
     let user = await keyValueDBService.getValueFromStore(USER)
     let hub = await keyValueDBService.getValueFromStore(HUB)
     let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    const jobstatusFromDB = await keyValueDBService.getValueFromStore(JOB_STATUS)
     let jobmaster
     for( let jobMasterObject of jobMaster){
       if(jobMasterObject.id == job.jobMasterId){
@@ -192,14 +193,14 @@ class Sync {
         break
       }
     }
-    let jobstatus = jobstatusFromDB.value.filter(item => (item.code == "PENDING" && item.jobMasterId == job.jobMasterId))[0]
-    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatus, jobmaster, user.value, hub.value, imei.value)
+    let jobstatusid = await jobStatusService.getStatusIdForJobMasterIdAndCode(job.jobMasterId, "PENDING")
+    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatusid, jobmaster, user.value, hub.value, imei.value)
     jobtransaction.jobId = job.id
     jobtransaction.seqSelected = -job.id
     return jobtransaction
   }
 
-  _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei) {
+  _getDefaultValuesForJobTransaction(id, statusid, jobMaster, user, hub, imei) {
     //TODO some values like lat/lng and battery are not valid values, update them as their library is added
     return jobTransaction = {
       id,
@@ -207,7 +208,7 @@ class Sync {
       syncErp: false,
       userId: user.id,
       jobId: id,
-      jobStatusId: status.id,
+      jobStatusId: statusid,
       companyId: user.company.id,
       actualAmount: 0.0,
       originalAmount: 0.0,
@@ -233,7 +234,7 @@ class Sync {
       jobMasterId: jobMaster.id,
       employeeCode: user.employeeCode,
       hubCode: hub.code,
-      statusCode: status.code,
+      statusCode: "PENDING",
       startTime: "00:00",
       endTime: "00:00",
       merchantCode: null,
