@@ -15,7 +15,8 @@ import {
     SEQUENCEMODULE,
     SUMMARY,
     USER_NOT_FOUND,
-    SORTING
+    SORTING,
+    CUSTOMAPP
 } from '../../lib/AttributeConstants'
 
 class ModuleCustomization {
@@ -113,6 +114,12 @@ class ModuleCustomization {
                     this.setModuleDetails(SORTING, moduleCustomizationList[index], user)
                     break
                 }
+
+                case CUSTOMAPP.appModuleId: {
+                    this.setModuleDetails(CUSTOMAPP, moduleCustomizationList[index], user)
+                    break
+                }
+
             }
         }
     }
@@ -131,6 +138,9 @@ class ModuleCustomization {
         if (!moduleCustomization.selectedUserType || moduleCustomization.selectedUserType.length == 0 || (displayName = this.checkSelectedUserType(JSON.parse(moduleCustomization.selectedUserType), user))) {
             appModule.enabled = true
             appModule.displayName = displayName.trim() ? displayName : moduleCustomization.displayName && (moduleCustomization.displayName + '').trim() ? moduleCustomization.displayName : appModule.displayName
+            if (appModule.appModuleId == CUSTOMAPP.appModuleId && moduleCustomization.remark != undefined) {
+                appModule.remark = JSON.parse(moduleCustomization.remark)
+            }
         }
 
     }

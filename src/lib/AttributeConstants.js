@@ -36,6 +36,7 @@ module.exports = {
     FIXED_SKU_QUANTITY: 6,
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,
+    IMAGE_URL: 24,
     LANDMARK: 30,
     MODE: 'mode_type',
     MONEY_COLLECT: 18,
@@ -63,6 +64,7 @@ module.exports = {
     SKU_ACTUAL_QUANTITY: 16,
     SKU_ARRAY: 17,
     SKU_CODE: 51,
+    JOB_EXPIRY_TIME: 69,
     SKU_ORIGINAL_QUANTITY: 15,
     SKU_UNIT_PRICE: 14,
     STRING: 1,
@@ -329,12 +331,20 @@ module.exports = {
         displayName: '',
         enabled: false,
     },
-    SORTING:{
-        appModuleId:26,
-         displayName: 'Sort Parcels',
+    SORTING: {
+        appModuleId: 26,
+        displayName: 'Sort Parcels',
         enabled: false,
         icon: <SequenceIcon />,
     },
+    CUSTOMAPP:{
+        appModuleId:12,
+        displayName: 'Web URL',
+        enabled: false,
+        remark: null,
+        icon: <SequenceIcon />
+    },
+
 
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
@@ -348,31 +358,72 @@ module.exports = {
     REFERENCE_NO: 'referenceNo=',
     REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
-    NA : 'N.A',
-    SEARCH_INFO : 'Search/Scan QR code in the top bar to Start',
-    SORTING_PLACEHOLDER : 'Enter Reference Number To Scan Package',
+    NA: 'N.A',
+    SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
+    SORTING_PLACEHOLDER: 'Enter Reference Number To Scan Package',
 
     //SkuListing Service
-    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY : 'Quantity should be less than max quantity.Cannot proceed.',
+    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
     QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
-    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY : 'Quantity should be equal to max quantity.Cannot proceed.',
-    QTY_ZERO : 'Quantity should be 0.Cannot proceed.',
+    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
+    QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
 
     //Sequence Container
     ROUTE_OPTIMIZATION: 'Route optimisation',
 
     //Bulk Listing Container
-    NEXT_POSSIBLE_STATUS:'Next possible status',
-    
+    NEXT_POSSIBLE_STATUS: 'Next possible status',
+
     // Array attribute constants
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
 
+    //job details constants
+    SELECT_NUMBER: 'Select number for message',
+    CANCEL: 'Cancel',
+    SELECT_TEMPLATE: 'Select template for message',
+    SELECT_NUMBER_FOR_CALL: 'Select number for call',
+    CONFIRMATION: 'Confirmation: ',
+    OK: 'Ok',
+    CALL_CONFIRM: 'Do you want to proceed with the call?',
+
+    //enableSequence
+    SEQ_SELECTED: 'seqSelected',
+
+    //Status_Code
+    UNSEEN: 'UNSEEN',
+    PENDING: 'PENDING',
+
     //Start Search PlaceHolder
     SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
+
+    //NonExpandableDetailsView
+    VIEW_TEXT_LABEL: 'View',
 
     //Error Messages
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
+    //Error Message for NonExpandableDetailsView
+    IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+   
+    //Custom App
+    WEBVIEW_REF : 'webview',
+    URL : 'URL',
+    CHOOSE_WEB_URL : "Choose Web URL",
+    ENTER_URL_HERE : "Enter Url Here",
+    HTTP : 'http://',
 
+    //SelectFromList
+    SEARCH: 'Search',
+    OK: 'Ok',
+
+    //Add Server Sms 
+    BIKER_NAME: 'BIKER_NAME',
+    BIKER_MOBILE: 'BIKER_MOBILE',
+    REF_NO: 'REF_NO',
+    ATTEMPT_NO: 'ATTEMPT_NO',
+    RUNSHEET_NO: 'RUNSHEET_NO',
+    CREATION_DATE: 'CREATION_DATE',
+    TRANSACTION_DATE: 'TRANSACTION_DATE',
+    JOB_ETA: 'JOB_ETA',
 }

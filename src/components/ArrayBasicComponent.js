@@ -32,7 +32,7 @@ function mapDispatchToProps(dispatch) {
 class ArrayBasicComponent extends Component {
 
     onFocusEvent(currentElement) {
-        //  this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before')
+        this.props.actions.fieldValidations(currentElement, this.props.arrayRow.formLayoutObject, 'Before', this.props.jobTransaction)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, value, arrayElements, rowId) {
@@ -63,6 +63,7 @@ class ArrayBasicComponent extends Component {
                                         <Input
                                             keyboardType={(item.attributeTypeId == NUMBER || item.attributeTypeId == DECIMAL) ? 'numeric' : 'default'}
                                             editable={item.editable}
+                                            onFocus={() => { this.onFocusEvent(item) }}
                                             multiline={item.attributeTypeId == TEXT ? true : false}
                                             onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.nextEditable, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
                                             value={item.value}

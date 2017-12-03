@@ -81,6 +81,8 @@ class FormLayout extends Component {
     return null
   }
 
+ 
+
   saveJobTransaction() {
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
