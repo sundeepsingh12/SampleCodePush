@@ -5,6 +5,7 @@ import { createZip } from './SyncZip'
 import {
   keyValueDBService
 } from './KeyValueDBService'
+import moment from 'moment'
 
 import {
   jobStatusService
@@ -32,7 +33,12 @@ import {
   USER,
   UNSEEN,
   PENDING,
-  TABLE_JOB_TRANSACTION_CUSTOMIZATION
+  TABLE_JOB_TRANSACTION_CUSTOMIZATION,
+  JOB_MASTER,
+  JOB_STATUS,
+  HUB,
+  DEVICE_IMEI,
+
 } from '../../lib/constants'
 
 import {
@@ -137,22 +143,127 @@ class Sync {
   async processTdcResponse(tdcContentArray) {
     let tdcContentObject,jobMasterIds
     for (tdcContentObject of tdcContentArray) {
+      let contentQuery = JSON.parse(tdcContentObject.query)
+      let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery)
+
+      if (allJobsToTransaction.length) {
+        contentQuery.jobTransactions = (contentQuery.jobTransactions) ? allJobsToTransaction.concat(contentQuery.jobTransactions) : allJobsToTransaction
+      }
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
-        jobMasterIds = await this.saveDataFromServerInDB(tdcContentObject.query)
+       jobMasterIds =  await this.saveDataFromServerInDB(contentQuery)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
-       jobMasterIds =  await this.updateDataInDB(tdcContentObject.query)
+        jobMasterIds = await this.updateDataInDB(contentQuery)
+      } else if (queryType == 'delete') {
+        const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+        const deleteJobTransactions = {
+          tableName: TABLE_JOB_TRANSACTION,
+          valueList: jobIds,
+          propertyName: 'jobId'
+        }
+        await realm.deleteRecordsInBatch(deleteJobTransactions)
+      }
+        return jobMasterIds
+    }
+  }
+
+  async getAssignOrderTohubEnabledJobs(query) {
+    let allJobsToTransactions = []
+    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    let jobMasterWithAssignOrderToHubEnabled = {}
+    jobMaster.value.forEach(jobMasterObject=>{
+    if(jobMasterObject.assignOrderToHub){
+      jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.id
+    }
+    })
+    let transactionList = query.jobTransactions
+    let transactionListIdMap = _.values(transactionList).reduce((object, item) => {
+      object[item.jobId] = item.jobId
+      return object
+    }, {})
+
+    for (let jobs of query.job) {
+      let jobMasterid = jobMasterWithAssignOrderToHubEnabled[jobs.jobMasterId]
+      if ((_.isEmpty(transactionListIdMap) || !transactionListIdMap[jobs.id]) && jobMasterid) {
+        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobs, jobMaster.value)
+        allJobsToTransactions.push(unassignedTransactions)
       }
     }
-    return jobMasterIds
+    return allJobsToTransactions
+  }
+
+  async _createTransactionsOfUnassignedJobs(job, jobMaster) {
+    let user = await keyValueDBService.getValueFromStore(USER)
+    let hub = await keyValueDBService.getValueFromStore(HUB)
+    let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+    let jobmaster
+    for( let jobMasterObject of jobMaster){
+      if(jobMasterObject.id == job.jobMasterId){
+        jobmaster = jobMasterObject
+        break
+      }
+    }
+    let jobstatusid = await jobStatusService.getStatusIdForJobMasterIdAndCode(job.jobMasterId, "PENDING")
+    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatusid, jobmaster, user.value, hub.value, imei.value)
+    jobtransaction.jobId = job.id
+    jobtransaction.seqSelected = -job.id
+    return jobtransaction
+  }
+
+  _getDefaultValuesForJobTransaction(id, statusid, jobMaster, user, hub, imei) {
+    //TODO some values like lat/lng and battery are not valid values, update them as their library is added
+    return jobTransaction = {
+      id,
+      runsheetNo: "AUTO-GEN",
+      syncErp: false,
+      userId: user.id,
+      jobId: id,
+      jobStatusId: statusid,
+      companyId: user.company.id,
+      actualAmount: 0.0,
+      originalAmount: 0.0,
+      moneyTransactionType: '',
+      referenceNumber: user.id + "/" + hub.id + "/" + moment().valueOf(),
+      runsheetId: null,
+      hubId: hub.id,
+      cityId: user.cityId,
+      trackKm: 0.0,
+      trackHalt: 0.0,
+      trackCallCount: 0,
+      trackCallDuration: 0,
+      trackSmsCount: 0,
+      trackTransactionTimeSpent: 0.0,
+      jobCreatedAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+      erpSyncTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      androidPushTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      lastUpdatedAtServer: moment().format('YYYY-MM-DD HH:mm:ss'),
+      lastTransactionTimeOnMobile: moment().format('YYYY-MM-DD HH:mm:ss'),
+      deleteFlag: 0,
+      attemptCount: 1,
+      jobType: jobMaster.code,
+      jobMasterId: jobMaster.id,
+      employeeCode: user.employeeCode,
+      hubCode: hub.code,
+      statusCode: "PENDING",
+      startTime: "00:00",
+      endTime: "00:00",
+      merchantCode: null,
+      seqSelected: 0,
+      seqAssigned: 0,
+      seqActual: 0,
+      latitude: 0.0,
+      longitude: 0.0,
+      trackBattery: 0,
+      imeiNumber: imei.imeiNumber
+    }
+
   }
 
   /**
    * 
    * @param {*} query 
    */
-  async saveDataFromServerInDB(query) {
-    const contentQuery = JSON.parse(query)
+  async saveDataFromServerInDB(contentQuery) {
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
@@ -191,8 +302,7 @@ class Sync {
    * 
    * @param {*} query 
    */
-  async updateDataInDB(query) {
-    const contentQuery = await JSON.parse(query)
+  async updateDataInDB(contentQuery) {
     const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
     const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
     const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
