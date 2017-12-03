@@ -31,7 +31,6 @@ import {
 function mapStateToProps(state) {
   return {
     formElement: state.formLayout.formElement,
-    nextEditable: state.formLayout.nextEditable,
     isSaveDisabled: state.formLayout.isSaveDisabled,
     statusName: state.formLayout.statusName,
     jobTransactionId: state.formLayout.jobTransactionId,
@@ -59,7 +58,6 @@ class FormLayout extends Component {
     return (
       <BasicFormElement
         item={item}
-        nextEditable={this.props.nextEditable}
         formElement={this.props.formElement}
         isSaveDisabled={this.props.isSaveDisabled}
         jobTransaction={this.props.navigation.state.params.jobTransaction}
@@ -109,6 +107,17 @@ class FormLayout extends Component {
       })
     }
     if (this.props.isLoading) { return <Loader /> }
+    if (this.props.formElement && this.props.formElement.length == 0) {
+      <Footer style={[style.footer]}>
+        <FooterTab style={[styles.padding10]}>
+          <Button success full
+            onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+            disabled={this.props.isSaveDisabled}>
+            <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+          </Button>
+        </FooterTab>
+      </Footer>
+    }
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>

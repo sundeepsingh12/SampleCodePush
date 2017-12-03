@@ -115,7 +115,7 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
 export function onSave(fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue) {
     return async function (dispatch) {
         try {
-            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
+            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, ON_BLUR))
         } catch (error) {
             console.log(error)
         }
@@ -153,7 +153,7 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
                 formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
             }
             dispatch(setState(SAVE_SUCCESSFUL, true))
-            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
+            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, ON_BLUR))
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
                 errorMessage: error.message,

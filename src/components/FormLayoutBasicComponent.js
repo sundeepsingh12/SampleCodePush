@@ -63,15 +63,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class BasicFormElement extends Component {
-    constructor(props) {
-        super(props);
-        //TODO this object can be removed if fieldData on updation is removed
-        this.formElementValue = {}
-    }
-    componentWillMount = () => {
+
+    componentDidMount() {
         if (this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value) {
             this.props.item.isLoading = true
-            this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable,
+            this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement,
                 this.props.isSaveDisabled, this.props.item.sequenceMasterId)
         }
     }
@@ -80,7 +76,7 @@ class BasicFormElement extends Component {
     navigateToScene = (item) => {
         let screenName = ''
         let cash = 0
-        console.log("attrrrr", item.attributeTypeId)
+        this.props.actions.fieldValidations(item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
@@ -150,7 +146,6 @@ class BasicFormElement extends Component {
                 jobStatusId: this.props.jobStatusId,
                 jobTransaction: this.props.jobTransaction,
                 latestPositionId: this.props.latestPositionId,
-                nextEditable: this.props.nextEditable,
                 isSaveDisabled: this.props.isSaveDisabled,
                 cash: cash
             }
@@ -158,59 +153,24 @@ class BasicFormElement extends Component {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction)
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
     }
 
-
     _onBlurEvent(currentElement) {
-        //TODo remove the below commented code to update field data if performance remains fine on updation of value on onChangeText
-        // this.props.actions.updateFieldData(attributeId, this.formElementValue[attributeId], this.props.formElement);
-        this.props.actions.updateFieldData(currentElement.fieldAttributeMasterId, this.props.formElement.get(currentElement.fieldAttributeMasterId).value, this.props.formElement);
-        const nextEditableElement = this.props.nextEditable[currentElement.fieldAttributeMasterId];
-        if (nextEditableElement != null && nextEditableElement.length != 0) {
-            nextEditableElement.forEach((nextElement) => {
-                if ((typeof (nextElement) == 'string')) {
-                    nextElement = this.props.formElement.get(Number(nextElement.split('$$')[1]));
-                    if (nextElement && !nextElement.value && nextElement.attributeTypeId == 62) {
-                        nextElement.isLoading = true;
-                        this.props.actions.setSequenceDataAndNextFocus(nextElement.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable,
-                            this.props.isSaveDisabled, nextElement.sequenceMasterId)
-                    }
-                }
-            })
-        }
         this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction)
     }
 
-    _getNextFocusableElement(fieldAttributeMasterId, formElement, nextEditable, value, isSaveDisabled) {
-        this.formElementValue[fieldAttributeMasterId] = value;
-        //TODO remove commented code, if performance with new code is fine
-        /*
-        if (value && value.length == 1) {
-            // then fire action to get next editable and focusable elements and update the value in store
-            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value);
+    _getNextFocusableElement(fieldAttributeMasterId, formElement, value, isSaveDisabled) {
+        if (value.length < 2) {
+            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value);
         }
-        */
-        if (value) {
-            // then fire action to get next editable and focusable elements and update the value in state
-            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value);
-        }
-        if (value.length == 0) {
-            this.props.actions.disableSaveIfRequired(fieldAttributeMasterId, isSaveDisabled, formElement, value);
-            this.props.actions.updateFieldData(fieldAttributeMasterId, this.formElementValue[fieldAttributeMasterId], formElement);
+        else {
+            this.props.actions.updateFieldData(fieldAttributeMasterId, value, formElement);
         }
     }
 
     _onPressHelpText(fieldAttributeMasterId) {
         this.props.actions.toogleHelpText(fieldAttributeMasterId, this.props.formElement);
-    }
-
-    _styleNextFocusable(isFocusable) {
-        if (isFocusable) {
-            return {
-                backgroundColor: 'blue'
-            }
-        }
     }
 
     render() {
@@ -223,87 +183,29 @@ class BasicFormElement extends Component {
             case PASSWORD:
                 return (
                     renderIf(!this.props.item.hidden,
-                        <View style={[styles.bgWhite, styles.padding10]}>
+                        <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingBottom30, styles.paddingLeft10, styles.paddingRight10, this.props.item.focus ? {borderLeftColor: styles.primaryColor, borderLeftWidth: 5}: null]}>
                             <View style={[styles.marginBottom15]}>
-                                <Item floatingLabel>
+                                <Item stackedLabel>
                                     <Label style={[styles.fontPrimary]}>{this.props.item.label}</Label>
                                     <Input
                                         autoCapitalize="none"
-                                        placeholder= "abccc"
+                                        placeholder="help text"
+                                        defaultValue={this.props.item.value}
+                                        value={this.props.item.value}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
                                         multiline={this.props.item.attributeTypeId == 2 ? true : false}
-                                        onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
+                                        onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
                                         onFocus={() => { this.onFocusEvent(this.props.item) }}
                                         onBlur={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                        value={this.props.item.value}
                                     />
                                 </Item>
+                                {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
+                                    <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
+                                    <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
+                                </View> */}
                             </View>
-
-                            {/* <Card>
-                                <CardItem>
-                                    <Body style={StyleSheet.flatten([styles.padding0])}>
-                                        <View style={StyleSheet.flatten([styles.width100, styles.row, styles.justifySpaceBetween])} >
-                                            <View style={StyleSheet.flatten([{ flexBasis: '12%', paddingTop: 2 }])}>
-                                                <Icon name='md-create' style={StyleSheet.flatten([styles.fontXxl, styles.fontPrimary, { marginTop: -5 }])} />
-                                            </View>
-                                            <View style={StyleSheet.flatten([styles.marginRightAuto, { flexBasis: '88%' }])}>
-                                                <View style={StyleSheet.flatten([styles.row])}>
-                                                    <View style={StyleSheet.flatten([{ flexBasis: '80%' }])}>
-                                                        <Text style={StyleSheet.flatten([styles.fontSm, styles.bold])}>
-                                                            {this.props.item.label}
-                                                        </Text>
-                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                            {this.props.item.subLabel}
-                                                        </Text>
-                                                    </View>
-
-                                                    <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, { flexBasis: '20%' }])}>
-
-                                                        {renderIf(this.props.item.showCheckMark || (this.props.item.attributeTypeId == 62 && this.props.item.isLoading !== undefined && this.props.item.isLoading),
-                                                            this.props.item.showCheckMark ?
-                                                                <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.fontSuccess, { marginTop: -5 }])} /> :
-                                                                (this.props.item.isLoading !== undefined && this.props.item.isLoading) ?
-                                                                    <ActivityIndicator animating={this.props.item.isLoading} style={StyleSheet.flatten([{ marginTop: -20 }])} size="small" color="green" /> : null
-                                                        )}
-
-                                                        {renderIf((this.props.item.helpText && this.props.item.helpText.length > 0),
-                                                            <View>
-                                                                <TouchableHighlight underlayColor='#e7e7e7' onPress={() => this._onPressHelpText(this.props.item.fieldAttributeMasterId)}>
-                                                                    <Icon name='ios-help-circle-outline' style={StyleSheet.flatten([styles.fontXl])} />
-                                                                </TouchableHighlight>
-                                                            </View>
-                                                        )}
-
-
-                                                    </View>
-                                                </View>
-                                                <View style={this._styleNextFocusable(this.props.item.focus)}>
-                                                    <Input
-                                                        autoCapitalize="none"
-                                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
-                                                        editable={this.props.item.editable}
-                                                        multiline={this.props.item.attributeTypeId == 2 ? true : false}
-                                                        placeholder='Regular Textbox'
-                                                        onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable, value, this.props.isSaveDisabled)}
-                                                        onFocus={() => { this.onFocusEvent(this.props.item) }}
-                                                        onBlur={(e) => this._onBlurEvent(this.props.item.fieldAttributeMasterId)}
-                                                        secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                                        value={this.props.item.value}
-                                                    />
-                                                </View>
-                                                {
-                                                    renderIf(this.props.item.helpText && this.props.item.showHelpText,
-                                                        <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                                                            {this.props.item.helpText} </Text>
-                                                    )}
-                                            </View>
-                                        </View>
-                                    </Body>
-                                </CardItem>
-                            </Card> */}
                         </View>
                     )
                 )

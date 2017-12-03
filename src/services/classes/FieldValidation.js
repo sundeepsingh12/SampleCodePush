@@ -7,12 +7,15 @@ import moment from 'moment'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
 
 import {
+    AFTER,
     ALERT_MESSAGE,
     ASSIGN,
     ASSIGN_BY_MATHEMATICAL_FORMULA,
     ASSIGN_DATE_TIME,
-    AFTER,
+    AVERAGE,
     BEFORE,
+    CONCATENATE,
+    DATE,
     DATE_COMPARATOR,
     ELSE,
     EQUAL_TO,
@@ -21,12 +24,17 @@ import {
     GREATER_THAN_OR_EQUAL_TO,
     LESS_THAN,
     LESS_THAN_OR_EQUAL_TO,
+    MAX,
+    MIN,
     NOT_EQUAL_TO,
+    RE_ATTEMPT_DATE,
     REGEX,
     REQUIRED_FALSE,
     REQUIRED_TRUE,
     RETURN,
+    SUM,
     THEN,
+    TIME,
     TIME_COMPARATOR,
 } from '../../lib/AttributeConstants'
 
@@ -49,12 +57,12 @@ class FieldValidation {
      * @param {*} timeOfExecution 
      * @param {*} jobTransaction 
      */
-    fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, nextEditable, fieldAttributeMasterList) {
+    fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction) {
         let validationList = currentElement.validation ? currentElement.validation.filter(validationObject => validationObject.timeOfExecution == timeOfExecution) : null
         let validationMapObject = this.prepareValidationReferenceMap(validationList)
         let validationStringMap = this.validationStringMap(validationMapObject.validationReferenceMap)
-        let alertMessageList = this.evaluateValidationMap(validationStringMap, validationMapObject.validationMap, formElement, jobTransaction, timeOfExecution, nextEditable, fieldAttributeMasterList)
-        return alertMessageList
+        let validationsResult = this.evaluateValidationMap(validationStringMap, validationMapObject.validationMap, formElement, jobTransaction, timeOfExecution)
+        return validationsResult
     }
 
     /**
@@ -111,18 +119,24 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    evaluateValidationMap(validationStringMap, validationMap, formElement, jobTransaction, timeOfExecution, nextEditable, fieldAttributeMasterList) {
-        let validationActionList, alertMessageList = []
+    evaluateValidationMap(validationStringMap, validationMap, formElement, jobTransaction, timeOfExecution) {
+        let validationActionList, alertMessageList = [], returnValue = true
         for (let index in validationStringMap) {
             if (this.evaluateValidation(validationStringMap[index], validationMap, '||', formElement, jobTransaction)) {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == THEN) : null
             } else {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == ELSE) : null
             }
-            let validationActionResultList = validationActionList ? this.runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, nextEditable, validationMap[index].fieldAttributeMasterId, fieldAttributeMasterList) : null
-            validationActionResultList ? validationActionResultList.alertMessage ? alertMessageList.push(validationActionResultList.alertMessage) : null : null
+            let validationActionResultList = validationActionList ? this.runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, validationMap[index].fieldAttributeMasterId) : null
+            if (validationActionResultList) {
+                validationActionResultList.alertMessage ? alertMessageList.concat(validationActionResultList.alertMessage) : null
+                returnValue = validationActionResultList.returnValue
+            }
         }
-        return alertMessageList
+        return {
+            alertMessageList,
+            returnValue
+        }
     }
 
     /**
@@ -229,7 +243,7 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, nextEditable, fieldAttributeMasterId, fieldAttributeMasterList) {
+    runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterId) {
         let validationActionResult = {
             alertMessageList: [],
             returnValue: true,
@@ -243,10 +257,11 @@ class FieldValidation {
                 case ASSIGN: {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (validationActionList[index].actionOnAssignFrom) {
-                        this.actionOnAssignFrom(fieldAttributeMasterList, jobTransaction)
+                        this.actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationActionList[index])
                     } else {
                         if (formElement.get(parseInt(fieldAttributeMasterId))) {
                             formElement.get(parseInt(fieldAttributeMasterId)).value = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction)
+                            formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                         }
                     }
                     break
@@ -255,14 +270,24 @@ class FieldValidation {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (formElement.get(parseInt(fieldAttributeMasterId))) {
                         let value = this.solveMathExpression(validationActionList[index].actionOnAssignFrom, formElement, jobTransaction)
-                        formElement.get(parseInt(fieldAttributeMasterId)).value = value != NaN ? value : null
+                        formElement.get(parseInt(fieldAttributeMasterId)).value = (value || value === 0) ? value + '' : null
+                        formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                     }
                     break
                 }
                 case ASSIGN_DATE_TIME: {
-                    let fieldAttributeMasterId = this.checkKey(validationActionList[index].assignValue)
+                    let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (formElement.get(parseInt(fieldAttributeMasterId))) {
                         let value = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction)
+                        if (formElement.get(parseInt(fieldAttributeMasterId)).attributeTypeId == TIME) {
+                            let tobeassign = moment()
+                            tobeassign.add(parseInt(value), 'h')
+                            formElement.get(parseInt(fieldAttributeMasterId)).value = tobeassign.format('HH:mm')
+                        } else if (formElement.get(parseInt(fieldAttributeMasterId)).attributeTypeId == DATE || formElement.get(parseInt(fieldAttributeMasterId)).attributeTypeId == RE_ATTEMPT_DATE) {
+                            let tobeassign = moment()
+                            tobeassign.add(parseInt(value), 'd')
+                            formElement.get(parseInt(fieldAttributeMasterId)).value = tobeassign.format('YYYY-MM-DD')
+                        }
                     }
                     break
                 }
@@ -270,7 +295,8 @@ class FieldValidation {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (formElement.get(parseInt(fieldAttributeMasterId))) {
                         let value = this.solveDateTimeExpression(validationActionList[index].actionOnAssignFrom, formElement, jobTransaction, true)
-                        formElement.get(parseInt(fieldAttributeMasterId)).value = value
+                        formElement.get(parseInt(fieldAttributeMasterId)).value = value ? value + '' : null
+                        formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                     }
                     break
                 }
@@ -289,10 +315,7 @@ class FieldValidation {
                     break
                 }
                 case RETURN: {
-                    let returnValue = this.evaluateReturnCondition(validationActionList[index].assignValue, timeOfExecution, formElement, nextEditable, fieldAttributeMasterId)
-                    if (!returnValue) {
-                        validationActionResult.returnValue = returnValue
-                    }
+                    validationActionResult.returnValue = this.evaluateReturnCondition(validationActionList[index].assignValue, timeOfExecution, formElement, fieldAttributeMasterId)
                     break
                 }
                 case TIME_COMPARATOR: {
@@ -300,6 +323,7 @@ class FieldValidation {
                     if (formElement.get(parseInt(fieldAttributeMasterId))) {
                         let value = this.solveDateTimeExpression(validationActionList[index].actionOnAssignFrom, formElement, jobTransaction, false)
                         formElement.get(parseInt(fieldAttributeMasterId)).value = value
+                        formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                     }
                     break
                 }
@@ -396,35 +420,67 @@ class FieldValidation {
         return isDate ? moment(value, 'YYYY-MM-DD') : moment(value, 'YYYY-MM-DD HH:mm:ss')
     }
 
-    evaluateReturnCondition(assignValue, timeOfExecution, formElement, nextEditable, fieldAttributeMasterId) {
+    evaluateReturnCondition(assignValue, timeOfExecution, formElement, fieldAttributeMasterId) {
         if (assignValue == 'true') {
             return true
         }
 
         if (timeOfExecution == BEFORE) {
-            formElement.get(fieldAttributeMasterId).editable = false
+            formElement.get(fieldAttributeMasterId).editable = formElement.get(fieldAttributeMasterId).value || formElement.get(fieldAttributeMasterId).value == 0 ? false : true
         } else {
             return false
         }
+
+        return true
     }
 
-    actionOnAssignFrom(fieldAttributeMasterList, fieldAttributeMasterId, jobTransaction) {
-        let fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList)
+    async actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationAction) {
+        const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+        let fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList.value)
         let fieldAttributeMasterObject = fieldAttributeMasterMap[jobTransaction.jobMasterId]
-
+        let parentId = rootFieldAttributeMasterId = validationAction.getAssignValue
+        while (fieldAttributeMasterObject[parentId]) {
+            rootFieldAttributeMasterId = parentId
+            parentId = fieldAttributeMasterObject[fieldAttributeMasterId].parentId
+        }
+        let dataList = this.findObjectValues(rootFieldAttributeMasterId, fieldAttributeMasterId, formElement)
+        evaluateActionOnAssign(validationAction, dataList)
     }
 
-    getNextRequiredElement(formElement) {
-        for (var [key, value] of formElement) {
-            if (value.required && !value.value && value.value != 0) {
-                value.editable = true
-                return value.positionId
+    findObjectValues(rootFieldAttributeMasterId, fieldAttributeMasterId, formElement) {
+        let valueList = []
+        if (!formElement.get(rootFieldAttributeMasterId).childDataList) {
+            return null
+        }
+        let childDataList = formElement.get(rootFieldAttributeMasterId.childDataList)
+        for (let index in childDataList) {
+            let childList = childDataList[index].childDataList
+            if (!childList) {
+                continue
+            }
+            valueList.push('' + childList.filter(fielData => fielData.fieldAttributeMasterId == fieldAttributeMasterId))
+        }
+    }
+
+    evaluateActionOnAssign(validationAction, dataList) {
+        switch (validationAction.getActionOnAssignFrom) {
+            case AVERAGE: {
+                break
+            }
+            case CONCATENATE: {
+                break
+            }
+            case MAX: {
+                break
+            }
+            case MIN: {
+                break
+            }
+            case SUM: {
+                break
             }
         }
-        return formElement.size + 1
     }
-
-
 
 }
 
