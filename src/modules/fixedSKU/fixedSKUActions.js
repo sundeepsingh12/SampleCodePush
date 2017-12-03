@@ -26,7 +26,7 @@ export function onSave(parentObject, formElement, nextEditable, fixedSKUList, is
                 fixedSKUList,
                 isLoaderRunning: false
             }))
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
         } catch (error) {
             console.log(error)
         }

@@ -32,10 +32,15 @@ import bulk from './bulk/bulkReducer'
 import profileReducer from './profile/profileReducer'
 import sorting from './sorting/sortingReducer'
 import taskList from './taskList/taskListReducer'
+import customApp from './customApp/customAppReducers'
 // import profile from './profile/profileReducer'
 
-import { combineReducers } from 'redux'
-import {PRE_LOGOUT_SUCCESS} from '../lib/constants'
+import {
+  combineReducers
+} from 'redux'
+import {
+  PRE_LOGOUT_SUCCESS
+} from '../lib/constants'
 
 /**
  * ## CombineReducers
@@ -44,6 +49,7 @@ import {PRE_LOGOUT_SUCCESS} from '../lib/constants'
  * EVERY TIME there is a basic action
  */
 const appReducer = combineReducers({
+  nav,
   auth,
   device,
   global,
@@ -52,7 +58,6 @@ const appReducer = combineReducers({
   selectFromList,
   skuListing,
   listing,
-  nav,
   payment,
   preloader,
   upiPayment,
@@ -70,6 +75,7 @@ const appReducer = combineReducers({
   profileReducer,
   sorting,
   taskList,
+  customApp,
 })
 
 const rootReducer = (state, action) => {

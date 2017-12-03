@@ -1,6 +1,6 @@
 'use strict'
 
-import { statisticsListService } from '../classes/statistics'
+import { statisticsListService } from '../classes/Statistics'
 
 describe('test cases for statisticsListService', () => {
     const statisticsList = {

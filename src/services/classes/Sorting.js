@@ -1,7 +1,7 @@
 
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
-import _ from 'underscore'
+import _ from 'lodash'
 import CONFIG from '.././../lib/config'
 import { REF_UNAVAILABLE, REFERENCE_NO, GET, FAILURE_SORTING, NA } from '../../lib/AttributeConstants'
 

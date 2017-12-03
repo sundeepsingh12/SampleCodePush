@@ -1,6 +1,6 @@
 'use strict'
 
-import {sortingService} from '../classes/sorting'
+import {sortingService} from '../classes/Sorting'
 import { restAPI } from '../../lib/RestAPI'
 
 describe('sorting services', () => {
