@@ -56,14 +56,14 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
                 const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransactionId, params.positionId, latestPositionId)
                 const value = params.attributeTypeId == OPTION_RADIO_FOR_MASTER ? OBJECT_SAROJ_FAREYE : ARRAY_SAROJ_FAREYE
                 if (calledFromArray)
-                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, nextEditable, isSaveDisabled, value, formElement, rowId, fieldDataListData))
+                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId, fieldDataListData))
                 else
-                    dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListData))
+                    dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, value, fieldDataListData))
             } else {
                 if (calledFromArray)
-                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, nextEditable, isSaveDisabled, selectFromListState[0].value, formElement, rowId))
+                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, selectFromListState[0].value, formElement, rowId))
                 else
-                    dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
+                    dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
             }
             dispatch(setState(INPUT_TEXT_VALUE, ''))
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))

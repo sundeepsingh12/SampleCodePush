@@ -25,7 +25,6 @@ class OverlayAttributes extends Component {
     onSave = (value) => {
         this.props.actions.getNextFocusableAndEditableElements(this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled,
             value + '', ON_BLUR)
         this.props.navigation.goBack()

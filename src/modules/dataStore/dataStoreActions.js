@@ -113,13 +113,13 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function onSave(fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, calledFromArray, rowId) {
+export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId) {
     return async function (dispatch) {
         try {
             if (!calledFromArray)
-                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
+                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, ON_BLUR))
             else
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, dataStorevalue, formElements, rowId))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
 
         } catch (error) {
             console.log(error)
@@ -160,12 +160,16 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
                 formElementResult = (!calledFromArray) ? dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements) : dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElement)
             }
             dispatch(setState(SAVE_SUCCESSFUL, true))
+<<<<<<< HEAD
             if (!calledFromArray)
                 dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
             else {
                 formElements[rowId].formLayoutObject = formElementResult
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, dataStorevalue, formElements, rowId))
             }
+=======
+            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, ON_BLUR))
+>>>>>>> origin/RN-60_field_validations
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
                 errorMessage: error.message,
