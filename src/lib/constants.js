@@ -183,6 +183,7 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
+    NEXT_FOCUS: null,
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,
@@ -202,6 +203,7 @@ module.exports = keyMirror({
     Sorting:null,
     ProfileView:null,
     Statistics:null,
+    CustomApp:null,
 
 
     //Skulisting Actions
@@ -286,6 +288,11 @@ module.exports = keyMirror({
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
+
+    //Custom App
+    START_FETCHING_URL: null,
+    END_FETCHING_URL:  null,
+    ON_CHANGE_STATE: null,
 })
 
 

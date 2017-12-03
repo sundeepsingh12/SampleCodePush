@@ -14,7 +14,7 @@ module.exports = {
     staging: {
       url: 'https://staging.fareye.co/app'
     },
-    port: 1883,
+    port: 8082,
     PUSH_QOS: 2
   },
   API: {
@@ -26,12 +26,12 @@ module.exports = {
     LOGOUT_API: '/logout',
     DOWNLOAD_DATA_API: '/rest/device/get_sync_table_job_with_pagination',
     DELETE_DATA_API: '/rest/device/delete_synch_job',
-    PUSH_BROKER: 'mqttdev.fareye.co',
+    PUSH_BROKER: 'mqttstaging.fareye.co',
     UPLOAD_DATA_API: '/rest/device/sync',
     SEQUENCE_USING_ROUTING_API: '/rest/order/sequence_using_routing',
     SERVICE_DSA: "/rest/data_search_api",
-    GET_SEQUENCE_NEXT_COUNT : '/rest/get_sequence_next_count',
+    GET_SEQUENCE_NEXT_COUNT: '/rest/get_sequence_next_count',
     SERVICE_RESET_PASSWORD: '/rest/users/password',
-    SCAN_AND_SEARCH_SORTING : '/rest/job/search_reference_no',
+    SCAN_AND_SEARCH_SORTING: '/rest/job/search_reference_no',
   }
 }

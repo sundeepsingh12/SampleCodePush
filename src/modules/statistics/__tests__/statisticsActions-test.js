@@ -2,7 +2,7 @@
 import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
-import { statisticsListService } from '../../../services/classes/statistics'
+import { statisticsListService } from '../../../services/classes/Statistics'
 import {getDataForStatisticsList} from '../statisticsActions'
 
 const middlewares = [thunk]

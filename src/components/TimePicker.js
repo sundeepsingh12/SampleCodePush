@@ -18,13 +18,14 @@ class TimePicker extends Component {
 
     _onCancel = () => {
         this.setState({ 'isVisible': false })
-        this.props.onCancel()
+        if (this.props.onCancel)
+            this.props.onCancel()
     }
 
     _onConfirm = (date) => {
         this.setState({ 'isVisible': false })
         const newDateTime = (this.props.item.attributeTypeId == 5) ? moment(date).format('HH:mm') : moment(date).format('YYYY-MM-DD')
-        this.props.onSave(newDateTime.toString())
+        this.props.onSave(newDateTime.toString(), this.props.item)
     }
 
     _minimumDate = () => {
@@ -63,9 +64,6 @@ class TimePicker extends Component {
 
 
     render() {
-        //       if(this.props.item.value == undefined){
-        // this.state.isVisible=true
-        //       }
         const mode = (this.props.item.attributeTypeId == 5) ? 'time' : 'date';
         const minimum = (this.state.isVisible) ? this._minimumDate() : undefined;
         let maximum = (this.state.isVisible) ? this._maximumDate() : undefined;

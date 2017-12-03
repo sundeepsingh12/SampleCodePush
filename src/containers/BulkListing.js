@@ -36,7 +36,7 @@ import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
-import _ from 'underscore'
+import _ from 'lodash'
 import {NEXT_POSSIBLE_STATUS} from '../lib/AttributeConstants'
 import {FormLayout,RESET_STATE} from '../lib/constants'
 

@@ -72,10 +72,6 @@ function mapDispatchToProps(dispatch) {
 
 class Login extends Component {
 
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount() {
     this.props.actions.checkRememberMe()
   }
