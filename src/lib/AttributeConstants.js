@@ -417,6 +417,9 @@ module.exports = {
     SEARCH: 'Search',
     OK: 'Ok',
 
+    //Notification 
+    FAREYE_UPDATES: 'FarEye Updates',
+
     //Add Server Sms 
     BIKER_NAME: 'BIKER_NAME',
     BIKER_MOBILE: 'BIKER_MOBILE',

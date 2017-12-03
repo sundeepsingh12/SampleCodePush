@@ -7,7 +7,7 @@ import {
   keyValueDBService
 } from './KeyValueDBService'
 
-import _ from 'underscore'
+import _ from 'lodash'
 
 class JobStatus {
 
