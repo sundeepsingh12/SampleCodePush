@@ -40,14 +40,15 @@ import {
   PIECHART,
   SEQUENCEMODULE,
   START,
-  SORTING
+  SORTING,
 } from '../lib/AttributeConstants'
 
 import {
   TabScreen,
   Sequence,
   BulkConfiguration,
-  Sorting
+  Sorting,
+  Summary
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -100,7 +101,7 @@ class Home extends Component {
       case SORTING: {
         this.props.actions.navigateToScene(Sorting)
         break
-      }
+      }    
     }
   }
 
@@ -161,6 +162,10 @@ class Home extends Component {
     }
     return moduleView
   }
+  
+  _onPieChartPress = () => {
+    this.props.actions.navigateToScene(Summary)
+  }
 
   pieChartView() {
     if(!PIECHART.enabled) {
@@ -175,7 +180,7 @@ class Home extends Component {
     }
 
     if(this.props.count) {
-      return (<PieChart count = {this.props.count}/>)
+      return (<PieChart count = {this.props.count} press = {this._onPieChartPress}/>)
     }
 
     return null

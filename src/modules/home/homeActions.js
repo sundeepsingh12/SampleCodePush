@@ -6,7 +6,8 @@ import {
   CHART_LOADING,
   JOB_DOWNLOADING_STATUS,
   USER,
-  UNSEEN
+  UNSEEN,
+  JOB_SUMMARY,
 } from '../../lib/constants'
 
 import {
@@ -69,6 +70,7 @@ export function pieChartCount() {
       const pendingStatusIds = await jobStatusService.getStatusIdsForStatusCategory(PENDING,UNSEEN)
       const successStatusIds = await jobStatusService.getStatusIdsForStatusCategory(SUCCESS,null)
       const failStatusIds    = await jobStatusService.getStatusIdsForStatusCategory(FAIL,null)
+      const jobStatus = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
       const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {

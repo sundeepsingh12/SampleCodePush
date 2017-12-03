@@ -121,6 +121,9 @@ export class keyValueDb {
       case 'JOB_SUMMARY':
         schemaInstance = require('../repositories/schema/jobSummary');
         break;
+      case 'JOB_STATUS':
+        schemaInstance = require('../repositories/schema/jobStatus');
+        break;   
     }
     if (value && validate(value, schemaInstance)) {
       return store.update(schemaName, value)

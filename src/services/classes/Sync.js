@@ -14,6 +14,10 @@ import {
 } from './JobTransaction'
 
 import {
+  runSheetService
+} from './RunSheet'
+
+import {
   jobSummaryService
 } from './JobSummary'
 import { addServerSmsService } from './AddServerSms'
@@ -368,6 +372,7 @@ class Sync {
           const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
           await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+          await runSheetService.updateRunSheetSummary(unseenTransactions,dataList.transactionIdDtos)
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
           jobSummaryService.updateJobSummary(dataList.jobSummaries)

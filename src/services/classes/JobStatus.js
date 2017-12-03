@@ -148,6 +148,13 @@ class JobStatus {
     const filteredJobStatusIds = jobStatusArray.value.filter(jobStatus => jobStatus.statusCategory == statusCategory && jobStatus.code != code && tabList[jobStatus.tabId].name.toLocaleLowerCase() !== 'hidden').map(jobStatus => jobStatus.id)
     return filteredJobStatusIds
   }
+
+
+  async getStatusCategoryOnStatusId(jobStatusId){
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    const category = jobStatusArray.value.filter(jobStatus => jobStatus.id ==jobStatusId &&  jobStatus.code != UNSEEN).map(id => id.statusCategory)
+    return category;
+  }
 }
 
 export let jobStatusService = new JobStatus()

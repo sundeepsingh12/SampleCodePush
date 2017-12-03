@@ -202,6 +202,7 @@ module.exports = keyMirror({
     Sorting:null,
     ProfileView:null,
     Statistics:null,
+    Summary:null,
 
 
     //Skulisting Actions
@@ -286,6 +287,10 @@ module.exports = keyMirror({
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
+
+    //Summary
+    SET_SUMMARY_FOR_JOBMASTER : null,
+    SET_SUMMARY_FOR_RUNSHEET : null,
 })
 
 

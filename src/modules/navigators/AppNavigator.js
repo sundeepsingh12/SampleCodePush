@@ -42,6 +42,7 @@ import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
+import Summary from '../../containers/Summary'
 
 
 
@@ -170,20 +171,21 @@ export const HomeTabNavigator = TabNavigator({
     tabBarOptions: {
       showIcon: true,
       activeTintColor: '#000000',
-      inactiveTintColor: '#000000',
+      inactiveTintColor: '#aaaaaa',
       style: {
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
-        borderTopColor: '#f3f3f3'
+        borderTopColor: '#f3f3f3',
       },
       labelStyle: {
-        fontSize: 12
+        fontSize: 12,
+        marginTop: 0,
       },
       tabStyle: {
         alignItems: 'center',
         height: 50,
-        paddingTop: 5,
-        paddingBottom: 5
+        paddingTop: 10,
+        paddingBottom: 10
       },
       indicatorStyle: {
         height: 0
@@ -258,6 +260,9 @@ export const AppNavigator = StackNavigator({
   },
   Sequence: {
     screen: Sequence,
+  },
+  Summary: {
+    screen: Summary,
   },
   Menu: {
     screen: Menu

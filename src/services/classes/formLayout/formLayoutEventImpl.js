@@ -1,9 +1,11 @@
 import {
     ON_BLUR,
     TABLE_FIELD_DATA,
+    TABLE_RUNSHEET,
     TABLE_JOB_TRANSACTION,
     JOB_MASTER,
     JOB_STATUS,
+    JOB_SUMMARY,
     HUB,
     USER,
     DEVICE_IMEI,
@@ -20,6 +22,7 @@ import _ from 'underscore'
 import moment from 'moment'
 import sha256 from 'sha256'
 import {formLayoutService} from '../../classes/formLayout/FormLayout'
+import {jobStatusService} from '../JobStatus'
 
 export default class FormLayoutEventImpl {
 
@@ -180,31 +183,78 @@ export default class FormLayoutEventImpl {
             if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
                 return formLayoutObject // return undefined or empty object if formLayoutObject is empty
             }
-            let fieldData, jobTransaction, job
+            let fieldData, jobTransaction, job, dbObjects
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
-                const dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
                 jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
-                job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
+                job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
-                const dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
             }
 
             //TODO add other dbs which needs updation
-            realm.performBatchSave(fieldData, jobTransaction, job)
+            const runSheet = await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList)
+            await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList)
+            realm.performBatchSave(fieldData, jobTransaction, job, runSheet)
+            //await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList,jobTransactionId)
         } catch (error) {
             console.log(error)
         }
     }
 
+    async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){
+        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+        const count  = (jobTransactionIdList) ? jobTransactionIdList.length : 1
+        const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+        jobSummaryList.value.forEach(item => (item.jobStatusId == statusId || item.jobStatusId == prevStatusId) ? (item.jobStatusId == statusId) ? item.count += count : item.count -= count : null )
+        await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
+    }
+
+    async _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList){
+        const setRunsheetSummary = []
+        const status = ['pendingCount','failCount','successCount']
+        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+        const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
+        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET,null)
+        const runsheetMap = runSheetData.reduce(function ( total, current ) {
+            total[ current.id ] = Object.assign({},current);
+            return total;
+        }, {});
+        if(jobTransactionIdList){
+            for(id in jobTransaction){
+                runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory-1]] -= 1
+                runsheetMap[jobTransaction[id].runsheetId][status[statusCategory-1]] += 1
+                setRunsheetSummary.push(runsheetMap[jobTransaction[id].runsheetId])                
+            }
+        }else{
+            runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory-1]] -= 1
+            runsheetMap[jobTransaction.runsheetId][status[statusCategory-1]] += 1
+            setRunsheetSummary.push(runsheetMap[jobTransaction[id].runsheetId]) 
+        }
+        return {
+            tableName : TABLE_RUNSHEET,
+            value : setRunsheetSummary
+        }
+    }
+
+    setCategoryInRunSheet(statusCategory,runSheet,count){
+        if(statusCategory == 1 ){
+            runSheet.pendingCount += count
+        }else if(statusCategory == 2){
+            runSheet.failCount += count
+        }else if(statusCategory == 3){
+            runSheet.successCount += count
+        }
+    }
 
     /**
      * creates fieldData db structure for current transaction
-     * and returns an object containing fieldDataArray
+     * and returns an object containing fieldDataArrayinue
      * 
      * @param {*formLayoutMap} formLayoutObject 
      * @param {*jobTransactionId} jobTransactionId 
@@ -390,7 +440,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setBulkJobDbValues(status, jobTransactions, jobMasterId, user, hub, referenceNumber) {
+    _setBulkJobDbValues(status, jobTransactions, jobMasterId, user, hub) {
         let jobArray = []
         const query = jobTransactions.map(jobTransaction => 'id = ' + jobTransaction.jobId).join(' OR ')
         console.log('query', query)
