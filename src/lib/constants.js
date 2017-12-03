@@ -182,6 +182,7 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
+    NEXT_FOCUS: null,
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,

@@ -41,7 +41,6 @@ class FixedSKUListing extends Component {
     this.jobTransaction = navigationState['jobTransaction']
     this.latestPositionId = navigationState['latestPositionId']
     this.formElement = navigationState['formElements']
-    this.nextEditable = navigationState['nextEditable']
     this.isSaveDisabled = navigationState['isSaveDisabled']
   }
 
@@ -79,7 +78,7 @@ class FixedSKUListing extends Component {
           </Text>
           <Button
             onPress={() => {
-              this.props.actions.onSave(this.parentObject, this.formElement, this.nextEditable, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction.id)
+              this.props.actions.onSave(this.parentObject, this.formElement, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction.id)
               this.props.navigation.goBack()
             }}>
             <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>

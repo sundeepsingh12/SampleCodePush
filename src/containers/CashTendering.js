@@ -10,7 +10,7 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import CashTenderingView from '../components/CashTenderingView'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
-import {IS_RECEIVE_TOGGLE, CHANGE_AMOUNT, CHANGE_AMOUNT_RETURN} from '../lib/constants'
+import { IS_RECEIVE_TOGGLE, CHANGE_AMOUNT, CHANGE_AMOUNT_RETURN } from '../lib/constants'
 
 let styles = StyleSheet.create({
     container: {
@@ -58,19 +58,19 @@ class CashTendering extends Component {
     _onSavePressReturn = () => {
         let cashToReturn = this.props.totalAmount - this.props.navigation.state.params['cash']
         if (cashToReturn == this.props.totalAmountReturn) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.navigation.state.params['nextEditable'], this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'].id, this.props.isReceive)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'].id, this.props.isReceive)
             this.props.actions.setState(IS_RECEIVE_TOGGLE, true)
-            this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0  })
-            this.props.actions.setState(CHANGE_AMOUNT_RETURN, { cashTenderingList: {}, totalAmount: 0  })   
-            this.props.navigation.goBack('FormLayout')                     
+            this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
+            this.props.actions.setState(CHANGE_AMOUNT_RETURN, { cashTenderingList: {}, totalAmount: 0 })
+            this.props.navigation.goBack('FormLayout')
         } else if (cashToReturn > this.props.totalAmountReturn) { Toast.show({ text: "More money to pay", position: 'bottom', buttonText: 'Okay' }) }
         else { Toast.show({ text: "Less money to pay", position: 'bottom', buttonText: 'OK' }) }
     }
 
     _onSavePress = () => {
         if (this.props.navigation.state.params['cash'] > 0 && this.props.navigation.state.params['cash'] == this.props.totalAmount) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.navigation.state.params['nextEditable'], this.props.cashTenderingList, null, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'].id, this.props.isReceive)
-            this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0  })            
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, null, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'].id, this.props.isReceive)
+            this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
             this.props.navigation.goBack()
         } else if (this.props.navigation.state.params['cash'] > this.props.totalAmount) {
             Toast.show({ text: "More, money to pay", position: 'bottom', buttonText: 'OK' })
@@ -84,7 +84,6 @@ class CashTendering extends Component {
                     jobStatusId: this.jobStatusId,
                     jobTransaction: this.props.navigation.state.params['jobTransaction'],
                     latestPositionId: this.props.navigation.state.params['latestPositionId'],
-                    nextEditable: this.props.navigation.state.params['nextEditable'],
                     isSaveDisabled: this.props.navigation.state.params['isSaveDisabled'],
                     cash: this.props.navigation.state.params['cash']
                 }
