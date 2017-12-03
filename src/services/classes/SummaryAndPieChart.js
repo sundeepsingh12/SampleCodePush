@@ -14,6 +14,8 @@ import {
     UNSEEN,
     TABLE_JOB_TRANSACTION_CUSTOMIZATION
   } from '../../lib/constants'
+   
+  import moment from 'moment'
   import {
     PENDING,
     ADDRESS_LINE_1,
@@ -35,12 +37,18 @@ class SummaryAndPieChart {
     * return {pendingCounts : a, successCounts : b, failCounts : c}
     */
     getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds){
-       // const pendingStatusIds = await jobStatusService.getAllIdsForCode(PENDING)
-        const pendingCounts =  (pendingStatusIds) ? (jobTransactionService.getJobTransactionsForStatusIds(pendingStatusIds)).length : 0
-        const successCounts =  (successStatusIds) ? (jobTransactionService.getJobTransactionsForStatusIds(successStatusIds)).length : 0
-        const failCounts =     (failStatusIds) ? (jobTransactionService.getJobTransactionsForStatusIds(failStatusIds)).length : 0
-        let obj = pendingCounts || successCounts || failCounts ? { pendingCounts, successCounts, failCounts } : null
-        return obj
+         const pendingCounts =  (pendingStatusIds) ? this.isTodaysDateCount(jobTransactionService.getJobTransactionsForStatusIds(pendingStatusIds)) : 0
+         const successCounts =  (successStatusIds) ? this.isTodaysDateCount(jobTransactionService.getJobTransactionsForStatusIds(successStatusIds)) : 0
+         const failCounts =     (failStatusIds) ? this.isTodaysDateCount(jobTransactionService.getJobTransactionsForStatusIds(failStatusIds)) : 0
+         let obj = pendingCounts || successCounts || failCounts ? { pendingCounts, successCounts, failCounts } : null
+         return obj
+     }
+
+     isTodaysDateCount(jobTransactions){
+        const todayDate =  moment(new Date()).format('YYYY-MM-DD')
+        let count = 0;
+        jobTransactions.forEach(data => (moment(data.getLastUpdatedAtServer).format('YYYY-MM-DD') == todayDate) ? count++ : count)
+        return count 
     }
 }
 
