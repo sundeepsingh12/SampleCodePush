@@ -50,7 +50,8 @@ function mapDispatchToProps(dispatch) {
 class SyncScreen extends Component {
 
   componentDidMount() {
-    this.props.actions.onResyncPress()
+    this.props.actions.startMqttService()
+    this.props.actions.performSyncService(true)
   }
 
   render() {

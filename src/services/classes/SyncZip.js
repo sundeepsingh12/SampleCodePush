@@ -2,8 +2,7 @@ import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs';
 import { zip, unzip } from 'react-native-zip-archive'
 import { keyValueDBService } from './KeyValueDBService'
-import * as realm from '../../repositories/realmdb';
-import _ from 'underscore'
+import * as realm from '../../repositories/realmdb'
 
 import {
     TABLE_TRACK_LOGS,

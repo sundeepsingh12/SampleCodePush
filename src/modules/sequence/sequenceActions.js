@@ -23,7 +23,6 @@ import {
     PREPARE_UPDATE_LIST
 
 } from '../../lib/constants'
-import _ from 'underscore'
 import {
     setState
 } from '../global/globalActions'
