@@ -48,7 +48,6 @@ class FormLayoutActivityComponent extends Component {
 }
 
 const style = StyleSheet.create({
-    //  styles.column, styles.paddingLeft0, styles.paddingRight0, {height: 'auto'}
     header: {
         borderBottomWidth: 0,
         height: 'auto',

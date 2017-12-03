@@ -135,7 +135,6 @@ class DataStore extends Component {
         this.props.actions.fillKeysAndSave(dataStoreAttributeValueMap,
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled,
             dataStoreValue,
             this.props.isMinMaxValidation,
@@ -187,7 +186,6 @@ class DataStore extends Component {
                                         this.props.actions.onSave(
                                             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
                                             this.props.navigation.state.params.formElements,
-                                            this.props.navigation.state.params.nextEditable,
                                             this.props.navigation.state.params.isSaveDisabled,
                                             this.props.searchText,
                                             this.props.navigation.state.params.calledFromArray,

@@ -143,7 +143,7 @@ export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dat
  * @param {*} isMinMaxValidation 
  * @param {*} attributeTypeId 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, isMinMaxValidation, attributeTypeId, calledFromArray, rowId) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, isMinMaxValidation, attributeTypeId, calledFromArray, rowId) {
     return async function (dispatch) {
         try {
             let formElementResult = {}
@@ -160,16 +160,12 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
                 formElementResult = (!calledFromArray) ? dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements) : dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElement)
             }
             dispatch(setState(SAVE_SUCCESSFUL, true))
-<<<<<<< HEAD
             if (!calledFromArray)
-                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
+                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, ON_BLUR))
             else {
                 formElements[rowId].formLayoutObject = formElementResult
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, dataStorevalue, formElements, rowId))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
             }
-=======
-            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, ON_BLUR))
->>>>>>> origin/RN-60_field_validations
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
                 errorMessage: error.message,

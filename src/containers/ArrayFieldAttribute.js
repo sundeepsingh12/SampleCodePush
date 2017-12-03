@@ -96,7 +96,6 @@ class ArrayFieldAttribute extends Component {
             this.props.navigation.state.params.jobTransaction,
             this.props.navigation.state.params.latestPositionId,
             this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled)
         this.props.navigation.goBack()
     }

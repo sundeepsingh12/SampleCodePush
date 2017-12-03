@@ -79,12 +79,12 @@ export function queryTransactionAPIRequest(transactionId) {
     }
 }
 
-export function testSave(actualAmount, currentElement, formElement, jobMasterId, jobId, jobTransactionId, latestPositionId, moneyCollectMaster, nextEditable, isSaveDisabled, originalAmount, selectedIndex, transactionNumber, remarks, receipt) {
+export function testSave(actualAmount, currentElement, formElement, jobMasterId, jobId, jobTransactionId, latestPositionId, moneyCollectMaster, isSaveDisabled, originalAmount, selectedIndex, transactionNumber, remarks, receipt) {
     return async function (dispatch) {
         try {
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedIndex, transactionNumber, remarks, receipt)
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransactionId, currentElement.positionId, latestPositionId)
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
             dispatch()
         } catch (error) {
 

@@ -48,7 +48,7 @@ export function setOrRemoveStates(selectFromListState, id, attributeTypeId) {
     }
 }
 
-export function selectFromListButton(selectFromListState, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, nextEditable, calledFromArray, rowId) {
+export function selectFromListButton(selectFromListState, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, calledFromArray, rowId) {
     return async function (dispatch) {
         try {
             selectFromListState = _.values(selectFromListDataService.selectFromListDoneButtonClicked(params.attributeTypeId, selectFromListState))

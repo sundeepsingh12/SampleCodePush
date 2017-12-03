@@ -101,9 +101,9 @@ class SelectFromList extends Component {
     console.log("_saveAndDropModal")
     this._dropModal()
     if (this.props.calledFromArray)
-      this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable, this.props.calledFromArray, this.props.rowId)
+      this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.calledFromArray, this.props.rowId)
     else
-      this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
+      this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements)
   }
 
   _setValueInInputText(valueOfInputText) {

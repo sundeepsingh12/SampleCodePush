@@ -45,7 +45,7 @@ export function _setErrorMessage(message) {
 export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId) {
     return async function (dispatch) {
         try {
-            
+
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId)
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
@@ -108,7 +108,7 @@ export function updateFieldData(attributeId, value, formElement) {
 export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject) {
     return function (dispatch) {
         const cloneFormElement = _.cloneDeep(formElement)
-        const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, fieldDataListObject.fieldDataList, ON_BLUR);
+        const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, fieldDataListObject.fieldDataList, NEXT_FOCUS);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
                 formElement: updatedFieldDataObject.formLayoutObject,

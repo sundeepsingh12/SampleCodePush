@@ -19,7 +19,7 @@ import { bindActionCreators } from 'redux'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
-import SelectFromList from  '../containers/SelectFromList'
+import SelectFromList from '../containers/SelectFromList'
 
 import {
     MONEY_COLLECT,
@@ -66,15 +66,15 @@ function mapDispatchToProps(dispatch) {
 
 class BasicFormElement extends Component {
 
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
         this.state = {
-        selectFromListEnable: false,
-    }
+            selectFromListEnable: false,
+        }
         this.formElementValue = {}
-  }
+    }
 
-  componentDidMount = () => {
+    componentDidMount = () => {
         if (this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value) {
             this.props.item.isLoading = true
             this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement,
@@ -175,30 +175,29 @@ class BasicFormElement extends Component {
         this.props.actions.toogleHelpText(fieldAttributeMasterId, this.props.formElement);
     }
 
-    _inflateModal=()=> {
-       this.setState(previousState => {
+    _inflateModal = () => {
+        this.setState(previousState => {
             return {
                 selectFromListEnable: !this.state.selectFromListEnable
             }
         })
-  }
+    }
 
 
     render() {
         if (this.state.selectFromListEnable) {
             return (
                 <View>
-                <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal}/>
-                <SelectFromList
-                    currentElement={this.props.item}
-                    nextEditable={this.props.nextEditable}
-                    formElements={this.props.formElement}
-                    isSaveDisabled={this.props.isSaveDisabled}
-                    jobTransaction={this.props.jobTransaction}
-                    jobStatusId={this.props.jobStatusId}
-                    latestPositionId={this.props.latestPositionId}
-                    press= {this._inflateModal}
-                />
+                    <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
+                    <SelectFromList
+                        currentElement={this.props.item}
+                        formElements={this.props.formElement}
+                        isSaveDisabled={this.props.isSaveDisabled}
+                        jobTransaction={this.props.jobTransaction}
+                        jobStatusId={this.props.jobStatusId}
+                        latestPositionId={this.props.latestPositionId}
+                        press={this._inflateModal}
+                    />
                 </View>
             )
         }
@@ -212,7 +211,7 @@ class BasicFormElement extends Component {
             case PASSWORD:
                 return (
                     renderIf(!this.props.item.hidden,
-                        <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingBottom30, styles.paddingLeft10, styles.paddingRight10, this.props.item.focus ? {borderLeftColor: styles.primaryColor, borderLeftWidth: 5}: null]}>
+                        <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, this.props.item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
                             <View style={[styles.marginBottom15]}>
                                 <Item stackedLabel>
                                     <Label style={[styles.fontPrimary]}>{this.props.item.label}</Label>
@@ -253,12 +252,12 @@ class BasicFormElement extends Component {
             case ARRAY:
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
-             return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-            case CHECKBOX:  
-            case RADIOBUTTON:  
-            case DROPDOWN:  
+                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+            case CHECKBOX:
+            case RADIOBUTTON:
+            case DROPDOWN:
             case OPTION_RADIO_FOR_MASTER:
-                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />                
+                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
             default:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />

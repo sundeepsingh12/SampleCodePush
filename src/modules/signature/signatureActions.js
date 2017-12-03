@@ -30,7 +30,7 @@ export function _setIsRemarksValidation(isRemarksValidation) {
     }
 }
 
-export function saveSignature(result, fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled) {
+export function saveSignature(result, fieldAttributeMasterId, formElement, isSaveDisabled) {
     return async function (dispatch) {
         const value = await signatureService.saveFile(result, moment())
         dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, ON_BLUR))
@@ -57,7 +57,7 @@ export function setIsRemarksValidation(validation) {
     }
 }
 
-export function saveSignatureAndRating(result, rating, currentElement, formElement, nextEditable, isSaveDisabled, jobTransactionId, latestPositionId) {
+export function saveSignatureAndRating(result, rating, currentElement, formElement, isSaveDisabled, jobTransactionId, latestPositionId) {
     return async function (dispatch) {
         const signatureValue = await signatureService.saveFile(result, moment())
         const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
