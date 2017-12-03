@@ -40,7 +40,7 @@ class OverlayAttributes extends Component {
             case NPS_FEEDBACK:
                 return (
                     <NPSFeedback
-                        onSave={this.onSave} onCancel={this.onCancel}
+                        onSave={this.onSave} onCancel={this.onCancel} item={[]}
                     />
                 )
             case DATE:

@@ -55,10 +55,19 @@ class SelectFromList extends Component {
   }
 
   componentDidMount() {
-    if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
-      this.props.actions.gettingDataForRadioMaster(this.props.currentElement, this.props.jobTransaction.jobId)
+    if (!this.props.calledFromArray) {
+      if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
+        this.props.actions.gettingDataForRadioMaster(this.props.currentElement, this.props.jobTransaction.jobId)
+      } else {
+        this.props.actions.gettingDataSelectFromList(this.props.currentElement.fieldAttributeMasterId, this.props.formElements, this.props.currentElement.attributeTypeId)
+      }
     } else {
-      this.props.actions.gettingDataSelectFromList(this.props.currentElement.fieldAttributeMasterId, this.props.formElements, this.props.currentElement.attributeTypeId)
+      let formElement = this.props.formElements.formLayoutObject
+      if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
+        this.props.actions.gettingDataForRadioMaster(this.props.currentElement, this.props.jobTransaction.jobId)
+      } else {
+        this.props.actions.gettingDataSelectFromList(this.props.currentElement.fieldAttributeMasterId, formElement, this.props.currentElement.attributeTypeId)
+      }
     }
   }
 
@@ -91,8 +100,10 @@ class SelectFromList extends Component {
   _saveAndDropModal() {
     console.log("_saveAndDropModal")
     this._dropModal()
-    this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
-    console.log("_saveAndDropModal")
+    if (this.props.calledFromArray)
+      this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable, this.props.calledFromArray, this.props.rowId)
+    else
+      this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction.id, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.nextEditable)
   }
 
   _setValueInInputText(valueOfInputText) {

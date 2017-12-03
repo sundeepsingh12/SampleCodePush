@@ -16,8 +16,9 @@ import {
     DATA_STORE
 } from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
-import _ from 'underscore'
+import _ from 'lodash'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
+import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 
 
 /**
@@ -112,10 +113,14 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function onSave(fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue) {
+export function onSave(fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, calledFromArray, rowId) {
     return async function (dispatch) {
         try {
-            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
+            if (!calledFromArray)
+                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
+            else
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, dataStorevalue, formElements, rowId))
+
         } catch (error) {
             console.log(error)
         }
@@ -138,22 +143,29 @@ export function onSave(fieldAttributeMasterId, formElements, nextEditable, isSav
  * @param {*} isMinMaxValidation 
  * @param {*} attributeTypeId 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, isMinMaxValidation, attributeTypeId) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, nextEditable, isSaveDisabled, dataStorevalue, isMinMaxValidation, attributeTypeId, calledFromArray, rowId) {
     return async function (dispatch) {
         try {
             let formElementResult = {}
+            let formElement
+            if (calledFromArray) formElement = _.cloneDeep(formElements[rowId].formLayoutObject)
             if (attributeTypeId == EXTERNAL_DATA_STORE && isMinMaxValidation) {
                 if (!await dataStoreService.dataStoreValuePresentInFieldData(dataStorevalue, fieldAttributeMasterId)) {
-                    formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
+                    formElementResult = (!calledFromArray) ? dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements) : dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElement)
                 } else {
                     throw new Error('This value is already added')
                 }
             }
             if (attributeTypeId == DATA_STORE) {
-                formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
+                formElementResult = (!calledFromArray) ? dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements) : dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElement)
             }
             dispatch(setState(SAVE_SUCCESSFUL, true))
-            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
+            if (!calledFromArray)
+                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, nextEditable, isSaveDisabled, dataStorevalue, ON_BLUR))
+            else {
+                formElements[rowId].formLayoutObject = formElementResult
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, dataStorevalue, formElements, rowId))
+            }
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
                 errorMessage: error.message,

@@ -71,13 +71,15 @@ class ArrayFieldAttribute extends Component {
                 isSaveDisabled={this.props.isSaveDisabled}
                 lastRowId={this.props.lastRowId}
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
+                jobStatusId={this.props.jobStatusId}
+                latestPositionId={this.props.latestPositionId}
             />
         )
     }
     addPressed = () => {
         if (this.props.isSaveDisabled) {
             Toast.show({
-                text: ADD_TOAST,// Comment put this in Attribute Const
+                text: ADD_TOAST,
                 position: 'bottom',
                 buttonText: 'Okay',
             })
@@ -189,13 +191,5 @@ const style = StyleSheet.create({// Comment Refactor these
         borderBottomWidth: 10,
         borderBottomColor: '#f3f3f3'
     },
-    inputType: {
-        height: 35,
-        fontSize: 14
-    },
-    listLeft: {
-        width: 50
-    }
-
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ArrayFieldAttribute)

@@ -56,10 +56,10 @@ export function deleteArrayRow(arrayElements, rowId, lastrowId) {
         }
     }
 }
-export function getNextFocusableAndEditableElement(attributeMasterId, nextEditable, isSaveDisabled, value, arrayElements, rowId) {
+export function getNextFocusableAndEditableElement(attributeMasterId, nextEditable, isSaveDisabled, value, arrayElements, rowId, fieldDataList) {
     return async function (dispatch) {
         try {
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, nextEditable, isSaveDisabled, rowId, value)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, nextEditable, isSaveDisabled, rowId, value, fieldDataList)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))

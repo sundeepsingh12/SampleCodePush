@@ -6,7 +6,8 @@ import {
     Text,
     Platform,
     FlatList,
-    TouchableHighlight
+    TouchableHighlight,
+    Modal
 }
     from 'react-native'
 import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Item } from 'native-base';
@@ -21,22 +22,44 @@ import {
     TEXT,
     NUMBER,
     DECIMAL,
+    DATE,
+    RE_ATTEMPT_DATE,
+    TIME,
+    NPS_FEEDBACK,
+    CHECKBOX,
+    RADIOBUTTON,
+    DROPDOWN,
+    OPTION_RADIO_FOR_MASTER,
+    DATA_STORE,
+    EXTERNAL_DATA_STORE
 } from '../lib/AttributeConstants'
+import TimePicker from '../components/TimePicker'
+import NPSFeedback from '../components/NPSFeedback'
+import SelectFromList from '../containers/SelectFromList'
+import * as globalActions from '../modules/global/globalActions'
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...arrayActions }, dispatch)
+        actions: bindActionCreators({ ...arrayActions, ...globalActions }, dispatch)
     }
 }
 
 class ArrayBasicComponent extends Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            showDateTimePicker: false,
+            showNPS: false,
+            selectFromListEnable: false,
+        };
+    }
 
     onFocusEvent(currentElement) {
         this.props.actions.fieldValidations(currentElement, this.props.arrayRow.formLayoutObject, 'Before', this.props.jobTransaction)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, value, arrayElements, rowId) {
-        // then fire action to get next editable and focusable elements
         this.props.actions.getNextFocusableAndEditableElement(fieldAttributeMasterId, nextEditable, isSaveDisabled, value, arrayElements, rowId);
     }
 
@@ -45,7 +68,44 @@ class ArrayBasicComponent extends Component {
             return [styles.bgLightGray]
         }
     }
+
+    onSaveDateTime = (value, item) => {
+        this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.nextEditable, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)
+        this.setState({ showDateTimePicker: false, showNPS: false })
+    }
+
+    cancelDateTimePicker = () => {
+        this.setState({ showDateTimePicker: false, showNPS: false })
+    }
+    _dropModal = () => {
+        this.setModalVisible(false)
+    }
+    _inflateModal = () => {
+        this.setState(previousState => {
+            return {
+                selectFromListEnable: !this.state.selectFromListEnable
+            }
+        })
+    }
     _renderData(item) {
+        if (this.state.selectFromListEnable) {
+            return (
+                <View>
+                    <SelectFromList
+                        currentElement={item}
+                        nextEditable={this.props.arrayRow.nextEditable}
+                        formElements={this.props.arrayElements}
+                        isSaveDisabled={this.props.isSaveDisabled}
+                        jobTransaction={this.props.jobTransaction}
+                        jobStatusId={this.props.jobStatusId}
+                        latestPositionId={this.props.latestPositionId}
+                        press={this._inflateModal}
+                        calledFromArray={true}
+                        rowId={this.props.arrayRow.rowId}
+                    />
+                </View>
+            )
+        }
         switch (item.attributeTypeId) {
             case STRING:
             case TEXT:
@@ -73,6 +133,99 @@ class ArrayBasicComponent extends Component {
                             </View>
                         </View>
                     )
+                )
+            case DATE:
+            case RE_ATTEMPT_DATE:
+            case TIME:
+                return (
+                    <TouchableHighlight onPress={() => this.setState({ showDateTimePicker: true })}>
+                        <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10, styles.marginBottom10]}>
+                            <View style={[style.listLeft, styles.justifyCenter, styles.alignStart, { height: 35 }]}>
+                                <Text style={[styles.fontSm]} >{item.label}</Text>
+                            </View>
+                            {renderIf(this.state.showDateTimePicker,
+                                <TimePicker onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={item} />
+                            )}
+                            <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
+                                <View style={[styles.row, styles.paddingRight10, styles.justifySpaceBetween, styles.alignCenter]}>
+                                    <Text style={this._styleNextFocusable(item.focus)}>
+                                        {item.value}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                    </TouchableHighlight>
+                )
+            case NPS_FEEDBACK:
+                return (
+                    <TouchableHighlight onPress={() => this.setState({ showNPS: true })} style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10, styles.marginBottom10]}>
+                        <View>
+                            <Text style={[styles.fontSm]} >{item.label}</Text>
+                            {renderIf(this.state.showNPS,
+                                <Modal
+                                    animationType="slide"
+                                    transparent={true}
+                                    visible={this.state.showNPS}
+                                    onRequestClose={this._dropModal}>
+                                    <TouchableHighlight
+                                        style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
+                                        <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                                            <View>
+                                                < NPSFeedback
+                                                    onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={item}
+                                                />
+                                            </View>
+                                        </TouchableHighlight>
+                                    </TouchableHighlight>
+                                </Modal>
+                            )}
+                            <Text style={this._styleNextFocusable(item.focus)}>
+                                {item.value}
+                            </Text>
+
+                        </View>
+                    </TouchableHighlight>
+                )
+            case CHECKBOX:
+            case RADIOBUTTON:
+            case DROPDOWN:
+            case OPTION_RADIO_FOR_MASTER:
+                return (
+                    <TouchableHighlight onPress={this._inflateModal} style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10, styles.marginBottom10]}>
+                        <View>
+                            <Text style={[styles.fontSm]} >{item.label}</Text>
+                            <Text style={this._styleNextFocusable(item.focus)}>
+                                {item.value}
+                            </Text>
+                        </View>
+                    </TouchableHighlight>
+                )
+            case DATA_STORE:
+            case EXTERNAL_DATA_STORE:
+                return (
+                    <TouchableHighlight onPress={
+                        () =>
+                            this.props.actions.navigateToScene('DataStore',
+                                {
+                                    currentElement: item,
+                                    formElements: this.props.arrayElements,
+                                    jobStatusId: this.props.jobStatusId,
+                                    jobTransaction: this.props.jobTransaction,
+                                    latestPositionId: this.props.latestPositionId,
+                                    nextEditable: this.props.arrayRow.nextEditable,
+                                    isSaveDisabled: this.props.isSaveDisabled,
+                                    calledFromArray: true,
+                                    rowId: this.props.arrayRow.rowId
+                                })
+                    } style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10, styles.marginBottom10]}>
+                        <View>
+                            <Text style={[styles.fontSm]} >{item.label}</Text>
+                            <Text style={this._styleNextFocusable(item.focus)}>
+                                {item.value}
+                            </Text>
+
+                        </View>
+                    </TouchableHighlight>
                 )
             default:
                 return (
