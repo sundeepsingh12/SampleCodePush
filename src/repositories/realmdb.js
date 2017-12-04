@@ -135,6 +135,13 @@ export function getAll(tableName) {
     return realm.objects(tableName);
 }
 
+// export function updateRecordOnTableListData(tableName,tableListData,valueList) {
+//     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
+//     realm.write(() => {
+//         _.forEach(filteredRecords, record => record = tableListData[record.id])
+//     });
+// }
+
 /**A generic method for getting value list based on particular property in Table
  * Eg - Returning all JobTransactionIds From Db
  * @param {*} tableName 

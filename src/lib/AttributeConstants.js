@@ -375,10 +375,6 @@ module.exports = {
     //enableSequence
     SEQ_SELECTED: 'seqSelected',
 
-    //Status_Code
-    UNSEEN: 'UNSEEN',
-    PENDING_CODE: 'PENDING',
-
     //Start Search PlaceHolder
     SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
 

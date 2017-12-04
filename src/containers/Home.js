@@ -179,6 +179,7 @@ class Home extends Component {
       )
     }
 
+    console.log('this.props.count',this.props.count)
     if(this.props.count) {
       return (<PieChart count = {this.props.count} press = {this._onPieChartPress}/>)
     }

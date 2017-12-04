@@ -35,6 +35,7 @@ class JobTransaction {
      */
     getJobTransactionsForStatusIds(statusIds) {
         let query = statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+        console.log('statusIds',statusIds)
         const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
         return transactionList
     }

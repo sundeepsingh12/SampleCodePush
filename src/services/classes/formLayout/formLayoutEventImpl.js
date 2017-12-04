@@ -200,8 +200,7 @@ export default class FormLayoutEventImpl {
             //TODO add other dbs which needs updation
             const runSheet = await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList)
             await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList)
-            realm.performBatchSave(fieldData, jobTransaction, job, runSheet)
-            //await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList,jobTransactionId)
+            realm.performBatchSave(fieldData, jobTransaction,runSheet, job)
         } catch (error) {
             console.log(error)
         }
@@ -209,14 +208,15 @@ export default class FormLayoutEventImpl {
 
     async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){
         const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+        const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
         const count  = (jobTransactionIdList) ? jobTransactionIdList.length : 1
         const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
-        jobSummaryList.value.forEach(item => (item.jobStatusId == statusId || item.jobStatusId == prevStatusId) ? (item.jobStatusId == statusId) ? item.count += count : item.count -= count : null )
+        jobSummaryList.value.forEach(item => (item.jobStatusId == statusId || item.jobStatusId == prevStatusId) ? ((item.jobStatusId == statusId)&& (item.updatedTime = currentDate) ? item.count += count : item.count -= count) : null )
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
 
     async _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList){
-        const setRunsheetSummary = []
+        const setRunsheetSummary = [],runSheetList = []
         const status = ['pendingCount','failCount','successCount']
         const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
@@ -228,29 +228,18 @@ export default class FormLayoutEventImpl {
         if(jobTransactionIdList){
             for(id in jobTransaction){
                 runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory-1]] -= 1
-                runsheetMap[jobTransaction[id].runsheetId][status[statusCategory-1]] += 1
-                setRunsheetSummary.push(runsheetMap[jobTransaction[id].runsheetId])                
+                runsheetMap[jobTransaction[id].runsheetId][status[statusCategory-1]] += 1 ;
+                runSheetList.push(runsheetMap[jobTransaction[id].runsheetId])          
             }
         }else{
             runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory-1]] -= 1
             runsheetMap[jobTransaction.runsheetId][status[statusCategory-1]] += 1
-            setRunsheetSummary.push(runsheetMap[jobTransaction[id].runsheetId]) 
+            runSheetList.push(runsheetMap[jobTransaction.runsheetId])
         }
-        return {
-            tableName : TABLE_RUNSHEET,
-            value : setRunsheetSummary
-        }
+        return {tableName : TABLE_RUNSHEET,value : runSheetList}
+      // realm.updateRecordOnTableListData(TABLE_RUNSHEET,runSheetList,Object.keys(runSheetList));
     }
 
-    setCategoryInRunSheet(statusCategory,runSheet,count){
-        if(statusCategory == 1 ){
-            runSheet.pendingCount += count
-        }else if(statusCategory == 2){
-            runSheet.failCount += count
-        }else if(statusCategory == 3){
-            runSheet.successCount += count
-        }
-    }
 
     /**
      * creates fieldData db structure for current transaction

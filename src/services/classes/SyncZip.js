@@ -4,6 +4,7 @@ import { zip, unzip } from 'react-native-zip-archive'
 import { keyValueDBService } from './KeyValueDBService'
 import * as realm from '../../repositories/realmdb';
 import _ from 'underscore'
+import {jobSummaryService} from './JobSummary'
 
 import {
     TABLE_TRACK_LOGS,
@@ -12,7 +13,9 @@ import {
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
     PENDING_SYNC_TRANSACTION_IDS,
-    TABLE_SERVER_SMS_LOG
+    TABLE_SERVER_SMS_LOG,
+    TABLE_RUNSHEET,
+
 } from '../../lib/constants'
 
 
@@ -39,9 +42,9 @@ export async function createZip() {
     // }
     SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
     SYNC_RESULTS.job = realmDbData.jobList;
-    SYNC_RESULTS.jobSummary = [];
+    SYNC_RESULTS.jobSummary = realmDbData.jobSummary;
     SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
-    SYNC_RESULTS.runSheetSummary = [];
+    SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
     SYNC_RESULTS.scannedReferenceNumberLog = [];
     SYNC_RESULTS.serverSmsLog = realmDbData.serverSmsLogs;
     SYNC_RESULTS.trackLog = [];
@@ -93,11 +96,15 @@ function _getSyncDataFromDb(transactionIdsObject) {
     jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB);
     let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId).join(' OR ')
     serverSmsLogs = _getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
+    let runSheetSummary = realm.getAll(TABLE_RUNSHEET);
+    let jobSummary = jobSummaryService.getJobSummaryDataOnLastSync()
     return {
         fieldDataList,
         transactionList,
         jobList,
-        serverSmsLogs
+        serverSmsLogs,
+        runSheetSummary,
+        jobSummary
     }
 }
 

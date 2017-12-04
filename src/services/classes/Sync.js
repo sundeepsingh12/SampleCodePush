@@ -196,7 +196,7 @@ class Sync {
     }
     const newJobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
-      valueList: newJobTransactionsIds,
+      valueList: newJobTransactionsIds,       
       propertyName: 'id'
     }
     const newJobs = {
@@ -212,7 +212,7 @@ class Sync {
 
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas, runsheets, newJobTransactions, newJobs, newJobFieldData)
+    await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, newJobFieldData)
     await this.saveDataFromServerInDB(query)
   }
 
@@ -372,6 +372,7 @@ class Sync {
           const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
           await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+          //console.log("12",unseenTransactions,dataList)
           await runSheetService.updateRunSheetSummary(unseenTransactions,dataList.transactionIdDtos)
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)

@@ -147,6 +147,7 @@ module.exports = keyMirror({
     SET_TABS_TRANSACTIONS: null,
     JOB_ATTRIBUTE_STATUS: null,
     HUB: null,
+    LAST_SYNC_WITH_SERVER: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

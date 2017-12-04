@@ -12,7 +12,6 @@ import {
 
 import {
   SERVICE_ALREADY_SCHEDULED,
-  PENDING,
   FAIL,
   SUCCESS,
   PIECHART,
@@ -66,12 +65,12 @@ export function syncService() {
 export function pieChartCount() {
   return async (dispatch) => {
     try {
-      dispatch(setState(CHART_LOADING, { loading: true, count: null }))
-      const pendingStatusIds = await jobStatusService.getStatusIdsForStatusCategory(PENDING,UNSEEN)
-      const successStatusIds = await jobStatusService.getStatusIdsForStatusCategory(SUCCESS,null)
-      const failStatusIds    = await jobStatusService.getStatusIdsForStatusCategory(FAIL,null)
+      dispatch(setState(CHART_LOADING, { loading: true }))
+      const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
       const jobStatus = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+      const {pendingStatusIds,failStatusIds,successStatusIds} = allStatusIds
       const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
+      console.log('count',count)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
       //Update UI here
