@@ -1,5 +1,6 @@
 import {
     ON_BLUR,
+    NEXT_FOCUS,
     TABLE_FIELD_DATA,
     TABLE_JOB_TRANSACTION,
     JOB_MASTER,
@@ -20,6 +21,14 @@ import _ from 'lodash'
 import moment from 'moment'
 import sha256 from 'sha256'
 import { formLayoutService } from '../../classes/formLayout/FormLayout'
+import { fieldValidationService } from '../FieldValidation'
+import {
+    AFTER,
+    BEFORE,
+    DATA_STORE,
+    EXTERNAL_DATA_STORE
+} from '../../../lib/AttributeConstants'
+import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
 
 export default class FormLayoutEventImpl {
 
@@ -33,23 +42,35 @@ export default class FormLayoutEventImpl {
      * @param {*isSaveDisabled} isSaveDisabled 
      * @param {*fieldAttribute value} value 
      */
-    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, nextEditable, isSaveDisabled, value, fieldDataList, event) {
+    findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event) {
         this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
-        nextEditable = this.updateNextEditable(formLayoutObject);
-        isSaveDisabled = !this._enableSave(formLayoutObject, nextEditable);
-        const nextEditableElements = nextEditable[attributeMasterId];
-        if (!nextEditableElements || nextEditableElements.length == 0) {
-            return { formLayoutObject, nextEditable, isSaveDisabled } // there is no next element so return
-        }
-        nextEditableElements.forEach((nextElement) => {
-            if ((typeof (nextElement) == 'string')) {
-                nextElement = Number(nextElement.split('$$')[1]);
-                formLayoutObject.get(nextElement).focus = true;
+        isSaveDisabled = false
+        for (var [key, value] of formLayoutObject) {
+            if (key != attributeMasterId || event == NEXT_FOCUS) {
+                value.focus = false
             }
-            formLayoutObject.get(nextElement).editable = !(formLayoutObject.get(nextElement).attributeTypeId == 62) ? true : false;
-        });
-
-        return { formLayoutObject, nextEditable, isSaveDisabled }
+            if (value.value || value.value === 0) {
+                continue
+            }
+            value.editable = true
+            if(value.required) {
+                value.focus = event == NEXT_FOCUS ? true : value.focus
+                isSaveDisabled = true
+                break
+            }
+            if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
+                let beforeMessageList = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE)
+                let valueAfterValidation = formLayoutObject.get(attributeMasterId).value
+                if (!valueAfterValidation && valueAfterValidation !== 0) {
+                    continue
+                }
+                let afterMessageList = fieldValidationService.fieldValidations(value, formLayoutObject, AFTER)
+            }
+        }
+        if (!isSaveDisabled) {
+            formLayoutObject.get(attributeMasterId).focus = true
+        }
+        return { formLayoutObject, isSaveDisabled }
     }
 
     /**
@@ -58,19 +79,19 @@ export default class FormLayoutEventImpl {
      * @param {*formLayoutMap} formLayoutObject 
      * @param {*nextEditable} nextEditable 
      */
-    _enableSave(formLayoutObject, nextEditable) {
-        if (!nextEditable || Object.keys(nextEditable).length == 0) {
-            return true;
-        }
-        let saveEnabled = true;
+    _enableSave(formLayoutObject) {
+        // if (!nextEditable || Object.keys(nextEditable).length == 0) {
+        //     return true;
+        // }
+        // let saveEnabled = true;
 
-        for (let key in nextEditable) {
-            if (!formLayoutObject.get(Number(key)).value || formLayoutObject.get(Number(key)).value.length == 0) {
-                saveEnabled = false; // if any required attribute does not contain value then disable save and break 
-                break;
-            }
-        }
-        return saveEnabled;
+        // for (let key in nextEditable) {
+        //     if (!formLayoutObject.get(Number(key)).value || formLayoutObject.get(Number(key)).value.length == 0) {
+        //         saveEnabled = false; // if any required attribute does not contain value then disable save and break 
+        //         break;
+        //     }
+        // }
+        // return saveEnabled;
     }
 
     /**
@@ -151,20 +172,20 @@ export default class FormLayoutEventImpl {
      * @param {*} formLayoutObject 
      */
     updateNextEditable(formLayoutObject) {
-        if (!formLayoutObject) {
-            return;
-        }
-        let nextEditable = {}
-        let mapData = JSON.stringify([...formLayoutObject]);// stringified map
-        let formLayoutArray = JSON.parse(mapData).map(d => d[1]); // to convert map to array
+        // if (!formLayoutObject) {
+        //     return;
+        // }
+        // let nextEditable = {}
+        // let mapData = JSON.stringify([...formLayoutObject]);// stringified map
+        // let formLayoutArray = JSON.parse(mapData).map(d => d[1]); // to convert map to array
 
-        for (let i = 0; i < formLayoutArray.length; i++) {
-            let fieldAttribute = formLayoutArray[i]; //1st of formLayoutArray[i] contains the object as Array.from on map gives array in which 0th index is a key and 1st index is the object
-            if (fieldAttribute && fieldAttribute.required) {
-                formLayoutService.getNextEditableAndFocusableElements(fieldAttribute.fieldAttributeMasterId, i, formLayoutArray, nextEditable);
-            }
-        }
-        return nextEditable
+        // for (let i = 0; i < formLayoutArray.length; i++) {
+        //     let fieldAttribute = formLayoutArray[i]; //1st of formLayoutArray[i] contains the object as Array.from on map gives array in which 0th index is a key and 1st index is the object
+        //     if (fieldAttribute && fieldAttribute.required) {
+        //         formLayoutService.getNextEditableAndFocusableElements(fieldAttribute.fieldAttributeMasterId, i, formLayoutArray, nextEditable);
+        //     }
+        // }
+        // return nextEditable
     }
 
     /**
@@ -516,5 +537,6 @@ export default class FormLayoutEventImpl {
         await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync)
         return
     }
+
 }
 

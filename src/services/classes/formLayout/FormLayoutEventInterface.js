@@ -2,8 +2,8 @@ import FormLayoutEventImpl from './formLayoutEventImpl.js'
 
 class FormLayoutEventsInterface extends FormLayoutEventImpl {
 
-    findNextFocusableAndEditableElement(attributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataList, event) {
-        return this.findNextFocusableAndEditableElements(attributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataList, event);
+    findNextFocusableAndEditableElement(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event) {
+        return this.findNextFocusableAndEditableElements(attributeMasterId, formElement, isSaveDisabled, value, fieldDataList, event);
     }
 
     disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
@@ -35,10 +35,6 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
 
     getSequenceData(sequenceMasterId){
         return this.getSequenceAttrData(sequenceMasterId)
-    }
-
-    updateNextEditableObject(formLayoutObject) {
-        return this.updateNextEditable(formLayoutObject)
     }
 
     executeBeforeValidations(attributeMasterId) {}

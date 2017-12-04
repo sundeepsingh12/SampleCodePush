@@ -5,11 +5,14 @@ import {
   View,
   Text,
   Platform,
-  FlatList
+  FlatList,
+  TouchableOpacity,
 }
   from 'react-native'
-import { Container, Content, Footer, Card, CardItem, Button, Body, Header, Left, Right, Icon,Toast } from 'native-base'
+import { Container, Content, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform';
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
@@ -28,7 +31,6 @@ import {
 function mapStateToProps(state) {
   return {
     formElement: state.formLayout.formElement,
-    nextEditable: state.formLayout.nextEditable,
     isSaveDisabled: state.formLayout.isSaveDisabled,
     statusName: state.formLayout.statusName,
     jobTransactionId: state.formLayout.jobTransactionId,
@@ -48,7 +50,7 @@ function mapDispatchToProps(dispatch) {
 
 class FormLayout extends Component {
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId)
   }
 
@@ -56,7 +58,6 @@ class FormLayout extends Component {
     return (
       <BasicFormElement
         item={item}
-        nextEditable={this.props.nextEditable}
         formElement={this.props.formElement}
         isSaveDisabled={this.props.isSaveDisabled}
         jobTransaction={this.props.navigation.state.params.jobTransaction}
@@ -92,7 +93,7 @@ class FormLayout extends Component {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
-        this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId,this.props.navigation.state.params.jobMasterId,
+      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId, this.props.navigation.state.params.jobMasterId,
         this.props.navigation.state.params.transactionIdList
       )
     }
@@ -100,43 +101,97 @@ class FormLayout extends Component {
 
   _keyExtractor = (item, index) => item[1].key;
   render() {
-    if((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)){ Toast.show({
+    if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
+      Toast.show({
         text: this.props.errorMessage,
         position: 'bottom',
         buttonText: 'Okay'
-         })}
+      })
+    }
     if (this.props.isLoading) { return <Loader /> }
+    if (this.props.formElement && this.props.formElement.length == 0) {
+      <Footer style={[style.footer]}>
+        <FooterTab style={[styles.padding10]}>
+          <Button success full
+            onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+            disabled={this.props.isSaveDisabled}>
+            <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+          </Button>
+        </FooterTab>
+      </Footer>
+    }
     return (
-      <Container style={StyleSheet.flatten([styles.mainBg])}>
-        <Header style={StyleSheet.flatten([styles.bgPrimary])}>
-          <Left>
-            <Button transparent onPress={() => { this.props.navigation.goBack(null) }}>
-              <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])} />
-            </Button>
-          </Left>
-          <Body>
-            <Text style={StyleSheet.flatten([styles.fontWhite])}>{this.props.statusName}</Text>
-          </Body>
-          <Right>
+      <StyleProvider style={getTheme(platform)}>
+        <Container>
+          <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            <Body>
+              <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                </TouchableOpacity>
+                <View style={[style.headerBody]}>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.statusName}</Text>
+                </View>
+                <View style={[style.headerRight]}>
+                </View>
+                <View />
+              </View>
+            </Body>
+          </Header>
 
-          </Right>
-        </Header>
-        <Content style={StyleSheet.flatten([styles.padding5])}>
-          <FlatList
-            data={Array.from(this.props.formElement)}
-            extraData={this.state}
-            renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
-            keyExtractor={this._keyExtractor}>
-          </FlatList>
-        </Content>
-        <Button full success
-          disabled={this.props.isSaveDisabled} onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}>
-          <Text style={{ color: 'white' }}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
-        </Button>
+          <Content style={[styles.flex1, styles.bgLightGray]}>
+            <FlatList
+              data={Array.from(this.props.formElement)}
+              extraData={this.state}
+              renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+              keyExtractor={this._keyExtractor}>
+            </FlatList>
+          </Content>
 
-      </Container>
+          <Footer style={[style.footer]}>
+            <FooterTab style={[styles.padding10]}>
+              <Button success full
+                onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+                disabled={this.props.isSaveDisabled}>
+                <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+              </Button>
+            </FooterTab>
+          </Footer>
+        </Container>
+      </StyleProvider>
     )
   }
 }
+
+const style = StyleSheet.create({
+  header: {
+    borderBottomWidth: 0,
+    height: 'auto',
+    padding: 0,
+    paddingRight: 0,
+    paddingLeft: 0
+  },
+  headerLeft: {
+    width: '15%',
+    padding: 15
+  },
+  headerBody: {
+    width: '70%',
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  headerRight: {
+    width: '15%',
+    padding: 15
+  },
+  footer: {
+    height: 'auto',
+    borderTopWidth: 1,
+    borderTopColor: '#f3f3f3'
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(FormLayout)

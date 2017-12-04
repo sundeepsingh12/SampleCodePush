@@ -70,6 +70,7 @@ module.exports = keyMirror({
 
     //Home Actions
     HOME_LOADING: null,
+    CHART_LOADING: null,
     JOB_FETCHING_START: null,
     JOB_FETCHING_END: null,
     SET_TABS_LIST: null,
@@ -184,6 +185,7 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
+    NEXT_FOCUS: null,
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,

@@ -17,7 +17,6 @@ import {
     UPDATE_FIELD_DATA_VALIDATION,
     SHOW_DATETIME_PICKER,
     HIDE_DATETIME_PICKER,
-    UPDATE_NEXT_EDITABLE
   } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -31,8 +30,7 @@ export default function formLayoutReducer(state = initialState, action) {
          */
         case GET_SORTED_ROOT_FIELD_ATTRIBUTES: {
             return state.set('formElement', action.payload.formLayoutObject)
-                .set('nextEditable', action.payload.nextEditable)
-                .set('isSaveDisabled', action.payload.isSaveDisabled ? true : false) // applied ternary condition to set null, undefined to false
+                .set('isSaveDisabled', action.payload.isSaveDisabled) // applied ternary condition to set null, undefined to false
         }
 
         /**
@@ -53,7 +51,6 @@ export default function formLayoutReducer(state = initialState, action) {
         case UPDATE_FIELD_DATA_WITH_CHILD_DATA: {
             return state.set('formElement', action.payload.formElement)
                 .set('latestPositionId', action.payload.latestPositionId)
-                .set('nextEditable', action.payload.nextEditable)
                 .set('isSaveDisabled', action.payload.isSaveDisabled ? true : false)
         }
 
@@ -102,10 +99,7 @@ export default function formLayoutReducer(state = initialState, action) {
         case UPDATE_FIELD_DATA_VALIDATION: {
             return state.set('formElement', action.payload.formElement)
                 .set('errorMessage', action.payload.message)
-        }
-
-        case UPDATE_NEXT_EDITABLE : {
-            return state.set('nextEditable',action.payload)
+                .set('currentElement', action.payload.currentElement)
         }
     }
     return state;

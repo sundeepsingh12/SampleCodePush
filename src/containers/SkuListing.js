@@ -97,7 +97,6 @@ class SkuListing extends Component {
       this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
       this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId,
       this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-      this.props.navigation.state.params.nextEditable,
       this.props.navigation.state.params.isSaveDisabled
     )
     this.props.navigation.goBack()

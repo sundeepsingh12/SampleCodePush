@@ -39,7 +39,7 @@ class NPSFeedback extends Component {
                 {renderIf(!this.props.showSave,
                     <View style={{ flexDirection: "row" }}>
                         <TouchableHighlight style={styles.buttonStyle}
-                            onPress={() => { this.props.onSave(this.state.starCount) }} >
+                            onPress={() => { this.props.onSave(this.state.starCount, this.props.item) }} >
                             <Text>Save</Text>
                         </TouchableHighlight>
 

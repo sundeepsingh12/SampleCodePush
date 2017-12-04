@@ -33,7 +33,6 @@ var InitialState = Record({
     jobTransactionId : 0,
     statusName : '',
     formElement : {},
-    nextEditable : {},
     isLoading : false,
     errorMessage : '',
     paymentAtEnd : {}

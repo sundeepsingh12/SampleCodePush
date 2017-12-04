@@ -3,6 +3,7 @@
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { selectFromListDataService } from '../../services/classes/SelectFromListService'
 import { updateFieldDataWithChildData, getNextFocusableAndEditableElements, updateFieldData } from '../form-layout/formLayoutActions'
+import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { CHECKBOX, RADIOBUTTON, ARRAY_SAROJ_FAREYE, OPTION_RADIO_FOR_MASTER, OBJECT_SAROJ_FAREYE, DROPDOWN } from '../../lib/AttributeConstants'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { setState } from '../global/globalActions'
@@ -47,19 +48,25 @@ export function setOrRemoveStates(selectFromListState, id, attributeTypeId) {
     }
 }
 
-export function selectFromListButton(selectFromListState, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, nextEditable) {
+export function selectFromListButton(selectFromListState, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, calledFromArray, rowId) {
     return async function (dispatch) {
         try {
             selectFromListState = _.values(selectFromListDataService.selectFromListDoneButtonClicked(params.attributeTypeId, selectFromListState))
             if (params.attributeTypeId == CHECKBOX || params.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
                 const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransactionId, params.positionId, latestPositionId)
                 const value = params.attributeTypeId == OPTION_RADIO_FOR_MASTER ? OBJECT_SAROJ_FAREYE : ARRAY_SAROJ_FAREYE
-                dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, value, fieldDataListData))
+                if (calledFromArray)
+                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId, fieldDataListData))
+                else
+                    dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, value, fieldDataListData))
             } else {
-                dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
+                if (calledFromArray)
+                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, selectFromListState[0].value, formElement, rowId))
+                else
+                    dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
             }
-             dispatch(setState(INPUT_TEXT_VALUE, ''))
-             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))
+            dispatch(setState(INPUT_TEXT_VALUE, ''))
+            dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))
         } catch (error) {
             dispatch(setState(ERROR_MESSAGE, error.message))
             dispatch(setState(ERROR_MESSAGE, ''))
@@ -101,9 +108,9 @@ export function gettingDataSelectFromList(fieldAttributeMasterId, formElement, a
                     }
                 }
             }
-            if (attributeTypeIdOfCurrentElement == DROPDOWN && selectFromListData.selectFromListsDataLength >= 30){
-                dispatch(setState(SELECTFROMLIST_ITEMS_LENGTH, 1))                
-                dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST,selectFromListData.selectFromListsData ))                
+            if (attributeTypeIdOfCurrentElement == DROPDOWN && selectFromListData.selectFromListsDataLength >= 30) {
+                dispatch(setState(SELECTFROMLIST_ITEMS_LENGTH, 1))
+                dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST, selectFromListData.selectFromListsData))
             }
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListData.selectFromListsData))
         } catch (error) {
@@ -147,7 +154,7 @@ export function setFilteredDataInDropdown(selectFromListState, searchText) {
             if (searchText.length) {
                 let filteredDataDropdown = selectFromListDataService.getFilteredDataInDropDown(selectFromListState, searchText)
                 dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST, filteredDataDropdown))
-            } else{
+            } else {
                 dispatch(setState(SET_FILTERED_DATA_SELECTFROMLIST, selectFromListState))
             }
         } catch (error) {

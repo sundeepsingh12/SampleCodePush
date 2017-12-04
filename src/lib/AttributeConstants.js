@@ -219,15 +219,22 @@ module.exports = {
     REGEX: 'regex',
 
     //Validation Action Constants
+    AFTER: 'After',
     ALERT_MESSAGE: 'alertMessage',
     ASSIGN: 'assign',
     ASSIGN_BY_MATHEMATICAL_FORMULA: 'assignByMathematicalFormula',
     ASSIGN_DATE_TIME: 'assignDateTime',
+    AVERAGE: 'average',
+    BEFORE: 'Before',
+    CONCATENATE: 'concatenate',
     DATE_COMPARATOR: 'dateComparator',
     ELSE: 'else',
+    MAX: 'max',
+    MIN: 'min',
     REQUIRED_FALSE: 'requiredFalse',
     REQUIRED_TRUE: 'requiredTrue',
     RETURN: 'return',
+    SUM: 'sum',
     THEN: 'then',
     TIME_COMPARATOR: 'timeComparator',
 
@@ -385,7 +392,7 @@ module.exports = {
 
     //Status_Code
     UNSEEN: 'UNSEEN',
-    PENDING: 'PENDING',
+    PENDING_CODE: 'PENDING',
 
     //Start Search PlaceHolder
     SEARCH_PLACEHOLDER: 'Filter Reference Numbers',

@@ -3,9 +3,10 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { Component } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
+import renderIf from '../lib/renderIf.js'
 import {
   Container,
   Content,
@@ -33,6 +34,7 @@ import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import CircularProgress from '../svg_components/components/CircularProgress'
+import PieChart from '../components/PieChart'
 import {
   BULK,
   LIVE,
@@ -56,7 +58,9 @@ import {
 
 function mapStateToProps(state) {
   return {
-    loading: state.home.loading
+    moduleLoading: state.home.moduleLoading,
+    chartLoading: state.home.chartLoading,
+    count: state.home.count,
   }
 }
 
@@ -158,39 +162,6 @@ class Home extends Component {
     )
   }
 
-  pieChartView() {
-    if (!PIECHART.enabled) {
-      return null
-    }
-    return (
-      <LinearGradient
-        colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}
-        style={style.chartBlock}>
-        <View style={[styles.justifyCenter, styles.paddingTop15, styles.paddingBottom15]}>
-          <CircularProgress percentage={percentage} style={[{backgroundColor: '#green'}]}>
-              <View style={[styles.justifyCenter, styles.alignCenter]}>
-                <Text style={{fontSize: 40, color: '#ffffff', fontWeight: '500'}}>{percentage}</Text>
-                <Text style={{fontSize: 18, color: '#ffffff'}}>pending</Text>
-              </View>
-          </CircularProgress>
-        </View>
-        <View style={[styles.row, styles.justifySpaceAround]}>
-          <View>
-            <Text
-              style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>200</Text>
-            <Text
-              style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>total</Text>
-          </View>
-          <View>
-            <Text
-              style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>165</Text>
-            <Text
-              style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>done</Text>
-          </View>
-        </View>
-      </LinearGradient>
-    )
-  }
 
   moduleView(modulesList) {
     let moduleView = []
@@ -218,11 +189,30 @@ class Home extends Component {
     return moduleView
   }
 
+  pieChartView() {
+    if(!PIECHART.enabled) {
+      return null
+    }
+
+    if(this.props.chartLoading) {
+      return (
+        <ActivityIndicator animating={this.props.chartLoading} 
+        style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
+      )
+    }
+
+    if(this.props.count) {
+      return (<PieChart count = {this.props.count}/>)
+    }
+
+    return null
+  }
+
   render() {
     const headerView = this.headerView()
-    const pieChartView = this.pieChartView()
     const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE,SORTING,CUSTOMAPP])
-    if (this.props.loading) {
+    const pieChartView = this.pieChartView()
+    if (this.props.moduleLoading) {
       return (<Loader />)
     }
     return (
