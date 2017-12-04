@@ -19,6 +19,7 @@ import {
     SET_FILTERED_DATA_SELECTFROMLIST,
     ERROR_MESSAGE,
     INPUT_TEXT_VALUE,
+    NEXT_FOCUS
 } from '../../lib/constants'
 import _ from 'lodash'
 
@@ -63,7 +64,7 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
                 if (calledFromArray)
                     dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, selectFromListState[0].value, formElement, rowId))
                 else
-                    dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value, ON_BLUR))
+                    dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value, NEXT_FOCUS))
             }
             dispatch(setState(INPUT_TEXT_VALUE, ''))
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))

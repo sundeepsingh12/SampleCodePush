@@ -59,7 +59,11 @@ class ArrayBasicComponent extends Component {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.arrayRow.formLayoutObject, 'Before', this.props.jobTransaction)
+        this.props.actions.fieldValidations(currentElement, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId,this.props.arrayRow.isSaveDisabled)
+    }
+
+    _onBlurEvent(currentElement) {
+        this.props.actions.fieldValidations(currentElement, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId,this.props.arrayRow.isSaveDisabled)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId) {
@@ -112,6 +116,7 @@ class ArrayBasicComponent extends Component {
                                         multiline={item.attributeTypeId == 2 ? true : false}
                                         onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
                                         onFocus={() => { this.onFocusEvent(item) }}
+                                        onBlur={(e) => this._onBlurEvent(item)}
                                     />
                                 </Item>
                             </View>

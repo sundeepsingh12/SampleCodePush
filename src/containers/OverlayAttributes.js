@@ -12,7 +12,7 @@ import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
 import { getNextFocusableAndEditableElements, updateFieldData } from '../modules/form-layout/formLayoutActions'
 import {
-    ON_BLUR
+    NEXT_FOCUS
 } from '../lib/constants'
 
 function mapDispatchToProps(dispatch) {
@@ -26,7 +26,7 @@ class OverlayAttributes extends Component {
         this.props.actions.getNextFocusableAndEditableElements(this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.isSaveDisabled,
-            value + '', ON_BLUR)
+            value + '', NEXT_FOCUS)
         this.props.navigation.goBack()
     }
 

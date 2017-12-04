@@ -6,7 +6,7 @@ import {
     FormLayout,
     SET_REMARKS_VALIDATION,
     FIELD_ATTRIBUTE,
-    ON_BLUR
+    NEXT_FOCUS
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
@@ -33,7 +33,7 @@ export function _setIsRemarksValidation(isRemarksValidation) {
 export function saveSignature(result, fieldAttributeMasterId, formElement, isSaveDisabled) {
     return async function (dispatch) {
         const value = await signatureService.saveFile(result, moment())
-        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, ON_BLUR))
+        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, NEXT_FOCUS))
     }
 }
 
