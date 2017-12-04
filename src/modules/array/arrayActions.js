@@ -87,12 +87,10 @@ export function clearArrayState() {
     }
 }
 
-export function fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction) {
+export function fieldValidations(currentElement, arrayElements, timeOfExecution, jobTransaction, rowId) {
     return function (dispatch) {
+        let formElement = arrayElements[rowId].formLayoutObject
         let alertMessageList = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
-        // dispatch(setState(UPDATE_FIELD_DATA_VALIDATION, {
-        //     formElement,
-        //     message: alertMessageList[0]
-        // }))
+        dispatch(setState('SET_ARRAY', arrayElements))
     }
 }

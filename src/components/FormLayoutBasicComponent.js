@@ -50,7 +50,12 @@ import {
     OPTION_RADIO_FOR_MASTER,
 } from '../lib/AttributeConstants'
 
+import {
+    NEXT_FOCUS
+} from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
+import NPSFeedback from '../components/NPSFeedback'
+import TimePicker from '../components/TimePicker'
 
 function mapStateToProps(state) {
     return {
@@ -63,15 +68,15 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions }, dispatch)
     }
 }
-
 class BasicFormElement extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             selectFromListEnable: false,
+            showNPS: false,
+            showDateTimePicker: false,
         }
-        this.formElementValue = {}
     }
 
     componentDidMount = () => {
@@ -91,14 +96,6 @@ class BasicFormElement extends Component {
             case MONEY_PAY:
             case MONEY_COLLECT: {
                 screenName = 'Payment'
-                break
-            }
-
-            case OPTION_RADIO_FOR_MASTER:
-            case DROPDOWN:
-            case RADIOBUTTON:
-            case CHECKBOX: {
-                screenName = 'SelectFromList'
                 break
             }
             case FIXED_SKU: {
@@ -182,8 +179,27 @@ class BasicFormElement extends Component {
             }
         })
     }
+    onSaveDateTime = (value) => {
+        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', NEXT_FOCUS);
+        this.setState({ showDateTimePicker: false, showNPS: false })
+    }
 
-
+    cancelDateTimePicker = () => {
+        this.setState({ showDateTimePicker: false, showNPS: false })
+    }
+    _dropModal = () => {
+        this.setModalVisible(false)
+    }
+    _showNPS = () => {
+        this.setState(previousState => {
+            return {
+                showNPS: true
+            }
+        })
+    }
+    _showDateTime = () => {
+        this.setState({ showDateTimePicker: true })
+    }
     render() {
         if (this.state.selectFromListEnable) {
             return (
@@ -199,6 +215,33 @@ class BasicFormElement extends Component {
                         press={this._inflateModal}
                     />
                 </View>
+            )
+        }
+        if (this.state.showNPS) {
+            return (
+                <View>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={this.state.showNPS}
+                        onRequestClose={this._dropModal}>
+                        <TouchableHighlight
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                                <View>
+                                    < NPSFeedback
+                                        onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item}
+                                    />
+                                </View>
+                            </TouchableHighlight>
+                        </TouchableHighlight>
+                    </Modal>
+                </View>
+            )
+        }
+        if (this.state.showDateTimePicker) {
+            return (
+                <TimePicker onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item} />
             )
         }
 
@@ -243,21 +286,25 @@ class BasicFormElement extends Component {
             case MONEY_PAY:
             case SKU_ARRAY:
             case MONEY_COLLECT:
-            case NPS_FEEDBACK:
-            case TIME:
-            case RE_ATTEMPT_DATE:
-            case DATE:
             case CASH_TENDERING:
             case SIGNATURE_AND_NPS:
             case ARRAY:
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+            case NPS_FEEDBACK:
+                return <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />
             case CHECKBOX:
             case RADIOBUTTON:
             case DROPDOWN:
             case OPTION_RADIO_FOR_MASTER:
                 return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
+            case DATE:
+            case RE_ATTEMPT_DATE:
+            case TIME:
+                return (
+                    <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />
+                )
             default:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />

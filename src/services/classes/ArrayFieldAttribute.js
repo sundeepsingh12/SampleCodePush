@@ -6,7 +6,7 @@ import {
     INVALID_CONFIG_ERROR
 } from '../../lib/AttributeConstants'
 import {
-    ON_BLUR,
+    NEXT_FOCUS,
 } from '../../lib/constants'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
@@ -77,7 +77,7 @@ class ArrayFieldAttribute {
     findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, isSaveDisabled, rowId, value, fieldDataList) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
         let arrayRow = cloneArrayElements[rowId]
-        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject,  isSaveDisabled, value, fieldDataList, ON_BLUR);
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, NEXT_FOCUS);
         arrayRow.allRequiredFieldsFilled = (!sortedArrayElements.isSaveDisabled) ? true : false
         let _isSaveDisabled = this.enableSaveIfRequired(cloneArrayElements)
         return {

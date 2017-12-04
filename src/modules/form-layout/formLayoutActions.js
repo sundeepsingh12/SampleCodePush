@@ -100,7 +100,7 @@ export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLay
 export function updateFieldData(attributeId, value, formElement) {
     return async function (dispatch) {
         const cloneFormElement = _.cloneDeep(formElement)
-        const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement, ON_BLUR)
+        const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement, NEXT_FOCUS)
         dispatch(setState(UPDATE_FIELD_DATA, updatedFieldData))
     }
 }

@@ -55,7 +55,7 @@ function mapDispatchToProps(dispatch) {
 
 class ArrayFieldAttribute extends Component {
 
-    componentDidMount() {//Comment do in did mount
+    componentDidMount() {
         this.props.actions.getSortedArrayChildElements(
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.jobStatusId,

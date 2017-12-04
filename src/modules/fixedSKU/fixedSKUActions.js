@@ -17,7 +17,7 @@ import {
 
 import { setState } from '../global/globalActions'
 
-export function onSave(parentObject, formElement, nextEditable, fixedSKUList, isSaveDisabled, latestPositionId, jobTransactionId) {
+export function onSave(parentObject, formElement, fixedSKUList, isSaveDisabled, latestPositionId, jobTransactionId) {
     return async function (dispatch) {
         try {
             fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
