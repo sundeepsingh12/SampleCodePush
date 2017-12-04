@@ -171,7 +171,7 @@ export function authenticateUser(username, password,rememberMe) {
       dispatch(NavigationActions.navigate({ routeName: PreloaderScreen }))
     }
     catch (error) {
-      dispatch(loginFailure(error.message))
+      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
     }
   }
 }
