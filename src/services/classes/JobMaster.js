@@ -29,6 +29,7 @@ import {
   CUSTOMIZATION_LIST_MAP,
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
+  CUSTOM_NAMING,
   HUB
 } from '../../lib/constants'
 
@@ -126,6 +127,7 @@ class JobMaster {
    */
   async saveJobMaster(json) {
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
+    await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming)
     await keyValueDBService.validateAndSaveData(USER, json.user)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
     await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_VALUE, json.jobAttributeValueMaster)
