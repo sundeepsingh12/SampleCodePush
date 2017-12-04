@@ -59,11 +59,11 @@ class ArrayBasicComponent extends Component {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId)
+        this.props.actions.fieldValidations(currentElement, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId,this.props.arrayRow.isSaveDisabled)
     }
 
     _onBlurEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId)
+        this.props.actions.fieldValidations(currentElement, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId,this.props.arrayRow.isSaveDisabled)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId) {

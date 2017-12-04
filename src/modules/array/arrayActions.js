@@ -87,10 +87,12 @@ export function clearArrayState() {
     }
 }
 
-export function fieldValidations(currentElement, arrayElements, timeOfExecution, jobTransaction, rowId) {
+export function fieldValidations(currentElement, arrayElements, timeOfExecution, jobTransaction, rowId, isSaveDisabled) {
     return function (dispatch) {
-        let formElement = arrayElements[rowId].formLayoutObject
+        let newArray = _.cloneDeep(arrayElements)
+        let formElement = newArray[rowId].formLayoutObject
         let alertMessageList = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
-        dispatch(setState('SET_ARRAY', arrayElements))
+        dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, currentElement.value, newArray, rowId))
+        //   dispatch(setState('SET_ARRAY', newArray))
     }
 }

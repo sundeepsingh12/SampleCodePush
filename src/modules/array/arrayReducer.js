@@ -27,7 +27,10 @@ export default function arrayReducer(state = initialState, action) {
             return state.set('arrayElements', action.payload.newArrayElements)
                 .set('isSaveDisabled', action.payload.isSaveDisabled)
                 .set('errorMessage', '')
-        case 'SET_ARRAY': return state.set('arrayElements', action.payload)
+        case 'SET_ARRAY':
+            return state.set('arrayElements', action.payload)
+                .set('errorMessage', '')
+
         case SET_ERROR_MSG:
             return state.set('errorMessage', action.payload)
         case CLEAR_ARRAY_STATE: {
