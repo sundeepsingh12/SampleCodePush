@@ -15,7 +15,7 @@ import { Container, Content, ListItem, List, Text, Footer, FooterTab, Button, In
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
-import _ from 'underscore'
+import _ from 'lodash'
 
 class SkuListing extends Component {
 
@@ -97,7 +97,6 @@ class SkuListing extends Component {
       this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
       this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId,
       this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-      this.props.navigation.state.params.nextEditable,
       this.props.navigation.state.params.isSaveDisabled
     )
     this.props.navigation.goBack()

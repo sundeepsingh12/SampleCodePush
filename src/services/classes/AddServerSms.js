@@ -24,6 +24,7 @@ import {
     TRANSACTION_DATE,
     JOB_ETA
 } from '../../lib/AttributeConstants'
+import _ from 'lodash'
 class AddServerSms {
     /**
    * This function sets message body and returns server sms logs
@@ -67,13 +68,13 @@ class AddServerSms {
             let jobAttributesList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE);
             let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
             let user = await keyValueDBService.getValueFromStore(USER);
-
+            let fieldAndJobAttrMap = await this.getKeyToAttributeMap(jobAttributesList, fieldAttributesList)
             if (smsJobStatus.messageBody && smsJobStatus.messageBody.trim() != '') {
-                let messageBody = await this.setSmsBodyJobData(smsJobStatus.messageBody, jobData, jobTransaction, jobAttributesList)
+                let messageBody = await this.setSmsBodyJobData(smsJobStatus.messageBody, jobData, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
                 messageBody = await this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
                 if (fieldData && fieldData.value) {
-                    messageBody = await this.setSMSBodyFieldData(messageBody, fieldData.value, jobTransaction, fieldAttributesList)
-                    messageBody = await this.checkForRecursiveData(messageBody, '', jobData, fieldData.value, jobTransaction, jobAttributesList, fieldAttributesList, user)
+                    messageBody = await this.setSMSBodyFieldData(messageBody, fieldData.value, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap)
+                    messageBody = await this.checkForRecursiveData(messageBody, '', jobData, fieldData.value, jobTransaction, fieldAndJobAttrMap, user)
                 }
                 serverSmsLog.smsBody = messageBody
                 serverSmsLog.dateTime = moment().format('YYYY-MM-DD HH:mm:ss') + ''
@@ -82,6 +83,11 @@ class AddServerSms {
         }
         let serverSMSLogObject = this.saveServerSmsLog(serverSmsLogs)
         return serverSMSLogObject
+    }
+    getKeyToAttributeMap(jobAttributesList, fieldAttributesList) {
+        let keyToJobAttributeMap = _.mapKeys(jobAttributesList.value, 'key')
+        let keyToFieldAttributeMap = _.mapKeys(fieldAttributesList.value, 'key')
+        return { keyToJobAttributeMap, keyToFieldAttributeMap }
     }
     /**
       * This function returns job data for given jobtransaction
@@ -113,15 +119,15 @@ class AddServerSms {
      * @returns
      * messageBody: string
      */
-    setSmsBodyJobData(messageBody, jobDataList, jobTransaction, jobAttributesList) {
+    setSmsBodyJobData(messageBody, jobDataList, jobTransaction, keyToJobAttributeMap) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
         if (!keys || !jobDataList) return messageBody
         for (let key of keys) {
             let keyForJob = key.slice(1, key.length - 1)
-            let jobAttributesWithSameKey = jobAttributesList.value.filter(jobAttribute => jobAttribute.key == keyForJob)
-            if (jobAttributesWithSameKey[0]) {
-                let jobData = jobDataList.filter(data => data.jobAttributeMasterId == jobAttributesWithSameKey[0].id && data.jobId == jobTransaction.jobId)
+            let jobAttributeWithSameKey = keyToJobAttributeMap[keyForJob]
+            if (jobAttributeWithSameKey) {
+                let jobData = jobDataList.filter(data => data.jobAttributeMasterId == jobAttributeWithSameKey.id && data.jobId == jobTransaction.jobId)
                 messageBody = (jobData[0] && jobData[0].value) ? messageBody.replace(key, jobData[0].value) : messageBody.replace(key, 'N.A.')
             }
         }
@@ -136,15 +142,15 @@ class AddServerSms {
     * @returns
     * messageBody: string
     */
-    setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, fieldAttributesList) {
+    setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, keyToFieldAttributeMap) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
         if (!keys || !fieldDataList || fieldDataList.length <= 0) return messageBody
         for (let key of keys) {
             let keyForJob = key.slice(1, key.length - 1)
-            let fieldAttributesWithSameKey = fieldAttributesList.value.filter(fieldAttribute => fieldAttribute.key == keyForJob)
-            if (fieldAttributesWithSameKey[0]) {
-                let fieldData = fieldDataList.filter(data => data.fieldAttributeMasterId == fieldAttributesWithSameKey[0].id && data.jobTransactionId == jobTransaction.id)
+            let fieldAttributesWithSameKey = keyToFieldAttributeMap[keyForJob]
+            if (fieldAttributesWithSameKey) {
+                let fieldData = fieldDataList.filter(data => data.fieldAttributeMasterId == fieldAttributesWithSameKey.id && data.jobTransactionId == jobTransaction.id)
                 messageBody = (fieldData[0] && fieldData[0].value) ? messageBody.replace(key, fieldData[0].value) : messageBody.replace(key, 'N.A.')
             }
         }
@@ -223,21 +229,21 @@ class AddServerSms {
     * @returns
     * messageBody: string
     */
-    checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, jobAttributesList, fieldAttributesList, user) {
+    checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, fieldAndJobAttrMap, user) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
         if (!keys || keys.length <= 0)
             return messageBody
         if (!previousMessage == messageBody) {
-            messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, jobAttributesList)
-            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAttributesList)
+            messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
+            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap)
             messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
             previousMessage = messageBody
-            messageBody = this.checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, jobAttributesList, fieldAttributesList)
+            messageBody = this.checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, fieldAndJobAttrMap)
         }
         else {
-            messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, jobAttributesList)
-            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAttributesList)
+            messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
+            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap)
             messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
         }
         return messageBody
@@ -246,13 +252,15 @@ class AddServerSms {
         if (smsTemplate.body && smsTemplate.body.trim() != '') {
             let fieldDataList, jobDataList;
             let messageBody = smsTemplate.body
+            let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAttributesList, fieldAttributesList)
+
             if (jobData != null) {
                 jobDataList = fieldData.map((dataList) => dataList.data)
                 messageBody = this.setSmsBodyJobData(smsTemplate.body, jobDataList, jobTransaction, jobAttributesList)
             }
             if (fieldData != null) {
                 fieldDataList = fieldData.map((dataList) => dataList.data)
-                messageBody = this.setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, fieldAttributesList)
+                messageBody = this.setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap)
             }
             messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
             if (messageBody && messageBody.length > 0 && contact && contact.length > 0) {

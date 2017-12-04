@@ -23,8 +23,8 @@ class ExpandableDetailsView extends Component {
 
     render() {
         return (
-                <TouchableOpacity onPress={() => { this.setState({ showDropdown: !this.state.showDropdown }) }}>
-                    <View style = {[styles.row, styles.paddingLeft10,  styles.paddingRight10]}>
+            <TouchableOpacity onPress={() => { this.setState({ showDropdown: !this.state.showDropdown }) }}>
+                <View style={[styles.row, styles.paddingLeft10, styles.paddingRight10]}>
                     <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
                         <Text style={[styles.fontDefault]} >
                             {this.props.label}
@@ -35,14 +35,14 @@ class ExpandableDetailsView extends Component {
                             {this.state.showDropdown ? 'Tap to hide' : 'Tap to show'}
                         </Text>
                     </View>
-                    </View>
-                
+                </View>
+
                 {renderIf(this.state.showDropdown,
                     <ExpandableDetailsList
                         key={this.props.id}
                         dataList={this.props.childDataList} />
                 )}
-                </TouchableOpacity>
+            </TouchableOpacity>
         )
     }
 }

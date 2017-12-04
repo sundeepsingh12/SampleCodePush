@@ -9,7 +9,7 @@ import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
 import TrackLogs from './schema/trackLogs'
 import ServerSmsLog from './schema/serverSmsLog'
-import _ from 'underscore'
+import _ from 'lodash'
 
 const schemaVersion = 32;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];

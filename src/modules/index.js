@@ -37,6 +37,9 @@ import liveJob from './liveJob/liveJobReducer'
 
 import { combineReducers } from 'redux'
 import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
+import customApp from './customApp/customAppReducers'
+// import profile from './profile/profileReducer'
+
 
 /**
  * ## CombineReducers
@@ -45,6 +48,7 @@ import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
  * EVERY TIME there is a basic action
  */
 const appReducer = combineReducers({
+  nav,
   auth,
   device,
   global,
@@ -53,7 +57,6 @@ const appReducer = combineReducers({
   selectFromList,
   skuListing,
   listing,
-  nav,
   payment,
   preloader,
   upiPayment,
@@ -72,7 +75,8 @@ const appReducer = combineReducers({
   sorting,
   taskList,
   liveJobList,
-  liveJob
+  liveJob,
+  customApp,
 })
 
 const rootReducer = (state, action) => {

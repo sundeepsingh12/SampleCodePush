@@ -277,7 +277,6 @@ class Payment extends Component {
                                     this.props.navigation.state.params.jobTransaction.id,
                                     this.props.navigation.state.params.latestPositionId,
                                     this.props.moneyCollectMaster,
-                                    this.props.navigation.state.params.nextEditable,
                                     this.props.navigation.state.params.isSaveDisabled,
                                     this.props.originalAmount,
                                     this.props.selectedIndex,

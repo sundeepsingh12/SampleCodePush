@@ -25,8 +25,8 @@ import {
     Button,
     Text,
     Footer,
-} from 'native-base';
-import _ from 'underscore'
+} from 'native-base'
+import _ from 'lodash'
 
 function mapStateToProps(state) {
     return {
@@ -135,11 +135,12 @@ class DataStore extends Component {
         this.props.actions.fillKeysAndSave(dataStoreAttributeValueMap,
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled,
             dataStoreValue,
             this.props.isMinMaxValidation,
-            this.props.navigation.state.params.currentElement.attributeTypeId)
+            this.props.navigation.state.params.currentElement.attributeTypeId,
+            this.props.navigation.state.params.calledFromArray,
+            this.props.navigation.state.params.rowId)
         this.setDetailsFor()
         // this._goBack()
     }
@@ -185,9 +186,10 @@ class DataStore extends Component {
                                         this.props.actions.onSave(
                                             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
                                             this.props.navigation.state.params.formElements,
-                                            this.props.navigation.state.params.nextEditable,
                                             this.props.navigation.state.params.isSaveDisabled,
-                                            this.props.searchText
+                                            this.props.searchText,
+                                            this.props.navigation.state.params.calledFromArray,
+                                            this.props.navigation.state.params.rowId
                                         )
                                         this._goBack()
                                     }}>

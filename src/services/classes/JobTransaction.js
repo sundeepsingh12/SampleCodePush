@@ -205,7 +205,7 @@ class JobTransaction {
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
         let jobTransactionQuery
         if (callingActivity != 'LiveJob') {
-            let runsheetQuery = 'isClosed = false'
+            let runsheetQuery = 'isClosed = true'
             const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
             jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
             jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'

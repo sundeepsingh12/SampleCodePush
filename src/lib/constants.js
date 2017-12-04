@@ -182,6 +182,7 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
+    NEXT_FOCUS: null,
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,
@@ -201,6 +202,7 @@ module.exports = keyMirror({
     Sorting: null,
     ProfileView: null,
     Statistics: null,
+    CustomApp: null,
     LiveJobs: null,
 
 
@@ -292,6 +294,10 @@ module.exports = keyMirror({
     END_LIVEJOB_DETAILD_FETCHING: null,
     TOGGLE_LIVE_JOB_LIST_ITEM: null,
     START_FETCHING_LIVE_JOB: null,
+    //Custom App
+    START_FETCHING_URL: null,
+    END_FETCHING_URL: null,
+    ON_CHANGE_STATE: null,
 })
 
 

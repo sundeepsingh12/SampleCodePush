@@ -15,7 +15,8 @@ import {
     SEQUENCEMODULE,
     SUMMARY,
     USER_NOT_FOUND,
-    SORTING
+    SORTING,
+    CUSTOMAPP
 } from '../../lib/AttributeConstants'
 
 class ModuleCustomization {
@@ -56,77 +57,69 @@ class ModuleCustomization {
         }
         for (let index in moduleCustomizationList) {
             switch (moduleCustomizationList[index].appModulesId) {
-                case BACKUP.appModuleId:
-                    {
-                        this.setModuleDetails(BACKUP, moduleCustomizationList[index], user)
-                        break
-                    }
-                case BLUETOOTH.appModuleId:
-                    {
-                        this.setModuleDetails(BLUETOOTH, moduleCustomizationList[index], user)
-                        break
-                    }
-                case BULK.appModuleId:
-                    {
-                        this.setModuleDetails(BULK, moduleCustomizationList[index], user)
-                        break
-                    }
-                case EZE_TAP.appModuleId:
-                    {
-                        this.setModuleDetails(EZE_TAP, moduleCustomizationList[index], user)
-                        break
-                    }
-                case LIVE.appModuleId:
-                    {
-                        this.setModuleDetails(LIVE, moduleCustomizationList[index], user)
-                        break
-                    }
-                case M_SWIPE.appModuleId:
-                    {
-                        this.setModuleDetails(M_SWIPE, moduleCustomizationList[index], user)
-                        break
-                    }
-                case OFFLINEDATASTORE.appModuleId:
-                    {
-                        this.setModuleDetails(OFFLINEDATASTORE, moduleCustomizationList[index], user)
-                        break
-                    }
-                case PIECHART.appModuleId:
-                    {
-                        this.setModuleDetails(PIECHART, moduleCustomizationList[index], user)
-                        break
-                    }
-                case PROFILE.appModuleId:
-                    {
-                        this.setModuleDetails(PROFILE, moduleCustomizationList[index], user)
-                        break
-                    }
-                case START.appModuleId:
-                    {
-                        this.setModuleDetails(START, moduleCustomizationList[index], user)
-                        break
-                    }
-                case STATISTIC.appModuleId:
-                    {
-                        this.setModuleDetails(STATISTIC, moduleCustomizationList[index], user)
-                        break
-                    }
-                case SEQUENCEMODULE.appModuleId:
-                    {
-                        this.setModuleDetails(SEQUENCEMODULE, moduleCustomizationList[index], user)
-                        break
-                    }
-                case SUMMARY.appModuleId:
-                    {
-                        this.setModuleDetails(SUMMARY, moduleCustomizationList[index], user)
-                        break
-                    }
+                case BACKUP.appModuleId: {
+                    this.setModuleDetails(BACKUP, moduleCustomizationList[index], user)
+                    break
+                }
+                case BLUETOOTH.appModuleId: {
+                    this.setModuleDetails(BLUETOOTH, moduleCustomizationList[index], user)
+                    break
+                }
+                case BULK.appModuleId: {
+                    this.setModuleDetails(BULK, moduleCustomizationList[index], user)
+                    break
+                }
+                case EZE_TAP.appModuleId: {
+                    this.setModuleDetails(EZE_TAP, moduleCustomizationList[index], user)
+                    break
+                }
+                case LIVE.appModuleId: {
+                    this.setModuleDetails(LIVE, moduleCustomizationList[index], user)
+                    break
+                }
+                case M_SWIPE.appModuleId: {
+                    this.setModuleDetails(M_SWIPE, moduleCustomizationList[index], user)
+                    break
+                }
+                case OFFLINEDATASTORE.appModuleId: {
+                    this.setModuleDetails(OFFLINEDATASTORE, moduleCustomizationList[index], user)
+                    break
+                }
+                case PIECHART.appModuleId: {
+                    this.setModuleDetails(PIECHART, moduleCustomizationList[index], user)
+                    break
+                }
+                case PROFILE.appModuleId: {
+                    this.setModuleDetails(PROFILE, moduleCustomizationList[index], user)
+                    break
+                }
+                case START.appModuleId: {
+                    this.setModuleDetails(START, moduleCustomizationList[index], user)
+                    break
+                }
+                case STATISTIC.appModuleId: {
+                    this.setModuleDetails(STATISTIC, moduleCustomizationList[index], user)
+                    break
+                }
+                case SEQUENCEMODULE.appModuleId: {
+                    this.setModuleDetails(SEQUENCEMODULE, moduleCustomizationList[index], user)
+                    break
+                }
+                case SUMMARY.appModuleId: {
+                    this.setModuleDetails(SUMMARY, moduleCustomizationList[index], user)
+                    break
+                }
 
-                case SORTING.appModuleId:
-                 {
-                        this.setModuleDetails(SORTING, moduleCustomizationList[index], user)
-                        break
-                    }
+                case SORTING.appModuleId: {
+                    this.setModuleDetails(SORTING, moduleCustomizationList[index], user)
+                    break
+                }
+
+                case CUSTOMAPP.appModuleId: {
+                    this.setModuleDetails(CUSTOMAPP, moduleCustomizationList[index], user)
+                    break
+                }
+
             }
         }
     }
@@ -141,10 +134,13 @@ class ModuleCustomization {
         if (!moduleCustomization) {
             return
         }
-         let displayName = ''
+        let displayName = ''
         if (!moduleCustomization.selectedUserType || moduleCustomization.selectedUserType.length == 0 || (displayName = this.checkSelectedUserType(JSON.parse(moduleCustomization.selectedUserType), user))) {
             appModule.enabled = true
             appModule.displayName = displayName.trim() ? displayName : moduleCustomization.displayName && (moduleCustomization.displayName + '').trim() ? moduleCustomization.displayName : appModule.displayName
+            if (appModule.appModuleId == CUSTOMAPP.appModuleId && moduleCustomization.remark != undefined) {
+                appModule.remark = JSON.parse(moduleCustomization.remark)
+            }
         }
 
     }

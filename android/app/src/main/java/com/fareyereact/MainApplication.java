@@ -3,9 +3,10 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import io.realm.react.RealmReactPackage;
+import com.wix.reactnativenotifications.RNNotificationsPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.rssignaturecapture.RSSignatureCapturePackage;
-import io.realm.react.RealmReactPackage;
 import com.horcrux.svg.SvgPackage;
 import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
 import com.rnziparchive.RNZipArchivePackage;
@@ -42,9 +43,10 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RealmReactPackage(),
+            new RNNotificationsPackage(MainApplication.this),
             new LinearGradientPackage(),
             new RSSignatureCapturePackage(),
-            new RealmReactPackage(),
             new SvgPackage(),
             new RNBackgroundGeolocation(),
             new RNZipArchivePackage(),

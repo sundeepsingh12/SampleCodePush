@@ -26,7 +26,6 @@ export default class JobListItem extends Component {
     return (
       <TouchableHighlight
         onPress={this.props.onPressItem}
-        onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
         <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : null]}>
           <View style={[style.seqCircle, styles.relative]}>
@@ -42,20 +41,20 @@ export default class JobListItem extends Component {
 
             {this.renderJobListItemDetails()}
 
-            {this.props.callingActivity == 'Sequence' ?
-              <View
-                style={{
-                  width: 30,
-                  alignSelf: 'center'
-                }}>
-                <Icon
-                  name="ios-menu"
-                  style={[
-                    styles.fontXl, {
-                      color: '#c9c9c9'
-                    }
-                  ]} />
-              </View> : <View />}
+            {this.props.callingActivity == 'Sequence' ? <View
+              style={{
+                width: 30,
+                alignSelf: 'center'
+              }}>
+              <Icon
+                name="ios-menu"
+                style={[
+                  styles.fontXl, {
+                    color: '#c9c9c9'
+                  }
+                ]} />
+            </View> : <View />}
+
           </View>
           {this.props.jobEndTime ?
             <Text> {this.props.jobEndTime}
@@ -79,7 +78,7 @@ export default class JobListItem extends Component {
         </Text>
         <Text
           style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.data.circleLine1}
+          {this.props.data.circleLine1} . {this.props.data.circleLine2}
         </Text>
       </View>
     )

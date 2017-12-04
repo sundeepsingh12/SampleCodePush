@@ -22,7 +22,8 @@ import {
   Footer,
   FooterTab,
   StyleProvider,
-  Toast
+  Toast,
+  ActionSheet
 } from 'native-base'
 import LinearGradient from 'react-native-linear-gradient'
 import getTheme from '../../native-base-theme/components'
@@ -38,7 +39,10 @@ import {
   PIECHART,
   SEQUENCEMODULE,
   START,
-  SORTING
+  SORTING,
+  CUSTOMAPP,
+  URL,
+  CHOOSE_WEB_URL,
 } from '../lib/AttributeConstants'
 
 import {
@@ -46,7 +50,9 @@ import {
   Sequence,
   BulkConfiguration,
   Sorting,
-  LiveJobs
+  LiveJobs,
+  CustomApp,
+  ON_CHANGE_STATE
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -94,8 +100,30 @@ class Home extends Component {
         this.props.actions.navigateToScene(Sorting)
         break
       }
+
+      case CUSTOMAPP: {
+        ((CUSTOMAPP.remark) && CUSTOMAPP.remark.length > 1) ? this.customAppSelection() : ((CUSTOMAPP.remark) && CUSTOMAPP.remark.length == 1)
+          ? this.props.actions.navigateToScene(CustomApp, CUSTOMAPP.remark[0].customUrl) : this.props.actions.navigateToScene(CustomApp);
+        break
+      }
     }
   }
+  customAppSelection() {
+    let BUTTONS = CUSTOMAPP.remark.map(id => !(id.title) ? URL : id.title)
+    BUTTONS.push('Cancel')
+    ActionSheet.show(
+      {
+        options: BUTTONS,
+        title: CHOOSE_WEB_URL,
+        cancelButtonIndex: BUTTONS.length - 1,
+        destructiveButtonIndex: BUTTONS.length - 1
+      },
+      buttonIndex => {
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, CUSTOMAPP.remark[buttonIndex].customUrl) : null
+      }
+    )
+  }
+
 
   headerView() {
     return (
@@ -191,7 +219,7 @@ class Home extends Component {
   render() {
     const headerView = this.headerView()
     const pieChartView = this.pieChartView()
-    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE, SORTING])
+    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE,SORTING,CUSTOMAPP])
     if (this.props.loading) {
       return (<Loader />)
     }
