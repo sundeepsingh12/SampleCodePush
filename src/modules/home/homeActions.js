@@ -7,16 +7,10 @@ import {
   JOB_DOWNLOADING_STATUS,
   PENDING_SYNC_TRANSACTION_IDS,
   USER,
-<<<<<<< HEAD
   SYNC_ERROR,
   SYNC_STATUS,
+   UNSEEN
 } from '../../lib/constants'
-
-import { SERVICE_ALREADY_SCHEDULED } from '../../lib/AttributeConstants'
-=======
-  UNSEEN
-} from '../../lib/constants'
-
 import {
   SERVICE_ALREADY_SCHEDULED,
   PENDING,
@@ -24,33 +18,18 @@ import {
   SUCCESS,
   PIECHART,
 } from '../../lib/AttributeConstants'
->>>>>>> master
 
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { sync } from '../../services/classes/Sync'
 import BackgroundTimer from 'react-native-background-timer'
-<<<<<<< HEAD
 import { setState } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { Client } from 'react-native-paho-mqtt'
 import { fetchJobs } from '../taskList/taskListActions'
 import { NetInfo } from 'react-native'
-=======
 import { jobStatusService } from '../../services/classes/JobStatus'
-import {
-  setState
-} from '../global/globalActions'
-import {
-  moduleCustomizationService
-} from '../../services/classes/ModuleCustomization'
-import {
-  Client
-} from 'react-native-paho-mqtt'
-import {fetchJobs} from '../taskList/taskListActions'
->>>>>>> master
-
 
 /**
  * This action enables modules for particular user
@@ -95,12 +74,6 @@ export function syncService() {
   }
 }
 
-<<<<<<< HEAD
-export function performSyncService(isCalledFromHome) {
-  return async function (dispatch) {
-    let transactionIdToBeSynced
-    try {
-=======
 export function pieChartCount() {
   return async (dispatch) => {
     try {
@@ -120,7 +93,6 @@ export function pieChartCount() {
 export function performSyncService(isCalledFromHome){
   return async function(dispatch){
     try{
->>>>>>> master
       // this.props.actions.startMqttService()
       // await dispatch(startMqttService())
       transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);

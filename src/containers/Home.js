@@ -151,12 +151,12 @@ class Home extends Component {
           <Button transparent>
             <Icon style={style.headerIcon} name='ios-search' />
           </Button>
-          <Button transparent>
+          {/* <Button transparent>
             <Icon style={style.headerIcon} name='ios-chatbubbles' />
-          </Button>
-          <Button transparent>
+          </Button> */}
+          {/* <Button transparent>
             <Icon style={style.headerIcon} name='md-notifications' />
-          </Button>
+          </Button> */}
         </Right>
       </Header>
     )

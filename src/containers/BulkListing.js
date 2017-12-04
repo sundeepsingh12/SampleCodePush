@@ -156,7 +156,7 @@ class BulkListing extends Component {
                           title: NEXT_POSSIBLE_STATUS
                         },
                         buttonIndex => { 
-                        if(buttonIndex!=nextStatusNames.length-1){
+                        if(buttonIndex >=0 && buttonIndex!=nextStatusNames.length-1){
                           this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex])
                           } }
                       ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0])
