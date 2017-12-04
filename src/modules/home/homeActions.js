@@ -95,7 +95,7 @@ export function performSyncService(isCalledFromHome){
     try{
       // this.props.actions.startMqttService()
       // await dispatch(startMqttService())
-      transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+      let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
         syncStatus: 'Uploading'
