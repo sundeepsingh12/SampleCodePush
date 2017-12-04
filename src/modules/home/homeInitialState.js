@@ -3,7 +3,9 @@
 const { Record } = require('immutable')
 
 var InitialState = Record({
-    loading: false,
+    moduleLoading: false,
+    chartLoading: false,
+    count: null,
 })
 
 export default InitialState

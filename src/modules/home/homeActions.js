@@ -3,14 +3,21 @@
 import {
   CUSTOMIZATION_APP_MODULE,
   HOME_LOADING,
+  CHART_LOADING,
   JOB_DOWNLOADING_STATUS,
   USER,
+  UNSEEN
 } from '../../lib/constants'
 
 import {
-  SERVICE_ALREADY_SCHEDULED
+  SERVICE_ALREADY_SCHEDULED,
+  PENDING,
+  FAIL,
+  SUCCESS,
+  PIECHART,
 } from '../../lib/AttributeConstants'
 
+import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import CONFIG from '../../lib/config'
 import {
   keyValueDBService
@@ -19,6 +26,7 @@ import {
   sync
 } from '../../services/classes/Sync'
 import BackgroundTimer from 'react-native-background-timer'
+import { jobStatusService } from '../../services/classes/JobStatus'
 import {
   setState
 } from '../global/globalActions'
@@ -43,6 +51,9 @@ export function fetchModulesList() {
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
       moduleCustomizationService.getActiveModules(appModulesList.value, user.value)
+      if(PIECHART.enabled){
+        dispatch(pieChartCount())
+      }
       dispatch(setState(HOME_LOADING, {
         loading: false
       }))
@@ -64,6 +75,22 @@ export function syncService() {
       CONFIG.intervalId = BackgroundTimer.setInterval(async() => {
         dispatch(performSyncService())
       }, CONFIG.SYNC_SERVICE_DELAY)
+    } catch (error) {
+      //Update UI here
+      console.log(error)
+    }
+  }
+}
+
+export function pieChartCount() {
+  return async (dispatch) => {
+    try {
+      dispatch(setState(CHART_LOADING, { loading: true, count: null }))
+      const pendingStatusIds = await jobStatusService.getStatusIdsForStatusCategory(PENDING,UNSEEN)
+      const successStatusIds = await jobStatusService.getStatusIdsForStatusCategory(SUCCESS,null)
+      const failStatusIds    = await jobStatusService.getStatusIdsForStatusCategory(FAIL,null)
+      const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
+      dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
       //Update UI here
       console.log(error)

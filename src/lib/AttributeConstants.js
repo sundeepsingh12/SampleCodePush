@@ -392,7 +392,7 @@ module.exports = {
 
     //Status_Code
     UNSEEN: 'UNSEEN',
-    PENDING: 'PENDING',
+    PENDING_CODE: 'PENDING',
 
     //Start Search PlaceHolder
     SEARCH_PLACEHOLDER: 'Filter Reference Numbers',

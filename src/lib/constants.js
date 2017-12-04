@@ -70,6 +70,7 @@ module.exports = keyMirror({
 
     //Home Actions
     HOME_LOADING: null,
+    CHART_LOADING: null,
     JOB_FETCHING_START: null,
     JOB_FETCHING_END: null,
     SET_TABS_LIST: null,
