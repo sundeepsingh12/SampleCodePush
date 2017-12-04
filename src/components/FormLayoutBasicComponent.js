@@ -74,7 +74,7 @@ class BasicFormElement extends Component {
         this.formElementValue = {}
   }
 
-    componentWillMount = () => {
+    componentDidMount = () => {
         if (this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value) {
             this.props.item.isLoading = true
             this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.nextEditable,
@@ -86,7 +86,6 @@ class BasicFormElement extends Component {
     navigateToScene = (item) => {
         let screenName = ''
         let cash = 0
-        console.log('item.attributeTypeId',item.attributeTypeId)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
@@ -208,7 +207,6 @@ class BasicFormElement extends Component {
             }
         }
     }
-
 
     _inflateModal=()=> {
        this.setState(previousState => {

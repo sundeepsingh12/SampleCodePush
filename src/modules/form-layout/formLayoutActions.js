@@ -146,8 +146,8 @@ export function saveJobTransaction(formElement, jobTransactionId, statusId, jobM
     return async function (dispatch) {
         dispatch(setState(IS_LOADING,true))
         let cloneFormElement = new Map(formElement)
-        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId,jobTransactionIdList)
+        let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
+        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         dispatch(setState(IS_LOADING, false))
         dispatch(setState(RESET_STATE))
         dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
