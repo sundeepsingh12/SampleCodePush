@@ -217,6 +217,8 @@ export default class FormLayoutEventImpl {
 
             //TODO add other dbs which needs updation
             realm.performBatchSave(fieldData, jobTransaction, job)
+            console.log('savdata', jobTransaction.value)
+            return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
         }
@@ -345,7 +347,7 @@ export default class FormLayoutEventImpl {
     }
 
     _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei) {
-        let jobTransactionArray = []
+        let jobTransactionArray = [], jobTransactionDTOList = []
         let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
         jobTransaction.jobStatusId = status.id
@@ -355,15 +357,20 @@ export default class FormLayoutEventImpl {
         jobTransaction.lastTransactionTimeOnMobile = moment().format('YYYY-MM-DD HH:mm:ss')
         jobTransaction.imeiNumber = imei.imeiNumber
         jobTransactionArray.push(jobTransaction)
+        jobTransactionDTOList.push({
+            id: jobTransaction.id,
+            referenceNumber: jobTransaction.referenceNumber
+        })
         return {
             tableName: TABLE_JOB_TRANSACTION,
-            value: jobTransactionArray
+            value: jobTransactionArray,
+            jobTransactionDTOList
         }
         //TODO only basic columns are set, some columns are not set which will be set as codebase progresses further
     }
 
     _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei) {
-        let jobTransactionArray = []
+        let jobTransactionArray = [], jobTransactionDTOList = []
         for (let jobTransaction1 of jobTransactionList) {
             let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
             jobTransaction.jobType = jobMaster.code
@@ -374,10 +381,15 @@ export default class FormLayoutEventImpl {
             jobTransaction.lastTransactionTimeOnMobile = moment().format('YYYY-MM-DD HH:mm:ss')
             jobTransaction.imeiNumber = imei.imeiNumber
             jobTransactionArray.push(jobTransaction)
+            jobTransactionDTOList.push({
+                id: jobTransaction.id,
+                referenceNumber: jobTransaction.referenceNumber
+            })
         }
         return {
             tableName: TABLE_JOB_TRANSACTION,
-            value: jobTransactionArray
+            value: jobTransactionArray,
+            jobTransactionDTOList
         }
     }
 
@@ -518,14 +530,10 @@ export default class FormLayoutEventImpl {
      * 
      * @param {*jobTransactionId} jobTransactionId 
      */
-    async addToSyncList(jobTransactionId, jobTransactionIdList) {
+    async addToSyncList(jobTransactionList) {
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-        if (jobTransactionIdList) {
-            transactionsToSync.push(...jobTransactionIdList)
-        } else {
-            transactionsToSync.push(jobTransactionId)
-        }
+        transactionsToSync = transactionsToSync.concat(jobTransactionList)
         await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync)
         return
     }

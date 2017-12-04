@@ -49,12 +49,12 @@ import NotificationsIOS,{NotificationsAndroid}from 'react-native-notifications'
 
 class Sync {
 
-  async createAndUploadZip() {
+  async createAndUploadZip(transactionIdToBeSynced) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
-    await createZip()
+    await createZip(transactionIdToBeSynced)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile()
     return responseBody
   }
@@ -337,7 +337,7 @@ class Sync {
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
     await realm.deleteRecordsInBatch(jobDatas, runsheets, newJobTransactions, newJobs, newJobFieldData)
-    const jobMasterIds = await this.saveDataFromServerInDB(query)
+    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
     return jobMasterIds
   }
 

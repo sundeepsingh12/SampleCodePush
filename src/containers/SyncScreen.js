@@ -1,6 +1,6 @@
 'use strict'
-import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -9,8 +9,8 @@ import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 
 
-import React, {Component} from 'react'
-import {StyleSheet, View, TouchableOpacity, Image} from 'react-native'
+import React, { Component } from 'react'
+import { StyleSheet, View, TouchableOpacity, Image } from 'react-native'
 
 import {
   Container,
@@ -34,13 +34,15 @@ import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
 
 function mapStateToProps(state) {
-  return {}
-};
+  return {
+    syncStatus: state.home.syncStatus,
+    unsyncedTransactionList: state.home.unsyncedTransactionList
+  }
+}
 
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({
-      ...globalActions,
       ...homeActions
     }, dispatch)
   }
@@ -54,7 +56,155 @@ class SyncScreen extends Component {
     this.props.actions.performSyncService(true)
   }
 
+  // getView() {
+  //   return (
+  //     <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
+  //       <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+  //         <View style={[styles.alignCenter, styles.justifyCenter]}>
+  //           <Image
+  //             style={styles.imageSync}
+  //             source={require('../../images/fareye-default-iconset/unable-to-sync.png')}
+  //           />
+  //         </View>
+  //       </View>
+  //       <View style={[styles.alignCenter, styles.justifyCenter, styles.paddingTop10, styles.paddingBottom10]}>
+  //         <Text style={[styles.fontLg, styles.fontBlack]}>
+  //           Can’t Connect to the internet
+  //       </Text>
+  //         <View style={[styles.paddingTop15]}>
+  // <Button onPress={() => { this.props.actions.onResyncPress() }} style={StyleSheet.flatten([styles.bgPrimary])} >
+  //   <Text> Retry </Text>
+  // </Button>
+  //         </View>
+  //       </View>
+  //     </View>
+  //   )
+  // }
+
+  getTransactionView() {
+    let transactionList = this.props.unsyncedTransactionList
+    let transactionView = []
+    for (let index in transactionList) {
+      console.log(transactionList)
+      transactionView.push(
+        <Text style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
+          {transactionList[index].referenceNumber}
+        </Text>
+      )
+    }
+    if (transactionView.length == 0) {
+      return null
+    }
+    return (
+      <View style={[styles.bgWhite, styles.padding15]}>
+        <Text style={[styles.fontLg, styles.fontWeight500, styles.marginBottom10]}>
+          Unsynced Tasks
+        </Text>
+        {transactionView}
+      </View>
+    )
+  }
+
+  getSyncView() {
+    if (this.props.syncStatus == 'Uploading') {
+      return (
+        <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            <View style={[styles.alignCenter, styles.justifyCenter]}>
+              <Text>Uploading ... </Text>
+            </View>
+          </View>
+        </View>
+      )
+    }
+    else if (this.props.syncStatus == 'Downloading') {
+      return (
+        <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            <View style={[styles.alignCenter, styles.justifyCenter]}>
+              <Text>Downloading ... </Text>
+            </View>
+          </View>
+        </View>
+      )
+    }
+    else if (this.props.syncStatus == 'OK') {
+      return (
+        <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+          <Image
+            style={style.imageSync}
+            source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
+          />
+          <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
+            All data synced perfectly to the server.
+          </Text>
+          <View style={[styles.marginTop30]}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+              <Text> Re-Sync </Text>
+            </Button>
+          </View>
+        </View>
+      )
+    } else if (this.props.syncStatus == 'INTERNALSERVERERROR') {
+      return (
+        <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+          <Image
+            style={style.imageSync}
+            source={require('../../images/fareye-default-iconset/syncscreen/Server_Error.png')}
+          />
+          <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
+            Internal Server Error.
+        </Text>
+          <View style={[styles.marginTop30]}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+              <Text> Retry </Text>
+            </Button>
+          </View>
+        </View>
+      )
+    }
+    else if (this.props.syncStatus == 'NOINTERNET') {
+      return (
+        <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+          <Image
+            style={style.imageSync}
+            source={require('../../images/fareye-default-iconset/syncscreen/No_Internet.png')}
+          />
+          <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
+            No Internet Connection
+        </Text>
+          <View style={[styles.marginTop30]}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+              <Text> Retry </Text>
+            </Button>
+          </View>
+        </View>
+      )
+    } else {
+      return (
+        <View style={[styles.bgWhite, styles.padding30, styles.margin10, styles.alignCenter, styles.justifyCenter]}>
+          <Image
+            style={style.imageSync}
+            source={require('../../images/fareye-default-iconset/syncscreen/Server_Error.png')}
+          />
+          <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
+            Internal Error.
+        </Text>
+          <View style={[styles.marginTop30]}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+              <Text> Retry </Text>
+            </Button>
+          </View>
+        </View>
+      )
+    }
+
+  }
+
   render() {
+
+    const syncView = this.getSyncView()
+    const transactionView = this.getTransactionView()
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -64,56 +214,22 @@ class SyncScreen extends Component {
               <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Sync</Text>  
-                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontSm, styles.alignCenter]}>Last Synced 20 Minutes ago</Text>  
+                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Sync</Text>
+                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontSm, styles.alignCenter]}>Last Synced 20 Minutes ago</Text>
                 </View>
-                <View/>
+                <View />
               </View>
             </Body>
           </Header>
 
-          <Content style={[styles.flex1, styles.bgLightGray]}>
-            {/*card 1*/}
-              <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
-                <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-                  <View style={[styles.alignCenter, styles.justifyCenter]}>
-                      <Image
-                        style={styles.imageSync}
-                        source={require('../../images/fareye-default-iconset/unable-to-sync.png')}
-                      />
-                  </View>
-                </View>
-                <View style={[styles.alignCenter, styles.justifyCenter, styles.paddingTop10, styles.paddingBottom10]}>
-                  <Text style={[styles.fontLg, styles.fontBlack]}>
-                      Can’t Connect to the internet
-                  </Text>
-                  <View style={[styles.paddingTop15]}>
-                    <Button onPress = {() => {this.props.actions.onResyncPress()}}  style={StyleSheet.flatten([styles.bgPrimary])} >
-                      <Text> Retry </Text>
-                    </Button>
-                  </View>
-                </View>
-              </View>
-
-              <View style={[styles.bgWhite, styles.padding15]}>
-                 <Text style={[styles.fontLg, styles.fontWeight500, styles.marginBottom10]}>
-                      Unsynced Tasks
-                  </Text>
-                  <Text style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
-                      REF32546223 / Josh Smith
-                  </Text>
-                  <Text style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
-                      REF32546223 / Josh Smith
-                  </Text>
-                  <Text style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
-                      REF32546223 / Josh Smith
-                  </Text>
-              </View>
+          <Content style={[styles.bgLightGray]}>
+            {syncView}
+            {transactionView}
           </Content>
         </Container>
       </StyleProvider>
 
-      )
+    )
   }
 
 };
@@ -122,29 +238,30 @@ const style = StyleSheet.create({
   header: {
     height: 'auto',
     padding: 0,
-    paddingRight: 0, 
+    paddingRight: 0,
     paddingLeft: 0,
     borderBottomWidth: 1,
     borderBottomColor: '#f3f3f3'
   },
-  headerBody : {
-    width: '100%', 
+  headerBody: {
+    width: '100%',
     paddingTop: 5,
     paddingBottom: 7,
     paddingLeft: 10,
     paddingRight: 10
   },
-  
+
   footer: {
     height: 'auto',
     borderTopWidth: 1,
     borderTopColor: '#f3f3f3'
   },
   imageSync: {
-    width: 84,
+    width: 116,
+    height: 116,
     resizeMode: 'contain'
   }
-  
+
 });
 
 

@@ -78,6 +78,8 @@ module.exports = keyMirror({
     CLEAR_HOME_STATE: null,
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
+    SYNC_ERROR: null,
+    SYNC_STATUS: null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -198,12 +200,12 @@ module.exports = keyMirror({
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
-    BulkConfiguration:null,
-    BulkListing:null,
-    Sorting:null,
-    ProfileView:null,
-    Statistics:null,
-    CustomApp:null,
+    BulkConfiguration: null,
+    BulkListing: null,
+    Sorting: null,
+    ProfileView: null,
+    Statistics: null,
+    CustomApp: null,
 
 
     //Skulisting Actions
@@ -260,19 +262,19 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
     TOGGLE_RESEQUENCE_BUTTON: null,
-    PREPARE_UPDATE_LIST:null,
+    PREPARE_UPDATE_LIST: null,
 
     //New Job
     NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
 
     //Bulk Module
-    START_FETCHING_BULK_CONFIG:null,
-    STOP_FETCHING_BULK_CONFIG:null,
-    START_FETCHING_BULK_TRANSACTIONS:null,
-    STOP_FETCHING_BULK_TRANSACTIONS:null,
-    TOGGLE_JOB_TRANSACTION_LIST_ITEM:null,
-    TOGGLE_ALL_JOB_TRANSACTIONS:null,
+    START_FETCHING_BULK_CONFIG: null,
+    STOP_FETCHING_BULK_CONFIG: null,
+    START_FETCHING_BULK_TRANSACTIONS: null,
+    STOP_FETCHING_BULK_TRANSACTIONS: null,
+    TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
+    TOGGLE_ALL_JOB_TRANSACTIONS: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -291,7 +293,7 @@ module.exports = keyMirror({
 
     //Custom App
     START_FETCHING_URL: null,
-    END_FETCHING_URL:  null,
+    END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
 })
 
