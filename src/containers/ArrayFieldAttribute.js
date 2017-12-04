@@ -55,7 +55,7 @@ function mapDispatchToProps(dispatch) {
 
 class ArrayFieldAttribute extends Component {
 
-    componentDidMount() {//Comment do in did mount
+    componentDidMount() {
         this.props.actions.getSortedArrayChildElements(
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.jobStatusId,
@@ -71,13 +71,15 @@ class ArrayFieldAttribute extends Component {
                 isSaveDisabled={this.props.isSaveDisabled}
                 lastRowId={this.props.lastRowId}
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
+                jobStatusId={this.props.jobStatusId}
+                latestPositionId={this.props.latestPositionId}
             />
         )
     }
     addPressed = () => {
         if (this.props.isSaveDisabled) {
             Toast.show({
-                text: ADD_TOAST,// Comment put this in Attribute Const
+                text: ADD_TOAST,
                 position: 'bottom',
                 buttonText: 'Okay',
             })
@@ -94,7 +96,6 @@ class ArrayFieldAttribute extends Component {
             this.props.navigation.state.params.jobTransaction,
             this.props.navigation.state.params.latestPositionId,
             this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled)
         this.props.navigation.goBack()
     }
@@ -189,13 +190,5 @@ const style = StyleSheet.create({// Comment Refactor these
         borderBottomWidth: 10,
         borderBottomColor: '#f3f3f3'
     },
-    inputType: {
-        height: 35,
-        fontSize: 14
-    },
-    listLeft: {
-        width: 50
-    }
-
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ArrayFieldAttribute)

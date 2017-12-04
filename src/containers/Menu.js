@@ -41,8 +41,8 @@ import {
 } from '../lib/AttributeConstants'
 
 import {
- ProfileView,
- Statistics
+  ProfileView,
+  Statistics
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -65,28 +65,6 @@ function mapDispatchToProps(dispatch) {
 
 class Menu extends Component {
 
-  renderModuleView(modulesList) {
-    let moduleView = []
-    for (let index in modulesList) {
-      moduleView.push(
-        <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-          <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter, styles.bgPrimary]}>
-            <Icon name="md-person" style={[styles.fontWhite, styles.fontXl]} />
-          </View>
-          <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
-            <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }]}>
-              <Text style={[styles.fontDefault]}>
-                Profile
-            </Text>
-              <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-            </View>
-          </View>
-        </View>
-      )
-    }
-    return moduleView
-  }
-
   renderTextView(text, key, isLast, icon) {
     return (
       <View key={key} style={[styles.justifySpaceBetween, icon ? styles.marginLeft10 : null, styles.flex1]}>
@@ -108,20 +86,19 @@ class Menu extends Component {
     )
   }
 
-  renderCardView(view, key,moduleIndex) {
+  renderCardView(view, key, moduleIndex) {
     return (
-      <TouchableOpacity onPress = {()=> this.navigateToScene(moduleIndex) }>
-        <View key={key} style={[styles.bgWhite]}>
+      <TouchableOpacity key = {key} onPress={() => this.navigateToScene(moduleIndex)}>
+        <View style={[styles.bgWhite]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             {view}
           </View>
         </View>
-        </TouchableOpacity>
+      </TouchableOpacity>
     )
   }
 
-   navigateToScene = (moduleName) => {
-    console.log('modulename',moduleName)
+  navigateToScene = (moduleName) => {
     switch (moduleName) {
       case PROFILE: {
         this.props.actions.navigateToScene(ProfileView)
@@ -129,15 +106,15 @@ class Menu extends Component {
       }
 
       case STATISTIC: {
-         this.props.actions.navigateToScene(Statistics)
+        this.props.actions.navigateToScene(Statistics)
         break
       }
       default:
-       Toast.show({
-              text: `Under development!Coming Soon`,
-              position: 'bottom',
-              buttonText: 'OK'
-            })
+        Toast.show({
+          text: `Under development!Coming Soon`,
+          position: 'bottom',
+          buttonText: 'OK'
+        })
     }
   }
 
@@ -156,7 +133,7 @@ class Menu extends Component {
       moduleView.push(
         this.renderTextView(moduleList[index].displayName, key * (index + 1) * 1000, (index == moduleList.length - 1), moduleList[index].icon)
       )
-      rowView.push(this.renderCardView(moduleView, key * (index + 1) * 10000,moduleList[index]))
+      rowView.push(this.renderCardView(moduleView, key * (index + 1) * 10000, moduleList[index]))
     }
     return rowView
   }
@@ -168,7 +145,7 @@ class Menu extends Component {
 
   render() {
     let profileView = this.renderModuleView([PROFILE, STATISTIC], 1)
-    let paymentView = this.renderModuleView([EZE_TAP, M_SWIPE], 2)
+    // let paymentView = this.renderModuleView([EZE_TAP, M_SWIPE], 2)
     let deviceView = this.renderModuleView([BACKUP, OFFLINEDATASTORE, BLUETOOTH], 3)
     return (
       <StyleProvider style={getTheme(platform)}>
@@ -198,9 +175,9 @@ class Menu extends Component {
             </View>
 
             {/*Card 2*/}
-            <View style={[styles.bgWhite, paymentView.length ? styles.marginBottom10 : null]}>
+            {/* <View style={[styles.bgWhite, paymentView.length ? styles.marginBottom10 : null]}>
               {paymentView}
-            </View>
+            </View> */}
 
             {/*Card 3*/}
             <View style={[styles.bgWhite, styles.marginBottom10]}>

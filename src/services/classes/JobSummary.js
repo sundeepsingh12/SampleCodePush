@@ -7,8 +7,8 @@ import {
   keyValueDBService
 } from './KeyValueDBService'
 
-import _ from 'underscore'
 import moment from 'moment'
+import _ from 'lodash'
 
 class JobSummary {
 

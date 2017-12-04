@@ -2,9 +2,9 @@ import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs';
 import { zip, unzip } from 'react-native-zip-archive'
 import { keyValueDBService } from './KeyValueDBService'
-import * as realm from '../../repositories/realmdb';
 import _ from 'underscore'
 import {jobSummaryService} from './JobSummary'
+import * as realm from '../../repositories/realmdb'
 
 import {
     TABLE_TRACK_LOGS,
@@ -23,14 +23,13 @@ var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
 
-export async function createZip() {
+export async function createZip(transactionIdToBeSynced) {
     //Create FarEye folder if doesn't exist
     RNFS.mkdir(PATH);
     RNFS.mkdir(PATH_TEMP);
 
     //Prepare the SYNC_RESULTS
     var SYNC_RESULTS = {};
-    let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
     let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
     //     if (realmDbData.serverSmsLogs != []) {
     //     for (let sms of realmDbData.serverSmsLogs) {
@@ -88,16 +87,16 @@ function _getSyncDataFromDb(transactionIdsObject) {
         return { fieldDataList, transactionList, jobList, serverSmsLogs };
     }
     let transactionIds = transactionIdsObject.value;
-    let fieldDataQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId).join(' OR ')
+    let fieldDataQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
     fieldDataList = _getDataFromRealm([], fieldDataQuery, TABLE_FIELD_DATA);
     let transactionListQuery = fieldDataQuery.replace(/jobTransactionId/g, 'id'); // regex expression to replace all jobTransactionId with id
     transactionList = _getDataFromRealm([], transactionListQuery, TABLE_JOB_TRANSACTION);
     let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
     jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB);
-    let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId).join(' OR ')
+    let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
     serverSmsLogs = _getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
     let runSheetSummary = realm.getAll(TABLE_RUNSHEET);
-    let jobSummary = jobSummaryService.getJobSummaryDataOnLastSync()
+    let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync()
     return {
         fieldDataList,
         transactionList,

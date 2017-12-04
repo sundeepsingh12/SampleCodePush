@@ -204,9 +204,9 @@ class JobTransaction {
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         let customerCareMap = customerCareService.getCustomerCareMap(jobTransactionCustomizationListParametersDTO.customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
-        let runsheetQuery = 'isClosed = false'
+        let runsheetQuery = 'isClosed = true'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
-        let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
+        let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         if(callingActivity=='Bulk'){
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
@@ -214,7 +214,7 @@ class JobTransaction {
          else if(callingActivity=='Sequence'){
             let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
             //Fetch only pending status category job transactions for sequence listing
-            jobTransactionQuery = `${jobTransactionQuery} AND (${statusQuery})`
+            jobTransactionQuery = statusQuery && statusQuery.trim() !=='' ? `${jobTransactionQuery} AND (${statusQuery})`:`${jobTransactionQuery}`
         }
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         if (jobTransactionList.length == 0) {

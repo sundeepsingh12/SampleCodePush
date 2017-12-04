@@ -12,9 +12,9 @@ module.exports = {
       url: 'https://www.fareye.co/app'
     },
     staging: {
-      url: 'https://dev.fareye.co/app'
+      url: 'https://staging.fareye.co/app'
     },
-    port: 1883,
+    port: 8083,
     PUSH_QOS: 2
   },
   API: {
@@ -30,8 +30,8 @@ module.exports = {
     UPLOAD_DATA_API: '/rest/device/sync',
     SEQUENCE_USING_ROUTING_API: '/rest/order/sequence_using_routing',
     SERVICE_DSA: "/rest/data_search_api",
-    GET_SEQUENCE_NEXT_COUNT : '/rest/get_sequence_next_count',
+    GET_SEQUENCE_NEXT_COUNT: '/rest/get_sequence_next_count',
     SERVICE_RESET_PASSWORD: '/rest/users/password',
-    SCAN_AND_SEARCH_SORTING : '/rest/job/search_reference_no',
+    SCAN_AND_SEARCH_SORTING: '/rest/job/search_reference_no',
   }
 }
