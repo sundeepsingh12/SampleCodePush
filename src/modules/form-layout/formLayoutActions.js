@@ -129,9 +129,9 @@ export function toogleHelpText(attributeId, formElement) {
 
 export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
     return async function (dispatch) {
-        dispatch(setState(IS_LOADING, true))
-        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId, jobTransactionIdList)
+        dispatch(setState(IS_LOADING,true))
+        let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
+        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         dispatch(setState(IS_LOADING, false))
         dispatch(setState(RESET_STATE))
         dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))

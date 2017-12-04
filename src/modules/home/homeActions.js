@@ -3,33 +3,33 @@
 import {
   CUSTOMIZATION_APP_MODULE,
   HOME_LOADING,
+  CHART_LOADING,
   JOB_DOWNLOADING_STATUS,
+  PENDING_SYNC_TRANSACTION_IDS,
   USER,
+  SYNC_ERROR,
+  SYNC_STATUS,
+   UNSEEN
 } from '../../lib/constants'
-
 import {
-  SERVICE_ALREADY_SCHEDULED
+  SERVICE_ALREADY_SCHEDULED,
+  PENDING,
+  FAIL,
+  SUCCESS,
+  PIECHART,
 } from '../../lib/AttributeConstants'
 
+import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import CONFIG from '../../lib/config'
-import {
-  keyValueDBService
-} from '../../services/classes/KeyValueDBService'
-import {
-  sync
-} from '../../services/classes/Sync'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { sync } from '../../services/classes/Sync'
 import BackgroundTimer from 'react-native-background-timer'
-import {
-  setState
-} from '../global/globalActions'
-import {
-  moduleCustomizationService
-} from '../../services/classes/ModuleCustomization'
-import {
-  Client
-} from 'react-native-paho-mqtt'
-import {fetchJobs} from '../taskList/taskListActions'
-
+import { setState } from '../global/globalActions'
+import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
+import { Client } from 'react-native-paho-mqtt'
+import { fetchJobs } from '../taskList/taskListActions'
+import { NetInfo } from 'react-native'
+import { jobStatusService } from '../../services/classes/JobStatus'
 
 /**
  * This action enables modules for particular user
@@ -43,6 +43,9 @@ export function fetchModulesList() {
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
       moduleCustomizationService.getActiveModules(appModulesList.value, user.value)
+      if(PIECHART.enabled){
+        dispatch(pieChartCount())
+      }
       dispatch(setState(HOME_LOADING, {
         loading: false
       }))
@@ -56,14 +59,30 @@ export function fetchModulesList() {
  * This services schedules sync service at interval of 2 minutes
  */
 export function syncService() {
-  return async(dispatch) => {
+  return async (dispatch) => {
     try {
       if (CONFIG.intervalId) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
-      CONFIG.intervalId = BackgroundTimer.setInterval(async() => {
+      CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
         dispatch(performSyncService())
       }, CONFIG.SYNC_SERVICE_DELAY)
+    } catch (error) {
+      //Update UI here
+      console.log(error)
+    }
+  }
+}
+
+export function pieChartCount() {
+  return async (dispatch) => {
+    try {
+      dispatch(setState(CHART_LOADING, { loading: true, count: null }))
+      const pendingStatusIds = await jobStatusService.getStatusIdsForStatusCategory(PENDING,UNSEEN)
+      const successStatusIds = await jobStatusService.getStatusIdsForStatusCategory(SUCCESS,null)
+      const failStatusIds    = await jobStatusService.getStatusIdsForStatusCategory(FAIL,null)
+      const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
+      dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
       //Update UI here
       console.log(error)
@@ -76,20 +95,53 @@ export function performSyncService(isCalledFromHome){
     try{
       // this.props.actions.startMqttService()
       // await dispatch(startMqttService())
-      const responseBody = await sync.createAndUploadZip()
-      console.log('responseBody', responseBody)
+      transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+      dispatch(setState(SYNC_STATUS, {
+        unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+        syncStatus: 'Uploading'
+      }))
+      const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
       const syncCount = responseBody.split(",")[1]
       //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
       if (isCalledFromHome || syncCount > 0) {
-         const isJobsPresent =  await sync.downloadAndDeleteDataFromServer()
-         if(isJobsPresent){
-           dispatch(fetchJobs())
-         }
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+          syncStatus: 'Downloading'
+        }))
+        const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+        if (isJobsPresent) {
+          dispatch(fetchJobs())
+        }
       }
+      dispatch(setState(SYNC_STATUS, {
+        unsyncedTransactionList: [],
+        syncStatus: 'OK',
+      }))
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService())
-    }catch(error){
-      console.log(error)
+    } catch (error) {
+      if (error.code == 500 || error.code == 502) {
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+          syncStatus: 'INTERNALSERVERERROR'
+        }))
+      }
+
+      let connectionInfo = await NetInfo.isConnected.fetch().then(isConnected => {
+        return isConnected
+      });
+
+      if(!connectionInfo) {
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+          syncStatus: 'NOINTERNET'
+        }))
+      }
+      
+      dispatch(setState(SYNC_STATUS, {
+        unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+        syncStatus: 'ERROR'
+      }))
     }
   }
 }

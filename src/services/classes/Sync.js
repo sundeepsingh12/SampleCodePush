@@ -49,12 +49,12 @@ import NotificationsIOS,{NotificationsAndroid}from 'react-native-notifications'
 
 class Sync {
 
-  async createAndUploadZip() {
+  async createAndUploadZip(transactionIdToBeSynced) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
-    await createZip()
+    await createZip(transactionIdToBeSynced)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile()
     return responseBody
   }
