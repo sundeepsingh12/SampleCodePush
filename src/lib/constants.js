@@ -77,6 +77,9 @@ module.exports = keyMirror({
     CLEAR_HOME_STATE: null,
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
+    FUTURE_RUNSHEET_ENABLED: null,
+    SET_SELECTED_DATE: null,
+    IS_CALENDAR_VISIBLE: null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -146,6 +149,7 @@ module.exports = keyMirror({
     SET_TABS_TRANSACTIONS: null,
     JOB_ATTRIBUTE_STATUS: null,
     HUB: null,
+    CUSTOM_NAMING: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -291,6 +295,7 @@ module.exports = keyMirror({
     START_FETCHING_URL: null,
     END_FETCHING_URL:  null,
     ON_CHANGE_STATE: null,
+
 })
 
 
