@@ -2,6 +2,7 @@ import { keyValueDBService } from '../KeyValueDBService.js'
 import {
     OBJECT
 } from '../../../lib/AttributeConstants'
+import _ from 'lodash'
 class FormLayout {
 
     /**
@@ -26,11 +27,10 @@ class FormLayout {
             throw new Error('Value of fieldAttributes or fieldAttribute Status missing')
         }
         let filedAttributesMappedToStatus = fieldAttributeStatusList.value.filter(fieldAttributeStatus => fieldAttributeStatus.statusId == statusId)
-            .sort((a, b) => a.sequence - b.sequence)
-            .map(fieldAttributeStatus => fieldAttributeStatus.fieldAttributeId); // first find list of fieldAttributeStatus mapped to a status using filter, then sort them on their sequence and then get list of fieldAttributeIds using map
+            .sort((a, b) => a.sequence - b.sequence) // first find list of fieldAttributeStatus mapped to a status using filter, then sort them on their sequence and then get list of fieldAttributeIds using map
 
         if (!filedAttributesMappedToStatus) {
-            throw new Error('No field attribute mapped to this status');
+            return []
         }
         let fieldAttributeMap = {}; //map for root field attributes
         let fieldAttributeValidationMap = {};
@@ -38,25 +38,29 @@ class FormLayout {
         if (fieldAttributeMasterIdFromArray) {
             arrayMainObject = fieldAttributes.value.filter(fieldAttributeObject => (fieldAttributeObject.parentId == fieldAttributeMasterIdFromArray &&
                 fieldAttributeObject.attributeTypeId == OBJECT))
-            for (const fieldAttribute of fieldAttributes.value) {
-                if (fieldAttribute.parentId == arrayMainObject[0].id && !fieldAttribute.hidden) {
-                    fieldAttributeMap[fieldAttribute.id] = fieldAttribute;
+        }
+
+        for (const fieldAttribute of fieldAttributes.value) {
+            if (fieldAttributeMasterIdFromArray) {
+                if (fieldAttribute.parentId == arrayMainObject[0].id) {
+                    fieldAttributeMap[fieldAttribute.id] = fieldAttribute
                 }
-            }
-        } else {
-            for (const fieldAttribute of fieldAttributes.value) {
-                if (!fieldAttributeMap[fieldAttribute.id] && !fieldAttribute.parentId) {
-                    fieldAttributeMap[fieldAttribute.id] = [];
-                }
-                if (fieldAttributeMap[fieldAttribute.id]) {
-                    fieldAttributeMap[fieldAttribute.id] = fieldAttribute;
-                }
+            } else if (!fieldAttribute.parentId) {
+                fieldAttributeMap[fieldAttribute.id] = fieldAttribute;
             }
         }
-        const sequenceWiseSortedFieldAttributesForStatus = filedAttributesMappedToStatus.map(fieldAttributeId => fieldAttributeMap[fieldAttributeId]).filter(fieldAttribute => fieldAttribute); //getting fieldAttribute list
-        const fieldAttributeMasterValidationMap = this.getFieldAttributeValidationMap(fieldAttributeMasterValidation);
-        const fieldAttrMasterValidationConditionMap = this.getFieldAttributeValidationConditionMap(fieldAttributeValidationCondition, fieldAttributeMasterValidationMap);
-        const sequenceWiseFormLayout = this.getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap);
+
+        let sequenceWiseSortedFieldAttributesForStatus = []
+
+        for (let index in filedAttributesMappedToStatus) {
+            if (fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) {
+                sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
+            }
+        } //getting fieldAttribute list
+
+        const fieldAttributeMasterValidationMap = this.getFieldAttributeValidationMap(fieldAttributeMasterValidation.value);
+        const fieldAttrMasterValidationConditionMap = this.getFieldAttributeValidationConditionMap(fieldAttributeValidationCondition.value, fieldAttributeMasterValidationMap)
+        const sequenceWiseFormLayout = this.getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap)
         if (fieldAttributeMasterIdFromArray) {
             sequenceWiseFormLayout.arrayMainObject = arrayMainObject[0]
             return sequenceWiseFormLayout
@@ -77,7 +81,7 @@ class FormLayout {
             return;
         }
         let fieldAttributeValidationMap = {};
-        for (const fieldAttributeMasterValidation of fieldAttributeMasterValidations.value) {
+        for (const fieldAttributeMasterValidation of fieldAttributeMasterValidations) {
             if (!fieldAttributeMasterValidation || !fieldAttributeMasterValidation.fieldAttributeMasterId) {
                 continue;
             }
@@ -98,11 +102,11 @@ class FormLayout {
      * @param {*} fieldAttributeMasterValidationMap fieldAttributeMasterValidationMap
      */
     getFieldAttributeValidationConditionMap(fieldAttributeValidationConditions, fieldAttributeMasterValidationMap) {
-        if (!fieldAttributeMasterValidationMap || !fieldAttributeValidationConditions || !fieldAttributeValidationConditions.value) {
-            return;
+        if (!fieldAttributeMasterValidationMap || !fieldAttributeValidationConditions) {
+            return
         }
         let fieldAttributeValidationConditionMap = {};
-        for (const fieldAttributeValidationCondition of fieldAttributeValidationConditions.value) {
+        for (const fieldAttributeValidationCondition of fieldAttributeValidationConditions) {
             let validationMasterId = fieldAttributeValidationCondition.fieldAttributeMasterValidationId;
             if (!fieldAttributeValidationConditionMap[validationMasterId]) {
                 fieldAttributeValidationConditionMap[validationMasterId] = [];
@@ -121,31 +125,28 @@ class FormLayout {
      * @param {*} fieldAttrMasterValidationConditionMap validation condition map
      */
     getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap) {
+        let formLayoutObject = new Map()
         if (!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0) {
-            throw new Error('No field attribute mapped to this status');
+            return { formLayoutObject, isSaveDisabled: false }
         }
-        let formLayoutObject = new Map();
-        let nextEditable = {};
-        let isRequiredAttributeFound = false;
+        
+        let isRequiredAttributeFound = false
         for (let i = 0; i < sequenceWiseSortedFieldAttributesForStatus.length; i++) {
-            let fieldAttribute = sequenceWiseSortedFieldAttributesForStatus[i];
+            let fieldAttribute = sequenceWiseSortedFieldAttributesForStatus[i]
             if (!isRequiredAttributeFound) {
-                fieldAttribute.required ? (fieldAttribute.editable = true, fieldAttribute.focus = true, isRequiredAttributeFound = true) : fieldAttribute.editable = true;
+                fieldAttribute.required ? (fieldAttribute.editable = true, fieldAttribute.focus = true, isRequiredAttributeFound = true) : fieldAttribute.editable = true
             }
-            let validationArr = fieldAttributeMasterValidationMap[fieldAttribute.id];
+            let validationArr = fieldAttributeMasterValidationMap[fieldAttribute.id]
             if (validationArr && validationArr.length > 0 && fieldAttrMasterValidationConditionMap) {
                 for (var validation of validationArr) {
-                    validation.conditions = fieldAttrMasterValidationConditionMap[validation.id];
+                    validation.conditions = fieldAttrMasterValidationConditionMap[validation.id]
                 }
             }
-            if (fieldAttribute.required) {
-                // find next editable and focusable elements of the required attribute
-                this.getNextEditableAndFocusableElements(fieldAttribute.id, i, sequenceWiseSortedFieldAttributesForStatus, nextEditable);
-            }
-            formLayoutObject.set(fieldAttribute.id,this.getFieldAttributeObject(fieldAttribute,validationArr,i+1));
+
+            formLayoutObject.set(fieldAttribute.id, this.getFieldAttributeObject(fieldAttribute, validationArr, i + 1))
         }
-        let latestPositionId = sequenceWiseSortedFieldAttributesForStatus.length - 1;
-        return { formLayoutObject, nextEditable, latestPositionId };
+        let latestPositionId = sequenceWiseSortedFieldAttributesForStatus.length - 1
+        return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId }
     }
 
     /**
@@ -164,12 +165,12 @@ class FormLayout {
                 nextEditable[attributeMasterId] = [];
             }
             const fieldAttribute = formLayoutArr[i];
-            if(i < currentSequence || (i == currentSequence && (attributeMasterId == fieldAttribute.id || attributeMasterId == fieldAttribute.fieldAttributeMasterId))){
+            if (i < currentSequence || (i == currentSequence && (attributeMasterId == fieldAttribute.id || attributeMasterId == fieldAttribute.fieldAttributeMasterId))) {
                 continue; // if parent iteration is less than child iteration then continue
             }
-            if(fieldAttribute.required && !fieldAttribute.value){
-                nextEditable[attributeMasterId].push('required$$'+(fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId)); //this is not necessary that required is always the last element in array, ex - if there are all non required. So instead of adding a new data structure, used a separator to know that this element is the required element
-               break; // as soon as next required attribute is found without value then break the loop
+            if (fieldAttribute.required && !fieldAttribute.value) {
+                nextEditable[attributeMasterId].push('required$$' + (fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId)); //this is not necessary that required is always the last element in array, ex - if there are all non required. So instead of adding a new data structure, used a separator to know that this element is the required element
+                break; // as soon as next required attribute is found without value then break the loop
             }
             nextEditable[attributeMasterId].push(fieldAttribute.id ? fieldAttribute.id : fieldAttribute.fieldAttributeMasterId);
         }
@@ -181,7 +182,7 @@ class FormLayout {
      * @param {*validationArray} validationArray 
      * @param {*positionId} positionId 
      */
-    getFieldAttributeObject(fieldAttribute, validationArray, positionId){
+    getFieldAttributeObject(fieldAttribute, validationArray, positionId) {
         const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl } = fieldAttribute
         return {
             label,
@@ -193,18 +194,18 @@ class FormLayout {
             attributeTypeId,
             fieldAttributeMasterId: fieldAttribute.id,
             positionId: positionId,
-            parentId : 0,
-            showHelpText : false,
-            editable : !(fieldAttribute.editable) || (fieldAttribute.attributeTypeId == 62)? false: fieldAttribute.editable,
-            focus : fieldAttribute.focus ? fieldAttribute.focus : false,
-            validation : (validationArray && validationArray.length > 0) ? validationArray : null,
+            parentId: 0,
+            showHelpText: false,
+            editable: !(fieldAttribute.editable) || (fieldAttribute.attributeTypeId == 62) ? false : fieldAttribute.editable,
+            focus: fieldAttribute.focus ? fieldAttribute.focus : false,
+            validation: (validationArray && validationArray.length > 0) ? validationArray : null,
             sequenceMasterId: fieldAttribute.sequenceMasterId,
             dataStoreMasterId,
             dataStoreAttributeId,
             externalDataStoreMasterUrl,
         };
     }
-    
+
 }
 
 export let formLayoutService = new FormLayout()

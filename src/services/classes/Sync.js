@@ -19,7 +19,10 @@ import {
 } from './JobSummary'
 import { addServerSmsService } from './AddServerSms'
 
-import _ from 'underscore'
+import {
+jobMasterService
+} from './JobMaster'
+import _ from 'lodash'
 
 import {
   TABLE_JOB_TRANSACTION,
@@ -38,16 +41,22 @@ import {
 
 } from '../../lib/constants'
 
+import {
+  FAREYE_UPDATES
+} from '../../lib/AttributeConstants'
+import { Platform } from 'react-native'
+import NotificationsIOS,{NotificationsAndroid}from 'react-native-notifications'
+
 class Sync {
 
-  async createAndUploadZip() {
+  async createAndUploadZip(transactionIdToBeSynced) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
-    await createZip()
-    console.log('token before call',token.value)
-    await RestAPIFactory(token.value).uploadZipFile()
+    await createZip(transactionIdToBeSynced)
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile()
+    return responseBody
   }
 
   /**GET API (Pagination)
@@ -132,7 +141,7 @@ class Sync {
    * @param {*} tdcResponse 
    */
   async processTdcResponse(tdcContentArray) {
-    let tdcContentObject
+    let tdcContentObject,jobMasterIds
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
       let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery)
@@ -142,9 +151,9 @@ class Sync {
       }
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
-        await this.saveDataFromServerInDB(contentQuery)
+       jobMasterIds =  await this.saveDataFromServerInDB(contentQuery)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
-        await this.updateDataInDB(contentQuery)
+        jobMasterIds = await this.updateDataInDB(contentQuery)
       } else if (queryType == 'delete') {
         const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
         const deleteJobTransactions = {
@@ -154,6 +163,7 @@ class Sync {
         }
         await realm.deleteRecordsInBatch(deleteJobTransactions)
       }
+        return jobMasterIds
     }
   }
 
@@ -262,6 +272,7 @@ class Sync {
       tableName: TABLE_JOB,
       value: contentQuery.job
     }
+  
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
       value: contentQuery.jobData
@@ -277,6 +288,14 @@ class Sync {
       value: contentQuery.runSheet
     }
     realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+    const jobMasterIds = this.getJobMasterIds(contentQuery.job)
+    return jobMasterIds
+  }
+
+  getJobMasterIds(jobList) {
+    let jobMasterIds = new Set()
+    jobMasterIds = jobList.map(job => job.jobMasterId)
+    return jobMasterIds
   }
 
   /**
@@ -318,7 +337,8 @@ class Sync {
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
     await realm.deleteRecordsInBatch(jobDatas, runsheets, newJobTransactions, newJobs, newJobFieldData)
-    await this.saveDataFromServerInDB(query)
+    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
+    return jobMasterIds
   }
 
   /**POST API
@@ -455,7 +475,7 @@ class Sync {
     const pageNumber = 0,
       pageSize = 3
     let isLastPageReached = false,
-      json, isJobsPresent = false
+      json, isJobsPresent = false,jobMasterIds
     const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize)
@@ -463,7 +483,7 @@ class Sync {
         json = await tdcResponse.json
         isLastPageReached = json.last
         if (!_.isNull(json.content) && !_.isUndefined(json.content) && !_.isEmpty(json.content)) {
-          await this.processTdcResponse(json.content)
+          jobMasterIds = await this.processTdcResponse(json.content)
         } else {
           isLastPageReached = true
         }
@@ -478,6 +498,8 @@ class Sync {
           const messageIdDTOs = []
           await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
+          const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
+          this.showNotification(jobMasterTitleList)
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
           jobSummaryService.updateJobSummary(dataList.jobSummaries)
         }
@@ -486,6 +508,23 @@ class Sync {
       }
     }
     return isJobsPresent
+  }
+
+  showNotification(jobMasterTitleList) {
+    const alertBody = jobMasterTitleList.join()
+    if (Platform.OS === 'ios') {
+      NotificationsIOS.localNotification({
+        alertBody: `You have new updates for ${alertBody} jobs`,
+        alertTitle: FAREYE_UPDATES,
+      })
+    }
+    else {
+      NotificationsAndroid.localNotification({
+        title: FAREYE_UPDATES,
+        body: `You have new updates for ${alertBody} jobs`,
+      })
+    }
+
   }
 }
 

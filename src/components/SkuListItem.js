@@ -11,7 +11,7 @@ import {
     SKU_ACTUAL_QUANTITY
 } from '../lib/AttributeConstants'
 import {  CheckBox,Picker } from 'native-base'
-import _ from 'underscore'
+import _ from 'lodash'
 
 const Item = Picker.Item;
 

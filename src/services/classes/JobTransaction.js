@@ -218,7 +218,7 @@ class JobTransaction {
         else if (callingActivity == 'Sequence') {
             let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
             //Fetch only pending status category job transactions for sequence listing
-            jobTransactionQuery = `${jobTransactionQuery} AND (${statusQuery})`
+            jobTransactionQuery = statusQuery && statusQuery.trim() !=='' ? `${jobTransactionQuery} AND (${statusQuery})`:`${jobTransactionQuery}`
         }
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         if (jobTransactionList.length == 0) {

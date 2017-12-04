@@ -36,7 +36,7 @@ import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
-import _ from 'underscore'
+import _ from 'lodash'
 import {NEXT_POSSIBLE_STATUS} from '../lib/AttributeConstants'
 import {FormLayout,RESET_STATE} from '../lib/constants'
 
@@ -156,7 +156,7 @@ class BulkListing extends Component {
                           title: NEXT_POSSIBLE_STATUS
                         },
                         buttonIndex => { 
-                        if(buttonIndex!=nextStatusNames.length-1){
+                        if(buttonIndex >=0 && buttonIndex!=nextStatusNames.length-1){
                           this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex])
                           } }
                       ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0])

@@ -20,7 +20,7 @@ import {
 
 import { setState } from '../global/globalActions'
 
-export function onSave(parentObject, formElement, nextEditable, cashTenderingList, cashTenderingListReturn, isSaveDisabled, latestPositionId, jobTransactionId, isReceive) {
+export function onSave(parentObject, formElement, cashTenderingList, cashTenderingListReturn, isSaveDisabled, latestPositionId, jobTransactionId, isReceive) {
     return async function (dispatch) {
         try {
             if (!cashTenderingList) {
@@ -31,7 +31,7 @@ export function onSave(parentObject, formElement, nextEditable, cashTenderingLis
             if (cashTenderingListReturn != null) {
                 dispatch(setState(IS_RECEIVE_TOGGLE, true))
             }
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
         } catch (error) {
             console.log(error)
         }

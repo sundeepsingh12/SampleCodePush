@@ -70,9 +70,9 @@ class FieldAttributeMaster {
      * @param {*} map 
      * @returns
      * childObject : {
-     *                      fielAttributeMaster,
-     *                      childObject : { fielAttributeMaster } 
-     *                   }
+     *                   fielAttributeMaster,
+     *                   childObject : { fielAttributeMaster } 
+     *               }
      */
     setChildFieldAttributeMaster(childObjectList, map) {
         for (let index in childObjectList) {
