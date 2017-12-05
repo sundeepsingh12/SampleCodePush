@@ -245,9 +245,13 @@ describe('test sync services', () => {
 
     sync.updateDataInDB = jest.fn()
     sync.saveDataFromServerInDB = jest.fn()
+    sync.deleteRecordsInBatch = jest.fn()
+    sync.getAssignOrderTohubEnabledJobs = jest.fn()
     sync.processTdcResponse(tdcContentArray)
     expect(sync.saveDataFromServerInDB).toHaveBeenCalledTimes(1)
+    expect(sync.getAssignOrderTohubEnabledJobs).toHaveBeenCalledTimes(1)    
     expect(sync.updateDataInDB).not.toHaveBeenCalled()
+    expect(sync.deleteRecordsInBatch).not.toHaveBeenCalled()
   })
   it('should process tdc response for update query type', () => {
     const tdcContentArray = [{
@@ -275,10 +279,48 @@ describe('test sync services', () => {
 
     sync.updateDataInDB = jest.fn()
     sync.saveDataFromServerInDB = jest.fn()
-
+    sync.deleteRecordsInBatch = jest.fn()
+    sync.getAssignOrderTohubEnabledJobs = jest.fn()
+    
     sync.processTdcResponse(tdcContentArray)
     expect(sync.updateDataInDB).toHaveBeenCalledTimes(1)
+    expect(sync.getAssignOrderTohubEnabledJobs).toHaveBeenCalledTimes(1)    
     expect(sync.saveDataFromServerInDB).not.toHaveBeenCalled()
+    expect(sync.deleteRecordsInBatch).not.toHaveBeenCalled()    
+  })
+  it('should process tdc response for delete query type', () => {
+    const tdcContentArray = [{
+      "id": 2326388,
+      "userId": 4954,
+      "type": "insert",
+      "query": {
+        "job": [
+
+        ],
+        "jobTransactions": [
+
+        ],
+        "jobData": [
+
+        ],
+        "fieldData": [
+
+        ],
+        "runSheet": [
+
+        ]
+      }
+    }]
+
+    sync.updateDataInDB = jest.fn()
+    sync.saveDataFromServerInDB = jest.fn()
+    sync.getAssignOrderTohubEnabledJobs = jest.fn()
+    sync.deleteRecordsInBatch = jest.fn()   
+    sync.processTdcResponse(tdcContentArray)
+    expect(sync.deleteRecordsInBatch).toHaveBeenCalled()    
+    expect(sync.getAssignOrderTohubEnabledJobs).toHaveBeenCalledTimes(1)    
+    expect(sync.saveDataFromServerInDB).not.toHaveBeenCalledTimes(1)
+    expect(sync.updateDataInDB).not.toHaveBeenCalled()
   })
    it('should not delete in case of null response', () => {
     jobStatusService.getAllIdsForCode = jest.fn()

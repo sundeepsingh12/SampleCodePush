@@ -23,7 +23,6 @@ import {
     PREPARE_UPDATE_LIST
 
 } from '../../lib/constants'
-import _ from 'underscore'
 import {
     setState
 } from '../global/globalActions'
@@ -56,15 +55,15 @@ export function resequenceJobsFromServer(sequenceList) {
             }
             const sequenceResponse = await RestAPIFactory(token.value).serviceCall(JSON.stringify(sequenceRequestDto), CONFIG.API.SEQUENCE_USING_ROUTING_API, 'POST')
             const responseBody = await sequenceResponse.json
-            const unAllocatedTransactionIdsLength = responseBody.unAllocatedTransactionIds.length
-            const sequenceList = await sequenceService.processSequenceResponse(responseBody, sequenceList)
+            const unallocatedTransactionCount = responseBody.unAllocatedTransactionIds.length
+            const updatedSequenceList = await sequenceService.processSequenceResponse(responseBody, sequenceList)
             dispatch(setState(PREPARE_UPDATE_LIST, {
-                sequenceList,
+                updatedSequenceList,
                 unallocatedTransactionCount
             }))
         } catch (error) {
             dispatch(setState(PREPARE_UPDATE_LIST, {
-                sequenceList,
+                updatedSequenceList:sequenceList,
                 responseMessage:error.message,
                 unallocatedTransactionCount:0
             }))

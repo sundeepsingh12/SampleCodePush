@@ -277,8 +277,8 @@ export function invalidateUserSession() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
-      dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
+      dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))

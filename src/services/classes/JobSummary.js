@@ -1,12 +1,14 @@
 import {
-  JOB_SUMMARY
+  JOB_SUMMARY,
+  LAST_SYNC_WITH_SERVER
 } from '../../lib/constants'
 
 import {
   keyValueDBService
 } from './KeyValueDBService'
 
-import _ from 'underscore'
+import moment from 'moment'
+import _ from 'lodash'
 
 class JobSummary {
 
@@ -24,11 +26,13 @@ class JobSummary {
     }
     const jobSummaryIds = await jobSummaries.map(jobSummaryObject => jobSummaryObject.id)
     const jobSummaryIdJobSummaryObjectMap = {}
+    const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')    
     jobSummaries.forEach(jobSummaryObject => {
       jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
     })
     jobSummariesInStore.value.forEach(jobSummaryObject => {
       if (jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id]) {
+        jobSummaryObject.updatedTime = currentDate
         jobSummaryObject.count = jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id].count
       }
     })
@@ -59,6 +63,20 @@ class JobSummary {
     }
     const filteredJobSummaryList = await alljobSummaryList.value.filter(jobSummaryObject => (jobSummaryObject.jobStatusId == statusId && jobSummaryObject.jobMasterId == jobMasterId))
     return filteredJobSummaryList[0]
+  }
+
+  async getJobSummaryDataOnLastSync() {
+    const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+    let filteredJobSummaryList = []
+    let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
+    // const userLastTime = moment(lastSyncTime).format('YYYY-MM-DD HH:mm:ss')
+    for(let index of alljobSummaryList.value){
+      if(moment(index.updatedTime).isAfter(lastSyncTime.value)){
+        delete index.updatedTime 
+        filteredJobSummaryList.push(index)       
+      }
+    }
+    return filteredJobSummaryList
   }
 
   // async getJobSummariesForJobMasterAndStatus(jobMasterIdStatusIdMap){

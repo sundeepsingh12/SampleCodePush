@@ -12,14 +12,15 @@
  * Config for defaults and underscore for a couple of features
  */
 import CONFIG from './config'
-import _ from 'underscore'
-import RNFS from 'react-native-fs';
+import _ from 'lodash'
+import RNFS from 'react-native-fs'
 import RNFetchBlob from 'react-native-fetch-blob'
 import {keyValueDBService} from '../services/classes/KeyValueDBService.js'
 import {
-  PENDING_SYNC_TRANSACTION_IDS
+  PENDING_SYNC_TRANSACTION_IDS,
+  LAST_SYNC_WITH_SERVER
 } from './constants'
-
+import moment from 'moment'
 const fetch = require('react-native-cancelable-fetch');
 class RestAPI {
   /**
@@ -56,6 +57,7 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = this.API_BASE_URL + opts.url
+    console.log('url',url)
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
@@ -186,6 +188,7 @@ class RestAPI {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
     // console.log('jid',jid)
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
+    let responseBody = "Fail"
   await RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
     Authorization :this._sessionToken,
     'Content-Type' : 'multipart/form-data',
@@ -194,20 +197,23 @@ class RestAPI {
   ]).uploadProgress((written, total) => {
         console.log('uploaded', written / total)
     }).then(async(resp) => {
-    const responseBody = resp.text()
-    console.log('responseBody>>>>>',responseBody)
+     responseBody = resp.text()
     const message = responseBody.split(",")[0]
-    console.log('message >>>>>',message);
     const syncCount = responseBody.split(",")[1]
     if(message=='success'){
       //do something
-      let storeValue =await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-      let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+      const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss') 
+      //console.log("qwe",currenDate)
+      await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,currenDate)      
+     await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+      // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
     }
-  }).catch((err) => {
-    console.log(err)
+  }).catch(err => {
+    throw err
   })
+  return responseBody
   }
+  
 
 }
 // The singleton variable

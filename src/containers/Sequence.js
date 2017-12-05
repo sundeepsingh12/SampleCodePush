@@ -175,7 +175,7 @@ class Sequence extends Component {
   showAlert = () => {
     Alert.alert(
        ROUTE_OPTIMIZATION ,
-         `This will run route optimization ${_.size(this.props.sequenceList)} job transactions`,
+         `This will run route optimization for ${_.size(this.props.sequenceList)} job transactions`,
          [
     {text: 'Cancel', style: 'cancel'},
     {text: 'OK', onPress: this.OnOkButtonPressed},

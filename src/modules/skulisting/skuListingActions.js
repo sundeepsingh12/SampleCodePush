@@ -39,17 +39,17 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
             const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId[0])
             const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation)
             const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap, skuData.attributeTypeIdValueMap)
-            dispatch(setState(SKU_LIST_FETCHING_STOP,{
-                skuListItems:skuData.skuObjectListDto,
+            dispatch(setState(SKU_LIST_FETCHING_STOP, {
+                skuListItems: skuData.skuObjectListDto,
                 skuObjectValidation,
                 skuArrayChildAttributes,
-                skuObjectAttributeId:skuListingDto.childFieldAttributeId[0]
+                skuObjectAttributeId: skuListingDto.childFieldAttributeId[0]
             }))
             if (skuListingDto.isSkuCodePresent)
-            dispatch(setState(SHOW_SEARCH_BAR))
+                dispatch(setState(SHOW_SEARCH_BAR))
         } catch (error) {
             console.log(error)
-             dispatch(setState(SKU_LIST_FETCHING_STOP))
+            dispatch(setState(SKU_LIST_FETCHING_STOP))
         }
     }
 }
@@ -73,9 +73,9 @@ export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItem
     return async function (dispatch) {
         try {
             const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, parentId, skuListItems, skuChildElements)
-            dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY,{
-                skuListItems:updatedSkuArray.updatedObject,
-                skuRootChildElements:updatedSkuArray.updatedChildElements
+            dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, {
+                skuListItems: updatedSkuArray.updatedObject,
+                skuRootChildElements: updatedSkuArray.updatedChildElements
             }))
         } catch (error) {
             console.log(error)
@@ -91,7 +91,7 @@ export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItem
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionId, latestPositionId, parentObject, formElement, nextEditable, isSaveDisabled) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionId, latestPositionId, parentObject, formElement, isSaveDisabled) {
     return async function (dispatch) {
         try {
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
@@ -99,7 +99,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
             // if (!message) {
             const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId)
             let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.positionId, latestPositionId)
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, nextEditable, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
             // }
             // else{
             //     //Show Toast or Modal here according to message string returned

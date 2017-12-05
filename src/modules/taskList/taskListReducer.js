@@ -6,6 +6,9 @@ const initialState = new InitialState()
 import {
   SET_TABS_LIST,
   JOB_DOWNLOADING_STATUS,
+  FUTURE_RUNSHEET_ENABLED,
+  SET_SELECTED_DATE,
+  IS_CALENDAR_VISIBLE,
 } from '../../lib/constants'
 
 
@@ -21,6 +24,15 @@ export default function taskList(state = initialState, action) {
 
     case JOB_DOWNLOADING_STATUS:
       return state.set('downloadingJobs', action.payload.isDownloadingjobs)
+
+    case FUTURE_RUNSHEET_ENABLED:
+      return state.set('isFutureRunsheetEnabled', action.payload)
+
+      case SET_SELECTED_DATE:
+      return state.set('selectedDate', action.payload)
+
+      case IS_CALENDAR_VISIBLE:
+      return state.set('isCalendarVisible', action.payload)
   }
 
   return state

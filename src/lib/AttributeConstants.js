@@ -37,6 +37,7 @@ module.exports = {
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,
     IMAGE_URL: 24,
+    JOB_EXPIRY_TIME: 69,    
     LANDMARK: 30,
     MODE: 'mode_type',
     MONEY_COLLECT: 18,
@@ -59,12 +60,10 @@ module.exports = {
     SEQUENCE: 62,
     SIGNATURE: 21,
     SIGNATURE_AND_FEEDBACK: 58,
-    SIGNATURE_AND_NPS: 58,
     SKU_ACTUAL_AMOUNT: 32,
     SKU_ACTUAL_QUANTITY: 16,
     SKU_ARRAY: 17,
     SKU_CODE: 51,
-    JOB_EXPIRY_TIME: 69,
     SKU_ORIGINAL_QUANTITY: 15,
     SKU_UNIT_PRICE: 14,
     STRING: 1,
@@ -219,15 +218,22 @@ module.exports = {
     REGEX: 'regex',
 
     //Validation Action Constants
+    AFTER: 'After',
     ALERT_MESSAGE: 'alertMessage',
     ASSIGN: 'assign',
     ASSIGN_BY_MATHEMATICAL_FORMULA: 'assignByMathematicalFormula',
     ASSIGN_DATE_TIME: 'assignDateTime',
+    AVERAGE: 'average',
+    BEFORE: 'Before',
+    CONCATENATE: 'concatenate',
     DATE_COMPARATOR: 'dateComparator',
     ELSE: 'else',
+    MAX: 'max',
+    MIN: 'min',
     REQUIRED_FALSE: 'requiredFalse',
     REQUIRED_TRUE: 'requiredTrue',
     RETURN: 'return',
+    SUM: 'sum',
     THEN: 'then',
     TIME_COMPARATOR: 'timeComparator',
 
@@ -383,10 +389,6 @@ module.exports = {
     //enableSequence
     SEQ_SELECTED: 'seqSelected',
 
-    //Status_Code
-    UNSEEN: 'UNSEEN',
-    PENDING: 'PENDING',
-
     //Start Search PlaceHolder
     SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
 
@@ -409,6 +411,9 @@ module.exports = {
     //SelectFromList
     SEARCH: 'Search',
     OK: 'Ok',
+
+    //Notification 
+    FAREYE_UPDATES: 'FarEye Updates',
 
     //Add Server Sms 
     BIKER_NAME: 'BIKER_NAME',

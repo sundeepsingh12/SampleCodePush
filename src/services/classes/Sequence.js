@@ -40,7 +40,6 @@ class Sequence {
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
         const jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,'Sequence',statusIds)
         const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList,'id')
-        console.log('idJobTransactionCustomizationListMap',idJobTransactionCustomizationListMap)
         return idJobTransactionCustomizationListMap
     }
 

@@ -84,6 +84,8 @@ export class keyValueDb {
       default:
         checkCondition = true;
     }
+    console.log('keyvaluedb ',value)
+    console.log(validate(value,schemaInstance))
     if (value && (checkCondition || validate(value, schemaInstance).valid)) {
       return store.save(schemaName, {
         value
@@ -121,6 +123,9 @@ export class keyValueDb {
       case 'JOB_SUMMARY':
         schemaInstance = require('../repositories/schema/jobSummary');
         break;
+      case 'JOB_STATUS':
+        schemaInstance = require('../repositories/schema/jobStatus');
+        break;   
     }
     if (value && validate(value, schemaInstance)) {
       return store.update(schemaName, value)

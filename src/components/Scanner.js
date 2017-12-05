@@ -23,7 +23,6 @@ class Scanner extends Component {
             <View style={styles.container}>
                 <Camera
                     ref="cam"
-                    onBarCodeRead={this.props.onBarCodeRead}
                     style={styles.preview}
                     aspect={Camera.constants.Aspect.fill}>
                     <Text style={styles.capture} onPress={this.props.onBackPress}>BACK</Text>
