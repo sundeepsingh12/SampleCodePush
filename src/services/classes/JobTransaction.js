@@ -25,6 +25,7 @@ import { smsTemplateService } from './SMSTemplate'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
 import { jobMasterService } from './JobMaster'
 import _ from 'lodash'
+import moment from 'moment'
 
 class JobTransaction {
 
@@ -205,10 +206,21 @@ class JobTransaction {
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         let customerCareMap = customerCareService.getCustomerCareMap(jobTransactionCustomizationListParametersDTO.customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
-        let runsheetQuery = selectedDate ?  `startDate BEGINSWITH '${selectedDate}' AND isClosed = false` : 'isClosed = true'
+        let runsheetQuery
+        if (selectedDate && selectedDate != "All") {
+            runsheetQuery = `startDate BEGINSWITH '${selectedDate}' AND isClosed = false`
+        } else if (selectedDate && selectedDate == "All") {
+            runsheetQuery = 'isClosed = false'
+        } else {
+            runsheetQuery = 'isClosed = true'
+        }
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+        let runsheetIdToStartDateMap = {}
+        if (selectedDate && selectedDate == "All") {
+            runsheetList.forEach(runsheetListObject => { runsheetIdToStartDateMap[runsheetListObject.id] = moment(runsheetListObject.startDate).format('YYYY-MM-DD') })
+        }
         let jobTransactionQuery = selectedDate ? runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ') : runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
-        if(selectedDate && (!jobTransactionQuery || jobTransactionQuery.trim() == '')) {
+        if (selectedDate && (!jobTransactionQuery || jobTransactionQuery.trim() == '')) {
             return []
         }
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
@@ -218,7 +230,7 @@ class JobTransaction {
         else if (callingActivity == 'Sequence') {
             let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
             //Fetch only pending status category job transactions for sequence listing
-            jobTransactionQuery = statusQuery && statusQuery.trim() !=='' ? `${jobTransactionQuery} AND (${statusQuery})`:`${jobTransactionQuery}`
+            jobTransactionQuery = statusQuery && statusQuery.trim() !== '' ? `${jobTransactionQuery} AND (${statusQuery})` : `${jobTransactionQuery}`
         }
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         if (jobTransactionList.length == 0) {
@@ -233,7 +245,7 @@ class JobTransaction {
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
         let fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
         let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
-        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap)
+        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, runsheetIdToStartDateMap)
         return jobTransactionCustomizationList
     }
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
@@ -283,8 +295,9 @@ class JobTransaction {
      *                                      }
      *                                   ]
      */
-    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap) {
+    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, runsheetIdToStartDateMap) {
         let jobTransactionCustomizationList = []
+        let jobTransactionDateTOJobTransactionsMap = {}
         for (var index in jobTransactionMap) {
             let jobTransaction = jobTransactionMap[index]
             let jobId = jobTransaction.jobId
@@ -312,9 +325,15 @@ class JobTransaction {
             jobTransactionCustomization.jobLatitude = job.latitude
             jobTransactionCustomization.jobLongitude = job.longitude
             jobTransactionCustomization.jobId = jobTransaction.jobId
-            jobTransactionCustomizationList.push(jobTransactionCustomization)
+            if (!_.isEmpty(runsheetIdToStartDateMap)) {
+                let jobTransactionsArray = (jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]]) ? jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]] : []
+                jobTransactionsArray.push(jobTransactionCustomization)
+                jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]] = jobTransactionsArray
+            } else{
+                jobTransactionCustomizationList.push(jobTransactionCustomization)                
+            }
         }
-        return jobTransactionCustomizationList
+        return (!_.isEmpty(runsheetIdToStartDateMap)) ? jobTransactionDateTOJobTransactionsMap : jobTransactionCustomizationList
     }
 
     /** This function prepares string for line1, line2, circleLine1, circleLine2

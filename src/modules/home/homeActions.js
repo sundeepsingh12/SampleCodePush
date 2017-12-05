@@ -11,6 +11,7 @@ import {
   JOB_SUMMARY,
   SYNC_ERROR,
   SYNC_STATUS,
+  PENDING
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -43,7 +44,7 @@ export function fetchModulesList() {
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
       moduleCustomizationService.getActiveModules(appModulesList.value, user.value)
-      if(PIECHART.enabled){
+      if (PIECHART.enabled) {
         dispatch(pieChartCount())
       }
       dispatch(setState(HOME_LOADING, {
@@ -79,7 +80,6 @@ export function pieChartCount() {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
       const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const jobStatus = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
       const {pendingStatusIds,failStatusIds,successStatusIds} = allStatusIds
       const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
@@ -94,8 +94,6 @@ export function performSyncService(isCalledFromHome){
   return async function(dispatch){
     let transactionIdToBeSynced
     try{
-      // this.props.actions.startMqttService()
-      // await dispatch(startMqttService())
        transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -130,23 +128,25 @@ export function performSyncService(isCalledFromHome){
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'INTERNALSERVERERROR'
         }))
-      }
+      } else {
+        let connectionInfo = await NetInfo.isConnected.fetch().then(isConnected => {
+          return isConnected
+        });
 
-      let connectionInfo = await NetInfo.isConnected.fetch().then(isConnected => {
-        return isConnected
-      });
+        console.log('connectionInfo isonline', connectionInfo)
 
-      if(!connectionInfo) {
-        dispatch(setState(SYNC_STATUS, {
-          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-          syncStatus: 'NOINTERNET'
-        }))
+        if (!connectionInfo) {
+          dispatch(setState(SYNC_STATUS, {
+            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+            syncStatus: 'NOINTERNET'
+          }))
+        } else {
+          dispatch(setState(SYNC_STATUS, {
+            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+            syncStatus: 'ERROR'
+          }))
+        }
       }
-      
-      dispatch(setState(SYNC_STATUS, {
-        unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-        syncStatus: 'ERROR'
-      }))
     }
   }
 }
