@@ -93,10 +93,11 @@ export function pieChartCount() {
 
 export function performSyncService(isCalledFromHome){
   return async function(dispatch){
+    let transactionIdToBeSynced
     try{
       // this.props.actions.startMqttService()
       // await dispatch(startMqttService())
-      transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+       transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
         syncStatus: 'Uploading'
@@ -110,9 +111,15 @@ export function performSyncService(isCalledFromHome){
           syncStatus: 'Downloading'
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+        console.log("32654859",isJobsPresent)                 ; 
         if (isJobsPresent) {
+          console.log("32654859")          
+          if(PIECHART.enabled){
+            console.log("32654859")
+            dispatch(pieChartCount())
+          }
           dispatch(fetchJobs())
-        }
+        }     
       }
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: [],

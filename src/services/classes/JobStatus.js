@@ -138,22 +138,23 @@ class JobStatus {
       throw new Error('tab missing in store')
     }
     const tabList = {}
-    tabs.value.forEach(key => tabList[key.id] = key)
+    tabs.value.forEach(key => {if(key.name.toLocaleLowerCase() !== 'hidden'){
+      tabList[key.id] = key}})
     if (!jobStatusArray || !jobStatusArray.value) {
       throw new Error('Job status missing in store')
     }
     const jobStatusList = jobStatusArray.value
     let pendingStatusIds = [], failStatusIds =[], successStatusIds = [];
     for(id in jobStatusList){
-        if(jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN && tabList[jobStatusList[id].tabId].name.toLocaleLowerCase() !== 'hidden'){
+        if(jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN){
           pendingStatusIds.push(jobStatusList[id].id)
           continue
         }
-        if(jobStatusList[id].statusCategory == 3  && tabList[jobStatusList[id].tabId].name.toLocaleLowerCase() !== 'hidden'){
+        if(jobStatusList[id].statusCategory == 3 ){
           successStatusIds.push(jobStatusList[id].id)
           continue
         }
-        if(jobStatusList[id].statusCategory == 2  && tabList[jobStatusList[id].tabId].name.toLocaleLowerCase() !== 'hidden'){
+        if(jobStatusList[id].statusCategory == 2  ){
           failStatusIds.push(jobStatusList[id].id)
         }
     }

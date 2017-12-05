@@ -114,6 +114,7 @@ class JobTransaction {
                 jobStatusId,
                 referenceNumber,
                 runsheetNo,
+                runsheetId,
                 seqSelected,
                 trackCallCount,
                 trackCallDuration,
@@ -140,6 +141,7 @@ class JobTransaction {
                 jobStatusId,
                 referenceNumber,
                 runsheetNo,
+                runsheetId,
                 seqSelected,
                 trackCallCount,
                 trackCallDuration,
@@ -154,7 +156,7 @@ class JobTransaction {
             jobQuery,
             jobTransactionQuery,
             jobDataQuery,
-            fieldDataQuery
+            fieldDataQuery,
         }
     }
 
@@ -197,21 +199,24 @@ class JobTransaction {
      *                                      }
      *                                  ]
      */
-    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData) {
+    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData, selectedDate) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobTransactionCustomizationListParametersDTO.jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobTransactionCustomizationListParametersDTO.jobAttributeStatusList)
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(jobTransactionCustomizationListParametersDTO.statusList, jobAttributeStatusMap)
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         let customerCareMap = customerCareService.getCustomerCareMap(jobTransactionCustomizationListParametersDTO.customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
-        let runsheetQuery = 'isClosed = true'
+        let runsheetQuery = selectedDate ?  `startDate BEGINSWITH '${selectedDate}' AND isClosed = false` : 'isClosed = true'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
-        let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
+        let jobTransactionQuery = selectedDate ? runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ') : runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
+        if(selectedDate && (!jobTransactionQuery || jobTransactionQuery.trim() == '')) {
+            return []
+        }
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
-        if(callingActivity=='Bulk'){
+        if (callingActivity == 'Bulk') {
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
         }
-         else if(callingActivity=='Sequence'){
+        else if (callingActivity == 'Sequence') {
             let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
             //Fetch only pending status category job transactions for sequence listing
             jobTransactionQuery = statusQuery && statusQuery.trim() !=='' ? `${jobTransactionQuery} AND (${statusQuery})`:`${jobTransactionQuery}`
@@ -228,15 +233,15 @@ class JobTransaction {
         let jobMap = jobService.getJobMap(jobsList)
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
         let fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
-        let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList,'id')
+        let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap)
         return jobTransactionCustomizationList
     }
-    getFirstTransactionWithEnableSequence(jobMasterIdList,statusMap){
+    getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
         let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
-        let jobStatusQuery = statusMap.map(statusId => 'jobStatusId = '+statusId).join(' OR ')
+        let jobStatusQuery = statusMap.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
         const jobTransactionQuery = `${jobMasterQuery} AND (${jobStatusQuery})`
-        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery,true,SEQ_SELECTED)
+        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, SEQ_SELECTED)
         return jobTransactionList[0].seqSelected
     }
 
@@ -299,6 +304,7 @@ class JobTransaction {
             }
             let jobSwipableDetails = this.setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap)
             jobTransactionCustomization.id = jobTransaction.id
+            jobTransactionCustomization.runsheetId = jobTransaction.runsheetId
             jobTransactionCustomization.jobMasterId = jobMasterId
             jobTransactionCustomization.jobSwipableDetails = jobSwipableDetails
             jobTransactionCustomization.seqSelected = jobTransaction.seqSelected

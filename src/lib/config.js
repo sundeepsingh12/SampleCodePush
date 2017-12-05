@@ -1,7 +1,7 @@
 module.exports = {
   SESSION_TOKEN_KEY: 'SESSION_TOKEN_KEY',
   APP_FOLDER: 'FAREYE',
-  SYNC_SERVICE_DELAY: 1200000,
+  SYNC_SERVICE_DELAY: 120000,
   intervalId: 0,
   backend: {
     fareyeProduction: false,
@@ -12,7 +12,7 @@ module.exports = {
       url: 'https://www.fareye.co/app'
     },
     staging: {
-      url: 'https://staging.fareye.co/app'
+      url: 'https://dev.fareye.co/app'
     },
     port: 8083,
     PUSH_QOS: 2

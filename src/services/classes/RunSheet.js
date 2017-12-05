@@ -1,14 +1,15 @@
 import {
     JOB_STATUS,
-    TABLE_RUNSHEET
+    TABLE_RUNSHEET,
+    TABLE_JOB_TRANSACTION
   } from '../../lib/constants'
   
   import {
     keyValueDBService
   } from './KeyValueDBService'
   
-  import _ from 'underscore'
   import * as realm from '../../repositories/realmdb'
+  import {jobStatusService} from './JobStatus'
   
   class RunSheet {
   
@@ -17,24 +18,43 @@ import {
      * @param {*} jobSummaries 
      */
     async updateRunSheetSummary(unseenTransactions,transactionIdDtos) {
-        const setRunsheetSummary = [] , propertyList = {}
-        let count = {}
-        const status = ['pendingCount','failCount','successCount']        
-        const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)  
-        let   idCategoryMap = this.idDtoMap(jobStatusArray.value, 'statusCategory') 
-        const unseenCategoryMap = {} 
-        transactionIdDtos.forEach(id => unseenCategoryMap[id.unSeenStatusId] = idCategoryMap[id.pendingStatusId]) 
-        for (item in unseenTransactions){
-            setRunsheetSummary.push(unseenTransactions[item].runsheetId)
-            propertyList[unseenTransactions[item].runsheetId] = status[unseenCategoryMap[unseenTransactions[item].jobStatusId]-1];
-            (count[unseenTransactions[item].runsheetId] != undefined) ? count[unseenTransactions[item].runsheetId] += 1 : count[unseenTransactions[item].runsheetId] = 1;
+    
+        const jobTransactionArray = realm.getAll(TABLE_JOB_TRANSACTION)
+        const allStatusIds = jobStatusService.getStatusIdsForAllStatusCategory()
+        const pendingStatusMap = this.idDtoMap(allStatusIds.pendingStatusIds)
+        const failStatusMap = this.idDtoMap(allStatusIds.failStatusIds)
+        const successStatusMap = this.idDtoMap(allStatusIds.successStatusIds)
+        const runsheetArray = realm.getAll(TABLE_RUNSHEET)
+        let runsheetList = {}
+        for (let id in runsheetArray){
+            runsheetList[runsheetArray[id].id] = Object.assign({},runsheetArray[id])
         }
-        realm.updateRecordOnMultipleProperty(TABLE_RUNSHEET,setRunsheetSummary,propertyList,count)    
+        let runShettArrayList = []
+        for (let index in jobTransactionArray) {
+            if(pendingStatusMap[jobTransactionArray[index].jobStatusId] == 1 (runsheetList[jobTransactionArray[index].runsheetId])){
+             runsheetList[jobTransactionArray[index]].pendingCount +=1
+              continue
+            }
+            if(successStatusMap[jobTransactionArray[index].jobStatusId] == 1 (runsheetList[jobTransactionArray[index].runsheetId])){
+              runsheetList[jobTransactionArray[index]].successCount +=1
+              continue
+            }
+            if(successStatusMap[jobTransactionArray[index].jobStatusId] == 1 (runsheetList[jobTransactionArray[index].runsheetId])){
+              runsheetList[jobTransactionArray[index]].failCount +=1
+                continue
+            }
+            
+        }
+        const runsheets = {
+            tableName: TABLE_RUNSHEET,
+            value: Object.values(runsheetList)
+          }
+        realm.performBatchSave(runsheets)
     }
 
-    idDtoMap(dtoList,property){
+    idDtoMap(dtoList){
         const listMap = dtoList.reduce(function ( total, current ) {
-            total[ current.id ] =  current[property]
+            total[ current ] =  1
             return total;
         }, {});
         return listMap

@@ -122,6 +122,7 @@ export function deleteRecordList(tableName, valueList, property) {
 
 export function updateRecordOnMultipleProperty(tableName, valueList,propertyList,count) {
     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
+    console.log('123',filteredRecords,propertyList,count)    
     realm.write(() => {
         _.forEach(filteredRecords, record => record[propertyList[record.id]] += count[record.id])
     });

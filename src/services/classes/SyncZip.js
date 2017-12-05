@@ -2,7 +2,6 @@ import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs';
 import { zip, unzip } from 'react-native-zip-archive'
 import { keyValueDBService } from './KeyValueDBService'
-import _ from 'underscore'
 import {jobSummaryService} from './JobSummary'
 import * as realm from '../../repositories/realmdb'
 
@@ -51,6 +50,8 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.userCommunicationLog = [];
     SYNC_RESULTS.userEventsLog = [];
     SYNC_RESULTS.userExceptionLog = [];
+    let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync()
+    SYNC_RESULTS.jobSummary = jobSummary || {}    
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     const userSummaryValue = userSummary.value
     SYNC_RESULTS.userSummary = userSummaryValue || {}
@@ -96,14 +97,12 @@ function _getSyncDataFromDb(transactionIdsObject) {
     let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
     serverSmsLogs = _getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
     let runSheetSummary = realm.getAll(TABLE_RUNSHEET);
-    let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync()
     return {
         fieldDataList,
         transactionList,
         jobList,
         serverSmsLogs,
         runSheetSummary,
-        jobSummary
     }
 }
 
