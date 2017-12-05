@@ -33,7 +33,7 @@ import {
     DATE,
     FIXED_SKU,
     SIGNATURE,
-    SIGNATURE_AND_NPS,
+    SIGNATURE_AND_FEEDBACK,
     STRING,
     TEXT,
     NUMBER,
@@ -125,7 +125,7 @@ class BasicFormElement extends Component {
                 screenName = 'DataStore'
                 break
             }
-            case SIGNATURE_AND_NPS: {
+            case SIGNATURE_AND_FEEDBACK: {
                 screenName = 'SignatureAndNps'
                 break
             }
@@ -196,11 +196,22 @@ class BasicFormElement extends Component {
                 showNPS: true
             }
         })
+        this.props.actions.fieldValidations(this.props.item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
     }
     _showDateTime = () => {
         this.setState({ showDateTimePicker: true })
+        this.props.actions.fieldValidations(this.props.item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
     }
-    render() {
+
+    getComponentLabelStyle(focus, editable) {
+        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+    }
+
+    getComponentSubLabelStyle(editable) {
+        return editable ? styles.fontDarkGray : styles.fontLowGray
+    }
+
+    getModalView() {
         if (this.state.selectFromListEnable) {
             return (
                 <View>
@@ -244,7 +255,10 @@ class BasicFormElement extends Component {
                 <TimePicker onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item} />
             )
         }
-
+        return null
+    }
+    render() {
+        let modalView = this.getModalView()
         switch (this.props.item.attributeTypeId) {
             case STRING:
             case TEXT:
@@ -253,15 +267,24 @@ class BasicFormElement extends Component {
             case SEQUENCE:
             case PASSWORD:
                 return (
-                    renderIf(!this.props.item.hidden,
-                        <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, this.props.item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
-                            <View style={[styles.marginBottom15]}>
+                    <View>
+                        {renderIf(!this.props.item.hidden,
+                            <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
                                 <Item stackedLabel>
-                                    <Label style={[styles.fontPrimary]}>{this.props.item.label}</Label>
+                                    {this.props.item.label ?
+                                        <Label style={[this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
+                                            {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
+                                        </Label>
+                                        : null}
+                                    {this.props.item.subLabel ?
+                                        <Label style={[this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Label>
+                                        : null}
                                     <Input
                                         autoCapitalize="none"
-                                        placeholder="help text"
+                                        placeholder={this.props.item.helpText}
+                                        placeholderTextColor={styles.fontLowGray.color}
                                         defaultValue={this.props.item.value}
+                                        style={{ paddingLeft: 0 }}
                                         value={this.props.item.value}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
@@ -273,12 +296,13 @@ class BasicFormElement extends Component {
                                     />
                                 </Item>
                                 {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
-                                    <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
-                                    <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
-                                </View> */}
+                                <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
+                                <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
+                            </View> */}
                             </View>
-                        </View>
-                    )
+
+                        )}
+                    </View>
                 )
 
             case FIXED_SKU:
@@ -287,13 +311,16 @@ class BasicFormElement extends Component {
             case SKU_ARRAY:
             case MONEY_COLLECT:
             case CASH_TENDERING:
-            case SIGNATURE_AND_NPS:
+            case SIGNATURE_AND_FEEDBACK:
             case ARRAY:
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             case NPS_FEEDBACK:
-                return <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />
+                return <View>
+                    {modalView}
+                    <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />
+                </View>
             case CHECKBOX:
             case RADIOBUTTON:
             case DROPDOWN:
@@ -303,7 +330,10 @@ class BasicFormElement extends Component {
             case RE_ATTEMPT_DATE:
             case TIME:
                 return (
-                    <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />
+                    <View>
+                        {modalView}
+                        <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />
+                    </View>
                 )
             default:
                 return (
