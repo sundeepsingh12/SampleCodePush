@@ -9,11 +9,11 @@ import {
   USER,
   SYNC_ERROR,
   SYNC_STATUS,
-   UNSEEN
+  UNSEEN,
+  PENDING
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
-  PENDING,
   FAIL,
   SUCCESS,
   PIECHART,
@@ -43,7 +43,7 @@ export function fetchModulesList() {
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
       moduleCustomizationService.getActiveModules(appModulesList.value, user.value)
-      if(PIECHART.enabled){
+      if (PIECHART.enabled) {
         dispatch(pieChartCount())
       }
       dispatch(setState(HOME_LOADING, {
@@ -78,9 +78,9 @@ export function pieChartCount() {
   return async (dispatch) => {
     try {
       dispatch(setState(CHART_LOADING, { loading: true, count: null }))
-      const pendingStatusIds = await jobStatusService.getStatusIdsForStatusCategory(PENDING,UNSEEN)
-      const successStatusIds = await jobStatusService.getStatusIdsForStatusCategory(SUCCESS,null)
-      const failStatusIds    = await jobStatusService.getStatusIdsForStatusCategory(FAIL,null)
+      const pendingStatusIds = await jobStatusService.getStatusIdsForStatusCategory(PENDING, UNSEEN)
+      const successStatusIds = await jobStatusService.getStatusIdsForStatusCategory(SUCCESS, null)
+      const failStatusIds = await jobStatusService.getStatusIdsForStatusCategory(FAIL, null)
       const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
@@ -90,12 +90,13 @@ export function pieChartCount() {
   }
 }
 
-export function performSyncService(isCalledFromHome){
-  return async function(dispatch){
-    try{
+export function performSyncService(isCalledFromHome) {
+  return async function (dispatch) {
+    let transactionIdToBeSynced
+    try {
       // this.props.actions.startMqttService()
       // await dispatch(startMqttService())
-      let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+      transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
         syncStatus: 'Uploading'
@@ -125,23 +126,25 @@ export function performSyncService(isCalledFromHome){
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'INTERNALSERVERERROR'
         }))
-      }
+      } else {
+        let connectionInfo = await NetInfo.isConnected.fetch().then(isConnected => {
+          return isConnected
+        });
 
-      let connectionInfo = await NetInfo.isConnected.fetch().then(isConnected => {
-        return isConnected
-      });
+        console.log('connectionInfo isonline', connectionInfo)
 
-      if(!connectionInfo) {
-        dispatch(setState(SYNC_STATUS, {
-          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-          syncStatus: 'NOINTERNET'
-        }))
+        if (!connectionInfo) {
+          dispatch(setState(SYNC_STATUS, {
+            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+            syncStatus: 'NOINTERNET'
+          }))
+        } else {
+          dispatch(setState(SYNC_STATUS, {
+            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+            syncStatus: 'ERROR'
+          }))
+        }
       }
-      
-      dispatch(setState(SYNC_STATUS, {
-        unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-        syncStatus: 'ERROR'
-      }))
     }
   }
 }

@@ -57,9 +57,9 @@ function mapDispatchToProps(dispatch) {
 class TaskListScreen extends Component {
 
   componentDidMount() {
-    // if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
-      this.props.actions.fetchJobs( moment().format('YYYY-MM-DD'))
-    // }
+    if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
+      this.props.actions.fetchJobs(moment().format('YYYY-MM-DD'))
+    }
     // this.props.actions.setSelectedState(moment(new Date()).format('YYYY-MM-DD'))
     // this.props.actions.futureRunsheetEnabled()
   }

@@ -181,7 +181,7 @@ class Home extends Component {
               style={[styles.fontWeight500, styles.fontLg]}>{modulesList[index].displayName}</Text>
           </Body>
           <Right>
-            <Icon name="arrow-forward" />
+            <Icon name="ios-arrow-forward" />
           </Right>
         </ListItem>
       )
