@@ -87,7 +87,7 @@ class SyncScreen extends Component {
     for (let index in transactionList) {
       console.log(transactionList)
       transactionView.push(
-        <Text style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
+        <Text key = {transactionList[index].id} style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
           {transactionList[index].referenceNumber}
         </Text>
       )

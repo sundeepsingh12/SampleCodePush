@@ -53,6 +53,15 @@ class TaskListScreen extends Component {
     if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
       this.props.actions.fetchJobs(moment().format('YYYY-MM-DD'))
     }
+<<<<<<< HEAD
+=======
+    // this.props.actions.setSelectedState(moment(new Date()).format('YYYY-MM-DD'))
+    // this.props.actions.futureRunsheetEnabled()
+  }
+
+  toggleStatus() {
+    console.log('toggle button handler')
+>>>>>>> master
   }
 
   navigateToScene = (item) => {
