@@ -10,6 +10,7 @@ import {
   
   import * as realm from '../../repositories/realmdb'
   import {jobStatusService} from './JobStatus'
+  import _ from 'lodash'
   
   class RunSheet {
   
@@ -17,39 +18,31 @@ import {
      * 
      * @param {*} jobSummaries 
      */
-    async updateRunSheetSummary(unseenTransactions,transactionIdDtos) {
-    
+    async updateRunSheetSummary() {
         const jobTransactionArray = realm.getAll(TABLE_JOB_TRANSACTION)
-        const allStatusIds = jobStatusService.getStatusIdsForAllStatusCategory()
+        const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
         const pendingStatusMap = this.idDtoMap(allStatusIds.pendingStatusIds)
-        const failStatusMap = this.idDtoMap(allStatusIds.failStatusIds)
-        const successStatusMap = this.idDtoMap(allStatusIds.successStatusIds)
         const runsheetArray = realm.getAll(TABLE_RUNSHEET)
         let runsheetList = {}
-        for (let id in runsheetArray){
-            runsheetList[runsheetArray[id].id] = Object.assign({},runsheetArray[id])
-        }
-        let runShettArrayList = []
+
+       runsheetArray.forEach(runsheetObject=>{
+         const runsheetCLone = {...runsheetObject}
+         runsheetCLone.pendingCount = 0
+         runsheetList[runsheetObject.id]= {...runsheetCLone}
+       })
         for (let index in jobTransactionArray) {
-            if(pendingStatusMap[jobTransactionArray[index].jobStatusId] == 1 (runsheetList[jobTransactionArray[index].runsheetId])){
-             runsheetList[jobTransactionArray[index]].pendingCount +=1
-              continue
-            }
-            if(successStatusMap[jobTransactionArray[index].jobStatusId] == 1 (runsheetList[jobTransactionArray[index].runsheetId])){
-              runsheetList[jobTransactionArray[index]].successCount +=1
-              continue
-            }
-            if(successStatusMap[jobTransactionArray[index].jobStatusId] == 1 (runsheetList[jobTransactionArray[index].runsheetId])){
-              runsheetList[jobTransactionArray[index]].failCount +=1
-                continue
-            }
+            if(pendingStatusMap[jobTransactionArray[index].jobStatusId] == 1 && (runsheetList[jobTransactionArray[index].runsheetId])){
             
+             runsheetList[jobTransactionArray[index].runsheetId].pendingCount +=1
+            }
         }
         const runsheets = {
             tableName: TABLE_RUNSHEET,
             value: Object.values(runsheetList)
           }
+
         realm.performBatchSave(runsheets)
+         
     }
 
     idDtoMap(dtoList){
@@ -58,6 +51,7 @@ import {
             return total;
         }, {});
         return listMap
+      
     }
     /**A generic method for getting jobSummary from store given a particular jobStatusId and jobMasterId
      * 

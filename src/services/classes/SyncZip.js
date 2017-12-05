@@ -1,8 +1,15 @@
 import CONFIG from '../../lib/config'
 import RNFS from 'react-native-fs';
-import { zip, unzip } from 'react-native-zip-archive'
-import { keyValueDBService } from './KeyValueDBService'
-import {jobSummaryService} from './JobSummary'
+import {
+    zip,
+    unzip
+} from 'react-native-zip-archive'
+import {
+    keyValueDBService
+} from './KeyValueDBService'
+import {
+    jobSummaryService
+} from './JobSummary'
 import * as realm from '../../repositories/realmdb'
 
 import {
@@ -23,6 +30,7 @@ var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
 
 export async function createZip(transactionIdToBeSynced) {
+
     //Create FarEye folder if doesn't exist
     RNFS.mkdir(PATH);
     RNFS.mkdir(PATH_TEMP);
@@ -30,19 +38,13 @@ export async function createZip(transactionIdToBeSynced) {
     //Prepare the SYNC_RESULTS
     var SYNC_RESULTS = {};
     let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
-    //     if (realmDbData.serverSmsLogs != []) {
-    //     for (let sms of realmDbData.serverSmsLogs) {
-    //         sms.duration = null
-    //         sms.transactionType = null
-    //         sms.communicationType = null
-    //         sms.serverResponse = null
-    //     }
-    // }
+
     SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
     SYNC_RESULTS.job = realmDbData.jobList;
     SYNC_RESULTS.jobSummary = realmDbData.jobSummary;
     SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
     SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
+
     SYNC_RESULTS.scannedReferenceNumberLog = [];
     SYNC_RESULTS.serverSmsLog = realmDbData.serverSmsLogs;
     SYNC_RESULTS.trackLog = [];
@@ -51,7 +53,7 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.userEventsLog = [];
     SYNC_RESULTS.userExceptionLog = [];
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync()
-    SYNC_RESULTS.jobSummary = jobSummary || {}    
+    SYNC_RESULTS.jobSummary = jobSummary || {}
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     const userSummaryValue = userSummary.value
     SYNC_RESULTS.userSummary = userSummaryValue || {}
@@ -64,7 +66,6 @@ export async function createZip(transactionIdToBeSynced) {
     const targetPath = PATH + '/sync.zip'
     const sourcePath = PATH_TEMP
     await zip(sourcePath, targetPath);
-    console.log('zip completed at ' + targetPath);
     // await unzip(targetPath, PATH)
     // var content = await RNFS.readFile(PATH + '/logs.json', 'base64')
     // console.log('==image', content)
@@ -75,6 +76,7 @@ export async function createZip(transactionIdToBeSynced) {
     await RNFS.unlink(PATH_TEMP);
     // console.log(PATH_TEMP+' removed');
 
+
 }
 
 /**
@@ -83,9 +85,20 @@ export async function createZip(transactionIdToBeSynced) {
  * @param {*} transactionIds whose data is to be synced
  */
 function _getSyncDataFromDb(transactionIdsObject) {
-    let transactionList = [], fieldDataList = [], jobList = [], serverSmsLogs = [];
+
+    let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
+    let transactionList = [],
+        fieldDataList = [],
+        jobList = [],
+        serverSmsLogs = []
     if (!transactionIdsObject || !transactionIdsObject.value) {
-        return { fieldDataList, transactionList, jobList, serverSmsLogs };
+        return {
+            fieldDataList,
+            transactionList,
+            jobList,
+            serverSmsLogs,
+            runSheetSummary
+        };
     }
     let transactionIds = transactionIdsObject.value;
     let fieldDataQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
@@ -96,7 +109,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
     jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB);
     let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
     serverSmsLogs = _getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
-    let runSheetSummary = realm.getAll(TABLE_RUNSHEET);
+
     return {
         fieldDataList,
         transactionList,
@@ -104,6 +117,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
         serverSmsLogs,
         runSheetSummary,
     }
+
 }
 
 /**
@@ -115,19 +129,20 @@ function _getSyncDataFromDb(transactionIdsObject) {
  * 
  */
 function _getDataFromRealm(dataType, query, table) {
-    if (!dataType || !query || !table) {
+    if (!dataType || !table) {
         return dataType;
     }
     let data = realm.getRecordListOnQuery(table, query);
     if (!data) {
         return dataType;
     }
-    let jsObject = null
     if (!Array.isArray(dataType)) {
         return Object.assign(dataType, data);
     }
     if (table == TABLE_FIELD_DATA) {
-        return data.map(x => Object.assign({}, x, { id: 0 })) // send id as 0 in case of field data
+        return data.map(x => Object.assign({}, x, {
+            id: 0
+        })) // send id as 0 in case of field data
     } else {
         return data.map(x => Object.assign({}, x))
     }

@@ -61,7 +61,7 @@ export function performBatchSave(...tableNamesVsDataList) {
                 console.log(error)
             }
         })
-    });
+    })
 }
 
 export function deleteRecords() {

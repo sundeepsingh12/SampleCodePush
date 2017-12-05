@@ -78,7 +78,7 @@ class SummaryListing extends Component {
                             {item[i+1].count}
                         </Text>
                     </View>
-                    <View style={[styles.marginTop5, styles.paddingBottom10]}>
+                    <View style={[styles.marginTop5]}>
                         <FlatList
                             data={item[i+1].list}
                             renderItem={({ item }) => {
@@ -127,8 +127,8 @@ class Summary extends Component {
         return (
            
             <View style={[style.slideInnerContainer]}>
-                <Text style={[styles.fontCenter, styles.fontWhite]}>{item[0]}</Text>
-                <View style={[styles.row, styles.alignCenter, styles.marginTop10]}>
+                <Text style={[styles.fontCenter, styles.fontWhite, styles.bgTransparent, styles.marginBottom10]}>{item[0]}</Text>
+                <View style={[styles.row, styles.alignCenter, styles.marginTop10, styles.bgTransparent]}>
                     <View style={[styles.justifyCenter, {flexBasis: '45%'}]}>
                         <Text style={[styles.fontLeft, styles.fontWhite, styles.fontWeight500]}>Successful</Text>
                     </View>
@@ -139,7 +139,7 @@ class Summary extends Component {
                         <Text style={[styles.fontRight, styles.fontWhite, styles.fontWeight500]}>{item[1]}</Text>
                     </View>
                 </View>
-                <View style={[styles.row, styles.alignCenter, styles.marginTop10]}>
+                <View style={[styles.row, styles.alignCenter, styles.marginTop10, styles.bgTransparent]}>
                     <View style={[styles.justifyCenter, {flexBasis: '45%'}]}>
                         <Text style={[styles.fontLeft, styles.fontWhite, styles.fontWeight500]}>Pending</Text>
                     </View>
@@ -150,7 +150,7 @@ class Summary extends Component {
                         <Text style={[styles.fontRight, styles.fontWhite, styles.fontWeight500]}>{item[2]}</Text>
                     </View>
                 </View>
-                <View style={[styles.row, styles.alignCenter, styles.marginTop10]}>
+                <View style={[styles.row, styles.alignCenter, styles.marginTop10, styles.bgTransparent]}>
                 <View style={[styles.justifyCenter, {flexBasis: '45%'}]}>
                     <Text style={[styles.fontLeft, styles.fontWhite, styles.fontWeight500]}>Failed</Text>
                 </View>
@@ -161,7 +161,7 @@ class Summary extends Component {
                     <Text style={[styles.fontRight, styles.fontWhite, styles.fontWeight500]}>{item[3]}</Text>
                 </View>
             </View>
-            <View style={[styles.row, styles.alignCenter, styles.marginTop10]}>
+            <View style={[styles.row, styles.alignCenter, styles.marginTop10, styles.bgTransparent]}>
                     <View style={[styles.justifyCenter, {flexBasis: '45%'}]}>
                         <Text style={[styles.fontLeft, styles.fontWhite, styles.fontWeight500]}>Cash Collected</Text>
                     </View>

@@ -68,10 +68,10 @@ class JobSummary {
   async getJobSummaryDataOnLastSync() {
     const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
     let filteredJobSummaryList = []
-    const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
-    const userLastTime = moment(lastSyncTime).format('YYYY-MM-DD HH:mm:ss')
+    let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
+    // const userLastTime = moment(lastSyncTime).format('YYYY-MM-DD HH:mm:ss')
     for(let index of alljobSummaryList.value){
-      if(moment(moment(index.updatedTime).format('YYYY-MM-DD HH:mm:ss')).isAfter(userLastTime)){
+      if(moment(index.updatedTime).isAfter(lastSyncTime.value)){
         delete index.updatedTime 
         filteredJobSummaryList.push(index)       
       }

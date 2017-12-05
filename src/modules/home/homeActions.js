@@ -82,7 +82,6 @@ export function pieChartCount() {
       const jobStatus = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
       const {pendingStatusIds,failStatusIds,successStatusIds} = allStatusIds
       const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
-      console.log('count',count)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
       //Update UI here
@@ -111,11 +110,8 @@ export function performSyncService(isCalledFromHome){
           syncStatus: 'Downloading'
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
-        console.log("32654859",isJobsPresent)                 ; 
         if (isJobsPresent) {
-          console.log("32654859")          
           if(PIECHART.enabled){
-            console.log("32654859")
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())
@@ -128,6 +124,7 @@ export function performSyncService(isCalledFromHome){
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService())
     } catch (error) {
+      console.log(error)
       if (error.code == 500 || error.code == 502) {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],

@@ -198,13 +198,11 @@ class RestAPI {
         console.log('uploaded', written / total)
     }).then(async(resp) => {
      responseBody = resp.text()
-    console.log('responseBody>>>>>',responseBody)
     const message = responseBody.split(",")[0]
-    console.log('message >>>>>',message);
     const syncCount = responseBody.split(",")[1]
     if(message=='success'){
       //do something
-      const currenDate = String(new Date())
+      const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss') 
       //console.log("qwe",currenDate)
       await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,currenDate)      
      await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);

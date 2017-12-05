@@ -478,7 +478,6 @@ class Sync {
   async downloadAndDeleteDataFromServer() {
     const pageNumber = 0,
       pageSize = 3
-      console.log("1234561234");
     let isLastPageReached = false,
       json, isJobsPresent = false,jobMasterIds
     const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
@@ -502,18 +501,23 @@ class Sync {
           const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
           await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+          await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
           this.showNotification(jobMasterTitleList)
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
           jobSummaryService.updateJobSummary(dataList.jobSummaries)
-          await runSheetService.updateRunSheetSummary()          
+                 
         }
       } else {
         isLastPageReached = true
       }
     }
-    await jobTransactionService.updateJobTransactionStatusId();    
+    console.log('isJobsPresent',isJobsPresent)
+    if(isJobsPresent){
+      await runSheetService.updateRunSheetSummary()  
+    }
     return isJobsPresent
+   
   }
 
   showNotification(jobMasterTitleList) {
