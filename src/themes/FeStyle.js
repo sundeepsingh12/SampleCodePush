@@ -1,6 +1,6 @@
 
 
-const themeColor = '#00897b'; 
+const themeColor = '#00796B'; 
 
 export default {
     primaryColor : themeColor,
@@ -8,7 +8,7 @@ export default {
     bgPrimary : {
         backgroundColor: themeColor
     },
-    shadeColor: themeColor + '95',
+    shadeColor: themeColor + '98',
     fontPrimary : {
         color: themeColor
     },

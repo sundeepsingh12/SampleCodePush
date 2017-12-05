@@ -7,7 +7,8 @@ import {
     View,
     Text,
     Platform,
-    SegmentedControlIOS
+    SegmentedControlIOS,
+    TouchableHighlight
 }
     from 'react-native'
 import { Icon} from 'native-base'
@@ -20,9 +21,10 @@ export default class PieChart extends Component {
     render() {
         const completedCount = this.props.count.successCounts + this.props.count.failCounts
         const total = completedCount + this.props.count.pendingCounts
-        const percentage = (total != 0) ?  Math.round(Number(((this.props.count.pendingCounts)*100)/total)) : 0
+        const percentage = (total != 0) ?  Math.round(Number(((this.props.count.successCounts)*100)/total)) : 0
         return (
-            <LinearGradient
+          <TouchableHighlight onPress={() => this.props.press()} underlayColor={"#ffffff90"}> 
+            <LinearGradient 
               colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}
               style={style.chartBlock}>
               <View style={[styles.justifyCenter, styles.paddingTop15, styles.paddingBottom15]}>
@@ -48,6 +50,7 @@ export default class PieChart extends Component {
                 </View>
               </View>
             </LinearGradient>
+          </TouchableHighlight>
           )
     }
 }

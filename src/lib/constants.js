@@ -152,6 +152,7 @@ module.exports = keyMirror({
     SET_TABS_TRANSACTIONS: null,
     JOB_ATTRIBUTE_STATUS: null,
     HUB: null,
+    LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
 
     //Realm Tables
@@ -204,11 +205,12 @@ module.exports = keyMirror({
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
-    BulkConfiguration: null,
-    BulkListing: null,
-    Sorting: null,
-    ProfileView: null,
-    Statistics: null,
+    BulkConfiguration:null,
+    BulkListing:null,
+    Sorting:null,
+    ProfileView:null,
+    Statistics:null,
+    Summary:null,
     CustomApp: null,
 
 
@@ -295,6 +297,10 @@ module.exports = keyMirror({
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
 
+    //Summary
+    SET_SUMMARY_FOR_JOBMASTER : null,
+    SET_SUMMARY_FOR_RUNSHEET : null,
+    
     //Custom App
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,

@@ -43,6 +43,7 @@ import BulkConfiguration from '../../containers/BulkConfiguration'
 import FormDetailsV2 from '../../containers/FormDetailsV2'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
+import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
 import {
   Container,
@@ -140,7 +141,12 @@ export const HomeTabNavigator = TabNavigator({
     navigationOptions: {
       header: null,
       title: 'Home',  
-      tabBarIcon: <Icon name='ios-home' style={{ fontSize: 18 }}></Icon>
+      tabBarIcon: ({ tintColor }) => (
+      <Icon
+          name='ios-home'
+          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+        />
+      ),
     }
   },
   SyncScreen: {
@@ -148,7 +154,12 @@ export const HomeTabNavigator = TabNavigator({
     navigationOptions: {
       header: null,
       title: 'Sync',
-      tabBarIcon: <Icon name='ios-sync' style={{ fontSize: 18 }}></Icon>
+      tabBarIcon: ({ tintColor }) => (
+      <Icon
+          name='ios-sync'
+          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+        />
+      ),
     }
   },
   MenuScreen: {
@@ -156,7 +167,14 @@ export const HomeTabNavigator = TabNavigator({
     navigationOptions: {
       header: null,
       title: 'Menu',
-      tabBarIcon: <Icon name='ios-menu' style={{ fontSize: 18 }}></Icon>
+      tabBarIcon: ({ tintColor }) => (
+      <Icon
+          name='ios-menu'
+          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+        />
+      ),
+
+
     }
   }
 },
@@ -165,21 +183,22 @@ export const HomeTabNavigator = TabNavigator({
     animationEnabled: true,
     tabBarOptions: {
       showIcon: true,
-      activeTintColor: '#000000',
-      inactiveTintColor: '#000000',
+      activeTintColor: styles.bgPrimary.backgroundColor,
+      inactiveTintColor: '#aaaaaa',
       style: {
         backgroundColor: '#ffffff',
         borderTopWidth: 1,
-        borderTopColor: '#f3f3f3'
+        borderTopColor: '#f3f3f3',
       },
       labelStyle: {
-        fontSize: 12
+        fontSize: 12,
+        marginTop: 0,
       },
       tabStyle: {
         alignItems: 'center',
         height: 50,
-        paddingTop: 5,
-        paddingBottom: 5
+        paddingTop: 10,
+        paddingBottom: 10
       },
       indicatorStyle: {
         height: 0
@@ -254,6 +273,9 @@ export const AppNavigator = StackNavigator({
   },
   Sequence: {
     screen: Sequence,
+  },
+  Summary: {
+    screen: Summary,
   },
   Menu: {
     screen: Menu

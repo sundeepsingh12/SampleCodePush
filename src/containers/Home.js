@@ -52,6 +52,7 @@ import {
   Sequence,
   BulkConfiguration,
   Sorting,
+  Summary,
   CustomApp,
   ON_CHANGE_STATE
 } from '../lib/constants'
@@ -106,8 +107,8 @@ class Home extends Component {
       case SORTING: {
         this.props.actions.navigateToScene(Sorting)
         break
-      }
-
+      }    
+      
       case CUSTOMAPP: {
         ((CUSTOMAPP.remark) && CUSTOMAPP.remark.length > 1) ?  this.customAppSelection() :  ((CUSTOMAPP.remark ) && CUSTOMAPP.remark.length == 1) 
                                    ? this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[0].customUrl) : this.props.actions.navigateToScene(CustomApp) ;
@@ -188,6 +189,10 @@ class Home extends Component {
     }
     return moduleView
   }
+  
+  _onPieChartPress = () => {
+    this.props.actions.navigateToScene(Summary)
+  }
 
   pieChartView() {
     if(!PIECHART.enabled) {
@@ -201,8 +206,9 @@ class Home extends Component {
       )
     }
 
+    console.log('this.props.count',this.props.count)
     if(this.props.count) {
-      return (<PieChart count = {this.props.count}/>)
+      return (<PieChart count = {this.props.count} press = {this._onPieChartPress}/>)
     }
 
     return null

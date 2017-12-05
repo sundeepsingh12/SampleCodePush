@@ -127,26 +127,45 @@ class JobStatus {
   /** Returns statusIds based on particular status category  and status_code  and also check that 
    *  job_status_tab is not hidden
    * 
-   * Possible values of statusCategory - 1,2,3
-   * @param {*} statusCategory 
-   * @param {*} code 
    * Sample Return value
    * [1,2,3]
    */
   
-  async getStatusIdsForStatusCategory(statusCategory,code) {
+  async getStatusIdsForAllStatusCategory() {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
     const tabs = await keyValueDBService.getValueFromStore(TAB)
     if (!tabs || !tabs.value) {
       throw new Error('tab missing in store')
     }
     const tabList = {}
-    tabs.value.forEach(key => tabList[key.id] = key)
+    tabs.value.forEach(key => {if(key.name.toLocaleLowerCase() !== 'hidden'){
+      tabList[key.id] = key}})
     if (!jobStatusArray || !jobStatusArray.value) {
       throw new Error('Job status missing in store')
     }
-    const filteredJobStatusIds = jobStatusArray.value.filter(jobStatus => jobStatus.statusCategory == statusCategory && jobStatus.code != code && tabList[jobStatus.tabId].name.toLocaleLowerCase() !== 'hidden').map(jobStatus => jobStatus.id)
-    return filteredJobStatusIds
+    const jobStatusList = jobStatusArray.value
+    let pendingStatusIds = [], failStatusIds =[], successStatusIds = [];
+    for(id in jobStatusList){
+        if(jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN){
+          pendingStatusIds.push(jobStatusList[id].id)
+          continue
+        }
+        if(jobStatusList[id].statusCategory == 3 ){
+          successStatusIds.push(jobStatusList[id].id)
+          continue
+        }
+        if(jobStatusList[id].statusCategory == 2  ){
+          failStatusIds.push(jobStatusList[id].id)
+        }
+    }
+   return {pendingStatusIds,failStatusIds,successStatusIds}
+  }
+
+
+  async getStatusCategoryOnStatusId(jobStatusId){
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    const category = jobStatusArray.value.filter(jobStatus => jobStatus.id ==jobStatusId &&  jobStatus.code != UNSEEN).map(id => id.statusCategory)
+    return category[0];
   }
 }
 

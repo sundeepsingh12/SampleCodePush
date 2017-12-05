@@ -30,7 +30,7 @@ import {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   CUSTOM_NAMING,
-  HUB
+  HUB,LAST_SYNC_WITH_SERVER
 } from '../../lib/constants'
 
 import {
@@ -150,6 +150,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
     await keyValueDBService.validateAndSaveData(HUB,json.hub)
+    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,moment(new Date(), 'YYYY-MM-DD HH:mm:ss'))
   }
 
   /**
