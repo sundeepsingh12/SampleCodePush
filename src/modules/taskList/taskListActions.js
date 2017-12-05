@@ -57,28 +57,3 @@ export function fetchJobs(date) {
     }
   }
 }
-
-/**
- * This function fetch whether future runsheetenabled is true or false and set its state accordingly
- */
-// export function futureRunsheetEnabled() {
-//   return async function (dispatch) {
-//     try {
-      
-//     } catch (error) {
-//       //TODO handle UI
-//       console.log(error)
-//     }
-//   }
-// }
-
-// export function setSelectedState(date) {
-//   return  function (dispatch) {
-//     try {
-//       dispatch(setState(SET_SELECTED_DATE,date))
-//     } catch (error) {
-//       //TODO handle UI
-//       console.log(error)
-//     }
-//   }
-// }

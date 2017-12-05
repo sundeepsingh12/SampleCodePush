@@ -26,7 +26,8 @@ import {
   Tab,
   Tabs,
   ScrollableTab,
-  StyleProvider
+  StyleProvider,
+  FooterTab
 } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
@@ -36,17 +37,25 @@ import styles from '../themes/FeStyle'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
+import DateTimePicker from 'react-native-modal-datetime-picker'
+import moment from 'moment'
 
 import {
   START,
   SEARCH_PLACEHOLDER
 } from '../lib/AttributeConstants'
+import {
+  IS_CALENDAR_VISIBLE,
+} from '../lib/constants'
 
 function mapStateToProps(state) {
   return {
     tabsList: state.taskList.tabsList,
     tabIdStatusIdMap: state.taskList.tabIdStatusIdMap,
     downloadingJobs: state.taskList.downloadingJobs,
+    isFutureRunsheetEnabled: state.taskList.isFutureRunsheetEnabled,
+    selectedDate: state.taskList.selectedDate,
+    isCalendarVisible: state.taskList.isCalendarVisible,
   }
 };
 
@@ -54,6 +63,7 @@ function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({
       ...taskListActions,
+      ...globalActions,
     }, dispatch)
   }
 }
@@ -67,6 +77,24 @@ class TabScreen extends Component {
 
   componentDidMount() {
     this.props.actions.fetchTabs()
+  }
+
+  _onCancel = () => {
+    this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
+  }
+
+  _onConfirm = (date) => {
+    this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
+    const formattedDate = moment(date).format('YYYY-MM-DD')
+    this.props.actions.fetchJobs(formattedDate)
+  }
+
+  _transactionsForTodayDate = () => {
+    this.props.actions.fetchJobs(moment(new Date()).format('YYYY-MM-DD'))
+  }
+
+  _showAllJobTransactions = () => {
+    this.props.actions.fetchJobs("All")
   }
 
   renderTabs() {
@@ -93,8 +121,57 @@ class TabScreen extends Component {
     return renderTabList
   }
 
+  _renderCalendar = () => {
+    if (!this.props.isFutureRunsheetEnabled) {
+      return null
+    }
+    return (
+      <Footer style={[styles.bgWhite, { borderTopWidth: 1, borderTopColor: '#f3f3f3' }]}>
+        <FooterTab style={[styles.flexBasis20]}>
+          <Button transparent
+            onPress={this._transactionsForTodayDate}
+            style={[styles.alignStart]}>
+            <Text style={[styles.fontPrimary, styles.fontSm]}>Today</Text>
+          </Button>
+        </FooterTab>
+        <FooterTab style={[styles.flexBasis60]}>
+          <DateTimePicker
+            isVisible={this.props.isCalendarVisible}
+            onConfirm={this._onConfirm}
+            onCancel={this._onCancel}
+            mode='date'
+            datePickerModeAndroid='spinner'
+          />
+          <Button transparent
+            onPress={() => { this.props.actions.setState(IS_CALENDAR_VISIBLE, true) }}
+            style={[styles.row]}>
+            <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{this._renderCalendarButtonText()}</Text>
+            <Icon name='ios-arrow-down' style={[styles.fontBlack, styles.fontSm]} />
+          </Button>
+        </FooterTab>
+        <FooterTab style={[styles.flexBasis20]}>
+          <Button transparent
+            onPress={this._showAllJobTransactions}
+            style={[styles.alignEnd]}>
+            <Text style={[styles.fontPrimary, styles.fontSm]}>All</Text>
+          </Button>
+        </FooterTab>
+
+      </Footer>
+    )
+  }
+
+  _renderCalendarButtonText() {
+    if ((this.props.selectedDate == "All")) {
+      return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>All</Text>
+    } else {
+      return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{moment(this.props.selectedDate).format('ddd, DD MMM, YYYY')}</Text>
+    }
+  }
+
   render() {
     const viewTabList = this.renderTabs()
+    const calendarView = this._renderCalendar()
     if (viewTabList.length == 0) {
       return (
         <Container>
@@ -127,6 +204,7 @@ class TabScreen extends Component {
             renderTabBar={() => <ScrollableTab />}>
             {viewTabList}
           </Tabs>
+            {calendarView}
         </Container>
       </StyleProvider>
     )
