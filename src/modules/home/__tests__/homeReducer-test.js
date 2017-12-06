@@ -7,14 +7,18 @@ import {
 import homeReducer from '../homeReducer'
 
 describe('home reducer', () => {
-    it('it should set loader',() => {
+    it('it should set loader and set newJobModules',() => {
         const action = {
             type : HOME_LOADING,
             payload: {
-                loading : false
+                loading : false,
+                newJobModules:{
+                    id:1
+                }
             }
         }
         let nextState = homeReducer(undefined,action)
         expect(nextState.loading).toBe(action.payload.loading)
+        expect(nextState.newJobModules).toBe(action.payload.newJobModules)
     })
 })

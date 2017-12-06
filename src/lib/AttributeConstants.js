@@ -1,14 +1,9 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
-import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
-import StartIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
-// import LiveIcon from '../../images/fareye-default-iconset/homescreen/live.png'
-
 import BulkIcon from '../../src/svg_components/icons/BulkIcon'
 import LiveIcon from '../../src/svg_components/icons/LiveIcon'
 import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
 import TaskIcon from '../../src/svg_components/icons/TaskIcon'
-// import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
 import React, { Component } from 'react'
 module.exports = {
 
@@ -278,83 +273,24 @@ module.exports = {
     NEW_PASSWORD: 'New Password',
     CONFIRM_NEW_PASSWORD: 'Confirm New Password',
 
-    //App Modules Constants
-    BACKUP: {
-        appModuleId: 17,
-        displayName: 'Backup',
-        enabled: false,
-    },
-    BLUETOOTH: {
-        appModuleId: 16,
-        displayName: 'Pair Bluetooth Device',
-        enabled: false,
-    },
-    BULK: {
-        appModuleId: 1,
-        displayName: 'Bulk Update',
-        enabled: false,
-        icon: <BulkIcon />,
-    },
-    LIVE: {
-        appModuleId: 13,
-        displayName: 'Live',
-        enabled: false,
-        icon: <LiveIcon />,
-    },
-    OFFLINEDATASTORE: {
-        appModuleId: 15,
-        displayName: 'Sync Datastore',
-        enabled: false,
-    },
-    PIECHART: {
-        appModuleId: 5,
-        displayName: 'Pie Chart',
-        enabled: false,
-    },
-    PROFILE: {
-        appModuleId: 14,
-        displayName: 'Profile',
-        enabled: false,
-        icon: 'md-person',
-    },
-    STATISTIC: {
-        appModuleId: 7,
-        displayName: 'My Stats',
-        enabled: false,
-        icon: 'md-trending-up',
-    },
-    SEQUENCEMODULE: {
-        appModuleId: 2,
-        displayName: 'Sequence',
-        enabled: false,
-        icon: <SequenceIcon />,
-    },
-    START: {
-        appModuleId: 4,
-        displayName: 'All Tasks',
-        enabled: false,
-        icon: <TaskIcon />
-    },
-    SUMMARY: {
-        appModuleId: 8,
-        displayName: '',
-        enabled: false,
-    },
-    SORTING: {
-        appModuleId: 26,
-        displayName: 'Sort Parcels',
-        enabled: false,
-        icon: <SequenceIcon />,
-    },
-    CUSTOMAPP:{
-        appModuleId:12,
-        displayName: 'Web URL',
-        enabled: false,
-        remark: null,
-        icon: <SequenceIcon />
-    },
-
-
+    // App Modules Constants
+    BACKUP_ID: 17,
+    BLUETOOTH_ID: 16,
+    BULK_ID: 1,
+    LIVE_ID: 13,
+    OFFLINEDATASTORE_ID: 15,
+    PIECHART_ID: 5,
+    PROFILE_ID: 14,
+    STATISTIC_ID: 7,
+    SEQUENCEMODULE_ID: 2,
+    START_ID: 4,
+    SUMMARY_ID: 8,
+    SORTING_ID: 26,
+    CUSTOMAPP_ID: 12,
+    NEWJOB_ID: 3, 
+    EZE_TAP_ID: 10,
+    M_SWIPE_ID: 9,
+   
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
 
@@ -435,4 +371,7 @@ module.exports = {
     CREATION_DATE: 'CREATION_DATE',
     TRANSACTION_DATE: 'TRANSACTION_DATE',
     JOB_ETA: 'JOB_ETA',
+
+    //ModuleCustomization
+    NEW_JOB: 'New Task',
 }

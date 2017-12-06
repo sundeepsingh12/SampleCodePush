@@ -89,8 +89,8 @@ class CustomApp extends Component {
     }
 
     componentDidMount() {
-        if(this.props.navigation.state.params != null && this.props.navigation.state.params != undefined ){
-            this.props.actions.setState(START_FETCHING_URL,this.props.navigation.state.params)
+        if(this.props.navigation.state.params.customUrl != null && this.props.navigation.state.params.customUrl != undefined ){
+            this.props.actions.setState(START_FETCHING_URL,this.props.navigation.state.params.customUrl)
         }
     }
 
@@ -110,7 +110,7 @@ class CustomApp extends Component {
                                 <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                             </TouchableOpacity>
                             <View style={[style.headerBody]}t>
-                            {renderIf( this.props.navigation.state,(!this.props.navigation.state.params)?
+                            {renderIf( this.props.navigation.state,(!this.props.navigation.state.params.customUrl)?
                                 <View style={[{height: 30 }]}>
                                     <Input
                                         onEndEditing = {(event) => this.onSubmit(event.nativeEvent.text)}

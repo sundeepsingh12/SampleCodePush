@@ -53,7 +53,11 @@ class NewJob extends Component {
   }
 
   componentDidMount() {
-    this.props.actions.getMastersWithNewJob()
+    if (this.props.navigation.state.params.jobMasterIdList) {
+      this.props.actions.getMastersFromMasterIds(this.props.navigation.state.params.jobMasterIdList)
+    } else {
+      this.props.actions.getMastersWithNewJob()
+    }
   }
 
   renderData = (item) => {
@@ -90,7 +94,7 @@ class NewJob extends Component {
                 </View>
               </View>
             </Body>
-            
+
           </Header>
           <Content style={[styles.bgWhite]}>
             <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Type</Text>

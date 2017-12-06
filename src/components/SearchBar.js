@@ -11,7 +11,8 @@ import {
 } from 'native-base';
 import styles from '../themes/FeStyle'
 import _ from 'underscore'
-
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 export default class SearchBar extends Component {
 
     constructor(props) {
@@ -51,10 +52,9 @@ export default class SearchBar extends Component {
                                     this.props.fetchDataStoreAttrValueMap(searchText, false)
                                 }}
                                 value={this.props.searchText}
-                                placeholderTextColor={'rgba(255,255,255,.4)'}
-                                style={[style.headerSearch]} />
+                                style={[style.headerSearch, styles.bgGray]} />
                             {renderIf(this.props.isScannerEnabled, <Button small transparent style={[style.headerQRButton]}>
-                                <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXl]} />
+                                <Icon name="md-qr-scanner" style={[styles.fontBlack, styles.fontXl]} />
                             </Button>)}
                         </View>
                         {renderIf(this.state.isSearchVisible, <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
@@ -82,7 +82,6 @@ const style = StyleSheet.create({
         backgroundColor: '#1260be',
         borderRadius: 2,
         height: 40,
-        color: '#ffffff',
         fontSize: 14
     },
     headerQRButton: {

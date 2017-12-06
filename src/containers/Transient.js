@@ -52,17 +52,15 @@ class Transient extends Component {
     }
 
     componentDidMount() {
-        if (_.size(this.props.navigation.state.params.currentStatus.nextStatusList) == 1) {
-            this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.nextStatusList[0].id,
-                this.props.navigation.state.params.currentStatus.nextStatusList[0].name)
-        }
         this.props.actions.setStateFromNavigationParams(
             this.props.navigation.state.params.formLayoutState,
             this.props.formLayoutStates,
             this.props.navigation.state.params.currentStatus,
-        )
+            this.props.navigation.state.params.contactData,
+            this.props.navigation.state.params.jobTransaction,
+            this.props.navigation.state.params.jobMasterId)
     }
-   
+
     navigateToFormLayout(statusId, statusName) {
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,

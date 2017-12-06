@@ -49,6 +49,7 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
             dispatch(setState(LOADER_ACTIVE, true))
             let totalAmount = await transientStatusService.calculateTotalAmount(commonData.amount, recurringData)
             await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(previousFormLayoutState, recurringData, jobMasterId, statusId, false)
+            dispatch(setState(LOADER_ACTIVE, false))
             dispatch(navigateToScene(CheckoutDetails, {
                 commonData: commonData.commonData,
                 recurringData,
@@ -69,13 +70,15 @@ export function storeState(saveActivatedState, screenName, jobMasterId, navigati
             let { differentData, arrayFormElement } = await transientStatusService.convertMapToArrayOrArrayToMap(cloneSaveActivatedState.differentData, cloneNavigationFormLayoutStates, true)
             cloneSaveActivatedState.differentData = differentData
             cloneNavigationFormLayoutStates = arrayFormElement
-            await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, {
+            let storeObject = {}
+            storeObject[jobMasterId] = {
                 saveActivatedState: cloneSaveActivatedState,
                 screenName,
                 jobMasterId,
                 navigationParams,
                 navigationFormLayoutStates: cloneNavigationFormLayoutStates
-            })
+            }
+            await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, storeObject)
         } catch (error) {
             console.log(error)
         }
@@ -83,13 +86,14 @@ export function storeState(saveActivatedState, screenName, jobMasterId, navigati
 }
 
 
-export function clearStateAndStore(goToHome) {
+export function clearStateAndStore(goToHome, jobMasterId) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
+            let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
+            delete saveActivatedData.value[jobMasterId]
+            await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, saveActivatedData.value)
             dispatch(setState(SAVE_ACTIVATED_INITIAL_STATE, {}))
-            await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
-            dispatch(setState(LOADER_ACTIVE, false))
             if (goToHome) {
                 dispatch(navigateToScene(HomeTabNavigatorScreen, {}))
             }

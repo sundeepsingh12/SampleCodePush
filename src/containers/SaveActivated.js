@@ -137,12 +137,12 @@ class SaveActivated extends Component {
 
     _discard = () => {
         if (!this.props.navigation.state.params.calledFromNewJob) {
-            this.props.actions.clearStateAndStore(false)
+            this.props.actions.clearStateAndStore(false, this.props.navigation.state.params.jobMasterId)
             this.props.actions.setState(SET_FORM_LAYOUT_STATE,
                 _.values(this.props.navigation.state.params.navigationFormLayoutStates)[_.size(this.props.navigation.state.params.navigationFormLayoutStates) - 1])
             this.props.navigation.goBack()
         } else {
-            this.props.actions.clearStateAndStore(true)
+            this.props.actions.clearStateAndStore(true, this.props.navigation.state.params.jobMasterId)
         }
     }
 

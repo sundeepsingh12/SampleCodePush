@@ -5,6 +5,7 @@ import {
   HOME_LOADING,
   JOB_DOWNLOADING_STATUS,
   USER,
+  SET_MODULES
 } from '../../lib/constants'
 
 import {
@@ -22,14 +23,19 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 /**
  * This action enables modules for particular user
  */
-export function fetchModulesList() {
+export function fetchModulesList(modules, pieChart, menu) {
   return async function (dispatch) {
     try {
       dispatch(setState(HOME_LOADING, { loading: true }))
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
-      moduleCustomizationService.getActiveModules(appModulesList.value, user.value)
-      dispatch(setState(HOME_LOADING, { loading: false }))
+      const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu)
+      dispatch(setState(SET_MODULES, {
+        loading: false,
+        modules: result.modules,
+        pieChart: result.pieChart,
+        menu: result.menu
+      }))
     } catch (error) {
       console.log(error)
     }

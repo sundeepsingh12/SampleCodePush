@@ -26,10 +26,9 @@ import { formLayoutEventsInterface } from '../../services/classes/formLayout/For
 import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
-import { setState } from '../global/globalActions'
+import { setState ,navigateToScene} from '../global/globalActions'
 import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { navigateToScene } from '../../modules/global/globalActions'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {

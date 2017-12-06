@@ -6,12 +6,14 @@ import {
     SaveActivated,
     CheckoutDetails,
     POPULATE_DATA,
+    JOB_MASTER
 } from '../../lib/constants'
 
 import {newJob} from '../../services/classes/NewJob'
 import { setState, navigateToScene } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { transientStatusService } from '../../services/classes/TransientStatusService'
+import  _ from 'lodash'
 
 
 export function getMastersWithNewJob() {
@@ -21,6 +23,13 @@ export function getMastersWithNewJob() {
     }
 }
 
+export function getMastersFromMasterIds(jobMasterIds) {
+    return async function (dispatch) {
+        const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
+        let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters.value, jobMasterIds)
+        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
+    }
+}
 
 export function getStatusAndIdForJobMaster(jobMasterId) {
     return async function (dispatch) {

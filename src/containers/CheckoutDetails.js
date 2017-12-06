@@ -34,7 +34,7 @@ import {
     View_Parcel_Summary,
     Sign_Off_Summary
 } from '../lib/AttributeConstants'
-
+import Loader from '../components/Loader'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
@@ -46,6 +46,12 @@ import * as saveActivatedActions from '../modules/saveActivated/saveActivatedAct
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
 import _ from 'lodash'
 
+
+function mapStateToProps(state) {
+    return {
+        loading: state.saveActivated.loading,
+    }
+};
 /*
  * Bind all the actions
  */
@@ -74,7 +80,7 @@ class CheckoutDetails extends Component {
             })
         }
         BackHandler.addEventListener(HardwareBackPress, () => {
-            this.props.actions.clearStateAndStore(true)
+            this.props.actions.clearStateAndStore(true, this.props.navigation.state.params.jobMasterId)
             return true
         })
     }
@@ -115,6 +121,11 @@ class CheckoutDetails extends Component {
     }
 
     render() {
+        if (this.props.loading) {
+            return (
+                <Loader />
+            )
+        }
         if (this.state.isParcelSummaryVisible) {
             return (<SummaryDetails recurringData={this.props.navigation.state.params.recurringData} showParcelSummary={this._showParcelSummary} />)
         }
@@ -228,7 +239,7 @@ class CheckoutDetails extends Component {
                     <Footer style={[style.footer]}>
                         <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                             <Button onPress={() => {
-                                this.props.actions.clearStateAndStore(true)
+                                this.props.actions.clearStateAndStore(true, this.props.navigation.state.params.jobMasterId)
                             }}>
                                 <Text style={[styles.fontPrimary, styles.fontDefault]}>{Return_To_Home}</Text>
                             </Button>
@@ -279,4 +290,4 @@ const style = StyleSheet.create({
     },
 
 });
-export default connect(null, mapDispatchToProps)(CheckoutDetails)
+export default connect(mapStateToProps, mapDispatchToProps)(CheckoutDetails)

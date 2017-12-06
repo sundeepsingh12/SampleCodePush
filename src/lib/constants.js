@@ -77,6 +77,10 @@ module.exports = keyMirror({
     CLEAR_HOME_STATE: null,
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
+    SET_MODULES: null,
+   
+    //Home Container
+    PIECHART: null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -202,6 +206,7 @@ module.exports = keyMirror({
     SaveActivated: null,
     Transient: null,
     CheckoutDetails: null,
+    NewJob: null,
     NewJobStatus: null,    
     BulkConfiguration:null,
     BulkListing:null,
@@ -319,6 +324,24 @@ module.exports = keyMirror({
     START_FETCHING_URL: null,
     END_FETCHING_URL:  null,
     ON_CHANGE_STATE: null,
+
+    //Menu Container
+    PROFILE: null,
+    STATISTIC: null,
+    EZETAP: null,
+    MSWIPE: null,
+    BACKUP: null,
+    OFFLINEDATASTORE: null,
+    BLUETOOTH: null,
+    BULK: null,
+    LIVE: null,
+    OFFLINEDATASTORE: null,
+    PIECHART: null,
+    START: null,
+    SEQUENCEMODULE: null,
+    SUMMARY: null,
+    SORTING: null,
+    CUSTOMAPP: null,
 })
 
 
