@@ -1,13 +1,14 @@
 import {
   JOB_STATUS,
-  UNSEEN
+  UNSEEN,
+  TAB,
 } from '../../lib/constants'
 
 import {
   keyValueDBService
 } from './KeyValueDBService'
 
-import _ from 'underscore'
+import _ from 'lodash'
 
 class JobStatus {
 
@@ -123,6 +124,49 @@ class JobStatus {
     return filteredJobStatusIds
   }
 
+  /** Returns statusIds based on particular status category  and status_code  and also check that 
+   *  job_status_tab is not hidden
+   * 
+   * Sample Return value
+   * [1,2,3]
+   */
+  
+  async getStatusIdsForAllStatusCategory() {
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    const tabs = await keyValueDBService.getValueFromStore(TAB)
+    if (!tabs || !tabs.value) {
+      throw new Error('tab missing in store')
+    }
+    const tabList = {}
+    tabs.value.forEach(key => {if(key.name.toLocaleLowerCase() !== 'hidden'){
+      tabList[key.id] = key}})
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error('Job status missing in store')
+    }
+    const jobStatusList = jobStatusArray.value
+    let pendingStatusIds = [], failStatusIds =[], successStatusIds = [];
+    for(id in jobStatusList){
+        if(jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN){
+          pendingStatusIds.push(jobStatusList[id].id)
+          continue
+        }
+        if(jobStatusList[id].statusCategory == 3 ){
+          successStatusIds.push(jobStatusList[id].id)
+          continue
+        }
+        if(jobStatusList[id].statusCategory == 2  ){
+          failStatusIds.push(jobStatusList[id].id)
+        }
+    }
+   return {pendingStatusIds,failStatusIds,successStatusIds}
+  }
+
+
+  async getStatusCategoryOnStatusId(jobStatusId){
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    const category = jobStatusArray.value.filter(jobStatus => jobStatus.id ==jobStatusId &&  jobStatus.code != UNSEEN).map(id => id.statusCategory)
+    return category[0];
+  }
 }
 
 export let jobStatusService = new JobStatus()

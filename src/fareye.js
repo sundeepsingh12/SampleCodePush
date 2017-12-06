@@ -2,9 +2,6 @@
 import React, { Component } from 'react'
 import {
   AppRegistry,
-  StyleSheet,
-  View,
-  Text
 } from 'react-native'
 
 /**
@@ -102,43 +99,6 @@ function getInitialState() {
   return _initState
 }
 
-const styles = StyleSheet.create({
-  tabBar: {
-    height: 60,
-    borderTopWidth: 1,
-    borderColor: '#d3d3d3',
-    backgroundColor: '#ffffff'
-  },
-
-  mainHeader: {
-    backgroundColor: 'white'
-  },
-  mainTitle: {
-    fontSize: 16,
-    fontWeight: 'normal',
-  }
-})
-
-
-
-
-/**
- * ## TabIcon
- *
- * Displays the icon for the tab w/ color dependent upon selection
- */
-class TabIcon extends React.Component {
-  render() {
-    var color = this.props.selected ? '#0091EA' : '#878787'
-    return (
-      <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', alignSelf: 'center' }}>
-        <Ionicons style={{ color: color }} name={this.props.iconName} size={26} />
-        <Text style={{ color: color, fontSize: 12, marginTop: 3 }}>{this.props.title}</Text>
-      </View>
-    )
-  }
-}
-
 /**
  * ## Native
  *
@@ -151,7 +111,7 @@ class TabIcon extends React.Component {
 export default function native(platform) {
   // configureStore will combine modules from FarEye and Main application
       // it will then create the store based on aggregate state from all modules
- const store = configureStore(getInitialState())
+      const store = configureStore(getInitialState())
 
       store.dispatch(setPlatform(platform))
       store.dispatch(setVersion(VERSION))

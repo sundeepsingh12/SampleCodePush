@@ -16,7 +16,8 @@ const jobSummary = {
             "date": {"type": "string","required":true,"format":"date-time"},
             "count": {"type": "integer","required":true},
             "jobMasterId": {"type": "number","required":true},
-            "jobStatusId": {"type": "number","required":true}
+            "jobStatusId": {"type": "number","required":true},
+            "updatedTime": {"type":"string","required":false}
         }
     }
 };

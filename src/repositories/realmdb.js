@@ -9,9 +9,9 @@ import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
 import TrackLogs from './schema/trackLogs'
 import ServerSmsLog from './schema/serverSmsLog'
-import _ from 'underscore'
+import _ from 'lodash'
 
-const schemaVersion = 31;
+const schemaVersion = 32;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];
 
 let realm = new Realm({
@@ -61,7 +61,7 @@ export function performBatchSave(...tableNamesVsDataList) {
                 console.log(error)
             }
         })
-    });
+    })
 }
 
 export function deleteRecords() {
@@ -119,6 +119,15 @@ export function deleteRecordList(tableName, valueList, property) {
     });
 }
 
+
+export function updateRecordOnMultipleProperty(tableName, valueList,propertyList,count) {
+    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
+    console.log('123',filteredRecords,propertyList,count)    
+    realm.write(() => {
+        _.forEach(filteredRecords, record => record[propertyList[record.id]] += count[record.id])
+    });
+}
+
 /**
  * 
  * @param {*} tableName 
@@ -126,6 +135,13 @@ export function deleteRecordList(tableName, valueList, property) {
 export function getAll(tableName) {
     return realm.objects(tableName);
 }
+
+// export function updateRecordOnTableListData(tableName,tableListData,valueList) {
+//     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
+//     realm.write(() => {
+//         _.forEach(filteredRecords, record => record = tableListData[record.id])
+//     });
+// }
 
 /**A generic method for getting value list based on particular property in Table
  * Eg - Returning all JobTransactionIds From Db

@@ -10,7 +10,6 @@ import {
   jobStatusService
 } from '../classes/JobStatus'
 
-import _ from 'underscore'
 
 describe('test cases for getAllIdsForCode', () => {
 

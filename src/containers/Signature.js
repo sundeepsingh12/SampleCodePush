@@ -59,7 +59,6 @@ class Signature extends Component {
             await this.props.actions.saveSignature(result,
                 this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
                 this.props.navigation.state.params.formElements,
-                this.props.navigation.state.params.nextEditable,
                 this.props.navigation.state.params.isSaveDisabled)
         }
         this.props.navigation.goBack()

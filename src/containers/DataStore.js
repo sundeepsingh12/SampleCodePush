@@ -26,11 +26,11 @@ import {
     Text,
     Footer,
     Toast
-} from 'native-base';
-import _ from 'underscore'
+} from 'native-base'
 import {
     EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
+import _ from 'lodash'
 
 function mapStateToProps(state) {
     return {
@@ -141,11 +141,10 @@ class DataStore extends Component {
         this.props.actions.fillKeysAndSave(dataStoreAttributeValueMap,
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled,
             dataStoreValue,
-            this.props.isMinMaxValidation,
-        )
+            this.props.navigation.state.params.calledFromArray,
+            this.props.navigation.state.params.rowId)
         this.setDetailsFor()
         this._goBack()
     }
@@ -162,7 +161,7 @@ class DataStore extends Component {
                 position: "bottom" | "center",
                 buttonText: 'Okay',
                 type: 'danger',
-                duration:5000
+                duration: 5000
             })
         }
         if (this.props.detailsVisibleFor == -1) {
@@ -197,9 +196,10 @@ class DataStore extends Component {
                                         this.props.actions.onSave(
                                             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
                                             this.props.navigation.state.params.formElements,
-                                            this.props.navigation.state.params.nextEditable,
                                             this.props.navigation.state.params.isSaveDisabled,
-                                            this.props.searchText
+                                            this.props.searchText,
+                                            this.props.navigation.state.params.calledFromArray,
+                                            this.props.navigation.state.params.rowId
                                         )
                                         this._goBack()
                                     }}>

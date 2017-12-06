@@ -10,33 +10,34 @@ import {
   Platform,
   TouchableHighlight,
   FlatList,
+  SectionList,
   ActivityIndicator,
   TouchableOpacity,
+  Text
 }
   from 'react-native'
 
-import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Text, Header, Icon, Button } from 'native-base';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Header,Separator, Icon, Footer, FooterTab, Button } from 'native-base';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import * as globalActions from '../modules/global/globalActions'
-import _ from 'underscore'
+import _ from 'lodash'
 import renderIf from '../lib/renderIf'
-import Swipeable from 'react-native-swipeable'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
-import { NavigationActions } from 'react-navigation'
 import {
-  JobDetails
+  JobDetails,
+  TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION,
 } from '../lib/constants'
 import JobListItem from '../components/JobListItem'
-
+import moment from 'moment'
 
 function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
-    isRefreshing: state.listing.isRefreshing
+    isRefreshing: state.listing.isRefreshing,
   }
 }
 
@@ -50,12 +51,8 @@ class TaskListScreen extends Component {
 
   componentDidMount() {
     if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
-      this.props.actions.fetchJobs()
+      this.props.actions.fetchJobs(moment().format('YYYY-MM-DD'))
     }
-  }
-
-  toggleStatus() {
-    console.log('toggle button handler')
   }
 
   navigateToScene = (item) => {
@@ -71,34 +68,83 @@ class TaskListScreen extends Component {
     return (
       <JobListItem
         data={item}
-        onPressItem={() => {this.navigateToScene(item)}}
+        onPressItem={() => { this.navigateToScene(item) }}
       />
     )
   }
 
+  renderListForAll() {
+    let sectionList = []
+    let listObject = this.props.jobTransactionCustomizationList
+    if (!_.isEmpty(listObject)) {
+      for (let key in listObject) {
+        let sectionListObject = {
+          data: listObject[key],
+          key: key,
+        }
+        sectionList.push(sectionListObject)
+      }
+    }
+    return sectionList
+  }
+
   renderList() {
-    const list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
+    let list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
     list.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
     return list
+  }  
+
+  renderItem = (row) => {
+    return (
+      <JobListItem
+        data={row.item}
+        onPressItem={() => { this.navigateToScene(row.item) }}
+      />
+    )
+  }
+
+  renderSectionHeader = (row) => {
+    return (
+      <Separator bordered>
+        <Text>{row.section.key}</Text>
+      </Separator>  
+    );
+  }
+
+  flatlist() {
+    return (
+      <FlatList
+        data={this.renderList()}
+        renderItem={({ item }) => this.renderData(item)}
+        keyExtractor={item => item.id}
+      />
+    )
+  }
+
+  sectionlist() {
+    return (
+      <SectionList
+        sections={this.renderListForAll()}
+        renderItem={this.renderItem}
+        renderSectionHeader={this.renderSectionHeader}
+      />
+    )
   }
 
   render() {
     if (this.props.isRefreshing) {
       return <Loader />
     } else {
+      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList)) ? this.sectionlist() : this.flatlist()
       return (
         <Container>
-          <View style={{ flex: 1, flexDirection: 'column', bottom: 5, marginLeft: 5, marginRight: 5 }}>
+          <Content>
             <List>
-              <FlatList
-                data={this.renderList()}
-                renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => item.id}
-              />
+              {joblist}
             </List>
-          </View>
+          </Content>
         </Container>
       )
     }

@@ -70,6 +70,7 @@ module.exports = keyMirror({
 
     //Home Actions
     HOME_LOADING: null,
+    CHART_LOADING: null,
     JOB_FETCHING_START: null,
     JOB_FETCHING_END: null,
     SET_TABS_LIST: null,
@@ -81,6 +82,11 @@ module.exports = keyMirror({
    
     //Home Container
     PIECHART: null,
+    FUTURE_RUNSHEET_ENABLED: null,
+    SET_SELECTED_DATE: null,
+    IS_CALENDAR_VISIBLE: null,
+    SYNC_ERROR: null,
+    SYNC_STATUS: null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -151,6 +157,8 @@ module.exports = keyMirror({
     JOB_ATTRIBUTE_STATUS: null,
     HUB: null,
     SAVE_ACTIVATED: null,
+    LAST_SYNC_WITH_SERVER: null,
+    CUSTOM_NAMING: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -189,6 +197,7 @@ module.exports = keyMirror({
 
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
+    NEXT_FOCUS: null,
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,
@@ -213,7 +222,8 @@ module.exports = keyMirror({
     Sorting:null,
     ProfileView:null,
     Statistics:null,
-    CustomApp:null,
+    Summary:null,
+    CustomApp: null,
 
 
     //Skulisting Actions
@@ -270,7 +280,7 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
     TOGGLE_RESEQUENCE_BUTTON: null,
-    PREPARE_UPDATE_LIST:null,
+    PREPARE_UPDATE_LIST: null,
 
     //New Job
     NEW_JOB_MASTER: null,
@@ -298,12 +308,12 @@ module.exports = keyMirror({
     Cancel: null,
     Checkout:null,
     //Bulk Module
-    START_FETCHING_BULK_CONFIG:null,
-    STOP_FETCHING_BULK_CONFIG:null,
-    START_FETCHING_BULK_TRANSACTIONS:null,
-    STOP_FETCHING_BULK_TRANSACTIONS:null,
-    TOGGLE_JOB_TRANSACTION_LIST_ITEM:null,
-    TOGGLE_ALL_JOB_TRANSACTIONS:null,
+    START_FETCHING_BULK_CONFIG: null,
+    STOP_FETCHING_BULK_CONFIG: null,
+    START_FETCHING_BULK_TRANSACTIONS: null,
+    STOP_FETCHING_BULK_TRANSACTIONS: null,
+    TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
+    TOGGLE_ALL_JOB_TRANSACTIONS: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -320,9 +330,13 @@ module.exports = keyMirror({
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
 
+    //Summary
+    SET_SUMMARY_FOR_JOBMASTER : null,
+    SET_SUMMARY_FOR_RUNSHEET : null,
+    
     //Custom App
     START_FETCHING_URL: null,
-    END_FETCHING_URL:  null,
+    END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
 
     //Menu Container
@@ -336,7 +350,6 @@ module.exports = keyMirror({
     BULK: null,
     LIVE: null,
     OFFLINEDATASTORE: null,
-    PIECHART: null,
     START: null,
     SEQUENCEMODULE: null,
     SUMMARY: null,

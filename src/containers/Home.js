@@ -3,9 +3,10 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { Component } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
+import renderIf from '../lib/renderIf.js'
 import {
   Container,
   Content,
@@ -33,6 +34,7 @@ import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import CircularProgress from '../svg_components/components/CircularProgress'
+import PieChart from '../components/PieChart'
 import {
   BULK_ID,
   LIVE_ID,
@@ -53,6 +55,7 @@ import {
   Sequence,
   BulkConfiguration,
   Sorting,
+  Summary,
   CustomApp,
   NewJob
 } from '../lib/constants'
@@ -63,7 +66,10 @@ function mapStateToProps(state) {
     loading: state.home.loading,
     modules: state.home.modules,
     pieChart: state.home.pieChart,
-    menu: state.home.menu
+    menu: state.home.menu,
+    moduleLoading: state.home.moduleLoading,
+    chartLoading: state.home.chartLoading,
+    count: state.home.count,
   }
 }
 
@@ -168,48 +174,14 @@ class Home extends Component {
           <Button transparent>
             <Icon style={style.headerIcon} name='ios-search' />
           </Button>
-          <Button transparent>
+          {/* <Button transparent>
             <Icon style={style.headerIcon} name='ios-chatbubbles' />
-          </Button>
-          <Button transparent>
+          </Button> */}
+          {/* <Button transparent>
             <Icon style={style.headerIcon} name='md-notifications' />
-          </Button>
+          </Button> */}
         </Right>
       </Header>
-    )
-  }
-
-  pieChartView() {
-    if (!this.props.pieChart[PIECHART].enabled) {
-      return null
-    }
-    return (
-      <LinearGradient
-        colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}
-        style={style.chartBlock}>
-        <View style={[styles.justifyCenter, styles.paddingTop15, styles.paddingBottom15]}>
-          <CircularProgress percentage={percentage} style={[{ backgroundColor: '#green' }]}>
-            <View style={[styles.justifyCenter, styles.alignCenter]}>
-              <Text style={{ fontSize: 40, color: '#ffffff', fontWeight: '500' }}>{percentage}</Text>
-              <Text style={{ fontSize: 18, color: '#ffffff' }}>pending</Text>
-            </View>
-          </CircularProgress>
-        </View>
-        <View style={[styles.row, styles.justifySpaceAround]}>
-          <View>
-            <Text
-              style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>200</Text>
-            <Text
-              style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>total</Text>
-          </View>
-          <View>
-            <Text
-              style={[styles.fontWhite, styles.fontXl, styles.bold, styles.fontCenter]}>165</Text>
-            <Text
-              style={[styles.fontWhite, styles.fontSm, styles.fontCenter]}>done</Text>
-          </View>
-        </View>
-      </LinearGradient>
     )
   }
 
@@ -230,12 +202,36 @@ class Home extends Component {
               style={[styles.fontWeight500, styles.fontLg]}>{modulesList[index].displayName}</Text>
           </Body>
           <Right>
-            <Icon name="arrow-forward" />
+            <Icon name="ios-arrow-forward" />
           </Right>
         </ListItem>
       )
     }
     return moduleView
+  }
+  
+  _onPieChartPress = () => {
+    this.props.actions.navigateToScene(Summary)
+  }
+
+  pieChartView() {
+    if(!this.props.pieChart[PIECHART].enabled) {
+      return null
+    }
+
+    if(this.props.chartLoading) {
+      return (
+        <ActivityIndicator animating={this.props.chartLoading} 
+        style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
+      )
+    }
+
+    console.log('this.props.count',this.props.count)
+    if(this.props.count) {
+      return (<PieChart count = {this.props.count} press = {this._onPieChartPress}/>)
+    }
+
+    return null
   }
 
   render() {

@@ -68,28 +68,6 @@ function mapDispatchToProps(dispatch) {
 
 class Menu extends Component {
 
-  renderModuleView(modulesList) {
-    let moduleView = []
-    for (let index in modulesList) {
-      moduleView.push(
-        <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-          <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter, styles.bgPrimary]}>
-            <Icon name="md-person" style={[styles.fontWhite, styles.fontXl]} />
-          </View>
-          <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
-            <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }]}>
-              <Text style={[styles.fontDefault]}>
-                Profile
-            </Text>
-              <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-            </View>
-          </View>
-        </View>
-      )
-    }
-    return moduleView
-  }
-
   renderTextView(text, key, isLast, icon) {
     return (
       <View key={key} style={[styles.justifySpaceBetween, icon ? styles.marginLeft10 : null, styles.flex1]}>
@@ -201,9 +179,9 @@ class Menu extends Component {
             </View>
 
             {/*Card 2*/}
-            <View style={[styles.bgWhite, paymentView.length ? styles.marginBottom10 : null]}>
+            {/* <View style={[styles.bgWhite, paymentView.length ? styles.marginBottom10 : null]}>
               {paymentView}
-            </View>
+            </View> */}
 
             {/*Card 3*/}
             <View style={[styles.bgWhite, styles.marginBottom10]}>

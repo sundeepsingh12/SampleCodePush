@@ -99,8 +99,6 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
-      dispatch(onChangePassword(''))
-      dispatch(onChangeUsername(''))
     } catch (error) {
       throw error
     }

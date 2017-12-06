@@ -86,6 +86,11 @@ var InitialState = Record({
             enabled: false,
         },
     },
+    syncStatus: null,
+    unsyncedTransactionList: [],
+    moduleLoading: false,
+    chartLoading: false,
+    count: null,
 })
 
 export default InitialState

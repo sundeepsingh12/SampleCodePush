@@ -9,8 +9,12 @@ import {
   JOB_LISTING_END,
   JOB_STATUS,
   SET_TABS_LIST,
-  TAB
+  CUSTOM_NAMING,
+  FUTURE_RUNSHEET_ENABLED,
+  TAB,
+  SET_SELECTED_DATE,
 } from '../../lib/constants'
+import moment from 'moment'
 
 /**
  * This function fetches tabs list and set in state
@@ -36,12 +40,16 @@ export function fetchTabs() {
 /**
  * This function fetches jobTransaction from db and set jobTransactionCustomizationListDTO in state
  */
-export function fetchJobs() {
+export function fetchJobs(date) {
   return async function (dispatch) {
     try {
+      const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
+      dispatch(setState(FUTURE_RUNSHEET_ENABLED, customNaming.value.enableFutureDateRunsheet))
+      dispatch(setState(SET_SELECTED_DATE,date))      
       dispatch(setState(JOB_LISTING_START))
       const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO)
+      let selectedDate = customNaming.value.enableFutureDateRunsheet ? date : null
+      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,null,null,selectedDate)
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }))
     } catch (error) {
       //TODO handle UI

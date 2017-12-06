@@ -1,12 +1,12 @@
 'use strict'
 import _ from 'lodash'
 import {
-    OBJECTSAROJFAREYE,
-    ARRAYSAROJFAREYE,
+    ARRAY_SAROJ_FAREYE,
+    OBJECT_SAROJ_FAREYE,
     INVALID_CONFIG_ERROR
 } from '../../lib/AttributeConstants'
 import {
-    ON_BLUR,
+    NEXT_FOCUS,
 } from '../../lib/constants'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
@@ -53,12 +53,12 @@ class ArrayFieldAttribute {
             arrayObject = {
                 fieldAttributeMasterId: arrayElements[rowId].arrayMainObject.id,
                 attributeTypeId: arrayElements[rowId].arrayMainObject.attributeTypeId,
-                value: OBJECTSAROJFAREYE,
+                value: OBJECT_SAROJ_FAREYE,
                 childDataList
             }
             arrayChildDataList.push(arrayObject)
         }
-        arrayParentItem.value = ARRAYSAROJFAREYE
+        arrayParentItem.value = ARRAY_SAROJ_FAREYE
         arrayParentItem.childDataList = arrayChildDataList
         let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayParentItem.childDataList, jobTransactionId, arrayParentItem.positionId, latestPositionId)
         return fieldDataListWithLatestPositionId
@@ -74,10 +74,10 @@ class ArrayFieldAttribute {
         }
         return isSaveDisabled
     }
-    findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, nextEditable, isSaveDisabled, rowId, value) {
+    findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, isSaveDisabled, rowId, value, fieldDataList) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
         let arrayRow = cloneArrayElements[rowId]
-        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, nextEditable, isSaveDisabled, value, null, ON_BLUR);
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, NEXT_FOCUS);
         arrayRow.allRequiredFieldsFilled = (!sortedArrayElements.isSaveDisabled) ? true : false
         let _isSaveDisabled = this.enableSaveIfRequired(cloneArrayElements)
         return {
