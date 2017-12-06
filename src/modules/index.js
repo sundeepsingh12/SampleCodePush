@@ -37,6 +37,7 @@ import liveJob from './liveJob/liveJobReducer'
 
 import { combineReducers } from 'redux'
 import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
+import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
 // import profile from './profile/profileReducer'
 
@@ -76,6 +77,7 @@ const appReducer = combineReducers({
   taskList,
   liveJobList,
   liveJob,
+  summary,
   customApp,
 })
 

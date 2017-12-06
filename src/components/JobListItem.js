@@ -19,7 +19,7 @@ import {
   FooterTab,
   StyleProvider
 } from 'native-base'
-
+import moment from 'moment'
 export default class JobListItem extends Component {
 
   render() {
@@ -57,7 +57,8 @@ export default class JobListItem extends Component {
 
           </View>
           {this.props.jobEndTime ?
-            <Text> {this.props.jobEndTime}
+            <Text style={styles.bgWarning}>
+              {(this.props.jobEndTime).seconds()}
             </Text> : <View />}
         </View>
       </TouchableHighlight>

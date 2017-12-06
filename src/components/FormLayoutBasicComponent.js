@@ -33,7 +33,7 @@ import {
     DATE,
     FIXED_SKU,
     SIGNATURE,
-    SIGNATURE_AND_NPS,
+    SIGNATURE_AND_FEEDBACK,
     STRING,
     TEXT,
     NUMBER,
@@ -50,7 +50,12 @@ import {
     OPTION_RADIO_FOR_MASTER,
 } from '../lib/AttributeConstants'
 
+import {
+    NEXT_FOCUS
+} from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
+import NPSFeedback from '../components/NPSFeedback'
+import TimePicker from '../components/TimePicker'
 
 function mapStateToProps(state) {
     return {
@@ -63,15 +68,15 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions }, dispatch)
     }
 }
-
 class BasicFormElement extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             selectFromListEnable: false,
+            showNPS: false,
+            showDateTimePicker: false,
         }
-        this.formElementValue = {}
     }
 
     componentDidMount = () => {
@@ -91,14 +96,6 @@ class BasicFormElement extends Component {
             case MONEY_PAY:
             case MONEY_COLLECT: {
                 screenName = 'Payment'
-                break
-            }
-
-            case OPTION_RADIO_FOR_MASTER:
-            case DROPDOWN:
-            case RADIOBUTTON:
-            case CHECKBOX: {
-                screenName = 'SelectFromList'
                 break
             }
             case FIXED_SKU: {
@@ -128,7 +125,7 @@ class BasicFormElement extends Component {
                 screenName = 'DataStore'
                 break
             }
-            case SIGNATURE_AND_NPS: {
+            case SIGNATURE_AND_FEEDBACK: {
                 screenName = 'SignatureAndNps'
                 break
             }
@@ -182,9 +179,39 @@ class BasicFormElement extends Component {
             }
         })
     }
+    onSaveDateTime = (value) => {
+        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', NEXT_FOCUS);
+        this.setState({ showDateTimePicker: false, showNPS: false })
+    }
 
+    cancelDateTimePicker = () => {
+        this.setState({ showDateTimePicker: false, showNPS: false })
+    }
+    _dropModal = () => {
+        this.setModalVisible(false)
+    }
+    _showNPS = () => {
+        this.setState(previousState => {
+            return {
+                showNPS: true
+            }
+        })
+        this.props.actions.fieldValidations(this.props.item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
+    }
+    _showDateTime = () => {
+        this.setState({ showDateTimePicker: true })
+        this.props.actions.fieldValidations(this.props.item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
+    }
 
-    render() {
+    getComponentLabelStyle(focus, editable) {
+        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+    }
+
+    getComponentSubLabelStyle(editable) {
+        return editable ? styles.fontDarkGray : styles.fontLowGray
+    }
+
+    getModalView() {
         if (this.state.selectFromListEnable) {
             return (
                 <View>
@@ -201,7 +228,37 @@ class BasicFormElement extends Component {
                 </View>
             )
         }
-
+        if (this.state.showNPS) {
+            return (
+                <View>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={this.state.showNPS}
+                        onRequestClose={this._dropModal}>
+                        <TouchableHighlight
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                                <View>
+                                    < NPSFeedback
+                                        onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item}
+                                    />
+                                </View>
+                            </TouchableHighlight>
+                        </TouchableHighlight>
+                    </Modal>
+                </View>
+            )
+        }
+        if (this.state.showDateTimePicker) {
+            return (
+                <TimePicker onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item} />
+            )
+        }
+        return null
+    }
+    render() {
+        let modalView = this.getModalView()
         switch (this.props.item.attributeTypeId) {
             case STRING:
             case TEXT:
@@ -210,15 +267,24 @@ class BasicFormElement extends Component {
             case SEQUENCE:
             case PASSWORD:
                 return (
-                    renderIf(!this.props.item.hidden,
-                        <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, this.props.item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
-                            <View style={[styles.marginBottom15]}>
+                    <View>
+                        {renderIf(!this.props.item.hidden,
+                            <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
                                 <Item stackedLabel>
-                                    <Label style={[styles.fontPrimary]}>{this.props.item.label}</Label>
+                                    {this.props.item.label ?
+                                        <Label style={[this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
+                                            {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
+                                        </Label>
+                                        : null}
+                                    {this.props.item.subLabel ?
+                                        <Label style={[this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Label>
+                                        : null}
                                     <Input
                                         autoCapitalize="none"
-                                        placeholder="help text"
+                                        placeholder={this.props.item.helpText}
+                                        placeholderTextColor={styles.fontLowGray.color}
                                         defaultValue={this.props.item.value}
+                                        style={{ paddingLeft: 0 }}
                                         value={this.props.item.value}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
@@ -230,12 +296,13 @@ class BasicFormElement extends Component {
                                     />
                                 </Item>
                                 {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
-                                    <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
-                                    <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
-                                </View> */}
+                                <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
+                                <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
+                            </View> */}
                             </View>
-                        </View>
-                    )
+
+                        )}
+                    </View>
                 )
 
             case FIXED_SKU:
@@ -243,21 +310,31 @@ class BasicFormElement extends Component {
             case MONEY_PAY:
             case SKU_ARRAY:
             case MONEY_COLLECT:
-            case NPS_FEEDBACK:
-            case TIME:
-            case RE_ATTEMPT_DATE:
-            case DATE:
             case CASH_TENDERING:
-            case SIGNATURE_AND_NPS:
+            case SIGNATURE_AND_FEEDBACK:
             case ARRAY:
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+            case NPS_FEEDBACK:
+                return <View>
+                    {modalView}
+                    <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />
+                </View>
             case CHECKBOX:
             case RADIOBUTTON:
             case DROPDOWN:
             case OPTION_RADIO_FOR_MASTER:
                 return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
+            case DATE:
+            case RE_ATTEMPT_DATE:
+            case TIME:
+                return (
+                    <View>
+                        {modalView}
+                        <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />
+                    </View>
+                )
             default:
                 return (
                     <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />

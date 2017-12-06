@@ -11,35 +11,90 @@ import { Container, Card, CardItem, Body, Icon, Right } from 'native-base'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import SearchIcon from '../../src/svg_components/icons/SearchIcon'
+import CameraIcon from '../svg_components/icons/CameraIcon'
+import CartIcon from '../svg_components/icons/CartIcon'
+import StarIcon from '../svg_components/icons/StarIcon'
+import PaperMoneyIcon from '../svg_components/icons/PaperMoneyIcon'
+import QRIcon from '../svg_components/icons/QRIcon'
+import BankCardIcon from '../svg_components/icons/BankCardIcon'
+import {
+    ARRAY,
+    CASH_TENDERING,
+    DATA_STORE,
+    MONEY_COLLECT,
+    MONEY_PAY,
+    NPS_FEEDBACK,
+    SIGNATURE,
+    SIGNATURE_AND_FEEDBACK,
+    SKU_ARRAY,
+} from '../lib/AttributeConstants'
 
 class FormLayoutActivityComponent extends Component {
 
+    getIcon(attributeTypeId) {
+        switch (attributeTypeId) {
+            case ARRAY: return <QRIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case CASH_TENDERING: return <PaperMoneyIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case DATA_STORE: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case MONEY_COLLECT:
+            case MONEY_PAY: return <BankCardIcon width={26} height={19} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case NPS_FEEDBACK:
+            case SIGNATURE:
+            case SIGNATURE_AND_FEEDBACK: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case SKU_ARRAY: return <CartIcon size={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            default: return <QRIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+        }
+    }
+
+    getComponentLabelStyle(focus, editable) {
+        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+    }
+
+    getComponentSubLabelStyle(editable) {
+        return editable ? styles.fontDarkGray : styles.fontLowGray
+    }
+
+    getComponentHelpTextStyle(editable) {
+        return editable ? styles.fontDarkGray : styles.fontLowGray
+    }
+
+    getComponentIconStyle(editable) {
+        return editable ? styles.fontBlack : styles.fontLowGray
+    }
+
     render() {
+        const icon = this.getIcon(this.props.item.attributeTypeId)
+        console.log('FormLayoutActivityComponent', this.props.item)
         return (
             <TouchableHighlight disabled={!this.props.item.editable} onPress={() => this.props.press(this.props.item)}>
-                <View style={[style.formCard, this.props.item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
-                    <View style={style.iconContainer}>
-                        <SearchIcon />
-                    </View>
+                <View style={[style.formCard, this.props.item.focus ? styles.borderLeft4 : null]}>
+
                     <View style={style.formCardDetail}>
                         <View>
-                            <Text style={[styles.fontDefault, styles.lineHeight25, styles.fontPrimary]}>
-                                {this.props.item.label}
-                            </Text>
-                            <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                                {this.props.item.subLabel}
-                            </Text>
+                            {this.props.item.label ?
+                                <Text style={[styles.fontDefault, styles.lineHeight25, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>
+                                    {this.props.item.label}
+                                    {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
+                                </Text> : null
+                            }
+                            {this.props.item.subLabel ?
+                                <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20, this.getComponentSubLabelStyle(this.props.item.editable)]}>
+                                    {this.props.item.subLabel}
+                                </Text> : null}
+                            {this.props.item.helpText ?
+                                <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20, styles.italic, this.getComponentHelpTextStyle(this.props.item.editable)]}>
+                                    {this.props.item.helpText}
+                                </Text> : null}
                         </View>
-                        <View style={[styles.row]}>
-                            {this.props.item.value || this.props.item.value === 0 ?
-                                <View style={[styles.marginRight5]}>
-                                    <Icon name="ios-checkmark-circle" style={[styles.fontXl, styles.fontSuccess, styles.fontXxl]} />
-                                </View>
-                                : null}
-                            <View>
-                                <Icon name="ios-help-circle" style={[styles.fontXl, styles.fontLightGray, styles.fontXxl]} />
+                    </View>
+                    <View style={style.iconContainer}>
+                        {this.props.item.value || this.props.item.value === 0 ?
+                            <View style={[styles.marginRight10]}>
+                                <Icon name="ios-checkmark-circle" style={[styles.fontXl, styles.fontSuccess, styles.fontXxl]} />
                             </View>
-                        </View>
+                            : null}
+                        {icon}
+                        <Icon name="ios-arrow-forward" style={[styles.fontBlack, styles.fontLg, styles.marginLeft10, this.getComponentSubLabelStyle(this.props.item.editable)]} />
                     </View>
                 </View>
             </TouchableHighlight>
@@ -92,26 +147,20 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingLeft: 10,
+        paddingTop: 40,
+        paddingBottom: 40,
         backgroundColor: '#ffffff'
     },
     iconContainer: {
-        width: 40,
-        height: 50,
+        paddingRight: 10,
+        flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'flex-start'
+        alignItems: 'center'
     },
     formCardDetail: {
         flex: 1,
-        minHeight: 70,
-        paddingTop: 10,
-        paddingBottom: 10,
         paddingRight: 10,
-        marginLeft: 15,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottomColor: '#d3d3d3',
-        borderBottomWidth: 1
     },
     footer: {
         height: 'auto',

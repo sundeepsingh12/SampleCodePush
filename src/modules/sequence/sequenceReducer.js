@@ -25,8 +25,7 @@ export default function sequenceReducer(state = initialState, action) {
                         .set('isSequenceScreenLoading',false)
 
         case PREPARE_UPDATE_LIST:
-            console.log('action.payload',action.payload)
-            return state.set('sequenceList',action.payload.sequenceList)
+            return state.set('sequenceList',action.payload.updatedSequenceList)
                         .set('isSequenceScreenLoading',false)
                         .set('unallocatedTransactionCount',action.payload.unallocatedTransactionCount)
                         .set('responseMessage',action.payload.responseMessage)

@@ -140,13 +140,15 @@ class FormLayout extends Component {
             </Body>
           </Header>
 
-          <Content style={[styles.flex1, styles.bgLightGray]}>
-            <FlatList
-              data={Array.from(this.props.formElement)}
-              extraData={this.state}
-              renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
-              keyExtractor={this._keyExtractor}>
-            </FlatList>
+          <Content style={[styles.flex1, styles.bgWhite]}>
+            <View style={[styles.paddingTop10, styles.paddingBottom10]}>
+              <FlatList
+                data={Array.from(this.props.formElement)}
+                extraData={this.state}
+                renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+                keyExtractor={this._keyExtractor}>
+              </FlatList>
+            </View>
           </Content>
 
           <Footer style={[style.footer]}>

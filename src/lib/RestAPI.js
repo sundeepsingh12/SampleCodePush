@@ -17,9 +17,10 @@ import RNFS from 'react-native-fs'
 import RNFetchBlob from 'react-native-fetch-blob'
 import {keyValueDBService} from '../services/classes/KeyValueDBService.js'
 import {
-  PENDING_SYNC_TRANSACTION_IDS
+  PENDING_SYNC_TRANSACTION_IDS,
+  LAST_SYNC_WITH_SERVER
 } from './constants'
-
+import moment from 'moment'
 const fetch = require('react-native-cancelable-fetch');
 class RestAPI {
   /**
@@ -197,16 +198,19 @@ class RestAPI {
         console.log('uploaded', written / total)
     }).then(async(resp) => {
      responseBody = resp.text()
-    console.log('responseBody>>>>>',responseBody)
     const message = responseBody.split(",")[0]
-    console.log('message >>>>>',message);
     const syncCount = responseBody.split(",")[1]
     if(message=='success'){
       //do something
+      const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss') 
+      //console.log("qwe",currenDate)
+      await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,currenDate)      
      await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
     }
-  }).catch(err => console.log(err))
+  }).catch(err => {
+    throw err
+  })
   return responseBody
   }
   

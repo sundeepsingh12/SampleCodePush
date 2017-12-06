@@ -25,6 +25,7 @@ import { smsTemplateService } from './SMSTemplate'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
 import { jobMasterService } from './JobMaster'
 import _ from 'lodash'
+import moment from 'moment'
 
 class JobTransaction {
 
@@ -113,6 +114,7 @@ class JobTransaction {
                 jobStatusId,
                 referenceNumber,
                 runsheetNo,
+                runsheetId,
                 seqSelected,
                 trackCallCount,
                 trackCallDuration,
@@ -139,6 +141,7 @@ class JobTransaction {
                 jobStatusId,
                 referenceNumber,
                 runsheetNo,
+                runsheetId,
                 seqSelected,
                 trackCallCount,
                 trackCallDuration,
@@ -153,7 +156,7 @@ class JobTransaction {
             jobQuery,
             jobTransactionQuery,
             jobDataQuery,
-            fieldDataQuery
+            fieldDataQuery,
         }
     }
 
@@ -196,27 +199,38 @@ class JobTransaction {
      *                                      }
      *                                  ]
      */
-    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData) {
+    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData, selectedDate) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobTransactionCustomizationListParametersDTO.jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobTransactionCustomizationListParametersDTO.jobAttributeStatusList)
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(jobTransactionCustomizationListParametersDTO.statusList, jobAttributeStatusMap)
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         let customerCareMap = customerCareService.getCustomerCareMap(jobTransactionCustomizationListParametersDTO.customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
-        let jobTransactionQuery
-        if (callingActivity != 'LiveJob') {
-            let runsheetQuery = 'isClosed = true'
-            const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
-            jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
-            jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
+        let runsheetQuery
+        if (selectedDate && selectedDate != "All") {
+            runsheetQuery = `startDate BEGINSWITH '${selectedDate}' AND isClosed = false`
+        } else if (selectedDate && selectedDate == "All") {
+            runsheetQuery = 'isClosed = false'
+        } else {
+            runsheetQuery = 'isClosed = true'
         }
+        const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+        let runsheetIdToStartDateMap = {}
+        if (selectedDate && selectedDate == "All") {
+            runsheetList.forEach(runsheetListObject => { runsheetIdToStartDateMap[runsheetListObject.id] = moment(runsheetListObject.startDate).format('YYYY-MM-DD') })
+        }
+        let jobTransactionQuery = selectedDate ? runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ') : runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
+        if (selectedDate && (!jobTransactionQuery || jobTransactionQuery.trim() == '')) {
+            return []
+        }
+        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         if (callingActivity == 'Bulk') {
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
         }
         else if (callingActivity == 'Sequence') {
             let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
             //Fetch only pending status category job transactions for sequence listing
-            jobTransactionQuery = `${jobTransactionQuery} AND (${statusQuery})`
+            jobTransactionQuery = statusQuery && statusQuery.trim() !== '' ? `${jobTransactionQuery} AND (${statusQuery})` : `${jobTransactionQuery}`
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
             fieldDataList = [], fieldDataMap = {}
@@ -246,12 +260,7 @@ class JobTransaction {
             fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
         }
         let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
-        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity)
-        // if (callingActivity == 'LiveJob') {
-        //     return jobTransactionCustomizationList
-        // } else {
-        //     return jobTransactionCustomizationList
-        // }
+        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap)
         return jobTransactionCustomizationList
     }
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
@@ -301,7 +310,7 @@ class JobTransaction {
      *                                      }
      *                                   ]
      */
-    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity) {
+    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap) {
         let jobTransactionCustomizationList = []
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
@@ -324,6 +333,7 @@ class JobTransaction {
             }
             let jobSwipableDetails = this.setJobSwipableDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, jobTransaction, job, customerCareMap, smsTemplateMap)
             jobTransactionCustomization.id = jobTransaction.id
+            jobTransactionCustomization.runsheetId = jobTransaction.runsheetId
             jobTransactionCustomization.jobMasterId = jobMasterId
             jobTransactionCustomization.jobSwipableDetails = jobSwipableDetails
             jobTransactionCustomization.seqSelected = jobTransaction.seqSelected
@@ -332,15 +342,21 @@ class JobTransaction {
             jobTransactionCustomization.jobLatitude = job.latitude
             jobTransactionCustomization.jobLongitude = job.longitude
             jobTransactionCustomization.jobId = jobTransaction.jobId
-            jobTransactionCustomizationList.push(jobTransactionCustomization)
             if (callingActivity == 'LiveJob') {
                 jobTransaction.jobTransactionCustomization = jobTransactionCustomization
+            }
+            if (!_.isEmpty(runsheetIdToStartDateMap)) {
+                let jobTransactionsArray = (jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]]) ? jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]] : []
+                jobTransactionsArray.push(jobTransactionCustomization)
+                jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]] = jobTransactionsArray
+            } else {
+                jobTransactionCustomizationList.push(jobTransactionCustomization)
             }
         }
         if (callingActivity == 'LiveJob') {
             return jobTransactionMap
         } else {
-            return jobTransactionCustomizationList
+            return (!_.isEmpty(runsheetIdToStartDateMap)) ? jobTransactionDateTOJobTransactionsMap : jobTransactionCustomizationList
         }
     }
 

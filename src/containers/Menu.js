@@ -145,7 +145,7 @@ class Menu extends Component {
 
   render() {
     let profileView = this.renderModuleView([PROFILE, STATISTIC], 1)
-    let paymentView = this.renderModuleView([EZE_TAP, M_SWIPE], 2)
+    // let paymentView = this.renderModuleView([EZE_TAP, M_SWIPE], 2)
     let deviceView = this.renderModuleView([BACKUP, OFFLINEDATASTORE, BLUETOOTH], 3)
     return (
       <StyleProvider style={getTheme(platform)}>
@@ -175,9 +175,9 @@ class Menu extends Component {
             </View>
 
             {/*Card 2*/}
-            <View style={[styles.bgWhite, paymentView.length ? styles.marginBottom10 : null]}>
+            {/* <View style={[styles.bgWhite, paymentView.length ? styles.marginBottom10 : null]}>
               {paymentView}
-            </View>
+            </View> */}
 
             {/*Card 3*/}
             <View style={[styles.bgWhite, styles.marginBottom10]}>

@@ -100,7 +100,7 @@ export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLay
 export function updateFieldData(attributeId, value, formElement) {
     return async function (dispatch) {
         const cloneFormElement = _.cloneDeep(formElement)
-        const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement, ON_BLUR)
+        const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement, NEXT_FOCUS)
         dispatch(setState(UPDATE_FIELD_DATA, updatedFieldData))
     }
 }
@@ -129,9 +129,9 @@ export function toogleHelpText(attributeId, formElement) {
 
 export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
     return async function (dispatch) {
-        dispatch(setState(IS_LOADING, true))
-        await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionId, jobTransactionIdList)
+        dispatch(setState(IS_LOADING,true))
+        let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
+        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         dispatch(setState(IS_LOADING, false))
         dispatch(setState(RESET_STATE))
         dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))

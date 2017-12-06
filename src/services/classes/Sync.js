@@ -15,6 +15,10 @@ import {
 } from './JobTransaction'
 
 import {
+  runSheetService
+} from './RunSheet'
+
+import {
   jobSummaryService
 } from './JobSummary'
 import { addServerSmsService } from './AddServerSms'
@@ -49,12 +53,12 @@ import NotificationsIOS,{NotificationsAndroid}from 'react-native-notifications'
 
 class Sync {
 
-  async createAndUploadZip() {
+  async createAndUploadZip(transactionIdToBeSynced) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
-    await createZip()
+    await createZip(transactionIdToBeSynced)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile()
     return responseBody
   }
@@ -325,7 +329,7 @@ class Sync {
     }
     const newJobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
-      valueList: newJobTransactionsIds,
+      valueList: newJobTransactionsIds,       
       propertyName: 'id'
     }
     const newJobs = {
@@ -341,8 +345,8 @@ class Sync {
 
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas, runsheets, newJobTransactions, newJobs, newJobFieldData)
-    const jobMasterIds = await this.saveDataFromServerInDB(query)
+    await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, newJobFieldData)
+    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
     return jobMasterIds
   }
 
@@ -509,12 +513,18 @@ class Sync {
           this.showNotification(jobMasterTitleList)
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
           jobSummaryService.updateJobSummary(dataList.jobSummaries)
+                 
         }
       } else {
         isLastPageReached = true
       }
     }
+    console.log('isJobsPresent',isJobsPresent)
+    if(isJobsPresent){
+      await runSheetService.updateRunSheetSummary()  
+    }
     return isJobsPresent
+   
   }
 
   showNotification(jobMasterTitleList) {

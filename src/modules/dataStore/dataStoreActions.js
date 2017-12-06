@@ -9,6 +9,7 @@ import {
     SHOW_LOADER,
     SHOW_ERROR_MESSAGE,
     ON_BLUR,
+    NEXT_FOCUS,
     SAVE_SUCCESSFUL
 } from '../../lib/constants'
 import {
@@ -117,7 +118,7 @@ export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dat
     return async function (dispatch) {
         try {
             if (!calledFromArray)
-                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, ON_BLUR))
+                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, NEXT_FOCUS))
             else
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
 
@@ -161,7 +162,7 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
             }
             dispatch(setState(SAVE_SUCCESSFUL, true))
             if (!calledFromArray)
-                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, ON_BLUR))
+                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, NEXT_FOCUS))
             else {
                 formElements[rowId].formLayoutObject = formElementResult
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
