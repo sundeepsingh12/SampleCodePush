@@ -21,6 +21,7 @@ import {
 } from '../../lib/constants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
+
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
@@ -53,16 +54,31 @@ export function acceptOrRejectJob(status, job, liveJobList) {
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             let newLiveJobList = await liveJobService.requestServerForApproval(status + '', token, job, liveJobList)
             if (status == 1) {
-                dispatch(navigateToScene('TabScreen'))
+                dispatch(NavigationActions.reset({
+                    index: 1,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+                        NavigationActions.navigate({ routeName: 'TabScreen' })
+                    ]
+                }))
             } else if (status == 2 && _.isEmpty(newLiveJobList)) {
-                dispatch(navigateToScene('HomeScreen'))
+                dispatch(NavigationActions.reset({
+                    index: 0,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+                    ]
+                }))
             } else {
-                dispatch(navigateToScene('LiveJobs'))
+                dispatch(NavigationActions.reset({
+                    index: 1,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+                        NavigationActions.navigate({ routeName: 'LiveJobs' })
+                    ]
+                }))
             }
 
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
             console.log(error)
         }
     }

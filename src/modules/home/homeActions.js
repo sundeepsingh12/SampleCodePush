@@ -91,7 +91,7 @@ export function pieChartCount() {
   }
 }
 
-export function performSyncService(isCalledFromHome) {
+export function performSyncService(isCalledFromHome, isLiveJob) {
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
@@ -108,7 +108,8 @@ export function performSyncService(isCalledFromHome) {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'Downloading'
         }))
-        const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+        const isJobsPresent = await sync.downloadAndDeleteDataFromServer(false)
+        const liveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
         if (isJobsPresent) {
           if (PIECHART.enabled) {
             dispatch(pieChartCount())
@@ -190,7 +191,11 @@ export function startMqttService() {
       })
       client.on('messageReceived', message => {
         console.log('message.payloadString', message.payloadString)
-        dispatch(performSyncService(true))
+        if (message.payloadString == 'Live Job Notification') {
+          dispatch(performSyncService(true, true))
+        } else {
+          dispatch(performSyncService(true))
+        }
       })
 
       // connect the client 

@@ -26,6 +26,7 @@ export default class JobListItem extends Component {
     return (
       <TouchableHighlight
         onPress={this.props.onPressItem}
+        onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
         <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : null]}>
           <View style={[style.seqCircle, styles.relative]}>
@@ -57,8 +58,15 @@ export default class JobListItem extends Component {
 
           </View>
           {this.props.jobEndTime ?
-            <Text style={styles.bgWarning}>
-              {(this.props.jobEndTime).seconds()}
+            <Text style={[styles.bgWarning, styles.flexBasis50]}>
+              {
+                (moment(this.props.jobEndTime, "HH:mm:ss")).hours() + ' hours ' +
+                (moment(this.props.jobEndTime, "HH:mm:ss")).minutes() + ' minutes' +
+                (moment(this.props.jobEndTime, "HH:mm:ss")).seconds() + ' seconds left'
+                // (moment(this.props.jobEndTime, "HH:mm:ss").hours() > 0) ? (moment(this.props.jobEndTime, "HH:mm:ss")).hours() + ' hours ' : '' +
+                // (moment(this.props.jobEndTime, "HH:mm:ss").minutes() > 0) ? (moment(this.props.jobEndTime, "HH:mm:ss")).minutes() + ' minutes ' : '' +
+                // (moment(this.props.jobEndTime, "HH:mm:ss").seconds()) + 'Left'
+              }
             </Text> : <View />}
         </View>
       </TouchableHighlight>

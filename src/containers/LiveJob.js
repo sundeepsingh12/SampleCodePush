@@ -75,31 +75,19 @@ class LiveJob extends Component {
     getJobEndTime = () => {
         let jobEndTime = moment(this.props.navigation.state.params.liveJobList[this.props.navigation.state.params.job.id].jobEndTime, 'HH:mm:ss')
         let currentTime = moment()
-        if (moment(jobEndTime).diff(moment(currentTime)) <= 0) {
-            return 'TimeUp'
-        }
+        // if (moment(jobEndTime).diff(moment(currentTime)) <= 0) {
+        //     return 'TimeUp'
+        // }
         return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
     }
     componentDidMount() {
         let endTime = this.getJobEndTime()
-        // if (endTime =='TimeUp') {
-        //     endTime=
-        // }
         this.setState({
             counter: endTime
         })
         let timer = setInterval(this.tick, 1000);
         this.setState({ timer });
         this.props.actions.getJobDetails(this.props.navigation.state.params.job.id)
-    }
-    componentWillUnmount() {
-        const resetAction = NavigationActions.reset({
-            index: 0,
-            actions: [
-              //  NavigationActions.navigate({ routeName: 'Profile' })
-            ]
-        })
-        this.props.navigation.dispatch(resetAction)
     }
     render() {
         return (
@@ -146,8 +134,12 @@ class LiveJob extends Component {
                             </View>
                         </View>
                         <View style={[styles.heightAuto, styles.bgWarning]}>
-                            <Text style={styles.justifyCenter}>
-                                {moment(this.state.counter).format('HH:mm:ss')}
+                            <Text style={[styles.alignSelfCenter, styles.fontWhite]}>
+                                {
+                                    (moment(this.state.counter, "HH:mm:ss")).hours() + ' hours ' +
+                                    (moment(this.state.counter, "HH:mm:ss")).minutes() + ' minutes ' +
+                                    (moment(this.state.counter, "HH:mm:ss")).seconds() + ' seconds left'
+                                }
                             </Text>
                         </View>
                         <View style={[styles.row, style.footer, styles.padding10]}>

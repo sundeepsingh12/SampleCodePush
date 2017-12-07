@@ -1,9 +1,6 @@
 'use strict'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import {
-
-} from '../../lib/AttributeConstants'
-import {
     TABLE_JOB,
     TABLE_JOB_DATA
 } from '../../lib/constants'
@@ -15,6 +12,7 @@ import * as realm from '../../repositories/realmdb'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import moment from 'moment'
+import _ from 'lodash'
 class LiveJobService {
     async getLiveJobList() {
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
@@ -23,7 +21,8 @@ class LiveJobService {
         const liveJobsWithValidTime = await this.checkJobExpiry(idJobTransactionCustomizationListMap)
         return liveJobsWithValidTime
     }
-    checkJobExpiry(liveJobMap) {
+    async checkJobExpiry(liveJobMap) {
+        if (!liveJobMap || _.isEmpty(liveJobMap)) return {}
         let expiredJobIds = []
         let liveJobList = Object.values(liveJobMap)
         for (let job of liveJobList) {
@@ -34,7 +33,7 @@ class LiveJobService {
             }
         }
         if (expiredJobIds.length > 0) {
-            return this.deleteJob(expiredJobIds, liveJobMap)
+            return await this.deleteJob(expiredJobIds, liveJobMap)
         } else {
             return liveJobMap
         }
@@ -43,7 +42,7 @@ class LiveJobService {
         let postJson = "{\"jobId\":\"" + job.id + "\", \"jobDate\":\"" + job.jobStartTime + "\", \"statusId\":\"" + status + "\"}"
         try {
             let serviceAlertResponse = await RestAPIFactory(token.value).serviceCall(postJson, CONFIG.API.SERVICE_ALERT_JOB, 'POST')
-            if (serviceAlertResponse) {
+            if (serviceAlertResponse && serviceAlertResponse.status == 200) {
                 let jobIdList = []
                 jobIdList.push(job.id)
                 let newLiveJobList = await this.deleteJob(jobIdList, liveJobList)
