@@ -64,18 +64,9 @@ class NewJobStatus extends Component {
 
   renderData = (item)=>{
     return (
-      <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.navigateToScene('FormLayout',
-        {
-          statusId: item.id, statusName: item.name,
-          jobTransactionId: this.props.negativeId,
-          jobMasterId: this.props.navigation.state.params.jobMaster.id,
-          jobTransaction: {
-            id: this.props.negativeId,
-            jobMasterId: this.props.navigation.state.params.jobMaster.id,
-            jobId: this.props.negativeId,
-          }
-        })}>
-          
+      <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.redirectToFormLayout(item, 
+      this.props.negativeId, 
+      this.props.navigation.state.params.jobMaster.id)}>
           <View style={[styles.row, styles.alignCenter]}>
             <View style={item.statusCategory == 3  ? [style.statusCircle, {backgroundColor: '#4cd964'}] : 
                   item.statusCategory == 1 ? [style.statusCircle, {backgroundColor: '#006490'}] : 

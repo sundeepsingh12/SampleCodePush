@@ -24,7 +24,7 @@ export function addTransactionAndPopulateView(formLayoutState, recurringData, co
                 commonData = { commonData: returnParams.commonData, amount: returnParams.totalAmount }
                 statusName = returnParams.statusName
             }
-            let { differentData } = await transientStatusService.setSavedJobDetails(formLayoutState, recurringData, navigationParams.jobTransaction, navigationParams.currentStatus.id)
+            let { differentData } = await transientStatusService.saveRecurringData(formLayoutState, recurringData, navigationParams.jobTransaction, navigationParams.currentStatus.id)
             await dispatch(storeState({
                 commonData,
                 differentData,

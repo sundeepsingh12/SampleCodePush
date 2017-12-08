@@ -157,7 +157,7 @@ class CustomApp extends Component {
                         </FooterTab>
                         <FooterTab>
                             <Button style={{alignItems: 'flex-end', height: 40, width:40}}>
-                                <QRIcon/>  
+                            <QRIcon width={30} height={30} color={styles.fontBlack}/>  
                             </Button>
                         </FooterTab>
                     </Footer>

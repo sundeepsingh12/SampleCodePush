@@ -20,7 +20,7 @@ import {
     NEW_JOB,
 } from '../../lib/AttributeConstants'
 import {
-    BACKUP ,
+    BACKUP,
     BLUETOOTH,
     BULK,
     EZETAP,
@@ -209,13 +209,10 @@ class ModuleCustomization {
       *                                           appModuleId
       *                                           displayText:'displayText',
       *                                           enabled:true,
-      *                                           jobMasterList:[
-      *                                                          123,
-      *                                                          234
-      *                                                           ],
-      *                                            icon
-      * 
-      *                                           }
+      *                                           jobMasterList:[123,234],
+      *                                           serialNumber,
+                                                  icon
+                                                 }
       *                           }
       */
     setModuleDetailsForNewJob(moduleCustomization, user, serialNumber) {
