@@ -63,7 +63,8 @@ class NewJob extends Component {
   renderData = (item) => {
     return (
 
-      <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} onPress={() => this.props.actions.redirectToContainer(item)}>
+      <ListItem style={[style.jobListItem, styles.justifySpaceBetween]}
+        onPress={() => this.props.actions.redirectToContainer(item)}>
         <View>
           <Text style={[styles.fontDefault, styles.fontWeight500]}>{item.title}</Text>
         </View>
