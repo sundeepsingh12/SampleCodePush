@@ -512,7 +512,6 @@ class Sync {
         isLastPageReached = true
       }
     }
-    console.log('isJobsPresent',isJobsPresent)
     if(isJobsPresent){
       await runSheetService.updateRunSheetSummary()  
     }

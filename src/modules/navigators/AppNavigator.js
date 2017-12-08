@@ -81,6 +81,8 @@ import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import { NavigationActions } from 'react-navigation'
+import Scanner from '../../components/Scanner'
+import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -374,6 +376,12 @@ export const AppNavigator = StackNavigator({
   FormDetailsV2: {
     screen: FormDetailsV2
   },
+  Scanner: {
+    screen: Scanner
+  },
+  PostAssignmentScanner: {
+    screen: PostAssignmentScanner
+  }
 },
   {
     cardStyle: {

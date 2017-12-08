@@ -54,7 +54,8 @@ import {
   Sorting,
   Summary,
   CustomApp,
-  ON_CHANGE_STATE
+  ON_CHANGE_STATE,
+  PostAssignmentScanner,
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -187,6 +188,20 @@ class Home extends Component {
         </ListItem>
       )
     }
+    moduleView.push(
+      <ListItem button onPress={() => this.props.actions.navigateToScene(PostAssignmentScanner)}
+      style={[style.moduleList]}
+      key={100}
+    >
+      <Body>
+        <Text
+          style={[styles.fontWeight500, styles.fontLg]}>Job Assignment</Text>
+      </Body>
+      <Right>
+        <Icon name="ios-arrow-forward" />
+      </Right>
+    </ListItem>
+    )
     return moduleView
   }
   

@@ -1,14 +1,9 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
-import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
-import StartIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
-// import LiveIcon from '../../images/fareye-default-iconset/homescreen/live.png'
-
 import BulkIcon from '../../src/svg_components/icons/BulkIcon'
 import LiveIcon from '../../src/svg_components/icons/LiveIcon'
 import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
 import TaskIcon from '../../src/svg_components/icons/TaskIcon'
-// import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
 import React, { Component } from 'react'
 module.exports = {
 

@@ -80,7 +80,7 @@ export function pieChartCount() {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
       const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const {pendingStatusIds,failStatusIds,successStatusIds} = allStatusIds
+      const { pendingStatusIds, failStatusIds, successStatusIds } = allStatusIds
       const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
@@ -90,11 +90,11 @@ export function pieChartCount() {
   }
 }
 
-export function performSyncService(isCalledFromHome){
-  return async function(dispatch){
+export function performSyncService(isCalledFromHome) {
+  return async function (dispatch) {
     let transactionIdToBeSynced
-    try{
-       transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+    try {
+      transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
         syncStatus: 'Uploading'
@@ -109,11 +109,11 @@ export function performSyncService(isCalledFromHome){
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
         if (isJobsPresent) {
-          if(PIECHART.enabled){
+          if (PIECHART.enabled) {
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())
-        }     
+        }
       }
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: [],

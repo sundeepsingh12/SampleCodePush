@@ -191,6 +191,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
+
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,
@@ -205,13 +206,14 @@ module.exports = keyMirror({
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
-    BulkConfiguration:null,
-    BulkListing:null,
-    Sorting:null,
-    ProfileView:null,
-    Statistics:null,
-    Summary:null,
+    BulkConfiguration: null,
+    BulkListing: null,
+    Sorting: null,
+    ProfileView: null,
+    Statistics: null,
+    Summary: null,
     CustomApp: null,
+    PostAssignmentScanner: null,
 
 
     //Skulisting Actions
@@ -298,9 +300,9 @@ module.exports = keyMirror({
     SORTING_ITEM_DETAILS: null,
 
     //Summary
-    SET_SUMMARY_FOR_JOBMASTER : null,
-    SET_SUMMARY_FOR_RUNSHEET : null,
-    
+    SET_SUMMARY_FOR_JOBMASTER: null,
+    SET_SUMMARY_FOR_RUNSHEET: null,
+
     //Custom App
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,

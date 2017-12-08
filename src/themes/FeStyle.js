@@ -448,5 +448,80 @@ export default {
     borderLeft4: {
         borderLeftColor: themeColor, 
         borderLeftWidth: 4 
+    },
+    header: {
+        borderBottomWidth: 0,
+        height: 'auto',
+        padding: 0,
+        paddingRight: 0,
+        paddingLeft: 0,
+        paddingBottom: 10
+    },
+    headerLeft: {
+        width: '15%',
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 10,
+        paddingRight: 10
+    },
+    headerBody: {
+        width: '70%',
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 10,
+        paddingRight: 10
+    },
+    headerRight: {
+        width: '15%',
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 10,
+        paddingRight: 10
+    },
+    headerIcon: {
+        width: 24
+    },
+    headerSearch: {
+        paddingLeft: 10,
+        paddingRight: 30,
+        backgroundColor: 'rgba(255, 255, 255, 0.20)',
+        paddingTop: 3,
+        paddingBottom: 3,
+        borderRadius: 2,
+        color: '#fff',
+        fontSize: 11
+    },
+    inputInnerBtn: {
+        position: 'absolute',
+        top: 0,
+        right: 5,
+        paddingLeft: 0,
+        paddingRight: 0
+    },
+    seqCard: {
+        minHeight: 70,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingLeft: 10
+    },
+    seqCircle: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: '#ffcc00',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    seqCardDetail: {
+        flex: 1,
+        minHeight: 70,
+        paddingTop: 10,
+        paddingBottom: 10,
+        marginLeft: 15,
+        borderBottomColor: '#e4e4e4',
+        borderBottomWidth: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between'
     }
 }
