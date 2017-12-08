@@ -63,14 +63,14 @@ export function fetchModulesList(modules, pieChart, menu) {
 /**
  * This services schedules sync service at interval of 2 minutes
  */
-export function syncService() {
+export function syncService(pieChart) {
   return async (dispatch) => {
     try {
       if (CONFIG.intervalId) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
-        dispatch(performSyncService())
+        dispatch(performSyncService(pieChart))
       }, CONFIG.SYNC_SERVICE_DELAY)
     } catch (error) {
       //Update UI here
@@ -94,7 +94,7 @@ export function pieChartCount() {
   }
 }
 
-export function performSyncService(isCalledFromHome){
+export function performSyncService(pieChart, isCalledFromHome){
   return async function(dispatch){
     let transactionIdToBeSynced
     try{
@@ -113,7 +113,7 @@ export function performSyncService(isCalledFromHome){
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
         if (isJobsPresent) {
-          if(PIECHART.enabled){
+          if(pieChart[PIECHART].enabled){
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())
@@ -124,7 +124,7 @@ export function performSyncService(isCalledFromHome){
         syncStatus: 'OK',
       }))
       //Now schedule sync service which will run regularly after 2 mins
-      await dispatch(syncService())
+      await dispatch(syncService(pieChart))
     } catch (error) {
       console.log(error)
       if (error.code == 500 || error.code == 502) {
@@ -155,7 +155,7 @@ export function performSyncService(isCalledFromHome){
   }
 }
 
-export function startMqttService() {
+export function startMqttService(pieChart) {
   return async function (dispatch) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     console.log('token', token)
@@ -176,7 +176,7 @@ export function startMqttService() {
           delete storage[key]
         },
       };
-
+      
       // Create a client instance 
       const client = new Client({
         uri,
@@ -193,7 +193,7 @@ export function startMqttService() {
       })
       client.on('messageReceived', message => {
         console.log('message.payloadString', message.payloadString)
-        dispatch(performSyncService(true))
+        dispatch(performSyncService(pieChart, true))
       })
 
       // connect the client 

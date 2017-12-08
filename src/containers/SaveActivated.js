@@ -121,7 +121,7 @@ class SaveActivated extends Component {
     }
 
     navigateToFormLayout = (statusId, statusName) => {
-        let cloneJobTransaction = { ...this.props.navigation.state.params.jobTransaction }
+        let cloneJobTransaction = _.cloneDeep(this.props.navigation.state.params.jobTransaction)
         cloneJobTransaction.id--
         cloneJobTransaction.jobId--
         this.props.actions.navigateToScene(FormLayout, {
@@ -249,10 +249,15 @@ class SaveActivated extends Component {
 
     _edit = (itemId) => {
         this.review(false, {})
+        let jobTransaction = {
+            id: itemId,
+            jobMasterId: this.props.navigation.state.params.jobMasterId,
+            jobId: itemId,
+        }
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
-            jobTransactionId: this.props.navigation.state.params.jobTransaction.id,
-            jobTransaction: this.props.navigation.state.params.jobTransaction,
+            jobTransactionId: itemId,
+            jobTransaction,
             statusId: this.props.navigation.state.params.currentStatus.id,
             statusName: this.props.navigation.state.params.currentStatus.name,
             jobMasterId: this.props.navigation.state.params.jobMasterId,

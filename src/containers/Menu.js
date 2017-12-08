@@ -83,8 +83,8 @@ class Menu extends Component {
 
   renderIconView(icon, key) {
     return (
-      <View key={key} style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter, styles.bgPrimary]}>
-        <Icon name={icon} style={[styles.fontWhite, styles.fontXl]} />
+      <View key={key} style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
+        <Icon name={icon} style={[styles.fontPrimary, styles.fontLg]} />
       </View>
     )
   }

@@ -10,26 +10,27 @@ import TaskIcon from '../../../src/svg_components/icons/TaskIcon'
 var InitialState = Record({
     loading: false,
     modules: {
-        BULK: {
-            appModuleId: 1,
-            displayName: 'Bulk Update',
+        START: {
+            appModuleId: 4,
+            displayName: 'All Tasks',
             enabled: false,
-            icon: <BulkIcon />,
+            icon: <TaskIcon />
         }, LIVE: {
             appModuleId: 13,
             displayName: 'Live',
             enabled: false,
             icon: <LiveIcon />,
+        },
+        BULK: {
+            appModuleId: 1,
+            displayName: 'Bulk Update',
+            enabled: false,
+            icon: <BulkIcon />,
         }, SEQUENCEMODULE: {
             appModuleId: 2,
             displayName: 'Sequence',
             enabled: false,
             icon: <SequenceIcon />,
-        }, START: {
-            appModuleId: 4,
-            displayName: 'All Tasks',
-            enabled: false,
-            icon: <TaskIcon />
         }, SORTING: {
             appModuleId: 26,
             displayName: 'Sort Parcels',

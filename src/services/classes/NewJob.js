@@ -25,7 +25,7 @@ class NewJob {
         if (!jobMasterIds) {
             throw new Error('configuration issues with next status in job master')
         }
-        return jobMasters.filter(jobMaster => _.indexOf(jobMasterIds, jobMaster.id) >= 0)
+        return jobMasters.filter(jobMaster => _.indexOf(jobMasterIds, jobMaster.id) >= 0 && jobMaster.allowAddNew)
     }
 
     async getNextPendingStatusForJobMaster(jobMasterId) {

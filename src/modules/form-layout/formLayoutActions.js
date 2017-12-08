@@ -135,8 +135,8 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
     return async function (dispatch) {
         let routeName, routeParam
         dispatch(setState(IS_LOADING, true))
-        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
-        const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId);
+        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+        const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
             routeName = SaveActivated
             routeParam = {
@@ -145,14 +145,13 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 navigationFormLayoutStates
             }
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
-            console.log('abhishek')
             let { elementsArray, amount } = await transientStatusService.getDataFromFormElement(formLayoutState.formElement)
             let totalAmount = await transientStatusService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
             routeName = CheckoutDetails
             routeParam = { commonData: previousStatusSaveActivated.commonData.commonData, recurringData: previousStatusSaveActivated.recurringData, totalAmount, signOfData: elementsArray, jobMasterId }
             let formLayoutObject = formLayoutState.formElement
             if (navigationFormLayoutStates) {
-                formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement);
+                formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
             await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
         }
@@ -164,9 +163,9 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
             routeName = HomeTabNavigatorScreen
             routeParam = {}
             await dispatch(saveDataAndAddToSyncList(formLayoutState, navigationFormLayoutStates, jobMasterId))
-            dispatch(setState(RESET_STATE));
+            dispatch(setState(RESET_STATE))
         }
-        dispatch(setState(IS_LOADING, false));
+        dispatch(setState(IS_LOADING, false))
         dispatch(navigateToScene(routeName, routeParam))
     }
 }
@@ -176,10 +175,10 @@ export function saveDataAndAddToSyncList(formLayoutState, navigationFormLayoutSt
         try {
             let formLayoutObject = formLayoutState.formElement
             if (navigationFormLayoutStates) {
-                formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement);
+                formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId);
-            await formLayoutEventsInterface.addTransactionsToSyncList(formLayoutState.jobTransactionId);
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId)
+            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         } catch (error) {
             console.log(error)
         }

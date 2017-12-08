@@ -221,7 +221,7 @@ export default class FormLayoutEventImpl {
             }
 
             //TODO add other dbs which needs updation
-            const runSheet = await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList)
+            const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList) : []
             await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList)
             realm.performBatchSave(fieldData, jobTransaction,runSheet, job)
             console.log('savdata', jobTransaction.value)

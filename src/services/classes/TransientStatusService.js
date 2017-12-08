@@ -64,7 +64,7 @@ class TransientStatusService {
            amount //amount collected if any
        }
       */
-    setSavedJobDetails(formLayoutState, recurringData, jobTransaction, statusId) {
+    saveRecurringData(formLayoutState, recurringData, jobTransaction, statusId) {
         let differentData = { ...recurringData }
         let priority = -1, textToShow = ''
         let savedJobDetailsObject = {}
@@ -206,8 +206,8 @@ class TransientStatusService {
             } else {
                 formLayoutObject = new Map([...previousFormLayoutState, ...dataForSingleTransaction.formLayoutState.formElement])
             }
-            await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId)
-            await formLayoutEventsInterface.addTransactionsToSyncList(dataForSingleTransaction.id);
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId)
+            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         }
     }
 
