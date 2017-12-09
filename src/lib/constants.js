@@ -83,6 +83,7 @@ module.exports = keyMirror({
     IS_CALENDAR_VISIBLE: null,
     SYNC_ERROR: null,
     SYNC_STATUS: null,
+    LISTING_SEARCH_VALUE: null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -212,6 +213,7 @@ module.exports = keyMirror({
     Statistics:null,
     Summary:null,
     CustomApp: null,
+    QrCodeScanner: null,
 
 
     //Skulisting Actions
@@ -300,11 +302,15 @@ module.exports = keyMirror({
     //Summary
     SET_SUMMARY_FOR_JOBMASTER : null,
     SET_SUMMARY_FOR_RUNSHEET : null,
+    RESET_SUMMARY_STATE: null,
     
     //Custom App
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
+
+    //QrCodeGenerator
+    SCANNING: null,
 
 })
 

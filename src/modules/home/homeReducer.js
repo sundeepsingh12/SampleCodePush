@@ -21,7 +21,7 @@ export default function homeReducer(state = initialState, action) {
     case SYNC_STATUS:
       return state.set('unsyncedTransactionList', action.payload.unsyncedTransactionList)
         .set('syncStatus', action.payload.syncStatus)
-
+        
 
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)

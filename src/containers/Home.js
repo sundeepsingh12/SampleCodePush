@@ -45,6 +45,7 @@ import {
   CUSTOMAPP,
   URL,
   CHOOSE_WEB_URL,
+  SUMMARY
 } from '../lib/AttributeConstants'
 
 import {
@@ -191,7 +192,9 @@ class Home extends Component {
   }
   
   _onPieChartPress = () => {
-    this.props.actions.navigateToScene(Summary)
+    if(SUMMARY.enabled){
+      this.props.actions.navigateToScene(Summary)
+    }
   }
 
   pieChartView() {

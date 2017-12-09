@@ -114,6 +114,10 @@ class ModuleCustomization {
                     this.setModuleDetails(SORTING, moduleCustomizationList[index], user)
                     break
                 }
+                case SUMMARY.appModuleId: {
+                    this.setModuleDetails(SUMMARY, moduleCustomizationList[index], user)
+                    break
+                }
 
                 case CUSTOMAPP.appModuleId: {
                     this.setModuleDetails(CUSTOMAPP, moduleCustomizationList[index], user)

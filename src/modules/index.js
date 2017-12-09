@@ -34,6 +34,7 @@ import sorting from './sorting/sortingReducer'
 import taskList from './taskList/taskListReducer'
 import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
+import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 // import profile from './profile/profileReducer'
 
 import {
@@ -78,6 +79,7 @@ const appReducer = combineReducers({
   taskList,
   summary,
   customApp,
+  qrCodeReducer,
 })
 
 const rootReducer = (state, action) => {

@@ -10,8 +10,16 @@ import {
     Icon,
 } from 'native-base';
 import styles from '../themes/FeStyle'
-
+import {SORTING_SEARCH_VALUE,QrCodeScanner,Statistics} from '../lib/constants'
+import QRIcon from '../svg_components/icons/QRIcon'
+import _ from 'lodash'
 export default class SearchBarV2 extends Component {
+    _setQrValue = (value) =>{
+        this.props.returnValue(_.trim(value));              
+    }
+    onPress = () =>{
+        this.props.onPress();
+    }
     render() {
         return (
             <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10]}>
@@ -19,13 +27,15 @@ export default class SearchBarV2 extends Component {
                     <Input
                         placeholder={this.props.placeholder}
                         placeholderTextColor={'rgba(255,255,255,.6)'}
+                        onChangeText={(searchText) => this.props.fetchDataForListing(searchText)}
+                        value={this.props.searchText}
                         style={[style.headerSearch]} />
-                    <Button small transparent style={[style.inputInnerBtn]}>
+                    <Button small transparent style={[style.inputInnerBtn]} onPress = {this.onPress}>
                         <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
                     </Button>
                 </View>
-                <TouchableOpacity small transparent style={{ width: '15%' }}>
-                    <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXxl, styles.fontRight]} onPress={() => { this.props.navigation.goBack(null) }} />
+                <TouchableOpacity style={[{ width: '15%' },styles.marginLeft15]} onPress = {() =>   this.props.navigation.navigate(QrCodeScanner, {returnData: this._setQrValue.bind(this)})} >
+                    <QRIcon width={30} height={30} color = {styles.fontBlack} />  
                 </TouchableOpacity>
             </View>
         )
