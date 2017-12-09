@@ -29,7 +29,8 @@ class Job {
                 jobStartTime,
                 latitude,
                 longitude,
-                slot
+                slot,
+                referenceNo
             } = job
             if (index == 0) {
                 jobDataQuery += 'jobId = ' + id
@@ -44,7 +45,8 @@ class Job {
                 jobStartTime,
                 latitude,
                 longitude,
-                slot
+                slot,
+                referenceNo
             }
         }
         return { jobMap, jobDataQuery }

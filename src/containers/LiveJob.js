@@ -99,17 +99,21 @@ class LiveJob extends Component {
                                 borderBottomWidth: 0
                             }
                         ])}>
-                        <Left>
-                            <Button transparent onPress={() => {
-                                this.props.navigation.goBack(null)
-                            }}>
-                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
-                            </Button>
-                        </Left>
+                        
                         <Body>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Live Tasks</Text>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[style.headerBody]}>
+                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Live Task</Text>
+                                </View>
+                                <View style={[style.headerRight]}>
+                                </View>
+                                <View />
+                            </View>
                         </Body>
-                        <Right />
                     </Header>
                     <View style={{ flexDirection: 'column' }}>
                         <View style={style.seqCard}>
@@ -181,6 +185,21 @@ const style = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#f3f3f3'
     },
+      headerLeft: {
+        width: '15%',
+        padding: 15
+      },
+      headerBody: {
+        width: '70%',
+        paddingTop: 15,
+        paddingBottom: 15,
+        paddingLeft: 10,
+        paddingRight: 10
+      },
+      headerRight: {
+        width: '15%',
+        padding: 15
+      },
     headerIcon: {
         fontSize: 18
     },

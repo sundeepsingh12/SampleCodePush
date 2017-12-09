@@ -19,7 +19,10 @@ export default class SearchBarV2 extends Component {
                     <Input
                         placeholder={this.props.placeholder}
                         placeholderTextColor={'rgba(255,255,255,.6)'}
-                        style={[style.headerSearch]} />
+                        style={[style.headerSearch]}
+                        onChangeText={(searchText) => {
+                            this.props.setSearchText(searchText)
+                        }} />
                     <Button small transparent style={[style.inputInnerBtn]}>
                         <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
                     </Button>
@@ -50,5 +53,5 @@ const style = StyleSheet.create({
         right: 5,
         paddingLeft: 0,
         paddingRight: 0
-      },
+    },
 });

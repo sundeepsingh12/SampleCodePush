@@ -87,7 +87,7 @@ class SyncScreen extends Component {
     for (let index in transactionList) {
       console.log(transactionList)
       transactionView.push(
-        <Text key = {transactionList[index].id} style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
+        <Text key={transactionList[index].id} style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
           {transactionList[index].referenceNumber}
         </Text>
       )
@@ -139,7 +139,7 @@ class SyncScreen extends Component {
             All data synced perfectly to the server.
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(true) }}>
               <Text> Re-Sync </Text>
             </Button>
           </View>
@@ -156,7 +156,7 @@ class SyncScreen extends Component {
             Internal Server Error.
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(true) }}>
               <Text> Retry </Text>
             </Button>
           </View>
@@ -174,7 +174,7 @@ class SyncScreen extends Component {
             No Internet Connection
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(true) }}>
               <Text> Retry </Text>
             </Button>
           </View>
@@ -191,7 +191,7 @@ class SyncScreen extends Component {
             Internal Error.
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(true) }}>
               <Text> Retry </Text>
             </Button>
           </View>

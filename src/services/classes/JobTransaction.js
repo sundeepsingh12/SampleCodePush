@@ -433,7 +433,7 @@ class JobTransaction {
      * finalText : String made by fixed attributes in customization object
      */
     setTransactionCustomizationDynamicParameters(customizationObject, jobTransaction, job, finalText) {
-        finalText += this.appendText(customizationObject.referenceNo, jobTransaction.referenceNumber, '', customizationObject.separator, finalText)
+        finalText += (jobTransaction.referenceNumber) ? this.appendText(customizationObject.referenceNo, jobTransaction.referenceNumber, '', customizationObject.separator, finalText) : this.appendText(customizationObject.referenceNo, job.referenceNo, '', customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.runsheetNo, jobTransaction.runsheetNo, '', customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.noOfAttempts, job.attemptCount, "Attempt: ", customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.slot, job.slot, "Slot: ", customizationObject.separator, finalText)

@@ -17,7 +17,8 @@ import {
     END_LIVEJOB_DETAILD_FETCHING,
     SET_LIVE_JOB_LIST,
     TOGGLE_LIVE_JOB_LIST_ITEM,
-    START_FETCHING_LIVE_JOB
+    START_FETCHING_LIVE_JOB,
+    SET_SEARCH
 } from '../../lib/constants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -89,6 +90,7 @@ export function fetchAllLiveJobsList() {
             dispatch(setState(START_FETCHING_LIVE_JOB, true))
             let liveJobList = await liveJobService.getLiveJobList()
             dispatch(setState(SET_LIVE_JOB_LIST, liveJobList))
+            dispatch(setState(SET_SEARCH, ''))            
         } catch (error) {
             console.log(error)
         }
@@ -127,6 +129,33 @@ export function deleteExpiredJob(jobId, liveJobList) {
             dispatch(setState(SET_LIVE_JOB_LIST, newLiveJobList))
         } catch (error) {
 
+        }
+    }
+}
+export function selectNone(liveJobList) {
+    return async function (dispatch) {
+        try {
+            const allJobs = await JSON.parse(JSON.stringify(liveJobList))
+            Object.values(allJobs).forEach(job => job.jobTransactionCustomization.isChecked = false)
+            dispatch(setState(TOGGLE_LIVE_JOB_LIST_ITEM, {
+                selectedItems: [],
+                jobTransactions: allJobs
+            }))
+        } catch (error) {
+        }
+    }
+}
+export function selectAll(liveJobList) {
+    return async function (dispatch) {
+        try {
+            const allJobs = await JSON.parse(JSON.stringify(liveJobList))
+            Object.values(allJobs).forEach(job => job.jobTransactionCustomization.isChecked = true)
+            let selectedItems = Object.keys(allJobs)
+            dispatch(setState(TOGGLE_LIVE_JOB_LIST_ITEM, {
+                selectedItems,
+                jobTransactions: allJobs
+            }))
+        } catch (error) {
         }
     }
 }

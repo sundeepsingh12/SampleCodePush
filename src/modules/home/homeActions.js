@@ -26,7 +26,7 @@ import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { sync } from '../../services/classes/Sync'
 import BackgroundTimer from 'react-native-background-timer'
-import { setState } from '../global/globalActions'
+import { setState, navigateToScene } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { Client } from 'react-native-paho-mqtt'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -104,17 +104,21 @@ export function performSyncService(isCalledFromHome, isLiveJob) {
       const syncCount = responseBody.split(",")[1]
       //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
       if (isCalledFromHome || syncCount > 0) {
+        console.log(isCalledFromHome, syncCount)
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'Downloading'
         }))
-        const isJobsPresent = await sync.downloadAndDeleteDataFromServer(false)
-        const liveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
+        const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+        const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
         if (isJobsPresent) {
           if (PIECHART.enabled) {
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())
+        }
+        if (isLiveJob) {
+          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
         }
       }
       dispatch(setState(SYNC_STATUS, {

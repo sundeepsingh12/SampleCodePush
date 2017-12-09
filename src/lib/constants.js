@@ -302,6 +302,7 @@ module.exports = keyMirror({
     END_LIVEJOB_DETAILD_FETCHING: null,
     TOGGLE_LIVE_JOB_LIST_ITEM: null,
     START_FETCHING_LIVE_JOB: null,
+    SET_SEARCH: null,
     //Summary
     SET_SUMMARY_FOR_JOBMASTER: null,
     SET_SUMMARY_FOR_RUNSHEET: null,

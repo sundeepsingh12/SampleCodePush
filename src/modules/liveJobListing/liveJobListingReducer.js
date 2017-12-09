@@ -2,7 +2,8 @@
 import {
     SET_LIVE_JOB_LIST,
     TOGGLE_LIVE_JOB_LIST_ITEM,
-    START_FETCHING_LIVE_JOB
+    START_FETCHING_LIVE_JOB,
+    SET_SEARCH
 } from '../../lib/constants'
 import InitialState from './liveJobListingInitialState.js'
 
@@ -19,6 +20,8 @@ export default function liveJobReducer(state = initialState, action) {
                 .set('selectedItems', action.payload.selectedItems)
         case START_FETCHING_LIVE_JOB:
             return state.set('loaderRunning', action.payload)
+        case SET_SEARCH:
+            return state.set('searchText', action.payload)
     }
     return state
 }
