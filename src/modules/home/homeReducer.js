@@ -16,14 +16,14 @@ export default function homeReducer(state = initialState, action) {
 
   switch (action.type) {
     case HOME_LOADING:
-      return state.set('loading', action.payload.loading)
-   
-      case SET_MODULES:
+      return state.set('moduleLoading', action.payload.moduleLoading)
+
+    case SET_MODULES:
       return state.set('modules', action.payload.modules)
         .set('pieChart', action.payload.pieChart)
         .set('menu', action.payload.menu)
-        .set('loading', action.payload.loading)
-      
+        .set('moduleLoading', action.payload.moduleLoading)
+
     case SYNC_STATUS:
       return state.set('unsyncedTransactionList', action.payload.unsyncedTransactionList)
         .set('syncStatus', action.payload.syncStatus)
@@ -31,7 +31,7 @@ export default function homeReducer(state = initialState, action) {
 
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)
-                  .set('count', action.payload.count)
+        .set('count', action.payload.count)
   }
 
   return state

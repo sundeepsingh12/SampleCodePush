@@ -40,13 +40,13 @@ export function fetchModulesList(modules, pieChart, menu) {
   return async function (dispatch) {
     try {
       dispatch(setState(HOME_LOADING, {
-        loading: true
+        moduleLoading: true
       }))
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
       const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu)
       dispatch(setState(SET_MODULES, {
-        loading: false,
+        moduleLoading: false,
         modules: result.modules,
         pieChart: result.pieChart,
         menu: result.menu

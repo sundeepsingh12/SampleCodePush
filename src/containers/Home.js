@@ -63,7 +63,6 @@ import _ from 'lodash'
 
 function mapStateToProps(state) {
   return {
-    loading: state.home.loading,
     modules: state.home.modules,
     pieChart: state.home.pieChart,
     menu: state.home.menu,
@@ -239,7 +238,7 @@ class Home extends Component {
     const moduleView = this.moduleView(_.values(this.props.modules))
     const pieChartView = this.pieChartView()
 
-    if (this.props.loading) {
+    if (this.props.moduleLoading) {
       return (<Loader />)
     }
     return (

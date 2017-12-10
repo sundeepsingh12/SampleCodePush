@@ -3,9 +3,11 @@ import {
     JOB_STATUS,
     PENDING,
     TABLE_JOB,
-    NewJobStatus
+    NewJobStatus,
+    SaveActivated
 } from '../../lib/constants'
 
+import { transientStatusService } from './TransientStatusService.js'
 import { keyValueDBService } from './KeyValueDBService.js'
 import * as realm from '../../repositories/realmdb'
 import _ from 'lodash'
@@ -51,18 +53,45 @@ class NewJob {
         if (!jobMaster) {
             throw new Error('jobMaster not present')
         }
+        let navigationParams, stateParam, screenName
         if (!saveActivatedData || !saveActivatedData.value[jobMaster.id]) {
             return {
                 screenName: NewJobStatus,
-                jobMaster
+                navigationParams: {
+                    jobMaster
+                }
             }
-        } else {
-            return {
-                screenName: saveActivatedData.value[jobMaster.id].screenName,
-                saveActivatedState: saveActivatedData.value[jobMaster.id].saveActivatedState,
-                navigationParams: saveActivatedData.value[jobMaster.id].navigationParams,
-                navigationFormLayoutStates: saveActivatedData.value[jobMaster.id].navigationFormLayoutStates
+        } else if (saveActivatedData.value[jobMaster.id].screenName == SaveActivated) {
+            let result = transientStatusService.convertMapToArrayOrArrayToMap(saveActivatedData.value[jobMaster.id].saveActivatedState.differentData, saveActivatedData.value[jobMaster.id].navigationFormLayoutStates, false)
+            stateParam = {
+                commonData: saveActivatedData.value[jobMaster.id].saveActivatedState.commonData,
+                statusName: saveActivatedData.value[jobMaster.id].saveActivatedState.statusName,
+                differentData: result.differentData,
+                isSignOffVisible: saveActivatedData.value[jobMaster.id].saveActivatedState.isSignOffVisible,
             }
+            navigationParams = {
+                calledFromNewJob: true,
+                jobMasterId: jobMaster.id,
+                navigationFormLayoutStates: saveActivatedData.value[jobMaster.id].saveActivatedState.arrayFormElement,
+                jobTransaction: saveActivatedData.value[jobMaster.id].navigationParams.jobTransaction,
+                contactData: saveActivatedData.value[jobMaster.id].navigationParams.contactData,
+                currentStatus: saveActivatedData.value[jobMaster.id].navigationParams.currentStatus
+            }
+        }
+        else {
+            navigationParams = {
+                calledFromNewJob: true,
+                jobMasterId: jobMaster.id,
+                commonData: saveActivatedData.value[jobMaster.id].navigationParams.commonData,
+                recurringData: saveActivatedData.value[jobMaster.id].navigationParams.recurringData,
+                signOfData: saveActivatedData.value[jobMaster.id].navigationParams.signOfData,
+                totalAmount: saveActivatedData.value[jobMaster.id].navigationParams.totalAmount
+            }
+        }
+        return {
+            screenName: screenName = saveActivatedData.value[jobMaster.id].screenName,
+            navigationParams,
+            stateParam
         }
     }
 }
