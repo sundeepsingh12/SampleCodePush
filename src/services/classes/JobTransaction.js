@@ -232,28 +232,41 @@ class JobTransaction {
             //Fetch only pending status category job transactions for sequence listing
             jobTransactionQuery = statusQuery && statusQuery.trim() !== '' ? `${jobTransactionQuery} AND (${statusQuery})` : `${jobTransactionQuery}`
         }
+        let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
+            fieldDataList = [], fieldDataMap = {}
 
-        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
-
-        if (jobTransactionList.length == 0) {
-            return []
-        }
-
-        let jobsList = realm.getRecordListOnQuery(TABLE_JOB, jobTransactionObject.jobQuery, false)
-        let jobMapAndJobDataQuery = jobService.getJobMapAndJobDataQuery(jobsList)
         if (callingActivity == 'LiveJob') {
-            jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery, false)
-        } else {
-            jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobTransactionObject.jobDataQuery, false)
+            jobTransactionObject.jobQuery = 'status = 6'
         }
-        let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
-        if (callingActivity != 'LiveJob') {
-            fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery, false)
-            fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
+        else {
+            jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
+            if (jobTransactionList.length == 0) {
+                return []
+            }
+            jobTransactionObject = this.getJobTransactionMapAndQuery(jobTransactionList)
+            jobTransactionMap = jobTransactionObject.jobTransactionMap
+            let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
+
+            if (jobTransactionList.length == 0) {
+                return []
+            }
+
+            let jobsList = realm.getRecordListOnQuery(TABLE_JOB, jobTransactionObject.jobQuery, false)
+            let jobMapAndJobDataQuery = jobService.getJobMapAndJobDataQuery(jobsList)
+            if (callingActivity == 'LiveJob') {
+                jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery, false)
+            } else {
+                jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobTransactionObject.jobDataQuery, false)
+            }
+            let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
+            if (callingActivity != 'LiveJob') {
+                fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery, false)
+                fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
+            }
+            let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
+            let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap)
+            return jobTransactionCustomizationList
         }
-        let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
-        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap)
-        return jobTransactionCustomizationList
     }
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
         let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
