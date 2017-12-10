@@ -1,8 +1,16 @@
 import { keyValueDBService } from '../KeyValueDBService.js'
+import { transientStatusService } from '../TransientStatusService.js'
 import {
     OBJECT
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
+import {
+    HomeTabNavigatorScreen,
+    SaveActivated,
+    Transient,
+    CheckoutDetails,
+} from '../../../lib/constants'
+import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 class FormLayout {
 
     /**
@@ -129,7 +137,7 @@ class FormLayout {
         if (!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0) {
             return { formLayoutObject, isSaveDisabled: false }
         }
-        
+
         let isRequiredAttributeFound = false
         for (let i = 0; i < sequenceWiseSortedFieldAttributesForStatus.length; i++) {
             let fieldAttribute = sequenceWiseSortedFieldAttributesForStatus[i]
@@ -206,6 +214,55 @@ class FormLayout {
         };
     }
 
+    concatFormElementForTransientStatus(navigationFormLayoutStates, formElement) {
+        let combineMap = new Map(formElement);
+        for (let formLayoutCounter in navigationFormLayoutStates) {
+            let formElementForPreviousStatus = navigationFormLayoutStates[formLayoutCounter].formElement
+            combineMap = new Map([...combineMap, ...formElementForPreviousStatus])
+        }
+        return combineMap
+    }
+
+    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList) {
+        let routeName, routeParam
+        const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
+        if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
+            routeName = SaveActivated
+            routeParam = {
+                formLayoutState,
+                contactData, currentStatus, jobTransaction, jobMasterId,
+                navigationFormLayoutStates
+            }
+        } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
+            let { elementsArray, amount } = await transientStatusService.getDataFromFormElement(formLayoutState.formElement)
+            let totalAmount = await transientStatusService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
+            routeName = CheckoutDetails
+            routeParam = { commonData: previousStatusSaveActivated.commonData.commonData, recurringData: previousStatusSaveActivated.recurringData, totalAmount, signOfData: elementsArray, jobMasterId }
+            let formLayoutObject = formLayoutState.formElement
+            if (navigationFormLayoutStates) {
+                formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
+            }
+            await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
+        }
+        else if (currentStatus.transient) {
+            routeName = Transient
+            routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, }
+        }
+        else {
+            routeName = HomeTabNavigatorScreen
+            routeParam = {}
+            let formLayoutObject = formLayoutState.formElement
+            if (navigationFormLayoutStates) {
+                formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
+            }
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId)
+            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+        }
+        return {
+            routeName,
+            routeParam
+        }
+    }
 }
 
 export let formLayoutService = new FormLayout()

@@ -40,6 +40,7 @@ export default function dataStoreReducer(state = initialState, action) {
 
         case SET_SEARCH_TEXT:
             return state.set('searchText', action.payload)
+                .set('errorMessage', '')
 
         case SHOW_DETAILS:
             return state.set('detailsVisibleFor', action.payload)

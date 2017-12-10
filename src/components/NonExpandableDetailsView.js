@@ -15,9 +15,10 @@ import {
     IMAGE_LOADING_ERROR,
     VIEW_TEXT_LABEL,
     IMAGE_URL,
-    DATA_STORE
+    DATA_STORE,
+    COUNT_DOWN_TIMER
 } from '../lib/AttributeConstants'
-
+import CountDownTimer from './CountDownTimer'
 export default class NonExpandableDetailsView extends Component {
 
     _openURL(url) {
@@ -46,10 +47,6 @@ export default class NonExpandableDetailsView extends Component {
                                 </Text>
                             </View>
                         </TouchableOpacity>)}
-                    {renderIf(this.props.attributeTypeId != IMAGE_URL && this.props.attributeTypeId != DATA_STORE,
-                        <Text style={[styles.fontDefault, styles.fontBlack]}>
-                            {this.props.value}
-                        </Text>)}
 
                     {renderIf(this.props.attributeTypeId == DATA_STORE,
                         <Text style={[styles.fontDefault, styles.fontPrimary, styles.textUnderline]}
@@ -57,6 +54,13 @@ export default class NonExpandableDetailsView extends Component {
                                 value: this.props.value,
                                 fieldAttributeMasterId: this.props.fieldAttributeMasterId
                             })}>
+                            {this.props.value}
+                        </Text>)}
+                    {renderIf(this.props.attributeTypeId == COUNT_DOWN_TIMER,
+                        <CountDownTimer value={this.props.value} />)}
+
+                    {renderIf(this.props.attributeTypeId != IMAGE_URL && this.props.attributeTypeId != COUNT_DOWN_TIMER && this.props.attributeTypeId != DATA_STORE,
+                        <Text style={[styles.fontDefault, styles.fontBlack]}>
                             {this.props.value}
                         </Text>)}
                 </View>

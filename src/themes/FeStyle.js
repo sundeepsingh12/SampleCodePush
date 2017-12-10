@@ -445,6 +445,12 @@ export default {
     absolute: {
         position: 'absolute'
     },
+    borderRadius3: {
+        borderRadius: 3
+    },
+    shadow: {
+        elevation: 2,
+    },
     borderLeft4: {
         borderLeftColor: themeColor, 
         borderLeftWidth: 4 
