@@ -59,8 +59,6 @@ import SkuListingInitialState from './modules/skulisting/skuListingInitialState'
 import FormLayoutInitialState from './modules/form-layout/formLayoutInitialState'
 import SequenceInitialState from './modules/sequence/sequenceInitialState'
 import NewJobInitialState from './modules/newJob/newJobInitialState'
-import SaveActivatedState from './modules/saveActivated/saveActivatedInitialState'
-import TransientStatusState from './modules/transientStatus/transientInitialState'
 import BulkInitialState from './modules/bulk/bulkInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
@@ -92,8 +90,6 @@ function getInitialState() {
     formLayout : new FormLayoutInitialState(),
     sequence: new SequenceInitialState(),
     newJob : new NewJobInitialState(),
-    transientStatus : new TransientStatusState(),
-    saveActivated : new SaveActivatedState(),
     bulk:new BulkInitialState(),
   }
   return _initState

@@ -9,6 +9,7 @@ import {
     SHOW_ERROR_MESSAGE,
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
+    SAVE_SUCCESSFUL,
     SET_INITIAL_STATE
 } from '../../../lib/constants'
 const InitialState = require('../dataStoreInitialState').default
@@ -82,7 +83,6 @@ describe('data Store reducer', () => {
         }
         let nextState = dataStoreReducer(undefined, action)
         expect(nextState.searchText).toBe(action.payload)
-        expect(nextState.errorMessage).toBe('')
     })
 
     it('should set detailsVisibleFor, and searchText', () => {
@@ -92,6 +92,15 @@ describe('data Store reducer', () => {
         }
         let nextState = dataStoreReducer(undefined, action)
         expect(nextState.detailsVisibleFor).toBe(action.payload)
+    })
+
+    it('should set isSaveSuccessful to true', () => {
+        const action = {
+            type: SAVE_SUCCESSFUL,
+            payload: true,
+        }
+        let nextState = dataStoreReducer(undefined, action)
+        expect(nextState.isSaveSuccessful).toBe(action.payload)
     })
 
     it('should set initialState', () => {

@@ -215,6 +215,7 @@ class BasicFormElement extends Component {
         if (this.state.selectFromListEnable) {
             return (
                 <View>
+                    <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
                     <SelectFromList
                         currentElement={this.props.item}
                         formElements={this.props.formElement}
@@ -324,12 +325,7 @@ class BasicFormElement extends Component {
             case RADIOBUTTON:
             case DROPDOWN:
             case OPTION_RADIO_FOR_MASTER:
-                return (
-                    <View>
-                        {modalView}
-                        <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
-                    </View>
-                )
+                return <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
             case DATE:
             case RE_ATTEMPT_DATE:
             case TIME:
