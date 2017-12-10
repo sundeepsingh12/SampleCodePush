@@ -196,6 +196,8 @@ export function startMqttService() {
       client.on('messageReceived', message => {
         console.log('message.payloadString', message.payloadString)
         if (message.payloadString == 'Live Job Notification') {
+          //let showLiveJobNotification = true
+          keyValueDBService.validateAndSaveData('LIVE_JOB', { showLiveJobNotification: true })
           dispatch(performSyncService(true, true))
         } else {
           dispatch(performSyncService(true))

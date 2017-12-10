@@ -171,8 +171,20 @@ class Sync {
           propertyName: 'jobId'
         }
         await realm.deleteRecordsInBatch(deleteJobTransactions)
+      } else if (queryType == 'deleteBroadcast') {
+        const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+        const deleteJobs = {
+          tableName: TABLE_JOB,
+          valueList: jobIds,
+          propertyName: 'jobId'
+        }
+        const deleteJobData = {
+          tableName: TABLE_JOB_DATA,
+          valueList: jobIds,
+          propertyName: 'jobId'
+        }
+        await realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
       }
-
     }
     return jobMasterIds
   }
@@ -526,8 +538,11 @@ class Sync {
           }
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
-          if (!isLiveJob)
-          this.showNotification(jobMasterTitleList)
+          let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
+          if (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification)) {
+            this.showNotification(jobMasterTitleList)
+            keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
+          }
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
           jobSummaryService.updateJobSummary(dataList.jobSummaries)
         }
