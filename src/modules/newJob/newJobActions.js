@@ -1,20 +1,42 @@
 'use strict'
 import {
     NEW_JOB_MASTER,
-    NEW_JOB_STATUS
+    NEW_JOB_STATUS,
+    SAVE_ACTIVATED,
+    SaveActivated,
+    CheckoutDetails,
+    POPULATE_DATA,
+    JOB_MASTER,
+    FormLayout
 } from '../../lib/constants'
 
 import {newJob} from '../../services/classes/NewJob'
-import { setState } from '../global/globalActions'
+import { setState, navigateToScene } from '../global/globalActions'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { transientStatusService } from '../../services/classes/TransientStatusService'
+import  _ from 'lodash'
 
 
 export function getMastersWithNewJob() {
     return async function (dispatch) {
         let mastersWithNewJob = await newJob.getMastersWithNewJob();
+        if (_.size(mastersWithNewJob) == 1) {
+            dispatch(redirectToContainer(mastersWithNewJob[0]))
+        }
         dispatch(setState(NEW_JOB_MASTER,mastersWithNewJob));
     }
 }
 
+export function getMastersFromMasterIds(jobMasterIds) {
+    return async function (dispatch) {
+        const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
+        let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters.value, jobMasterIds)
+        if (_.size(mastersWithNewJob) == 1) {
+            dispatch(redirectToContainer(mastersWithNewJob[0]))
+        }
+        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
+    }
+}
 
 export function getStatusAndIdForJobMaster(jobMasterId) {
     return async function (dispatch) {
@@ -24,6 +46,72 @@ export function getStatusAndIdForJobMaster(jobMasterId) {
         //initially reset the statusList
         dispatch(setState(NEW_JOB_STATUS,[]));
         let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMasterId);
+        if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
+            dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, jobMasterId))
+        }
         dispatch(setState(NEW_JOB_STATUS,nextPendingStatusWithId));
+    }
+}
+
+export function redirectToFormLayout(status, negativeId, jobMasterId) {
+    return async function (dispatch) {
+        try {
+            dispatch(navigateToScene(FormLayout, {
+                statusId: status.id,
+                statusName: status.name,
+                jobTransactionId: negativeId,
+                jobMasterId: jobMasterId,
+                jobTransaction: {
+                    id: negativeId,
+                    jobMasterId: jobMasterId,
+                    jobId: negativeId,
+                }
+            }))
+        } catch (error) {
+
+        }
+    }
+}
+
+export function redirectToContainer(jobMaster) {
+    return async function (dispatch) {
+        try {
+            let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
+            let returnParams = await newJob.checkForNextContainer(jobMaster, saveActivatedData)
+            let navigationParams
+            if (returnParams.screenName == SaveActivated) {
+                let result = await transientStatusService.convertMapToArrayOrArrayToMap(returnParams.saveActivatedState.differentData, returnParams.navigationFormLayoutStates, false)
+                await dispatch(setState(POPULATE_DATA, {
+                    commonData: returnParams.saveActivatedState.commonData,
+                    statusName: returnParams.saveActivatedState.statusName,
+                    differentData: result.differentData,
+                    isSignOffVisible: returnParams.saveActivatedState.isSignOffVisible,
+                }))
+                navigationParams = {
+                    calledFromNewJob: true,
+                    jobMasterId: jobMaster.id,
+                    navigationFormLayoutStates: result.arrayFormElement,
+                    jobTransaction: returnParams.navigationParams.jobTransaction,
+                    contactData: returnParams.navigationParams.contactData,
+                    currentStatus: returnParams.navigationParams.currentStatus
+                }
+            } else if (returnParams.screenName == CheckoutDetails) {
+                navigationParams = {
+                    calledFromNewJob: true,
+                    jobMasterId: jobMaster.id,
+                    commonData: returnParams.navigationParams.commonData,
+                    recurringData: returnParams.navigationParams.recurringData,
+                    signOfData: returnParams.navigationParams.signOfData,
+                    totalAmount: returnParams.navigationParams.totalAmount
+                }
+            } else {
+                navigationParams = {
+                    jobMaster: returnParams.jobMaster
+                }
+            }
+            dispatch(navigateToScene(returnParams.screenName, navigationParams))
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
