@@ -22,6 +22,7 @@ module.exports = {
     CASH_TENDERING: 38,
     CHECKBOX: 8,
     CONTACT_NUMBER: 27,
+    COUNT_DOWN_TIMER: 34,
     DATE: 3,
     DATA_STORE: 44,
     DECIMAL: 13,
@@ -32,7 +33,7 @@ module.exports = {
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,
     IMAGE_URL: 24,
-    JOB_EXPIRY_TIME: 69,    
+    JOB_EXPIRY_TIME: 69,
     LANDMARK: 30,
     MODE: 'mode_type',
     MONEY_COLLECT: 18,
@@ -352,13 +353,13 @@ module.exports = {
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
-   
+
     //Custom App
-    WEBVIEW_REF : 'webview',
-    URL : 'URL',
-    CHOOSE_WEB_URL : "Choose Web URL",
-    ENTER_URL_HERE : "Enter Url Here",
-    HTTP : 'http://',
+    WEBVIEW_REF: 'webview',
+    URL: 'URL',
+    CHOOSE_WEB_URL: "Choose Web URL",
+    ENTER_URL_HERE: "Enter Url Here",
+    HTTP: 'http://',
 
     //SelectFromList
     SEARCH: 'Search',

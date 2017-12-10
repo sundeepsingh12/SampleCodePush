@@ -24,7 +24,7 @@ import {
 import { addServerSmsService } from './AddServerSms'
 
 import {
-jobMasterService
+  jobMasterService
 } from './JobMaster'
 import _ from 'lodash'
 
@@ -49,7 +49,7 @@ import {
   FAREYE_UPDATES
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
-import NotificationsIOS,{NotificationsAndroid}from 'react-native-notifications'
+import NotificationsIOS, { NotificationsAndroid } from 'react-native-notifications'
 
 class Sync {
 
@@ -145,7 +145,7 @@ class Sync {
    * @param {*} tdcResponse 
    */
   async processTdcResponse(tdcContentArray) {
-    let tdcContentObject,jobMasterIds
+    let tdcContentObject, jobMasterIds
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
       let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery)
@@ -155,7 +155,7 @@ class Sync {
       }
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
-       jobMasterIds =  await this.saveDataFromServerInDB(contentQuery)
+        jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
         jobMasterIds = await this.updateDataInDB(contentQuery)
       } else if (queryType == 'delete') {
@@ -167,18 +167,18 @@ class Sync {
         }
         await realm.deleteRecordsInBatch(deleteJobTransactions)
       }
-        return jobMasterIds
     }
+    return jobMasterIds
   }
 
   async getAssignOrderTohubEnabledJobs(query) {
     let allJobsToTransactions = []
     const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     let jobMasterWithAssignOrderToHubEnabled = {}
-    jobMaster.value.forEach(jobMasterObject=>{
-    if(jobMasterObject.assignOrderToHub){
-      jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.id
-    }
+    jobMaster.value.forEach(jobMasterObject => {
+      if (jobMasterObject.assignOrderToHub) {
+        jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.id
+      }
     })
     let transactionList = query.jobTransactions
     let transactionListIdMap = _.values(transactionList).reduce((object, item) => {
@@ -201,8 +201,8 @@ class Sync {
     let hub = await keyValueDBService.getValueFromStore(HUB)
     let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     let jobmaster
-    for( let jobMasterObject of jobMaster){
-      if(jobMasterObject.id == job.jobMasterId){
+    for (let jobMasterObject of jobMaster) {
+      if (jobMasterObject.id == job.jobMasterId) {
         jobmaster = jobMasterObject
         break
       }
@@ -276,7 +276,7 @@ class Sync {
       tableName: TABLE_JOB,
       value: contentQuery.job
     }
-  
+
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
       value: contentQuery.jobData
@@ -324,7 +324,7 @@ class Sync {
     }
     const newJobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
-      valueList: newJobTransactionsIds,       
+      valueList: newJobTransactionsIds,
       propertyName: 'id'
     }
     const newJobs = {
@@ -479,7 +479,7 @@ class Sync {
     const pageNumber = 0,
       pageSize = 3
     let isLastPageReached = false,
-      json, isJobsPresent = false,jobMasterIds
+      json, isJobsPresent = false, jobMasterIds
     const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize)
@@ -506,18 +506,18 @@ class Sync {
           this.showNotification(jobMasterTitleList)
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
           jobSummaryService.updateJobSummary(dataList.jobSummaries)
-                 
+
         }
       } else {
         isLastPageReached = true
       }
     }
-    console.log('isJobsPresent',isJobsPresent)
-    if(isJobsPresent){
-      await runSheetService.updateRunSheetSummary()  
+    console.log('isJobsPresent', isJobsPresent)
+    if (isJobsPresent) {
+      await runSheetService.updateRunSheetSummary()
     }
     return isJobsPresent
-   
+
   }
 
   showNotification(jobMasterTitleList) {
