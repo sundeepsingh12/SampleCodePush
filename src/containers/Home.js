@@ -36,16 +36,19 @@ import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import CircularProgress from '../svg_components/components/CircularProgress'
 import PieChart from '../components/PieChart'
 import {
-  BULK,
-  LIVE,
-  PIECHART,
-  SEQUENCEMODULE,
-  START,
-  SORTING,
-  CUSTOMAPP,
-  URL,
+  BULK_ID,
+  LIVE_ID,
+  START_ID,
+  SEQUENCEMODULE_ID,
+  SORTING_ID,
+  CUSTOMAPP_ID,
   CHOOSE_WEB_URL,
+  NEWJOB_ID
 } from '../lib/AttributeConstants'
+
+import {
+  PIECHART
+} from '../lib/constants'
 
 import {
   TabScreen,
@@ -54,11 +57,16 @@ import {
   Sorting,
   Summary,
   CustomApp,
-  ON_CHANGE_STATE
+  NewJob
 } from '../lib/constants'
+import _ from 'lodash'
 
 function mapStateToProps(state) {
   return {
+    loading: state.home.loading,
+    modules: state.home.modules,
+    pieChart: state.home.pieChart,
+    menu: state.home.menu,
     moduleLoading: state.home.moduleLoading,
     chartLoading: state.home.chartLoading,
     count: state.home.count,
@@ -77,60 +85,74 @@ const percentage = 95;
 class Home extends Component {
 
   componentDidMount() {
-    this.props.actions.fetchModulesList()
+    this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
   }
 
-  navigateToScene = (moduleName) => {
-    console.log('modulename',moduleName)
-    switch (moduleName) {
-      case BULK: {
+  navigateToScene = (appModule) => {
+    switch (appModule.appModuleId) {
+      case BULK_ID: {
         this.props.actions.navigateToScene(BulkConfiguration)
         break
       }
-      case LIVE: {
-          Toast.show({
-              text: `Under development!Coming Soon`,
-              position: 'bottom',
-              buttonText: 'OK'
-            })
+      case LIVE_ID: {
+        Toast.show({
+          text: `Under development!Coming Soon`,
+          position: 'bottom',
+          buttonText: 'OK'
+        })
         break
       }
-      case SEQUENCEMODULE: { 
+      case SEQUENCEMODULE_ID: {
         this.props.actions.navigateToScene(Sequence)
         break
       }
-      case START: {
-        this.props.actions.navigateToScene(TabScreen)
+      case START_ID: {
+        this.props.actions.navigateToScene(TabScreen, {
+          appModule
+        })
         break
       }
 
-      case SORTING: {
+      case SORTING_ID: {
         this.props.actions.navigateToScene(Sorting)
         break
-      }    
-      
-      case CUSTOMAPP: {
-        ((CUSTOMAPP.remark) && CUSTOMAPP.remark.length > 1) ?  this.customAppSelection() :  ((CUSTOMAPP.remark ) && CUSTOMAPP.remark.length == 1) 
-                                   ? this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[0].customUrl) : this.props.actions.navigateToScene(CustomApp) ;
+      }
+
+      case CUSTOMAPP_ID: {
+        ((appModule.remark) && appModule.remark.length > 1) ? this.customAppSelection(appModule) : ((appModule.remark) && appModule.remark.length == 1)
+          ? this.props.actions.navigateToScene(CustomApp, {
+            customUrl: appModule.remark[0].customUrl,
+            appModule
+          }) :
+          this.props.actions.navigateToScene(CustomApp, {
+            appModule
+          });
         break
       }
+
+      default:
+        (appModule.appModuleId == NEWJOB_ID) ? this.props.actions.navigateToScene(NewJob, {
+          jobMasterIdList: appModule.jobMasterIdList
+        }) : null
+
     }
   }
-  customAppSelection(){
-   let  BUTTONS = CUSTOMAPP.remark.map(id => !(id.title) ? URL : id.title)
-   BUTTONS.push('Cancel')
+  customAppSelection(appModule) {
+    let BUTTONS = appModule.remark.map(id => !(id.title) ? URL : id.title)
+    BUTTONS.push('Cancel')
     ActionSheet.show(
       {
         options: BUTTONS,
         title: CHOOSE_WEB_URL,
-        cancelButtonIndex: BUTTONS.length-1,
-        destructiveButtonIndex: BUTTONS.length-1
+        cancelButtonIndex: BUTTONS.length - 1,
+        destructiveButtonIndex: BUTTONS.length - 1
       },
-       buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length-1)) ? this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[buttonIndex].customUrl)  : null
+      buttonIndex => {
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, appModule.remark[buttonIndex].customUrl) : null
       }
-    )}
-  
+    )
+  }
+
 
   headerView() {
     return (
@@ -163,18 +185,16 @@ class Home extends Component {
     )
   }
 
-
   moduleView(modulesList) {
     let moduleView = []
     for (let index in modulesList) {
-      
       if (!modulesList[index].enabled) {
         continue
       }
       moduleView.push(
         <ListItem button onPress={() => this.navigateToScene(modulesList[index])}
           style={[style.moduleList]}
-          key={modulesList[index].appModuleId}
+          key={modulesList[index].serialNumber}
         >
           {modulesList[index].icon}
           <Body>
@@ -195,7 +215,7 @@ class Home extends Component {
   }
 
   pieChartView() {
-    if(!PIECHART.enabled) {
+    if(!this.props.pieChart[PIECHART].enabled) {
       return null
     }
 
@@ -216,9 +236,10 @@ class Home extends Component {
 
   render() {
     const headerView = this.headerView()
-    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE,SORTING,CUSTOMAPP])
+    const moduleView = this.moduleView(_.values(this.props.modules))
     const pieChartView = this.pieChartView()
-    if (this.props.moduleLoading) {
+
+    if (this.props.loading) {
       return (<Loader />)
     }
     return (

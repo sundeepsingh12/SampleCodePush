@@ -14,6 +14,10 @@ import {
     RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+    JOB_STATUS,
+    SaveActivated,
+    Transient,
+    CheckoutDetails,
     UPDATE_FIELD_DATA_VALIDATION,
     NEXT_FOCUS
 } from '../../lib/constants'
@@ -23,8 +27,9 @@ import { formLayoutEventsInterface } from '../../services/classes/formLayout/For
 import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
+import { setState ,navigateToScene} from '../global/globalActions'
+import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { setState } from '../global/globalActions'
 import _ from 'lodash'
 
 export function _setFormList(sortedFormAttributesDto) {
@@ -45,7 +50,6 @@ export function _setErrorMessage(message) {
 export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId) {
     return async function (dispatch) {
         try {
-
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId)
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
@@ -127,15 +131,57 @@ export function toogleHelpText(attributeId, formElement) {
     }
 }
 
-export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated) {
     return async function (dispatch) {
-        dispatch(setState(IS_LOADING,true))
-        let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+        let routeName, routeParam
+        dispatch(setState(IS_LOADING, true))
+        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+        const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
+        if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
+            routeName = SaveActivated
+            routeParam = {
+                formLayoutState,
+                contactData, currentStatus, jobTransaction, jobMasterId,
+                navigationFormLayoutStates
+            }
+        } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
+            let { elementsArray, amount } = await transientStatusService.getDataFromFormElement(formLayoutState.formElement)
+            let totalAmount = await transientStatusService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
+            routeName = CheckoutDetails
+            routeParam = { commonData: previousStatusSaveActivated.commonData.commonData, recurringData: previousStatusSaveActivated.recurringData, totalAmount, signOfData: elementsArray, jobMasterId }
+            let formLayoutObject = formLayoutState.formElement
+            if (navigationFormLayoutStates) {
+                formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
+            }
+            await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
+        }
+        else if (currentStatus.transient) {
+            routeName = Transient
+            routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, }
+        }
+        else {
+            routeName = HomeTabNavigatorScreen
+            routeParam = {}
+            await dispatch(saveDataAndAddToSyncList(formLayoutState, navigationFormLayoutStates, jobMasterId))
+            dispatch(setState(RESET_STATE))
+        }
         dispatch(setState(IS_LOADING, false))
-        dispatch(setState(RESET_STATE))
-        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        dispatch(navigateToScene(routeName, routeParam))
+    }
+}
 
+export function saveDataAndAddToSyncList(formLayoutState, navigationFormLayoutStates, jobMasterId) {
+    return async function (dispatch) {
+        try {
+            let formLayoutObject = formLayoutState.formElement
+            if (navigationFormLayoutStates) {
+                formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
+            }
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId)
+            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 

@@ -206,6 +206,14 @@ class FormLayout {
         };
     }
 
+    concatFormElementForTransientStatus(navigationFormLayoutStates, formElement) {
+        let combineMap = new Map(formElement);
+        for (let formLayoutCounter in navigationFormLayoutStates) {
+            let formElementForPreviousStatus = navigationFormLayoutStates[formLayoutCounter].formElement
+            combineMap = new Map([...combineMap, ...formElementForPreviousStatus])
+        }
+        return combineMap
+    }
 }
 
 export let formLayoutService = new FormLayout()

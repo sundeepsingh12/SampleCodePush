@@ -33,14 +33,6 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
-import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
-import {
-    BULK,
-    LIVE,
-    PIECHART,
-    SEQUENCE,
-    START,
-} from '../lib/AttributeConstants'
 
 import {
     HomeScreen
