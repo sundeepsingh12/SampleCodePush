@@ -27,6 +27,8 @@ import sequence from './sequence/sequenceReducer'
 import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
+import transientStatus from './transientStatus/transientReducer'
+import saveActivated from './saveActivated/saveActivatedReducer'
 import statistics from './statistics/statisticsReducer'
 import bulk from './bulk/bulkReducer'
 import profileReducer from './profile/profileReducer'
@@ -71,6 +73,8 @@ const appReducer = combineReducers({
   cashTenderingReducer,
   dataStore,
   newJob,
+  transientStatus,
+  saveActivated,
   statistics,
   bulk,
   profileReducer,

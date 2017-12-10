@@ -9,7 +9,6 @@ import {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     SET_INITIAL_STATE,
-    SAVE_SUCCESSFUL
 } from '../../lib/constants'
 const initialState = new InitialState()
 
@@ -38,15 +37,13 @@ export default function dataStoreReducer(state = initialState, action) {
 
         case SET_SEARCH_TEXT:
             return state.set('searchText', action.payload)
+                .set('errorMessage', '')
 
         case SHOW_DETAILS:
             return state.set('detailsVisibleFor', action.payload)
 
         case SET_INITIAL_STATE:
             return initialState
-
-        case SAVE_SUCCESSFUL:
-            return state.set('isSaveSuccessful', action.payload)
     }
     return state
 }
