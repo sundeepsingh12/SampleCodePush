@@ -4,7 +4,6 @@ import { Record } from 'immutable'
 
 var InitialState = Record({
     addressList: [],
-    contactList: [],
     customerCareList: [],
     fieldDataList: [],
     jobDetailsLoading: false,
