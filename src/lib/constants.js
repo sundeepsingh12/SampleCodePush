@@ -78,6 +78,10 @@ module.exports = keyMirror({
     CLEAR_HOME_STATE: null,
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
+    SET_MODULES: null,
+   
+    //Home Container
+    PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
     SET_SELECTED_DATE: null,
     IS_CALENDAR_VISIBLE: null,
@@ -153,6 +157,7 @@ module.exports = keyMirror({
     SET_TABS_TRANSACTIONS: null,
     JOB_ATTRIBUTE_STATUS: null,
     HUB: null,
+    SAVE_ACTIVATED: null,
     LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
 
@@ -189,6 +194,8 @@ module.exports = keyMirror({
     ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
+    SET_FORM_LAYOUT_STATE: null,
+
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
@@ -206,6 +213,11 @@ module.exports = keyMirror({
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
+    SaveActivated: null,
+    Transient: null,
+    CheckoutDetails: null,
+    NewJob: null,
+    NewJobStatus: null,    
     BulkConfiguration:null,
     BulkListing:null,
     Sorting:null,
@@ -276,6 +288,27 @@ module.exports = keyMirror({
     NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
 
+    //Transient
+    ADD_FORM_LAYOUT_STATE: null,
+    SET_SHOW_JOB_DETAILS: null,
+    LOADER_IS_RUNNING: null,
+    SHOW_CHECKOUT_DETAILS: null,
+    SET_INITIAL_STATE_TRANSIENT_STATUS: null,
+
+    //Save Activated
+    POPULATE_DATA: null,
+    SAVE_ACTIVATED_INITIAL_STATE: null,
+    LOADER_ACTIVE: null,
+    DELETE_ITEM_SAVE_ACTIVATED: null,
+    Edit: null,
+    Receipt: null,
+    Print: null,
+    SMS: null,
+    TotalAmount: null,
+    Discard: null,
+    Keep: null,
+    Cancel: null,
+    Checkout:null,
     //Bulk Module
     START_FETCHING_BULK_CONFIG: null,
     STOP_FETCHING_BULK_CONFIG: null,
@@ -312,6 +345,22 @@ module.exports = keyMirror({
     //QrCodeGenerator
     SCANNING: null,
 
+    //Menu Container
+    PROFILE: null,
+    STATISTIC: null,
+    EZETAP: null,
+    MSWIPE: null,
+    BACKUP: null,
+    OFFLINEDATASTORE: null,
+    BLUETOOTH: null,
+    BULK: null,
+    LIVE: null,
+    OFFLINEDATASTORE: null,
+    START: null,
+    SEQUENCEMODULE: null,
+    SUMMARY: null,
+    SORTING: null,
+    CUSTOMAPP: null,
 })
 
 

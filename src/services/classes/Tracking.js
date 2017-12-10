@@ -5,10 +5,10 @@ import { keyValueDBService } from './KeyValueDBService'
 import BackgroundGeolocation from "react-native-background-geolocation";
 import moment from 'moment';
 
-const {
+import {
   TABLE_TRACK_LOGS,
   USER
-} = require('../../lib/constants').default
+} from '../../lib/constants'
 
 class Tracking {
 

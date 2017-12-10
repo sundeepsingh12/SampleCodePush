@@ -93,7 +93,7 @@ class TaskListScreen extends Component {
     _.forEach(listArray, function(value) {
       let values = [value.referenceNumber,value.runsheetNo,value.line1,value.line2,value.circleLine1,value.circleLine2]
       if(_.isEqual(_.toLower(value.referenceNumber),searchText) || _.isEqual(_.toLower(value.runsheetNo),searchText)){
-         return  jobTransactionArray.push(value)
+         return  value
       }
       if(_.some(values, (data) => _.includes(_.toLower(data),searchText))){
             jobTransactionArray.push(value)

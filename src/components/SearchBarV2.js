@@ -2,23 +2,20 @@ import React, { Component } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 import {
-    Header,
     Button,
-    Text,
     Input,
-    Body,
     Icon,
 } from 'native-base';
 import styles from '../themes/FeStyle'
-import {SORTING_SEARCH_VALUE,QrCodeScanner,Statistics} from '../lib/constants'
+import {QrCodeScanner} from '../lib/constants'
 import QRIcon from '../svg_components/icons/QRIcon'
 import _ from 'lodash'
 export default class SearchBarV2 extends Component {
     _setQrValue = (value) =>{
-        this.props.returnValue(_.trim(value));              
+        this.props.returnValue(_.trim(value))             
     }
     onPress = () =>{
-        this.props.onPress();
+        this.props.onPress()
     }
     render() {
         return (

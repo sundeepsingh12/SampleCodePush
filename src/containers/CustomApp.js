@@ -61,14 +61,14 @@ class CustomApp extends Component {
     }  
 
     goBack = () =>{   
-        this.refs[WEBVIEW_REF].goBack();        
+        this.refs[WEBVIEW_REF].goBack()      
     }
     goForward = () =>{       
-        this.refs[WEBVIEW_REF].goForward();        
+        this.refs[WEBVIEW_REF].goForward()        
     }
 
     onReload = () =>{
-        this.refs[WEBVIEW_REF].reload();
+        this.refs[WEBVIEW_REF].reload()
     }
      
     onLoadEnd = () =>{
@@ -89,13 +89,13 @@ class CustomApp extends Component {
         this.props.actions.setState(START_FETCHING_URL,this.props.customUrl)
     }
     onSetText = (value) =>{
-        this.refs.webview.injectJavascript = (value);
+        this.refs.webview.injectJavascript = (value)
         this.render()
     }
 
     componentDidMount() {
-        if(this.props.navigation.state.params != null && this.props.navigation.state.params != undefined ){
-            this.props.actions.setState(START_FETCHING_URL,this.props.navigation.state.params)
+        if(this.props.navigation.state.params.customUrl != null && this.props.navigation.state.params.customUrl != undefined ){
+            this.props.actions.setState(START_FETCHING_URL,this.props.navigation.state.params.customUrl)
         }
     }
 
@@ -115,7 +115,7 @@ class CustomApp extends Component {
                                 <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                             </TouchableOpacity>
                             <View style={[style.headerBody]}t>
-                            {renderIf( this.props.navigation.state,(!this.props.navigation.state.params)?
+                            {renderIf( this.props.navigation.state,(!this.props.navigation.state.params.customUrl)?
                                 <View style={[{height: 30 }]}>
                                     <Input
                                         onEndEditing = {(event) => this.onSubmit(event.nativeEvent.text)}

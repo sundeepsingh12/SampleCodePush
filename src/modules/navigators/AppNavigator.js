@@ -76,7 +76,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
-import SelectFromList from '../../containers/SelectFromList'
+import SelectFromList from '../../containers/SelectFromList';
+import SaveActivated from '../../containers/SaveActivated';
+import Transient from '../../containers/Transient';
+import CheckoutDetails from '../../containers/CheckoutDetails'
 import CashTendering from '../../containers/CashTendering'
 import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
@@ -107,7 +110,7 @@ class AppWithNavigationState extends React.Component {
       case ApplicationScreen:
       case LoginScreen:
       case PreloaderScreen: return false
-      case HomeTabNavigatorScreen : {
+      case HomeTabNavigatorScreen: {
         if (route.routes[route.index].routeName == HomeScreen) {
           return false
         }
@@ -141,11 +144,11 @@ export const HomeTabNavigator = TabNavigator({
     screen: Home,
     navigationOptions: {
       header: null,
-      title: 'Home',  
+      title: 'Home',
       tabBarIcon: ({ tintColor }) => (
-      <Icon
+        <Icon
           name='ios-home'
-          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
         />
       ),
     }
@@ -156,9 +159,9 @@ export const HomeTabNavigator = TabNavigator({
       header: null,
       title: 'Sync',
       tabBarIcon: ({ tintColor }) => (
-      <Icon
+        <Icon
           name='ios-sync'
-          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
         />
       ),
     }
@@ -169,9 +172,9 @@ export const HomeTabNavigator = TabNavigator({
       header: null,
       title: 'Menu',
       tabBarIcon: ({ tintColor }) => (
-      <Icon
+        <Icon
           name='ios-menu'
-          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
         />
       ),
 
@@ -361,16 +364,25 @@ export const AppNavigator = StackNavigator({
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
   },
-   SignatureAndNps: {
+  SaveActivated: {
+    screen: SaveActivated
+  },
+  Transient: {
+    screen: Transient
+  },
+  CheckoutDetails: {
+    screen: CheckoutDetails
+  },
+  SignatureAndNps: {
     screen: SignatureAndNps
   },
-  BulkConfiguration:{
+  BulkConfiguration: {
     screen: BulkConfiguration
   },
-  BulkListing:{
-    screen:BulkListing
+  BulkListing: {
+    screen: BulkListing
   },
-   CashTendering: {
+  CashTendering: {
     screen: CashTendering,
     navigationOptions: {
       title: 'Collect Cash',
@@ -378,12 +390,14 @@ export const AppNavigator = StackNavigator({
   },
   TaskListScreen: {
     screen: TaskListScreen
-  },
-  FormDetailsV2: {
+  }, FormDetailsV2: {
     screen: FormDetailsV2
   },
-},
-  {
+}, {
+    SignatureAndNps: {
+      screen: SignatureAndNps
+    }
+  }, {
     cardStyle: {
       backgroundColor: 'white'
     }

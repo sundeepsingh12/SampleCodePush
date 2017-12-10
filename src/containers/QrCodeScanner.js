@@ -1,14 +1,10 @@
 'use strict';
 import React, { Component } from 'react';
 import {
-  AppRegistry,
   Dimensions,
   StyleSheet,
   Text,
-  TouchableHighlight,
   View,
-  Linking,
-  Vibration,
   TouchableOpacity
 } from 'react-native';
 
@@ -16,13 +12,11 @@ import {
     Container,
     Content,
     Header,
-    Button,
     Left,
     Body,
     Right,
     Icon,
     Footer,
-    FooterTab,
     StyleProvider
   } from 'native-base';
   
@@ -56,8 +50,8 @@ class QrCodeScanner extends Component {
         
         _handleQrCodeRead(e) {       
             this.props.actions.setState(SCANNING,false)
-            this.props.navigation.state.params.returnData(e.data);            
-            this.props.navigation.goBack(null);            
+            this.props.navigation.state.params.returnData(e.data)           
+            this.props.navigation.goBack(null)            
         } 
 
         render() {
@@ -107,11 +101,6 @@ class QrCodeScanner extends Component {
             height: Dimensions.get('window').width,
             width: Dimensions.get('window').width,
         },  
-        instructions: {
-            textAlign: 'center',
-            color: '#333333',
-            marginBottom: 5,
-        },
         rectangleContainer: {
             flex: 1,
             alignItems: 'center',

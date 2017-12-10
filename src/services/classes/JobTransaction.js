@@ -232,7 +232,9 @@ class JobTransaction {
             //Fetch only pending status category job transactions for sequence listing
             jobTransactionQuery = statusQuery && statusQuery.trim() !== '' ? `${jobTransactionQuery} AND (${statusQuery})` : `${jobTransactionQuery}`
         }
+      
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
+      
         if (jobTransactionList.length == 0) {
             return []
         }
