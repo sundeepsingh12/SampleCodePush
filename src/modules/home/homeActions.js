@@ -7,18 +7,19 @@ import {
   JOB_DOWNLOADING_STATUS,
   PENDING_SYNC_TRANSACTION_IDS,
   USER,
+  SET_MODULES,
   UNSEEN,
   JOB_SUMMARY,
   SYNC_ERROR,
   SYNC_STATUS,
   PENDING,
-  LiveJobs
+  LiveJobs,
+  PIECHART
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
   FAIL,
   SUCCESS,
-  PIECHART,
 } from '../../lib/AttributeConstants'
 
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
@@ -36,21 +37,24 @@ import { jobStatusService } from '../../services/classes/JobStatus'
 /**
  * This action enables modules for particular user
  */
-export function fetchModulesList() {
+export function fetchModulesList(modules, pieChart, menu) {
   return async function (dispatch) {
     try {
       dispatch(setState(HOME_LOADING, {
-        loading: true
+        moduleLoading: true
       }))
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
-      moduleCustomizationService.getActiveModules(appModulesList.value, user.value)
-      if (PIECHART.enabled) {
+      const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu)
+      dispatch(setState(SET_MODULES, {
+        moduleLoading: false,
+        modules: result.modules,
+        pieChart: result.pieChart,
+        menu: result.menu
+      }))
+      if (result.pieChart[PIECHART].enabled) {
         dispatch(pieChartCount())
       }
-      dispatch(setState(HOME_LOADING, {
-        loading: false
-      }))
     } catch (error) {
       console.log(error)
     }
@@ -60,14 +64,14 @@ export function fetchModulesList() {
 /**
  * This services schedules sync service at interval of 2 minutes
  */
-export function syncService() {
+export function syncService(pieChart) {
   return async (dispatch) => {
     try {
       if (CONFIG.intervalId) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
-        dispatch(performSyncService())
+        dispatch(performSyncService(pieChart))
       }, CONFIG.SYNC_SERVICE_DELAY)
     } catch (error) {
       //Update UI here
@@ -91,7 +95,7 @@ export function pieChartCount() {
   }
 }
 
-export function performSyncService(isCalledFromHome, isLiveJob) {
+export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
@@ -112,7 +116,7 @@ export function performSyncService(isCalledFromHome, isLiveJob) {
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
         const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
         if (isJobsPresent) {
-          if (PIECHART.enabled) {
+          if (pieChart[PIECHART].enabled) {
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())
@@ -126,7 +130,7 @@ export function performSyncService(isCalledFromHome, isLiveJob) {
         syncStatus: 'OK',
       }))
       //Now schedule sync service which will run regularly after 2 mins
-      await dispatch(syncService())
+      await dispatch(syncService(pieChart))
     } catch (error) {
       console.log(error)
       if (error.code == 500 || error.code == 502) {
@@ -157,7 +161,7 @@ export function performSyncService(isCalledFromHome, isLiveJob) {
   }
 }
 
-export function startMqttService() {
+export function startMqttService(pieChart) {
   return async function (dispatch) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     console.log('token', token)
@@ -198,9 +202,9 @@ export function startMqttService() {
         if (message.payloadString == 'Live Job Notification') {
           //let showLiveJobNotification = true
           keyValueDBService.validateAndSaveData('LIVE_JOB', { showLiveJobNotification: true })
-          dispatch(performSyncService(true, true))
+          dispatch(performSyncService(pieChart, true, true))
         } else {
-          dispatch(performSyncService(true))
+          dispatch(performSyncService(pieChart, true))
         }
       })
 

@@ -232,19 +232,11 @@ class JobTransaction {
             //Fetch only pending status category job transactions for sequence listing
             jobTransactionQuery = statusQuery && statusQuery.trim() !== '' ? `${jobTransactionQuery} AND (${statusQuery})` : `${jobTransactionQuery}`
         }
-        let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
-            fieldDataList = [], fieldDataMap = {}
 
-        if (callingActivity == 'LiveJob') {
-            jobTransactionObject.jobQuery = 'status = 6'
-        }
-        else {
-            jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
-            if (jobTransactionList.length == 0) {
-                return []
-            }
-            jobTransactionObject = this.getJobTransactionMapAndQuery(jobTransactionList)
-            jobTransactionMap = jobTransactionObject.jobTransactionMap
+        let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
+
+        if (jobTransactionList.length == 0) {
+            return []
         }
 
         let jobsList = realm.getRecordListOnQuery(TABLE_JOB, jobTransactionObject.jobQuery, false)

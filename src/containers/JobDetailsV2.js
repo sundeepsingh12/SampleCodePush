@@ -43,15 +43,20 @@ import {
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
   OK,
-  CALL_CONFIRM
+  CALL_CONFIRM,
+  LANDMARK,
+  PINCODE,
+  ADDRESS_LINE_1,
+  ADDRESS_LINE_2
 } from '../lib/AttributeConstants'
-import Communications from 'react-native-communications';
+import Communications from 'react-native-communications'
 import CallIcon from '../svg_components/icons/CallIcon'
+import getDirections from 'react-native-google-maps-directions'
+import _ from 'lodash'
 
 function mapStateToProps(state) {
   return {
     addressList: state.jobDetails.addressList,
-    contactList: state.jobDetails.contactList,
     customerCareList: state.jobDetails.customerCareList,
     currentStatus: state.jobDetails.currentStatus,
     fieldDataList: state.jobDetails.fieldDataList,
@@ -224,6 +229,70 @@ class JobDetailsV2 extends Component {
       }
     )
   }
+
+  navigationButtonPressed = () => {
+    const addressDatas = this.props.navigation.state.params.jobSwipableDetails.addressData
+    const latitude = this.props.navigation.state.params.jobTransaction.jobLatitude
+    const longitude = this.props.navigation.state.params.jobTransaction.jobLongitude
+    let data
+
+    if (latitude && longitude) {
+      data = {
+        source: {},
+        destination: {
+          latitude,
+          longitude
+        },
+      }
+      getDirections(data)
+    }
+    else {
+      let addressArray = []
+      Object.values(addressDatas).forEach(object => {
+        addressArray.push(Object.values(object).join())
+      })
+      addressArray.push(CANCEL)
+      if (_.size(addressArray) > 2) {
+        ActionSheet.show(
+          {
+            options: addressArray,
+            cancelButtonIndex: addressArray.length - 1,
+            title: 'Select address for navigation'
+          },
+          buttonIndex => {
+            if (buttonIndex != addressArray.length - 1 && buttonIndex >= 0) {
+              data = {
+                source: {},
+                destination: {},
+                params: [
+                  {
+                    key: 'q',
+                    value: addressArray[buttonIndex]
+                  }
+                ]
+              }
+              getDirections(data)
+            }
+          }
+        )
+      } else {
+        data = {
+          source: {},
+          destination: {},
+          params: [
+            {
+              key: 'q',
+              value: addressArray[0]
+            }
+          ]
+        }
+        getDirections(data)
+      }
+    }
+
+
+  }
+
   render() {
     if (this.props.jobDetailsLoading) {
       return (
@@ -325,11 +394,14 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>
               )}
-              <FooterTab>
-                <Button full>
-                  <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>
-              </FooterTab>
+              {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
+                (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
+                <FooterTab>
+                  <Button full onPress={this.navigationButtonPressed}>
+                    <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>)}
+
               {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>

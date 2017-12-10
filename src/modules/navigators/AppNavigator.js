@@ -77,7 +77,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
-import SelectFromList from '../../containers/SelectFromList'
+import SelectFromList from '../../containers/SelectFromList';
+import SaveActivated from '../../containers/SaveActivated';
+import Transient from '../../containers/Transient';
+import CheckoutDetails from '../../containers/CheckoutDetails'
 import CashTendering from '../../containers/CashTendering'
 import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
@@ -355,6 +358,15 @@ export const AppNavigator = StackNavigator({
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
   },
+  SaveActivated: {
+    screen: SaveActivated
+  },
+  Transient: {
+    screen: Transient
+  },
+  CheckoutDetails: {
+    screen: CheckoutDetails
+  },
   SignatureAndNps: {
     screen: SignatureAndNps
   },
@@ -382,8 +394,11 @@ export const AppNavigator = StackNavigator({
   FormDetailsV2: {
     screen: FormDetailsV2
   },
-},
-  {
+}, {
+    SignatureAndNps: {
+      screen: SignatureAndNps
+    }
+  }, {
     cardStyle: {
       backgroundColor: 'white'
     }
