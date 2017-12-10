@@ -14,7 +14,8 @@ import { Icon } from 'native-base'
 import {
     IMAGE_LOADING_ERROR,
     VIEW_TEXT_LABEL,
-    IMAGE_URL
+    IMAGE_URL,
+    DATA_STORE
 } from '../lib/AttributeConstants'
 
 export default class NonExpandableDetailsView extends Component {
@@ -45,8 +46,17 @@ export default class NonExpandableDetailsView extends Component {
                                 </Text>
                             </View>
                         </TouchableOpacity>)}
-                    {renderIf(this.props.attributeTypeId != IMAGE_URL,
+                    {renderIf(this.props.attributeTypeId != IMAGE_URL && this.props.attributeTypeId != DATA_STORE,
                         <Text style={[styles.fontDefault, styles.fontBlack]}>
+                            {this.props.value}
+                        </Text>)}
+
+                    {renderIf(this.props.attributeTypeId == DATA_STORE,
+                        <Text style={[styles.fontDefault, styles.fontPrimary, styles.textUnderline]}
+                            onPress={() => this.props.navigateToDataStoreDetails({
+                                value: this.props.value,
+                                fieldAttributeMasterId: this.props.fieldAttributeMasterId
+                            })}>
                             {this.props.value}
                         </Text>)}
                 </View>

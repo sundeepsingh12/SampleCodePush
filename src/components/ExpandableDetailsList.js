@@ -4,14 +4,9 @@ import React, { Component } from 'react'
 import {
     StyleSheet,
     View,
-    Text,
-    Platform,
     FlatList,
-    TouchableOpacity
 } from 'react-native'
-import { Container, Content, Footer, FooterTab, Card, CardItem, Button, Body, Header, Left, Right, Icon, List, ListItem } from 'native-base';
-import styles from '../themes/FeStyle'
-import renderIf from '../lib/renderIf'
+import { List } from 'native-base';
 import ExpandableDetailsView from './ExpandableDetailsView'
 import NonExpandableDetailsView from './NonExpandableDetailsView'
 
@@ -48,14 +43,16 @@ class ExpandableDetailsList extends Component {
                     key={item.id}
                     attributeTypeId={item.attributeTypeId}
                     label={item.label}
-                    value={item.data.value} />
+                    value={item.data.value}
+                    fieldAttributeMasterId={item.data.fieldAttributeMasterId}
+                    navigateToDataStoreDetails={this.props.navigateToDataStoreDetails} />
             )
         }
     }
 
     render() {
         return (
-            <View style={StyleSheet.flatten([{ flex: 1,minHeight:'50%', maxHeight: '100%' }])}>
+            <View style={StyleSheet.flatten([{ flex: 1, minHeight: '50%', maxHeight: '100%' }])}>
                 <List>
                     <FlatList
                         data={this.props.dataList}

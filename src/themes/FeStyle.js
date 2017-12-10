@@ -448,5 +448,8 @@ export default {
     borderLeft4: {
         borderLeftColor: themeColor, 
         borderLeftWidth: 4 
+    },
+    textUnderline: {
+        textDecorationLine: 'underline'
     }
 }

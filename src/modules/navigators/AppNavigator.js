@@ -80,6 +80,7 @@ import CashTendering from '../../containers/CashTendering'
 import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
+import DataStoreDetails from '../../containers/DataStoreDetails'
 import { NavigationActions } from 'react-navigation'
 import {
   ApplicationScreen,
@@ -374,6 +375,9 @@ export const AppNavigator = StackNavigator({
   FormDetailsV2: {
     screen: FormDetailsV2
   },
+  DataStoreDetails: {
+    screen: DataStoreDetails
+  }
 },
   {
     cardStyle: {
