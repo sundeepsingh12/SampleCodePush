@@ -83,9 +83,44 @@ class DataStoreDetails extends Component {
         )
     }
 
-    _keyExtractor = (item, index) => item.id;
+    _keyExtractor = (item, index) => item.id
+
+
+    loader() {
+        let loaderView = null
+        if (this.props.loaderRunning) {
+            loaderView = <Loader />
+        }
+        return loaderView
+    }
+
+    flatList() {
+        let flatListView = null
+        if (_.size(this.props.dataStoreAttrValueMap) == 1) {
+            flatListView = <FlatList
+                data={this.createDetails(_.values(this.props.dataStoreAttrValueMap)[0])}
+                extraData={this.state}
+                renderItem={(item) => this.renderData(item.item)}
+                keyExtractor={this._keyExtractor}>
+            </FlatList >
+        }
+        return flatListView
+    }
+
+
+    error() {
+        let errorView = null
+        if (this.props.errorMessage != '' && _.size(this.props.dataStoreAttrValueMap) != 1) {
+            errorView = <Text style={[styles.alignSelfCenter, styles.marginTop30, styles.fontDarkGray]}>{this.props.errorMessage}</Text>
+        }
+        return errorView
+    }
 
     render() {
+        let loaderView = this.loader()
+        let flatListView = this.flatList()
+        let errorView = this.error()
+        console.log('render',this.props.errorMessage)
         return (
             <Modal
                 animationType="slide"
@@ -108,18 +143,11 @@ class DataStoreDetails extends Component {
                         </Header >
 
                         <Content style={[styles.flex1, styles.bgWhite]}>
-                            {this.props.loaderRunning ?
-                                <Loader /> : null}
-                            {_.size(this.props.dataStoreAttrValueMap) == 1 ?
-                                <FlatList
-                                    data={this.createDetails(_.values(this.props.dataStoreAttrValueMap)[0])}
-                                    extraData={this.state}
-                                    renderItem={(item) => this.renderData(item.item)}
-                                    keyExtractor={this._keyExtractor}>
-                                </FlatList > : null}
-                            {this.props.errorMessage != '' && _.size(this.props.dataStoreAttrValueMap) != 1 ?
-                                <Text style={[styles.alignSelfCenter, styles.marginTop30, styles.fontDarkGray]}>{this.props.errorMessage}</Text> : null}
+                            {loaderView}
+                            {flatListView}
+                            {errorView}
                         </Content >
+                        
                     </Container >
                 </StyleProvider >
             </Modal >
