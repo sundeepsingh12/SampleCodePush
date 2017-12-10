@@ -65,19 +65,7 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
 export function storeState(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates) {
     return async function (dispatch) {
         try {
-            let cloneSaveActivatedState = _.cloneDeep(saveActivatedState)
-            let cloneNavigationFormLayoutStates = _.cloneDeep(navigationFormLayoutStates)
-            let { differentData, arrayFormElement } = await transientStatusService.convertMapToArrayOrArrayToMap(cloneSaveActivatedState.differentData, cloneNavigationFormLayoutStates, true)
-            cloneSaveActivatedState.differentData = differentData
-            cloneNavigationFormLayoutStates = arrayFormElement
-            let storeObject = {}
-            storeObject[jobMasterId] = {
-                saveActivatedState: cloneSaveActivatedState,
-                screenName,
-                jobMasterId,
-                navigationParams,
-                navigationFormLayoutStates: cloneNavigationFormLayoutStates
-            }
+            let storeObject = await transientStatusService.createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates)
             await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, storeObject)
         } catch (error) {
             console.log(error)

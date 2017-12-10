@@ -10,11 +10,11 @@ import {
     FormLayout
 } from '../../lib/constants'
 
-import {newJob} from '../../services/classes/NewJob'
+import { newJob } from '../../services/classes/NewJob'
 import { setState, navigateToScene } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { transientStatusService } from '../../services/classes/TransientStatusService'
-import  _ from 'lodash'
+import _ from 'lodash'
 
 
 export function getMastersWithNewJob() {
@@ -23,7 +23,7 @@ export function getMastersWithNewJob() {
         if (_.size(mastersWithNewJob) == 1) {
             dispatch(redirectToContainer(mastersWithNewJob[0]))
         }
-        dispatch(setState(NEW_JOB_MASTER,mastersWithNewJob));
+        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob));
     }
 }
 
@@ -40,16 +40,16 @@ export function getMastersFromMasterIds(jobMasterIds) {
 
 export function getStatusAndIdForJobMaster(jobMasterId) {
     return async function (dispatch) {
-        if(!jobMasterId){
+        if (!jobMasterId) {
             // fire error action for missing jobMasterId
         }
         //initially reset the statusList
-        dispatch(setState(NEW_JOB_STATUS,[]));
+        dispatch(setState(NEW_JOB_STATUS, []));
         let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMasterId);
         if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
             dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, jobMasterId))
         }
-        dispatch(setState(NEW_JOB_STATUS,nextPendingStatusWithId));
+        dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
     }
 }
 
@@ -78,38 +78,10 @@ export function redirectToContainer(jobMaster) {
         try {
             let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
             let returnParams = await newJob.checkForNextContainer(jobMaster, saveActivatedData)
-            let navigationParams
-            if (returnParams.screenName == SaveActivated) {
-                let result = await transientStatusService.convertMapToArrayOrArrayToMap(returnParams.saveActivatedState.differentData, returnParams.navigationFormLayoutStates, false)
-                await dispatch(setState(POPULATE_DATA, {
-                    commonData: returnParams.saveActivatedState.commonData,
-                    statusName: returnParams.saveActivatedState.statusName,
-                    differentData: result.differentData,
-                    isSignOffVisible: returnParams.saveActivatedState.isSignOffVisible,
-                }))
-                navigationParams = {
-                    calledFromNewJob: true,
-                    jobMasterId: jobMaster.id,
-                    navigationFormLayoutStates: result.arrayFormElement,
-                    jobTransaction: returnParams.navigationParams.jobTransaction,
-                    contactData: returnParams.navigationParams.contactData,
-                    currentStatus: returnParams.navigationParams.currentStatus
-                }
-            } else if (returnParams.screenName == CheckoutDetails) {
-                navigationParams = {
-                    calledFromNewJob: true,
-                    jobMasterId: jobMaster.id,
-                    commonData: returnParams.navigationParams.commonData,
-                    recurringData: returnParams.navigationParams.recurringData,
-                    signOfData: returnParams.navigationParams.signOfData,
-                    totalAmount: returnParams.navigationParams.totalAmount
-                }
-            } else {
-                navigationParams = {
-                    jobMaster: returnParams.jobMaster
-                }
+            if (returnParams.stateParam) {
+                await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
             }
-            dispatch(navigateToScene(returnParams.screenName, navigationParams))
+            dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
         } catch (error) {
             console.log(error)
         }

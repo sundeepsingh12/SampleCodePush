@@ -49,10 +49,12 @@ module.exports = {
     ORIGINAL_AMOUNT: 25,
     PASSWORD: 61,
     PINCODE: 31,
+    QR_SCAN: 22,
     RADIOBUTTON: 9,
     RECEIPT: 'receipt',
     REMARKS: 'remarks',
     RE_ATTEMPT_DATE: 33,
+    SCAN_OR_TEXT: 54,
     SEQUENCE: 62,
     SIGNATURE: 21,
     SIGNATURE_AND_FEEDBACK: 58,
@@ -257,8 +259,8 @@ module.exports = {
     Yes_Checkout: 'Yes,Checkout',
     Total: 'Total :',
     Select_Next_Status: 'Select Next Status',
-   
-   
+
+
     TOKEN_MISSING: 'Token Missing',
     LOGIN: '?login=',
     POST: 'POST',
@@ -294,10 +296,10 @@ module.exports = {
     SUMMARY_ID: 8,
     SORTING_ID: 26,
     CUSTOMAPP_ID: 12,
-    NEWJOB_ID: 3, 
+    NEWJOB_ID: 3,
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
-   
+
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
 

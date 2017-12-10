@@ -27,7 +27,11 @@ import {
     ACTUAL_AMOUNT,
     PATH_TEMP,
     SIGN,
-    IMAGE_EXTENSION
+    IMAGE_EXTENSION,
+    EXTERNAL_DATA_STORE,
+    DATA_STORE,
+    QR_SCAN,
+    SCAN_OR_TEXT
 } from '../../lib/AttributeConstants'
 import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface.js'
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout'
@@ -69,26 +73,26 @@ class TransientStatusService {
         let priority = -1, textToShow = ''
         let savedJobDetailsObject = {}
         for (let [id, currentObject] of formLayoutState.formElement.entries()) {
-            if (currentObject.attributeTypeId == 54 && priority < 4) {
+            if (currentObject.attributeTypeId == SCAN_OR_TEXT && priority < 4) {
                 priority = 4
                 textToShow = currentObject.value
                 break
             }
-            else if (currentObject.attributeTypeId == 63 && priority < 3) {
+            else if (currentObject.attributeTypeId == EXTERNAL_DATA_STORE && priority < 3) {
                 priority = 3
                 textToShow = currentObject.value
             }
-            else if (currentObject.attributeTypeId == 44 && priority < 2) {
+            else if (currentObject.attributeTypeId == DATA_STORE && priority < 2) {
                 priority = 2
                 textToShow = currentObject.value
             }
-            else if (currentObject.attributeTypeId == 22 && priority < 1) {
+            else if (currentObject.attributeTypeId == QR_SCAN && priority < 1) {
                 priority = 1
                 textToShow = currentObject.value
             }
         }
         if (priority == -1) {
-            textToShow = Object.keys(savedJobDetails).length + 1
+            textToShow = _.size(recurringData) + 1
         }
         let { elementsArray, amount } = this.getDataFromFormElement(formLayoutState.formElement)
         differentData[jobTransaction.id] = {
@@ -277,6 +281,22 @@ class TransientStatusService {
             arrayFormElement: navigationFormLayoutStates
         }
     }
-}
+
+    createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates) {
+        let cloneSaveActivatedState = _.cloneDeep(saveActivatedState)
+        let cloneNavigationFormLayoutStates = _.cloneDeep(navigationFormLayoutStates)
+        let { differentData, arrayFormElement } = this.convertMapToArrayOrArrayToMap(cloneSaveActivatedState.differentData, cloneNavigationFormLayoutStates, true)
+        cloneSaveActivatedState.differentData = differentData
+        cloneNavigationFormLayoutStates = arrayFormElement
+        let storeObject = {}
+        storeObject[jobMasterId] = {
+            saveActivatedState: cloneSaveActivatedState, screenName,
+            jobMasterId,
+            navigationParams,
+            navigationFormLayoutStates: cloneNavigationFormLayoutStates
+        }
+        return storeObject
+    }
+}   
 
 export let transientStatusService = new TransientStatusService()

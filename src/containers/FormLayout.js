@@ -55,7 +55,7 @@ function mapDispatchToProps(dispatch) {
 
 class FormLayout extends Component {
 
-  componentWillMount() {
+  componentDidMount() {
     if (this.props.navigation.state.params.editableFormLayoutState) {
       this.props.actions.setState(SET_FORM_LAYOUT_STATE, this.props.navigation.state.params.editableFormLayoutState)
     }
@@ -184,7 +184,7 @@ class FormLayout extends Component {
           <Footer style={[style.footer]}>
             <FooterTab style={[styles.padding10]}>
               <Button success full
-                onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+                onPress={() => this.saveJobTransaction()}
                 disabled={this.props.isSaveDisabled}>
                 <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
               </Button>

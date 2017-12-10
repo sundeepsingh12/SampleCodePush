@@ -8,7 +8,6 @@ import SequenceIcon from '../../../src/svg_components/icons/SequenceIcon'
 import TaskIcon from '../../../src/svg_components/icons/TaskIcon'
 
 var InitialState = Record({
-    loading: false,
     modules: {
         START: {
             appModuleId: 4,
