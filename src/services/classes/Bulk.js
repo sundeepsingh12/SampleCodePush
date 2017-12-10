@@ -31,14 +31,14 @@ import {
     moduleCustomizationService
 } from './ModuleCustomization'
 import {
-    BULK_ID
+    BULK
 } from '../../lib/AttributeConstants'
 
 class Bulk {
 
     prepareJobMasterVsStatusList(jobMasterList, jobStatusList, modulesCustomizationList) {
         const idJobMasterMap = _.mapKeys(jobMasterList, 'id')
-        const bulkModuleCustomization = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomizationList, BULK_ID)
+        const bulkModuleCustomization = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomizationList, BULK.appModuleId)
         const bulkModuleRemark = (bulkModuleCustomization[0].remark) ? JSON.parse(bulkModuleCustomization[0].remark) : null
         const bulkJobMasterStatusConfiguration = (bulkModuleRemark != null) ? bulkModuleRemark.jobMasterStatusConfiguration : null
         const statusIdJobMasterIdBulkAllowedMap = this._getStatusIdJobMasterIdBulkAllowedMap(bulkJobMasterStatusConfiguration)

@@ -41,7 +41,7 @@ class FormLayoutActivityComponent extends Component {
             case NPS_FEEDBACK:
             case SIGNATURE:
             case SIGNATURE_AND_FEEDBACK: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case SKU_ARRAY: return <CartIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case SKU_ARRAY: return <CartIcon size={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             default: return <QRIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
         }
     }

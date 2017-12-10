@@ -20,7 +20,7 @@ import {
     keyValueDBService
 } from '../../services/classes/KeyValueDBService'
 import {
-    BULK_ID
+    BULK
 } from '../../lib/AttributeConstants'
 import {
     moduleCustomizationService
@@ -59,7 +59,7 @@ export function getBulkJobTransactions(bulkParams) {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS))
             const bulkTransactions = await bulkService.getJobListingForBulk(bulkParams)
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
-            const bulkModule = await moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomizationList.value, BULK_ID)
+            const bulkModule = await moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomizationList.value, BULK.appModuleId)
             const selectAll = (bulkModule[0].remark) ? JSON.parse(bulkModule[0].remark).selectAll : false
             console.log('selectAll', selectAll)
             dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS, {

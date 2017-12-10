@@ -25,11 +25,7 @@ import {
     Button,
     Text,
     Footer,
-    Toast
 } from 'native-base'
-import {
-    EXTERNAL_DATA_STORE,
-} from '../lib/AttributeConstants'
 import _ from 'lodash'
 
 function mapStateToProps(state) {
@@ -43,6 +39,7 @@ function mapStateToProps(state) {
         errorMessage: state.dataStore.errorMessage,
         searchText: state.dataStore.searchText,
         detailsVisibleFor: state.dataStore.detailsVisibleFor,
+        // isSaveSuccessful: state.dataStore.isSaveSuccessful,
     }
 };
 
@@ -62,10 +59,15 @@ class DataStore extends Component {
     }
 
     componentWillMount() {
-        console.log(this.props.navigation.state.params.currentElement)
         this.props.actions.setState(SET_INITIAL_STATE)
         this.props.actions.setValidation(this.props.navigation.state.params.currentElement.validation)
     }
+
+    // componentWillReceiveProps(){
+    //     if (this.props.isSaveSuccessful) {
+    //         this._goBack()
+    //     }
+    // }
 
     getTextData(item) {
         let firstValue = item.dataStoreAttributeValueMap[item.matchKey]
@@ -91,8 +93,10 @@ class DataStore extends Component {
         return (
             <Card>
                 <TouchableOpacity
-                    onPress={() => this.showDetails(item.id, firstValue, false)}>
-                    <View style={[style.cardLeidft]}>
+                    onPress={() => {
+                        this.props.actions.setState(SHOW_DETAILS, item.id)
+                    }}>
+                    <View style={[style.cardLeft]}>
                         {renderIf(firstValue, <View style={[style.cardLeftTopRow]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight500, styles.fontDefault]}>{firstValue}</Text>
                         </View>)}
@@ -103,16 +107,6 @@ class DataStore extends Component {
                 </TouchableOpacity>
             </Card >
         )
-    }
-
-    showDetails = (itemId, dataStoreValue, isCancel) => {
-        if (this.props.navigation.state.params.currentElement.attributeTypeId == EXTERNAL_DATA_STORE && this.props.isMinMaxValidation && !isCancel) {
-            this.props.actions.uniqueValidationCheck(dataStoreValue,
-                this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
-                itemId)
-        } else {
-            this.props.actions.setState(SHOW_DETAILS, itemId)
-        }
     }
 
     setSearchText = (searchText) => {
@@ -143,10 +137,12 @@ class DataStore extends Component {
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.isSaveDisabled,
             dataStoreValue,
+            this.props.isMinMaxValidation,
+            this.props.navigation.state.params.currentElement.attributeTypeId,
             this.props.navigation.state.params.calledFromArray,
             this.props.navigation.state.params.rowId)
         this.setDetailsFor()
-        this._goBack()
+        // this._goBack()
     }
 
     setDetailsFor = () => {
@@ -154,16 +150,6 @@ class DataStore extends Component {
     }
 
     render() {
-
-        if (this.props.errorMessage != '') {
-            Toast.show({
-                text: this.props.errorMessage,
-                position: "bottom" | "center",
-                buttonText: 'Okay',
-                type: 'danger',
-                duration: 5000
-            })
-        }
         if (this.props.detailsVisibleFor == -1) {
             return (
                 < Container >
@@ -179,6 +165,10 @@ class DataStore extends Component {
                             <Loader />)}
                         {renderIf(!_.isEmpty(this.props.dataStoreAttrValueMap),
                             <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>Suggestions</Text>)}
+                        {renderIf(this.props.errorMessage != '',
+                            <Text style={[styles.fontDarkGray, styles.alignSelfCenter, styles.justifyCenter, styles.marginTop25]}>
+                                {this.props.errorMessage}
+                            </Text>)}
                         {renderIf(!this.props.loaderRunning,
                             < FlatList
                                 data={Object.values(this.props.dataStoreAttrValueMap)}
@@ -214,7 +204,7 @@ class DataStore extends Component {
         return (
             < DataStoreItemDetails
                 selectedElement={this.props.dataStoreAttrValueMap[this.props.detailsVisibleFor]}
-                goBack={this.showDetails}
+                goBack={this.setDetailsFor}
                 onSave={this.onSave} />
         )
     }
