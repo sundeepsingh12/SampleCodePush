@@ -15,7 +15,8 @@ import {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     _id,
-    SET_INITIAL_STATE
+    SET_INITIAL_STATE,
+    QrCodeScanner
 } from '../lib/constants'
 import {
     FooterTab,
@@ -153,6 +154,16 @@ class DataStore extends Component {
         this.props.actions.setState(SHOW_DETAILS, -1)
     }
 
+    _searchDataStore = (value) => {
+        this.fetchDataStoreAttrValueMap(value, false)
+        this.setSearchText(value)
+    }
+
+    scanner = () => {
+        console.log('scanner is called')
+        this.props.navigation.navigate(QrCodeScanner, { returnData: this._searchDataStore.bind(this) })
+    }
+
     render() {
 
         if (this.props.errorMessage != '') {
@@ -173,7 +184,8 @@ class DataStore extends Component {
                         fetchDataStoreAttrValueMap={this.fetchDataStoreAttrValueMap}
                         goBack={this._goBack}
                         searchText={this.props.searchText}
-                        setSearchText={this.setSearchText} />
+                        setSearchText={this.setSearchText}
+                        scanner={this.scanner} />
                     <Content style={[styles.marginLeft10]}>
                         {renderIf(this.props.loaderRunning,
                             <Loader />)}

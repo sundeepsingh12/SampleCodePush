@@ -12,6 +12,7 @@ import {
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
+import QRIcon from '../svg_components/icons/QRIcon'
 export default class SearchBar extends Component {
 
     constructor(props) {
@@ -52,8 +53,8 @@ export default class SearchBar extends Component {
                                 }}
                                 value={this.props.searchText}
                                 style={[style.headerSearch, styles.bgGray]} />
-                            {renderIf(this.props.isScannerEnabled, <Button small transparent style={[style.headerQRButton]}>
-                                <Icon name="md-qr-scanner" style={[styles.fontBlack, styles.fontXl]} />
+                            {renderIf(this.props.isScannerEnabled, <Button small transparent style={[style.headerQRButton]} onPress={() => this.props.scanner()} >
+                                <QRIcon width={30} height={30} color={styles.fontBlack} />
                             </Button>)}
                         </View>
                         {renderIf(this.state.isSearchVisible, <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>

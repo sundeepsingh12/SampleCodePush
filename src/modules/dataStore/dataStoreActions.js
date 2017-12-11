@@ -96,7 +96,9 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
             if (_.isEmpty(dataStoreAttrValueMap)) {
                 throw new Error('No records found for search')
             } else {
-                dispatch(setState(SET_DATA_STORE_ATTR_MAP, dataStoreAttrValueMap))
+                dispatch(setState(SET_DATA_STORE_ATTR_MAP, {
+                    dataStoreAttrValueMap,
+                }))
             }
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
