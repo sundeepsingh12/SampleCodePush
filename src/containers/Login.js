@@ -19,8 +19,9 @@ import sha256 from 'sha256';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
-import renderIf from '../lib/renderIf';
-import codePush from "react-native-code-push";
+import renderIf from '../lib/renderIf'
+import codePush from "react-native-code-push"
+import {QrCodeScanner} from '../lib/constants'
 
 
 var styles = StyleSheet.create({
@@ -93,13 +94,12 @@ class Login extends Component {
     }
   }
 
-  _onBarCodeRead = (result) => {
-    const username = result.data.split("/")[0];
-    const password = result.data.split("/")[1];
-    this.props.actions.stopScanner();
-    this.onChangeUsername(username);
-    this.onChangePassword(password);
-    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe);
+  _onBarCodeRead = (value) => {
+    const username = value.split("/")[0]
+    const password = value.split("/")[1]
+    this.onChangeUsername(username)
+    this.onChangePassword(password)
+    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
   }
 
   _onScaningCancelled = () => {
@@ -120,10 +120,14 @@ class Login extends Component {
     });
   }
 
+  startScanner = () => {
+    this.props.navigation.navigate(QrCodeScanner, {returnData: this._onBarCodeRead.bind(this)})
+  }
+
   render() {
     return (
       <Container>
-        {renderIf(!this.props.auth.form.isCameraScannerActive,
+       
           <View style={styles.container}>
             <View style={styles.logoContainer}>
               {renderIf(!this.props.auth.form.authenticationService,
@@ -175,7 +179,7 @@ class Login extends Component {
                   {this.props.auth.form.displayMessage}
                 </Text>
                 <Button
-                  onPress={() => this.props.actions.startScanner()} rounded style={{ width: '100%', }}>
+                  onPress={this.startScanner} rounded style={{ width: '100%', }}>
                   <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Scanner</Text>
                 </Button>
               </View>
@@ -187,10 +191,6 @@ class Login extends Component {
               </View>
             </View>
           </View>
-        )}
-        {renderIf(this.props.auth.form.isCameraScannerActive,
-          <Scanner onBarCodeRead={this._onBarCodeRead} onBackPress={this._onScaningCancelled} />
-        )}
       </Container>
     )
   }
