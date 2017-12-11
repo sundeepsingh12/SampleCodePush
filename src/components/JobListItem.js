@@ -19,15 +19,16 @@ import {
   FooterTab,
   StyleProvider
 } from 'native-base'
-
+import moment from 'moment'
 export default class JobListItem extends Component {
 
   render() {
     return (
       <TouchableHighlight
         onPress={this.props.onPressItem}
+        onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
-        <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : null]}>
+        <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : {backgroundColor: '#ffffff'}]}>
           <View style={[style.seqCircle, styles.relative]}>
             <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
               {this.props.data.jobMasterIdentifier}
@@ -55,7 +56,18 @@ export default class JobListItem extends Component {
                 ]} />
             </View> : <View />}
 
+
           </View>
+
+          {/* {this.props.jobEndTime ?
+            <Text style={[styles.bgWarning, styles.flexBasis50,styles.fontWhite]}>
+              {
+                (moment(this.props.jobEndTime, "HH:mm:ss")).hours() + ' hours ' +
+                (moment(this.props.jobEndTime, "HH:mm:ss")).minutes() + ' minutes' +
+                (moment(this.props.jobEndTime, "HH:mm:ss")).seconds() + ' seconds left'
+
+              }
+            </Text> : <View />} */}
         </View>
       </TouchableHighlight>
     )
@@ -67,16 +79,35 @@ export default class JobListItem extends Component {
   renderJobListItemDetails() {
     return (
       <View>
-        <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-          {this.props.data.line1}
-        </Text>
-        <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.data.line2}
-        </Text>
-        <Text
-          style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.data.circleLine1} . {this.props.data.circleLine2}
-        </Text>
+        <View>
+          {this.props.data.line1 ?
+            <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+              {this.props.data.line1}
+            </Text>
+            : null
+          }
+          {this.props.data.line2 ?
+            <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+              {this.props.data.line2}
+            </Text>
+            : null
+          }
+          {this.props.data.circleLine1 || this.props.data.circleLine2 ?
+            <Text
+              style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
+              {this.props.data.circleLine1} . {this.props.data.circleLine2}
+            </Text>
+            : null
+          }
+        </View>
+        {this.props.jobEndTime ?
+          <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5}]}>
+            <Text style={[styles.fontWhite, styles.fontDefault, styles.fontCenter]}>
+              {(moment(this.props.jobEndTime, "HH:mm:ss")).hours() + ' hours ' +
+                (moment(this.props.jobEndTime, "HH:mm:ss")).minutes() + ' minutes ' +
+                (moment(this.props.jobEndTime, "HH:mm:ss")).seconds() + ' seconds left'}
+            </Text>
+          </View> : null}
       </View>
     )
   }
@@ -115,7 +146,7 @@ const style = StyleSheet.create({
   selectedItemCircle: {
     width: 24,
     bottom: 0,
-    right: -5,
+    right: 0,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
