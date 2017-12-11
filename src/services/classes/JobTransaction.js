@@ -327,6 +327,8 @@ class JobTransaction {
             jobTransactionCustomization.jobLatitude = job.latitude
             jobTransactionCustomization.jobLongitude = job.longitude
             jobTransactionCustomization.jobId = jobTransaction.jobId
+            jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
+            jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
             if (!_.isEmpty(runsheetIdToStartDateMap)) {
                 let jobTransactionsArray = (jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]]) ? jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]] : []
                 jobTransactionsArray.push(jobTransactionCustomization)

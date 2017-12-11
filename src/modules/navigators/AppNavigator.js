@@ -45,6 +45,7 @@ import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
+import QrCodeScanner from '../../containers/QrCodeScanner'
 import {
   Container,
   Content,
@@ -255,6 +256,13 @@ export const AppNavigator = StackNavigator({
   },
   SelectFromList: {
     screen: SelectFromList,
+  },
+  QrCodeScanner: {
+    screen: QrCodeScanner,
+    navigationOptions: {
+      title: 'Scanner',
+      header: null,
+    }
   },
   Statistics: {
     screen: Statistics,

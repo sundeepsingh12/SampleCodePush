@@ -8,14 +8,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import Loader from '../components/Loader'
 import renderIf from '../lib/renderIf'
 import QRCode from 'react-native-qrcode-svg'
+import QRIcon from '../svg_components/icons/QRIcon'
 import _ from 'lodash'
+import Camera from 'react-native-camera'
 import { NA, SORTING_PLACEHOLDER, SEARCH_INFO } from '../lib/AttributeConstants'
 import * as sortingActions from '../modules/sorting/sortingActions'
 import * as globalActions from '../modules/global/globalActions'
-
 import React, { Component } from 'react'
 import { StyleSheet, View, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native'
-
 import {
     Container,
     Content,
@@ -34,7 +34,7 @@ import {
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import {SORTING_SEARCH_VALUE} from '../lib/constants'
+import {SORTING_SEARCH_VALUE,QrCodeScanner} from '../lib/constants'
 
 function mapStateToProps(state) {
     return {
@@ -106,20 +106,39 @@ class SortingListing extends Component {
 }
 
 class Sorting extends Component {
+    componentDidmount(){
+        if(!_.isUndefined(this.props.navigation.state.params)){
+            this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))
+         }
+    }
 
     _onChangeReferenceValue = (value) => {
         this.props.actions.setState(SORTING_SEARCH_VALUE, {value})
     }
 
-    _searchForReferenceValue = () => {
-        this.props.actions.getDataForSortingAndPrinting(this.props.searchRefereneceValue.value)
+    _searchForReferenceValue = (value) => {
+        this.props.actions.getDataForSortingAndPrinting(value)
+    }
+
+    _renderContent(){
+        if(this.props.loaderRunning){
+            return <Loader/>
+        }
+        if(((this.props.searchRefereneceValue === '') && !(_.isEmpty(this.props.sortingDetails)) && this.props.sortingDetails[0].value !== NA)){
+            return <SortingListing sortingDetails={this.props.sortingDetails} />
+        }else{
+            return <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+                       <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{SEARCH_INFO}</Text>
+                  </View>
+        }
     }
 
     render() {
+        const renderView = this._renderContent()
         if ((!_.isNull(this.props.errorMessage) && !_.isUndefined(this.props.errorMessage)  && this.props.errorMessage.length > 0)) {
             Toast.show({
                 text: this.props.errorMessage,
-                position: 'bottom',
+                position: 'bottom', 
                 buttonText: 'Okay',
             })
         }
@@ -138,7 +157,6 @@ class Sorting extends Component {
                                 </View>
                                 <View style={[style.headerRight]}>
                                 </View>
-                                <View />
                             </View>
 
                             <View
@@ -150,30 +168,19 @@ class Sorting extends Component {
                                         placeholder={SORTING_PLACEHOLDER}
                                         placeholderTextColor={'rgba(255,255,255,.4)'}
                                         style={[style.headerSearch]} />
-                                    <Button small transparent style={[style.inputInnerBtn]} onPress={this._searchForReferenceValue}>
+                                    <Button small transparent style={[style.inputInnerBtn]} onPress={() => this._searchForReferenceValue(this.props.searchRefereneceValue.value)}>
                                         <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
                                     </Button>
                                 </View>
-                                <View style={{ width: '15%' }}>
-                                    <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXxl, styles.fontRight]}  />
-                                </View>
+                                <TouchableOpacity style={[{ width: '15%' },styles.marginLeft15]} onPress = {() =>   this.props.navigation.navigate(QrCodeScanner, {returnData: this._searchForReferenceValue.bind(this)})} >
+                                     <QRIcon width={30} height={30} color = {styles.fontBlack} />  
+                                </TouchableOpacity>
                             </View>
                         </Body>
                     </Header>
-
                     <Content style={[styles.flex1, styles.bgLightGray]}>
-                        {renderIf(this.props.loaderRunning,
-                            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                                <ActivityIndicator animating={this.props.loaderRunning} style={[style.loadar]} size="large" color="blue" />
-                            </View>
-                        )}
-                        {renderIf(!(this.props.loaderRunning), ((this.props.searchRefereneceValue === '') && !(_.isEmpty(this.props.sortingDetails)) && this.props.sortingDetails[0].value !== NA) ?
-                            <SortingListing sortingDetails={this.props.sortingDetails} /> :
-                            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{SEARCH_INFO}</Text>
-                            </View>
-                        )}
-                    </Content>
+                        {renderView}
+                    </Content> 
                 </Container>
             </StyleProvider>
         )
