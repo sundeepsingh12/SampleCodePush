@@ -32,7 +32,8 @@ class ExpandableDetailsList extends Component {
                     id={item.id}
                     label={item.label}
                     value={item.data.value}
-                    childDataList={item.childDataList} />
+                    childDataList={item.childDataList}
+                    navigateToDataStoreDetails={this.props.navigateToDataStoreDetails} />
             )
         } else if (item.childDataList) {
             let childListView = this.renderChildList(item.childDataList)
