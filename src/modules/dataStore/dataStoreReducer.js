@@ -9,6 +9,9 @@ import {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     SET_INITIAL_STATE,
+    SAVE_SUCCESSFUL,
+    CLEAR_ATTR_MAP_AND_SET_LOADER,
+    DISABLE_AUTO_START_SCANNER
 } from '../../lib/constants'
 const initialState = new InitialState()
 
@@ -26,7 +29,8 @@ export default function dataStoreReducer(state = initialState, action) {
                 .set('isSearchEnabled', action.payload.isSearchEnabled)
 
         case SET_DATA_STORE_ATTR_MAP:
-            return state.set('dataStoreAttrValueMap', action.payload)
+            return state.set('dataStoreAttrValueMap', action.payload.dataStoreAttrValueMap)
+                .set('value', action.payload.searchText)
                 .set('loaderRunning', false)
                 .set('errorMessage', '')
 
@@ -44,6 +48,17 @@ export default function dataStoreReducer(state = initialState, action) {
 
         case SET_INITIAL_STATE:
             return initialState
+
+        case SAVE_SUCCESSFUL:
+            return state.set('isSaveSuccessful', action.payload)
+
+        case CLEAR_ATTR_MAP_AND_SET_LOADER:
+            return state.set('loaderRunning', true)
+                .set('dataStoreAttrValueMap', {})
+                .set('errorMessage', '')
+
+        case DISABLE_AUTO_START_SCANNER:
+            return state.set('isAutoStartScannerEnabled', action.payload)
     }
     return state
 }

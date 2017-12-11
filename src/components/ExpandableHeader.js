@@ -5,12 +5,9 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
-    FlatList,
-    TouchableOpacity,
     TouchableHighlight
 } from 'react-native'
-import { Container, Content, Card, CardItem, Button, Body, Header, Icon } from 'native-base'
+import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
@@ -39,7 +36,8 @@ class ExpandableHeader extends Component {
                 </TouchableHighlight>
                 {renderIf(this.state.showDropDown,
                     <ExpandableDetailsList
-                        dataList={this.props.dataList} />
+                        dataList={this.props.dataList}
+                        navigateToDataStoreDetails={this.props.navigateToDataStoreDetails} />
                 )}
             </View>
 

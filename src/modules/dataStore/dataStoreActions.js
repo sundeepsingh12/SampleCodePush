@@ -11,7 +11,8 @@ import {
     ON_BLUR,
     SHOW_DETAILS,
     NEXT_FOCUS,
-    SAVE_SUCCESSFUL
+    SAVE_SUCCESSFUL,
+    CLEAR_ATTR_MAP_AND_SET_LOADER
 } from '../../lib/constants'
 import {
     EXTERNAL_DATA_STORE,
@@ -22,6 +23,15 @@ import _ from 'lodash'
 import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 
+
+export function getFieldAttribute(fieldAttributeMasterId, value) {
+    return async function (dispatch) {
+        dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
+        const fieldAttributes = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE')
+        let fieldAttribute = dataStoreService.getFieldAttribute(fieldAttributes.value, fieldAttributeMasterId)
+        dispatch(getDataStoreAttrValueMap(value, fieldAttribute[0].dataStoreMasterId, fieldAttribute[0].dataStoreAttributeId, fieldAttribute[0].externalDataStoreMasterUrl, fieldAttribute[0].key))
+    }
+}
 
 /**
  * @param {*} validationArray 
@@ -98,6 +108,7 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
             } else {
                 dispatch(setState(SET_DATA_STORE_ATTR_MAP, {
                     dataStoreAttrValueMap,
+                    searchText
                 }))
             }
         } catch (error) {
@@ -170,10 +181,11 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
 export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId) {
     return async function (dispatch) {
         try {
-            let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
-            if (!calledFromArray)
+            if (!calledFromArray) {
+                let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
                 dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, NEXT_FOCUS))
-            else {
+            } else {
+                let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements[rowId].formLayoutObject)
                 formElements[rowId].formLayoutObject = formElementResult
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
             }

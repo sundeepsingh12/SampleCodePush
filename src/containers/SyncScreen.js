@@ -140,7 +140,7 @@ class SyncScreen extends Component {
             All data synced perfectly to the server.
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart) }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> Re-Sync </Text>
             </Button>
           </View>
@@ -157,7 +157,7 @@ class SyncScreen extends Component {
             Internal Server Error.
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart) }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> Retry </Text>
             </Button>
           </View>
@@ -175,7 +175,7 @@ class SyncScreen extends Component {
             No Internet Connection
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart) }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> Retry </Text>
             </Button>
           </View>
@@ -192,7 +192,7 @@ class SyncScreen extends Component {
             Internal Error.
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart) }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> Retry </Text>
             </Button>
           </View>
