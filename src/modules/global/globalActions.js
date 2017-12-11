@@ -91,6 +91,7 @@ export async function getJobListingParameters() {
 export function deleteSessionToken() {
   return async function (dispatch) {
     try {
+     
       await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
@@ -99,6 +100,8 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
+       dispatch(clearHomeState())
+
     } catch (error) {
       throw error
     }

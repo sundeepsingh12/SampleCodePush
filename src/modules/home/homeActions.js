@@ -14,7 +14,8 @@ import {
   SYNC_STATUS,
   PENDING,
   LiveJobs,
-  PIECHART
+  PIECHART,
+  CLEAR_HOME_STATE
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -229,5 +230,11 @@ export function startMqttService(pieChart) {
           }
         })
     }
+  }
+}
+
+export function clearHomeState() {
+  return {
+    type: CLEAR_HOME_STATE
   }
 }
