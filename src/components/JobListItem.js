@@ -28,7 +28,7 @@ export default class JobListItem extends Component {
         onPress={this.props.onPressItem}
         onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
-        <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : null]}>
+        <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : {backgroundColor: '#ffffff'}]}>
           <View style={[style.seqCircle, styles.relative]}>
             <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
               {this.props.data.jobMasterIdentifier}
@@ -101,8 +101,8 @@ export default class JobListItem extends Component {
           }
         </View>
         {this.props.jobEndTime ?
-          <View style={[styles.marginTop10]}>
-            <Text style={[styles.bgWarning, styles.fontWhite, styles.fontDefault, styles.fontCenter, { borderRadius: 3, padding: 3 }]}>
+          <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5}]}>
+            <Text style={[styles.fontWhite, styles.fontDefault, styles.fontCenter]}>
               {(moment(this.props.jobEndTime, "HH:mm:ss")).hours() + ' hours ' +
                 (moment(this.props.jobEndTime, "HH:mm:ss")).minutes() + ' minutes ' +
                 (moment(this.props.jobEndTime, "HH:mm:ss")).seconds() + ' seconds left'}

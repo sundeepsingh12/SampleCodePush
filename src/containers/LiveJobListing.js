@@ -182,8 +182,8 @@ class LiveJobListing extends Component {
                             {renderIf(this.props.selectedItems && this.props.selectedItems.length > 0,
                                 <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
                                     <Body>
-                                        <View style={[styles.column]}>
-                                            <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
+                                        <View style={[styles.column, {alignSelf: 'stretch'}]}>
+                                            <View style={[styles.row,styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
                                                 <View style={[styles.row, styles.justifySpaceAround, styles.alignCenter]}>
                                                     <TouchableOpacity
                                                         style={[styles.margin5, styles.padding10, styles.paddingLeft0]}

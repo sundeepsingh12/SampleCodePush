@@ -94,13 +94,7 @@ class LiveJob extends Component {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
-                    <Header
-                        style={StyleSheet.flatten([
-                            styles.bgPrimary, {
-                                borderBottomWidth: 0
-                            }
-                        ])}>
-
+                    <Header searchBar style={[styles.bgPrimary, style.header]}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -147,13 +141,17 @@ class LiveJob extends Component {
                                 }
                             </Text>
                         </View>
-                        <View style={[styles.row, style.footer, styles.padding10]}>
-                            <Button full style={[styles.bgDanger, styles.flexBasis50]} onPress={() => this.props.actions.acceptOrRejectJob(2, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList)}>
-                                <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
-                            </Button>
-                            <Button full style={[styles.bgSuccess, styles.flexBasis50]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList, this.props.modules[START])}>
-                                <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
-                            </Button>
+                        <View style={[styles.row, styles.bgWhite]}>
+                            <View style={[styles.padding10, styles.paddingRight5, styles.flexBasis50]}>
+                                <Button full style={[styles.bgDanger]} onPress={() => this.props.actions.acceptOrRejectJob(2, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList)}>
+                                    <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
+                                </Button>
+                            </View>
+                            <View style={[styles.padding10, styles.paddingLeft5, styles.flexBasis50]}>
+                                <Button full style={[styles.bgSuccess]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList, this.props.modules[START])}>
+                                    <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
+                                </Button>
+                            </View>
                         </View>
                     </View>
                     <Content>
@@ -179,12 +177,11 @@ class LiveJob extends Component {
 const style = StyleSheet.create({
     //  styles.column, styles.paddingLeft0, styles.paddingRight0, {height: 'auto'}
     header: {
-        flexDirection: 'column',
-        paddingLeft: 0,
-        paddingRight: 0,
+        borderBottomWidth: 0,
         height: 'auto',
-        borderBottomWidth: 1,
-        borderBottomColor: '#f3f3f3'
+        padding: 0,
+        paddingRight: 0,
+        paddingLeft: 0,
     },
     headerLeft: {
         width: '15%',

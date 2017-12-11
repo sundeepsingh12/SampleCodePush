@@ -425,7 +425,8 @@ const style = StyleSheet.create({
     paddingRight: 0,
     height: 'auto',
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f3f3'
+    borderBottomColor: '#f3f3f3',
+    backgroundColor: '#ffffff'
   },
   headerIcon: {
     fontSize: 18
