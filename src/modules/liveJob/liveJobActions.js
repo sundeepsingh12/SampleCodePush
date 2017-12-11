@@ -18,7 +18,8 @@ import {
     SET_LIVE_JOB_LIST,
     TOGGLE_LIVE_JOB_LIST_ITEM,
     START_FETCHING_LIVE_JOB,
-    SET_SEARCH
+    SET_SEARCH,
+    TabScreen
 } from '../../lib/constants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -49,7 +50,7 @@ export function endFetchingJobDetails(jobDataList, currentStatus, jobTransaction
         }
     }
 }
-export function acceptOrRejectJob(status, job, liveJobList) {
+export function acceptOrRejectJob(status, job, liveJobList, StartModule) {
     return async function (dispatch) {
         try {
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
@@ -59,7 +60,7 @@ export function acceptOrRejectJob(status, job, liveJobList) {
                     index: 1,
                     actions: [
                         NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-                        NavigationActions.navigate({ routeName: 'TabScreen' })
+                        NavigationActions.navigate({ routeName: TabScreen, params: { appModule: StartModule }})
                     ]
                 }))
             } else if (status == 2 && _.isEmpty(newLiveJobList)) {
@@ -90,7 +91,7 @@ export function fetchAllLiveJobsList() {
             dispatch(setState(START_FETCHING_LIVE_JOB, true))
             let liveJobList = await liveJobService.getLiveJobList()
             dispatch(setState(SET_LIVE_JOB_LIST, liveJobList))
-            dispatch(setState(SET_SEARCH, ''))            
+            dispatch(setState(SET_SEARCH, ''))
         } catch (error) {
             console.log(error)
         }

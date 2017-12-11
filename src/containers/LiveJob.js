@@ -33,8 +33,8 @@ import Loader from '../components/Loader'
 import ExpandableHeader from '../components/ExpandableHeader'
 import renderIf from '../lib/renderIf'
 import {
-
-} from '../lib/AttributeConstants'
+    START
+} from '../lib/constants'
 import moment from 'moment'
 import { NavigationActions } from 'react-navigation'
 
@@ -44,6 +44,7 @@ function mapStateToProps(state) {
         currentStatus: state.liveJob.currentStatus,
         jobDataList: state.liveJob.jobDataList,
         jobTransaction: state.liveJob.jobTransaction,
+        modules: state.home.modules,
     }
 }
 
@@ -99,15 +100,15 @@ class LiveJob extends Component {
                                 borderBottomWidth: 0
                             }
                         ])}>
-                        
+
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                                 <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[style.headerBody]}>
-                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Live Task</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Live Task</Text>
                                 </View>
                                 <View style={[style.headerRight]}>
                                 </View>
@@ -150,7 +151,7 @@ class LiveJob extends Component {
                             <Button full style={[styles.bgDanger, styles.flexBasis50]} onPress={() => this.props.actions.acceptOrRejectJob(2, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList)}>
                                 <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
                             </Button>
-                            <Button full style={[styles.bgSuccess, styles.flexBasis50]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList)}>
+                            <Button full style={[styles.bgSuccess, styles.flexBasis50]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList, this.props.modules[START])}>
                                 <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
                             </Button>
                         </View>
@@ -185,21 +186,21 @@ const style = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#f3f3f3'
     },
-      headerLeft: {
+    headerLeft: {
         width: '15%',
         padding: 15
-      },
-      headerBody: {
+    },
+    headerBody: {
         width: '70%',
         paddingTop: 15,
         paddingBottom: 15,
         paddingLeft: 10,
         paddingRight: 10
-      },
-      headerRight: {
+    },
+    headerRight: {
         width: '15%',
         padding: 15
-      },
+    },
     headerIcon: {
         fontSize: 18
     },
