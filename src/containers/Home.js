@@ -56,6 +56,7 @@ import {
   Sequence,
   BulkConfiguration,
   Sorting,
+  LiveJobs,
   Summary,
   CustomApp,
   NewJob
@@ -95,11 +96,7 @@ class Home extends Component {
         break
       }
       case LIVE_ID: {
-        Toast.show({
-          text: `Under development!Coming Soon`,
-          position: 'bottom',
-          buttonText: 'OK'
-        })
+        this.props.actions.navigateToScene(LiveJobs)
         break
       }
       case SEQUENCEMODULE_ID: {
@@ -209,7 +206,7 @@ class Home extends Component {
     }
     return moduleView
   }
-  
+
   _onPieChartPress = () => {
     if(this.props.pieChart[SUMMARY].enabled){
       this.props.actions.navigateToScene(Summary)
@@ -217,20 +214,20 @@ class Home extends Component {
   }
 
   pieChartView() {
-    if(!this.props.pieChart[PIECHART].enabled) {
+    if (!this.props.pieChart[PIECHART].enabled) {
       return null
     }
 
-    if(this.props.chartLoading) {
+    if (this.props.chartLoading) {
       return (
-        <ActivityIndicator animating={this.props.chartLoading} 
-        style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
+        <ActivityIndicator animating={this.props.chartLoading}
+          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
       )
     }
 
-    console.log('this.props.count',this.props.count)
-    if(this.props.count) {
-      return (<PieChart count = {this.props.count} press = {this._onPieChartPress}/>)
+    console.log('this.props.count', this.props.count)
+    if (this.props.count) {
+      return (<PieChart count={this.props.count} press={this._onPieChartPress} />)
     }
 
     return null

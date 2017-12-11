@@ -124,8 +124,8 @@ class TabScreen extends Component {
     return renderTabList
   }
 
-  fetchDataForListing = (searchText) =>{
-    this.props.actions.setState(LISTING_SEARCH_VALUE,searchText) 
+  fetchDataForListing = (searchText) => {
+    this.props.actions.setState(LISTING_SEARCH_VALUE, searchText)
   }
 
   _renderCalendar = () => {
@@ -175,7 +175,7 @@ class TabScreen extends Component {
       return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{moment(this.props.selectedDate).format('ddd, DD MMM, YYYY')}</Text>
     }
   }
-  onPress = () =>{ //implement for search
+  onPress = () => { //implement for search
 
   }
 
@@ -205,7 +205,7 @@ class TabScreen extends Component {
                 <View style={[style.headerRight]}>
                 </View>
               </View>
-              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} fetchDataForListing = {this.fetchDataForListing} searchText = {this.props.searchText} navigation = {this.props.navigation} returnValue = {this.fetchDataForListing.bind(this)} onPress = {this.onPress} />
+              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.fetchDataForListing} searchText={this.props.searchText} navigation={this.props.navigation} returnValue={this.fetchDataForListing.bind(this)} onPress={this.onPress} />
             </Body>
           </Header>
           <Tabs
@@ -214,7 +214,7 @@ class TabScreen extends Component {
             renderTabBar={() => <ScrollableTab />}>
             {viewTabList}
           </Tabs>
-            {calendarView}
+          {calendarView}
         </Container>
       </StyleProvider>
     )

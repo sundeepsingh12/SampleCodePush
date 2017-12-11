@@ -244,7 +244,7 @@ class JobDetailsV2 extends Component {
           longitude
         },
       }
-       getDirections(data)
+      getDirections(data)
     }
     else {
       let addressArray = []
@@ -271,7 +271,7 @@ class JobDetailsV2 extends Component {
                   }
                 ]
               }
-               getDirections(data)
+              getDirections(data)
             }
           }
         )
@@ -290,7 +290,7 @@ class JobDetailsV2 extends Component {
       }
     }
 
-   
+
   }
 
   render() {
@@ -351,7 +351,7 @@ class JobDetailsV2 extends Component {
             </Header>
             <Content>
 
-              <View style={[styles.marginTop10, styles.bgWhite]}>
+              <View style={[styles.marginTop5, styles.bgWhite]}>
                 {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
                   <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
                     {this.props.errorMessage}
@@ -362,7 +362,7 @@ class JobDetailsV2 extends Component {
               </View>
 
               {/*Basic Details*/}
-              <View style={[styles.bgWhite, styles.marginTop10, styles.padding10]}>
+              <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
                 <ExpandableHeader
                   title={'Basic Details'}
                   dataList={this.props.jobDataList}
@@ -370,7 +370,7 @@ class JobDetailsV2 extends Component {
               </View>
 
               {/*Payment Details*/}
-              <View style={[styles.bgWhite, styles.marginTop10, styles.padding10]}>
+              <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
                 <ExpandableHeader
                   title={'Field Details'}
                   dataList={this.props.fieldDataList} />
@@ -394,14 +394,14 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>
               )}
-               {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || 
-               (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),         
-                  <FooterTab>
-                <Button full onPress = {this.navigationButtonPressed}>
-                  <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>
-              </FooterTab>)} 
-  
+              {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
+                (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
+                <FooterTab>
+                  <Button full onPress={this.navigationButtonPressed}>
+                    <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>)}
+
               {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
@@ -409,7 +409,6 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>)}
             </Footer>
-
           </Container>
         </StyleProvider>
       )
@@ -426,7 +425,8 @@ const style = StyleSheet.create({
     paddingRight: 0,
     height: 'auto',
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f3f3'
+    borderBottomColor: '#f3f3f3',
+    backgroundColor: '#ffffff'
   },
   headerIcon: {
     fontSize: 18

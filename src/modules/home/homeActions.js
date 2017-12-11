@@ -13,6 +13,7 @@ import {
   SYNC_ERROR,
   SYNC_STATUS,
   PENDING,
+  LiveJobs,
   PIECHART
 } from '../../lib/constants'
 import {
@@ -26,7 +27,7 @@ import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { sync } from '../../services/classes/Sync'
 import BackgroundTimer from 'react-native-background-timer'
-import { setState } from '../global/globalActions'
+import { setState, navigateToScene } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { Client } from 'react-native-paho-mqtt'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -84,7 +85,7 @@ export function pieChartCount() {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
       const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const {pendingStatusIds,failStatusIds,successStatusIds} = allStatusIds
+      const { pendingStatusIds, failStatusIds, successStatusIds } = allStatusIds
       const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
@@ -94,11 +95,15 @@ export function pieChartCount() {
   }
 }
 
-export function performSyncService(pieChart, isCalledFromHome){
-  return async function(dispatch){
+export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
+  return async function (dispatch) {
     let transactionIdToBeSynced
-    try{
-       transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+    try {
+      let saveStoreObject = {
+        showLiveJobNotification: false
+      }
+      keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
+      transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
         syncStatus: 'Uploading'
@@ -107,17 +112,22 @@ export function performSyncService(pieChart, isCalledFromHome){
       const syncCount = responseBody.split(",")[1]
       //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
       if (isCalledFromHome || syncCount > 0) {
+        console.log(isCalledFromHome, syncCount)
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'Downloading'
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+        const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
         if (isJobsPresent) {
-          if(pieChart[PIECHART].enabled){
+          if (pieChart[PIECHART].enabled) {
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())
-        }     
+        }
+        if (isLiveJob) {
+          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
+        }
       }
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: [],
@@ -176,7 +186,7 @@ export function startMqttService(pieChart) {
           delete storage[key]
         },
       };
-      
+
       // Create a client instance 
       const client = new Client({
         uri,
@@ -193,7 +203,15 @@ export function startMqttService(pieChart) {
       })
       client.on('messageReceived', message => {
         console.log('message.payloadString', message.payloadString)
-        dispatch(performSyncService(pieChart, true))
+        if (message.payloadString == 'Live Job Notification') {
+          let saveStoreObject = {
+            showLiveJobNotification: true
+          }
+          keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
+          dispatch(performSyncService(pieChart, true, true))
+        } else {
+          dispatch(performSyncService(pieChart, true))
+        }
       })
 
       // connect the client 
