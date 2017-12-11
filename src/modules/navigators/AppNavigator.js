@@ -354,9 +354,6 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
-  SignatureAndNps: {
-    screen: SignatureAndNps
-  },
   ArrayFieldAttribute: {
     screen: ArrayFieldAttribute
   }
@@ -407,10 +404,6 @@ export const AppNavigator = StackNavigator({
     screen: DataStoreDetails
   }
 }, {
-    SignatureAndNps: {
-      screen: SignatureAndNps
-    }
-  }, {
     cardStyle: {
       backgroundColor: 'white'
     }

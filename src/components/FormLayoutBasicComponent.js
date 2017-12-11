@@ -48,6 +48,7 @@ import {
     OBJECT,
     CASH,
     OPTION_RADIO_FOR_MASTER,
+    QR_SCAN
 } from '../lib/AttributeConstants'
 
 import {
@@ -133,6 +134,10 @@ class BasicFormElement extends Component {
                 screenName = 'ArrayFieldAttribute'
                 break
             }
+            case QR_SCAN:{
+                screenName = 'QrCodeScanner'
+                break
+            }
             default: {
                 screenName = 'OverlayAttributes'
             }
@@ -146,9 +151,15 @@ class BasicFormElement extends Component {
                 jobTransaction: this.props.jobTransaction,
                 latestPositionId: this.props.latestPositionId,
                 isSaveDisabled: this.props.isSaveDisabled,
-                cash: cash
+                cash: cash,
+                returnData: this._searchForReferenceValue.bind(this)
+
             }
         )
+    }
+
+        _searchForReferenceValue = (value) => {
+       this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value,NEXT_FOCUS);
     }
 
     onFocusEvent(currentElement) {
@@ -314,6 +325,7 @@ class BasicFormElement extends Component {
             case ARRAY:
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
+            case QR_SCAN:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             case NPS_FEEDBACK:
                 return <View>
