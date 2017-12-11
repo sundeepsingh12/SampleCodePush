@@ -6,7 +6,8 @@ var InitialState = Record({
     liveJobList: {},
     selectedItems: [],
     loaderRunning: false,
-    searchText: ''
+    searchText: '',
+    liveJobToastMessage: ''
 })
 
 export default InitialState

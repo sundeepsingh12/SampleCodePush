@@ -19,7 +19,9 @@ import {
     TOGGLE_LIVE_JOB_LIST_ITEM,
     START_FETCHING_LIVE_JOB,
     SET_SEARCH,
-    TabScreen
+    TabScreen,
+    SET_MESSAGE,
+    SET_LIVE_JOB_TOAST
 } from '../../lib/constants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -27,6 +29,7 @@ import _ from 'lodash'
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
+            dispatch(setState(SET_MESSAGE, ''))
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
@@ -54,16 +57,19 @@ export function acceptOrRejectJob(status, job, liveJobList, StartModule) {
     return async function (dispatch) {
         try {
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            let newLiveJobList = await liveJobService.requestServerForApproval(status + '', token, job, liveJobList)
+            let serverResponse = await liveJobService.requestServerForApproval(status + '', token, job, liveJobList)
+            if (serverResponse.toastMessage && serverResponse.toastMessage != '') {
+                dispatch(setState(SET_MESSAGE, serverResponse.toastMessage))
+            }
             if (status == 1) {
                 dispatch(NavigationActions.reset({
                     index: 1,
                     actions: [
                         NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-                        NavigationActions.navigate({ routeName: TabScreen, params: { appModule: StartModule }})
+                        NavigationActions.navigate({ routeName: TabScreen, params: { appModule: StartModule } })
                     ]
                 }))
-            } else if (status == 2 && _.isEmpty(newLiveJobList)) {
+            } else if (status == 2 && _.isEmpty(serverResponse.newLiveJobList)) {
                 dispatch(NavigationActions.reset({
                     index: 0,
                     actions: [
@@ -116,8 +122,9 @@ export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
     return async function (dispatch) {
         try {
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            let newLiveJobList = await liveJobService.requestServerForApprovalForMultiple(status + '', selectedItems, liveJobList, token)
-            dispatch(setState(SET_LIVE_JOB_LIST, newLiveJobList))
+            let serverResponseForLive = await liveJobService.requestServerForApprovalForMultiple(status + '', selectedItems, liveJobList, token)
+            dispatch(setState(SET_LIVE_JOB_LIST, serverResponseForLive.newLiveJobList))
+            dispatch(setState(SET_LIVE_JOB_TOAST, serverResponseForLive.toastMessage))
         } catch (error) {
 
         }

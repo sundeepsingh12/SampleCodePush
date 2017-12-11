@@ -27,7 +27,8 @@ import {
     FooterTab,
     StyleProvider,
     Spinner,
-    ActionSheet
+    ActionSheet,
+    Toast
 } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
@@ -45,7 +46,8 @@ function mapStateToProps(state) {
         liveJobList: state.liveJobList.liveJobList,
         selectedItems: state.liveJobList.selectedItems,
         loaderRunning: state.liveJobList.loaderRunning,
-        searchText: state.liveJobList.searchText
+        searchText: state.liveJobList.searchText,
+        liveJobToastMessage: state.liveJobList.liveJobToastMessage
     }
 }
 
@@ -64,7 +66,15 @@ class LiveJobListing extends Component {
             this.props.navigation.state.params.callAlarm = false
         }
     }
-
+    componentDidUpdate() {
+        if (this.props.liveJobToastMessage && this.props.liveJobToastMessage != '') {
+            Toast.show({
+                text: this.props.liveJobToastMessage,
+                position: 'bottom',
+                buttonText: 'Okay',
+            })
+        }
+    }
     static navigationOptions = ({ navigation }) => {
         return {
             header: null
@@ -118,7 +128,7 @@ class LiveJobListing extends Component {
             let searchText = this.props.searchText
             _.forEach(this.props.liveJobList, function (value) {
                 let values = [value.referenceNo]
-                if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
+                if (_.some(values, (data) => _.includes(_.toLower(data), _.toLower(searchText)))) {
                     jobTransactionArray.push(value)
                 }
             })
@@ -175,15 +185,15 @@ class LiveJobListing extends Component {
                                             </View>
                                             <View />
                                         </View>
-                                        <SearchBarV2 placeholder='Filter Reference Numbers' setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} />
+                                        <SearchBarV2 placeholder='Filter Reference Numbers' setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation} returnValue={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} searchText={this.props.searchText} />
                                     </Body>
                                 </Header>
                             )}
                             {renderIf(this.props.selectedItems && this.props.selectedItems.length > 0,
                                 <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
                                     <Body>
-                                        <View style={[styles.column, {alignSelf: 'stretch'}]}>
-                                            <View style={[styles.row,styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
+                                        <View style={[styles.column, { alignSelf: 'stretch' }]}>
+                                            <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
                                                 <View style={[styles.row, styles.justifySpaceAround, styles.alignCenter]}>
                                                     <TouchableOpacity
                                                         style={[styles.margin5, styles.padding10, styles.paddingLeft0]}
