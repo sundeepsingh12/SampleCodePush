@@ -92,9 +92,6 @@ export default function authReducer(state = initialState, action) {
           .setIn(['form', 'isButtonDisabled'], true)
       }
 
-      case LOGIN_CAMERA_SCANNER:
-        return state.setIn(['form', 'isCameraScannerActive'], action.payload)
-      
       case TOGGLE_CHECKBOX:
        return state.setIn(['form','rememberMe'],!state.form.rememberMe)
 

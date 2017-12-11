@@ -1,5 +1,5 @@
-import { AppNavigator } from '../navigators/AppNavigator';
-import { NavigationActions } from 'react-navigation';
+import { AppNavigator } from '../navigators/AppNavigator'
+import { NavigationActions } from 'react-navigation'
 import initialNavState from './navigatorInitialState'
 
 import {
@@ -12,43 +12,12 @@ import {
 } from '../../lib/constants'
 
 export default function nav(state = initialNavState, action) {
-  let nextState
-  switch (action.type) {
-    // case ApplicationScreen:
-    //   nextState = AppNavigator.router.getStateForAction(
-    //      NavigationActions.back(),
-    //     state
-    //   );
-    //   break;
-    //   case LoginScreen:
-    //   nextState = AppNavigator.router.getStateForAction(
-    //     NavigationActions.navigate({ routeName: Preloader }),
-    //     state
-    //   );
-    // break;
-    // case PreloaderScreen:
-    //    nextState = AppNavigator.router.getStateForAction(
-    //     NavigationActions.navigate({ routeName:  Home }),
-    //     state
-    //   );
-    //   break;
-    //   case HomeScreen:
-    //    nextState = AppNavigator.router.getStateForAction(
-    //     NavigationActions.navigate({ routeName:  JobDetails }),
-    //     state
-    //   );
-    //   break;
-    //   case JobDetails:
-    //   nextState = AppNavigator.router.getStateForAction(
-    //    NavigationActions.navigate({ routeName:  FormLayout }),
-    //    state
-    //  );
-    //  break;
-    default:
-      nextState = AppNavigator.router.getStateForAction(action, state);
-      break;
+   if (action.type.startsWith('Navigation/')) {
+    const { type, routeName } = action
+    const lastRoute = state.routes[state.routes.length - 1]
+    console.log('lastRoute',lastRoute)
+       console.log('routeName',routeName)
+    if (routeName == lastRoute.routeName) return state
   }
-
-  // Simply return the original `state` if `nextState` is null or undefined.
-  return nextState || state;
+  return AppNavigator.router.getStateForAction(action, state)
 }
