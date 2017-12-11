@@ -43,11 +43,12 @@ import {
   SORTING_ID,
   CUSTOMAPP_ID,
   CHOOSE_WEB_URL,
-  NEWJOB_ID
+  NEWJOB_ID,
 } from '../lib/AttributeConstants'
 
 import {
-  PIECHART
+  PIECHART,
+  SUMMARY,
 } from '../lib/constants'
 
 import {
@@ -207,7 +208,9 @@ class Home extends Component {
   }
 
   _onPieChartPress = () => {
-    this.props.actions.navigateToScene(Summary)
+    if(this.props.pieChart[SUMMARY].enabled){
+      this.props.actions.navigateToScene(Summary)
+    }
   }
 
   pieChartView() {

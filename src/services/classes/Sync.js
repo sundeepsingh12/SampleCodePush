@@ -540,9 +540,10 @@ class Sync {
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
-          if (!isLiveJob || showLiveJobNotification) {
+          if (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification)) {
             this.showNotification(jobMasterTitleList)
-            keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
+            await keyValueDBService.deleteValueFromStore('LIVE_JOB')
+            await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
           jobSummaryService.updateJobSummary(dataList.jobSummaries)

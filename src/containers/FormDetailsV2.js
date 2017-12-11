@@ -96,7 +96,7 @@ class FormDetailsV2 extends Component {
             {/*card 1*/}
             <View style={style.formCard}>
               <View style={style.iconContainer}>
-                <SearchIcon/>
+                <SearchIcon width={30} height={30}/>
               </View>
               <View style={style.formCardDetail}>
                 <View>
@@ -122,7 +122,7 @@ class FormDetailsV2 extends Component {
             {/*card 2*/}
             <View style={style.formCard}>
               <View style={style.iconContainer}>
-                <SearchIcon/>
+                <SearchIcon width={30} height={30}/>
               </View>
               <View style={style.formCardDetail}>
                 <View>
@@ -148,7 +148,7 @@ class FormDetailsV2 extends Component {
             {/*card 3*/}
             <View style={style.formCard}>
               <View style={style.iconContainer}>
-                <SearchIcon/>
+                <SearchIcon width={30} height={30}/>
               </View>
               <View style={style.formCardDetail}>
                 <View>

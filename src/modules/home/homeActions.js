@@ -99,6 +99,10 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
+      let saveStoreObject = {
+        showLiveJobNotification: false
+      }
+      keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
       transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -200,8 +204,10 @@ export function startMqttService(pieChart) {
       client.on('messageReceived', message => {
         console.log('message.payloadString', message.payloadString)
         if (message.payloadString == 'Live Job Notification') {
-          //let showLiveJobNotification = true
-          keyValueDBService.validateAndSaveData('LIVE_JOB', { showLiveJobNotification: true })
+          let saveStoreObject = {
+            showLiveJobNotification: true
+          }
+          keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
           dispatch(performSyncService(pieChart, true, true))
         } else {
           dispatch(performSyncService(pieChart, true))

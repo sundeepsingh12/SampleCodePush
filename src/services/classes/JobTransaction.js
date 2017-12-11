@@ -346,6 +346,8 @@ class JobTransaction {
             if (callingActivity == 'LiveJob') {
                 jobTransaction.jobTransactionCustomization = jobTransactionCustomization
             }
+            jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
+            jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
             if (!_.isEmpty(runsheetIdToStartDateMap)) {
                 let jobTransactionsArray = (jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]]) ? jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]] : []
                 jobTransactionsArray.push(jobTransactionCustomization)

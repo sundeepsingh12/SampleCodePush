@@ -46,6 +46,7 @@ import {
 } from '../lib/AttributeConstants'
 import {
   IS_CALENDAR_VISIBLE,
+  LISTING_SEARCH_VALUE
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -56,6 +57,7 @@ function mapStateToProps(state) {
     isFutureRunsheetEnabled: state.taskList.isFutureRunsheetEnabled,
     selectedDate: state.taskList.selectedDate,
     isCalendarVisible: state.taskList.isCalendarVisible,
+    searchText: state.taskList.searchText,
   }
 };
 
@@ -113,12 +115,17 @@ class TabScreen extends Component {
             <TaskListScreen
               tabId={tabs[index].id}
               statusIdList={this.props.tabIdStatusIdMap[tabs[index].id]}
+              searchText={this.props.searchText}
             />
           </Tab>
         )
       }
     }
     return renderTabList
+  }
+
+  fetchDataForListing = (searchText) => {
+    this.props.actions.setState(LISTING_SEARCH_VALUE, searchText)
   }
 
   _renderCalendar = () => {
@@ -168,6 +175,9 @@ class TabScreen extends Component {
       return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{moment(this.props.selectedDate).format('ddd, DD MMM, YYYY')}</Text>
     }
   }
+  onPress = () => { //implement for search
+
+  }
 
   render() {
     const viewTabList = this.renderTabs()
@@ -195,7 +205,7 @@ class TabScreen extends Component {
                 <View style={[style.headerRight]}>
                 </View>
               </View>
-              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} />
+              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.fetchDataForListing} searchText={this.props.searchText} navigation={this.props.navigation} returnValue={this.fetchDataForListing.bind(this)} onPress={this.onPress} />
             </Body>
           </Header>
           <Tabs
@@ -204,7 +214,7 @@ class TabScreen extends Component {
             renderTabBar={() => <ScrollableTab />}>
             {viewTabList}
           </Tabs>
-            {calendarView}
+          {calendarView}
         </Container>
       </StyleProvider>
     )

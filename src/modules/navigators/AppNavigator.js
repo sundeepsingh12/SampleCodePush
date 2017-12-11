@@ -47,6 +47,7 @@ import LiveJobListing from '../../containers/LiveJobListing'
 import LiveJob from '../../containers/LiveJob'
 import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
+import QrCodeScanner from '../../containers/QrCodeScanner'
 import {
   Container,
   Content,
@@ -256,6 +257,13 @@ export const AppNavigator = StackNavigator({
   },
   SelectFromList: {
     screen: SelectFromList,
+  },
+  QrCodeScanner: {
+    screen: QrCodeScanner,
+    navigationOptions: {
+      title: 'Scanner',
+      header: null,
+    }
   },
   Statistics: {
     screen: Statistics,

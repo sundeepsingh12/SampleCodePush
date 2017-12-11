@@ -34,8 +34,7 @@ class SummaryAndPieChart {
         const allTransactionOnTodaysDate =  (allPendingSuccessFailIds) ? this.isTodaysDateTransactions(jobTransactionService.getJobTransactionsForStatusIds(allPendingSuccessFailIds)) : 0
         const getPendingFailSuccessCounts = this.setAllCounts(allTransactionOnTodaysDate,pendingStatusIds,successStatusIds,failStatusIds)
         const {pendingCounts,failCounts,successCounts} = getPendingFailSuccessCounts        
-        let obj = pendingCounts || successCounts || failCounts ? { pendingCounts, successCounts, failCounts } : null
-        return obj
+        return {pendingCounts,failCounts,successCounts}
     }
 
 
