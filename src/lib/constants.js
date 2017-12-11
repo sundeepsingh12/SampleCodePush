@@ -341,11 +341,13 @@ module.exports = keyMirror({
     TOGGLE_LIVE_JOB_LIST_ITEM: null,
     START_FETCHING_LIVE_JOB: null,
     SET_SEARCH: null,
+    SET_MESSAGE: null,
+    SET_LIVE_JOB_TOAST: null,
     //Summary
-    SET_SUMMARY_FOR_JOBMASTER : null,
-    SET_SUMMARY_FOR_RUNSHEET : null,
+    SET_SUMMARY_FOR_JOBMASTER: null,
+    SET_SUMMARY_FOR_RUNSHEET: null,
     RESET_SUMMARY_STATE: null,
-    
+
     //Custom App
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,

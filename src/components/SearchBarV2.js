@@ -27,7 +27,8 @@ export default class SearchBarV2 extends Component {
                         style={[style.headerSearch]}
                         onChangeText={(searchText) => {
                             this.props.setSearchText(searchText)
-                        }} />
+                        }}
+                        value={this.props.searchText} />
                     <Button small transparent style={[style.inputInnerBtn]} onPress={this.onPress}>
                         <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
                     </Button>

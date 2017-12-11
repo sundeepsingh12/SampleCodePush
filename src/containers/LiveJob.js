@@ -6,7 +6,7 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 
 import React, { Component } from 'react'
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, } from 'react-native'
 
 import {
     Container,
@@ -24,7 +24,8 @@ import {
     Footer,
     FooterTab,
     Card,
-    ActionSheet
+    ActionSheet,
+    Toast
 } from 'native-base'
 
 import * as globalActions from '../modules/global/globalActions'
@@ -33,7 +34,8 @@ import Loader from '../components/Loader'
 import ExpandableHeader from '../components/ExpandableHeader'
 import renderIf from '../lib/renderIf'
 import {
-    START
+    START,
+    SET_LIVE_JOB_TOAST
 } from '../lib/constants'
 import moment from 'moment'
 import { NavigationActions } from 'react-navigation'
@@ -45,6 +47,7 @@ function mapStateToProps(state) {
         jobDataList: state.liveJob.jobDataList,
         jobTransaction: state.liveJob.jobTransaction,
         modules: state.home.modules,
+        toastMessage: state.liveJob.toastMessage
     }
 }
 
@@ -81,6 +84,9 @@ class LiveJob extends Component {
         // }
         return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
     }
+    // componentWillMount() {
+    //     this.props.actions.setState(SET_LIVE_JOB_TOAST, '')
+    // }
     componentDidMount() {
         let endTime = this.getJobEndTime()
         this.setState({
@@ -89,6 +95,15 @@ class LiveJob extends Component {
         let timer = setInterval(this.tick, 1000);
         this.setState({ timer });
         this.props.actions.getJobDetails(this.props.navigation.state.params.job.id)
+    }
+    componentDidUpdate() {
+        if (this.props.toastMessage && this.props.toastMessage != '') {
+            Toast.show({
+                text: this.props.toastMessage,
+                position: 'bottom',
+                buttonText: 'Okay',
+            })
+        }
     }
     render() {
         return (

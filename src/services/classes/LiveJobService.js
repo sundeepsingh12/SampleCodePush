@@ -41,13 +41,24 @@ class LiveJobService {
     async requestServerForApproval(status, token, job, liveJobList) {
         let postJson = "{\"jobId\":\"" + job.id + "\", \"jobDate\":\"" + job.jobStartTime + "\", \"statusId\":\"" + status + "\"}"
         try {
+            let toastMessage = '', newLiveJobList
             let serviceAlertResponse = await RestAPIFactory(token.value).serviceCall(postJson, CONFIG.API.SERVICE_ALERT_JOB, 'POST')
             if (serviceAlertResponse && serviceAlertResponse.status == 200) {
                 let jobIdList = []
                 jobIdList.push(job.id)
-                let newLiveJobList = await this.deleteJob(jobIdList, liveJobList)
-                return newLiveJobList
+                newLiveJobList = await this.deleteJob(jobIdList, liveJobList)
+                let statusMessage = serviceAlertResponse._bodyText
+                if (statusMessage == 'success') {
+                    toastMessage = 'Your request has been accepted'
+                } else if (statusMessage == 'failed' && status == '1') {
+                    toastMessage = 'Your request has been rejected'
+                } else if (statusMessage == 'failed' && status == '2') {
+                    toastMessage = 'You rejected the job'
+                }
+            } else {
+                toastMessage = 'Something went wrong,try again'
             }
+            return { newLiveJobList, toastMessage }
         } catch (e) {
             return e.message
         }
@@ -81,19 +92,26 @@ class LiveJobService {
             multipleJobsDTO.push({ jobId: id, jobDate: jobStartTime, statusId: status })
         }
         try {
+            let toastMessage = '', newLiveJobList
             let postJson = JSON.stringify(multipleJobsDTO)
             let serviceAlertResponse = await RestAPIFactory(token.value).serviceCall(postJson, CONFIG.API.SERVICE_ALERT_JOB_MULTIPLE, 'POST')
             if (serviceAlertResponse && serviceAlertResponse.status == 200) {
                 console.log(serviceAlertResponse)
                 let successCount = serviceAlertResponse.json.successCount
                 let failCount = serviceAlertResponse.json.failCount
-                let successJsonArray = serviceAlertResponse.json.successList
-                let failureJsonArray = serviceAlertResponse.json.failureList
-                let successJobList, failedJobList
-
-                let newLiveJobList = await this.deleteJob(selectedItems, liveJobList)
-                return newLiveJobList
+                if (selectedItems.length == successCount && status == '1') {
+                    toastMessage = 'All your jobs are accepted'
+                } else if (selectedItems.length == failCount && status == '2') {
+                    toastMessage = 'All your jobs are rejected'
+                } else {
+                    toastMessage = successCount + ' jobs were accepted and ' + failCount + ' jobs were rejected.'
+                }
+                newLiveJobList = await this.deleteJob(selectedItems, liveJobList)
+                return { newLiveJobList, toastMessage }
+            } else {
+                toastMessage = 'Something went wrong,try again'
             }
+            return { newLiveJobList, toastMessage }
         } catch (e) {
             return e.message
         }
