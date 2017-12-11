@@ -312,7 +312,7 @@ class Sync {
     if (isLiveJob) {
       await this.saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     }
-    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     const jobMasterIds = this.getJobMasterIds(contentQuery.job)
     return jobMasterIds
   }
@@ -324,6 +324,7 @@ class Sync {
     if (jobsInDbList.length <= 0)
       return
     await realm.deleteRecordsInBatch(jobDatas, jobTransactions, jobs, fieldDatas)
+    return
   }
   getJobMasterIds(jobList) {
     let jobMasterIds = new Set()
@@ -539,7 +540,7 @@ class Sync {
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
-          if (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification)) {
+          if (!isLiveJob || showLiveJobNotification) {
             this.showNotification(jobMasterTitleList)
             keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
