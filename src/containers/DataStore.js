@@ -153,8 +153,20 @@ class DataStore extends Component {
         this.props.actions.setState(SHOW_DETAILS, -1)
     }
 
-    render() {
+    flatListView() {
+        let flatListView
+        if (!this.props.loaderRunning && !_.isEmpty(this.props.dataStoreAttrValueMap)) {
+            flatListView = < FlatList
+                data={Object.values(this.props.dataStoreAttrValueMap)}
+                renderItem={({ item }) => this.renderData(item)}
+                keyExtractor={item => item.id}
+            />
+        }
+        return flatListView
+    }
 
+    render() {
+        let flatListView = this.flatListView()
         if (this.props.errorMessage != '') {
             Toast.show({
                 text: this.props.errorMessage,
@@ -177,14 +189,9 @@ class DataStore extends Component {
                     <Content style={[styles.marginLeft10]}>
                         {renderIf(this.props.loaderRunning,
                             <Loader />)}
-                        {renderIf(!_.isEmpty(this.props.dataStoreAttrValueMap),
+                        {renderIf(!this.props.loaderRunning && !_.isEmpty(this.props.dataStoreAttrValueMap),
                             <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>Suggestions</Text>)}
-                        {renderIf(!this.props.loaderRunning,
-                            < FlatList
-                                data={Object.values(this.props.dataStoreAttrValueMap)}
-                                renderItem={({ item }) => this.renderData(item)}
-                                keyExtractor={item => item.id}
-                            />)}
+                        {flatListView}
                     </Content>
                     {renderIf(this.props.isMinMaxValidation &&
                         this.props.searchText.length > 2 &&
