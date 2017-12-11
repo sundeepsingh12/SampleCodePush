@@ -92,6 +92,7 @@ export function pieChartCount() {
     } catch (error) {
       //Update UI here
       console.log(error)
+       dispatch(setState(CHART_LOADING, { loading: false,count:null }))
     }
   }
 }
