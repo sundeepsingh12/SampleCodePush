@@ -280,6 +280,7 @@ module.exports = keyMirror({
     SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
     CLEAR_ATTR_MAP_AND_SET_LOADER: null,
+    DISABLE_AUTO_START_SCANNER: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,

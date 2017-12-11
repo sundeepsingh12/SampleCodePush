@@ -10,7 +10,8 @@ import {
     SHOW_DETAILS,
     SET_INITIAL_STATE,
     SAVE_SUCCESSFUL,
-    CLEAR_ATTR_MAP_AND_SET_LOADER
+    CLEAR_ATTR_MAP_AND_SET_LOADER,
+    DISABLE_AUTO_START_SCANNER
 } from '../../lib/constants'
 const initialState = new InitialState()
 
@@ -55,6 +56,9 @@ export default function dataStoreReducer(state = initialState, action) {
             return state.set('loaderRunning', true)
                 .set('dataStoreAttrValueMap', {})
                 .set('errorMessage', '')
+
+        case DISABLE_AUTO_START_SCANNER:
+            return state.set('isAutoStartScannerEnabled', action.payload)
     }
     return state
 }
