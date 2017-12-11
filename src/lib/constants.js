@@ -225,6 +225,7 @@ module.exports = keyMirror({
     Statistics: null,
     Summary: null,
     CustomApp: null,
+    DataStoreDetails: null,
     LiveJobs: null,
     QrCodeScanner: null,
 
@@ -278,6 +279,7 @@ module.exports = keyMirror({
     _id: null,
     SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
+    CLEAR_ATTR_MAP_AND_SET_LOADER: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,

@@ -106,7 +106,6 @@ class DataStoreService {
         }
         for (let itemCounter in dataStoreResponse.items) {
             let itemObject = dataStoreResponse.items[itemCounter]
-            delete itemObject.details.dataStoreAttributeValueMap._id;
             let dataStoreObject = {
                 id: itemCounter,
                 uniqueKey: itemObject.uniqueKey,
@@ -191,6 +190,16 @@ class DataStoreService {
             }
         }
         return false
+    }
+
+    getFieldAttribute(fieldAttributes, fieldAttributeMasterId) {
+        if (!fieldAttributes) {
+            throw new Error('fieldAttributes missing')
+        }
+        if (!fieldAttributeMasterId) {
+            throw new Error('fieldAttributeMasterId missing')
+        }
+        return fieldAttributes.filter(fieldAttribute => fieldAttribute.id == fieldAttributeMasterId)
     }
 }
 

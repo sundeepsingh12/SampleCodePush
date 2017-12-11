@@ -230,6 +230,7 @@ describe('test getDataStoreAttrValueMapFromJson', () => {
             matchKey: 'name',
             uniqueKey: 'contact',
             dataStoreAttributeValueMap: {
+                _id: '_1234',
                 name: 'temp_name',
                 contact: 'temp_contact'
             }
@@ -339,6 +340,38 @@ describe('test dataStoreValuePresentInFieldData', () => {
             value: 'abhi'
         }]);
         expect(dataStoreService.dataStoreValuePresentInFieldData('xyz', 989)).toEqual(false)
+    })
+})
+
+
+describe('test getFieldAttribute', () => {
+
+    it('should throw fieldAttributes missing error', () => {
+        const message = 'fieldAttributes missing'
+        try {
+            dataStoreService.getFieldAttribute(null, 123)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw fieldAttributeMasterId missing error', () => {
+        const message = 'fieldAttributeMasterId missing'
+        try {
+            dataStoreService.getFieldAttribute('abhi', null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should return FieldAttribuute', () => {
+        const fieldAttributes = [{
+            id: 123
+        }, {
+            id: 456
+        }]
+        const fieldAttributeMasterId = 123
+        expect(dataStoreService.getFieldAttribute(fieldAttributes, fieldAttributeMasterId)).toEqual([{ id: 123 }])
     })
 })
 

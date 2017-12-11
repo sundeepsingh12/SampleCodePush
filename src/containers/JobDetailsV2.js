@@ -32,7 +32,8 @@ import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
 import ExpandableHeader from '../components/ExpandableHeader'
 import {
-  IS_MISMATCHING_LOCATION
+  IS_MISMATCHING_LOCATION,
+  DataStoreDetails
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -84,6 +85,10 @@ class JobDetailsV2 extends Component {
 
   componentDidMount() {
     this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
+  }
+
+  navigateToDataStoreDetails = (navigationParam) => {
+    this.props.actions.navigateToScene(DataStoreDetails, navigationParam)
   }
 
   renderStatusList(statusList) {
@@ -373,7 +378,8 @@ class JobDetailsV2 extends Component {
               <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
                 <ExpandableHeader
                   title={'Field Details'}
-                  dataList={this.props.fieldDataList} />
+                  dataList={this.props.fieldDataList}
+                  navigateToDataStoreDetails={this.navigateToDataStoreDetails} />
               </View>
             </Content>
             <Footer style={[style.footer]}>
