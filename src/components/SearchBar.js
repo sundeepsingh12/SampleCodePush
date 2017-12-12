@@ -10,25 +10,24 @@ import {
     Icon,
 } from 'native-base';
 import styles from '../themes/FeStyle'
-
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
+import QRIcon from '../svg_components/icons/QRIcon'
 export default class SearchBar extends Component {
-
-    constructor(props) {
-        super(props)
-        this.state = {
-            isSearchVisible: (this.props.searchText.length > 2)
+    
+    _startScanner() {
+        if (this.props.isScannerEnabled) {
+            return <Button small transparent
+                style={[style.headerQRButton]}
+                onPress={() => this.props.scanner()}
+                autoFocus={this.props.isAutoStartScannerEnabled} >
+                <QRIcon width={30} height={30} color={styles.fontBlack} />
+            </Button>
         }
     }
 
-    _setSearchVisibility(isSearchVisible) {
-        this.setState(previousState => {
-            return {
-                isSearchVisible
-            }
-        })
-    }
-
     render() {
+        let scanner = this._startScanner()
         return (
             <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
                 <Body>
@@ -45,18 +44,14 @@ export default class SearchBar extends Component {
                             <Input
                                 placeholder={'Search'}
                                 onChangeText={(searchText) => {
-                                    this._setSearchVisibility(searchText.length > 2)
                                     this.props.setSearchText(searchText)
                                     this.props.fetchDataStoreAttrValueMap(searchText, false)
                                 }}
                                 value={this.props.searchText}
-                                placeholderTextColor={'rgba(255,255,255,.4)'}
-                                style={[style.headerSearch]} />
-                            {renderIf(this.props.isScannerEnabled, <Button small transparent style={[style.headerQRButton]}>
-                                <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXl]} />
-                            </Button>)}
+                                style={[style.headerSearch, styles.bgGray]} />
+                            {scanner}
                         </View>
-                        {renderIf(this.state.isSearchVisible, <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
+                        {renderIf(this.props.searchText.length > 2, <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
                             <Text style={[styles.fontDefault, styles.fontWhite, styles.paddingTop10, styles.paddingBottom10]}
                                 onPress={() => {
                                     this.props.fetchDataStoreAttrValueMap(this.props.searchText, true)
@@ -81,7 +76,6 @@ const style = StyleSheet.create({
         backgroundColor: '#1260be',
         borderRadius: 2,
         height: 40,
-        color: '#fff',
         fontSize: 14
     },
     headerQRButton: {

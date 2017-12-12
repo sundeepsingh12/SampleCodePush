@@ -9,13 +9,9 @@ import {
     REMARKS,
     MINMAX,
     SPECIAL,
-    SAVE_SUCCESSFUL
+    SHOW_DETAILS,
 } from '../../../lib/constants'
 import CONFIG from '../../../lib/config'
-import {
-    EXTERNAL_DATA_STORE,
-    DATA_STORE
-} from '../../../lib/AttributeConstants'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../../services/classes/DataStoreService'
 import thunk from 'redux-thunk'
@@ -70,18 +66,7 @@ describe('test for setValidation', () => {
 })
 
 describe('test for fillKeysAndSave', () => {
-
-    const expectedActions = [{
-        type: SAVE_SUCCESSFUL,
-        payload: true
-    }, {
-        type: SHOW_ERROR_MESSAGE,
-        payload: {
-            errorMessage: 'This value is already added',
-            dataStoreAttrValueMap: {},
-        }
-    }]
-
+    
     const formLayoutObject = {
         1: {
             label: "rr",
@@ -162,42 +147,13 @@ describe('test for fillKeysAndSave', () => {
         contact: '123456',
     }
 
-    it('should fill value of matched keys in formElement from dataStoreAttributeValueMap for DataStore', () => {
+    it('should fill value of matched keys in formElement', () => {
         dataStoreService.fillKeysInFormElement = jest.fn();
         dataStoreService.fillKeysInFormElement.mockReturnValue(formLayoutMapResult);
         const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, formLayoutMap, null, null, null, true, DATA_STORE))
+        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123))
             .then(() => {
                 expect(dataStoreService.fillKeysInFormElement).toHaveBeenCalledTimes(1)
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-            })
-    })
-
-    it('should fill value of matched keys in formElement from dataStoreAttributeValueMap for ExternalDataStore and not present in any transaction', () => {
-        dataStoreService.fillKeysInFormElement = jest.fn();
-        dataStoreService.fillKeysInFormElement.mockReturnValue(formLayoutMapResult);
-        dataStoreService.dataStoreValuePresentInFieldData = jest.fn()
-        dataStoreService.dataStoreValuePresentInFieldData.mockReturnValue(false)
-        const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, formLayoutMap, null, null, null, true, EXTERNAL_DATA_STORE))
-            .then(() => {
-                expect(dataStoreService.dataStoreValuePresentInFieldData).toHaveBeenCalledTimes(1)
-                expect(dataStoreService.fillKeysInFormElement).toHaveBeenCalledTimes(1)
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-            })
-    })
-
-    it('should fill value of matched keys in formElement from dataStoreAttributeValueMap for ExternalDataStore and is present in transaction', () => {
-        dataStoreService.dataStoreValuePresentInFieldData = jest.fn()
-        dataStoreService.dataStoreValuePresentInFieldData.mockReturnValue(true)
-        const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, formLayoutMap, null, null, null, true, EXTERNAL_DATA_STORE))
-            .then(() => {
-                expect(dataStoreService.dataStoreValuePresentInFieldData).toHaveBeenCalledTimes(1)
-                expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
             })
     })
 })
@@ -222,7 +178,10 @@ describe('test for getDataStoreAttrValueMap', () => {
             payload: true
         }, {
             type: SET_DATA_STORE_ATTR_MAP,
-            payload: attrValueMap
+            payload: {
+                dataStoreAttrValueMap: attrValueMap,
+                searchText: 'temp_name'
+            }
         }, {
             type: SHOW_ERROR_MESSAGE,
             payload: {
@@ -330,6 +289,43 @@ describe('test for getDataStoreAttrValueMap', () => {
     })
 })
 
+describe('test for uniqueValidationCheck', () => {
+
+    const expectedActions = [{
+        type: SHOW_ERROR_MESSAGE,
+        payload: {
+            errorMessage: 'This value is already added',
+            dataStoreAttrValueMap: {}
+        }
+    }, {
+        type: SHOW_DETAILS,
+        payload: 1
+    }]
+
+    it('should return true as dataStoreValue is already present', () => {
+        dataStoreService.dataStoreValuePresentInFieldData = jest.fn()
+        dataStoreService.dataStoreValuePresentInFieldData.mockReturnValue(true);
+        const store = mockStore({})
+        return store.dispatch(actions.uniqueValidationCheck('abhi', 123))
+            .then(() => {
+                expect(dataStoreService.dataStoreValuePresentInFieldData).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+
+    it('should return false as dataStoreValue is already present', () => {
+        dataStoreService.dataStoreValuePresentInFieldData = jest.fn()
+        dataStoreService.dataStoreValuePresentInFieldData.mockReturnValue(false);
+        const store = mockStore({})
+        return store.dispatch(actions.uniqueValidationCheck('abhi', 123, 1))
+            .then(() => {
+                expect(dataStoreService.dataStoreValuePresentInFieldData).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
+            })
+    })
+})
 
 
 function getMapFromObject(obj) {

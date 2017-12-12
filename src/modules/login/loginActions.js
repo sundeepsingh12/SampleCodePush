@@ -5,7 +5,6 @@ import {
   IS_PRELOADER_COMPLETE,
   LoginScreen,
   LOGIN,
-  LOGIN_CAMERA_SCANNER,
   LOGIN_FAILURE,
   LOGIN_START,
   LOGIN_SUCCESS,
@@ -119,19 +118,6 @@ export function onChangePassword(value) {
   }
 }
 
-export function startScanner() {
-  return{
-    type: LOGIN_CAMERA_SCANNER,
-    payload: true
-  }
-}
-
-export function stopScanner() {
-  return{
-    type: LOGIN_CAMERA_SCANNER,
-    payload: false    
-  }
-}
 
 export function toggleCheckbox() {
   return {

@@ -13,7 +13,8 @@ var InitialState = Record({
     errorMessage: '',
     searchText: '',
     detailsVisibleFor: -1,
-    isSaveSuccessful: false
+    isSaveSuccessful: false,
+    value: ''
 })
 
 export default InitialState

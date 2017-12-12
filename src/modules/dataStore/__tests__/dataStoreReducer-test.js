@@ -10,7 +10,8 @@ import {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     SAVE_SUCCESSFUL,
-    SET_INITIAL_STATE
+    SET_INITIAL_STATE,
+    CLEAR_ATTR_MAP_AND_SET_LOADER
 } from '../../../lib/constants'
 const InitialState = require('../dataStoreInitialState').default
 
@@ -44,20 +45,23 @@ describe('data Store reducer', () => {
         expect(nextState.isSearchEnabled).toBe(action.payload.isSearchEnabled)
     })
 
-    it('should set dataStoreAttrValueMap, loaderRunning to false and errorMessage to empty', () => {
+    it('should set dataStoreAttrValueMap, loaderRunning to false, errorMessage to empty and value to search text', () => {
         const action = {
             type: SET_DATA_STORE_ATTR_MAP,
             payload: {
-                matchKey: 'name',
-                uniqueKey: 'contact',
-                dataStoreAttributeValueMap: {
-                    name: 'temp_name',
-                    contact: 'temp_contact'
-                }
+                dataStoreAttrValueMap: {
+                    matchKey: 'name',
+                    uniqueKey: 'contact',
+                    dataStoreAttributeValueMap: {
+                        name: 'temp_name',
+                        contact: 'temp_contact'
+                    }
+                }, searchText: 'abc'
             }
         }
         let nextState = dataStoreReducer(undefined, action)
-        expect(nextState.dataStoreAttrValueMap).toBe(action.payload)
+        expect(nextState.dataStoreAttrValueMap).toBe(action.payload.dataStoreAttrValueMap)
+        expect(nextState.value).toBe(action.payload.searchText)
         expect(nextState.loaderRunning).toBe(false)
         expect(nextState.errorMessage).toBe('')
     })
@@ -83,6 +87,7 @@ describe('data Store reducer', () => {
         }
         let nextState = dataStoreReducer(undefined, action)
         expect(nextState.searchText).toBe(action.payload)
+        expect(nextState.errorMessage).toBe('')
     })
 
     it('should set detailsVisibleFor, and searchText', () => {
@@ -92,15 +97,6 @@ describe('data Store reducer', () => {
         }
         let nextState = dataStoreReducer(undefined, action)
         expect(nextState.detailsVisibleFor).toBe(action.payload)
-    })
-
-    it('should set isSaveSuccessful to true', () => {
-        const action = {
-            type: SAVE_SUCCESSFUL,
-            payload: true,
-        }
-        let nextState = dataStoreReducer(undefined, action)
-        expect(nextState.isSaveSuccessful).toBe(action.payload)
     })
 
     it('should set initialState', () => {
@@ -117,5 +113,15 @@ describe('data Store reducer', () => {
         }
         let nextState = dataStoreReducer(undefined, action)
         expect(nextState).toEqual(resultState)
+    })
+
+    it('should set errorMessage to empty, loaderRunning to true and dataStoreAttrValueMap to {}', () => {
+        const action = {
+            type: CLEAR_ATTR_MAP_AND_SET_LOADER,
+        }
+        let nextState = dataStoreReducer(undefined, action)
+        expect(nextState.dataStoreAttrValueMap).toEqual({})
+        expect(nextState.errorMessage).toBe('')
+        expect(nextState.loaderRunning).toBe(true)
     })
 })

@@ -10,10 +10,10 @@ import {
     TOOGLE_HELP_TEXT,
     BASIC_INFO,
     IS_LOADING,
-    HomeTabNavigatorScreen,
     RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+    JOB_STATUS,
     UPDATE_FIELD_DATA_VALIDATION,
     NEXT_FOCUS
 } from '../../lib/constants'
@@ -23,8 +23,9 @@ import { formLayoutEventsInterface } from '../../services/classes/formLayout/For
 import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
+import { setState, navigateToScene } from '../global/globalActions'
+import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { setState } from '../global/globalActions'
 import _ from 'lodash'
 
 export function _setFormList(sortedFormAttributesDto) {
@@ -45,7 +46,6 @@ export function _setErrorMessage(message) {
 export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId) {
     return async function (dispatch) {
         try {
-
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId)
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
@@ -127,15 +127,14 @@ export function toogleHelpText(attributeId, formElement) {
     }
 }
 
-export function saveJobTransaction(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated,jobTransactionIdList) {
     return async function (dispatch) {
-        dispatch(setState(IS_LOADING,true))
-        let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId,jobTransactionIdList)
-        await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+        dispatch(setState(IS_LOADING, true))
+        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+        let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList,jobTransactionIdList)
         dispatch(setState(IS_LOADING, false))
+        dispatch(navigateToScene(routeName, routeParam))
         dispatch(setState(RESET_STATE))
-        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
-
     }
 }
 

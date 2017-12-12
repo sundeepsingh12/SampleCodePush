@@ -1,14 +1,9 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
-import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
-import StartIcon from '../../images/fareye-default-iconset/homescreen/tasks.png'
-// import LiveIcon from '../../images/fareye-default-iconset/homescreen/live.png'
-
 import BulkIcon from '../../src/svg_components/icons/BulkIcon'
 import LiveIcon from '../../src/svg_components/icons/LiveIcon'
 import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
 import TaskIcon from '../../src/svg_components/icons/TaskIcon'
-// import SequenceIcon from '../../images/fareye-default-iconset/homescreen/sequence.png'
 import React, { Component } from 'react'
 module.exports = {
 
@@ -27,6 +22,7 @@ module.exports = {
     CASH_TENDERING: 38,
     CHECKBOX: 8,
     CONTACT_NUMBER: 27,
+    COUNT_DOWN_TIMER: 34,
     DATE: 3,
     DATA_STORE: 44,
     DECIMAL: 13,
@@ -37,7 +33,7 @@ module.exports = {
     FIXED_SKU_UNIT_PRICE: 13,
     FIXED_SKU_CODE: 1,
     IMAGE_URL: 24,
-    JOB_EXPIRY_TIME: 69,    
+    JOB_EXPIRY_TIME: 69,
     LANDMARK: 30,
     MODE: 'mode_type',
     MONEY_COLLECT: 18,
@@ -53,10 +49,12 @@ module.exports = {
     ORIGINAL_AMOUNT: 25,
     PASSWORD: 61,
     PINCODE: 31,
+    QR_SCAN: 22,
     RADIOBUTTON: 9,
     RECEIPT: 'receipt',
     REMARKS: 'remarks',
     RE_ATTEMPT_DATE: 33,
+    SCAN_OR_TEXT: 54,
     SEQUENCE: 62,
     SIGNATURE: 21,
     SIGNATURE_AND_FEEDBACK: 58,
@@ -247,6 +245,22 @@ module.exports = {
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
+    PASSWORD: 61,
+
+    //SaveActivated & Transient Strings
+    EMAIL: 'E-mail',
+    Return_To_Home: 'Return To Home',
+    View_SignOff_Summary: 'View SignOff Summary',
+    View_Parcel_Summary: 'View Parcel Summary',
+    Sign_Off_Summary: 'Sign Off Summary',
+    Parcel_Summary: 'Parcel Summary',
+    Discard_these_jobs: 'Discard these jobs?',
+    Do_you_want_to_checkout: 'Do you want to checkout?',
+    Yes_Checkout: 'Yes,Checkout',
+    Total: 'Total :',
+    Select_Next_Status: 'Select Next Status',
+
+
     TOKEN_MISSING: 'Token Missing',
     LOGIN: '?login=',
     POST: 'POST',
@@ -268,82 +282,23 @@ module.exports = {
     NEW_PASSWORD: 'New Password',
     CONFIRM_NEW_PASSWORD: 'Confirm New Password',
 
-    //App Modules Constants
-    BACKUP: {
-        appModuleId: 17,
-        displayName: 'Backup',
-        enabled: false,
-    },
-    BLUETOOTH: {
-        appModuleId: 16,
-        displayName: 'Pair Bluetooth Device',
-        enabled: false,
-    },
-    BULK: {
-        appModuleId: 1,
-        displayName: 'Bulk Update',
-        enabled: false,
-        icon: <BulkIcon />,
-    },
-    LIVE: {
-        appModuleId: 13,
-        displayName: 'Live',
-        enabled: false,
-        icon: <LiveIcon />,
-    },
-    OFFLINEDATASTORE: {
-        appModuleId: 15,
-        displayName: 'Sync Datastore',
-        enabled: false,
-    },
-    PIECHART: {
-        appModuleId: 5,
-        displayName: 'Pie Chart',
-        enabled: false,
-    },
-    PROFILE: {
-        appModuleId: 14,
-        displayName: 'Profile',
-        enabled: false,
-        icon: 'md-person',
-    },
-    STATISTIC: {
-        appModuleId: 7,
-        displayName: 'My Stats',
-        enabled: false,
-        icon: 'md-trending-up',
-    },
-    SEQUENCEMODULE: {
-        appModuleId: 2,
-        displayName: 'Sequence',
-        enabled: false,
-        icon: <SequenceIcon />,
-    },
-    START: {
-        appModuleId: 4,
-        displayName: 'All Tasks',
-        enabled: false,
-        icon: <TaskIcon />
-    },
-    SUMMARY: {
-        appModuleId: 8,
-        displayName: '',
-        enabled: false,
-    },
-    SORTING: {
-        appModuleId: 26,
-        displayName: 'Sort Parcels',
-        enabled: false,
-        icon: <SequenceIcon />,
-    },
-    CUSTOMAPP:{
-        appModuleId:12,
-        displayName: 'Web URL',
-        enabled: false,
-        remark: null,
-        icon: <SequenceIcon />
-    },
-
+    // App Modules Constants
+    BACKUP_ID: 17,
+    BLUETOOTH_ID: 16,
+    BULK_ID: 1,
+    LIVE_ID: 13,
+    OFFLINEDATASTORE_ID: 15,
+    PIECHART_ID: 5,
+    PROFILE_ID: 14,
+    STATISTIC_ID: 7,
+    SEQUENCEMODULE_ID: 2,
+    START_ID: 4,
+    SUMMARY_ID: 8,
+    SORTING_ID: 26,
+    CUSTOMAPP_ID: 12,
+    NEWJOB_ID: 3,
+    EZE_TAP_ID: 10,
+    M_SWIPE_ID: 9,
 
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
@@ -400,13 +355,13 @@ module.exports = {
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
-   
+
     //Custom App
-    WEBVIEW_REF : 'webview',
-    URL : 'URL',
-    CHOOSE_WEB_URL : "Choose Web URL",
-    ENTER_URL_HERE : "Enter Url Here",
-    HTTP : 'http://',
+    WEBVIEW_REF: 'webview',
+    URL: 'URL',
+    CHOOSE_WEB_URL: "Choose Web URL",
+    ENTER_URL_HERE: "Enter Url Here",
+    HTTP: 'http://',
 
     //SelectFromList
     SEARCH: 'Search',
@@ -424,4 +379,7 @@ module.exports = {
     CREATION_DATE: 'CREATION_DATE',
     TRANSACTION_DATE: 'TRANSACTION_DATE',
     JOB_ETA: 'JOB_ETA',
+
+    //ModuleCustomization
+    NEW_JOB: 'New Task',
 }

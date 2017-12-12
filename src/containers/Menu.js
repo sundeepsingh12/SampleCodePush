@@ -31,18 +31,20 @@ import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf'
 import CustomAlert from '../components/CustomAlert'
 import {
-  BACKUP,
-  BLUETOOTH,
-  EZE_TAP,
-  M_SWIPE,
-  OFFLINEDATASTORE,
-  PROFILE,
-  STATISTIC,
+  PROFILE_ID,
+  STATISTIC_ID,
 } from '../lib/AttributeConstants'
 
 import {
   ProfileView,
-  Statistics
+  Statistics,
+  PROFILE,
+  EZETAP,
+  MSWIPE,
+  STATISTIC,
+  OFFLINEDATASTORE,
+  BACKUP,
+  BLUETOOTH
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -50,6 +52,7 @@ function mapStateToProps(state) {
     loading: state.home.loading,
     errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
     isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
+    menu: state.home.menu
   }
 };
 
@@ -80,15 +83,15 @@ class Menu extends Component {
 
   renderIconView(icon, key) {
     return (
-      <View key={key} style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter, styles.bgPrimary]}>
-        <Icon name={icon} style={[styles.fontWhite, styles.fontXl]} />
+      <View key={key} style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
+        <Icon name={icon} style={[styles.fontPrimary, styles.fontLg]} />
       </View>
     )
   }
 
   renderCardView(view, key, moduleIndex) {
     return (
-      <TouchableOpacity key = {key} onPress={() => this.navigateToScene(moduleIndex)}>
+      <TouchableOpacity key={key} onPress={() => this.navigateToScene(moduleIndex)}>
         <View style={[styles.bgWhite]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             {view}
@@ -98,14 +101,15 @@ class Menu extends Component {
     )
   }
 
-  navigateToScene = (moduleName) => {
-    switch (moduleName) {
-      case PROFILE: {
+  navigateToScene = (appModule) => {
+    console.log('modulename', appModule)
+    switch (appModule.appModuleId) {
+      case PROFILE_ID: {
         this.props.actions.navigateToScene(ProfileView)
         break
       }
 
-      case STATISTIC: {
+      case STATISTIC_ID: {
         this.props.actions.navigateToScene(Statistics)
         break
       }
@@ -144,9 +148,9 @@ class Menu extends Component {
 
 
   render() {
-    let profileView = this.renderModuleView([PROFILE, STATISTIC], 1)
-    // let paymentView = this.renderModuleView([EZE_TAP, M_SWIPE], 2)
-    let deviceView = this.renderModuleView([BACKUP, OFFLINEDATASTORE, BLUETOOTH], 3)
+    let profileView = this.renderModuleView([this.props.menu[PROFILE], this.props.menu[STATISTIC]], 1)
+    let paymentView = this.renderModuleView([this.props.menu[EZETAP], this.props.menu[MSWIPE]], 2)
+    let deviceView = this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3)
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -185,7 +189,7 @@ class Menu extends Component {
             </View>
 
             {/*Card 4*/}
-            <View style={[styles.bgWhite, styles.marginBottom10]}>
+            {/* <View style={[styles.bgWhite, styles.marginBottom10]}>
               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
                 <View style={[styles.justifySpaceBetween, styles.flex1]}>
                   <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }]}>
@@ -197,7 +201,7 @@ class Menu extends Component {
                 </View>
               </View>
 
-              <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
                 <View style={[styles.justifySpaceBetween, styles.flex1]}>
                   <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
                     <Text style={[styles.fontDefault]}>
@@ -206,11 +210,11 @@ class Menu extends Component {
                     <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
                   </View>
                 </View>
-              </View>
-            </View>
+              </View> 
+            </View> */}
 
             {/* only for UI Components */}
-            <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.navigateToScene('UIViews') }}>
+            {/* <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.navigateToScene('UIViews') }}>
               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
                 <View style={[styles.justifySpaceBetween, styles.flex1]}>
                   <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
@@ -221,7 +225,7 @@ class Menu extends Component {
                   </View>
                 </View>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/*Card 5*/}
             <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.invalidateUserSession() }}>

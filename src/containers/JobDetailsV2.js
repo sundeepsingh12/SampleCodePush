@@ -32,7 +32,8 @@ import * as jobDetailsActions from '../modules/job-details/jobDetailsActions'
 import Loader from '../components/Loader'
 import ExpandableHeader from '../components/ExpandableHeader'
 import {
-  IS_MISMATCHING_LOCATION
+  IS_MISMATCHING_LOCATION,
+  DataStoreDetails
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -43,15 +44,20 @@ import {
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
   OK,
-  CALL_CONFIRM
+  CALL_CONFIRM,
+  LANDMARK,
+  PINCODE,
+  ADDRESS_LINE_1,
+  ADDRESS_LINE_2
 } from '../lib/AttributeConstants'
-import Communications from 'react-native-communications';
+import Communications from 'react-native-communications'
 import CallIcon from '../svg_components/icons/CallIcon'
+import getDirections from 'react-native-google-maps-directions'
+import _ from 'lodash'
 
 function mapStateToProps(state) {
   return {
     addressList: state.jobDetails.addressList,
-    contactList: state.jobDetails.contactList,
     customerCareList: state.jobDetails.customerCareList,
     currentStatus: state.jobDetails.currentStatus,
     fieldDataList: state.jobDetails.fieldDataList,
@@ -79,6 +85,10 @@ class JobDetailsV2 extends Component {
 
   componentDidMount() {
     this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
+  }
+
+  navigateToDataStoreDetails = (navigationParam) => {
+    this.props.actions.navigateToScene(DataStoreDetails, navigationParam)
   }
 
   renderStatusList(statusList) {
@@ -225,6 +235,69 @@ class JobDetailsV2 extends Component {
     )
   }
 
+  navigationButtonPressed = () => {
+    const addressDatas = this.props.navigation.state.params.jobSwipableDetails.addressData
+    const latitude = this.props.navigation.state.params.jobTransaction.jobLatitude
+    const longitude = this.props.navigation.state.params.jobTransaction.jobLongitude
+    let data
+
+    if (latitude && longitude) {
+      data = {
+        source: {},
+        destination: {
+          latitude,
+          longitude
+        },
+      }
+      getDirections(data)
+    }
+    else {
+      let addressArray = []
+      Object.values(addressDatas).forEach(object => {
+        addressArray.push(Object.values(object).join())
+      })
+      addressArray.push(CANCEL)
+      if (_.size(addressArray) > 2) {
+        ActionSheet.show(
+          {
+            options: addressArray,
+            cancelButtonIndex: addressArray.length - 1,
+            title: 'Select address for navigation'
+          },
+          buttonIndex => {
+            if (buttonIndex != addressArray.length - 1 && buttonIndex >= 0) {
+              data = {
+                source: {},
+                destination: {},
+                params: [
+                  {
+                    key: 'q',
+                    value: addressArray[buttonIndex]
+                  }
+                ]
+              }
+              getDirections(data)
+            }
+          }
+        )
+      } else {
+        data = {
+          source: {},
+          destination: {},
+          params: [
+            {
+              key: 'q',
+              value: addressArray[0]
+            }
+          ]
+        }
+        getDirections(data)
+      }
+    }
+
+
+  }
+
   render() {
     if (this.props.jobDetailsLoading) {
       return (
@@ -283,7 +356,7 @@ class JobDetailsV2 extends Component {
             </Header>
             <Content>
 
-              <View style={[styles.marginTop10, styles.bgWhite]}>
+              <View style={[styles.marginTop5, styles.bgWhite]}>
                 {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
                   <Text style={StyleSheet.flatten([styles.bold, styles.fontCenter, styles.fontSm, styles.fontWarning])}>
                     {this.props.errorMessage}
@@ -294,7 +367,7 @@ class JobDetailsV2 extends Component {
               </View>
 
               {/*Basic Details*/}
-              <View style={[styles.bgWhite, styles.marginTop10, styles.padding10]}>
+              <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
                 <ExpandableHeader
                   title={'Basic Details'}
                   dataList={this.props.jobDataList}
@@ -302,10 +375,11 @@ class JobDetailsV2 extends Component {
               </View>
 
               {/*Payment Details*/}
-              <View style={[styles.bgWhite, styles.marginTop10, styles.padding10]}>
+              <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
                 <ExpandableHeader
                   title={'Field Details'}
-                  dataList={this.props.fieldDataList} />
+                  dataList={this.props.fieldDataList}
+                  navigateToDataStoreDetails={this.navigateToDataStoreDetails} />
               </View>
             </Content>
             <Footer style={[style.footer]}>
@@ -326,11 +400,14 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>
               )}
-              <FooterTab>
-                <Button full>
-                  <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>
-              </FooterTab>
+              {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
+                (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
+                <FooterTab>
+                  <Button full onPress={this.navigationButtonPressed}>
+                    <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+                  </Button>
+                </FooterTab>)}
+
               {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
@@ -338,7 +415,6 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>)}
             </Footer>
-
           </Container>
         </StyleProvider>
       )
@@ -355,7 +431,8 @@ const style = StyleSheet.create({
     paddingRight: 0,
     height: 'auto',
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f3f3'
+    borderBottomColor: '#f3f3f3',
+    backgroundColor: '#ffffff'
   },
   headerIcon: {
     fontSize: 18

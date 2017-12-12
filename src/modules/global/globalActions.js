@@ -19,7 +19,8 @@ import {
   IS_SHOW_MOBILE_NUMBER_SCREEN,
   IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
-  USER
+  USER,
+  PENDING_SYNC_TRANSACTION_IDS
 } from '../../lib/constants'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -91,14 +92,18 @@ export async function getJobListingParameters() {
 export function deleteSessionToken() {
   return async function (dispatch) {
     try {
+     
       await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
+       dispatch(clearHomeState())
+
     } catch (error) {
       throw error
     }
