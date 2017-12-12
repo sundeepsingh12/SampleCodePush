@@ -269,6 +269,20 @@ class BasicFormElement extends Component {
         }
         return null
     }
+
+    goToQRCode = () => {
+        this.props.actions.navigateToScene('QrCodeScanner',
+            {
+                formElements: this.props.formElement,
+                jobStatusId: this.props.jobStatusId,
+                jobTransaction: this.props.jobTransaction,
+                latestPositionId: this.props.latestPositionId,
+                isSaveDisabled: this.props.isSaveDisabled,
+                returnData: this._searchForReferenceValue.bind(this)
+
+            })
+    }
+
     render() {
         let modalView = this.getModalView()
         switch (this.props.item.attributeTypeId) {
@@ -297,7 +311,7 @@ class BasicFormElement extends Component {
                                         placeholder={this.props.item.helpText}
                                         placeholderTextColor={styles.fontLowGray.color}
                                         defaultValue={this.props.item.value}
-                                        style={[styles.paddingLeft0, (this.props.item.attributeTypeId==54)?{paddingRight: 45}:null]}
+                                        style={[styles.paddingLeft0, (this.props.item.attributeTypeId==SCAN_OR_TEXT)?{paddingRight: 45}:null]}
                                         value={this.props.item.value}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
@@ -309,9 +323,12 @@ class BasicFormElement extends Component {
                                     />
                                     
                                 </Item>
-                                {(this.props.item.attributeTypeId==54)?<TouchableHighlight style={[styles.absolute, {bottom: 50, right: 10}]}>
+                                {(this.props.item.attributeTypeId==SCAN_OR_TEXT)?<TouchableHighlight 
+                                style={[styles.absolute, {bottom: 50, right: 10}]}
+                                onPress = {this.goToQRCode}
+                                >
                                     <View>
-                                    <QRIcon width={30} height={30} color={styles.fontLowGray} />
+                                    <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus,this.props.item.editable)} />
                                     </View>
                                 </TouchableHighlight>:null}
                                 
