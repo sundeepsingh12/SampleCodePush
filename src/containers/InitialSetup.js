@@ -5,10 +5,12 @@ import {
     Text,
     Image
 } from 'react-native'
-import { Container, Button, List, ListItem, Body, Left, Right, Input } from 'native-base';
+import { StyleProvider, Container, Content, Button, List, ListItem, Body, Left, Right, Input } from 'native-base';
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import feStyle from '../themes/FeStyle'
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
@@ -41,8 +43,10 @@ class InitialSetup extends Component{
 
     render(){
         return (
-            <View style={styles.issueWrapper}>
-                        <View style={[feStyle.column, feStyle.flexBasis40, feStyle.alignCenter, feStyle.flex1, feStyle.width100]}>
+            <StyleProvider style={getTheme(platform)}>
+                <Container>
+                    <Content style={[feStyle.paddingTop30]}>
+                        <View style={[feStyle.column, feStyle.flexBasis40, feStyle.alignCenter, feStyle.flex1, feStyle.width100, feStyle.marginTop30, feStyle.marginBottom30]}>
                             <View style={{ flexBasis: '70%' }}>
                                 <Image
                                     style={styles.logoStyle}
@@ -55,7 +59,7 @@ class InitialSetup extends Component{
                                 </Text>
                             </View>
                         </View>
-                        <View style={[feStyle.column, feStyle.flexBasis30, feStyle.marginTop10, feStyle.flex1, feStyle.justifyCenter]}>
+                        <View style={[feStyle.column, feStyle.flexBasis30, feStyle.marginTop30, feStyle.flex1, feStyle.justifyCenter]}>
                             <List>
                                 <ListItem style={{ height: 50 }}>
                                     <Left style={{ flex: 1 }}>
@@ -86,11 +90,13 @@ class InitialSetup extends Component{
                                 </ListItem>
                             </List>
                         </View>
-                        <View style={[feStyle.flexBasis25, feStyle.marginTop15, feStyle.flex1, feStyle.column, feStyle.alignCenter, feStyle.justifyCenter]}>
+                        <View style={[feStyle.flexBasis25, feStyle.marginTop15, feStyle.flex1, feStyle.column, feStyle.alignCenter, feStyle.justifyCenter, feStyle.marginTop30]}>
                             {this._renderErrorMessage()}
                             {this._renderButtons()}
                         </View>
-                    </View>
+                    </Content>
+                </Container>
+            </StyleProvider>
         )
     }
        _renderErrorMessage() {
@@ -107,7 +113,7 @@ class InitialSetup extends Component{
      _renderButtons() {
         if (this.props.isError) {
             return (
-                <View style={feStyle.row}>
+                <View style={[feStyle.row, feStyle.marginTop30]}>
                     <Button onPress={this.invalidateSession} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
                         <Text style={{ color: '#ffffff' }}>Cancel</Text>
                     </Button>
