@@ -46,7 +46,6 @@ function mapStateToProps(state) {
         currentStatus: state.liveJob.currentStatus,
         jobDataList: state.liveJob.jobDataList,
         jobTransaction: state.liveJob.jobTransaction,
-        modules: state.home.modules,
         toastMessage: state.liveJob.toastMessage
     }
 }
@@ -163,7 +162,7 @@ class LiveJob extends Component {
                                 </Button>
                             </View>
                             <View style={[styles.padding10, styles.paddingLeft5, styles.flexBasis50]}>
-                                <Button full style={[styles.bgSuccess]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList, this.props.modules[START])}>
+                                <Button full style={[styles.bgSuccess]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList)}>
                                     <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
                                 </Button>
                             </View>
