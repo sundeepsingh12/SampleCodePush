@@ -48,7 +48,8 @@ import {
     OBJECT,
     CASH,
     OPTION_RADIO_FOR_MASTER,
-    QR_SCAN
+    QR_SCAN,
+    CONTACT_NUMBER
 } from '../lib/AttributeConstants'
 
 import {
@@ -134,7 +135,7 @@ class BasicFormElement extends Component {
                 screenName = 'ArrayFieldAttribute'
                 break
             }
-            case QR_SCAN:{
+            case QR_SCAN: {
                 screenName = 'QrCodeScanner'
                 break
             }
@@ -158,8 +159,8 @@ class BasicFormElement extends Component {
         )
     }
 
-        _searchForReferenceValue = (value) => {
-       this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value,NEXT_FOCUS);
+    _searchForReferenceValue = (value) => {
+        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, NEXT_FOCUS);
     }
 
     onFocusEvent(currentElement) {
@@ -276,6 +277,7 @@ class BasicFormElement extends Component {
             case DECIMAL:
             case SEQUENCE:
             case PASSWORD:
+            case CONTACT_NUMBER:
                 return (
                     <View>
                         {renderIf(!this.props.item.hidden,

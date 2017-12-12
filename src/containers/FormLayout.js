@@ -124,6 +124,7 @@ class FormLayout extends Component {
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
+        this.props.navigation.state.params.transactionIdList,
         this.props.pieChart
       )
     }

@@ -21,7 +21,8 @@ import {
   IS_PRELOADER_COMPLETE,
   USER,
   SAVE_ACTIVATED,
-  LIVE_JOB
+  LIVE_JOB,
+  PENDING_SYNC_TRANSACTION_IDS
 } from '../../lib/constants'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -101,6 +102,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
       await keyValueDBService.deleteValueFromStore(LIVE_JOB)
+      await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
       dispatch(clearHomeState())
