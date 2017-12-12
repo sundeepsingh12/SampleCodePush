@@ -189,7 +189,7 @@ class Menu extends Component {
             </View>
 
             {/*Card 4*/}
-            <View style={[styles.bgWhite, styles.marginBottom10]}>
+            {/* <View style={[styles.bgWhite, styles.marginBottom10]}>
               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
                 <View style={[styles.justifySpaceBetween, styles.flex1]}>
                   <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }]}>
@@ -201,7 +201,7 @@ class Menu extends Component {
                 </View>
               </View>
 
-              <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
                 <View style={[styles.justifySpaceBetween, styles.flex1]}>
                   <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
                     <Text style={[styles.fontDefault]}>
@@ -210,11 +210,11 @@ class Menu extends Component {
                     <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
                   </View>
                 </View>
-              </View>
-            </View>
+              </View> 
+            </View> */}
 
             {/* only for UI Components */}
-            <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.navigateToScene('UIViews') }}>
+            {/* <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.navigateToScene('UIViews') }}>
               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
                 <View style={[styles.justifySpaceBetween, styles.flex1]}>
                   <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
@@ -225,7 +225,7 @@ class Menu extends Component {
                   </View>
                 </View>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/*Card 5*/}
             <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.invalidateUserSession() }}>
