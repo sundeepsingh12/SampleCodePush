@@ -45,13 +45,13 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
     SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
 
-    SYNC_RESULTS.scannedReferenceNumberLog = [];
+    SYNC_RESULTS.scannedReferenceNumberLog = []; //do nothing
     SYNC_RESULTS.serverSmsLog = realmDbData.serverSmsLogs;
-    SYNC_RESULTS.trackLog = [];
-    SYNC_RESULTS.transactionLog = [];
-    SYNC_RESULTS.userCommunicationLog = [];
-    SYNC_RESULTS.userEventsLog = [];
-    SYNC_RESULTS.userExceptionLog = [];
+    SYNC_RESULTS.trackLog = []; //do nothing
+    SYNC_RESULTS.transactionLog = []; //db
+    SYNC_RESULTS.userCommunicationLog = []; //store
+    SYNC_RESULTS.userEventsLog = []; //store
+    SYNC_RESULTS.userExceptionLog = []; //store
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync()
     SYNC_RESULTS.jobSummary = jobSummary || {}
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)

@@ -11,6 +11,7 @@ import {
     USER,
     DEVICE_IMEI,
     TABLE_JOB,
+    TABLE_TRANSACTION_LOGS,
     PENDING_SYNC_TRANSACTION_IDS
 } from '../../../lib/constants'
 
@@ -221,14 +222,50 @@ export default class FormLayoutEventImpl {
             }
 
             //TODO add other dbs which needs updation
+            const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, jobTransactionIdList, jobMasterId)
             const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList) : []
             await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList)
-            realm.performBatchSave(fieldData, jobTransaction,runSheet, job)
+            realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
+            let fieldDataList = realm.getAll(TABLE_TRANSACTION_LOGS)
+            for (let index in fieldDataList) {
+                console.log("transactionLog",{ ...fieldDataList[index] })
+            }
             console.log('savdata', jobTransaction.value)
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
         }
+    }
+
+    async _updateTransactionLogs(jobTransaction, statusId, jobTransactionIdList, jobMasterId){
+        const prevStatusId  = jobTransaction[0].jobStatusId
+        let user = await keyValueDBService.getValueFromStore(USER)
+        
+        let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
+        return {tableName : TABLE_TRANSACTION_LOGS, value : transactionLogs}
+    }
+
+    _prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user, dateTime) {
+        let transactionLogs = []
+        for (let job in jobTransaction) {
+            transactionLog = {
+                userId: user.id,
+                transactionId: jobTransaction[job].id,
+                jobMasterId: jobMasterId,
+                toJobStatusId: statusId,
+                fromJobStatusId: prevStatusId,
+                latitude: 0,  //to be set later
+                longitude: 0,  //to be set later
+                transactionTime: dateTime,
+                updatedAt: dateTime,
+                hubId: jobTransaction[job].hubId,
+                cityId: jobTransaction[job].cityId,
+                companyId: jobTransaction[job].companyId,
+                syncFlag: 1,
+            }
+            transactionLogs.push(transactionLog)
+        }
+        return transactionLogs
     }
 
     async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){

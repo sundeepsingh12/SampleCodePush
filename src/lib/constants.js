@@ -170,6 +170,7 @@ module.exports = keyMirror({
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
     TABLE_SERVER_SMS_LOG: null,
+    TABLE_TRANSACTION_LOGS:null,
 
     //Home Actions
     IS_LAST_PAGE: null,
