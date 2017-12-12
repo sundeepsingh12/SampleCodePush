@@ -41,12 +41,13 @@ import DateTimePicker from 'react-native-modal-datetime-picker'
 import moment from 'moment'
 
 import {
-  START,
   SEARCH_PLACEHOLDER
 } from '../lib/AttributeConstants'
 import {
+  START,
   IS_CALENDAR_VISIBLE,
-  LISTING_SEARCH_VALUE
+  LISTING_SEARCH_VALUE,
+
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -58,6 +59,7 @@ function mapStateToProps(state) {
     selectedDate: state.taskList.selectedDate,
     isCalendarVisible: state.taskList.isCalendarVisible,
     searchText: state.taskList.searchText,
+    modules: state.home.modules,
   }
 };
 
@@ -116,6 +118,7 @@ class TabScreen extends Component {
               tabId={tabs[index].id}
               statusIdList={this.props.tabIdStatusIdMap[tabs[index].id]}
               searchText={this.props.searchText}
+              loadTabScreen={this.props.navigation.state.params.loadTabScreen}
             />
           </Tab>
         )
@@ -200,7 +203,7 @@ class TabScreen extends Component {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.appModule.displayText}</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.modules[START].displayName}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>

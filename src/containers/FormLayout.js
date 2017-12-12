@@ -44,6 +44,7 @@ function mapStateToProps(state) {
     isLoading: state.formLayout.isLoading,
     errorMessage: state.formLayout.errorMessage,
     currentElement: state.formLayout.currentElement,
+    pieChart: state.home.pieChart
   }
 }
 
@@ -122,7 +123,8 @@ class FormLayout extends Component {
         this.props.navigation.state.params.contactData,
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
-        this.props.navigation.state.params.saveActivatedStatusData
+        this.props.navigation.state.params.saveActivatedStatusData,
+        this.props.pieChart
       )
     }
   }
