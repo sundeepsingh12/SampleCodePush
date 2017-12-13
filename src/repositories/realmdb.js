@@ -9,10 +9,12 @@ import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
 import TrackLogs from './schema/trackLogs'
 import ServerSmsLog from './schema/serverSmsLog'
+import TransactionLogs from './schema/transactionLogs'
+
 import _ from 'lodash'
 
 const schemaVersion = 33;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs];
 
 let realm = new Realm({
     schemaVersion,

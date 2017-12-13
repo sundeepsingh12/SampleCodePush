@@ -262,6 +262,7 @@ export default class FormLayoutEventImpl {
                 cityId: jobTransaction[job].cityId,
                 companyId: jobTransaction[job].companyId,
                 syncFlag: 1,
+                uniqueId: jobTransaction[job].id + prevStatusId,
             }
             transactionLogs.push(transactionLog)
         }

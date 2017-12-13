@@ -43,6 +43,8 @@ import BulkConfiguration from '../../containers/BulkConfiguration'
 import FormDetailsV2 from '../../containers/FormDetailsV2'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
+import LiveJobListing from '../../containers/LiveJobListing'
+import LiveJob from '../../containers/LiveJob'
 import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
 import QrCodeScanner from '../../containers/QrCodeScanner'
@@ -84,6 +86,7 @@ import CashTendering from '../../containers/CashTendering'
 import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
+import DataStoreDetails from '../../containers/DataStoreDetails'
 import { NavigationActions } from 'react-navigation'
 import {
   ApplicationScreen,
@@ -351,9 +354,6 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
-  SignatureAndNps: {
-    screen: SignatureAndNps
-  },
   ArrayFieldAttribute: {
     screen: ArrayFieldAttribute
   }
@@ -390,14 +390,20 @@ export const AppNavigator = StackNavigator({
   },
   TaskListScreen: {
     screen: TaskListScreen
-  }, FormDetailsV2: {
+  },
+  LiveJobs: {
+    screen: LiveJobListing
+  },
+  LiveJob: {
+    screen: LiveJob
+  },
+  FormDetailsV2: {
     screen: FormDetailsV2
   },
+  DataStoreDetails: {
+    screen: DataStoreDetails
+  }
 }, {
-    SignatureAndNps: {
-      screen: SignatureAndNps
-    }
-  }, {
     cardStyle: {
       backgroundColor: 'white'
     }

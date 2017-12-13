@@ -15,7 +15,7 @@ import CONFIG from './config'
 import _ from 'lodash'
 import RNFS from 'react-native-fs'
 import RNFetchBlob from 'react-native-fetch-blob'
-import {keyValueDBService} from '../services/classes/KeyValueDBService.js'
+import { keyValueDBService } from '../services/classes/KeyValueDBService.js'
 import {
   PENDING_SYNC_TRANSACTION_IDS,
   LAST_SYNC_WITH_SERVER
@@ -57,16 +57,17 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = this.API_BASE_URL + opts.url
-    console.log('url',url)
+    console.log('url', url)
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
     const response = await fetch(url, opts, fetchRequestId)
-    const { status, code, headers } = response;
+    const { status, code, headers, _bodyText } = response;
     let res = {
       status,
       code,
       headers,
+      _bodyText,
       json: {}
     }
 
@@ -189,31 +190,31 @@ class RestAPI {
     // console.log('jid',jid)
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
     let responseBody = "Fail"
-  await RNFetchBlob.fetch('POST', this.API_BASE_URL+CONFIG.API.UPLOAD_DATA_API, {
-    Authorization :this._sessionToken,
-    'Content-Type' : 'multipart/form-data',
-  }, [
-    { name : 'file', filename : 'sync.zip', type:'*/*', data: RNFetchBlob.wrap(PATH+'/sync.zip')},
-  ]).uploadProgress((written, total) => {
+    await RNFetchBlob.fetch('POST', this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API, {
+      Authorization: this._sessionToken,
+      'Content-Type': 'multipart/form-data',
+    }, [
+        { name: 'file', filename: 'sync.zip', type: '*/*', data: RNFetchBlob.wrap(PATH + '/sync.zip') },
+      ]).uploadProgress((written, total) => {
         console.log('uploaded', written / total)
-    }).then(async(resp) => {
-     responseBody = resp.text()
-    const message = responseBody.split(",")[0]
-    const syncCount = responseBody.split(",")[1]
-    if(message=='success'){
-      //do something
-      const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss') 
-      //console.log("qwe",currenDate)
-      await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,currenDate)      
-     await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-      // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-    }
-  }).catch(err => {
-    throw err
-  })
-  return responseBody
+      }).then(async (resp) => {
+        responseBody = resp.text()
+        const message = responseBody.split(",")[0]
+        const syncCount = responseBody.split(",")[1]
+        if (message == 'success') {
+          //do something
+          const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+          //console.log("qwe",currenDate)
+          await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
+          await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+          // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+        }
+      }).catch(err => {
+        throw err
+      })
+    return responseBody
   }
-  
+
 
 }
 // The singleton variable

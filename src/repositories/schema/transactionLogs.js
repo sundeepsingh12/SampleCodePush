@@ -8,7 +8,7 @@ transactionLogs.schema = {
     name: TABLE_TRANSACTION_LOGS,
     primaryKey: 'uniqueId',
     properties: {
-        id: { type: 'int', default: 'id' },
+        id: { type: 'int', default: 0 },
         userId: 'int',
         transactionId: 'int',
         jobMasterId: 'int',
@@ -21,7 +21,7 @@ transactionLogs.schema = {
         hubId: 'int',
         cityId: 'int',
         companyId: 'int',
-        uniqueId: { type: 'int', default: '_uniqueId' },
+        uniqueId: 'int',
         syncFlag: 'int',
     }
 }

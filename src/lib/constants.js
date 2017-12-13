@@ -79,7 +79,7 @@ module.exports = keyMirror({
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
-   
+
     //Home Container
     PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
@@ -218,14 +218,16 @@ module.exports = keyMirror({
     Transient: null,
     CheckoutDetails: null,
     NewJob: null,
-    NewJobStatus: null,    
-    BulkConfiguration:null,
-    BulkListing:null,
-    Sorting:null,
-    ProfileView:null,
-    Statistics:null,
-    Summary:null,
+    NewJobStatus: null,
+    BulkConfiguration: null,
+    BulkListing: null,
+    Sorting: null,
+    ProfileView: null,
+    Statistics: null,
+    Summary: null,
     CustomApp: null,
+    DataStoreDetails: null,
+    LiveJobs: null,
     QrCodeScanner: null,
 
 
@@ -278,6 +280,8 @@ module.exports = keyMirror({
     _id: null,
     SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
+    CLEAR_ATTR_MAP_AND_SET_LOADER: null,
+    DISABLE_AUTO_START_SCANNER: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
@@ -309,7 +313,7 @@ module.exports = keyMirror({
     Discard: null,
     Keep: null,
     Cancel: null,
-    Checkout:null,
+    Checkout: null,
     //Bulk Module
     START_FETCHING_BULK_CONFIG: null,
     STOP_FETCHING_BULK_CONFIG: null,
@@ -333,11 +337,19 @@ module.exports = keyMirror({
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
 
+    //Live Job actions
+    SET_LIVE_JOB_LIST: null,
+    END_LIVEJOB_DETAILD_FETCHING: null,
+    TOGGLE_LIVE_JOB_LIST_ITEM: null,
+    START_FETCHING_LIVE_JOB: null,
+    SET_SEARCH: null,
+    SET_MESSAGE: null,
+    SET_LIVE_JOB_TOAST: null,
     //Summary
-    SET_SUMMARY_FOR_JOBMASTER : null,
-    SET_SUMMARY_FOR_RUNSHEET : null,
+    SET_SUMMARY_FOR_JOBMASTER: null,
+    SET_SUMMARY_FOR_RUNSHEET: null,
     RESET_SUMMARY_STATE: null,
-    
+
     //Custom App
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,

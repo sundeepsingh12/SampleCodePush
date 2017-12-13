@@ -127,11 +127,11 @@ export function toogleHelpText(attributeId, formElement) {
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated,jobTransactionIdList) {
     return async function (dispatch) {
         dispatch(setState(IS_LOADING, true))
         const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-        let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
+        let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList,jobTransactionIdList)
         dispatch(setState(IS_LOADING, false))
         dispatch(navigateToScene(routeName, routeParam))
         dispatch(setState(RESET_STATE))

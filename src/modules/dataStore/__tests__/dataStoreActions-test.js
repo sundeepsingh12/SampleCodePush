@@ -178,7 +178,10 @@ describe('test for getDataStoreAttrValueMap', () => {
             payload: true
         }, {
             type: SET_DATA_STORE_ATTR_MAP,
-            payload: attrValueMap
+            payload: {
+                dataStoreAttrValueMap: attrValueMap,
+                searchText: 'temp_name'
+            }
         }, {
             type: SHOW_ERROR_MESSAGE,
             payload: {

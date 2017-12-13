@@ -173,7 +173,7 @@ class Sorting extends Component {
                                     </Button>
                                 </View>
                                 <TouchableOpacity style={[{ width: '15%' },styles.marginLeft15]} onPress = {() =>   this.props.navigation.navigate(QrCodeScanner, {returnData: this._searchForReferenceValue.bind(this)})} >
-                                     <QRIcon width={30} height={30} color = {styles.fontBlack} />  
+                                     <QRIcon width={30} height={30} color = {styles.fontWhite} />  
                                 </TouchableOpacity>
                             </View>
                         </Body>

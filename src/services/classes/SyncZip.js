@@ -21,7 +21,7 @@ import {
     PENDING_SYNC_TRANSACTION_IDS,
     TABLE_SERVER_SMS_LOG,
     TABLE_RUNSHEET,
-
+    TABLE_TRANSACTION_LOGS,
 } from '../../lib/constants'
 
 
@@ -37,8 +37,9 @@ export async function createZip(transactionIdToBeSynced) {
 
     //Prepare the SYNC_RESULTS
     var SYNC_RESULTS = {};
+    console.log("before")
     let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
-
+    console.log("after", realmDbData) 
     SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
     SYNC_RESULTS.job = realmDbData.jobList;
     SYNC_RESULTS.jobSummary = realmDbData.jobSummary;
@@ -48,7 +49,7 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.scannedReferenceNumberLog = []; //do nothing
     SYNC_RESULTS.serverSmsLog = realmDbData.serverSmsLogs;
     SYNC_RESULTS.trackLog = []; //do nothing
-    SYNC_RESULTS.transactionLog = []; //db
+    SYNC_RESULTS.transactionLog = realmDbData.transactionLogs; //db
     SYNC_RESULTS.userCommunicationLog = []; //store
     SYNC_RESULTS.userEventsLog = []; //store
     SYNC_RESULTS.userExceptionLog = []; //store
@@ -90,14 +91,16 @@ function _getSyncDataFromDb(transactionIdsObject) {
     let transactionList = [],
         fieldDataList = [],
         jobList = [],
-        serverSmsLogs = []
+        serverSmsLogs = [],
+        transactionLogs = []
     if (!transactionIdsObject || !transactionIdsObject.value) {
         return {
             fieldDataList,
             transactionList,
             jobList,
             serverSmsLogs,
-            runSheetSummary
+            runSheetSummary,
+            transactionLogs,
         };
     }
     let transactionIds = transactionIdsObject.value;
@@ -109,13 +112,15 @@ function _getSyncDataFromDb(transactionIdsObject) {
     jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB);
     let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
     serverSmsLogs = _getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
-
+    let transactionLogQuery = transactionIds.map(transactionId => 'transactionId = ' + transactionId.id).join(' OR ')
+    transactionLogs = _getDataFromRealm([], transactionLogQuery, TABLE_TRANSACTION_LOGS);
     return {
         fieldDataList,
         transactionList,
         jobList,
         serverSmsLogs,
         runSheetSummary,
+        transactionLogs
     }
 
 }

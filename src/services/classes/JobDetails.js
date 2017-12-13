@@ -4,7 +4,7 @@ import * as realm from '../../repositories/realmdb'
 
 import { jobDataService } from './JobData'
 import { jobTransactionService } from './JobTransaction'
-import {jobStatusService} from './JobStatus'
+import { jobStatusService } from './JobStatus'
 import {
     ARRAY_SAROJ_FAREYE,
     CONTACT_NUMBER,
@@ -88,26 +88,26 @@ class JobDetails {
     }
 
 
-    checkJobExpire(jobDataList){      
+    checkJobExpire(jobDataList) {
         const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
-        return ((jobAttributeTime != null && jobAttributeTime != undefined) &&  moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : null 
+        return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : null
     }
 
-     checkEnableResequence(jobMasterList,tabId,seqSelected,statusList){
-                const jobMasterIdWithEnableResequence  = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id) 
-                const statusMap = statusList.value.filter((status) => status.tabId == tabId).map(obj => obj.id)
-                const firstEnableSequenceValue = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence,statusMap)  
-                return  !(seqSelected > firstEnableSequenceValue) ? false : "Please finish previous items first" 
-         }
-         		  
-    async checkOutForDelivery(jobMasterList){
-        const jobListWithDelivery  = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) 
-        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobListWithDelivery,UNSEEN)
-        let statusIds = Object.keys(mapOfUnseenStatusWithJobMaster).map(function(key) {
+    checkEnableResequence(jobMasterList, tabId, seqSelected, statusList) {
+        const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id)
+        const statusMap = statusList.value.filter((status) => status.tabId == tabId).map(obj => obj.id)
+        const firstEnableSequenceValue = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
+        return !(seqSelected > firstEnableSequenceValue) ? false : "Please finish previous items first"
+    }
+
+    async checkOutForDelivery(jobMasterList) {
+        const jobListWithDelivery = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id)
+        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobListWithDelivery, UNSEEN)
+        let statusIds = Object.keys(mapOfUnseenStatusWithJobMaster).map(function (key) {
             return mapOfUnseenStatusWithJobMaster[key];
-          });
-        const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)  
-        return  !(unseenTransactions.length>0) ? false : "Please Scan all Parcels First" 
+        });
+        const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)
+        return !(unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
     }
     /**
      * ## convert degree to radians
@@ -145,7 +145,7 @@ class JobDetails {
      */
     checkLatLong(jobId, userLat, userLong) {
         let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0];
-        if ( !jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong) 
+        if (!jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong)
             return false
         const dist = this.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
         return (dist * 1000 >= 100)
