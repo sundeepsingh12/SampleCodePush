@@ -74,26 +74,25 @@ class Tracking {
 
     async onLocation(location) {
         let user = await keyValueDBService.getValueFromStore(USER) || {};
-        console.log("====user object inside location====");
-        console.log(user);
         console.log('- [js]location: ');
         console.log(location);
         let track_record = {
-            'battery': location.battery.battery,
+            'battery': location.battery.level,
             'gpsSignal': location.coords.accuracy,
             'latitude': location.coords.latitude,
             'longitude': location.coords.longitude,
             'speed': location.coords.speed,
             'trackTime': moment(location.timestamp).format('YYYY-MM-DD HH:mm:ss'),
-            'userId': user.id
+            'userId': user.value.id
         }
-        realm.save(TABLE_TRACK_LOGS, track_record);
+        realm.save(TABLE_TRACK_LOGS, track_record)
     }
 
     onError(error) {
-        var type = error.type;
-        var code = error.code;
-        alert(type + " Error: " + code);
+        console.log('error',error)
+        // var type = error.type;
+        // var code = error.code;
+        // alert(type + " Error: " + code);
     }
     onActivityChange(activityName) {
         console.log('- Current motion activity: ', activityName);  // eg: 'on_foot', 'still', 'in_vehicle'
@@ -103,6 +102,16 @@ class Tracking {
     }
     onMotionChange(location) {
         console.log('- [js]motionchanged: ', JSON.stringify(location));
+    }
+
+    getTrackLogs(trackLogs,lastSyncTime){
+        let trackLogsToBeSynced = []
+        trackLogs.forEach(trackLog=>{
+              if(moment(trackLog.trackTime).isAfter(lastSyncTime.value)){
+                trackLogsToBeSynced.push(trackLog)
+              }
+        })
+        return trackLogsToBeSynced
     }
 }
 

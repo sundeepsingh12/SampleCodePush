@@ -38,6 +38,7 @@ import { clearHomeState } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
+import {trackingService} from '../../services/classes/Tracking'
 
 /**
  * ## set the store
@@ -100,6 +101,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
+      trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
        dispatch(clearHomeState())

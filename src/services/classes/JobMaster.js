@@ -150,7 +150,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
     await keyValueDBService.validateAndSaveData(HUB,json.hub)
-    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,moment(new Date(), 'YYYY-MM-DD HH:mm:ss'))
+    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
   }
 
   /**

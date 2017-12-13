@@ -88,6 +88,7 @@ module.exports = keyMirror({
     SYNC_ERROR: null,
     SYNC_STATUS: null,
     LISTING_SEARCH_VALUE: null,
+    LAST_SYNC_TIME:null,
 
     //Listing Actions
     JOB_LISTING_START: null,

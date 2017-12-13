@@ -91,6 +91,7 @@ var InitialState = Record({
     moduleLoading: false,
     chartLoading: false,
     count: null,
+    lastSyncTime:null
 })
 
 export default InitialState
