@@ -9,6 +9,7 @@ import {
     SaveActivated,
     Transient,
     CheckoutDetails,
+    TabScreen
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 class FormLayout {
@@ -249,7 +250,7 @@ class FormLayout {
             routeParam = { currentStatus, formLayoutState, contactData, jobTransaction, jobMasterId, }
         }
         else {
-            routeName = HomeTabNavigatorScreen
+            routeName = TabScreen
             routeParam = {}
             let formLayoutObject = formLayoutState.formElement
             if (navigationFormLayoutStates) {

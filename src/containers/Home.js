@@ -103,9 +103,7 @@ class Home extends Component {
         break
       }
       case START_ID: {
-        this.props.actions.navigateToScene(TabScreen, {
-          appModule
-        })
+        this.props.actions.navigateToScene(TabScreen, {})
         break
       }
 
@@ -207,7 +205,7 @@ class Home extends Component {
   }
 
   _onPieChartPress = () => {
-    if(this.props.pieChart[SUMMARY].enabled){
+    if (this.props.pieChart[SUMMARY].enabled) {
       this.props.actions.navigateToScene(Summary)
     }
   }
