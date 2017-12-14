@@ -33,7 +33,8 @@ import Loader from '../components/Loader'
 import ExpandableHeader from '../components/ExpandableHeader'
 import {
   IS_MISMATCHING_LOCATION,
-  DataStoreDetails
+  DataStoreDetails,
+  ImageDetailsView
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -90,7 +91,9 @@ class JobDetailsV2 extends Component {
   navigateToDataStoreDetails = (navigationParam) => {
     this.props.actions.navigateToScene(DataStoreDetails, navigationParam)
   }
-
+  navigateToCameraDetails = (navigationParam) => {
+    this.props.actions.navigateToScene(ImageDetailsView, navigationParam)
+  }
   renderStatusList(statusList) {
     let statusView = []
     for (let index in statusList) {
@@ -379,7 +382,8 @@ class JobDetailsV2 extends Component {
                 <ExpandableHeader
                   title={'Field Details'}
                   dataList={this.props.fieldDataList}
-                  navigateToDataStoreDetails={this.navigateToDataStoreDetails} />
+                  navigateToDataStoreDetails={this.navigateToDataStoreDetails}
+                  navigateToCameraDetails={this.navigateToCameraDetails} />
               </View>
             </Content>
             <Footer style={[style.footer]}>

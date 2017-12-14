@@ -88,18 +88,24 @@ class SignatureRemarks {
             * @param {*} result result from signature save
             * @param {*} currentTimeInMillis current time 
             */
-    async saveFile(result, currentTimeInMillis) {
+    async saveFile(result, currentTimeInMillis, isCameraImage) {
         RNFS.mkdir(PATH_TEMP);
-        const image_name = SIGN + currentTimeInMillis + IMAGE_EXTENSION
-        await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
+        let image_name
+        if (!isCameraImage) {
+            image_name = SIGN + currentTimeInMillis + IMAGE_EXTENSION
+            await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
+        } else {
+            image_name = 'cust_' + currentTimeInMillis + IMAGE_EXTENSION
+            await RNFS.writeFile(PATH_TEMP + image_name, result, 'base64');
+        }
         const user = await keyValueDBService.getValueFromStore(USER);
         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
         return value
     }
     /**
-                * returns remarks validation
-                * @param {*} validation validation array
-                */
+     * returns remarks validation
+     * @param {*} validation validation array
+     */
     getRemarksValidation(validation) {
         if (validation != null && validation.length > 0) {
             let value = validation.filter((value) => value.timeOfExecution == 'MINMAX')

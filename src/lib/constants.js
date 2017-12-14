@@ -228,7 +228,8 @@ module.exports = keyMirror({
     DataStoreDetails: null,
     LiveJobs: null,
     QrCodeScanner: null,
-
+    CameraAttribute: null,
+    ImageDetailsView: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -373,6 +374,11 @@ module.exports = keyMirror({
     SUMMARY: null,
     SORTING: null,
     CUSTOMAPP: null,
+
+    //Camera Actions
+    SET_SHOW_IMAGE: null,
+    SET_IMAGE_DATA: null,
+
 })
 
 

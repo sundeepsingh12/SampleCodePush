@@ -48,11 +48,15 @@ import {
     OBJECT,
     CASH,
     OPTION_RADIO_FOR_MASTER,
-    QR_SCAN
+    QR_SCAN,
+    CAMERA,
+    CAMERA_HIGH,
+    CAMERA_MEDIUM
 } from '../lib/AttributeConstants'
 
 import {
-    NEXT_FOCUS
+    NEXT_FOCUS,
+    CameraAttribute
 } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
@@ -134,8 +138,14 @@ class BasicFormElement extends Component {
                 screenName = 'ArrayFieldAttribute'
                 break
             }
-            case QR_SCAN:{
+            case QR_SCAN: {
                 screenName = 'QrCodeScanner'
+                break
+            }
+            case CAMERA:
+            case CAMERA_MEDIUM:
+            case CAMERA_HIGH: {
+                screenName = CameraAttribute
                 break
             }
             default: {
@@ -158,8 +168,8 @@ class BasicFormElement extends Component {
         )
     }
 
-        _searchForReferenceValue = (value) => {
-       this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value,NEXT_FOCUS);
+    _searchForReferenceValue = (value) => {
+        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, NEXT_FOCUS);
     }
 
     onFocusEvent(currentElement) {
@@ -326,6 +336,9 @@ class BasicFormElement extends Component {
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
             case QR_SCAN:
+            case CAMERA:
+            case CAMERA_HIGH:
+            case CAMERA_MEDIUM:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             case NPS_FEEDBACK:
                 return <View>
