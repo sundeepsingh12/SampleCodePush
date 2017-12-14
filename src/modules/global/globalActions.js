@@ -20,7 +20,8 @@ import {
   IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
   USER,
-  PENDING_SYNC_TRANSACTION_IDS
+  PENDING_SYNC_TRANSACTION_IDS,
+  RESET_STATE
 } from '../../lib/constants'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -33,8 +34,6 @@ import {
 } from '../login/loginActions'
 
 import { onResyncPress } from '../home/homeActions'
-
-import { clearHomeState } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
@@ -101,11 +100,10 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-      trackingService.destroy()
+      await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
-       dispatch(clearHomeState())
-
+       dispatch(setState(RESET_STATE))
     } catch (error) {
       throw error
     }

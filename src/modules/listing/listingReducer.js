@@ -6,6 +6,7 @@ const initialState = new InitialState()
 import {
     JOB_LISTING_START,
     JOB_LISTING_END,
+    CLEAR_LISTING_STATE
 } from '../../lib/constants'
 
 export default function listingReducer(state = initialState, action) {
@@ -16,6 +17,8 @@ export default function listingReducer(state = initialState, action) {
         case JOB_LISTING_END:
             return state.set('jobTransactionCustomizationList', action.payload.jobTransactionCustomizationList)
                         .set('isRefreshing', false)
+        case CLEAR_LISTING_STATE:
+            return initialState                
     }
     return state
 }

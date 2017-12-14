@@ -79,6 +79,7 @@ module.exports = keyMirror({
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
+    TOGGLE_LOGOUT:null,
 
     //Home Container
     PIECHART: null,
@@ -98,6 +99,7 @@ module.exports = keyMirror({
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
     IS_MISMATCHING_LOCATION: null,
+
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,

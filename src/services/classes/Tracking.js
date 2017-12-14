@@ -65,15 +65,16 @@ class Tracking {
 
     destroy() {
         // Remove BackgroundGeolocation listeners
-        BackgroundGeolocation.un('location', this.onLocation);
-        BackgroundGeolocation.un('error', this.onError);
-        BackgroundGeolocation.un('motionchange', this.onMotionChange);
-        BackgroundGeolocation.un('activitychange', this.onActivityChange);
-        BackgroundGeolocation.un('providerchange', this.onProviderChange);
+        BackgroundGeolocation.un('location', this.onLocation)
+        BackgroundGeolocation.un('error', this.onError)
+        BackgroundGeolocation.un('motionchange', this.onMotionChange)
+        BackgroundGeolocation.un('activitychange', this.onActivityChange)
+        BackgroundGeolocation.un('providerchange', this.onProviderChange)
+         BackgroundGeolocation.removeListeners()
     }
 
     async onLocation(location) {
-        let user = await keyValueDBService.getValueFromStore(USER) || {};
+        let user = await keyValueDBService.getValueFromStore(USER) || {}
         console.log('- [js]location: ');
         console.log(location);
         let track_record = {

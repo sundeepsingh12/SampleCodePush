@@ -75,7 +75,8 @@ var InitialState = Record({
             displayName: 'MSwipe',
             enabled: false,
         }
-    }, pieChart: {
+    },
+     pieChart: {
         PIECHART: {
             appModuleId: 5,
             displayName: 'Pie Chart',
@@ -91,7 +92,8 @@ var InitialState = Record({
     moduleLoading: false,
     chartLoading: false,
     count: null,
-    lastSyncTime:null
+    lastSyncTime:null,
+    isLoggingOut:false
 })
 
 export default InitialState

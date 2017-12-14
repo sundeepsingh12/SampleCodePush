@@ -15,7 +15,6 @@ import {
   PENDING,
   LiveJobs,
   PIECHART,
-  CLEAR_HOME_STATE,
   LAST_SYNC_WITH_SERVER,
   LAST_SYNC_TIME
 } from '../../lib/constants'
@@ -243,11 +242,5 @@ export function startMqttService(pieChart) {
 export function startTracking(){
   return async function(dispatch){
     trackingService.init()
-  }
-}
-
-export function clearHomeState() {
-  return {
-    type: CLEAR_HOME_STATE
   }
 }

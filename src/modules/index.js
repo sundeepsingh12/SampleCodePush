@@ -51,7 +51,7 @@ import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
  * the rootReducer will call each and every reducer with the state and action
  * EVERY TIME there is a basic action
  */
-const appReducer = combineReducers({
+const rootReducer = combineReducers({
   nav,
   auth,
   device,
@@ -87,12 +87,12 @@ const appReducer = combineReducers({
   qrCodeReducer,
 })
 
-const rootReducer = (state, action) => {
-  //Reset state of Redux Store
-  if (action.type == PRE_LOGOUT_SUCCESS) {
-    state = undefined
-  }
-  return appReducer(state, action)
-}
+// const rootReducer = (state, action) => {
+//   //Reset state of Redux Store
+//   // if (action.type == PRE_LOGOUT_SUCCESS) {
+//   //   state = undefined
+//   // }
+//   // return appReducer(state, action)
+// }
 
 export default rootReducer

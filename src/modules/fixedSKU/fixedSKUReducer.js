@@ -5,7 +5,8 @@ const InitialState = require('./fixedSKUInitialState').default
 import {
     IS_LOADER_RUNNING,
     CHANGE_QUANTITY,
-    SET_FIXED_SKU
+    SET_FIXED_SKU,
+    RESET_STATE
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -20,6 +21,8 @@ export default function fixedSKUReducer(state = initialState, action) {
         case SET_FIXED_SKU:
             return state.set('fixedSKUList', action.payload.fixedSKUList)
                 .set('isLoaderRunning', action.payload.isLoaderRunning)
+        case RESET_STATE:
+            return initialState        
     }
     return state
 }

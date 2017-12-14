@@ -6,7 +6,6 @@ import React, { Component } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
-import renderIf from '../lib/renderIf.js'
 import {
   Container,
   Content,
