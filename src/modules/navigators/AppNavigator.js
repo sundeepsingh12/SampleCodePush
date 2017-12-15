@@ -48,6 +48,7 @@ import LiveJob from '../../containers/LiveJob'
 import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
 import QrCodeScanner from '../../containers/QrCodeScanner'
+import CameraFieldAttribute from '../../containers/CameraFieldAttribute'
 import {
   Container,
   Content,
@@ -87,6 +88,7 @@ import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
+import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
 import {
   ApplicationScreen,
@@ -402,6 +404,12 @@ export const AppNavigator = StackNavigator({
   },
   DataStoreDetails: {
     screen: DataStoreDetails
+  },
+  CameraAttribute: {
+    screen: CameraFieldAttribute,
+  },
+  ImageDetailsView: {
+    screen: ImageDetailsView,
   }
 }, {
     cardStyle: {

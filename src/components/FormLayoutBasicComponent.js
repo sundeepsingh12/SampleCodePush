@@ -50,12 +50,16 @@ import {
     CASH,
     OPTION_RADIO_FOR_MASTER,
     QR_SCAN,
+    CAMERA,
+    CAMERA_HIGH,
+    CAMERA_MEDIUM,
     SCAN_OR_TEXT,
     CONTACT_NUMBER
 } from '../lib/AttributeConstants'
 
 import {
-    NEXT_FOCUS
+    NEXT_FOCUS,
+    CameraAttribute
 } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
@@ -139,6 +143,12 @@ class BasicFormElement extends Component {
             }
             case QR_SCAN: {
                 screenName = 'QrCodeScanner'
+                break
+            }
+            case CAMERA:
+            case CAMERA_MEDIUM:
+            case CAMERA_HIGH: {
+                screenName = CameraAttribute
                 break
             }
             default: {
@@ -313,7 +323,7 @@ class BasicFormElement extends Component {
                                         placeholder={this.props.item.helpText}
                                         placeholderTextColor={styles.fontLowGray.color}
                                         defaultValue={this.props.item.value}
-                                        style={[styles.paddingLeft0, (this.props.item.attributeTypeId==SCAN_OR_TEXT)?{paddingRight: 45}:null]}
+                                        style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
                                         value={this.props.item.value}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
@@ -323,17 +333,17 @@ class BasicFormElement extends Component {
                                         onBlur={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                     />
-                                    
+
                                 </Item>
-                                {(this.props.item.attributeTypeId==SCAN_OR_TEXT)?<TouchableHighlight 
-                                style={[styles.absolute, {bottom: 50, right: 10}]}
-                                onPress = {this.goToQRCode}
+                                {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ? <TouchableHighlight
+                                    style={[styles.absolute, { bottom: 50, right: 10 }]}
+                                    onPress={this.goToQRCode}
                                 >
                                     <View>
-                                    <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus,this.props.item.editable)} />
+                                        <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)} />
                                     </View>
-                                </TouchableHighlight>:null}
-                                
+                                </TouchableHighlight> : null}
+
                                 {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
                                 <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
                                 <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
@@ -355,6 +365,9 @@ class BasicFormElement extends Component {
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
             case QR_SCAN:
+            case CAMERA:
+            case CAMERA_HIGH:
+            case CAMERA_MEDIUM:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             case NPS_FEEDBACK:
                 return <View>
