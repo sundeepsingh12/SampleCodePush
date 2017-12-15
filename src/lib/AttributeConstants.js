@@ -299,7 +299,9 @@ module.exports = {
     NEWJOB_ID: 3,
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
-
+    Piechart : {
+      enabled : false
+    },
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
 
