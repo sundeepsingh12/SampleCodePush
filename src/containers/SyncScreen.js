@@ -204,7 +204,7 @@ class SyncScreen extends Component {
 
   }
 
-  render() {
+  render() { 
 
     const syncView = this.getSyncView()
     const transactionView = this.getTransactionView()

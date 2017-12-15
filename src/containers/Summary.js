@@ -248,7 +248,7 @@ class Summary extends Component {
                                         </Text>
                                     </View>
                                     <View style={{width: "90%", borderRadius: 5, height: 8, backgroundColor: '#f3f3f3'}}>
-                                        <View style={{width: (item.count) ? String(((item[3].count)*100)/item.count)+"%" : "0%", height: 8, borderRadius: 5, backgroundColor: 'green'}}>
+                                        <View style={{width: (item.count > 0) ? String(((item[3].count + item[2].count)*100)/item.count)+"%" : "0%", height: 8, borderRadius: 5, backgroundColor: 'green'}}>
 
                                         </View>
                                     </View>

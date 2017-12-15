@@ -236,7 +236,15 @@ export default class FormLayoutEventImpl {
         const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
         const count  = (jobTransactionIdList) ? jobTransactionIdList.length : 1
         const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
-        jobSummaryList.value.forEach(item => (item.jobStatusId == statusId || item.jobStatusId == prevStatusId) ? ((item.jobStatusId == statusId)&& (item.updatedTime = currentDate) ? item.count += count : item.count -= count) : null )
+        jobSummaryList.value.forEach(item => {
+            item.updatedTime = currentDate
+            if(item.jobStatusId == prevStatusId ){
+                item.count = ( item.count - count >= 0) ? item.count-count : 0 
+            }            
+            if(item.jobStatusId == statusId ){
+                item.count += count
+            }     
+        });
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
 
@@ -252,12 +260,14 @@ export default class FormLayoutEventImpl {
         }, {});
         if(jobTransactionIdList){
             for(id in jobTransaction){
-                runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory-1]] -= 1
+                let prevCount  = runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory-1]]
+                runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory-1]] = (prevCount > 0) ? prevCount-1 : 0
                 runsheetMap[jobTransaction[id].runsheetId][status[statusCategory-1]] += 1 ;
                 runSheetList.push(runsheetMap[jobTransaction[id].runsheetId])          
             }
         }else{
-            runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory-1]] -= 1
+            let prevCount  = runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory-1]]
+            runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory-1]] = (prevCount > 0) ? prevCount-1 : 0
             runsheetMap[jobTransaction.runsheetId][status[statusCategory-1]] += 1
             runSheetList.push(runsheetMap[jobTransaction.runsheetId])
         }

@@ -73,7 +73,7 @@ class JobSummary {
         delete index.updatedTime 
         filteredJobSummaryList.push(index)       
       }
-    }
+    }    
     return filteredJobSummaryList
   }
 

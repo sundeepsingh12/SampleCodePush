@@ -45,7 +45,6 @@ export async function createZip(transactionIdToBeSynced) {
 
     SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
     SYNC_RESULTS.job = realmDbData.jobList;
-    SYNC_RESULTS.jobSummary = realmDbData.jobSummary;
     SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
     SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
 

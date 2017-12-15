@@ -22,6 +22,7 @@ import {
   SERVICE_ALREADY_SCHEDULED,
   FAIL,
   SUCCESS,
+  Piechart
 } from '../../lib/AttributeConstants'
 
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
@@ -123,7 +124,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
         const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
         if (isJobsPresent) {
-          if (pieChart[PIECHART].enabled) {
+          if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())

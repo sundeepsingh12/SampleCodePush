@@ -18,6 +18,7 @@ import {
     CUSTOMAPP_ID,
     NEWJOB_ID,
     NEW_JOB,
+    Piechart
 } from '../../lib/AttributeConstants'
 import {
     BACKUP,
@@ -121,6 +122,7 @@ class ModuleCustomization {
                 case PIECHART_ID:
                     {
                         clonePieChart[PIECHART] = this.setModuleDetails(clonePieChart[PIECHART], moduleCustomizationList[index], user, serialNumber++)
+                        Piechart.enabled = clonePieChart[PIECHART].enabled
                         break
                     }
                 case PROFILE_ID:
