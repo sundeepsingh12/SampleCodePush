@@ -532,8 +532,8 @@ class Sync {
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
           const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
-          const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
-          const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
+          const jobMasterIdJobStatusIdTransactionIdDtoObject = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
+          const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
@@ -546,8 +546,8 @@ class Sync {
             await keyValueDBService.deleteValueFromStore('LIVE_JOB')
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
-          await jobSummaryService.updateJobSummary(dataList.jobSummaries)                    
-          await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
+          jobSummaryService.updateJobSummary(dataList.jobSummaries)
+          await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
         }
       } else {
         isLastPageReached = true
