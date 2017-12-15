@@ -15,7 +15,8 @@ import {
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     UPDATE_PAYMENT_AT_END,
     UPDATE_FIELD_DATA_VALIDATION,
-    SET_FORM_LAYOUT_STATE
+    SET_FORM_LAYOUT_STATE,
+    CLEAR_FORM_LAYOUT
   } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -84,6 +85,7 @@ export default function formLayoutReducer(state = initialState, action) {
         /**
          * resets state to initial state
          */
+        case CLEAR_FORM_LAYOUT:
         case RESET_STATE: {
             return initialState
         }

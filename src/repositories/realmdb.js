@@ -11,7 +11,7 @@ import TrackLogs from './schema/trackLogs'
 import ServerSmsLog from './schema/serverSmsLog'
 import _ from 'lodash'
 
-const schemaVersion = 33;
+const schemaVersion = 36
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];
 
 let realm = new Realm({
@@ -34,7 +34,7 @@ import {
 export function save(tableName, object) {
     return realm.write(() => {
         //removing existing entry from Table
-        realm.delete(realm.objects(tableName));
+        // realm.delete(realm.objects(tableName));
         //writing new record
         realm.create(tableName, object);
     });

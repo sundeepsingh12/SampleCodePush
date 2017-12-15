@@ -1,5 +1,5 @@
 import CONFIG from '../../lib/config'
-import RNFS from 'react-native-fs';
+import RNFS from 'react-native-fs'
 import {
     zip,
     unzip
@@ -21,8 +21,11 @@ import {
     PENDING_SYNC_TRANSACTION_IDS,
     TABLE_SERVER_SMS_LOG,
     TABLE_RUNSHEET,
+    LAST_SYNC_WITH_SERVER
 
 } from '../../lib/constants'
+import moment from 'moment'
+import {trackingService} from './Tracking'
 
 
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
@@ -37,6 +40,7 @@ export async function createZip(transactionIdToBeSynced) {
 
     //Prepare the SYNC_RESULTS
     var SYNC_RESULTS = {};
+     let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
     let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
 
     SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
@@ -46,12 +50,14 @@ export async function createZip(transactionIdToBeSynced) {
 
     SYNC_RESULTS.scannedReferenceNumberLog = [];
     SYNC_RESULTS.serverSmsLog = realmDbData.serverSmsLogs;
-    SYNC_RESULTS.trackLog = [];
+    SYNC_RESULTS.trackLog = await trackingService.getTrackLogs(realmDbData.trackLogs,lastSyncTime)
+
     SYNC_RESULTS.transactionLog = [];
     SYNC_RESULTS.userCommunicationLog = [];
     SYNC_RESULTS.userEventsLog = [];
     SYNC_RESULTS.userExceptionLog = [];
-    let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync()
+   
+    let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     const userSummaryValue = userSummary.value
@@ -86,6 +92,11 @@ export async function createZip(transactionIdToBeSynced) {
 function _getSyncDataFromDb(transactionIdsObject) {
 
     let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
+    // console.log('lastSyncTime',lastSyncTime.value)
+    // const formattedTime = moment(lastSyncTime.value).format('YYYY-MM-DD HH:mm:ss')
+    // console.log('moment',formattedTime)
+    // let trackLogQuery = `Date(trackTime) > ${formattedTime}`
+    let trackLogs = _getDataFromRealm([],null,TABLE_TRACK_LOGS)
     let transactionList = [],
         fieldDataList = [],
         jobList = [],
@@ -96,7 +107,8 @@ function _getSyncDataFromDb(transactionIdsObject) {
             transactionList,
             jobList,
             serverSmsLogs,
-            runSheetSummary
+            runSheetSummary,
+            trackLogs
         };
     }
     let transactionIds = transactionIdsObject.value;
@@ -105,7 +117,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
     let transactionListQuery = fieldDataQuery.replace(/jobTransactionId/g, 'id'); // regex expression to replace all jobTransactionId with id
     transactionList = _getDataFromRealm([], transactionListQuery, TABLE_JOB_TRANSACTION);
     let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
-    jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB);
+    jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB)
     let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
     serverSmsLogs = _getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
 
@@ -115,6 +127,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
         jobList,
         serverSmsLogs,
         runSheetSummary,
+        trackLogs
     }
 
 }

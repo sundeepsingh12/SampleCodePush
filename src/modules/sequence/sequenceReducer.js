@@ -8,7 +8,8 @@ import {
     SEQUENCE_LIST_FETCHING_START,
     TOGGLE_RESEQUENCE_BUTTON,
     RESET_STATE,
-    PREPARE_UPDATE_LIST
+    PREPARE_UPDATE_LIST,
+    CLEAR_SEQUENCE_STATE
 } from '../../lib/constants'
 
 
@@ -31,6 +32,7 @@ export default function sequenceReducer(state = initialState, action) {
                         .set('responseMessage',action.payload.responseMessage)
         
         case RESET_STATE:
+        case CLEAR_SEQUENCE_STATE:
             return initialState                
 
     }

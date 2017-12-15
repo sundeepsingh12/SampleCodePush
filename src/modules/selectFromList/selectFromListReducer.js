@@ -8,6 +8,7 @@ import {
     INPUT_TEXT_VALUE,
     SELECTFROMLIST_ITEMS_LENGTH,
     SET_FILTERED_DATA_SELECTFROMLIST,
+    RESET_STATE
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -24,6 +25,8 @@ export default function selectFromListReducer(state = initialState, action) {
             return state.set('totalItemsInSelectFromList', action.payload)
         case SET_FILTERED_DATA_SELECTFROMLIST:
             return state.set('filteredDataSelectFromList', action.payload)
+        case RESET_STATE:
+            return initialState
     }
     return state
 }

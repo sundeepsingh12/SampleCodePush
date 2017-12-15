@@ -42,6 +42,7 @@ import {
   JOB_STATUS,
   HUB,
   DEVICE_IMEI,
+  LAST_SYNC_WITH_SERVER
 
 } from '../../lib/constants'
 
@@ -582,6 +583,25 @@ class Sync {
       })
     }
 
+  }
+
+  async calculateDifference(){
+     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
+      const differenceInDays = moment().diff(lastSyncTime.value, 'days')
+       const differenceInHours = moment().diff(lastSyncTime.value, 'hours')
+       const differenceInMinutes = moment().diff(lastSyncTime.value, 'minutes')
+       const differenceInSeconds = moment().diff(lastSyncTime.value, 'seconds')
+       let timeDifference = ""
+        if (differenceInDays > 0) {
+            timeDifference = `${differenceInDays} days ago`
+        } else if (differenceInHours > 0) {
+            timeDifference = `${differenceInHours} hours ago`
+        } else if (differenceInMinutes > 0) {
+            timeDifference = `${differenceInMinutes} minutes ago`
+        } else {
+            timeDifference = `${differenceInSeconds} seconds ago`
+        }
+      return timeDifference
   }
 }
 

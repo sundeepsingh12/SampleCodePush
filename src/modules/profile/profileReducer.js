@@ -8,7 +8,8 @@ import {
     SET_NEW_PASSWORD,
     SET_CONFIRM_NEW_PASSWORD,
     CLEAR_PASSWORD_TEXTINPUT,
-    TOGGLE_SAVE_RESET_BUTTON,
+    TOGGLE_SAVE_RESET_BUTTON,      
+    RESET_STATE     
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -37,6 +38,9 @@ export default function profileReducer(state = initialState, action) {
 
         case TOGGLE_SAVE_RESET_BUTTON:
             return state.set('isSaveResetButtonDisabled', action.payload)
+
+        case RESET_STATE:
+        return initialState
     }
     return state
 }

@@ -204,10 +204,12 @@ class RestAPI {
         if (message == 'success') {
           //do something
           const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
-          //console.log("qwe",currenDate)
           await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
           await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
           // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+        }
+        else{
+          throw new Error(responseBody)
         }
       }).catch(err => {
         throw err

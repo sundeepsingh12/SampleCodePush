@@ -29,7 +29,7 @@ export default class JobListItem extends Component {
         onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
         <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : {backgroundColor: '#ffffff'}]}>
-          <View style={[style.seqCircle, styles.relative]}>
+          <View style={[style.seqCircle, styles.relative,{backgroundColor : this.props.data.identifierColor}]}>
             <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
               {this.props.data.jobMasterIdentifier}
             </Text>
@@ -128,7 +128,6 @@ const style = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#ffcc00',
     justifyContent: 'center',
     alignItems: 'center'
   },

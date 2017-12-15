@@ -105,7 +105,7 @@ class JobDetailsV2 extends Component {
         >
 
           <View style={[styles.row, styles.alignCenter]}>
-            <View style={[style.statusCircle, { backgroundColor: '#4cd964' }]}></View>
+            <View style={[style.statusCircle, { backgroundColor: statusList[index].buttonColor }]}></View>
             <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
           </View>
           <Right>
@@ -322,7 +322,7 @@ class JobDetailsV2 extends Component {
             </View>
             <Header style={[style.header]}>
               <View style={style.seqCard}>
-                <View style={style.seqCircle}>
+                <View style={[style.seqCircle,{backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor}]}>
                   <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
                     {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
                   </Text>
@@ -397,14 +397,16 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>
               )}
-              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
+              
+                {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
                     <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
                   </Button>
                 </FooterTab>
-              )}
-              {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
+                )}
+
+                {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
                 (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
                 <FooterTab>
                   <Button full onPress={this.navigationButtonPressed}>
@@ -412,12 +414,14 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>)}
 
+
               {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
                     <CallIcon />
                   </Button>
                 </FooterTab>)}
+
             </Footer>
           </Container>
         </StyleProvider>
@@ -453,7 +457,6 @@ const style = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#ffcc00',
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -473,9 +476,9 @@ const style = StyleSheet.create({
     paddingBottom: 20
   },
   statusCircle: {
-    width: 6,
-    height: 6,
-    borderRadius: 3
+    width: 10,
+    height: 10,
+    borderRadius: 5
   },
   footer: {
     height: 'auto',
