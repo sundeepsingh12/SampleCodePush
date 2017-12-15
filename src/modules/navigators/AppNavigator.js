@@ -83,6 +83,7 @@ import Sorting from '../../containers/Sorting'
 import { NavigationActions } from 'react-navigation'
 import Scanner from '../../components/Scanner'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
+import JobMaster from '../../containers/JobMaster'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -381,6 +382,9 @@ export const AppNavigator = StackNavigator({
   },
   PostAssignmentScanner: {
     screen: PostAssignmentScanner
+  },
+  JobMasterListScreen: {
+    screen: JobMaster
   }
 },
   {

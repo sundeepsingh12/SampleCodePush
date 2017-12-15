@@ -33,5 +33,6 @@ module.exports = {
     GET_SEQUENCE_NEXT_COUNT: '/rest/get_sequence_next_count',
     SERVICE_RESET_PASSWORD: '/rest/users/password',
     SCAN_AND_SEARCH_SORTING: '/rest/job/search_reference_no',
+    POST_ASSIGNMENT_FORCE_ASSIGN_API: '/rest/device/assign_scanned_job',
   }
 }

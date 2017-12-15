@@ -484,6 +484,7 @@ export default {
     headerSearch: {
         paddingLeft: 10,
         paddingRight: 30,
+        height:30,
         backgroundColor: 'rgba(255, 255, 255, 0.20)',
         paddingTop: 3,
         paddingBottom: 3,

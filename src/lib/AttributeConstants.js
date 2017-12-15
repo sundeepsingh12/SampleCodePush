@@ -339,6 +339,8 @@ module.exports = {
         icon: <SequenceIcon />
     },
 
+    JOB_ASSIGNMENT : 20,
+
 
     //JobStatusConstants
     UNSEEN: 'UNSEEN',

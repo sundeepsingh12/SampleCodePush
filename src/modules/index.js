@@ -34,6 +34,8 @@ import sorting from './sorting/sortingReducer'
 import taskList from './taskList/taskListReducer'
 import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
+import jobMaster from './job-master/jobMasterReducer'
+import postAssignment from './postAssignment/postAssignmentReducer'
 // import profile from './profile/profileReducer'
 
 import {
@@ -78,6 +80,8 @@ const appReducer = combineReducers({
   taskList,
   summary,
   customApp,
+  jobMaster,
+  postAssignment,
 })
 
 const rootReducer = (state, action) => {

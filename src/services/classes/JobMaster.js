@@ -1,6 +1,6 @@
- /**
- * Created by udbhav on 12/4/17.
- */
+/**
+* Created by udbhav on 12/4/17.
+*/
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
@@ -30,7 +30,7 @@ import {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   CUSTOM_NAMING,
-  HUB,LAST_SYNC_WITH_SERVER
+  HUB, LAST_SYNC_WITH_SERVER
 } from '../../lib/constants'
 
 import {
@@ -149,8 +149,8 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
-    await keyValueDBService.validateAndSaveData(HUB,json.hub)
-    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,moment(new Date(), 'YYYY-MM-DD HH:mm:ss'))
+    await keyValueDBService.validateAndSaveData(HUB, json.hub)
+    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment(new Date(), 'YYYY-MM-DD HH:mm:ss'))
   }
 
   /**
@@ -194,7 +194,7 @@ class JobMaster {
     }
     let jobMasterIdCustomizationMap = {}
     jobListCustomization.forEach(jobListCustomizationObject => {
-      if(!jobMasterIdCustomizationMap[jobListCustomizationObject.jobMasterId]) {
+      if (!jobMasterIdCustomizationMap[jobListCustomizationObject.jobMasterId]) {
         jobMasterIdCustomizationMap[jobListCustomizationObject.jobMasterId] = {}
       }
       jobMasterIdCustomizationMap[jobListCustomizationObject.jobMasterId][jobListCustomizationObject.appJobListMasterId] = jobListCustomizationObject
@@ -213,7 +213,7 @@ class JobMaster {
     }
     let tabIdStatusIdsMap = {}
     jobStatus.forEach(jobStatusObject => {
-      if(jobStatusObject.code == UNSEEN) {
+      if (jobStatusObject.code == UNSEEN) {
         return
       }
       if (!tabIdStatusIdsMap[jobStatusObject.tabId]) {
@@ -269,15 +269,43 @@ class JobMaster {
     return jobMasterTitleList
   }
 
-  getJobMaterFromJobMasterLists(jobMasterId,jobMasterList){
+  getJobMaterFromJobMasterLists(jobMasterId, jobMasterList) {
     const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
     return jobMaster
   }
-  async getJobMaterFromJobMasterList(jobMasterId){
+  async getJobMaterFromJobMasterList(jobMasterId) {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
     return jobMaster;
   }
+
+  /**
+   * This function prepares job master list on the basis of pre and post assignment list
+   * @param {*} postAssignmentList 
+   * @param {*} preAssignmentList 
+   * @param {*} jobMasterList 
+   * @returns
+   * [JobMaster]
+   */
+  getJobMasterListFromPostAndPreAssignmentList(postAssignmentList, preAssignmentList, jobMasterList) {
+    let orderJobMasterList = []
+    postAssignmentList = postAssignmentList ? postAssignmentList : []
+    preAssignmentList = preAssignmentList ? preAssignmentList : []
+    for (let index in jobMasterList) {
+      let jobMaster = jobMasterList[index]
+      if (postAssignmentList.includes(jobMaster.id)) {
+        jobMaster.postAssignment = true
+      }
+      if (preAssignmentList.includes(jobMaster.id)) {
+        jobMaster.preAssignment = true
+      }
+      if (jobMaster.postAssignment || jobMaster.preAssignment) {
+        orderJobMasterList.push(jobMaster)
+      }
+    }
+    return orderJobMasterList
+  }
+
 }
 
 

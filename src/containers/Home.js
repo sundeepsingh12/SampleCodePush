@@ -56,6 +56,7 @@ import {
   CustomApp,
   ON_CHANGE_STATE,
   PostAssignmentScanner,
+  JobMasterListScreen
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -82,21 +83,21 @@ class Home extends Component {
   }
 
   navigateToScene = (moduleName) => {
-    console.log('modulename',moduleName)
+    console.log('modulename', moduleName)
     switch (moduleName) {
       case BULK: {
         this.props.actions.navigateToScene(BulkConfiguration)
         break
       }
       case LIVE: {
-          Toast.show({
-              text: `Under development!Coming Soon`,
-              position: 'bottom',
-              buttonText: 'OK'
-            })
+        Toast.show({
+          text: `Under development!Coming Soon`,
+          position: 'bottom',
+          buttonText: 'OK'
+        })
         break
       }
-      case SEQUENCEMODULE: { 
+      case SEQUENCEMODULE: {
         this.props.actions.navigateToScene(Sequence)
         break
       }
@@ -108,30 +109,31 @@ class Home extends Component {
       case SORTING: {
         this.props.actions.navigateToScene(Sorting)
         break
-      }    
-      
+      }
+
       case CUSTOMAPP: {
-        ((CUSTOMAPP.remark) && CUSTOMAPP.remark.length > 1) ?  this.customAppSelection() :  ((CUSTOMAPP.remark ) && CUSTOMAPP.remark.length == 1) 
-                                   ? this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[0].customUrl) : this.props.actions.navigateToScene(CustomApp) ;
+        ((CUSTOMAPP.remark) && CUSTOMAPP.remark.length > 1) ? this.customAppSelection() : ((CUSTOMAPP.remark) && CUSTOMAPP.remark.length == 1)
+          ? this.props.actions.navigateToScene(CustomApp, CUSTOMAPP.remark[0].customUrl) : this.props.actions.navigateToScene(CustomApp);
         break
       }
     }
   }
-  customAppSelection(){
-   let  BUTTONS = CUSTOMAPP.remark.map(id => !(id.title) ? URL : id.title)
-   BUTTONS.push('Cancel')
+  customAppSelection() {
+    let BUTTONS = CUSTOMAPP.remark.map(id => !(id.title) ? URL : id.title)
+    BUTTONS.push('Cancel')
     ActionSheet.show(
       {
         options: BUTTONS,
         title: CHOOSE_WEB_URL,
-        cancelButtonIndex: BUTTONS.length-1,
-        destructiveButtonIndex: BUTTONS.length-1
+        cancelButtonIndex: BUTTONS.length - 1,
+        destructiveButtonIndex: BUTTONS.length - 1
       },
-       buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length-1)) ? this.props.actions.navigateToScene(CustomApp,CUSTOMAPP.remark[buttonIndex].customUrl)  : null
+      buttonIndex => {
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, CUSTOMAPP.remark[buttonIndex].customUrl) : null
       }
-    )}
-  
+    )
+  }
+
 
   headerView() {
     return (
@@ -168,7 +170,7 @@ class Home extends Component {
   moduleView(modulesList) {
     let moduleView = []
     for (let index in modulesList) {
-      
+
       if (!modulesList[index].enabled) {
         continue
       }
@@ -188,42 +190,28 @@ class Home extends Component {
         </ListItem>
       )
     }
-    moduleView.push(
-      <ListItem button onPress={() => this.props.actions.navigateToScene(PostAssignmentScanner)}
-      style={[style.moduleList]}
-      key={100}
-    >
-      <Body>
-        <Text
-          style={[styles.fontWeight500, styles.fontLg]}>Job Assignment</Text>
-      </Body>
-      <Right>
-        <Icon name="ios-arrow-forward" />
-      </Right>
-    </ListItem>
-    )
     return moduleView
   }
-  
+
   _onPieChartPress = () => {
     this.props.actions.navigateToScene(Summary)
   }
 
   pieChartView() {
-    if(!PIECHART.enabled) {
+    if (!PIECHART.enabled) {
       return null
     }
 
-    if(this.props.chartLoading) {
+    if (this.props.chartLoading) {
       return (
-        <ActivityIndicator animating={this.props.chartLoading} 
-        style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
+        <ActivityIndicator animating={this.props.chartLoading}
+          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
       )
     }
 
-    console.log('this.props.count',this.props.count)
-    if(this.props.count) {
-      return (<PieChart count = {this.props.count} press = {this._onPieChartPress}/>)
+    console.log('this.props.count', this.props.count)
+    if (this.props.count) {
+      return (<PieChart count={this.props.count} press={this._onPieChartPress} />)
     }
 
     return null
@@ -231,7 +219,7 @@ class Home extends Component {
 
   render() {
     const headerView = this.headerView()
-    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE,SORTING,CUSTOMAPP])
+    const moduleView = this.moduleView([START, LIVE, BULK, SEQUENCEMODULE, SORTING, CUSTOMAPP])
     const pieChartView = this.pieChartView()
     if (this.props.moduleLoading) {
       return (<Loader />)

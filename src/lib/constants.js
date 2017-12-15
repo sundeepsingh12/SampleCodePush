@@ -154,6 +154,7 @@ module.exports = keyMirror({
     HUB: null,
     LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
+    POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -214,7 +215,7 @@ module.exports = keyMirror({
     Summary: null,
     CustomApp: null,
     PostAssignmentScanner: null,
-
+    JobMasterListScreen: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -308,6 +309,14 @@ module.exports = keyMirror({
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
 
+    //Job Master
+    SET_JOB_MASTER_LIST: null,
+
+    //Post Assignment
+    SET_POST_ASSIGNMENT_TRANSACTION_LIST: null,
+    SET_POST_ASSIGNMENT_ERROR: null,
+    SET_POST_SCAN_SUCCESS: null,
+    SET_POST_ASSIGNMENT_PARAMETERS: null,
 })
 
 
