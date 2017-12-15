@@ -6,7 +6,6 @@ export default class transactionLogs extends Realm.Object { }
 
 transactionLogs.schema = {
     name: TABLE_TRANSACTION_LOGS,
-    primaryKey: 'uniqueId',
     properties: {
         id: { type: 'int', default: 0 },
         userId: 'int',
@@ -21,7 +20,5 @@ transactionLogs.schema = {
         hubId: 'int',
         cityId: 'int',
         companyId: 'int',
-        uniqueId: 'int',
-        syncFlag: 'int',
     }
 }

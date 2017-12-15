@@ -22,6 +22,7 @@ import {
     TABLE_SERVER_SMS_LOG,
     TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
+    USER_EVENT_LOG,
 } from '../../lib/constants'
 
 
@@ -37,7 +38,6 @@ export async function createZip(transactionIdToBeSynced) {
 
     //Prepare the SYNC_RESULTS
     var SYNC_RESULTS = {};
-    console.log("before")
     let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
     console.log("after", realmDbData) 
     SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
@@ -51,7 +51,9 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.trackLog = []; //do nothing
     SYNC_RESULTS.transactionLog = realmDbData.transactionLogs; //db
     SYNC_RESULTS.userCommunicationLog = []; //store
-    SYNC_RESULTS.userEventsLog = []; //store
+    const userEventsLogs = await keyValueDBService.getValueFromStore(USER_EVENT_LOG); //store
+    const userEventLogValue = userEventsLogs ? userEventsLogs.value : []
+    SYNC_RESULTS.userEventsLog = userEventLogValue || []
     SYNC_RESULTS.userExceptionLog = []; //store
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync()
     SYNC_RESULTS.jobSummary = jobSummary || {}

@@ -79,6 +79,9 @@ export class keyValueDb {
       case 'JOB_SUMMARY':
         schemaInstance = require('../repositories/schema/jobSummary');
         break;
+      case 'USER_EVENT_LOG':
+        schemaInstance = require('../repositories/schema/userEventLog');
+        break;
       case 'HUB': 
       schemaInstance = require('../repositories/schema/hub');
       default:

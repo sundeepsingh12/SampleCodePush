@@ -288,8 +288,11 @@ class AddServerSms {
                     realm.performBatchSave(serverSmsLog)
                     let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
                     let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-                    if (!transactionsToSync.includes(transactionIdDto.transactionId))
-                        transactionsToSync.push(transactionIdDto.transactionId);
+                    let pendingTransaction = {
+                        id: jobTransaction.id,
+                        referenceNumber: jobTransaction.referenceNumber
+                    }
+                    transactionsToSync = transactionsToSync.concat(pendingTransaction)
                     await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync);
                 }
             }

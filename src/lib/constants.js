@@ -160,6 +160,8 @@ module.exports = keyMirror({
     SAVE_ACTIVATED: null,
     LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
+    LIVE_JOB: null,
+    USER_EVENT_LOG: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
