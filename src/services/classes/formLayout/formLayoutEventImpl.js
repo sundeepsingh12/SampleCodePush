@@ -203,28 +203,28 @@ export default class FormLayoutEventImpl {
      */
     async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
         try {
+            let currentTime =  moment().format('YYYY-MM-DD HH:mm:ss')
             if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
                 return formLayoutObject // return undefined or empty object if formLayoutObject is empty
             }
             let fieldData, jobTransaction, job, dbObjects
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
-                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime)
+                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList)
-                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value)
-                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime)
+                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
+                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber,currentTime)
             }
 
             //TODO add other dbs which needs updation
             const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList) : []
             await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList)
             realm.performBatchSave(fieldData, jobTransaction,runSheet, job)
-            console.log('savdata', jobTransaction.value)
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
@@ -358,7 +358,7 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId 
      */
-    async _getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
+    async _getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime) {
         let user = await keyValueDBService.getValueFromStore(USER)
         let hub = await keyValueDBService.getValueFromStore(HUB)
         let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
@@ -373,7 +373,7 @@ export default class FormLayoutEventImpl {
         else {
             //JobTransactionId > 0 for Normal Job && <0 for New Job
             jobTransaction = (jobTransactionId > 0) ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
-                : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value)
+                : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value,currentTime)
         }
 
         //TODO add more db objects
@@ -387,7 +387,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei) {
+    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei,currentTime) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
@@ -395,7 +395,7 @@ export default class FormLayoutEventImpl {
         jobTransaction.statusCode = status.code
         jobTransaction.employeeCode = user.employeeCode
         jobTransaction.hubCode = hub.code
-        jobTransaction.lastTransactionTimeOnMobile = moment().format('YYYY-MM-DD HH:mm:ss')
+        jobTransaction.lastTransactionTimeOnMobile = currentTime
         jobTransaction.imeiNumber = imei.imeiNumber
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOList.push({
@@ -410,7 +410,7 @@ export default class FormLayoutEventImpl {
         //TODO only basic columns are set, some columns are not set which will be set as codebase progresses further
     }
 
-    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei) {
+    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei,currentTime) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         for (let jobTransaction1 of jobTransactionList) {
             let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
@@ -419,7 +419,7 @@ export default class FormLayoutEventImpl {
             jobTransaction.statusCode = status.code
             jobTransaction.employeeCode = user.employeeCode
             jobTransaction.hubCode = hub.code
-            jobTransaction.lastTransactionTimeOnMobile = moment().format('YYYY-MM-DD HH:mm:ss')
+            jobTransaction.lastTransactionTimeOnMobile = currentTime
             jobTransaction.imeiNumber = imei.imeiNumber
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOList.push({
@@ -440,13 +440,13 @@ export default class FormLayoutEventImpl {
      * @param {*statusObject} status 
      * @param {*jobId} jobId 
      */
-    _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber) {
+    _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber,currentTime) {
         let jobArray = []
         let realmJobObject = null
         if (jobId > 0) {
             realmJobObject = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0]; // to get the first job, as query is on id and it returns list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
         } else {
-            realmJobObject = this._getDefaultValuesForJob(jobMasterId, jobId, user, hub, referenceNumber)
+            realmJobObject = this._getDefaultValuesForJob(jobMasterId, jobId, user, hub, referenceNumber,currentTime)
         }
         let job = Object.assign({}, realmJobObject)
         switch (status.actionOnStatus) {
@@ -493,7 +493,7 @@ export default class FormLayoutEventImpl {
      * @param {*} jobMasterId 
      * @param {*} id 
      */
-    _getDefaultValuesForJob(jobMasterId, id, user, hub, referenceNumber) {
+    _getDefaultValuesForJob(jobMasterId, id, user, hub, referenceNumber,currentTime) {
         return job = {
             id,
             referenceNo: referenceNumber,
@@ -506,8 +506,8 @@ export default class FormLayoutEventImpl {
             longitude: 0.0,
             slot: 0,
             merchantCode: null,
-            jobStartTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-            createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+            jobStartTime: currentTime,
+            createdAt: currentTime,
             attemptCount: 1,
             missionId: null,
             jobEndTime: null,
@@ -515,7 +515,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei) {
+    _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei,currentTime) {
         //TODO some values like lat/lng and battery are not valid values, update them as their library is added
         return jobTransaction = {
             id,
@@ -538,11 +538,11 @@ export default class FormLayoutEventImpl {
             trackCallDuration: 0,
             trackSmsCount: 0,
             trackTransactionTimeSpent: 0.0,
-            jobCreatedAt: moment().format('YYYY-MM-DD HH:mm:ss'),
-            erpSyncTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-            androidPushTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-            lastUpdatedAtServer: moment().format('YYYY-MM-DD HH:mm:ss'),
-            lastTransactionTimeOnMobile: moment().format('YYYY-MM-DD HH:mm:ss'),
+            jobCreatedAt:currentTime,
+            erpSyncTime: currentTime,
+            androidPushTime: currentTime,
+            lastUpdatedAtServer:currentTime,
+            lastTransactionTimeOnMobile: currentTime,
             deleteFlag: 0,
             attemptCount: 1,
             jobType: jobMaster.code,

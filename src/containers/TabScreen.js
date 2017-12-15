@@ -137,14 +137,14 @@ class TabScreen extends Component {
     }
     return (
       <Footer style={[styles.bgWhite, { borderTopWidth: 1, borderTopColor: '#f3f3f3' }]}>
-        <FooterTab style={[styles.flexBasis20]}>
+        <FooterTab style={[styles.flexBasis25]}>
           <Button transparent
             onPress={this._transactionsForTodayDate}
             style={[styles.alignStart]}>
             <Text style={[styles.fontPrimary, styles.fontSm]}>Today</Text>
           </Button>
         </FooterTab>
-        <FooterTab style={[styles.flexBasis60]}>
+        <FooterTab style={[styles.flexBasis50]}>
           <DateTimePicker
             isVisible={this.props.isCalendarVisible}
             onConfirm={this._onConfirm}
@@ -159,7 +159,7 @@ class TabScreen extends Component {
             <Icon name='ios-arrow-down' style={[styles.fontBlack, styles.fontSm]} />
           </Button>
         </FooterTab>
-        <FooterTab style={[styles.flexBasis20]}>
+        <FooterTab style={[styles.flexBasis25]}>
           <Button transparent
             onPress={this._showAllJobTransactions}
             style={[styles.alignEnd]}>

@@ -1,8 +1,8 @@
 'use strict'
 
-import * as realm from '../../repositories/realmdb';
+import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from './KeyValueDBService'
-import BackgroundGeolocation from "react-native-background-geolocation";
+import BackgroundGeolocation from "react-native-background-geolocation"
 import moment from 'moment';
 
 import {
@@ -70,6 +70,7 @@ class Tracking {
         BackgroundGeolocation.un('motionchange', this.onMotionChange)
         BackgroundGeolocation.un('activitychange', this.onActivityChange)
         BackgroundGeolocation.un('providerchange', this.onProviderChange)
+        BackgroundGeolocation.stop()
          BackgroundGeolocation.removeListeners()
     }
 

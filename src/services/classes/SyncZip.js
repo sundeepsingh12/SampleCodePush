@@ -1,5 +1,5 @@
 import CONFIG from '../../lib/config'
-import RNFS from 'react-native-fs';
+import RNFS from 'react-native-fs'
 import {
     zip,
     unzip
@@ -52,6 +52,7 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.scannedReferenceNumberLog = [];
     SYNC_RESULTS.serverSmsLog = realmDbData.serverSmsLogs;
     SYNC_RESULTS.trackLog = await trackingService.getTrackLogs(realmDbData.trackLogs,lastSyncTime)
+
     SYNC_RESULTS.transactionLog = [];
     SYNC_RESULTS.userCommunicationLog = [];
     SYNC_RESULTS.userEventsLog = [];

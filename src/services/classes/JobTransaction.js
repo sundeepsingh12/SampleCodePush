@@ -343,6 +343,7 @@ class JobTransaction {
             jobTransactionCustomization.jobLatitude = job.latitude
             jobTransactionCustomization.jobLongitude = job.longitude
             jobTransactionCustomization.jobId = jobTransaction.jobId
+            jobTransactionCustomization.identifierColor = idJobMasterMap[jobMasterId].identifierColor
             if (callingActivity == 'LiveJob') {
                 jobTransaction.jobTransactionCustomization = jobTransactionCustomization
             }

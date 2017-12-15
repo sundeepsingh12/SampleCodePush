@@ -199,6 +199,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
+    CLEAR_FORM_LAYOUT:null,
 
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
@@ -291,6 +292,7 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_STOP: null,
     TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
+    CLEAR_SEQUENCE_STATE:null,
 
     //New Job
     NEW_JOB_MASTER: null,
@@ -317,6 +319,7 @@ module.exports = keyMirror({
     Keep: null,
     Cancel: null,
     Checkout: null,
+
     //Bulk Module
     START_FETCHING_BULK_CONFIG: null,
     STOP_FETCHING_BULK_CONFIG: null,
@@ -324,6 +327,7 @@ module.exports = keyMirror({
     STOP_FETCHING_BULK_TRANSACTIONS: null,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
     TOGGLE_ALL_JOB_TRANSACTIONS: null,
+    CLEAR_BULK_STATE:null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -348,6 +352,7 @@ module.exports = keyMirror({
     SET_SEARCH: null,
     SET_MESSAGE: null,
     SET_LIVE_JOB_TOAST: null,
+
     //Summary
     SET_SUMMARY_FOR_JOBMASTER: null,
     SET_SUMMARY_FOR_RUNSHEET: null,

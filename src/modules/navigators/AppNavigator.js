@@ -147,6 +147,7 @@ export const HomeTabNavigator = TabNavigator({
     screen: Home,
     navigationOptions: {
       header: null,
+      gesturesEnabled: false,
       title: 'Home',
       tabBarIcon: ({ tintColor }) => (
         <Icon
@@ -161,6 +162,7 @@ export const HomeTabNavigator = TabNavigator({
     navigationOptions: {
       header: null,
       title: 'Sync',
+      gesturesEnabled: false,
       tabBarIcon: ({ tintColor }) => (
         <Icon
           name='ios-sync'
@@ -174,9 +176,10 @@ export const HomeTabNavigator = TabNavigator({
     navigationOptions: {
       header: null,
       title: 'Menu',
+      gesturesEnabled: false,
       tabBarIcon: ({ tintColor }) => (
         <Icon
-          name='ios-menu'
+          name='md-menu'
           style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
         />
       ),
@@ -200,6 +203,8 @@ export const HomeTabNavigator = TabNavigator({
       labelStyle: {
         fontSize: 12,
         marginTop: 0,
+        fontWeight: '600'
+        
       },
       tabStyle: {
         alignItems: 'center',
@@ -226,12 +231,14 @@ export const AppNavigator = StackNavigator({
     screen: Login,
     navigationOptions: {
       header: null,
+      gesturesEnabled: false
     },
   },
   PreloaderScreen: {
     screen: Preloader,
     navigationOptions: {
-      header: null
+      header: null,
+      gesturesEnabled: false
     }
   },
   Message: {
