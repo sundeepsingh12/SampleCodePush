@@ -53,8 +53,8 @@ function mapDispatchToProps(dispatch) {
 class SyncScreen extends Component {
 
   componentDidMount() {
-    this.props.actions.startMqttService(this.props.pieChart)
-    this.props.actions.performSyncService(this.props.pieChart, true)
+     this.props.actions.startMqttService(this.props.pieChart)
+     this.props.actions.performSyncService(this.props.pieChart, true)
   }
 
   // getView() {
@@ -202,7 +202,7 @@ class SyncScreen extends Component {
 
   }
 
-  render() {
+  render() { 
 
     const syncView = this.getSyncView()
     const transactionView = this.getTransactionView()
