@@ -1,7 +1,8 @@
 'use strict'
 import {
     SET_IMAGE_DATA,
-    SET_SHOW_IMAGE
+    SET_SHOW_IMAGE,
+    VIEW_IMAGE_DATA
 } from '../../lib/constants'
 
 const InitialState = require('./cameraInitialState').default
@@ -14,6 +15,8 @@ export default function cameraReducer(state = initialState, action) {
             return state.set('imageData', action.payload)
         case SET_SHOW_IMAGE:
             return state.set('showImage', action.payload)
+        case VIEW_IMAGE_DATA:
+            return state.set('viewData', action.payload)
     }
     return state
 }

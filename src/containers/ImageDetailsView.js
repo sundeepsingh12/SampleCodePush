@@ -8,42 +8,73 @@ import {
     View,
     Image
 } from 'react-native';
-import RNFS from 'react-native-fs';
 import {
-    PATH_TEMP
-} from '../lib/AttributeConstants'
+    Container,
+    Content,
+    Header,
+    Left,
+    Body,
+    Right,
+    Icon,
+    Footer,
+    StyleProvider,
+    Button,
 
-class ImageDetailsView extends Component {
-    componentDidMount() {
+} from 'native-base';
+import * as cameraActions from '../modules/camera/cameraActions'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import platform from '../../native-base-theme/variables/platform'
+import getTheme from '../../native-base-theme/components';
+import styles from '../themes/FeStyle'
 
+function mapStateToProps(state) {
+    return {
+        viewData: state.cameraReducer.viewData,
     }
-    async getImageData() {
-        // let result = await RNFS.readFile(PATH_TEMP + this.props.navigation.state.params.value, 'base64');
-        // return result
-       let result = await RNFS.readdir(PATH_TEMP)
-        console.log('image data', result)
+};
+
+/*
+ * Bind all the actions
+ */
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({ ...cameraActions }, dispatch)
+    }
+}
+class ImageDetailsView extends Component {
+
+    static navigationOptions = ({ navigation }) => {
+        return { header: null }
+    }
+    componentDidMount() {
+        this.props.actions.getImageData(this.props.navigation.state.params.value)
     }
     render() {
-        let x = this.getImageData()
         return (
-            <View style={styles.container}>
-                <Image
-                    source={{
-                        isStatic: true,
-                        uri: 'data:image/jpeg;base64,' + x,
-                    }}
-                    style={{ height: '100%', width: '100%' }}
-                />
-                {/* <Image source={this.props.navigation.state.params.value} /> */}
-            </View>
+            <StyleProvider style={getTheme(platform)}>
+                <Container>
+                    <View style={{ flex: 1 }}>
+                        <Image
+                            source={{
+                                isStatic: true,
+                                uri: 'data:image/jpeg;base64,' + this.props.viewData,
+                            }}
+                            style={{ height: '100%', width: '100%' }}
+                        />
+                        <View style={[styles.absolute, styles.padding10, { top: 0, left: 0, flex: 2 }]}>
+                            <Icon
+                                name="md-close"
+                                style={[styles.fontXxxl, styles.fontDarkGray]}
+                                onPress={() => {
+                                    this.props.navigation.goBack()
+                                }} />
+                        </View>
+                    </View>
+                </Container>
+            </StyleProvider>
         );
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'row',
-    },
-});
-export default ImageDetailsView
+export default connect(mapStateToProps, mapDispatchToProps)(ImageDetailsView)

@@ -23,7 +23,8 @@ import {
     ACTUAL_AMOUNT,
     PATH_TEMP,
     SIGN,
-    IMAGE_EXTENSION
+    IMAGE_EXTENSION,
+    PATH
 } from '../../lib/AttributeConstants'
 import {
     USER,
@@ -90,13 +91,16 @@ class SignatureRemarks {
             */
     async saveFile(result, currentTimeInMillis, isCameraImage) {
         RNFS.mkdir(PATH_TEMP);
+        RNFS.mkdir(PATH);
         let image_name
         if (!isCameraImage) {
             image_name = SIGN + currentTimeInMillis + IMAGE_EXTENSION
             await RNFS.writeFile(PATH_TEMP + image_name, result.encoded, 'base64');
+            await RNFS.writeFile(PATH + image_name, result.encoded, 'base64');
         } else {
             image_name = 'cust_' + currentTimeInMillis + IMAGE_EXTENSION
             await RNFS.writeFile(PATH_TEMP + image_name, result, 'base64');
+            await RNFS.writeFile(PATH + image_name, result, 'base64');
         }
         const user = await keyValueDBService.getValueFromStore(USER);
         const value = moment().format('YYYY-MM-DD') + '/' + user.value.company.id + '/' + image_name
@@ -134,6 +138,11 @@ class SignatureRemarks {
         }
         let fieldDataObject = fieldDataService.prepareFieldDataForTransactionSavingInState(childDataList, jobTransactionId, currentElement.positionId, latestPositionId)
         return fieldDataObject
+    }
+    async getImageData(value) {
+        let imageName = value.split('/')
+        let result = await RNFS.readFile(PATH + imageName[imageName.length - 1], 'base64');
+        return result
     }
 }
 

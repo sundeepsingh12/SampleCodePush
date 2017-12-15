@@ -21,7 +21,8 @@ import {
     SET_SEARCH,
     TabScreen,
     SET_MESSAGE,
-    SET_LIVE_JOB_TOAST
+    SET_LIVE_JOB_TOAST,
+    HomeTabNavigatorScreen
 } from '../../lib/constants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -53,7 +54,7 @@ export function endFetchingJobDetails(jobDataList, currentStatus, jobTransaction
         }
     }
 }
-export function acceptOrRejectJob(status, job, liveJobList, StartModule) {
+export function acceptOrRejectJob(status, job, liveJobList) {
     return async function (dispatch) {
         try {
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
@@ -65,22 +66,22 @@ export function acceptOrRejectJob(status, job, liveJobList, StartModule) {
                 dispatch(NavigationActions.reset({
                     index: 1,
                     actions: [
-                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-                        NavigationActions.navigate({ routeName: TabScreen, params: { appModule: StartModule } })
+                        NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+                        NavigationActions.navigate({ routeName: TabScreen })
                     ]
                 }))
             } else if (status == 2 && _.isEmpty(serverResponse.newLiveJobList)) {
                 dispatch(NavigationActions.reset({
                     index: 0,
                     actions: [
-                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+                        NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
                     ]
                 }))
             } else {
                 dispatch(NavigationActions.reset({
                     index: 1,
                     actions: [
-                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+                        NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
                         NavigationActions.navigate({ routeName: 'LiveJobs' })
                     ]
                 }))
@@ -125,6 +126,30 @@ export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
             let serverResponseForLive = await liveJobService.requestServerForApprovalForMultiple(status + '', selectedItems, liveJobList, token)
             dispatch(setState(SET_LIVE_JOB_LIST, serverResponseForLive.newLiveJobList))
             dispatch(setState(SET_LIVE_JOB_TOAST, serverResponseForLive.toastMessage))
+            if (status == 1) {
+                dispatch(NavigationActions.reset({
+                    index: 1,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+                        NavigationActions.navigate({ routeName: TabScreen })
+                    ]
+                }))
+            } else if (status == 2 && _.isEmpty(serverResponseForLive.newLiveJobList)) {
+                dispatch(NavigationActions.reset({
+                    index: 0,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+                    ]
+                }))
+            } else {
+                dispatch(NavigationActions.reset({
+                    index: 1,
+                    actions: [
+                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+                        NavigationActions.navigate({ routeName: 'LiveJobs' })
+                    ]
+                }))
+            }
         } catch (error) {
 
         }

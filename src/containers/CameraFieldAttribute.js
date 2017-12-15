@@ -49,7 +49,6 @@ function mapStateToProps(state) {
     return {
         imageData: state.cameraReducer.imageData,
         showImage: state.cameraReducer.showImage
-        //    scanning: state.qrCodeReducer.scanning
     }
 }
 
@@ -109,19 +108,16 @@ class CameraFieldAttribute extends Component {
         let view
         if (this.state.torchOff == Camera.constants.FlashMode.off) {
             view =
-                <View style={[styles.flexBasis50, styles.alignCenter]}>
-                    <TouchableOpacity style={[styles.flexBasis33_3, styles.alignCenter]}>
-                        <Icon name="ios-flash-outline" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this._setTorchOn()} />
-                    </TouchableOpacity>
-                </View>
+                
+                <TouchableOpacity style={[styles.flexBasis33_3, styles.alignCenter]}>
+                    <Icon name="ios-flash-outline" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this._setTorchOn()} />
+                </TouchableOpacity>
 
         } else {
             view =
-                <View style={[styles.flexBasis50, styles.alignCenter]}>
-                    <TouchableOpacity style={[styles.flexBasis33_3, styles.alignCenter]}>
-                        <Icon name="ios-flash" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this._setTorchOff()} />
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity style={[styles.flexBasis33_3, styles.alignCenter]}>
+                    <Icon name="ios-flash" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this._setTorchOff()} />
+                </TouchableOpacity>
         }
         return view
     }
@@ -146,21 +142,30 @@ class CameraFieldAttribute extends Component {
 
                             </Camera>
                         </View>
-                        <View style={{ width: '100%', position: 'absolute', bottom: 0, height: 140, backgroundColor: 'rgba(0,0,0,.4)', borderLeftWidth: 0 }}>
-                            <View style={[styles.row, styles.justifySpaceBetween, styles.paddingTop10, styles.paddingBottom10, { borderBottomColor: 'rgba(0,0,0,.1)', borderBottomWidth: 1 }]}>
-                                {torchView}
+                        <View style={[style.cameraFooter]}>
+                            {/* <View style={[styles.row, styles.justifySpaceBetween, styles.paddingTop10, styles.paddingBottom10, { borderBottomColor: 'rgba(0,0,0,.1)', borderBottomWidth: 1 }]}> */}
+                                
                                 {/* <View style={[styles.flexBasis33_3, styles.alignCenter]}>
                                 <Icon name="md-image" style={[styles.fontWhite, styles.fontXxxl]} />
                             </View> */}
-                                <View style={[styles.flexBasis50, styles.alignCenter]}>
-                                    <Icon name="ios-reverse-camera" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this.toggleCameraType()} />
+                                {/* <View style={[styles.flexBasis50, styles.alignCenter]}>
+                                    
                                 </View>
-                            </View>
-                            <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
-                                <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
-                                    <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
-                                        <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture.bind(this)} />
+                            </View> */}
+                            <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
+                                <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
+                                    {torchView}
+                                </View>
+
+                                <View style={[styles.flexBasis33_3, styles.alignCenter]}>
+                                    <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
+                                        <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
+                                            <TouchableOpacity style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }} onPress={this.takePicture.bind(this)} />
+                                        </View>
                                     </View>
+                                </View>
+                                <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
+                                    <Icon name="ios-reverse-camera" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this.toggleCameraType()} />
                                 </View>
                             </View>
                         </View>
@@ -172,7 +177,15 @@ class CameraFieldAttribute extends Component {
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
                         <View style={{ flex: 1 }}>
-                            <View style={{ width: 'auto', padding: 5, height: 'auto', backgroundColor: 'rgba(0,0,0,.4)', borderLeftWidth: 0 }}>
+                            
+                            <Image
+                                source={{
+                                    isStatic: true,
+                                    uri: 'data:image/jpeg;base64,' + this.props.imageData,
+                                }}
+                                style={[styles.flex1]}
+                            />
+                            <View style={[styles.absolute, styles.padding10, {top:0, left: 0}]}>
                                 <Icon
                                     name="md-close"
                                     style={[styles.fontXxxl, styles.fontWhite]}
@@ -181,23 +194,15 @@ class CameraFieldAttribute extends Component {
                                         this.props.actions.setState(SET_IMAGE_DATA, '')
                                     }} />
                             </View>
-                            <Image
-                                source={{
-                                    isStatic: true,
-                                    uri: 'data:image/jpeg;base64,' + this.props.imageData,
-                                }}
-                                style={{ height: '100%', width: '100%' }}
-                            />
                         </View>
-                        <View style={{ width: '100%', position: 'absolute', bottom: 0, height: 'auto', backgroundColor: 'rgba(0,0,0,0)', borderLeftWidth: 0, padding: 10 }}>
+                        <View style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, {bottom: 0}]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
-                                <View style={{ width: 70, height: 70, borderRadius: 40, backgroundColor: '#28bf54', elevation: 2 }}>
-                                    <TouchableOpacity style={{ width: 70, height: 70, borderRadius: 40, backgroundColor: '#28bf54', elevation: 2 }} onPress={() => {
-                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled)
-                                        this.props.navigation.goBack()
-                                    }} />
-                                    <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
-                                </View>
+                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35}]} onPress={() => {
+                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled)
+                                    this.props.navigation.goBack()
+                                }}>
+                                    <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </Container>
@@ -241,55 +246,15 @@ const style = StyleSheet.create({
         backgroundColor: '#fff',
         color: '#000',
         padding: 10,
+    },
+    cameraFooter: {
+        width: '100%', 
+        position: 'absolute', 
+        bottom: 0, 
+        height: 100, 
+        backgroundColor: 'rgba(0,0,0,.4)', 
+        borderLeftWidth: 0
     }
 });
-// const style = StyleSheet.create({
-//     camera: {
-//         flex: 0,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//         backgroundColor: 'transparent',
-//         height: Dimensions.get('window').width,
-//         width: Dimensions.get('window').width,
-//     },
-//     rectangleContainer: {
-//         flex: 1,
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//         backgroundColor: 'transparent',
-//     },
-
-//     rectangle: {
-//         height: 250,
-//         width: 250,
-//         borderWidth: 2,
-//         borderColor: '#00FF00',
-//         backgroundColor: 'transparent',
-//     },
-//     header: {
-//         borderBottomWidth: 0,
-//         height: 'auto',
-//         padding: 0,
-//         paddingRight: 0,
-//         paddingLeft: 0,
-//         elevation: 0
-//     },
-//     headerLeft: {
-//         width: '15%',
-//         padding: 15
-//     },
-//     headerBody: {
-//         width: '70%',
-//         paddingTop: 15,
-//         paddingBottom: 15,
-//         paddingLeft: 10,
-//         paddingRight: 10
-//     },
-//     headerRight: {
-//         width: '15%',
-//         padding: 15
-//     },
-// });
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(CameraFieldAttribute)

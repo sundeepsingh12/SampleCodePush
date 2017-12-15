@@ -4,7 +4,8 @@ import { Record } from 'immutable'
 
 var InitialState = Record({
     showImage: false,
-    imageData: ''
+    imageData: '',
+    viewData: ''
 })
 
 export default InitialState
