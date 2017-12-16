@@ -33,7 +33,7 @@ import {
   Toast
 } from 'native-base'
 
-import {RESET_STATE} from '../lib/constants'
+import {CLEAR_SEQUENCE_STATE} from '../lib/constants'
 
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -96,7 +96,7 @@ class Sequence extends Component {
           ])}>
             <Left>
                <Button transparent onPress={() => { 
-                 this.props.actions.setState(RESET_STATE)
+                 this.props.actions.setState(CLEAR_SEQUENCE_STATE)
                  this.props.navigation.goBack(null) }}>
               <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}/>
               </Button>
@@ -151,7 +151,7 @@ class Sequence extends Component {
           ])}>
             <Left>
                <Button transparent onPress={() => { 
-                 this.props.actions.setState(RESET_STATE)
+                 this.props.actions.setState(CLEAR_SEQUENCE_STATE)
                  this.props.navigation.goBack(null) }}>
               <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}/>
               </Button>

@@ -15,8 +15,6 @@ export default function nav(state = initialNavState, action) {
    if (action.type.startsWith('Navigation/')) {
     const { type, routeName } = action
     const lastRoute = state.routes[state.routes.length - 1]
-    console.log('lastRoute',lastRoute)
-       console.log('routeName',routeName)
     if (routeName == lastRoute.routeName) return state
   }
   return AppNavigator.router.getStateForAction(action, state)

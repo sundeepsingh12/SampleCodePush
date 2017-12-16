@@ -1,7 +1,8 @@
 'use strict'
 import {
     END_LIVEJOB_DETAILD_FETCHING,
-    SET_MESSAGE
+    SET_MESSAGE,
+    RESET_STATE
 } from '../../lib/constants'
 import InitialState from './liveJobInitialState.js'
 
@@ -17,6 +18,9 @@ export default function liveJobReducer(state = initialState, action) {
 
         case SET_MESSAGE:
             return state.set('toastMessage', action.payload)
+
+        case RESET_STATE:
+            return initialState    
     }
     return state
 }

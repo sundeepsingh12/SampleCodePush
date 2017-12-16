@@ -10,12 +10,14 @@ import {
     TOOGLE_HELP_TEXT,
     BASIC_INFO,
     IS_LOADING,
-    RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     JOB_STATUS,
     UPDATE_FIELD_DATA_VALIDATION,
-    NEXT_FOCUS
+    NEXT_FOCUS,
+    TabScreen,
+    HomeTabNavigatorScreen,
+    CLEAR_FORM_LAYOUT
 } from '../../lib/constants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -27,6 +29,7 @@ import { setState, navigateToScene } from '../global/globalActions'
 import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import _ from 'lodash'
+import { performSyncService } from '../home/homeActions'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
@@ -127,14 +130,25 @@ export function toogleHelpText(attributeId, formElement) {
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated,jobTransactionIdList) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, jobTransactionIdList, pieChart) {
     return async function (dispatch) {
         dispatch(setState(IS_LOADING, true))
         const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-        let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList,jobTransactionIdList)
+        let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
         dispatch(setState(IS_LOADING, false))
-        dispatch(navigateToScene(routeName, routeParam))
-        dispatch(setState(RESET_STATE))
+        if (routeName == TabScreen) {
+            dispatch(NavigationActions.reset({
+                index: 1,
+                actions: [
+                    NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+                    NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true } })
+                ]
+            }))
+        } else {
+            dispatch(navigateToScene(routeName, routeParam))
+        }
+        dispatch(performSyncService(pieChart))
+        dispatch(setState(CLEAR_FORM_LAYOUT))
     }
 }
 

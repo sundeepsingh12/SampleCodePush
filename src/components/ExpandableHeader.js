@@ -37,7 +37,8 @@ class ExpandableHeader extends Component {
                 {renderIf(this.state.showDropDown,
                     <ExpandableDetailsList
                         dataList={this.props.dataList}
-                        navigateToDataStoreDetails={this.props.navigateToDataStoreDetails} />
+                        navigateToDataStoreDetails={this.props.navigateToDataStoreDetails}
+                        navigateToCameraDetails={this.props.navigateToCameraDetails} />
                 )}
             </View>
 

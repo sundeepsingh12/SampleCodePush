@@ -41,12 +41,13 @@ import DateTimePicker from 'react-native-modal-datetime-picker'
 import moment from 'moment'
 
 import {
-  START,
   SEARCH_PLACEHOLDER
 } from '../lib/AttributeConstants'
 import {
+  START,
   IS_CALENDAR_VISIBLE,
-  LISTING_SEARCH_VALUE
+  LISTING_SEARCH_VALUE,
+
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -58,6 +59,7 @@ function mapStateToProps(state) {
     selectedDate: state.taskList.selectedDate,
     isCalendarVisible: state.taskList.isCalendarVisible,
     searchText: state.taskList.searchText,
+    modules: state.home.modules,
   }
 };
 
@@ -116,6 +118,7 @@ class TabScreen extends Component {
               tabId={tabs[index].id}
               statusIdList={this.props.tabIdStatusIdMap[tabs[index].id]}
               searchText={this.props.searchText}
+              loadTabScreen={this.props.navigation.state.params.loadTabScreen}
             />
           </Tab>
         )
@@ -134,14 +137,14 @@ class TabScreen extends Component {
     }
     return (
       <Footer style={[styles.bgWhite, { borderTopWidth: 1, borderTopColor: '#f3f3f3' }]}>
-        <FooterTab style={[styles.flexBasis20]}>
+        <FooterTab style={[styles.flexBasis25]}>
           <Button transparent
             onPress={this._transactionsForTodayDate}
             style={[styles.alignStart]}>
             <Text style={[styles.fontPrimary, styles.fontSm]}>Today</Text>
           </Button>
         </FooterTab>
-        <FooterTab style={[styles.flexBasis60]}>
+        <FooterTab style={[styles.flexBasis50]}>
           <DateTimePicker
             isVisible={this.props.isCalendarVisible}
             onConfirm={this._onConfirm}
@@ -156,7 +159,7 @@ class TabScreen extends Component {
             <Icon name='ios-arrow-down' style={[styles.fontBlack, styles.fontSm]} />
           </Button>
         </FooterTab>
-        <FooterTab style={[styles.flexBasis20]}>
+        <FooterTab style={[styles.flexBasis25]}>
           <Button transparent
             onPress={this._showAllJobTransactions}
             style={[styles.alignEnd]}>
@@ -200,7 +203,7 @@ class TabScreen extends Component {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.appModule.displayName}</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.modules[START].displayName}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>

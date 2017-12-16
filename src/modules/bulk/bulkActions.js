@@ -25,6 +25,7 @@ import {
 import {
     moduleCustomizationService
 } from '../../services/classes/ModuleCustomization'
+import _ from 'lodash'
 
 
 export function getJobMasterVsStatusNameList() {
@@ -79,9 +80,15 @@ export function toggleListItemIsChecked(jobTransactionId, allTransactions) {
             const bulkTransactions = await JSON.parse(JSON.stringify(allTransactions))
             bulkTransactions[jobTransactionId].isChecked = !bulkTransactions[jobTransactionId].isChecked
             const selectedItems = await bulkService.getSelectedTransactionIds(bulkTransactions)
-            dispatch(setState(TOGGLE_JOB_TRANSACTION_LIST_ITEM, {
+            // dispatch(setState(TOGGLE_JOB_TRANSACTION_LIST_ITEM, {
+            //     selectedItems,
+            //     bulkTransactions
+            // }))
+            let displayText = (selectedItems.length==_.size(allTransactions))?'Select None':'Select All'
+           dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
                 selectedItems,
-                bulkTransactions
+                bulkTransactions,
+                displayText
             }))
         } catch (error) {
             console.log(error)

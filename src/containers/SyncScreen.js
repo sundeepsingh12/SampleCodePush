@@ -37,7 +37,8 @@ function mapStateToProps(state) {
   return {
     syncStatus: state.home.syncStatus,
     unsyncedTransactionList: state.home.unsyncedTransactionList,
-    pieChart: state.home.pieChart
+    pieChart: state.home.pieChart,
+    lastSyncTime:state.home.lastSyncTime
   }
 }
 
@@ -55,6 +56,7 @@ class SyncScreen extends Component {
   componentDidMount() {
     this.props.actions.startMqttService(this.props.pieChart)
     this.props.actions.performSyncService(this.props.pieChart, true)
+    this.props.actions.startTracking()
   }
 
   // getView() {
@@ -202,7 +204,7 @@ class SyncScreen extends Component {
 
   }
 
-  render() {
+  render() { 
 
     const syncView = this.getSyncView()
     const transactionView = this.getTransactionView()
@@ -216,7 +218,7 @@ class SyncScreen extends Component {
                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                 <View style={[style.headerBody]}>
                   <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Sync</Text>
-                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontSm, styles.alignCenter]}>Last Synced 20 Minutes ago</Text>
+                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontSm, styles.alignCenter]}>{this.props.lastSyncTime}</Text>
                 </View>
                 <View />
               </View>

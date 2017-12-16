@@ -121,7 +121,7 @@ class ResetPassword extends Component {
                 </Item>
                 <Item stackedLabel style={[styles.marginBottom15]}>
                     <Label style={[styles.fontPrimary, styles.fontSm]}>New Password</Label>
-                    <Label style={[styles.fontDarkGray, styles.fontXs]}>Minimum 8 characters, including a symbol and a number.</Label>
+                    <Label style={[styles.fontDarkGray, styles.fontXs]}>Min. 8 characters, include capital letter, symbol and number.</Label>
                     <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setNewPassword} value={this.props.newPassword} />
                 </Item>
                 <Item stackedLabel style={[styles.marginBottom15]}>

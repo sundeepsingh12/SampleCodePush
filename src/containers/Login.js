@@ -12,9 +12,10 @@ import {
 }
   from 'react-native'
 import Scanner from "../components/Scanner"
-import { Container, Button, Input, Item, CheckBox, Spinner } from 'native-base'
-
-import feStyle from '../themes/FeStyle';
+import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner } from 'native-base'
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
+import styles from '../themes/FeStyle'
 import sha256 from 'sha256';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -24,7 +25,7 @@ import codePush from "react-native-code-push"
 import {QrCodeScanner} from '../lib/constants'
 
 
-var styles = StyleSheet.create({
+var style = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
@@ -48,6 +49,7 @@ var styles = StyleSheet.create({
     marginTop: 70,
     flexBasis: '20%',
     justifyContent: 'flex-start',
+    marginBottom: 20
   },
 
   logoStyle: {
@@ -110,15 +112,15 @@ class Login extends Component {
     this.props.actions.toggleCheckbox()
   }
 
-  codepushSync = () => {
-    codePush.sync({
-      updateDialog: true,
-      installMode: codePush.InstallMode.IMMEDIATE
-    }, (status) => {
-      console.log("====Code push update=====");
-      console.log(status);
-    });
-  }
+  // codepushSync = () => {
+  //   codePush.sync({
+  //     updateDialog: true,
+  //     installMode: codePush.InstallMode.IMMEDIATE
+  //   }, (status) => {
+  //     console.log("====Code push update=====");
+  //     console.log(status);
+  //   });
+  // }
 
   startScanner = () => {
     this.props.navigation.navigate(QrCodeScanner, {returnData: this._onBarCodeRead.bind(this)})
@@ -126,72 +128,78 @@ class Login extends Component {
 
   render() {
     return (
-      <Container>
-       
-          <View style={styles.container}>
-            <View style={styles.logoContainer}>
-              {renderIf(!this.props.auth.form.authenticationService,
-                <Image
-                  style={styles.logoStyle}
-                  source={require('../../images/fareye-logo.png')}
-                />
-              )}
-              {renderIf(this.props.auth.form.authenticationService,
-                <Spinner />
-              )}
-            </View>
-            <View style={styles.width70}>
-              <Item style={{ borderWidth: 0 }}>
-                <Input
-                  value={this.props.auth.form.username}
-                  autoCapitalize="none"
-                  placeholder='Username'
-                  onChangeText={this.onChangeUsername}
-                  disabled={this.props.auth.form.isEditTextDisabled}
-                />
-              </Item>
-              <Item style={{ borderWidth: 0, marginTop: 15 }}>
-                <Input
-                  value={this.props.auth.form.password}
-                  placeholder='Password'
-                  secureTextEntry={true}
-                  onChangeText={this.onChangePassword}
-                  disabled={this.props.auth.form.isEditTextDisabled}
-                />
-              </Item>
+          <StyleProvider style={getTheme(platform)}>
+            <Container>
+              <Content>
+                <View style={style.container}>
+                  <View style={style.logoContainer}>
+                    {renderIf(!this.props.auth.form.authenticationService,
+                      <Image
+                        style={style.logoStyle}
+                        source={require('../../images/fareye-logo.png')}
+                      />
+                    )}
+                    {renderIf(this.props.auth.form.authenticationService,
+                      <Spinner />
+                    )}
+                  </View>
+                  <View style={[style.width70, styles.marginTop30]}>
+                    <Item rounded style={[styles.marginBottom10]}>
+                      <Input
+                        value={this.props.auth.form.username}
+                        autoCapitalize="none"
+                        placeholder='Username'
+                        onChangeText={this.onChangeUsername}
+                        disabled={this.props.auth.form.isEditTextDisabled}
+                        style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
+                      />
+                    </Item>
+                    <Item rounded>
+                      <Input
+                        value={this.props.auth.form.password}
+                        placeholder='Password'
+                        secureTextEntry={true}
+                        onChangeText={this.onChangePassword}
+                        disabled={this.props.auth.form.isEditTextDisabled}
+                        style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
+                      />
+                    </Item>
 
-              <Button
-                rounded success style={{ width: '100%', marginTop: 15 }}
-                disabled={this.props.auth.form.isButtonDisabled}
-                onPress={this.loginButtonPress}
-              >
-                <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Log In</Text>
-              </Button>
+                    <Button
+                      full rounded success
+                      disabled={this.props.auth.form.isButtonDisabled}
+                      onPress={this.loginButtonPress}
+                      style={[styles.marginTop15]}
+                    >
+                      <Text style={[styles.fontWhite]}>Log In</Text>
+                    </Button>
 
-              <View style={{ flexDirection: 'row', flexGrow: 1, justifyContent: 'flex-start', marginTop: 15 }}>
-                <CheckBox checked={this.props.auth.form.rememberMe}
-                  onPress={this.rememberMe} />
-                <Text style={{ marginLeft: 20 }}>Remember Me</Text>
-              </View>
+                    <View style={[styles.row, styles.flex1, styles.justifyStart, styles.marginTop15]}>
+                      <CheckBox checked={this.props.auth.form.rememberMe}
+                        onPress={this.rememberMe} />
+                      <Text style={{ marginLeft: 20 }}>Remember Me</Text>
+                    </View>
 
-              <View style={{ marginTop: 35 }}>
-                <Text style={{ textAlign: 'center', color: '#CC3333', marginBottom: 10 }}>
-                  {this.props.auth.form.displayMessage}
-                </Text>
-                <Button
-                  onPress={this.startScanner} rounded style={{ width: '100%', }}>
-                  <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Scanner</Text>
-                </Button>
-              </View>
-              <View style={{ marginTop: 15 }}>
-                <Button
-                  onPress={this.codepushSync} rounded style={{ width: '100%', }}>
-                  <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Code Push Sync</Text>
-                </Button>
-              </View>
-            </View>
-          </View>
-      </Container>
+                    <View style={[styles.marginTop30]}>
+                      <Text style={[styles.fontCenter, styles.fontDanger, styles.marginBottom10]}>
+                        {this.props.auth.form.displayMessage}
+                      </Text>
+                      <Button
+                        onPress={this.startScanner} full rounded>
+                        <Text style={[styles.fontWhite]}>Scanner</Text>
+                      </Button>
+                    </View>
+                    {/* <View style={{ marginTop: 15 }}>
+                      <Button
+                        onPress={this.codepushSync} rounded style={{ width: '100%', }}>
+                        <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Code Push Sync</Text>
+                      </Button>
+                    </View> */}
+                  </View>
+                </View>
+              </Content>
+            </Container>
+          </StyleProvider>
     )
   }
 };

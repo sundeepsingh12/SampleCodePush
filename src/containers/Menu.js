@@ -4,7 +4,9 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { Component } from 'react'
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, TouchableOpacity,Alert } from 'react-native'
+
+import Loader from '../components/Loader'
 
 import {
   Container,
@@ -52,7 +54,8 @@ function mapStateToProps(state) {
     loading: state.home.loading,
     errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
     isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
-    menu: state.home.menu
+    menu: state.home.menu,
+    isLoggingOut:state.home.isLoggingOut
   }
 };
 
@@ -113,12 +116,12 @@ class Menu extends Component {
         this.props.actions.navigateToScene(Statistics)
         break
       }
-      default:
-        Toast.show({
-          text: `Under development!Coming Soon`,
-          position: 'bottom',
-          buttonText: 'OK'
-        })
+      // default:
+      //   Toast.show({
+      //     text: `Under development!Coming Soon`,
+      //     position: 'bottom',
+      //     buttonText: 'OK'
+      //   })
     }
   }
 
@@ -172,7 +175,10 @@ class Menu extends Component {
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
 
-          <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
+          {renderIf(this.props.isLoggingOut,<Loader />)}
+
+
+          {renderIf(!this.props.isLoggingOut, <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
             {/*card 1*/}
             <View style={[styles.bgWhite, styles.marginBottom10]}>
               {profileView}
@@ -228,7 +234,7 @@ class Menu extends Component {
             </TouchableOpacity> */}
 
             {/*Card 5*/}
-            <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.invalidateUserSession() }}>
+            <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={this.showLogoutAlert}>
               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
                 <View style={[styles.justifySpaceBetween, styles.flex1]}>
                   <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
@@ -240,7 +246,8 @@ class Menu extends Component {
                 </View>
               </View>
             </TouchableOpacity>
-          </Content>
+          </Content>)}
+         
           {/* <Footer style={[style.footer]}>
             <FooterTab>
               <Button onPress={() => { this.props.actions.navigateToScene('JobDetailsV2') }}>
@@ -263,7 +270,22 @@ class Menu extends Component {
     )
   }
 
-};
+  showLogoutAlert = () => {
+    Alert.alert(
+      "Logout",
+      `Are you sure you want to Logout?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK', onPress: this.logoutButtonPressed },
+      ],
+    )
+  }
+
+  logoutButtonPressed = () => {
+    this.props.actions.invalidateUserSession()
+  }
+
+}
 
 const style = StyleSheet.create({
   header: {

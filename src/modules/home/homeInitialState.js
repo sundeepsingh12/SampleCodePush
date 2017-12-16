@@ -6,6 +6,8 @@ import BulkIcon from '../../../src/svg_components/icons/BulkIcon'
 import LiveIcon from '../../../src/svg_components/icons/LiveIcon'
 import SequenceIcon from '../../../src/svg_components/icons/SequenceIcon'
 import TaskIcon from '../../../src/svg_components/icons/TaskIcon'
+import SortParcelIcon from '../../../src/svg_components/icons/SortParcelIcon'
+import WebUrlIcon from '../../../src/svg_components/icons/WebUrlIcon'
 
 var InitialState = Record({
     modules: {
@@ -34,13 +36,13 @@ var InitialState = Record({
             appModuleId: 26,
             displayName: 'Sort Parcels',
             enabled: false,
-            icon: <SequenceIcon />,
+            icon: <SortParcelIcon />,
         }, CUSTOMAPP: {
             appModuleId: 12,
             displayName: 'Web URL',
             enabled: false,
             remark: null,
-            icon: <SequenceIcon />
+            icon: <WebUrlIcon />
         },
     },
     menu: {
@@ -75,7 +77,8 @@ var InitialState = Record({
             displayName: 'MSwipe',
             enabled: false,
         }
-    }, pieChart: {
+    },
+     pieChart: {
         PIECHART: {
             appModuleId: 5,
             displayName: 'Pie Chart',
@@ -91,6 +94,8 @@ var InitialState = Record({
     moduleLoading: false,
     chartLoading: false,
     count: null,
+    lastSyncTime:null,
+    isLoggingOut:false
 })
 
 export default InitialState

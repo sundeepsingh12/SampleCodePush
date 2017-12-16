@@ -48,6 +48,7 @@ import LiveJob from '../../containers/LiveJob'
 import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
 import QrCodeScanner from '../../containers/QrCodeScanner'
+import CameraFieldAttribute from '../../containers/CameraFieldAttribute'
 import {
   Container,
   Content,
@@ -87,6 +88,7 @@ import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
+import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
 import {
   ApplicationScreen,
@@ -147,6 +149,7 @@ export const HomeTabNavigator = TabNavigator({
     screen: Home,
     navigationOptions: {
       header: null,
+      gesturesEnabled: false,
       title: 'Home',
       tabBarIcon: ({ tintColor }) => (
         <Icon
@@ -161,6 +164,7 @@ export const HomeTabNavigator = TabNavigator({
     navigationOptions: {
       header: null,
       title: 'Sync',
+      gesturesEnabled: false,
       tabBarIcon: ({ tintColor }) => (
         <Icon
           name='ios-sync'
@@ -174,9 +178,10 @@ export const HomeTabNavigator = TabNavigator({
     navigationOptions: {
       header: null,
       title: 'Menu',
+      gesturesEnabled: false,
       tabBarIcon: ({ tintColor }) => (
         <Icon
-          name='ios-menu'
+          name='md-menu'
           style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
         />
       ),
@@ -200,6 +205,8 @@ export const HomeTabNavigator = TabNavigator({
       labelStyle: {
         fontSize: 12,
         marginTop: 0,
+        fontWeight: '600'
+        
       },
       tabStyle: {
         alignItems: 'center',
@@ -226,12 +233,14 @@ export const AppNavigator = StackNavigator({
     screen: Login,
     navigationOptions: {
       header: null,
+      gesturesEnabled: false
     },
   },
   PreloaderScreen: {
     screen: Preloader,
     navigationOptions: {
-      header: null
+      header: null,
+      gesturesEnabled: false
     }
   },
   Message: {
@@ -402,6 +411,12 @@ export const AppNavigator = StackNavigator({
   },
   DataStoreDetails: {
     screen: DataStoreDetails
+  },
+  CameraAttribute: {
+    screen: CameraFieldAttribute,
+  },
+  ImageDetailsView: {
+    screen: ImageDetailsView,
   }
 }, {
     cardStyle: {

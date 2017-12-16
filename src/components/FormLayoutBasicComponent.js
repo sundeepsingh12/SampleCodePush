@@ -20,6 +20,7 @@ import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import SelectFromList from '../containers/SelectFromList'
+import QRIcon from '../svg_components/icons/QRIcon'
 
 import {
     MONEY_COLLECT,
@@ -48,11 +49,17 @@ import {
     OBJECT,
     CASH,
     OPTION_RADIO_FOR_MASTER,
-    QR_SCAN
+    QR_SCAN,
+    CAMERA,
+    CAMERA_HIGH,
+    CAMERA_MEDIUM,
+    SCAN_OR_TEXT,
+    CONTACT_NUMBER
 } from '../lib/AttributeConstants'
 
 import {
-    NEXT_FOCUS
+    NEXT_FOCUS,
+    CameraAttribute
 } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
@@ -134,8 +141,14 @@ class BasicFormElement extends Component {
                 screenName = 'ArrayFieldAttribute'
                 break
             }
-            case QR_SCAN:{
+            case QR_SCAN: {
                 screenName = 'QrCodeScanner'
+                break
+            }
+            case CAMERA:
+            case CAMERA_MEDIUM:
+            case CAMERA_HIGH: {
+                screenName = CameraAttribute
                 break
             }
             default: {
@@ -158,8 +171,8 @@ class BasicFormElement extends Component {
         )
     }
 
-        _searchForReferenceValue = (value) => {
-       this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value,NEXT_FOCUS);
+    _searchForReferenceValue = (value) => {
+        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, NEXT_FOCUS);
     }
 
     onFocusEvent(currentElement) {
@@ -267,6 +280,20 @@ class BasicFormElement extends Component {
         }
         return null
     }
+
+    goToQRCode = () => {
+        this.props.actions.navigateToScene('QrCodeScanner',
+            {
+                formElements: this.props.formElement,
+                jobStatusId: this.props.jobStatusId,
+                jobTransaction: this.props.jobTransaction,
+                latestPositionId: this.props.latestPositionId,
+                isSaveDisabled: this.props.isSaveDisabled,
+                returnData: this._searchForReferenceValue.bind(this)
+
+            })
+    }
+
     render() {
         let modalView = this.getModalView()
         switch (this.props.item.attributeTypeId) {
@@ -276,10 +303,12 @@ class BasicFormElement extends Component {
             case DECIMAL:
             case SEQUENCE:
             case PASSWORD:
+            case SCAN_OR_TEXT:
+            case CONTACT_NUMBER:
                 return (
                     <View>
                         {renderIf(!this.props.item.hidden,
-                            <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
+                            <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
                                 <Item stackedLabel>
                                     {this.props.item.label ?
                                         <Label style={[this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
@@ -294,7 +323,7 @@ class BasicFormElement extends Component {
                                         placeholder={this.props.item.helpText}
                                         placeholderTextColor={styles.fontLowGray.color}
                                         defaultValue={this.props.item.value}
-                                        style={{ paddingLeft: 0 }}
+                                        style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
                                         value={this.props.item.value}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
@@ -304,7 +333,17 @@ class BasicFormElement extends Component {
                                         onBlur={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                     />
+
                                 </Item>
+                                {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ? <TouchableHighlight
+                                    style={[styles.absolute, { bottom: 50, right: 10 }]}
+                                    onPress={this.goToQRCode}
+                                >
+                                    <View>
+                                        <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)} />
+                                    </View>
+                                </TouchableHighlight> : null}
+
                                 {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
                                 <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
                                 <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
@@ -326,6 +365,9 @@ class BasicFormElement extends Component {
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
             case QR_SCAN:
+            case CAMERA:
+            case CAMERA_HIGH:
+            case CAMERA_MEDIUM:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             case NPS_FEEDBACK:
                 return <View>
