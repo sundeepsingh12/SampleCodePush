@@ -273,6 +273,9 @@ class AddServerSms {
     * @param {String} transactionIdDtos 
     */
     async setServerSmsMapForPendingStatus(transactionIdDtosMap) {
+        if(!transactionIdDtosMap) {
+            return
+        }
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values        
         let transactionIdDtos = _.values(transactionIdDtosMap)
