@@ -11,6 +11,7 @@ import {
     USER,
     DEVICE_IMEI,
     TABLE_JOB,
+    TABLE_TRANSACTION_LOGS,
     PENDING_SYNC_TRANSACTION_IDS
 } from '../../../lib/constants'
 
@@ -203,6 +204,7 @@ export default class FormLayoutEventImpl {
      */
     async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
         try {
+            let user = await keyValueDBService.getValueFromStore(USER)        
             let currentTime =  moment().format('YYYY-MM-DD HH:mm:ss')
             if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
                 return formLayoutObject // return undefined or empty object if formLayoutObject is empty
@@ -210,25 +212,54 @@ export default class FormLayoutEventImpl {
             let fieldData, jobTransaction, job, dbObjects
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user)
                 jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user)
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber,currentTime)
             }
 
             //TODO add other dbs which needs updation
+            const prevStatusId  = (jobTransactionIdList) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
+            const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user)
             const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList) : []
             await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList)
-            realm.performBatchSave(fieldData, jobTransaction,runSheet, job)
+            realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
         }
+    }
+
+    async _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user){
+        let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
+        return {tableName : TABLE_TRANSACTION_LOGS, value : transactionLogs}
+    }
+
+    _prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user, dateTime) {
+        let transactionLogs = []
+        for (let job in jobTransaction) {
+            transactionLog = {
+                userId: user.id,
+                transactionId: jobTransaction[job].id,
+                jobMasterId: jobMasterId,
+                toJobStatusId: statusId,
+                fromJobStatusId: prevStatusId,
+                latitude: 0.0,  //to be set later
+                longitude: 0.0,  //to be set later
+                transactionTime: dateTime,
+                updatedAt: dateTime,
+                hubId: jobTransaction[job].hubId,
+                cityId: jobTransaction[job].cityId,
+                companyId: jobTransaction[job].companyId,
+            }
+            transactionLogs.push(transactionLog)
+        }
+        return transactionLogs
     }
 
     async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){
@@ -368,8 +399,7 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId 
      */
-    async _getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime) {
-        let user = await keyValueDBService.getValueFromStore(USER)
+    async _getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user) {
         let hub = await keyValueDBService.getValueFromStore(HUB)
         let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus => { return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId) })
