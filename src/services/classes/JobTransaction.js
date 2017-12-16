@@ -313,6 +313,7 @@ class JobTransaction {
      */
     prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap) {
         let jobTransactionCustomizationList = []
+        let jobTransactionDateTOJobTransactionsMap = {}        
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
