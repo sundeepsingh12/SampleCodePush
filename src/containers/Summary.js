@@ -16,6 +16,7 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
+import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import {
   Container,
@@ -30,6 +31,7 @@ import {
   StyleProvider
 } from 'native-base';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
+import {RESET_SUMMARY_STATE} from '../lib/constants'
 function mapStateToProps(state) {
     return {
         jobMasterSummary : state.summary.jobMasterSummary,
@@ -38,7 +40,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...summaryActions }, dispatch)
+        actions: bindActionCreators({ ...summaryActions, ...globalActions }, dispatch)
     }
 }
 
@@ -121,6 +123,10 @@ class Summary extends Component {
         this.props.actions.getDataForJobMasterSummaryAndRunSheetSummary()
     }
 
+    componentWillUnmount() {
+        this.props.actions.setState(RESET_SUMMARY_STATE)
+    }
+
 
     _renderItem ({item, index}) {
         
@@ -175,17 +181,95 @@ class Summary extends Component {
             </View>
         );
     }
-
-  
-
-    render() {
-        const status = ['Pending','Failed','Successful']
+    _renderCrousel(){
         const { slider1ActiveSlide, slider1Ref } = this.state;
-        const listData = this.props.jobMasterSummary
-        if(listData.length == 0) {
-            return (<Loader/>)
+        if(this.props.runSheetSummary  && this.props.runSheetSummary.length == 0 ){
+            return(<Text style={[styles.padding20,styles.fontCenter,styles.fontWhite]}>No RunSheet Available</Text>)
         }
-        else {
+        return(
+            <View>
+                <Carousel
+                ref={(c) => { if (!this.state.slider1Ref) { this.setState({ slider1Ref: c }); } }}
+                data={this.props.runSheetSummary}
+                renderItem={this._renderItem}
+                sliderWidth={sliderWidth}
+                itemWidth={itemWidth}
+                firstItem={SLIDER_1_FIRST_ITEM}
+                inactiveSlideScale={1}
+                inactiveSlideOpacity={0.7}
+                enableMomentum={false}
+                loop={false}
+                onSnapToItem={(index) => this.setState({ slider1ActiveSlide: index }) }
+                />
+
+                <Pagination
+                dotsLength={this.props.runSheetSummary.length}
+                activeDotIndex={slider1ActiveSlide}
+                containerStyle={style.paginationContainer}
+                dotColor={'rgb(255, 255, 255)'}
+                dotStyle={style.paginationDot}
+                inactiveDotColor={'rgb(255, 255, 255)'}
+                inactiveDotOpacity={0.4}
+                inactiveDotScale={1}
+                carouselRef={slider1Ref}
+                tappableDots={!!slider1Ref}
+                />
+            </View>
+        )
+    }
+
+    _renderView= () => {
+        const status = ['Pending','Failed','Successful']
+        const listData = this.props.jobMasterSummary;
+        if(this.props.jobMasterSummary && this.props.jobMasterSummary.length == 0){
+            return <Loader/>
+        }
+        return(
+            <Content style={[styles.bgLightGray]}>
+                <LinearGradient 
+                    colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}>
+                    {this._renderCrousel()}
+                </LinearGradient>                                
+                <FlatList
+                    data={listData}
+                    renderItem={({ item }) => {
+                        return (
+                            <View style={[styles.margin10, styles.bgWhite, {elevation: 2}]}>
+                            <View style={[style.seqCard, {borderBottomColor: '#d3d3d3', borderBottomWidth:1}]}>
+                                <View style={style.seqCircle}>
+                                    <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
+                                        {item.code}
+                                    </Text>
+                                </View>
+                                <View style={style.seqCardDetail}>
+                                    <View>
+                                        <Text style={[styles.fontDefault, styles.fontWeight500, styles.paddingTop10, styles.paddingBottom10]}>
+                                            {item.title}
+                                        </Text>
+                                    </View>
+                                    <View style={{width: "90%", borderRadius: 5, height: 8, backgroundColor: '#f3f3f3'}}>
+                                        <View style={{width: (item.count > 0) ? String(((item[3].count + item[2].count)*100)/item.count)+"%" : "0%", height: 8, borderRadius: 5, backgroundColor: 'green'}}>
+
+                                        </View>
+                                    </View>
+                                    <View>
+                                        <Text style={[styles.fontDefault, styles.lineHeight25]}>
+                                            Total Task : {item.count}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+                                    <SummaryListing status = {status} data = {item}/>    
+                            </View>                                                             
+                        )}
+                    }
+                    keyExtractor={item => item.id}
+                />  
+            </Content>
+        )
+    }
+
+    render() { 
             return (
                <StyleProvider style={getTheme(platform)}>
                    <Container>
@@ -205,75 +289,10 @@ class Summary extends Component {
                                 </View>
                             </Body>
                         </Header>
-                        <Content style={[styles.bgLightGray]}>
-                            <LinearGradient 
-                                colors={[styles.bgPrimary.backgroundColor, styles.shadeColor]}>
-                                <Carousel
-                                    ref={(c) => { if (!this.state.slider1Ref) { this.setState({ slider1Ref: c }); } }}
-                                    data={this.props.runSheetSummary}
-                                    renderItem={this._renderItem}
-                                    sliderWidth={sliderWidth}
-                                    itemWidth={itemWidth}
-                                    firstItem={SLIDER_1_FIRST_ITEM}
-                                    inactiveSlideScale={1}
-                                    inactiveSlideOpacity={0.7}
-                                    enableMomentum={false}
-                                    loop={false}
-                                    onSnapToItem={(index) => this.setState({ slider1ActiveSlide: index }) }
-                                    />
-
-                                    <Pagination
-                                    dotsLength={this.props.runSheetSummary.length}
-                                    activeDotIndex={slider1ActiveSlide}
-                                    containerStyle={style.paginationContainer}
-                                    dotColor={'rgb(255, 255, 255)'}
-                                    dotStyle={style.paginationDot}
-                                    inactiveDotColor={'rgb(255, 255, 255)'}
-                                    inactiveDotOpacity={0.4}
-                                    inactiveDotScale={1}
-                                    carouselRef={slider1Ref}
-                                    tappableDots={!!slider1Ref}
-                                    />
-                            </LinearGradient>                                
-                                 <FlatList
-                                    data={listData}
-                                    renderItem={({ item }) => {
-                                        return (
-                                            <View style={[styles.margin10, styles.bgWhite, {elevation: 2}]}>
-                                            <View style={[style.seqCard, {borderBottomColor: '#d3d3d3', borderBottomWidth:1}]}>
-                                                <View style={style.seqCircle}>
-                                                    <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-                                                        {item.code}
-                                                    </Text>
-                                                </View>
-                                                <View style={style.seqCardDetail}>
-                                                    <View>
-                                                        <Text style={[styles.fontDefault, styles.fontWeight500, styles.paddingTop10, styles.paddingBottom10]}>
-                                                            {item.title}
-                                                        </Text>
-                                                    </View>
-                                                    <View style={{width: "90%", borderRadius: 5, height: 8, backgroundColor: '#f3f3f3'}}>
-                                                        <View style={{width: (item.count) ? String(((item[3].count)*100)/item.count)+"%" : "0%", height: 8, borderRadius: 5, backgroundColor: 'green'}}>
-
-                                                        </View>
-                                                    </View>
-                                                    <View>
-                                                        <Text style={[styles.fontDefault, styles.lineHeight25]}>
-                                                            Total Task : {item.count}
-                                                        </Text>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                                 <SummaryListing status = {status} data = {item}/>    
-                                            </View>                                                             
-                                        )}}
-                                    keyExtractor={item => item.id}
-                                />  
-                        </Content>
+                        {this._renderView()}
                    </Container>
                </StyleProvider>
             )
-        }
         }
     }
 const style = StyleSheet.create({

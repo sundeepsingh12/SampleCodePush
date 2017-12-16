@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList } from 'react-native'
 import {
     Container,
@@ -12,6 +11,9 @@ import {
     Footer,
     FooterTab,
 } from 'native-base';
+import {
+    _id,
+} from '../lib/constants'
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 export default class DataStoreItemDetails extends Component {
@@ -30,12 +32,14 @@ export default class DataStoreItemDetails extends Component {
         let attributeArray = []
         let id = 0;
         for (let attribute in dataStoreAttributeValueMap) {
-            let attributeObject = {
-                id: id++,
-                key: attribute,
-                value: dataStoreAttributeValueMap[attribute]
+            if (attribute != _id) {
+                let attributeObject = {
+                    id: id++,
+                    key: attribute,
+                    value: dataStoreAttributeValueMap[attribute]
+                }
+                attributeArray.push(attributeObject)
             }
-            attributeArray.push(attributeObject)
         }
         return attributeArray
     }
@@ -47,7 +51,7 @@ export default class DataStoreItemDetails extends Component {
                     <Body>
                         <View
                             style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                            <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.paddingRight5, styles.paddingLeft5]} onPress={() => { this.props.goBack() }} />
+                            <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.paddingRight5, styles.paddingLeft5]} onPress={() => { this.props.goBack(-1, null, true) }} />
                             <Text
                                 style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Confirm</Text>
                             <View />
@@ -70,7 +74,7 @@ export default class DataStoreItemDetails extends Component {
                     <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
                         <Button success full style={styles.bgPrimary}
                             onPress={() => {
-                                this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.matchKey])
+                                this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])
                             }}>
                             <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                         </Button>

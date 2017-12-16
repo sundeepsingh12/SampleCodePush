@@ -27,6 +27,10 @@ import {
     PostAssignmentScanner
 } from '../lib/constants'
 
+import {
+    JOB_MASTER_HEADER
+} from '../lib/ContainerConstants'
+
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -100,7 +104,7 @@ class JobMaster extends Component {
                                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} onPress={() => { this.props.navigation.goBack(null) }} />
                                 </View>
                                 <View style={{ width: '70%' }}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}></Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{JOB_MASTER_HEADER}</Text>
                                 </View>
                                 <View style={{ width: '15%' }}>
                                     <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}></Text>

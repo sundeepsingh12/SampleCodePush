@@ -17,7 +17,7 @@ import {
 }
   from 'react-native'
 
-import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Header,Separator, Icon, Footer, FooterTab, Button } from 'native-base';
+import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Header, Separator, Icon, Footer, FooterTab, Button } from 'native-base';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as taskListActions from '../modules/taskList/taskListActions'
@@ -50,7 +50,7 @@ function mapDispatchToProps(dispatch) {
 class TaskListScreen extends Component {
 
   componentDidMount() {
-    if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
+    if (this.props.loadTabScreen || _.isEmpty(this.props.jobTransactionCustomizationList)) {
       this.props.actions.fetchJobs(moment().format('YYYY-MM-DD'))
     }
   }
@@ -88,13 +88,28 @@ class TaskListScreen extends Component {
     return sectionList
   }
 
+  renderSearchList(searchText, listArray) {
+    let jobTransactionArray = []
+    _.forEach(listArray, function (value) {
+      let values = [value.referenceNumber, value.runsheetNo, value.line1, value.line2, value.circleLine1, value.circleLine2]
+      if (_.isEqual(_.toLower(value.referenceNumber), searchText) || _.isEqual(_.toLower(value.runsheetNo), searchText)) {
+        return value
+      }
+      if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
+        jobTransactionArray.push(value)
+      }
+    })
+    return jobTransactionArray;
+  }
+
   renderList() {
     let list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
-    list.sort(function (transaction1, transaction2) {
+    let jobTransactionArray = (this.props.searchText) ? this.renderSearchList(_.toLower(this.props.searchText), list) : list
+    jobTransactionArray.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
-    return list
-  }  
+    return jobTransactionArray
+  }
 
   renderItem = (row) => {
     return (
@@ -109,7 +124,7 @@ class TaskListScreen extends Component {
     return (
       <Separator bordered>
         <Text>{row.section.key}</Text>
-      </Separator>  
+      </Separator>
     );
   }
 

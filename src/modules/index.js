@@ -27,23 +27,25 @@ import sequence from './sequence/sequenceReducer'
 import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 import dataStore from './dataStore/dataStoreReducer'
 import newJob from './newJob/newJobReducer'
+import transientStatus from './transientStatus/transientReducer'
+import saveActivated from './saveActivated/saveActivatedReducer'
 import statistics from './statistics/statisticsReducer'
 import bulk from './bulk/bulkReducer'
 import profileReducer from './profile/profileReducer'
 import sorting from './sorting/sortingReducer'
 import taskList from './taskList/taskListReducer'
+import liveJobList from './liveJobListing/liveJobListingReducer'
+import liveJob from './liveJob/liveJobReducer'
+
+import { combineReducers } from 'redux'
+import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
 import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
 import jobMaster from './job-master/jobMasterReducer'
 import postAssignment from './postAssignment/postAssignmentReducer'
+import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 // import profile from './profile/profileReducer'
 
-import {
-  combineReducers
-} from 'redux'
-import {
-  PRE_LOGOUT_SUCCESS
-} from '../lib/constants'
 
 /**
  * ## CombineReducers
@@ -73,15 +75,20 @@ const appReducer = combineReducers({
   cashTenderingReducer,
   dataStore,
   newJob,
+  transientStatus,
+  saveActivated,
   statistics,
   bulk,
   profileReducer,
   sorting,
   taskList,
+  liveJobList,
+  liveJob,
   summary,
   customApp,
   jobMaster,
   postAssignment,
+  qrCodeReducer,
 })
 
 const rootReducer = (state, action) => {

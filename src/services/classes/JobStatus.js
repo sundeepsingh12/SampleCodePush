@@ -45,6 +45,15 @@ class JobStatus {
     return jobStatusId[0]
   }
 
+  async getStatusForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error('Job status missing in store')
+    }
+    const jobStatus = jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobStatusObject.jobMasterId == jobMasterId))
+    return jobStatus[0]
+  }
+
   /**Returns jobMasterId Vs JobStatusId Map from set of jobMasterIds and a status code
    * 
    * @param {*} jobMasterIdList 

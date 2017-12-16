@@ -7,17 +7,21 @@ import {
   JOB_DOWNLOADING_STATUS,
   PENDING_SYNC_TRANSACTION_IDS,
   USER,
+  SET_MODULES,
   UNSEEN,
   JOB_SUMMARY,
   SYNC_ERROR,
   SYNC_STATUS,
-  PENDING
+  PENDING,
+  LiveJobs,
+  PIECHART,
+  CLEAR_HOME_STATE
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
   FAIL,
   SUCCESS,
-  PIECHART,
+  Piechart
 } from '../../lib/AttributeConstants'
 
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
@@ -25,7 +29,7 @@ import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { sync } from '../../services/classes/Sync'
 import BackgroundTimer from 'react-native-background-timer'
-import { setState } from '../global/globalActions'
+import { setState, navigateToScene } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { Client } from 'react-native-paho-mqtt'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -35,21 +39,24 @@ import { jobStatusService } from '../../services/classes/JobStatus'
 /**
  * This action enables modules for particular user
  */
-export function fetchModulesList() {
+export function fetchModulesList(modules, pieChart, menu) {
   return async function (dispatch) {
     try {
       dispatch(setState(HOME_LOADING, {
-        loading: true
+        moduleLoading: true
       }))
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
-      moduleCustomizationService.getActiveModules(appModulesList.value, user.value)
-      if (PIECHART.enabled) {
+      const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu)
+      dispatch(setState(SET_MODULES, {
+        moduleLoading: false,
+        modules: result.modules,
+        pieChart: result.pieChart,
+        menu: result.menu
+      }))
+      if (result.pieChart[PIECHART].enabled) {
         dispatch(pieChartCount())
       }
-      dispatch(setState(HOME_LOADING, {
-        loading: false
-      }))
     } catch (error) {
       console.log(error)
     }
@@ -59,14 +66,14 @@ export function fetchModulesList() {
 /**
  * This services schedules sync service at interval of 2 minutes
  */
-export function syncService() {
+export function syncService(pieChart) {
   return async (dispatch) => {
     try {
       if (CONFIG.intervalId) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
-        dispatch(performSyncService())
+        dispatch(performSyncService(pieChart))
       }, CONFIG.SYNC_SERVICE_DELAY)
     } catch (error) {
       //Update UI here
@@ -86,14 +93,19 @@ export function pieChartCount() {
     } catch (error) {
       //Update UI here
       console.log(error)
+       dispatch(setState(CHART_LOADING, { loading: false,count:null }))
     }
   }
 }
 
-export function performSyncService(isCalledFromHome) {
+export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
+      let saveStoreObject = {
+        showLiveJobNotification: false
+      }
+      keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
       transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       dispatch(setState(SYNC_STATUS, {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -103,16 +115,21 @@ export function performSyncService(isCalledFromHome) {
       const syncCount = responseBody.split(",")[1]
       //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
       if (isCalledFromHome || syncCount > 0) {
+        console.log(isCalledFromHome, syncCount)
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'Downloading'
         }))
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+        const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
         if (isJobsPresent) {
-          if (PIECHART.enabled) {
+          if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())
+        }
+        if (isLiveJob) {
+          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
         }
       }
       dispatch(setState(SYNC_STATUS, {
@@ -120,7 +137,7 @@ export function performSyncService(isCalledFromHome) {
         syncStatus: 'OK',
       }))
       //Now schedule sync service which will run regularly after 2 mins
-      await dispatch(syncService())
+      await dispatch(syncService(pieChart))
     } catch (error) {
       console.log(error)
       if (error.code == 500 || error.code == 502) {
@@ -151,7 +168,7 @@ export function performSyncService(isCalledFromHome) {
   }
 }
 
-export function startMqttService() {
+export function startMqttService(pieChart) {
   return async function (dispatch) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     console.log('token', token)
@@ -189,7 +206,15 @@ export function startMqttService() {
       })
       client.on('messageReceived', message => {
         console.log('message.payloadString', message.payloadString)
-        dispatch(performSyncService(true))
+        if (message.payloadString == 'Live Job Notification') {
+          let saveStoreObject = {
+            showLiveJobNotification: true
+          }
+          keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
+          dispatch(performSyncService(pieChart, true, true))
+        } else {
+          dispatch(performSyncService(pieChart, true))
+        }
       })
 
       // connect the client 
@@ -207,5 +232,11 @@ export function startMqttService() {
           }
         })
     }
+  }
+}
+
+export function clearHomeState() {
+  return {
+    type: CLEAR_HOME_STATE
   }
 }

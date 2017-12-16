@@ -5,9 +5,10 @@ import InitialState from './homeInitialState'
 const initialState = new InitialState()
 import {
   HOME_LOADING,
-  SYNC_ERROR,
+  SET_MODULES,
   SYNC_STATUS,
   CHART_LOADING,
+  CLEAR_HOME_STATE
 } from '../../lib/constants'
 
 
@@ -16,8 +17,14 @@ export default function homeReducer(state = initialState, action) {
 
   switch (action.type) {
     case HOME_LOADING:
-      return state.set('moduleLoading', action.payload.loading)
-      
+      return state.set('moduleLoading', action.payload.moduleLoading)
+
+    case SET_MODULES:
+      return state.set('modules', action.payload.modules)
+        .set('pieChart', action.payload.pieChart)
+        .set('menu', action.payload.menu)
+        .set('moduleLoading', action.payload.moduleLoading)
+
     case SYNC_STATUS:
       return state.set('unsyncedTransactionList', action.payload.unsyncedTransactionList)
         .set('syncStatus', action.payload.syncStatus)
@@ -25,7 +32,10 @@ export default function homeReducer(state = initialState, action) {
 
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)
-                  .set('count', action.payload.count)
+        .set('count', action.payload.count)
+
+    case CLEAR_HOME_STATE:
+      return initialState
   }
 
   return state

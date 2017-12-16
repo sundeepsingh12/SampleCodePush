@@ -78,11 +78,16 @@ module.exports = keyMirror({
     CLEAR_HOME_STATE: null,
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
+    SET_MODULES: null,
+
+    //Home Container
+    PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
     SET_SELECTED_DATE: null,
     IS_CALENDAR_VISIBLE: null,
     SYNC_ERROR: null,
     SYNC_STATUS: null,
+    LISTING_SEARCH_VALUE: null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -152,9 +157,11 @@ module.exports = keyMirror({
     SET_TABS_TRANSACTIONS: null,
     JOB_ATTRIBUTE_STATUS: null,
     HUB: null,
+    SAVE_ACTIVATED: null,
     LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
+    LIVE_JOB: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -189,6 +196,8 @@ module.exports = keyMirror({
     ERROR_MESSAGE: null,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
+    SET_FORM_LAYOUT_STATE: null,
+
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
@@ -207,6 +216,11 @@ module.exports = keyMirror({
     TabScreen: null,
     TimePicker: null,
     SkuListing: null,
+    SaveActivated: null,
+    Transient: null,
+    CheckoutDetails: null,
+    NewJob: null,
+    NewJobStatus: null,
     BulkConfiguration: null,
     BulkListing: null,
     Sorting: null,
@@ -216,6 +230,10 @@ module.exports = keyMirror({
     CustomApp: null,
     PostAssignmentScanner: null,
     JobMasterListScreen: null,
+    DataStoreDetails: null,
+    LiveJobs: null,
+    QrCodeScanner: null,
+
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -266,6 +284,8 @@ module.exports = keyMirror({
     _id: null,
     SET_INITIAL_STATE: null,
     SAVE_SUCCESSFUL: null,
+    CLEAR_ATTR_MAP_AND_SET_LOADER: null,
+    DISABLE_AUTO_START_SCANNER: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
@@ -277,6 +297,27 @@ module.exports = keyMirror({
     NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
 
+    //Transient
+    ADD_FORM_LAYOUT_STATE: null,
+    SET_SHOW_JOB_DETAILS: null,
+    LOADER_IS_RUNNING: null,
+    SHOW_CHECKOUT_DETAILS: null,
+    SET_INITIAL_STATE_TRANSIENT_STATUS: null,
+
+    //Save Activated
+    POPULATE_DATA: null,
+    SAVE_ACTIVATED_INITIAL_STATE: null,
+    LOADER_ACTIVE: null,
+    DELETE_ITEM_SAVE_ACTIVATED: null,
+    Edit: null,
+    Receipt: null,
+    Print: null,
+    SMS: null,
+    TotalAmount: null,
+    Discard: null,
+    Keep: null,
+    Cancel: null,
+    Checkout: null,
     //Bulk Module
     START_FETCHING_BULK_CONFIG: null,
     STOP_FETCHING_BULK_CONFIG: null,
@@ -300,9 +341,18 @@ module.exports = keyMirror({
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
 
+    //Live Job actions
+    SET_LIVE_JOB_LIST: null,
+    END_LIVEJOB_DETAILD_FETCHING: null,
+    TOGGLE_LIVE_JOB_LIST_ITEM: null,
+    START_FETCHING_LIVE_JOB: null,
+    SET_SEARCH: null,
+    SET_MESSAGE: null,
+    SET_LIVE_JOB_TOAST: null,
     //Summary
     SET_SUMMARY_FOR_JOBMASTER: null,
     SET_SUMMARY_FOR_RUNSHEET: null,
+    RESET_SUMMARY_STATE: null,
 
     //Custom App
     START_FETCHING_URL: null,
@@ -317,6 +367,26 @@ module.exports = keyMirror({
     SET_POST_ASSIGNMENT_ERROR: null,
     SET_POST_SCAN_SUCCESS: null,
     SET_POST_ASSIGNMENT_PARAMETERS: null,
+    //QrCodeGenerator
+    SCANNING: null,
+
+    //Menu Container
+    PROFILE: null,
+    STATISTIC: null,
+    EZETAP: null,
+    MSWIPE: null,
+    BACKUP: null,
+    OFFLINEDATASTORE: null,
+    BLUETOOTH: null,
+    BULK: null,
+    LIVE: null,
+    OFFLINEDATASTORE: null,
+    START: null,
+    SEQUENCEMODULE: null,
+    SUMMARY: null,
+    SORTING: null,
+    CUSTOMAPP: null,
+    JOB_ASSIGNMENT: null,
 })
 
 

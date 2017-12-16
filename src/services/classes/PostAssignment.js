@@ -22,13 +22,13 @@ import moment from 'moment'
 
 class PostAssignment {
 
-    async checkScanResult(referenceNumber, jobTransactionMap, pendingStatusId, jobMaster, isForceAssignmentAllowed, pendingCount) {
+    async checkScanResult(referenceNumber, jobTransactionMap, pendingStatus, jobMaster, isForceAssignmentAllowed, pendingCount) {
         if (jobTransactionMap[referenceNumber] && jobTransactionMap[referenceNumber].isScanned) {
             throw new Error(SHIPMENT_ALREADY_SCANNED)
         }
 
         if (jobTransactionMap[referenceNumber]) {
-            await this.updateTransactionStatus(jobTransactionMap[referenceNumber], pendingStatusId, jobMaster)
+            await this.updateTransactionStatus(jobTransactionMap[referenceNumber], pendingStatus, jobMaster)
             jobTransactionMap[referenceNumber].isScanned = true
             return {
                 jobTransactionMap,
@@ -48,16 +48,18 @@ class PostAssignment {
         }
     }
 
-    async updateTransactionStatus(transaction, pendingStatusId, jobMaster) {
+    async updateTransactionStatus(transaction, pendingStatus, jobMaster) {
         let transactionDTOList = [], transactionList = []
         let jobTransaction = { ...transaction }
         let transactionDTO = {
             id: jobTransaction.id,
             referenceNumber: jobTransaction.referenceNumber
         }
+        const runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction, pendingStatus.statusCategory)
+        await formLayoutEventsInterface._updateJobSummary(jobTransaction, pendingStatus.id)
         let user = await keyValueDBService.getValueFromStore(USER)
         let hub = await keyValueDBService.getValueFromStore(HUB)
-        jobTransaction.jobStatusId = pendingStatusId
+        jobTransaction.jobStatusId = pendingStatus.id
         jobTransaction.jobType = jobMaster.code
         jobTransaction.statusCode = PENDING
         jobTransaction.employeeCode = user.value.employeeCode
@@ -70,7 +72,7 @@ class PostAssignment {
             tableName: TABLE_JOB_TRANSACTION,
             value: transactionList
         }
-        realm.performBatchSave(jobTransactionTableDTO)
+        realm.performBatchSave(jobTransactionTableDTO, runSheet)
         // realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION, 'jobStatusId', transactionIdList, pendingStatusId)
         await formLayoutEventsInterface.addTransactionsToSyncList(transactionDTOList)
     }
@@ -82,13 +84,11 @@ class PostAssignment {
             jobMasterId: jobMaster.id,
             referenceNumberList: [referenceNumber]
         }])
-        console.log('post api body', postData)
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token || !token.value) {
             throw new Error('Token Missing')
         }
         let postJobResponse = await RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.POST_ASSIGNMENT_FORCE_ASSIGN_API, 'POST')
-        console.log('postJobResponse', postJobResponse)
         let notFoundList = postJobResponse.json[0].notFoundList
         let successList = postJobResponse.json[0].successList
         if (successList && successList.length > 0) {

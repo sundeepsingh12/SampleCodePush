@@ -11,9 +11,17 @@ module.exports = {
     UPLOADING: 'Uploading ...',
 
     //Post Assignment Container
-    SHIPMENT_NOT_FOUND : 'Scanned Shipment Not Found',
+    SHIPMENT_NOT_FOUND: 'Scanned Shipment Not Found',
     SHIPMENT_ALREADY_SCANNED: 'Shipment is already scanned',
-    NOT_FOUND : 'Not Found',
+    NOT_FOUND: 'Not Found',
     FORCE_ASSIGNED: 'Force Assigned',
-    POST_SEARCH_PLACEHOLDER: 'Enter Reference Number To Scan Package'
+    POST_SEARCH_PLACEHOLDER: 'Enter Reference Number To Scan Package',
+
+    //Home Constants
+    JOB_ASSIGNMENT_DISPLAY: 'Job Assignment',
+    CUSTOM_APP_DISPLAY:'Web URL',
+    SORTING_DISPLAY:'Sort Parcels',
+
+    //Job Master
+    JOB_MASTER_HEADER: 'Job Master List',
 }

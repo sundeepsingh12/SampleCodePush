@@ -1,12 +1,33 @@
 'use strict'
-
+import React from 'react'
+import {
+    BACKUP_ID,
+    BLUETOOTH_ID,
+    BULK_ID,
+    EZE_TAP_ID,
+    LIVE_ID,
+    M_SWIPE_ID,
+    OFFLINEDATASTORE_ID,
+    PIECHART_ID,
+    PROFILE_ID,
+    STATISTIC_ID,
+    START_ID,
+    SEQUENCEMODULE_ID,
+    SUMMARY_ID,
+    SORTING_ID,
+    CUSTOMAPP_ID,
+    NEWJOB_ID,
+    NEW_JOB,
+    Piechart,
+    JOB_ASSIGNMENT_ID,
+} from '../../lib/AttributeConstants'
 import {
     BACKUP,
     BLUETOOTH,
     BULK,
-    EZE_TAP,
+    EZETAP,
     LIVE,
-    M_SWIPE,
+    MSWIPE,
     OFFLINEDATASTORE,
     PIECHART,
     PROFILE,
@@ -14,11 +35,12 @@ import {
     START,
     SEQUENCEMODULE,
     SUMMARY,
-    USER_NOT_FOUND,
     SORTING,
-    CUSTOMAPP
-} from '../../lib/AttributeConstants'
-
+    CUSTOMAPP,
+    JOB_ASSIGNMENT,
+} from '../../lib/constants'
+import _ from 'lodash'
+import SequenceIcon from '../../../src/svg_components/icons/SequenceIcon'
 class ModuleCustomization {
 
     /**
@@ -48,101 +70,198 @@ class ModuleCustomization {
     /**
      * This function enables modules for user
      * @param {*} moduleCustomizationList 
-     * @param {*} user 
-     * 
+     * @param {*} user  
+     * @param {*} modules
+     * @param {*} pieChart
+     * @param {*} menu
      */
-    getActiveModules(moduleCustomizationList, user) {
+    getActiveModules(moduleCustomizationList, user, modules, pieChart, menu) {
+        let serialNumber = 0
         if (!user || !user.userType) {
             throw new Error(USER_NOT_FOUND)
         }
+        let cloneModules = _.cloneDeep(modules)
+        let clonePieChart = _.cloneDeep(pieChart)
+        let cloneMenu = _.cloneDeep(menu)
         for (let index in moduleCustomizationList) {
+
             switch (moduleCustomizationList[index].appModulesId) {
-                case BACKUP.appModuleId: {
-                    this.setModuleDetails(BACKUP, moduleCustomizationList[index], user)
-                    break
-                }
-                case BLUETOOTH.appModuleId: {
-                    this.setModuleDetails(BLUETOOTH, moduleCustomizationList[index], user)
-                    break
-                }
-                case BULK.appModuleId: {
-                    this.setModuleDetails(BULK, moduleCustomizationList[index], user)
-                    break
-                }
-                case EZE_TAP.appModuleId: {
-                    this.setModuleDetails(EZE_TAP, moduleCustomizationList[index], user)
-                    break
-                }
-                case LIVE.appModuleId: {
-                    this.setModuleDetails(LIVE, moduleCustomizationList[index], user)
-                    break
-                }
-                case M_SWIPE.appModuleId: {
-                    this.setModuleDetails(M_SWIPE, moduleCustomizationList[index], user)
-                    break
-                }
-                case OFFLINEDATASTORE.appModuleId: {
-                    this.setModuleDetails(OFFLINEDATASTORE, moduleCustomizationList[index], user)
-                    break
-                }
-                case PIECHART.appModuleId: {
-                    this.setModuleDetails(PIECHART, moduleCustomizationList[index], user)
-                    break
-                }
-                case PROFILE.appModuleId: {
-                    this.setModuleDetails(PROFILE, moduleCustomizationList[index], user)
-                    break
-                }
-                case START.appModuleId: {
-                    this.setModuleDetails(START, moduleCustomizationList[index], user)
-                    break
-                }
-                case STATISTIC.appModuleId: {
-                    this.setModuleDetails(STATISTIC, moduleCustomizationList[index], user)
-                    break
-                }
-                case SEQUENCEMODULE.appModuleId: {
-                    this.setModuleDetails(SEQUENCEMODULE, moduleCustomizationList[index], user)
-                    break
-                }
-                case SUMMARY.appModuleId: {
-                    this.setModuleDetails(SUMMARY, moduleCustomizationList[index], user)
-                    break
-                }
+                case BACKUP_ID:
+                    {
+                        cloneMenu[BACKUP] = this.setModuleDetails(cloneMenu[BACKUP], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case BLUETOOTH_ID:
+                    {
+                        cloneMenu[BLUETOOTH] = this.setModuleDetails(cloneMenu[BLUETOOTH], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case BULK_ID:
+                    {
+                        cloneModules[BULK] = this.setModuleDetails(cloneModules[BULK], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case EZE_TAP_ID:
+                    {
+                        cloneMenu[EZETAP] = this.setModuleDetails(cloneMenu[EZETAP], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case LIVE_ID:
+                    {
+                        cloneModules[LIVE] = this.setModuleDetails(cloneModules[LIVE], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case M_SWIPE_ID:
+                    {
+                        cloneMenu[MSWIPE] = this.setModuleDetails(cloneMenu[MSWIPE], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case OFFLINEDATASTORE_ID:
+                    {
+                        cloneMenu[OFFLINEDATASTORE] = this.setModuleDetails(cloneMenu[OFFLINEDATASTORE], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case PIECHART_ID:
+                    {
+                        clonePieChart[PIECHART] = this.setModuleDetails(clonePieChart[PIECHART], moduleCustomizationList[index], user, serialNumber++)
+                        Piechart.enabled = clonePieChart[PIECHART].enabled
+                        break
+                    }
+                case PROFILE_ID:
+                    {
+                        cloneMenu[PROFILE] = this.setModuleDetails(cloneMenu[PROFILE], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case START_ID:
+                    {
+                        cloneModules[START] = this.setModuleDetails(cloneModules[START], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case STATISTIC_ID:
+                    {
+                        cloneMenu[STATISTIC] = this.setModuleDetails(cloneMenu[STATISTIC], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case SEQUENCEMODULE_ID:
+                    {
+                        cloneModules[SEQUENCEMODULE] = this.setModuleDetails(cloneModules[SEQUENCEMODULE], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case SUMMARY_ID:
+                    {
+                        clonePieChart[SUMMARY] = this.setModuleDetails(clonePieChart[SUMMARY], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
 
-                case SORTING.appModuleId: {
-                    this.setModuleDetails(SORTING, moduleCustomizationList[index], user)
+                case SORTING_ID:
+                    {
+                        cloneModules[SORTING] = this.setModuleDetails(cloneModules[SORTING], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+
+                case CUSTOMAPP_ID:
+                    {
+                        cloneModules[CUSTOMAPP] = this.setModuleDetails(cloneModules[CUSTOMAPP], moduleCustomizationList[index], user, serialNumber++)
+                        break
+                    }
+                case NEWJOB_ID:
+                    {
+                        let newJobModuleParams = this.setModuleDetailsForNewJob(moduleCustomizationList[index], user, serialNumber)
+                        serialNumber = newJobModuleParams.serialNumber
+                        cloneModules = _.merge(cloneModules, newJobModuleParams.appModuleObject)
+                        break
+                    }
+                case JOB_ASSIGNMENT_ID: {
+                    cloneModules[JOB_ASSIGNMENT] = this.setModuleDetails(cloneModules[JOB_ASSIGNMENT], moduleCustomizationList[index], user, serialNumber++)
+                    console.log(cloneModules[JOB_ASSIGNMENT])
                     break
                 }
-
-                case CUSTOMAPP.appModuleId: {
-                    this.setModuleDetails(CUSTOMAPP, moduleCustomizationList[index], user)
-                    break
-                }
-
             }
+        }
+        return {
+            modules: cloneModules,
+            pieChart: clonePieChart,
+            menu: cloneMenu
         }
     }
 
     /**
-     * This function enable module and sets display name
-     * @param {*} appModule 
-     * @param {*} moduleCustomization 
-     * @param {*} user 
-     */
-    setModuleDetails(appModule, moduleCustomization, user) {
+    * This function enable module and sets display name
+    * @param {*} appModule 
+    * @param {*} moduleCustomization 
+    * @param {*} user 
+    * @param {*} serialNumber 
+    */
+    setModuleDetails(appModule, moduleCustomization, user, serialNumber) {
         if (!moduleCustomization) {
             return
         }
         let displayName = ''
         if (!moduleCustomization.selectedUserType || moduleCustomization.selectedUserType.length == 0 || (displayName = this.checkSelectedUserType(JSON.parse(moduleCustomization.selectedUserType), user))) {
             appModule.enabled = true
+            appModule.serialNumber = serialNumber
             appModule.displayName = displayName.trim() ? displayName : moduleCustomization.displayName && (moduleCustomization.displayName + '').trim() ? moduleCustomization.displayName : appModule.displayName
-            if (appModule.appModuleId == CUSTOMAPP.appModuleId && moduleCustomization.remark != undefined) {
+            if (appModule.appModuleId == CUSTOMAPP_ID && moduleCustomization.remark != undefined) {
                 appModule.remark = JSON.parse(moduleCustomization.remark)
             }
         }
+        return appModule
+    }
 
+    /**
+      * This function enable module and sets display name in case of new job
+      * @param {*} moduleCustomization 
+      * @param {*} user 
+      * @param {*} serialNumber
+      * @returns appModuleObject:{
+      *                          'displayText':{  
+      *                                           appModuleId
+      *                                           displayText:'displayText',
+      *                                           enabled:true,
+      *                                           jobMasterList:[123,234],
+      *                                           serialNumber,
+                                                  icon
+                                                 }
+      *                           }
+      */
+    setModuleDetailsForNewJob(moduleCustomization, user, serialNumber) {
+        if (!moduleCustomization) {
+            return
+        }
+        let appModuleObject = {}
+        let appModule = {
+            enabled: true,
+            icon: <SequenceIcon />,
+            appModuleId: moduleCustomization.appModulesId
+        }
+        if (moduleCustomization.remark != undefined && moduleCustomization.remark != null && moduleCustomization.remark != '[]') {
+            let remarkList = JSON.parse(moduleCustomization.remark)
+            for (let remark of remarkList) {
+                if (user.userType.id == remark.userTypeId) {
+                    if (appModuleObject[remark.displayText]) {
+                        appModule.jobMasterIdList.push(remark.jobMasterId)
+                    } else {
+                        appModule.jobMasterIdList = []
+                        appModule.jobMasterIdList.push(remark.jobMasterId)
+                        appModule.displayName = remark.displayText
+                    }
+                    appModule.serialNumber = serialNumber++
+                    appModuleObject[remark.displayText] = _.cloneDeep(appModule)
+                }
+            }
+        } else if (moduleCustomization.displayName) {
+            appModule.serialNumber = serialNumber++
+            appModule.displayName = moduleCustomization.displayName
+            appModuleObject[appModule.displayName] = appModule
+        } else {
+            appModule.displayName = NEW_JOB
+            appModule.serialNumber = serialNumber++
+            appModuleObject[appModule.displayName] = appModule
+        }
+        return {
+            appModuleObject,
+            serialNumber
+        }
     }
 
     /**
@@ -158,7 +277,7 @@ class ModuleCustomization {
         }
         for (let index in selectedUserTypeList) {
             if (selectedUserTypeList[index].userTypeId == user.userType.id) {
-                return (selectedUserTypeList[index].displayText + ' ')
+                return (selectedUserTypeList[index].displayText ? selectedUserTypeList[index].displayText + ' ' : '  ')
             }
         }
         return false

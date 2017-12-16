@@ -43,8 +43,11 @@ import BulkConfiguration from '../../containers/BulkConfiguration'
 import FormDetailsV2 from '../../containers/FormDetailsV2'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
+import LiveJobListing from '../../containers/LiveJobListing'
+import LiveJob from '../../containers/LiveJob'
 import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
+import QrCodeScanner from '../../containers/QrCodeScanner'
 import {
   Container,
   Content,
@@ -75,11 +78,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
-import SelectFromList from '../../containers/SelectFromList'
+import SelectFromList from '../../containers/SelectFromList';
+import SaveActivated from '../../containers/SaveActivated';
+import Transient from '../../containers/Transient';
+import CheckoutDetails from '../../containers/CheckoutDetails'
 import CashTendering from '../../containers/CashTendering'
 import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
+import DataStoreDetails from '../../containers/DataStoreDetails'
 import { NavigationActions } from 'react-navigation'
 import Scanner from '../../components/Scanner'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
@@ -109,7 +116,7 @@ class AppWithNavigationState extends React.Component {
       case ApplicationScreen:
       case LoginScreen:
       case PreloaderScreen: return false
-      case HomeTabNavigatorScreen : {
+      case HomeTabNavigatorScreen: {
         if (route.routes[route.index].routeName == HomeScreen) {
           return false
         }
@@ -143,11 +150,11 @@ export const HomeTabNavigator = TabNavigator({
     screen: Home,
     navigationOptions: {
       header: null,
-      title: 'Home',  
+      title: 'Home',
       tabBarIcon: ({ tintColor }) => (
-      <Icon
+        <Icon
           name='ios-home'
-          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
         />
       ),
     }
@@ -158,9 +165,9 @@ export const HomeTabNavigator = TabNavigator({
       header: null,
       title: 'Sync',
       tabBarIcon: ({ tintColor }) => (
-      <Icon
+        <Icon
           name='ios-sync'
-          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
         />
       ),
     }
@@ -171,9 +178,9 @@ export const HomeTabNavigator = TabNavigator({
       header: null,
       title: 'Menu',
       tabBarIcon: ({ tintColor }) => (
-      <Icon
+        <Icon
           name='ios-menu'
-          style={[{fontSize: 18 , marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor}]}
+          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
         />
       ),
 
@@ -254,6 +261,13 @@ export const AppNavigator = StackNavigator({
   },
   SelectFromList: {
     screen: SelectFromList,
+  },
+  QrCodeScanner: {
+    screen: QrCodeScanner,
+    navigationOptions: {
+      title: 'Scanner',
+      header: null,
+    }
   },
   Statistics: {
     screen: Statistics,
@@ -343,9 +357,6 @@ export const AppNavigator = StackNavigator({
   OverlayAttributes: {
     screen: OverlayAttributes,
   },
-  SignatureAndNps: {
-    screen: SignatureAndNps
-  },
   ArrayFieldAttribute: {
     screen: ArrayFieldAttribute
   }
@@ -356,16 +367,25 @@ export const AppNavigator = StackNavigator({
   DataStoreItemDetails: {
     screen: DataStoreItemDetails
   },
-   SignatureAndNps: {
+  SaveActivated: {
+    screen: SaveActivated
+  },
+  Transient: {
+    screen: Transient
+  },
+  CheckoutDetails: {
+    screen: CheckoutDetails
+  },
+  SignatureAndNps: {
     screen: SignatureAndNps
   },
-  BulkConfiguration:{
+  BulkConfiguration: {
     screen: BulkConfiguration
   },
-  BulkListing:{
-    screen:BulkListing
+  BulkListing: {
+    screen: BulkListing
   },
-   CashTendering: {
+  CashTendering: {
     screen: CashTendering,
     navigationOptions: {
       title: 'Collect Cash',
@@ -373,6 +393,12 @@ export const AppNavigator = StackNavigator({
   },
   TaskListScreen: {
     screen: TaskListScreen
+  },
+  LiveJobs: {
+    screen: LiveJobListing
+  },
+  LiveJob: {
+    screen: LiveJob
   },
   FormDetailsV2: {
     screen: FormDetailsV2
@@ -388,6 +414,10 @@ export const AppNavigator = StackNavigator({
   }
 },
   {
+  DataStoreDetails: {
+    screen: DataStoreDetails
+  }
+}, {
     cardStyle: {
       backgroundColor: 'white'
     }

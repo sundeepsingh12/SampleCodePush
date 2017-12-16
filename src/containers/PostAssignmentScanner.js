@@ -46,6 +46,13 @@ import {
     POST_SEARCH_PLACEHOLDER,
 } from '../lib/ContainerConstants'
 
+import {
+    Piechart
+} from '../lib/AttributeConstants'
+
+import * as homeActions from '../modules/home/homeActions'
+import * as taskListActions from '../modules/taskList/taskListActions'
+
 function mapStateToProps(state) {
     return {
         jobTransactionMap: state.postAssignment.jobTransactionMap,
@@ -61,7 +68,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...postAssignmentActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...postAssignmentActions, ...globalActions, ...homeActions, ...taskListActions }, dispatch)
     }
 }
 
@@ -131,7 +138,7 @@ class PostAssignmentScanner extends Component {
     }
 
     _onBarcodeRead(barcodeResult) {
-        this.props.actions.checkScannedJob(barcodeResult.data, this.props.jobTransactionMap, this.props.navigation.state.params.jobMaster, this.props.isForceAssignmentAllowed, this.props.pendingCount)
+        this.props.actions.checkScannedJob(barcodeResult.data, this.props.jobTransactionMap, this.props.navigation.state.params.jobMaster, this.props.isForceAssignmentAllowed, this.props.pendingCount, true)
     }
 
     getTransactionIconView(jobTransaction) {
@@ -140,7 +147,9 @@ class PostAssignmentScanner extends Component {
         }
 
         if (!jobTransaction.status) {
-            <Icon name="md-checkmark-circle" style={[styles.fontXl, styles.fontSuccess]} />
+            return (
+                <Icon name="md-checkmark-circle" style={[styles.fontXl, styles.fontSuccess]} />
+            )
         }
 
         if (jobTransaction.status == FORCE_ASSIGNED) {
@@ -150,7 +159,6 @@ class PostAssignmentScanner extends Component {
         }
 
         return (
-
             <View style={[styles.row]}>
                 <TouchableHighlight
                     onPress={() => {
@@ -166,12 +174,15 @@ class PostAssignmentScanner extends Component {
         )
     }
 
-    checkJobTransaction(referenceNumber) {
-        if (!this.props.isManualSelectionAllowed || this.props.jobTransactionMap[referenceNumber].isScanned || this.props.jobTransactionMap[referenceNumber].status) {
+    checkJobTransaction(referenceNumber, search) {
+        console.log(this.props.jobTransactionMap)
+        if (!search && !this.props.isManualSelectionAllowed) {
             return
         }
-
-        this.props.actions.checkScannedJob(referenceNumber, this.props.jobTransactionMap, this.props.navigation.state.params.jobMaster, this.props.isForceAssignmentAllowed, this.props.pendingCount)
+        if (this.props.jobTransactionMap[referenceNumber] && this.props.jobTransactionMap[referenceNumber].isScanned) {
+            return
+        }
+        this.props.actions.checkScannedJob(referenceNumber, this.props.jobTransactionMap, this.props.navigation.state.params.jobMaster, this.props.isForceAssignmentAllowed, this.props.pendingCount, search)
         this.setState({ searchText: '' })
     }
 
@@ -180,8 +191,8 @@ class PostAssignmentScanner extends Component {
         for (let index in jobTransactionMap) {
             let transactionIconView = this.getTransactionIconView(jobTransactionMap[index])
             transactionView.push(
-                <TouchableHighlight onPress={() => { this.checkJobTransaction(jobTransactionMap[index].referenceNumber) }} key={index} style={[styles.row, styles.padding10, styles.justifySpaceBetween, styles.alignCenter]}>
-                    <View>
+                <TouchableHighlight onPress={() => { this.checkJobTransaction(jobTransactionMap[index].referenceNumber) }} key={index}>
+                    <View style={[styles.row, styles.padding10, styles.justifySpaceBetween, styles.alignCenter]}>
                         <Text style={[styles.fontBlack]}>
                             {jobTransactionMap[index].referenceNumber}
                         </Text>
@@ -204,6 +215,13 @@ class PostAssignmentScanner extends Component {
                 { cancelable: false })
         }
         return null
+    }
+
+    componentWillUnmount() {
+        if (Piechart.enabled) {
+            this.props.actions.pieChartCount()
+        }
+        this.props.actions.fetchJobs()
     }
 
     render() {
@@ -239,8 +257,9 @@ class PostAssignmentScanner extends Component {
                                         underlineColorAndroid='transparent'
                                         style={[styles.headerSearch]}
                                         onChangeText={value => this.setState({ searchText: value })}
+                                        onSubmitEditing={event => this.checkJobTransaction(this.state.searchText, true)}
                                         value={this.state.searchText} />
-                                    <Button onPress={() => { this.checkJobTransaction(this.state.searchText) }} small transparent style={[styles.inputInnerBtn]}>
+                                    <Button onPress={() => { this.checkJobTransaction(this.state.searchText, true) }} small transparent style={[styles.inputInnerBtn]}>
                                         <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
                                     </Button>
                                 </View>

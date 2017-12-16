@@ -48,7 +48,8 @@ import * as globalActions from '../modules/global/globalActions'
 function mapStateToProps(state) {
   return {
     syncStatus: state.home.syncStatus,
-    unsyncedTransactionList: state.home.unsyncedTransactionList
+    unsyncedTransactionList: state.home.unsyncedTransactionList,
+    pieChart: state.home.pieChart
   }
 }
 
@@ -64,8 +65,8 @@ function mapDispatchToProps(dispatch) {
 class SyncScreen extends Component {
 
   componentDidMount() {
-    this.props.actions.startMqttService()
-    this.props.actions.performSyncService(true)
+     this.props.actions.startMqttService(this.props.pieChart)
+     this.props.actions.performSyncService(this.props.pieChart, true)
   }
 
   getTransactionView() {
@@ -125,7 +126,7 @@ class SyncScreen extends Component {
             {SYNC_OK_TEXT}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> {RE_SYNC} </Text>
             </Button>
           </View>
@@ -142,7 +143,7 @@ class SyncScreen extends Component {
             {INTERNAL_SERVER_ERROR}
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -160,7 +161,7 @@ class SyncScreen extends Component {
             {NO_INTERNET}
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -177,7 +178,7 @@ class SyncScreen extends Component {
             {INTERNAL_ERROR}
         </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService() }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -187,7 +188,7 @@ class SyncScreen extends Component {
 
   }
 
-  render() {
+  render() { 
 
     const syncView = this.getSyncView()
     const transactionView = this.getTransactionView()

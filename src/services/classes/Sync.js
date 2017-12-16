@@ -48,7 +48,7 @@ import {
 
 import {
   FAREYE_UPDATES,
-  JOB_ASSIGNMENT,
+  JOB_ASSIGNMENT_ID,
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
 import NotificationsIOS, { NotificationsAndroid } from 'react-native-notifications'
@@ -123,7 +123,7 @@ class Sync {
    * 
    * @return tdcResponse object
    */
-  async downloadDataFromServer(pageNumber, pageSize) {
+  async downloadDataFromServer(pageNumber, pageSize, isLiveJob) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
@@ -137,7 +137,12 @@ class Sync {
     if (!isCustomErpPullActivated) {
       formData = 'pageNumber=' + pageNumber + '&pageSize=' + pageSize
     }
-    const url = (formData == null) ? CONFIG.API.DOWNLOAD_DATA_API : CONFIG.API.DOWNLOAD_DATA_API + "?" + formData
+    let url = ''
+    if (!isLiveJob)
+      url = (formData == null) ? CONFIG.API.DOWNLOAD_DATA_API : CONFIG.API.DOWNLOAD_DATA_API + "?" + formData
+    else
+      url = (formData == null) ? CONFIG.API.DOWNLOAD_LIVE_JOB_DATA : CONFIG.API.DOWNLOAD_LIVE_JOB_DATA + "?" + formData
+
     let downloadResponse = RestAPIFactory(token.value).serviceCall(null, url, 'GET')
     return downloadResponse
   }
@@ -147,7 +152,7 @@ class Sync {
    * 
    * @param {*} tdcResponse 
    */
-  async processTdcResponse(tdcContentArray) {
+  async processTdcResponse(tdcContentArray, isLiveJob) {
     let tdcContentObject, jobMasterIds
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
@@ -158,7 +163,7 @@ class Sync {
       }
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
-        jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
+        jobMasterIds = await this.saveDataFromServerInDB(contentQuery, isLiveJob)
       } else if (queryType == 'update' || queryType == 'updateStatus') {
         jobMasterIds = await this.updateDataInDB(contentQuery)
       } else if (queryType == 'delete') {
@@ -169,9 +174,22 @@ class Sync {
           propertyName: 'jobId'
         }
         await realm.deleteRecordsInBatch(deleteJobTransactions)
+      } else if (queryType == 'deleteBroadcast') {
+        const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+        const deleteJobs = {
+          tableName: TABLE_JOB,
+          valueList: jobIds,
+          propertyName: 'jobId'
+        }
+        const deleteJobData = {
+          tableName: TABLE_JOB_DATA,
+          valueList: jobIds,
+          propertyName: 'jobId'
+        }
+        await realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
       }
-      return jobMasterIds
     }
+    return jobMasterIds
   }
 
   async getAssignOrderTohubEnabledJobs(query) {
@@ -270,7 +288,7 @@ class Sync {
    * 
    * @param {*} query 
    */
-  async saveDataFromServerInDB(contentQuery) {
+  async saveDataFromServerInDB(contentQuery, isLiveJob) {
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
@@ -294,11 +312,23 @@ class Sync {
       tableName: TABLE_RUNSHEET,
       value: contentQuery.runSheet
     }
-    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+    if (isLiveJob) {
+      await this.saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+    }
+    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     const jobMasterIds = this.getJobMasterIds(contentQuery.job)
     return jobMasterIds
   }
-
+  async saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets) {
+    let jobIds = jobs.value;
+    let jobQuery = jobIds.map(jobId => 'id = ' + jobId.id).join(' OR ')
+    jobQuery = jobQuery + ' AND status = 6'
+    let jobsInDbList = await realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
+    if (jobsInDbList.length <= 0)
+      return
+    await realm.deleteRecordsInBatch(jobDatas, jobTransactions, jobs, fieldDatas)
+    return
+  }
   getJobMasterIds(jobList) {
     let jobMasterIds = new Set()
     jobMasterIds = jobList.map(job => job.jobMasterId)
@@ -379,7 +409,7 @@ class Sync {
               "transactionId": "2361130:123456",
               "unSeenStatusId": 4814
       ]
-
+  
       Expected Response Body
       Success/fail
   }
@@ -478,28 +508,32 @@ class Sync {
    * 
    * Returns true if any job present in sync table on server side
    */
-  async downloadAndDeleteDataFromServer() {
-    const pageNumber = 0,
-      pageSize = 3
+  async downloadAndDeleteDataFromServer(isLiveJob) {
+    let pageNumber = 0,
+      pageSize = 3, currentPage
+    if (isLiveJob)
+      pageSize = 200
     let isLastPageReached = false,
       json, isJobsPresent = false, jobMasterIds
     const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
-    let jobAssignmentModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(appModulesList.value, JOB_ASSIGNMENT)
+    let jobAssignmentModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(appModulesList.value, JOB_ASSIGNMENT_ID)
     let postAssignmentList = jobAssignmentModule.length == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark).postAssignmentList : null
     const unseenStatusIds = postAssignmentList && postAssignmentList.length > 0 ? await jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(postAssignmentList, UNSEEN) : await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
-      const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize)
+      const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob)
       if (tdcResponse) {
         json = await tdcResponse.json
         isLastPageReached = json.last
+        currentPage = json.number
         if (!_.isNull(json.content) && !_.isUndefined(json.content) && !_.isEmpty(json.content)) {
-          jobMasterIds = await this.processTdcResponse(json.content)
+          jobMasterIds = await this.processTdcResponse(json.content, isLiveJob)
         } else {
           isLastPageReached = true
         }
         const successSyncIds = await this.getSyncIdFromResponse(json.content)
         //Dont hit delete sync API if successSyncIds empty
         //Delete Data from server code starts here
+
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
@@ -507,17 +541,30 @@ class Sync {
           const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
           const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
-          await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
-          await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
+          if (!isLiveJob) {
+            await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+            await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
+          }
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
-          this.showNotification(jobMasterTitleList)
+          let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
+          if (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification)) {
+            this.showNotification(jobMasterTitleList)
+            await keyValueDBService.deleteValueFromStore('LIVE_JOB')
+            await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
+          }
+          await jobSummaryService.updateJobSummary(dataList.jobSummaries)                    
           await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
-          jobSummaryService.updateJobSummary(dataList.jobSummaries)
-
         }
       } else {
         isLastPageReached = true
+      }
+      if (!isLastPageReached) {
+        if (isLiveJob) {
+          pageNumber = currentPage + 1
+        } else {
+          pageNumber = 0
+        }
       }
     }
     if (isJobsPresent) {

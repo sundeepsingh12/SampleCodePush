@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 }
   from 'react-native'
-import { Container, Content, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
+import { Container, Content, Card, Button, Body, Header, Right, Icon, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform';
@@ -28,6 +28,10 @@ import {
   UPI,
 } from '../lib/AttributeConstants'
 
+import {
+  SET_FORM_LAYOUT_STATE,
+} from '../lib/constants'
+
 function mapStateToProps(state) {
   return {
     formElement: state.formLayout.formElement,
@@ -38,7 +42,9 @@ function mapStateToProps(state) {
     latestPositionId: state.formLayout.latestPositionId,
     paymentAtEnd: state.formLayout.paymentAtEnd,
     isLoading: state.formLayout.isLoading,
-    errorMessage: state.formLayout.errorMessage
+    errorMessage: state.formLayout.errorMessage,
+    currentElement: state.formLayout.currentElement,
+    pieChart: state.home.pieChart
   }
 }
 
@@ -51,7 +57,12 @@ function mapDispatchToProps(dispatch) {
 class FormLayout extends Component {
 
   componentDidMount() {
-    this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId)
+    if (this.props.navigation.state.params.editableFormLayoutState) {
+      this.props.actions.setState(SET_FORM_LAYOUT_STATE, this.props.navigation.state.params.editableFormLayoutState)
+    }
+    else {
+      this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId);
+    }
   }
 
   renderData = (item) => {
@@ -81,9 +92,22 @@ class FormLayout extends Component {
     return null
   }
 
- 
+
 
   saveJobTransaction() {
+    let formLayoutState = {
+      formElement: this.props.formElement,
+      nextEditable: this.props.nextEditable,
+      isSaveDisabled: this.props.isSaveDisabled,
+      statusName: this.props.statusName,
+      jobTransactionId: this.props.jobTransactionId,
+      statusId: this.props.statusId,
+      latestPositionId: this.props.latestPositionId,
+      paymentAtEnd: this.props.paymentAtEnd,
+      isLoading: this.props.isLoading,
+      errorMessage: this.props.errorMessage,
+      currentElement: this.props.currentElement,
+    }
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
         {
@@ -93,14 +117,23 @@ class FormLayout extends Component {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
-      this.props.actions.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId, this.props.navigation.state.params.jobMasterId,
-        this.props.navigation.state.params.transactionIdList
+      this.props.actions.saveJobTransaction(
+        formLayoutState,
+        this.props.navigation.state.params.jobMasterId,
+        this.props.navigation.state.params.contactData,
+        this.props.navigation.state.params.jobTransaction,
+        this.props.navigation.state.params.navigationFormLayoutStates,
+        this.props.navigation.state.params.saveActivatedStatusData,
+        this.props.navigation.state.params.transactionIdList,
+        this.props.pieChart
       )
     }
   }
 
   _keyExtractor = (item, index) => item[1].key;
+
   render() {
+    console.log(this.props)
     if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
       Toast.show({
         text: this.props.errorMessage,
@@ -154,14 +187,14 @@ class FormLayout extends Component {
           <Footer style={[style.footer]}>
             <FooterTab style={[styles.padding10]}>
               <Button success full
-                onPress={() => this.saveJobTransaction(this.props.formElement, this.props.jobTransactionId, this.props.statusId)}
+                onPress={() => this.saveJobTransaction()}
                 disabled={this.props.isSaveDisabled}>
                 <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
               </Button>
             </FooterTab>
           </Footer>
-        </Container>
-      </StyleProvider>
+        </Container >
+      </StyleProvider >
     )
   }
 }

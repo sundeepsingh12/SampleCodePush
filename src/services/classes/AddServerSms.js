@@ -250,12 +250,13 @@ class AddServerSms {
     }
     sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user) {
         if (smsTemplate.body && smsTemplate.body.trim() != '') {
-            let fieldDataList;
+            let fieldDataList, jobDataList;
             let messageBody = smsTemplate.body
             let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAttributesList, fieldAttributesList)
 
             if (jobData != null) {
-                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobData, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
+                jobDataList = fieldData.map((dataList) => dataList.data)
+                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobDataList, jobTransaction, jobAttributesList)
             }
             if (fieldData != null) {
                 fieldDataList = fieldData.map((dataList) => dataList.data)
@@ -287,8 +288,11 @@ class AddServerSms {
                     realm.performBatchSave(serverSmsLog)
                     let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
                     let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-                    if (!transactionsToSync.includes(transactionIdDto.transactionId))
-                        transactionsToSync.push(transactionIdDto.transactionId);
+                    let pendingTransaction = {
+                        id: jobTransaction.id,
+                        referenceNumber: jobTransaction.referenceNumber
+                    }
+                    transactionsToSync = transactionsToSync.concat(pendingTransaction)
                     await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync);
                 }
             }

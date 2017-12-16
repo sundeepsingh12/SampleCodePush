@@ -15,7 +15,9 @@ import {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     _id,
-    SET_INITIAL_STATE
+    SET_INITIAL_STATE,
+    QrCodeScanner,
+    DISABLE_AUTO_START_SCANNER,
 } from '../lib/constants'
 import {
     FooterTab,
@@ -25,7 +27,11 @@ import {
     Button,
     Text,
     Footer,
+    Toast
 } from 'native-base'
+import {
+    EXTERNAL_DATA_STORE,
+} from '../lib/AttributeConstants'
 import _ from 'lodash'
 
 function mapStateToProps(state) {
@@ -39,7 +45,6 @@ function mapStateToProps(state) {
         errorMessage: state.dataStore.errorMessage,
         searchText: state.dataStore.searchText,
         detailsVisibleFor: state.dataStore.detailsVisibleFor,
-        // isSaveSuccessful: state.dataStore.isSaveSuccessful,
     }
 };
 
@@ -58,17 +63,27 @@ class DataStore extends Component {
         return { header: null }
     }
 
-    componentWillMount() {
+    componentDidMount() {
+        console.log(this.props.navigation.state.params.currentElement)
         this.props.actions.setState(SET_INITIAL_STATE)
         this.props.actions.setValidation(this.props.navigation.state.params.currentElement.validation)
     }
 
-    // componentWillReceiveProps(){
-    //     if (this.props.isSaveSuccessful) {
-    //         this._goBack()
-    //     }
-    // }
-
+    componentDidUpdate() {
+        if (this.props.isAutoStartScannerEnabled) {
+            this.scanner()
+            this.props.actions.setState(DISABLE_AUTO_START_SCANNER, false)
+        }
+        if (this.props.errorMessage != '') {
+            Toast.show({
+                text: this.props.errorMessage,
+                position: "bottom" | "center",
+                buttonText: 'Okay',
+                type: 'danger',
+                duration: 5000
+            })
+        }
+    }
     getTextData(item) {
         let firstValue = item.dataStoreAttributeValueMap[item.matchKey]
         let secondValue
@@ -93,10 +108,8 @@ class DataStore extends Component {
         return (
             <Card>
                 <TouchableOpacity
-                    onPress={() => {
-                        this.props.actions.setState(SHOW_DETAILS, item.id)
-                    }}>
-                    <View style={[style.cardLeft]}>
+                    onPress={() => this.showDetails(item.id, firstValue, false)}>
+                    <View style={[style.cardLeidft]}>
                         {renderIf(firstValue, <View style={[style.cardLeftTopRow]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight500, styles.fontDefault]}>{firstValue}</Text>
                         </View>)}
@@ -107,6 +120,16 @@ class DataStore extends Component {
                 </TouchableOpacity>
             </Card >
         )
+    }
+
+    showDetails = (itemId, dataStoreValue, isCancel) => {
+        if (this.props.navigation.state.params.currentElement.attributeTypeId == EXTERNAL_DATA_STORE && this.props.isMinMaxValidation && !isCancel) {
+            this.props.actions.uniqueValidationCheck(dataStoreValue,
+                this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
+                itemId)
+        } else {
+            this.props.actions.setState(SHOW_DETAILS, itemId)
+        }
     }
 
     setSearchText = (searchText) => {
@@ -137,44 +160,57 @@ class DataStore extends Component {
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.isSaveDisabled,
             dataStoreValue,
-            this.props.isMinMaxValidation,
-            this.props.navigation.state.params.currentElement.attributeTypeId,
             this.props.navigation.state.params.calledFromArray,
             this.props.navigation.state.params.rowId)
         this.setDetailsFor()
-        // this._goBack()
+        this._goBack()
     }
 
     setDetailsFor = () => {
         this.props.actions.setState(SHOW_DETAILS, -1)
     }
 
+    _searchDataStore = (value) => {
+        this.fetchDataStoreAttrValueMap(value, false)
+        this.setSearchText(value)
+    }
+
+    scanner = () => {
+        this.props.navigation.navigate(QrCodeScanner, { returnData: this._searchDataStore.bind(this) })
+    }
+
+    flatListView() {
+        let flatListView
+        if (!this.props.loaderRunning && !_.isEmpty(this.props.dataStoreAttrValueMap)) {
+            flatListView = < FlatList
+                data={Object.values(this.props.dataStoreAttrValueMap)}
+                renderItem={({ item }) => this.renderData(item)}
+                keyExtractor={item => item.id}
+            />
+        }
+        return flatListView
+    }
+
     render() {
+        let flatListView = this.flatListView()
         if (this.props.detailsVisibleFor == -1) {
             return (
                 < Container >
                     <SearchBar
                         title={this.props.navigation.state.params.currentElement.label}
                         isScannerEnabled={this.props.isScannerEnabled}
+                        isAutoStartScannerEnabled={this.props.isAutoStartScannerEnabled}
                         fetchDataStoreAttrValueMap={this.fetchDataStoreAttrValueMap}
                         goBack={this._goBack}
                         searchText={this.props.searchText}
-                        setSearchText={this.setSearchText} />
+                        setSearchText={this.setSearchText}
+                        scanner={this.scanner} />
                     <Content style={[styles.marginLeft10]}>
                         {renderIf(this.props.loaderRunning,
                             <Loader />)}
-                        {renderIf(!_.isEmpty(this.props.dataStoreAttrValueMap),
+                        {renderIf(!this.props.loaderRunning && !_.isEmpty(this.props.dataStoreAttrValueMap),
                             <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>Suggestions</Text>)}
-                        {renderIf(this.props.errorMessage != '',
-                            <Text style={[styles.fontDarkGray, styles.alignSelfCenter, styles.justifyCenter, styles.marginTop25]}>
-                                {this.props.errorMessage}
-                            </Text>)}
-                        {renderIf(!this.props.loaderRunning,
-                            < FlatList
-                                data={Object.values(this.props.dataStoreAttrValueMap)}
-                                renderItem={({ item }) => this.renderData(item)}
-                                keyExtractor={item => item.id}
-                            />)}
+                        {flatListView}
                     </Content>
                     {renderIf(this.props.isMinMaxValidation &&
                         this.props.searchText.length > 2 &&
@@ -204,7 +240,7 @@ class DataStore extends Component {
         return (
             < DataStoreItemDetails
                 selectedElement={this.props.dataStoreAttrValueMap[this.props.detailsVisibleFor]}
-                goBack={this.setDetailsFor}
+                goBack={this.showDetails}
                 onSave={this.onSave} />
         )
     }
