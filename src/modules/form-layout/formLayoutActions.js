@@ -10,14 +10,14 @@ import {
     TOOGLE_HELP_TEXT,
     BASIC_INFO,
     IS_LOADING,
-    RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     JOB_STATUS,
     UPDATE_FIELD_DATA_VALIDATION,
     NEXT_FOCUS,
     TabScreen,
-    HomeTabNavigatorScreen
+    HomeTabNavigatorScreen,
+    CLEAR_FORM_LAYOUT
 } from '../../lib/constants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -148,7 +148,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
             dispatch(navigateToScene(routeName, routeParam))
         }
         dispatch(performSyncService(pieChart))
-        dispatch(setState(RESET_STATE))
+        dispatch(setState(CLEAR_FORM_LAYOUT))
     }
 }
 

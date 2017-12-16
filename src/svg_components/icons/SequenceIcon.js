@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import Svg,{
     G,
-    Circle,
-    Polygon
+    Path,
+    Rect
 } from 'react-native-svg';
 import styles from '../../themes/FeStyle'
 
@@ -12,15 +12,14 @@ export default class SequenceIcon extends Component {
             <Svg
             width="30" 
             height="30" 
-            viewBox="0 0 256 256"
+            viewBox="0 0 1024 1024"
             >
                 <G id="Themes" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                    <G>
-                        <Polygon id="Rectangle" fill="#D8D8D8" points="17 60.683583 61.1157833 17 241 197.517454 197.343788 241"/>
-                        <Circle id="Oval-3" fill={styles.primaryColor} cx="39.5" cy="39.5" r="39.5"/>
-                        <Circle id="Oval-3-Copy" fill={styles.primaryColor} opacity="0.5" cx="216.5" cy="39.5" r="39.5"/>
-                        <Circle id="Oval-3-Copy-2" fill={styles.primaryColor} cx="216.5" cy="216.5" r="39.5"/>
-                        <Circle id="Oval-3-Copy-3" fill={styles.primaryColor} opacity="0.5" cx="39.5" cy="216.5" r="39.5"/>
+                    <G id="Sequence">
+                        <Rect id="Rectangle-22" fill={styles.primaryColor} opacity="0.3" x="0" y="6" width="1024" height="1024"></Rect>
+                        <Rect id="Rectangle-22-Copy-2" fill={styles.primaryColor} x="102.4" y="108.4" width="824" height="824"></Rect>
+                        <Path d="M730.824416,423.459476 L640.539098,333.174159 C634.615062,327.250122 625.09161,327.250122 619.167574,333.174159 L528.957244,423.459476 C523.033207,429.383513 523.033207,438.906964 528.957244,444.831001 C534.88128,450.755037 544.404732,450.755037 550.328768,444.831001 L614.593317,380.566452 L614.593317,645.123429 C614.593317,653.597051 621.417208,660.420941 629.89083,660.420941 C638.364452,660.420941 645.188342,653.597051 645.188342,645.123429 L645.188342,380.566452 L709.452891,444.831001 C715.376928,450.755037 724.900379,450.755037 730.824416,444.831001 C736.748452,438.981952 736.748452,429.383513 730.824416,423.459476 Z" id="arrow-up" stroke="#FFFFFF" strokeWidth="4" fill="#FFFFFF" fillRule="nonzero"></Path>
+                        <Path d="M495.041331,580.109002 C489.117294,574.184965 479.593843,574.184965 473.669806,580.109002 L409.405257,644.373551 L409.405257,379.816574 C409.405257,371.342952 402.581367,364.519061 394.107745,364.519061 C385.634123,364.519061 378.810232,371.342952 378.810232,379.816574 L378.810232,644.373551 L314.545683,580.109002 C308.621646,574.184965 299.098195,574.184965 293.174159,580.109002 C287.250122,586.033038 287.250122,595.55649 293.174159,601.480526 L383.459476,691.765844 C389.383513,697.68988 398.906964,697.68988 404.831001,691.765844 L495.116318,601.480526 C500.965367,595.55649 500.965367,585.95805 495.041331,580.109002 Z" id="aroow-down" stroke="#FFFFFF" strokeWidth="4" fill="#FFFFFF" fillRule="nonzero"></Path>
                     </G>
                 </G>
             </Svg>

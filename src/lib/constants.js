@@ -79,6 +79,7 @@ module.exports = keyMirror({
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
+    TOGGLE_LOGOUT:null,
 
     //Home Container
     PIECHART: null,
@@ -88,6 +89,7 @@ module.exports = keyMirror({
     SYNC_ERROR: null,
     SYNC_STATUS: null,
     LISTING_SEARCH_VALUE: null,
+    LAST_SYNC_TIME:null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -97,6 +99,7 @@ module.exports = keyMirror({
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
     IS_MISMATCHING_LOCATION: null,
+
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
@@ -160,6 +163,7 @@ module.exports = keyMirror({
     SAVE_ACTIVATED: null,
     LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
+    POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
 
@@ -198,10 +202,12 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
+    CLEAR_FORM_LAYOUT:null,
 
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
+
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,
@@ -228,10 +234,13 @@ module.exports = keyMirror({
     Statistics: null,
     Summary: null,
     CustomApp: null,
+    PostAssignmentScanner: null,
+    JobMasterListScreen: null,
     DataStoreDetails: null,
     LiveJobs: null,
     QrCodeScanner: null,
-
+    CameraAttribute: null,
+    ImageDetailsView: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -290,6 +299,7 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_STOP: null,
     TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
+    CLEAR_SEQUENCE_STATE:null,
 
     //New Job
     NEW_JOB_MASTER: null,
@@ -316,6 +326,7 @@ module.exports = keyMirror({
     Keep: null,
     Cancel: null,
     Checkout: null,
+
     //Bulk Module
     START_FETCHING_BULK_CONFIG: null,
     STOP_FETCHING_BULK_CONFIG: null,
@@ -323,6 +334,7 @@ module.exports = keyMirror({
     STOP_FETCHING_BULK_TRANSACTIONS: null,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
     TOGGLE_ALL_JOB_TRANSACTIONS: null,
+    CLEAR_BULK_STATE:null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -347,6 +359,7 @@ module.exports = keyMirror({
     SET_SEARCH: null,
     SET_MESSAGE: null,
     SET_LIVE_JOB_TOAST: null,
+
     //Summary
     SET_SUMMARY_FOR_JOBMASTER: null,
     SET_SUMMARY_FOR_RUNSHEET: null,
@@ -357,6 +370,14 @@ module.exports = keyMirror({
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
 
+    //Job Master
+    SET_JOB_MASTER_LIST: null,
+
+    //Post Assignment
+    SET_POST_ASSIGNMENT_TRANSACTION_LIST: null,
+    SET_POST_ASSIGNMENT_ERROR: null,
+    SET_POST_SCAN_SUCCESS: null,
+    SET_POST_ASSIGNMENT_PARAMETERS: null,
     //QrCodeGenerator
     SCANNING: null,
 
@@ -376,6 +397,13 @@ module.exports = keyMirror({
     SUMMARY: null,
     SORTING: null,
     CUSTOMAPP: null,
+    JOB_ASSIGNMENT: null,
+
+    //Camera Actions
+    SET_SHOW_IMAGE: null,
+    SET_IMAGE_DATA: null,
+    VIEW_IMAGE_DATA: null,
+
 })
 
 

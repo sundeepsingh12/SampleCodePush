@@ -21,7 +21,7 @@ export default class PieChart extends Component {
     render() {
         const completedCount = this.props.count.successCounts + this.props.count.failCounts
         const total = completedCount + this.props.count.pendingCounts
-        const percentage = (total != 0) ?  Math.round(Number(((this.props.count.successCounts)*100)/total)) : 0
+        const percentage = (total != 0) ?  Math.round(Number(((completedCount)*100)/total)) : 0
         return (
           <TouchableHighlight onPress={() => this.props.press()} underlayColor={"#ffffff90"}> 
             <LinearGradient 

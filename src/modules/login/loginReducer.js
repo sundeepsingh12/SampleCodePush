@@ -26,6 +26,7 @@ import {
   ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
   REMEMBER_ME_SET_TRUE,
+  RESET_STATE
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -97,6 +98,9 @@ export default function authReducer(state = initialState, action) {
 
       case REMEMBER_ME_SET_TRUE:
         return state.setIn(['form','rememberMe'],true)
+
+      case RESET_STATE: 
+          return initialState  
   }
   return state
 }

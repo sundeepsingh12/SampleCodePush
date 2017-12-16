@@ -1,8 +1,8 @@
 'use strict'
 
-import * as realm from '../../repositories/realmdb';
+import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from './KeyValueDBService'
-import BackgroundGeolocation from "react-native-background-geolocation";
+import BackgroundGeolocation from "react-native-background-geolocation"
 import moment from 'moment';
 
 import {
@@ -65,35 +65,36 @@ class Tracking {
 
     destroy() {
         // Remove BackgroundGeolocation listeners
-        BackgroundGeolocation.un('location', this.onLocation);
-        BackgroundGeolocation.un('error', this.onError);
-        BackgroundGeolocation.un('motionchange', this.onMotionChange);
-        BackgroundGeolocation.un('activitychange', this.onActivityChange);
-        BackgroundGeolocation.un('providerchange', this.onProviderChange);
+        BackgroundGeolocation.un('location', this.onLocation)
+        BackgroundGeolocation.un('error', this.onError)
+        BackgroundGeolocation.un('motionchange', this.onMotionChange)
+        BackgroundGeolocation.un('activitychange', this.onActivityChange)
+        BackgroundGeolocation.un('providerchange', this.onProviderChange)
+        BackgroundGeolocation.stop()
+         BackgroundGeolocation.removeListeners()
     }
 
     async onLocation(location) {
-        let user = await keyValueDBService.getValueFromStore(USER) || {};
-        console.log("====user object inside location====");
-        console.log(user);
+        let user = await keyValueDBService.getValueFromStore(USER) || {}
         console.log('- [js]location: ');
         console.log(location);
         let track_record = {
-            'battery': location.battery.battery,
+            'battery': location.battery.level,
             'gpsSignal': location.coords.accuracy,
             'latitude': location.coords.latitude,
             'longitude': location.coords.longitude,
             'speed': location.coords.speed,
             'trackTime': moment(location.timestamp).format('YYYY-MM-DD HH:mm:ss'),
-            'userId': user.id
+            'userId': user.value.id
         }
-        realm.save(TABLE_TRACK_LOGS, track_record);
+        realm.save(TABLE_TRACK_LOGS, track_record)
     }
 
     onError(error) {
-        var type = error.type;
-        var code = error.code;
-        alert(type + " Error: " + code);
+        console.log('error',error)
+        // var type = error.type;
+        // var code = error.code;
+        // alert(type + " Error: " + code);
     }
     onActivityChange(activityName) {
         console.log('- Current motion activity: ', activityName);  // eg: 'on_foot', 'still', 'in_vehicle'
@@ -103,6 +104,16 @@ class Tracking {
     }
     onMotionChange(location) {
         console.log('- [js]motionchanged: ', JSON.stringify(location));
+    }
+
+    getTrackLogs(trackLogs,lastSyncTime){
+        let trackLogsToBeSynced = []
+        trackLogs.forEach(trackLog=>{
+              if(moment(trackLog.trackTime).isAfter(lastSyncTime.value)){
+                trackLogsToBeSynced.push(trackLog)
+              }
+        })
+        return trackLogsToBeSynced
     }
 }
 
