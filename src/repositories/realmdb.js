@@ -31,6 +31,7 @@ import {
     TABLE_JOB_TRANSACTION_CUSTOMIZATION,
     TABLE_TRACK_LOGS,
     TABLE_SERVER_SMS_LOG,
+    USER_EVENT_LOG,
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -75,6 +76,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_RUNSHEET))
         realm.delete(realm.objects(TABLE_TRACK_LOGS))
         realm.delete(realm.objects(TABLE_SERVER_SMS_LOG))
+        realm.delete(realm.objects(USER_EVENT_LOG))
     });
 }
 

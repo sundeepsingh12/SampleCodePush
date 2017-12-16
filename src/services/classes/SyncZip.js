@@ -111,11 +111,8 @@ function _getSyncDataFromDb(transactionIdsObject) {
             jobList,
             serverSmsLogs,
             runSheetSummary,
-<<<<<<< HEAD
             transactionLogs,
-=======
             trackLogs
->>>>>>> master
         };
     }
     let transactionIds = transactionIdsObject.value;
@@ -135,11 +132,8 @@ function _getSyncDataFromDb(transactionIdsObject) {
         jobList,
         serverSmsLogs,
         runSheetSummary,
-<<<<<<< HEAD
-        transactionLogs
-=======
+        transactionLogs,
         trackLogs
->>>>>>> master
     }
 
 }
