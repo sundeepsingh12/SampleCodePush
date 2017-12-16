@@ -386,4 +386,7 @@ module.exports = {
 
     //ModuleCustomization
     NEW_JOB: 'New Task',
+    
+    //Events Log
+    LOGIN_SUCCESSFUL: 1,
 }

@@ -165,6 +165,7 @@ module.exports = keyMirror({
     CUSTOM_NAMING: null,
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
+    USER_EVENT_LOG: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -175,6 +176,7 @@ module.exports = keyMirror({
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
     TABLE_SERVER_SMS_LOG: null,
+    TABLE_TRANSACTION_LOGS:null,
 
     //Home Actions
     IS_LAST_PAGE: null,
