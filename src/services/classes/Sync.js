@@ -42,15 +42,18 @@ import {
   JOB_STATUS,
   HUB,
   DEVICE_IMEI,
-  LAST_SYNC_WITH_SERVER
-
+  CUSTOMIZATION_APP_MODULE,
+  POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
+  LAST_SYNC_WITH_SERVER,
 } from '../../lib/constants'
 
 import {
-  FAREYE_UPDATES
+  FAREYE_UPDATES,
+  JOB_ASSIGNMENT_ID,
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
 import NotificationsIOS, { NotificationsAndroid } from 'react-native-notifications'
+import { moduleCustomizationService } from './ModuleCustomization';
 
 class Sync {
 
@@ -513,7 +516,10 @@ class Sync {
       pageSize = 200
     let isLastPageReached = false,
       json, isJobsPresent = false, jobMasterIds
-    const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
+    const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
+    let jobAssignmentModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(appModulesList.value, JOB_ASSIGNMENT_ID)
+    let postAssignmentList = jobAssignmentModule.length == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark).postAssignmentList : null
+    const unseenStatusIds = postAssignmentList && postAssignmentList.length > 0 ? await jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(postAssignmentList, UNSEEN) : await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob)
       if (tdcResponse) {
@@ -531,12 +537,14 @@ class Sync {
 
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
-          const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
+          const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
+          const unseenTransactions = postOrderList ? await jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : await jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoObject = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
           const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+            await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
           }
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
@@ -546,7 +554,7 @@ class Sync {
             await keyValueDBService.deleteValueFromStore('LIVE_JOB')
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
-          jobSummaryService.updateJobSummary(dataList.jobSummaries)
+          await jobSummaryService.updateJobSummary(dataList.jobSummaries)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
         }
       } else {
@@ -560,7 +568,6 @@ class Sync {
         }
       }
     }
-    console.log('isJobsPresent', isJobsPresent)
     if (isJobsPresent) {
       await runSheetService.updateRunSheetSummary()
     }

@@ -300,6 +300,7 @@ module.exports = {
     NEWJOB_ID: 3,
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
+    JOB_ASSIGNMENT_ID : 20,
     Piechart : {
       enabled : false
     },

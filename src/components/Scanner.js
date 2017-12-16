@@ -4,43 +4,34 @@
  * @param onBarCodeRead: Callback function which will receive the scanning result
  * @param onBackPress: Callback function which is called when user presses back buttton
  */
-'use strict';
 import React, { Component } from 'react';
 import {
-    AppRegistry,
-    Dimensions,
+    Platform,
     StyleSheet,
     Text,
-    View
+    View,
+    Dimensions,
+    TextInput,
+    Button
 } from 'react-native';
 import Camera from 'react-native-camera'
 
-
-class Scanner extends Component {
+export default class Scanner extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                <Camera
-                    ref="cam"
-                    style={styles.preview}
-                    aspect={Camera.constants.Aspect.fill}>
-                    <Text style={styles.capture} onPress={this.props.onBackPress}>BACK</Text>
-                </Camera>
-            </View>
+            <Camera
+                ref="cam"
+                style={stylesa.preview}
+                aspect={Camera.constants.Aspect.fill}>
+            </Camera>
         );
     }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'row',
-    },
+const stylesa = StyleSheet.create({
     preview: {
         flex: 1,
-        justifyContent: 'flex-end',
-        alignItems: 'center'
     },
     capture: {
         flex: 0,
@@ -51,4 +42,3 @@ const styles = StyleSheet.create({
         margin: 40
     }
 });
-module.exports = Scanner
