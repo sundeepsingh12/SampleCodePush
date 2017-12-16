@@ -202,7 +202,7 @@ class FormLayout {
             hidden,
             attributeTypeId,
             fieldAttributeMasterId: fieldAttribute.id,
-            positionId: positionId,
+            positionId,
             parentId: 0,
             showHelpText: false,
             editable: !(fieldAttribute.editable) || (fieldAttribute.attributeTypeId == 62) ? false : fieldAttribute.editable,

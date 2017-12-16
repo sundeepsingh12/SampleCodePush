@@ -46,7 +46,8 @@ class ExpandableDetailsList extends Component {
                     label={item.label}
                     value={item.data.value}
                     fieldAttributeMasterId={item.data.fieldAttributeMasterId}
-                    navigateToDataStoreDetails={this.props.navigateToDataStoreDetails} />
+                    navigateToDataStoreDetails={this.props.navigateToDataStoreDetails}
+                    navigateToCameraDetails={this.props.navigateToCameraDetails} />
             )
         }
     }

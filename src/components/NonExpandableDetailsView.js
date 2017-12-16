@@ -16,7 +16,12 @@ import {
     VIEW_TEXT_LABEL,
     IMAGE_URL,
     DATA_STORE,
-    COUNT_DOWN_TIMER
+    COUNT_DOWN_TIMER,
+    SIGNATURE,
+    CAMERA,
+    CAMERA_HIGH,
+    CAMERA_MEDIUM,
+    SIGNATURE_AND_FEEDBACK
 } from '../lib/AttributeConstants'
 import CountDownTimer from './CountDownTimer'
 export default class NonExpandableDetailsView extends Component {
@@ -58,8 +63,15 @@ export default class NonExpandableDetailsView extends Component {
                         </Text>)}
                     {renderIf(this.props.attributeTypeId == COUNT_DOWN_TIMER,
                         <CountDownTimer value={this.props.value} />)}
-
-                    {renderIf(this.props.attributeTypeId != IMAGE_URL && this.props.attributeTypeId != COUNT_DOWN_TIMER && this.props.attributeTypeId != DATA_STORE,
+                    {renderIf(this.props.attributeTypeId == CAMERA || this.props.attributeTypeId == CAMERA_HIGH || this.props.attributeTypeId == CAMERA_MEDIUM || this.props.attributeTypeId == SIGNATURE,
+                        <Text style={[styles.fontDefault, styles.fontPrimary, styles.textUnderline]}
+                            onPress={() => this.props.navigateToCameraDetails({
+                                value: this.props.value,
+                            })}>
+                            Tap to View
+                        </Text>)}
+                    {renderIf(this.props.attributeTypeId != IMAGE_URL && this.props.attributeTypeId != COUNT_DOWN_TIMER && this.props.attributeTypeId != DATA_STORE &&
+                        this.props.attributeTypeId != CAMERA && this.props.attributeTypeId != CAMERA_HIGH && this.props.attributeTypeId != CAMERA_MEDIUM && this.props.attributeTypeId != SIGNATURE,
                         <Text style={[styles.fontDefault, styles.fontBlack]}>
                             {this.props.value}
                         </Text>)}

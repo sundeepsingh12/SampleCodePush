@@ -6,7 +6,6 @@ import React, { Component } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
-import renderIf from '../lib/renderIf.js'
 import {
   Container,
   Content,
@@ -44,12 +43,8 @@ import {
   CUSTOMAPP_ID,
   CHOOSE_WEB_URL,
   NEWJOB_ID,
+  JOB_ASSIGNMENT_ID
 } from '../lib/AttributeConstants'
-
-import {
-  PIECHART,
-  SUMMARY,
-} from '../lib/constants'
 
 import {
   TabScreen,
@@ -59,7 +54,10 @@ import {
   LiveJobs,
   Summary,
   CustomApp,
-  NewJob
+  NewJob,
+  PIECHART,
+  SUMMARY,
+  JobMasterListScreen,
 } from '../lib/constants'
 import _ from 'lodash'
 
@@ -79,9 +77,6 @@ function mapDispatchToProps(dispatch) {
     actions: bindActionCreators({ ...homeActions, ...globalActions }, dispatch)
   }
 }
-
-const percentage = 95;
-
 
 class Home extends Component {
 
@@ -125,6 +120,10 @@ class Home extends Component {
         break
       }
 
+      case JOB_ASSIGNMENT_ID: {
+        this.props.actions.navigateToScene(JobMasterListScreen)
+      }
+
       default:
         (appModule.appModuleId == NEWJOB_ID) ? this.props.actions.navigateToScene(NewJob, {
           jobMasterIdList: appModule.jobMasterIdList
@@ -151,32 +150,28 @@ class Home extends Component {
 
   headerView() {
     return (
-      <Header
-        hasTabs
-        style={[styles.bgPrimary]}>
-        <Left style={{
-          width: 90
-        }}>
-          <Image
-            style={StyleSheet.flatten([
-              styles.width100, {
-                resizeMode: 'contain'
-              }
-            ])}
-            source={FareyeLogo} />
-        </Left>
-        <Right>
-          <Button transparent>
-            <Icon style={style.headerIcon} name='ios-search' />
-          </Button>
-          {/* <Button transparent>
-            <Icon style={style.headerIcon} name='ios-chatbubbles' />
-          </Button> */}
-          {/* <Button transparent>
-            <Icon style={style.headerIcon} name='md-notifications' />
-          </Button> */}
-        </Right>
+      <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+        <Body>
+          <View
+            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+            <View style={[style.headerBody]}>
+              <View style={{
+                  width: 90
+                }}>
+                  <Image
+                    style={StyleSheet.flatten([
+                      styles.width100, {
+                        resizeMode: 'contain'
+                      }
+                    ])}
+                    source={FareyeLogo} />
+                </View>
+            </View>
+            <View />
+          </View>
+        </Body>
       </Header>
+    
     )
   }
 
@@ -258,6 +253,21 @@ class Home extends Component {
 }
 
 const style = StyleSheet.create({
+  header: {
+    height: 'auto',
+    padding: 0,
+    paddingRight: 0,
+    paddingLeft: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f3f3'
+  },
+  headerBody: {
+    width: '100%',
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
   chartCenterData: {
     backgroundColor: 'transparent',
     textAlign: 'center',

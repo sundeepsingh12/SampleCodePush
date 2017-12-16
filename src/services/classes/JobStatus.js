@@ -45,6 +45,15 @@ class JobStatus {
     return jobStatusId[0]
   }
 
+  async getStatusForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error('Job status missing in store')
+    }
+    const jobStatus = jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobStatusObject.jobMasterId == jobMasterId))
+    return jobStatus[0]
+  }
+
   /**Returns jobMasterId Vs JobStatusId Map from set of jobMasterIds and a status code
    * 
    * @param {*} jobMasterIdList 
@@ -68,6 +77,32 @@ class JobStatus {
       jobMasterIdStatusIdMap[jobStatusObject.jobMasterId] = jobStatusObject.id
     })
     return jobMasterIdStatusIdMap
+  }
+
+  /**
+   * This function returns status id list for specific status code and not present in list of jobmaster ids
+   * @param {*} jobMasterIdList 
+   * @param {*} jobStatusCode 
+   * @returns
+   * [jobStatusIdList]
+   */
+  async getStatusIdListForStatusCodeAndJobMasterList(jobMasterIdList, jobStatusCode) {
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error('Job status missing in store')
+    }
+    const filteredJobStatusArray = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && !jobMasterIdList.includes(jobStatusObject.jobMasterId)))
+    console.log('filteredJobStatusArray',filteredJobStatusArray)
+    if (_.isUndefined(filteredJobStatusArray) || _.isNull(filteredJobStatusArray)) {
+      throw new Error('Invalid Job Master or Job Status Code')
+    }
+
+    let jobStatusIdList = filteredJobStatusArray.map(jobStatusObject => jobStatusObject.id)
+    // filteredJobStatusArray.forEach(jobStatusObject => {
+    //   jobMasterIdStatusIdMap[jobStatusObject.jobMasterId] = jobStatusObject.id
+    // })
+    console.log('jobStatusIdList',jobStatusIdList)
+    return jobStatusIdList
   }
 
   /**
@@ -130,7 +165,7 @@ class JobStatus {
    * Sample Return value
    * [1,2,3]
    */
-  
+
   async getStatusIdsForAllStatusCategory() {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
     const tabs = await keyValueDBService.getValueFromStore(TAB)
@@ -138,33 +173,36 @@ class JobStatus {
       throw new Error('tab missing in store')
     }
     const tabList = {}
-    tabs.value.forEach(key => {if(key.name.toLocaleLowerCase() !== 'hidden'){
-      tabList[key.id] = key}})
+    tabs.value.forEach(key => {
+      if (key.name.toLocaleLowerCase() !== 'hidden') {
+        tabList[key.id] = key
+      }
+    })
     if (!jobStatusArray || !jobStatusArray.value) {
       throw new Error('Job status missing in store')
     }
     const jobStatusList = jobStatusArray.value
-    let pendingStatusIds = [], failStatusIds =[], successStatusIds = [];
-    for(id in jobStatusList){
-        if(jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN){
-          pendingStatusIds.push(jobStatusList[id].id)
-          continue
-        }
-        if(jobStatusList[id].statusCategory == 3 ){
-          successStatusIds.push(jobStatusList[id].id)
-          continue
-        }
-        if(jobStatusList[id].statusCategory == 2  ){
-          failStatusIds.push(jobStatusList[id].id)
-        }
+    let pendingStatusIds = [], failStatusIds = [], successStatusIds = [];
+    for (id in jobStatusList) {
+      if (jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN) {
+        pendingStatusIds.push(jobStatusList[id].id)
+        continue
+      }
+      if (jobStatusList[id].statusCategory == 3) {
+        successStatusIds.push(jobStatusList[id].id)
+        continue
+      }
+      if (jobStatusList[id].statusCategory == 2) {
+        failStatusIds.push(jobStatusList[id].id)
+      }
     }
-   return {pendingStatusIds,failStatusIds,successStatusIds}
+    return { pendingStatusIds, failStatusIds, successStatusIds }
   }
 
 
-  async getStatusCategoryOnStatusId(jobStatusId){
+  async getStatusCategoryOnStatusId(jobStatusId) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    const category = jobStatusArray.value.filter(jobStatus => jobStatus.id ==jobStatusId &&  jobStatus.code != UNSEEN).map(id => id.statusCategory)
+    const category = jobStatusArray.value.filter(jobStatus => jobStatus.id == jobStatusId && jobStatus.code != UNSEEN).map(id => id.statusCategory)
     return category[0];
   }
 }

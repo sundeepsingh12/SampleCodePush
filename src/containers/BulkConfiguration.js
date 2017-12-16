@@ -62,7 +62,7 @@ class BulkConfiguration extends Component{
            onPress={()=>this.goToBulkListing(item)}
           >
           <View style={[styles.row, styles.alignCenter]}>
-            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{item.jobMasterName}-{item.statusName}</Text>
+            <Text style={[styles.fontDefault, styles.fontWeight500]}>{item.jobMasterName}-{item.statusName}</Text>
           </View>
           <Right>
             <Icon name="arrow-forward" style={[styles.fontLg, styles.fontBlack]} />

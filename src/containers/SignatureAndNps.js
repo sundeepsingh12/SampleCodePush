@@ -63,7 +63,6 @@ class SignatureAndNps extends Component {
             this.state.starCount,
             this.props.navigation.state.params.currentElement,
             this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.nextEditable,
             this.props.navigation.state.params.isSaveDisabled,
             this.props.navigation.state.params.jobTransaction,
             this.props.navigation.state.params.latestPositionId)

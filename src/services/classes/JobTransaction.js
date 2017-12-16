@@ -40,6 +40,14 @@ class JobTransaction {
         return transactionList
     }
 
+    getJobTransactionsForDeleteSync(statusIds, postOrderList) {
+        let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : ''
+        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"` ).join(' OR ') : ''
+        query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery
+        const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
+        return transactionList
+    }
+
     /**Sample Return type
      * 
      * 
@@ -59,11 +67,12 @@ class JobTransaction {
             return {}
         }
         let jobMasterIdTransactionDtoMap = {}, // Map<JobMasterId, TransactionIdDTO>
-            jobMasterIdJobStatusIdTransactionIdDtoMap = {} // Map<JobMasterId, Map<JobStausId, TransactionIdDTO>>
+            jobMasterIdJobStatusIdTransactionIdDtoMap = {}, // Map<JobMasterId, Map<JobStausId, TransactionIdDTO>>
+            jobMasterIdStatusIdTransactionIdMap = {}
         const jobMasterIdList = await this.getUnseenTransactionsJobMasterIds(unseenTransactions)
         const jobMasterIdStatusIdMap = await jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdList, PENDING)
         unseenTransactions.forEach(unseenTransactionObject => {
-            let transactionIdDtoObject = {}
+            let transactionIdDtoObject = {}, transactionIdDTO = {}
             if (!jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId]) {
                 transactionIdDtoObject = {
                     "jobMasterId": unseenTransactionObject.jobMasterId,
@@ -83,8 +92,15 @@ class JobTransaction {
                 jobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobStatusId] = transactionIdDtoObject
                 jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId] = jobStatusIdTransactionIdDtoMap
             }
+            transactionIdDTO = {
+                "jobMasterId": unseenTransactionObject.jobMasterId,
+                "pendingStatusId": jobMasterIdStatusIdMap[unseenTransactionObject.jobMasterId],
+                "transactionId": unseenTransactionObject.id,
+                "unSeenStatusId": unseenTransactionObject.jobStatusId
+            }
+            jobMasterIdStatusIdTransactionIdMap[unseenTransactionObject.id] = transactionIdDTO
         })
-        return jobMasterIdJobStatusIdTransactionIdDtoMap
+        return { jobMasterIdJobStatusIdTransactionIdDtoMap, jobMasterIdStatusIdTransactionIdMap }
     }
 
     /**
@@ -344,6 +360,7 @@ class JobTransaction {
             jobTransactionCustomization.jobLatitude = job.latitude
             jobTransactionCustomization.jobLongitude = job.longitude
             jobTransactionCustomization.jobId = jobTransaction.jobId
+            jobTransactionCustomization.identifierColor = idJobMasterMap[jobMasterId].identifierColor
             if (callingActivity == 'LiveJob') {
                 jobTransaction.jobTransactionCustomization = jobTransactionCustomization
             }
@@ -622,7 +639,7 @@ class JobTransaction {
     prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = (callingActivity != 'LiveJob') ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery) : realm.getRecordListOnQuery(TABLE_JOB, jobTransactionQuery)
-        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
+        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
         if (callingActivity == 'LiveJob') {
             jobMasterId = jobTransaction[0].jobMasterId
             jobStatusId = jobTransaction[0].status
@@ -663,6 +680,11 @@ class JobTransaction {
                 jobMasterId,
                 jobStatusId,
                 referenceNumber,
+                attemptCount,
+                runsheetNo,
+                jobCreatedAt,
+                lastUpdatedAtServer,
+                jobEtaTime
             }
             return {
                 currentStatus,
@@ -685,6 +707,28 @@ class JobTransaction {
                 jobDataObject,
                 jobTransactionDisplay,
             }
+        }
+    }
+
+    /**
+     * 
+     * @param {*} jobMaster 
+     */
+    async getUnseenJobTransaction(jobMaster) {
+        let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMaster.id, UNSEEN)
+        console.log(unseenStatusId)
+        let jobTransactionQuery = `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId}`
+        let unseenJobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
+        let jobTransactionMap = {}
+        for (let index in unseenJobTransactionList) {
+            let jobTransaction = { ...unseenJobTransactionList[index] }
+            // let referenceNumber = unseenJobTransactionList[index].referenceNumber
+            // let id = unseenJobTransactionList[index].id
+            jobTransactionMap[jobTransaction.referenceNumber] = jobTransaction
+        }
+        return {
+            jobTransactionMap,
+            pendingCount: unseenJobTransactionList.length
         }
     }
 
