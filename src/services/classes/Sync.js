@@ -555,7 +555,7 @@ class Sync {
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
           await jobSummaryService.updateJobSummary(dataList.jobSummaries)
-          await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
+          //  await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
         }
       } else {
         isLastPageReached = true
@@ -592,23 +592,23 @@ class Sync {
 
   }
 
-  async calculateDifference(){
-     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
-      const differenceInDays = moment().diff(lastSyncTime.value, 'days')
-       const differenceInHours = moment().diff(lastSyncTime.value, 'hours')
-       const differenceInMinutes = moment().diff(lastSyncTime.value, 'minutes')
-       const differenceInSeconds = moment().diff(lastSyncTime.value, 'seconds')
-       let timeDifference = ""
-        if (differenceInDays > 0) {
-            timeDifference = `${differenceInDays} days ago`
-        } else if (differenceInHours > 0) {
-            timeDifference = `${differenceInHours} hours ago`
-        } else if (differenceInMinutes > 0) {
-            timeDifference = `${differenceInMinutes} minutes ago`
-        } else {
-            timeDifference = `${differenceInSeconds} seconds ago`
-        }
-      return timeDifference
+  async calculateDifference() {
+    const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
+    const differenceInDays = moment().diff(lastSyncTime.value, 'days')
+    const differenceInHours = moment().diff(lastSyncTime.value, 'hours')
+    const differenceInMinutes = moment().diff(lastSyncTime.value, 'minutes')
+    const differenceInSeconds = moment().diff(lastSyncTime.value, 'seconds')
+    let timeDifference = ""
+    if (differenceInDays > 0) {
+      timeDifference = `${differenceInDays} days ago`
+    } else if (differenceInHours > 0) {
+      timeDifference = `${differenceInHours} hours ago`
+    } else if (differenceInMinutes > 0) {
+      timeDifference = `${differenceInMinutes} minutes ago`
+    } else {
+      timeDifference = `${differenceInSeconds} seconds ago`
+    }
+    return timeDifference
   }
 }
 
