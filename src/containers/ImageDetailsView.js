@@ -50,6 +50,9 @@ class ImageDetailsView extends Component {
     componentDidMount() {
         this.props.actions.getImageData(this.props.navigation.state.params.value)
     }
+    componentWillUnmount() {
+        this.props.actions.setInitialState()
+    }
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
@@ -60,7 +63,7 @@ class ImageDetailsView extends Component {
                                 isStatic: true,
                                 uri: 'data:image/jpeg;base64,' + this.props.viewData,
                             }}
-                            style={{ height: '100%', width: '100%' }}
+                            style={{ height: '100%', width: '100%', padding: 5 }}
                         />
                         <View style={[styles.absolute, styles.padding10, { top: 0, left: 0, flex: 2 }]}>
                             <Icon

@@ -74,6 +74,7 @@ export function saveArray(arrayElements, arrayParentItem, jobTransactionId, late
                 let fieldDataListWithLatestPositionId = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId)
                 dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
                 dispatch(setState(SET_ERROR_MSG, ''))
+                dispatch(setState(CLEAR_ARRAY_STATE))
             }
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))
