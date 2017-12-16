@@ -121,6 +121,7 @@ class Login extends Component {
   //     console.log(status);
   //   });
   // }
+<<<<<<< HEAD
 
   getImageView() {
     if (!this.props.auth.form.authenticationService) {
@@ -135,6 +136,8 @@ class Login extends Component {
       return <Spinner />
     }
   }
+=======
+>>>>>>> master
 
   startScanner = () => {
     this.props.navigation.navigate(QrCodeScanner, { returnData: this._onBarCodeRead.bind(this) })
@@ -148,7 +151,19 @@ class Login extends Component {
               <Content>
                 <View style={style.container}>
                   <View style={style.logoContainer}>
+<<<<<<< HEAD
                     {imageView}
+=======
+                    {renderIf(!this.props.auth.form.authenticationService,
+                      <Image
+                        style={style.logoStyle}
+                        source={require('../../images/fareye-logo.png')}
+                      />
+                    )}
+                    {renderIf(this.props.auth.form.authenticationService,
+                      <Spinner />
+                    )}
+>>>>>>> master
                   </View>
                   <View style={[style.width70, styles.marginTop30]}>
                     <Item rounded style={[styles.marginBottom10]}>

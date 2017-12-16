@@ -126,6 +126,7 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    console.log('jobMaster',json.jobMaster)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : [])
     await keyValueDBService.validateAndSaveData(USER, json.user)
@@ -149,8 +150,8 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
-    await keyValueDBService.validateAndSaveData(HUB, json.hub)
-    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment().format('YYYY-MM-DD HH:mm:ss'))
+    await keyValueDBService.validateAndSaveData(HUB,json.hub)
+    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,moment().format('YYYY-MM-DD HH:mm:ss'))
   }
 
   /**
