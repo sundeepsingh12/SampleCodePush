@@ -40,6 +40,14 @@ class JobTransaction {
         return transactionList
     }
 
+    getJobTransactionsForDeleteSync(statusIds, postOrderList) {
+        let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : ''
+        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"` ).join(' OR ') : ''
+        query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery
+        const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
+        return transactionList
+    }
+
     /**Sample Return type
      * 
      * 
@@ -698,6 +706,28 @@ class JobTransaction {
                 jobDataObject,
                 jobTransactionDisplay,
             }
+        }
+    }
+
+    /**
+     * 
+     * @param {*} jobMaster 
+     */
+    async getUnseenJobTransaction(jobMaster) {
+        let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMaster.id, UNSEEN)
+        console.log(unseenStatusId)
+        let jobTransactionQuery = `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId}`
+        let unseenJobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
+        let jobTransactionMap = {}
+        for (let index in unseenJobTransactionList) {
+            let jobTransaction = { ...unseenJobTransactionList[index] }
+            // let referenceNumber = unseenJobTransactionList[index].referenceNumber
+            // let id = unseenJobTransactionList[index].id
+            jobTransactionMap[jobTransaction.referenceNumber] = jobTransaction
+        }
+        return {
+            jobTransactionMap,
+            pendingCount: unseenJobTransactionList.length
         }
     }
 

@@ -41,6 +41,8 @@ import { combineReducers } from 'redux'
 import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
 import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
+import jobMaster from './job-master/jobMasterReducer'
+import postAssignment from './postAssignment/postAssignmentReducer'
 import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 import cameraReducer from './camera/cameraReducer'
 // import profile from './profile/profileReducer'
@@ -85,6 +87,8 @@ const rootReducer = combineReducers({
   liveJob,
   summary,
   customApp,
+  jobMaster,
+  postAssignment,
   qrCodeReducer,
   cameraReducer,
 })

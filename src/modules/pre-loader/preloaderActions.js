@@ -68,10 +68,11 @@ import {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   HomeTabNavigatorScreen,
+  USER_EVENT_LOG,
   LoginScreen,
-  TOGGLE_LOGOUT
+  TOGGLE_LOGOUT,
 } from '../../lib/constants'
-
+import { LOGIN_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
@@ -81,7 +82,7 @@ import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
-
+import { userEventLogService } from '../../services/classes/UserEvent'
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -390,7 +391,8 @@ export function checkAsset() {
       const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
       if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-        dispatch(preloaderSuccess())
+        await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
+        dispatch(preloaderSuccess())        
         dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)

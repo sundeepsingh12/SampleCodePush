@@ -27,6 +27,19 @@ import {
   StyleProvider
 } from 'native-base';
 
+import {
+  AUTHENTICATING,
+  DOWNLOADING,
+  INTERNAL_ERROR,
+  INTERNAL_SERVER_ERROR,
+  NO_INTERNET,
+  RE_SYNC,
+  RETRY,
+  SYNC_OK_TEXT,
+  UNSYNCED_TASKS,
+  UPLOADING,
+} from '../lib/ContainerConstants'
+
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
@@ -38,7 +51,7 @@ function mapStateToProps(state) {
     syncStatus: state.home.syncStatus,
     unsyncedTransactionList: state.home.unsyncedTransactionList,
     pieChart: state.home.pieChart,
-    lastSyncTime:state.home.lastSyncTime
+    lastSyncTime: state.home.lastSyncTime
   }
 }
 
@@ -59,36 +72,10 @@ class SyncScreen extends Component {
     this.props.actions.startTracking()
   }
 
-  // getView() {
-  //   return (
-  //     <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
-  //       <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-  //         <View style={[styles.alignCenter, styles.justifyCenter]}>
-  //           <Image
-  //             style={styles.imageSync}
-  //             source={require('../../images/fareye-default-iconset/unable-to-sync.png')}
-  //           />
-  //         </View>
-  //       </View>
-  //       <View style={[styles.alignCenter, styles.justifyCenter, styles.paddingTop10, styles.paddingBottom10]}>
-  //         <Text style={[styles.fontLg, styles.fontBlack]}>
-  //           Can’t Connect to the internet
-  //       </Text>
-  //         <View style={[styles.paddingTop15]}>
-  // <Button onPress={() => { this.props.actions.onResyncPress() }} style={StyleSheet.flatten([styles.bgPrimary])} >
-  //   <Text> Retry </Text>
-  // </Button>
-  //         </View>
-  //       </View>
-  //     </View>
-  //   )
-  // }
-
   getTransactionView() {
     let transactionList = this.props.unsyncedTransactionList
     let transactionView = []
     for (let index in transactionList) {
-      console.log(transactionList)
       transactionView.push(
         <Text key={transactionList[index].id} style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
           {transactionList[index].referenceNumber}
@@ -101,7 +88,7 @@ class SyncScreen extends Component {
     return (
       <View style={[styles.bgWhite, styles.padding15]}>
         <Text style={[styles.fontLg, styles.fontWeight500, styles.marginBottom10]}>
-          Unsynced Tasks
+          {UNSYNCED_TASKS}
         </Text>
         {transactionView}
       </View>
@@ -114,7 +101,7 @@ class SyncScreen extends Component {
         <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[styles.alignCenter, styles.justifyCenter]}>
-              <Text>Uploading ... </Text>
+              <Text>{UPLOADING}</Text>
             </View>
           </View>
         </View>
@@ -125,7 +112,7 @@ class SyncScreen extends Component {
         <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[styles.alignCenter, styles.justifyCenter]}>
-              <Text>Downloading ... </Text>
+              <Text>{DOWNLOADING}</Text>
             </View>
           </View>
         </View>
@@ -139,11 +126,11 @@ class SyncScreen extends Component {
             source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
           />
           <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-            All data synced perfectly to the server.
+            {SYNC_OK_TEXT}
           </Text>
           <View style={[styles.marginTop30]}>
             <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
-              <Text> Re-Sync </Text>
+              <Text> {RE_SYNC} </Text>
             </Button>
           </View>
         </View>
@@ -156,11 +143,11 @@ class SyncScreen extends Component {
             source={require('../../images/fareye-default-iconset/syncscreen/Server_Error.png')}
           />
           <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-            Internal Server Error.
-        </Text>
+            {INTERNAL_SERVER_ERROR}
+          </Text>
           <View style={[styles.marginTop30]}>
             <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
-              <Text> Retry </Text>
+              <Text> {RETRY} </Text>
             </Button>
           </View>
         </View>
@@ -174,12 +161,22 @@ class SyncScreen extends Component {
             source={require('../../images/fareye-default-iconset/syncscreen/No_Internet.png')}
           />
           <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-            No Internet Connection
-        </Text>
+            {NO_INTERNET}
+          </Text>
           <View style={[styles.marginTop30]}>
             <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
-              <Text> Retry </Text>
+              <Text> {RETRY} </Text>
             </Button>
+          </View>
+        </View>
+      )
+    } else if (this.props.syncStatus == 'RE_AUTHENTICATING') {
+      return (
+        <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            <View style={[styles.alignCenter, styles.justifyCenter]}>
+              <Text>{AUTHENTICATING}</Text>
+            </View>
           </View>
         </View>
       )
@@ -191,11 +188,11 @@ class SyncScreen extends Component {
             source={require('../../images/fareye-default-iconset/syncscreen/Server_Error.png')}
           />
           <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
-            Internal Error.
-        </Text>
+            {INTERNAL_ERROR}
+          </Text>
           <View style={[styles.marginTop30]}>
             <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
-              <Text> Retry </Text>
+              <Text> {RETRY} </Text>
             </Button>
           </View>
         </View>
@@ -204,7 +201,11 @@ class SyncScreen extends Component {
 
   }
 
-  render() { 
+  render() {
+
+    if(this.props.syncStatus == 'LOADING') {
+      return <Loader />
+    }
 
     const syncView = this.getSyncView()
     const transactionView = this.getTransactionView()

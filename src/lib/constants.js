@@ -163,7 +163,9 @@ module.exports = keyMirror({
     SAVE_ACTIVATED: null,
     LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
+    POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
+    USER_EVENT_LOG: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -174,6 +176,7 @@ module.exports = keyMirror({
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
     TABLE_SERVER_SMS_LOG: null,
+    TABLE_TRANSACTION_LOGS:null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -204,6 +207,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
+
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
     FormLayout: null,
@@ -230,6 +234,8 @@ module.exports = keyMirror({
     Statistics: null,
     Summary: null,
     CustomApp: null,
+    PostAssignmentScanner: null,
+    JobMasterListScreen: null,
     DataStoreDetails: null,
     LiveJobs: null,
     QrCodeScanner: null,
@@ -364,6 +370,14 @@ module.exports = keyMirror({
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
 
+    //Job Master
+    SET_JOB_MASTER_LIST: null,
+
+    //Post Assignment
+    SET_POST_ASSIGNMENT_TRANSACTION_LIST: null,
+    SET_POST_ASSIGNMENT_ERROR: null,
+    SET_POST_SCAN_SUCCESS: null,
+    SET_POST_ASSIGNMENT_PARAMETERS: null,
     //QrCodeGenerator
     SCANNING: null,
 
@@ -383,6 +397,7 @@ module.exports = keyMirror({
     SUMMARY: null,
     SORTING: null,
     CUSTOMAPP: null,
+    JOB_ASSIGNMENT: null,
 
     //Camera Actions
     SET_SHOW_IMAGE: null,
