@@ -167,6 +167,7 @@ class Login extends Component {
                         placeholder='Password'
                         secureTextEntry={true}
                         onChangeText={this.onChangePassword}
+                        onSubmitEditing={this.loginButtonPress}
                         disabled={this.props.auth.form.isEditTextDisabled}
                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                       />

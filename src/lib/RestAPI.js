@@ -208,11 +208,13 @@ class RestAPI {
           await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
           // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         }
-        else{
+        else {
           throw new Error(responseBody)
         }
       }).catch(err => {
-        throw err
+        throw {
+          code: err.message ? JSON.parse(err.message).status : null,
+        }
       })
     return responseBody
   }
