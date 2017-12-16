@@ -42,6 +42,7 @@ import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
 import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
 import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
+import offlineDS from './offlineDS/offlineDSReducer'
 // import profile from './profile/profileReducer'
 
 
@@ -85,6 +86,7 @@ const appReducer = combineReducers({
   summary,
   customApp,
   qrCodeReducer,
+  offlineDS
 })
 
 const rootReducer = (state, action) => {

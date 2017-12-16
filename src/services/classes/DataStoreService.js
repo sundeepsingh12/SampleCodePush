@@ -5,7 +5,12 @@ import {
     REMARKS,
     MINMAX,
     SPECIAL,
-    TABLE_FIELD_DATA
+    TABLE_FIELD_DATA,
+    FIELD_ATTRIBUTE,
+    Datastore_Master_DB,
+    Datastore_AttributeValue_DB,
+    DataStore_DB,
+    LAST_DATASTORE_SYNC_TIME
 } from '../../lib/constants'
 
 import {
@@ -14,10 +19,14 @@ import {
     SEARCH_VALUE,
     GET,
     EXTERNAL_DATA_STORE_URL,
-    DATA_STORE_ATTR_KEY
+    DATA_STORE_ATTR_KEY,
+    DATA_STORE,
 } from '../../lib/AttributeConstants'
 import * as realm from '../../repositories/realmdb'
-
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import moment from 'moment'
+import { keyValueDb } from '../../repositories/keyValueDb'
+import _ from 'lodash'
 class DataStoreService {
 
     /**
@@ -200,6 +209,131 @@ class DataStoreService {
             throw new Error('fieldAttributeMasterId missing')
         }
         return fieldAttributes.filter(fieldAttribute => fieldAttribute.id == fieldAttributeMasterId)
+    }
+
+    /*
+    Offline Datastore service methods  
+    */
+
+    fetchDataStoreMaster(token) {
+        if (!token) {
+            throw new Error('Token Missing')
+        }
+        const url = CONFIG.API.DATASTORE_MASTER
+        const dataStoreMasterResponse = RestAPIFactory(token.value).serviceCall(null, url, GET)
+        return dataStoreMasterResponse
+    }
+
+    getDataStoreMasterIdMappedWithFieldAttribute(fieldAttributes) {
+        let dataStoreMasterIdList = []
+        for (let fieldAttributeObject of fieldAttributes) {
+            if (fieldAttributeObject.attributeTypeId == DATA_STORE && _.indexOf(dataStoreMasterIdList, fieldAttributeObject.dataStoreMasterId) < 0) {
+                dataStoreMasterIdList.push(fieldAttributeObject.dataStoreMasterId)
+            }
+        }
+        return dataStoreMasterIdList
+    }
+
+    saveDataStoreMasterToDB(dataStoreMasterjsonResponse, dataStoreMasterIdList) {
+        const dataStoreMasterListToBeSaved = dataStoreMasterjsonResponse.filter(dataStoreMaster => _.indexOf(dataStoreMasterIdList, dataStoreMaster.dsMasterId) >= 0)
+        let dataStoreMasterList = []
+        let id = 0
+        for (let dataStoreMaster of dataStoreMasterListToBeSaved) {
+            let dataStoreMasterObject = {
+                attributeTypeId: dataStoreMaster.attributeTypeId,
+                datastoreMasterId: dataStoreMaster.dsMasterId,
+                id: id++,
+                key: dataStoreMaster.key,
+                label: dataStoreMaster.label,
+                lastSyncTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+                searchIndex: dataStoreMaster.searchIndex,
+                uniqueIndex: dataStoreMaster.uniqueIndex,
+            }
+            dataStoreMasterList.push(dataStoreMasterObject)
+        }
+        realm.performBatchSave({
+            tableName: Datastore_Master_DB,
+            value: dataStoreMasterList
+        })
+    }
+
+    async syncDataStore(token) {
+        try {
+            const dataStoreMasterResponse = await this.fetchDataStoreMaster(token)
+            const dataStoreMasterjsonResponse = await dataStoreMasterResponse.json
+            const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+            const dataStoreMasterIdList = await this.getDataStoreMasterIdMappedWithFieldAttribute(fieldAttributes.value)
+            await realm.deleteSpecificTableRecords(Datastore_Master_DB)
+            await this.saveDataStoreMasterToDB(dataStoreMasterjsonResponse, dataStoreMasterIdList)
+            return dataStoreMasterIdList
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    fetchDataStore(token, datastoreMasterId, lastSyncTime, currentPageNumber) {
+        if (!token) {
+            throw new Error('Token Missing')
+        }
+        if (!datastoreMasterId) {
+            throw new Error('datastoreMasterId missing')
+        }
+        console.log('lastSyncTime', encodeURIComponent(lastSyncTime))
+        console.log('currentPageNumber', currentPageNumber)
+        const url = CONFIG.API.DATASTORE_DATA_FETCH_WITH_DATETIME + '?dataStoreMasterId=' + datastoreMasterId + '&pageNumber=' + currentPageNumber + '&pageSize=500' + '&lastDataStoreSyncTime=' + encodeURIComponent(lastSyncTime)
+        const dataStoreResponse = RestAPIFactory(token.value).serviceCall(null, url, GET)
+        return dataStoreResponse
+    }
+
+    async  saveDataStoreToDB(dataStoreJsonResponse) {
+        if (dataStoreJsonResponse) {
+            let dataStoreList = []
+            let dataStoreId = realm.getAll(DataStore_DB).length
+            let id = realm.getAll(Datastore_AttributeValue_DB).length
+            for (let dataStore of dataStoreJsonResponse.content) {
+                let dataStoreAttrValueList = []
+                for (let attribute in dataStore.dataStoreAttributeValueMap) {
+                    // let checkServerIdQuery = `serverUniqueKey = "${dataStore.id}"`
+                    // let queryResult = realm.getRecordListOnQuery(Datastore_AttributeValue_DB, checkServerIdQuery, null, null)
+                    // if (queryResult.length > 0) {
+                    //  realm.deleteRecordList
+                    // }
+                    let dataStoreAttrValue = { id: id++, key: attribute, value: dataStore.dataStoreAttributeValueMap[attribute], serverUniqueKey: dataStore.id }
+                    dataStoreAttrValueList.push(dataStoreAttrValue)
+                }
+                await realm.performBatchSave({ tableName: Datastore_AttributeValue_DB, value: dataStoreAttrValueList })
+                let dataStoreAttrQuery = `serverUniqueKey = "${dataStore.id}"`
+                let dataStoreAttributeResult = realm.getRecordListOnQuery(Datastore_AttributeValue_DB, dataStoreAttrQuery, null, null)
+                let listOfAttributes = []
+                for (let index in dataStoreAttributeResult) {
+                    listOfAttributes.push({ ...dataStoreAttributeResult[index] })
+                }
+                let dataStoreObject = { id: dataStoreId++, datastoreMasterId: dataStore.dataStoreMasterId, datastoreAttributeValueMap: listOfAttributes }
+                dataStoreList.push(dataStoreObject)
+            }
+            await realm.performBatchSave({ tableName: DataStore_DB, value: dataStoreList })
+            // let all = realm.getAll(DataStore_DB)
+            // for (let index in all) {
+            //     let fieldData = { ...all[index] }
+            //     let abc = fieldData.datastoreAttributeValueMap
+            //     console.log('fieldData', abc)
+            //     let result1 = abc.filtered('value = "hello"')
+            //     console.log({...result1[0]})
+            //     console.log('result1', result1)
+            // }
+        }
+    }
+
+    async fetchDatastoreAndSaveInDB(token, datastoreMasterId, currentPageNumber, lastSyncTime) {
+        console.log('fetchDatastoreAndSaveInDB')
+        const dataStoreResponse = await this.fetchDataStore(token, datastoreMasterId, lastSyncTime, currentPageNumber)
+        let dataStoreJsonResponse = await dataStoreResponse.json
+        await this.saveDataStoreToDB(dataStoreJsonResponse)
+        console.log('dataStoreJsonResponse', dataStoreJsonResponse)
+        return {
+            totalElements: dataStoreJsonResponse.totalElements,
+            totalPage: dataStoreJsonResponse.totalPage
+        }
     }
 }
 

@@ -87,6 +87,7 @@ import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
+import OfflineDS from '../../containers/OfflineDS'
 import { NavigationActions } from 'react-navigation'
 import {
   ApplicationScreen,
@@ -402,6 +403,9 @@ export const AppNavigator = StackNavigator({
   },
   DataStoreDetails: {
     screen: DataStoreDetails
+  },
+  OfflineDS: {
+    screen: OfflineDS
   }
 }, {
     cardStyle: {

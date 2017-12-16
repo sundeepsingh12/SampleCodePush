@@ -160,6 +160,7 @@ module.exports = keyMirror({
     SAVE_ACTIVATED: null,
     LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
+    LAST_DATASTORE_SYNC_TIME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -170,6 +171,9 @@ module.exports = keyMirror({
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
     TABLE_SERVER_SMS_LOG: null,
+    Datastore_Master_DB: null,
+    DataStore_DB: null,
+    Datastore_AttributeValue_DB: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -228,6 +232,7 @@ module.exports = keyMirror({
     DataStoreDetails: null,
     LiveJobs: null,
     QrCodeScanner: null,
+    OfflineDS: null,
 
 
     //Skulisting Actions

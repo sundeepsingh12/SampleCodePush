@@ -35,6 +35,8 @@ module.exports = {
     SCAN_AND_SEARCH_SORTING: '/rest/job/search_reference_no',
     DOWNLOAD_LIVE_JOB_DATA: '/rest/device/get_sync_table_live_job_with_pagination',
     SERVICE_ALERT_JOB: '/rest/device/broadcast_job_confirmation',
-    SERVICE_ALERT_JOB_MULTIPLE: '/rest/device/broadcast_job_confirmation_multiple'
+    SERVICE_ALERT_JOB_MULTIPLE: '/rest/device/broadcast_job_confirmation_multiple',
+    DATASTORE_MASTER: '/rest/data_store_attribute_master_all',
+    DATASTORE_DATA_FETCH_WITH_DATETIME: '/rest/device/datastore_fetch_with_datetime',
   }
 }
