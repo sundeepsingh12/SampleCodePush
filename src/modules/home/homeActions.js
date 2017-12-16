@@ -15,7 +15,8 @@ import {
   PENDING,
   LiveJobs,
   PIECHART,
-  CLEAR_HOME_STATE
+  LAST_SYNC_WITH_SERVER,
+  LAST_SYNC_TIME
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -35,7 +36,7 @@ import { Client } from 'react-native-paho-mqtt'
 import { fetchJobs } from '../taskList/taskListActions'
 import { NetInfo } from 'react-native'
 import { jobStatusService } from '../../services/classes/JobStatus'
-
+import {trackingService} from '../../services/classes/Tracking'
 /**
  * This action enables modules for particular user
  */
@@ -136,6 +137,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         unsyncedTransactionList: [],
         syncStatus: 'OK',
       }))
+    
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService(pieChart))
     } catch (error) {
@@ -164,6 +166,9 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
           }))
         }
       }
+    } finally {
+     const difference = await sync.calculateDifference()
+      dispatch(setState(LAST_SYNC_TIME, difference))
     }
   }
 }
@@ -235,8 +240,8 @@ export function startMqttService(pieChart) {
   }
 }
 
-export function clearHomeState() {
-  return {
-    type: CLEAR_HOME_STATE
+export function startTracking(){
+  return async function(dispatch){
+    trackingService.init()
   }
 }

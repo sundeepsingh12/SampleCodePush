@@ -65,10 +65,9 @@ class JobSummary {
     return filteredJobSummaryList[0]
   }
 
-  async getJobSummaryDataOnLastSync() {
+  async getJobSummaryDataOnLastSync(lastSyncTime) {
     const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
     let filteredJobSummaryList = []
-    let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
     for(let index of alljobSummaryList.value){
       if(moment(index.updatedTime).isAfter(lastSyncTime.value)){
         delete index.updatedTime 

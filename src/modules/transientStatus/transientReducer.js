@@ -7,6 +7,7 @@ const initialState = new InitialState()
 import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_IS_RUNNING,
+    RESET_STATE
 }  from '../../lib/constants'
 
 export default function transientStatusReducer(state = initialState, action) {
@@ -17,6 +18,8 @@ export default function transientStatusReducer(state = initialState, action) {
         case ADD_FORM_LAYOUT_STATE:
             return state.set('formLayoutStates', action.payload)
                 .set('loaderRunning', false)
+         case RESET_STATE:
+            return initialState
     }
 
     return state

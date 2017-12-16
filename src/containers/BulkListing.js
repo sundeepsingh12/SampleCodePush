@@ -38,7 +38,7 @@ import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
 import _ from 'lodash'
 import {NEXT_POSSIBLE_STATUS} from '../lib/AttributeConstants'
-import {FormLayout,RESET_STATE} from '../lib/constants'
+import {FormLayout,CLEAR_BULK_STATE} from '../lib/constants'
 
 
 function mapStateToProps(state) {
@@ -96,7 +96,7 @@ class BulkListing extends Component {
               <Container>
                     <Header  style={StyleSheet.flatten([styles.bgPrimary])}>
                   <Left>
-                     <Button transparent onPress={() => { this.props.actions.setState(RESET_STATE)
+                     <Button transparent onPress={() => { this.props.actions.setState(CLEAR_BULK_STATE)
                        this.props.navigation.goBack(null) }}>
                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
                     </Button>
@@ -113,16 +113,21 @@ class BulkListing extends Component {
             </StyleProvider>
           )
         } else {
-          const nextStatusNames = this.props.navigation.state.params.nextStatusList.map(nextStatus => nextStatus.name)
-          nextStatusNames.push('Cancel')
+          let nextStatusNames = []
+          this.props.navigation.state.params.nextStatusList.forEach(object=>{
+            let statusObject = 
+              { text: object.name, icon:"md-arrow-dropright", iconColor: "#000000" }
+              nextStatusNames.push(statusObject)
+          })
+          nextStatusNames.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
           const nextStatusIds = this.props.navigation.state.params.nextStatusList.map(nextStatus => nextStatus.id)
-          console.log('this.props.isSelectAllVisible',this.props.isSelectAllVisible)
+          
           return (
             <StyleProvider style={getTheme(platform)}>
               <Container>
                 <Header  style={StyleSheet.flatten([styles.bgPrimary])}>
                   <Left>
-                     <Button transparent onPress={() => { this.props.actions.setState(RESET_STATE)
+                     <Button transparent onPress={() => { this.props.actions.setState(CLEAR_BULK_STATE)
                        this.props.navigation.goBack(null) }}>
                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
                     </Button>

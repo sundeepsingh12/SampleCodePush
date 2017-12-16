@@ -44,6 +44,7 @@ import {
   DEVICE_IMEI,
   CUSTOMIZATION_APP_MODULE,
   POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
+  LAST_SYNC_WITH_SERVER,
 } from '../../lib/constants'
 
 import {
@@ -538,8 +539,8 @@ class Sync {
           isJobsPresent = true
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
           const unseenTransactions = postOrderList ? await jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : await jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
-          const jobMasterIdJobStatusIdTransactionIdDtoMap = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
-          const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap)
+          const jobMasterIdJobStatusIdTransactionIdDtoObject = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
+          const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
@@ -553,8 +554,8 @@ class Sync {
             await keyValueDBService.deleteValueFromStore('LIVE_JOB')
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
-          await jobSummaryService.updateJobSummary(dataList.jobSummaries)                    
-          await addServerSmsService.setServerSmsMapForPendingStatus(dataList.transactionIdDtos)
+          await jobSummaryService.updateJobSummary(dataList.jobSummaries)
+          await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
         }
       } else {
         isLastPageReached = true
@@ -589,6 +590,25 @@ class Sync {
       })
     }
 
+  }
+
+  async calculateDifference(){
+     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
+      const differenceInDays = moment().diff(lastSyncTime.value, 'days')
+       const differenceInHours = moment().diff(lastSyncTime.value, 'hours')
+       const differenceInMinutes = moment().diff(lastSyncTime.value, 'minutes')
+       const differenceInSeconds = moment().diff(lastSyncTime.value, 'seconds')
+       let timeDifference = ""
+        if (differenceInDays > 0) {
+            timeDifference = `${differenceInDays} days ago`
+        } else if (differenceInHours > 0) {
+            timeDifference = `${differenceInHours} hours ago`
+        } else if (differenceInMinutes > 0) {
+            timeDifference = `${differenceInMinutes} minutes ago`
+        } else {
+            timeDifference = `${differenceInSeconds} seconds ago`
+        }
+      return timeDifference
   }
 }
 

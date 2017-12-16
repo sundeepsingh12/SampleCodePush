@@ -12,6 +12,8 @@ import {
     CUSTOM_APP_DISPLAY,
     SORTING_DISPLAY
 } from '../../lib/ContainerConstants'
+import SortParcelIcon from '../../../src/svg_components/icons/SortParcelIcon'
+import WebUrlIcon from '../../../src/svg_components/icons/WebUrlIcon'
 
 var InitialState = Record({
     modules: {
@@ -40,13 +42,13 @@ var InitialState = Record({
             appModuleId: 26,
             displayName: SORTING_DISPLAY,
             enabled: false,
-            icon: <SequenceIcon />,
+            icon: <SortParcelIcon />,
         }, CUSTOMAPP: {
             appModuleId: 12,
             displayName: CUSTOM_APP_DISPLAY,
             enabled: false,
             remark: null,
-            icon: <SequenceIcon />
+            icon: <WebUrlIcon />
         },
         JOB_ASSIGNMENT: {
             appModuleId: 20,
@@ -87,7 +89,8 @@ var InitialState = Record({
             displayName: 'MSwipe',
             enabled: false,
         }
-    }, pieChart: {
+    },
+     pieChart: {
         PIECHART: {
             appModuleId: 5,
             displayName: 'Pie Chart',
@@ -103,6 +106,8 @@ var InitialState = Record({
     moduleLoading: false,
     chartLoading: false,
     count: null,
+    lastSyncTime:null,
+    isLoggingOut:false
 })
 
 export default InitialState

@@ -5,8 +5,10 @@ import {
     Text,
     Modal
 } from 'react-native'
-import { Button, Input } from 'native-base';
-import feStyle from '../themes/FeStyle'
+import {Content, Button, Input,StyleProvider,Item } from 'native-base';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
+import styles from '../themes/FeStyle'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
@@ -39,50 +41,51 @@ class MobileNoScreen extends Component{
     render(){
         return (
               <Modal
-                        animationType={"slide"}
-                        transparent={false}
-                        onRequestClose={() => null}>
-                        <View style={[feStyle.bgWhite, feStyle.flex1, feStyle.column, { paddingTop: 70 }]}>
-                            <View style={[feStyle.alignCenter, feStyle.column]}>
-                                <Text style={[feStyle.fontWeight500, feStyle.fontXxl, feStyle.fontBlack]}>Enter your mobile</Text>
+                animationType={"slide"}
+                transparent={false}
+                onRequestClose={() => null}>
+                <StyleProvider style={getTheme(platform)}>
+                    <Content style={[styles.marginLeft30, styles.marginRight30]}>
+                        <View style={[styles.bgWhite, styles.flex1, styles.column, { paddingTop: 70 }]}>
+                            <View style={[styles.alignCenter, styles.column]}>
+                                <Text style={[styles.fontWeight500, styles.fontXxl, styles.fontBlack]}>Enter your mobile</Text>
                             </View>
-                            <View style={[feStyle.alignCenter, feStyle.row, feStyle.margin30]}>
-                                <View style={[feStyle.flex1, { height: 50 }]}>
+                            <View style={[styles.marginTop30]}>
+                                <Item rounded>
                                     <Input
                                         placeholder='Mobile Number'
                                         value={this.props.mobileNumber}
                                         keyboardType='numeric'
                                         onChangeText={this.onChangeMobileNo}
+                                        style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                                     />
-                                </View>
+                                </Item>
                             </View>
-                            <Text style={{ textAlign: 'center', color: '#333333', marginBottom: 10 }}>
-                                {this.props.mobileDisplayMessage}
+                            <Text style={[styles.fontCenter, styles.marginTop15, styles.marginBottom15, styles.lineHeight25]}>
+                                 {this.props.mobileDisplayMessage} 
                             </Text>
-                            <View style={[feStyle.row, feStyle.justifyCenter, feStyle.marginTop30]}>
-                                <Button onPress={this.getOtp} full rounded
-                                    style={StyleSheet.flatten(feStyle.margin10)}
-                                    disabled={this.props.isGenerateOtpButtonDisabled}>
-                                    <Text style={[feStyle.fontWhite]}>Send OTP</Text>
-                                </Button>
-                                <Button onPress={this.props.invalidateUserSession} full rounded danger
-                                    disabled={this.props.isMobileScreenLogoutDisabled}
-                                    style={StyleSheet.flatten(feStyle.margin10, feStyle.bgDanger)}>
-                                    <Text style={[feStyle.fontWhite]}>Close</Text>
-                                </Button>
+                            <View style={[styles.justifyCenter]}>
+                                <View style={[styles.marginBottom10]}>
+                                    <Button onPress={this.getOtp} full rounded
+                                        disabled={this.props.isGenerateOtpButtonDisabled}>
+                                        <Text style={[styles.fontWhite]}>Send OTP</Text>
+                                    </Button>
+                                </View>
+                                <View>
+                                    <Button onPress={this.props.invalidateUserSession} full rounded danger
+                                        disabled={this.props.isMobileScreenLogoutDisabled}
+                                        style={[styles.bgDanger]}>
+                                        <Text style={[styles.fontWhite]}>Close</Text>
+                                    </Button>
+                                </View>
                             </View>
 
                         </View>
-                    </Modal>
+                    </Content>
+                </StyleProvider>
+            </Modal>
         )
     }
 }
 
-var styles = StyleSheet.create({
-    container: {
-        flexDirection: 'column',
-        flex: 1,
-        backgroundColor: '#f7f7f7'
-    }
-})
 export default connect(mapStateToProps, mapDispatchToProps)(MobileNoScreen)

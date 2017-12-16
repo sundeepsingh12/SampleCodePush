@@ -11,7 +11,7 @@ import TrackLogs from './schema/trackLogs'
 import ServerSmsLog from './schema/serverSmsLog'
 import _ from 'lodash'
 
-const schemaVersion = 33;
+const schemaVersion = 36
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];
 
 let realm = new Realm({
@@ -34,7 +34,7 @@ import {
 export function save(tableName, object) {
     return realm.write(() => {
         //removing existing entry from Table
-        realm.delete(realm.objects(tableName));
+        // realm.delete(realm.objects(tableName));
         //writing new record
         realm.create(tableName, object);
     });
@@ -120,9 +120,9 @@ export function deleteRecordList(tableName, valueList, property) {
 }
 
 
-export function updateRecordOnMultipleProperty(tableName, valueList,propertyList,count) {
+export function updateRecordOnMultipleProperty(tableName, valueList, propertyList, count) {
     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
-    console.log('123',filteredRecords,propertyList,count)    
+    console.log('123', filteredRecords, propertyList, count)
     realm.write(() => {
         _.forEach(filteredRecords, record => record[propertyList[record.id]] += count[record.id])
     });
@@ -176,4 +176,10 @@ export function updateRealmDb(tableName, transactionIdSequenceMap) {
     realm.write(() => {
         filteredRecords.forEach(record => record.seqSelected = record.seqAssigned = transactionIdSequenceMap[record.id])
     })
+}
+export function deleteSpecificTableRecords(tableName) {
+    return realm.write(() => {
+        //removing existing entry from Table
+        realm.delete(realm.objects(tableName))
+    });
 }

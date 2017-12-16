@@ -243,6 +243,7 @@ module.exports = {
     EXTERNAL_DATA_STORE_URL: "&externalDataStoreUrl=",
     DATA_STORE_ATTR_KEY: "&dataStoreAttributeKey=",
     PATH_TEMP: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP/',
+    PATH: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/CustomerImages/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
     PASSWORD: 61,

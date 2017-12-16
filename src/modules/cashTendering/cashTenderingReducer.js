@@ -8,6 +8,7 @@ import {
     IS_RECEIVE_TOGGLE,
     FETCH_CASH_TENDERING_LIST_RETURN,
     CHANGE_AMOUNT_RETURN,
+    RESET_STATE
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -36,6 +37,9 @@ export default function cashTenderingReducer(state = initialState, action) {
         case FETCH_CASH_TENDERING_LIST_RETURN:
             return state.set('cashTenderingListReturn', action.payload.cashTenderingListReturn)
                 .set('isCashTenderingLoaderRunning', action.payload.isCashTenderingLoaderRunning)
+        
+        case RESET_STATE:
+            return initialState        
 
     }
     return state
