@@ -333,6 +333,9 @@ class BasicFormElement extends Component {
                                         onBlur={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                     />
+                                    {this.props.item.alertMessage ?
+                                        <Label style={[styles.fontDanger]}>{this.props.item.alertMessage}</Label>
+                                        : null}
 
                                 </Item>
                                 {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ? <TouchableHighlight
