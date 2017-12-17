@@ -41,7 +41,7 @@ class SummaryAndPieChart {
 
     setAllJobMasterSummary(jobMasterList,jobStatusList,jobSummaryList){
         const jobMasterSummaryList = {}, jobStatusIdAndLastUpdatedAtServerMap = {}
-        const todayDate =  moment(new Date()).format('YYYY-MM-DD')
+        const todayDate =  moment().format('YYYY-MM-DD')
         const jobTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION,null)
         jobTransactions.forEach(item =>jobStatusIdAndLastUpdatedAtServerMap[item.jobStatusId] = moment(item.getLastUpdatedAtServer).format('YYYY-MM-DD'))
         jobMasterList.forEach(id => jobMasterSummaryList[id.id] = {id : id.id ,code: id.identifier, title : id.title, count : 0, 1 : {count : 0,list : []},2 : {count : 0,list : []},3 : {count : 0,list : []}} )
@@ -50,8 +50,9 @@ class SummaryAndPieChart {
             return total;
         }, {});
         for(id in jobStatusList){
-            if(jobStatusList[id].code == UNSEEN && jobStatusIdAndLastUpdatedAtServerMap[jobStatusList[id].id] != todayDate )
+            if(jobStatusList[id].code == UNSEEN || (jobStatusIdAndLastUpdatedAtServerMap[jobStatusList[id].id] && !(moment(todayDate).isSame(jobStatusIdAndLastUpdatedAtServerMap[jobStatusList[id].id])))){
               continue
+            }
             jobMasterSummaryList[ jobStatusList[id].jobMasterId ][jobStatusList[id].statusCategory].list.push([jobStatusIdCountMap[jobStatusList[id].id] , jobStatusList[id].name, jobStatusList[id].id]);
             jobMasterSummaryList[ jobStatusList[id].jobMasterId ][jobStatusList[id].statusCategory].count += jobStatusIdCountMap[jobStatusList[id].id];
             jobMasterSummaryList[ jobStatusList[id].jobMasterId ].count +=  jobStatusIdCountMap[jobStatusList[id].id];
@@ -93,11 +94,11 @@ class SummaryAndPieChart {
     }
 
     /**
-    * function return count for all transaction according to todayDate
+    * function return map for all list 
     *
-    *@param {*} jobTransactions
+    *@param {*} dtoList
     * 
-    * return {count}
+    * return {listMap}
     */
     idDtoMap(dtoList){
         const listMap = dtoList.reduce(function ( total, current ) {

@@ -9,10 +9,12 @@ import FieldData from './schema/FieldData'
 import Runsheet from './schema/Runsheet'
 import TrackLogs from './schema/trackLogs'
 import ServerSmsLog from './schema/serverSmsLog'
+import TransactionLogs from './schema/transactionLogs'
+
 import _ from 'lodash'
 
-const schemaVersion = 36
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog];
+const schemaVersion = 37;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs];
 
 let realm = new Realm({
     schemaVersion,
@@ -29,6 +31,7 @@ import {
     TABLE_JOB_TRANSACTION_CUSTOMIZATION,
     TABLE_TRACK_LOGS,
     TABLE_SERVER_SMS_LOG,
+    TABLE_TRANSACTION_LOGS,
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -73,6 +76,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_RUNSHEET))
         realm.delete(realm.objects(TABLE_TRACK_LOGS))
         realm.delete(realm.objects(TABLE_SERVER_SMS_LOG))
+        realm.delete(realm.objects(TABLE_TRANSACTION_LOGS))
     });
 }
 

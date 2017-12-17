@@ -658,9 +658,10 @@ class JobTransaction {
         let fieldAttributeMap = fieldAttributeMasterMap[jobMasterId] ? fieldAttributeMasterMap[jobMasterId] : {}
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
         let fieldDataObject = (callingActivity != 'LiveJob') ? fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMap, fieldAttributeStatusMap) : {}
+        let jobTime
         if (callingActivity != 'LiveJob') {
             let skuMap = fieldDataObject.dataMap[SKU_ARRAY]
-            let jobTime = jobDataObject.dataMap[JOB_EXPIRY_TIME]
+            jobTime = jobDataObject.dataMap[JOB_EXPIRY_TIME]
             for (let index in skuMap) {
                 let fieldAttributeMaster = fieldAttributeMap[index]
                 if (jobDataObject.dataList[fieldAttributeMaster.jobAttributeMasterId]) {
@@ -692,6 +693,7 @@ class JobTransaction {
                 jobDataObject,
                 jobTransactionDisplay,
                 seqSelected,
+                jobTime
             }
         }
         else {

@@ -220,7 +220,8 @@ class Summary extends Component {
 
     _renderView= () => {
         const status = ['Pending','Failed','Successful']
-        const listData = this.props.jobMasterSummary;
+        const listData = this.props.jobMasterSummary
+        listData.sort((master1, master2) => master1.title.localeCompare(master2.title))
         if(this.props.jobMasterSummary && this.props.jobMasterSummary.length == 0){
             return <Loader/>
         }

@@ -28,6 +28,7 @@ import {
 } from 'native-base';
 
 import {
+  AUTHENTICATING,
   DOWNLOADING,
   INTERNAL_ERROR,
   INTERNAL_SERVER_ERROR,
@@ -50,7 +51,7 @@ function mapStateToProps(state) {
     syncStatus: state.home.syncStatus,
     unsyncedTransactionList: state.home.unsyncedTransactionList,
     pieChart: state.home.pieChart,
-    lastSyncTime:state.home.lastSyncTime
+    lastSyncTime: state.home.lastSyncTime
   }
 }
 
@@ -143,7 +144,7 @@ class SyncScreen extends Component {
           />
           <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
             {INTERNAL_SERVER_ERROR}
-        </Text>
+          </Text>
           <View style={[styles.marginTop30]}>
             <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> {RETRY} </Text>
@@ -161,11 +162,21 @@ class SyncScreen extends Component {
           />
           <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
             {NO_INTERNET}
-        </Text>
+          </Text>
           <View style={[styles.marginTop30]}>
             <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> {RETRY} </Text>
             </Button>
+          </View>
+        </View>
+      )
+    } else if (this.props.syncStatus == 'RE_AUTHENTICATING') {
+      return (
+        <View style={[styles.bgWhite, styles.padding30, styles.margin10]}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            <View style={[styles.alignCenter, styles.justifyCenter]}>
+              <Text>{AUTHENTICATING}</Text>
+            </View>
           </View>
         </View>
       )
@@ -178,7 +189,7 @@ class SyncScreen extends Component {
           />
           <Text style={[styles.fontLg, styles.fontBlack, styles.marginTop30]}>
             {INTERNAL_ERROR}
-        </Text>
+          </Text>
           <View style={[styles.marginTop30]}>
             <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
               <Text> {RETRY} </Text>
@@ -191,6 +202,10 @@ class SyncScreen extends Component {
   }
 
   render() { 
+
+    if(this.props.syncStatus == 'LOADING') {
+      return <Loader />
+    }
 
     const syncView = this.getSyncView()
     const transactionView = this.getTransactionView()

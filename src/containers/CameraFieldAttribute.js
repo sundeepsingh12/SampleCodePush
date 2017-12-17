@@ -108,7 +108,6 @@ class CameraFieldAttribute extends Component {
         let view
         if (this.state.torchOff == Camera.constants.FlashMode.off) {
             view =
-                
                 <TouchableOpacity style={[styles.flexBasis33_3, styles.alignCenter]}>
                     <Icon name="ios-flash-outline" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this._setTorchOn()} />
                 </TouchableOpacity>
@@ -144,11 +143,11 @@ class CameraFieldAttribute extends Component {
                         </View>
                         <View style={[style.cameraFooter]}>
                             {/* <View style={[styles.row, styles.justifySpaceBetween, styles.paddingTop10, styles.paddingBottom10, { borderBottomColor: 'rgba(0,0,0,.1)', borderBottomWidth: 1 }]}> */}
-                                
-                                {/* <View style={[styles.flexBasis33_3, styles.alignCenter]}>
+
+                            {/* <View style={[styles.flexBasis33_3, styles.alignCenter]}>
                                 <Icon name="md-image" style={[styles.fontWhite, styles.fontXxxl]} />
                             </View> */}
-                                {/* <View style={[styles.flexBasis50, styles.alignCenter]}>
+                            {/* <View style={[styles.flexBasis50, styles.alignCenter]}>
                                     
                                 </View>
                             </View> */}
@@ -177,7 +176,6 @@ class CameraFieldAttribute extends Component {
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
                         <View style={{ flex: 1 }}>
-                            
                             <Image
                                 source={{
                                     isStatic: true,
@@ -185,7 +183,7 @@ class CameraFieldAttribute extends Component {
                                 }}
                                 style={[styles.flex1]}
                             />
-                            <View style={[styles.absolute, styles.padding10, {top:0, left: 0}]}>
+                            <View style={[styles.absolute, styles.padding10, { top: 0, left: 0 }]}>
                                 <Icon
                                     name="md-close"
                                     style={[styles.fontXxxl, styles.fontWhite]}
@@ -195,10 +193,10 @@ class CameraFieldAttribute extends Component {
                                     }} />
                             </View>
                         </View>
-                        <View style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, {bottom: 0}]}>
+                        <View style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
-                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35}]} onPress={() => {
-                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled)
+                                <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
+                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId)
                                     this.props.navigation.goBack()
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
@@ -248,11 +246,11 @@ const style = StyleSheet.create({
         padding: 10,
     },
     cameraFooter: {
-        width: '100%', 
-        position: 'absolute', 
-        bottom: 0, 
-        height: 100, 
-        backgroundColor: 'rgba(0,0,0,.4)', 
+        width: '100%',
+        position: 'absolute',
+        bottom: 0,
+        height: 100,
+        backgroundColor: 'rgba(0,0,0,.4)',
         borderLeftWidth: 0
     }
 });

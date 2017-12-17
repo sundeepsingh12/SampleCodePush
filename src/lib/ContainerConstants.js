@@ -9,6 +9,7 @@ module.exports = {
     SYNC_OK_TEXT: 'All data synced perfectly to the server.',
     UNSYNCED_TASKS: 'Unsynced Tasks',
     UPLOADING: 'Uploading ...',
+    AUTHENTICATING: 'Authenticating...',
 
     //Post Assignment Container
     SHIPMENT_NOT_FOUND: 'Scanned Shipment Not Found',
@@ -24,4 +25,7 @@ module.exports = {
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
+
+    //New Job
+    NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!'
 }

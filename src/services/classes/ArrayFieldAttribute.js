@@ -15,7 +15,7 @@ class ArrayFieldAttribute {
     getSortedArrayChildElements(lastRowId, arrayElements, arrayDTO) {
         if (_.isEmpty(arrayElements)) {
             let errorMessage;
-            let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required))
+            let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
             if (requiredFields.length <= 0) {
                 errorMessage = INVALID_CONFIG_ERROR
             }

@@ -156,7 +156,7 @@ class CheckoutDetails extends Component {
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
                         <View style={[styles.bgWhite]}>
-                            <List>
+                            {/* <List>
                                 <ListItem style={[style.jobListItem]} >
                                     <View style={[styles.row, styles.alignCenter]}>
                                         <Icon name="md-print" style={[styles.fontLg, styles.fontPrimary]} />
@@ -190,7 +190,7 @@ class CheckoutDetails extends Component {
                                         <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
                                     </Right>
                                 </ListItem>
-                            </List>
+                            </List> */}
                         </View>
                         {/* List View */}
                         <View style={[styles.marginTop10, styles.bgWhite]}>
