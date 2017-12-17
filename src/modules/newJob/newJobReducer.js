@@ -4,7 +4,8 @@ import InitialState from './newJobInitialState.js'
 
 import {
     NEW_JOB_MASTER,
-    NEW_JOB_STATUS
+    NEW_JOB_STATUS,
+    SET_ERROR_MSG_FOR_NEW_JOB
   } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -21,8 +22,11 @@ export default function newJobReducer(state = initialState, action){
 
         case NEW_JOB_STATUS : {
             return state.set('statusList',action.payload.nextPendingStatus)
-                        .set('negativeId',action.payload.negativeId)
+                        .set('negativeId',action.payload.negativeId)           
         }
+
+        case SET_ERROR_MSG_FOR_NEW_JOB:
+            return state.set('newJobError', action.payload)     
     }
     return state;
 }

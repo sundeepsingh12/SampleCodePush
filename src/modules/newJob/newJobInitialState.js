@@ -5,6 +5,7 @@
         jobMasterList : [],
         statusList : [],
         negativeId : 0,
+        newJobError: ''
     })
     
     export default InitialState    

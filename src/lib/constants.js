@@ -79,7 +79,7 @@ module.exports = keyMirror({
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
-    TOGGLE_LOGOUT:null,
+    TOGGLE_LOGOUT: null,
 
     //Home Container
     PIECHART: null,
@@ -89,7 +89,7 @@ module.exports = keyMirror({
     SYNC_ERROR: null,
     SYNC_STATUS: null,
     LISTING_SEARCH_VALUE: null,
-    LAST_SYNC_TIME:null,
+    LAST_SYNC_TIME: null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -176,7 +176,7 @@ module.exports = keyMirror({
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
     TABLE_SERVER_SMS_LOG: null,
-    TABLE_TRANSACTION_LOGS:null,
+    TABLE_TRANSACTION_LOGS: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -202,7 +202,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
-    CLEAR_FORM_LAYOUT:null,
+    CLEAR_FORM_LAYOUT: null,
 
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
@@ -299,11 +299,12 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_STOP: null,
     TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
-    CLEAR_SEQUENCE_STATE:null,
+    CLEAR_SEQUENCE_STATE: null,
 
     //New Job
     NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
+    SET_ERROR_MSG_FOR_NEW_JOB: null,
 
     //Transient
     ADD_FORM_LAYOUT_STATE: null,
@@ -334,7 +335,7 @@ module.exports = keyMirror({
     STOP_FETCHING_BULK_TRANSACTIONS: null,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
     TOGGLE_ALL_JOB_TRANSACTIONS: null,
-    CLEAR_BULK_STATE:null,
+    CLEAR_BULK_STATE: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,

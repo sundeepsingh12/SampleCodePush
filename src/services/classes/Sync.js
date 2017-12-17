@@ -343,8 +343,11 @@ class Sync {
   async updateDataInDB(contentQuery) {
     const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
     const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
+    const jobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => !jobTransaction.negativeJobTransactionId)
+      .map(jobTransaction => jobTransaction.id)
     const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
       .map(newJobTransaction => newJobTransaction.negativeJobTransactionId);
+    let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
 
     const runsheets = {
       tableName: TABLE_RUNSHEET,
@@ -366,15 +369,14 @@ class Sync {
       valueList: newJobTransactionsIds,
       propertyName: 'id'
     }
-    const newJobFieldData = {
+    const jobFieldData = {
       tableName: TABLE_FIELD_DATA,
-      valueList: newJobTransactionsIds,
+      valueList: concatinatedJobTransactionsIdsAndNewJobTransactionsIds,
       propertyName: 'jobTransactionId'
     }
-
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, newJobFieldData)
+    await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
     const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
     return jobMasterIds
   }
@@ -592,23 +594,23 @@ class Sync {
 
   }
 
-  async calculateDifference(){
-     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
-      const differenceInDays = moment().diff(lastSyncTime.value, 'days')
-       const differenceInHours = moment().diff(lastSyncTime.value, 'hours')
-       const differenceInMinutes = moment().diff(lastSyncTime.value, 'minutes')
-       const differenceInSeconds = moment().diff(lastSyncTime.value, 'seconds')
-       let timeDifference = ""
-        if (differenceInDays > 0) {
-            timeDifference = `${differenceInDays} days ago`
-        } else if (differenceInHours > 0) {
-            timeDifference = `${differenceInHours} hours ago`
-        } else if (differenceInMinutes > 0) {
-            timeDifference = `${differenceInMinutes} minutes ago`
-        } else {
-            timeDifference = `${differenceInSeconds} seconds ago`
-        }
-      return timeDifference
+  async calculateDifference() {
+    const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
+    const differenceInDays = moment().diff(lastSyncTime.value, 'days')
+    const differenceInHours = moment().diff(lastSyncTime.value, 'hours')
+    const differenceInMinutes = moment().diff(lastSyncTime.value, 'minutes')
+    const differenceInSeconds = moment().diff(lastSyncTime.value, 'seconds')
+    let timeDifference = ""
+    if (differenceInDays > 0) {
+      timeDifference = `${differenceInDays} days ago`
+    } else if (differenceInHours > 0) {
+      timeDifference = `${differenceInHours} hours ago`
+    } else if (differenceInMinutes > 0) {
+      timeDifference = `${differenceInMinutes} minutes ago`
+    } else {
+      timeDifference = `${differenceInSeconds} seconds ago`
+    }
+    return timeDifference
   }
 }
 
