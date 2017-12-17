@@ -201,7 +201,7 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId
      */
-    async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionIdList) {
+    async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionIdList, jobTransactionAssignOrderToHub) {
         try {
             let currentTime =  moment().format('YYYY-MM-DD HH:mm:ss')
             if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
@@ -210,13 +210,13 @@ export default class FormLayoutEventImpl {
             let fieldData, jobTransaction, job, dbObjects
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, jobTransactionAssignOrderToHub)
                 jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, jobTransactionAssignOrderToHub)
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber,currentTime)
             }
@@ -368,7 +368,7 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId 
      */
-    async _getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime) {
+    async _getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, jobTransactionAssignOrderToHub) {
         let user = await keyValueDBService.getValueFromStore(USER)
         let hub = await keyValueDBService.getValueFromStore(HUB)
         let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
@@ -382,8 +382,8 @@ export default class FormLayoutEventImpl {
         }
         else {
             //JobTransactionId > 0 for Normal Job && <0 for New Job
-            jobTransaction = (jobTransactionId > 0) ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
-                : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value,currentTime)
+            jobTransaction = (jobTransactionId > 0 || (jobTransactionId < 0 && !_.isNull(jobTransactionAssignOrderToHub.referenceNumber))) ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
+                : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value, currentTime)
         }
 
         //TODO add more db objects
