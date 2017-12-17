@@ -72,7 +72,7 @@ export async function createZip(transactionIdToBeSynced) {
     const targetPath = PATH + '/sync.zip'
     const sourcePath = PATH_TEMP
     await zip(sourcePath, targetPath);
-    await realm.deleteSpecificTableRecords(TABLE_SERVER_SMS_LOG)
+   // await realm.deleteSpecificTableRecords(TABLE_SERVER_SMS_LOG)
     // await unzip(targetPath, PATH)
     // var content = await RNFS.readFile(PATH + '/logs.json', 'base64')
     // console.log('==image', content)

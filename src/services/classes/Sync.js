@@ -557,7 +557,7 @@ class Sync {
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
           await jobSummaryService.updateJobSummary(dataList.jobSummaries)
-          await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
+          //  await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
         }
       } else {
         isLastPageReached = true

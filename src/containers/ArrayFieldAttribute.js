@@ -5,6 +5,7 @@ import {
     Text,
     FlatList,
     TouchableOpacity,
+    BackHandler
 }
     from 'react-native'
 import { connect } from 'react-redux'
@@ -37,7 +38,9 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
-
+import {
+    HardwareBackPress
+} from '../lib/constants'
 function mapStateToProps(state) {
     return {
         arrayElements: state.array.arrayElements,
@@ -55,6 +58,11 @@ function mapDispatchToProps(dispatch) {
 
 class ArrayFieldAttribute extends Component {
 
+    _goBack = () => {
+        this.props.navigation.goBack()
+        this.props.actions.clearArrayState()
+    }
+
     componentDidMount() {
         this.props.actions.getSortedArrayChildElements(
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
@@ -62,6 +70,7 @@ class ArrayFieldAttribute extends Component {
             this.props.lastRowId,
             this.props.arrayElements
         )
+        BackHandler.addEventListener(HardwareBackPress, this._goBack)
     }
     renderData = (arrayRow) => {
         return (
@@ -146,7 +155,7 @@ class ArrayFieldAttribute extends Component {
                             </Button>
                         </View>
                         <View style={[styles.bgPrimary, styles.marginBottom15]}>
-                            <Button full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
+                            <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
                                 <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                             </Button>
                         </View>
