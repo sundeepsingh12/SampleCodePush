@@ -15,6 +15,7 @@ import {
   SET_SELECTED_DATE,
 } from '../../lib/constants'
 import moment from 'moment'
+import _ from 'lodash'
 
 /**
  * This function fetches tabs list and set in state
@@ -45,6 +46,7 @@ export function fetchJobs(date) {
     try {
       const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
       dispatch(setState(FUTURE_RUNSHEET_ENABLED, customNaming.value.enableFutureDateRunsheet))
+       if(_.isUndefined(date) && customNaming.value.enableFutureDateRunsheet) date = moment().format('YYYY-MM-DD')
       dispatch(setState(SET_SELECTED_DATE,date))      
       dispatch(setState(JOB_LISTING_START))
       const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()

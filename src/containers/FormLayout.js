@@ -133,7 +133,6 @@ class FormLayout extends Component {
   _keyExtractor = (item, index) => item[1].key;
 
   render() {
-    console.log(this.props)
     if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
       Toast.show({
         text: this.props.errorMessage,

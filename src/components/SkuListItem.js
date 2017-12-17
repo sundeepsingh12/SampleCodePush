@@ -10,7 +10,7 @@ import {
     SKU_ORIGINAL_QUANTITY,
     SKU_ACTUAL_QUANTITY
 } from '../lib/AttributeConstants'
-import {  CheckBox,Picker } from 'native-base'
+import {  CheckBox,Picker,Content } from 'native-base'
 import _ from 'lodash'
 
 const Item = Picker.Item;
@@ -21,11 +21,11 @@ const Item = Picker.Item;
     checkSkuItemQuantity(rowItem,originalQuantityValue){
         let quantitySelector
         if (originalQuantityValue <= 1) {
-            quantitySelector = <CheckBox checked={rowItem.value!=0} onPress={()=>this.changeQuantityForCheckBox(rowItem.parentId,rowItem.value)} />
+            quantitySelector = <CheckBox  style={[style.cardCheckbox]} checked={rowItem.value!=0} onPress={()=>this.changeQuantityForCheckBox(rowItem.parentId,rowItem.value)} />
         }
         else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
             
-            quantitySelector = <Picker style={StyleSheet.flatten([{ width: '100%' }])}
+            quantitySelector = <Picker
                 mode="dropdown"  
                 selectedValue={rowItem.value}
                 onValueChange={(value)=>this.changeSkuActualQuantity(value,rowItem.parentId)} >
@@ -61,22 +61,19 @@ const Item = Picker.Item;
 
         if(rowItem.attributeTypeId!=SKU_ORIGINAL_QUANTITY){
          return(
-          <View key={rowItem.autoIncrementId} style={StyleSheet.flatten([styles.column, { backgroundColor: '#F2F2F2' }])}>
+          <View key={rowItem.autoIncrementId} style={[style.card, styles.row]}>
 
-               {!isSkuActualQuantity  ?   <View style={StyleSheet.flatten([styles.row, styles.padding5,styles.justifyStart])}>
-                    <View style={StyleSheet.flatten([styles.row, styles.justifyStart, styles.alignCenter, { flex: .5 }])}>
-                        <Text style={StyleSheet.flatten([styles.bold, styles.fontLg])} >
+               {!isSkuActualQuantity  ?   <View style={[style.cardLeft]}>
+                    <View style={[style.cardLeftTopRow]}>
+                        <Text style={[styles.flexBasis40, styles.fontSm, styles.paddingTop10, styles.paddingBottom10, styles.paddingRight10]} >
                             {rowItem.label}
                           </Text>
-                    </View>
-                     <View style={StyleSheet.flatten([styles.row, styles.justifySpaceBetween, styles.alignCenter, { flex: .5 }])}>
-                        <Text style={StyleSheet.flatten([styles.fontSm])}>
+                          <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10]}>
                             {rowItem.value}
                         </Text>
                     </View>
-
                   </View> :  
-                  <View style={StyleSheet.flatten([])}>
+                  <View>
                   {this.checkSkuItemQuantity(rowItem,originalQuantityValue)}
                   </View>
                 } 
@@ -87,10 +84,73 @@ const Item = Picker.Item;
     render(){
       const originalQuantityValue = this.props.item.filter(object=>object.attributeTypeId==SKU_ORIGINAL_QUANTITY).map(item=>item.value)
         return (
-              <View >
+
+          <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
+              <View style={[style.card]}>
                     {this.props.item.map(object=> this.renderListRow(object,originalQuantityValue))} 
                     </View>
+                    </Content>
         )
     }
 }
+const style = StyleSheet.create({
+  header: {
+    borderBottomWidth: 0,
+    height: 'auto',
+    paddingTop: 10,
+    paddingBottom: 10
+  },
+  headerIcon: {
+    width: 24
+  },
+  headerSearch: {
+    paddingLeft: 10,
+    paddingRight: 30,
+    backgroundColor: '#1260be',
+    borderRadius: 2,
+    height: 30,
+    color: '#fff',
+    fontSize: 10
+  },
+  headerQRButton: {
+    position: 'absolute',
+    right: 5,
+    paddingLeft: 0,
+    paddingRight: 0
+  },
+  card: {
+    paddingLeft: 10,
+    marginBottom: 10,
+    backgroundColor: '#ffffff',
+    elevation: 1,
+    shadowColor: '#d3d3d3',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 2
+  },
+  cardLeft: {
+    flex: 0.85,
+    borderRightColor: '#f3f3f3',
+    borderRightWidth: 1
+  },
+  cardLeftTopRow: {
+    flexDirection: 'row',
+    borderBottomColor: '#f3f3f3',
+    borderBottomWidth: 1
+  },
+  cardRight: {
+    width: 40,
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  cardCheckbox: {
+    backgroundColor: 'green',
+    borderRadius: 0,
+  }
+
+});
 

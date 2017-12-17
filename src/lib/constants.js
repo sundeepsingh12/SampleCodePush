@@ -186,7 +186,6 @@ module.exports = keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
