@@ -162,9 +162,9 @@ class BulkListing extends Component {
                         },
                         buttonIndex => { 
                         if(buttonIndex >=0 && buttonIndex!=nextStatusNames.length-1){
-                          this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex])
+                          this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex].text)
                           } }
-                      ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0])
+                      ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
                     }}
                     success full
                     disabled={_.isEmpty(this.props.selectedItems)}

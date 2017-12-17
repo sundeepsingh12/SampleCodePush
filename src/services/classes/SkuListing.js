@@ -106,9 +106,6 @@ class SkuListing {
                         unitPrice = parseInt(innerObject.value)
                         isUnitPricePresent = true
 
-                    }else if(innerObject.attributeTypeId==SKU_ACTUAL_QUANTITY){
-                            actualQuantityValue=parseInt(innerObject.value)
-                            totalActualQuantityValue+=actualQuantityValue
                     }
                     if(!isUnitPricePresent){
                         skuActualAmount+=(unitPrice*actualQuantityValue)
@@ -122,6 +119,8 @@ class SkuListing {
                         parentId,
                         autoIncrementId
                 }
+                      actualQuantityValue=parseInt(skuActualQuantityObject.value)
+                    totalActualQuantityValue+=actualQuantityValue
                 innerArray.push(skuActualQuantityObject)
                 autoIncrementId++
                 skuObjectListDto[parentId] = innerArray
@@ -137,7 +136,6 @@ class SkuListing {
 
     getSkuChildAttributes(idFieldAttributeMap,attributeTypeIdValueMap){
         const childAttributesList = {}
-
         if(!idFieldAttributeMap.has(TOTAL_ACTUAL_QUANTITY)){
             throw new Error('Total Actual Quantity missing')
         }
@@ -173,6 +171,8 @@ class SkuListing {
     }
 
     getFinalCheckForValidation(skuObjectValidation,skuRootChildElements){
+        console.log('skuRootChildElements',skuRootChildElements)
+        
         if(!skuObjectValidation){
             throw new Error('Sku Object validation missing')
         }
@@ -180,6 +180,7 @@ class SkuListing {
             throw new Error('Sku child elements missing')
         }
         const rightKey = skuObjectValidation.rightKey
+        console.log('skuObjectValidation',skuObjectValidation)
         let message
         if (rightKey!= null && rightKey.includes("1")) {
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ORIGINAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value==skuRootChildElements[TOTAL_ORIGINAL_QUANTITY].value)
@@ -191,6 +192,8 @@ class SkuListing {
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ORIGINAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value!=skuRootChildElements[TOTAL_ORIGINAL_QUANTITY].value)
                         message = TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY
                 } else if (rightKey.includes("4")) {
+                    console.log('4>>>>')
+                    console.log('vv',skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value)
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value!=0)
                         message = QTY_ZERO
                 }

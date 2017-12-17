@@ -9,7 +9,7 @@ var InitialState = Record({
    isSearchBarVisible:false,
    skuObjectValidation:{},
    skuChildItems:{},
-   skuObjectAttributeId:''
+   skuObjectAttributeId:'',
 })
 
 export default InitialState
