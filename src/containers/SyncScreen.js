@@ -201,7 +201,7 @@ class SyncScreen extends Component {
 
   }
 
-  render() {
+  render() { 
 
     if(this.props.syncStatus == 'LOADING') {
       return <Loader />
