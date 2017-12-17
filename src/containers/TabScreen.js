@@ -82,7 +82,9 @@ class TabScreen extends Component {
   componentDidMount() {
     this.props.actions.fetchTabs()
   }
-
+  componentWillUnmount(){
+    this.props.actions.setState(LISTING_SEARCH_VALUE,"")    
+  }
   _onCancel = () => {
     this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
   }

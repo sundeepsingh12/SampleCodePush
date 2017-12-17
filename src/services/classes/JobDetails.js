@@ -86,11 +86,23 @@ class JobDetails {
             autoIncrementId
         }
     }
-
+   async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList){
+       let enableFlag = false
+        if(enableOutForDelivery){
+            enableFlag =  await this.checkOutForDelivery(jobMasterList)
+        }
+        if(!enableFlag && enableResequenceRestriction){
+            enableFlag =  this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList)
+        }
+        if(!enableFlag && jobTime){
+            enableFlag =  this.checkJobExpire(jobTime)
+        }
+        return enableFlag
+    }
 
     checkJobExpire(jobDataList) {
         const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
-        return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : null
+        return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : false
     }
 
     checkEnableResequence(jobMasterList, tabId, seqSelected, statusList) {

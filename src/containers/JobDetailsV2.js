@@ -34,7 +34,8 @@ import ExpandableHeader from '../components/ExpandableHeader'
 import {
   IS_MISMATCHING_LOCATION,
   DataStoreDetails,
-  ImageDetailsView
+  ImageDetailsView,
+  RESET_STATE_FOR_JOBDETAIL
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -86,6 +87,12 @@ class JobDetailsV2 extends Component {
 
   componentDidMount() {
     this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
+  }
+
+  componentWillUnmount(){
+    if(this.props.errorMessage){
+      this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
+    }
   }
 
   navigateToDataStoreDetails = (navigationParam) => {

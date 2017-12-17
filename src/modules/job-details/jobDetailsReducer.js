@@ -7,7 +7,8 @@ import {
     JOB_DETAILS_FETCHING_START,
     JOB_DETAILS_FETCHING_END,
     IS_MISMATCHING_LOCATION,
-    RESET_STATE
+    RESET_STATE,
+    RESET_STATE_FOR_JOBDETAIL
 } from '../../lib/constants'
 
 
@@ -27,7 +28,9 @@ export default function jobDetailsReducer(state = initialState, action) {
                         .set('currentStatus',action.payload.currentStatus)
                         .set('errorMessage',action.payload.errorMessage)
         case RESET_STATE:
-            return initialState                
+            return initialState 
+        case RESET_STATE_FOR_JOBDETAIL:
+            return state.set('errorMessage',false)                
     }
     return state
 }

@@ -89,16 +89,18 @@ class TaskListScreen extends Component {
   }
 
   renderSearchList(searchText, listArray) {
-    let jobTransactionArray = []
-    _.forEach(listArray, function (value) {
+     let jobTransactionArray = []
+    for(let value of listArray) {
       let values = [value.referenceNumber, value.runsheetNo, value.line1, value.line2, value.circleLine1, value.circleLine2]
-      if (_.isEqual(_.toLower(value.referenceNumber), searchText) || _.isEqual(_.toLower(value.runsheetNo), searchText)) {
-        return value
+      if (_.isEqual(_.toLower(value.referenceNumber), searchText) || _.isEqual(_.toLower(value.runsheetNo), searchText)){
+        jobTransactionArray = []
+        jobTransactionArray.push(value)
+        break
       }
       if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
         jobTransactionArray.push(value)
       }
-    })
+    }
     return jobTransactionArray;
   }
 

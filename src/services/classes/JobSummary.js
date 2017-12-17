@@ -27,8 +27,8 @@ class JobSummary {
     const jobSummaryIds = await jobSummaries.map(jobSummaryObject => jobSummaryObject.id)
     const jobSummaryIdJobSummaryObjectMap = {}
     const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')    
-    jobSummaries.forEach(jobSummaryObject => {
-      jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
+    jobSummaries.forEach(jobSummaryObject => {        
+         jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
     })
     jobSummariesInStore.value.forEach(jobSummaryObject => {
       if (jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id]) {
