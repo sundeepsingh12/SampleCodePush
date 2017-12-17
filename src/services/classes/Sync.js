@@ -155,9 +155,13 @@ class Sync {
    */
   async processTdcResponse(tdcContentArray, isLiveJob) {
     let tdcContentObject, jobMasterIds
+    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)   
+    const user = await keyValueDBService.getValueFromStore(USER)
+    const hub = await keyValueDBService.getValueFromStore(HUB)
+    const imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI) 
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
-      let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery)
+      let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery, jobMaster, user, hub, imei)
 
       if (allJobsToTransaction.length) {
         contentQuery.jobTransactions = (contentQuery.jobTransactions) ? allJobsToTransaction.concat(contentQuery.jobTransactions) : allJobsToTransaction
@@ -180,7 +184,7 @@ class Sync {
         const deleteJobs = {
           tableName: TABLE_JOB,
           valueList: jobIds,
-          propertyName: 'jobId'
+          propertyName: 'id'
         }
         const deleteJobData = {
           tableName: TABLE_JOB_DATA,
@@ -193,13 +197,12 @@ class Sync {
     return jobMasterIds
   }
 
-  async getAssignOrderTohubEnabledJobs(query) {
+  async getAssignOrderTohubEnabledJobs(query, jobMaster, user, hub, imei) {
     let allJobsToTransactions = []
-    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     let jobMasterWithAssignOrderToHubEnabled = {}
     jobMaster.value.forEach(jobMasterObject => {
       if (jobMasterObject.assignOrderToHub) {
-        jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.id
+        jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.code
       }
     })
     let transactionList = query.jobTransactions
@@ -211,45 +214,33 @@ class Sync {
     for (let jobs of query.job) {
       let jobMasterid = jobMasterWithAssignOrderToHubEnabled[jobs.jobMasterId]
       if ((_.isEmpty(transactionListIdMap) || !transactionListIdMap[jobs.id]) && jobMasterid) {
-        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobs, jobMaster.value)
+        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobs, jobMaster.value, user, hub, imei, jobMasterWithAssignOrderToHubEnabled)
         allJobsToTransactions.push(unassignedTransactions)
       }
     }
     return allJobsToTransactions
   }
 
-  async _createTransactionsOfUnassignedJobs(job, jobMaster) {
-    let user = await keyValueDBService.getValueFromStore(USER)
-    let hub = await keyValueDBService.getValueFromStore(HUB)
-    let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    let jobmaster
-    for (let jobMasterObject of jobMaster) {
-      if (jobMasterObject.id == job.jobMasterId) {
-        jobmaster = jobMasterObject
-        break
-      }
-    }
+  async _createTransactionsOfUnassignedJobs(job, jobMaster, user, hub, imei, jobMasterIdvsCode) {
     let jobstatusid = await jobStatusService.getStatusIdForJobMasterIdAndCode(job.jobMasterId, "PENDING")
-    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatusid, jobmaster, user.value, hub.value, imei.value)
-    jobtransaction.jobId = job.id
-    jobtransaction.seqSelected = -job.id
+    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatusid, job.referenceNo, user.value, hub.value, imei.value, jobMasterIdvsCode)
     return jobtransaction
   }
 
-  _getDefaultValuesForJobTransaction(id, statusid, jobMaster, user, hub, imei) {
+  _getDefaultValuesForJobTransaction(id, statusid, referenceNumber, user, hub, imei, jobMasterIdVSCode) {
     //TODO some values like lat/lng and battery are not valid values, update them as their library is added
     return jobTransaction = {
       id,
       runsheetNo: "AUTO-GEN",
       syncErp: false,
       userId: user.id,
-      jobId: id,
+      jobId: -id,
       jobStatusId: statusid,
       companyId: user.company.id,
       actualAmount: 0.0,
       originalAmount: 0.0,
       moneyTransactionType: '',
-      referenceNumber: user.id + "/" + hub.id + "/" + moment().valueOf(),
+      referenceNumber: referenceNumber,
       runsheetId: null,
       hubId: hub.id,
       cityId: user.cityId,
@@ -266,15 +257,15 @@ class Sync {
       lastTransactionTimeOnMobile: moment().format('YYYY-MM-DD HH:mm:ss'),
       deleteFlag: 0,
       attemptCount: 1,
-      jobType: jobMaster.code,
-      jobMasterId: jobMaster.id,
+      jobType: _.values(jobMasterIdVSCode)[0],
+      jobMasterId: Number(_.keys(jobMasterIdVSCode)[0]),
       employeeCode: user.employeeCode,
       hubCode: hub.code,
       statusCode: "PENDING",
       startTime: "00:00",
       endTime: "00:00",
       merchantCode: null,
-      seqSelected: 0,
+      seqSelected: id,
       seqAssigned: 0,
       seqActual: 0,
       latitude: 0.0,
@@ -551,7 +542,7 @@ class Sync {
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
-          if (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification)) {
+          if (!_.isNull(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification))) {
             this.showNotification(jobMasterTitleList)
             await keyValueDBService.deleteValueFromStore('LIVE_JOB')
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })

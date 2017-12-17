@@ -36,7 +36,7 @@ import {
 import {
   UNSEEN,
 } from '../../lib/AttributeConstants'
-
+import _ from 'lodash'
 
 class JobMaster {
   /**
@@ -261,6 +261,9 @@ class JobMaster {
   async getJobMasterTitleListFromIds(jobMasterIdList) {
     const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
     let jobMasterTitleList = []
+    if(_.isUndefined(jobMasterIdList)){
+      return null
+    }
     jobMasters.value.forEach(jobMaster => {
       if (jobMasterIdList.includes(jobMaster.id)) {
         jobMasterTitleList.push(jobMaster.title)
