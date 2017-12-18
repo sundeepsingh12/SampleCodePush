@@ -130,6 +130,9 @@ export default class FormLayoutEventImpl {
         formLayoutObject.get(attributeMasterId).value = (value != null && value != undefined && value.length != 0 && value.length < 64 &&
             formLayoutObject.get(attributeMasterId).attributeTypeId == 61) ? sha256(value) : value;
         formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
+        if(!calledFrom) {
+            formLayoutObject.get(attributeMasterId).alertMessage = null
+        }
         if (value && value.length > 0 && calledFrom == ON_BLUR) {
             formLayoutObject.get(attributeMasterId).showCheckMark = true;
         }
