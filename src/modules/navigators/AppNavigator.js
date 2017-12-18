@@ -420,10 +420,8 @@ export const AppNavigator = StackNavigator({
   },
   JobMasterListScreen: {
     screen: JobMaster
-  }
-},
-  {
-  DataStoreDetails: {
+  },
+   DataStoreDetails: {
     screen: DataStoreDetails
   },
   CameraAttribute: {
@@ -432,7 +430,8 @@ export const AppNavigator = StackNavigator({
   ImageDetailsView: {
     screen: ImageDetailsView,
   }
-}, {
+},
+{
     cardStyle: {
       backgroundColor: 'white'
     }
