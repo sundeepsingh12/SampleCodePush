@@ -21,7 +21,7 @@ Job.schema = {
       status: 'int',
       latitude: { type: 'double', default: 0 },
       longitude: { type: 'double', default: 0 },
-      slot: { type: 'int', default: 0 },
+      slot: { type: 'int', default: 0,optional:true },
       merchantCode: 'string?',
       jobStartTime: { type: 'string', default: '' },
       createdAt: { type: 'string', default: '' },
