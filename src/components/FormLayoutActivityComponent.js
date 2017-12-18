@@ -93,7 +93,7 @@ class FormLayoutActivityComponent extends Component {
                                     {this.props.item.helpText}
                                 </Text> : null}
                             {this.props.item.alertMessage ?
-                                <Text style={[styles.fontDanger]}>{this.props.item.alertMessage}</Text>
+                                <Text style={[styles.fontDanger, styles.fontSm, styles.paddingTop5]}>{this.props.item.alertMessage}</Text>
                                 : null}
                         </View>
                     </View>
