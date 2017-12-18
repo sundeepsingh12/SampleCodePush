@@ -18,7 +18,8 @@ import {
     CUSTOMAPP_ID,
     NEWJOB_ID,
     NEW_JOB,
-    Piechart
+    Piechart,
+    JOB_ASSIGNMENT_ID,
 } from '../../lib/AttributeConstants'
 import {
     BACKUP,
@@ -36,9 +37,10 @@ import {
     SUMMARY,
     SORTING,
     CUSTOMAPP,
+    JOB_ASSIGNMENT,
 } from '../../lib/constants'
 import _ from 'lodash'
-import SequenceIcon from '../../../src/svg_components/icons/SequenceIcon'
+import NewJobIcon from '../../../src/svg_components/icons/NewJobIcon'
 class ModuleCustomization {
 
     /**
@@ -169,6 +171,11 @@ class ModuleCustomization {
                         cloneModules = _.merge(cloneModules, newJobModuleParams.appModuleObject)
                         break
                     }
+                case JOB_ASSIGNMENT_ID: {
+                    cloneModules[JOB_ASSIGNMENT] = this.setModuleDetails(cloneModules[JOB_ASSIGNMENT], moduleCustomizationList[index], user, serialNumber++)
+                    console.log(cloneModules[JOB_ASSIGNMENT])
+                    break
+                }
             }
         }
         return {
@@ -224,7 +231,7 @@ class ModuleCustomization {
         let appModuleObject = {}
         let appModule = {
             enabled: true,
-            icon: <SequenceIcon />,
+            icon: <NewJobIcon />,
             appModuleId: moduleCustomization.appModulesId
         }
         if (moduleCustomization.remark != undefined && moduleCustomization.remark != null && moduleCustomization.remark != '[]') {
@@ -270,7 +277,7 @@ class ModuleCustomization {
         }
         for (let index in selectedUserTypeList) {
             if (selectedUserTypeList[index].userTypeId == user.userType.id) {
-                return (selectedUserTypeList[index].displayText + ' ')
+                return (selectedUserTypeList[index].displayText ? selectedUserTypeList[index].displayText + ' ' : '  ')
             }
         }
         return false

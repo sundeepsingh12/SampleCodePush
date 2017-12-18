@@ -256,7 +256,7 @@ class FormLayout {
             if (navigationFormLayoutStates) {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId,jobTransactionIdList)
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId,jobTransactionIdList, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         }
         return {

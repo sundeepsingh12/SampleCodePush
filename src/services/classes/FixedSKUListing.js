@@ -65,7 +65,7 @@ class FixedSKUListing {
             fixedSKUObject.id = this.id++
             fixedSKUObject.childDataList[FIXED_SKU_CODE].value = name
             fixedSKUObject.childDataList[FIXED_SKU_UNIT_PRICE].value = code
-            fixedSKUObject.childDataList[FIXED_SKU_QUANTITY].value = ''
+            fixedSKUObject.childDataList[FIXED_SKU_QUANTITY].value = 0
             fixedSKUList[fixedSKUObject.id] = fixedSKUObject
         })
         return fixedSKUList

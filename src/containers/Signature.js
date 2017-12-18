@@ -61,6 +61,7 @@ class Signature extends Component {
                 this.props.navigation.state.params.formElements,
                 this.props.navigation.state.params.isSaveDisabled)
         }
+        this.setState({ isLandscape: 'portrait' })
         this.props.navigation.goBack()
     }
 
@@ -79,7 +80,6 @@ class Signature extends Component {
 
     onSaveEvent = (result) => {
         this.onSaveSign(result)
-        this.setState({ isLandscape: 'portrait' })
     }
     onDragEvent() {
         console.log("dragged");
@@ -93,7 +93,10 @@ class Signature extends Component {
                             <Body>
                                 <View
                                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => {
+                                        this.setState({ isLandscape: 'portrait' })
+                                        this.props.navigation.goBack(null)
+                                    }}>
                                         <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
                                     </TouchableOpacity>
                                     <View style={[style.headerBody]}>

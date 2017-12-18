@@ -90,6 +90,9 @@ import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
 import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
+import Scanner from '../../components/Scanner'
+import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
+import JobMaster from '../../containers/JobMaster'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -409,6 +412,17 @@ export const AppNavigator = StackNavigator({
   FormDetailsV2: {
     screen: FormDetailsV2
   },
+  Scanner: {
+    screen: Scanner
+  },
+  PostAssignmentScanner: {
+    screen: PostAssignmentScanner
+  },
+  JobMasterListScreen: {
+    screen: JobMaster
+  }
+},
+  {
   DataStoreDetails: {
     screen: DataStoreDetails
   },

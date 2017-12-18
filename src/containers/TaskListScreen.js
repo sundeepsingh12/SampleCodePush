@@ -75,11 +75,22 @@ class TaskListScreen extends Component {
 
   renderListForAll() {
     let sectionList = []
-    let listObject = this.props.jobTransactionCustomizationList
-    if (!_.isEmpty(listObject)) {
-      for (let key in listObject) {
+    let listObject = _.clone(this.props.jobTransactionCustomizationList)  
+    let statusIdlistObject = {}  
+    for(let selectedDateObject in listObject){
+      let statusIdFilteredArray = []
+      statusIdFilteredArray = listObject[selectedDateObject].filter(arrayItem => this.props.statusIdList.includes(arrayItem.statusId))
+      console.log("statusIdFilteredArray",statusIdFilteredArray)
+      if(!_.isEmpty(statusIdFilteredArray)){
+        statusIdlistObject[selectedDateObject] = statusIdFilteredArray
+      console.log("statusIdlistObject",statusIdlistObject)
+    }
+  }
+      console.log("statusIdlistObject",statusIdlistObject)
+      if (!_.isEmpty(statusIdlistObject)) {
+      for (let key in statusIdlistObject) {
         let sectionListObject = {
-          data: listObject[key],
+          data: statusIdlistObject[key],
           key: key,
         }
         sectionList.push(sectionListObject)
@@ -89,16 +100,18 @@ class TaskListScreen extends Component {
   }
 
   renderSearchList(searchText, listArray) {
-    let jobTransactionArray = []
-    _.forEach(listArray, function (value) {
+     let jobTransactionArray = []
+    for(let value of listArray) {
       let values = [value.referenceNumber, value.runsheetNo, value.line1, value.line2, value.circleLine1, value.circleLine2]
-      if (_.isEqual(_.toLower(value.referenceNumber), searchText) || _.isEqual(_.toLower(value.runsheetNo), searchText)) {
-        return value
+      if (_.isEqual(_.toLower(value.referenceNumber), searchText) || _.isEqual(_.toLower(value.runsheetNo), searchText)){
+        jobTransactionArray = []
+        jobTransactionArray.push(value)
+        break
       }
       if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
         jobTransactionArray.push(value)
       }
-    })
+    }
     return jobTransactionArray;
   }
 

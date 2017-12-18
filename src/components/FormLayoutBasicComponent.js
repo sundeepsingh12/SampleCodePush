@@ -152,7 +152,7 @@ class BasicFormElement extends Component {
                 break
             }
             default: {
-                screenName = 'OverlayAttributes'
+                break
             }
         }
 
@@ -333,8 +333,12 @@ class BasicFormElement extends Component {
                                         onBlur={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                     />
+                                    
 
                                 </Item>
+                                {this.props.item.alertMessage ?
+                                        <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
+                                        : null}
                                 {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ? <TouchableHighlight
                                     style={[styles.absolute, { bottom: 50, right: 10 }]}
                                     onPress={this.goToQRCode}
@@ -368,12 +372,16 @@ class BasicFormElement extends Component {
             case CAMERA:
             case CAMERA_HIGH:
             case CAMERA_MEDIUM:
-                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
+                return (
+                    renderIf(!this.props.item.hidden,
+                        <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />)
+                )
             case NPS_FEEDBACK:
-                return <View>
+                return (<View>
                     {modalView}
-                    <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />
-                </View>
+                    {renderIf(!this.props.item.hidden,
+                        <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />)}
+                </View>)
             case CHECKBOX:
             case RADIOBUTTON:
             case DROPDOWN:
@@ -381,7 +389,8 @@ class BasicFormElement extends Component {
                 return (
                     <View>
                         {modalView}
-                        <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />
+                        {renderIf(!this.props.item.hidden,
+                            <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />)}
                     </View>
                 )
             case DATE:
@@ -390,7 +399,8 @@ class BasicFormElement extends Component {
                 return (
                     <View>
                         {modalView}
-                        <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />
+                        {renderIf(!this.props.item.hidden,
+                            <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />)}
                     </View>
                 )
             default:

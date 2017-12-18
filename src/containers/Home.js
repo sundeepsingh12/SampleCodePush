@@ -43,12 +43,8 @@ import {
   CUSTOMAPP_ID,
   CHOOSE_WEB_URL,
   NEWJOB_ID,
+  JOB_ASSIGNMENT_ID
 } from '../lib/AttributeConstants'
-
-import {
-  PIECHART,
-  SUMMARY,
-} from '../lib/constants'
 
 import {
   TabScreen,
@@ -58,7 +54,10 @@ import {
   LiveJobs,
   Summary,
   CustomApp,
-  NewJob
+  NewJob,
+  PIECHART,
+  SUMMARY,
+  JobMasterListScreen,
 } from '../lib/constants'
 import _ from 'lodash'
 
@@ -78,9 +77,6 @@ function mapDispatchToProps(dispatch) {
     actions: bindActionCreators({ ...homeActions, ...globalActions }, dispatch)
   }
 }
-
-const percentage = 95;
-
 
 class Home extends Component {
 
@@ -122,6 +118,10 @@ class Home extends Component {
             appModule
           });
         break
+      }
+
+      case JOB_ASSIGNMENT_ID: {
+        this.props.actions.navigateToScene(JobMasterListScreen)
       }
 
       default:

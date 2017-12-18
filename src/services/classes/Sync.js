@@ -42,15 +42,18 @@ import {
   JOB_STATUS,
   HUB,
   DEVICE_IMEI,
-  LAST_SYNC_WITH_SERVER
-
+  CUSTOMIZATION_APP_MODULE,
+  POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
+  LAST_SYNC_WITH_SERVER,
 } from '../../lib/constants'
 
 import {
-  FAREYE_UPDATES
+  FAREYE_UPDATES,
+  JOB_ASSIGNMENT_ID,
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
 import NotificationsIOS, { NotificationsAndroid } from 'react-native-notifications'
+import { moduleCustomizationService } from './ModuleCustomization';
 
 class Sync {
 
@@ -152,9 +155,13 @@ class Sync {
    */
   async processTdcResponse(tdcContentArray, isLiveJob) {
     let tdcContentObject, jobMasterIds
+    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)   
+    const user = await keyValueDBService.getValueFromStore(USER)
+    const hub = await keyValueDBService.getValueFromStore(HUB)
+    const imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI) 
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
-      let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery)
+      let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery, jobMaster, user, hub, imei)
 
       if (allJobsToTransaction.length) {
         contentQuery.jobTransactions = (contentQuery.jobTransactions) ? allJobsToTransaction.concat(contentQuery.jobTransactions) : allJobsToTransaction
@@ -177,7 +184,7 @@ class Sync {
         const deleteJobs = {
           tableName: TABLE_JOB,
           valueList: jobIds,
-          propertyName: 'jobId'
+          propertyName: 'id'
         }
         const deleteJobData = {
           tableName: TABLE_JOB_DATA,
@@ -190,13 +197,12 @@ class Sync {
     return jobMasterIds
   }
 
-  async getAssignOrderTohubEnabledJobs(query) {
+  async getAssignOrderTohubEnabledJobs(query, jobMaster, user, hub, imei) {
     let allJobsToTransactions = []
-    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     let jobMasterWithAssignOrderToHubEnabled = {}
     jobMaster.value.forEach(jobMasterObject => {
       if (jobMasterObject.assignOrderToHub) {
-        jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.id
+        jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.code
       }
     })
     let transactionList = query.jobTransactions
@@ -208,45 +214,33 @@ class Sync {
     for (let jobs of query.job) {
       let jobMasterid = jobMasterWithAssignOrderToHubEnabled[jobs.jobMasterId]
       if ((_.isEmpty(transactionListIdMap) || !transactionListIdMap[jobs.id]) && jobMasterid) {
-        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobs, jobMaster.value)
+        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobs, jobMaster.value, user, hub, imei, jobMasterWithAssignOrderToHubEnabled)
         allJobsToTransactions.push(unassignedTransactions)
       }
     }
     return allJobsToTransactions
   }
 
-  async _createTransactionsOfUnassignedJobs(job, jobMaster) {
-    let user = await keyValueDBService.getValueFromStore(USER)
-    let hub = await keyValueDBService.getValueFromStore(HUB)
-    let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-    let jobmaster
-    for (let jobMasterObject of jobMaster) {
-      if (jobMasterObject.id == job.jobMasterId) {
-        jobmaster = jobMasterObject
-        break
-      }
-    }
+  async _createTransactionsOfUnassignedJobs(job, jobMaster, user, hub, imei, jobMasterIdvsCode) {
     let jobstatusid = await jobStatusService.getStatusIdForJobMasterIdAndCode(job.jobMasterId, "PENDING")
-    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatusid, jobmaster, user.value, hub.value, imei.value)
-    jobtransaction.jobId = job.id
-    jobtransaction.seqSelected = -job.id
+    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatusid, job.referenceNo, user.value, hub.value, imei.value, jobMasterIdvsCode)
     return jobtransaction
   }
 
-  _getDefaultValuesForJobTransaction(id, statusid, jobMaster, user, hub, imei) {
+  _getDefaultValuesForJobTransaction(id, statusid, referenceNumber, user, hub, imei, jobMasterIdVSCode) {
     //TODO some values like lat/lng and battery are not valid values, update them as their library is added
     return jobTransaction = {
       id,
       runsheetNo: "AUTO-GEN",
       syncErp: false,
       userId: user.id,
-      jobId: id,
+      jobId: -id,
       jobStatusId: statusid,
       companyId: user.company.id,
       actualAmount: 0.0,
       originalAmount: 0.0,
       moneyTransactionType: '',
-      referenceNumber: user.id + "/" + hub.id + "/" + moment().valueOf(),
+      referenceNumber: referenceNumber,
       runsheetId: null,
       hubId: hub.id,
       cityId: user.cityId,
@@ -263,15 +257,15 @@ class Sync {
       lastTransactionTimeOnMobile: moment().format('YYYY-MM-DD HH:mm:ss'),
       deleteFlag: 0,
       attemptCount: 1,
-      jobType: jobMaster.code,
-      jobMasterId: jobMaster.id,
+      jobType: _.values(jobMasterIdVSCode)[0],
+      jobMasterId: Number(_.keys(jobMasterIdVSCode)[0]),
       employeeCode: user.employeeCode,
       hubCode: hub.code,
       statusCode: "PENDING",
       startTime: "00:00",
       endTime: "00:00",
       merchantCode: null,
-      seqSelected: 0,
+      seqSelected: id,
       seqAssigned: 0,
       seqActual: 0,
       latitude: 0.0,
@@ -340,8 +334,11 @@ class Sync {
   async updateDataInDB(contentQuery) {
     const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
     const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
+    const jobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => !jobTransaction.negativeJobTransactionId)
+      .map(jobTransaction => jobTransaction.id)
     const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
       .map(newJobTransaction => newJobTransaction.negativeJobTransactionId);
+    let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
 
     const runsheets = {
       tableName: TABLE_RUNSHEET,
@@ -363,15 +360,14 @@ class Sync {
       valueList: newJobTransactionsIds,
       propertyName: 'id'
     }
-    const newJobFieldData = {
+    const jobFieldData = {
       tableName: TABLE_FIELD_DATA,
-      valueList: newJobTransactionsIds,
+      valueList: concatinatedJobTransactionsIdsAndNewJobTransactionsIds,
       propertyName: 'jobTransactionId'
     }
-
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, newJobFieldData)
+    await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
     const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
     return jobMasterIds
   }
@@ -513,7 +509,10 @@ class Sync {
       pageSize = 200
     let isLastPageReached = false,
       json, isJobsPresent = false, jobMasterIds
-    const unseenStatusIds = await jobStatusService.getAllIdsForCode(UNSEEN)
+    const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
+    let jobAssignmentModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(appModulesList.value, JOB_ASSIGNMENT_ID)
+    let postAssignmentList = jobAssignmentModule.length == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark).postAssignmentList : null
+    const unseenStatusIds = postAssignmentList && postAssignmentList.length > 0 ? await jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(postAssignmentList, UNSEEN) : await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob)
       if (tdcResponse) {
@@ -531,23 +530,25 @@ class Sync {
 
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
-          const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
+          const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
+          const unseenTransactions = postOrderList ? await jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : await jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoObject = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
           const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
           const messageIdDTOs = []
           if (!isLiveJob) {
             await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+            await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
           }
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
-          if (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification)) {
+          if (!_.isNull(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification))) {
             this.showNotification(jobMasterTitleList)
             await keyValueDBService.deleteValueFromStore('LIVE_JOB')
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
-          jobSummaryService.updateJobSummary(dataList.jobSummaries)
-          await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
+          await jobSummaryService.updateJobSummary(dataList.jobSummaries)
+          //  await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
         }
       } else {
         isLastPageReached = true
@@ -560,7 +561,6 @@ class Sync {
         }
       }
     }
-    console.log('isJobsPresent', isJobsPresent)
     if (isJobsPresent) {
       await runSheetService.updateRunSheetSummary()
     }
@@ -585,23 +585,23 @@ class Sync {
 
   }
 
-  async calculateDifference(){
-     const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
-      const differenceInDays = moment().diff(lastSyncTime.value, 'days')
-       const differenceInHours = moment().diff(lastSyncTime.value, 'hours')
-       const differenceInMinutes = moment().diff(lastSyncTime.value, 'minutes')
-       const differenceInSeconds = moment().diff(lastSyncTime.value, 'seconds')
-       let timeDifference = ""
-        if (differenceInDays > 0) {
-            timeDifference = `${differenceInDays} days ago`
-        } else if (differenceInHours > 0) {
-            timeDifference = `${differenceInHours} hours ago`
-        } else if (differenceInMinutes > 0) {
-            timeDifference = `${differenceInMinutes} minutes ago`
-        } else {
-            timeDifference = `${differenceInSeconds} seconds ago`
-        }
-      return timeDifference
+  async calculateDifference() {
+    const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
+    const differenceInDays = moment().diff(lastSyncTime.value, 'days')
+    const differenceInHours = moment().diff(lastSyncTime.value, 'hours')
+    const differenceInMinutes = moment().diff(lastSyncTime.value, 'minutes')
+    const differenceInSeconds = moment().diff(lastSyncTime.value, 'seconds')
+    let timeDifference = ""
+    if (differenceInDays > 0) {
+      timeDifference = `${differenceInDays} days ago`
+    } else if (differenceInHours > 0) {
+      timeDifference = `${differenceInHours} hours ago`
+    } else if (differenceInMinutes > 0) {
+      timeDifference = `${differenceInMinutes} minutes ago`
+    } else {
+      timeDifference = `${differenceInSeconds} seconds ago`
+    }
+    return timeDifference
   }
 }
 

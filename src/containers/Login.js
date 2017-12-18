@@ -22,7 +22,7 @@ import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf'
 import codePush from "react-native-code-push"
-import {QrCodeScanner} from '../lib/constants'
+import { QrCodeScanner } from '../lib/constants'
 
 
 var style = StyleSheet.create({
@@ -122,26 +122,33 @@ class Login extends Component {
   //   });
   // }
 
+  getImageView() {
+    if (!this.props.auth.form.authenticationService) {
+      return (
+        <Image
+          style={styles.logoStyle}
+          source={require('../../images/fareye-logo.png')}
+        />
+      )
+    }
+    if (this.props.auth.form.authenticationService) {
+      return <Spinner />
+    }
+  }
+
   startScanner = () => {
-    this.props.navigation.navigate(QrCodeScanner, {returnData: this._onBarCodeRead.bind(this)})
+    this.props.navigation.navigate(QrCodeScanner, { returnData: this._onBarCodeRead.bind(this) })
   }
 
   render() {
+    const imageView = this.getImageView()
     return (
           <StyleProvider style={getTheme(platform)}>
             <Container>
               <Content>
                 <View style={style.container}>
                   <View style={style.logoContainer}>
-                    {renderIf(!this.props.auth.form.authenticationService,
-                      <Image
-                        style={style.logoStyle}
-                        source={require('../../images/fareye-logo.png')}
-                      />
-                    )}
-                    {renderIf(this.props.auth.form.authenticationService,
-                      <Spinner />
-                    )}
+                    {imageView}
                   </View>
                   <View style={[style.width70, styles.marginTop30]}>
                     <Item rounded style={[styles.marginBottom10]}>
@@ -160,6 +167,7 @@ class Login extends Component {
                         placeholder='Password'
                         secureTextEntry={true}
                         onChangeText={this.onChangePassword}
+                        onSubmitEditing={this.loginButtonPress}
                         disabled={this.props.auth.form.isEditTextDisabled}
                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                       />

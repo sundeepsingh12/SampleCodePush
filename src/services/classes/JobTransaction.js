@@ -40,6 +40,14 @@ class JobTransaction {
         return transactionList
     }
 
+    getJobTransactionsForDeleteSync(statusIds, postOrderList) {
+        let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : ''
+        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"` ).join(' OR ') : ''
+        query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery
+        const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
+        return transactionList
+    }
+
     /**Sample Return type
      * 
      * 
@@ -321,6 +329,7 @@ class JobTransaction {
      */
     prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap) {
         let jobTransactionCustomizationList = []
+        let jobTransactionDateTOJobTransactionsMap = {}        
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
@@ -649,9 +658,10 @@ class JobTransaction {
         let fieldAttributeMap = fieldAttributeMasterMap[jobMasterId] ? fieldAttributeMasterMap[jobMasterId] : {}
         let jobDataObject = jobDataService.prepareJobDataForTransactionParticularStatus(jobId, jobAttributeMasterMap, jobAttributeMap)
         let fieldDataObject = (callingActivity != 'LiveJob') ? fieldDataService.prepareFieldDataForTransactionParticularStatus(jobTransactionId, fieldAttributeMap, fieldAttributeStatusMap) : {}
+        let jobTime
         if (callingActivity != 'LiveJob') {
             let skuMap = fieldDataObject.dataMap[SKU_ARRAY]
-            let jobTime = jobDataObject.dataMap[JOB_EXPIRY_TIME]
+            jobTime = jobDataObject.dataMap[JOB_EXPIRY_TIME]
             for (let index in skuMap) {
                 let fieldAttributeMaster = fieldAttributeMap[index]
                 if (jobDataObject.dataList[fieldAttributeMaster.jobAttributeMasterId]) {
@@ -683,6 +693,7 @@ class JobTransaction {
                 jobDataObject,
                 jobTransactionDisplay,
                 seqSelected,
+                jobTime
             }
         }
         else {
@@ -698,6 +709,28 @@ class JobTransaction {
                 jobDataObject,
                 jobTransactionDisplay,
             }
+        }
+    }
+
+    /**
+     * 
+     * @param {*} jobMaster 
+     */
+    async getUnseenJobTransaction(jobMaster) {
+        let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMaster.id, UNSEEN)
+        console.log(unseenStatusId)
+        let jobTransactionQuery = `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId}`
+        let unseenJobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
+        let jobTransactionMap = {}
+        for (let index in unseenJobTransactionList) {
+            let jobTransaction = { ...unseenJobTransactionList[index] }
+            // let referenceNumber = unseenJobTransactionList[index].referenceNumber
+            // let id = unseenJobTransactionList[index].id
+            jobTransactionMap[jobTransaction.referenceNumber] = jobTransaction
+        }
+        return {
+            jobTransactionMap,
+            pendingCount: unseenJobTransactionList.length
         }
     }
 

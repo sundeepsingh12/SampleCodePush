@@ -6,6 +6,12 @@ import BulkIcon from '../../../src/svg_components/icons/BulkIcon'
 import LiveIcon from '../../../src/svg_components/icons/LiveIcon'
 import SequenceIcon from '../../../src/svg_components/icons/SequenceIcon'
 import TaskIcon from '../../../src/svg_components/icons/TaskIcon'
+import JobAssignmentIcon from '../../svg_components/icons/JobAssignmentIcon'
+import {
+    JOB_ASSIGNMENT_DISPLAY,
+    CUSTOM_APP_DISPLAY,
+    SORTING_DISPLAY
+} from '../../lib/ContainerConstants'
 import SortParcelIcon from '../../../src/svg_components/icons/SortParcelIcon'
 import WebUrlIcon from '../../../src/svg_components/icons/WebUrlIcon'
 
@@ -34,16 +40,22 @@ var InitialState = Record({
             icon: <SequenceIcon />,
         }, SORTING: {
             appModuleId: 26,
-            displayName: 'Sort Parcels',
+            displayName: SORTING_DISPLAY,
             enabled: false,
             icon: <SortParcelIcon />,
         }, CUSTOMAPP: {
             appModuleId: 12,
-            displayName: 'Web URL',
+            displayName: CUSTOM_APP_DISPLAY,
             enabled: false,
             remark: null,
             icon: <WebUrlIcon />
         },
+        JOB_ASSIGNMENT: {
+            appModuleId: 20,
+            displayName: JOB_ASSIGNMENT_DISPLAY,
+            enabled: false,
+            icon: <JobAssignmentIcon width = {30} height = {30} />
+        }
     },
     menu: {
         BACKUP: {
