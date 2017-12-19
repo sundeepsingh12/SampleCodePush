@@ -8,7 +8,9 @@ import {
   SET_MODULES,
   SYNC_STATUS,
   CHART_LOADING,
-  CLEAR_HOME_STATE
+  RESET_STATE,
+  LAST_SYNC_TIME,
+  TOGGLE_LOGOUT
 } from '../../lib/constants'
 
 
@@ -29,13 +31,19 @@ export default function homeReducer(state = initialState, action) {
       return state.set('unsyncedTransactionList', action.payload.unsyncedTransactionList)
         .set('syncStatus', action.payload.syncStatus)
 
-
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)
         .set('count', action.payload.count)
 
-    case CLEAR_HOME_STATE:
+
+    case LAST_SYNC_TIME:
+      return state.set('lastSyncTime',action.payload)    
+
+    case RESET_STATE:
       return initialState
+
+    case TOGGLE_LOGOUT:
+      return state.set('isLoggingOut',action.payload)  
   }
 
   return state

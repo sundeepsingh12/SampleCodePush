@@ -43,10 +43,10 @@ import _ from 'lodash'
 
 function mapStateToProps(state) {
     return {
-        progressBarMaxRange: state.offlineDS.progressBarMaxRange,
-        progressBarMinRange: state.offlineDS.progressBarMinRange,
-        isDownLoadingDS: state.offlineDS.isDownLoadingDS,
-        isDownLoadSuccessful: state.offlineDS.isDownLoadSuccessful
+        progressBarStatus: state.offlineDS.progressBarStatus,
+        downLoadingStatus: state.offlineDS.downLoadingStatus,
+        fileName: state.offlineDS.fileName,
+        lastSyncTime: state.offlineDS.lastSyncTime
     }
 };
 
@@ -65,101 +65,109 @@ class OfflineDS extends Component {
         return { header: null }
     }
 
-    componentDidMount() {
+    headerView() {
+        return <Header style={[styles.bgPrimary, style.header]}>
+            <Body>
+                <View
+                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
+                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                    </TouchableOpacity>
+                    <View style={[style.headerBody]}>
+                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Offline DataStore</Text>
+                    </View>
+                    <View style={[style.headerRight]}>
+                    </View>
+                </View>
+            </Body>
+        </Header>
 
     }
 
     initialScreen() {
-        return
-        <Container>
-            <Header style={[styles.bgPrimary, style.header]}>
-                <Body>
-                    <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.navigation.goBack() }}>
-                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                        </TouchableOpacity>
-                        <View style={[style.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Offline DataStore</Text>
-                        </View>
-                        <View style={[style.headerRight]}>
-                        </View>
+        if (this.props.downLoadingStatus == 0) {
+            return <View style={[styles.flexBasis100, styles.justifySpaceBetween]}>
+                <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
+                    <Image
+                        style={[style.imageSync]}
+                        source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
+                    />
+                </View>
+                <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
+                    <Text style={[styles.fontDarkGray]}>
+                        {this.props.lastSyncTime}
+                    </Text>
+                    <View style={[styles.marginTop30, styles.alignCenter]}>
+                        <Button style={[styles.bgPrimary]}
+                            onPress={() => {
+                                this.props.actions.syncDataStore()
+                            }} >
+                            <Text style={[styles.fontWhite]}>Sync Datastore</Text>
+                        </Button>
                     </View>
-                </Body>
-            </Header>
+                </View>
+            </View>
+        }
+    }
 
-            <View style={[styles.flex1, styles.primaryColor]}>
-
-                <View style={[styles.flex1, styles.justifySpaceBetween]}>
-                    <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
-                        <Image
-                            style={[style.imageSync]}
-                            source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
-                        />
-                    </View>
-                    <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
+    downLoadingView() {
+        if (this.props.downLoadingStatus == 1) {
+            return <View style={[styles.flex1, styles.justifySpaceBetween]}>
+                <View style={[styles.justifyCenter, styles.flexBasis100, styles.padding10]}>
+                    <View style={[styles.row, styles.justifySpaceBetween, styles.marginBottom10]}>
                         <Text style={[styles.fontDarkGray]}>
-                            Last synced 20 hours ago
-                         </Text>
-                        <View style={[styles.marginTop30, styles.alignCenter]}>
-                            <Button style={[styles.bgPrimary]}
-                                onPress={() => {
-                                    this.props.actions.syncDataStore()
-                                }}
-                            >
-                                <Text style={[styles.fontWhite]}>Sync Datastore</Text>
-                            </Button>
+                            Downloading {this.props.fileName}...
+                    </Text>
+                        <Text style={[styles.fontDarkGray]}>
+                            {this.props.progressBarStatus}%
+                    </Text>
+                    </View>
+                    <View style={{ width: '100%', borderRadius: 8, height: 10, backgroundColor: styles.bgGray.backgroundColor }}>
+                        <View style={{ width: String(this.props.progressBarStatus + "%"), borderRadius: 8, height: 10, backgroundColor: styles.bgPrimary.backgroundColor }}>
                         </View>
                     </View>
                 </View>
             </View>
-        </Container>
+        }
+    }
+
+    successView() {
+        if (this.props.downLoadingStatus == 2) {
+            return <View style={[styles.flex1, styles.justifySpaceBetween]}>
+                <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
+                    <Image
+                        style={[style.imageSync]}
+                        source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
+                    />
+                    <Text style={[styles.fontDarkGray, styles.marginTop30]}>
+                        Download Successful
+                                </Text>
+                </View>
+                <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
+
+                    <View style={[styles.marginTop30, styles.alignCenter]}>
+                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}>
+                            <Text style={[styles.fontPrimary]}>Close</Text>
+                        </Button>
+                    </View>
+                </View>
+            </View>
+        }
     }
 
     render() {
-
+        let headerView = this.headerView()
         let initialScreen = this.initialScreen()
+        let DownloadingView = this.downLoadingView()
+        let successView = this.successView()
         return (
             <StyleProvider style={getTheme(platform)}>
-                {initialScreen}
-                {/* <View style={[styles.flex1, styles.justifySpaceBetween]}>
-                            <View style={[styles.justifyCenter, styles.flexBasis100, styles.padding10]}>
-                                <View style={[styles.row, styles.justifySpaceBetween, styles.marginBottom10]}>
-                                    <Text style={[styles.fontDarkGray]}>
-                                        Downloading Phone Book...
-                                    </Text>
-                                    <Text style={[styles.fontDarkGray]}>
-                                        80%
-                                    </Text>
-                                </View>
-                                <View style={{width: '100%', borderRadius: 8, height: 10, backgroundColor: styles.bgGray.backgroundColor}}>
-                                    <View style={{width: '60%', borderRadius: 8, height: 10, backgroundColor: styles.bgPrimary.backgroundColor}}>
-                                    </View>
-                                </View>
-                            </View>
-                            
-                        </View> */}
-
-                {/* <View style={[styles.flex1, styles.justifySpaceBetween]}>
-                            <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
-                                <Image
-                                    style={[style.imageSync]}
-                                    source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
-                                />
-                                <Text style={[styles.fontDarkGray, styles.marginTop30]}>
-                                    Download Successful
-                                </Text>
-                            </View>
-                            <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
-                                
-                                <View style={[styles.marginTop30, styles.alignCenter]}>
-                                    <Button bordered style={{borderColor: styles.bgPrimary.backgroundColor}}>
-                                        <Text style={[styles.fontPrimary]}>Close</Text>
-                                    </Button>
-                                </View>
-                            </View>
-                        </View> */}
-
+                <Container>
+                    {headerView}
+                    {initialScreen}
+                    {DownloadingView}
+                    {successView}
+                </Container>
             </StyleProvider>)
     }
 }

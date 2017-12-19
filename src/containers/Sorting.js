@@ -111,7 +111,15 @@ class Sorting extends Component {
             this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))
          }
     }
-
+    componentDidUpdate(){
+        if ((!_.isNull(this.props.errorMessage) && !_.isUndefined(this.props.errorMessage)  && this.props.errorMessage.length > 0)) {
+            Toast.show({
+                text: this.props.errorMessage,
+                position: 'bottom', 
+                buttonText: 'Okay',
+            })
+        }
+    }
     _onChangeReferenceValue = (value) => {
         this.props.actions.setState(SORTING_SEARCH_VALUE, {value})
     }
@@ -135,13 +143,6 @@ class Sorting extends Component {
 
     render() {
         const renderView = this._renderContent()
-        if ((!_.isNull(this.props.errorMessage) && !_.isUndefined(this.props.errorMessage)  && this.props.errorMessage.length > 0)) {
-            Toast.show({
-                text: this.props.errorMessage,
-                position: 'bottom', 
-                buttonText: 'Okay',
-            })
-        }
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -229,9 +230,12 @@ const style = StyleSheet.create({
     headerSearch: {
         paddingLeft: 10,
         paddingRight: 30,
-        backgroundColor: '#1260be',
+        backgroundColor: 'rgba(255, 255, 255, 0.20)',
         borderRadius: 2,
-        height: 55,
+        lineHeight: 10,
+        paddingTop: 0,
+        paddingBottom: 0,
+        height: 30,
         color: '#fff',
         fontSize: 11
     },
@@ -264,8 +268,8 @@ const style = StyleSheet.create({
         backgroundColor: '#fff'
     },
     qrBox: {
-        width: 60,
-        height: 60,
+        width: 68,
+        height: 68,
         backgroundColor: '#ffcc00',
         justifyContent: 'center',
         alignItems: 'center'

@@ -41,7 +41,8 @@ class ExpandableDetailsView extends Component {
                     <ExpandableDetailsList
                         key={this.props.id}
                         dataList={this.props.childDataList}
-                        navigateToDataStoreDetails={this.props.navigateToDataStoreDetails} />
+                        navigateToDataStoreDetails={this.props.navigateToDataStoreDetails}
+                        navigateToCameraDetails={this.props.navigateToCameraDetails} />
                 )}
             </TouchableOpacity>
         )

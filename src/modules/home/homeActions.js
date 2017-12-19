@@ -15,12 +15,17 @@ import {
   PENDING,
   LiveJobs,
   PIECHART,
-  CLEAR_HOME_STATE
+  LAST_SYNC_WITH_SERVER,
+  LAST_SYNC_TIME,
+  USERNAME,
+  PASSWORD,
+  LoginScreen,
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
   FAIL,
   SUCCESS,
+  Piechart
 } from '../../lib/AttributeConstants'
 
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
@@ -28,13 +33,15 @@ import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { sync } from '../../services/classes/Sync'
 import BackgroundTimer from 'react-native-background-timer'
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState, navigateToScene, deleteSessionToken } from '../global/globalActions'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { Client } from 'react-native-paho-mqtt'
 import { fetchJobs } from '../taskList/taskListActions'
 import { NetInfo } from 'react-native'
 import { jobStatusService } from '../../services/classes/JobStatus'
-
+import { trackingService } from '../../services/classes/Tracking'
+import { authenticationService } from '../../services/classes/Authentication'
+import { logoutService } from '../../services/classes/Logout'
 /**
  * This action enables modules for particular user
  */
@@ -92,7 +99,7 @@ export function pieChartCount() {
     } catch (error) {
       //Update UI here
       console.log(error)
-       dispatch(setState(CHART_LOADING, { loading: false,count:null }))
+      dispatch(setState(CHART_LOADING, { loading: false, count: null }))
     }
   }
 }
@@ -122,7 +129,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
         const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
         if (isJobsPresent) {
-          if (pieChart[PIECHART].enabled) {
+          if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
           dispatch(fetchJobs())
@@ -135,34 +142,45 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         unsyncedTransactionList: [],
         syncStatus: 'OK',
       }))
+
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService(pieChart))
     } catch (error) {
-      console.log(error)
       if (error.code == 500 || error.code == 502) {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'INTERNALSERVERERROR'
         }))
+      } else if (error.code == 401) {
+        dispatch(reAuthenticateUser(transactionIdToBeSynced))
       } else {
-        let connectionInfo = await NetInfo.isConnected.fetch().then(isConnected => {
-          return isConnected
+        let connectionInfo = await NetInfo.getConnectionInfo().then(reachability => {
+          if (reachability.type === 'unknown') {
+            return new Promise(resolve => {
+              const handleFirstConnectivityChangeIOS = isConnected => {
+                NetInfo.isConnected.removeEventListener('connectionChange', handleFirstConnectivityChangeIOS);
+                resolve(isConnected);
+              };
+              NetInfo.isConnected.addEventListener('connectionChange', handleFirstConnectivityChangeIOS);
+            });
+          }
+          return (reachability.type !== 'none' && reachability.type !== 'unknown')
         });
-
-        console.log('connectionInfo isonline', connectionInfo)
-
-        if (!connectionInfo) {
-          dispatch(setState(SYNC_STATUS, {
-            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-            syncStatus: 'NOINTERNET'
-          }))
-        } else {
+        if (connectionInfo) {
           dispatch(setState(SYNC_STATUS, {
             unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
             syncStatus: 'ERROR'
           }))
+        } else {
+          dispatch(setState(SYNC_STATUS, {
+            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+            syncStatus: 'NOINTERNET'
+          }))
         }
       }
+    } finally {
+      const difference = await sync.calculateDifference()
+      dispatch(setState(LAST_SYNC_TIME, difference))
     }
   }
 }
@@ -170,7 +188,6 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
 export function startMqttService(pieChart) {
   return async function (dispatch) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    console.log('token', token)
     //Check if user session is alive
     if (token && token.value) {
       console.log('registerMqttClient')
@@ -178,7 +195,6 @@ export function startMqttService(pieChart) {
       console.log('uri', uri)
       const userObject = await keyValueDBService.getValueFromStore(USER)
       const clientId = `FE_${userObject.value.id}`
-      console.log('clientId', clientId)
       const storage = {
         setItem: (key, item) => {
           storage[key] = item;
@@ -234,8 +250,40 @@ export function startMqttService(pieChart) {
   }
 }
 
-export function clearHomeState() {
-  return {
-    type: CLEAR_HOME_STATE
+export function startTracking() {
+  return async function (dispatch) {
+    trackingService.init()
+  }
+}
+
+export function reAuthenticateUser(transactionIdToBeSynced) {
+  return async function (dispatch) {
+    try {
+      dispatch(setState(SYNC_STATUS, {
+        unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+        syncStatus: 'RE_AUTHENTICATING'
+      }))
+      let username = keyValueDBService.getValueFromStore(USERNAME)
+      let password = keyValueDBService.getValueFromStore(PASSWORD)
+      const authenticationResponse = await authenticationService.login(username.value, password.value)
+      let cookie = authenticationResponse.headers.map['set-cookie'][0]
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
+      dispatch(performSyncService())
+    } catch (error) {
+      if (error.code == 401) {
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+          syncStatus: 'LOADING'
+        }))
+        await logoutService.deleteDataBase()
+        dispatch(deleteSessionToken())
+        dispatch(navigateToScene(LoginScreen))
+      } else {
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+          syncStatus: 'ERROR'
+        }))
+      }
+    }
   }
 }

@@ -228,7 +228,10 @@ class DataStoreService {
         let dataStoreMasterIdList = []
         for (let fieldAttributeObject of fieldAttributes) {
             if (fieldAttributeObject.attributeTypeId == DATA_STORE && _.indexOf(dataStoreMasterIdList, fieldAttributeObject.dataStoreMasterId) < 0) {
-                dataStoreMasterIdList.push(fieldAttributeObject.dataStoreMasterId)
+                console.log('getDataStoreMasterIdMappedWithFieldAttribute', fieldAttributeObject)
+                dataStoreMasterIdList.push({
+                    dataStoreMasterId: fieldAttributeObject.dataStoreMasterId,
+                })
             }
         }
         return dataStoreMasterIdList

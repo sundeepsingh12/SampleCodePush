@@ -41,8 +41,11 @@ import { combineReducers } from 'redux'
 import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
 import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
+import jobMaster from './job-master/jobMasterReducer'
+import postAssignment from './postAssignment/postAssignmentReducer'
 import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 import offlineDS from './offlineDS/offlineDSReducer'
+import cameraReducer from './camera/cameraReducer'
 // import profile from './profile/profileReducer'
 
 
@@ -52,7 +55,7 @@ import offlineDS from './offlineDS/offlineDSReducer'
  * the rootReducer will call each and every reducer with the state and action
  * EVERY TIME there is a basic action
  */
-const appReducer = combineReducers({
+const rootReducer = combineReducers({
   nav,
   auth,
   device,
@@ -85,16 +88,19 @@ const appReducer = combineReducers({
   liveJob,
   summary,
   customApp,
+  jobMaster,
+  postAssignment,
   qrCodeReducer,
-  offlineDS
+  offlineDS,
+  cameraReducer,
 })
 
-const rootReducer = (state, action) => {
-  //Reset state of Redux Store
-  if (action.type == PRE_LOGOUT_SUCCESS) {
-    state = undefined
-  }
-  return appReducer(state, action)
-}
+// const rootReducer = (state, action) => {
+//   //Reset state of Redux Store
+//   // if (action.type == PRE_LOGOUT_SUCCESS) {
+//   //   state = undefined
+//   // }
+//   // return appReducer(state, action)
+// }
 
 export default rootReducer

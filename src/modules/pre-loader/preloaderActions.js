@@ -68,19 +68,21 @@ import {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   HomeTabNavigatorScreen,
-  LoginScreen
+  USER_EVENT_LOG,
+  LoginScreen,
+  TOGGLE_LOGOUT,
 } from '../../lib/constants'
-
+import { LOGIN_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken,stopMqttService } from '../global/globalActions'
+import { deleteSessionToken,stopMqttService,setState} from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
-
+import { userEventLogService } from '../../services/classes/UserEvent'
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -274,14 +276,17 @@ export function invalidateUserSession() {
   return async function (dispatch) {
     try {
       dispatch(preLogoutRequest())
+      dispatch(setState(TOGGLE_LOGOUT,true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
       dispatch(deleteSessionToken())
       dispatch(preLogoutSuccess())
+       dispatch(setState(TOGGLE_LOGOUT,false))
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))
+        dispatch(setState(TOGGLE_LOGOUT,false))
     }
   }
 }
@@ -386,7 +391,8 @@ export function checkAsset() {
       const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
       if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
-        dispatch(preloaderSuccess())
+        await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
+        dispatch(preloaderSuccess())        
         dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)

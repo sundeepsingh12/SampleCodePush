@@ -3,10 +3,10 @@
 import { Record } from 'immutable'
 
 var InitialState = Record({
-    progressBarMaxRange: 100,
-    progressBarMinRange: 0,
-    isDownLoadingDS: false,
-    isDownLoadSuccessful: false,
+    progressBarStatus: 70,
+    fileName: '',
+    downLoadingStatus: 0,
+    lastSyncTime:'Never'
 })
 
 export default InitialState

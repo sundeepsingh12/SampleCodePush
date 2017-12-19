@@ -12,10 +12,11 @@ import ServerSmsLog from './schema/serverSmsLog'
 import DatastoreMaster from './schema/DatastoreMaster'
 import DatastoreSchema from './schema/DatastoreSchema'
 import DatastoreAttributeValue from './schema/DatastoreAttributeValue'
+import TransactionLogs from './schema/transactionLogs'
 import _ from 'lodash'
 
-const schemaVersion = 33;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, DatastoreMaster, DatastoreSchema, DatastoreAttributeValue];
+const schemaVersion = 38;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, DatastoreAttributeValue];
 
 let realm = new Realm({
     schemaVersion,
@@ -32,12 +33,13 @@ import {
     TABLE_JOB_TRANSACTION_CUSTOMIZATION,
     TABLE_TRACK_LOGS,
     TABLE_SERVER_SMS_LOG,
+    TABLE_TRANSACTION_LOGS,
 } from '../lib/constants'
 
 export function save(tableName, object) {
     return realm.write(() => {
         //removing existing entry from Table
-        realm.delete(realm.objects(tableName));
+        // realm.delete(realm.objects(tableName));
         //writing new record
         realm.create(tableName, object);
     });
@@ -76,6 +78,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_RUNSHEET))
         realm.delete(realm.objects(TABLE_TRACK_LOGS))
         realm.delete(realm.objects(TABLE_SERVER_SMS_LOG))
+        realm.delete(realm.objects(TABLE_TRANSACTION_LOGS))
     });
 }
 

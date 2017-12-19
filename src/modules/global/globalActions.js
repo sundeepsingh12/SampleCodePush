@@ -20,6 +20,10 @@ import {
   IS_SHOW_OTP_SCREEN,
   IS_PRELOADER_COMPLETE,
   USER,
+  RESET_STATE,
+  SAVE_ACTIVATED,
+  LIVE_JOB,
+  USER_EVENT_LOG,
   PENDING_SYNC_TRANSACTION_IDS
 } from '../../lib/constants'
 
@@ -34,10 +38,9 @@ import {
 
 import { onResyncPress } from '../home/homeActions'
 
-import { clearHomeState } from '../home/homeActions'
-
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
+import {trackingService} from '../../services/classes/Tracking'
 
 /**
  * ## set the store
@@ -92,18 +95,20 @@ export async function getJobListingParameters() {
 export function deleteSessionToken() {
   return async function (dispatch) {
     try {
-     
       await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_PRELOADER_COMPLETE)
       await keyValueDBService.deleteValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
+      await keyValueDBService.deleteValueFromStore(LIVE_JOB)
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
+      await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)            
+      await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
-       dispatch(clearHomeState())
-
+       dispatch(setState(RESET_STATE))
     } catch (error) {
       throw error
     }

@@ -54,7 +54,7 @@ class AddServerSms {
                 referenceNumber: jobTransaction.referenceNumber,
                 runsheetNumber: jobTransaction.runsheetNo,
             }
-            const jobData = this.getJobData(smsJobStatus.contactNoJobAttributeId, jobTransaction)
+            const jobData = this.getJobData(jobTransaction)
             const fieldDataList = [];
             if (fieldData) {
                 fieldDataList = fieldData.value.filter(data => data.fieldAttributeMasterId == smsJobStatus.contactNoJobAttributeId && data.jobTransactionId == jobTransaction.id)
@@ -99,7 +99,7 @@ class AddServerSms {
       *      TABLE_NAME
       * }
       */
-    getJobData(jobAttributeMasterId, jobTransaction) {
+    getJobData(jobTransaction) {
         let jobDataQuery = `jobId = ${jobTransaction.jobId}`
         let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery, null, null)
         let jobData = []
@@ -272,28 +272,35 @@ class AddServerSms {
     * This function checks if a sms is mapped to transaction's pending status and saves server sms log
     * @param {String} transactionIdDtos 
     */
-    async setServerSmsMapForPendingStatus(transactionIdDtos) {
-        const smsJobStatuses = await keyValueDBService.getValueFromStore(SMS_JOB_STATUS);
-        for (let transactionIdDto of transactionIdDtos) {
-            let smsForStatus = smsJobStatuses.value.filter(smsJobStatus => smsJobStatus.statusId == transactionIdDto.pendingStatusId)
-            if (!smsForStatus || smsForStatus.length <= 0)
-                continue
+    async setServerSmsMapForPendingStatus(transactionIdDtosMap) {
+        if (!transactionIdDtosMap || _.isEmpty(transactionIdDtosMap)) return
+        let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values        
+        let transactionIdDtos = _.values(transactionIdDtosMap)
+        let jobTransactionQuery = transactionIdDtos.map(transactionIdDto => 'id = ' + transactionIdDto.transactionId).join(' OR ')
+        let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, null, null)
+        let serverSmsLogs = []
 
-            let transactionQuery = `id =  ${transactionIdDto.transactionId}`
-            let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, transactionQuery, null, null)
-            for (let index in transactionList) {
-                let jobTransaction = { ...transactionList[index] }
-                if (jobTransaction) {
-                    let serverSmsLog = await this.addServerSms(transactionIdDto.pendingStatusId, transactionIdDto.jobMasterId, null, jobTransaction)
-                    realm.performBatchSave(serverSmsLog)
-                    let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-                    let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-                    if (!transactionsToSync.includes(transactionIdDto.transactionId))
-                        transactionsToSync.push(transactionIdDto.transactionId);
-                    await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync);
+        for (let index in transactionList) {
+            let jobTransaction = { ...transactionList[index] }
+            if (jobTransaction) {
+                let serverSmsLog = await this.addServerSms(transactionIdDtosMap[jobTransaction.id].pendingStatusId, transactionIdDtosMap[jobTransaction.id].jobMasterId, null, jobTransaction)
+                if (serverSmsLog.value && serverSmsLog.value != []) {
+                    let pendingTransaction = {
+                        id: jobTransaction.id, referenceNumber: jobTransaction.referenceNumber
+                    }
+                    serverSmsLogs = serverSmsLogs.concat(serverSmsLog.value)
+                    transactionsToSync = transactionsToSync.concat(pendingTransaction)
                 }
             }
         }
+        let serverSmsLogList
+        if (serverSmsLogs && serverSmsLogs.length > 0) {
+            serverSmsLogList = this.saveServerSmsLog(serverSmsLogs)
+            await realm.performBatchSave(serverSmsLogList)
+        }
+        await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync);
+
     }
 }
 

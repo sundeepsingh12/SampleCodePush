@@ -86,15 +86,15 @@ export function syncDataStore() {
             const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_DATASTORE_SYNC_TIME)
             console.log('lastDataStoreSyncTime', lastSyncTime)
             lastSyncTime = (lastSyncTime) ? lastSyncTime.value : null
-            for (let datastoreMasterId of dataStoreMasterIdList) {
+            for (let datastoreMaster of dataStoreMasterIdList) {
                 let currentPageNumber = 0, totalPage = 1;
                 let responseResults
-                console.log('datastoreMasterId', datastoreMasterId)
-                do {
-                    responseResults = await dataStoreService.fetchDatastoreAndSaveInDB(token, datastoreMasterId, currentPageNumber, lastSyncTime)
+                console.log('datastoreMasterId', datastoreMaster.datastoreMasterId)
+                // do {
+                    responseResults = await dataStoreService.fetchDatastoreAndSaveInDB(token, datastoreMaster.dataStoreMasterId, currentPageNumber, lastSyncTime)
                     currentPageNumber++
-                }
-                while (currentPageNumber < responseResults)
+                // }
+                // while (currentPageNumber < responseResults)
             }
             console.log('after')
             // await keyValueDBService.validateAndSaveData(LAST_DATASTORE_SYNC_TIME, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))

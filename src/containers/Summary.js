@@ -220,7 +220,8 @@ class Summary extends Component {
 
     _renderView= () => {
         const status = ['Pending','Failed','Successful']
-        const listData = this.props.jobMasterSummary;
+        const listData = this.props.jobMasterSummary
+        listData.sort((master1, master2) => master1.title.localeCompare(master2.title))
         if(this.props.jobMasterSummary && this.props.jobMasterSummary.length == 0){
             return <Loader/>
         }
@@ -248,7 +249,7 @@ class Summary extends Component {
                                         </Text>
                                     </View>
                                     <View style={{width: "90%", borderRadius: 5, height: 8, backgroundColor: '#f3f3f3'}}>
-                                        <View style={{width: (item.count) ? String(((item[3].count)*100)/item.count)+"%" : "0%", height: 8, borderRadius: 5, backgroundColor: 'green'}}>
+                                        <View style={{width: (item.count > 0) ? String(((item[3].count + item[2].count)*100)/item.count)+"%" : "0%", height: 8, borderRadius: 5, backgroundColor: 'green'}}>
 
                                         </View>
                                     </View>

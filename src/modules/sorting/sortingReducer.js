@@ -5,7 +5,8 @@ import {
     SORTING_SEARCH_VALUE,
     SORTING_ITEM_DETAILS,
     ERROR_MESSAGE,
-    SHOW_LOADER
+    SHOW_LOADER,
+    RESET_STATE
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -26,6 +27,8 @@ export default function sortingReducer(state = initialState, action) {
            return state.set('errorMessage',action.payload)
                        .set('loaderRunning', false)
                        .set('searchRefereneceValue','')
+        case RESET_STATE:
+            return initialState               
    }
    return state
 }
