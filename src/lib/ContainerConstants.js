@@ -1,4 +1,7 @@
 module.exports = {
+    //Token Error
+    TOKEN_MISSING: 'Token Missing',
+
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
     INTERNAL_ERROR: 'Internal Error.',

@@ -15,7 +15,7 @@ import {
     PENDING_SYNC_TRANSACTION_IDS
 } from '../../../lib/constants'
 
-import CONFIG from '../.././../lib/config'
+import CONFIG from '../../../lib/config'
 
 import * as realm from '../../../repositories/realmdb'
 import { keyValueDBService } from '../KeyValueDBService.js'
@@ -32,7 +32,6 @@ import {
     DATA_STORE,
     EXTERNAL_DATA_STORE
 } from '../../../lib/AttributeConstants'
-import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
 
 export default class FormLayoutEventImpl {
 

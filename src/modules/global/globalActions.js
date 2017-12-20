@@ -40,7 +40,7 @@ import { onResyncPress } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
-import {trackingService} from '../../services/classes/Tracking'
+import { trackingService } from '../../services/classes/Tracking'
 
 /**
  * ## set the store
@@ -104,11 +104,11 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
       await keyValueDBService.deleteValueFromStore(LIVE_JOB)
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-      await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)            
+      await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
-       dispatch(setState(RESET_STATE))
+      dispatch(setState(RESET_STATE))
     } catch (error) {
       throw error
     }
