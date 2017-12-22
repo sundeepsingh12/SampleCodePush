@@ -8,7 +8,13 @@ import {
     TABLE_JOB_TRANSACTION,
     TABLE_RUNSHEET,
     USER,
+    USER_SUMMARY
   } from '../../lib/constants'
+
+  import {
+    keyValueDBService
+} from './KeyValueDBService'
+
   import moment from 'moment'
 
   import * as realm from '../../repositories/realmdb'
@@ -26,13 +32,16 @@ class SummaryAndPieChart {
     * @param {*} failStatusIds 
     * getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds)
     *
-    * 
-    * return {pendingCounts : a, successCounts : b, failCounts : c}
+    * return {pendingCounts : a, successCounts : b, failCounts : 
+    * c}
     */
-    getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds){
+    async getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds){
         const allPendingSuccessFailIds = pendingStatusIds.concat(successStatusIds,failStatusIds)
-        const allTransactionOnTodaysDate =  (allPendingSuccessFailIds) ? this.isTodaysDateTransactions(jobTransactionService.getJobTransactionsForStatusIds(allPendingSuccessFailIds)) : 0
-        const getPendingFailSuccessCounts = this.setAllCounts(allTransactionOnTodaysDate,pendingStatusIds,successStatusIds,failStatusIds)
+        let query = allPendingSuccessFailIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+        query = query && query.trim() !== '' ? `deleteFlag != 1 AND (${query})` : 'deleteFlag != 1'
+        const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
+        const allTransactionOnTodaysDate =  (allPendingSuccessFailIds) ? this.isTodaysDateTransactions(transactionList) : 0
+        const getPendingFailSuccessCounts = await this.setAllCounts(allTransactionOnTodaysDate,pendingStatusIds,successStatusIds,failStatusIds)
         const {pendingCounts,failCounts,successCounts} = getPendingFailSuccessCounts        
         return {pendingCounts,failCounts,successCounts}
     }
@@ -42,7 +51,8 @@ class SummaryAndPieChart {
     setAllJobMasterSummary(jobMasterList,jobStatusList,jobSummaryList){
         const jobMasterSummaryList = {}, jobStatusIdAndLastUpdatedAtServerMap = {}
         const todayDate =  moment().format('YYYY-MM-DD')
-        const jobTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION,null)
+        let query = "deleteFlag != 1"
+        const jobTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
         jobTransactions.forEach(item =>jobStatusIdAndLastUpdatedAtServerMap[item.jobStatusId] = moment(item.getLastUpdatedAtServer).format('YYYY-MM-DD'))
         jobMasterList.forEach(id => jobMasterSummaryList[id.id] = {id : id.id ,code: id.identifier, title : id.title, count : 0, 1 : {count : 0,list : []},2 : {count : 0,list : []},3 : {count : 0,list : []}} )
         const jobStatusIdCountMap = jobSummaryList.reduce(function ( total, current ) {
@@ -72,7 +82,7 @@ class SummaryAndPieChart {
     * return {pendingCounts : a, successCounts : b, failCounts : c}
     */
     
-    setAllCounts(allTransactions,pendingStatusIds,successStatusIds,failStatusIds){
+    async setAllCounts(allTransactions,pendingStatusIds,successStatusIds,failStatusIds){
         let pendingCounts = 0,successCounts = 0, failCounts = 0;
         let pendingMap  = this.idDtoMap(pendingStatusIds)
         let successMap = this.idDtoMap(successStatusIds)
@@ -90,6 +100,9 @@ class SummaryAndPieChart {
                 failCounts++;
             }
         }
+        const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+        userSummary.value.pendingCount,userSummary.value.failCount,userSummary.value.successCount = pendingCounts,failCounts,successCounts;
+        await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary)
         return {pendingCounts,failCounts,successCounts}
     }
 

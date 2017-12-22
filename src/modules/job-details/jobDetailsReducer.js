@@ -27,10 +27,13 @@ export default function jobDetailsReducer(state = initialState, action) {
                         .set('jobDetailsLoading',false)
                         .set('currentStatus',action.payload.currentStatus)
                         .set('errorMessage',action.payload.errorMessage)
+                        .set('statusRevertList',action.payload.parentStatusList)
         case RESET_STATE:
             return initialState 
         case RESET_STATE_FOR_JOBDETAIL:
-            return state.set('errorMessage',false)                
+            return state.set('errorMessage',false) 
+                        .set('statusRevertList',[])
+                        .set('jobDetailsLoading',false)              
     }
     return state
 }

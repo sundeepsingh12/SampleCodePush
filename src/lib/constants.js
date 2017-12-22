@@ -351,6 +351,7 @@ module.exports = keyMirror({
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
+    SORTING_LOADER: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,

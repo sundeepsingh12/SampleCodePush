@@ -178,6 +178,7 @@ class TaskListScreen extends Component {
     }
   }
 
+
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TaskListScreen)

@@ -19,7 +19,8 @@ import {
      * @param {*} jobSummaries 
      */
     async updateRunSheetSummary() {
-        const jobTransactionArray = realm.getAll(TABLE_JOB_TRANSACTION)
+        let query = "deleteFlag != 1"
+        const jobTransactionArray = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
         const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
         const pendingStatusMap = this.idDtoMap(allStatusIds.pendingStatusIds)
         const runsheetArray = realm.getAll(TABLE_RUNSHEET)

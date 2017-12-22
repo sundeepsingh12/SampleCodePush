@@ -94,7 +94,7 @@ export function pieChartCount() {
       dispatch(setState(CHART_LOADING, { loading: true }))
       const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
       const { pendingStatusIds, failStatusIds, successStatusIds } = allStatusIds
-      const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
+      const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
       //Update UI here
@@ -251,7 +251,7 @@ export function startMqttService(pieChart) {
 
 export function startTracking() {
   return async function (dispatch) {
-    trackingService.init()
+     trackingService.init()
   }
 }
 

@@ -14,6 +14,7 @@ var InitialState = Record({
     smsTemplateList: [],
     errorMessage: false,
     statusList: null,
+    statusRevertList: [],
 })
 
 export default InitialState

@@ -12,11 +12,14 @@ import {
     UNSEEN
 } from '../../lib/AttributeConstants'
 import moment from 'moment'
-
-
+import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface'
 import {
     TABLE_JOB,
+    USER,
+    TABLE_JOB_TRANSACTION
 } from '../../lib/constants'
+import { keyValueDBService } from './KeyValueDBService'
+
 
 class JobDetails {
 
@@ -100,6 +103,20 @@ class JobDetails {
         return enableFlag
     }
 
+    getParentStatusList(statusList,currentStatus){
+        let parentStatusList = []
+        for(let status of statusList){
+            if(status.code === UNSEEN)
+                continue
+            for(let nextStatus of status.nextStatusList){
+                if(currentStatus.id === nextStatus.id){
+                   parentStatusList.push([status.id, status.name, status.code, status.statusCategory])
+                }
+            }
+        }
+        return parentStatusList
+    }
+
     checkJobExpire(jobDataList) {
         const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
         return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : false
@@ -131,6 +148,21 @@ class JobDetails {
         return angle * (Math.PI / 180);
     }
 
+    updateTransactionOnRevert(jobTransaction1,previousStatus){
+        let jobTransactionArray = [];
+        let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method        
+        jobTransaction.jobStatusId = previousStatus[0]
+        jobTransaction.statusCode = previousStatus[2]
+        jobTransaction.actualAmount = 0.00
+        jobTransaction.originalAmount = 0.00
+        jobTransaction.lastUpdatedAtServer = moment().format('YYYY-MM-DD HH:mm:ss')
+        jobTransactionArray.push(jobTransaction)
+        return {
+            tableName: TABLE_JOB_TRANSACTION,
+            value: jobTransactionArray,
+        }
+    }
+
     /**
      * ## find aerial distance between user location and job location
      * @param {string} jobLat - job location latitude
@@ -145,6 +177,19 @@ class JobDetails {
         let dist = Math.sin(this.toRadians(jobLat)) * Math.sin(this.toRadians(userLat)) + Math.cos(this.toRadians(jobLat)) * Math.cos(this.toRadians(userLat)) * Math.cos(this.toRadians(theta));
         dist = (Math.acos(dist) * (180 / Math.PI)) * 60 * 1.1515 * 1.609344;
         return dist;
+    }
+
+    async setAllDataForRevertStatus(statusList,jobTransaction,previousStatus){
+     let updatedJobTransaction
+     let user = await keyValueDBService.getValueFromStore(USER)                
+     let statusData = statusList.value.filter(list => list.id == jobTransaction.jobStatusId)
+     let updatedJobDb = formLayoutEventsInterface._setJobDbValues(statusData,jobTransaction.jobId)
+     await formLayoutEventsInterface._updateJobSummary(jobTransaction,previousStatus[0])
+     let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction],previousStatus[0],jobTransaction.jobStatusId,jobTransaction.jobMasterId,user)
+     let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction,previousStatus[3]) 
+     updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction,previousStatus)  
+     await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value)       
+     realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog)  
     }
 
     /**

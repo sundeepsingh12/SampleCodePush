@@ -6,7 +6,7 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 
 import React, { Component } from 'react'
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
 
 import {
   Container,
@@ -24,7 +24,8 @@ import {
   Footer,
   FooterTab,
   Card,
-  ActionSheet
+  ActionSheet,
+  Toast
 } from 'native-base'
 
 import * as globalActions from '../modules/global/globalActions'
@@ -69,7 +70,8 @@ function mapStateToProps(state) {
     messageList: state.jobDetails.messageList,
     smsTemplateList: state.jobDetails.smsTemplateList,
     errorMessage: state.jobDetails.errorMessage,
-    statusList: state.jobDetails.statusList
+    statusList: state.jobDetails.statusList,
+    statusRevertList: state.jobDetails.statusRevertList,
   }
 }
 
@@ -307,12 +309,48 @@ class JobDetailsV2 extends Component {
 
 
   }
+  alertForStatusRevert(statusData){
+    Alert.alert(
+      "Confirm Revert",
+      `Press OK to confirm revert to `+statusData[1],
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK', onPress: () => this._onGoToPreviousStatus(statusData) }
+      ],
+    )
+  }
+  selectStatusToRevert =  () => {
+    this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
+  } 
+  _onGoToPreviousStatus = (statusData) =>{
+    if(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType){
+      { Toast.show({ text: "Revert is not allowed after collecting amount.", position: 'bottom', buttonText: 'Okay' }) }      
+    }else{
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction,statusData,this.props.navigation)
+    }
+  }
+
+  statusRevertSelection(statusList){
+    let BUTTONS = statusList.map(list => list[1])
+    BUTTONS.push('Cancel')
+    ActionSheet.show(
+      {
+        options: BUTTONS,
+        title: 'Revert Status to',
+        cancelButtonIndex: BUTTONS.length - 1,
+        destructiveButtonIndex: BUTTONS.length - 1
+      },
+      buttonIndex => {
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.alertForStatusRevert(statusList[buttonIndex]) : null
+      }
+    )
+  }
 
   render() {
     if (this.props.jobDetailsLoading) {
       return (
-        <Loader />
-      )
+           <Loader />
+         )
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
@@ -372,8 +410,16 @@ class JobDetailsV2 extends Component {
                     {this.props.errorMessage}
                   </Text>
                 </View> : null}
-
-                {statusView}
+                { !this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0  ?
+                  <View style = {[styles.marginLeft15, styles.marginTop15]}>
+                      <View style={[styles.row, styles.alignCenter]}>
+                          <View style={[style.statusCircle, { backgroundColor: 'black'}]}>
+                          </View>
+                          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} onPress = {this.selectStatusToRevert}>Revert Status</Text>
+                      </View>
+                  
+                  </View> : null} 
+                    {statusView}
               </View>
 
               {/*Basic Details*/}

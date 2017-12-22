@@ -365,6 +365,8 @@ describe('jobDetail actions', () => {
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
+        })
+    })
 
 describe('location mismatch actions', () => {
     let jobMasterList = {
@@ -454,3 +456,4 @@ describe('location mismatch actions', () => {
         }
     })
 })
+

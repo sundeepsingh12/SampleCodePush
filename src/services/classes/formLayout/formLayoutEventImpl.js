@@ -12,7 +12,8 @@ import {
     DEVICE_IMEI,
     TABLE_JOB,
     TABLE_TRANSACTION_LOGS,
-    PENDING_SYNC_TRANSACTION_IDS
+    PENDING_SYNC_TRANSACTION_IDS,
+    USER_SUMMARY
 } from '../../../lib/constants'
 
 import CONFIG from '../.././../lib/config'
@@ -33,6 +34,7 @@ import {
     EXTERNAL_DATA_STORE
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
+import {summaryAndPieChartService} from '../SummaryAndPieChart'
 
 export default class FormLayoutEventImpl {
 
@@ -493,6 +495,8 @@ export default class FormLayoutEventImpl {
         }
         let job = Object.assign({}, realmJobObject)
         switch (status.actionOnStatus) {
+            case 0: job.status = 2; // jobStatus 2 is for  assigned
+                break;
             case 1: job.status = 3; // jobStatus 3 is for closed when actionOnStatus is success
                 break;
             case 2: job.status = 1;// jobStatus 1 is for unassigned

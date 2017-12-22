@@ -8,8 +8,9 @@ import { jobDetailsService } from '../../services/classes/JobDetails'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { NavigationActions } from 'react-navigation'
 import { setState, navigateToScene } from '..//global/globalActions'
-
+import { performSyncService, pieChartCount } from '../home/homeActions'
 import * as realm from '../../repositories/realmdb'
+import { fetchJobs } from '../taskList/taskListActions'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -24,7 +25,10 @@ import {
     TABLE_JOB,
     USER_SUMMARY,
     JOB_MASTER,
-    USER
+    USER,
+    TabScreen,
+    HomeTabNavigatorScreen,
+    RESET_STATE_FOR_JOBDETAIL
 } from '../../lib/constants'
 
 export function startFetchingJobDetails() {
@@ -33,7 +37,13 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage) {
+export function resetState() {
+    return {
+        type: RESET_STATE_FOR_JOBDETAIL,
+    }
+}
+
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage,parentStatusList) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -42,6 +52,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobTransaction,
             currentStatus,
             errorMessage,
+            parentStatusList
         }
     }
 }
@@ -60,7 +71,8 @@ export function getJobDetails(jobTransactionId) {
             const jobMaster = jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId, jobMasterList)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery, 
                                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList) : false
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay,errorMessage))
+            const parentStatusList = (jobMaster[0].isStatusRevert) ? jobDetailsService.getParentStatusList(statusList.value,details.currentStatus) : []
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay,errorMessage,parentStatusList))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
@@ -75,8 +87,25 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
             let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
             let user = await keyValueDBService.getValueFromStore(USER);
             await addServerSmsService.sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user)
-        } catch (error) {
+        }catch (error) {
 
+        }
+    }
+}
+
+export function setAllDataOnRevert(jobTransaction,statusTo,navigation) {
+    return async function (dispatch) {
+        try {
+            dispatch(startFetchingJobDetails());    
+            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)            
+            await jobDetailsService.setAllDataForRevertStatus(statusList,jobTransaction,statusTo)
+            dispatch(performSyncService())     
+            dispatch(pieChartCount())                                                           
+            dispatch(fetchJobs())
+            dispatch(navigation.goBack())            
+            dispatch(resetState())
+        } catch (error) {
+            console.log(error)            
         }
     }
 }
