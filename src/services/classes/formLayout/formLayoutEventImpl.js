@@ -12,6 +12,12 @@ import {
     DEVICE_IMEI,
     TABLE_JOB,
     TABLE_TRANSACTION_LOGS,
+    TABLE_TRACK_LOGS,
+    LAST_JOB_COMPLETED_TIME,
+    USER_SUMMARY,
+    PREVIOUSLY_TRAVELLED_DISTANCE,
+    TRANSACTION_TIME_SPENT,
+    TRACK_BATTERY,
     PENDING_SYNC_TRANSACTION_IDS
 } from '../../../lib/constants'
 
@@ -207,7 +213,19 @@ export default class FormLayoutEventImpl {
      */
     async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionIdList, jobTransactionAssignOrderToHub) {
         try {
-            let user = await keyValueDBService.getValueFromStore(USER)        
+            let user = await keyValueDBService.getValueFromStore(USER)
+            let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+            let previouslyTravelledDistance = await keyValueDBService.getValueFromStore(PREVIOUSLY_TRAVELLED_DISTANCE)
+            let trackKms = userSummary.value.gpsKms - previouslyTravelledDistance.value
+            let trackTransactionTimeSpent = await keyValueDBService.getValueFromStore(TRANSACTION_TIME_SPENT)
+            trackTransactionTimeSpent = moment().diff(trackTransactionTimeSpent.value, 'seconds')
+            let trackBattery = await keyValueDBService.getValueFromStore(TRACK_BATTERY)
+
+            await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, userSummary.value.gpsKms)
+            let lastTrackLog = {
+                latitude: userSummary.value.lastLat,
+                longitude: userSummary.value.lastLng
+            }
             let currentTime =  moment().format('YYYY-MM-DD HH:mm:ss')
             if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
                 return formLayoutObject // return undefined or empty object if formLayoutObject is empty
@@ -216,13 +234,13 @@ export default class FormLayoutEventImpl {
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
+                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value) // to edit later 
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
+                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value) //to edit later
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber,currentTime)
             }
 
@@ -232,6 +250,8 @@ export default class FormLayoutEventImpl {
             const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList) : []
             await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList)
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
+            await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
+            await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))            
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
@@ -430,7 +450,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei,currentTime) {
+    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
@@ -440,6 +460,11 @@ export default class FormLayoutEventImpl {
         jobTransaction.hubCode = hub.code
         jobTransaction.lastTransactionTimeOnMobile = currentTime
         jobTransaction.imeiNumber = imei.imeiNumber
+        jobTransaction.latitude = lastTrackLog.latitude
+        jobTransaction.longitude = lastTrackLog.longitude        
+        jobTransaction.trackKm = trackKms
+        jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
+        jobTransaction.trackBattery = trackBattery
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOList.push({
             id: jobTransaction.id,
@@ -453,7 +478,7 @@ export default class FormLayoutEventImpl {
         //TODO only basic columns are set, some columns are not set which will be set as codebase progresses further
     }
 
-    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei,currentTime) {
+    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         for (let jobTransaction1 of jobTransactionList) {
             let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
@@ -464,6 +489,11 @@ export default class FormLayoutEventImpl {
             jobTransaction.hubCode = hub.code
             jobTransaction.lastTransactionTimeOnMobile = currentTime
             jobTransaction.imeiNumber = imei.imeiNumber
+            jobTransaction.latitude = lastTrackLog.latitude
+            jobTransaction.longitude = lastTrackLog.longitude  
+            jobTransaction.trackKm = trackKms
+            jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
+            jobTransaction.trackBattery = trackBattery
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOList.push({
                 id: jobTransaction.id,

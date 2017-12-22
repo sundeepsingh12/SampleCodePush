@@ -38,6 +38,22 @@ class UserEvent {
     userEventLogArray.push(userEventLogObject)
     await keyValueDBService.validateAndSaveData(USER_EVENT_LOG, userEventLogArray)
   }
+
+  /**
+   * @param {*} lastSyncTime --Latest time when the sync is done.
+   */
+  async getUserEventLog(lastSyncTime) {
+    const userEventsLogs = await keyValueDBService.getValueFromStore(USER_EVENT_LOG);
+    const userEventLogValue = userEventsLogs ? userEventsLogs.value : []
+    let userEventLogsToBeSynced = []
+
+    userEventLogValue.forEach(eventLog => {
+      if (moment(eventLog.dateTime).isAfter(lastSyncTime.value)) {
+        userEventLogsToBeSynced.push(eventLog)
+      }
+    })
+    return userEventLogsToBeSynced
+  }
 }
 
 export let userEventLogService = new UserEvent()

@@ -30,7 +30,10 @@ import {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   CUSTOM_NAMING,
-  HUB, LAST_SYNC_WITH_SERVER
+  TRANSACTION_TIME_SPENT,
+  HUB,
+  LAST_SYNC_WITH_SERVER,
+  PREVIOUSLY_TRAVELLED_DISTANCE,
 } from '../../lib/constants'
 
 import {
@@ -151,6 +154,8 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
     await keyValueDBService.validateAndSaveData(HUB,json.hub)
     await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,moment().format('YYYY-MM-DD HH:mm:ss'))
+    await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))  
+    await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, "0")  
   }
 
   /**

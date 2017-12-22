@@ -18,7 +18,7 @@ JobTransaction.schema = {
               androidPushTime  :  'string?',
               lastUpdatedAtServer  :     'string'   ,
               lastTransactionTimeOnMobile  :  'string?',
-              jobEtaTime  :  'string?',
+              jobEtaTime  :  'string?', // todo
               seqSelected  : 'int' ,
               seqActual  :  'int?',
               seqAssigned  : 'int?',
@@ -30,28 +30,28 @@ JobTransaction.schema = {
               actualAmount  : { type: 'double',default:0.0,optional:true},
               originalAmount  : { type: 'double',default:0.0,optional:true},
               moneyTransactionType  :   'string?',
-              referenceNumber  :     'string'  ,
+              referenceNumber  :     'string'  , // todo
               runsheetId  :   'int?',
               hubId  :  'int' ,
               cityId  :   'int' ,
               trackKm  :  'double' ,
-              trackHalt  :  'double' ,
+              trackHalt  :  'double' , // todo
               trackCallCount  : { type: 'int',default:0},
               trackCallDuration  : { type: 'int',default:0},
               trackSmsCount  : { type: 'int',default:0},
               trackTransactionTimeSpent  :  'double' ,
               latitude  :  'double' ,
               longitude  :  'double' ,
-              trackBattery  : 'int' ,
+              trackBattery  : 'int' , // to do
               deleteFlag  : 'int' ,
               attemptCount  : { type: 'int',default:1},
-              startTime  :   'string?',
+              startTime  :   'string?',  // todo
               endTime  :  'string?',
               merchantCode  :  'string?',
               imeiNumber  :  'string?',
-              npsFeedBack  :  'string?',
-              id  : 'int' ,
-              jobType : 'string?',
+              npsFeedBack  :  'string?', // todo
+              id  : 'int' ,     //todo
+              jobType : 'string?',   
               statusCode : 'string?',
               employeeCode :  'string?',
               hubCode : 'string?',

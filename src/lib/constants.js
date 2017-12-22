@@ -167,6 +167,7 @@ module.exports = keyMirror({
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
+    LAST_JOB_COMPLETED_TIME:null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -405,6 +406,10 @@ module.exports = keyMirror({
     SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
 
+    //FormLayoutImpl
+    PREVIOUSLY_TRAVELLED_DISTANCE: null,
+    TRANSACTION_TIME_SPENT: null,
+    TRACK_BATTERY: null,
 })
 
 
