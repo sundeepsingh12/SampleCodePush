@@ -25,4 +25,7 @@ module.exports = {
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
+
+    //New Job
+    NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!'
 }

@@ -64,6 +64,7 @@ export async function createZip(transactionIdToBeSynced) {
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     const userSummaryValue = userSummary.value
     SYNC_RESULTS.userSummary = userSummaryValue || {}
+     console.log(JSON.stringify(SYNC_RESULTS));
 
     //Writing Object to File at TEMP location
     await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');

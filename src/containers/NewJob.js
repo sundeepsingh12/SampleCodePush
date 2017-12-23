@@ -20,9 +20,12 @@ import {
   Body,
   Right,
   Icon,
-  StyleProvider
+  StyleProvider,
+  Toast
 } from 'native-base'
-
+import {
+  SET_ERROR_MSG_FOR_NEW_JOB
+} from '../lib/constants'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -33,7 +36,8 @@ function mapStateToProps(state) {
   return {
     jobMasterList: state.newJob.jobMasterList,
     statusList: state.newJob.statusList,
-    negativeId: state.newJob.negativeId
+    negativeId: state.newJob.negativeId,
+    newJobError: state.newJob.newJobError,
   }
 }
 
@@ -57,6 +61,19 @@ class NewJob extends Component {
       this.props.actions.getMastersFromMasterIds(this.props.navigation.state.params.jobMasterIdList)
     } else {
       this.props.actions.getMastersWithNewJob()
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.newJobError != '') {
+      Toast.show({
+        text: this.props.newJobError,
+        position: "bottom" | "center",
+        buttonText: 'Okay',
+        type: 'danger',
+        duration: 10000
+      })
+     this.props.actions.setState(SET_ERROR_MSG_FOR_NEW_JOB, '')
     }
   }
 

@@ -243,7 +243,7 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterId) {
+    runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, currentFieldAttributeMasterId) {
         let validationActionResult = {
             alertMessageList: [],
             returnValue: true,
@@ -251,7 +251,7 @@ class FieldValidation {
         for (let index in validationActionList) {
             switch (validationActionList[index].type) {
                 case ALERT_MESSAGE: {
-                    validationActionResult.alertMessageList.push(validationActionList[index].assignValue)
+                    formElement.get(currentFieldAttributeMasterId).alertMessage = validationActionList[index].assignValue
                     break
                 }
                 case ASSIGN: {
@@ -315,7 +315,7 @@ class FieldValidation {
                     break
                 }
                 case RETURN: {
-                    validationActionResult.returnValue = this.evaluateReturnCondition(validationActionList[index].assignValue, timeOfExecution, formElement, fieldAttributeMasterId)
+                    validationActionResult.returnValue = this.evaluateReturnCondition(validationActionList[index].assignValue, timeOfExecution, formElement, currentFieldAttributeMasterId)
                     break
                 }
                 case TIME_COMPARATOR: {

@@ -6,7 +6,7 @@ var InitialState = Record({
     progressBarStatus: 70,
     fileName: '',
     downLoadingStatus: 0,
-    lastSyncTime:'Never'
+    lastSyncTime:''
 })
 
 export default InitialState

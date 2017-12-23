@@ -434,7 +434,8 @@ export const AppNavigator = StackNavigator({
   ImageDetailsView: {
     screen: ImageDetailsView,
   }
-}, {
+},
+{
     cardStyle: {
       backgroundColor: 'white'
     }

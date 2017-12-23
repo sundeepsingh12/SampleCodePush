@@ -17,16 +17,22 @@ import StarIcon from '../svg_components/icons/StarIcon'
 import PaperMoneyIcon from '../svg_components/icons/PaperMoneyIcon'
 import QRIcon from '../svg_components/icons/QRIcon'
 import BankCardIcon from '../svg_components/icons/BankCardIcon'
+import DateIcon from '../svg_components/icons/DateIcon'
+import TimeIcon from '../svg_components/icons/TimeIcon'
+import SignatureIcon from '../svg_components/icons/SignatureIcon'
+import CashTenderingIcon from '../svg_components/icons/CashTenderingIcon'
 import {
     ARRAY,
     CASH_TENDERING,
     DATA_STORE,
+    DATE,
     MONEY_COLLECT,
     MONEY_PAY,
     NPS_FEEDBACK,
     SIGNATURE,
     SIGNATURE_AND_FEEDBACK,
     SKU_ARRAY,
+    TIME,
 } from '../lib/AttributeConstants'
 
 class FormLayoutActivityComponent extends Component {
@@ -39,9 +45,11 @@ class FormLayoutActivityComponent extends Component {
             case MONEY_COLLECT:
             case MONEY_PAY: return <BankCardIcon width={26} height={19} color={this.getComponentIconStyle(this.props.item.editable)} />
             case NPS_FEEDBACK:
-            case SIGNATURE:
+            case SIGNATURE:return <SignatureIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             case SIGNATURE_AND_FEEDBACK: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             case SKU_ARRAY: return <CartIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case DATE: return <DateIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case TIME: return <TimeIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             default: return <QRIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
         }
     }
@@ -64,7 +72,6 @@ class FormLayoutActivityComponent extends Component {
 
     render() {
         const icon = this.getIcon(this.props.item.attributeTypeId)
-        console.log('FormLayoutActivityComponent', this.props.item)
         return (
             <TouchableHighlight disabled={!this.props.item.editable} onPress={() => this.props.press(this.props.item)}>
                 <View style={[style.formCard, this.props.item.focus ? styles.borderLeft4 : null]}>
@@ -85,6 +92,9 @@ class FormLayoutActivityComponent extends Component {
                                 <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20, styles.italic, this.getComponentHelpTextStyle(this.props.item.editable)]}>
                                     {this.props.item.helpText}
                                 </Text> : null}
+                            {this.props.item.alertMessage ?
+                                <Text style={[styles.fontDanger, styles.fontSm, styles.paddingTop5]}>{this.props.item.alertMessage}</Text>
+                                : null}
                         </View>
                     </View>
                     <View style={style.iconContainer}>

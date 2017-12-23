@@ -1,15 +1,15 @@
 
 'use strict'
 
-import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 
-import React, {Component} from 'react'
-import {StyleSheet, View, TouchableOpacity, FlatList} from 'react-native'
+import React, { Component } from 'react'
+import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
 
 import {
   Container,
@@ -35,10 +35,10 @@ import * as globalActions from '../modules/global/globalActions'
 
 function mapStateToProps(state) {
   return {
-    jobMasterList : state.newJob.jobMasterList,
-    statusList : state.newJob.statusList,
-    statusList1 : state.newJob.statusList,
-    negativeId : state.newJob.negativeId
+    jobMasterList: state.newJob.jobMasterList,
+    statusList: state.newJob.statusList,
+    statusList1: state.newJob.statusList,
+    negativeId: state.newJob.negativeId
   }
 };
 
@@ -54,29 +54,27 @@ function mapDispatchToProps(dispatch) {
 
 class NewJobStatus extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    return {header: null}
+  static navigationOptions = ({ navigation }) => {
+    return { header: null }
   }
 
   componentWillMount() {
     this.props.actions.getStatusAndIdForJobMaster(this.props.navigation.state.params.jobMaster.id)
   }
 
-  renderData = (item)=>{
+  renderData = (item) => {
     return (
-      <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.redirectToFormLayout(item, 
-      this.props.negativeId, 
-      this.props.navigation.state.params.jobMaster.id)}>
-          <View style={[styles.row, styles.alignCenter]}>
-            <View style={item.statusCategory == 3  ? [style.statusCircle, {backgroundColor: '#4cd964'}] : 
-                  item.statusCategory == 1 ? [style.statusCircle, {backgroundColor: '#006490'}] : 
-                  [style.statusCircle, {backgroundColor: '#FF3B30'}]}></View>
-            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{item.name}</Text>
-          </View>
-          <Right>
-            <Icon name="ios-arrow-forward" style={[styles.fontDefault, styles.fontBlack]} />
-          </Right>
-        </ListItem>
+      <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.redirectToFormLayout(item,
+        this.props.negativeId,
+        this.props.navigation.state.params.jobMaster.id)}>
+        <View style={[styles.row, styles.alignCenter]}>
+          <View style={[style.statusCircle, { backgroundColor: item.buttonColor }]}></View>
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{item.name}</Text>
+        </View>
+        <Right>
+          <Icon name="ios-arrow-forward" style={[styles.fontDefault, styles.fontBlack]} />
+        </Right>
+      </ListItem>
     )
   }
 
@@ -143,17 +141,17 @@ const style = StyleSheet.create({
     padding: 15
   },
   jobListItem: {
-    borderBottomColor: '#f2f2f2', 
-    borderBottomWidth: 1, 
-    paddingTop: 20, 
+    borderBottomColor: '#f2f2f2',
+    borderBottomWidth: 1,
+    paddingTop: 20,
     paddingBottom: 20,
     justifyContent: 'space-between'
   },
   statusCircle: {
-    width: 6,
-    height: 6,
-    borderRadius: 3
-  }
+    width: 10,
+    height: 10,
+    borderRadius: 5
+  },
 });
 
 

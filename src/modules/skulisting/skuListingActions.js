@@ -5,7 +5,7 @@ import {
     SKU_LIST_FETCHING_START,
     SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
-    UPDATE_SKU_ACTUAL_QUANTITY
+    UPDATE_SKU_ACTUAL_QUANTITY,
 } from '../../lib/constants'
 
 import {
@@ -30,6 +30,9 @@ import { fieldDataService } from '../../services/classes/FieldData'
 import {
     setState
 } from '../global/globalActions'
+import {
+  Toast
+} from 'native-base'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {
     return async function (dispatch) {
@@ -91,19 +94,23 @@ export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItem
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionId, latestPositionId, parentObject, formElement, isSaveDisabled) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionId, latestPositionId, parentObject, formElement, isSaveDisabled,navigation) {
     return async function (dispatch) {
         try {
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
-            console.log('message', message)
-            // if (!message) {
-            const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId)
-            let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.positionId, latestPositionId)
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
-            // }
-            // else{
-            //     //Show Toast or Modal here according to message string returned
-            // }
+            if (!message) {
+                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId)
+                let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.positionId, latestPositionId)
+                dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+                navigation.goBack()
+            }
+            else {
+                Toast.show({
+              text: `${message}`,
+              position: 'bottom',
+              buttonText: 'OK'
+            })
+            }
         } catch (error) {
             console.log(error)
             //UI needs updating here

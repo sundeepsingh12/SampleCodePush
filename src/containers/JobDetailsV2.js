@@ -380,6 +380,7 @@ class JobDetailsV2 extends Component {
               <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
                 <ExpandableHeader
                   title={'Basic Details'}
+                  navigateToDataStoreDetails={this.navigateToDataStoreDetails}
                   dataList={this.props.jobDataList}
                 />
               </View>

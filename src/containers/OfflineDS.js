@@ -17,7 +17,7 @@ import {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     _id,
-    SET_INITIAL_STATE,
+    SET_OFFLINEDS_INITIAL_STATE,
     QrCodeScanner,
     DISABLE_AUTO_START_SCANNER,
 } from '../lib/constants'
@@ -61,6 +61,10 @@ function mapDispatchToProps(dispatch) {
 
 class OfflineDS extends Component {
 
+    componentDidMount() {
+        this.props.actions.getLastSyncTime()
+    }
+
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
@@ -70,7 +74,7 @@ class OfflineDS extends Component {
             <Body>
                 <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
+                    <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.goBack() }}>
                         <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                     </TouchableOpacity>
                     <View style={[style.headerBody]}>
@@ -90,17 +94,17 @@ class OfflineDS extends Component {
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
                         style={[style.imageSync]}
-                        source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
+                        source={require('../../images/fareye-default-iconset/sync-cloud.png')}
                     />
                 </View>
-                <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
+                <View style={[styles.flexBasis50, styles.alignCenter, styles.justifyCenter]}>
                     <Text style={[styles.fontDarkGray]}>
                         {this.props.lastSyncTime}
                     </Text>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button style={[styles.bgPrimary]}
                             onPress={() => {
-                                this.props.actions.syncDataStore()
+                                this.props.actions.syncDataStore(this.props.lastSyncTime)
                             }} >
                             <Text style={[styles.fontWhite]}>Sync Datastore</Text>
                         </Button>
@@ -146,7 +150,8 @@ class OfflineDS extends Component {
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}>
+                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
+                            onPress={() => { this.goBack() }}  >
                             <Text style={[styles.fontPrimary]}>Close</Text>
                         </Button>
                     </View>
@@ -155,11 +160,43 @@ class OfflineDS extends Component {
         }
     }
 
+    failureView() {
+        if (this.props.downLoadingStatus == 3) {
+            return <View style={[styles.flex1, styles.justifySpaceBetween]}>
+                <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
+                    <Image
+                        style={[style.imageSync]}
+                        source={require('../../images/fareye-default-iconset/error.png')}
+                    />
+                    <Text style={[styles.fontDarkGray, styles.marginTop30]}>
+                        Download Failed
+                                </Text>
+                </View>
+                <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
+
+                    <View style={[styles.marginTop30, styles.alignCenter]}>
+                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
+                            onPress={() => { this.goBack() }}  >
+                            <Text style={[styles.fontPrimary]}>Close</Text>
+                        </Button>
+                    </View>
+                </View>
+            </View>
+        }
+
+    }
+
+    goBack = () => {
+        this.props.actions.setState(SET_OFFLINEDS_INITIAL_STATE)
+        this.props.navigation.goBack()
+    }
+
     render() {
         let headerView = this.headerView()
         let initialScreen = this.initialScreen()
         let DownloadingView = this.downLoadingView()
         let successView = this.successView()
+        let failureView = this.failureView()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -167,6 +204,7 @@ class OfflineDS extends Component {
                     {initialScreen}
                     {DownloadingView}
                     {successView}
+                    {failureView}
                 </Container>
             </StyleProvider>)
     }

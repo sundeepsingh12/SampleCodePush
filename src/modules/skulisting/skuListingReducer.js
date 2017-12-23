@@ -9,7 +9,7 @@ import {
     SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
-    RESET_STATE
+    RESET_STATE,
 } from '../../lib/constants'
 
 

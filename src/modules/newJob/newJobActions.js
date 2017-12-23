@@ -7,9 +7,12 @@ import {
     CheckoutDetails,
     POPULATE_DATA,
     JOB_MASTER,
-    FormLayout
+    FormLayout,
+    SET_ERROR_MSG_FOR_NEW_JOB
 } from '../../lib/constants'
-
+import {
+    NEW_JOB_CONFIGURATION_ERROR
+} from '../../lib/ContainerConstants'
 import { newJob } from '../../services/classes/NewJob'
 import { setState, navigateToScene } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -22,6 +25,8 @@ export function getMastersWithNewJob() {
         let mastersWithNewJob = await newJob.getMastersWithNewJob();
         if (_.size(mastersWithNewJob) == 1) {
             dispatch(redirectToContainer(mastersWithNewJob[0]))
+        } else if (_.size(mastersWithNewJob) == 0) {
+            dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
         }
         dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob));
     }
@@ -33,6 +38,8 @@ export function getMastersFromMasterIds(jobMasterIds) {
         let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters.value, jobMasterIds)
         if (_.size(mastersWithNewJob) == 1) {
             dispatch(redirectToContainer(mastersWithNewJob[0]))
+        } else if (_.size(mastersWithNewJob) == 0) {
+            dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
         }
         dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
     }

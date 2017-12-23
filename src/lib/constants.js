@@ -79,7 +79,7 @@ module.exports = keyMirror({
     SET_REFRESHING_TRUE: null,
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
-    TOGGLE_LOGOUT:null,
+    TOGGLE_LOGOUT: null,
 
     //Home Container
     PIECHART: null,
@@ -89,7 +89,7 @@ module.exports = keyMirror({
     SYNC_ERROR: null,
     SYNC_STATUS: null,
     LISTING_SEARCH_VALUE: null,
-    LAST_SYNC_TIME:null,
+    LAST_SYNC_TIME: null,
 
     //Listing Actions
     JOB_LISTING_START: null,
@@ -181,7 +181,7 @@ module.exports = keyMirror({
     Datastore_Master_DB: null,
     DataStore_DB: null,
     Datastore_AttributeValue_DB: null,
-    TABLE_TRANSACTION_LOGS:null,
+    TABLE_TRANSACTION_LOGS: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -190,7 +190,6 @@ module.exports = keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
-    UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
@@ -207,7 +206,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_WITH_CHILD_DATA: null,
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
-    CLEAR_FORM_LAYOUT:null,
+    CLEAR_FORM_LAYOUT: null,
 
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
@@ -287,7 +286,7 @@ module.exports = keyMirror({
     //Data Store
     SET_VALIDATIONS: null,
     SET_DATA_STORE_ATTR_MAP: null,
-    SHOW_LOADER: null,
+    SHOW_LOADER_DS: null,
     SHOW_ERROR_MESSAGE: null,
     SET_SEARCH_TEXT: null,
     SHOW_DETAILS: null,
@@ -305,11 +304,12 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_STOP: null,
     TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
-    CLEAR_SEQUENCE_STATE:null,
+    CLEAR_SEQUENCE_STATE: null,
 
     //New Job
     NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
+    SET_ERROR_MSG_FOR_NEW_JOB: null,
 
     //Transient
     ADD_FORM_LAYOUT_STATE: null,
@@ -340,7 +340,7 @@ module.exports = keyMirror({
     STOP_FETCHING_BULK_TRANSACTIONS: null,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
     TOGGLE_ALL_JOB_TRANSACTIONS: null,
-    CLEAR_BULK_STATE:null,
+    CLEAR_BULK_STATE: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -356,6 +356,7 @@ module.exports = keyMirror({
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
+    SHOW_LOADER: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,
@@ -409,6 +410,13 @@ module.exports = keyMirror({
     SET_SHOW_IMAGE: null,
     SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
+
+    //Offline Actions
+    SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
+    UPDATE_PROGRESS_BAR: null,
+    SET_DOWNLOADING_STATUS: null,
+    SET_OFFLINEDS_INITIAL_STATE: null,
+    SET_LAST_SYNC_TIME: null,
 
 })
 

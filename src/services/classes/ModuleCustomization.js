@@ -40,7 +40,7 @@ import {
     JOB_ASSIGNMENT,
 } from '../../lib/constants'
 import _ from 'lodash'
-import SequenceIcon from '../../../src/svg_components/icons/SequenceIcon'
+import NewJobIcon from '../../../src/svg_components/icons/NewJobIcon'
 class ModuleCustomization {
 
     /**
@@ -231,7 +231,7 @@ class ModuleCustomization {
         let appModuleObject = {}
         let appModule = {
             enabled: true,
-            icon: <SequenceIcon />,
+            icon: <NewJobIcon />,
             appModuleId: moduleCustomization.appModulesId
         }
         if (moduleCustomization.remark != undefined && moduleCustomization.remark != null && moduleCustomization.remark != '[]') {

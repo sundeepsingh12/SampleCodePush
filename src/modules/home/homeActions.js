@@ -142,7 +142,6 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         unsyncedTransactionList: [],
         syncStatus: 'OK',
       }))
-
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService(pieChart))
     } catch (error) {
@@ -252,7 +251,7 @@ export function startMqttService(pieChart) {
 
 export function startTracking() {
   return async function (dispatch) {
-    trackingService.init()
+    // trackingService.init()
   }
 }
 

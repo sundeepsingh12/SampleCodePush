@@ -61,6 +61,7 @@ class ArrayFieldAttribute extends Component {
     _goBack = () => {
         this.props.navigation.goBack()
         this.props.actions.clearArrayState()
+        return true
     }
 
     componentDidMount() {

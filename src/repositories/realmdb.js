@@ -34,6 +34,9 @@ import {
     TABLE_TRACK_LOGS,
     TABLE_SERVER_SMS_LOG,
     TABLE_TRANSACTION_LOGS,
+    DataStore_DB,
+    Datastore_Master_DB,
+    Datastore_AttributeValue_DB
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -41,7 +44,7 @@ export function save(tableName, object) {
         //removing existing entry from Table
         // realm.delete(realm.objects(tableName));
         //writing new record
-        realm.create(tableName, object);
+        realm.create(tableName, object, true);
     });
 }
 
@@ -188,5 +191,12 @@ export function deleteSpecificTableRecords(tableName) {
     return realm.write(() => {
         //removing existing entry from Table
         realm.delete(realm.objects(tableName))
+    });
+}
+
+export function deleteSingleRecord(tableName, value, property) {
+    let filteredRecords = realm.objects(tableName).filtered(property + ' = "' + value + '"');
+    realm.write(() => {
+        realm.delete(filteredRecords)
     });
 }

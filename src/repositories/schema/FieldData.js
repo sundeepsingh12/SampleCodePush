@@ -9,7 +9,6 @@ export default class FieldData extends Realm.Object { }
 //Every Schema must have atleast 1 Primary key index
 FieldData.schema = {
   name: TABLE_FIELD_DATA,
-  primaryKey: 'id',
   properties: {
     fieldAttributeMasterId: 'int' ,
     id:  'int' ,
