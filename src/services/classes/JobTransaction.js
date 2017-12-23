@@ -283,9 +283,9 @@ class JobTransaction {
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
         let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
         let jobStatusQuery = statusMap.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-        const jobTransactionQuery = `${jobMasterQuery} AND (${jobStatusQuery})`
+        const jobTransactionQuery = `deleteFlag != 1 AND (${jobMasterQuery}) AND (${jobStatusQuery})`
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, SEQ_SELECTED)
-        return jobTransactionList[0].seqSelected
+        return jobTransactionList[0]
     }
 
     updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {

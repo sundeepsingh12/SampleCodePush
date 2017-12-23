@@ -70,7 +70,7 @@ export function getJobDetails(jobTransactionId) {
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             const jobMaster = jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId, jobMasterList)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery, 
-                                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList) : false
+                                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId) : false
             const parentStatusList = (jobMaster[0].isStatusRevert) ? jobDetailsService.getParentStatusList(statusList.value,details.currentStatus) : []
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay,errorMessage,parentStatusList))
         } catch (error) {

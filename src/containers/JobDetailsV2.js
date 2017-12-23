@@ -320,14 +320,14 @@ class JobDetailsV2 extends Component {
     )
   }
   selectStatusToRevert =  () => {
-    this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
-  } 
-  _onGoToPreviousStatus = (statusData) =>{
     if(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType){
       { Toast.show({ text: "Revert is not allowed after collecting amount.", position: 'bottom', buttonText: 'Okay' }) }      
     }else{
-    this.props.actions.setAllDataOnRevert(this.props.jobTransaction,statusData,this.props.navigation)
+    this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
     }
+  } 
+  _onGoToPreviousStatus = (statusData) =>{
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction,statusData,this.props.navigation)
   }
 
   statusRevertSelection(statusList){

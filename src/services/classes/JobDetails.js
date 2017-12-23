@@ -89,13 +89,13 @@ class JobDetails {
             autoIncrementId
         }
     }
-   async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList){
+   async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId){
        let enableFlag = false
         if(enableOutForDelivery){
             enableFlag =  await this.checkOutForDelivery(jobMasterList)
         }
         if(!enableFlag && enableResequenceRestriction){
-            enableFlag =  this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList)
+            enableFlag =  this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
         }
         if(!enableFlag && jobTime){
             enableFlag =  this.checkJobExpire(jobTime)
@@ -122,11 +122,11 @@ class JobDetails {
         return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : false
     }
 
-    checkEnableResequence(jobMasterList, tabId, seqSelected, statusList) {
+    checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId) {
         const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id)
-        const statusMap = statusList.value.filter((status) => status.tabId == tabId).map(obj => obj.id)
-        const firstEnableSequenceValue = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
-        return !(seqSelected > firstEnableSequenceValue) ? false : "Please finish previous items first"
+        const statusMap = statusList.value.filter((status) => status.tabId == tabId && status.code !== UNSEEN).map(obj => obj.id)
+        const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
+        return !(firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : "Please finish previous items first"
     }
 
     async checkOutForDelivery(jobMasterList) {

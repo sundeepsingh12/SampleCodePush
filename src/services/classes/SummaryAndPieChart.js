@@ -49,18 +49,20 @@ class SummaryAndPieChart {
 
 
     setAllJobMasterSummary(jobMasterList,jobStatusList,jobSummaryList){
-        const jobMasterSummaryList = {}, jobStatusIdAndLastUpdatedAtServerMap = {}
+        const jobMasterSummaryList = {}, jobStatusIdMap = {}
         const todayDate =  moment().format('YYYY-MM-DD')
         let query = "deleteFlag != 1"
         const jobTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
-        jobTransactions.forEach(item =>jobStatusIdAndLastUpdatedAtServerMap[item.jobStatusId] = moment(item.getLastUpdatedAtServer).format('YYYY-MM-DD'))
+        jobTransactions.forEach(item =>{ if(moment(todayDate).isSame(moment(item.getLastUpdatedAtServer).format('YYYY-MM-DD'))){
+            jobStatusIdMap[item.jobStatusId] = (jobStatusIdMap[item.jobStatusId]) ? jobStatusIdMap[item.jobStatusId] + 1 : 1
+        }})
         jobMasterList.forEach(id => jobMasterSummaryList[id.id] = {id : id.id ,code: id.identifier, title : id.title, count : 0, 1 : {count : 0,list : []},2 : {count : 0,list : []},3 : {count : 0,list : []}} )
         const jobStatusIdCountMap = jobSummaryList.reduce(function ( total, current ) {
-            total[ current.jobStatusId ] = current.count;
+            total[ current.jobStatusId ] = (jobStatusIdMap[current.jobStatusId]) ? jobStatusIdMap[current.jobStatusId] : 0;
             return total;
         }, {});
         for(id in jobStatusList){
-            if(jobStatusList[id].code == UNSEEN || (jobStatusIdAndLastUpdatedAtServerMap[jobStatusList[id].id] && !(moment(todayDate).isSame(jobStatusIdAndLastUpdatedAtServerMap[jobStatusList[id].id])))){
+            if(jobStatusList[id].code == UNSEEN ){
               continue
             }
             jobMasterSummaryList[ jobStatusList[id].jobMasterId ][jobStatusList[id].statusCategory].list.push([jobStatusIdCountMap[jobStatusList[id].id] , jobStatusList[id].name, jobStatusList[id].id]);
@@ -100,9 +102,11 @@ class SummaryAndPieChart {
                 failCounts++;
             }
         }
-        const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-        userSummary.value.pendingCount,userSummary.value.failCount,userSummary.value.successCount = pendingCounts,failCounts,successCounts;
-        await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary)
+        let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+        userSummary.value.pendingCount = pendingCounts;
+        userSummary.value.failCount = failCounts;
+        userSummary.value.successCount = successCounts;
+        await keyValueDBService.validateAndUpdateData(USER_SUMMARY, userSummary)
         return {pendingCounts,failCounts,successCounts}
     }
 
