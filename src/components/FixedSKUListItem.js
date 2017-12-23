@@ -57,7 +57,7 @@ class FixedSKUListItem extends Component {
                                 maxLength={4}
                                 placeholder={'0'}
                                 keyboardType={'numeric'}
-                                value={(this.props.item.childDataList[FIXED_SKU_QUANTITY].value).toString()}
+                                value={(this.props.item.childDataList[FIXED_SKU_QUANTITY].value == 0) ? '' : (this.props.item.childDataList[FIXED_SKU_QUANTITY].value).toString()}
                                 onChangeText={(quantity) => {
                                     let payload = {
                                         id: this.props.item.id,

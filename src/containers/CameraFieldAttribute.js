@@ -108,7 +108,6 @@ class CameraFieldAttribute extends Component {
         let view
         if (this.state.torchOff == Camera.constants.FlashMode.off) {
             view =
-
                 <TouchableOpacity style={[styles.flexBasis33_3, styles.alignCenter]}>
                     <Icon name="ios-flash-outline" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this._setTorchOn()} />
                 </TouchableOpacity>
@@ -177,7 +176,6 @@ class CameraFieldAttribute extends Component {
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
                         <View style={{ flex: 1 }}>
-
                             <Image
                                 source={{
                                     isStatic: true,

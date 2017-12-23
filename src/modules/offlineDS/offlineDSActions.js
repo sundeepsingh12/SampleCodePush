@@ -4,8 +4,12 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { setState } from '../global/globalActions'
 import {
+    SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR,
     FIELD_ATTRIBUTE,
-    LAST_DATASTORE_SYNC_TIME
+    LAST_DATASTORE_SYNC_TIME,
+    UPDATE_PROGRESS_BAR,
+    SET_DOWNLOADING_STATUS,
+    SET_LAST_SYNC_TIME
 } from '../../lib/constants'
 import {
     EXTERNAL_DATA_STORE,
@@ -16,92 +20,45 @@ import _ from 'lodash'
 import * as realm from '../../repositories/realmdb'
 import moment from 'moment'
 
-
-/**This is called when save button is clicked 
- * Fills all the corresponding matched key fieldAttributes from dataStoreAttributeMap and update formLayout state
- * 
- * @param {*} dataStoreAttributeValueMap 
- * @param {*} fieldAttributeMasterId 
- * @param {*} formElements  
- * @param {*} isSaveDisabled 
- * @param {*} dataStorevalue 
- */
-export function getDataStore() {
+export function getLastSyncTime() {
     return async function (dispatch) {
         try {
-
-            // realm.save('Car', {
-            //     make: 'honda',
-            //     model: 'city'
-            // })
-            // let obj = realm.getAll('Car')
-            // console.log('test>>', { ...obj[0] })
-            // console.log('getDataStore')
-            // realm.save('Person',
-            //     {
-            //         name: 'abhisehk',
-            //         birthday: 'date',
-            //         cars: [{ ...obj[0] }]
-            //     }
-            // )
-            // let obj1 = realm.getAll('Person')
-            // let temp = { ...obj1[0] }
-            // let result = temp.cars
-            // console.log('temp',obj1)
-            // console.log('resultfilter',result)
-            // let result1 = result.filtered('make = "honda"')
-            // console.log(result1)
-            // console.log({...result1[0]})
-            // console.log('test1>>', { ...obj1[0] }, { ...temp.cars[0] })
-            // console.log('getDataStore')
-
-
-            // realm.save(Datastore_Master_DB, {
-            //     attributeTypeId: 12222,
-            //     datastoreMasterId: 2,
-            //     id: 3,
-            //     key: 'DS',
-            //     label: 'dataStore',
-            //     lastSyncTime: '123',
-            //     searchIndex: true,
-            //     uniqueIndex: true
-            // })
-
-            // let obj = realm.getAll(Datastore_Master_DB)
-            // console.log('test>>', { ...obj[0] })
-            // console.log('getDataStore')
-
+            const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_DATASTORE_SYNC_TIME)
+            if (lastSyncTime && lastSyncTime.value) {
+                let timeDifference = "Last synced   " + dataStoreService.getLastSyncTimeInFormat(lastSyncTime.value)
+                dispatch(setState(SET_LAST_SYNC_TIME, { lastSyncTime: timeDifference }))
+            } else {
+                dispatch(setState(SET_LAST_SYNC_TIME, { lastSyncTime: 'Never Synced' }))
+            }
         } catch (error) {
             console.log(error)
         }
     }
 }
 
-
 export function syncDataStore() {
     return async function (dispatch) {
         try {
+            dispatch(setState(SET_DOWNLOADING_STATUS, { downLoadingStatus: 1, progressBarStatus: 0 }))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            let dataStoreMasterIdList = await dataStoreService.syncDataStore(token)
-            const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_DATASTORE_SYNC_TIME)
-            console.log('lastDataStoreSyncTime', lastSyncTime)
-            lastSyncTime = (lastSyncTime) ? lastSyncTime.value : null
-            for (let datastoreMaster of dataStoreMasterIdList) {
-                let currentPageNumber = 0, totalPage = 1;
-                let responseResults
-                console.log('datastoreMasterId', datastoreMaster.datastoreMasterId)
-                // do {
-                    responseResults = await dataStoreService.fetchDatastoreAndSaveInDB(token, datastoreMaster.dataStoreMasterId, currentPageNumber, lastSyncTime)
+            let dataStoreIdVSTitleMap = await dataStoreService.syncDataStore(token)
+            let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_DATASTORE_SYNC_TIME)
+            lastSyncTime = (lastSyncTime && lastSyncTime.value) ? lastSyncTime.value : null
+            for (let datastoreMasterId in dataStoreIdVSTitleMap) {
+                dispatch(setState(SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR, { fileName: dataStoreIdVSTitleMap[datastoreMasterId], progressBarStatus: 0 }))
+                let currentPageNumber = 0, elements = 0, fetchResults
+                do {
+                    fetchResults = await dataStoreService.fetchDatastoreAndSaveInDB(token, datastoreMasterId, currentPageNumber, null)
+                    elements += fetchResults.numberOfElements
                     currentPageNumber++
-                // }
-                // while (currentPageNumber < responseResults)
+                    await dispatch(setState(UPDATE_PROGRESS_BAR, parseInt((elements / fetchResults.totalElements) * 100)))
+                }
+                while (elements < fetchResults.totalElements)
             }
-            console.log('after')
-            // await keyValueDBService.validateAndSaveData(LAST_DATASTORE_SYNC_TIME, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
-            // let time = await keyValueDBService.getValueFromStore(LAST_DATASTORE_SYNC_TIME)
-            // console.log('time', time.value)
+            await keyValueDBService.validateAndSaveData(LAST_DATASTORE_SYNC_TIME, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
+            dispatch(setState(SET_DOWNLOADING_STATUS, { downLoadingStatus: 2, progressBarStatus: 0, }))
         } catch (error) {
-
+            dispatch(setState(SET_DOWNLOADING_STATUS, { downLoadingStatus: 3, progressBarStatus: 0, }))
         }
     }
 }

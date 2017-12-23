@@ -2,21 +2,31 @@
 
 const InitialState = require('./offlineDSInitialState').default
 import {
-    SET_VALIDATIONS,
-    SET_DATA_STORE_ATTR_MAP,
-    SHOW_LOADER,
-    SHOW_ERROR_MESSAGE,
-    SET_SEARCH_TEXT,
-    SHOW_DETAILS,
-    SET_INITIAL_STATE,
-    SAVE_SUCCESSFUL,
-    CLEAR_ATTR_MAP_AND_SET_LOADER,
-    DISABLE_AUTO_START_SCANNER
+    SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR,
+    UPDATE_PROGRESS_BAR,
+    SET_DOWNLOADING_STATUS,
+    SET_OFFLINEDS_INITIAL_STATE,
+    SET_LAST_SYNC_TIME
 } from '../../lib/constants'
 const initialState = new InitialState()
 
 export default function offlineDSReducer(state = initialState, action) {
     switch (action.type) {
+        case SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR:
+            return state.set('progressBarStatus', action.payload.progressBarStatus)
+                .set('fileName', action.payload.fileName)
+        case UPDATE_PROGRESS_BAR:
+            return state.set('progressBarStatus', action.payload)
+
+        case SET_DOWNLOADING_STATUS:
+            return state.set('progressBarStatus', action.payload.progressBarStatus)
+                .set('downLoadingStatus', action.payload.downLoadingStatus)
+
+        case SET_OFFLINEDS_INITIAL_STATE:
+            return initialState
+
+        case SET_LAST_SYNC_TIME:
+            return state.set('lastSyncTime', action.payload.lastSyncTime)
 
     }
     return state

@@ -138,11 +138,13 @@ class DataStore extends Component {
 
     fetchDataStoreAttrValueMap = _.debounce((searchText, manualSearch) => {
         if ((this.props.isSearchEnabled || manualSearch) && searchText.length > 2) {
-            this.props.actions.getDataStoreAttrValueMap(searchText,
+            this.props.actions.checkOfflineDS(searchText,
                 this.props.navigation.state.params.currentElement.dataStoreMasterId,
                 this.props.navigation.state.params.currentElement.dataStoreAttributeId,
                 this.props.navigation.state.params.currentElement.externalDataStoreMasterUrl,
-                this.props.navigation.state.params.currentElement.key)
+                this.props.navigation.state.params.currentElement.key,
+                this.props.navigation.state.params.currentElement.attributeTypeId
+            )
         }
         if (searchText.length <= 2) {
             this.props.actions.setState(SET_DATA_STORE_ATTR_MAP, {})
@@ -191,8 +193,17 @@ class DataStore extends Component {
         return flatListView
     }
 
+    getLoader() {
+        let loader
+        if (this.props.loaderRunning) {
+            loader = <Loader />
+        }
+        return loader
+    }
+
     render() {
         let flatListView = this.flatListView()
+        let loader = this.getLoader()
         if (this.props.detailsVisibleFor == -1) {
             return (
                 < Container >
@@ -206,8 +217,7 @@ class DataStore extends Component {
                         setSearchText={this.setSearchText}
                         scanner={this.scanner} />
                     <Content style={[styles.marginLeft10]}>
-                        {renderIf(this.props.loaderRunning,
-                            <Loader />)}
+                        {loader}
                         {renderIf(!this.props.loaderRunning && !_.isEmpty(this.props.dataStoreAttrValueMap),
                             <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>Suggestions</Text>)}
                         {flatListView}

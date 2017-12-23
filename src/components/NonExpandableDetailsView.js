@@ -57,7 +57,8 @@ export default class NonExpandableDetailsView extends Component {
                         <Text style={[styles.fontDefault, styles.fontPrimary, styles.textUnderline]}
                             onPress={() => this.props.navigateToDataStoreDetails({
                                 value: this.props.value,
-                                fieldAttributeMasterId: this.props.fieldAttributeMasterId
+                                fieldAttributeMasterId: this.props.fieldAttributeMasterId,
+                                jobAttributeMasterId: this.props.jobAttributeMasterId
                             })}>
                             {this.props.value}
                         </Text>)}
