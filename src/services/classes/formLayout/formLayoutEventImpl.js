@@ -23,7 +23,7 @@ import RestAPIFactory from '../../../lib/RestAPIFactory'
 import _ from 'lodash'
 import moment from 'moment'
 import sha256 from 'sha256'
-import {jobStatusService} from '../JobStatus'
+import { jobStatusService } from '../JobStatus'
 import { formLayoutService } from '../../classes/formLayout/FormLayout'
 import { fieldValidationService } from '../FieldValidation'
 import {
@@ -49,9 +49,9 @@ export default class FormLayoutEventImpl {
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event) {
         this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         isSaveDisabled = false
-       
+
         for (var [key, value] of formLayoutObject) {
-            
+
             if (key != attributeMasterId || event == NEXT_FOCUS) {
                 value.focus = false
             }
@@ -59,7 +59,7 @@ export default class FormLayoutEventImpl {
                 continue
             }
             value.editable = true
-            if(value.required) {
+            if (value.required) {
                 value.focus = event == NEXT_FOCUS ? true : value.focus
                 isSaveDisabled = true
                 break
@@ -130,7 +130,7 @@ export default class FormLayoutEventImpl {
         formLayoutObject.get(attributeMasterId).value = (value != null && value != undefined && value.length != 0 && value.length < 64 &&
             formLayoutObject.get(attributeMasterId).attributeTypeId == 61) ? sha256(value) : value;
         formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
-        if(!calledFrom) {
+        if (!calledFrom) {
             formLayoutObject.get(attributeMasterId).alertMessage = null
         }
         if (value && value.length > 0 && calledFrom == ON_BLUR) {
@@ -207,30 +207,30 @@ export default class FormLayoutEventImpl {
      */
     async saveData(formLayoutObject, jobTransactionId, statusId, jobMasterId, jobTransactionIdList, jobTransactionAssignOrderToHub) {
         try {
-            let user = await keyValueDBService.getValueFromStore(USER)        
-            let currentTime =  moment().format('YYYY-MM-DD HH:mm:ss')
+            let user = await keyValueDBService.getValueFromStore(USER)
+            let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
             if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
                 return formLayoutObject // return undefined or empty object if formLayoutObject is empty
             }
             let fieldData, jobTransaction, job, dbObjects
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
+                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime)
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
-                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime)
-                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber,currentTime)
+                dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
+                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime)
+                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime)
             }
 
             //TODO add other dbs which needs updation
-            const prevStatusId  = (jobTransactionIdList) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
+            const prevStatusId = (jobTransactionIdList) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
             const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user)
-            const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction,dbObjects.status[0].statusCategory,jobTransactionIdList) : []
-            await this._updateJobSummary(dbObjects.jobTransaction,statusId,jobTransactionIdList)
+            const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionIdList) : []
+            await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionIdList)
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
@@ -238,9 +238,9 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    async _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user){
+    async _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user) {
         let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
-        return {tableName : TABLE_TRANSACTION_LOGS, value : transactionLogs}
+        return { tableName: TABLE_TRANSACTION_LOGS, value: transactionLogs }
     }
 
     _prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user, dateTime) {
@@ -265,48 +265,48 @@ export default class FormLayoutEventImpl {
         return transactionLogs
     }
 
-    async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){
-        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+    async _updateJobSummary(jobTransaction, statusId, jobTransactionIdList) {
+        const prevStatusId = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
-        const count  = (jobTransactionIdList) ? jobTransactionIdList.length : 1
+        const count = (jobTransactionIdList) ? jobTransactionIdList.length : 1
         const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
         jobSummaryList.value.forEach(item => {
             item.updatedTime = currentDate
-            if(item.jobStatusId == prevStatusId ){
-                item.count = ( item.count - count >= 0) ? item.count-count : 0 
-            }            
-            if(item.jobStatusId == statusId ){
+            if (item.jobStatusId == prevStatusId) {
+                item.count = (item.count - count >= 0) ? item.count - count : 0
+            }
+            if (item.jobStatusId == statusId) {
                 item.count += count
-            }     
+            }
         });
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
 
-    async _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList){
-        const setRunsheetSummary = [],runSheetList = []
-        const status = ['pendingCount','failCount','successCount']
-        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+    async _updateRunsheetSummary(jobTransaction, statusCategory, jobTransactionIdList) {
+        const setRunsheetSummary = [], runSheetList = []
+        const status = ['pendingCount', 'failCount', 'successCount']
+        const prevStatusId = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
-        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET,null)
-        const runsheetMap = runSheetData.reduce(function ( total, current ) {
-            total[ current.id ] = Object.assign({},current);
+        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, null)
+        const runsheetMap = runSheetData.reduce(function (total, current) {
+            total[current.id] = Object.assign({}, current);
             return total;
         }, {});
-        if(jobTransactionIdList){
-            for(id in jobTransaction){
-                let prevCount  = runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory-1]]
-                runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory-1]] = (prevCount > 0) ? prevCount-1 : 0
-                runsheetMap[jobTransaction[id].runsheetId][status[statusCategory-1]] += 1 ;
-                runSheetList.push(runsheetMap[jobTransaction[id].runsheetId])          
+        if (jobTransactionIdList) {
+            for (id in jobTransaction) {
+                let prevCount = runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory - 1]]
+                runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory - 1]] = (prevCount > 0) ? prevCount - 1 : 0
+                runsheetMap[jobTransaction[id].runsheetId][status[statusCategory - 1]] += 1;
+                runSheetList.push(runsheetMap[jobTransaction[id].runsheetId])
             }
-        }else{
-            let prevCount  = runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory-1]]
-            runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory-1]] = (prevCount > 0) ? prevCount-1 : 0
-            runsheetMap[jobTransaction.runsheetId][status[statusCategory-1]] += 1
+        } else {
+            let prevCount = runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory - 1]]
+            runsheetMap[jobTransaction.runsheetId][status[prevStatusCategory - 1]] = (prevCount > 0) ? prevCount - 1 : 0
+            runsheetMap[jobTransaction.runsheetId][status[statusCategory - 1]] += 1
             runSheetList.push(runsheetMap[jobTransaction.runsheetId])
         }
-        return {tableName : TABLE_RUNSHEET,value : runSheetList}
-      // realm.updateRecordOnTableListData(TABLE_RUNSHEET,runSheetList,Object.keys(runSheetList));
+        return { tableName: TABLE_RUNSHEET, value: runSheetList }
+        // realm.updateRecordOnTableListData(TABLE_RUNSHEET,runSheetList,Object.keys(runSheetList));
     }
 
 
@@ -402,7 +402,7 @@ export default class FormLayoutEventImpl {
      * @param {*statusId} statusId 
      * @param {*jobMasterId} jobMasterId 
      */
-    async _getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user, jobTransactionAssignOrderToHub) {
+    async _getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub) {
         let hub = await keyValueDBService.getValueFromStore(HUB)
         let imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
         let status = await keyValueDBService.getValueFromStore(JOB_STATUS).then(jobStatus => { return jobStatus.value.filter(jobStatus1 => jobStatus1.id == statusId) })
@@ -415,7 +415,8 @@ export default class FormLayoutEventImpl {
         }
         else {
             //JobTransactionId > 0 for Normal Job && <0 for New Job
-            jobTransaction = (jobTransactionId > 0 || (jobTransactionId < 0 && !_.isNull(jobTransactionAssignOrderToHub.referenceNumber))) ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
+            jobTransaction = (jobTransactionId > 0 || (jobTransactionId < 0 && jobTransactionAssignOrderToHub.referenceNumber)) ?
+                realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, 'id = ' + jobTransactionId, false)[0] // to get the first transaction, as query is on id and it returns list
                 : this._getDefaultValuesForJobTransaction(jobTransactionId, status[0], jobMaster[0], user.value, hub.value, imei.value, currentTime)
         }
 
@@ -430,7 +431,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei,currentTime) {
+    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei, currentTime) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
@@ -453,7 +454,7 @@ export default class FormLayoutEventImpl {
         //TODO only basic columns are set, some columns are not set which will be set as codebase progresses further
     }
 
-    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei,currentTime) {
+    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         for (let jobTransaction1 of jobTransactionList) {
             let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
@@ -483,13 +484,13 @@ export default class FormLayoutEventImpl {
      * @param {*statusObject} status 
      * @param {*jobId} jobId 
      */
-    _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber,currentTime) {
+    _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber, currentTime) {
         let jobArray = []
         let realmJobObject = null
         if (jobId > 0) {
             realmJobObject = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0]; // to get the first job, as query is on id and it returns list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
         } else {
-            realmJobObject = this._getDefaultValuesForJob(jobMasterId, jobId, user, hub, referenceNumber,currentTime)
+            realmJobObject = this._getDefaultValuesForJob(jobMasterId, jobId, user, hub, referenceNumber, currentTime)
         }
         let job = Object.assign({}, realmJobObject)
         switch (status.actionOnStatus) {
@@ -536,7 +537,7 @@ export default class FormLayoutEventImpl {
      * @param {*} jobMasterId 
      * @param {*} id 
      */
-    _getDefaultValuesForJob(jobMasterId, id, user, hub, referenceNumber,currentTime) {
+    _getDefaultValuesForJob(jobMasterId, id, user, hub, referenceNumber, currentTime) {
         return job = {
             id,
             referenceNo: referenceNumber,
@@ -558,7 +559,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei,currentTime) {
+    _getDefaultValuesForJobTransaction(id, status, jobMaster, user, hub, imei, currentTime) {
         //TODO some values like lat/lng and battery are not valid values, update them as their library is added
         return jobTransaction = {
             id,
@@ -581,10 +582,10 @@ export default class FormLayoutEventImpl {
             trackCallDuration: 0,
             trackSmsCount: 0,
             trackTransactionTimeSpent: 0.0,
-            jobCreatedAt:currentTime,
+            jobCreatedAt: currentTime,
             erpSyncTime: currentTime,
             androidPushTime: currentTime,
-            lastUpdatedAtServer:currentTime,
+            lastUpdatedAtServer: currentTime,
             lastTransactionTimeOnMobile: currentTime,
             deleteFlag: 0,
             attemptCount: 1,

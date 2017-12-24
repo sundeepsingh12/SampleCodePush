@@ -12,6 +12,8 @@ import {
     TabScreen
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
+import { draftService } from '../DraftService.js'
+
 class FormLayout {
 
     /**
@@ -224,7 +226,7 @@ class FormLayout {
         return combineMap
     }
 
-    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList,jobTransactionIdList) {
+    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList) {
         let routeName, routeParam
         const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
@@ -256,8 +258,9 @@ class FormLayout {
             if (navigationFormLayoutStates) {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId,jobTransactionIdList, jobTransaction)
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransactionIdList, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)            
         }
         return {
             routeName,

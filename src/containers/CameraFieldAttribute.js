@@ -71,7 +71,10 @@ class CameraFieldAttribute extends Component {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
-
+    componentWillUnmount() {
+        this.props.actions.setState(SET_SHOW_IMAGE, false)
+        this.props.actions.setState(SET_IMAGE_DATA, '')
+    }
     componentDidMount() {
         switch (this.props.navigation.state.params.currentElement.attributeTypeId) {
             case CAMERA: this.setState({ quality: 'low' })
@@ -85,6 +88,7 @@ class CameraFieldAttribute extends Component {
             }
         }
         this.setState({ torchOff: Camera.constants.FlashMode.off })
+        this.props.actions.setExistingImage(this.props.navigation.state.params.currentElement)
     }
     _setTorchOn = () => {
         this.setState({ torchOff: Camera.constants.FlashMode.on })
@@ -220,7 +224,7 @@ class CameraFieldAttribute extends Component {
         const options = {};
         this.camera.capture()
             .then((data) => {
-                this.camera.stopCapture()
+                //this.camera.stopCapture()
                 console.log('image data', data)
                 this.props.actions.setState(SET_SHOW_IMAGE, true)
                 this.props.actions.setState(SET_IMAGE_DATA, data.data)

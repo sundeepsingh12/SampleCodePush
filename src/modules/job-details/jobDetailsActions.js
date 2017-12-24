@@ -26,6 +26,7 @@ import {
     JOB_MASTER,
     USER
 } from '../../lib/constants'
+import { draftService } from '../../services/classes/DraftService';
 
 export function startFetchingJobDetails() {
     return {
@@ -33,7 +34,7 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusId) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -42,6 +43,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobTransaction,
             currentStatus,
             errorMessage,
+            draftStatusId
         }
     }
 }
@@ -58,9 +60,11 @@ export function getJobDetails(jobTransactionId) {
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             const jobMaster = jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId, jobMasterList)
-            const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery, 
-                                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList) : false
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay,errorMessage))
+            const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
+                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList) : false
+            const draftStatusId = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId)
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusId))
+
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

@@ -22,7 +22,7 @@ export function saveImage(result, fieldAttributeMasterId, formElement, isSaveDis
         }
         dispatch(setState(SET_IMAGE_DATA, ''))
         dispatch(setState(SET_SHOW_IMAGE, false))
-        dispatch(setState(VIEW_IMAGE_DATA, ''))        
+        dispatch(setState(VIEW_IMAGE_DATA, ''))
     }
 }
 export function getImageData(value) {
@@ -34,5 +34,14 @@ export function getImageData(value) {
 export function setInitialState() {
     return async function (dispatch) {
         dispatch(setState(VIEW_IMAGE_DATA, ''))
+    }
+}
+export function setExistingImage(item) {
+    return async function (dispatch) {
+        if (item.value && item.value != '') {
+            const result = await signatureService.getImageData(item.value)
+            dispatch(setState(SET_IMAGE_DATA, result))
+            dispatch(setState(SET_SHOW_IMAGE, true))
+        }
     }
 }
