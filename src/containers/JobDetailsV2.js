@@ -6,7 +6,7 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 
 import React, { Component } from 'react'
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
 
 import {
   Container,

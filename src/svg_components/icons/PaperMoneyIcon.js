@@ -12,7 +12,7 @@ export default class PaperMoneyIcon extends Component {
             <Svg
                 width={this.props.width}
                 height={this.props.height}
-                viewBox={`0 0 ${this.props.width} ${this.props.height}`}
+                viewBox='0 0 30 20'
             >
                 <G stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                     <G rotate="-8.000000, -563.000000">
