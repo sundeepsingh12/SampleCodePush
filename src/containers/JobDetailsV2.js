@@ -71,7 +71,7 @@ function mapStateToProps(state) {
     smsTemplateList: state.jobDetails.smsTemplateList,
     errorMessage: state.jobDetails.errorMessage,
     statusList: state.jobDetails.statusList,
-    draftStatusId: state.jobDetails.draftStatusId
+    draftStatusInfo: state.jobDetails.draftStatusInfo
   }
 }
 
@@ -92,7 +92,7 @@ class JobDetailsV2 extends Component {
   }
 
   componentWillUnmount() {
-    if (this.props.errorMessage || this.props.draftStatusId) {
+    if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
   }
@@ -309,23 +309,24 @@ class JobDetailsV2 extends Component {
 
   }
   showDraftAlert() {
-    let draftStatus = this.props.currentStatus.nextStatusList.filter(nextStatus => nextStatus.id == this.props.draftStatusId)
-    let draftMessage = 'Do you want to restore draft for ' + draftStatus[0].name + '?'
+    // let draftStatus = this.props.currentStatus.nextStatusList.filter(nextStatus => nextStatus.id == this.props.draftStatusId)
+    // let draftMessage = (draftStatus.length > 0) ? 'Do you want to restore draft for ' + draftStatus[0].name + '?' : 'Do you want to restore draft?'
+    let draftMessage = 'Do you want to restore draft for ' + this.props.draftStatusInfo.name + '?'
     let view =
       <CustomAlert
         title="Draft"
         message={draftMessage}
-        onOkPressed={() => this._goToFormLayoutWithDraft(draftStatus[0].name)}
+        onOkPressed={() => this._goToFormLayoutWithDraft()}
         onCancelPressed={this._onCancel} />
     return view
   }
-  _goToFormLayoutWithDraft = (statusName) => {
+  _goToFormLayoutWithDraft = () => {
     this.props.actions.navigateToScene('FormLayout', {
       contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
       jobTransaction: this.props.jobTransaction,
-      statusId: this.props.draftStatusId,
-      statusName: statusName,
+      statusId: this.props.draftStatusInfo.id,
+      statusName: this.props.draftStatusInfo.name,
       jobMasterId: this.props.jobTransaction.jobMasterId,
       isDraftRestore: true
     })
@@ -338,7 +339,7 @@ class JobDetailsV2 extends Component {
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
-      const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo)) ? this.showDraftAlert() : null
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>

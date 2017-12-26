@@ -43,12 +43,20 @@ class DraftService {
         }
         return draftObject
     }
-    checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) {
+    checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId, calledFromJobDetails, statusList) {
         let draftDbObject = this.getDraftFromDb(jobTransactionId, jobMasterId, statusId)
         for (let index in draftDbObject) {
             let draft = { ...draftDbObject[index] }
-            if (draft.statusId)
+            if (draft.statusId && !calledFromJobDetails)
                 return draft.statusId
+            else if (draft.statusId && statusList && statusList.value && statusList.value.length > 0) {
+                const draftStatus = statusList.value.filter(status => status.id == draft.statusId);
+                let draftStatusInfo = {
+                    id: draft.statusId,
+                    name: draftStatus[0].name
+                }
+                return draftStatusInfo
+            }
         }
     }
     restoreDraftFromDb(jobTransactionId, statusId, jobMasterId) {

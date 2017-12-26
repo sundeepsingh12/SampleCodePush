@@ -260,8 +260,8 @@ class FormLayout {
             }
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransactionIdList, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
-            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)            
         }
+        await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
         return {
             routeName,
             routeParam

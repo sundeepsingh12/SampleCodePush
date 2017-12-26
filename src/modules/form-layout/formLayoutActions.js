@@ -54,7 +54,7 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
         try {
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId)
-            const draftStatusId = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId)
+            const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
             dispatch(setState(BASIC_INFO, {
                 statusId,

@@ -34,7 +34,7 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusId) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -43,7 +43,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobTransaction,
             currentStatus,
             errorMessage,
-            draftStatusId
+            draftStatusInfo
         }
     }
 }
@@ -62,8 +62,8 @@ export function getJobDetails(jobTransactionId) {
             const jobMaster = jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId, jobMasterList)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList) : false
-            const draftStatusId = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusId))
+            const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo))
 
         } catch (error) {
             // To do

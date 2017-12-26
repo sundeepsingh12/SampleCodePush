@@ -325,7 +325,7 @@ class BasicFormElement extends Component {
                                         defaultValue={this.props.item.value}
                                         style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
                                         value={this.props.item.value}
-                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
+                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
                                         multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                         onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
@@ -333,12 +333,12 @@ class BasicFormElement extends Component {
                                         onBlur={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                     />
-                                    
+
 
                                 </Item>
                                 {this.props.item.alertMessage ?
-                                        <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
-                                        : null}
+                                    <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
+                                    : null}
                                 {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ? <TouchableHighlight
                                     style={[styles.absolute, { bottom: 50, right: 10 }]}
                                     onPress={this.goToQRCode}

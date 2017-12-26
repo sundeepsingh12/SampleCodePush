@@ -55,9 +55,9 @@ describe('test checkIfDraftExistsAndGetStatusId', () => {
     it('should return undefined for no drafts in db', () => {
         draftService.getDraftFromDb = jest.fn()
         draftService.getDraftFromDb.mockReturnValue(null)
-        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1)).toEqual(undefined)
+        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, false, null)).toEqual(undefined)
     })
-    it('should return draft object', () => {
+    it('should return status id', () => {
         let draftDb = [{
             jobTransactionId: 1,
             statusId: 1,
@@ -65,7 +65,61 @@ describe('test checkIfDraftExistsAndGetStatusId', () => {
         }]
         draftService.getDraftFromDb = jest.fn()
         draftService.getDraftFromDb.mockReturnValue(draftDb)
-        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1)).toEqual(1)
+        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, false, null)).toEqual(1)
+    })
+    it('should return undefined for null status list', () => {
+        let draftDb = [{
+            jobTransactionId: 1,
+            statusId: 1,
+            formElement: {}
+        }]
+        draftService.getDraftFromDb = jest.fn()
+        draftService.getDraftFromDb.mockReturnValue(draftDb)
+        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, true, null)).toEqual(undefined)
+    })
+    it('should return undefined for empty status list', () => {
+        let draftDb = [{
+            jobTransactionId: 1,
+            statusId: 1,
+            formElement: {}
+        }]
+        draftService.getDraftFromDb = jest.fn()
+        draftService.getDraftFromDb.mockReturnValue(draftDb)
+        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, true, [])).toEqual(undefined)
+    })
+    it('should return undefined for empty status list', () => {
+        const statusList = { value: [] }
+        let draftDb = [{
+            jobTransactionId: 1,
+            statusId: 1,
+            formElement: {}
+        }]
+        draftService.getDraftFromDb = jest.fn()
+        draftService.getDraftFromDb.mockReturnValue(draftDb)
+        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, true, statusList)).toEqual(undefined)
+    })
+    it('should return status id and name', () => {
+        const statusList = {
+            value: [
+                {
+                    name: 'delivered',
+                    id: 1
+                }
+            ]
+        }
+        let draftDb = [{
+            jobTransactionId: 1,
+            statusId: 1,
+            formElement: {}
+        }]
+        draftService.getDraftFromDb = jest.fn()
+        draftService.getDraftFromDb.mockReturnValue(draftDb)
+        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, true, statusList)).toEqual({
+
+            name: 'delivered',
+            id: 1
+
+        })
     })
 })
 

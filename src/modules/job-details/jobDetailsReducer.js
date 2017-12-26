@@ -27,12 +27,12 @@ export default function jobDetailsReducer(state = initialState, action) {
                 .set('jobDetailsLoading', false)
                 .set('currentStatus', action.payload.currentStatus)
                 .set('errorMessage', action.payload.errorMessage)
-                .set('draftStatusId', action.payload.draftStatusId)
+                .set('draftStatusInfo', action.payload.draftStatusInfo)
         case RESET_STATE:
             return initialState
         case RESET_STATE_FOR_JOBDETAIL:
             return state.set('errorMessage', false)
-                .set('draftStatusId', null)
+                .set('draftStatusInfo', {})
     }
     return state
 }
