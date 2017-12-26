@@ -5,10 +5,13 @@ import { restAPI } from "../../lib/RestAPI";
 import {
     TOKEN_MISSING,
     NOT_FOUND,
+    SHIPMENT_ALREADY_SCANNED,
+    SHIPMENT_NOT_FOUND,
 } from '../../lib/ContainerConstants'
 
 import { formLayoutEventsInterface } from '../classes/formLayout/FormLayoutEventInterface'
 import * as realm from '../../repositories/realmdb'
+import { error } from "util";
 
 describe('test cases for savePostJobOrder', () => {
 
@@ -29,6 +32,30 @@ describe('test cases for savePostJobOrder', () => {
         let successList = ['123', '234']
         return postAssignmentService.savePostJobOrder(successList)
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+            })
+    })
+
+    it('inserts concatenated list in store', () => {
+        let successList = ['123', '234']
+        keyValueDBService.getValueFromStore.mockReturnValue({
+            value : ['122']
+        })
+        return postAssignmentService.savePostJobOrder(successList)
+            .then((result) => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+            })
+    })
+
+    it('inserts concatenated list in store', () => {
+        let successList = ['123', '234']
+        keyValueDBService.getValueFromStore.mockReturnValue({
+            value : null
+        })
+        return postAssignmentService.savePostJobOrder(successList)
+            .then((result) => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
             })
@@ -145,13 +172,13 @@ describe('test cases for updateTransactionStatus', () => {
 
     it('should update transaction status,runsheet and job summary', () => {
         keyValueDBService.getValueFromStore.mockReturnValueOnce({
-            value : {
-                employeeCode : 'xyz'
+            value: {
+                employeeCode: 'xyz'
             }
         })
         keyValueDBService.getValueFromStore.mockReturnValueOnce({
-            value : {
-                code : 'abc'
+            value: {
+                code: 'abc'
             }
         })
         return postAssignmentService.updateTransactionStatus(transaction, pendingStatus, jobMaster)
@@ -161,6 +188,98 @@ describe('test cases for updateTransactionStatus', () => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(realm.performBatchSave).toHaveBeenCalledTimes(1)
                 expect(formLayoutEventsInterface.addTransactionsToSyncList).toHaveBeenCalledTimes(1)
+            })
+    })
+})
+
+describe('test cases for checkScanResult', () => {
+    beforeEach(() => {
+        postAssignmentService.updateTransactionStatus = jest.fn()
+        postAssignmentService.checkPostJobOnServer = jest.fn()
+    })
+    const referenceNumber = '123'
+    // const jobTransactionMap = {}
+    const pendingStatus = 11
+    const jobMaster = {
+        id: 1,
+        code: 'ABC'
+    }
+    const isForceAssignmentAllowed = false
+    const pendingCount = 4
+
+    it('should throw error for already scanned shipment', () => {
+        const jobTransactionMap = {
+            123: {
+                isScanned: true
+            }
+        }
+
+        return postAssignmentService.checkScanResult(referenceNumber, jobTransactionMap, pendingStatus, jobMaster, false, 4)
+            .then()
+            .catch((error) => {
+                expect(error.message).toEqual(SHIPMENT_ALREADY_SCANNED)
+                expect(postAssignmentService.updateTransactionStatus).not.toHaveBeenCalled()
+                expect(postAssignmentService.checkPostJobOnServer).not.toHaveBeenCalled()
+            })
+    })
+
+    it('should call updateTransactionStatus method to update existing transaction', () => {
+        const jobTransactionMap = {
+            123: {
+                isScanned: false
+            }
+        }
+
+        const resultJobTransactionMap = {
+            123: {
+                isScanned: true
+            }
+        }
+
+        postAssignmentService.updateTransactionStatus.mockReturnValue(null)
+
+        return postAssignmentService.checkScanResult(referenceNumber, jobTransactionMap, pendingStatus, jobMaster, false, 4)
+            .then((postAssignmentResult) => {
+                expect(postAssignmentService.updateTransactionStatus).toHaveBeenCalledTimes(1)
+                expect(postAssignmentService.checkPostJobOnServer).not.toHaveBeenCalled()
+                expect(postAssignmentResult.jobTransactionMap).toEqual(resultJobTransactionMap)
+                expect(postAssignmentResult.pendingCount).toEqual(3)
+            })
+    })
+
+    it('should throw error for scanned shipment not found when force assigned is false', () => {
+        const jobTransactionMap = {
+            124: {
+                isScanned: true
+            }
+        }
+
+        return postAssignmentService.checkScanResult(referenceNumber, jobTransactionMap, pendingStatus, jobMaster, false, 4)
+            .then()
+            .catch((error) => {
+                expect(error.message).toEqual(SHIPMENT_NOT_FOUND)
+                expect(postAssignmentService.updateTransactionStatus).not.toHaveBeenCalled()
+                expect(postAssignmentService.checkPostJobOnServer).not.toHaveBeenCalled()
+            })
+    })
+
+    it('should call checkPostJobOnServer method if force assigned is true', () => {
+        const jobTransactionMap = {
+            124: {
+                isScanned: false
+            }
+        }
+
+        const scanError = 'Not Found'
+        postAssignmentService.checkPostJobOnServer.mockReturnValue(scanError)
+
+        return postAssignmentService.checkScanResult(referenceNumber, jobTransactionMap, pendingStatus, jobMaster, true, 4)
+            .then((postAssignmentResult) => {
+                expect(postAssignmentService.checkPostJobOnServer).toHaveBeenCalledTimes(1)
+                expect(postAssignmentService.updateTransactionStatus).not.toHaveBeenCalled()
+                expect(postAssignmentResult.jobTransactionMap).toEqual(jobTransactionMap)
+                expect(postAssignmentResult.pendingCount).toEqual(4)
+                expect(postAssignmentResult.scanError).toEqual(scanError)
             })
     })
 })
