@@ -2,7 +2,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { selectFromListDataService } from '../../services/classes/SelectFromListService'
-import { updateFieldDataWithChildData, getNextFocusableAndEditableElements, updateFieldData } from '../form-layout/formLayoutActions'
+import { updateFieldDataWithChildData, fieldValidations, getNextFocusableAndEditableElements, updateFieldData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { CHECKBOX, RADIOBUTTON, ARRAY_SAROJ_FAREYE, OPTION_RADIO_FOR_MASTER, OBJECT_SAROJ_FAREYE, DROPDOWN } from '../../lib/AttributeConstants'
 import { fieldDataService } from '../../services/classes/FieldData'
@@ -21,6 +21,9 @@ import {
     INPUT_TEXT_VALUE,
     NEXT_FOCUS
 } from '../../lib/constants'
+import {
+    AFTER
+} from '../../lib/AttributeConstants'
 import _ from 'lodash'
 
 export function _setErrorMessage(message) {
@@ -49,12 +52,12 @@ export function setOrRemoveStates(selectFromListState, id, attributeTypeId) {
     }
 }
 
-export function selectFromListButton(selectFromListState, params, jobTransactionId, latestPositionId, isSaveDisabled, formElement, calledFromArray, rowId) {
+export function selectFromListButton(selectFromListState, params, jobTransaction, latestPositionId, isSaveDisabled, formElement, calledFromArray, rowId) {
     return async function (dispatch) {
         try {
             selectFromListState = _.values(selectFromListDataService.selectFromListDoneButtonClicked(params.attributeTypeId, selectFromListState))
             if (params.attributeTypeId == CHECKBOX || params.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
-                const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransactionId, params.positionId, latestPositionId)
+                const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransaction.id, params.positionId, latestPositionId)
                 const value = params.attributeTypeId == OPTION_RADIO_FOR_MASTER ? OBJECT_SAROJ_FAREYE : ARRAY_SAROJ_FAREYE
                 if (calledFromArray)
                     dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId, fieldDataListData))
@@ -64,7 +67,7 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
                 if (calledFromArray)
                     dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, selectFromListState[0].value, formElement, rowId))
                 else
-                    dispatch(getNextFocusableAndEditableElements(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value, NEXT_FOCUS))
+                    dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value))
             }
             dispatch(setState(INPUT_TEXT_VALUE, ''))
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))

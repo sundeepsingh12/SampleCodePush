@@ -18,7 +18,7 @@ export function saveImage(result, fieldAttributeMasterId, formElement, isSaveDis
         if (calledFromArray) {
             dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId))
         } else {
-            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, NEXT_FOCUS))
+            dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value))
         }
         dispatch(setState(SET_IMAGE_DATA, ''))
         dispatch(setState(SET_SHOW_IMAGE, false))
