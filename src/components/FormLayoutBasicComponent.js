@@ -172,7 +172,7 @@ class BasicFormElement extends Component {
     }
 
     _searchForReferenceValue = (value) => {
-        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, NEXT_FOCUS);
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, { latestPositionId: this.props.latestPositionId });
     }
 
     onFocusEvent(currentElement) {
@@ -192,10 +192,6 @@ class BasicFormElement extends Component {
         }
     }
 
-    _onPressHelpText(fieldAttributeMasterId) {
-        this.props.actions.toogleHelpText(fieldAttributeMasterId, this.props.formElement);
-    }
-
     _inflateModal = () => {
         this.setState(previousState => {
             return {
@@ -204,7 +200,7 @@ class BasicFormElement extends Component {
         })
     }
     onSaveDateTime = (value) => {
-        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', NEXT_FOCUS);
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId });
         this.setState({ showDateTimePicker: false, showNPS: false })
     }
 
@@ -322,9 +318,9 @@ class BasicFormElement extends Component {
                                         autoCapitalize="none"
                                         placeholder={this.props.item.helpText}
                                         placeholderTextColor={styles.fontLowGray.color}
-                                        defaultValue={this.props.item.value}
+                                        defaultValue={this.props.item.displayValue}
                                         style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
-                                        value={this.props.item.value}
+                                        value={this.props.item.displayValue}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
                                         multiline={this.props.item.attributeTypeId == 2 ? true : false}
@@ -333,12 +329,12 @@ class BasicFormElement extends Component {
                                         onBlur={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                     />
-                                    
+
 
                                 </Item>
                                 {this.props.item.alertMessage ?
-                                        <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
-                                        : null}
+                                    <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
+                                    : null}
                                 {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ? <TouchableHighlight
                                     style={[styles.absolute, { bottom: 50, right: 10 }]}
                                     onPress={this.goToQRCode}

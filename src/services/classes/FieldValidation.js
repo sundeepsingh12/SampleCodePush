@@ -120,23 +120,17 @@ class FieldValidation {
      * @param {*} jobTransaction 
      */
     evaluateValidationMap(validationStringMap, validationMap, formElement, jobTransaction, timeOfExecution) {
-        let validationActionList, alertMessageList = [], returnValue = true
+        let validationActionList, returnValue = true
         for (let index in validationStringMap) {
             if (this.evaluateValidation(validationStringMap[index], validationMap, '||', formElement, jobTransaction)) {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == THEN) : null
             } else {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == ELSE) : null
             }
-            let validationActionResultList = validationActionList ? this.runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, validationMap[index].fieldAttributeMasterId) : null
-            if (validationActionResultList) {
-                validationActionResultList.alertMessage ? alertMessageList.concat(validationActionResultList.alertMessage) : null
-                returnValue = validationActionResultList.returnValue
-            }
+            let validationActionResult = validationActionList ? this.runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, validationMap[index].fieldAttributeMasterId) : null
+            returnValue = returnValue ? validationActionResult : returnValue
         }
-        return {
-            alertMessageList,
-            returnValue
-        }
+        return returnValue
     }
 
     /**
@@ -181,7 +175,7 @@ class FieldValidation {
             let id = this.splitKey(key, false)
             let fieldAttributeMasterId = parseInt(id)
             fieldAttributeMasterId = fieldAttributeMasterId != NaN ? fieldAttributeMasterId : id
-            return formElement.get(fieldAttributeMasterId) ? formElement.get(fieldAttributeMasterId).value : null
+            return formElement.get(fieldAttributeMasterId) ? formElement.get(fieldAttributeMasterId).displayValue : null
         } else if (key[0] == 'J') {
             let jobAttributeMasterId = this.splitKey(key, true)
             let jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${jobAttributeMasterId} AND parentId = 0`
@@ -222,7 +216,8 @@ class FieldValidation {
                 return (leftKey !== rightKey)
             }
             case REGEX: {
-                return rightKey.test(leftKey)
+                let regex = new RegExp(rightKey)
+                return regex.test(leftKey)
             }
         }
     }
@@ -244,10 +239,11 @@ class FieldValidation {
      * @param {*} jobTransaction 
      */
     runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, currentFieldAttributeMasterId) {
-        let validationActionResult = {
-            alertMessageList: [],
-            returnValue: true,
-        }
+        let returnValue = true
+        // let validationActionResult = {
+        //     alertMessageList: [],
+        //     returnValue: true,
+        // }
         for (let index in validationActionList) {
             switch (validationActionList[index].type) {
                 case ALERT_MESSAGE: {
@@ -260,7 +256,8 @@ class FieldValidation {
                         this.actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationActionList[index])
                     } else {
                         if (formElement.get(parseInt(fieldAttributeMasterId))) {
-                            formElement.get(parseInt(fieldAttributeMasterId)).value = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction)
+                            let valueToBeAssigned = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction)
+                            formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = valueToBeAssigned
                             formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                         }
                     }
@@ -270,7 +267,7 @@ class FieldValidation {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (formElement.get(parseInt(fieldAttributeMasterId))) {
                         let value = this.solveMathExpression(validationActionList[index].actionOnAssignFrom, formElement, jobTransaction)
-                        formElement.get(parseInt(fieldAttributeMasterId)).value = (value || value === 0) ? value + '' : null
+                        formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = (value || value === 0) ? value + '' : null
                         formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                     }
                     break
@@ -282,11 +279,11 @@ class FieldValidation {
                         if (formElement.get(parseInt(fieldAttributeMasterId)).attributeTypeId == TIME) {
                             let tobeassign = moment()
                             tobeassign.add(parseInt(value), 'h')
-                            formElement.get(parseInt(fieldAttributeMasterId)).value = tobeassign.format('HH:mm')
+                            formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = tobeassign.format('HH:mm')
                         } else if (formElement.get(parseInt(fieldAttributeMasterId)).attributeTypeId == DATE || formElement.get(parseInt(fieldAttributeMasterId)).attributeTypeId == RE_ATTEMPT_DATE) {
                             let tobeassign = moment()
                             tobeassign.add(parseInt(value), 'd')
-                            formElement.get(parseInt(fieldAttributeMasterId)).value = tobeassign.format('YYYY-MM-DD')
+                            formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = tobeassign.format('YYYY-MM-DD')
                         }
                     }
                     break
@@ -295,7 +292,7 @@ class FieldValidation {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (formElement.get(parseInt(fieldAttributeMasterId))) {
                         let value = this.solveDateTimeExpression(validationActionList[index].actionOnAssignFrom, formElement, jobTransaction, true)
-                        formElement.get(parseInt(fieldAttributeMasterId)).value = value ? value + '' : null
+                        formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = value ? value + '' : null
                         formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                     }
                     break
@@ -315,14 +312,14 @@ class FieldValidation {
                     break
                 }
                 case RETURN: {
-                    validationActionResult.returnValue = this.evaluateReturnCondition(validationActionList[index].assignValue, timeOfExecution, formElement, currentFieldAttributeMasterId)
+                    returnValue = this.evaluateReturnCondition(validationActionList[index].assignValue, timeOfExecution, formElement, currentFieldAttributeMasterId)
                     break
                 }
                 case TIME_COMPARATOR: {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
                     if (formElement.get(parseInt(fieldAttributeMasterId))) {
                         let value = this.solveDateTimeExpression(validationActionList[index].actionOnAssignFrom, formElement, jobTransaction, false)
-                        formElement.get(parseInt(fieldAttributeMasterId)).value = value
+                        formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = value
                         formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                     }
                     break
@@ -330,7 +327,7 @@ class FieldValidation {
             }
         }
 
-        return validationActionResult
+        return returnValue
     }
 
     /**
