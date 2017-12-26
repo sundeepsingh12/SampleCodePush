@@ -44,7 +44,7 @@ class SummaryAndPieChart {
         const todayDate =  moment().format('YYYY-MM-DD')
         const jobTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION,null)
         jobTransactions.forEach(item =>jobStatusIdAndLastUpdatedAtServerMap[item.jobStatusId] = moment(item.getLastUpdatedAtServer).format('YYYY-MM-DD'))
-        jobMasterList.forEach(id => jobMasterSummaryList[id.id] = {id : id.id ,code: id.identifier, title : id.title, count : 0, 1 : {count : 0,list : []},2 : {count : 0,list : []},3 : {count : 0,list : []}} )
+        jobMasterList.forEach(id => jobMasterSummaryList[id.id] = {id : id.id ,code: id.identifier, identifierColor:id.identifierColor, title : id.title, count : 0, 1 : {count : 0,list : []},2 : {count : 0,list : []},3 : {count : 0,list : []}} )
         const jobStatusIdCountMap = jobSummaryList.reduce(function ( total, current ) {
             total[ current.jobStatusId ] = current.count;
             return total;
