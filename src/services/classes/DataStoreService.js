@@ -309,29 +309,18 @@ class DataStoreService {
         return dataStoreResponse
     }
 
-    async  saveDataStoreToDB(dataStoreJsonResponse) {
+    async saveDataStoreToDB(dataStoreJsonResponse) {
         if (!dataStoreJsonResponse) {
             return
         }
-        let dataStoreList = []
         let dataStoreId = realm.getAll(DataStore_DB).length
-        let id = realm.getAll(Datastore_AttributeValue_DB).length
+        let dataStoreList = []
         for (let dataStore of dataStoreJsonResponse.content) {
-            let dataStoreAttrValueList = []
             for (let attribute in dataStore.dataStoreAttributeValueMap) {
-                let dataStoreAttrValue = { id: id++, key: attribute, value: dataStore.dataStoreAttributeValueMap[attribute], serverUniqueKey: dataStore.id }
-                dataStoreAttrValueList.push(dataStoreAttrValue)
+                let dataStoreAttrValue = { id: dataStoreId++, key: attribute, value: dataStore.dataStoreAttributeValueMap[attribute], serverUniqueKey: dataStore.id, datastoreMasterId: dataStore.dataStoreMasterId }
+                dataStoreList.push(dataStoreAttrValue)
             }
             await this.checkIfRecordPresentWithServerId(dataStore.id)
-            await realm.performBatchSave({ tableName: Datastore_AttributeValue_DB, value: dataStoreAttrValueList })
-            let dataStoreAttrQuery = `serverUniqueKey = "${dataStore.id}"`
-            let dataStoreAttributeResult = realm.getRecordListOnQuery(Datastore_AttributeValue_DB, dataStoreAttrQuery, null, null)
-            let listOfAttributes = []
-            for (let index in dataStoreAttributeResult) {
-                listOfAttributes.push({ ...dataStoreAttributeResult[index] })
-            }
-            let dataStoreObject = { id: dataStoreId++, datastoreMasterId: dataStore.dataStoreMasterId, datastoreAttributeValueMap: listOfAttributes }
-            dataStoreList.push(dataStoreObject)
         }
         await realm.performBatchSave({ tableName: DataStore_DB, value: dataStoreList })
     }
@@ -340,7 +329,7 @@ class DataStoreService {
         if (!serverKey) {
             throw new Error('serverUniqueKey missing')
         }
-        await realm.deleteSingleRecord(Datastore_AttributeValue_DB, serverKey, 'serverUniqueKey')
+        await realm.deleteSingleRecord(DataStore_DB, serverKey, 'serverUniqueKey')
     }
 
     async fetchDatastoreAndSaveInDB(token, datastoreMasterId, currentPageNumber, lastSyncTime) {
@@ -416,23 +405,16 @@ class DataStoreService {
         }
         let searchQuery = `(`
         searchQuery += searchList.map(listItem => `key  = "${listItem}"`).join(` OR `)
-        searchQuery += `) AND value CONTAINS[c] "${searchText}"`
-        console.log('searchQuery', searchQuery)
-        let dataStoreQuery = `datastoreMasterId = ${dataStoreMasterId}`
-        let dataStoreWithMatchingId = realm.getRecordListOnQuery(DataStore_DB, dataStoreQuery)
+        searchQuery += `) AND value CONTAINS[c] "${searchText}" AND datastoreMasterId = ${dataStoreMasterId}`
+        let queryList = realm.getRecordListOnQuery(DataStore_DB, searchQuery)
         let listOfUniqueRecords = []
-        for (let index in dataStoreWithMatchingId) {
-            let fieldData = { ...dataStoreWithMatchingId[index] }
-            let datastoreAttributeValueMap = fieldData.datastoreAttributeValueMap
-            let queryResult = datastoreAttributeValueMap.filtered(searchQuery)
-            for (let index in queryResult) {
-                let resultObject = { ...queryResult[index] }
-                if (listOfUniqueRecords.indexOf(resultObject.serverUniqueKey) < 0) {
-                    listOfUniqueRecords.push({
-                        serverUniqueKey: resultObject.serverUniqueKey,
-                        matchKey: resultObject.key
-                    })
-                }
+        for (let index in queryList) {
+            let resultObject = { ...queryList[index] }
+            if (listOfUniqueRecords.indexOf(resultObject.serverUniqueKey) < 0) {
+                listOfUniqueRecords.push({
+                    serverUniqueKey: resultObject.serverUniqueKey,
+                    matchKey: resultObject.key
+                })
             }
         }
         return listOfUniqueRecords
@@ -448,7 +430,7 @@ class DataStoreService {
         let dataStoreAttrValueMap = {}, id = 0
         for (let record of listOfUniqueRecords) {
             let dataStoreAttributeValueMapQuery = `serverUniqueKey = "${record.serverUniqueKey}"`
-            let dataStoreAttributeResult = realm.getRecordListOnQuery(Datastore_AttributeValue_DB, dataStoreAttributeValueMapQuery, null, null)
+            let dataStoreAttributeResult = realm.getRecordListOnQuery(DataStore_DB, dataStoreAttributeValueMapQuery, null, null)
             let listOfAttributes = {}
             for (let index in dataStoreAttributeResult) {
                 let singleEntryOfAttrValueMap = { ...dataStoreAttributeResult[index] }

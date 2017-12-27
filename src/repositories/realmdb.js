@@ -11,12 +11,11 @@ import TrackLogs from './schema/trackLogs'
 import ServerSmsLog from './schema/serverSmsLog'
 import DatastoreMaster from './schema/DatastoreMaster'
 import DatastoreSchema from './schema/DatastoreSchema'
-import DatastoreAttributeValue from './schema/DatastoreAttributeValue'
 import TransactionLogs from './schema/transactionLogs'
 import _ from 'lodash'
 
 const schemaVersion = 38;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, DatastoreAttributeValue];
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema];
 
 let realm = new Realm({
     schemaVersion,
@@ -36,7 +35,6 @@ import {
     TABLE_TRANSACTION_LOGS,
     DataStore_DB,
     Datastore_Master_DB,
-    Datastore_AttributeValue_DB
 } from '../lib/constants'
 
 export function save(tableName, object) {

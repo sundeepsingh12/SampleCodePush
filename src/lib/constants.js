@@ -180,7 +180,6 @@ module.exports = keyMirror({
     TABLE_SERVER_SMS_LOG: null,
     Datastore_Master_DB: null,
     DataStore_DB: null,
-    Datastore_AttributeValue_DB: null,
     TABLE_TRANSACTION_LOGS: null,
 
     //Home Actions

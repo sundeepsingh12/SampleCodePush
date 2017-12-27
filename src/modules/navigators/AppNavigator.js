@@ -378,13 +378,22 @@ export const AppNavigator = StackNavigator({
     screen: DataStoreItemDetails
   },
   SaveActivated: {
-    screen: SaveActivated
+    screen: SaveActivated,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   Transient: {
-    screen: Transient
+    screen: Transient,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   CheckoutDetails: {
-    screen: CheckoutDetails
+    screen: CheckoutDetails,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   SignatureAndNps: {
     screen: SignatureAndNps
@@ -435,7 +444,7 @@ export const AppNavigator = StackNavigator({
     screen: ImageDetailsView,
   }
 },
-{
+  {
     cardStyle: {
       backgroundColor: 'white'
     }

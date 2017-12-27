@@ -1,5 +1,5 @@
 'use strict'
-import { DataStore_DB, Datastore_AttributeValue_DB } from '../../lib/constants'
+import { DataStore_DB } from '../../lib/constants'
 import Realm from 'realm';
 
 export default class DatastoreSchema extends Realm.Object { }
@@ -11,8 +11,10 @@ DatastoreSchema.schema = {
   name: DataStore_DB,
   primaryKey: 'id',
   properties: {
-    datastoreAttributeValueMap: { type: 'list', objectType: Datastore_AttributeValue_DB },
     datastoreMasterId: 'int',
     id: { type: 'int', default: 0 },
+    key: 'string',
+    serverUniqueKey: 'string',
+    value: 'string',
   }
 }
