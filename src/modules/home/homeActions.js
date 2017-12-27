@@ -46,7 +46,7 @@ import { trackingService } from '../../services/classes/Tracking'
 import { authenticationService } from '../../services/classes/Authentication'
 import { logoutService } from '../../services/classes/Logout'
 import _ from 'lodash'
-
+import { userEventLogService } from '../../services/classes/UserEvent'
 /**
  * This action enables modules for particular user
  */
@@ -150,10 +150,10 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService(pieChart))
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-      if (_.isNull(serverReachable) || !serverReachable) {
+      if (_.isNull(serverReachable) || !serverReachable.value) {
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, true)
-      }
+    }
     } catch (error) {
       if (error.code == 500 || error.code == 502) {
         dispatch(setState(SYNC_STATUS, {
@@ -161,7 +161,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
           syncStatus: 'INTERNALSERVERERROR'
         }))
         let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable) {
+        if (_.isNull(serverReachable) || serverReachable.value) {
           await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
           await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, false)
         }
@@ -298,7 +298,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
           syncStatus: 'ERROR'
         }))
         let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable) {
+        if (_.isNull(serverReachable) || serverReachable.value) {
           await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
           await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, false)
         }

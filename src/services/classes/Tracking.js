@@ -10,7 +10,6 @@ import {
     TRACK_BATTERY,
     USER
 } from '../../lib/constants'
-import _ from 'lodash'
 import { userSummaryService } from './UserSummary'
 
 class Tracking {
@@ -82,7 +81,7 @@ class Tracking {
         console.log('- [js]location: ');
         console.log(location);
         let track_record = {
-            'battery': location.battery.level,
+            'battery': location.battery.level * 100,
             'gpsSignal': location.coords.accuracy,
             'latitude': location.coords.latitude,
             'longitude': location.coords.longitude,

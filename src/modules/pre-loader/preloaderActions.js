@@ -277,9 +277,10 @@ export function invalidateUserSession() {
       dispatch(preLogoutRequest())
       dispatch(setState(TOGGLE_LOGOUT,true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      // TODO uncomment this code when run sync in logout
+      // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")      
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
-      await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")
       dispatch(deleteSessionToken())
       dispatch(preLogoutSuccess())
        dispatch(setState(TOGGLE_LOGOUT,false))

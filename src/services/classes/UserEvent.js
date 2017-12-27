@@ -21,6 +21,7 @@ class UserEvent {
 
   async addUserEventLog(eventID, description) {
     const userDetails = await keyValueDBService.getValueFromStore(USER)
+    let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     let userEventLogArray = []
     let userEventLogObject = {
       userId: userDetails.value.id,
@@ -29,8 +30,8 @@ class UserEvent {
       cityId: userDetails.value.cityId,
       eventId: eventID,
       description: description,
-      latitude: 0, // to be set later
-      longitude: 0, // to be set later
+      latitude: userSummary.value.lastLat, 
+      longitude: userSummary.value.lastLng,
       dateTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
     }
     let olduserEventLogArray = await keyValueDBService.getValueFromStore(USER_EVENT_LOG)

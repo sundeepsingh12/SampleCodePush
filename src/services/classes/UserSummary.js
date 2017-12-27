@@ -5,7 +5,7 @@ import {
 import {
     keyValueDBService
 } from './KeyValueDBService'
-
+import { jobDetailsService } from './JobDetails'
 import _ from 'lodash'
 
 class UserSummary {
@@ -22,8 +22,8 @@ class UserSummary {
             let gpsKms = userSummary.value.gpsKms
             let totalDistanceTravelled = 0
             if (!_.isNull(lastLatitude)) {
-                let distanceTravelled = this._calculateDistance(lastLatitude, lastLongitude, currentLatitude, currentLongitude)
-                totalDistanceTravelled = distanceTravelled + gpsKms
+                let distanceTravelled = jobDetailsService.distance(lastLatitude, lastLongitude, currentLatitude, currentLongitude)
+                totalDistanceTravelled = distanceTravelled*1000 + gpsKms
             }
             userSummary.value.lastLat = currentLatitude,
             userSummary.value.lastLng = currentLongitude,
@@ -32,26 +32,6 @@ class UserSummary {
         } catch (error) {
             console.log("error_updateUserSummary", error)
         }
-    }
-
-    /**
-     * @param {*} currentLatitude --current Latitude of user
-     * @param {*} currentLongitude --current longitude of user
-     * @param {*} lastLatitude --last longitude of user
-     * @param {*} lastLongitude --last longitude of user
-     */
-    _calculateDistance(lastLatitude, lastLongitude, currentLatitude, currentLongitude) {
-        let distance = Math.sin(this._toRadians(lastLatitude)) * Math.sin(this._toRadians(currentLatitude)) + Math.cos(this._toRadians(lastLatitude)) * Math.cos(this._toRadians(currentLatitude)) * Math.cos(this._toRadians(lastLongitude - currentLongitude))
-        distance = Math.acos(distance) * 180.0 / Math.PI
-        distance = distance * 60 * 1.1515 * 1.609344 * 1000
-        return (distance)
-    }
-
-    /**
-     * @param {*} angle --angle which is to be converted to radians.
-     */
-    _toRadians(angle) {
-        return angle * (Math.PI / 180);
     }
 }
 

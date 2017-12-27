@@ -163,7 +163,8 @@ export default class FormLayoutEventImpl {
             let user = await keyValueDBService.getValueFromStore(USER)
             let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
             let previouslyTravelledDistance = await keyValueDBService.getValueFromStore(PREVIOUSLY_TRAVELLED_DISTANCE)
-            let trackKms = userSummary.value.gpsKms - previouslyTravelledDistance.value
+            previouslyTravelledDistance = (!previouslyTravelledDistance) ? 0 : previouslyTravelledDistance.value
+            let trackKms = userSummary.value.gpsKms - previouslyTravelledDistance
             let trackTransactionTimeSpent = await keyValueDBService.getValueFromStore(TRANSACTION_TIME_SPENT)
             trackTransactionTimeSpent = moment().diff(trackTransactionTimeSpent.value, 'seconds')
             let trackBattery = await keyValueDBService.getValueFromStore(TRACK_BATTERY)
@@ -193,7 +194,7 @@ export default class FormLayoutEventImpl {
 
             //TODO add other dbs which needs updation
             const prevStatusId = (jobTransactionIdList) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
-            const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user)
+            const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
             const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionIdList) : []
             await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionIdList)
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
@@ -205,12 +206,12 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    async _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user) {
-        let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
+    async _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user, lastTrackLog) {
+        let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'), lastTrackLog)
         return { tableName: TABLE_TRANSACTION_LOGS, value: transactionLogs }
     }
 
-    _prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user, dateTime) {
+    _prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user, dateTime, lastTrackLog) {
         let transactionLogs = []
         for (let job in jobTransaction) {
             transactionLog = {
@@ -219,8 +220,8 @@ export default class FormLayoutEventImpl {
                 jobMasterId: jobMasterId,
                 toJobStatusId: statusId,
                 fromJobStatusId: prevStatusId,
-                latitude: 0.0,  //to be set later
-                longitude: 0.0,  //to be set later
+                latitude: lastTrackLog.latitude,
+                longitude: lastTrackLog.longitude,
                 transactionTime: dateTime,
                 updatedAt: dateTime,
                 hubId: jobTransaction[job].hubId,

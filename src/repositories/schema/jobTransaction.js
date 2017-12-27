@@ -30,7 +30,7 @@ JobTransaction.schema = {
               actualAmount  : { type: 'double',default:0.0,optional:true},
               originalAmount  : { type: 'double',default:0.0,optional:true},
               moneyTransactionType  :   'string?',
-              referenceNumber  :     'string'  , // todo
+              referenceNumber  :     'string'  ,
               runsheetId  :   'int?',
               hubId  :  'int' ,
               cityId  :   'int' ,
@@ -42,15 +42,15 @@ JobTransaction.schema = {
               trackTransactionTimeSpent  :  'double' ,
               latitude  :  'double' ,
               longitude  :  'double' ,
-              trackBattery  : 'int' , // to do
+              trackBattery  : 'int' ,
               deleteFlag  : 'int' ,
               attemptCount  : { type: 'int',default:1},
               startTime  :   'string?',  // todo
               endTime  :  'string?',
               merchantCode  :  'string?',
               imeiNumber  :  'string?',
-              npsFeedBack  :  'string?', // todo
-              id  : 'int' ,     //todo
+              npsFeedBack  :  'string?',
+              id  : 'int' ,
               jobType : 'string?',   
               statusCode : 'string?',
               employeeCode :  'string?',
