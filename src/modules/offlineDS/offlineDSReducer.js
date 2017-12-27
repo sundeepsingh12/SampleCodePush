@@ -15,6 +15,7 @@ export default function offlineDSReducer(state = initialState, action) {
         case SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR:
             return state.set('progressBarStatus', action.payload.progressBarStatus)
                 .set('fileName', action.payload.fileName)
+
         case UPDATE_PROGRESS_BAR:
             return state.set('progressBarStatus', action.payload)
 
@@ -26,7 +27,7 @@ export default function offlineDSReducer(state = initialState, action) {
             return initialState
 
         case SET_LAST_SYNC_TIME:
-            return state.set('lastSyncTime', action.payload.lastSyncTime)
+            return state.set('lastSyncTime', action.payload)
 
     }
     return state

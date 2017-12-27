@@ -5,30 +5,31 @@ import { dataStoreService } from '../../services/classes/DataStoreService'
 import { setState } from '../global/globalActions'
 import {
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR,
-    FIELD_ATTRIBUTE,
     LAST_DATASTORE_SYNC_TIME,
     UPDATE_PROGRESS_BAR,
     SET_DOWNLOADING_STATUS,
     SET_LAST_SYNC_TIME
 } from '../../lib/constants'
-import {
-    EXTERNAL_DATA_STORE,
-    DATA_STORE
-} from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
-import _ from 'lodash'
-import * as realm from '../../repositories/realmdb'
 import moment from 'moment'
+import {
+    LAST_SYNCED,
+    NEVER_SYNCED
+} from '../../lib/AttributeConstants'
+import thunk from 'redux-thunk'
+import configureStore from 'redux-mock-store'
+const middlewares = [thunk]
+const mockStore = configureStore(middlewares)
 
 export function getLastSyncTime() {
     return async function (dispatch) {
         try {
             const lastSyncTime = await keyValueDBService.getValueFromStore(LAST_DATASTORE_SYNC_TIME)
             if (lastSyncTime && lastSyncTime.value) {
-                let timeDifference = "Last synced   " + dataStoreService.getLastSyncTimeInFormat(lastSyncTime.value)
-                dispatch(setState(SET_LAST_SYNC_TIME, { lastSyncTime: timeDifference }))
+                let timeDifference = LAST_SYNCED + dataStoreService.getLastSyncTimeInFormat(lastSyncTime.value)
+                dispatch(setState(SET_LAST_SYNC_TIME, timeDifference))
             } else {
-                dispatch(setState(SET_LAST_SYNC_TIME, { lastSyncTime: 'Never Synced' }))
+                dispatch(setState(SET_LAST_SYNC_TIME, NEVER_SYNCED))
             }
         } catch (error) {
             console.log(error)
