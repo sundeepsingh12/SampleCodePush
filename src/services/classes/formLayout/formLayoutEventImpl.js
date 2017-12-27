@@ -297,7 +297,7 @@ export default class FormLayoutEventImpl {
                  npsFeedbackValue =  value.value
             } else if (value.attributeTypeId == SIGNATURE_AND_FEEDBACK){
                 let npsFeedback = _.values(value.childDataList).filter(item => item.attributeTypeId == NPS_FEEDBACK)
-                 npsFeedbackValue = npsFeedback[0].value
+                 npsFeedbackValue = _.isEmpty(npsFeedback) ? null : npsFeedback[0].value
             }
             let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
             fieldDataArray.push(fieldDataObject)

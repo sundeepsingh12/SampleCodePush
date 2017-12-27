@@ -150,9 +150,9 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService(pieChart))
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-      if (_.isNull(serverReachable) || !serverReachable.value) {
+      if (_.isNull(serverReachable) || serverReachable.value == 2) {
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
-        await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, true)
+        await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
     }
     } catch (error) {
       if (error.code == 500 || error.code == 502) {
@@ -161,9 +161,9 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
           syncStatus: 'INTERNALSERVERERROR'
         }))
         let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable.value) {
+        if (_.isNull(serverReachable) || serverReachable.value == 1) {
           await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
-          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, false)
+          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
         }
       } else if (error.code == 401) {
         dispatch(reAuthenticateUser(transactionIdToBeSynced))
@@ -298,9 +298,9 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
           syncStatus: 'ERROR'
         }))
         let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable.value) {
+        if (_.isNull(serverReachable) || serverReachable.value == 1) {
           await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
-          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, false)
+          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
         }
       }
     }

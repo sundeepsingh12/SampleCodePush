@@ -1,6 +1,7 @@
 import {
   USER_EVENT_LOG,
   USER,
+  USER_SUMMARY,
 } from '../../lib/constants'
 
 import {
