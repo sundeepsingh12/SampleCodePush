@@ -267,6 +267,15 @@ export default class FormLayoutEventImpl {
         return transactionLogs
     }
 
+    /**
+     * update jobSummaryDb count after completing transactions.
+     * 
+     * @param {*jobTransaction} jobTransaction 
+     * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
+     * @param {*statusId} statusId // new transaction status Id
+     * 
+     */
+
     async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){
         const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
@@ -283,6 +292,16 @@ export default class FormLayoutEventImpl {
         });
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
+
+   /**
+     * update runSheetDb count after completing transactions.
+     * and returns an object containing runSheetArray
+     * 
+     * @param {*jobTransaction} jobTransaction 
+     * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
+     * @param {*statusCategory} statusCategory // new transaction status category
+     * 
+     */
 
     async _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList){
         const setRunsheetSummary = [],runSheetList = []
@@ -308,7 +327,6 @@ export default class FormLayoutEventImpl {
             runSheetList.push(runsheetMap[jobTransaction.runsheetId])
         }
         return {tableName : TABLE_RUNSHEET,value : runSheetList}
-      // realm.updateRecordOnTableListData(TABLE_RUNSHEET,runSheetList,Object.keys(runSheetList));
     }
 
 

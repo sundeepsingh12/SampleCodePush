@@ -93,6 +93,18 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
     }
 }
 
+/**
+ * ## status revert from field case
+ *  
+ * @param {object} jobTransaction - It contains data for form layout
+ * @param {object} statusTo - status to revert transaction
+ * @param {callback} navigation - navigation action
+ *
+ * It set all data for revert status and start sync service
+ * It also fetch jobs and reset state of job details
+ *
+ */
+
 export function setAllDataOnRevert(jobTransaction,statusTo,navigation) {
     return async function (dispatch) {
         try {

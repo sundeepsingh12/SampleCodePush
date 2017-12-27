@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, TextInput } from 'react-native'
 import {
     Button,
     Input,
@@ -21,10 +21,12 @@ export default class SearchBarV2 extends Component {
         return (
             <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10]}>
                 <View style={[styles.relative, { width: '85%', height: 30 }]}>
-                    <Input
+                    <TextInput
                         placeholder={this.props.placeholder}
                         placeholderTextColor={'rgba(255,255,255,.6)'}
+                        selectionColor={'rgba(224, 224, 224,.5)'}
                         style={[style.headerSearch]}
+                        underlineColorAndroid= {'transparent'}
                         onChangeText={(searchText) => {
                             this.props.setSearchText(searchText)
                         }}
@@ -46,7 +48,6 @@ const style = StyleSheet.create({
         paddingRight: 30,
         backgroundColor: 'rgba(255, 255, 255, 0.20)',
         borderRadius: 2,
-        lineHeight: 10,
         paddingTop: 0,
         paddingBottom: 0,
         height: 30,

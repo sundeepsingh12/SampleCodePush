@@ -55,6 +55,7 @@ import {
 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications'
 import CallIcon from '../svg_components/icons/CallIcon'
+import RevertIcon from '../svg_components/icons/RevertIcon'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 
@@ -403,6 +404,20 @@ class JobDetailsV2 extends Component {
               </View>
             </Header>
             <Content>
+              { !this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0  ?
+              <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = {this.selectStatusToRevert}>
+                  <View style = {[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+                      <View style={[styles.row, styles.alignCenter]}>
+                          <View>
+                            <RevertIcon color={styles.fontPrimary}/>
+                          </View>
+                          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Revert Status</Text>
+                          <Right>
+                            <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+                          </Right>
+                      </View>
+                  </View>
+              </TouchableOpacity> : null} 
 
               <View style={[styles.marginTop5, styles.bgWhite]}>
                 {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
@@ -410,15 +425,7 @@ class JobDetailsV2 extends Component {
                     {this.props.errorMessage}
                   </Text>
                 </View> : null}
-                { !this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0  ?
-                  <View style = {[styles.marginLeft15, styles.marginTop15]}>
-                      <View style={[styles.row, styles.alignCenter]}>
-                          <View style={[style.statusCircle, { backgroundColor: 'black'}]}>
-                          </View>
-                          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} onPress = {this.selectStatusToRevert}>Revert Status</Text>
-                      </View>
-                  
-                  </View> : null} 
+               
                     {statusView}
               </View>
 
@@ -533,6 +540,7 @@ const style = StyleSheet.create({
     height: 10,
     borderRadius: 5
   },
+  
   footer: {
     height: 'auto',
     backgroundColor: '#ffffff',

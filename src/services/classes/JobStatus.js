@@ -182,8 +182,11 @@ class JobStatus {
       throw new Error('Job status missing in store')
     }
     const jobStatusList = jobStatusArray.value
-    let pendingStatusIds = [], failStatusIds = [], successStatusIds = [];
+    let pendingStatusIds = [], failStatusIds = [], successStatusIds = [], noNextStatusIds = [];
     for (id in jobStatusList) {
+      if(jobStatusList[id].nextStatusList.length == 0){
+        noNextStatusIds.push(jobStatusList[id].id)
+      }
       if (jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN) {
         pendingStatusIds.push(jobStatusList[id].id)
         continue
@@ -196,8 +199,10 @@ class JobStatus {
         failStatusIds.push(jobStatusList[id].id)
       }
     }
-    return { pendingStatusIds, failStatusIds, successStatusIds }
+    return { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds }
   }
+
+
 
 
   async getStatusCategoryOnStatusId(jobStatusId) {

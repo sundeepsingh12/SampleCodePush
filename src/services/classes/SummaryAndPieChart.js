@@ -32,28 +32,49 @@ class SummaryAndPieChart {
     * @param {*} failStatusIds 
     * getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds)
     *
-    * return {pendingCounts : a, successCounts : b, failCounts : 
-    * c}
+    *@return {pendingCounts : a, successCounts : b, failCounts : c}
+    *
     */
-    async getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds){
+    async getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds, noNextStatusIds){
         const allPendingSuccessFailIds = pendingStatusIds.concat(successStatusIds,failStatusIds)
         let query = allPendingSuccessFailIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
         query = query && query.trim() !== '' ? `deleteFlag != 1 AND (${query})` : 'deleteFlag != 1'
         const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
-        const allTransactionOnTodaysDate =  (allPendingSuccessFailIds) ? this.isTodaysDateTransactions(transactionList) : 0
+        const allTransactionOnTodaysDate =  (allPendingSuccessFailIds) ? this.isTodaysDateTransactions(transactionList,pendingStatusIds,noNextStatusIds) : 0
         const getPendingFailSuccessCounts = await this.setAllCounts(allTransactionOnTodaysDate,pendingStatusIds,successStatusIds,failStatusIds)
         const {pendingCounts,failCounts,successCounts} = getPendingFailSuccessCounts        
         return {pendingCounts,failCounts,successCounts}
     }
 
+    /**
+    * function return array of jobMasters. It calculates on all jobTransactions according to statusId
+    *
+    * @param {*} jobMasterList  
+    * @param {*} jobStatusList 
+    * @param {*} jobSummaryList 
+    *
+    * setAllJobMasterSummary(jobMasterList,jobStatusList,jobSummaryList)
+    *
+    *@return [{
+        id: '12' // jobMasterId
+        code: 'abc' // jobMaster Identifier
+        title: 'ABC123' // jobMaster title
+        count: 7 // all Transactions of particular jobMaster
+        pending:{ count : 1, list : []}
+        fail : { count : 2, list : []}
+        Success : { count : 4, list : []}
+    }]
+    *
+    */
 
-
-    setAllJobMasterSummary(jobMasterList,jobStatusList,jobSummaryList){
+    setAllJobMasterSummary(jobMasterList,jobStatusList,jobSummaryList,pendingStatusIds,noNextStatusIds){
         const jobMasterSummaryList = {}, jobStatusIdMap = {}
         const todayDate =  moment().format('YYYY-MM-DD')
         let query = "deleteFlag != 1"
+        const noNextStatusMap = this.idDtoMap(noNextStatusIds)
+        const pendingStatusMap = this.idDtoMap(pendingStatusIds)
         const jobTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
-        jobTransactions.forEach(item =>{ if(moment(todayDate).isSame(moment(item.getLastUpdatedAtServer).format('YYYY-MM-DD'))){
+        jobTransactions.forEach(item =>{ if(moment(todayDate).isSame(moment(item.lastUpdatedAtServer).format('YYYY-MM-DD')) || !noNextStatusMap[item.jobStatusId] || pendingStatusMap[item.jobStatusId] ){
             jobStatusIdMap[item.jobStatusId] = (jobStatusIdMap[item.jobStatusId]) ? jobStatusIdMap[item.jobStatusId] + 1 : 1
         }})
         jobMasterList.forEach(id => jobMasterSummaryList[id.id] = {id : id.id ,code: id.identifier, title : id.title, count : 0, 1 : {count : 0,list : []},2 : {count : 0,list : []},3 : {count : 0,list : []}} )
@@ -61,6 +82,7 @@ class SummaryAndPieChart {
             total[ current.jobStatusId ] = (jobStatusIdMap[current.jobStatusId]) ? jobStatusIdMap[current.jobStatusId] : 0;
             return total;
         }, {});
+
         for(id in jobStatusList){
             if(jobStatusList[id].code == UNSEEN ){
               continue
@@ -74,14 +96,17 @@ class SummaryAndPieChart {
 
     /**
     * function return all count object for piechart of user on all transactions
+    * It also update user summary count of pending ,fail and success 
+    *
     * @param {*} allTransactions 
     * @param {*} pendingStatusIds 
     * @param {*} successStatusIds 
     * @param {*} failStatusIds 
+    *
     * setAllCounts(allTransactions,pendingStatusIds,successStatusIds,failStatusIds){
     *
     * 
-    * return {pendingCounts : a, successCounts : b, failCounts : c}
+    *@return {pendingCounts : a, successCounts : b, failCounts : c}
     */
     
     async setAllCounts(allTransactions,pendingStatusIds,successStatusIds,failStatusIds){
@@ -115,7 +140,7 @@ class SummaryAndPieChart {
     *
     *@param {*} dtoList
     * 
-    * return {listMap}
+    *@return {listMap}
     */
     idDtoMap(dtoList){
         const listMap = dtoList.reduce(function ( total, current ) {
@@ -124,7 +149,13 @@ class SummaryAndPieChart {
         }, {});
         return listMap
     }
-
+ 
+    /**
+    * function get all runSheet for user from runsheetDb and return
+    * an array which contain runSheetNo,count and cash collected
+    * 
+    *@return {setRunsheetSummary}
+    */
 
     getAllRunSheetSummary(){
         const setRunsheetSummary = []
@@ -132,18 +163,21 @@ class SummaryAndPieChart {
         runSheetData.forEach(item => setRunsheetSummary.push([item.runsheetNumber,item.successCount,item.pendingCount,item.failCount,item.cashCollected]))
         return setRunsheetSummary;
     }
+
     /**
     * function check for all transaction according to todayDate
     *
     *@param {*} jobTransactions
     * 
-    * return {jobTransactions}
+    *@return {jobTransactions}
     */
     
-    isTodaysDateTransactions(jobTransactions){
-        const todayDate =  moment(new Date()).format('YYYY-MM-DD')
-        jobTransactions.filter(data => (moment(data.getLastUpdatedAtServer).format('YYYY-MM-DD') == todayDate))
-        return jobTransactions 
+    isTodaysDateTransactions(jobTransactions,pendingStatusIds,noNextStatusIds){
+        const noNextStatusMap = this.idDtoMap(noNextStatusIds)
+        const pendingStatusMap = this.idDtoMap(pendingStatusIds)
+        const todayDate =  moment().format('YYYY-MM-DD')
+        let todayJobTransactions = jobTransactions.filter(data => (moment(todayDate).isSame(moment(data.lastUpdatedAtServer).format('YYYY-MM-DD')) || !noNextStatusMap[data.jobStatusId] || pendingStatusMap[data.jobStatusId]))
+        return todayJobTransactions 
     }
 }
 

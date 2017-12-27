@@ -47,7 +47,7 @@ import {
   START,
   IS_CALENDAR_VISIBLE,
   LISTING_SEARCH_VALUE,
-
+  SEARCH_TAP
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -60,6 +60,7 @@ function mapStateToProps(state) {
     isCalendarVisible: state.taskList.isCalendarVisible,
     searchText: state.taskList.searchText,
     modules: state.home.modules,
+    searchTap: state.taskList.searchTap,
   }
 };
 
@@ -84,9 +85,22 @@ class TabScreen extends Component {
   }
   componentWillUnmount(){
     this.props.actions.setState(LISTING_SEARCH_VALUE,"")    
+    this.props.actions.setState(SEARCH_TAP,null)    
+    
   }
   _onCancel = () => {
     this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
+  }
+
+  componentDidUpdate(){
+    if(this.props.searchTap && this.props.searchTap.scanner){
+      this.props.actions.navigateToScene('JobDetailsV2',
+      {
+        jobSwipableDetails: this.props.searchTap.jobTransaction.jobSwipableDetails,
+        jobTransaction: this.props.searchTap.jobTransaction,
+      }
+    )
+    }
   }
 
   _onConfirm = (date) => {
@@ -130,7 +144,11 @@ class TabScreen extends Component {
   }
 
   fetchDataForListing = (searchText) => {
-    this.props.actions.setState(LISTING_SEARCH_VALUE, searchText)
+    this.props.actions.setState(LISTING_SEARCH_VALUE,{searchText})
+  }
+
+  fetchDataForScanner = (searchText) => {
+    this.props.actions.setState(LISTING_SEARCH_VALUE, {searchText,scanner:true})    
   }
 
   _renderCalendar = () => {
@@ -181,12 +199,20 @@ class TabScreen extends Component {
     }
   }
   onPress = () => { //implement for search
-
+     if(this.props.searchTap){
+      this.props.actions.navigateToScene('JobDetailsV2',
+      {
+        jobSwipableDetails: this.props.searchTap.jobTransaction.jobSwipableDetails,
+        jobTransaction: this.props.searchTap.jobTransaction,
+      }
+    )
+     }
   }
 
   render() {
     const viewTabList = this.renderTabs()
     const calendarView = this._renderCalendar()
+    const searchTextValue = (this.props.searchText) ? this.props.searchText.searchText : ''
     if (viewTabList.length == 0) {
       return (
         <Container>
@@ -210,7 +236,7 @@ class TabScreen extends Component {
                 <View style={[style.headerRight]}>
                 </View>
               </View>
-              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.fetchDataForListing} searchText={this.props.searchText} navigation={this.props.navigation} returnValue={this.fetchDataForListing.bind(this)} onPress={this.onPress} />
+              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.onPress} />
             </Body>
           </Header>
           <Tabs

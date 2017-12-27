@@ -30,6 +30,8 @@ import {
   JobDetails,
   TABLE_RUNSHEET,
   TABLE_JOB_TRANSACTION,
+  SEARCH_TAP,
+  LISTING_SEARCH_VALUE
 } from '../lib/constants'
 import JobListItem from '../components/JobListItem'
 import moment from 'moment'
@@ -99,8 +101,10 @@ class TaskListScreen extends Component {
     return sectionList
   }
 
-  renderSearchList(searchText, listArray) {
-     let jobTransactionArray = []
+  renderSearchList(searchTextValue, listArray) {
+    let scanner = (searchTextValue.scanner) ? true : false
+    let searchText = _.toLower(searchTextValue.searchText)
+    let jobTransactionArray = []
     for(let value of listArray) {
       let values = [value.referenceNumber, value.runsheetNo, value.line1, value.line2, value.circleLine1, value.circleLine2]
       if (_.isEqual(_.toLower(value.referenceNumber), searchText) || _.isEqual(_.toLower(value.runsheetNo), searchText)){
@@ -112,12 +116,14 @@ class TaskListScreen extends Component {
         jobTransactionArray.push(value)
       }
     }
+    (jobTransactionArray.length == 1) ? 
+      this.props.actions.setState(SEARCH_TAP,{jobTransaction : jobTransactionArray[0],scanner}) : this.props.actions.setState(SEARCH_TAP,null) 
     return jobTransactionArray;
   }
 
   renderList() {
     let list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
-    let jobTransactionArray = (this.props.searchText) ? this.renderSearchList(_.toLower(this.props.searchText), list) : list
+    let jobTransactionArray = (_.trim(this.props.searchText)) ? this.renderSearchList(this.props.searchText, list) : list
     jobTransactionArray.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })

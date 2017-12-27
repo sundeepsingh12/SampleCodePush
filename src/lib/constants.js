@@ -80,7 +80,8 @@ module.exports = keyMirror({
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
-
+    SEARCH_TAP: null,
+    
     //Home Container
     PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
