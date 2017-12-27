@@ -237,7 +237,7 @@ class Summary extends Component {
                         return (
                             <View style={[styles.margin10, styles.bgWhite, {elevation: 2}]}>
                             <View style={[style.seqCard, {borderBottomColor: '#d3d3d3', borderBottomWidth:1}]}>
-                                <View style={style.seqCircle}>
+                                <View style={[style.seqCircle,{backgroundColor : item.identifierColor}]}>
                                     <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
                                         {item.code}
                                     </Text>
@@ -332,7 +332,6 @@ const style = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#ffcc00',
         justifyContent: 'center',
         alignItems: 'center'
     },

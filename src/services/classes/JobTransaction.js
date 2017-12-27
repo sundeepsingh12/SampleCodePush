@@ -725,13 +725,14 @@ class JobTransaction {
     async getUnseenJobTransaction(jobMaster) {
         let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMaster.id, UNSEEN)
         console.log(unseenStatusId)
-        let jobTransactionQuery = `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId}`
+        let runsheetQuery = 'isClosed = true'
+        const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+        let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
+        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1  AND (${jobTransactionQuery})` : `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1`
         let unseenJobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         let jobTransactionMap = {}
         for (let index in unseenJobTransactionList) {
             let jobTransaction = { ...unseenJobTransactionList[index] }
-            // let referenceNumber = unseenJobTransactionList[index].referenceNumber
-            // let id = unseenJobTransactionList[index].id
             jobTransactionMap[jobTransaction.referenceNumber] = jobTransaction
         }
         return {

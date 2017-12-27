@@ -161,7 +161,9 @@ class DataStore extends Component {
             this.props.navigation.state.params.isSaveDisabled,
             dataStoreValue,
             this.props.navigation.state.params.calledFromArray,
-            this.props.navigation.state.params.rowId)
+            this.props.navigation.state.params.rowId,
+            this.props.navigation.state.params.latestPositionId,
+        )
         this.setDetailsFor()
         this._goBack()
     }
