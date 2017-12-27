@@ -6,9 +6,11 @@ import BackgroundGeolocation from "react-native-background-geolocation"
 import moment from 'moment';
 
 import {
-  TABLE_TRACK_LOGS,
-  USER
+    TABLE_TRACK_LOGS,
+    TRACK_BATTERY,
+    USER
 } from '../../lib/constants'
+import { userSummaryService } from './UserSummary'
 
 class Tracking {
 
@@ -71,7 +73,7 @@ class Tracking {
         BackgroundGeolocation.un('activitychange', this.onActivityChange)
         BackgroundGeolocation.un('providerchange', this.onProviderChange)
         BackgroundGeolocation.stop()
-         BackgroundGeolocation.removeListeners()
+        BackgroundGeolocation.removeListeners()
     }
 
     async onLocation(location) {
@@ -79,7 +81,7 @@ class Tracking {
         console.log('- [js]location: ');
         console.log(location);
         let track_record = {
-            'battery': location.battery.level,
+            'battery': location.battery.level * 100,
             'gpsSignal': location.coords.accuracy,
             'latitude': location.coords.latitude,
             'longitude': location.coords.longitude,
@@ -87,11 +89,15 @@ class Tracking {
             'trackTime': moment(location.timestamp).format('YYYY-MM-DD HH:mm:ss'),
             'userId': user.value.id
         }
-        realm.save(TABLE_TRACK_LOGS, track_record)
+        realm.save(TABLE_TRACK_LOGS, track_record)        
+        await userSummaryService._updateUserSummary(location.coords.latitude, location.coords.longitude)
+        await keyValueDBService.validateAndSaveData(TRACK_BATTERY, location.battery.level * 100)
     }
 
+ 
+
     onError(error) {
-        console.log('error',error)
+        console.log('error', error)
         // var type = error.type;
         // var code = error.code;
         // alert(type + " Error: " + code);
@@ -106,12 +112,12 @@ class Tracking {
         console.log('- [js]motionchanged: ', JSON.stringify(location));
     }
 
-    getTrackLogs(trackLogs,lastSyncTime){
+    getTrackLogs(trackLogs, lastSyncTime) {
         let trackLogsToBeSynced = []
-        trackLogs.forEach(trackLog=>{
-              if(moment(trackLog.trackTime).isAfter(lastSyncTime.value)){
+        trackLogs.forEach(trackLog => {
+            if (moment(trackLog.trackTime).isAfter(lastSyncTime.value)) {
                 trackLogsToBeSynced.push(trackLog)
-              }
+            }
         })
         return trackLogsToBeSynced
     }
