@@ -95,7 +95,7 @@ class Home extends Component {
         break
       }
       case SEQUENCEMODULE_ID: {
-        this.props.actions.navigateToScene(Sequence)
+        this.props.actions.navigateToScene(Sequence,{displayName:this.props.modules.SEQUENCEMODULE.displayName})
         break
       }
       case START_ID: {

@@ -277,8 +277,8 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
         syncStatus: 'RE_AUTHENTICATING'
       }))
-      let username = keyValueDBService.getValueFromStore(USERNAME)
-      let password = keyValueDBService.getValueFromStore(PASSWORD)
+      let username = await keyValueDBService.getValueFromStore(USERNAME)
+      let password = await keyValueDBService.getValueFromStore(PASSWORD)
       const authenticationResponse = await authenticationService.login(username.value, password.value)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)

@@ -24,7 +24,6 @@ import configureStore from './lib/configureStore'
  *
  */
 import ResyncLoader from './components/ResyncLoader'
-import JobDetails from './containers/JobDetails'
 import FormLayout from './containers/FormLayout'
 /**
  * ### icons
@@ -54,7 +53,6 @@ import GlobalInitialState from './modules/global/globalInitialState'
 import PreloaderInitiaState from './modules/pre-loader/preloaderInitialState'
 import HomeInititalState from './modules/home/homeInitialState'
 import ListingInitialState from './modules/listing/listingInitialState'
-import JobDetailsInitialState from './modules/job-details/jobDetailsInitialState'
 import SkuListingInitialState from './modules/skulisting/skuListingInitialState'
 import FormLayoutInitialState from './modules/form-layout/formLayoutInitialState'
 import SequenceInitialState from './modules/sequence/sequenceInitialState'
@@ -87,7 +85,6 @@ function getInitialState() {
     preloader: (new PreloaderInitiaState()),
     home: (new HomeInititalState()),
     listing: (new ListingInitialState()),
-    jobDetails: new JobDetailsInitialState(),
     skuListing: new SkuListingInitialState(),
     formLayout : new FormLayoutInitialState(),
     sequence: new SequenceInitialState(),

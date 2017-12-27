@@ -14,10 +14,6 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
         return this.updateFieldInfo(attributeMasterId, value, formElement, calledFrom);
     }
 
-    toogleHelpTextView(attributeMasterId, formElement) {
-        return this.toogleHelpText(attributeMasterId, formElement);
-    }
-
     /**
      * 
      * @param {*} formElement 

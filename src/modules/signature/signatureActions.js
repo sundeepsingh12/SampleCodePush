@@ -30,10 +30,10 @@ export function _setIsRemarksValidation(isRemarksValidation) {
     }
 }
 
-export function saveSignature(result, fieldAttributeMasterId, formElement, isSaveDisabled) {
+export function saveSignature(result, fieldAttributeMasterId, formElement, isSaveDisabled, latestPositionId) {
     return async function (dispatch) {
         const value = await signatureService.saveFile(result, moment())
-        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, NEXT_FOCUS))
+        dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }))
     }
 }
 
