@@ -172,7 +172,7 @@ class BasicFormElement extends Component {
     }
 
     _searchForReferenceValue = (value) => {
-        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, NEXT_FOCUS);
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, { latestPositionId: this.props.latestPositionId });
     }
 
     onFocusEvent(currentElement) {
@@ -192,10 +192,6 @@ class BasicFormElement extends Component {
         }
     }
 
-    _onPressHelpText(fieldAttributeMasterId) {
-        this.props.actions.toogleHelpText(fieldAttributeMasterId, this.props.formElement);
-    }
-
     _inflateModal = () => {
         this.setState(previousState => {
             return {
@@ -204,7 +200,7 @@ class BasicFormElement extends Component {
         })
     }
     onSaveDateTime = (value) => {
-        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', NEXT_FOCUS);
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId });
         this.setState({ showDateTimePicker: false, showNPS: false })
     }
 
@@ -322,7 +318,7 @@ class BasicFormElement extends Component {
                                         autoCapitalize="none"
                                         placeholder={this.props.item.helpText}
                                         placeholderTextColor={styles.fontLowGray.color}
-                                        defaultValue={this.props.item.value}
+                                        defaultValue={this.props.item.displayValue}
                                         style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
                                         value={this.props.item.value}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}

@@ -200,7 +200,7 @@ class CameraFieldAttribute extends Component {
                         <View style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
                                 <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
-                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId)
+                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.latestPositionId)
                                     this.props.navigation.goBack()
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />

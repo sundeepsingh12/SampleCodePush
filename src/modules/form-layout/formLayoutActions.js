@@ -22,6 +22,10 @@ import {
     SET_UPDATE_DRAFT
 } from '../../lib/constants'
 
+import {
+    AFTER,
+} from '../../lib/AttributeConstants'
+
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 import { NavigationActions } from 'react-navigation'
@@ -117,6 +121,8 @@ export function updateFieldData(attributeId, value, formElement) {
 export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject) {
     return function (dispatch) {
         const cloneFormElement = _.cloneDeep(formElement)
+        console.log('fieldDataListObject',fieldDataListObject)
+        cloneFormElement.get(attributeMasterId).value = value
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, fieldDataListObject.fieldDataList, NEXT_FOCUS);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
@@ -125,14 +131,6 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
                 isSaveDisabled: updatedFieldDataObject.isSaveDisabled
             }
         ))
-    }
-}
-
-export function toogleHelpText(attributeId, formElement) {
-    return async function (dispatch) {
-        const cloneFormElement = _.cloneDeep(formElement)
-        const toogledHelpText = formLayoutEventsInterface.toogleHelpTextView(attributeId, cloneFormElement)
-        dispatch(setState(TOOGLE_HELP_TEXT, toogledHelpText))
     }
 }
 
@@ -162,7 +160,10 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
     return async function (dispatch) {
         let cloneFormElement = _.cloneDeep(formElement)
         let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction)
-        dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).value, NEXT_FOCUS))
+        if (timeOfExecution == AFTER) {
+            cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+        }
+        dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS))
     }
 }
 

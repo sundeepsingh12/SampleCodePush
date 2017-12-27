@@ -20,7 +20,7 @@ import {
 } from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
-import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
+import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 
 
@@ -128,11 +128,11 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId) {
+export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId) {
     return async function (dispatch) {
         try {
             if (!calledFromArray)
-                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, NEXT_FOCUS))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, { latestPositionId }))
             else
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
 
@@ -183,7 +183,7 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
         try {
             if (!calledFromArray) {
                 let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
-                dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, NEXT_FOCUS))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue))
             } else {
                 let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements[rowId].formLayoutObject)
                 formElements[rowId].formLayoutObject = formElementResult

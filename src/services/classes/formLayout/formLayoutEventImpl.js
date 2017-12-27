@@ -55,9 +55,14 @@ export default class FormLayoutEventImpl {
             if (key != attributeMasterId || event == NEXT_FOCUS) {
                 value.focus = false
             }
-            if (value.value || value.value === 0) {
+            if (!value.value && value.value !== 0 && value.required) {
+                isSaveDisabled = true
+            }
+
+            if (value.displayValue || value.displayValue === 0) {
                 continue
             }
+
             value.editable = true
             if (value.required) {
                 value.focus = event == NEXT_FOCUS ? true : value.focus
@@ -65,39 +70,18 @@ export default class FormLayoutEventImpl {
                 break
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
-                let beforeMessageList = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE)
-                let valueAfterValidation = formLayoutObject.get(attributeMasterId).value
+                let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE)
+                let valueAfterValidation = formLayoutObject.get(value.fieldAttributeMasterId).value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
                     continue
                 }
-                let afterMessageList = fieldValidationService.fieldValidations(value, formLayoutObject, AFTER)
+                let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER)
             }
         }
         if (!isSaveDisabled) {
             formLayoutObject.get(attributeMasterId).focus = true
         }
         return { formLayoutObject, isSaveDisabled }
-    }
-
-    /**
-     * if any required attribute does not contain value then disables save
-     * 
-     * @param {*formLayoutMap} formLayoutObject 
-     * @param {*nextEditable} nextEditable 
-     */
-    _enableSave(formLayoutObject) {
-        // if (!nextEditable || Object.keys(nextEditable).length == 0) {
-        //     return true;
-        // }
-        // let saveEnabled = true;
-
-        // for (let key in nextEditable) {
-        //     if (!formLayoutObject.get(Number(key)).value || formLayoutObject.get(Number(key)).value.length == 0) {
-        //         saveEnabled = false; // if any required attribute does not contain value then disable save and break 
-        //         break;
-        //     }
-        // }
-        // return saveEnabled;
     }
 
     /**
@@ -127,25 +111,12 @@ export default class FormLayoutEventImpl {
      * @param {*} calledFrom 
      */
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
-        formLayoutObject.get(attributeMasterId).value = (value != null && value != undefined && value.length != 0 && value.length < 64 &&
+        formLayoutObject.get(attributeMasterId).displayValue = (value != null && value != undefined && value.length != 0 && value.length < 64 &&
             formLayoutObject.get(attributeMasterId).attributeTypeId == 61) ? sha256(value) : value;
         formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
         if (!calledFrom) {
             formLayoutObject.get(attributeMasterId).alertMessage = null
         }
-        if (value && value.length > 0 && calledFrom == ON_BLUR) {
-            formLayoutObject.get(attributeMasterId).showCheckMark = true;
-        }
-        else
-            formLayoutObject.get(attributeMasterId).showCheckMark = false;
-        return formLayoutObject;
-    }
-
-    toogleHelpText(attributeMasterId, formLayoutObject) {
-        if (!attributeMasterId || !formLayoutObject) {
-            return;
-        }
-        formLayoutObject.get(attributeMasterId).showHelpText = !formLayoutObject.get(attributeMasterId).showHelpText;
         return formLayoutObject;
     }
 
@@ -168,33 +139,6 @@ export default class FormLayoutEventImpl {
             throw new Error('masterId unavailable')
         }
         return data;
-    }
-
-
-    /**
-     * accepts formLayoutObject map and
-     * returns nextEditable and required object
-     * 
-     * call this method when required and non required elements are changed
-     * for example via validations, otherwise it is already obtained initially
-     * 
-     * @param {*} formLayoutObject 
-     */
-    updateNextEditable(formLayoutObject) {
-        // if (!formLayoutObject) {
-        //     return;
-        // }
-        // let nextEditable = {}
-        // let mapData = JSON.stringify([...formLayoutObject]);// stringified map
-        // let formLayoutArray = JSON.parse(mapData).map(d => d[1]); // to convert map to array
-
-        // for (let i = 0; i < formLayoutArray.length; i++) {
-        //     let fieldAttribute = formLayoutArray[i]; //1st of formLayoutArray[i] contains the object as Array.from on map gives array in which 0th index is a key and 1st index is the object
-        //     if (fieldAttribute && fieldAttribute.required) {
-        //         formLayoutService.getNextEditableAndFocusableElements(fieldAttribute.fieldAttributeMasterId, i, formLayoutArray, nextEditable);
-        //     }
-        // }
-        // return nextEditable
     }
 
     /**

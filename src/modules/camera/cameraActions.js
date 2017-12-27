@@ -12,13 +12,13 @@ import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } fro
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { setState } from '../global/globalActions';
 
-export function saveImage(result, fieldAttributeMasterId, formElement, isSaveDisabled, calledFromArray, rowId) {
+export function saveImage(result, fieldAttributeMasterId, formElement, isSaveDisabled, calledFromArray, rowId, latestPositionId) {
     return async function (dispatch) {
         const value = await signatureService.saveFile(result, moment(), true)
         if (calledFromArray) {
             dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId))
         } else {
-            dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, NEXT_FOCUS))
+            dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }))
         }
         dispatch(setState(SET_IMAGE_DATA, ''))
         dispatch(setState(SET_SHOW_IMAGE, false))
