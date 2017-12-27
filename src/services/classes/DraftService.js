@@ -81,7 +81,11 @@ class DraftService {
         return draftDbObject
     }
     deleteDraftFromDb(jobTransactionId, jobMasterId) {
-        realm.deleteSingleRecord(TABLE_DRAFT, jobTransactionId, 'jobTransactionId')
+        if (jobTransactionId < 0) {
+            realm.deleteSingleRecord(TABLE_DRAFT, jobMasterId, 'jobMasterId')
+        } else {
+            realm.deleteSingleRecord(TABLE_DRAFT, jobTransactionId, 'jobTransactionId')
+        }
         // let allData = realm.getAll(TABLE_DRAFT)
         // for (let index in allData) {
         //     let draft = { ...allData[index] }
