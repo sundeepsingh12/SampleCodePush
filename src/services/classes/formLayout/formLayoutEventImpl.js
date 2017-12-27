@@ -163,13 +163,13 @@ export default class FormLayoutEventImpl {
             let user = await keyValueDBService.getValueFromStore(USER)
             let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
             let previouslyTravelledDistance = await keyValueDBService.getValueFromStore(PREVIOUSLY_TRAVELLED_DISTANCE)
-            previouslyTravelledDistance = (!previouslyTravelledDistance) ? 0 : previouslyTravelledDistance.value
+            previouslyTravelledDistance = (!parseFloat(previouslyTravelledDistance)) ? 0 : previouslyTravelledDistance.value
             let trackKms = userSummary.value.gpsKms - previouslyTravelledDistance
             let trackTransactionTimeSpent = await keyValueDBService.getValueFromStore(TRANSACTION_TIME_SPENT)
             trackTransactionTimeSpent = moment().diff(trackTransactionTimeSpent.value, 'seconds')
             let trackBattery = await keyValueDBService.getValueFromStore(TRACK_BATTERY)
-            
-            await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, userSummary.value.gpsKms)
+            let gpsKms = (!userSummary.value.gpsKms)?"0" :userSummary.value.gpsKms
+            await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE,gpsKms)
             let lastTrackLog = {
                 latitude: userSummary.value.lastLat,
                 longitude: userSummary.value.lastLng
@@ -286,6 +286,7 @@ export default class FormLayoutEventImpl {
      * @param {*jobTransactionId} jobTransactionId 
      */
     _saveFieldData(formLayoutObject, jobTransactionId) {
+        try{
         let currentFieldDataObject = {} // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
         currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length
         let fieldDataArray = []
@@ -309,6 +310,9 @@ export default class FormLayoutEventImpl {
             tableName: TABLE_FIELD_DATA,
             value: fieldDataArray,
             npsFeedbackValue
+        }
+        }catch(error){
+            console.log(error)
         }
     }
 
