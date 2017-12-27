@@ -207,7 +207,7 @@ export const HomeTabNavigator = TabNavigator({
         fontSize: 12,
         marginTop: 0,
         fontWeight: '600'
-        
+
       },
       tabStyle: {
         alignItems: 'center',
@@ -413,7 +413,7 @@ export const AppNavigator = StackNavigator({
   JobMasterListScreen: {
     screen: JobMaster
   },
-   DataStoreDetails: {
+  DataStoreDetails: {
     screen: DataStoreDetails
   },
   CameraAttribute: {
@@ -423,7 +423,7 @@ export const AppNavigator = StackNavigator({
     screen: ImageDetailsView,
   }
 },
-{
+   {
     cardStyle: {
       backgroundColor: 'white'
     }

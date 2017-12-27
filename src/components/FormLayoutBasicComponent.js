@@ -320,8 +320,8 @@ class BasicFormElement extends Component {
                                         placeholderTextColor={styles.fontLowGray.color}
                                         defaultValue={this.props.item.displayValue}
                                         style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
-                                        value={this.props.item.displayValue}
-                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
+                                        value={this.props.item.value}
+                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
                                         multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                         onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}

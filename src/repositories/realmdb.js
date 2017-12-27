@@ -10,11 +10,11 @@ import Runsheet from './schema/Runsheet'
 import TrackLogs from './schema/trackLogs'
 import ServerSmsLog from './schema/serverSmsLog'
 import TransactionLogs from './schema/transactionLogs'
-
+import Draft from './schema/Draft'
 import _ from 'lodash'
 
-const schemaVersion = 37;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs];
+const schemaVersion = 38;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, Draft];
 
 let realm = new Realm({
     schemaVersion,
@@ -32,6 +32,7 @@ import {
     TABLE_TRACK_LOGS,
     TABLE_SERVER_SMS_LOG,
     TABLE_TRANSACTION_LOGS,
+    TABLE_DRAFT
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -39,7 +40,7 @@ export function save(tableName, object) {
         //removing existing entry from Table
         // realm.delete(realm.objects(tableName));
         //writing new record
-        realm.create(tableName, object);
+        realm.create(tableName, object, true);
     });
 }
 
@@ -77,6 +78,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_TRACK_LOGS))
         realm.delete(realm.objects(TABLE_SERVER_SMS_LOG))
         realm.delete(realm.objects(TABLE_TRANSACTION_LOGS))
+        realm.delete(realm.objects(TABLE_DRAFT))        
     });
 }
 
@@ -126,7 +128,6 @@ export function deleteRecordList(tableName, valueList, property) {
 
 export function updateRecordOnMultipleProperty(tableName, valueList, propertyList, count) {
     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
-    console.log('123', filteredRecords, propertyList, count)
     realm.write(() => {
         _.forEach(filteredRecords, record => record[propertyList[record.id]] += count[record.id])
     });
@@ -185,5 +186,18 @@ export function deleteSpecificTableRecords(tableName) {
     return realm.write(() => {
         //removing existing entry from Table
         realm.delete(realm.objects(tableName))
+    });
+}
+/**A generic method for filtering out a single record from a table 
+ * based on a property and then deleting them
+ * 
+ * @param {*} tableName 
+ * @param {*} value 
+ * @param {*} property 
+ */
+export function deleteSingleRecord(tableName, value, property) {
+    let filteredRecords = realm.objects(tableName).filtered(property + ' = "' + value + '"');
+    realm.write(() => {
+        realm.delete(filteredRecords)
     });
 }

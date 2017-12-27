@@ -178,6 +178,7 @@ module.exports = keyMirror({
     TABLE_TRACK_LOGS: null,
     TABLE_SERVER_SMS_LOG: null,
     TABLE_TRANSACTION_LOGS: null,
+    TABLE_DRAFT: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -203,6 +204,8 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
     CLEAR_FORM_LAYOUT: null,
+    SET_DRAFT: null,
+    SET_UPDATE_DRAFT: null,
 
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,

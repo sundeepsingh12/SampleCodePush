@@ -16,7 +16,8 @@ import {
     Left,
     Body,
     Icon,
-    StyleProvider
+    StyleProvider,
+    Toast
 } from 'native-base';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -44,10 +45,11 @@ class SignatureAndNps extends Component {
         super(props)
         this.state = {
             starCount: 0,
-            isLandscape: 'landscape'
+            isLandscape: 'landscape',
+            isSaveDisabled: true
         };
     }
-    componentWillMount() {
+    componentDidMount() {
         this.props.actions.getRemarksList(this.props.navigation.state.params.formElements)
         this.props.actions.setIsRemarksValidation(this.props.navigation.state.params.currentElement.validation)
     }
@@ -73,22 +75,35 @@ class SignatureAndNps extends Component {
         return { header: null }
     }
     saveSign = () => {
-        this.refs["sign"].saveImage();
-        this.refs["sign"].resetImage();
+        if (this.state.isSaveDisabled) {
+            Toast.show({
+                text: 'Improper signature. Please make your full signature.',
+                position: "bottom" | "center",
+                buttonText: 'Okay',
+                duration: 5000
+            })
+        } else {
+            this.refs["sign"].saveImage();
+            this.refs["sign"].resetImage();
+        }
     }
 
     resetSign = () => {
         this.refs["sign"].resetImage();
+        this.setState({ isSaveDisabled: true })
     }
 
     onSaveEvent = (result) => {
         this.onRatingSaveEvent(result)
         this.setState({ isLandscape: 'portrait' })
     }
-    onDragEvent() {
-        console.log("dragged");
+    onDragEvent = () => {
+        this.setState({ isSaveDisabled: false })
     }
-
+    goBack = () => {
+        this.setState({ isLandscape: 'portrait' })
+        this.props.navigation.goBack()
+    }
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
@@ -97,7 +112,7 @@ class SignatureAndNps extends Component {
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={() => this.goBack}>
                                     <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[style.headerBody]}>

@@ -58,6 +58,10 @@ function mapDispatchToProps(dispatch) {
 
 class ArrayFieldAttribute extends Component {
 
+    componentWillUnmount() {
+        BackHandler.removeEventListener(HardwareBackPress, this._goBack)
+    }
+
     _goBack = () => {
         this.props.navigation.goBack()
         this.props.actions.clearArrayState()
@@ -71,7 +75,7 @@ class ArrayFieldAttribute extends Component {
             this.props.lastRowId,
             this.props.arrayElements
         )
-        BackHandler.addEventListener(HardwareBackPress, this._goBack)
+     //   BackHandler.addEventListener(HardwareBackPress, this._goBack)
     }
     renderData = (arrayRow) => {
         return (

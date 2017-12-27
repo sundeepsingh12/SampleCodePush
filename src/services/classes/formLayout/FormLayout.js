@@ -12,6 +12,8 @@ import {
     TabScreen
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
+import { draftService } from '../DraftService.js'
+
 class FormLayout {
 
     /**
@@ -224,7 +226,7 @@ class FormLayout {
         return combineMap
     }
 
-    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList,jobTransactionIdList) {
+    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList) {
         let routeName, routeParam
         const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
@@ -234,6 +236,8 @@ class FormLayout {
                 contactData, currentStatus, jobTransaction, jobMasterId,
                 navigationFormLayoutStates
             }
+            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = await transientStatusService.getDataFromFormElement(formLayoutState.formElement)
             let totalAmount = await transientStatusService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
@@ -244,6 +248,8 @@ class FormLayout {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
             await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
+            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+
         }
         else if (currentStatus.transient) {
             routeName = Transient
@@ -256,8 +262,9 @@ class FormLayout {
             if (navigationFormLayoutStates) {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId,jobTransactionIdList, jobTransaction)
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransactionIdList, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
         }
         return {
             routeName,
