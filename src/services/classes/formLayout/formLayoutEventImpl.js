@@ -18,6 +18,7 @@ import {
     PREVIOUSLY_TRAVELLED_DISTANCE,
     TRANSACTION_TIME_SPENT,
     TRACK_BATTERY,
+    NPSFEEDBACK_VALUE,
     PENDING_SYNC_TRANSACTION_IDS
 } from '../../../lib/constants'
 
@@ -36,6 +37,8 @@ import {
     AFTER,
     BEFORE,
     DATA_STORE,
+    SIGNATURE_AND_FEEDBACK,
+    NPS_FEEDBACK,
     EXTERNAL_DATA_STORE
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
@@ -220,7 +223,7 @@ export default class FormLayoutEventImpl {
             let trackTransactionTimeSpent = await keyValueDBService.getValueFromStore(TRANSACTION_TIME_SPENT)
             trackTransactionTimeSpent = moment().diff(trackTransactionTimeSpent.value, 'seconds')
             let trackBattery = await keyValueDBService.getValueFromStore(TRACK_BATTERY)
-
+            
             await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, userSummary.value.gpsKms)
             let lastTrackLog = {
                 latitude: userSummary.value.lastLat,
@@ -234,13 +237,13 @@ export default class FormLayoutEventImpl {
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value) // to edit later 
+                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) // to edit later 
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList,currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value) //to edit later
+                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) //to edit later
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber,currentTime)
             }
 
@@ -341,9 +344,15 @@ export default class FormLayoutEventImpl {
         let currentFieldDataObject = {} // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
         currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length
         let fieldDataArray = []
+        let npsFeedbackValue = null
         for (var [key, value] of formLayoutObject) {
             if (value.attributeTypeId == 61) {
                 continue
+            } else if (value.attributeTypeId == NPS_FEEDBACK) {
+                 npsFeedbackValue =  value.value
+            } else if (value.attributeTypeId == SIGNATURE_AND_FEEDBACK){
+                let npsFeedback = _.values(value.childDataList).filter(item => item.attributeTypeId == NPS_FEEDBACK)
+                 npsFeedbackValue = npsFeedback[0].value
             }
             let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
             fieldDataArray.push(fieldDataObject)
@@ -353,7 +362,8 @@ export default class FormLayoutEventImpl {
         }
         return {
             tableName: TABLE_FIELD_DATA,
-            value: fieldDataArray
+            value: fieldDataArray,
+            npsFeedbackValue
         }
     }
 
@@ -374,7 +384,8 @@ export default class FormLayoutEventImpl {
         }
         return {
             tableName: TABLE_FIELD_DATA,
-            value: fieldDataArray
+            value: fieldDataArray,
+            npsFeedbackValue: fieldData.npsFeedbackValue
         }
     }
 
@@ -450,7 +461,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery) {
+    _setJobTransactionValues(jobTransaction1, status, jobMaster, user, hub, imei,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
         jobTransaction.jobType = jobMaster.code
@@ -465,6 +476,7 @@ export default class FormLayoutEventImpl {
         jobTransaction.trackKm = trackKms
         jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
         jobTransaction.trackBattery = trackBattery
+        jobTransaction.npsFeedBack = npsFeedbackValue
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOList.push({
             id: jobTransaction.id,
@@ -478,7 +490,7 @@ export default class FormLayoutEventImpl {
         //TODO only basic columns are set, some columns are not set which will be set as codebase progresses further
     }
 
-    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery) {
+    _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei,currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         for (let jobTransaction1 of jobTransactionList) {
             let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
@@ -494,6 +506,7 @@ export default class FormLayoutEventImpl {
             jobTransaction.trackKm = trackKms
             jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
             jobTransaction.trackBattery = trackBattery
+            jobTransaction.npsFeedBack = npsFeedbackValue
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOList.push({
                 id: jobTransaction.id,

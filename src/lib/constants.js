@@ -410,6 +410,8 @@ module.exports = keyMirror({
     PREVIOUSLY_TRAVELLED_DISTANCE: null,
     TRANSACTION_TIME_SPENT: null,
     TRACK_BATTERY: null,
+    NPSFEEDBACK_VALUE: null,
+    IS_SERVER_REACHABLE: null,
 })
 
 

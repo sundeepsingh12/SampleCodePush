@@ -68,11 +68,10 @@ import {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   HomeTabNavigatorScreen,
-  USER_EVENT_LOG,
   LoginScreen,
   TOGGLE_LOGOUT,
 } from '../../lib/constants'
-import { LOGIN_SUCCESSFUL } from '../../lib/AttributeConstants'
+import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
@@ -280,6 +279,7 @@ export function invalidateUserSession() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
+      await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")
       dispatch(deleteSessionToken())
       dispatch(preLogoutSuccess())
        dispatch(setState(TOGGLE_LOGOUT,false))

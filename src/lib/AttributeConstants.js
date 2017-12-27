@@ -389,4 +389,7 @@ module.exports = {
     
     //Events Log
     LOGIN_SUCCESSFUL: 1,
+    LOGOUT_SUCCESSFUL: 2,
+    SERVER_UNREACHABLE: 3,
+    SERVER_REACHABLE: 4,
 }
