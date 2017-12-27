@@ -24,8 +24,6 @@ import Application from '../../containers/Application'
 import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
-import JobDetails from '../../containers/JobDetails'
-import HomeUI from '../../containers/HomeUI'
 import Home from '../../containers/Home'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
@@ -266,9 +264,6 @@ export const AppNavigator = StackNavigator({
   Logout: {
     screen: Logout,
   },
-  JobDetails: {
-    screen: JobDetails,
-  },
   SelectFromList: {
     screen: SelectFromList,
   },
@@ -291,9 +286,6 @@ export const AppNavigator = StackNavigator({
       title: 'Sorting',
       header: null,
     }
-  },
-  HomeUI: {
-    screen: HomeUI
   },
   HomeTabNavigatorScreen: {
     screen: HomeTabNavigator

@@ -8,7 +8,7 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 
 import React, {Component} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight,Alert,FlatList} from 'react-native'
+import {StyleSheet, View, Image, TouchableHighlight,Alert,FlatList,TouchableOpacity} from 'react-native'
 
 import {
   Container,
@@ -94,18 +94,25 @@ class BulkListing extends Component {
           return (
             <StyleProvider style={getTheme(platform)}>
               <Container>
-                    <Header  style={StyleSheet.flatten([styles.bgPrimary])}>
-                  <Left>
-                     <Button transparent onPress={() => { this.props.actions.setState(CLEAR_BULK_STATE)
-                       this.props.navigation.goBack(null) }}>
-                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
-                    </Button>
-                  </Left>
-                  <Body>
-                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Bulk Update</Text>
-                  </Body>
-                  <Right />
-                </Header>
+                 <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            <Body>
+              <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <TouchableOpacity style={[style.headerLeft]} onPress={() => { 
+                  this.props.actions.setState(CLEAR_BULK_STATE)
+                  this.props.navigation.goBack(null) }}>
+                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                </TouchableOpacity>
+                <View style={[style.headerBody]}>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Bulk Update</Text>
+                </View>
+                <View style={[style.headerRight]}>
+                </View>
+                <View />
+              </View>
+            </Body>
+          </Header>
+
                 <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
                   <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>No jobs present</Text>
                 </View>
@@ -125,7 +132,7 @@ class BulkListing extends Component {
           return (
             <StyleProvider style={getTheme(platform)}>
               <Container>
-                <Header  style={StyleSheet.flatten([styles.bgPrimary])}>
+                 <Header  style={StyleSheet.flatten([styles.bgPrimary])}>
                   <Left>
                      <Button transparent onPress={() => { this.props.actions.setState(CLEAR_BULK_STATE)
                        this.props.navigation.goBack(null) }}>
@@ -141,7 +148,8 @@ class BulkListing extends Component {
                     style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{this.props.selectAllNone}</Text>
                   </Right>:<Right />}
                  
-                </Header>
+                </Header> 
+              
                   <FlatList
                     data={Object.values(this.props.bulkTransactionList)}
                     renderItem={({ item }) => this.renderData(item)}
@@ -193,6 +201,31 @@ class BulkListing extends Component {
       )
     }
 }
+
+const style = StyleSheet.create({
+  header: {
+    borderBottomWidth: 0,
+    height: 'auto',
+    padding: 0,
+    paddingRight: 0,
+    paddingLeft: 0
+  },
+  headerLeft: {
+    width: '15%',
+    padding: 15
+  },
+  headerBody: {
+    width: '70%',
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  headerRight: {
+    width: '15%',
+    padding: 15
+  },
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(BulkListing)
 
