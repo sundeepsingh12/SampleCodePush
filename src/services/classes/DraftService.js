@@ -1,9 +1,6 @@
 'use strict'
 import _ from 'lodash'
 import {
-
-} from '../../lib/AttributeConstants'
-import {
     TABLE_DRAFT
 } from '../../lib/constants'
 import * as realm from '../../repositories/realmdb'
