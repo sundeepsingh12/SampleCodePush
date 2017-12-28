@@ -4,7 +4,7 @@
 
  fareye('android')
 // import React, {
-//   Component
+//   PureComponent
 // } from 'react';
 
 // var mqtt    = require('react-native-mqtt');
@@ -15,7 +15,7 @@
 //   Text,
 // } from 'react-native';
 
-// export default class Fareye extends Component {
+// export default class Fareye extends PureComponent {
 //   render() {
 
 //         return (

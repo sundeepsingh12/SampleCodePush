@@ -26,7 +26,7 @@ import {
 } from '../lib/constants'
 
 
-class ServiceStatusIcon extends React.Component {
+class ServiceStatusIcon extends React.PureComponent {
 
   getIconBasedOnState(status) {
     console.log(status);

@@ -1,6 +1,6 @@
 'use strict';
 
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import ReactNative from 'react-native';
 
 const {
@@ -17,7 +17,7 @@ import { Button } from 'native-base'
 
 var isHidden = true;
 
-class AppContainer extends Component {
+class AppContainer extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

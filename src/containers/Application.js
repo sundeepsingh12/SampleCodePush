@@ -4,7 +4,7 @@
  *  getSessionTokenAtStartup which will navigate upon completion
  */
 'use strict'
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
@@ -59,7 +59,7 @@ var styles = StyleSheet.create({
 var reactMixin = require('react-mixin')
 import TimerMixin from 'react-timer-mixin'
 
-class Application extends Component {
+class Application extends PureComponent {
 
     componentDidMount() {
         // Use a timer so Application screen is displayed

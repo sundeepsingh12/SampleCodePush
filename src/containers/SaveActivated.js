@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
@@ -69,7 +69,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class SaveActivated extends Component {
+class SaveActivated extends PureComponent {
 
     constructor(props) {
         super(props)

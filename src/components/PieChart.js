@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 
 import {
     StyleSheet,
@@ -16,7 +16,7 @@ import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import CircularProgress from '../svg_components/components/CircularProgress'
 
-export default class PieChart extends Component {
+export default class PieChart extends PureComponent {
     
     render() {
         const completedCount = this.props.count.successCounts + this.props.count.failCounts

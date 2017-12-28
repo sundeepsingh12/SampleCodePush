@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import * as dataStoreActions from '../modules/dataStore/dataStoreActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -57,7 +57,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class DataStore extends Component {
+class DataStore extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
         return { header: null }

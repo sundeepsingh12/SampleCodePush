@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -24,7 +24,7 @@ import {
     SIGNATURE_AND_FEEDBACK
 } from '../lib/AttributeConstants'
 import CountDownTimer from './CountDownTimer'
-export default class NonExpandableDetailsView extends Component {
+export default class NonExpandableDetailsView extends PureComponent {
 
     _openURL(url) {
         Linking.openURL(url).

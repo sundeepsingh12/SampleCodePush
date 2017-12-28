@@ -18,7 +18,7 @@ import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import { Button, Spinner } from 'native-base';
 
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -59,7 +59,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class Logout extends Component {
+class Logout extends PureComponent {
 
   /**
    * ### render

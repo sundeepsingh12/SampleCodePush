@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -73,7 +73,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class Login extends Component {
+class Login extends PureComponent {
 
   componentDidMount() {
     this.props.actions.checkRememberMe()

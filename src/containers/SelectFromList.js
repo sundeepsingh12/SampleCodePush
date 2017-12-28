@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 
 import * as globalActions from '../modules/global/globalActions'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -45,7 +45,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class SelectFromList extends Component {
+class SelectFromList extends PureComponent {
 
   constructor(props) {
     super(props);

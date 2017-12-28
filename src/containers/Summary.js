@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet, 
     Dimensions, 
@@ -66,7 +66,7 @@ const itemWidth = slideWidth;
 
 
 const SLIDER_1_FIRST_ITEM = 0;
-class SummaryListing extends Component {
+class SummaryListing extends PureComponent {
        
         renderData(status,item) {
             return status.map(function(status, i){
@@ -106,7 +106,7 @@ class SummaryListing extends Component {
         }
     }
 
-class Summary extends Component {
+class Summary extends PureComponent {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
       }

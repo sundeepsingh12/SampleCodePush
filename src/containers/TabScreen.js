@@ -10,7 +10,7 @@ import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 import SearchBarV2 from '../components/SearchBarV2'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 
 import {
@@ -73,7 +73,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class TabScreen extends Component {
+class TabScreen extends PureComponent {
 
   static navigationOptions = ({ navigation }) => {
     return { header: null }

@@ -100,7 +100,7 @@ import {
   PreloaderScreen,
 } from '../../lib/constants'
 
-class AppWithNavigationState extends React.Component {
+class AppWithNavigationState extends React.PureComponent {
 
   componentDidMount() {
     BackHandler.addEventListener(HardwareBackPress, this.onBackPress);

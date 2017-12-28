@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -76,7 +76,7 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions }, dispatch)
     }
 }
-class BasicFormElement extends Component {
+class BasicFormElement extends PureComponent {
 
     constructor(props) {
         super(props);

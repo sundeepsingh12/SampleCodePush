@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
@@ -72,7 +72,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class PostAssignmentScanner extends Component {
+class PostAssignmentScanner extends PureComponent {
 
     constructor(props) {
         super(props);

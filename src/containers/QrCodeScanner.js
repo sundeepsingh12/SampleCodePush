@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
     Dimensions,
     StyleSheet,
@@ -42,7 +42,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class QrCodeScanner extends Component {
+class QrCodeScanner extends PureComponent {
 
     componentDidMount() {
         this.props.actions.setState(SCANNING, true)

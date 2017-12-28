@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 import {
@@ -10,7 +10,7 @@ import styles from '../themes/FeStyle'
 import { QrCodeScanner } from '../lib/constants'
 import QRIcon from '../svg_components/icons/QRIcon'
 import _ from 'lodash'
-export default class SearchBarV2 extends Component {
+export default class SearchBarV2 extends PureComponent {
     _setQrValue = (value) => {
         this.props.returnValue(_.trim(value))
     }

@@ -5,7 +5,7 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
 
 import {
@@ -82,7 +82,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class JobDetailsV2 extends Component {
+class JobDetailsV2 extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     return { header: null }
   }

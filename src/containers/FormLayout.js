@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -59,7 +59,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class FormLayout extends Component {
+class FormLayout extends PureComponent {
   componentDidUpdate() {
     if (this.props.updateDraft) {
       this.saveDraft()
