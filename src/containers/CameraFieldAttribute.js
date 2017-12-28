@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
     Dimensions,
     StyleSheet,
@@ -58,7 +58,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class CameraFieldAttribute extends Component {
+class CameraFieldAttribute extends PureComponent {
 
     constructor(props) {
         super(props);

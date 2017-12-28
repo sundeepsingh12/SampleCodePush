@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   AppRegistry,
 } from 'react-native'
@@ -116,7 +116,7 @@ export default function native(platform) {
   store.dispatch(setVersion(VERSION))
   store.dispatch(setStore(store))
 
-  class Fareye extends Component {
+  class Fareye extends PureComponent {
 
     render() {
       return (

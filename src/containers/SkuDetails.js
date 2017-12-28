@@ -10,7 +10,7 @@ import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 
 
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import {StyleSheet, View, Image, TouchableHighlight} from 'react-native'
 
 import {
@@ -51,7 +51,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class SkuDetails extends Component {
+class SkuDetails extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     return {header: null}

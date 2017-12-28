@@ -6,7 +6,7 @@ fareye('ios')
 
 /*//Realm DB Playgroud....
 
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import validate from "json-schema";
 import _ from "underscore";
 import Realm from 'realm';
@@ -17,7 +17,7 @@ import {
     Text,
 } from 'react-native';
 
-export default class Fareye extends Component {
+export default class Fareye extends PureComponent {
     render() {
         var instance = 4;
         var instance2 = "asdasd";

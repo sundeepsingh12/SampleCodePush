@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity,Alert } from 'react-native'
 
 import Loader from '../components/Loader'
@@ -71,7 +71,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class Menu extends Component {
+class Menu extends PureComponent {
 
   renderTextView(text, key, isLast, icon) {
     return (

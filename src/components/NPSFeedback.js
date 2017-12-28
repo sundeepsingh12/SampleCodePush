@@ -6,10 +6,10 @@ import {
     TouchableHighlight
 }
     from 'react-native'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
 
-class NPSFeedback extends Component {
+class NPSFeedback extends PureComponent {
 
     constructor(props) {
         super(props);

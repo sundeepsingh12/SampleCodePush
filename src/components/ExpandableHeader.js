@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -12,7 +12,7 @@ import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
 
-class ExpandableHeader extends Component {
+class ExpandableHeader extends PureComponent {
 
     constructor(props) {
         super(props)

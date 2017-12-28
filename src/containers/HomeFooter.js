@@ -2,7 +2,7 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
 import Loader from '../components/Loader'
 import Menu from './Menu'
@@ -44,7 +44,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class HomeFooter extends Component {
+class HomeFooter extends PureComponent {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
       }
