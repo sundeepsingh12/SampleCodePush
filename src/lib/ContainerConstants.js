@@ -20,12 +20,19 @@ module.exports = {
 
     //Home Constants
     JOB_ASSIGNMENT_DISPLAY: 'Job Assignment',
-    CUSTOM_APP_DISPLAY:'Web URL',
-    SORTING_DISPLAY:'Sort Parcels',
+    CUSTOM_APP_DISPLAY: 'Web URL',
+    SORTING_DISPLAY: 'Sort Parcels',
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
 
     //New Job
-    NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!'
+    NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
+
+    //Offline DS
+    OFFLINE_DS_TITLE: 'Offline DataStore',
+    DOWNLOADING_OFFLINE_DS: 'Downloading',
+    DOWNLOAD_SUCCESSFUL: 'Download Successful',
+    DOWNLOAD_FAILED: 'Download Failed',
+    CLOSE: 'Close'
 }

@@ -146,6 +146,7 @@ class DataStoreService {
         for (let [id, currentObject] of formElements.entries()) {
             if (dataStoreAttributeValueMap[currentObject.key]) {
                 currentObject.value = dataStoreAttributeValueMap[currentObject.key]
+                currentObject.displayValue = dataStoreAttributeValueMap[currentObject.key]
             }
         }
         return formElements
@@ -203,6 +204,13 @@ class DataStoreService {
         return false
     }
 
+    /**
+     * This function return fieldAttribute with matching fieldAttributeMasterId
+     * @param {*} fieldAttributes
+     * @param {*} fieldAttributeMasterId
+     * @returns 
+     * array having only one fieldData object
+     */
     getFieldAttribute(fieldAttributes, fieldAttributeMasterId) {
         if (!fieldAttributes) {
             throw new Error('fieldAttributes missing')
@@ -213,6 +221,13 @@ class DataStoreService {
         return fieldAttributes.filter(fieldAttribute => fieldAttribute.id == fieldAttributeMasterId)
     }
 
+    /**
+     * This function return jobAttribute with matching jobAttributeMasterId
+     * @param {*} jobAttributes
+     * @param {*} jobAttributeMasterId
+     * @returns 
+     * array having only one jobData object
+     */
     getJobAttribute(jobAttributes, jobAttributeMasterId) {
         if (!jobAttributes) {
             throw new Error('jobAttributes missing')
@@ -227,6 +242,13 @@ class DataStoreService {
     Offline Datastore service methods  
     */
 
+
+    /**
+    * This function fetch data store master
+    * @param {*} token
+    * @returns 
+    * jsonReponse from Server
+    */
     fetchDataStoreMaster(token) {
         if (!token) {
             throw new Error('Token Missing')
@@ -236,6 +258,12 @@ class DataStoreService {
         return dataStoreMasterResponse
     }
 
+    /**
+   * This function return list of dataStoreMasterId
+   * @param {*} fieldAttributes
+   * @returns 
+   * array - dataStoreMasterId List which have mapping with fieldAttributes
+   */
     getDataStoreMasterIdMappedWithFieldAttribute(fieldAttributes) {
         if (!fieldAttributes) {
             throw new Error('fieldAttributes missing')
@@ -249,6 +277,16 @@ class DataStoreService {
         return dataStoreMasterIdList
     }
 
+    /**
+    * @param {*} dataStoreMasterjsonResponse
+    * @param {*} dataStoreMasterIdList
+    * @returns 
+    * object
+    {
+            dataStoreIdVSTitleMap, //contains dataStoreMasterId vs data store name 
+            dataStoreMasterList // contains dataStoreMasters which we have to save in db
+    } 
+    */
     getDataStoreMasterList(dataStoreMasterjsonResponse, dataStoreMasterIdList) {
         if (!dataStoreMasterjsonResponse) {
             throw new Error('dataStoreMasterjsonResponse missing')
@@ -280,7 +318,14 @@ class DataStoreService {
         }
     }
 
-    async syncDataStore(token) {
+    /**
+    * This function fetch dataStoreMasters
+    * @param {*} token
+    * @returns 
+    * object
+            dataStoreIdVSTitleMap, //contains dataStoreMasterId vs data store name 
+    */
+    async getDataStoreMasters(token) {
         if (!token) {
             throw new Error('Token Missing')
         }
@@ -297,6 +342,16 @@ class DataStoreService {
         return dataStoreIdVSTitleMap
     }
 
+
+    /**
+    * This function fetch data store
+    * @param {*} token
+    * @param {*} datastoreMasterId
+    * @param {*} lastSyncTime
+    * @param {*} currentPageNumber
+    * @returns 
+    * dataStoreResponse: jsonReponse from Server
+    */
     fetchDataStore(token, datastoreMasterId, lastSyncTime, currentPageNumber) {
         if (!token) {
             throw new Error('Token Missing')
@@ -309,6 +364,10 @@ class DataStoreService {
         return dataStoreResponse
     }
 
+    /**
+    * This function save data store to DB 
+    * @param {*} dataStoreJsonResponse
+    */
     async saveDataStoreToDB(dataStoreJsonResponse) {
         if (!dataStoreJsonResponse) {
             return
@@ -325,6 +384,10 @@ class DataStoreService {
         await realm.performBatchSave({ tableName: DataStore_DB, value: dataStoreList })
     }
 
+    /**
+     * delete records if present with given serverKey
+     * @param {*} serverKey 
+     */
     async checkIfRecordPresentWithServerId(serverKey) {
         if (!serverKey) {
             throw new Error('serverUniqueKey missing')
@@ -332,6 +395,15 @@ class DataStoreService {
         await realm.deleteSingleRecord(DataStore_DB, serverKey, 'serverUniqueKey')
     }
 
+    /**
+   * This function fetch data store with page size of 500 
+   * @param {*} token
+   * @param {*} datastoreMasterId
+   * @param {*} currentPageNumber
+   * @param {*} lastSyncTime
+   * @returns 
+   * jsonReponse from Server containing totalElements & numberOfElements
+   */
     async fetchDatastoreAndSaveInDB(token, datastoreMasterId, currentPageNumber, lastSyncTime) {
         if (!token) {
             throw new Error('Token Missing')
@@ -348,6 +420,11 @@ class DataStoreService {
         }
     }
 
+    /**
+   * This function returns time difference
+   * @param {*} lastSyncTime
+   * string - time difference between current time and last synced time
+   */
     getLastSyncTimeInFormat(lastSyncTime) {
         if (!lastSyncTime) {
             throw new Error('lastSyncTime not present')
@@ -369,6 +446,16 @@ class DataStoreService {
         return timeDifference
     }
 
+    /**
+* This function check if offline data store is present or not and if present then return the queried results
+* @param {*} searchText
+* @param {*} dataStoreMasterId
+* @returns
+* {
+            offlineDSPresent: boolean,
+            dataStoreAttrValueMap: map containing queried records
+   }
+*/
     async checkForOfflineDsResponse(searchText, dataStoreMasterId) {
         if (!searchText) {
             throw new Error('searchText not present')
@@ -399,6 +486,14 @@ class DataStoreService {
         }
     }
 
+    /**
+ * This function search records that contains given search text
+ * @param {*} searchText
+ * @param {*} dataStoreMasterId
+ * @param {*} searchList
+ * @returns
+ * listOfUniqueRecords: array of records which contains search text
+ */
     async searchDataStore(searchText, dataStoreMasterId, searchList) {
         if (!searchList) {
             throw new Error('searchList not present')
@@ -420,10 +515,13 @@ class DataStoreService {
         return listOfUniqueRecords
     }
 
+    /**
+  * This function returns map containing search records from data store table
+  * @param {*} uniqueKey
+  * @param {*} listOfUniqueRecords
+  * dataStoreAttrValueMap : map containing queried records
+  */
     createDataStoreAttrValueMap(uniqueKey, listOfUniqueRecords) {
-        if (!uniqueKey) {
-            throw new Error('uniqueKey not present')
-        }
         if (!listOfUniqueRecords) {
             throw new Error('listOfUniqueRecords not present')
         }
@@ -437,6 +535,9 @@ class DataStoreService {
                 listOfAttributes[singleEntryOfAttrValueMap.key] = singleEntryOfAttrValueMap.value
             }
             listOfAttributes[_id] = record.serverUniqueKey
+            if (!uniqueKey) {
+                uniqueKey = _id
+            }
             let dataStoreObject = { id, uniqueKey: uniqueKey, matchKey: record.matchKey, dataStoreAttributeValueMap: listOfAttributes }
             dataStoreAttrValueMap[id] = dataStoreObject
             id++

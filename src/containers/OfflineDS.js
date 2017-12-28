@@ -38,7 +38,15 @@ import {
 import {
     EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
+import {
+    OFFLINE_DS_TITLE,
+    DOWNLOADING_OFFLINE_DS,
+    DOWNLOAD_SUCCESSFUL,
+    DOWNLOAD_FAILED,
+    CLOSE
+} from '../lib/ContainerConstants'
 import _ from 'lodash'
+import { downloadJobMaster } from '../modules/pre-loader/preloaderActions';
 
 
 function mapStateToProps(state) {
@@ -78,7 +86,7 @@ class OfflineDS extends Component {
                         <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                     </TouchableOpacity>
                     <View style={[style.headerBody]}>
-                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Offline DataStore</Text>
+                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{OFFLINE_DS_TITLE}</Text>
                     </View>
                     <View style={[style.headerRight]}>
                     </View>
@@ -98,7 +106,7 @@ class OfflineDS extends Component {
                     />
                 </View>
                 <View style={[styles.flexBasis50, styles.alignCenter, styles.justifyCenter]}>
-                    <Text style={[styles.fontDarkGray]}>
+                    <Text style={[styles.fontBlack]}>
                         {this.props.lastSyncTime}
                     </Text>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
@@ -119,8 +127,8 @@ class OfflineDS extends Component {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.justifyCenter, styles.flexBasis100, styles.padding10]}>
                     <View style={[styles.row, styles.justifySpaceBetween, styles.marginBottom10]}>
-                        <Text style={[styles.fontDarkGray]}>
-                            Downloading {this.props.fileName}...
+                        <Text style={[styles.fontBlack]}>
+                            {DOWNLOADING_OFFLINE_DS} {this.props.fileName}...
                     </Text>
                         <Text style={[styles.fontDarkGray]}>
                             {this.props.progressBarStatus}%
@@ -143,9 +151,9 @@ class OfflineDS extends Component {
                         style={[style.imageSync]}
                         source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
                     />
-                    <Text style={[styles.fontDarkGray, styles.marginTop30]}>
-                        Download Successful
-                                </Text>
+                    <Text style={[styles.fontBlack, styles.marginTop30]}>
+                        {DOWNLOAD_SUCCESSFUL}
+                    </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
@@ -168,16 +176,16 @@ class OfflineDS extends Component {
                         style={[style.imageSync]}
                         source={require('../../images/fareye-default-iconset/error.png')}
                     />
-                    <Text style={[styles.fontDarkGray, styles.marginTop30]}>
-                        Download Failed
-                                </Text>
+                    <Text style={[styles.fontBlack, styles.marginTop30]}>
+                        {DOWNLOAD_FAILED}
+                    </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
                     <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
                             onPress={() => { this.goBack() }}  >
-                            <Text style={[styles.fontPrimary]}>Close</Text>
+                            <Text style={[styles.fontPrimary]}>{CLOSE}</Text>
                         </Button>
                     </View>
                 </View>

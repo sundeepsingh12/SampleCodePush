@@ -42,17 +42,21 @@ export function syncDataStore() {
         try {
             dispatch(setState(SET_DOWNLOADING_STATUS, { downLoadingStatus: 1, progressBarStatus: 0 }))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            let dataStoreIdVSTitleMap = await dataStoreService.syncDataStore(token)
+            let dataStoreIdVSTitleMap = await dataStoreService.getDataStoreMasters(token)
             let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_DATASTORE_SYNC_TIME)
             lastSyncTime = (lastSyncTime && lastSyncTime.value) ? lastSyncTime.value : null
             for (let datastoreMasterId in dataStoreIdVSTitleMap) {
                 dispatch(setState(SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR, { fileName: dataStoreIdVSTitleMap[datastoreMasterId], progressBarStatus: 0 }))
                 let currentPageNumber = 0, elements = 0, fetchResults
                 do {
-                    fetchResults = await dataStoreService.fetchDatastoreAndSaveInDB(token, datastoreMasterId, currentPageNumber, null)
+                    fetchResults = await dataStoreService.fetchDatastoreAndSaveInDB(token, datastoreMasterId, currentPageNumber, lastSyncTime)
                     elements += fetchResults.numberOfElements
                     currentPageNumber++
-                    await dispatch(setState(UPDATE_PROGRESS_BAR, parseInt((elements / fetchResults.totalElements) * 100)))
+                    (fetchResults.totalElements) ?
+                        await dispatch(setState(UPDATE_PROGRESS_BAR, parseInt((elements / fetchResults.totalElements) * 100))) :
+                        await dispatch(setState(UPDATE_PROGRESS_BAR, 100))
+
+
                 }
                 while (elements < fetchResults.totalElements)
             }
