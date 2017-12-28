@@ -120,7 +120,7 @@ class Menu extends Component {
       }
 
       case OFFLINEDATASTORE_ID: {
-        this.props.actions.navigateToScene(OfflineDS)
+        this.props.actions.navigateToScene(OfflineDS,{displayName:this.props.menu.OFFLINEDATASTORE.displayName})
         break
       }
       

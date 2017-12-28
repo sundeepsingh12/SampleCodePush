@@ -39,7 +39,6 @@ import {
     EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
 import {
-    OFFLINE_DS_TITLE,
     DOWNLOADING_OFFLINE_DS,
     DOWNLOAD_SUCCESSFUL,
     DOWNLOAD_FAILED,
@@ -86,7 +85,7 @@ class OfflineDS extends Component {
                         <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                     </TouchableOpacity>
                     <View style={[style.headerBody]}>
-                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{OFFLINE_DS_TITLE}</Text>
+                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
                     </View>
                     <View style={[style.headerRight]}>
                     </View>

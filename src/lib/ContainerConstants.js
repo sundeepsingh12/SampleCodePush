@@ -30,7 +30,6 @@ module.exports = {
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
 
     //Offline DS
-    OFFLINE_DS_TITLE: 'Offline DataStore',
     DOWNLOADING_OFFLINE_DS: 'Downloading',
     DOWNLOAD_SUCCESSFUL: 'Download Successful',
     DOWNLOAD_FAILED: 'Download Failed',
