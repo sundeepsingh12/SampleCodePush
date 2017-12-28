@@ -1,6 +1,7 @@
 import {
   USER_EVENT_LOG,
   USER,
+  USER_SUMMARY,
 } from '../../lib/constants'
 
 import {
@@ -21,6 +22,7 @@ class UserEvent {
 
   async addUserEventLog(eventID, description) {
     const userDetails = await keyValueDBService.getValueFromStore(USER)
+    let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     let userEventLogArray = []
     let userEventLogObject = {
       userId: userDetails.value.id,
@@ -29,14 +31,30 @@ class UserEvent {
       cityId: userDetails.value.cityId,
       eventId: eventID,
       description: description,
-      latitude: 0, // to be set later
-      longitude: 0, // to be set later
+      latitude: userSummary.value.lastLat, 
+      longitude: userSummary.value.lastLng,
       dateTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
     }
     let olduserEventLogArray = await keyValueDBService.getValueFromStore(USER_EVENT_LOG)
     userEventLogArray = olduserEventLogArray ? olduserEventLogArray.value : []
     userEventLogArray.push(userEventLogObject)
     await keyValueDBService.validateAndSaveData(USER_EVENT_LOG, userEventLogArray)
+  }
+
+  /**
+   * @param {*} lastSyncTime --Latest time when the sync is done.
+   */
+  async getUserEventLog(lastSyncTime) {
+    const userEventsLogs = await keyValueDBService.getValueFromStore(USER_EVENT_LOG);
+    const userEventLogValue = userEventsLogs ? userEventsLogs.value : []
+    let userEventLogsToBeSynced = []
+
+    userEventLogValue.forEach(eventLog => {
+      if (moment(eventLog.dateTime).isAfter(lastSyncTime.value)) {
+        userEventLogsToBeSynced.push(eventLog)
+      }
+    })
+    return userEventLogsToBeSynced
   }
 }
 

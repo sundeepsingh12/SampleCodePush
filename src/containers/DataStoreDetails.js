@@ -48,9 +48,10 @@ class DataStoreDetails extends Component {
     }
 
     componentDidMount() {
-        if (this.props.value != this.props.navigation.state.params.value
-            || _.size(this.props.dataStoreAttrValueMap) != 1) {
-            this.props.actions.getFieldAttribute(this.props.navigation.state.params.fieldAttributeMasterId, this.props.navigation.state.params.value)
+        if (this.props.value != this.props.navigation.state.params.value || _.size(this.props.dataStoreAttrValueMap) != 1) {
+            (this.props.navigation.state.params.jobAttributeMasterId) ?
+                this.props.actions.getJobAttribute(this.props.navigation.state.params.jobAttributeMasterId, this.props.navigation.state.params.value)
+                : this.props.actions.getFieldAttribute(this.props.navigation.state.params.fieldAttributeMasterId, this.props.navigation.state.params.value)
         }
     }
 
@@ -147,7 +148,7 @@ class DataStoreDetails extends Component {
                             {flatListView}
                             {errorView}
                         </Content >
-                        
+
                     </Container >
                 </StyleProvider >
             </Modal >

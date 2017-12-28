@@ -8,7 +8,7 @@ import {
     JOB_DETAILS_FETCHING_END,
     IS_MISMATCHING_LOCATION,
     RESET_STATE,
-    RESET_STATE_FOR_JOBDETAIL
+    RESET_STATE_FOR_JOBDETAIL,
 } from '../../lib/constants'
 
 
@@ -16,8 +16,8 @@ export default function jobDetailsReducer(state = initialState, action) {
     if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
 
     switch (action.type) {
-        case JOB_DETAILS_FETCHING_START :
-            return state.set('jobDetailsLoading',true)
+        case JOB_DETAILS_FETCHING_START:
+            return state.set('jobDetailsLoading', true)
         case IS_MISMATCHING_LOCATION:
             return state.set('statusList',action.payload)
         case JOB_DETAILS_FETCHING_END :
@@ -28,12 +28,14 @@ export default function jobDetailsReducer(state = initialState, action) {
                         .set('currentStatus',action.payload.currentStatus)
                         .set('errorMessage',action.payload.errorMessage)
                         .set('statusRevertList',action.payload.parentStatusList)
+                        .set('draftStatusInfo', action.payload.draftStatusInfo)
         case RESET_STATE:
-            return initialState 
+            return initialState
         case RESET_STATE_FOR_JOBDETAIL:
             return state.set('errorMessage',false) 
                         .set('statusRevertList',[])
-                        .set('jobDetailsLoading',false)              
+                        .set('jobDetailsLoading',false)
+                        .set('draftStatusInfo', {})              
     }
     return state
 }

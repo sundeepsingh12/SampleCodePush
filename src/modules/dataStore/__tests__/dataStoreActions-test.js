@@ -4,7 +4,7 @@ var formLayoutActions = require('../../form-layout/formLayoutActions')
 import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
-    SHOW_LOADER,
+    SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
     REMARKS,
     MINMAX,
@@ -174,7 +174,7 @@ describe('test for getDataStoreAttrValueMap', () => {
 
     const expectedActions = [
         {
-            type: SHOW_LOADER,
+            type: SHOW_LOADER_DS,
             payload: true
         }, {
             type: SET_DATA_STORE_ATTR_MAP,

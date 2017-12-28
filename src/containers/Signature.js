@@ -4,7 +4,7 @@ import {
     View,
     Text,
     FlatList,
-    TouchableOpacity
+    TouchableOpacity,
 }
     from 'react-native'
 import { connect } from 'react-redux'
@@ -23,7 +23,8 @@ import {
     Left,
     Body,
     Icon,
-    StyleProvider
+    StyleProvider,
+    Toast
 } from 'native-base';
 import {
     SIGNATURE,
@@ -45,11 +46,12 @@ class Signature extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            isLandscape: 'landscape'
+            isLandscape: 'landscape',
+            isSaveDisabled: true
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.props.actions.getRemarksList(this.props.navigation.state.params.formElements)
         this.props.actions.setIsRemarksValidation(this.props.navigation.state.params.currentElement.validation)
     }
@@ -72,25 +74,36 @@ class Signature extends Component {
     }
 
     saveSign = () => {
-        this.refs["sign"].saveImage();
-        this.refs["sign"].resetImage();
+        if (this.state.isSaveDisabled) {
+            Toast.show({
+                text: 'Improper signature. Please make your full signature.',
+                position: "bottom" | "center",
+                buttonText: 'Okay',
+                duration: 5000
+            })
+        } else {
+            this.refs["sign"].saveImage();
+            this.refs["sign"].resetImage();
+        }
     }
 
     resetSign = () => {
         this.refs["sign"].resetImage();
+        this.setState({ isSaveDisabled: true })
     }
 
     onSaveEvent = (result) => {
         this.onSaveSign(result)
     }
-    onDragEvent() {
+    onDragEvent = () => {
+        this.setState({ isSaveDisabled: false })
         console.log("dragged");
     }
+
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    {renderIf(this.props.navigation.state.params.currentElement.attributeTypeId == SIGNATURE,
                         <Header searchBar style={[styles.bgWhite, style.header]}>
                             <Body>
                                 <View
@@ -112,7 +125,6 @@ class Signature extends Component {
                                 </View>
                             </Body>
                         </Header>
-                    )}
                     <View style={[styles.flex1, styles.row]}>
                         <View style={{ borderWidth: 1 }}>
                             {renderIf(this.props.isRemarksValidation && this.props.fieldDataList.length > 0,
@@ -130,12 +142,12 @@ class Signature extends Component {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        {renderIf(this.props.navigation.state.params.currentElement.attributeTypeId == SIGNATURE,
-                            <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
-                                onPress={this.saveSign} >
-                                <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
-                            </TouchableOpacity>
-                        )}
+                        {/* {renderIf(this.props.navigation.state.params.currentElement.attributeTypeId == SIGNATURE, */}
+                        <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
+                            onPress={this.saveSign} >
+                            <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
+                        </TouchableOpacity>
+                        {/* )} */}
                     </View>
                 </Container>
             </StyleProvider >

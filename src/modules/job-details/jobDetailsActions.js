@@ -30,6 +30,7 @@ import {
     HomeTabNavigatorScreen,
     RESET_STATE_FOR_JOBDETAIL
 } from '../../lib/constants'
+import { draftService } from '../../services/classes/DraftService';
 
 export function startFetchingJobDetails() {
     return {
@@ -43,7 +44,7 @@ export function resetState() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage,parentStatusList) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo,parentStatusList) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -52,7 +53,8 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobTransaction,
             currentStatus,
             errorMessage,
-            parentStatusList
+            parentStatusList,
+            draftStatusInfo
         }
     }
 }
@@ -60,7 +62,6 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
-            dispatch(startFetchingJobDetails())
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
@@ -72,7 +73,8 @@ export function getJobDetails(jobTransactionId) {
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery, 
                                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId) : false
             const parentStatusList = (jobMaster[0].isStatusRevert) ? jobDetailsService.getParentStatusList(statusList.value,details.currentStatus) : []
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay,errorMessage,parentStatusList))
+            const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

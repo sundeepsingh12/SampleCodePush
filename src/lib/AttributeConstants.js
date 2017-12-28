@@ -300,9 +300,9 @@ module.exports = {
     NEWJOB_ID: 3,
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
-    JOB_ASSIGNMENT_ID : 20,
-    Piechart : {
-      enabled : false
+    JOB_ASSIGNMENT_ID: 20,
+    Piechart: {
+        enabled: false
     },
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
@@ -386,7 +386,14 @@ module.exports = {
 
     //ModuleCustomization
     NEW_JOB: 'New Task',
-    
+
     //Events Log
     LOGIN_SUCCESSFUL: 1,
+    LOGOUT_SUCCESSFUL: 2,
+    SERVER_UNREACHABLE: 3,
+    SERVER_REACHABLE: 4,
+
+     //Offline DS Actiions
+     LAST_SYNCED: 'Last synced   ',
+     NEVER_SYNCED: 'Never Synced',
 }

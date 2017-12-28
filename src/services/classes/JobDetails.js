@@ -16,7 +16,8 @@ import { formLayoutEventsInterface } from '../../services/classes/formLayout/For
 import {
     TABLE_JOB,
     USER,
-    TABLE_JOB_TRANSACTION
+    TABLE_JOB_TRANSACTION,
+    USER_SUMMARY
 } from '../../lib/constants'
 import { keyValueDBService } from './KeyValueDBService'
 
@@ -181,11 +182,16 @@ class JobDetails {
 
     async setAllDataForRevertStatus(statusList,jobTransaction,previousStatus){
      let updatedJobTransaction
+     let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)     
+     let lastTrackLog = {
+        latitude: userSummary.value.lastLat,
+        longitude: userSummary.value.lastLng
+     }
      let user = await keyValueDBService.getValueFromStore(USER)                
      let statusData = statusList.value.filter(list => list.id == jobTransaction.jobStatusId)
      let updatedJobDb = formLayoutEventsInterface._setJobDbValues(statusData,jobTransaction.jobId)
      await formLayoutEventsInterface._updateJobSummary(jobTransaction,previousStatus[0])
-     let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction],previousStatus[0],jobTransaction.jobStatusId,jobTransaction.jobMasterId,user)
+     let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction],previousStatus[0],jobTransaction.jobStatusId,jobTransaction.jobMasterId,user, lastTrackLog)
      let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction,previousStatus[3]) 
      updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction,previousStatus)  
      await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value)       

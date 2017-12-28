@@ -77,7 +77,7 @@ class SummaryAndPieChart {
         jobTransactions.forEach(item =>{ if(moment(todayDate).isSame(moment(item.lastUpdatedAtServer).format('YYYY-MM-DD')) || !noNextStatusMap[item.jobStatusId] || pendingStatusMap[item.jobStatusId] ){
             jobStatusIdMap[item.jobStatusId] = (jobStatusIdMap[item.jobStatusId]) ? jobStatusIdMap[item.jobStatusId] + 1 : 1
         }})
-        jobMasterList.forEach(id => jobMasterSummaryList[id.id] = {id : id.id ,code: id.identifier, title : id.title, count : 0, 1 : {count : 0,list : []},2 : {count : 0,list : []},3 : {count : 0,list : []}} )
+        jobMasterList.forEach(id => jobMasterSummaryList[id.id] = {id : id.id ,code: id.identifier, identifierColor:id.identifierColor, title : id.title, count : 0, 1 : {count : 0,list : []},2 : {count : 0,list : []},3 : {count : 0,list : []}} )
         const jobStatusIdCountMap = jobSummaryList.reduce(function ( total, current ) {
             total[ current.jobStatusId ] = (jobStatusIdMap[current.jobStatusId]) ? jobStatusIdMap[current.jobStatusId] : 0;
             return total;

@@ -36,7 +36,8 @@ import {
   IS_MISMATCHING_LOCATION,
   DataStoreDetails,
   ImageDetailsView,
-  RESET_STATE_FOR_JOBDETAIL
+  RESET_STATE_FOR_JOBDETAIL,
+
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -73,6 +74,7 @@ function mapStateToProps(state) {
     errorMessage: state.jobDetails.errorMessage,
     statusList: state.jobDetails.statusList,
     statusRevertList: state.jobDetails.statusRevertList,
+    draftStatusInfo: state.jobDetails.draftStatusInfo
   }
 }
 
@@ -92,8 +94,8 @@ class JobDetailsV2 extends Component {
     this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
   }
 
-  componentWillUnmount(){
-    if(this.props.errorMessage){
+  componentWillUnmount() {
+    if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
   }
@@ -135,8 +137,7 @@ class JobDetailsV2 extends Component {
       statusId: this.props.statusList.id,
       statusName: this.props.statusList.name,
       jobMasterId: this.props.jobTransaction.jobMasterId
-    }
-    )
+    })
     this._onCancel()
   }
   _onCancel = () => {
@@ -347,6 +348,29 @@ class JobDetailsV2 extends Component {
     )
   }
 
+  showDraftAlert() {
+    // let draftStatus = this.props.currentStatus.nextStatusList.filter(nextStatus => nextStatus.id == this.props.draftStatusId)
+    // let draftMessage = (draftStatus.length > 0) ? 'Do you want to restore draft for ' + draftStatus[0].name + '?' : 'Do you want to restore draft?'
+    let draftMessage = 'Do you want to restore draft for ' + this.props.draftStatusInfo.name + '?'
+    let view =
+      <CustomAlert
+        title="Draft"
+        message={draftMessage}
+        onOkPressed={() => this._goToFormLayoutWithDraft()}
+        onCancelPressed={this._onCancel} />
+    return view
+  }
+  _goToFormLayoutWithDraft = () => {
+    this.props.actions.navigateToScene('FormLayout', {
+      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      jobTransactionId: this.props.jobTransaction.id,
+      jobTransaction: this.props.jobTransaction,
+      statusId: this.props.draftStatusInfo.id,
+      statusName: this.props.draftStatusInfo.name,
+      jobMasterId: this.props.jobTransaction.jobMasterId,
+      isDraftRestore: true
+    })
+  }
   render() {
     if (this.props.jobDetailsLoading) {
       return (
@@ -355,9 +379,11 @@ class JobDetailsV2 extends Component {
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo)) ? this.showDraftAlert() : null
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
+            {draftAlert}
             <View>
               {renderIf(this.props.statusList,
                 <CustomAlert
@@ -368,7 +394,7 @@ class JobDetailsV2 extends Component {
             </View>
             <Header style={[style.header]}>
               <View style={style.seqCard}>
-                <View style={[style.seqCircle,{backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor}]}>
+                <View style={[style.seqCircle, { backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor }]}>
                   <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
                     {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
                   </Text>
@@ -433,6 +459,7 @@ class JobDetailsV2 extends Component {
               <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
                 <ExpandableHeader
                   title={'Basic Details'}
+                  navigateToDataStoreDetails={this.navigateToDataStoreDetails}
                   dataList={this.props.jobDataList}
                 />
               </View>
@@ -457,16 +484,16 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>
               )}
-              
-                {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
+
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
                     <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
                   </Button>
                 </FooterTab>
-                )}
+              )}
 
-                {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
+              {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
                 (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
                 <FooterTab>
                   <Button full onPress={this.navigationButtonPressed}>
@@ -492,7 +519,6 @@ class JobDetailsV2 extends Component {
 
 
 const style = StyleSheet.create({
-  //  styles.column, styles.paddingLeft0, styles.paddingRight0, {height: 'auto'}
   header: {
     flexDirection: 'column',
     paddingLeft: 0,
