@@ -6,16 +6,15 @@ import { setState } from '../global/globalActions'
 import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
-    SHOW_LOADER,
+    SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
-    ON_BLUR,
     SHOW_DETAILS,
     NEXT_FOCUS,
-    SAVE_SUCCESSFUL,
-    CLEAR_ATTR_MAP_AND_SET_LOADER
+    CLEAR_ATTR_MAP_AND_SET_LOADER,
+    FIELD_ATTRIBUTE,
+    JOB_ATTRIBUTE
 } from '../../lib/constants'
 import {
-    EXTERNAL_DATA_STORE,
     DATA_STORE
 } from '../../lib/AttributeConstants'
 import CONFIG from '../../lib/config'
@@ -27,9 +26,18 @@ import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 export function getFieldAttribute(fieldAttributeMasterId, value) {
     return async function (dispatch) {
         dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
-        const fieldAttributes = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE')
+        const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
         let fieldAttribute = dataStoreService.getFieldAttribute(fieldAttributes.value, fieldAttributeMasterId)
         dispatch(getDataStoreAttrValueMap(value, fieldAttribute[0].dataStoreMasterId, fieldAttribute[0].dataStoreAttributeId, fieldAttribute[0].externalDataStoreMasterUrl, fieldAttribute[0].key))
+    }
+}
+
+export function getJobAttribute(jobAttributeMasterId, value) {
+    return async function (dispatch) {
+        dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
+        const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+        let jobAttribute = dataStoreService.getJobAttribute(jobAttributes.value, jobAttributeMasterId)
+        dispatch(getDataStoreAttrValueMap(value, jobAttribute[0].dataStoreMasterId, jobAttribute[0].dataStoreAttributeId, null, null))
     }
 }
 
@@ -64,7 +72,7 @@ export function setValidation(validationArray) {
 export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStoreMasterAttributeId, externalDataStoreUrl, attributeKey) {
     return async function (dispatch) {
         try {
-            dispatch(setState(SHOW_LOADER, true))
+            dispatch(setState(SHOW_LOADER_DS, true))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             let dataStoreResponse
             if (externalDataStoreUrl) {
@@ -178,14 +186,14 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
-                let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue))
+                let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, { latestPositionId }))
             } else {
-                let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements[rowId].formLayoutObject)
+                let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements[rowId].formLayoutObject)
                 formElements[rowId].formLayoutObject = formElementResult
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
             }
@@ -194,6 +202,33 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
                 errorMessage: error.message,
                 dataStoreAttrValueMap: {},
             }))
+        }
+    }
+}
+
+export function checkOfflineDS(searchText, dataStoreMasterId, dataStoreMasterAttributeId, externalDataStoreUrl, attributeKey, attributeTypeId) {
+    return async function (dispatch) {
+        try {
+            dispatch(setState(SHOW_LOADER_DS, true))
+            if (attributeTypeId == DATA_STORE) {
+                let { offlineDSPresent, dataStoreAttrValueMap } = await dataStoreService.checkForOfflineDsResponse(searchText, dataStoreMasterId)
+                if (offlineDSPresent) {
+                    if (_.isEmpty(dataStoreAttrValueMap)) {
+                        throw new Error('No records found for search')
+                    } else {
+                        dispatch(setState(SET_DATA_STORE_ATTR_MAP, {
+                            dataStoreAttrValueMap,
+                            searchText
+                        }))
+                    }
+                } else {
+                    dispatch(getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStoreMasterAttributeId, null, null))
+                }
+            } else {
+                dispatch(getDataStoreAttrValueMap(searchText, null, null, externalDataStoreUrl, attributeKey))
+            }
+        } catch (error) {
+            dispatch(setState(SHOW_ERROR_MESSAGE, { errorMessage: error.message, dataStoreAttrValueMap: {} }))
         }
     }
 }

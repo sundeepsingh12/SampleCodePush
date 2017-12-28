@@ -86,6 +86,7 @@ import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
+import OfflineDS from '../../containers/OfflineDS'
 import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
 import Scanner from '../../components/Scanner'
@@ -369,13 +370,22 @@ export const AppNavigator = StackNavigator({
     screen: DataStoreItemDetails
   },
   SaveActivated: {
-    screen: SaveActivated
+    screen: SaveActivated,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   Transient: {
-    screen: Transient
+    screen: Transient,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   CheckoutDetails: {
-    screen: CheckoutDetails
+    screen: CheckoutDetails,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   SignatureAndNps: {
     screen: SignatureAndNps
@@ -416,6 +426,9 @@ export const AppNavigator = StackNavigator({
   DataStoreDetails: {
     screen: DataStoreDetails
   },
+  OfflineDS: {
+    screen: OfflineDS
+  },
   CameraAttribute: {
     screen: CameraFieldAttribute,
   },
@@ -423,7 +436,7 @@ export const AppNavigator = StackNavigator({
     screen: ImageDetailsView,
   }
 },
-   {
+  {
     cardStyle: {
       backgroundColor: 'white'
     }
