@@ -17,7 +17,9 @@ import {
     NEXT_FOCUS,
     TabScreen,
     HomeTabNavigatorScreen,
-    CLEAR_FORM_LAYOUT
+    CLEAR_FORM_LAYOUT,
+    SET_FORM_LAYOUT_STATE,
+    SET_UPDATE_DRAFT
 } from '../../lib/constants'
 
 import {
@@ -34,6 +36,7 @@ import { transientStatusService } from '../../services/classes/TransientStatusSe
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import _ from 'lodash'
 import { performSyncService } from '../home/homeActions'
+import { draftService } from '../../services/classes/DraftService'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
@@ -50,17 +53,19 @@ export function _setErrorMessage(message) {
     }
 }
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId) {
+export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId) {
     return async function (dispatch) {
         try {
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId)
+            const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
             dispatch(setState(BASIC_INFO, {
                 statusId,
                 statusName,
                 jobTransactionId,
-                latestPositionId: sortedFormAttributesDto.latestPositionId
+                latestPositionId: sortedFormAttributesDto.latestPositionId,
+                draftStatusId
             }))
             dispatch(setState(IS_LOADING, false))
         } catch (error) {
@@ -76,6 +81,7 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = _.cloneDeep(formElement)
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, null, event);
         dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributeDto))
+        dispatch(setState(SET_UPDATE_DRAFT, true))
     }
 }
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSaveDisabled, sequenceId) {
@@ -158,5 +164,33 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
             cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
         }
         dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS))
+    }
+}
+
+export function saveDraftInDb(formLayoutState, jobMasterId) {
+    return async function (dispatch) {
+        draftService.saveDraftInDb(formLayoutState, jobMasterId)
+    }
+}
+
+export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
+    return async function (dispatch) {
+        let formLayoutState = draftService.restoreDraftFromDb(jobTransactionId, statusId, jobMasterId)
+        dispatch(setState(SET_FORM_LAYOUT_STATE, formLayoutState))
+    }
+}
+
+export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId) {
+    return async function (dispatch) {
+        if (isDraftRestore) {
+            dispatch(restoreDraft(jobTransactionId, statusId))
+        } else {
+            if (editableFormLayoutState) {
+                dispatch(setState(SET_FORM_LAYOUT_STATE, editableFormLayoutState))
+            }
+            else {
+                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId))
+            }
+        }
     }
 }

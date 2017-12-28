@@ -1,6 +1,6 @@
 'use strict'
 
-import {Record} from 'immutable'
+import { Record } from 'immutable'
 
 /**
  * Initial state of formLayout
@@ -26,16 +26,18 @@ import {Record} from 'immutable'
     other elements are as per their names
  */
 var InitialState = Record({
-    currentElement : 0,
-    latestPositionId : 0,
-    isSaveDisabled : true,
-    statusId : 0,
-    jobTransactionId : 0,
-    statusName : '',
-    formElement : {},
-    isLoading : false,
-    errorMessage : '',
-    paymentAtEnd : {}
+        currentElement: 0,
+        latestPositionId: 0,
+        isSaveDisabled: true,
+        statusId: 0,
+        jobTransactionId: 0,
+        statusName: '',
+        formElement: {},
+        isLoading: false,
+        errorMessage: '',
+        paymentAtEnd: {},
+        draftStatusId: null,
+        updateDraft: false
 })
 
 export default InitialState

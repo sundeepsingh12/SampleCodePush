@@ -86,6 +86,10 @@ class SaveActivated extends Component {
         return { header: null }
     }
 
+    componentWillUnmount() {
+        BackHandler.removeEventListener(HardwareBackPress, this._goBack)
+    }
+    
     componentDidMount() {
         if (!this.props.navigation.state.params.calledFromNewJob) {
             this.props.actions.addTransactionAndPopulateView(

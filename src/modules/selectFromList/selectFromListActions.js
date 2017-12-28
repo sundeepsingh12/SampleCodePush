@@ -67,7 +67,7 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
                 if (calledFromArray)
                     dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, selectFromListState[0].value, formElement, rowId))
                 else
-                    dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value))
+                    dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value, { latestPositionId }))
             }
             dispatch(setState(INPUT_TEXT_VALUE, ''))
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))

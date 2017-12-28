@@ -71,7 +71,10 @@ class CameraFieldAttribute extends Component {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
-
+    componentWillUnmount() {
+        this.props.actions.setState(SET_SHOW_IMAGE, false)
+        this.props.actions.setState(SET_IMAGE_DATA, '')
+    }
     componentDidMount() {
         switch (this.props.navigation.state.params.currentElement.attributeTypeId) {
             case CAMERA: this.setState({ quality: 'low' })
@@ -85,6 +88,7 @@ class CameraFieldAttribute extends Component {
             }
         }
         this.setState({ torchOff: Camera.constants.FlashMode.off })
+        this.props.actions.setExistingImage(this.props.navigation.state.params.currentElement)
     }
     _setTorchOn = () => {
         this.setState({ torchOff: Camera.constants.FlashMode.on })
@@ -196,7 +200,7 @@ class CameraFieldAttribute extends Component {
                         <View style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
                                 <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
-                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId)
+                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.latestPositionId)
                                     this.props.navigation.goBack()
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
@@ -220,7 +224,7 @@ class CameraFieldAttribute extends Component {
         const options = {};
         this.camera.capture()
             .then((data) => {
-                this.camera.stopCapture()
+                //this.camera.stopCapture()
                 console.log('image data', data)
                 this.props.actions.setState(SET_SHOW_IMAGE, true)
                 this.props.actions.setState(SET_IMAGE_DATA, data.data)

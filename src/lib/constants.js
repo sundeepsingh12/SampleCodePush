@@ -168,6 +168,7 @@ module.exports = keyMirror({
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
+    LAST_JOB_COMPLETED_TIME:null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -181,6 +182,7 @@ module.exports = keyMirror({
     Datastore_Master_DB: null,
     DataStore_DB: null,
     TABLE_TRANSACTION_LOGS: null,
+    TABLE_DRAFT: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -206,6 +208,8 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
     CLEAR_FORM_LAYOUT: null,
+    SET_DRAFT: null,
+    SET_UPDATE_DRAFT: null,
 
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
@@ -417,6 +421,12 @@ module.exports = keyMirror({
     SET_OFFLINEDS_INITIAL_STATE: null,
     SET_LAST_SYNC_TIME: null,
 
+    //FormLayoutImpl
+    PREVIOUSLY_TRAVELLED_DISTANCE: null,
+    TRANSACTION_TIME_SPENT: null,
+    TRACK_BATTERY: null,
+    NPSFEEDBACK_VALUE: null,
+    IS_SERVER_REACHABLE: null,
 })
 
 
