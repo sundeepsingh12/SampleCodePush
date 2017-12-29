@@ -50,12 +50,12 @@ class QrCodeScanner extends Component {
 
     _handleQrCodeRead(e) {
         this.props.actions.setState(SCANNING, false)
+        this.props.navigation.goBack(null)
         if (this.props.navigation.state.params.calledFromArray) {
             this.props.navigation.state.params.returnData(e.data, this.props.navigation.state.params.currentElement)
         } else {
             this.props.navigation.state.params.returnData(e.data)
         }
-        this.props.navigation.goBack(null)
     }
 
     render() {

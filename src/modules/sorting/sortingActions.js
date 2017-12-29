@@ -4,7 +4,7 @@ import {
     SORTING_SEARCH_VALUE,
     SORTING_ITEM_DETAILS,
     ERROR_MESSAGE,
-    SHOW_LOADER
+    SORTING_LOADER
 } from '../../lib/constants'
 import { sortingService } from '../../services/classes/Sorting'
 import { setState } from '../global/globalActions'
@@ -21,7 +21,7 @@ import {TOKEN_MISSING} from '../../lib/AttributeConstants'
 export function getDataForSortingAndPrinting(referenceNumber) {
     return async function (dispatch) {
         try {
-            dispatch(setState(SHOW_LOADER, true))
+            dispatch(setState(SORTING_LOADER, true))
             const token =  await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             if (!token && token.value != null && token.value != undefined) {
                 throw new Error(TOKEN_MISSING)

@@ -19,20 +19,23 @@ export default function jobDetailsReducer(state = initialState, action) {
         case JOB_DETAILS_FETCHING_START:
             return state.set('jobDetailsLoading', true)
         case IS_MISMATCHING_LOCATION:
-            return state.set('statusList', action.payload)
-        case JOB_DETAILS_FETCHING_END:
-            return state.set('fieldDataList', action.payload.fieldDataList)
-                .set('jobDataList', action.payload.jobDataList)
-                .set('jobTransaction', action.payload.jobTransaction)
-                .set('jobDetailsLoading', false)
-                .set('currentStatus', action.payload.currentStatus)
-                .set('errorMessage', action.payload.errorMessage)
-                .set('draftStatusInfo', action.payload.draftStatusInfo)
+            return state.set('statusList',action.payload)
+        case JOB_DETAILS_FETCHING_END :
+            return state.set('fieldDataList',action.payload.fieldDataList)
+                        .set('jobDataList',action.payload.jobDataList)
+                        .set('jobTransaction',action.payload.jobTransaction)
+                        .set('jobDetailsLoading',false)
+                        .set('currentStatus',action.payload.currentStatus)
+                        .set('errorMessage',action.payload.errorMessage)
+                        .set('statusRevertList',action.payload.parentStatusList)
+                        .set('draftStatusInfo', action.payload.draftStatusInfo)
         case RESET_STATE:
             return initialState
         case RESET_STATE_FOR_JOBDETAIL:
-            return state.set('errorMessage', false)
-                .set('draftStatusInfo', {})
+            return state.set('errorMessage',false) 
+                        .set('statusRevertList',[])
+                        .set('jobDetailsLoading',false)
+                        .set('draftStatusInfo', {})              
     }
     return state
 }

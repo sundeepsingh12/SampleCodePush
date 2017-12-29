@@ -7,7 +7,7 @@ describe('PieChart service', () => {
     const pendingStatusIds = [12,13]
     const failStatusIds = [14,15]
     const successStatusIds = [16,17] 
-    const pendingJobTransactions = [{
+    const allJobTransactions = [{
         id: 1,
         jobStatusId: 12
       }, {

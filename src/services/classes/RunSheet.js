@@ -1,77 +1,56 @@
 import {
-    JOB_STATUS,
-    TABLE_RUNSHEET,
-    TABLE_JOB_TRANSACTION
-  } from '../../lib/constants'
-  
-  import {
-    keyValueDBService
-  } from './KeyValueDBService'
-  
-  import * as realm from '../../repositories/realmdb'
-  import {jobStatusService} from './JobStatus'
-  import _ from 'lodash'
-  
-  class RunSheet {
-  
-    /**
-     * 
-     * @param {*} jobSummaries 
-     */
-    async updateRunSheetSummary() {
-        const jobTransactionArray = realm.getAll(TABLE_JOB_TRANSACTION)
-        const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
-        const pendingStatusMap = this.idDtoMap(allStatusIds.pendingStatusIds)
-        const runsheetArray = realm.getAll(TABLE_RUNSHEET)
-        let runsheetList = {}
+  TABLE_RUNSHEET,
+  TABLE_JOB_TRANSACTION
+} from '../../lib/constants'
 
-       runsheetArray.forEach(runsheetObject=>{
-         const runsheetCLone = {...runsheetObject}
-         runsheetCLone.pendingCount = 0
-         runsheetList[runsheetObject.id]= {...runsheetCLone}
-       })
-        for (let index in jobTransactionArray) {
-            if(pendingStatusMap[jobTransactionArray[index].jobStatusId] == 1 && (runsheetList[jobTransactionArray[index].runsheetId])){
-            
-             runsheetList[jobTransactionArray[index].runsheetId].pendingCount +=1
-            }
-        }
-        const runsheets = {
-            tableName: TABLE_RUNSHEET,
-            value: Object.values(runsheetList)
-          }
+import * as realm from '../../repositories/realmdb'
+import {
+  jobStatusService
+} from './JobStatus'
 
-        realm.performBatchSave(runsheets)
-         
+class RunSheet {
+
+  /**
+   * 
+   * @param {*} jobSummaries 
+   */
+  async updateRunSheetSummary() {
+    let query = "deleteFlag != 1";
+    const status = ['pendingCount','failCount','successCount']
+    const jobTransactionArray = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
+    const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
+    const pendingStatusMap = this.idDtoMap(allStatusIds.pendingStatusIds, 1)
+    const failStatusMap = this.idDtoMap(allStatusIds.failStatusIds, 2)
+    const successStatusMap = this.idDtoMap(allStatusIds.successStatusIds, 3)
+    let allStatusMap =  { ...pendingStatusMap, ...failStatusMap, ...successStatusMap};
+    const runsheetArray = realm.getAll(TABLE_RUNSHEET)
+    let runsheetList = {}
+    runsheetArray.forEach(runsheetObject => {
+      const runsheetCLone = { ...runsheetObject } 
+      runsheetCLone.pendingCount = 0 ; runsheetCLone.failCount = 0 ; runsheetCLone.successCount = 0 ;
+      runsheetList[runsheetObject.id] = { ...runsheetCLone }
+    })
+    for (let index in jobTransactionArray) {
+      if (allStatusMap[jobTransactionArray[index].jobStatusId] && (runsheetList[jobTransactionArray[index].runsheetId])) {
+        runsheetList[jobTransactionArray[index].runsheetId][status[allStatusMap[jobTransactionArray[index].jobStatusId] -1 ]] += 1
+      }
     }
-
-    idDtoMap(dtoList){
-        const listMap = dtoList.reduce(function ( total, current ) {
-            total[ current ] =  1
-            return total;
-        }, {});
-        return listMap
-      
+    const runsheets = {
+      tableName: TABLE_RUNSHEET,
+      value: Object.values(runsheetList)
     }
-    /**A generic method for getting jobSummary from store given a particular jobStatusId and jobMasterId
-     * 
-     * @param {*} jobMasterId 
-     * @param {*} statusId 
-     * 
-     * Sample Return Type
-     * 
-     * {
-      * id: 2260120,
-      * userId: 4957,
-      * cityId: 744,
-      * companyId: 295,
-      * jobStatusId:4814,
-      * count:1,
-        date:'2017-06-26 00:00:00'
-     * }
-     */
-  
+    realm.performBatchSave(runsheets)
   }
-  
-  export let runSheetService = new RunSheet()
-  
+
+  idDtoMap(dtoList, value) {
+    const listMap = dtoList.reduce(function (total, current) {
+      total[current] = value
+      return total;
+    }, {});
+    return listMap
+
+  }
+
+}
+
+export let runSheetService = new RunSheet()

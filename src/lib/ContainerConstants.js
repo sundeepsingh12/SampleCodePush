@@ -1,4 +1,9 @@
 module.exports = {
+
+    //common_CONSTANTS
+    CANCEL: 'Cancel',
+    OK: 'Ok',
+    
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
     INTERNAL_ERROR: 'Internal Error.',
@@ -20,12 +25,25 @@ module.exports = {
 
     //Home Constants
     JOB_ASSIGNMENT_DISPLAY: 'Job Assignment',
-    CUSTOM_APP_DISPLAY:'Web URL',
-    SORTING_DISPLAY:'Sort Parcels',
+    CUSTOM_APP_DISPLAY: 'Web URL',
+    SORTING_DISPLAY: 'Sort Parcels',
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
 
     //New Job
-    NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!'
+    NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
+
+    //Offline DS
+    DOWNLOADING_OFFLINE_DS: 'Downloading',
+    DOWNLOAD_SUCCESSFUL: 'Download Successful',
+    DOWNLOAD_FAILED: 'Download Failed',
+    CLOSE: 'Close',
+
+    //status revert 
+    REVERT_STATUS_TO: 'Revert Status to',
+    REVERT_NOT_ALLOWED_INCASE_OF_SYNCING: 'Syncing with server.\nPlease try after some time.',
+    CONFIRM_REVERT: 'Confirm Revert',
+    PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
+    REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.'
 }

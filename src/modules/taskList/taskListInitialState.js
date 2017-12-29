@@ -9,7 +9,8 @@ var InitialState = Record({
     isFutureRunsheetEnabled : false,
     selectedDate: null,
     isCalendarVisible:false,
-    searchText:'',
+    searchText:null,
+    searchTap: null,
 })
 
 export default InitialState

@@ -60,6 +60,7 @@ import NewJobInitialState from './modules/newJob/newJobInitialState'
 import SaveActivatedState from './modules/saveActivated/saveActivatedInitialState'
 import TransientStatusState from './modules/transientStatus/transientInitialState'
 import BulkInitialState from './modules/bulk/bulkInitialState'
+import OfflineDataStoreInitialState from './modules/offlineDS/offlineDSInitialState'
 // import ProfileInitialState from './modules/profile/profileInitialState'
 
 
@@ -68,7 +69,7 @@ import BulkInitialState from './modules/bulk/bulkInitialState'
  */
 import pack from '../package'
 import AppWithNavigationState from './modules/navigators/AppNavigator'
- 
+
 var VERSION = pack.version
 
 /**
@@ -86,12 +87,13 @@ function getInitialState() {
     home: (new HomeInititalState()),
     listing: (new ListingInitialState()),
     skuListing: new SkuListingInitialState(),
-    formLayout : new FormLayoutInitialState(),
+    formLayout: new FormLayoutInitialState(),
     sequence: new SequenceInitialState(),
-    newJob : new NewJobInitialState(),
-    transientStatus : new TransientStatusState(),
-    saveActivated : new SaveActivatedState(),
-    bulk:new BulkInitialState(),
+    newJob: new NewJobInitialState(),
+    transientStatus: new TransientStatusState(),
+    saveActivated: new SaveActivatedState(),
+    bulk: new BulkInitialState(),
+    offlineDS: new OfflineDataStoreInitialState(),
   }
   return _initState
 }
@@ -107,21 +109,21 @@ function getInitialState() {
 
 export default function native(platform) {
   // configureStore will combine modules from FarEye and Main application
-      // it will then create the store based on aggregate state from all modules
-      const store = configureStore(getInitialState())
+  // it will then create the store based on aggregate state from all modules
+  const store = configureStore(getInitialState())
 
-      store.dispatch(setPlatform(platform))
-      store.dispatch(setVersion(VERSION))
-      store.dispatch(setStore(store))
+  store.dispatch(setPlatform(platform))
+  store.dispatch(setVersion(VERSION))
+  store.dispatch(setStore(store))
 
   class Fareye extends Component {
 
     render() {
-        return (
-            <Provider store={store}>
-                <AppWithNavigationState />
-            </Provider>
-        );
+      return (
+        <Provider store={store}>
+          <AppWithNavigationState />
+        </Provider>
+      );
     }
   }
 

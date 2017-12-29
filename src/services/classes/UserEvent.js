@@ -31,8 +31,8 @@ class UserEvent {
       cityId: userDetails.value.cityId,
       eventId: eventID,
       description: description,
-      latitude: userSummary.value.lastLat, 
-      longitude: userSummary.value.lastLng,
+      latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
+      longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0,
       dateTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
     }
     let olduserEventLogArray = await keyValueDBService.getValueFromStore(USER_EVENT_LOG)

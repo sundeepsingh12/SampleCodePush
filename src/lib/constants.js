@@ -80,7 +80,8 @@ module.exports = keyMirror({
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
-
+    SEARCH_TAP: null,
+    
     //Home Container
     PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
@@ -164,6 +165,7 @@ module.exports = keyMirror({
     SAVE_ACTIVATED: null,
     LAST_SYNC_WITH_SERVER: null,
     CUSTOM_NAMING: null,
+    LAST_DATASTORE_SYNC_TIME: null,
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
@@ -178,6 +180,8 @@ module.exports = keyMirror({
     TABLE_JOB_TRANSACTION_CUSTOMIZATION: null,
     TABLE_TRACK_LOGS: null,
     TABLE_SERVER_SMS_LOG: null,
+    Datastore_Master_DB: null,
+    DataStore_DB: null,
     TABLE_TRANSACTION_LOGS: null,
     TABLE_DRAFT: null,
 
@@ -243,8 +247,10 @@ module.exports = keyMirror({
     DataStoreDetails: null,
     LiveJobs: null,
     QrCodeScanner: null,
+    OfflineDS: null,
     CameraAttribute: null,
     ImageDetailsView: null,
+    JobDetailsV2: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -285,7 +291,7 @@ module.exports = keyMirror({
     //Data Store
     SET_VALIDATIONS: null,
     SET_DATA_STORE_ATTR_MAP: null,
-    SHOW_LOADER: null,
+    SHOW_LOADER_DS: null,
     SHOW_ERROR_MESSAGE: null,
     SET_SEARCH_TEXT: null,
     SHOW_DETAILS: null,
@@ -355,6 +361,7 @@ module.exports = keyMirror({
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
+    SORTING_LOADER: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,
@@ -408,6 +415,13 @@ module.exports = keyMirror({
     SET_SHOW_IMAGE: null,
     SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
+
+    //Offline Actions
+    SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
+    UPDATE_PROGRESS_BAR: null,
+    SET_DOWNLOADING_STATUS: null,
+    SET_OFFLINEDS_INITIAL_STATE: null,
+    SET_LAST_SYNC_TIME: null,
 
     //FormLayoutImpl
     PREVIOUSLY_TRAVELLED_DISTANCE: null,

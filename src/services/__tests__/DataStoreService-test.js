@@ -7,6 +7,8 @@ import {
 } from '../../lib/constants'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import * as realm from '../../repositories/realmdb'
+import moment from 'moment'
+import { keyValueDBService } from '../classes/KeyValueDBService';
 
 describe('test getValidationsArray', () => {
     it('should return validation array having all validations', () => {
@@ -375,6 +377,298 @@ describe('test getFieldAttribute', () => {
     })
 })
 
+
+describe('test getJobAttribute', () => {
+
+    it('should throw jobAttributes missing error', () => {
+        const message = 'jobAttributes missing'
+        try {
+            dataStoreService.getJobAttribute(null, 123)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw jobAttributeMasterId missing error', () => {
+        const message = 'jobAttributeMasterId missing'
+        try {
+            dataStoreService.getJobAttribute('abhi', null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should return JobAttribute', () => {
+        const jobAttributes = [{
+            id: 123
+        }, {
+            id: 456
+        }]
+        const jobAttributeMasterId = 123
+        expect(dataStoreService.getFieldAttribute(jobAttributes, jobAttributeMasterId)).toEqual([{ id: 123 }])
+    })
+})
+
+
+
+describe('test fetchDataStoreMaster', () => {
+    it('should return jsonResponse', () => {
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(null);
+        dataStoreService.fetchDataStoreMaster('token')
+        expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+    })
+
+    it('should throw Token missing error', () => {
+        const message = 'Token Missing'
+        try {
+            dataStoreService.fetchDataStoreMaster(null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+})
+
+
+describe('test fetchDataStore', () => {
+    it('should return jsonResponse', () => {
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(null);
+        dataStoreService.fetchDataStore(1, 123, '22/08/2017', 0)
+        expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+    })
+
+    it('should throw Token missing error', () => {
+        const message = 'Token Missing'
+        try {
+            dataStoreService.fetchDataStore(null, 123, '22/08/2017', 0)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw datastoreMasterId missing error', () => {
+        const message = 'datastoreMasterId missing'
+        try {
+            dataStoreService.fetchDataStore(1, null, '22/08/2017', 0)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+})
+
+
+describe('test getDataStoreMasterIdMappedWithFieldAttribute', () => {
+    it('should throw fieldAttributes missing error', () => {
+        const message = 'fieldAttributes missing'
+        try {
+            dataStoreService.getDataStoreMasterIdMappedWithFieldAttribute(null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should return dataStoreMasterIdList', () => {
+        const fieldAttributes = [{
+            dataStoreMasterId: 123,
+            attributeTypeId: 44
+        }, {
+            dataStoreMasterId: 234,
+            attributeTypeId: 62
+        }]
+        const dataStoreMasterIdList = [123]
+        expect(dataStoreService.getDataStoreMasterIdMappedWithFieldAttribute(fieldAttributes)).toEqual(dataStoreMasterIdList)
+    })
+})
+
+
+describe('test getDataStoreMasterList', () => {
+    it('should throw dataStoreMasterjsonResponse missing error', () => {
+        const message = 'dataStoreMasterjsonResponse missing'
+        try {
+            dataStoreService.getDataStoreMasterList(null, 123)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw dataStoreMasterIdList missing error', () => {
+        const message = 'dataStoreMasterIdList missing'
+        try {
+            dataStoreService.getDataStoreMasterList(123, null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should return dataStoreMasterIdList', () => {
+        const dataStoreMasterjsonResponse = [{
+            dsMasterId: 123,
+            attributeTypeId: 22,
+            key: 'test',
+            label: 'test',
+            searchIndex: true,
+            uniqueIndex: false,
+            dsMasterTitle: 'test'
+        }, {
+            dsMasterId: 233,
+            attributeTypeId: 12,
+            key: 'test1',
+            label: 'test1',
+            searchIndex: false,
+            uniqueIndex: true,
+            dsMasterTitle: 'test1'
+        }]
+        const dataStoreMasterIdList = [123]
+        const returnParams = {
+            dataStoreIdVSTitleMap: {
+                '123': 'test'
+            },
+            dataStoreMasterList: [{
+                attributeTypeId: 22,
+                datastoreMasterId: 123,
+                id: 0,
+                key: 'test',
+                label: 'test',
+                lastSyncTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+                searchIndex: true,
+                uniqueIndex: false,
+            }]
+        }
+        expect(dataStoreService.getDataStoreMasterList(dataStoreMasterjsonResponse, dataStoreMasterIdList)).toEqual(returnParams)
+    })
+})
+
+describe('test getLastSyncTimeInFormat', () => {
+    it('should throw dataStoreMasterjsonResponse missing error', () => {
+        const message = 'lastSyncTime not present'
+        try {
+            dataStoreService.getLastSyncTimeInFormat(null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+})
+
+describe('test getDataStoreMasters', () => {
+    it('should throw Token missing error', () => {
+        const message = 'Token Missing'
+        try {
+            dataStoreService.getDataStoreMasters(null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should return dataStoreIdVSTitleMap', () => {
+        const dataStoreMasterjsonResponse = [{
+            dsMasterId: 123,
+            attributeTypeId: 22,
+            key: 'test',
+            label: 'test',
+            searchIndex: true,
+            uniqueIndex: false,
+            dsMasterTitle: 'test'
+        }, {
+            dsMasterId: 233,
+            attributeTypeId: 12,
+            key: 'test1',
+            label: 'test1',
+            searchIndex: false,
+            uniqueIndex: true,
+            dsMasterTitle: 'test1'
+        }]
+        const dataStoreMasterIdList = [123]
+        const fieldAttributes = [{ attributeTypeId: 44, dataStoreMasterId: 123 }]
+        const returnParams = {
+            dataStoreIdVSTitleMap: {
+                '123': 'test'
+            },
+            dataStoreMasterList: [{
+                attributeTypeId: 22,
+                datastoreMasterId: 123,
+                id: 0,
+                key: 'test',
+                label: 'test',
+                lastSyncTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+                searchIndex: true,
+                uniqueIndex: false,
+            }]
+        }
+
+        dataStoreService.fetchDataStoreMaster = jest.fn()
+        dataStoreService.fetchDataStoreMaster.mockReturnValue({ status: 200, json: dataStoreMasterjsonResponse })
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(fieldAttributes)
+        dataStoreService.getDataStoreMasterIdMappedWithFieldAttribute = jest.fn()
+        dataStoreService.getDataStoreMasterIdMappedWithFieldAttribute.mockReturnValue(dataStoreMasterIdList)
+        realm.deleteSpecificTableRecords = jest.fn()
+        dataStoreService.getDataStoreMasterList = jest.fn()
+        dataStoreService.getDataStoreMasterList.mockReturnValue(returnParams)
+        realm.performBatchSave = jest.fn()
+        dataStoreService.getDataStoreMasters('temp_token').then(() => {
+            expect(dataStoreService.fetchDataStoreMaster).toHaveBeenCalledTimes(1)
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+            expect(dataStoreService.getDataStoreMasterIdMappedWithFieldAttribute).toHaveBeenCalledTimes(1)
+            expect(realm.deleteSpecificTableRecords).toHaveBeenCalledTimes(1)
+            expect(dataStoreService.getDataStoreMasterList).toHaveBeenCalledTimes(1)
+            expect(realm.performBatchSave).toHaveBeenCalledTimes(1)
+            expect(result).toEqual(returnParams.dataStoreIdVSTitleMap)
+        })
+    })
+})
+
+
+
+describe('test fetchDatastoreAndSaveInDB', () => {
+    it('should throw Token missing error', () => {
+        const message = 'Token Missing'
+        try {
+            dataStoreService.fetchDatastoreAndSaveInDB(null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw datastoreMasterId missing error', () => {
+        const message = 'datastoreMasterId missing'
+        try {
+            dataStoreService.fetchDatastoreAndSaveInDB('temp', null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+
+    it('should return totalElements && numberOfElements', () => {
+        const dataStoreJsonResponse = {
+            content: [{
+                id: 123,
+                dataStoreAttributeValueMap: {
+                    temp_name: 'temp'
+                }
+            }, {
+                id: 1234,
+                dataStoreAttributeValueMap: {
+                    temp_name: 'temp'
+                }
+            }],
+            totalElements: 5000,
+            numberOfElements: 500
+        }
+        dataStoreService.fetchDataStore = jest.fn()
+        dataStoreService.fetchDataStore.mockReturnValue({ status: 200, json: dataStoreJsonResponse })
+        dataStoreService.saveDataStoreToDB = jest.fn()
+        dataStoreService.fetchDatastoreAndSaveInDB('temp_token').then(() => {
+            expect(dataStoreService.fetchDataStore).toHaveBeenCalledTimes(1)
+            expect(dataStoreService.saveDataStoreToDB).toHaveBeenCalledTimes(1)
+            expect(result).toEqual({
+                totalElements: dataStoreJsonResponse.totalElements,
+                numberOfElements: dataStoreJsonResponse.numberOfElements
+            })
+        })
+    })
+})
 
 function getMapFromObject(obj) {
     let strMap = new Map();

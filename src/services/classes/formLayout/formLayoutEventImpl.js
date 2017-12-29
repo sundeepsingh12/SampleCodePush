@@ -42,6 +42,7 @@ import {
     EXTERNAL_DATA_STORE
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
+import {summaryAndPieChartService} from '../SummaryAndPieChart'
 
 export default class FormLayoutEventImpl {
 
@@ -233,8 +234,17 @@ export default class FormLayoutEventImpl {
         return transactionLogs
     }
 
-    async _updateJobSummary(jobTransaction, statusId, jobTransactionIdList) {
-        const prevStatusId = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+    /**
+     * update jobSummaryDb count after completing transactions.
+     * 
+     * @param {*jobTransaction} jobTransaction 
+     * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
+     * @param {*statusId} statusId // new transaction status Id
+     * 
+     */
+
+    async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){
+        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
         const count = (jobTransactionIdList) ? jobTransactionIdList.length : 1
         const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
@@ -250,10 +260,20 @@ export default class FormLayoutEventImpl {
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
 
-    async _updateRunsheetSummary(jobTransaction, statusCategory, jobTransactionIdList) {
-        const setRunsheetSummary = [], runSheetList = []
-        const status = ['pendingCount', 'failCount', 'successCount']
-        const prevStatusId = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+   /**
+     * update runSheetDb count after completing transactions.
+     * and returns an object containing runSheetArray
+     * 
+     * @param {*jobTransaction} jobTransaction 
+     * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
+     * @param {*statusCategory} statusCategory // new transaction status category
+     * 
+     */
+
+    async _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList){
+        const setRunsheetSummary = [],runSheetList = []
+        const status = ['pendingCount','failCount','successCount']
+        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
         const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, null)
         const runsheetMap = runSheetData.reduce(function (total, current) {
@@ -273,8 +293,7 @@ export default class FormLayoutEventImpl {
             runsheetMap[jobTransaction.runsheetId][status[statusCategory - 1]] += 1
             runSheetList.push(runsheetMap[jobTransaction.runsheetId])
         }
-        return { tableName: TABLE_RUNSHEET, value: runSheetList }
-        // realm.updateRecordOnTableListData(TABLE_RUNSHEET,runSheetList,Object.keys(runSheetList));
+        return {tableName : TABLE_RUNSHEET, value : runSheetList}
     }
 
 
@@ -486,6 +505,8 @@ export default class FormLayoutEventImpl {
         }
         let job = Object.assign({}, realmJobObject)
         switch (status.actionOnStatus) {
+            case 0: job.status = 2; // jobStatus 2 is for  assigned
+                break;
             case 1: job.status = 3; // jobStatus 3 is for closed when actionOnStatus is success
                 break;
             case 2: job.status = 1;// jobStatus 1 is for unassigned
