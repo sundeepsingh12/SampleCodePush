@@ -37,6 +37,8 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import _ from 'lodash'
 import { performSyncService } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
+import { dataStoreService } from '../../services/classes/DataStoreService'
+import { UNIQUE_VALIDATION_FAILED } from '../../lib/ContainerConstants'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
@@ -121,7 +123,7 @@ export function updateFieldData(attributeId, value, formElement) {
 export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject) {
     return function (dispatch) {
         const cloneFormElement = _.cloneDeep(formElement)
-        console.log('fieldDataListObject',fieldDataListObject)
+        console.log('fieldDataListObject', fieldDataListObject)
         cloneFormElement.get(attributeMasterId).value = value
         const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, fieldDataListObject.fieldDataList, NEXT_FOCUS);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
@@ -191,6 +193,24 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
             else {
                 dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId))
             }
+        }
+    }
+}
+
+export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSaveDisabled, value, latestPositionId, jobTransaction) {
+    return async function (dispatch) {
+        try {
+            let isValuePresentInAnotherTransaction = await dataStoreService.checkForUniqueValidation(value, fieldAtrribute.fieldAttributeMasterId)
+            if (isValuePresentInAnotherTransaction) {
+                formElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
+                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, formElement, isSaveDisabled, value, latestPositionId, jobTransaction))
+            } else {
+                formElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = ''
+                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, formElement, isSaveDisabled, value, latestPositionId, jobTransaction))
+            }
+        }
+        catch (error) {
+            console.log(error)
         }
     }
 }

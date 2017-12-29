@@ -31,7 +31,8 @@ import {
 import {
   SET_FORM_LAYOUT_STATE,
   SET_DRAFT,
-  SET_UPDATE_DRAFT
+  SET_UPDATE_DRAFT,
+  ERROR_MESSAGE
 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 
@@ -60,12 +61,24 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FormLayout extends Component {
+
   componentDidUpdate() {
     if (this.props.updateDraft) {
       this.saveDraft()
       this.props.actions.setState(SET_UPDATE_DRAFT, false)
     }
+    if (this.props.errorMessage && this.props.errorMessage != '') {
+      Toast.show({
+        text: this.props.errorMessage,
+        position: "bottom" | "center",
+        buttonText: 'Okay',
+        type: 'danger',
+        duration: 10000
+      })
+      this.props.actions.setState(ERROR_MESSAGE, '')
+    }
   }
+
   saveDraft = () => {
     if (this.props.jobTransactionId != 0) {
       let formLayoutState = {
@@ -90,10 +103,10 @@ class FormLayout extends Component {
         title="Draft"
         message={draftMessage}
         onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={()=>this._onCancel()} />
+        onCancelPressed={() => this._onCancel()} />
     return view
   }
-  _onCancel=()=> {
+  _onCancel = () => {
     this.props.actions.setState(SET_DRAFT, null)
   }
   _goToFormLayoutWithDraft = () => {
@@ -174,13 +187,6 @@ class FormLayout extends Component {
 
   render() {
     const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
-    if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
-      Toast.show({
-        text: this.props.errorMessage,
-        position: 'bottom',
-        buttonText: 'Okay'
-      })
-    }
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
       <Footer style={[style.footer]}>

@@ -33,5 +33,8 @@ module.exports = {
     DOWNLOADING_OFFLINE_DS: 'Downloading',
     DOWNLOAD_SUCCESSFUL: 'Download Successful',
     DOWNLOAD_FAILED: 'Download Failed',
-    CLOSE: 'Close'
+    CLOSE: 'Close',
+
+    //Form Layout Container
+    UNIQUE_VALIDATION_FAILED: 'This code is already in use'
 }
