@@ -87,6 +87,9 @@ export class keyValueDb {
       default:
         checkCondition = true;
     }
+    if(schemaName=='USER_EVENT_LOG'){
+      console.log('rfr',validate(value, schemaInstance))
+    }
     if (value && (checkCondition || validate(value, schemaInstance).valid)) {
       return store.save(schemaName, {
         value
@@ -126,7 +129,10 @@ export class keyValueDb {
         break;
       case 'JOB_STATUS':
         schemaInstance = require('../repositories/schema/jobStatus');
-        break;   
+        break; 
+      case 'USER_SUMMARY':
+        schemaInstance = require('../repositories/schema/userSummary');
+        break;
     }
     if (value && validate(value, schemaInstance)) {
       return store.update(schemaName, value)

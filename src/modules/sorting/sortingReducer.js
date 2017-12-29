@@ -5,7 +5,7 @@ import {
     SORTING_SEARCH_VALUE,
     SORTING_ITEM_DETAILS,
     ERROR_MESSAGE,
-    SHOW_LOADER,
+    SORTING_LOADER,
     RESET_STATE
 } from '../../lib/constants'
 
@@ -14,7 +14,7 @@ const initialState = new InitialState()
 export default function sortingReducer(state = initialState, action) {
     if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
    switch (action.type) {
-       case SHOW_LOADER:
+       case SORTING_LOADER:
            return state.set('loaderRunning', action.payload)
                        .set('sortingDetails',{})
        case SORTING_SEARCH_VALUE:

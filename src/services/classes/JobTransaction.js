@@ -11,6 +11,7 @@ import {
     TAB,
     JOB_ATTRIBUTE,
     TABLE_RUNSHEET,
+    PENDING_SYNC_TRANSACTION_IDS
 } from '../../lib/constants'
 
 import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
@@ -283,9 +284,9 @@ class JobTransaction {
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
         let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
         let jobStatusQuery = statusMap.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-        const jobTransactionQuery = `${jobMasterQuery} AND (${jobStatusQuery})`
+        const jobTransactionQuery = `deleteFlag != 1 AND (${jobMasterQuery}) AND (${jobStatusQuery})`
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, SEQ_SELECTED)
-        return jobTransactionList[0].seqSelected
+        return jobTransactionList[0]
     }
 
     updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
@@ -491,6 +492,20 @@ class JobTransaction {
         return text
     }
 
+   async checkIdToBeSync(jobTransactionId){
+       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
+       let checkId = false
+       if(pendingSyncTransactionIds && pendingSyncTransactionIds.value.length > 0){
+           for(let item of pendingSyncTransactionIds.value){
+               if(item.id == jobTransactionId){
+                   checkId = true
+                   break
+               }
+           }
+       }
+       return checkId
+    }
+
     /**
      * This function prepares swipable details of job transaction
      * @param {*} jobDataDetailsForListing 
@@ -639,7 +654,7 @@ class JobTransaction {
     prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = (callingActivity != 'LiveJob') ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery) : realm.getRecordListOnQuery(TABLE_JOB, jobTransactionQuery)
-        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
+        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
         if (callingActivity == 'LiveJob') {
             jobMasterId = jobTransaction[0].jobMasterId
             jobStatusId = jobTransaction[0].status
@@ -685,7 +700,13 @@ class JobTransaction {
                 runsheetNo,
                 jobCreatedAt,
                 lastUpdatedAtServer,
-                jobEtaTime
+                jobEtaTime,
+                runsheetId,
+                companyId,
+                cityId,
+                hubId,
+                actualAmount,
+                moneyTransactionType
             }
             return {
                 currentStatus,
