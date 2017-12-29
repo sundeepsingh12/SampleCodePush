@@ -4,8 +4,17 @@ import { connect } from 'react-redux'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
+import {
+  OK,
+  REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT,
+  REVERT_STATUS_TO,
+  REVERT_NOT_ALLOWED_INCASE_OF_SYNCING,
+  PRESS_OK_TO_CONFIRM_REVERT_TO,
+  CANCEL,
+  CONFIRM_REVERT
+} from '../lib/ContainerConstants'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
 
 import {
@@ -43,11 +52,9 @@ import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
 import {
   SELECT_NUMBER,
-  CANCEL,
   SELECT_TEMPLATE,
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
-  OK,
   CALL_CONFIRM,
   LANDMARK,
   PINCODE,
@@ -85,7 +92,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class JobDetailsV2 extends Component {
+class JobDetailsV2 extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     return { header: null }
   }
@@ -313,17 +320,20 @@ class JobDetailsV2 extends Component {
   }
   alertForStatusRevert(statusData){
     Alert.alert(
-      "Confirm Revert",
-      `Press OK to confirm revert to `+statusData[1],
+      CONFIRM_REVERT,
+      PRESS_OK_TO_CONFIRM_REVERT_TO+statusData[1],
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'OK', onPress: () => this._onGoToPreviousStatus(statusData) }
+        { text: CANCEL, style: CANCEL },
+        { text: OK, onPress: () => this._onGoToPreviousStatus(statusData) }
       ],
     )
   }
   selectStatusToRevert =  () => {
-    if(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType){
-      { Toast.show({ text: "Revert is not allowed after collecting amount.", position: 'bottom', buttonText: 'Okay' }) }      
+    if(this.props.statusRevertList[0] == 1){
+      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom'| "center", buttonText: 'Okay' ,type: 'danger',duration: 5000 }) }
+    }
+    else if(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType){
+      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom'| "center", buttonText: 'Okay', type: 'danger', duration: 5000 }) }      
     }else{
     this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
     }
@@ -334,11 +344,11 @@ class JobDetailsV2 extends Component {
 
   statusRevertSelection(statusList){
     let BUTTONS = statusList.map(list => list[1])
-    BUTTONS.push('Cancel')
+    BUTTONS.push(CANCEL)
     ActionSheet.show(
       {
         options: BUTTONS,
-        title: 'Revert Status to',
+        title: REVERT_STATUS_TO,
         cancelButtonIndex: BUTTONS.length - 1,
         destructiveButtonIndex: BUTTONS.length - 1
       },

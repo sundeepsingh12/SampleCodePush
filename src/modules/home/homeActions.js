@@ -97,8 +97,7 @@ export function pieChartCount() {
   return async (dispatch) => {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
-      const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = allStatusIds
+      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds }  = await jobStatusService.getStatusIdsForAllStatusCategory()
       const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {

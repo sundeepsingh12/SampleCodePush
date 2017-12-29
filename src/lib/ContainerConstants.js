@@ -1,4 +1,9 @@
 module.exports = {
+
+    //common_CONSTANTS
+    CANCEL: 'Cancel',
+    OK: 'Ok',
+    
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
     INTERNAL_ERROR: 'Internal Error.',
@@ -33,5 +38,12 @@ module.exports = {
     DOWNLOADING_OFFLINE_DS: 'Downloading',
     DOWNLOAD_SUCCESSFUL: 'Download Successful',
     DOWNLOAD_FAILED: 'Download Failed',
-    CLOSE: 'Close'
+    CLOSE: 'Close',
+
+    //status revert 
+    REVERT_STATUS_TO: 'Revert Status to',
+    REVERT_NOT_ALLOWED_INCASE_OF_SYNCING: 'Syncing with server.\nPlease try after some time.',
+    CONFIRM_REVERT: 'Confirm Revert',
+    PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
+    REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.'
 }

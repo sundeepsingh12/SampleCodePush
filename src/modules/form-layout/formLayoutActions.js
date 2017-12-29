@@ -24,6 +24,7 @@ import {
 
 import {
     AFTER,
+    Start
 } from '../../lib/AttributeConstants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -34,6 +35,8 @@ import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState, navigateToScene } from '../global/globalActions'
 import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { jobStatusService } from '../../services/classes/JobStatus'
+
 import _ from 'lodash'
 import { performSyncService } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
@@ -140,12 +143,13 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
         const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
         let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
         dispatch(setState(IS_LOADING, false))
+        let landingId = (Start.landingTab)  ? jobStatusService.getTabIdOnStatusId(statusList.value,formLayoutState.statusId): false
         if (routeName == TabScreen) {
             dispatch(NavigationActions.reset({
                 index: 1,
                 actions: [
                     NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                    NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true } })
+                    NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
                 ]
             }))
         } else {

@@ -104,7 +104,7 @@ class JobDetails {
         return enableFlag
     }
 
-    getParentStatusList(statusList,currentStatus){
+    async getParentStatusList(statusList,currentStatus,jobTransactionId){
         let parentStatusList = []
         for(let status of statusList){
             if(status.code === UNSEEN)
@@ -114,6 +114,10 @@ class JobDetails {
                    parentStatusList.push([status.id, status.name, status.code, status.statusCategory])
                 }
             }
+        }
+        if((parentStatusList.length > 0 && await jobTransactionService.checkIdToBeSync(jobTransactionId))){
+            parentStatusList = []
+            parentStatusList.push(1)
         }
         return parentStatusList
     }
@@ -149,9 +153,9 @@ class JobDetails {
         return angle * (Math.PI / 180);
     }
 
-    updateTransactionOnRevert(jobTransaction1,previousStatus){
+    updateTransactionOnRevert(jobTransactionData,previousStatus){
         let jobTransactionArray = [];
-        let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method        
+        let jobTransaction = Object.assign({}, jobTransactionData) // no need to have null checks as it is called from a private method        
         jobTransaction.jobStatusId = previousStatus[0]
         jobTransaction.statusCode = previousStatus[2]
         jobTransaction.actualAmount = 0.00

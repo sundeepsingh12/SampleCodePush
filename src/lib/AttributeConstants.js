@@ -304,6 +304,9 @@ module.exports = {
     Piechart: {
         enabled: false
     },
+    Start : {
+      landingTab : false
+    },
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
 
@@ -338,7 +341,6 @@ module.exports = {
 
     //job details constants
     SELECT_NUMBER: 'Select number for message',
-    CANCEL: 'Cancel',
     SELECT_TEMPLATE: 'Select template for message',
     SELECT_NUMBER_FOR_CALL: 'Select number for call',
     CONFIRMATION: 'Confirmation: ',

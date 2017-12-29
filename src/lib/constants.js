@@ -250,6 +250,7 @@ module.exports = keyMirror({
     OfflineDS: null,
     CameraAttribute: null,
     ImageDetailsView: null,
+    JobDetailsV2: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,

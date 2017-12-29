@@ -201,6 +201,17 @@ class JobStatus {
   }
 
 
+  getTabIdOnStatusId(statusList,statusId){
+    let tabId
+    for(let data of statusList){
+      if(data.id == statusId){
+        tabId = data.tabId
+        break
+      }
+    }
+    return tabId
+  }
+
 
 
   async getStatusCategoryOnStatusId(jobStatusId) {

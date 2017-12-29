@@ -11,6 +11,7 @@ import {
     TAB,
     JOB_ATTRIBUTE,
     TABLE_RUNSHEET,
+    PENDING_SYNC_TRANSACTION_IDS
 } from '../../lib/constants'
 
 import { SKU_ARRAY, ADDRESS_LINE_1, ADDRESS_LINE_2, LANDMARK, PINCODE, SEQ_SELECTED, JOB_EXPIRY_TIME } from '../../lib/AttributeConstants'
@@ -489,6 +490,20 @@ class JobTransaction {
             }
         }
         return text
+    }
+
+   async checkIdToBeSync(jobTransactionId){
+       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
+       let checkId = false
+       if(pendingSyncTransactionIds && pendingSyncTransactionIds.value.length > 0){
+           for(let item of pendingSyncTransactionIds.value){
+               if(item.id == jobTransactionId){
+                   checkId = true
+                   break
+               }
+           }
+       }
+       return checkId
     }
 
     /**

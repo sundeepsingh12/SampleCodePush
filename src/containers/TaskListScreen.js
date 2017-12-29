@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -49,7 +49,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class TaskListScreen extends Component {
+class TaskListScreen extends PureComponent {
 
   componentDidMount() {
     if (this.props.loadTabScreen || _.isEmpty(this.props.jobTransactionCustomizationList)) {

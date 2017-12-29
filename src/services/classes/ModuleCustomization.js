@@ -20,6 +20,7 @@ import {
     NEW_JOB,
     Piechart,
     JOB_ASSIGNMENT_ID,
+    Start
 } from '../../lib/AttributeConstants'
 import {
     BACKUP,
@@ -135,6 +136,7 @@ class ModuleCustomization {
                 case START_ID:
                     {
                         cloneModules[START] = this.setModuleDetails(cloneModules[START], moduleCustomizationList[index], user, serialNumber++)
+                        Start.landingTab = (cloneModules[START].remark) ? cloneModules[START].remark.landingTabAfterJobCompletion : false
                         break
                     }
                 case STATISTIC_ID:
@@ -201,7 +203,7 @@ class ModuleCustomization {
             appModule.enabled = true
             appModule.serialNumber = serialNumber
             appModule.displayName = displayName.trim() ? displayName : moduleCustomization.displayName && (moduleCustomization.displayName + '').trim() ? moduleCustomization.displayName : appModule.displayName
-            if (appModule.appModuleId == CUSTOMAPP_ID && moduleCustomization.remark != undefined) {
+            if ((appModule.appModuleId == START_ID || appModule.appModuleId == CUSTOMAPP_ID) && moduleCustomization.remark != undefined) {
                 appModule.remark = JSON.parse(moduleCustomization.remark)
             }
         }

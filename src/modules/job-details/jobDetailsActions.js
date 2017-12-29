@@ -12,6 +12,9 @@ import { performSyncService, pieChartCount } from '../home/homeActions'
 import * as realm from '../../repositories/realmdb'
 import { fetchJobs } from '../taskList/taskListActions'
 import {
+    Start
+} from '../../lib/AttributeConstants'
+import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
     JOB_ATTRIBUTE_STATUS,
@@ -38,11 +41,6 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function resetState() {
-    return {
-        type: RESET_STATE_FOR_JOBDETAIL,
-    }
-}
 
 export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo,parentStatusList) {
     return {
@@ -62,6 +60,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
+            dispatch(startFetchingJobDetails()) 
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
@@ -72,7 +71,7 @@ export function getJobDetails(jobTransactionId) {
             const jobMaster = jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId, jobMasterList)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery, 
                                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId) : false
-            const parentStatusList = (jobMaster[0].isStatusRevert) ? jobDetailsService.getParentStatusList(statusList.value,details.currentStatus) : []
+            const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value,details.currentStatus,jobTransactionId) : []
             const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList))
         } catch (error) {
@@ -116,8 +115,16 @@ export function setAllDataOnRevert(jobTransaction,statusTo,navigation) {
             dispatch(performSyncService())     
             dispatch(pieChartCount())                                                           
             dispatch(fetchJobs())
-            dispatch(navigation.goBack())            
-            dispatch(resetState())
+            let landingId = (Start.landingTab)  ? jobStatusService.getTabIdOnStatusId(statusList.value,statusTo[0]): false    
+            if(landingId){       
+            dispatch(NavigationActions.reset({
+                index: 1,
+                actions: [
+                    NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+                    NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
+                ]
+            }))}else{ dispatch(navigation.goBack())      }      
+            dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
             console.log(error)            
         }
