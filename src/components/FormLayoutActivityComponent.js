@@ -21,6 +21,7 @@ import DateIcon from '../svg_components/icons/DateIcon'
 import TimeIcon from '../svg_components/icons/TimeIcon'
 import SignatureIcon from '../svg_components/icons/SignatureIcon'
 import CashTenderingIcon from '../svg_components/icons/CashTenderingIcon'
+import RadioButtonIcon from '../svg_components/icons/RadioButtonIcon'
 import {
     ARRAY,
     CASH_TENDERING,
@@ -33,6 +34,13 @@ import {
     SIGNATURE_AND_FEEDBACK,
     SKU_ARRAY,
     TIME,
+    RE_ATTEMPT_DATE,
+    ARRAY_SAROJ_FAREYE,
+    OBJECT_SAROJ_FAREYE,
+    CAMERA,
+    CAMERA_HIGH,
+    CAMERA_MEDIUM,
+    RADIOBUTTON
 } from '../lib/AttributeConstants'
 
 class FormLayoutActivityComponent extends Component {
@@ -45,11 +53,14 @@ class FormLayoutActivityComponent extends Component {
             case MONEY_COLLECT:
             case MONEY_PAY: return <BankCardIcon width={26} height={19} color={this.getComponentIconStyle(this.props.item.editable)} />
             case NPS_FEEDBACK:
-            case SIGNATURE:return <SignatureIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case SIGNATURE: return <SignatureIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             case SIGNATURE_AND_FEEDBACK: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             case SKU_ARRAY: return <CartIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case DATE: return <DateIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case DATE:
+            case RE_ATTEMPT_DATE:
+                return <DateIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             case TIME: return <TimeIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case RADIOBUTTON: return <RadioButtonIcon width={38} height={37} color={this.getComponentIconStyle(this.props.item.editable)} />
             default: return <QRIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
         }
     }
@@ -91,6 +102,17 @@ class FormLayoutActivityComponent extends Component {
                             {this.props.item.helpText ?
                                 <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20, styles.italic, this.getComponentHelpTextStyle(this.props.item.editable)]}>
                                     {this.props.item.helpText}
+                                </Text> : null}
+                            {this.props.item.value
+                                && this.props.item.value != ARRAY_SAROJ_FAREYE
+                                && this.props.item.value != OBJECT_SAROJ_FAREYE
+                                && this.props.item.attributeTypeId != SIGNATURE
+                                && this.props.item.attributeTypeId != CAMERA
+                                && this.props.item.attributeTypeId != CAMERA_HIGH
+                                && this.props.item.attributeTypeId != CAMERA_MEDIUM
+                                ?
+                                <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20, this.getComponentLabelStyle(this.props.item.editable)]}>
+                                    {this.props.item.value}
                                 </Text> : null}
                             {this.props.item.alertMessage ?
                                 <Text style={[styles.fontDanger, styles.fontSm, styles.paddingTop5]}>{this.props.item.alertMessage}</Text>

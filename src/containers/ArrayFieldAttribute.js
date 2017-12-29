@@ -73,9 +73,10 @@ class ArrayFieldAttribute extends Component {
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.jobStatusId,
             this.props.lastRowId,
-            this.props.arrayElements
+            this.props.arrayElements,
+            this.props.navigation.state.params.latestPositionId
         )
-     //   BackHandler.addEventListener(HardwareBackPress, this._goBack)
+        //   BackHandler.addEventListener(HardwareBackPress, this._goBack)
     }
     renderData = (arrayRow) => {
         return (
@@ -86,7 +87,7 @@ class ArrayFieldAttribute extends Component {
                 lastRowId={this.props.lastRowId}
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
                 jobStatusId={this.props.jobStatusId}
-                latestPositionId={this.props.latestPositionId}
+                latestPositionId={this.props.navigation.state.params.latestPositionId}
             />
         )
     }

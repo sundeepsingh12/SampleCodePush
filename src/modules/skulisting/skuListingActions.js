@@ -31,7 +31,7 @@ import {
     setState
 } from '../global/globalActions'
 import {
-  Toast
+    Toast
 } from 'native-base'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {
@@ -94,22 +94,22 @@ export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItem
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionId, latestPositionId, parentObject, formElement, isSaveDisabled,navigation) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, latestPositionId, parentObject, formElement, isSaveDisabled, navigation) {
     return async function (dispatch) {
         try {
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
             if (!message) {
                 const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId)
-                let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.positionId, latestPositionId)
-                dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+                let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, latestPositionId)
+                dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
                 navigation.goBack()
             }
             else {
                 Toast.show({
-              text: `${message}`,
-              position: 'bottom',
-              buttonText: 'OK'
-            })
+                    text: `${message}`,
+                    position: 'bottom',
+                    buttonText: 'OK'
+                })
             }
         } catch (error) {
             console.log(error)

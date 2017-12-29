@@ -136,13 +136,13 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId) {
+export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId, jobTransaction) {
     return async function (dispatch) {
         try {
             if (!calledFromArray)
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, { latestPositionId }))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, { latestPositionId }, jobTransaction))
             else
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId, null, NEXT_FOCUS))
 
         } catch (error) {
             console.log(error)
@@ -186,16 +186,16 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
-                let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, { latestPositionId }))
+                let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, { latestPositionId }, jobTransaction))
             } else {
                 let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements[rowId].formLayoutObject)
                 formElements[rowId].formLayoutObject = formElementResult
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId, null, NEXT_FOCUS))
             }
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {
