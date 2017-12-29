@@ -76,10 +76,10 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
     }
 }
 
-export function getNextFocusableAndEditableElements(attributeMasterId, formElement, isSaveDisabled, value, event) {
+export function getNextFocusableAndEditableElements(attributeMasterId, formElement, isSaveDisabled, value, event, jobTransaction) {
     return async function (dispatch) {
         const cloneFormElement = _.cloneDeep(formElement)
-        const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, null, event);
+        const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, null, event, jobTransaction);
         dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributeDto))
         dispatch(setState(SET_UPDATE_DRAFT, true))
     }
@@ -118,12 +118,14 @@ export function updateFieldData(attributeId, value, formElement) {
     }
 }
 
-export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject) {
+export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject, jobTransaction) {
     return function (dispatch) {
         const cloneFormElement = _.cloneDeep(formElement)
-        console.log('fieldDataListObject',fieldDataListObject)
-        cloneFormElement.get(attributeMasterId).value = value
-        const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, fieldDataListObject.fieldDataList, NEXT_FOCUS);
+        console.log('fieldDataListObject', fieldDataListObject)
+        cloneFormElement.get(attributeMasterId).displayValue = value
+        let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, 'After', jobTransaction)
+        cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
+        const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, fieldDataListObject.fieldDataList, NEXT_FOCUS, jobTransaction);
         dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
             {
                 formElement: updatedFieldDataObject.formLayoutObject,
@@ -163,7 +165,7 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
         if (timeOfExecution == AFTER) {
             cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
         }
-        dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS))
+        dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS, jobTransaction))
     }
 }
 

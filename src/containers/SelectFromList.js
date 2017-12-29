@@ -27,6 +27,7 @@ import {
   INPUT_TEXT_VALUE,
   SELECTFROMLIST_ITEMS_LENGTH,
 } from '../lib/constants'
+import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 
 function mapStateToProps(state) {
   return {
@@ -41,7 +42,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...selectFromListActions, ...globalActions }, dispatch)
+    actions: bindActionCreators({ ...selectFromListActions, ...globalActions, ...formLayoutActions }, dispatch)
   }
 }
 
@@ -102,8 +103,10 @@ class SelectFromList extends Component {
     this._dropModal()
     if (this.props.calledFromArray)
       this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements, this.props.calledFromArray, this.props.rowId)
-    else
+    else {
       this.props.actions.selectFromListButton(this.props.selectFromListState, this.props.currentElement, this.props.jobTransaction, this.props.latestPositionId, this.props.isSaveDisabled, this.props.formElements)
+    //  this.props.actions.fieldValidations(this.props.currentElement, this.props.formElements, 'After', this.props.jobTransaction, this.props.isSaveDisabled)
+    }
   }
 
   _setValueInInputText(valueOfInputText) {
