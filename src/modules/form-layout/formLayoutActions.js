@@ -145,7 +145,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
         const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
         let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
         dispatch(setState(IS_LOADING, false))
-        let landingId = (Start.landingTab)  ? jobStatusService.getTabIdOnStatusId(statusList.value,formLayoutState.statusId): false
+        let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
         if (routeName == TabScreen) {
             dispatch(NavigationActions.reset({
                 index: 1,
@@ -207,11 +207,10 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
             let isValuePresentInAnotherTransaction = await dataStoreService.checkForUniqueValidation(value, fieldAtrribute.fieldAttributeMasterId)
             if (isValuePresentInAnotherTransaction) {
                 formElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
-                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, formElement, isSaveDisabled, value, latestPositionId, jobTransaction))
             } else {
                 formElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = ''
-                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, formElement, isSaveDisabled, value, latestPositionId, jobTransaction))
             }
+            dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, formElement, isSaveDisabled, value, latestPositionId, jobTransaction))
         }
         catch (error) {
             console.log(error)
