@@ -115,8 +115,10 @@ class Sorting extends Component {
         if ((!_.isNull(this.props.errorMessage) && !_.isUndefined(this.props.errorMessage)  && this.props.errorMessage.length > 0)) {
             Toast.show({
                 text: this.props.errorMessage,
-                position: 'bottom', 
+                position: 'bottom' | "center", 
                 buttonText: 'Okay',
+                type: 'danger',
+                duration: 5000
             })
         }
     }

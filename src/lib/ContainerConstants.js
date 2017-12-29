@@ -1,4 +1,9 @@
 module.exports = {
+
+    //common_CONSTANTS
+    CANCEL: 'Cancel',
+    OK: 'Ok',
+    
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
     INTERNAL_ERROR: 'Internal Error.',
@@ -36,5 +41,12 @@ module.exports = {
     CLOSE: 'Close',
 
     //Form Layout Container
-    UNIQUE_VALIDATION_FAILED: 'This code is already in use'
+    UNIQUE_VALIDATION_FAILED: 'This code is already in use',
+
+    //status revert 
+    REVERT_STATUS_TO: 'Revert Status to',
+    REVERT_NOT_ALLOWED_INCASE_OF_SYNCING: 'Syncing with server.\nPlease try after some time.',
+    CONFIRM_REVERT: 'Confirm Revert',
+    PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
+    REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.'
 }

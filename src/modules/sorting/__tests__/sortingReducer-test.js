@@ -2,7 +2,7 @@
 import {
     SORTING_SEARCH_VALUE,
     SORTING_ITEM_DETAILS,
-    SHOW_LOADER,
+    SORTING_LOADER,
     ERROR_MESSAGE
 } from '../../../lib/constants'
 
@@ -34,7 +34,7 @@ describe('sortingReducer ', () => {
         const dataList = true
         const details = {}
         const action = {
-            type: SHOW_LOADER,
+            type: SORTING_LOADER,
             payload: dataList
         }
         let nextState = sortingReducer(undefined, action)

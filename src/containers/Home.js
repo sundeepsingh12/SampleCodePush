@@ -2,7 +2,7 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
@@ -78,7 +78,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class Home extends Component {
+class Home extends PureComponent {
 
   componentDidMount() {
     this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
@@ -99,7 +99,7 @@ class Home extends Component {
         break
       }
       case START_ID: {
-        this.props.actions.navigateToScene(TabScreen, {})
+        this.props.actions.navigateToScene(TabScreen, {remark: appModule.remark})
         break
       }
 

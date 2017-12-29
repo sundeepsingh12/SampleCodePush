@@ -80,7 +80,8 @@ module.exports = keyMirror({
     JOB_DOWNLOADING_STATUS: null,
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
-
+    SEARCH_TAP: null,
+    
     //Home Container
     PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
@@ -249,6 +250,7 @@ module.exports = keyMirror({
     OfflineDS: null,
     CameraAttribute: null,
     ImageDetailsView: null,
+    JobDetailsV2: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -359,7 +361,7 @@ module.exports = keyMirror({
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
-    SHOW_LOADER: null,
+    SORTING_LOADER: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,

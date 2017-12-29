@@ -13,7 +13,7 @@ import {
     SORTING_SEARCH_VALUE,
     SORTING_ITEM_DETAILS,
     ERROR_MESSAGE,
-    SHOW_LOADER
+    SORTING_LOADER
 } from '../../../lib/constants'
 
 describe('sorting actions', () => {
@@ -41,7 +41,7 @@ describe('sorting actions', () => {
        }
     const expectedActions = [
         {
-            type: SHOW_LOADER,
+            type: SORTING_LOADER,
             payload: true
         }, {
             type: SORTING_ITEM_DETAILS,

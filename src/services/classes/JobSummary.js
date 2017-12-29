@@ -1,6 +1,7 @@
 import {
   JOB_SUMMARY,
-  LAST_SYNC_WITH_SERVER
+  LAST_SYNC_WITH_SERVER,
+  TABLE_JOB_TRANSACTION
 } from '../../lib/constants'
 
 import {
@@ -9,6 +10,8 @@ import {
 
 import moment from 'moment'
 import _ from 'lodash'
+import * as realm from '../../repositories/realmdb'
+
 
 class JobSummary {
 
@@ -24,10 +27,9 @@ class JobSummary {
     if(!jobSummariesInStore || !jobSummariesInStore.value){
       throw new Error('Unable to update Job Summary')
     }
-    const jobSummaryIds = await jobSummaries.map(jobSummaryObject => jobSummaryObject.id)
     const jobSummaryIdJobSummaryObjectMap = {}
     const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')    
-    jobSummaries.forEach(jobSummaryObject => {        
+    jobSummaries.forEach(jobSummaryObject => {  
          jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
     })
     jobSummariesInStore.value.forEach(jobSummaryObject => {
