@@ -7,13 +7,8 @@ import * as bulkActions from '../modules/bulk/bulkActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 
-<<<<<<< 2e9f2bbd6a5775cdb5d43c0c0616429f82ed0db7
-import React, {Component} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight,Alert,FlatList,TouchableOpacity,BackHandler} from 'react-native'
-=======
 import React, {PureComponent} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight,Alert,FlatList,TouchableOpacity} from 'react-native'
->>>>>>> Changed component inheritance tree: Made all the components inherit from PureComponent instead of Component
+import {StyleSheet, View, Image, TouchableHighlight,Alert,FlatList,TouchableOpacity,BackHandler} from 'react-native'
 
 import {
   Container,
