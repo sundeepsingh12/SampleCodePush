@@ -25,7 +25,6 @@ import {
   Toast,
   ActionSheet
 } from 'native-base'
-import LinearGradient from 'react-native-linear-gradient'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -218,7 +217,6 @@ class Home extends PureComponent {
       )
     }
 
-    console.log('this.props.count', this.props.count)
     if (this.props.count) {
       return (<PieChart count={this.props.count} press={this._onPieChartPress} />)
     }

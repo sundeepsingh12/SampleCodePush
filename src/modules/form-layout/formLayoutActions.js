@@ -19,7 +19,8 @@ import {
     HomeTabNavigatorScreen,
     CLEAR_FORM_LAYOUT,
     SET_FORM_LAYOUT_STATE,
-    SET_UPDATE_DRAFT
+    SET_UPDATE_DRAFT,
+    CLEAR_BULK_STATE
 } from '../../lib/constants'
 
 import {
@@ -159,6 +160,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
         }
         dispatch(performSyncService(pieChart))
         dispatch(setState(CLEAR_FORM_LAYOUT))
+        dispatch(setState(CLEAR_BULK_STATE))
     }
 }
 

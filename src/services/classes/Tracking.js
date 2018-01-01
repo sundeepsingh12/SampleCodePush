@@ -78,8 +78,6 @@ class Tracking {
 
     async onLocation(location) {
         let user = await keyValueDBService.getValueFromStore(USER) || {}
-        console.log('- [js]location: ');
-        console.log(location);
         let track_record = {
             'battery': location.battery.level * 100,
             'gpsSignal': location.coords.accuracy,
@@ -109,7 +107,7 @@ class Tracking {
         console.log('- Location provider changed: ', provider.enabled);
     }
     onMotionChange(location) {
-        console.log('- [js]motionchanged: ', JSON.stringify(location));
+        // console.log('- [js]motionchanged: ', JSON.stringify(location));
     }
 
     getTrackLogs(trackLogs, lastSyncTime) {

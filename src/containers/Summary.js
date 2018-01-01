@@ -13,7 +13,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as summaryActions from '../modules/summary/summaryActions'
 import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import * as globalActions from '../modules/global/globalActions'
