@@ -80,6 +80,7 @@ class DraftService {
         }
         return draftDbObject
     }
+    
     deleteDraftFromDb(jobTransactionId, jobMasterId) {
         if (jobTransactionId < 0) {
             realm.deleteSingleRecord(TABLE_DRAFT, jobMasterId, 'jobMasterId')

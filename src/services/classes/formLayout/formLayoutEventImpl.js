@@ -524,7 +524,6 @@ export default class FormLayoutEventImpl {
     _setBulkJobDbValues(status, jobTransactions, jobMasterId, user, hub) {
         let jobArray = []
         const query = jobTransactions.map(jobTransaction => 'id = ' + jobTransaction.jobId).join(' OR ')
-        console.log('query', query)
         let realmJobObjects = realm.getRecordListOnQuery(TABLE_JOB, query)
         for (let realmJobObject of realmJobObjects) {
             let job = Object.assign({}, realmJobObject)

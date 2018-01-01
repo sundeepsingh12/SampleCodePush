@@ -8,7 +8,7 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 
 import React, {Component} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight,Alert,FlatList,TouchableOpacity} from 'react-native'
+import {StyleSheet, View, Image, TouchableHighlight,Alert,FlatList,TouchableOpacity,BackHandler} from 'react-native'
 
 import {
   Container,
@@ -38,7 +38,7 @@ import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
 import _ from 'lodash'
 import {NEXT_POSSIBLE_STATUS} from '../lib/AttributeConstants'
-import {FormLayout,CLEAR_BULK_STATE} from '../lib/constants'
+import {FormLayout,CLEAR_BULK_STATE,HardwareBackPress} from '../lib/constants'
 
 
 function mapStateToProps(state) {
@@ -77,6 +77,11 @@ class BulkListing extends Component {
 
     componentDidMount() {
       this.props.actions.getBulkJobTransactions(this.props.navigation.state.params)
+      BackHandler.addEventListener(HardwareBackPress, this._goBack)
+    }
+
+     componentWillUnmount() {
+        BackHandler.removeEventListener(HardwareBackPress, this._goBack)
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -121,6 +126,7 @@ class BulkListing extends Component {
           )
         } else {
           let nextStatusNames = []
+         
           this.props.navigation.state.params.nextStatusList.forEach(object=>{
             let statusObject = 
               { text: object.name, icon:"md-arrow-dropright", iconColor: "#000000" }
@@ -199,6 +205,10 @@ class BulkListing extends Component {
         jobTransaction:{}
       }
       )
+    }
+
+     _goBack = () => {
+       this.props.actions.setState(CLEAR_BULK_STATE)
     }
 }
 

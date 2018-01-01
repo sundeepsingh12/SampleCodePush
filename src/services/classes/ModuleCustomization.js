@@ -175,7 +175,6 @@ class ModuleCustomization {
                     }
                 case JOB_ASSIGNMENT_ID: {
                     cloneModules[JOB_ASSIGNMENT] = this.setModuleDetails(cloneModules[JOB_ASSIGNMENT], moduleCustomizationList[index], user, serialNumber++)
-                    console.log(cloneModules[JOB_ASSIGNMENT])
                     break
                 }
             }

@@ -61,7 +61,7 @@ function mapDispatchToProps(dispatch) {
 
 class FormLayout extends Component {
   componentDidUpdate() {
-    if (this.props.updateDraft) {
+    if (this.props.updateDraft && !this.props.navigation.state.params.transactionIdList) { //Draft should not be saved for bulk
       this.saveDraft()
       this.props.actions.setState(SET_UPDATE_DRAFT, false)
     }
