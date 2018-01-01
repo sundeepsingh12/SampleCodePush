@@ -24,8 +24,6 @@ import { createLogger } from 'redux-logger'
 import reducer from '../modules'
 import { compose } from 'redux';
 
-console.tron.log(Reactotron)
-
 const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__ });
 /**
  * ## creatStoreWithMiddleware
@@ -47,5 +45,5 @@ const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__
 // };
 
 export default function configureStore(intialState) {
-  return createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware))
+  return Reactotron.createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware))
 }
