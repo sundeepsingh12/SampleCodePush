@@ -11,6 +11,7 @@ import {
   LOGOUT,
   LOGOUT_FAILURE,
   LOGOUT_START,
+  FORGET_PASSWORD,
   LOGOUT_SUCCESS,
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
@@ -70,6 +71,12 @@ export function loginFailure(error) {
   return {
     type: LOGIN_FAILURE,
     payload: error
+  }
+}
+
+function forgetPassword() {
+  return {
+    type: FORGET_PASSWORD
   }
 }
 
@@ -156,6 +163,27 @@ export function authenticateUser(username, password,rememberMe) {
       dispatch(NavigationActions.navigate({ routeName: PreloaderScreen }))
     }
     catch (error) {
+      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
+    }
+  }
+}
+
+export function forgetPasswordRequest(username) {
+  return async function (dispatch) {
+    try {
+      if(!username) {
+        throw new Error('Please enter a valid username')
+      }
+      let data = new FormData()
+      console.log('username',username)
+      data.append('usernameToResetPass', username)
+      dispatch(forgetPassword())
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      const response = await RestAPIFactory().serviceCall(data,CONFIG.API.FORGET_PASSWORD,'LOGIN')
+      console.log('response',response)
+      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
+    }
+    catch  (error) {
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
     }
   }

@@ -20,6 +20,7 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
   LOGIN_CAMERA_SCANNER,
+  FORGET_PASSWORD,
 
   SET_STATE,
   ON_LOGIN_USERNAME_CHANGE,
@@ -45,6 +46,7 @@ export default function authReducer(state = initialState, action) {
      * ### Requests start
      * Set the fetching flag so the forms will be disabled
      */
+    case FORGET_PASSWORD:
     case LOGIN_START:
       return state.setIn(['form', 'authenticationService'], true)
         .setIn(['form', 'displayMessage'], '')

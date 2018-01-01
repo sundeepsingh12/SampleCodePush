@@ -12,7 +12,7 @@ import {
 }
   from 'react-native'
 import Scanner from "../components/Scanner"
-import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner } from 'native-base'
+import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner ,Icon as Iconimg} from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -23,6 +23,7 @@ import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf'
 import codePush from "react-native-code-push"
 import { QrCodeScanner } from '../lib/constants'
+import Icon from '../../native-base-theme/components/Icon';
 
 
 var style = StyleSheet.create({
@@ -171,6 +172,7 @@ class Login extends PureComponent {
                         disabled={this.props.auth.form.isEditTextDisabled}
                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                       />
+                      <Iconimg  name='pizza' onPress={()=> this.props.actions.forgetPasswordRequest(this.props.auth.form.username)} style={{right:5, position: 'absolute', color: 'green'}} />
                     </Item>
 
                     <Button

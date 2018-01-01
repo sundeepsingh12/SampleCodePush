@@ -19,6 +19,7 @@ module.exports = keyMirror({
     LOGIN_SUCCESS: null,
     LOGIN_FAILURE: null,
     LOGIN_CAMERA_SCANNER: null,
+    FORGET_PASSWORD: null,
     LOGOUT_START: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
