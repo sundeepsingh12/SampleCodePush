@@ -66,33 +66,33 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators({ ...authActions }, dispatch)
-  }
-}
+// function mapDispatchToProps(dispatch) {
+//   return {
+//     actions: bindActionCreators({ ...authActions }, dispatch)
+//   }
+// }
 
 
 class Login extends Component {
 
   componentDidMount() {
-    this.props.actions.checkRememberMe()
+    this.props.checkRememberMe()
   }
 
   onChangeUsername = (value) => {
-    this.props.actions.onChangeUsername(value)
+    this.props.onChangeUsername(value)
   }
 
   onChangePassword = (value) => {
-    this.props.actions.onChangePassword(value)
+    this.props.onChangePassword(value)
   }
 
   loginButtonPress = () => {
     const password = this.props.auth.form.password;
     if (password.length > 50) {
-      this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
+      this.props.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
     } else {
-      this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
+      this.props.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
     }
   }
 
@@ -101,15 +101,15 @@ class Login extends Component {
     const password = value.split("/")[1]
     this.onChangeUsername(username)
     this.onChangePassword(password)
-    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
+    this.props.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
   }
 
   _onScaningCancelled = () => {
-    this.props.actions.stopScanner()
+    this.props.stopScanner()
   }
 
   rememberMe = () => {
-    this.props.actions.toggleCheckbox()
+    this.props.toggleCheckbox()
   }
 
   // codepushSync = () => {
@@ -212,4 +212,4 @@ class Login extends Component {
   }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login)
+export default connect(mapStateToProps, authActions)(Login)

@@ -4,9 +4,18 @@ import { connect } from 'react-redux'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
+import {
+  OK,
+  REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT,
+  REVERT_STATUS_TO,
+  REVERT_NOT_ALLOWED_INCASE_OF_SYNCING,
+  PRESS_OK_TO_CONFIRM_REVERT_TO,
+  CANCEL,
+  CONFIRM_REVERT
+} from '../lib/ContainerConstants'
 
-import React, { Component } from 'react'
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import React, { PureComponent } from 'react'
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
 
 import {
   Container,
@@ -24,7 +33,8 @@ import {
   Footer,
   FooterTab,
   Card,
-  ActionSheet
+  ActionSheet,
+  Toast
 } from 'native-base'
 
 import * as globalActions from '../modules/global/globalActions'
@@ -35,17 +45,16 @@ import {
   IS_MISMATCHING_LOCATION,
   DataStoreDetails,
   ImageDetailsView,
-  RESET_STATE_FOR_JOBDETAIL
+  RESET_STATE_FOR_JOBDETAIL,
+
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
 import {
   SELECT_NUMBER,
-  CANCEL,
   SELECT_TEMPLATE,
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
-  OK,
   CALL_CONFIRM,
   LANDMARK,
   PINCODE,
@@ -54,6 +63,7 @@ import {
 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications'
 import CallIcon from '../svg_components/icons/CallIcon'
+import RevertIcon from '../svg_components/icons/RevertIcon'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 
@@ -69,7 +79,9 @@ function mapStateToProps(state) {
     messageList: state.jobDetails.messageList,
     smsTemplateList: state.jobDetails.smsTemplateList,
     errorMessage: state.jobDetails.errorMessage,
-    statusList: state.jobDetails.statusList
+    statusList: state.jobDetails.statusList,
+    statusRevertList: state.jobDetails.statusRevertList,
+    draftStatusInfo: state.jobDetails.draftStatusInfo
   }
 }
 
@@ -80,7 +92,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class JobDetailsV2 extends Component {
+class JobDetailsV2 extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     return { header: null }
   }
@@ -89,8 +101,8 @@ class JobDetailsV2 extends Component {
     this.props.actions.getJobDetails(this.props.navigation.state.params.jobTransaction.id)
   }
 
-  componentWillUnmount(){
-    if(this.props.errorMessage){
+  componentWillUnmount() {
+    if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
   }
@@ -132,8 +144,7 @@ class JobDetailsV2 extends Component {
       statusId: this.props.statusList.id,
       statusName: this.props.statusList.name,
       jobMasterId: this.props.jobTransaction.jobMasterId
-    }
-    )
+    })
     this._onCancel()
   }
   _onCancel = () => {
@@ -307,18 +318,82 @@ class JobDetailsV2 extends Component {
 
 
   }
+  alertForStatusRevert(statusData){
+    Alert.alert(
+      CONFIRM_REVERT,
+      PRESS_OK_TO_CONFIRM_REVERT_TO+statusData[1],
+      [
+        { text: CANCEL, style: CANCEL },
+        { text: OK, onPress: () => this._onGoToPreviousStatus(statusData) }
+      ],
+    )
+  }
+  selectStatusToRevert =  () => {
+    if(this.props.statusRevertList[0] == 1){
+      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom'| "center", buttonText: 'Okay' ,type: 'danger',duration: 5000 }) }
+    }
+    else if(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType){
+      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom'| "center", buttonText: 'Okay', type: 'danger', duration: 5000 }) }      
+    }else{
+    this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
+    }
+  } 
+  _onGoToPreviousStatus = (statusData) =>{
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction,statusData,this.props.navigation)
+  }
 
+  statusRevertSelection(statusList){
+    let BUTTONS = statusList.map(list => list[1])
+    BUTTONS.push(CANCEL)
+    ActionSheet.show(
+      {
+        options: BUTTONS,
+        title: REVERT_STATUS_TO,
+        cancelButtonIndex: BUTTONS.length - 1,
+        destructiveButtonIndex: BUTTONS.length - 1
+      },
+      buttonIndex => {
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.alertForStatusRevert(statusList[buttonIndex]) : null
+      }
+    )
+  }
+
+  showDraftAlert() {
+    // let draftStatus = this.props.currentStatus.nextStatusList.filter(nextStatus => nextStatus.id == this.props.draftStatusId)
+    // let draftMessage = (draftStatus.length > 0) ? 'Do you want to restore draft for ' + draftStatus[0].name + '?' : 'Do you want to restore draft?'
+    let draftMessage = 'Do you want to restore draft for ' + this.props.draftStatusInfo.name + '?'
+    let view =
+      <CustomAlert
+        title="Draft"
+        message={draftMessage}
+        onOkPressed={() => this._goToFormLayoutWithDraft()}
+        onCancelPressed={this._onCancel} />
+    return view
+  }
+  _goToFormLayoutWithDraft = () => {
+    this.props.actions.navigateToScene('FormLayout', {
+      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+      jobTransactionId: this.props.jobTransaction.id,
+      jobTransaction: this.props.jobTransaction,
+      statusId: this.props.draftStatusInfo.id,
+      statusName: this.props.draftStatusInfo.name,
+      jobMasterId: this.props.jobTransaction.jobMasterId,
+      isDraftRestore: true
+    })
+  }
   render() {
     if (this.props.jobDetailsLoading) {
       return (
-        <Loader />
-      )
+           <Loader />
+         )
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo)) ? this.showDraftAlert() : null
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
+            {draftAlert}
             <View>
               {renderIf(this.props.statusList,
                 <CustomAlert
@@ -329,7 +404,7 @@ class JobDetailsV2 extends Component {
             </View>
             <Header style={[style.header]}>
               <View style={style.seqCard}>
-                <View style={[style.seqCircle,{backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor}]}>
+                <View style={[style.seqCircle, { backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor }]}>
                   <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
                     {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
                   </Text>
@@ -365,6 +440,20 @@ class JobDetailsV2 extends Component {
               </View>
             </Header>
             <Content>
+              { !this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0  ?
+              <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = {this.selectStatusToRevert}>
+                  <View style = {[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+                      <View style={[styles.row, styles.alignCenter]}>
+                          <View>
+                            <RevertIcon color={styles.fontPrimary}/>
+                          </View>
+                          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Revert Status</Text>
+                          <Right>
+                            <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+                          </Right>
+                      </View>
+                  </View>
+              </TouchableOpacity> : null} 
 
               <View style={[styles.marginTop5, styles.bgWhite]}>
                 {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
@@ -372,14 +461,15 @@ class JobDetailsV2 extends Component {
                     {this.props.errorMessage}
                   </Text>
                 </View> : null}
-
-                {statusView}
+               
+                    {statusView}
               </View>
 
               {/*Basic Details*/}
               <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
                 <ExpandableHeader
                   title={'Basic Details'}
+                  navigateToDataStoreDetails={this.navigateToDataStoreDetails}
                   dataList={this.props.jobDataList}
                 />
               </View>
@@ -404,16 +494,16 @@ class JobDetailsV2 extends Component {
                   </Button>
                 </FooterTab>
               )}
-              
-                {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
+
+              {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
                 <FooterTab>
                   <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
                     <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
                   </Button>
                 </FooterTab>
-                )}
+              )}
 
-                {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
+              {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
                 (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
                 <FooterTab>
                   <Button full onPress={this.navigationButtonPressed}>
@@ -439,7 +529,6 @@ class JobDetailsV2 extends Component {
 
 
 const style = StyleSheet.create({
-  //  styles.column, styles.paddingLeft0, styles.paddingRight0, {height: 'auto'}
   header: {
     flexDirection: 'column',
     paddingLeft: 0,
@@ -487,6 +576,7 @@ const style = StyleSheet.create({
     height: 10,
     borderRadius: 5
   },
+  
   footer: {
     height: 'auto',
     backgroundColor: '#ffffff',

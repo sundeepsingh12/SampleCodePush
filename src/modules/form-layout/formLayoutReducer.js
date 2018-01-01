@@ -16,8 +16,10 @@ import {
     UPDATE_PAYMENT_AT_END,
     UPDATE_FIELD_DATA_VALIDATION,
     SET_FORM_LAYOUT_STATE,
-    CLEAR_FORM_LAYOUT
-  } from '../../lib/constants'
+    CLEAR_FORM_LAYOUT,
+    SET_DRAFT,
+    SET_UPDATE_DRAFT
+} from '../../lib/constants'
 
 const initialState = new InitialState();
 
@@ -45,6 +47,7 @@ export default function formLayoutReducer(state = initialState, action) {
          */
         case UPDATE_FIELD_DATA: {
             return state.set('formElement', action.payload)
+                .set('updateDraft', true)
         }
 
 
@@ -52,6 +55,7 @@ export default function formLayoutReducer(state = initialState, action) {
             return state.set('formElement', action.payload.formElement)
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('isSaveDisabled', action.payload.isSaveDisabled ? true : false)
+                .set('updateDraft', true)
         }
 
         case UPDATE_PAYMENT_AT_END: {
@@ -66,6 +70,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('statusName', action.payload.statusName)
                 .set('jobTransactionId', action.payload.jobTransactionId)
                 .set('latestPositionId', action.payload.latestPositionId)
+                .set('draftStatusId', action.payload.draftStatusId)
         }
 
         /**
@@ -108,7 +113,6 @@ export default function formLayoutReducer(state = initialState, action) {
          * back pressed from TransientStatus container
          */
         case SET_FORM_LAYOUT_STATE: {
-            console.log(action.type,action.payload)
             return state.set('currentElement', action.payload.currentElement)
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('isSaveDisabled', action.payload.isSaveDisabled)
@@ -119,6 +123,12 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('isLoading', action.payload.isLoading)
                 .set('errorMessage', action.payload.errorMessage)
                 .set('paymentAtEnd', action.payload.paymentAtEnd)
+        }
+        case SET_DRAFT: {
+            return state.set('draftStatusId', action.payload)
+        }
+        case SET_UPDATE_DRAFT: {
+            return state.set('updateDraft', action.payload)
         }
     }
     return state;

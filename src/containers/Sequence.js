@@ -10,7 +10,7 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 
 import React, {Component} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight,Alert} from 'react-native'
+import {StyleSheet, View, Image, TouchableHighlight,Alert,TouchableOpacity} from 'react-native'
 
 import {ROUTE_OPTIMIZATION} from '../lib/AttributeConstants'
 
@@ -88,23 +88,23 @@ class Sequence extends Component {
         return (
           <StyleProvider style={getTheme(platform)}>
             <Container>
-               <Header
-            style={StyleSheet.flatten([
-            styles.bgPrimary, {
-              borderBottomWidth: 0
-            }
-          ])}>
-            <Left>
-               <Button transparent onPress={() => { 
-                 this.props.actions.setState(CLEAR_SEQUENCE_STATE)
-                 this.props.navigation.goBack(null) }}>
-              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}/>
-              </Button>
-            </Left>
+             <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
             <Body>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Sequence</Text>
+              <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <TouchableOpacity style={[style.headerLeft]} onPress={() => { 
+                  this.props.actions.setState(CLEAR_SEQUENCE_STATE)
+                  this.props.navigation.goBack(null) }}>
+                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                </TouchableOpacity>
+                <View style={[style.headerBody]}>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
+                </View>
+                <View style={[style.headerRight]}>
+                </View>
+                <View />
+              </View>
             </Body>
-            <Right/>
           </Header>
               <View style={[styles.flex1, styles.bgWhite]}>
                 <SortableListView
@@ -157,7 +157,7 @@ class Sequence extends Component {
               </Button>
             </Left>
             <Body>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Sequence</Text>
+              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{this.props.navigation.state.params.displayName}</Text>
             </Body>
             <Right/>
           </Header>
@@ -196,5 +196,29 @@ class Sequence extends Component {
   }
 
 }
+const style = StyleSheet.create({
+  header: {
+    borderBottomWidth: 0,
+    height: 'auto',
+    padding: 0,
+    paddingRight: 0,
+    paddingLeft: 0
+  },
+  headerLeft: {
+    width: '15%',
+    padding: 15
+  },
+  headerBody: {
+    width: '70%',
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  headerRight: {
+    width: '15%',
+    padding: 15
+  },
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sequence)

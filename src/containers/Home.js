@@ -2,7 +2,7 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
@@ -25,7 +25,6 @@ import {
   Toast,
   ActionSheet
 } from 'native-base'
-import LinearGradient from 'react-native-linear-gradient'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -78,7 +77,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class Home extends Component {
+class Home extends PureComponent {
 
   componentDidMount() {
     this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
@@ -95,11 +94,11 @@ class Home extends Component {
         break
       }
       case SEQUENCEMODULE_ID: {
-        this.props.actions.navigateToScene(Sequence)
+        this.props.actions.navigateToScene(Sequence,{displayName:this.props.modules.SEQUENCEMODULE.displayName})
         break
       }
       case START_ID: {
-        this.props.actions.navigateToScene(TabScreen, {})
+        this.props.actions.navigateToScene(TabScreen, {remark: appModule.remark})
         break
       }
 
@@ -218,7 +217,6 @@ class Home extends Component {
       )
     }
 
-    console.log('this.props.count', this.props.count)
     if (this.props.count) {
       return (<PieChart count={this.props.count} press={this._onPieChartPress} />)
     }

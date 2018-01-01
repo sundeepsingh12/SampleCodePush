@@ -30,7 +30,10 @@ import {
 
 import {
   SET_FORM_LAYOUT_STATE,
+  SET_DRAFT,
+  SET_UPDATE_DRAFT
 } from '../lib/constants'
+import CustomAlert from "../components/CustomAlert"
 
 function mapStateToProps(state) {
   return {
@@ -44,7 +47,9 @@ function mapStateToProps(state) {
     isLoading: state.formLayout.isLoading,
     errorMessage: state.formLayout.errorMessage,
     currentElement: state.formLayout.currentElement,
-    pieChart: state.home.pieChart
+    pieChart: state.home.pieChart,
+    draftStatusId: state.formLayout.draftStatusId,
+    updateDraft: state.formLayout.updateDraft
   }
 }
 
@@ -55,14 +60,48 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FormLayout extends Component {
-
+  componentDidUpdate() {
+    if (this.props.updateDraft && !this.props.navigation.state.params.transactionIdList) { //Draft should not be saved for bulk
+      this.saveDraft()
+      this.props.actions.setState(SET_UPDATE_DRAFT, false)
+    }
+  }
+  saveDraft = () => {
+    if (this.props.jobTransactionId != 0) {
+      let formLayoutState = {
+        formElement: this.props.formElement,
+        isSaveDisabled: this.props.isSaveDisabled,
+        statusName: this.props.statusName,
+        jobTransactionId: this.props.jobTransactionId,
+        statusId: this.props.statusId,
+        latestPositionId: this.props.latestPositionId,
+        paymentAtEnd: this.props.paymentAtEnd,
+        isLoading: this.props.isLoading,
+        errorMessage: this.props.errorMessage,
+        currentElement: this.props.currentElement,
+      }
+      this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId)
+    }
+  }
+  showDraftAlert() {
+    let draftMessage = 'Do you want to restore draft for ' + this.props.statusName + '?'
+    let view =
+      <CustomAlert
+        title="Draft"
+        message={draftMessage}
+        onOkPressed={() => this._goToFormLayoutWithDraft()}
+        onCancelPressed={()=>this._onCancel()} />
+    return view
+  }
+  _onCancel=()=> {
+    this.props.actions.setState(SET_DRAFT, null)
+  }
+  _goToFormLayoutWithDraft = () => {
+    this.props.actions.setState(SET_DRAFT, null)
+    this.props.actions.restoreDraft(this.props.jobTransactionId, this.props.statusId, this.props.navigation.state.params.jobMasterId)
+  }
   componentDidMount() {
-    if (this.props.navigation.state.params.editableFormLayoutState) {
-      this.props.actions.setState(SET_FORM_LAYOUT_STATE, this.props.navigation.state.params.editableFormLayoutState)
-    }
-    else {
-      this.props.actions.getSortedRootFieldAttributes(this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId);
-    }
+    this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId)
   }
 
   renderData = (item) => {
@@ -73,7 +112,8 @@ class FormLayout extends Component {
         isSaveDisabled={this.props.isSaveDisabled}
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
-        latestPositionId={this.props.latestPositionId} />
+        latestPositionId={this.props.latestPositionId}
+      />
     )
   }
 
@@ -133,6 +173,7 @@ class FormLayout extends Component {
   _keyExtractor = (item, index) => item[1].key;
 
   render() {
+    const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
     if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
       Toast.show({
         text: this.props.errorMessage,
@@ -155,6 +196,7 @@ class FormLayout extends Component {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
+          {draftAlert}
           <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
             <Body>
               <View

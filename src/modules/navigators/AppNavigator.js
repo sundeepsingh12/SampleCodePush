@@ -24,8 +24,6 @@ import Application from '../../containers/Application'
 import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
 import Logout from '../../containers/Logout'
-import JobDetails from '../../containers/JobDetails'
-import HomeUI from '../../containers/HomeUI'
 import Home from '../../containers/Home'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
@@ -88,6 +86,7 @@ import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
+import OfflineDS from '../../containers/OfflineDS'
 import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
 import Scanner from '../../components/Scanner'
@@ -209,7 +208,7 @@ export const HomeTabNavigator = TabNavigator({
         fontSize: 12,
         marginTop: 0,
         fontWeight: '600'
-        
+
       },
       tabStyle: {
         alignItems: 'center',
@@ -265,9 +264,6 @@ export const AppNavigator = StackNavigator({
   Logout: {
     screen: Logout,
   },
-  JobDetails: {
-    screen: JobDetails,
-  },
   SelectFromList: {
     screen: SelectFromList,
   },
@@ -290,9 +286,6 @@ export const AppNavigator = StackNavigator({
       title: 'Sorting',
       header: null,
     }
-  },
-  HomeUI: {
-    screen: HomeUI
   },
   HomeTabNavigatorScreen: {
     screen: HomeTabNavigator
@@ -377,13 +370,22 @@ export const AppNavigator = StackNavigator({
     screen: DataStoreItemDetails
   },
   SaveActivated: {
-    screen: SaveActivated
+    screen: SaveActivated,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   Transient: {
-    screen: Transient
+    screen: Transient,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   CheckoutDetails: {
-    screen: CheckoutDetails
+    screen: CheckoutDetails,
+    navigationOptions: {
+      gesturesEnabled: false,
+    }
   },
   SignatureAndNps: {
     screen: SignatureAndNps
@@ -421,8 +423,11 @@ export const AppNavigator = StackNavigator({
   JobMasterListScreen: {
     screen: JobMaster
   },
-   DataStoreDetails: {
+  DataStoreDetails: {
     screen: DataStoreDetails
+  },
+  OfflineDS: {
+    screen: OfflineDS
   },
   CameraAttribute: {
     screen: CameraFieldAttribute,
@@ -431,7 +436,7 @@ export const AppNavigator = StackNavigator({
     screen: ImageDetailsView,
   }
 },
-{
+  {
     cardStyle: {
       backgroundColor: 'white'
     }

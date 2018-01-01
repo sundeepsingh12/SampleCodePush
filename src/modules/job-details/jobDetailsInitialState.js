@@ -8,12 +8,14 @@ var InitialState = Record({
     fieldDataList: [],
     jobDetailsLoading: false,
     jobDataList: [],
-    jobTransaction : null,
+    jobTransaction: null,
     messageList: [],
     currentStatus: null,
     smsTemplateList: [],
     errorMessage: false,
     statusList: null,
+    statusRevertList: [],
+    draftStatusInfo: {},
 })
 
 export default InitialState

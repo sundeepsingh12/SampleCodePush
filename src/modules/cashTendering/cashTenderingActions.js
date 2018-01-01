@@ -20,18 +20,18 @@ import {
 
 import { setState } from '../global/globalActions'
 
-export function onSave(parentObject, formElement, cashTenderingList, cashTenderingListReturn, isSaveDisabled, latestPositionId, jobTransactionId, isReceive) {
+export function onSave(parentObject, formElement, cashTenderingList, cashTenderingListReturn, isSaveDisabled, latestPositionId, jobTransaction, isReceive) {
     return async function (dispatch) {
         try {
             if (!cashTenderingList) {
                 throw new Error("cashTenderingList not set Properly onSave action")
             }
             let cashTenderingListCombined = (isReceive) ? cashTenderingList : Object.assign({}, cashTenderingList, cashTenderingListReturn)
-            let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(cashTenderingListCombined, jobTransactionId, parentObject.positionId, latestPositionId)
+            let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(cashTenderingListCombined, jobTransaction.id, parentObject.positionId, latestPositionId)
             if (cashTenderingListReturn != null) {
                 dispatch(setState(IS_RECEIVE_TOGGLE, true))
             }
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
         } catch (error) {
             console.log(error)
         }

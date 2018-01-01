@@ -92,7 +92,6 @@ class JobStatus {
       throw new Error('Job status missing in store')
     }
     const filteredJobStatusArray = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && !jobMasterIdList.includes(jobStatusObject.jobMasterId)))
-    console.log('filteredJobStatusArray',filteredJobStatusArray)
     if (_.isUndefined(filteredJobStatusArray) || _.isNull(filteredJobStatusArray)) {
       throw new Error('Invalid Job Master or Job Status Code')
     }
@@ -101,7 +100,6 @@ class JobStatus {
     // filteredJobStatusArray.forEach(jobStatusObject => {
     //   jobMasterIdStatusIdMap[jobStatusObject.jobMasterId] = jobStatusObject.id
     // })
-    console.log('jobStatusIdList',jobStatusIdList)
     return jobStatusIdList
   }
 
@@ -182,8 +180,11 @@ class JobStatus {
       throw new Error('Job status missing in store')
     }
     const jobStatusList = jobStatusArray.value
-    let pendingStatusIds = [], failStatusIds = [], successStatusIds = [];
+    let pendingStatusIds = [], failStatusIds = [], successStatusIds = [], noNextStatusIds = [];
     for (id in jobStatusList) {
+      if(jobStatusList[id].nextStatusList.length == 0){
+        noNextStatusIds.push(jobStatusList[id].id)
+      }
       if (jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN) {
         pendingStatusIds.push(jobStatusList[id].id)
         continue
@@ -196,8 +197,21 @@ class JobStatus {
         failStatusIds.push(jobStatusList[id].id)
       }
     }
-    return { pendingStatusIds, failStatusIds, successStatusIds }
+    return { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds }
   }
+
+
+  getTabIdOnStatusId(statusList,statusId){
+    let tabId
+    for(let data of statusList){
+      if(data.id == statusId){
+        tabId = data.tabId
+        break
+      }
+    }
+    return tabId
+  }
+
 
 
   async getStatusCategoryOnStatusId(jobStatusId) {

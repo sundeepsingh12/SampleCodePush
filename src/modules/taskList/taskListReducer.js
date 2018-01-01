@@ -10,7 +10,8 @@ import {
   SET_SELECTED_DATE,
   IS_CALENDAR_VISIBLE,
   LISTING_SEARCH_VALUE,
-  RESET_STATE
+  RESET_STATE,
+  SEARCH_TAP
 } from '../../lib/constants'
 
 
@@ -38,6 +39,9 @@ export default function taskList(state = initialState, action) {
 
     case LISTING_SEARCH_VALUE:
       return state.set('searchText',action.payload) 
+
+    case SEARCH_TAP:
+      return state.set('searchTap',action.payload)
 
     case RESET_STATE:
       return initialState  

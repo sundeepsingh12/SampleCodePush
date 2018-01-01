@@ -18,7 +18,7 @@ JobTransaction.schema = {
               androidPushTime  :  'string?',
               lastUpdatedAtServer  :     'string'   ,
               lastTransactionTimeOnMobile  :  'string?',
-              jobEtaTime  :  'string?',
+              jobEtaTime  :  'string?', // todo
               seqSelected  : 'int' ,
               seqActual  :  'int?',
               seqAssigned  : 'int?',
@@ -35,7 +35,7 @@ JobTransaction.schema = {
               hubId  :  'int' ,
               cityId  :   'int' ,
               trackKm  :  'double' ,
-              trackHalt  :  'double' ,
+              trackHalt  :  'double' , // todo
               trackCallCount  : { type: 'int',default:0},
               trackCallDuration  : { type: 'int',default:0},
               trackSmsCount  : { type: 'int',default:0},
@@ -45,13 +45,13 @@ JobTransaction.schema = {
               trackBattery  : 'int' ,
               deleteFlag  : 'int' ,
               attemptCount  : { type: 'int',default:1},
-              startTime  :   'string?',
+              startTime  :   'string?',  // todo
               endTime  :  'string?',
               merchantCode  :  'string?',
               imeiNumber  :  'string?',
               npsFeedBack  :  'string?',
               id  : 'int' ,
-              jobType : 'string?',
+              jobType : 'string?',   
               statusCode : 'string?',
               employeeCode :  'string?',
               hubCode : 'string?',

@@ -5,7 +5,7 @@ import dataStoreReducer from '../dataStoreReducer'
 import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
-    SHOW_LOADER,
+    SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
@@ -20,7 +20,7 @@ describe('data Store reducer', () => {
     const resultState = new InitialState()
     it('should set loaderRunning to true and errorMessage to empty', () => {
         const action = {
-            type: SHOW_LOADER,
+            type: SHOW_LOADER_DS,
             payload: true
         }
         let nextState = dataStoreReducer(undefined, action)

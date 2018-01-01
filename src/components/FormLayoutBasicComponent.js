@@ -172,7 +172,7 @@ class BasicFormElement extends Component {
     }
 
     _searchForReferenceValue = (value) => {
-        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, NEXT_FOCUS);
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction);
     }
 
     onFocusEvent(currentElement) {
@@ -185,15 +185,11 @@ class BasicFormElement extends Component {
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, value, isSaveDisabled) {
         if (value.length < 2) {
-            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value);
+            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, null, this.props.jobTransaction);
         }
         else {
             this.props.actions.updateFieldData(fieldAttributeMasterId, value, formElement);
         }
-    }
-
-    _onPressHelpText(fieldAttributeMasterId) {
-        this.props.actions.toogleHelpText(fieldAttributeMasterId, this.props.formElement);
     }
 
     _inflateModal = () => {
@@ -204,8 +200,9 @@ class BasicFormElement extends Component {
         })
     }
     onSaveDateTime = (value) => {
-        this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', NEXT_FOCUS);
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction);
         this.setState({ showDateTimePicker: false, showNPS: false })
+        //  this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction, this.props.isSaveDisabled)
     }
 
     cancelDateTimePicker = () => {
@@ -213,6 +210,13 @@ class BasicFormElement extends Component {
     }
     _dropModal = () => {
         this.setModalVisible(false)
+    }
+    setModalVisible = (visible) => {
+        this.setState(() => {
+            return {
+                showNPS: visible,
+            }
+        })
     }
     _showNPS = () => {
         this.setState(previousState => {
@@ -322,10 +326,10 @@ class BasicFormElement extends Component {
                                         autoCapitalize="none"
                                         placeholder={this.props.item.helpText}
                                         placeholderTextColor={styles.fontLowGray.color}
-                                        defaultValue={this.props.item.value}
+                                        defaultValue={this.props.item.displayValue}
                                         style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
-                                        value={this.props.item.value}
-                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13) ? 'numeric' : 'default'}
+                                        value={this.props.item.displayValue}
+                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
                                         multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                         onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
@@ -333,12 +337,12 @@ class BasicFormElement extends Component {
                                         onBlur={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                     />
-                                    
+
 
                                 </Item>
                                 {this.props.item.alertMessage ?
-                                        <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
-                                        : null}
+                                    <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
+                                    : null}
                                 {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ? <TouchableHighlight
                                     style={[styles.absolute, { bottom: 50, right: 10 }]}
                                     onPress={this.goToQRCode}

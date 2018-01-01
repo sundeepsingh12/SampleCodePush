@@ -8,15 +8,17 @@ import {
     SET_ERROR_MSG,
     ON_BLUR,
     CLEAR_ARRAY_STATE,
-    UPDATE_FIELD_DATA_VALIDATION
+    UPDATE_FIELD_DATA_VALIDATION,
+    NEXT_FOCUS
+
 } from '../../lib/constants'
-import { ARRAY_SAROJ_FAREYE } from '../../lib/AttributeConstants'
+import { ARRAY_SAROJ_FAREYE, AFTER } from '../../lib/AttributeConstants'
 import _ from 'lodash'
 import { setState } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 
-export function getSortedArrayChildElements(fieldAttributeMasterId, jobStatusId, lastrowId, arrayElements) {
+export function getSortedArrayChildElements(fieldAttributeMasterId, jobStatusId, lastrowId, arrayElements, latestPositionId) {
     return async function (dispatch) {
         try {
             const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, fieldAttributeMasterId)
@@ -56,10 +58,10 @@ export function deleteArrayRow(arrayElements, rowId, lastrowId) {
         }
     }
 }
-export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, fieldDataList) {
+export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, fieldDataList, event) {
     return async function (dispatch) {
         try {
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, isSaveDisabled, rowId, value, fieldDataList)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, isSaveDisabled, rowId, value, fieldDataList, event)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))
@@ -67,12 +69,12 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
     }
 }
 
-export function saveArray(arrayElements, arrayParentItem, jobTransactionId, latestPositionId, formElement, isSaveDisabled) {
+export function saveArray(arrayElements, arrayParentItem, jobTransaction, latestPositionId, formElement, isSaveDisabled) {
     return async function (dispatch) {
         try {
             if (!_.isEmpty(arrayElements)) {
-                let fieldDataListWithLatestPositionId = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId)
-                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId))
+                let fieldDataListWithLatestPositionId = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction.id, latestPositionId)
+                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
                 dispatch(setState(SET_ERROR_MSG, ''))
                 dispatch(setState(CLEAR_ARRAY_STATE))
             }
@@ -88,12 +90,15 @@ export function clearArrayState() {
     }
 }
 
-export function fieldValidations(currentElement, arrayElements, timeOfExecution, jobTransaction, rowId, isSaveDisabled) {
+export function fieldValidationsArray(currentElement, arrayElements, timeOfExecution, jobTransaction, rowId, isSaveDisabled) {
     return function (dispatch) {
         let newArray = _.cloneDeep(arrayElements)
         let formElement = newArray[rowId].formLayoutObject
-        let alertMessageList = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
-        dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, currentElement.value, newArray, rowId))
+        let validationsResult = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
+        if (timeOfExecution == AFTER) {
+            formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+        }
+        dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, currentElement.displayValue, newArray, rowId, null, NEXT_FOCUS))
         //   dispatch(setState('SET_ARRAY', newArray))
     }
 }

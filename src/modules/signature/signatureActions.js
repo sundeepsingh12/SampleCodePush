@@ -30,10 +30,10 @@ export function _setIsRemarksValidation(isRemarksValidation) {
     }
 }
 
-export function saveSignature(result, fieldAttributeMasterId, formElement, isSaveDisabled) {
+export function saveSignature(result, fieldAttributeMasterId, formElement, isSaveDisabled, latestPositionId, jobTransaction) {
     return async function (dispatch) {
         const value = await signatureService.saveFile(result, moment())
-        dispatch(getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, NEXT_FOCUS))
+        dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }, jobTransaction))
     }
 }
 
@@ -57,11 +57,11 @@ export function setIsRemarksValidation(validation) {
     }
 }
 
-export function saveSignatureAndRating(result, rating, currentElement, formElement, isSaveDisabled, jobTransactionId, latestPositionId) {
+export function saveSignatureAndRating(result, rating, currentElement, formElement, isSaveDisabled, jobTransaction, latestPositionId) {
     return async function (dispatch) {
         const signatureValue = await signatureService.saveFile(result, moment())
         const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-        const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransactionId, latestPositionId)
-        dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
+        const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransaction.id, latestPositionId)
+        dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
     }
 }

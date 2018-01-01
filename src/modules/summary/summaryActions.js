@@ -3,6 +3,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
+import { jobStatusService } from '../../services/classes/JobStatus'
 import { setState } from '../global/globalActions'
 import {
     SET_SUMMARY_FOR_JOBMASTER,
@@ -22,11 +23,13 @@ export function getDataForJobMasterSummaryAndRunSheetSummary() {
         try {
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobStatusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-            const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)            
+            const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY) 
+            const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
+            const { pendingStatusIds, noNextStatusIds } = allStatusIds           
             if (!jobMasterList || !jobStatusList || !jobSummaryList) {
                 throw new Error('store not available')
             }
-            const jobMasterSummaryList =  summaryAndPieChartService.setAllJobMasterSummary(jobMasterList.value,jobStatusList.value,jobSummaryList.value)
+            const jobMasterSummaryList =  summaryAndPieChartService.setAllJobMasterSummary(jobMasterList.value,jobStatusList.value,jobSummaryList.value,pendingStatusIds,noNextStatusIds)
             const runsheetSummaryList =   summaryAndPieChartService.getAllRunSheetSummary()
             dispatch(setState(SET_SUMMARY_FOR_JOBMASTER, jobMasterSummaryList))
             dispatch(setState(SET_SUMMARY_FOR_RUNSHEET,runsheetSummaryList))

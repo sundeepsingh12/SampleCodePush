@@ -2,18 +2,23 @@
 
 import {
     ON_BLUR,
-    TABLE_FIELD_DATA
+    TABLE_FIELD_DATA,
+    TABLE_RUNSHEET
 } from '../../lib/constants'
 
 import {
     formLayoutEventsInterface
 } from '../classes/formLayout/FormLayoutEventInterface'
 
+import {jobStatusService} from '../classes/JobStatus'
+
 import sha256 from 'sha256';
 
 import {
   restAPI
 } from '../../lib/RestAPI'
+
+import moment from 'moment'
 
 import {
     keyValueDBService
@@ -231,6 +236,151 @@ describe('add transaction to sync list',()=>{
         
     })
 })
+
+describe('update jobSummary data ',()=>{
+    const jobSummary = { value:[
+           {
+            id: 2260120,
+            userId: 4957,
+            hubId: 2759,
+            cityId: 744,
+            companyId: 295,
+            jobStatusId:4814,
+            count:1,
+           },
+           {
+            id: 2260121,
+            userId: 4957,
+            hubId: 2759,
+            cityId: 744,
+            companyId: 295,
+            jobStatusId:4815,
+            count:2,
+           }
+    ]}
+
+    let jobTransaction = {
+        id:1,
+        jobId:2,
+        jobMasterId:3,
+        jobStatusId:4814,
+        referenceNumber:"abc123",
+        runsheetNo:"aks",
+        runsheetId:1234,
+        seqSelected:2,
+       }
+       let nextStatusId = 4815;
+
+    let newJobSummary  = { value:[
+        {
+         id: 2260120,
+         userId: 4957,
+         hubId: 2759,
+         cityId: 744,
+         companyId: 295,
+         jobStatusId:4814,
+         count:0,
+        },
+        {
+         id: 2260121,
+         userId: 4957,
+         hubId: 2759,
+         cityId: 744,
+         companyId: 295,
+         jobStatusId:4815,
+         count:3,
+        }
+ ]}
+
+    it('should update job summary',()=>{
+        keyValueDBService.getValueFromStore = jest.fn();
+        keyValueDBService.getValueFromStore.mockReturnValue(jobSummary);
+        keyValueDBService.validateAndUpdateData = jest.fn();
+        formLayoutEventsInterface._updateJobSummary(jobTransaction,nextStatusId,null).then((idList)=>{
+            expect(idList).toEqual(newJobSummary);
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1);
+            expect(keyValueDBService.validateAndUpdateData).toHaveBeenCalledTimes(1);
+        })
+        
+    })
+})
+
+describe('update Runsheet Summary data ',()=>{
+    const runsheetSummary =[
+           {
+            id: 2260,
+            userId: 4957,
+            hubId: 2759,
+            runsheetNumber: "1",
+            pendingCount:0,
+            successCount: 2,
+            failCount: 0
+           },
+           {
+            id: 2261,
+            userId: 4957,
+            hubId: 2759,
+            runsheetNumber: "2",
+            pendingCount:1,
+            successCount: 0,
+            failCount: 0
+           },
+    ]
+
+    let jobTransaction = {
+        id:1,
+        jobId:2,
+        jobMasterId:3,
+        jobStatusId:4814,
+        referenceNumber:"abc123",
+        runsheetNo:"2",
+        runsheetId:2261,
+        seqSelected:2,
+       }
+    let nextStatusCategory = 3, prevStatusCategory = 1;
+
+    const newRunsheetList =[
+        {
+         id: 2260,
+         userId: 4957,
+         hubId: 2759,
+         runsheetNumber: "1",
+         pendingCount:0,
+         successCount: 2,
+         failCount: 0
+        },
+        {
+         id: 2261,
+         userId: 4957,
+         hubId: 2759,
+         runsheetNumber: "2",
+         pendingCount:0,
+         successCount: 1,
+         failCount: 0
+        },
+ ]
+
+ let data = {
+     tableName: TABLE_RUNSHEET,
+     value: newRunsheetList
+     }
+
+    it('should update runsheet summary',()=>{
+        jobStatusService.getStatusCategoryOnStatusId = jest.fn();
+        jobStatusService.getStatusCategoryOnStatusId.mockReturnValue(prevStatusCategory);
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue(runsheetSummary);
+        keyValueDBService.validateAndUpdateData = jest.fn();
+        formLayoutEventsInterface._updateRunsheetSummary(jobTransaction,nextStatusCategory,null).then((idList)=>{
+            expect(idList).toEqual(data);
+            expect(jobStatusService.getStatusCategoryOnStatusId).toHaveBeenCalledTimes(1);
+            expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1);
+        })
+        
+    })
+})
+
+
 
 describe('save data to db',()=>{
     it('should save field data',()=>{

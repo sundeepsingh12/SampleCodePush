@@ -78,7 +78,7 @@ class FixedSKUListing extends Component {
           </Text>
           <Button success
             onPress={() => {
-              this.props.actions.onSave(this.parentObject, this.formElement, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction.id)
+              this.props.actions.onSave(this.parentObject, this.formElement, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction)
               this.props.navigation.goBack()
             }}>
             <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>

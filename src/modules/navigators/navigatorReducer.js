@@ -1,6 +1,5 @@
 import { AppNavigator } from '../navigators/AppNavigator'
 import { NavigationActions } from 'react-navigation'
-import initialNavState from './navigatorInitialState'
 
 import {
     ApplicationScreen,
@@ -11,7 +10,7 @@ import {
     FormLayout
 } from '../../lib/constants'
 
-export default function nav(state = initialNavState, action) {
+export default function nav(state, action) {
    if (action.type.startsWith('Navigation/')) {
     const { type, routeName } = action
     const lastRoute = state.routes[state.routes.length - 1]

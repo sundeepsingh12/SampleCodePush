@@ -22,12 +22,12 @@ import {
     TABLE_SERVER_SMS_LOG,
     TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
-    USER_EVENT_LOG,
     LAST_SYNC_WITH_SERVER
 
 } from '../../lib/constants'
 import moment from 'moment'
 import {trackingService} from './Tracking'
+import {userEventLogService} from './UserEvent'
 
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
@@ -54,10 +54,8 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.trackLog = await trackingService.getTrackLogs(realmDbData.trackLogs,lastSyncTime)
     SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
     SYNC_RESULTS.userCommunicationLog = [];
-    const userEventsLogs = await keyValueDBService.getValueFromStore(USER_EVENT_LOG);
-    const userEventLogValue = userEventsLogs ? userEventsLogs.value : []
-    SYNC_RESULTS.userEventsLog = userEventLogValue
-    SYNC_RESULTS.userExceptionLog = [];
+    SYNC_RESULTS.userEventsLog = await userEventLogService.getUserEventLog(lastSyncTime)
+    SYNC_RESULTS.userExceptionLog =  [];
    
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
