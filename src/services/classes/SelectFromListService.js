@@ -133,7 +133,7 @@ class SelectFromListService {
     }
 
     getFilteredDataInDropDown(selectFromListValues, searchText) {
-        let filteredData = Object.values(selectFromListValues).filter(item => (item.name).indexOf(searchText) == 0)
+        let filteredData = Object.values(selectFromListValues).filter(item => (item.name.toUpperCase()).indexOf(searchText.toUpperCase()) == 0)
         let filteredDataObject = this.arrayToObject(filteredData) 
         return filteredDataObject
     }
