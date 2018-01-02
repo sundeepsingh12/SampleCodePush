@@ -15,7 +15,6 @@ import Reactotron from 'reactotron-react-native'
 import { applyMiddleware, createStore } from 'redux' //createStore to be removed
 import thunk from 'redux-thunk'
 import { createLogger } from 'redux-logger'
-import Reactotron from 'reactotron-react-native'
 
 /**
 * ## Reducer

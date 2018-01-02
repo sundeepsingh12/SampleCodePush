@@ -172,7 +172,14 @@ class Login extends PureComponent {
                         disabled={this.props.auth.form.isEditTextDisabled}
                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                       />
-                      <Iconimg  name='pizza' onPress={()=> this.props.actions.forgetPasswordRequest(this.props.auth.form.username)} style={{right:5, position: 'absolute', color: 'green'}} />
+                      <Iconimg  
+                        name='ios-help-circle-outline' 
+                        onPress={()=> {
+                          console.tron.log(this.props,true)
+                          this.props.forgetPasswordRequest(this.props.auth.form.username)
+                          }
+                        } 
+                        style={{right:5, position: 'absolute', color: 'black', backgroundColor: 'white'}} />
                     </Item>
 
                     <Button
