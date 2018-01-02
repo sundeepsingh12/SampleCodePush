@@ -66,9 +66,9 @@ export default class FormLayoutEventImpl {
             if (key != attributeMasterId || event == NEXT_FOCUS) {
                 value.focus = false
             }
-            if (!value.value && value.value !== 0 && value.required) {
-                isSaveDisabled = true
-            }
+            // if (!value.value && value.value !== 0 && value.required) {
+            //     isSaveDisabled = true
+            // }
 
             if (value.displayValue || value.displayValue === 0) {
                 continue
