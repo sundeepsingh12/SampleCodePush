@@ -7,15 +7,39 @@ import Reactotron, {
   } from 'reactotron-react-native'
 import { reactotronRedux } from 'reactotron-redux'
 
+import Immutable from 'immutable'
+
 console.tron = Reactotron
   
-Reactotron
+Reactotron //To be added dev under dev flag
     .configure({
-        host: '192.168.31.34',
+        host: '192.168.1.20',
         name: "Fareye App"
     }) // controls connection & communication settings
     //.useReactNative()
-    .use(reactotronRedux()) //  <- Redux like govt mind control experiments!!
+    .use(reactotronRedux({
+        onRestore:(state,oldState) => {
+            let newstate = {}
+            console.tron.display({
+            name: 'gunn',
+            value:oldState,
+            important: true
+            });
+            // for(let i in state) {
+            //     //console.tron.log(i)
+            //      if(i === 'nav'|| i === 'auth') {
+            //          console.tron.log('bazoooka',true)
+            //         // newstate[i] = state[i]
+            //          continue
+            //      }
+            //      //console.tron.log(state[i],true)
+            //      newstate[i] = Immutable.Record(state[i])
+            // }
+            // console.tron.log(newstate,true)
+            // return newstate
+            return {...Immutable.Record(state), nav: state.nav,auth: {...Immutable.Record(state.auth)}}
+        }
+    })) //  <- Redux like a govt-run mind control experiment!!
     .use(trackGlobalErrors({
         veto: frame => frame.fileName.indexOf('/node_modules/react-native/') >= 0
     }))

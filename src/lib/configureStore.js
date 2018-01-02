@@ -12,7 +12,7 @@
  * redux functions
  */
 import Reactotron from 'reactotron-react-native'
-import { applyMiddleware, createStore } from 'redux'
+import { applyMiddleware, createStore } from 'redux' //createStore to be removed
 import thunk from 'redux-thunk'
 import { createLogger } from 'redux-logger'
 
@@ -40,10 +40,10 @@ const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__
  * device, global, login, profile
  *
  */
+export default function configureStore(intialState) {
+  return Reactotron.createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware)) //Redux logger not required But still working here
+}
+
 // export default function configureStore(initialState) {
 //   return createStoreWithMiddleware(reducer, initialState)
 // };
-
-export default function configureStore(intialState) {
-  return Reactotron.createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware))
-}
