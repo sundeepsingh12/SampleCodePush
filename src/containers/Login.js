@@ -175,7 +175,6 @@ class Login extends PureComponent {
                       <Iconimg  
                         name='ios-help-circle-outline' 
                         onPress={()=> {
-                          console.tron.log(this.props,true)
                           this.props.forgetPasswordRequest(this.props.auth.form.username)
                           }
                         } 

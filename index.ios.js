@@ -1,4 +1,5 @@
 'use strict'
+
 import './ReactotronConfig'
 import fareye from './src/fareye'
 

@@ -119,6 +119,7 @@ export default function native(platform) {
   class Fareye extends PureComponent {
 
     render() {
+      //console.logs('hi','how','are',{good: 'luck'},{hi: 'goodday', welcome: {to: 'fareye'}})
       return (
         <Provider store={store}>
           <AppWithNavigationState />

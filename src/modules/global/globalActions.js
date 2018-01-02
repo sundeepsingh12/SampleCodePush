@@ -95,7 +95,6 @@ export async function getJobListingParameters() {
 export function deleteSessionToken() {
   return async function (dispatch) {
     try {
-      await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
@@ -105,6 +104,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(LIVE_JOB)
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
       await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)            
+      await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0

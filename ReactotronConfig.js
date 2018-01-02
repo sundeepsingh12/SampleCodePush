@@ -9,6 +9,17 @@ import { reactotronRedux } from 'reactotron-redux'
 
 import Immutable from 'immutable'
 
+console.logs = function() {
+    for(let i in arguments) {
+        Reactotron.display({
+            name: 'Console Log',
+            value: arguments[i],
+            preview: JSON.stringify(arguments[i]),
+            important: true,
+          })
+    }
+}
+
 console.tron = Reactotron
   
 Reactotron //To be added dev under dev flag
@@ -19,10 +30,9 @@ Reactotron //To be added dev under dev flag
     //.useReactNative()
     .use(reactotronRedux({
         onRestore:(state,oldState) => {
-            let newstate = {}
             console.tron.display({
             name: 'gunn',
-            value:oldState,
+            value:state,
             important: true
             });
             // for(let i in state) {

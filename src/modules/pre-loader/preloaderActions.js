@@ -281,10 +281,14 @@ export function invalidateUserSession() {
       // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")      
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
-      dispatch(deleteSessionToken())
+      console.logs('start')
       dispatch(preLogoutSuccess())
-       dispatch(setState(TOGGLE_LOGOUT,false))
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(setState(TOGGLE_LOGOUT,false))
+      console.logs('med')
+      dispatch(deleteSessionToken())
+      console.logs('end')
+       
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))
         dispatch(setState(TOGGLE_LOGOUT,false))
