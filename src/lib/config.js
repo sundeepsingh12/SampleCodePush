@@ -19,7 +19,7 @@ module.exports = {
   },
   API: {
     AUTHENTICATION_API: '/app/authentication',
-    JOB_MASTER_API: '/app/app/rest/device/job_master',
+    JOB_MASTER_API: '/app/rest/device/job_master',
     CHECK_ASSET_API: '/app/rest/device/check_asset',
     GENERATE_OTP_API: '/app/rest/device/generate_otp',
     SIM_VERIFICATION_API: '/app/rest/device/sim_verified',
