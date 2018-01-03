@@ -173,8 +173,8 @@ export default class FormLayoutEventImpl {
             let gpsKms = (!userSummary.value.gpsKms) ? "0" : userSummary.value.gpsKms
             await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, gpsKms)
             let lastTrackLog = {
-                latitude: userSummary.value.lastLat,
-                longitude: userSummary.value.lastLng
+                latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
+                longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
             }
             let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
             if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
