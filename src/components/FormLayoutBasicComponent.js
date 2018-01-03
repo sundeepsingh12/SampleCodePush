@@ -11,7 +11,7 @@ import {
     Modal
 }
     from 'react-native'
-import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Toast, Item, Label } from 'native-base'
+import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Item, Label } from 'native-base'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import { connect } from 'react-redux'
@@ -302,6 +302,9 @@ class BasicFormElement extends Component {
 
     render() {
         let modalView = this.getModalView()
+        if(this.props.item.hidden) {
+            return null
+        }
         switch (this.props.item.attributeTypeId) {
             case STRING:
             case TEXT:

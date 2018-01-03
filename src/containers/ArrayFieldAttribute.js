@@ -160,7 +160,7 @@ class ArrayFieldAttribute extends Component {
                                 <Text style={[styles.fontSuccess, styles.padding10]}>Add</Text>
                             </Button>
                         </View>
-                        <View style={[styles.bgPrimary, styles.marginBottom15]}>
+                        <View style={[styles.bgPrimary]}>
                             <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
                                 <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                             </Button>

@@ -79,7 +79,8 @@ export async function createZip(transactionIdToBeSynced) {
     // var stat = await RNFS.stat(PATH + '/sync.zip');
     // console.log('=====zip '+stat.size);
     //Deleting TEMP folder location
-    await RNFS.unlink(PATH_TEMP);
+    //TODO uncomment below line (quick fix)
+    // await RNFS.unlink(PATH_TEMP);
     // console.log(PATH_TEMP+' removed');
 
 
