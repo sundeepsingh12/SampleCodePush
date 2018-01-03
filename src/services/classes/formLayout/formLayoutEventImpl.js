@@ -202,6 +202,9 @@ export default class FormLayoutEventImpl {
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
             await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
             await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
+            userSummary.value.lastOrderTime = jobTransaction.value[0].lastTransactionTimeOnMobile
+            userSummary.value.lastOrderNumber = jobTransaction.value[0].referenceNumber
+            await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
