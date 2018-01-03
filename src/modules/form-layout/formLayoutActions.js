@@ -146,32 +146,36 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
 
 export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, jobTransactionIdList, pieChart) {
     return async function (dispatch) {
-        dispatch(setState(IS_LOADING, true))
-        let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement)
-        if (isFormValid) {
-            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-            let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
-            dispatch(setState(IS_LOADING, false))
-            let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
-            if (routeName == TabScreen) {
-                dispatch(NavigationActions.reset({
-                    index: 1,
-                    actions: [
-                        NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                        NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
-                    ]
-                }))
+        try {
+            dispatch(setState(IS_LOADING, true))
+            let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement)
+            if (isFormValid) {
+                const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+                let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
+                dispatch(setState(IS_LOADING, false))
+                let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
+                if (routeName == TabScreen) {
+                    dispatch(NavigationActions.reset({
+                        index: 1,
+                        actions: [
+                            NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+                            NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
+                        ]
+                    }))
+                } else {
+                    dispatch(navigateToScene(routeName, routeParam))
+                }
+                dispatch(performSyncService(pieChart))
+                dispatch(setState(CLEAR_FORM_LAYOUT))
+                dispatch(setState(CLEAR_BULK_STATE))
             } else {
-                dispatch(navigateToScene(routeName, routeParam))
+                dispatch(setState(SET_FORM_TO_INVALID, {
+                    isLoading: false,
+                    isFormValid: false
+                }))
             }
-            dispatch(performSyncService(pieChart))
-            dispatch(setState(CLEAR_FORM_LAYOUT))
-            dispatch(setState(CLEAR_BULK_STATE))
-        } else {
-            dispatch(setState(SET_FORM_TO_INVALID, {
-                isLoading: false,
-                isFormValid: false
-            }))
+        } catch (error) {
+            console.log(error)
         }
     }
 }

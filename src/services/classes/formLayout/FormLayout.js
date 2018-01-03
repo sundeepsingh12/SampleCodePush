@@ -279,7 +279,7 @@ class FormLayout {
             throw new Error('formElement is missing')
         }
         for (let [id, currentObject] of formElement.entries()) {
-            if (currentObject.required && !currentObject.value) {
+            if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
                 return false
             }
         }
