@@ -87,9 +87,6 @@ export class keyValueDb {
       default:
         checkCondition = true;
     }
-    if(schemaName=='USER_EVENT_LOG'){
-      console.log('rfr',validate(value, schemaInstance))
-    }
     if (value && (checkCondition || validate(value, schemaInstance).valid)) {
       return store.save(schemaName, {
         value

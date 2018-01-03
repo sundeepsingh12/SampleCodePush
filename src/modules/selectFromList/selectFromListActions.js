@@ -60,14 +60,18 @@ export function selectFromListButton(selectFromListState, params, jobTransaction
                 const fieldDataListData = await fieldDataService.prepareFieldDataForTransactionSavingInState(selectFromListState, jobTransaction.id, params.positionId, latestPositionId)
                 const value = params.attributeTypeId == OPTION_RADIO_FOR_MASTER ? OBJECT_SAROJ_FAREYE : ARRAY_SAROJ_FAREYE
                 if (calledFromArray)
-                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId, fieldDataListData))
-                else
-                    dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, value, fieldDataListData))
+                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId, fieldDataListData.fieldDataList, NEXT_FOCUS))
+                else {
+                     dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, value, fieldDataListData, jobTransaction))
+                  //  dispatch(fieldValidations(params, formElement, 'After', jobTransaction, isSaveDisabled))
+                }
             } else {
                 if (calledFromArray)
-                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, selectFromListState[0].value, formElement, rowId))
-                else
-                    dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value, { latestPositionId }))
+                    dispatch(getNextFocusableAndEditableElement(params.fieldAttributeMasterId, isSaveDisabled, selectFromListState[0].value, formElement, rowId, null, NEXT_FOCUS))
+                else {
+                     dispatch(updateFieldDataWithChildData(params.fieldAttributeMasterId, formElement, isSaveDisabled, selectFromListState[0].value, { latestPositionId }, jobTransaction))
+                   // dispatch(fieldValidations(params, formElement, 'After', jobTransaction, isSaveDisabled))
+                }
             }
             dispatch(setState(INPUT_TEXT_VALUE, ''))
             dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, {}))

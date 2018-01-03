@@ -215,6 +215,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
+    SET_FORM_TO_INVALID: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,

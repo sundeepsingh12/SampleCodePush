@@ -58,7 +58,7 @@ class CashTendering extends Component {
     _onSavePressReturn = () => {
         let cashToReturn = this.props.totalAmount - this.props.navigation.state.params['cash']
         if (cashToReturn == this.props.totalAmountReturn) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'].id, this.props.isReceive)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
             this.props.actions.setState(IS_RECEIVE_TOGGLE, true)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
             this.props.actions.setState(CHANGE_AMOUNT_RETURN, { cashTenderingList: {}, totalAmount: 0 })
@@ -69,7 +69,7 @@ class CashTendering extends Component {
 
     _onSavePress = () => {
         if (this.props.navigation.state.params['cash'] > 0 && this.props.navigation.state.params['cash'] == this.props.totalAmount) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, null, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'].id, this.props.isReceive)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, null, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
             this.props.navigation.goBack()
         } else if (this.props.navigation.state.params['cash'] > this.props.totalAmount) {

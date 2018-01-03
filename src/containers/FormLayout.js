@@ -32,9 +32,14 @@ import {
   SET_FORM_LAYOUT_STATE,
   SET_DRAFT,
   SET_UPDATE_DRAFT,
-  ERROR_MESSAGE
+  ERROR_MESSAGE,
+  SET_FORM_TO_INVALID
 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
+import {
+  ALERT,
+  INVALID_FORM_ALERT
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -50,7 +55,8 @@ function mapStateToProps(state) {
     currentElement: state.formLayout.currentElement,
     pieChart: state.home.pieChart,
     draftStatusId: state.formLayout.draftStatusId,
-    updateDraft: state.formLayout.updateDraft
+    updateDraft: state.formLayout.updateDraft,
+    isFormValid: state.formLayout.isFormValid
   }
 }
 
@@ -63,7 +69,7 @@ function mapDispatchToProps(dispatch) {
 class FormLayout extends Component {
 
   componentDidUpdate() {
-    if (this.props.updateDraft) {
+    if (this.props.updateDraft && !this.props.navigation.state.params.transactionIdList) { //Draft should not be saved for bulk
       this.saveDraft()
       this.props.actions.setState(SET_UPDATE_DRAFT, false)
     }
@@ -185,8 +191,23 @@ class FormLayout extends Component {
 
   _keyExtractor = (item, index) => item[1].key;
 
+  showInvalidFormAlert() {
+    let draftMessage = INVALID_FORM_ALERT
+    let view =
+      <CustomAlert
+        title={ALERT}
+        message={draftMessage}
+        onOkPressed={() => this.props.actions.setState(SET_FORM_TO_INVALID, {
+          isLoading: false,
+          isFormValid: true
+        })}
+      />
+    return view
+  }
+
   render() {
     const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
+    const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
       <Footer style={[style.footer]}>
@@ -203,6 +224,7 @@ class FormLayout extends Component {
       <StyleProvider style={getTheme(platform)}>
         <Container>
           {draftAlert}
+          {invalidFormAlert}
           <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
             <Body>
               <View

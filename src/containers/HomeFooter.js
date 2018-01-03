@@ -27,7 +27,6 @@ import {
     TabHeading,
     Tabs
 } from 'native-base'
-import LinearGradient from 'react-native-linear-gradient'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'

@@ -39,7 +39,7 @@ class SkuListing extends Component {
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+    this.props.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
   }
 
   renderData(item) {
@@ -49,15 +49,15 @@ class SkuListing extends Component {
   }
 
   updateSkuActualQty(value, parentId) {
-    this.props.actions.updateSkuActualQuantityAndOtherData(value, parentId, this.props.skuListItems, this.props.skuChildItems)
+    this.props.updateSkuActualQuantityAndOtherData(value, parentId, this.props.skuListItems, this.props.skuChildItems)
   }
 
   onChangeSkuCode(skuCode) {
-    this.props.actions.changeSkuCode(skuCode)
+    this.props.changeSkuCode(skuCode)
   }
 
-  static navigationOptions = ({navigation}) => {
-    return {header: null}
+  static navigationOptions = ({ navigation }) => {
+    return { header: null }
   }
 
   render() {
@@ -66,18 +66,18 @@ class SkuListing extends Component {
     }
     else {
       return (
-         <StyleProvider style={getTheme(platform)}>
-        <Container>
+        <StyleProvider style={getTheme(platform)}>
+          <Container>
             <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-            <Body>
-              <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }}/>
-                <Text
-                  style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
-                <View/>
-              </View>
-              {/* <View
+              <Body>
+                <View
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
+                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
+                  <Text
+                    style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
+                  <View />
+                </View>
+                {/* <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.relative]}>
                 <Input
                   placeholder="Filter Reference Numbers"
@@ -87,19 +87,19 @@ class SkuListing extends Component {
                   <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXl]}/>
                 </Button>
               </View> */}
-            </Body>
+              </Body>
 
-          </Header>
+            </Header>
 
-              <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
+            <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
               <FlatList
                 data={_.values(this.props.skuListItems)}
                 renderItem={({ item }) => this.renderData(item)}
                 keyExtractor={item => _.values(this.props.skuListItems).indexOf(item)}
               />
-              </Content>
+            </Content>
 
-          {/* {renderIf(this.props.isSearchBarVisible,
+            {/* {renderIf(this.props.isSearchBarVisible,
             <View style={{ flex: 2, flexDirection: 'row' }}>
               <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
                 <Input value={this.props.skuSearchTerm}
@@ -114,12 +114,12 @@ class SkuListing extends Component {
               </View>
             </View>)} */}
 
-          <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
+            <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
               <Button primary full onPress={this.saveSkuList}>
                 <Text style={[styles.fontLg, styles.fontWhite]}>Proceed</Text>
               </Button>
-          </Footer>
-        </Container>
+            </Footer>
+          </Container>
         </StyleProvider>
       )
     }
@@ -129,18 +129,18 @@ class SkuListing extends Component {
     //Code incomplete
     const searchTerm = this.props.skuSearchTerm;
     if (skuSearchTerm) {
-      this.props.actions.scanSkuItem(this.props.skuListItems, searchTerm)
+      this.props.scanSkuItem(this.props.skuListItems, searchTerm)
     }
   }
 
   saveSkuList = () => {
-    this.props.actions.saveSkuListItems(
+    this.props.saveSkuListItems(
       this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
-      this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction.id, this.props.navigation.state.params.latestPositionId,
+      this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
       this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-      this.props.navigation.state.params.isSaveDisabled,this.props.navigation
+      this.props.navigation.state.params.isSaveDisabled, this.props.navigation
     )
-    
+
   }
 
 }
@@ -228,4 +228,4 @@ const style = StyleSheet.create({
 
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SkuListing)
+export default connect(mapStateToProps, skuListingActions)(SkuListing)

@@ -180,13 +180,15 @@ class BasicFormElement extends Component {
     }
 
     _onBlurEvent(currentElement) {
-        this.props.actions.checkUniqueValidationThenSave(currentElement, this.props.formElement, this.props.isSaveDisabled, currentElement.displayValue, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction)
+        if (currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == QR_SCAN) {
+            this.props.actions.checkUniqueValidationThenSave(currentElement, this.props.formElement, this.props.isSaveDisabled, currentElement.displayValue, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction)
+        }
         this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, value, isSaveDisabled) {
         if (value.length < 2) {
-            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value);
+            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, null, this.props.jobTransaction);
         }
         else {
             this.props.actions.updateFieldData(fieldAttributeMasterId, value, formElement);
@@ -201,8 +203,9 @@ class BasicFormElement extends Component {
         })
     }
     onSaveDateTime = (value) => {
-        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId });
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction);
         this.setState({ showDateTimePicker: false, showNPS: false })
+        //  this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction, this.props.isSaveDisabled)
     }
 
     cancelDateTimePicker = () => {
@@ -210,6 +213,13 @@ class BasicFormElement extends Component {
     }
     _dropModal = () => {
         this.setModalVisible(false)
+    }
+    setModalVisible = (visible) => {
+        this.setState(() => {
+            return {
+                showNPS: visible,
+            }
+        })
     }
     _showNPS = () => {
         this.setState(previousState => {
@@ -327,7 +337,7 @@ class BasicFormElement extends Component {
                                             multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                             onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
                                             onFocus={() => { this.onFocusEvent(this.props.item) }}
-                                            onBlur={(e) => this._onBlurEvent(this.props.item)}
+                                            onEndEditing={(e) => this._onBlurEvent(this.props.item)}
                                             secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
                                         />
                                     </Item>

@@ -36,8 +36,8 @@ export function getPaymentParameters(jobMasterId, jobId, fieldAttributeMasterId,
                 {
                     actualAmount: paymentParameters.actualAmount,
                     isAmountEditable,
-                    maxValue : paymentParameters.amountEditableObject ? paymentParameters.amountEditableObject.maxValue : null,
-                    minValue : paymentParameters.amountEditableObject ? paymentParameters.amountEditableObject.minValue : null,
+                    maxValue: paymentParameters.amountEditableObject ? paymentParameters.amountEditableObject.maxValue : null,
+                    minValue: paymentParameters.amountEditableObject ? paymentParameters.amountEditableObject.minValue : null,
                     moneyCollectMaster: paymentParameters.moneyCollectMaster,
                     originalAmount: paymentParameters.originalAmount,
                     paymentModeList: paymentParameters.paymentModeList,
@@ -49,18 +49,18 @@ export function getPaymentParameters(jobMasterId, jobId, fieldAttributeMasterId,
     }
 }
 
-export function saveMoneyCollectObject(actualAmount, currentElement, formElement, jobMasterId, jobId, jobTransactionId, latestPositionId, moneyCollectMaster, isSaveDisabled, originalAmount, selectedIndex, transactionNumber, remarks, receipt) {
+export function saveMoneyCollectObject(actualAmount, currentElement, formElement, jobMasterId, jobId, jobTransaction, latestPositionId, moneyCollectMaster, isSaveDisabled, originalAmount, selectedIndex, transactionNumber, remarks, receipt) {
     return async function (dispatch) {
         try {
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedIndex, transactionNumber, remarks, receipt)
-            const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransactionId, currentElement.positionId, latestPositionId)
+            const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransaction.id, currentElement.positionId, latestPositionId)
             const isCardPayment = paymentService.checkCardPayment(selectedIndex)
             let paymentAtEnd = {
                 currentElement,
                 modeTypeId: selectedIndex,
                 isCardPayment
             }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
             dispatch(setState(UPDATE_PAYMENT_AT_END, {
                 paymentAtEnd
             }))

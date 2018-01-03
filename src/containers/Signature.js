@@ -63,6 +63,7 @@ class Signature extends Component {
                 this.props.navigation.state.params.formElements,
                 this.props.navigation.state.params.isSaveDisabled,
                 this.props.navigation.state.params.latestPositionId,
+                this.props.navigation.state.params.jobTransaction
             )
         }
         this.setState({ isLandscape: 'portrait' })
@@ -104,27 +105,27 @@ class Signature extends Component {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                        <Header searchBar style={[styles.bgWhite, style.header]}>
-                            <Body>
-                                <View
-                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                    <TouchableOpacity style={[style.headerLeft]} onPress={() => {
-                                        this.setState({ isLandscape: 'portrait' })
-                                        this.props.navigation.goBack(null)
-                                    }}>
-                                        <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
-                                    </TouchableOpacity>
-                                    <View style={[style.headerBody]}>
-                                        <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
-                                    </View>
-                                    <TouchableOpacity style={[style.headerRight]}
-                                        onPress={this.resetSign} >
-                                        <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
-                                    </TouchableOpacity>
-                                    <View />
+                    <Header searchBar style={[styles.bgWhite, style.header]}>
+                        <Body>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={() => {
+                                    this.setState({ isLandscape: 'portrait' })
+                                    this.props.navigation.goBack(null)
+                                }}>
+                                    <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[style.headerBody]}>
+                                    <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
                                 </View>
-                            </Body>
-                        </Header>
+                                <TouchableOpacity style={[style.headerRight]}
+                                    onPress={this.resetSign} >
+                                    <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
+                                </TouchableOpacity>
+                                <View />
+                            </View>
+                        </Body>
+                    </Header>
                     <View style={[styles.flex1, styles.row]}>
                         <View style={{ borderWidth: 1 }}>
                             {renderIf(this.props.isRemarksValidation && this.props.fieldDataList.length > 0,
