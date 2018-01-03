@@ -18,7 +18,8 @@ import {
     SET_FORM_LAYOUT_STATE,
     CLEAR_FORM_LAYOUT,
     SET_DRAFT,
-    SET_UPDATE_DRAFT
+    SET_UPDATE_DRAFT,
+    SET_FORM_TO_INVALID
 } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -129,6 +130,11 @@ export default function formLayoutReducer(state = initialState, action) {
         }
         case SET_UPDATE_DRAFT: {
             return state.set('updateDraft', action.payload)
+        }
+
+        case SET_FORM_TO_INVALID: {
+            return state.set('isLoading', action.payload.isLoading)
+                .set('isFormValid', action.payload.isFormValid)
         }
     }
     return state;

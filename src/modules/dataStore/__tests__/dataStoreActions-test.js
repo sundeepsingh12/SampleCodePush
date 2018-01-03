@@ -303,24 +303,24 @@ describe('test for uniqueValidationCheck', () => {
     }]
 
     it('should return true as dataStoreValue is already present', () => {
-        dataStoreService.dataStoreValuePresentInFieldData = jest.fn()
-        dataStoreService.dataStoreValuePresentInFieldData.mockReturnValue(true);
+        dataStoreService.checkForUniqueValidation = jest.fn()
+        dataStoreService.checkForUniqueValidation.mockReturnValue(true);
         const store = mockStore({})
         return store.dispatch(actions.uniqueValidationCheck('abhi', 123))
             .then(() => {
-                expect(dataStoreService.dataStoreValuePresentInFieldData).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.checkForUniqueValidation).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
     })
 
     it('should return false as dataStoreValue is already present', () => {
-        dataStoreService.dataStoreValuePresentInFieldData = jest.fn()
-        dataStoreService.dataStoreValuePresentInFieldData.mockReturnValue(false);
+        dataStoreService.checkForUniqueValidation = jest.fn()
+        dataStoreService.checkForUniqueValidation.mockReturnValue(false);
         const store = mockStore({})
         return store.dispatch(actions.uniqueValidationCheck('abhi', 123, 1))
             .then(() => {
-                expect(dataStoreService.dataStoreValuePresentInFieldData).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.checkForUniqueValidation).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
             })

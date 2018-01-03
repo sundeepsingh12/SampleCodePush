@@ -20,7 +20,8 @@ import {
     CLEAR_FORM_LAYOUT,
     SET_FORM_LAYOUT_STATE,
     SET_UPDATE_DRAFT,
-    CLEAR_BULK_STATE
+    CLEAR_BULK_STATE,
+    SET_FORM_TO_INVALID
 } from '../../lib/constants'
 
 import {
@@ -41,6 +42,9 @@ import { jobStatusService } from '../../services/classes/JobStatus'
 import _ from 'lodash'
 import { performSyncService } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
+import { dataStoreService } from '../../services/classes/DataStoreService'
+import { UNIQUE_VALIDATION_FAILED } from '../../lib/ContainerConstants'
+import { getNextFocusableAndEditableElement } from '../array/arrayActions';
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
@@ -142,25 +146,37 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
 
 export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, jobTransactionIdList, pieChart) {
     return async function (dispatch) {
-        dispatch(setState(IS_LOADING, true))
-        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-        let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
-        dispatch(setState(IS_LOADING, false))
-        let landingId = (Start.landingTab)  ? jobStatusService.getTabIdOnStatusId(statusList.value,formLayoutState.statusId): false
-        if (routeName == TabScreen) {
-            dispatch(NavigationActions.reset({
-                index: 1,
-                actions: [
-                    NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                    NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
-                ]
-            }))
-        } else {
-            dispatch(navigateToScene(routeName, routeParam))
+        try {
+            dispatch(setState(IS_LOADING, true))
+            let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement)
+            if (isFormValid) {
+                const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+                let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
+                dispatch(setState(IS_LOADING, false))
+                let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
+                if (routeName == TabScreen) {
+                    dispatch(NavigationActions.reset({
+                        index: 1,
+                        actions: [
+                            NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+                            NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
+                        ]
+                    }))
+                } else {
+                    dispatch(navigateToScene(routeName, routeParam))
+                }
+                dispatch(performSyncService(pieChart))
+                dispatch(setState(CLEAR_FORM_LAYOUT))
+                dispatch(setState(CLEAR_BULK_STATE))
+            } else {
+                dispatch(setState(SET_FORM_TO_INVALID, {
+                    isLoading: false,
+                    isFormValid: false
+                }))
+            }
+        } catch (error) {
+            console.log(error)
         }
-        dispatch(performSyncService(pieChart))
-        dispatch(setState(CLEAR_FORM_LAYOUT))
-        dispatch(setState(CLEAR_BULK_STATE))
     }
 }
 
@@ -199,6 +215,31 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
             else {
                 dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId))
             }
+        }
+    }
+}
+
+export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSaveDisabled, value, latestPositionId, jobTransaction) {
+    return async function (dispatch) {
+        try {
+            let isValuePresentInAnotherTransaction = await dataStoreService.checkForUniqueValidation(value, fieldAtrribute.fieldAttributeMasterId)
+            let cloneFormElement = _.cloneDeep(formElement)
+            if (isValuePresentInAnotherTransaction) {
+                cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
+                cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).displayValue = value
+                cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).value = null
+                dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, {
+                    formLayoutObject: cloneFormElement,
+                    isSaveDisabled: true
+                }))
+                dispatch(setState(SET_UPDATE_DRAFT, true))
+            } else {
+                cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = ''
+                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, value, latestPositionId, jobTransaction))
+            }
+        }
+        catch (error) {
+            console.log(error)
         }
     }
 }

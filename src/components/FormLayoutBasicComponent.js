@@ -172,7 +172,7 @@ class BasicFormElement extends Component {
     }
 
     _searchForReferenceValue = (value) => {
-        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction);
+        this.props.actions.checkUniqueValidationThenSave(this.props.item, this.props.formElement, this.props.isSaveDisabled, value, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction)
     }
 
     onFocusEvent(currentElement) {
@@ -180,6 +180,9 @@ class BasicFormElement extends Component {
     }
 
     _onBlurEvent(currentElement) {
+        if (currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == QR_SCAN) {
+            this.props.actions.checkUniqueValidationThenSave(currentElement, this.props.formElement, this.props.isSaveDisabled, currentElement.displayValue, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction)
+        }
         this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction)
     }
 
@@ -294,7 +297,6 @@ class BasicFormElement extends Component {
                 latestPositionId: this.props.latestPositionId,
                 isSaveDisabled: this.props.isSaveDisabled,
                 returnData: this._searchForReferenceValue.bind(this)
-
             })
     }
 
@@ -313,45 +315,45 @@ class BasicFormElement extends Component {
                     <View>
                         {renderIf(!this.props.item.hidden,
                             <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
-                                <Item stackedLabel>
-                                    {this.props.item.label ?
-                                        <Label style={[this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
-                                            {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
-                                        </Label>
-                                        : null}
-                                    {this.props.item.subLabel ?
-                                        <Label style={[this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Label>
-                                        : null}
-                                    <Input
-                                        autoCapitalize="none"
-                                        placeholder={this.props.item.helpText}
-                                        placeholderTextColor={styles.fontLowGray.color}
-                                        defaultValue={this.props.item.displayValue}
-                                        style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
-                                        value={this.props.item.displayValue}
-                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
-                                        editable={this.props.item.editable}
-                                        multiline={this.props.item.attributeTypeId == 2 ? true : false}
-                                        onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
-                                        onFocus={() => { this.onFocusEvent(this.props.item) }}
-                                        onBlur={(e) => this._onBlurEvent(this.props.item)}
-                                        secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                    />
-
-
-                                </Item>
+                                {this.props.item.label ?
+                                    <Label style={[styles.fontDefault, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
+                                        {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
+                                    </Label>
+                                    : null}
+                                {this.props.item.subLabel ?
+                                    <Label style={[styles.fontSm, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Label>
+                                    : null}
+                                <View>
+                                    <Item stackedLabel>
+                                        <Input
+                                            autoCapitalize="none"
+                                            placeholder={this.props.item.helpText}
+                                            placeholderTextColor={styles.fontLowGray.color}
+                                            defaultValue={this.props.item.displayValue}
+                                            style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
+                                            value={this.props.item.displayValue}
+                                            keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
+                                            editable={this.props.item.editable}
+                                            multiline={this.props.item.attributeTypeId == 2 ? true : false}
+                                            onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
+                                            onFocus={() => { this.onFocusEvent(this.props.item) }}
+                                            onEndEditing={(e) => this._onBlurEvent(this.props.item)}
+                                            secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
+                                        />
+                                    </Item>
+                                    {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ?
+                                        <TouchableHighlight
+                                            style={[styles.absolute, { top: 10, right: 10 }]}
+                                            onPress={this.goToQRCode}
+                                        >
+                                            <View>
+                                                <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)} />
+                                            </View>
+                                        </TouchableHighlight> : null}
+                                </View>
                                 {this.props.item.alertMessage ?
                                     <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
                                     : null}
-                                {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ? <TouchableHighlight
-                                    style={[styles.absolute, { bottom: 50, right: 10 }]}
-                                    onPress={this.goToQRCode}
-                                >
-                                    <View>
-                                        <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)} />
-                                    </View>
-                                </TouchableHighlight> : null}
-
                                 {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
                                 <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
                                 <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
