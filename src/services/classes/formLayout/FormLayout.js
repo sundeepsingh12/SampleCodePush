@@ -264,14 +264,26 @@ class FormLayout {
             }
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransactionIdList, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
-            if(!jobTransactionIdList){ //Delete draft only if not bulk
-            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+            if (!jobTransactionIdList) { //Delete draft only if not bulk
+                await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
             }
         }
         return {
             routeName,
             routeParam
         }
+    }
+
+    isFormValid(formElement) {
+        if (!formElement) {
+            throw new Error('formElement is missing')
+        }
+        for (let [id, currentObject] of formElement.entries()) {
+            if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
+                return false
+            }
+        }
+        return true
     }
 }
 

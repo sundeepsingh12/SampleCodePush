@@ -67,6 +67,7 @@ module.exports = keyMirror({
     PRE_LOGOUT_FAILURE: null,
     TOGGLE_CHECKBOX: null,
     REMEMBER_ME_SET_TRUE: null,
+    OTP_SUCCESS: null,
 
     //Home Actions
     HOME_LOADING: null,
@@ -215,6 +216,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
+    SET_FORM_TO_INVALID: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
