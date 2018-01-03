@@ -242,7 +242,7 @@ class FormLayout extends Component {
             </Body>
           </Header>
 
-          <Content style={[styles.flex1, styles.bgWhite]}>
+          <View style={[styles.flex1, styles.bgWhite]}>
             <View style={[styles.paddingTop10, styles.paddingBottom10]}>
               <FlatList
                 data={Array.from(this.props.formElement)}
@@ -251,7 +251,7 @@ class FormLayout extends Component {
                 keyExtractor={this._keyExtractor}>
               </FlatList>
             </View>
-          </Content>
+          </View>
 
           <Footer style={[style.footer]}>
             <FooterTab style={[styles.padding10]}>
