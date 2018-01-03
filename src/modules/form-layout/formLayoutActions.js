@@ -61,11 +61,11 @@ export function _setErrorMessage(message) {
     }
 }
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId) {
+export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
             dispatch(setState(IS_LOADING, true))
-            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId)
+            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
             dispatch(setState(BASIC_INFO, {
@@ -129,7 +129,6 @@ export function updateFieldData(attributeId, value, formElement) {
 export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject, jobTransaction) {
     return function (dispatch) {
         const cloneFormElement = _.cloneDeep(formElement)
-        console.log('fieldDataListObject', fieldDataListObject)
         cloneFormElement.get(attributeMasterId).displayValue = value
         let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, 'After', jobTransaction)
         cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
@@ -148,7 +147,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
     return async function (dispatch) {
         try {
             dispatch(setState(IS_LOADING, true))
-            let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement)
+            let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement, jobTransaction)
             if (isFormValid) {
                 const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                 let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
@@ -176,6 +175,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
             }
         } catch (error) {
             console.log(error)
+            dispatch(setState(IS_LOADING, false))
         }
     }
 }
@@ -204,7 +204,7 @@ export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
     }
 }
 
-export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId) {
+export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         if (isDraftRestore) {
             dispatch(restoreDraft(jobTransactionId, statusId))
@@ -213,7 +213,7 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
                 dispatch(setState(SET_FORM_LAYOUT_STATE, editableFormLayoutState))
             }
             else {
-                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId))
+                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
             }
         }
     }
