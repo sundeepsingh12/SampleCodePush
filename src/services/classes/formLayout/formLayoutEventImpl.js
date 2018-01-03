@@ -191,7 +191,7 @@ export default class FormLayoutEventImpl {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) //to edit later
-                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate)
+                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
             }
 
             //TODO add other dbs which needs updation
@@ -501,7 +501,7 @@ export default class FormLayoutEventImpl {
      * @param {*statusObject} status 
      * @param {*jobId} jobId 
      */
-    _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber, currentTime, reAttemptDate) {
+    _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber, currentTime, reAttemptDate, lastTrackLog) {
         let jobArray = []
         let realmJobObject = null
         if (jobId > 0) {
@@ -522,6 +522,10 @@ export default class FormLayoutEventImpl {
         }
         if(reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")){
             job.jobStartTime = reAttemptDate + " 00:00:00"
+        }
+        if(jobId < 0){
+            job.latitude = lastTrackLog.latitude,
+            job.longitude = lastTrackLog.longitude
         }
         jobArray.push(job)
         return {
