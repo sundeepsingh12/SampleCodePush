@@ -106,7 +106,7 @@ class Payment extends Component {
         this.props.actions.setState(SET_PAYMENT_CHANGED_PARAMETERS, payload)
     }
 
-    renderChequeOrDD(type){
+    renderChequeOrDD(type) {
         return (
             <View>
                 <Text> {type} </Text>
@@ -125,7 +125,7 @@ class Payment extends Component {
                             }
                         )}
                         style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])} />
-                    
+
                 </View>
             </View>
         )
@@ -225,7 +225,7 @@ class Payment extends Component {
                         style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
                         value={this.props.actualAmount != null && this.props.actualAmount != undefined ? '' + this.props.actualAmount : null}
                     />
-                  
+
                 </View>
             )
         } else {
@@ -274,7 +274,7 @@ class Payment extends Component {
                                     this.props.navigation.state.params.formElements,
                                     this.props.navigation.state.params.jobTransaction.jobMasterId,
                                     this.props.navigation.state.params.jobTransaction.jobId,
-                                    this.props.navigation.state.params.jobTransaction.id,
+                                    this.props.navigation.state.params.jobTransaction,
                                     this.props.navigation.state.params.latestPositionId,
                                     this.props.moneyCollectMaster,
                                     this.props.navigation.state.params.isSaveDisabled,

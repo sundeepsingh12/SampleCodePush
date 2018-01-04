@@ -20,12 +20,15 @@ import {
   USERNAME,
   PASSWORD,
   LoginScreen,
+  IS_SERVER_REACHABLE,
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
   FAIL,
   SUCCESS,
-  Piechart
+  Piechart,
+  SERVER_REACHABLE,
+  SERVER_UNREACHABLE,
 } from '../../lib/AttributeConstants'
 
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
@@ -42,6 +45,8 @@ import { jobStatusService } from '../../services/classes/JobStatus'
 import { trackingService } from '../../services/classes/Tracking'
 import { authenticationService } from '../../services/classes/Authentication'
 import { logoutService } from '../../services/classes/Logout'
+import _ from 'lodash'
+import { userEventLogService } from '../../services/classes/UserEvent'
 /**
  * This action enables modules for particular user
  */
@@ -92,9 +97,8 @@ export function pieChartCount() {
   return async (dispatch) => {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
-      const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const { pendingStatusIds, failStatusIds, successStatusIds } = allStatusIds
-      const count = summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds)
+      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds }  = await jobStatusService.getStatusIdsForAllStatusCategory()
+      const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
       //Update UI here
@@ -144,12 +148,22 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
       }))
       //Now schedule sync service which will run regularly after 2 mins
       await dispatch(syncService(pieChart))
+      let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
+      if (_.isNull(serverReachable) || serverReachable.value == 2) {
+        await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
+        await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
+    }
     } catch (error) {
       if (error.code == 500 || error.code == 502) {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'INTERNALSERVERERROR'
         }))
+        let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
+        if (_.isNull(serverReachable) || serverReachable.value == 1) {
+          await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
+          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
+        }
       } else if (error.code == 401) {
         dispatch(reAuthenticateUser(transactionIdToBeSynced))
       } else {
@@ -251,7 +265,7 @@ export function startMqttService(pieChart) {
 
 export function startTracking() {
   return async function (dispatch) {
-    trackingService.init()
+     trackingService.init()
   }
 }
 
@@ -262,8 +276,8 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
         unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
         syncStatus: 'RE_AUTHENTICATING'
       }))
-      let username = keyValueDBService.getValueFromStore(USERNAME)
-      let password = keyValueDBService.getValueFromStore(PASSWORD)
+      let username = await keyValueDBService.getValueFromStore(USERNAME)
+      let password = await keyValueDBService.getValueFromStore(PASSWORD)
       const authenticationResponse = await authenticationService.login(username.value, password.value)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
@@ -282,6 +296,11 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'ERROR'
         }))
+        let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
+        if (_.isNull(serverReachable) || serverReachable.value == 1) {
+          await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
+          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
+        }
       }
     }
   }

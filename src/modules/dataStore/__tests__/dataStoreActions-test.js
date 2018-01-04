@@ -4,7 +4,7 @@ var formLayoutActions = require('../../form-layout/formLayoutActions')
 import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
-    SHOW_LOADER,
+    SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
     REMARKS,
     MINMAX,
@@ -174,7 +174,7 @@ describe('test for getDataStoreAttrValueMap', () => {
 
     const expectedActions = [
         {
-            type: SHOW_LOADER,
+            type: SHOW_LOADER_DS,
             payload: true
         }, {
             type: SET_DATA_STORE_ATTR_MAP,
@@ -303,24 +303,24 @@ describe('test for uniqueValidationCheck', () => {
     }]
 
     it('should return true as dataStoreValue is already present', () => {
-        dataStoreService.dataStoreValuePresentInFieldData = jest.fn()
-        dataStoreService.dataStoreValuePresentInFieldData.mockReturnValue(true);
+        dataStoreService.checkForUniqueValidation = jest.fn()
+        dataStoreService.checkForUniqueValidation.mockReturnValue(true);
         const store = mockStore({})
         return store.dispatch(actions.uniqueValidationCheck('abhi', 123))
             .then(() => {
-                expect(dataStoreService.dataStoreValuePresentInFieldData).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.checkForUniqueValidation).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
     })
 
     it('should return false as dataStoreValue is already present', () => {
-        dataStoreService.dataStoreValuePresentInFieldData = jest.fn()
-        dataStoreService.dataStoreValuePresentInFieldData.mockReturnValue(false);
+        dataStoreService.checkForUniqueValidation = jest.fn()
+        dataStoreService.checkForUniqueValidation.mockReturnValue(false);
         const store = mockStore({})
         return store.dispatch(actions.uniqueValidationCheck('abhi', 123, 1))
             .then(() => {
-                expect(dataStoreService.dataStoreValuePresentInFieldData).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.checkForUniqueValidation).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
             })

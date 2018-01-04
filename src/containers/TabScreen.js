@@ -10,7 +10,7 @@ import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 import SearchBarV2 from '../components/SearchBarV2'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 
 import {
@@ -47,7 +47,8 @@ import {
   START,
   IS_CALENDAR_VISIBLE,
   LISTING_SEARCH_VALUE,
-
+  SEARCH_TAP,
+  JobDetailsV2
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -60,6 +61,7 @@ function mapStateToProps(state) {
     isCalendarVisible: state.taskList.isCalendarVisible,
     searchText: state.taskList.searchText,
     modules: state.home.modules,
+    searchTap: state.taskList.searchTap,
   }
 };
 
@@ -73,7 +75,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class TabScreen extends Component {
+class TabScreen extends PureComponent {
 
   static navigationOptions = ({ navigation }) => {
     return { header: null }
@@ -84,9 +86,22 @@ class TabScreen extends Component {
   }
   componentWillUnmount(){
     this.props.actions.setState(LISTING_SEARCH_VALUE,"")    
+    this.props.actions.setState(SEARCH_TAP,null)    
+    
   }
   _onCancel = () => {
     this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
+  }
+
+  componentDidUpdate(){
+    if(this.props.searchTap && this.props.searchTap.scanner){
+      this.props.actions.navigateToScene(JobDetailsV2,
+      {
+        jobSwipableDetails: this.props.searchTap.jobTransaction.jobSwipableDetails,
+        jobTransaction: this.props.searchTap.jobTransaction,
+      }
+    )
+    }
   }
 
   _onConfirm = (date) => {
@@ -128,9 +143,23 @@ class TabScreen extends Component {
     }
     return renderTabList
   }
-
+  _landingIndex(tabId){
+    const tabs = this.props.tabsList
+    let index
+    for(let id in tabs){
+         if(tabs[id].id == tabId){
+           index = id
+           break
+         }
+    }
+    return Number(index)
+  }
   fetchDataForListing = (searchText) => {
-    this.props.actions.setState(LISTING_SEARCH_VALUE, searchText)
+    this.props.actions.setState(LISTING_SEARCH_VALUE,{searchText})
+  }
+
+  fetchDataForScanner = (searchText) => {
+    this.props.actions.setState(LISTING_SEARCH_VALUE, {searchText,scanner:true})    
   }
 
   _renderCalendar = () => {
@@ -181,12 +210,21 @@ class TabScreen extends Component {
     }
   }
   onPress = () => { //implement for search
-
+     if(this.props.searchTap){
+      this.props.actions.navigateToScene(JobDetailsV2,
+      {
+        jobSwipableDetails: this.props.searchTap.jobTransaction.jobSwipableDetails,
+        jobTransaction: this.props.searchTap.jobTransaction,
+      }
+    )
+     }
   }
 
   render() {
+    let landingValue = (this.props.navigation.state.params.landingTab) ?this._landingIndex(this.props.navigation.state.params.landingTab) : 0
     const viewTabList = this.renderTabs()
     const calendarView = this._renderCalendar()
+    const searchTextValue = (this.props.searchText) ? this.props.searchText.searchText : ''
     if (viewTabList.length == 0) {
       return (
         <Container>
@@ -210,11 +248,12 @@ class TabScreen extends Component {
                 <View style={[style.headerRight]}>
                 </View>
               </View>
-              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.fetchDataForListing} searchText={this.props.searchText} navigation={this.props.navigation} returnValue={this.fetchDataForListing.bind(this)} onPress={this.onPress} />
+              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.onPress} />
             </Body>
           </Header>
           <Tabs
             style={styles.bgPrimary}
+            initialPage = {landingValue}
             tabBarUnderlineStyle={[styles.bgWhite]}
             renderTabBar={() => <ScrollableTab />}>
             {viewTabList}

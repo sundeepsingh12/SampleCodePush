@@ -58,6 +58,10 @@ function mapDispatchToProps(dispatch) {
 
 class ArrayFieldAttribute extends Component {
 
+    componentWillUnmount() {
+        BackHandler.removeEventListener(HardwareBackPress, this._goBack)
+    }
+
     _goBack = () => {
         this.props.navigation.goBack()
         this.props.actions.clearArrayState()
@@ -69,9 +73,10 @@ class ArrayFieldAttribute extends Component {
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
             this.props.navigation.state.params.jobStatusId,
             this.props.lastRowId,
-            this.props.arrayElements
+            this.props.arrayElements,
+            this.props.navigation.state.params.latestPositionId
         )
-        BackHandler.addEventListener(HardwareBackPress, this._goBack)
+        //   BackHandler.addEventListener(HardwareBackPress, this._goBack)
     }
     renderData = (arrayRow) => {
         return (
@@ -82,7 +87,7 @@ class ArrayFieldAttribute extends Component {
                 lastRowId={this.props.lastRowId}
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
                 jobStatusId={this.props.jobStatusId}
-                latestPositionId={this.props.latestPositionId}
+                latestPositionId={this.props.navigation.state.params.latestPositionId}
             />
         )
     }
@@ -155,7 +160,7 @@ class ArrayFieldAttribute extends Component {
                                 <Text style={[styles.fontSuccess, styles.padding10]}>Add</Text>
                             </Button>
                         </View>
-                        <View style={[styles.bgPrimary, styles.marginBottom15]}>
+                        <View style={[styles.bgPrimary]}>
                             <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
                                 <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                             </Button>

@@ -10,8 +10,8 @@ const userEventLog = {
             "cityId": { "type": "number", "required": true },
             "eventId": { "type": "number", "required": true },
             "description": {"type":["string",null]},
-            "latitude": { "type": "number", "required": true },
-            "longitude": { "type": "number", "required": true },
+            "latitude": { "type": ["number",null], "required": true },
+            "longitude": { "type": ["number",null], "required": true },
             "dateTime": { "type": "string", "required": true },
         }
     }

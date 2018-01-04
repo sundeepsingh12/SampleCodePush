@@ -56,6 +56,7 @@ export function fetchJobs(date) {
     } catch (error) {
       //TODO handle UI
       console.log(error)
+       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList:[]}))
     }
   }
 }

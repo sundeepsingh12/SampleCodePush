@@ -12,11 +12,15 @@ import {
     UNSEEN
 } from '../../lib/AttributeConstants'
 import moment from 'moment'
-
-
+import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface'
 import {
     TABLE_JOB,
+    USER,
+    TABLE_JOB_TRANSACTION,
+    USER_SUMMARY
 } from '../../lib/constants'
+import { keyValueDBService } from './KeyValueDBService'
+
 
 class JobDetails {
 
@@ -86,13 +90,13 @@ class JobDetails {
             autoIncrementId
         }
     }
-   async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList){
+   async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId){
        let enableFlag = false
         if(enableOutForDelivery){
             enableFlag =  await this.checkOutForDelivery(jobMasterList)
         }
         if(!enableFlag && enableResequenceRestriction){
-            enableFlag =  this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList)
+            enableFlag =  this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
         }
         if(!enableFlag && jobTime){
             enableFlag =  this.checkJobExpire(jobTime)
@@ -100,16 +104,34 @@ class JobDetails {
         return enableFlag
     }
 
+    async getParentStatusList(statusList,currentStatus,jobTransactionId){
+        let parentStatusList = []
+        for(let status of statusList){
+            if(status.code === UNSEEN)
+                continue
+            for(let nextStatus of status.nextStatusList){
+                if(currentStatus.id === nextStatus.id){
+                   parentStatusList.push([status.id, status.name, status.code, status.statusCategory])
+                }
+            }
+        }
+        if((parentStatusList.length > 0 && await jobTransactionService.checkIdToBeSync(jobTransactionId))){
+            parentStatusList = []
+            parentStatusList.push(1)
+        }
+        return parentStatusList
+    }
+
     checkJobExpire(jobDataList) {
         const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
         return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : false
     }
 
-    checkEnableResequence(jobMasterList, tabId, seqSelected, statusList) {
+    checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId) {
         const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id)
-        const statusMap = statusList.value.filter((status) => status.tabId == tabId).map(obj => obj.id)
-        const firstEnableSequenceValue = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
-        return !(seqSelected > firstEnableSequenceValue) ? false : "Please finish previous items first"
+        const statusMap = statusList.value.filter((status) => status.tabId == tabId && status.code !== UNSEEN).map(obj => obj.id)
+        const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
+        return !(firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : "Please finish previous items first"
     }
 
     async checkOutForDelivery(jobMasterList) {
@@ -131,6 +153,21 @@ class JobDetails {
         return angle * (Math.PI / 180);
     }
 
+    updateTransactionOnRevert(jobTransactionData,previousStatus){
+        let jobTransactionArray = [];
+        let jobTransaction = Object.assign({}, jobTransactionData) // no need to have null checks as it is called from a private method        
+        jobTransaction.jobStatusId = previousStatus[0]
+        jobTransaction.statusCode = previousStatus[2]
+        jobTransaction.actualAmount = 0.00
+        jobTransaction.originalAmount = 0.00
+        jobTransaction.lastUpdatedAtServer = moment().format('YYYY-MM-DD HH:mm:ss')
+        jobTransactionArray.push(jobTransaction)
+        return {
+            tableName: TABLE_JOB_TRANSACTION,
+            value: jobTransactionArray,
+        }
+    }
+
     /**
      * ## find aerial distance between user location and job location
      * @param {string} jobLat - job location latitude
@@ -145,6 +182,24 @@ class JobDetails {
         let dist = Math.sin(this.toRadians(jobLat)) * Math.sin(this.toRadians(userLat)) + Math.cos(this.toRadians(jobLat)) * Math.cos(this.toRadians(userLat)) * Math.cos(this.toRadians(theta));
         dist = (Math.acos(dist) * (180 / Math.PI)) * 60 * 1.1515 * 1.609344;
         return dist;
+    }
+
+    async setAllDataForRevertStatus(statusList,jobTransaction,previousStatus){
+     let updatedJobTransaction
+     let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)     
+     let lastTrackLog = {
+        latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
+        longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
+     }
+     let user = await keyValueDBService.getValueFromStore(USER)                
+     let statusData = statusList.value.filter(list => list.id == jobTransaction.jobStatusId)
+     let updatedJobDb = formLayoutEventsInterface._setJobDbValues(statusData,jobTransaction.jobId)
+     await formLayoutEventsInterface._updateJobSummary(jobTransaction,previousStatus[0])
+     let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction],previousStatus[0],jobTransaction.jobStatusId,jobTransaction.jobMasterId,user, lastTrackLog)
+     let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction,previousStatus[3]) 
+     updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction,previousStatus)  
+     await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value)       
+     realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog)  
     }
 
     /**

@@ -1,6 +1,8 @@
 import { keyValueDBService } from '../KeyValueDBService.js'
 import { transientStatusService } from '../TransientStatusService.js'
 import {
+    AFTER,
+    BEFORE,
     OBJECT
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
@@ -12,6 +14,9 @@ import {
     TabScreen
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
+import { draftService } from '../DraftService.js'
+import { fieldValidationService } from '../FieldValidation';
+
 class FormLayout {
 
     /**
@@ -23,7 +28,7 @@ class FormLayout {
      * 
      * @param {*} statusId id of status to be captured
      */
-    async getSequenceWiseRootFieldAttributes(statusId, fieldAttributeMasterIdFromArray) {
+    async getSequenceWiseRootFieldAttributes(statusId, fieldAttributeMasterIdFromArray, jobTransaction) {
         if (!statusId) {
             throw new Error('Missing statusId');
         }
@@ -69,7 +74,7 @@ class FormLayout {
 
         const fieldAttributeMasterValidationMap = this.getFieldAttributeValidationMap(fieldAttributeMasterValidation.value);
         const fieldAttrMasterValidationConditionMap = this.getFieldAttributeValidationConditionMap(fieldAttributeValidationCondition.value, fieldAttributeMasterValidationMap)
-        const sequenceWiseFormLayout = this.getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap)
+        const sequenceWiseFormLayout = this.getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction)
         if (fieldAttributeMasterIdFromArray) {
             sequenceWiseFormLayout.arrayMainObject = arrayMainObject[0]
             return sequenceWiseFormLayout
@@ -133,13 +138,14 @@ class FormLayout {
      * @param {*} fieldAttributeMasterValidationMap fieldAttributeMaster validation map
      * @param {*} fieldAttrMasterValidationConditionMap validation condition map
      */
-    getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap) {
+    getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction) {
         let formLayoutObject = new Map()
         if (!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0) {
             return { formLayoutObject, isSaveDisabled: false }
         }
 
         let isRequiredAttributeFound = false
+        let tempFieldAttributeList = []
         for (let i = 0; i < sequenceWiseSortedFieldAttributesForStatus.length; i++) {
             let fieldAttribute = sequenceWiseSortedFieldAttributesForStatus[i]
             if (!isRequiredAttributeFound) {
@@ -151,8 +157,18 @@ class FormLayout {
                     validation.conditions = fieldAttrMasterValidationConditionMap[validation.id]
                 }
             }
-
             formLayoutObject.set(fieldAttribute.id, this.getFieldAttributeObject(fieldAttribute, validationArr, i + 1))
+            if (!fieldAttribute.hidden) {
+                tempFieldAttributeList.push(formLayoutObject.get(fieldAttribute.id))
+            }
+        }
+        //TODO remove this code (just a quick fix for demo)
+        if (tempFieldAttributeList.length == 1) {
+            fieldValidationService.fieldValidations(tempFieldAttributeList[0], formLayoutObject, BEFORE, jobTransaction)
+            if (tempFieldAttributeList[0].value != undefined && tempFieldAttributeList[0].value != null && tempFieldAttributeList[0].value != '') {
+                isRequiredAttributeFound = false
+            }
+            // formLayoutObject.set(tempFieldAttributeList[0].id, this.getFieldAttributeObject(tempFieldAttributeList[0], formLayoutObject.get(tempFieldAttributeList[0].id).validation, formLayoutObject.get(tempFieldAttributeList[0].id).positionId))
         }
         let latestPositionId = sequenceWiseSortedFieldAttributesForStatus.length - 1
         return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId }
@@ -224,7 +240,7 @@ class FormLayout {
         return combineMap
     }
 
-    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList,jobTransactionIdList) {
+    async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList) {
         let routeName, routeParam
         const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
@@ -234,6 +250,8 @@ class FormLayout {
                 contactData, currentStatus, jobTransaction, jobMasterId,
                 navigationFormLayoutStates
             }
+            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = await transientStatusService.getDataFromFormElement(formLayoutState.formElement)
             let totalAmount = await transientStatusService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
@@ -244,6 +262,8 @@ class FormLayout {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
             await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
+            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+
         }
         else if (currentStatus.transient) {
             routeName = Transient
@@ -256,13 +276,33 @@ class FormLayout {
             if (navigationFormLayoutStates) {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId,jobTransactionIdList, jobTransaction)
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransactionIdList, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+            if (!jobTransactionIdList) { //Delete draft only if not bulk
+                await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+            }
         }
         return {
             routeName,
             routeParam
         }
+    }
+
+    isFormValid(formElement, jobTransaction) {
+        if (!formElement) {
+            throw new Error('formElement is missing')
+        }
+        for (let [id, currentObject] of formElement.entries()) {
+            if (!currentObject.required || currentObject.value || currentObject.value === 0) {
+                continue
+            }
+            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction)
+            currentObject.value = afterValidationResult ? currentObject.displayValue : null
+            if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
+                return false
+            }
+        }
+        return true
     }
 }
 

@@ -44,6 +44,7 @@ import customApp from './customApp/customAppReducers'
 import jobMaster from './job-master/jobMasterReducer'
 import postAssignment from './postAssignment/postAssignmentReducer'
 import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
+import offlineDS from './offlineDS/offlineDSReducer'
 import cameraReducer from './camera/cameraReducer'
 // import profile from './profile/profileReducer'
 
@@ -90,6 +91,7 @@ const rootReducer = combineReducers({
   jobMaster,
   postAssignment,
   qrCodeReducer,
+  offlineDS,
   cameraReducer,
 })
 

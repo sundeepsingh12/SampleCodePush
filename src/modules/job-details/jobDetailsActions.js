@@ -6,8 +6,12 @@ import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { jobDetailsService } from '../../services/classes/JobDetails'
 import { setState, navigateToScene } from '..//global/globalActions'
-
+import { performSyncService, pieChartCount } from '../home/homeActions'
 import * as realm from '../../repositories/realmdb'
+import { fetchJobs } from '../taskList/taskListActions'
+import {
+    Start
+} from '../../lib/AttributeConstants'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -22,8 +26,12 @@ import {
     TABLE_JOB,
     USER_SUMMARY,
     JOB_MASTER,
-    USER
+    USER,
+    TabScreen,
+    HomeTabNavigatorScreen,
+    RESET_STATE_FOR_JOBDETAIL
 } from '../../lib/constants'
+import { draftService } from '../../services/classes/DraftService';
 
 export function startFetchingJobDetails() {
     return {
@@ -31,7 +39,8 @@ export function startFetchingJobDetails() {
     }
 }
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage) {
+
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo,parentStatusList) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -40,6 +49,8 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             jobTransaction,
             currentStatus,
             errorMessage,
+            parentStatusList,
+            draftStatusInfo
         }
     }
 }
@@ -47,7 +58,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
-            dispatch(startFetchingJobDetails())
+            dispatch(startFetchingJobDetails()) 
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
@@ -57,8 +68,10 @@ export function getJobDetails(jobTransactionId) {
             const details = jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             const jobMaster = jobMasterService.getJobMaterFromJobMasterLists(details.jobTransactionDisplay.jobMasterId, jobMasterList)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery, 
-                                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList) : false
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay,errorMessage))
+                                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId) : false
+            const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value,details.currentStatus,jobTransactionId) : []
+            const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
@@ -73,8 +86,45 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
             let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
             let user = await keyValueDBService.getValueFromStore(USER);
             await addServerSmsService.sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user)
-        } catch (error) {
+        }catch (error) {
 
+        }
+    }
+}
+
+/**
+ * ## status revert from field case
+ *  
+ * @param {object} jobTransaction - It contains data for form layout
+ * @param {object} statusTo - status to revert transaction
+ * @param {callback} navigation - navigation action
+ *
+ * It set all data for revert status and start sync service
+ * It also fetch jobs and reset state of job details
+ *
+ */
+
+export function setAllDataOnRevert(jobTransaction,statusTo,navigation) {
+    return async function (dispatch) {
+        try {
+            dispatch(startFetchingJobDetails());    
+            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)            
+            await jobDetailsService.setAllDataForRevertStatus(statusList,jobTransaction,statusTo)
+            dispatch(performSyncService())     
+            dispatch(pieChartCount())                                                           
+            dispatch(fetchJobs())
+            let landingId = (Start.landingTab)  ? jobStatusService.getTabIdOnStatusId(statusList.value,statusTo[0]): false    
+            if(landingId){       
+            dispatch(NavigationActions.reset({
+                index: 1,
+                actions: [
+                    NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+                    NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
+                ]
+            }))}else{ dispatch(navigation.goBack())      }      
+            dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
+        } catch (error) {
+            console.log(error)            
         }
     }
 }

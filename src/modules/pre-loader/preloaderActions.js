@@ -68,16 +68,16 @@ import {
   TABIDMAP,
   JOB_ATTRIBUTE_STATUS,
   HomeTabNavigatorScreen,
-  USER_EVENT_LOG,
   LoginScreen,
   TOGGLE_LOGOUT,
+  OTP_SUCCESS,
 } from '../../lib/constants'
-import { LOGIN_SUCCESSFUL } from '../../lib/AttributeConstants'
+import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken,stopMqttService,setState} from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -276,17 +276,19 @@ export function invalidateUserSession() {
   return async function (dispatch) {
     try {
       dispatch(preLogoutRequest())
-      dispatch(setState(TOGGLE_LOGOUT,true))
+      dispatch(setState(TOGGLE_LOGOUT, true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      // TODO uncomment this code when run sync in logout
+      // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")      
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
       dispatch(deleteSessionToken())
       dispatch(preLogoutSuccess())
-       dispatch(setState(TOGGLE_LOGOUT,false))
+      dispatch(setState(TOGGLE_LOGOUT, false))
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))
-        dispatch(setState(TOGGLE_LOGOUT,false))
+      dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
 }
@@ -392,7 +394,7 @@ export function checkAsset() {
       if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
-        dispatch(preloaderSuccess())        
+        dispatch(preloaderSuccess())
         dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
@@ -489,6 +491,7 @@ export function validateOtp(otpNumber) {
       const simVerificationResponse = await deviceVerificationService.verifySim(deviceSIM.value, token)
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
+      dispatch(setState(OTP_SUCCESS))
       dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
     } catch (error) {
       dispatch(otpValidationFailure(error.message))

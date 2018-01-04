@@ -4,7 +4,7 @@ const InitialState = require('./dataStoreInitialState').default
 import {
     SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
-    SHOW_LOADER,
+    SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
@@ -18,7 +18,7 @@ const initialState = new InitialState()
 export default function dataStoreReducer(state = initialState, action) {
     switch (action.type) {
 
-        case SHOW_LOADER:
+        case SHOW_LOADER_DS:
             return state.set('loaderRunning', action.payload)
                 .set('errorMessage', '')
 

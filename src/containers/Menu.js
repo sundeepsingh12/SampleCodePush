@@ -35,6 +35,7 @@ import CustomAlert from '../components/CustomAlert'
 import {
   PROFILE_ID,
   STATISTIC_ID,
+  OFFLINEDATASTORE_ID
 } from '../lib/AttributeConstants'
 
 import {
@@ -46,7 +47,8 @@ import {
   STATISTIC,
   OFFLINEDATASTORE,
   BACKUP,
-  BLUETOOTH
+  BLUETOOTH,
+  OfflineDS
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -116,6 +118,12 @@ class Menu extends Component {
         this.props.actions.navigateToScene(Statistics)
         break
       }
+
+      case OFFLINEDATASTORE_ID: {
+        this.props.actions.navigateToScene(OfflineDS,{displayName:this.props.menu.OFFLINEDATASTORE.displayName})
+        break
+      }
+      
       // default:
       //   Toast.show({
       //     text: `Under development!Coming Soon`,

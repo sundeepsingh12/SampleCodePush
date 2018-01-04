@@ -46,7 +46,10 @@ import NPSFeedback from '../components/NPSFeedback'
 import SelectFromList from '../containers/SelectFromList'
 import * as globalActions from '../modules/global/globalActions'
 import QRIcon from '../svg_components/icons/QRIcon'
-
+import {
+    ON_BLUR,
+    NEXT_FOCUS
+} from '../lib/constants'
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...arrayActions, ...globalActions }, dispatch)
@@ -60,25 +63,26 @@ class ArrayBasicComponent extends Component {
         this.state = {
             showDateTimePicker: false,
             showNPS: false,
-            showRadioButton: false,
-            showDropdown: false,
-            showCheckbox: false,
-            showRadioMaster: false
+            // showRadioButton: false,
+            // showDropdown: false,
+            // showCheckbox: false,
+            // showRadioMaster: false
+            selectFromListId: null
         };
     }
     _searchForReferenceValue = (value, item) => {
         this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId);
     }
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
     }
 
     _onBlurEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId) {
-        this.props.actions.getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId);
+        this.props.actions.getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, ON_BLUR);
     }
 
     _styleNextFocusable(isFocusable) {
@@ -88,7 +92,10 @@ class ArrayBasicComponent extends Component {
     }
 
     onSaveDateTime = (value, item) => {
-        this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS);
+        // this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS)
+        //item.displayValue = value
+        //this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
         this.setState({ showDateTimePicker: false, showNPS: false })
     }
 
@@ -98,15 +105,24 @@ class ArrayBasicComponent extends Component {
     _dropModal = () => {
         this.setModalVisible(false)
     }
-    _inflateModal = (item) => {
-        this.setState(previousState => {
+    setModalVisible = (visible) => {
+        this.setState(() => {
             return {
-                selectFromListEnable: !this.state.selectFromListEnable
+                showNPS: visible,
+                showDateTimePicker: visible,
+
             }
         })
     }
+    _inflateModal = (item) => {
+        this.setState({ selectFromListId: -1 })
+    }
     getComponentLabelStyle(focus, editable) {
         return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+    }
+
+    getComponentSubLabelStyle(editable) {
+        return editable ? styles.fontDarkGray : styles.fontLowGray
     }
     goToQRCode = (item) => {
         this.props.actions.navigateToScene('QrCodeScanner',
@@ -136,7 +152,14 @@ class ArrayBasicComponent extends Component {
                         {renderIf(!item.hidden,
                             <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
                                 <Item stackedLabel>
-                                    <Label style={[styles.fontPrimary]}>{item.label}</Label>
+                                    {item.label ?
+                                        <Label style={[styles.fontDefault, this.getComponentLabelStyle(item.focus, item.editable)]}>{item.label}
+                                            {item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
+                                        </Label>
+                                        : null}
+                                    {item.subLabel ?
+                                        <Label style={[styles.fontSm, this.getComponentSubLabelStyle(item.editable)]}>{item.subLabel}</Label>
+                                        : null}
                                     <Input
                                         autoCapitalize="none"
                                         placeholder={item.helpText}
@@ -205,7 +228,7 @@ class ArrayBasicComponent extends Component {
             case CHECKBOX:
                 return (
                     <View>{
-                        renderIf(this.state.showCheckbox,
+                        renderIf(this.state.selectFromListId == item.fieldAttributeMasterId,
                             <SelectFromList
                                 currentElement={item}
                                 formElements={this.props.arrayElements}
@@ -213,20 +236,20 @@ class ArrayBasicComponent extends Component {
                                 jobTransaction={this.props.jobTransaction}
                                 jobStatusId={this.props.jobStatusId}
                                 latestPositionId={this.props.latestPositionId}
-                                press={this._inflateModal}
+                                press={this._inflateModal(item)}
                                 calledFromArray={true}
                                 rowId={this.props.arrayRow.rowId}
                             />
                         )}
                         {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ showCheckbox: true })} />
+                            <FormLayoutActivityComponent item={item} press={() => this.setState({ selectFromListId: item.fieldAttributeMasterId })} />
                         )}
                     </View>
                 )
             case RADIOBUTTON:
                 return (
                     <View>{
-                        renderIf(this.state.showRadioButton,
+                        renderIf(this.state.selectFromListId == item.fieldAttributeMasterId,
                             <SelectFromList
                                 currentElement={item}
                                 formElements={this.props.arrayElements}
@@ -240,14 +263,14 @@ class ArrayBasicComponent extends Component {
                             />
                         )}
                         {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ showRadioButton: true })} />
+                            <FormLayoutActivityComponent item={item} press={() => this.setState({ selectFromListId: item.fieldAttributeMasterId })} />
                         )}
                     </View>
                 )
             case DROPDOWN:
                 return (
                     <View>{
-                        renderIf(this.state.showDropdown,
+                        renderIf(this.state.selectFromListId == item.fieldAttributeMasterId,
                             <SelectFromList
                                 currentElement={item}
                                 formElements={this.props.arrayElements}
@@ -261,14 +284,14 @@ class ArrayBasicComponent extends Component {
                             />
                         )}
                         {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ showDropdown: true })} />
+                            <FormLayoutActivityComponent item={item} press={() => this.setState({ selectFromListId: item.fieldAttributeMasterId })} />
                         )}
                     </View>
                 )
             case OPTION_RADIO_FOR_MASTER:
                 return (
                     <View>{
-                        renderIf(this.state.showRadioMaster,
+                        renderIf(this.state.selectFromListId == item.fieldAttributeMasterId,
                             <SelectFromList
                                 currentElement={item}
                                 formElements={this.props.arrayElements}
@@ -282,7 +305,7 @@ class ArrayBasicComponent extends Component {
                             />
                         )}
                         {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ showRadioMaster: true })} />
+                            <FormLayoutActivityComponent item={item} press={() => this.setState({ selectFromListId: item.fieldAttributeMasterId })} />
                         )}
                     </View>
                 )
@@ -293,7 +316,7 @@ class ArrayBasicComponent extends Component {
                         {renderIf(!item.hidden,
                             <FormLayoutActivityComponent item={item} press={
                                 () => {
-                                    this.props.actions.fieldValidations(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                                    this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
                                     this.props.actions.navigateToScene('DataStore',
                                         {
                                             currentElement: item,
@@ -314,7 +337,7 @@ class ArrayBasicComponent extends Component {
                         {renderIf(!item.hidden,
                             <FormLayoutActivityComponent item={item} press={
                                 () => {
-                                    this.props.actions.fieldValidations(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                                    this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
                                     this.goToQRCode(item)
                                 }} />)}
                     </View>
@@ -326,7 +349,7 @@ class ArrayBasicComponent extends Component {
                     {renderIf(!item.hidden,
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidations(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
                                 this.props.actions.navigateToScene('CameraAttribute',
                                     {
                                         currentElement: item,
@@ -342,18 +365,14 @@ class ArrayBasicComponent extends Component {
                 </View>
                 )
             default:
-                return (
-                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                        Under construction  {item.label} - attributeTypeId {item.attributeTypeId}
-                    </Text>
-                )
+                return null
         }
     }
     render() {
         return (
-            <View style={[style.card, styles.bgWhite, styles.padding10]}>
+            <View style={[style.card, styles.bgWhite]}>
                 <View style={[styles.flexBasis90]}>
-                    <FlatList style={[styles.flexBasis90]}
+                    <FlatList
                         data={Array.from(this.props.arrayRow.formLayoutObject)}
                         renderItem={(item) => this._renderData(item.item[1])}
                         keyExtractor={item => item[0]}

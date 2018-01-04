@@ -13,7 +13,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as summaryActions from '../modules/summary/summaryActions'
 import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import LinearGradient from 'react-native-linear-gradient'
 import * as globalActions from '../modules/global/globalActions'
@@ -221,7 +221,7 @@ class Summary extends Component {
     _renderView= () => {
         const status = ['Pending','Failed','Successful']
         const listData = this.props.jobMasterSummary
-        listData.sort((master1, master2) => master1.title.localeCompare(master2.title))
+        listData.sort((master1, master2) => master1.title.toLowerCase().localeCompare(master2.title.toLowerCase()))
         if(this.props.jobMasterSummary && this.props.jobMasterSummary.length == 0){
             return <Loader/>
         }
@@ -237,7 +237,7 @@ class Summary extends Component {
                         return (
                             <View style={[styles.margin10, styles.bgWhite, {elevation: 2}]}>
                             <View style={[style.seqCard, {borderBottomColor: '#d3d3d3', borderBottomWidth:1}]}>
-                                <View style={style.seqCircle}>
+                                <View style={[style.seqCircle,{backgroundColor : item.identifierColor}]}>
                                     <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
                                         {item.code}
                                     </Text>
@@ -332,7 +332,6 @@ const style = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#ffcc00',
         justifyContent: 'center',
         alignItems: 'center'
     },
