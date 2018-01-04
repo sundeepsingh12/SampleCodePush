@@ -120,6 +120,10 @@ class ArrayBasicComponent extends PureComponent {
     getComponentLabelStyle(focus, editable) {
         return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
     }
+
+    getComponentSubLabelStyle(editable) {
+        return editable ? styles.fontDarkGray : styles.fontLowGray
+    }
     goToQRCode = (item) => {
         this.props.actions.navigateToScene('QrCodeScanner',
             {
@@ -148,7 +152,14 @@ class ArrayBasicComponent extends PureComponent {
                         {renderIf(!item.hidden,
                             <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
                                 <Item stackedLabel>
-                                    <Label style={[styles.fontPrimary]}>{item.label}</Label>
+                                    {item.label ?
+                                        <Label style={[styles.fontDefault, this.getComponentLabelStyle(item.focus, item.editable)]}>{item.label}
+                                            {item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
+                                        </Label>
+                                        : null}
+                                    {item.subLabel ?
+                                        <Label style={[styles.fontSm, this.getComponentSubLabelStyle(item.editable)]}>{item.subLabel}</Label>
+                                        : null}
                                     <Input
                                         autoCapitalize="none"
                                         placeholder={item.helpText}
@@ -354,18 +365,14 @@ class ArrayBasicComponent extends PureComponent {
                 </View>
                 )
             default:
-                return (
-                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                        Under construction  {item.label} - attributeTypeId {item.attributeTypeId}
-                    </Text>
-                )
+                return null
         }
     }
     render() {
         return (
-            <View style={[style.card, styles.bgWhite, styles.padding10]}>
+            <View style={[style.card, styles.bgWhite]}>
                 <View style={[styles.flexBasis90]}>
-                    <FlatList style={[styles.flexBasis90]}
+                    <FlatList
                         data={Array.from(this.props.arrayRow.formLayoutObject)}
                         renderItem={(item) => this._renderData(item.item[1])}
                         keyExtractor={item => item[0]}

@@ -102,7 +102,8 @@ describe('test fillKeysInFormElement', () => {
             editable: false,
             focus: false,
             validation: [],
-            value: 'xyz'
+            value: 'xyz',
+            displayValue: 'xyz'
         },
         2: {
             label: "ds",
@@ -119,7 +120,8 @@ describe('test fillKeysInFormElement', () => {
             editable: false,
             focus: false,
             validation: [],
-            value: '123456'
+            value: '123456',
+            displayValue: '123456'
         }
     }
     const formLayoutMapResult = getMapFromObject(formLayoutResultObject);
@@ -298,12 +300,12 @@ describe('test fetchJsonForExternalDS', () => {
     })
 })
 
-describe('test dataStoreValuePresentInFieldData', () => {
+describe('test checkForUniqueValidation', () => {
 
-    it('should throw DataStorevalue missing error', () => {
-        const message = 'dataStorevalue missing in currentElement'
+    it('should throw fieldAttributeValue missing error', () => {
+        const message = 'fieldAttributeValue missing in currentElement'
         try {
-            dataStoreService.dataStoreValuePresentInFieldData(null, 123)
+            dataStoreService.checkForUniqueValidation(null, 123)
         } catch (error) {
             expect(error.message).toEqual(message)
         }
@@ -312,13 +314,13 @@ describe('test dataStoreValuePresentInFieldData', () => {
     it('should throw FieldAttributeMasterId missing error', () => {
         const message = 'fieldAttributeMasterId missing in currentElement'
         try {
-            dataStoreService.dataStoreValuePresentInFieldData('abhi', null)
+            dataStoreService.checkForUniqueValidation('abhi', null)
         } catch (error) {
             expect(error.message).toEqual(message)
         }
     })
 
-    it('should return true as dataStoreValue is present is FieldData Table', () => {
+    it('should return true as fieldAttributeValue is present is FieldData Table', () => {
         realm.getRecordListOnQuery = jest.fn();
         realm.getRecordListOnQuery.mockReturnValue([{
             fieldAttributeMasterId: 123,
@@ -328,10 +330,10 @@ describe('test dataStoreValuePresentInFieldData', () => {
             positionId: 0,
             value: 'abhi'
         }]);
-        expect(dataStoreService.dataStoreValuePresentInFieldData('abhi', 123)).toEqual(true)
+        expect(dataStoreService.checkForUniqueValidation('abhi', 123)).toEqual(true)
     })
 
-    it('should return false as dataStoreValue is not present is FieldData Table', () => {
+    it('should return false as fieldAttributeValue is not present is FieldData Table', () => {
         realm.getRecordListOnQuery = jest.fn();
         realm.getRecordListOnQuery.mockReturnValue([{
             fieldAttributeMasterId: 123,
@@ -341,7 +343,7 @@ describe('test dataStoreValuePresentInFieldData', () => {
             positionId: 0,
             value: 'abhi'
         }]);
-        expect(dataStoreService.dataStoreValuePresentInFieldData('xyz', 989)).toEqual(false)
+        expect(dataStoreService.checkForUniqueValidation('xyz', 989)).toEqual(false)
     })
 })
 

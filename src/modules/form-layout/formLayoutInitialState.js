@@ -37,7 +37,8 @@ var InitialState = Record({
         errorMessage: '',
         paymentAtEnd: {},
         draftStatusId: null,
-        updateDraft: false
+        updateDraft: false,
+        isFormValid: true
 })
 
 export default InitialState

@@ -142,7 +142,14 @@ class CameraFieldAttribute extends PureComponent {
                                 flashMode={this.state.torchOff}
                                 type={this.state.cameraType}
                                 orientation={Camera.constants.Orientation.portrait}>
-
+                                <View style={[styles.absolute, styles.padding10, { top: 0, left: 0 }]}>
+                                <Icon
+                                    name="md-close"
+                                    style={[styles.fontXxxl, styles.fontWhite]}
+                                    onPress={() => {
+                                        this.props.navigation.goBack()
+                                    }} />
+                            </View>
                             </Camera>
                         </View>
                         <View style={[style.cameraFooter]}>
