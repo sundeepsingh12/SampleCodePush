@@ -354,11 +354,12 @@ class ArrayBasicComponent extends Component {
                 </View>
                 )
             default:
-                return (
-                    <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
-                        Under construction  {item.label} - attributeTypeId {item.attributeTypeId}
-                    </Text>
-                )
+                return null
+            // return (
+            //     <Text style={StyleSheet.flatten([styles.fontXs, styles.marginTop5, { color: '#999999' }])}>
+            //         Under construction  {item.label} - attributeTypeId {item.attributeTypeId}
+            //     </Text>
+            // )
         }
     }
     render() {

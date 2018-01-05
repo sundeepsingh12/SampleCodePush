@@ -82,13 +82,10 @@ class TaskListScreen extends PureComponent {
     for(let selectedDateObject in listObject){
       let statusIdFilteredArray = []
       statusIdFilteredArray = listObject[selectedDateObject].filter(arrayItem => this.props.statusIdList.includes(arrayItem.statusId))
-      console.log("statusIdFilteredArray",statusIdFilteredArray)
       if(!_.isEmpty(statusIdFilteredArray)){
         statusIdlistObject[selectedDateObject] = statusIdFilteredArray
-      console.log("statusIdlistObject",statusIdlistObject)
     }
   }
-      console.log("statusIdlistObject",statusIdlistObject)
       if (!_.isEmpty(statusIdlistObject)) {
       for (let key in statusIdlistObject) {
         let sectionListObject = {
