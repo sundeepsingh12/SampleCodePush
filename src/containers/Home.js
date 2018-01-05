@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator,PushNotificationIOS } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
 import {
@@ -60,6 +60,7 @@ import {
   JobMasterListScreen,
 } from '../lib/constants'
 import _ from 'lodash'
+import PushNotification from 'react-native-push-notification'
 
 function mapStateToProps(state) {
   return {
@@ -81,6 +82,15 @@ function mapDispatchToProps(dispatch) {
 class Home extends PureComponent {
 
   componentDidMount() {
+      PushNotification.configure({
+              onNotification: function(notification) {
+        console.log( 'NOTIFICATION:', notification );
+        // process the notification
+        
+        // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
+        notification.finish(PushNotificationIOS.FetchResult.NoData);
+    }
+        })
     this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
   }
 

@@ -53,7 +53,8 @@ import {
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
 import NotificationsIOS, { NotificationsAndroid } from 'react-native-notifications'
-import { moduleCustomizationService } from './ModuleCustomization';
+import { moduleCustomizationService } from './ModuleCustomization'
+import PushNotification from 'react-native-push-notification'
 
 class Sync {
 
@@ -570,18 +571,24 @@ class Sync {
 
   showNotification(jobMasterTitleList) {
     const alertBody = jobMasterTitleList.join()
-    if (Platform.OS === 'ios') {
-      NotificationsIOS.localNotification({
-        alertBody: `You have new updates for ${alertBody} jobs`,
-        alertTitle: FAREYE_UPDATES,
-      })
-    }
-    else {
-      NotificationsAndroid.localNotification({
-        title: FAREYE_UPDATES,
-        body: `You have new updates for ${alertBody} jobs`,
-      })
-    }
+    // if (Platform.OS === 'ios') {
+    //   NotificationsIOS.localNotification({
+    //     alertBody: `You have new updates for ${alertBody} jobs`,
+    //     alertTitle: FAREYE_UPDATES,
+    //   })
+    // }
+    // else {
+    //   NotificationsAndroid.localNotification({
+    //     title: FAREYE_UPDATES,
+    //     body: `You have new updates for ${alertBody} jobs`,
+    //   })
+    // }
+    
+    PushNotification.localNotificationSchedule({
+      title: FAREYE_UPDATES,
+      message: `You have new updates for ${alertBody} jobs`, // (required)
+      date: new Date(Date.now() + 3 * 1000) // in 60 secs
+    });
 
   }
 

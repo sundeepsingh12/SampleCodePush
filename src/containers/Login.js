@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { Component,AppState} from 'react'
 import {
   StyleSheet,
   View,
@@ -12,6 +12,7 @@ import {
 }
   from 'react-native'
 import Scanner from "../components/Scanner"
+import PushController from '../components/PushController'
 import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -23,6 +24,7 @@ import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf'
 import codePush from "react-native-code-push"
 import { QrCodeScanner } from '../lib/constants'
+// import PushNotification from 'react-native-push-notification'
 
 
 var style = StyleSheet.create({
@@ -77,7 +79,18 @@ class Login extends Component {
 
   componentDidMount() {
     this.props.actions.checkRememberMe()
+    // AppState.addEventListener('change',this.handleAppStateChange)
   }
+
+  // componentWillUnmount(){
+  //   AppState.removeEventListener('change',this.handleAppStateChange)
+  // }
+
+  // handleAppStateChange(appState){
+  //   if(appState == 'background'){
+  
+  //   }
+  // }
 
   onChangeUsername = (value) => {
     this.props.actions.onChangeUsername(value)
@@ -94,6 +107,10 @@ class Login extends Component {
     } else {
       this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
     }
+//         PushNotification.localNotificationSchedule({
+//   message: "My Notification Message", // (required)
+//   date: new Date(Date.now()) // in 60 secs
+// });
   }
 
   _onBarCodeRead = (value) => {
@@ -206,7 +223,9 @@ class Login extends Component {
                   </View>
                 </View>
               </Content>
+               {/* <PushController />  */}
             </Container>
+            
           </StyleProvider>
     )
   }
