@@ -22,7 +22,6 @@ import { createLogger } from 'redux-logger'
 * device, global, login, profile
 */
 import reducer from '../modules'
-import { compose } from 'redux';
 
 const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__ });
 /**
@@ -36,12 +35,12 @@ const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__
 
 /**
  * ## configureStore
- * @param {Object} the state with for keys:
- * device, global, login, profile
+ *
+ * 
  *
  */
 export default function configureStore(intialState) {
-  return Reactotron.createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware)) //Redux logger not required But still working here
+  return (__DEV__)?Reactotron.createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware)) :createStore(reducer,intialState,applyMiddleware(thunk,loggerMiddleware)) //Redux logger not required But still working here
 }
 
 // export default function configureStore(initialState) {

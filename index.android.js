@@ -1,9 +1,11 @@
 'use strict'
 
-import './ReactotronConfig'
+if (__DEV__) {
+    require ('./ReactotronConfig')
+}
 import fareye from './src/fareye'
 
- fareye('android')
+fareye('android')
 // import React, {
 //   PureComponent
 // } from 'react';

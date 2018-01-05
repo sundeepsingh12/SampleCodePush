@@ -22,9 +22,10 @@ console.logs = function() {
 
 console.tron = Reactotron
   
+if(__DEV__){
 Reactotron //To be added dev under dev flag
     .configure({
-        host: '192.168.1.20',
+        host: '192.168.1.162',
         name: "Fareye App"
     }) // controls connection & communication settings
     //.useReactNative()
@@ -58,3 +59,5 @@ Reactotron //To be added dev under dev flag
     .use(asyncStorage())
     .use(networking())
     .connect() //let's connect!!!
+
+}

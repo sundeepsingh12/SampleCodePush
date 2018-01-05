@@ -42,14 +42,6 @@ import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
 import {trackingService} from '../../services/classes/Tracking'
 
-/**
- * ## set the store
- *
- * this is the Redux store
- *
- * this is here to support Hot Loading
- *
- */
 
 export function setState(type, payload) {
   return {
@@ -58,12 +50,6 @@ export function setState(type, payload) {
   }
 }
 
-export function setStore(store) {
-  return {
-    type: SET_STORE,
-    payload: store
-  }
-}
 
 //Use to navigate to other scene
 export function navigateToScene(routeName, params) {
