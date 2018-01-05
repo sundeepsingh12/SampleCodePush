@@ -163,7 +163,7 @@ export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dat
 export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, itemId) {
     return async function (dispatch) {
         try {
-            if (!await dataStoreService.dataStoreValuePresentInFieldData(dataStorevalue, fieldAttributeMasterId)) {
+            if (!await dataStoreService.checkForUniqueValidation(dataStorevalue, fieldAttributeMasterId)) {
                 dispatch(setState(SHOW_DETAILS, itemId))
             } else {
                 throw new Error('This value is already added')

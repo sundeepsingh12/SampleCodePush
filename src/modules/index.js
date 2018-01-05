@@ -7,7 +7,6 @@
 'use strict'
 
 import auth from './login/loginReducer'
-import device from './device/deviceReducer'
 import global from './global/globalReducer'
 import preloader from './pre-loader/preloaderReducer'
 import nav from './navigators/navigatorReducer'
@@ -58,7 +57,6 @@ import cameraReducer from './camera/cameraReducer'
 const rootReducer = combineReducers({
   nav,
   auth,
-  device,
   global,
   home,
   jobDetails,

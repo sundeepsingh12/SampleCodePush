@@ -180,15 +180,15 @@ class DataStoreService {
     }
 
     /**
-      * This function checks for dataStoreValue present in TABLE_FIELD_DATA for external data store fieldAttributeMasterId
-      * @param {*} dataStoreValue
+      * This function checks for fieldAttributeValue present in TABLE_FIELD_DATA
+      * @param {*} fieldAttributeValue
       * @param {*} fieldAttributeMasterId
       * @returns 
       * boolean
       */
-    dataStoreValuePresentInFieldData(dataStoreValue, fieldAttributeMasterId) {
-        if (!dataStoreValue) {
-            throw new Error('dataStorevalue missing in currentElement')
+    checkForUniqueValidation(fieldAttributeValue, fieldAttributeMasterId) {
+        if (!fieldAttributeValue) {
+            throw new Error('fieldAttributeValue missing in currentElement')
         }
         if (!fieldAttributeMasterId) {
             throw new Error('fieldAttributeMasterId missing in currentElement')
@@ -197,7 +197,7 @@ class DataStoreService {
         let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
         for (let index in fieldDataList) {
             let fieldData = { ...fieldDataList[index] }
-            if (fieldData.value == dataStoreValue) {
+            if (fieldData.value == fieldAttributeValue) {
                 return true
             }
         }

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
 import styles from '../themes/FeStyle'
 
@@ -20,7 +20,7 @@ import {
   StyleProvider
 } from 'native-base'
 import moment from 'moment'
-export default class JobListItem extends Component {
+export default class JobListItem extends PureComponent {
 
   render() {
     return (

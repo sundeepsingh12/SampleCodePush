@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
 import {
@@ -20,7 +20,7 @@ import {
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-export default class ReviewSaveActivatedDetails extends Component {
+export default class ReviewSaveActivatedDetails extends PureComponent {
 
     renderData = (item) => {
         return (

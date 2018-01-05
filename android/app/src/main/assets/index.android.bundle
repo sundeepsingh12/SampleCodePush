@@ -1336,8 +1336,8 @@ var styles = _reactNative.StyleSheet.create({
   }
 });
 
-var TabIcon = function (_React$Component) {
-  babelHelpers.inherits(TabIcon, _React$Component);
+var TabIcon = function (_React$PureComponent) {
+  babelHelpers.inherits(TabIcon, _React$PureComponent);
 
   function TabIcon() {
     babelHelpers.classCallCheck(this, TabIcon);
@@ -1361,7 +1361,7 @@ var TabIcon = function (_React$Component) {
     }
   }]);
   return TabIcon;
-}(_react2.default.Component);
+}(_react2.default.PureComponent);
 
 function native(platform) {
   var Fareye = _react2.default.createClass({
@@ -1496,7 +1496,7 @@ var React = {
     only: onlyChild
   },
 
-  Component: ReactComponent,
+  PureComponent: ReactComponent,
   PureComponent: ReactPureComponent,
 
   createElement: createElement,
@@ -4304,7 +4304,7 @@ var ReactNative = {
 if (__DEV__) {
   (function () {
     var throwOnWrongReactAPI = require(401                   ); // 401 = throwOnWrongReactAPI
-    var reactAPIs = ['createClass', 'Component'];
+    var reactAPIs = ['createClass', 'PureComponent'];
 
     var _loop = function _loop(key) {
       Object.defineProperty(ReactNative, key, {
@@ -4812,7 +4812,7 @@ var NativeMethodsMixin = {
   setNativeProps: function setNativeProps(nativeProps) {
     if (!this.viewConfig) {
       var ctor = this.constructor;
-      var componentName = ctor.displayName || ctor.name || '<Unknown Component>';
+      var componentName = ctor.displayName || ctor.name || '<Unknown PureComponent>';
       invariant(false, componentName + ' "viewConfig" is not defined.');
     }
 
@@ -9910,8 +9910,8 @@ __d(/* UnimplementedView */function(global, require, module, exports) {
 var React = require(100    ); // 100 = React
 var StyleSheet = require(101         ); // 101 = StyleSheet
 
-var UnimplementedView = function (_React$Component) {
-  babelHelpers.inherits(UnimplementedView, _React$Component);
+var UnimplementedView = function (_React$PureComponent) {
+  babelHelpers.inherits(UnimplementedView, _React$PureComponent);
 
   function UnimplementedView() {
     var _ref;
@@ -9939,7 +9939,7 @@ var UnimplementedView = function (_React$Component) {
     }
   }]);
   return UnimplementedView;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   unimplementedView: {
@@ -12068,27 +12068,27 @@ var CompositeTypes = {
   StatelessFunctional: 2
 };
 
-function StatelessComponent(Component) {}
+function StatelessComponent(PureComponent) {}
 StatelessComponent.prototype.render = function () {
-  var Component = ReactInstanceMap.get(this)._currentElement.type;
-  var element = Component(this.props, this.context, this.updater);
-  warnIfInvalidElement(Component, element);
+  var PureComponent = ReactInstanceMap.get(this)._currentElement.type;
+  var element = PureComponent(this.props, this.context, this.updater);
+  warnIfInvalidElement(PureComponent, element);
   return element;
 };
 
-function warnIfInvalidElement(Component, element) {
+function warnIfInvalidElement(PureComponent, element) {
   if (__DEV__) {
-    warning(element === null || element === false || React.isValidElement(element), '%s(...): A valid React element (or null) must be returned. You may have ' + 'returned undefined, an array or some other invalid object.', Component.displayName || Component.name || 'Component');
-    warning(!Component.childContextTypes, '%s(...): childContextTypes cannot be defined on a functional component.', Component.displayName || Component.name || 'Component');
+    warning(element === null || element === false || React.isValidElement(element), '%s(...): A valid React element (or null) must be returned. You may have ' + 'returned undefined, an array or some other invalid object.', PureComponent.displayName || PureComponent.name || 'PureComponent');
+    warning(!PureComponent.childContextTypes, '%s(...): childContextTypes cannot be defined on a functional component.', PureComponent.displayName || PureComponent.name || 'PureComponent');
   }
 }
 
-function shouldConstruct(Component) {
-  return !!(Component.prototype && Component.prototype.isReactComponent);
+function shouldConstruct(PureComponent) {
+  return !!(PureComponent.prototype && PureComponent.prototype.isReactComponent);
 }
 
-function isPureComponent(Component) {
-  return !!(Component.prototype && Component.prototype.isPureReactComponent);
+function isPureComponent(PureComponent) {
+  return !!(PureComponent.prototype && PureComponent.prototype.isPureReactComponent);
 }
 
 function measureLifeCyclePerf(fn, debugID, timerType) {
@@ -12147,22 +12147,22 @@ var ReactCompositeComponent = {
     var publicProps = this._currentElement.props;
     var publicContext = this._processContext(context);
 
-    var Component = this._currentElement.type;
+    var PureComponent = this._currentElement.type;
 
     var updateQueue = transaction.getUpdateQueue();
 
-    var doConstruct = shouldConstruct(Component);
+    var doConstruct = shouldConstruct(PureComponent);
     var inst = this._constructComponent(doConstruct, publicProps, publicContext, updateQueue);
     var renderedElement;
 
     if (!doConstruct && (inst == null || inst.render == null)) {
       renderedElement = inst;
-      warnIfInvalidElement(Component, renderedElement);
-      invariant(inst === null || inst === false || React.isValidElement(inst), '%s(...): A valid React element (or null) must be returned. You may have ' + 'returned undefined, an array or some other invalid object.', Component.displayName || Component.name || 'Component');
-      inst = new StatelessComponent(Component);
+      warnIfInvalidElement(PureComponent, renderedElement);
+      invariant(inst === null || inst === false || React.isValidElement(inst), '%s(...): A valid React element (or null) must be returned. You may have ' + 'returned undefined, an array or some other invalid object.', PureComponent.displayName || PureComponent.name || 'PureComponent');
+      inst = new StatelessComponent(PureComponent);
       this._compositeType = CompositeTypes.StatelessFunctional;
     } else {
-      if (isPureComponent(Component)) {
+      if (isPureComponent(PureComponent)) {
         this._compositeType = CompositeTypes.PureClass;
       } else {
         this._compositeType = CompositeTypes.ImpureClass;
@@ -12171,11 +12171,11 @@ var ReactCompositeComponent = {
 
     if (__DEV__) {
       if (inst.render == null) {
-        warning(false, '%s(...): No `render` method found on the returned component ' + 'instance: you may have forgotten to define `render`.', Component.displayName || Component.name || 'Component');
+        warning(false, '%s(...): No `render` method found on the returned component ' + 'instance: you may have forgotten to define `render`.', PureComponent.displayName || PureComponent.name || 'PureComponent');
       }
 
       var propsMutated = inst.props !== publicProps;
-      var componentName = Component.displayName || Component.name || 'Component';
+      var componentName = PureComponent.displayName || PureComponent.name || 'PureComponent';
 
       warning(inst.props === undefined || !propsMutated, '%s(...): When calling super() in `%s`, make sure to pass ' + 'up the same props that your component\'s constructor was passed.', componentName, componentName);
     }
@@ -12245,24 +12245,24 @@ var ReactCompositeComponent = {
   },
 
   _constructComponentWithoutOwner: function _constructComponentWithoutOwner(doConstruct, publicProps, publicContext, updateQueue) {
-    var Component = this._currentElement.type;
+    var PureComponent = this._currentElement.type;
 
     if (doConstruct) {
       if (__DEV__) {
         return measureLifeCyclePerf(function () {
-          return new Component(publicProps, publicContext, updateQueue);
+          return new PureComponent(publicProps, publicContext, updateQueue);
         }, this._debugID, 'ctor');
       } else {
-        return new Component(publicProps, publicContext, updateQueue);
+        return new PureComponent(publicProps, publicContext, updateQueue);
       }
     }
 
     if (__DEV__) {
       return measureLifeCyclePerf(function () {
-        return Component(publicProps, publicContext, updateQueue);
+        return PureComponent(publicProps, publicContext, updateQueue);
       }, this._debugID, 'render');
     } else {
-      return Component(publicProps, publicContext, updateQueue);
+      return PureComponent(publicProps, publicContext, updateQueue);
     }
   },
 
@@ -12379,8 +12379,8 @@ var ReactCompositeComponent = {
   },
 
   _maskContext: function _maskContext(context) {
-    var Component = this._currentElement.type;
-    var contextTypes = Component.contextTypes;
+    var PureComponent = this._currentElement.type;
+    var contextTypes = PureComponent.contextTypes;
     if (!contextTypes) {
       return emptyObject;
     }
@@ -12394,16 +12394,16 @@ var ReactCompositeComponent = {
   _processContext: function _processContext(context) {
     var maskedContext = this._maskContext(context);
     if (__DEV__) {
-      var Component = this._currentElement.type;
-      if (Component.contextTypes) {
-        this._checkContextTypes(Component.contextTypes, maskedContext, 'context');
+      var PureComponent = this._currentElement.type;
+      if (PureComponent.contextTypes) {
+        this._checkContextTypes(PureComponent.contextTypes, maskedContext, 'context');
       }
     }
     return maskedContext;
   },
 
   _processChildContext: function _processChildContext(currentContext) {
-    var Component = this._currentElement.type;
+    var PureComponent = this._currentElement.type;
     var inst = this._instance;
     var childContext;
 
@@ -12421,12 +12421,12 @@ var ReactCompositeComponent = {
     }
 
     if (childContext) {
-      invariant(typeof Component.childContextTypes === 'object', '%s.getChildContext(): childContextTypes must be defined in order to ' + 'use getChildContext().', this.getName() || 'ReactCompositeComponent');
+      invariant(typeof PureComponent.childContextTypes === 'object', '%s.getChildContext(): childContextTypes must be defined in order to ' + 'use getChildContext().', this.getName() || 'ReactCompositeComponent');
       if (__DEV__) {
-        this._checkContextTypes(Component.childContextTypes, childContext, 'childContext');
+        this._checkContextTypes(PureComponent.childContextTypes, childContext, 'childContext');
       }
       for (var name in childContext) {
-        invariant(name in Component.childContextTypes, '%s.getChildContext(): key "%s" is not defined in childContextTypes.', this.getName() || 'ReactCompositeComponent', name);
+        invariant(name in PureComponent.childContextTypes, '%s.getChildContext(): key "%s" is not defined in childContextTypes.', this.getName() || 'ReactCompositeComponent', name);
       }
       return babelHelpers.extends({}, currentContext, childContext);
     }
@@ -13592,8 +13592,8 @@ function childrenAsString(children) {
   return '';
 }
 
-var Surface = function (_React$Component) {
-  babelHelpers.inherits(Surface, _React$Component);
+var Surface = function (_React$PureComponent) {
+  babelHelpers.inherits(Surface, _React$PureComponent);
 
   function Surface() {
     babelHelpers.classCallCheck(this, Surface);
@@ -13619,7 +13619,7 @@ var Surface = function (_React$Component) {
     }
   }]);
   return Surface;
-}(React.Component);
+}(React.PureComponent);
 
 Surface.childContextTypes = {
   isInSurface: React.PropTypes.bool
@@ -13681,7 +13681,7 @@ var Group = function (_React$Component2) {
     }
   }]);
   return Group;
-}(React.Component);
+}(React.PureComponent);
 
 Group.contextTypes = {
   isInSurface: React.PropTypes.bool.isRequired
@@ -13719,7 +13719,7 @@ var ClippingRectangle = function (_React$Component3) {
     }
   }]);
   return ClippingRectangle;
-}(React.Component);
+}(React.PureComponent);
 
 var SOLID_COLOR = 0;
 var LINEAR_GRADIENT = 1;
@@ -13872,7 +13872,7 @@ var Shape = function (_React$Component4) {
     }
   }]);
   return Shape;
-}(React.Component);
+}(React.PureComponent);
 
 var cachedFontObjectsFromString = {};
 
@@ -13969,7 +13969,7 @@ var Text = function (_React$Component5) {
     }
   }]);
   return Text;
-}(React.Component);
+}(React.PureComponent);
 
 function LinearGradient(stops, x1, y1, x2, y2) {
   var type = LINEAR_GRADIENT;
@@ -14812,8 +14812,8 @@ var View = require(121   ); // 121 = View
 
 var invariant = require(19                  ); // 19 = fbjs/lib/invariant
 
-var Button = function (_React$Component) {
-  babelHelpers.inherits(Button, _React$Component);
+var Button = function (_React$PureComponent) {
+  babelHelpers.inherits(Button, _React$PureComponent);
 
   function Button() {
     babelHelpers.classCallCheck(this, Button);
@@ -14867,7 +14867,7 @@ var Button = function (_React$Component) {
     }
   }]);
   return Button;
-}(React.Component);
+}(React.PureComponent);
 
 Button.propTypes = {
   title: React.PropTypes.string.isRequired,
@@ -23063,9 +23063,9 @@ var AnimatedProps = function (_Animated2) {
   return AnimatedProps;
 }(Animated);
 
-function createAnimatedComponent(Component) {
-  var AnimatedComponent = function (_React$Component) {
-    babelHelpers.inherits(AnimatedComponent, _React$Component);
+function createAnimatedComponent(PureComponent) {
+  var AnimatedComponent = function (_React$PureComponent) {
+    babelHelpers.inherits(AnimatedComponent, _React$PureComponent);
 
     function AnimatedComponent(props) {
       babelHelpers.classCallCheck(this, AnimatedComponent);
@@ -23163,7 +23163,7 @@ function createAnimatedComponent(Component) {
     }, {
       key: 'render',
       value: function render() {
-        return React.createElement(Component, babelHelpers.extends({}, this._propsAnimated.__getValue(), {
+        return React.createElement(PureComponent, babelHelpers.extends({}, this._propsAnimated.__getValue(), {
           ref: this._setComponentRef
         }));
       }
@@ -23179,16 +23179,16 @@ function createAnimatedComponent(Component) {
       }
     }]);
     return AnimatedComponent;
-  }(React.Component);
+  }(React.PureComponent);
 
   AnimatedComponent.propTypes = {
     style: function style(props, propName, componentName) {
-      if (!Component.propTypes) {
+      if (!PureComponent.propTypes) {
         return;
       }
 
       for (var key in ViewStylePropTypes) {
-        if (!Component.propTypes[key] && props[key] !== undefined) {
+        if (!PureComponent.propTypes[key] && props[key] !== undefined) {
           console.warn('You are setting the style `{ ' + key + ': ... }` as a prop. You ' + 'should nest it in a style object. ' + 'E.g. `{ style: { ' + key + ': ... } }`');
         }
       }
@@ -25447,8 +25447,8 @@ var StyleSheet = require(101         ); // 101 = StyleSheet
 var Text = require(185   ); // 185 = Text
 var View = require(121   ); // 121 = View
 
-var DummyDatePickerIOS = function (_React$Component) {
-  babelHelpers.inherits(DummyDatePickerIOS, _React$Component);
+var DummyDatePickerIOS = function (_React$PureComponent) {
+  babelHelpers.inherits(DummyDatePickerIOS, _React$PureComponent);
 
   function DummyDatePickerIOS() {
     babelHelpers.classCallCheck(this, DummyDatePickerIOS);
@@ -25470,7 +25470,7 @@ var DummyDatePickerIOS = function (_React$Component) {
     }
   }]);
   return DummyDatePickerIOS;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   dummyDatePickerIOS: {
@@ -25738,8 +25738,8 @@ function createStackEntry(props) {
   };
 }
 
-var StatusBar = function (_React$Component) {
-  babelHelpers.inherits(StatusBar, _React$Component);
+var StatusBar = function (_React$PureComponent) {
+  babelHelpers.inherits(StatusBar, _React$PureComponent);
 
   function StatusBar() {
     var _ref;
@@ -25873,7 +25873,7 @@ var StatusBar = function (_React$Component) {
     }
   }]);
   return StatusBar;
-}(React.Component);
+}(React.PureComponent);
 
 StatusBar._propsStack = [];
 StatusBar._defaultProps = createStackEntry({
@@ -26930,8 +26930,8 @@ __d(/* StaticRenderer */function(global, require, module, exports) {
 
 var React = require(100    ); // 100 = React
 
-var StaticRenderer = function (_React$Component) {
-  babelHelpers.inherits(StaticRenderer, _React$Component);
+var StaticRenderer = function (_React$PureComponent) {
+  babelHelpers.inherits(StaticRenderer, _React$PureComponent);
 
   function StaticRenderer() {
     babelHelpers.classCallCheck(this, StaticRenderer);
@@ -26950,7 +26950,7 @@ var StaticRenderer = function (_React$Component) {
     }
   }]);
   return StaticRenderer;
-}(React.Component);
+}(React.PureComponent);
 
 StaticRenderer.propTypes = {
   shouldUpdate: React.PropTypes.bool.isRequired,
@@ -27321,8 +27321,8 @@ var RCTModalHostView = requireNativeComponent('RCTModalHostView', null);
 
 var PropTypes = React.PropTypes;
 
-var Modal = function (_React$Component) {
-  babelHelpers.inherits(Modal, _React$Component);
+var Modal = function (_React$PureComponent) {
+  babelHelpers.inherits(Modal, _React$PureComponent);
 
   function Modal() {
     babelHelpers.classCallCheck(this, Modal);
@@ -27381,7 +27381,7 @@ var Modal = function (_React$Component) {
     }
   }]);
   return Modal;
-}(React.Component);
+}(React.PureComponent);
 
 Modal.propTypes = {
   animationType: PropTypes.oneOf(['none', 'slide', 'fade']),
@@ -27433,8 +27433,8 @@ var ReactNative = require(193          ); // 193 = ReactNative
 var StyleSheet = require(101         ); // 101 = StyleSheet
 var View = require(121   ); // 121 = View
 
-var AppContainer = function (_React$Component) {
-  babelHelpers.inherits(AppContainer, _React$Component);
+var AppContainer = function (_React$PureComponent) {
+  babelHelpers.inherits(AppContainer, _React$PureComponent);
 
   function AppContainer() {
     var _ref;
@@ -27520,7 +27520,7 @@ var AppContainer = function (_React$Component) {
     }
   }]);
   return AppContainer;
-}(React.Component);
+}(React.PureComponent);
 
 AppContainer.childContextTypes = {
   rootTag: React.PropTypes.number
@@ -27554,8 +27554,8 @@ if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.resolveRNStyle = require(51            ); // 51 = flattenStyle
 }
 
-var Inspector = function (_React$Component) {
-  babelHelpers.inherits(Inspector, _React$Component);
+var Inspector = function (_React$PureComponent) {
+  babelHelpers.inherits(Inspector, _React$PureComponent);
 
   function Inspector(props) {
     babelHelpers.classCallCheck(this, Inspector);
@@ -27724,7 +27724,7 @@ var Inspector = function (_React$Component) {
     }
   }]);
   return Inspector;
-}(React.Component);
+}(React.PureComponent);
 
 var _initialiseProps = function _initialiseProps() {
   var _this4 = this;
@@ -27801,8 +27801,8 @@ var ElementBox = require(290         ); // 290 = ElementBox
 
 var PropTypes = React.PropTypes;
 
-var InspectorOverlay = function (_React$Component) {
-  babelHelpers.inherits(InspectorOverlay, _React$Component);
+var InspectorOverlay = function (_React$PureComponent) {
+  babelHelpers.inherits(InspectorOverlay, _React$PureComponent);
 
   function InspectorOverlay() {
     var _ref;
@@ -27852,7 +27852,7 @@ var InspectorOverlay = function (_React$Component) {
     }
   }]);
   return InspectorOverlay;
-}(React.Component);
+}(React.PureComponent);
 
 InspectorOverlay.propTypes = {
   inspected: PropTypes.shape({
@@ -27921,8 +27921,8 @@ var resolveBoxStyle = require(292              ); // 292 = resolveBoxStyle
 
 var flattenStyle = require(51            ); // 51 = flattenStyle
 
-var ElementBox = function (_React$Component) {
-  babelHelpers.inherits(ElementBox, _React$Component);
+var ElementBox = function (_React$PureComponent) {
+  babelHelpers.inherits(ElementBox, _React$PureComponent);
 
   function ElementBox() {
     babelHelpers.classCallCheck(this, ElementBox);
@@ -27970,7 +27970,7 @@ var ElementBox = function (_React$Component) {
     }
   }]);
   return ElementBox;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   frame: {
@@ -27995,8 +27995,8 @@ __d(/* BorderBox */function(global, require, module, exports) {
 var React = require(100    ); // 100 = React
 var View = require(121   ); // 121 = View
 
-var BorderBox = function (_React$Component) {
-  babelHelpers.inherits(BorderBox, _React$Component);
+var BorderBox = function (_React$PureComponent) {
+  babelHelpers.inherits(BorderBox, _React$PureComponent);
 
   function BorderBox() {
     babelHelpers.classCallCheck(this, BorderBox);
@@ -28024,7 +28024,7 @@ var BorderBox = function (_React$Component) {
     }
   }]);
   return BorderBox;
-}(React.Component);
+}(React.PureComponent);
 
 module.exports = BorderBox;
 }, 291, null, "BorderBox");
@@ -28083,8 +28083,8 @@ var View = require(121   ); // 121 = View
 
 var PropTypes = React.PropTypes;
 
-var InspectorPanel = function (_React$Component) {
-  babelHelpers.inherits(InspectorPanel, _React$Component);
+var InspectorPanel = function (_React$PureComponent) {
+  babelHelpers.inherits(InspectorPanel, _React$PureComponent);
 
   function InspectorPanel() {
     babelHelpers.classCallCheck(this, InspectorPanel);
@@ -28164,7 +28164,7 @@ var InspectorPanel = function (_React$Component) {
     }
   }]);
   return InspectorPanel;
-}(React.Component);
+}(React.PureComponent);
 
 InspectorPanel.propTypes = {
   devtoolsIsOpen: PropTypes.bool,
@@ -28206,7 +28206,7 @@ var Button = function (_React$Component2) {
     }
   }]);
   return Button;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   buttonRow: {
@@ -28264,8 +28264,8 @@ var openFileInEditor = require(301               ); // 301 = openFileInEditor
 
 var PropTypes = React.PropTypes;
 
-var ElementProperties = function (_React$Component) {
-  babelHelpers.inherits(ElementProperties, _React$Component);
+var ElementProperties = function (_React$PureComponent) {
+  babelHelpers.inherits(ElementProperties, _React$PureComponent);
 
   function ElementProperties() {
     babelHelpers.classCallCheck(this, ElementProperties);
@@ -28354,7 +28354,7 @@ var ElementProperties = function (_React$Component) {
     }
   }]);
   return ElementProperties;
-}(React.Component);
+}(React.PureComponent);
 
 ElementProperties.propTypes = {
   hierarchy: PropTypes.array.isRequired,
@@ -28443,8 +28443,8 @@ var blank = {
   bottom: 0
 };
 
-var BoxInspector = function (_React$Component) {
-  babelHelpers.inherits(BoxInspector, _React$Component);
+var BoxInspector = function (_React$PureComponent) {
+  babelHelpers.inherits(BoxInspector, _React$PureComponent);
 
   function BoxInspector() {
     babelHelpers.classCallCheck(this, BoxInspector);
@@ -28489,7 +28489,7 @@ var BoxInspector = function (_React$Component) {
     }
   }]);
   return BoxInspector;
-}(React.Component);
+}(React.PureComponent);
 
 var BoxContainer = function (_React$Component2) {
   babelHelpers.inherits(BoxContainer, _React$Component2);
@@ -28544,7 +28544,7 @@ var BoxContainer = function (_React$Component2) {
     }
   }]);
   return BoxContainer;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   row: {
@@ -28598,8 +28598,8 @@ var StyleSheet = require(101         ); // 101 = StyleSheet
 var Text = require(185   ); // 185 = Text
 var View = require(121   ); // 121 = View
 
-var StyleInspector = function (_React$Component) {
-  babelHelpers.inherits(StyleInspector, _React$Component);
+var StyleInspector = function (_React$PureComponent) {
+  babelHelpers.inherits(StyleInspector, _React$PureComponent);
 
   function StyleInspector() {
     babelHelpers.classCallCheck(this, StyleInspector);
@@ -28650,7 +28650,7 @@ var StyleInspector = function (_React$Component) {
     }
   }]);
   return StyleInspector;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   container: {
@@ -28956,8 +28956,8 @@ var SEPARATOR_THICKNESS = 2;
 
 var nextXHRId = 0;
 
-var NetworkOverlay = function (_React$Component) {
-  babelHelpers.inherits(NetworkOverlay, _React$Component);
+var NetworkOverlay = function (_React$PureComponent) {
+  babelHelpers.inherits(NetworkOverlay, _React$PureComponent);
 
   function NetworkOverlay(props) {
     babelHelpers.classCallCheck(this, NetworkOverlay);
@@ -29394,7 +29394,7 @@ var NetworkOverlay = function (_React$Component) {
     }
   }]);
   return NetworkOverlay;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   container: {
@@ -29782,8 +29782,8 @@ var StyleSheet = require(101         ); // 101 = StyleSheet
 var Text = require(185   ); // 185 = Text
 var View = require(121   ); // 121 = View
 
-var PerformanceOverlay = function (_React$Component) {
-  babelHelpers.inherits(PerformanceOverlay, _React$Component);
+var PerformanceOverlay = function (_React$PureComponent) {
+  babelHelpers.inherits(PerformanceOverlay, _React$PureComponent);
 
   function PerformanceOverlay() {
     babelHelpers.classCallCheck(this, PerformanceOverlay);
@@ -29824,7 +29824,7 @@ var PerformanceOverlay = function (_React$Component) {
     }
   }]);
   return PerformanceOverlay;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   container: {
@@ -30138,8 +30138,8 @@ var WarningInspector = function WarningInspector(_ref3) {
   );
 };
 
-var YellowBox = function (_React$Component) {
-  babelHelpers.inherits(YellowBox, _React$Component);
+var YellowBox = function (_React$PureComponent) {
+  babelHelpers.inherits(YellowBox, _React$PureComponent);
 
   function YellowBox(props, context) {
     babelHelpers.classCallCheck(this, YellowBox);
@@ -30264,7 +30264,7 @@ var YellowBox = function (_React$Component) {
     }
   }]);
   return YellowBox;
-}(React.Component);
+}(React.PureComponent);
 
 var backgroundColor = function backgroundColor(opacity) {
   return 'rgba(250, 186, 48, ' + opacity + ')';
@@ -36411,8 +36411,8 @@ function initStyle(index, presentedIndex) {
   return index === presentedIndex ? NavigatorBreadcrumbNavigationBarStyles.Center[index] : index < presentedIndex ? NavigatorBreadcrumbNavigationBarStyles.Left[index] : NavigatorBreadcrumbNavigationBarStyles.Right[index];
 }
 
-var NavigatorBreadcrumbNavigationBar = function (_React$Component) {
-  babelHelpers.inherits(NavigatorBreadcrumbNavigationBar, _React$Component);
+var NavigatorBreadcrumbNavigationBar = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigatorBreadcrumbNavigationBar, _React$PureComponent);
 
   function NavigatorBreadcrumbNavigationBar() {
     var _ref;
@@ -36615,7 +36615,7 @@ var NavigatorBreadcrumbNavigationBar = function (_React$Component) {
     }
   }]);
   return NavigatorBreadcrumbNavigationBar;
-}(React.Component);
+}(React.PureComponent);
 
 NavigatorBreadcrumbNavigationBar.propTypes = {
   navigator: PropTypes.shape({
@@ -37350,8 +37350,8 @@ var navStatePresentedIndex = function navStatePresentedIndex(navState) {
   return navState.observedTopOfStack;
 };
 
-var NavigatorNavigationBar = function (_React$Component) {
-  babelHelpers.inherits(NavigatorNavigationBar, _React$Component);
+var NavigatorNavigationBar = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigatorNavigationBar, _React$PureComponent);
 
   function NavigatorNavigationBar() {
     var _ref;
@@ -37476,7 +37476,7 @@ var NavigatorNavigationBar = function (_React$Component) {
     }
   }]);
   return NavigatorNavigationBar;
-}(React.Component);
+}(React.PureComponent);
 
 NavigatorNavigationBar.propTypes = {
   navigator: React.PropTypes.object,
@@ -39225,8 +39225,8 @@ var pickerStyleType = StyleSheetPropType(babelHelpers.extends({}, ViewStylePropT
 var MODE_DIALOG = 'dialog';
 var MODE_DROPDOWN = 'dropdown';
 
-var Picker = function (_React$Component) {
-  babelHelpers.inherits(Picker, _React$Component);
+var Picker = function (_React$PureComponent) {
+  babelHelpers.inherits(Picker, _React$PureComponent);
 
   function Picker() {
     babelHelpers.classCallCheck(this, Picker);
@@ -39254,7 +39254,7 @@ var Picker = function (_React$Component) {
     }
   }]);
   return Picker;
-}(React.Component);
+}(React.PureComponent);
 
 Picker.MODE_DIALOG = MODE_DIALOG;
 Picker.MODE_DROPDOWN = MODE_DROPDOWN;
@@ -39294,7 +39294,7 @@ Picker.Item = (_temp = _class = function (_React$Component2) {
     }
   }]);
   return _class;
-}(React.Component), _class.propTypes = {
+}(React.PureComponent), _class.propTypes = {
   label: React.PropTypes.string.isRequired,
 
   value: React.PropTypes.any,
@@ -39334,8 +39334,8 @@ var pickerStyleType = StyleSheetPropType(babelHelpers.extends({}, ViewStylePropT
   color: ColorPropType
 }));
 
-var PickerAndroid = function (_React$Component) {
-  babelHelpers.inherits(PickerAndroid, _React$Component);
+var PickerAndroid = function (_React$PureComponent) {
+  babelHelpers.inherits(PickerAndroid, _React$PureComponent);
 
   function PickerAndroid(props, context) {
     babelHelpers.classCallCheck(this, PickerAndroid);
@@ -39391,7 +39391,7 @@ var PickerAndroid = function (_React$Component) {
     }
   }]);
   return PickerAndroid;
-}(React.Component);
+}(React.PureComponent);
 
 PickerAndroid.propTypes = babelHelpers.extends({}, View.propTypes, {
   style: pickerStyleType,
@@ -39531,8 +39531,8 @@ var StyleSheet = require(101         ); // 101 = StyleSheet
 var Text = require(185   ); // 185 = Text
 var View = require(121   ); // 121 = View
 
-var DummyProgressViewIOS = function (_React$Component) {
-  babelHelpers.inherits(DummyProgressViewIOS, _React$Component);
+var DummyProgressViewIOS = function (_React$PureComponent) {
+  babelHelpers.inherits(DummyProgressViewIOS, _React$PureComponent);
 
   function DummyProgressViewIOS() {
     babelHelpers.classCallCheck(this, DummyProgressViewIOS);
@@ -39554,7 +39554,7 @@ var DummyProgressViewIOS = function (_React$Component) {
     }
   }]);
   return DummyProgressViewIOS;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   dummy: {
@@ -39584,8 +39584,8 @@ var StyleSheet = require(101         ); // 101 = StyleSheet
 var Text = require(185   ); // 185 = Text
 var View = require(121   ); // 121 = View
 
-var DummySegmentedControlIOS = function (_React$Component) {
-  babelHelpers.inherits(DummySegmentedControlIOS, _React$Component);
+var DummySegmentedControlIOS = function (_React$PureComponent) {
+  babelHelpers.inherits(DummySegmentedControlIOS, _React$PureComponent);
 
   function DummySegmentedControlIOS() {
     babelHelpers.classCallCheck(this, DummySegmentedControlIOS);
@@ -39607,7 +39607,7 @@ var DummySegmentedControlIOS = function (_React$Component) {
     }
   }]);
   return DummySegmentedControlIOS;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   dummy: {
@@ -39971,8 +39971,8 @@ var SwipeableRow = require(339           ); // 339 = SwipeableRow
 
 var PropTypes = React.PropTypes;
 
-var SwipeableListView = function (_React$Component) {
-  babelHelpers.inherits(SwipeableListView, _React$Component);
+var SwipeableListView = function (_React$PureComponent) {
+  babelHelpers.inherits(SwipeableListView, _React$PureComponent);
   babelHelpers.createClass(SwipeableListView, null, [{
     key: 'getNewDataSource',
     value: function getNewDataSource() {
@@ -40117,7 +40117,7 @@ var SwipeableListView = function (_React$Component) {
     }
   }]);
   return SwipeableListView;
-}(React.Component);
+}(React.PureComponent);
 
 SwipeableListView.propTypes = {
   bounceFirstRowOnMount: PropTypes.bool.isRequired,
@@ -40477,8 +40477,8 @@ var React = require(100    ); // 100 = React
 var View = require(121   ); // 121 = View
 var StyleSheet = require(101         ); // 101 = StyleSheet
 
-var DummyTabBarIOS = function (_React$Component) {
-  babelHelpers.inherits(DummyTabBarIOS, _React$Component);
+var DummyTabBarIOS = function (_React$PureComponent) {
+  babelHelpers.inherits(DummyTabBarIOS, _React$PureComponent);
 
   function DummyTabBarIOS() {
     babelHelpers.classCallCheck(this, DummyTabBarIOS);
@@ -40496,7 +40496,7 @@ var DummyTabBarIOS = function (_React$Component) {
     }
   }]);
   return DummyTabBarIOS;
-}(React.Component);
+}(React.PureComponent);
 
 var styles = StyleSheet.create({
   tabGroup: {
@@ -41554,8 +41554,8 @@ var ReactPropTypes = React.PropTypes;
 
 var VIEWPAGER_REF = 'viewPager';
 
-var ViewPagerAndroid = function (_React$Component) {
-  babelHelpers.inherits(ViewPagerAndroid, _React$Component);
+var ViewPagerAndroid = function (_React$PureComponent) {
+  babelHelpers.inherits(ViewPagerAndroid, _React$PureComponent);
 
   function ViewPagerAndroid() {
     var _ref;
@@ -41635,7 +41635,7 @@ var ViewPagerAndroid = function (_React$Component) {
     }
   }]);
   return ViewPagerAndroid;
-}(React.Component);
+}(React.PureComponent);
 
 ViewPagerAndroid.propTypes = babelHelpers.extends({}, View.propTypes, {
   initialPage: ReactPropTypes.number,
@@ -41694,8 +41694,8 @@ var defaultRenderLoading = function defaultRenderLoading() {
   );
 };
 
-var WebView = function (_React$Component) {
-  babelHelpers.inherits(WebView, _React$Component);
+var WebView = function (_React$PureComponent) {
+  babelHelpers.inherits(WebView, _React$PureComponent);
 
   function WebView() {
     var _ref;
@@ -41836,7 +41836,7 @@ var WebView = function (_React$Component) {
     }
   }]);
   return WebView;
-}(React.Component);
+}(React.PureComponent);
 
 WebView.propTypes = babelHelpers.extends({}, View.propTypes, {
   renderError: PropTypes.func,
@@ -42974,7 +42974,7 @@ function printExclusive(flushHistory) {
     var renderCount = item.counts.render || 0;
     var renderDuration = item.durations.render || 0;
     return {
-      'Component': key,
+      'PureComponent': key,
       'Total time (ms)': roundFloat(totalDuration),
       'Instance count': instanceCount,
       'Total render time (ms)': roundFloat(renderDuration),
@@ -43000,7 +43000,7 @@ function printInclusive(flushHistory) {
         renderCount = item.renderCount;
 
     return {
-      'Owner > Component': key,
+      'Owner > PureComponent': key,
       'Inclusive render time (ms)': roundFloat(inclusiveRenderDuration),
       'Instance count': instanceCount,
       'Render count': renderCount
@@ -43023,7 +43023,7 @@ function printWasted(flushHistory) {
         renderCount = item.renderCount;
 
     return {
-      'Owner > Component': key,
+      'Owner > PureComponent': key,
       'Inclusive wasted time (ms)': roundFloat(inclusiveRenderDuration),
       'Instance count': instanceCount,
       'Render count': renderCount
@@ -43045,8 +43045,8 @@ function printOperations(flushHistory) {
       'Operation': stat.type,
       'Payload': typeof stat.payload === 'object' ? JSON.stringify(stat.payload) : stat.payload,
       'Flush index': stat.flushIndex,
-      'Owner Component ID': stat.ownerID,
-      'DOM Component ID': stat.instanceID
+      'Owner PureComponent ID': stat.ownerID,
+      'DOM PureComponent ID': stat.instanceID
     };
   });
   consoleTable(table);
@@ -43658,8 +43658,8 @@ var StyleSheet = require(101         ); // 101 = StyleSheet
 
 var PropTypes = React.PropTypes;
 
-var NavigationCard = function (_React$Component) {
-  babelHelpers.inherits(NavigationCard, _React$Component);
+var NavigationCard = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationCard, _React$PureComponent);
 
   function NavigationCard() {
     babelHelpers.classCallCheck(this, NavigationCard);
@@ -43694,7 +43694,7 @@ var NavigationCard = function (_React$Component) {
     }
   }]);
   return NavigationCard;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationCard.propTypes = babelHelpers.extends({}, NavigationPropTypes.SceneRendererProps, {
   onComponentRef: PropTypes.func.isRequired,
@@ -44272,9 +44272,9 @@ var invariant = require(19                  ); // 19 = fbjs/lib/invariant
 
 var MIN_POSITION_OFFSET = 0.01;
 
-function create(Component) {
-  var Container = function (_React$Component) {
-    babelHelpers.inherits(Container, _React$Component);
+function create(PureComponent) {
+  var Container = function (_React$PureComponent) {
+    babelHelpers.inherits(Container, _React$PureComponent);
 
     function Container(props, context) {
       babelHelpers.classCallCheck(this, Container);
@@ -44310,7 +44310,7 @@ function create(Component) {
       key: 'render',
       value: function render() {
         this._pointerEvents = this._computePointerEvents();
-        return React.createElement(Component, babelHelpers.extends({}, this.props, {
+        return React.createElement(PureComponent, babelHelpers.extends({}, this.props, {
           pointerEvents: this._pointerEvents,
           onComponentRef: this._onComponentRef
         }));
@@ -44362,7 +44362,7 @@ function create(Component) {
       }
     }]);
     return Container;
-  }(React.Component);
+  }(React.PureComponent);
 
   return Container;
 }
@@ -44497,8 +44497,8 @@ var View = require(121   ); // 121 = View
 var PropTypes = React.PropTypes;
 var Directions = NavigationCardStackPanResponder.Directions;
 
-var NavigationCardStack = function (_React$Component) {
-  babelHelpers.inherits(NavigationCardStack, _React$Component);
+var NavigationCardStack = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationCardStack, _React$PureComponent);
 
   function NavigationCardStack(props, context) {
     babelHelpers.classCallCheck(this, NavigationCardStack);
@@ -44593,7 +44593,7 @@ var NavigationCardStack = function (_React$Component) {
     }
   }]);
   return NavigationCardStack;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationCardStack.propTypes = {
   cardStyle: PropTypes.any,
@@ -44659,8 +44659,8 @@ var DefaultTransitionSpec = {
   timing: Animated.timing
 };
 
-var NavigationTransitioner = function (_React$Component) {
-  babelHelpers.inherits(NavigationTransitioner, _React$Component);
+var NavigationTransitioner = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationTransitioner, _React$PureComponent);
 
   function NavigationTransitioner(props, context) {
     babelHelpers.classCallCheck(this, NavigationTransitioner);
@@ -44812,7 +44812,7 @@ var NavigationTransitioner = function (_React$Component) {
     }
   }]);
   return NavigationTransitioner;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationTransitioner.propTypes = {
   configureTransition: PropTypes.func,
@@ -45030,8 +45030,8 @@ var APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 var STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : 0;
 var PropTypes = React.PropTypes;
 
-var NavigationHeader = function (_React$Component) {
-  babelHelpers.inherits(NavigationHeader, _React$Component);
+var NavigationHeader = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationHeader, _React$PureComponent);
 
   function NavigationHeader() {
     var _ref;
@@ -45138,7 +45138,7 @@ var NavigationHeader = function (_React$Component) {
     }
   }]);
   return NavigationHeader;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationHeader.defaultProps = {
 
@@ -46390,7 +46390,7 @@ __d(/* throwOnWrongReactAPI */function(global, require, module, exports) {
 'use strict';
 
 function throwOnWrongReactAPI(key) {
-  throw new Error('Seems you\'re trying to access \'ReactNative.' + key + '\' from the \'react-native\' package. Perhaps you meant to access \'React.' + key + '\' from the \'react\' package instead?\n\nFor example, instead of:\n\n  import React, { Component, View } from \'react-native\';\n\nYou should now do:\n\n  import React, { Component } from \'react\';\n  import { View } from \'react-native\';\n\nCheck the release notes on how to upgrade your code - https://github.com/facebook/react-native/releases/tag/v0.25.1\n');
+  throw new Error('Seems you\'re trying to access \'ReactNative.' + key + '\' from the \'react-native\' package. Perhaps you meant to access \'React.' + key + '\' from the \'react\' package instead?\n\nFor example, instead of:\n\n  import React, { PureComponent, View } from \'react-native\';\n\nYou should now do:\n\n  import React, { PureComponent } from \'react\';\n  import { View } from \'react-native\';\n\nCheck the release notes on how to upgrade your code - https://github.com/facebook/react-native/releases/tag/v0.25.1\n');
 }
 
 module.exports = throwOnWrongReactAPI;
@@ -46794,8 +46794,8 @@ var _react2 = babelHelpers.interopRequireDefault(_react);
 
 var _reactNative = require(43            ); // 43 = react-native
 
-var _class = function (_React$Component) {
-  babelHelpers.inherits(_class, _React$Component);
+var _class = function (_React$PureComponent) {
+  babelHelpers.inherits(_class, _React$PureComponent);
 
   function _class() {
     babelHelpers.classCallCheck(this, _class);
@@ -46809,7 +46809,7 @@ var _class = function (_React$Component) {
     }
   }]);
   return _class;
-}(_react2.default.Component);
+}(_react2.default.PureComponent);
 
 _class.propTypes = {
   tabBarStyle: _reactNative.View.propTypes.style,
@@ -47173,7 +47173,7 @@ var DefaultRenderer = function (_Component) {
     }
   }]);
   return DefaultRenderer;
-}(_react.Component);
+}(_react.PureComponent);
 
 DefaultRenderer.propTypes = {
   navigationState: _react.PropTypes.object,
@@ -47240,8 +47240,8 @@ function applyDefaultAnimation(position, navigationState) {
   }).start();
 }
 
-var NavigationAnimatedView = function (_React$Component) {
-  babelHelpers.inherits(NavigationAnimatedView, _React$Component);
+var NavigationAnimatedView = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationAnimatedView, _React$PureComponent);
 
   function NavigationAnimatedView(props, context) {
     babelHelpers.classCallCheck(this, NavigationAnimatedView);
@@ -47401,7 +47401,7 @@ var NavigationAnimatedView = function (_React$Component) {
     }
   }]);
   return NavigationAnimatedView;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationAnimatedView.propTypes = {
   applyAnimation: PropTypes.func,
@@ -47431,9 +47431,9 @@ __d(/* react-native-experimental-navigation/NavigationContainer.js */function(gl
 var React = require(13     ); // 13 = react
 var NavigationRootContainer = require(411                        ); // 411 = ./NavigationRootContainer
 
-function createNavigationContainer(Component) {
-  var NavigationComponent = function (_React$Component) {
-    babelHelpers.inherits(NavigationComponent, _React$Component);
+function createNavigationContainer(PureComponent) {
+  var NavigationComponent = function (_React$PureComponent) {
+    babelHelpers.inherits(NavigationComponent, _React$PureComponent);
 
     function NavigationComponent() {
       babelHelpers.classCallCheck(this, NavigationComponent);
@@ -47443,7 +47443,7 @@ function createNavigationContainer(Component) {
     babelHelpers.createClass(NavigationComponent, [{
       key: 'render',
       value: function render() {
-        return React.createElement(Component, babelHelpers.extends({
+        return React.createElement(PureComponent, babelHelpers.extends({
           onNavigate: this.getNavigationHandler()
         }, this.props));
       }
@@ -47461,7 +47461,7 @@ function createNavigationContainer(Component) {
       }
     }]);
     return NavigationComponent;
-  }(React.Component);
+  }(React.PureComponent);
 
   NavigationComponent.contextTypes = {
     onNavigate: React.PropTypes.func
@@ -47495,8 +47495,8 @@ function getBackAction() {
 
 var PropTypes = React.PropTypes;
 
-var NavigationRootContainer = function (_React$Component) {
-  babelHelpers.inherits(NavigationRootContainer, _React$Component);
+var NavigationRootContainer = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationRootContainer, _React$PureComponent);
 
   function NavigationRootContainer(props) {
     babelHelpers.classCallCheck(this, NavigationRootContainer);
@@ -47595,7 +47595,7 @@ var NavigationRootContainer = function (_React$Component) {
     }
   }]);
   return NavigationRootContainer;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationRootContainer.propTypes = {
   initialAction: NavigationPropTypes.action.isRequired,
@@ -47986,8 +47986,8 @@ var View = require(43            ).View; // 43 = react-native
 
 var PropTypes = React.PropTypes;
 
-var SceneView = function (_React$Component) {
-  babelHelpers.inherits(SceneView, _React$Component);
+var SceneView = function (_React$PureComponent) {
+  babelHelpers.inherits(SceneView, _React$PureComponent);
 
   function SceneView() {
     babelHelpers.classCallCheck(this, SceneView);
@@ -48006,7 +48006,7 @@ var SceneView = function (_React$Component) {
     }
   }]);
   return SceneView;
-}(React.Component);
+}(React.PureComponent);
 
 SceneView.propTypes = {
   sceneRenderer: PropTypes.func.isRequired,
@@ -48055,7 +48055,7 @@ var NavigationCard = function (_React$Component2) {
     }
   }]);
   return NavigationCard;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationCard.propTypes = babelHelpers.extends({}, NavigationPropTypes.SceneRendererProps, {
   onComponentRef: PropTypes.func.isRequired,
@@ -48604,9 +48604,9 @@ var invariant = require(19                  ); // 19 = fbjs/lib/invariant
 
 var MIN_POSITION_OFFSET = 0.01;
 
-function create(Component) {
-  var Container = function (_React$Component) {
-    babelHelpers.inherits(Container, _React$Component);
+function create(PureComponent) {
+  var Container = function (_React$PureComponent) {
+    babelHelpers.inherits(Container, _React$PureComponent);
 
     function Container(props, context) {
       babelHelpers.classCallCheck(this, Container);
@@ -48642,7 +48642,7 @@ function create(Component) {
       key: 'render',
       value: function render() {
         this._pointerEvents = this._computePointerEvents();
-        return React.createElement(Component, babelHelpers.extends({}, this.props, {
+        return React.createElement(PureComponent, babelHelpers.extends({}, this.props, {
           pointerEvents: this._pointerEvents,
           onComponentRef: this._onComponentRef
         }));
@@ -48694,7 +48694,7 @@ function create(Component) {
       }
     }]);
     return Container;
-  }(React.Component);
+  }(React.PureComponent);
 
   return Container;
 }
@@ -48745,8 +48745,8 @@ var emptyFunction = require(23                      ); // 23 = fbjs/lib/emptyFun
 var PropTypes = React.PropTypes;
 var Directions = NavigationCardStackPanResponder.Directions;
 
-var NavigationCardStack = function (_React$Component) {
-  babelHelpers.inherits(NavigationCardStack, _React$Component);
+var NavigationCardStack = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationCardStack, _React$PureComponent);
 
   function NavigationCardStack(props, context) {
     babelHelpers.classCallCheck(this, NavigationCardStack);
@@ -48792,7 +48792,7 @@ var NavigationCardStack = function (_React$Component) {
     }
   }]);
   return NavigationCardStack;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationCardStack.propTypes = {
   direction: PropTypes.oneOf([Directions.HORIZONTAL, Directions.VERTICAL]),
@@ -48836,8 +48836,8 @@ var APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 var STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : 0;
 var PropTypes = React.PropTypes;
 
-var NavigationHeader = function (_React$Component) {
-  babelHelpers.inherits(NavigationHeader, _React$Component);
+var NavigationHeader = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationHeader, _React$PureComponent);
 
   function NavigationHeader() {
     babelHelpers.classCallCheck(this, NavigationHeader);
@@ -48922,7 +48922,7 @@ var NavigationHeader = function (_React$Component) {
     }
   }]);
   return NavigationHeader;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationHeader.defaultProps = {
 
@@ -49337,8 +49337,8 @@ var ReactComponentWithPureRenderMixin = require(424                             
 
 var PropTypes = React.PropTypes;
 
-var NavigationView = function (_React$Component) {
-  babelHelpers.inherits(NavigationView, _React$Component);
+var NavigationView = function (_React$PureComponent) {
+  babelHelpers.inherits(NavigationView, _React$PureComponent);
 
   function NavigationView(props, context) {
     babelHelpers.classCallCheck(this, NavigationView);
@@ -49453,7 +49453,7 @@ var NavigationView = function (_React$Component) {
     }
   }]);
   return NavigationView;
-}(React.Component);
+}(React.PureComponent);
 
 NavigationView.propTypes = {
   navigationState: PropTypes.object.isRequired,
@@ -49584,7 +49584,7 @@ var TabBar = function (_Component) {
     }
   }]);
   return TabBar;
-}(_react.Component);
+}(_react.PureComponent);
 
 TabBar.propTypes = {
   navigationState: _react.PropTypes.object,
@@ -49661,7 +49661,7 @@ var Tabs = function (_Component) {
         }
     }]);
     return Tabs;
-}(_react.Component);
+}(_react.PureComponent);
 
 var styles = _reactNative.StyleSheet.create({
     tabbarView: {
@@ -49768,7 +49768,7 @@ var TabbedView = function (_Component) {
     }
   }]);
   return TabbedView;
-}(_react.Component);
+}(_react.PureComponent);
 
 TabbedView.propTypes = {
   navigationState: _react.PropTypes.object.isRequired,
@@ -49829,8 +49829,8 @@ function _inherits(subClass, superClass) {
 
 var React = require(13     ); // 13 = react
 
-var StaticContainer = function (_React$Component) {
-  _inherits(StaticContainer, _React$Component);
+var StaticContainer = function (_React$PureComponent) {
+  _inherits(StaticContainer, _React$PureComponent);
 
   function StaticContainer() {
     _classCallCheck(this, StaticContainer);
@@ -49855,7 +49855,7 @@ var StaticContainer = function (_React$Component) {
   }]);
 
   return StaticContainer;
-}(React.Component);
+}(React.PureComponent);
 
 module.exports = StaticContainer;
 }, 440, null, "react-static-container/lib/StaticContainer.react.js");
@@ -50019,8 +50019,8 @@ var defaultProps = {
   titleOpacity: 1
 };
 
-var NavBar = function (_React$Component) {
-  babelHelpers.inherits(NavBar, _React$Component);
+var NavBar = function (_React$PureComponent) {
+  babelHelpers.inherits(NavBar, _React$PureComponent);
 
   function NavBar(props) {
     babelHelpers.classCallCheck(this, NavBar);
@@ -50305,7 +50305,7 @@ var NavBar = function (_React$Component) {
     }
   }]);
   return NavBar;
-}(_react2.default.Component);
+}(_react2.default.PureComponent);
 
 NavBar.propTypes = propTypes;
 NavBar.contextTypes = contextTypes;
@@ -50354,8 +50354,8 @@ function Modal(props) {
     })),
     children.length > 1 && children.map(function (el, i) {
       if (i > 0 && el.component) {
-        var Component = el.component;
-        return _react2.default.createElement(Component, babelHelpers.extends({
+        var PureComponent = el.component;
+        return _react2.default.createElement(PureComponent, babelHelpers.extends({
           navigationState: children[i],
           key: el.key
         }, el, {
@@ -51052,7 +51052,7 @@ var Router = function (_Component) {
     }
   }]);
   return Router;
-}(_react.Component);
+}(_react.PureComponent);
 
 Router.childContextTypes = {
   routes: _react.PropTypes.object
@@ -51233,7 +51233,7 @@ var Provider = function (_Component) {
   };
 
   return Provider;
-}(_react.Component);
+}(_react.PureComponent);
 
 exports["default"] = Provider;
 
@@ -51362,7 +51362,7 @@ var defaultMergeProps = function defaultMergeProps(stateProps, dispatchProps, pa
 };
 
 function getDisplayName(WrappedComponent) {
-  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+  return WrappedComponent.displayName || WrappedComponent.name || 'PureComponent';
 }
 
 var errorObject = { value: null };
@@ -51670,7 +51670,7 @@ function connect(mapStateToProps, mapDispatchToProps, mergeProps) {
       };
 
       return Connect;
-    }(_react.Component);
+    }(_react.PureComponent);
 
     Connect.displayName = connectDisplayName;
     Connect.WrappedComponent = WrappedComponent;
@@ -60468,7 +60468,7 @@ function mixinClass(reactClass, reactMixin) {
       var right = reactMixin.statics[key];
 
       if (left !== undefined && right !== undefined) {
-        throw new TypeError('Cannot mixin statics because statics.' + key + ' and Component.' + key + ' are defined.');
+        throw new TypeError('Cannot mixin statics because statics.' + key + ' and PureComponent.' + key + ' are defined.');
       }
 
       reactClass[key] = left !== undefined ? left : right;
@@ -60957,7 +60957,7 @@ var LoginRender = function (_Component) {
     }
   }]);
   return LoginRender;
-}(_react.Component);
+}(_react.PureComponent);
 
 exports.default = (0, _reactRedux.connect)(null, mapDispatchToProps)(LoginRender);
 }, 537, null, "FareyeReact/src/components/LoginRender.js");
@@ -64435,13 +64435,13 @@ function getComparator(order) {
   }[order];
 }
 
-var Component = function (_React$Component) {
-  babelHelpers.inherits(Component, _React$Component);
+var PureComponent = function (_React$PureComponent) {
+  babelHelpers.inherits(PureComponent, _React$PureComponent);
 
-  function Component(props) {
-    babelHelpers.classCallCheck(this, Component);
+  function PureComponent(props) {
+    babelHelpers.classCallCheck(this, PureComponent);
 
-    var _this = babelHelpers.possibleConstructorReturn(this, (Component.__proto__ || Object.getPrototypeOf(Component)).call(this, props));
+    var _this = babelHelpers.possibleConstructorReturn(this, (PureComponent.__proto__ || Object.getPrototypeOf(PureComponent)).call(this, props));
 
     _this.typeInfo = (0, _util.getTypeInfo)(props.type);
     _this.state = {
@@ -64451,7 +64451,7 @@ var Component = function (_React$Component) {
     return _this;
   }
 
-  babelHelpers.createClass(Component, [{
+  babelHelpers.createClass(PureComponent, [{
     key: 'getTransformer',
     value: function getTransformer() {
       return this.props.options.transformer || this.constructor.transformer;
@@ -64593,10 +64593,10 @@ var Component = function (_React$Component) {
       return template(locals);
     }
   }]);
-  return Component;
-}(_react2.default.Component);
+  return PureComponent;
+}(_react2.default.PureComponent);
 
-Component.transformer = {
+PureComponent.transformer = {
   format: function format(value) {
     return Nil.is(value) ? null : value;
   },
@@ -64671,7 +64671,7 @@ var Textbox = function (_Component) {
     }
   }]);
   return Textbox;
-}(Component);
+}(PureComponent);
 
 Textbox.transformer = {
   format: function format(value) {
@@ -64717,7 +64717,7 @@ var Checkbox = function (_Component2) {
     }
   }]);
   return Checkbox;
-}(Component);
+}(PureComponent);
 
 Checkbox.transformer = {
   format: function format(value) {
@@ -64790,7 +64790,7 @@ var Select = function (_Component3) {
     }
   }]);
   return Select;
-}(Component);
+}(PureComponent);
 
 Select.transformer = function (nullOption) {
   return {
@@ -64830,7 +64830,7 @@ var DatePicker = function (_Component4) {
     }
   }]);
   return DatePicker;
-}(Component);
+}(PureComponent);
 
 DatePicker.transformer = {
   format: function format(value) {
@@ -64999,7 +64999,7 @@ var Struct = function (_Component5) {
     }
   }]);
   return Struct;
-}(Component);
+}(PureComponent);
 
 function toSameLength(value, keys, uidGenerator) {
   if (value.length === keys.length) {
@@ -65229,7 +65229,7 @@ var List = exports.List = function (_Component6) {
     }
   }]);
   return List;
-}(Component);
+}(PureComponent);
 
 List.transformer = {
   format: function format(value) {
@@ -65331,11 +65331,11 @@ var Form = function (_React$Component2) {
     }
   }]);
   return Form;
-}(_react2.default.Component);
+}(_react2.default.PureComponent);
 
 module.exports = {
   getComponent: getFormComponent,
-  Component: Component,
+  PureComponent: PureComponent,
   Textbox: Textbox,
   Checkbox: Checkbox,
   Select: Select,
@@ -73182,7 +73182,7 @@ function createIconSet(glyphMap, fontFamily, fontFile) {
       }
     }]);
     return Icon;
-  }(_react.Component);
+  }(_react.PureComponent);
 
   Icon.propTypes = babelHelpers.extends({}, _reactNative.Text.propTypes, {
     name: IconNamePropType.isRequired,
@@ -73356,7 +73356,7 @@ function createIconButtonComponent(Icon) {
       }
     }]);
     return IconButton;
-  }(_react.Component), _class.propTypes = babelHelpers.extends({}, _reactNative.View.propTypes, {
+  }(_react.PureComponent), _class.propTypes = babelHelpers.extends({}, _reactNative.View.propTypes, {
     backgroundColor: _react.PropTypes.string,
     borderRadius: _react.PropTypes.number,
     color: _react.PropTypes.string,
@@ -75560,7 +75560,7 @@ function createTabBarItemIOSComponent(IconNamePropType, getImageSource) {
       }
     }]);
     return TabBarItemIOS;
-  }(_react.Component), _class.propTypes = {
+  }(_react.PureComponent), _class.propTypes = {
     iconName: IconNamePropType.isRequired,
     selectedIconName: IconNamePropType,
     iconSize: _react.PropTypes.number,
@@ -76031,7 +76031,7 @@ function createToolbarAndroidComponent(IconNamePropType, getImageSource) {
       }
     }]);
     return IconToolbarAndroid;
-  }(_react.Component), _class.propTypes = {
+  }(_react.PureComponent), _class.propTypes = {
     logoIconName: IconNamePropType,
     navIconName: IconNamePropType,
     overflowIconName: IconNamePropType,
@@ -77305,7 +77305,7 @@ var Logout = function (_Component) {
     }
   }]);
   return Logout;
-}(_react.Component);
+}(_react.PureComponent);
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Logout);
 }, 776, null, "FareyeReact/src/containers/Logout.js");
@@ -77515,22 +77515,22 @@ exports.default = function (componentStyleName) {
   var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
   function getComponentDisplayName(WrappedComponent) {
-    return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+    return WrappedComponent.displayName || WrappedComponent.name || 'PureComponent';
   }
 
   return function wrapWithStyledComponent(WrappedComponent) {
     var componentDisplayName = getComponentDisplayName(WrappedComponent);
 
     if (!_.isPlainObject(componentStyle)) {
-      throwConnectStyleError('Component style must be plain object', componentDisplayName);
+      throwConnectStyleError('PureComponent style must be plain object', componentDisplayName);
     }
 
     if (!_.isString(componentStyleName)) {
-      throwConnectStyleError('Component Style Name must be string', componentDisplayName);
+      throwConnectStyleError('PureComponent Style Name must be string', componentDisplayName);
     }
 
-    var StyledComponent = function (_React$Component) {
-      babelHelpers.inherits(StyledComponent, _React$Component);
+    var StyledComponent = function (_React$PureComponent) {
+      babelHelpers.inherits(StyledComponent, _React$PureComponent);
 
       function StyledComponent(props, context) {
         babelHelpers.classCallCheck(this, StyledComponent);
@@ -77712,7 +77712,7 @@ exports.default = function (componentStyleName) {
         }
       }]);
       return StyledComponent;
-    }(_react2.default.Component);
+    }(_react2.default.PureComponent);
 
     StyledComponent.contextTypes = {
       theme: _Theme.ThemeShape,
@@ -84457,8 +84457,8 @@ var _normalizeStyle = require(782                               ); // 782 = ./St
 
 var _normalizeStyle2 = babelHelpers.interopRequireDefault(_normalizeStyle);
 
-var StyleProvider = function (_React$Component) {
-  babelHelpers.inherits(StyleProvider, _React$Component);
+var StyleProvider = function (_React$PureComponent) {
+  babelHelpers.inherits(StyleProvider, _React$PureComponent);
 
   function StyleProvider(props, context) {
     babelHelpers.classCallCheck(this, StyleProvider);
@@ -84502,7 +84502,7 @@ var StyleProvider = function (_React$Component) {
     }
   }]);
   return StyleProvider;
-}(_react2.default.Component);
+}(_react2.default.PureComponent);
 
 StyleProvider.propTypes = {
   children: _react.PropTypes.element.isRequired,
@@ -84617,8 +84617,8 @@ var theme = function theme() {
   };
 };
 
-var Shapes = function (_React$Component) {
-  babelHelpers.inherits(Shapes, _React$Component);
+var Shapes = function (_React$PureComponent) {
+  babelHelpers.inherits(Shapes, _React$PureComponent);
 
   function Shapes(props, context) {
     babelHelpers.classCallCheck(this, Shapes);
@@ -84664,7 +84664,7 @@ var Shapes = function (_React$Component) {
     }
   }]);
   return Shapes;
-}(_react2.default.Component);
+}(_react2.default.PureComponent);
 
 Shapes.propTypes = {
   themeVariables: _react2.default.PropTypes.object,
@@ -84795,7 +84795,7 @@ var RowNB = function (_Component) {
         }
     }]);
     return RowNB;
-}(_react.Component);
+}(_react.PureComponent);
 
 exports.default = RowNB;
 }, 793, null, "react-native-easy-grid/Components/Row.js");
@@ -84927,7 +84927,7 @@ var GridNB = function (_Component) {
         }
     }]);
     return GridNB;
-}(_react.Component);
+}(_react.PureComponent);
 
 exports.default = GridNB;
 }, 795, null, "react-native-easy-grid/Components/Grid.js");
@@ -84996,7 +84996,7 @@ var ColumnNB = function (_Component) {
         }
     }]);
     return ColumnNB;
-}(_react.Component);
+}(_react.PureComponent);
 
 exports.default = ColumnNB;
 }, 796, null, "react-native-easy-grid/Components/Col.js");
@@ -85365,7 +85365,7 @@ var _light = require(801              );var _light2 = _interopRequireDefault(_li
     } }, { key: 'getTheme', value: function getTheme() {
       return this.props.NBtheme ? this.props.NBtheme : this.context.NBtheme || _light2.default;
     } }]);return NativeBaseComponent;
-}(_react.Component);NativeBaseComponent.contextTypes = { NBtheme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };NativeBaseComponent.propTypes = { NBtheme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };NativeBaseComponent.childContextTypes = { NBtheme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };exports.default = NativeBaseComponent;
+}(_react.PureComponent);NativeBaseComponent.contextTypes = { NBtheme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };NativeBaseComponent.propTypes = { NBtheme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };NativeBaseComponent.childContextTypes = { NBtheme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };exports.default = NativeBaseComponent;
 }, 800, null, "native-base/dist/src/backward/Base/NativeBaseComponent.js");
 __d(/* native-base/dist/src/backward/Themes/light.js */function(global, require, module, exports) {Object.defineProperty(exports, "__esModule", { value: true });var _color = require(802    ); // 802 = color
 
@@ -90613,7 +90613,7 @@ var _reactNativeDrawer = require(849                  );var _reactNativeDrawer2 
           return _this2._root = c;
         } }, this.props));
     } }]);return Drawer;
-}(_react.Component);exports.default = Drawer;
+}(_react.PureComponent);exports.default = Drawer;
 
 Drawer.defaultProps = {
   type: 'overlay',
@@ -91099,7 +91099,7 @@ var Drawer = function (_Component) {
     }
   }]);
   return Drawer;
-}(_react.Component);
+}(_react.PureComponent);
 
 Drawer.tweenPresets = {
   parallax: function parallax(ratio) {
@@ -91557,7 +91557,7 @@ var _reactNative = require(43            );function _interopRequireDefault(obj) 
     } }], [{ key: 'defaultProps', get: function get() {
       return { backgroundColor: null, color: null, component: null, underlayColor: null, height: 0, key: null, onPress: null, disabled: false, text: 'Click me', type: '', width: 0 };
     } }]);return SwipeoutBtn;
-}(_react.Component);exports.default = SwipeoutBtn;
+}(_react.PureComponent);exports.default = SwipeoutBtn;
 
 var Swipeout = _react2.default.createClass({ displayName: 'Swipeout',
   mixins: [_reactTweenState2.default.Mixin],
@@ -92205,7 +92205,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Text;
-}(_react.Component);
+}(_react.PureComponent);
 
 Text.propTypes = _extends({}, _reactNative.Text.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -92622,7 +92622,7 @@ function makeZoomable(ComponentToBeDecorated) {
       }
     }]);
     return ZoomDecorator;
-  }(_react.Component);
+  }(_react.PureComponent);
 
   ZoomDecorator.propTypes = {
     componentWidth: _react.PropTypes.number.isRequired,
@@ -92851,7 +92851,7 @@ var Parallax = exports.Parallax = function (_Component) {
     }
   }]);
   return Parallax;
-}(_react.Component);
+}(_react.PureComponent);
 
 Parallax.propTypes = {
   driver: _DriverShape.DriverShape.isRequired,
@@ -92936,7 +92936,7 @@ var FadeIn = exports.FadeIn = function (_Component) {
     }
   }]);
   return FadeIn;
-}(_react.Component);
+}(_react.PureComponent);
 
 FadeIn.propTypes = {
   driver: _DriverShape.DriverShape.isRequired,
@@ -92994,7 +92994,7 @@ var FadeOut = exports.FadeOut = function (_Component) {
     }
   }]);
   return FadeOut;
-}(_react.Component);
+}(_react.PureComponent);
 
 FadeOut.propTypes = {
   driver: _DriverShape.DriverShape.isRequired,
@@ -93057,7 +93057,7 @@ var ZoomIn = exports.ZoomIn = function (_Component) {
     }
   }]);
   return ZoomIn;
-}(_react.Component);
+}(_react.PureComponent);
 
 ZoomIn.propTypes = {
   driver: _DriverShape.DriverShape.isRequired,
@@ -93122,7 +93122,7 @@ var ZoomOut = exports.ZoomOut = function (_Component) {
     }
   }]);
   return ZoomOut;
-}(_react.Component);
+}(_react.PureComponent);
 
 ZoomOut.propTypes = {
   driver: _DriverShape.DriverShape.isRequired,
@@ -93208,7 +93208,7 @@ var HeroHeader = exports.HeroHeader = function (_Component) {
     }
   }]);
   return HeroHeader;
-}(_react.Component);
+}(_react.PureComponent);
 
 HeroHeader.propTypes = {
   driver: _DriverShape.DriverShape.isRequired,
@@ -93389,7 +93389,7 @@ function connectAnimation(WrappedComponent) {
       }
     }]);
     return AnimatedComponent;
-  }(_react.Component);
+  }(_react.PureComponent);
 
   AnimatedComponent.propTypes = {
     driver: _DriverShape.DriverShape,
@@ -93505,7 +93505,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return ViewNB;
-}(_react.Component);
+}(_react.PureComponent);
 
 ViewNB.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -93582,7 +93582,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           background: this.props.androidRippleColor ? _reactNative.TouchableNativeFeedback.Ripple(this.props.androidRippleColor) : _reactNative.TouchableNativeFeedback.Ripple(_platform2.default.androidRippleColor) }, this.prepareRootProps()), _react2.default.createElement(_reactNative.View, this.prepareRootProps(), this.props.children));
       }
     } }]);return Button;
-}(_react.Component);
+}(_react.PureComponent);
 
 Button.propTypes = _extends({}, _reactNative.TouchableOpacity.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -93652,7 +93652,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props), this.props.children);
     } }]);return Badge;
-}(_react.Component);
+}(_react.PureComponent);
 
 Badge.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -93703,7 +93703,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return TabHeadingNB;
-}(_react.Component);
+}(_react.PureComponent);
 
 TabHeadingNB.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -93754,7 +93754,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return TabContainer;
-}(_react.Component);
+}(_react.PureComponent);
 
 TabContainer.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -93845,7 +93845,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return IconNB;
-}(_react.Component);IconNB.contextTypes = { theme: _react2.default.PropTypes.object };
+}(_react.PureComponent);IconNB.contextTypes = { theme: _react2.default.PropTypes.object };
 
 IconNB.propTypes = {
   style: _react2.default.PropTypes.object };
@@ -98529,7 +98529,7 @@ var _mapPropsToStyleNames = require(799                               );var _map
           } }, this.props, { name: this.getName() }));
       }
     } }]);return Icon;
-}(_react.Component);Icon.contextTypes = { theme: _react2.default.PropTypes.object };
+}(_react.PureComponent);Icon.contextTypes = { theme: _react2.default.PropTypes.object };
 
 Icon.propTypes = _extends({}, _IconNB.IconNB.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -101513,7 +101513,7 @@ var _lodash = require(781     );var _lodash2 = _interopRequireDefault(_lodash);f
           return _this2._root = c;
         } }, this.props)));
     } }]);return Header;
-}(_react.Component);Header.contextTypes = { theme: _react2.default.PropTypes.object };
+}(_react.PureComponent);Header.contextTypes = { theme: _react2.default.PropTypes.object };
 
 Header.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -101577,7 +101577,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.prepareRootProps()), this.props.children);
     } }]);return InputGroup;
-}(_react.Component);
+}(_react.PureComponent);
 
 InputGroup.propTypes = _extends({}, _reactNative.View.propTypes, {
   regular: _react2.default.PropTypes.bool,
@@ -101677,7 +101677,7 @@ var _light = require(801                          );var _light2 = _interopRequir
     } }, { key: 'getTheme', value: function getTheme() {
       return this.props.theme ? this.props.theme : this.context.theme || _light2.default;
     } }]);return NativeBaseComponent;
-}(_react.Component);NativeBaseComponent.contextTypes = { theme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };NativeBaseComponent.propTypes = { theme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };NativeBaseComponent.childContextTypes = { theme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };exports.default = NativeBaseComponent;
+}(_react.PureComponent);NativeBaseComponent.contextTypes = { theme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };NativeBaseComponent.propTypes = { theme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };NativeBaseComponent.childContextTypes = { theme: _react2.default.PropTypes.object, foregroundColor: _react2.default.PropTypes.string };exports.default = NativeBaseComponent;
 }, 896, null, "native-base/dist/src/basic/Base/NativeBaseComponent.js");
 __d(/* native-base/dist/src/basic/Title.js */function(global, require, module, exports) {Object.defineProperty(exports, "__esModule", { value: true });exports.Title = undefined;var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
@@ -101723,7 +101723,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props, { numberOfLines: 1 }));
     } }]);return Title;
-}(_react.Component);
+}(_react.PureComponent);
 
 Title.propTypes = _extends({}, _reactNative.Text.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -102036,7 +102036,7 @@ var AnimatedFab = _reactNative.Animated.createAnimatedComponent(_Button.Button);
           return _this4.fabOnPress();
         } }, this.prepareFabProps(), { activeOpacity: 1 }), this.renderFab()));
     } }]);return Fab;
-}(_react.Component);
+}(_react.PureComponent);
 
 Fab.propTypes = _extends({}, _reactNative.Animated.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -102090,7 +102090,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Left;
-}(_react.Component);
+}(_react.PureComponent);
 
 Left.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -102140,7 +102140,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Right;
-}(_react.Component);
+}(_react.PureComponent);
 
 Right.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -102190,7 +102190,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Body;
-}(_react.Component);
+}(_react.PureComponent);
 
 Body.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -102260,7 +102260,7 @@ var _computeProps = require(809                    );var _computeProps2 = _inter
           lineHeight: variables.CheckboxIconSize },
         name: platform === 'ios' && platformStyle !== 'material' ? 'ios-checkmark-outline' : 'md-checkmark' }));
     } }]);return CheckBox;
-}(_react.Component);CheckBox.contextTypes = { theme: _react2.default.PropTypes.object };
+}(_react.PureComponent);CheckBox.contextTypes = { theme: _react2.default.PropTypes.object };
 
 CheckBox.propTypes = _extends({}, _reactNative.TouchableOpacity.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -102329,7 +102329,7 @@ var _platform = require(813                          );var _platform2 = _interop
 
         name: this.props.selected ? 'md-radio-button-on' : 'md-radio-button-off' }));
     } }]);return Radio;
-}(_react.Component);Radio.contextTypes = { theme: _react2.default.PropTypes.object };
+}(_react.PureComponent);Radio.contextTypes = { theme: _react2.default.PropTypes.object };
 
 Radio.propTypes = _extends({}, _reactNative.TouchableOpacity.propTypes, {
   selected: _react2.default.PropTypes.bool });
@@ -102379,7 +102379,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Thumbnail;
-}(_react.Component);
+}(_react.PureComponent);
 
 Thumbnail.propTypes = _extends({}, _reactNative.Image.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -102442,7 +102442,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props), this.props.children);
     } }]);return Card;
-}(_react.Component);
+}(_react.PureComponent);
 
 Card.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -102496,7 +102496,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
         } }, this.props, {
         activeOpacity: this.props.button ? 0.2 : 1 }), this.props.children);
     } }]);return CardItem;
-}(_react.Component);
+}(_react.PureComponent);
 
 CardItem.propTypes = _extends({}, _reactNative.TouchableOpacity.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -102550,7 +102550,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return H1;
-}(_react.Component);
+}(_react.PureComponent);
 
 var childrenType = function childrenType(props, propName, component) {
   var error = void 0;
@@ -102612,7 +102612,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return H2;
-}(_react.Component);
+}(_react.PureComponent);
 
 var childrenType = function childrenType(props, propName, component) {
   var error = void 0;
@@ -102674,7 +102674,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return H3;
-}(_react.Component);
+}(_react.PureComponent);
 
 var childrenType = function childrenType(props, propName, component) {
   var error = void 0;
@@ -102739,7 +102739,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
         } }, this.props, {
         color: this.props.color ? this.props.color : this.props.inverse ? _platform2.default.inverseSpinnerColor : _platform2.default.defaultSpinnerColor, size: this.props.size ? this.props.size : 'large' }));
     } }]);return Spinner;
-}(_react.Component);
+}(_react.PureComponent);
 
 Spinner.propTypes = _extends({}, _reactNative.ActivityIndicator.propTypes, {
   color: _react2.default.PropTypes.string,
@@ -102790,7 +102790,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Switch;
-}(_react.Component);
+}(_react.PureComponent);
 
 Switch.propTypes = _extends({}, Switch.propTypes);
 
@@ -102846,7 +102846,7 @@ var _Text = require(856     );function _interopRequireDefault(obj) { // 856 = ./
           _Actionsheet.ActionSheetContainer.actionsheetInstance = c;
         } }));
     } }]);return Container;
-}(_react.Component);
+}(_react.PureComponent);
 
 Container.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -102942,7 +102942,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
     } }], [{ key: 'show', value: function show(_ref2) {
       var config = _objectWithoutProperties(_ref2, []);this.toastInstance._root.showToast({ config: config });
     } }]);return ToastContainer;
-}(_react.Component);
+}(_react.PureComponent);
 
 ToastContainer.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -102993,7 +102993,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Toast;
-}(_react.Component);
+}(_react.PureComponent);
 
 Toast.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -103097,7 +103097,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
     } }], [{ key: 'show', value: function show(config, callback) {
       this.actionsheetInstance._root.showActionSheet(config, callback);
     } }]);return ActionSheetContainer;
-}(_react.Component);
+}(_react.PureComponent);
 
 ActionSheetContainer.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -103178,7 +103178,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props), this.renderChildren());
     } }]);return List;
-}(_react.Component);
+}(_react.PureComponent);
 
 var StyledList = (0, _theme.connectStyle)('NativeBase.List', {}, _mapPropsToStyleNames2.default)(List);exports.List = StyledList;
 }, 916, null, "native-base/dist/src/basic/List.js");
@@ -103241,7 +103241,7 @@ var _platform = require(813                          );var _platform2 = _interop
           background: this.props.androidRippleColor ? _reactNative.TouchableNativeFeedback.Ripple(this.props.androidRippleColor) : _reactNative.TouchableNativeFeedback.Ripple(_platform2.default.androidRippleColorDark) }, _react2.default.createElement(_reactNative.View, { style: { marginLeft: -17, paddingLeft: 17 } }, _react2.default.createElement(_reactNative.View, this.props, this.props.children)));
       }
     } }]);return ListItem;
-}(_react.Component);ListItem.contextTypes = { theme: _react2.default.PropTypes.object };
+}(_react.PureComponent);ListItem.contextTypes = { theme: _react2.default.PropTypes.object };
 
 ListItem.propTypes = _extends({}, _reactNative.TouchableHighlight.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -103295,7 +103295,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           _this2._scrollview = c;_this2._root = c;
         } }, this.props), this.props.children);
     } }]);return Content;
-}(_react.Component);
+}(_react.PureComponent);
 
 Content.propTypes = _extends({}, _reactNativeKeyboardAwareScrollView.KeyboardAwareScrollView.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -103629,7 +103629,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Footer;
-}(_react.Component);
+}(_react.PureComponent);
 
 Footer.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -103679,7 +103679,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props), this.props.children);
     } }]);return FooterTab;
-}(_react.Component);
+}(_react.PureComponent);
 
 FooterTab.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -103729,7 +103729,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Form;
-}(_react.Component);
+}(_react.PureComponent);
 
 Form.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -103780,7 +103780,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props), this.props.children);
     } }]);return PickerNB;
-}(_react.Component);exports.default = PickerNB;
+}(_react.PureComponent);exports.default = PickerNB;
 
 PickerNB.Item = _react2.default.createClass({ displayName: 'Item',
 
@@ -103835,7 +103835,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Separator;
-}(_react.Component);
+}(_react.PureComponent);
 
 Separator.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -104036,7 +104036,7 @@ var SWIPE_THRESHOLD = 120;var DeckSwiper = function (_Component) {
 
       return _react2.default.createElement(_reactNative.View, { style: { position: 'relative', flexDirection: 'column' } }, this.state.selectedItem === undefined ? _react2.default.createElement(_reactNative.View, null) : _react2.default.createElement(_reactNative.View, null, this.state.selectedItem2 && _react2.default.createElement(_reactNative.Animated.View, _extends({ style: [this.getCardStyles()[1], this.getInitialStyle().topCard, { opacity: this.state.fadeAnim }] }, this._panResponder.panHandlers), this.props.renderBottom ? this.props.renderBottom(this.state.selectedItem2) : this.props.renderItem(this.state.selectedItem2)), _react2.default.createElement(_reactNative.Animated.View, _extends({ style: [this.getCardStyles()[0], this.getInitialStyle().topCard] }, this._panResponder.panHandlers), this.props.renderTop ? this.props.renderTop(this.state.selectedItem) : this.props.renderItem(this.state.selectedItem))));
     } }]);return DeckSwiper;
-}(_react.Component);
+}(_react.PureComponent);
 
 DeckSwiper.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -104204,7 +104204,7 @@ var _lodash = require(781     );var _lodash2 = _interopRequireDefault(_lodash);f
           return _this3._root = c;
         } }, this.prepareRootProps(), { activeOpacity: 1 }), this.renderChildren());
     } }]);return Item;
-}(_react.Component);
+}(_react.PureComponent);
 
 var childrenType = function childrenType(props, propName, component) {
   var error = void 0;
@@ -104271,7 +104271,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Label;
-}(_react.Component);
+}(_react.PureComponent);
 
 Label.propTypes = _extends({}, _reactNative.Text.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -104322,7 +104322,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props));
     } }]);return Segment;
-}(_react.Component);
+}(_react.PureComponent);
 
 Segment.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -104385,7 +104385,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
         multiline: true,
         placeholderTextColor: this.props.placeholderTextColor ? this.props.placeholderTextColor : _platform2.default.inputColorPlaceholder, underlineColorAndroid: 'rgba(0,0,0,0)' }));
     } }]);return Textarea;
-}(_react.Component);
+}(_react.PureComponent);
 
 Textarea.propTypes = _extends({}, _reactNative.TextInput.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -104438,7 +104438,7 @@ var _mapPropsToStyleNames = require(799                            );var _mapPro
           return _this2._root = c;
         } }, this.props), this.props.children);
     } }]);return Tab;
-}(_react.Component);
+}(_react.PureComponent);
 
 Tab.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -104464,7 +104464,7 @@ var _lodash = require(781     );var _lodash2 = _interopRequireDefault(_lodash);f
     obj[key] = value;
   }return obj;
 }var React = require(13     );var PropTypes = React.PropTypes, // 13 = react
-    Component = React.Component;var ReactNative = require(43            );var Dimensions = ReactNative.Dimensions, // 43 = react-native
+    PureComponent = React.PureComponent;var ReactNative = require(43            );var Dimensions = ReactNative.Dimensions, // 43 = react-native
     View = ReactNative.View,
     Animated = ReactNative.Animated,
     ScrollView = ReactNative.ScrollView,
@@ -104755,7 +104755,7 @@ __d(/* native-base/dist/src/basic/Tabs/SceneComponent.js */function(global, requ
     if (keys.indexOf(i) >= 0) continue;if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;target[i] = obj[i];
   }return target;
 }var React = require(13     ); // 13 = react
-var ReactNative = require(43            );var Component = React.Component;var View = ReactNative.View, // 43 = react-native
+var ReactNative = require(43            );var PureComponent = React.PureComponent;var View = ReactNative.View, // 43 = react-native
     StyleSheet = ReactNative.StyleSheet;
 
 var StaticContainer = require(936                                                ); // 936 = react-native/Libraries/Components/StaticContainer
@@ -104773,8 +104773,8 @@ __d(/* StaticContainer.react */function(global, require, module, exports) {
 
 var React = require(100    ); // 100 = React
 
-var StaticContainer = function (_React$Component) {
-  babelHelpers.inherits(StaticContainer, _React$Component);
+var StaticContainer = function (_React$PureComponent) {
+  babelHelpers.inherits(StaticContainer, _React$PureComponent);
 
   function StaticContainer() {
     babelHelpers.classCallCheck(this, StaticContainer);
@@ -104794,7 +104794,7 @@ var StaticContainer = function (_React$Component) {
     }
   }]);
   return StaticContainer;
-}(React.Component);
+}(React.PureComponent);
 
 module.exports = StaticContainer;
 }, 936, null, "StaticContainer.react");
@@ -105306,7 +105306,7 @@ var _TabBar = require(941       );function _interopRequireDefault(obj) { // 941 
           return _this4._root = c;
         } }, this.props), this.props.tabBarPosition === 'top' && this.renderTab(tabBarProps), this.renderContent(), _react2.default.createElement(_reactNative.View, { style: this.props.tabBarPosition === 'bottom' ? { bottom: _reactNative.Platform.OS === 'ios' ? 0 : 23 } : {} }, this.props.tabBarPosition === 'bottom' && this.renderTab(tabBarProps)));
     } }]);return STabs;
-}(_react.Component);
+}(_react.PureComponent);
 
 STabs.propTypes = _extends({}, _reactNative.View.propTypes, {
   style: _react2.default.PropTypes.object,
@@ -105407,7 +105407,7 @@ var _mapPropsToStyleNames = require(799                               );var _map
         return _this5.renderLabelOption(tab, i);
       }), _react2.default.createElement(_reactNative.Animated.View, { style: [tabUnderlineStyle, { left: left }, this.props.underlineStyle] }));
     } }]);return TabBar;
-}(_react.Component);
+}(_react.PureComponent);
 
 TabBar.propTypes = _extends({}, _reactNative.View.propTypes);
 
@@ -105457,7 +105457,7 @@ var _mapPropsToStyleNames = require(799                               );var _map
           return _this2._root = c;
         } }, this.props));
     } }]);return Subtitle;
-}(_react.Component);
+}(_react.PureComponent);
 
 Subtitle.propTypes = _extends({}, _reactNative.Text.propTypes, {
   style: _react2.default.PropTypes.object });
@@ -105635,7 +105635,7 @@ var Main = function (_Component) {
     }
   }]);
   return Main;
-}(_react.Component);
+}(_react.PureComponent);
 
 ;
 
@@ -105859,7 +105859,7 @@ var Jobs = function (_Component) {
     }
   }]);
   return Jobs;
-}(_react.Component);
+}(_react.PureComponent);
 
 ;
 
@@ -106072,7 +106072,7 @@ var Utilities = function (_Component) {
     }
   }]);
   return Utilities;
-}(_react.Component);
+}(_react.PureComponent);
 
 ;
 
@@ -106144,7 +106144,7 @@ var Message = function (_Component) {
     }
   }]);
   return Message;
-}(_react.Component);
+}(_react.PureComponent);
 
 ;
 

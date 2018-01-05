@@ -6,7 +6,7 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 
 import {
@@ -38,7 +38,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class UIViews extends Component {
+class UIViews extends PureComponent {
 
     render() {
         return (

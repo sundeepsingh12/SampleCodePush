@@ -64,7 +64,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class BulkListing extends Component {
+class BulkListing extends PureComponent {
 
   renderData = (item) => {
     return (

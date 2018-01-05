@@ -11,6 +11,7 @@ import {
   LOGOUT,
   LOGOUT_FAILURE,
   LOGOUT_START,
+  FORGET_PASSWORD,
   LOGOUT_SUCCESS,
   ON_LOGIN_USERNAME_CHANGE,
   ON_LOGIN_PASSWORD_CHANGE,
@@ -28,10 +29,16 @@ import {
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 
-import { authenticationService } from '../../services/classes/Authentication'
+import {
+  authenticationService
+} from '../../services/classes/Authentication'
 import CONFIG from '../../lib/config'
-import {keyValueDBService} from '../../services/classes/KeyValueDBService'
-import { NavigationActions } from 'react-navigation'
+import {
+  keyValueDBService
+} from '../../services/classes/KeyValueDBService'
+import {
+  NavigationActions
+} from 'react-navigation'
 
 /**
  * ## State actions
@@ -73,12 +80,9 @@ export function loginFailure(error) {
   }
 }
 
-/**
- * ## SessionToken actions
- */
-export function sessionTokenRequest() {
+function forgetPassword() {
   return {
-    type: SESSION_TOKEN_REQUEST
+    type: FORGET_PASSWORD
   }
 }
 
@@ -143,19 +147,39 @@ export function rememberMeSetTrue() {
  * otherwise, dispatch a failure
  */
 
-export function authenticateUser(username, password,rememberMe) {
+export function authenticateUser(username, password, rememberMe) {
   return async function (dispatch) {
     try {
-      let j_sessionid = null , xsrfToken = null
+      let j_sessionid = null,
+        xsrfToken = null
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]
-      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY,cookie)
-      await authenticationService.saveLoginCredentials(username,password,rememberMe)
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
+      await authenticationService.saveLoginCredentials(username, password, rememberMe)
       dispatch(loginSuccess())
-      dispatch(NavigationActions.navigate({ routeName: PreloaderScreen }))
+      dispatch(NavigationActions.navigate({
+        routeName: PreloaderScreen
+      }))
+    } catch (error) {
+      dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
     }
-    catch (error) {
+  }
+}
+
+export function forgetPasswordRequest(username) {
+  return async function (dispatch) {
+    try {
+      if (!username) {
+        throw new Error('Please enter a valid username')
+      }
+      let data = new FormData()
+      data.append('usernameToResetPass', username)
+      dispatch(forgetPassword())
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      const response = await RestAPIFactory().serviceCall(data, CONFIG.API.FORGET_PASSWORD, 'LOGIN')
+      dispatch(loginFailure(response.json.message.replace(/<\/?[^>]+(>|$)/g, "")))
+    } catch (error) {
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
     }
   }
@@ -165,14 +189,14 @@ export function checkRememberMe() {
   return async function (dispatch) {
     try {
       let rememberMe = await keyValueDBService.getValueFromStore(REMEMBER_ME)
-      if(rememberMe) {
+      if (rememberMe) {
         let username = await keyValueDBService.getValueFromStore(USERNAME)
         let password = await keyValueDBService.getValueFromStore(PASSWORD)
         dispatch(onChangeUsername(username.value))
         dispatch(onChangePassword(password.value))
         dispatch(rememberMeSetTrue())
       }
-    } catch(error) {
+    } catch (error) {
 
     }
   }
@@ -187,25 +211,27 @@ export function checkRememberMe() {
 export function getSessionToken() {
   return async function (dispatch) {
     try {
-      dispatch(sessionTokenRequest())
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-      const isPreloaderComplete =  await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
+      const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
-         dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
-      } else if(token) {
-          dispatch(NavigationActions.navigate({ routeName: PreloaderScreen }))
+        dispatch(NavigationActions.navigate({
+          routeName: HomeTabNavigatorScreen
+        }))
+      } else if (token) {
+        dispatch(NavigationActions.navigate({
+          routeName: PreloaderScreen
+        }))
+      } else {
+        dispatch(NavigationActions.navigate({
+          routeName: LoginScreen
+        }))
       }
-      else {
-          dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
-      }
-    }
-    catch (error) {
+    } catch (error) {
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())
-       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(NavigationActions.navigate({
+        routeName: LoginScreen
+      }))
     }
   }
 }
-
-
-

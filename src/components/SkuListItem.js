@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -16,7 +16,7 @@ import _ from 'lodash'
 const Item = Picker.Item;
 
   
- export default class SkuListItem extends Component {
+ export default class SkuListItem extends PureComponent {
 
     checkSkuItemQuantity(rowItem,originalQuantityValue){
         let quantitySelector
