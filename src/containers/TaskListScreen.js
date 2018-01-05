@@ -70,6 +70,7 @@ class TaskListScreen extends PureComponent {
     return (
       <JobListItem
         data={item}
+        showIconsInJobListing = {true}
         onPressItem={() => { this.navigateToScene(item) }}
       />
     )
