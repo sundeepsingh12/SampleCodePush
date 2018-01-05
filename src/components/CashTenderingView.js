@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { View, Text, TextInput } from 'react-native'
 import { connect } from 'react-redux'
 import { Content, Card, CardItem } from 'native-base';
@@ -27,7 +27,7 @@ function mapStateToProps(state) {
     }
 };
 
-class CashTenderingView extends Component {
+class CashTenderingView extends PureComponent {
     render() {
         return (
             <View>

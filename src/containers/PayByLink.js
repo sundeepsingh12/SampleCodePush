@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -38,7 +38,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class PayByLink extends Component {
+class PayByLink extends PureComponent {
 
     componentWillMount() {
         this.props.actions.getPayByLinkPaymentParameters(this.props.navigation.state.params.contactData)

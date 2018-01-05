@@ -4,15 +4,12 @@
  *  getSessionTokenAtStartup which will navigate upon completion
  */
 'use strict'
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
-/**
- * Project actions
- */
+
 import * as authActions from '../modules/login/loginActions'
-import * as globalActions from '../modules/global/globalActions'
 
 import
 {
@@ -22,23 +19,7 @@ import
 }
     from 'react-native'
 
-/**
- *  Save that state
- */
-function mapStateToProps(state) {
-    return {
-        deviceVersion: state.device.version,
-    }
-};
-
-/**
- * Bind all the actions from authActions and globalActions
- */
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators({...authActions, ...globalActions}, dispatch)
-    }
-}
+    var package_json = require('../../package.json')
 
 var styles = StyleSheet.create({
     container: {
@@ -56,16 +37,16 @@ var styles = StyleSheet.create({
 /**
  * ## Application class
  */
-var reactMixin = require('react-mixin')
-import TimerMixin from 'react-timer-mixin'
+// var reactMixin = require('react-mixin')
+// import TimerMixin from 'react-timer-mixin'
 
-class Application extends Component {
-
+class Application extends PureComponent {
+    
     componentDidMount() {
         // Use a timer so Application screen is displayed
-        this.setTimeout(
+        setTimeout(
             () => {
-                this.props.actions.getSessionToken()
+                this.props.getSessionToken()
             },
             1000 //change 100 to 2500
         )
@@ -74,15 +55,15 @@ class Application extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.summary}>FarEye Version : {this.props.deviceVersion}</Text>
+                <Text style={styles.summary}>FarEye Version : {package_json.version}</Text>
             </View>
         )
     }
 
 }
 // Since we're using ES6 classes, have to define the TimerMixin
-reactMixin(Application.prototype, TimerMixin)
+// reactMixin(Application.prototype, TimerMixin)
 /**
  * Connect the properties
  */
-export default connect(mapStateToProps, mapDispatchToProps)(Application)
+export default connect(null, authActions)(Application)

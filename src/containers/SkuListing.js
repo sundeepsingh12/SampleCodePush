@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -34,7 +34,7 @@ import _ from 'lodash'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 
-class SkuListing extends Component {
+class SkuListing extends PureComponent {
 
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId

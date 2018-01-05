@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Spinner } from 'native-base';
 
-class ResyncLoader extends Component {
+class ResyncLoader extends PureComponent {
     render() {
         return (
             <View>

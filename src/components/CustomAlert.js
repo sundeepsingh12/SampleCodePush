@@ -1,6 +1,6 @@
 /**
  * Created by Gaurav
- * Component to show alert dailog with max. 2 buttons
+ * PureComponent to show alert dailog with max. 2 buttons
  * @param title: Title of alert dailog
  * @param message: Body of alert message
  * @param onOkPressed: Optional - Callback function which is called when user presses OK buttton
@@ -8,14 +8,14 @@
  */
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     View,
     Alert
 }
 from 'react-native'
 
-class CustomAlert extends Component {
+class CustomAlert extends PureComponent {
 
     render() {
         var _buttons = new Array();

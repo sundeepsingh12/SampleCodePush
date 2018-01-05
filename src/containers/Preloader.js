@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet 
 }
@@ -31,7 +31,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class Preloader extends Component {
+class Preloader extends PureComponent {
 
     componentDidMount() {
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)

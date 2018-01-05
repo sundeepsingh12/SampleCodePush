@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View } from 'react-native'
 import {
@@ -13,7 +13,7 @@ import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import QRIcon from '../svg_components/icons/QRIcon'
-export default class SearchBar extends Component {
+export default class SearchBar extends PureComponent {
     
     _startScanner() {
         if (this.props.isScannerEnabled) {

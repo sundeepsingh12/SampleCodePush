@@ -6,7 +6,7 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import SearchIcon from '../../src/svg_components/icons/SearchIcon'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 
 import {
@@ -45,7 +45,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class FormDetailsV2 extends Component {
+class FormDetailsV2 extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     return { header: null }
   }

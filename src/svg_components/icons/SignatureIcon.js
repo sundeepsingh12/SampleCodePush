@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Svg, {
     G,
     Path,
@@ -7,7 +7,7 @@ import Svg, {
 } from 'react-native-svg';
 import styles from '../../themes/FeStyle'
 
-export default class SignatureIcon extends Component {
+export default class SignatureIcon extends PureComponent {
     render() {
         return (
             <Svg
