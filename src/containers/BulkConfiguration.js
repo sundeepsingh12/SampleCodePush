@@ -5,7 +5,7 @@
 
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import * as bulkActions from '../modules/bulk/bulkActions'
@@ -45,7 +45,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class BulkConfiguration extends Component{
+class BulkConfiguration extends PureComponent{
 
     static navigationOptions = ({navigation}) => {
     return {header: null}

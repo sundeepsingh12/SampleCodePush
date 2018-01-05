@@ -9,7 +9,7 @@ import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native'
 
 import {
@@ -64,7 +64,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class SyncScreen extends Component {
+class SyncScreen extends PureComponent {
 
   componentDidMount() {
     this.props.actions.startMqttService(this.props.pieChart)

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, FlatList } from 'react-native'
 import {
     Container,
@@ -16,7 +16,7 @@ import {
 } from '../lib/constants'
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-export default class DataStoreItemDetails extends Component {
+export default class DataStoreItemDetails extends PureComponent {
 
     renderData = (item) => {
         return (

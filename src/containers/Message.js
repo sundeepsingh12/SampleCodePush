@@ -1,5 +1,5 @@
 'use strict'
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import
 {
   StyleSheet,
@@ -18,7 +18,7 @@ var styles = StyleSheet.create({
   },
 })
 
-class Message extends Component {
+class Message extends PureComponent {
 
   render () {
     return (

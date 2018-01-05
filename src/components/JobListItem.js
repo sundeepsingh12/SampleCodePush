@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, Alert } from 'react-native'
 import styles from '../themes/FeStyle'
 
@@ -37,14 +37,14 @@ import {
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
 
-export default class JobListItem extends Component {
+export default class JobListItem extends PureComponent {
 
   callButtonPressed = () => {
     if (this.props.data.jobSwipableDetails.contactData.length == 0)
       return
     if (this.props.data.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.data.jobSwipableDetails.contactData.slice(0)
-      contactData.push(CANCEL)
+      let contactData = this.props.data.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
+      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -69,8 +69,8 @@ export default class JobListItem extends Component {
     Communications.phonecall(contact, false)
   }
   customerCareButtonPressed = () => {
-    let customerCareTitles = this.props.data.jobSwipableDetails.customerCareData.map(customerCare => customerCare.name)
-    customerCareTitles.push(CANCEL)
+    let customerCareTitles = this.props.data.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
+    customerCareTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
     ActionSheet.show(
       {
         options: customerCareTitles,
@@ -104,9 +104,9 @@ export default class JobListItem extends Component {
     else {
       let addressArray = []
       Object.values(addressDatas).forEach(object => {
-        addressArray.push(Object.values(object).join())
+        addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
       })
-      addressArray.push(CANCEL)
+      addressArray.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       if (_.size(addressArray) > 2) {
         ActionSheet.show(
           {

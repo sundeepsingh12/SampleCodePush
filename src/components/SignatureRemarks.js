@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     FlatList,
     View,
@@ -11,7 +11,7 @@ import {
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-class SignatureRemarks extends Component {
+class SignatureRemarks extends PureComponent {
 
     renderData = (item) => {
         return (

@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -13,7 +13,7 @@ import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
 
-class ExpandableDetailsView extends Component {
+class ExpandableDetailsView extends PureComponent {
     constructor(props) {
         super(props)
         this.state = {

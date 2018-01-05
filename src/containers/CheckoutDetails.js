@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList, TouchableOpacity, BackHandler } from 'react-native'
 
@@ -60,7 +60,7 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators({ ...globalActions, ...saveActivatedActions }, dispatch)
     }
 }
-class CheckoutDetails extends Component {
+class CheckoutDetails extends PureComponent {
 
     constructor(props) {
         super(props)

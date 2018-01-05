@@ -7,7 +7,7 @@ import * as globalActions from '../modules/global/globalActions'
 import * as liveJobActions from '../modules/liveJob/liveJobActions'
 import Loader from '../components/Loader'
 import moment from 'moment'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, Vibration, TouchableOpacity } from 'react-native'
 import _ from 'lodash'
 import {
@@ -57,7 +57,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class LiveJobListing extends Component {
+class LiveJobListing extends PureComponent {
 
     componentWillMount() {
         this.props.actions.fetchAllLiveJobsList()

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, WebView, Platform, ActivityIndicator,BackHandler } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -48,7 +48,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class CustomApp extends Component {
+class CustomApp extends PureComponent {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }

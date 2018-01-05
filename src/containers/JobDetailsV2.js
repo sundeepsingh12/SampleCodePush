@@ -163,8 +163,8 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
       return
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
-      contactData.push(CANCEL)
+      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
+      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -185,8 +185,8 @@ class JobDetailsV2 extends PureComponent {
   showSmsTemplateList = (contact) => {
     setTimeout(() => {
       if (this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 1) {
-        let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => sms.title)
-        msgTitles.push(CANCEL)
+        let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => ({ text: sms.title, icon: "md-arrow-dropright", iconColor: "#000000" }))
+        msgTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
         ActionSheet.show(
           {
             options: msgTitles,
@@ -214,8 +214,8 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
       return
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
-      contactData.push(CANCEL)
+      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
+      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -240,8 +240,8 @@ class JobDetailsV2 extends PureComponent {
     Communications.phonecall(contact, false)
   }
   customerCareButtonPressed = () => {
-    let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => customerCare.name)
-    customerCareTitles.push(CANCEL)
+    let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
+    customerCareTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
     ActionSheet.show(
       {
         options: customerCareTitles,
@@ -275,9 +275,9 @@ class JobDetailsV2 extends PureComponent {
     else {
       let addressArray = []
       Object.values(addressDatas).forEach(object => {
-        addressArray.push(Object.values(object).join())
+        addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
       })
-      addressArray.push(CANCEL)
+      addressArray.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       if (_.size(addressArray) > 2) {
         ActionSheet.show(
           {

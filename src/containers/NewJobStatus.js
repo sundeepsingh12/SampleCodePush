@@ -8,7 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
 
 import {
@@ -52,7 +52,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class NewJobStatus extends Component {
+class NewJobStatus extends PureComponent {
 
   static navigationOptions = ({ navigation }) => {
     return { header: null }
