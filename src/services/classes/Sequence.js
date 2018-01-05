@@ -19,7 +19,8 @@ import {
     SMS_TEMPLATE,
     JOB_MASTER,
     HUB,
-    TABLE_JOB_TRANSACTION
+    TABLE_JOB_TRANSACTION,
+    TABLE_RUNSHEET
 } from '../../lib/constants'
 
 import {
@@ -35,12 +36,18 @@ import * as realm from '../../repositories/realmdb'
 
 class Sequence {
 
-    async getSequenceList() {
+    async getSequenceList(runsheetNumber) {
+        if (!runsheetNumber) {
+            throw new Error('Runsheet number not present !')
+        }
         const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        const jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,'Sequence',statusIds)
-        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList,'id')
-        return idJobTransactionCustomizationListMap
+        const jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Sequence', {
+            statusIds,
+            runsheetNumber
+        })
+        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id')
+        return []
     }
 
     async prepareRequestBody(sequenceList) {
@@ -82,30 +89,43 @@ class Sequence {
         return sequenceRequestDto
     }
 
-     processSequenceResponse(responseBody, sequenceList) {
+    processSequenceResponse(responseBody, sequenceList) {
         const transactionIdSequenceMap = responseBody.transactionIdSequenceMap
-          const updatedSequenceList = JSON.parse(JSON.stringify(sequenceList))
-        let position  = 1
+        const updatedSequenceList = JSON.parse(JSON.stringify(sequenceList))
+        let position = 1
         if (transactionIdSequenceMap != null && transactionIdSequenceMap != undefined && !_.isEmpty(transactionIdSequenceMap)) {
             for (let index in sequenceList) {
-                if(transactionIdSequenceMap[sequenceList[index].id]){
+                if (transactionIdSequenceMap[sequenceList[index].id]) {
                     position++
                     updatedSequenceList[index].seqSelected = transactionIdSequenceMap[index]
                 }
             }
         }
         const unAllocatedTransactionIds = responseBody.unAllocatedTransactionIds
-        if(unAllocatedTransactionIds!=null && unAllocatedTransactionIds!=undefined && !_.isEmpty(unAllocatedTransactionIds)){
-              for (let index in sequenceList) {
-                if(unAllocatedTransactionIds.includes(sequenceList[index].id)){
+        if (unAllocatedTransactionIds != null && unAllocatedTransactionIds != undefined && !_.isEmpty(unAllocatedTransactionIds)) {
+            for (let index in sequenceList) {
+                if (unAllocatedTransactionIds.includes(sequenceList[index].id)) {
                     transactionIdSequenceMap[sequenceList[index].id] = position++
                     updatedSequenceList[index].seqSelected = transactionIdSequenceMap[index]
                 }
             }
         }
         realm.updateRealmDb(TABLE_JOB_TRANSACTION, transactionIdSequenceMap)
-        return  updatedSequenceList
+        return updatedSequenceList
 
+    }
+
+    getRunsheets() {
+        const runsheetArray = realm.getAll(TABLE_RUNSHEET)
+        let runsheetNumberList = []
+        runsheetArray.forEach(runsheetObject => {
+            const runsheetClone = { ...runsheetObject }
+            runsheetNumberList.push(runsheetClone.runsheetNumber)
+        })
+        if (_.isEmpty(runsheetNumberList)) {
+            throw new Error('No runsheet found !')
+        }
+        return runsheetNumberList
     }
 }
 

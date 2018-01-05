@@ -7,7 +7,8 @@ var InitialState = Record({
    isSequenceScreenLoading:false,
    isResequencingDisabled:false,
    unallocatedTransactionCount:0,
-   responseMessage:''
+   responseMessage:'',
+    runsheetNumberList: [] 
    
 })
 

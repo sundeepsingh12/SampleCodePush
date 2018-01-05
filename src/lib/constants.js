@@ -82,7 +82,7 @@ module.exports = keyMirror({
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
-    
+
     //Home Container
     PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
@@ -170,7 +170,7 @@ module.exports = keyMirror({
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
-    LAST_JOB_COMPLETED_TIME:null,
+    LAST_JOB_COMPLETED_TIME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -253,6 +253,7 @@ module.exports = keyMirror({
     CameraAttribute: null,
     ImageDetailsView: null,
     JobDetailsV2: null,
+    SequenceRunsheetList: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -312,6 +313,8 @@ module.exports = keyMirror({
     TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
     CLEAR_SEQUENCE_STATE: null,
+    SET_RUNSHEET_NUMBER_LIST: null,
+    SET_RESPONSE_MESSAGE: null,
 
     //New Job
     NEW_JOB_MASTER: null,

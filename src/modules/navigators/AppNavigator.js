@@ -47,6 +47,7 @@ import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
 import QrCodeScanner from '../../containers/QrCodeScanner'
 import CameraFieldAttribute from '../../containers/CameraFieldAttribute'
+import SequenceRunsheetList from '../../containers/SequenceRunsheetList'
 import {
   Container,
   Content,
@@ -434,6 +435,9 @@ export const AppNavigator = StackNavigator({
   },
   ImageDetailsView: {
     screen: ImageDetailsView,
+  },
+  SequenceRunsheetList: {
+    screen: SequenceRunsheetList
   }
 },
   {

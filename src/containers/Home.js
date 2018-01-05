@@ -47,7 +47,7 @@ import {
 
 import {
   TabScreen,
-  Sequence,
+  SequenceRunsheetList,
   BulkConfiguration,
   Sorting,
   LiveJobs,
@@ -94,11 +94,11 @@ class Home extends PureComponent {
         break
       }
       case SEQUENCEMODULE_ID: {
-        this.props.actions.navigateToScene(Sequence,{displayName:this.props.modules.SEQUENCEMODULE.displayName})
+        this.props.actions.navigateToScene(SequenceRunsheetList, { displayName: this.props.modules.SEQUENCEMODULE.displayName })
         break
       }
       case START_ID: {
-        this.props.actions.navigateToScene(TabScreen, {remark: appModule.remark})
+        this.props.actions.navigateToScene(TabScreen, { remark: appModule.remark })
         break
       }
 
@@ -155,22 +155,22 @@ class Home extends PureComponent {
             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
             <View style={[style.headerBody]}>
               <View style={{
-                  width: 90
-                }}>
-                  <Image
-                    style={StyleSheet.flatten([
-                      styles.width100, {
-                        resizeMode: 'contain'
-                      }
-                    ])}
-                    source={FareyeLogo} />
-                </View>
+                width: 90
+              }}>
+                <Image
+                  style={StyleSheet.flatten([
+                    styles.width100, {
+                      resizeMode: 'contain'
+                    }
+                  ])}
+                  source={FareyeLogo} />
+              </View>
             </View>
             <View />
           </View>
         </Body>
       </Header>
-    
+
     )
   }
 

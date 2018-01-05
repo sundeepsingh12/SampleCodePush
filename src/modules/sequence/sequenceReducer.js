@@ -9,7 +9,9 @@ import {
     TOGGLE_RESEQUENCE_BUTTON,
     RESET_STATE,
     PREPARE_UPDATE_LIST,
-    CLEAR_SEQUENCE_STATE
+    CLEAR_SEQUENCE_STATE,
+    SET_RUNSHEET_NUMBER_LIST,
+    SET_RESPONSE_MESSAGE
 } from '../../lib/constants'
 
 
@@ -33,7 +35,15 @@ export default function sequenceReducer(state = initialState, action) {
         
         case RESET_STATE:
         case CLEAR_SEQUENCE_STATE:
-            return initialState                
+            return initialState  
+        
+        case SET_RUNSHEET_NUMBER_LIST:
+            return state.set('runsheetNumberList', action.payload)
+                .set('isSequenceScreenLoading', false)
+
+        case SET_RESPONSE_MESSAGE:
+            return state.set('responseMessage', action.payload)
+                .set('isSequenceScreenLoading', false)        
 
     }
     return state

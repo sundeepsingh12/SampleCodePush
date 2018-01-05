@@ -20,26 +20,28 @@ import {
     SEQUENCE_LIST_FETCHING_STOP,
     HUB,
     TOGGLE_RESEQUENCE_BUTTON,
-    PREPARE_UPDATE_LIST
-
+    PREPARE_UPDATE_LIST,
+    SET_RUNSHEET_NUMBER_LIST,
+    SET_RESPONSE_MESSAGE,
+    Sequence
 } from '../../lib/constants'
 import {
-    setState
+    setState, navigateToScene
 } from '../global/globalActions'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 
-export function prepareListForSequenceModule() {
+export function prepareListForSequenceModule(runsheetNumber) {
     return async function (dispatch) {
         try {
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
-            const sequenceList = await sequenceService.getSequenceList()
+            const sequenceList = await sequenceService.getSequenceList(runsheetNumber)
             dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
                 sequenceList,
             }))
         } catch (error) {
             //Update UI here
-            dispatch(setState(SEQUENCE_LIST_FETCHING_STOP))
+            dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
 }
@@ -70,3 +72,34 @@ export function resequenceJobsFromServer(sequenceList) {
         }
     }
 }
+
+export function getJobTransactionsFromRunsheetNumber(runsheetNumber) {
+    return async function (dispatch) {
+        try {
+            console.log('runsheetNumber', runsheetNumber)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+
+
+export function getRunsheets(displayName) {
+    return async function (dispatch) {
+        try {
+            dispatch(setState(SEQUENCE_LIST_FETCHING_START))
+            const runsheetNumberList = await sequenceService.getRunsheets()
+            if (runsheetNumberList.length == 1) {
+                dispatch(navigateToScene(Sequence, {
+                    runsheetNumber: runsheetNumberList[0],
+                    displayName
+                }))
+            }
+            dispatch(setState(SET_RUNSHEET_NUMBER_LIST, runsheetNumberList))
+        } catch (error) {
+            console.log(error)
+            dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
+        }
+    }
+}
+
