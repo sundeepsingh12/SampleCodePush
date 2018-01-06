@@ -46,6 +46,7 @@ import {
 
   Home,
   Login,
+  AutoLogoutScreen,
   JOB_MASTER,
   JOB_ATTRIBUTE,
   JOB_ATTRIBUTE_VALUE,
@@ -71,6 +72,7 @@ import {
   LoginScreen,
   TOGGLE_LOGOUT,
   OTP_SUCCESS,
+  SET_LOADER_IN_AUTOLOGOUT,
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -83,6 +85,8 @@ import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
 import { userEventLogService } from '../../services/classes/UserEvent'
+import BackgroundTimer from 'react-native-background-timer';
+import moment from 'moment'
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -256,6 +260,7 @@ export function downloadJobMaster() {
       const json = await jobMasters.json
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
+      dispatch(autoLogout(userObject))
     } catch (error) {
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
@@ -290,6 +295,29 @@ export function invalidateUserSession() {
     } catch (error) {
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
+    }
+  }
+}
+
+
+export function autoLogout(userData) {
+  return async (dispatch) => {
+    try {      
+     let timeLimit = (userData) ? moment('23:59:59',"HH:mm:ss").diff(moment(new Date(),"HH:mm:ss"), 'seconds')+2 : 0
+     if(userData && userData.value.company.autoLogoutFromDevice && timeLimit){
+      const timeOutId  = BackgroundTimer.setTimeout(async () => {
+        if(!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
+          dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
+          dispatch(setState(SET_LOADER_IN_AUTOLOGOUT, true))
+          dispatch(invalidateUserSession())
+          dispatch(setState(SET_LOADER_IN_AUTOLOGOUT, false))
+          BackgroundTimer.clearTimeout(timeOutId);         
+        }
+      }, timeLimit*1000)      
+    }
+    } catch (error) {
+      //Update UI here
+      console.log(error)
     }
   }
 }

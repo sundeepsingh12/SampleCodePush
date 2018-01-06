@@ -68,7 +68,7 @@ export function fetchModulesList(modules, pieChart, menu) {
       if (result.pieChart[PIECHART].enabled) {
         dispatch(pieChartCount())
       }
-    } catch (error) {
+    }catch (error) {
       console.log(error)
     }
   }

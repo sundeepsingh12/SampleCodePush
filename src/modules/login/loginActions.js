@@ -25,13 +25,20 @@ import {
   SESSION_TOKEN_FAILURE,
   TOGGLE_CHECKBOX,
   USERNAME,
+  AutoLogoutScreen,
+  SET_LOADER_IN_AUTOLOGOUT,
+  USER
 } from '../../lib/constants'
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
+import moment from 'moment'
 
 import {
   authenticationService
 } from '../../services/classes/Authentication'
+import {
+  invalidateUserSession
+} from '../pre-loader/preloaderActions'
 import CONFIG from '../../lib/config'
 import {
   keyValueDBService
@@ -39,6 +46,8 @@ import {
 import {
   NavigationActions
 } from 'react-navigation'
+
+import { setState } from '../global/globalActions'
 
 /**
  * ## State actions
@@ -211,6 +220,13 @@ export function checkRememberMe() {
 export function getSessionToken() {
   return async function (dispatch) {
     try {
+      const userData = await keyValueDBService.getValueFromStore(USER)      
+      if(userData && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
+        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
+        dispatch(setState(SET_LOADER_IN_AUTOLOGOUT, true))
+        dispatch(invalidateUserSession())
+        dispatch(setState(SET_LOADER_IN_AUTOLOGOUT, false))
+      }else{
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
       if (token && isPreloaderComplete && isPreloaderComplete.value) {
@@ -226,6 +242,7 @@ export function getSessionToken() {
           routeName: LoginScreen
         }))
       }
+    }
     } catch (error) {
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())

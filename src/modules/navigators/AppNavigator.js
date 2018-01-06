@@ -91,6 +91,7 @@ import { NavigationActions } from 'react-navigation'
 import Scanner from '../../components/Scanner'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import JobMaster from '../../containers/JobMaster'
+import AutoLogout from '../../containers/AutoLogout'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -263,6 +264,12 @@ export const AppNavigator = StackNavigator({
   SelectFromList: {
     screen: SelectFromList,
   },
+  AutoLogoutScreen: {
+    screen: AutoLogout,
+    navigationOptions: {
+      header: null
+    }
+  }, 
   QrCodeScanner: {
     screen: QrCodeScanner,
     navigationOptions: {

@@ -12,6 +12,9 @@ module.exports = keyMirror({
     SET_PLATFORM: null,
     SET_VERSION: null,
 
+    //autoLogout Actions
+    SET_LOADER_IN_AUTOLOGOUT: null,
+
     //Auth Actions
     LOGIN: null,
     LOGOUT: null,
@@ -227,6 +230,7 @@ module.exports = keyMirror({
     HomeTabNavigatorScreen: null,
     JobDetails: null,
     LoginScreen: null,
+    AutoLogoutScreen: null,
     MenuScreen: null,
     PreloaderScreen: null,
     Sequence: null,
