@@ -305,7 +305,8 @@ class JobMaster {
       if (preAssignmentList.includes(jobMaster.id)) {
         jobMaster.preAssignment = true
       }
-      if (jobMaster.postAssignment || jobMaster.preAssignment) {
+      // if (jobMaster.postAssignment || jobMaster.preAssignment) {
+      if (jobMaster.postAssignment) {
         orderJobMasterList.push(jobMaster)
       }
     }
