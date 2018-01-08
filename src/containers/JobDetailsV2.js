@@ -293,7 +293,7 @@ class JobDetailsV2 extends PureComponent {
                 params: [
                   {
                     key: 'q',
-                    value: addressArray[buttonIndex]
+                    value: addressArray[buttonIndex].text
                   }
                 ]
               }
@@ -308,7 +308,7 @@ class JobDetailsV2 extends PureComponent {
           params: [
             {
               key: 'q',
-              value: addressArray[0]
+              value: addressArray[0].text
             }
           ]
         }

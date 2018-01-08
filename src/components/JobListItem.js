@@ -120,7 +120,7 @@ export default class JobListItem extends PureComponent {
                 params: [
                   {
                     key: 'q',
-                    value: addressArray[buttonIndex]
+                    value: addressArray[buttonIndex].text
                   }
                 ]
               }
@@ -135,7 +135,7 @@ export default class JobListItem extends PureComponent {
           params: [
             {
               key: 'q',
-              value: addressArray[0]
+              value: addressArray[0].text
             }
           ]
         }
