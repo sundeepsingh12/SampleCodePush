@@ -298,3 +298,113 @@ describe('test case for performsearch', () => {
         expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
     })
 })
+
+describe('test case for checkForPresenceInDisplayText', () => {
+
+    it('should return false for no value found in display text', () => {
+        const searchValue = 'test'
+        const bulkTransactions = {
+            runsheetNo: 'test2',
+
+        }
+        const idToSeparatorMap = {
+            1: '-',
+            2: '-'
+        }
+        expect(bulkService.checkForPresenceInDisplayText(searchValue, bulkTransactions, idToSeparatorMap)).toEqual(false)
+    })
+    it('should return true for value found in line1', () => {
+        const searchValue = 'test'
+        const bulkTransactions = {
+            runsheetNo: 'test2',
+            line1: 'test'
+        }
+        const idToSeparatorMap = {
+            1: '-',
+            2: '-'
+        }
+        expect(bulkService.checkForPresenceInDisplayText(searchValue, bulkTransactions, idToSeparatorMap)).toEqual(true)
+    })
+    it('should return true for value found in circleline1', () => {
+        const searchValue = 'test'
+        const bulkTransactions = {
+            runsheetNo: 'test2',
+            circleLine1: 'test'
+        }
+        const idToSeparatorMap = {
+            1: '-',
+        
+        }
+        expect(bulkService.checkForPresenceInDisplayText(searchValue, bulkTransactions, idToSeparatorMap)).toEqual(true)
+    })
+    it('should return true for value found in circleline2', () => {
+        const searchValue = 'test'
+        const bulkTransactions = {
+            runsheetNo: 'test2',
+            circleLine2: 'test'
+        }
+        const idToSeparatorMap = {
+            1: '-',
+       
+        }
+        expect(bulkService.checkForPresenceInDisplayText(searchValue, bulkTransactions, idToSeparatorMap)).toEqual(true)
+    })
+})
+describe('test case for checkLineContents', () => {
+
+    it('should return false for no value found in display text', () => {
+        const searchValue = 'test'
+        const seperator = '-'
+        const lineContent = 'test1'
+        expect(bulkService.checkLineContents(lineContent, seperator, searchValue)).toEqual(false)
+    })
+    it('should return true for  value found in display text', () => {
+        const searchValue = 'test'
+        const seperator = '-'
+        const lineContent = 'test'
+        expect(bulkService.checkLineContents(lineContent, seperator, searchValue)).toEqual(true)
+    })
+})
+
+describe('test case for getIdSeparatorMap', () => {
+
+    it('should return empty object for no jobMasterIdCustomizationMap', () => {
+        //const jobMasterIdCustomizationMap = []
+        expect(bulkService.getIdSeparatorMap(undefined, 0)).toEqual({})
+    })
+    it('should return empty object for no jobMasterIdCustomizationMap.value', () => {
+        const jobMasterIdCustomizationMap = {}
+        expect(bulkService.getIdSeparatorMap(jobMasterIdCustomizationMap, 0)).toEqual({})
+    })
+    it('should return empty idtoseperatormap for no map for particular job masterid', () => {
+        const jobMasterIdCustomizationMap = {
+            value: {
+                400: {
+                    1: {
+                        appJobListMasterId: 1,
+                        seperator: '-'
+                    }
+                }
+            }
+        }
+        const idToSeparatorMap = {
+        }
+        expect(bulkService.getIdSeparatorMap(jobMasterIdCustomizationMap, 500)).toEqual(idToSeparatorMap)
+    })
+    it('should return id to seprator map', () => {
+        const jobMasterIdCustomizationMap = {
+            value: {
+                400: {
+                    1: {
+                        appJobListMasterId: 1,
+                        separator: '-'
+                    }
+                }
+            }
+        }
+        const idToSeparatorMap = {
+            1: '-'
+        }
+        expect(bulkService.getIdSeparatorMap(jobMasterIdCustomizationMap, 400)).toEqual(idToSeparatorMap)
+    })
+})

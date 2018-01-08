@@ -149,7 +149,7 @@ class Bulk {
         return false;
     }
     checkLineContents(lineContent, separator, searchValue) {
-        let contentList = (separator) ? lineContent.split(separator) : []
+        let contentList = (separator) ? lineContent.split(separator) : [lineContent]
         let matchingContent = contentList.filter(content => _.isEqual(content, searchValue))
         if (matchingContent && matchingContent.length > 0) {
             return true
@@ -160,6 +160,7 @@ class Bulk {
     getIdSeparatorMap(jobMasterIdCustomizationMap, jobMasterId) {
         if (!jobMasterIdCustomizationMap || !jobMasterIdCustomizationMap.value) return {}
         const jobMasterCustomisationMap = jobMasterIdCustomizationMap.value[jobMasterId]
+        if (!jobMasterCustomisationMap) return {}
         let idToSeparatorMap = {}
         for (let customisation of Object.values(jobMasterCustomisationMap)) {
             idToSeparatorMap[customisation.appJobListMasterId] = customisation.separator

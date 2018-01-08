@@ -7,7 +7,7 @@ import * as bulkActions from '../modules/bulk/bulkActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, Alert, FlatList, TouchableOpacity, BackHandler, TextInput } from 'react-native'
 
 import {
