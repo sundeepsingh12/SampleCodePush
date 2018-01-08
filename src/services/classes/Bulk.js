@@ -117,12 +117,12 @@ class Bulk {
         let jobTransactionArray = []
         let isSearchFound = false
         let errorMessage = ''
-        for (let bulkTransaction of Object.values(bulkTransactions)) {
-            if (_.isEqual(_.toLower(bulkTransaction.referenceNumber), searchText) || _.isEqual(_.toLower(bulkTransaction.runsheetNo), searchText)) {
-                jobTransactionArray.push(bulkTransaction)
+        for (let key in bulkTransactions) {
+            if (_.isEqual(_.toLower(bulkTransactions[key].referenceNumber), searchText) || _.isEqual(_.toLower(bulkTransactions[key].runsheetNo), searchText)) {
+                jobTransactionArray.push(bulkTransactions[key])
                 isSearchFound = true
-            } else if (searchSelectionOnLine1Line2 && this.checkForPresenceInDisplayText(searchText, bulkTransaction, idToSeparatorMap)) {
-                jobTransactionArray.push(bulkTransaction)
+            } else if (searchSelectionOnLine1Line2 && this.checkForPresenceInDisplayText(searchText, bulkTransactions[key], idToSeparatorMap)) {
+                jobTransactionArray.push(bulkTransactions[key])
                 isSearchFound = true
                 if (jobTransactionArray.length > 1) {
                     errorMessage = 'Invalid Scan'
@@ -151,19 +151,15 @@ class Bulk {
     checkLineContents(lineContent, separator, searchValue) {
         let contentList = (separator) ? lineContent.split(separator) : [lineContent]
         let matchingContent = contentList.filter(content => _.isEqual(content, searchValue))
-        if (matchingContent && matchingContent.length > 0) {
-            return true
-        } else {
-            return false
-        }
+        return (matchingContent && matchingContent.length > 0)
     }
     getIdSeparatorMap(jobMasterIdCustomizationMap, jobMasterId) {
         if (!jobMasterIdCustomizationMap || !jobMasterIdCustomizationMap.value) return {}
         const jobMasterCustomisationMap = jobMasterIdCustomizationMap.value[jobMasterId]
         if (!jobMasterCustomisationMap) return {}
         let idToSeparatorMap = {}
-        for (let customisation of Object.values(jobMasterCustomisationMap)) {
-            idToSeparatorMap[customisation.appJobListMasterId] = customisation.separator
+        for (let key in jobMasterCustomisationMap) {
+            idToSeparatorMap[jobMasterCustomisationMap[key].appJobListMasterId] = jobMasterCustomisationMap[key].separator
         }
         return idToSeparatorMap
     }

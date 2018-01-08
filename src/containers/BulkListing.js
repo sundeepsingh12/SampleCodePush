@@ -86,7 +86,7 @@ class BulkListing extends PureComponent {
   }
   onClickRowItem(item) {
     if (this.props.isManualSelectionAllowed) {
-      this.props.actions.toggleListItemIsChecked(item.id, this.props.bulkTransactionList)
+      this.props.actions.toggleMultipleTransactions([item], this.props.bulkTransactionList)
     }
   }
 
