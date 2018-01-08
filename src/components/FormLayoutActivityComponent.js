@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -43,7 +43,7 @@ import {
     RADIOBUTTON
 } from '../lib/AttributeConstants'
 
-class FormLayoutActivityComponent extends Component {
+class FormLayoutActivityComponent extends PureComponent {
 
     getIcon(attributeTypeId) {
         switch (attributeTypeId) {

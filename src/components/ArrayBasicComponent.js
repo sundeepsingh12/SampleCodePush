@@ -1,5 +1,5 @@
 'use strict' //Comment Review import
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -56,7 +56,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class ArrayBasicComponent extends Component {
+class ArrayBasicComponent extends PureComponent {
 
     constructor(props) {
         super(props)

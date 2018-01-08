@@ -14,7 +14,7 @@ import Camera from 'react-native-camera'
 import { NA, SORTING_PLACEHOLDER, SEARCH_INFO } from '../lib/AttributeConstants'
 import * as sortingActions from '../modules/sorting/sortingActions'
 import * as globalActions from '../modules/global/globalActions'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native'
 import {
     Container,
@@ -49,7 +49,7 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators({ ...sortingActions,...globalActions}, dispatch)
     }
 }
-class SortingListing extends Component {
+class SortingListing extends PureComponent {
 
     renderData = (item) => {
         return (
@@ -105,7 +105,7 @@ class SortingListing extends Component {
     }
 }
 
-class Sorting extends Component {
+class Sorting extends PureComponent {
     componentDidmount(){
         if(!_.isUndefined(this.props.navigation.state.params)){
             this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))

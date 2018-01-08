@@ -1,5 +1,5 @@
 'use strict';
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     Text,
@@ -32,7 +32,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class OtpScreen extends Component {
+class OtpScreen extends PureComponent{
 
     onChangeOtp = (value) => {
         this.props.actions.onChangeOtp(value)

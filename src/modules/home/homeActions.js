@@ -122,7 +122,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         syncStatus: 'Uploading'
       }))
       const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
-      const syncCount = responseBody.split(",")[1]
+      const syncCount = parseInt(responseBody.split(",")[1])
       //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
       if (isCalledFromHome || syncCount > 0) {
         console.log(isCalledFromHome, syncCount)

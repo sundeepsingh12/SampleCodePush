@@ -16,7 +16,7 @@ import {
     SUMMARY,
     USER_NOT_FOUND,
 } from '../../lib/AttributeConstants'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 
 import BulkIcon from '../../svg_components/icons/BulkIcon'
 import LiveIcon from '../../svg_components/icons/LiveIcon'

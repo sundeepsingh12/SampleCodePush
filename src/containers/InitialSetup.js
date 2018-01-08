@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -31,7 +31,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class InitialSetup extends Component{
+class InitialSetup extends PureComponent{
 
      invalidateSession = () => {
         this.props.actions.invalidateUserSession()

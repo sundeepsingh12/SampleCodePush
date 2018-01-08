@@ -6,7 +6,7 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 
 import {
@@ -41,7 +41,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class ProfileView extends Component {
+class ProfileView extends PureComponent {
 
   static navigationOptions = ({ navigation }) => {
     return { header: null }

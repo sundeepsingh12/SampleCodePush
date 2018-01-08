@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, FlatList } from 'react-native'
 import { Container, Button, Content, Card, CardItem, Toast } from 'native-base';
 import { connect } from 'react-redux'
@@ -37,7 +37,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class CashTendering extends Component {
+class CashTendering extends PureComponent {
 
     componentDidMount() {
         if (this.props.isReceive) {

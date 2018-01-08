@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -39,7 +39,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class SignatureAndNps extends Component {
+class SignatureAndNps extends PureComponent {
 
     constructor(props) {
         super(props)
