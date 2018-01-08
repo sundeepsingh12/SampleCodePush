@@ -40,8 +40,6 @@ import getDirections from 'react-native-google-maps-directions'
 export default class JobListItem extends PureComponent {
 
   callButtonPressed = () => {
-    if (this.props.data.jobSwipableDetails.contactData.length == 0)
-      return
     if (this.props.data.jobSwipableDetails.contactData.length > 1) {
       let contactData = this.props.data.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
       contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
@@ -242,8 +240,8 @@ export default class JobListItem extends PureComponent {
                 </Button>
             )}
 
-            {renderIf(!_.isEmpty(this.props.data.jobSwipableDetails.addressData) ||
-              (this.props.data.jobLatitude && this.props.data.jobLongitude) && this.props.showIconsInJobListing,
+            {renderIf((!_.isEmpty(this.props.data.jobSwipableDetails.addressData) ||
+              (this.props.data.jobLatitude && this.props.data.jobLongitude)) && this.props.showIconsInJobListing,
                 <Button transparent onPress={this.navigationButtonPressed}>
                   <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
                 </Button>)}
