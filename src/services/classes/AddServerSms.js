@@ -285,7 +285,7 @@ class AddServerSms {
             let jobTransaction = { ...transactionList[index] }
             if (jobTransaction) {
                 let serverSmsLog = await this.addServerSms(transactionIdDtosMap[jobTransaction.id].pendingStatusId, transactionIdDtosMap[jobTransaction.id].jobMasterId, null, jobTransaction)
-                if (serverSmsLog.value && serverSmsLog.value != []) {
+                if (serverSmsLog.value && serverSmsLog.value.length > 0) {
                     let pendingTransaction = {
                         id: jobTransaction.id, referenceNumber: jobTransaction.referenceNumber
                     }
