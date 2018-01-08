@@ -386,6 +386,7 @@ module.exports = keyMirror({
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
+    SCANNER_TEXT: null,
 
     //Job Master
     SET_JOB_MASTER_LIST: null,
