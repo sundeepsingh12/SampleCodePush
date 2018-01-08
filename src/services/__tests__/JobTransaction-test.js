@@ -7,7 +7,7 @@ import { jobDataService } from '../classes/JobData'
 import { fieldDataService } from '../classes/FieldData'
 import { customerCareService } from '../classes/CustomerCare'
 import { smsTemplateService } from '../classes/SMSTemplate'
-import {SEQ_SELECTED} from '../../lib/AttributeConstants'
+import { SEQ_SELECTED } from '../../lib/AttributeConstants'
 
 import * as realm from '../../repositories/realmdb'
 
@@ -632,46 +632,46 @@ describe('test cases for setCustomerCareDetails', () => {
   it('should return undefined list', () => {
     const customerCareMap = {}
     const job = {}
-    expect(jobTransactionService.setCustomerCareDetails(customerCareMap,job)).toEqual(undefined)
+    expect(jobTransactionService.setCustomerCareDetails(customerCareMap, job)).toEqual(undefined)
   })
 
   it('should return customerCare list', () => {
     const customerCareMap = {
-      1 : []
+      1: []
     }
     const job = {
-      jobMasterId : 1
+      jobMasterId: 1
     }
-    expect(jobTransactionService.setCustomerCareDetails(customerCareMap,job)).toEqual([])
+    expect(jobTransactionService.setCustomerCareDetails(customerCareMap, job)).toEqual([])
   })
 
 })
 
-describe('test cases for setSMSDetails',() => {
+describe('test cases for setSMSDetails', () => {
 
-  it('should return empty list for empty contact data list',() => {
+  it('should return empty list for empty contact data list', () => {
     const smsTemplateMap = {}
     const job = {}
     const contactData = []
     expect(jobTransactionService.setSMSDetails(smsTemplateMap, job, contactData)).toEqual([])
   })
 
-  it('should return undefined list for empty sms template',() => {
+  it('should return undefined list for empty sms template', () => {
     const smsTemplateMap = {}
     const job = {}
     const contactData = ['989797987']
     expect(jobTransactionService.setSMSDetails(smsTemplateMap, job, contactData)).toEqual(undefined)
   })
 
-  it('should return undefined list for empty sms template',() => {
+  it('should return undefined list for empty sms template', () => {
     const smsTemplate = {
-      id : 1
+      id: 1
     }
     const smsTemplateMap = {
-      1 : smsTemplate
+      1: smsTemplate
     }
     const job = {
-      jobMasterId : 1
+      jobMasterId: 1
     }
     const contactData = ['989797987']
     expect(jobTransactionService.setSMSDetails(smsTemplateMap, job, contactData)).toEqual(smsTemplate)
@@ -683,8 +683,8 @@ describe('test cases for setJobSwipableDetails', () => {
   const jobAttributeMasterMap = {}
   const jobAttributeStatusMap = {}
   const jobTransaction = {
-    jobMasterId : 1,
-    jobStatusId : 1
+    jobMasterId: 1,
+    jobStatusId: 1
   }
   const job = {}
   const customerCareMap = {}
@@ -936,8 +936,8 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
     jobTransactionService.prepareJobCustomizationList = jest.fn()
     jobStatusService.getJobMasterIdStatusIdMap = jest.fn()
     jobStatusService.getJobMasterIdStatusIdMap.mockReturnValue({
-      jobMasterIdJobAttributeStatusMap : {},
-      statusIdNextStatusMap : {},
+      jobMasterIdJobAttributeStatusMap: {},
+      statusIdNextStatusMap: {},
     })
     realm.getRecordListOnQuery = jest.fn()
     realm.getRecordListOnQuery.mockReturnValue([])
@@ -986,8 +986,8 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
       seqSelected: 1
     }]
     realm.getRecordListOnQuery.mockReturnValueOnce([])
-                              .mockReturnValueOnce(jobTransactionList)
-                              .mockReturnValue([])
+      .mockReturnValueOnce(jobTransactionList)
+      .mockReturnValue([])
     jobTransactionService.getJobTransactionMapAndQuery = jest.fn()
     jobTransactionService.getJobTransactionMapAndQuery.mockReturnValue(jobTransactionObject)
     jobTransactionService.prepareJobCustomizationList = jest.fn()
@@ -1104,8 +1104,8 @@ describe('test Job Transaction services', () => {
 
 
 describe('test for enable resequence restriction ', () => {
-  const jobMasterIdList = [441,442]
-  const statusMap = [1999,2000,1998,2416,2001,2002]
+  const jobMasterIdList = [441, 442]
+  const statusMap = [1999, 2000, 1998, 2416, 2001, 2002]
   const jobTransactionList = [
     {
       id: '1',
@@ -1148,8 +1148,70 @@ describe('test for enable resequence restriction ', () => {
   it('should get first sequence value with enable resequence restriction', () => {
     realm.getRecordListOnQuery = jest.fn()
     realm.getRecordListOnQuery.mockReturnValueOnce(jobTransactionList)
-    jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdList,statusMap)
+    jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap)
     expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
-    
+
   })
+})
+
+describe('test cases for getUnseenJobTransaction', () => {
+  beforeEach(() => {
+    jobStatusService.getStatusIdForJobMasterIdAndCode = jest.fn()
+    realm.getRecordListOnQuery = jest.fn()
+  })
+  const jobMaster = {
+    id: 1
+  }
+
+  it('should return empty job transaction map', () => {
+    realm.getRecordListOnQuery.mockReturnValue([])
+    return jobTransactionService.getUnseenJobTransaction(jobMaster)
+      .then((data) => {
+        expect(jobStatusService.getStatusIdForJobMasterIdAndCode).toHaveBeenCalledTimes(1)
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(2)
+        expect(data.jobTransactionMap).toEqual({})
+        expect(data.pendingCount).toEqual(0)
+      })
+  })
+
+  it('should return empty job transaction map', () => {
+    const jobTransactionList = [
+      {
+        id: 1,
+        referenceNumber: 'qwe',
+      },
+      {
+        id: 2,
+        referenceNumber: 'asd',
+      },
+      {
+        id: 3,
+        referenceNumber: 'zxc',
+      }
+    ]
+    const jobTransactionMap = {
+      'qwe': {
+        id: 1,
+        referenceNumber: 'qwe',
+      },
+      'asd': {
+        id: 2,
+        referenceNumber: 'asd',
+      },
+      'zxc': {
+        id: 3,
+        referenceNumber: 'zxc',
+      }
+    }
+    realm.getRecordListOnQuery.mockReturnValueOnce([])
+      .mockReturnValueOnce(jobTransactionList)
+    return jobTransactionService.getUnseenJobTransaction(jobMaster)
+      .then((data) => {
+        expect(jobStatusService.getStatusIdForJobMasterIdAndCode).toHaveBeenCalledTimes(1)
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(2)
+        expect(data.jobTransactionMap).toEqual(jobTransactionMap)
+        expect(data.pendingCount).toEqual(3)
+      })
+  })
+
 })
