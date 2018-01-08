@@ -255,8 +255,8 @@ class AddServerSms {
             let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAttributesList, fieldAttributesList)
 
             if (jobData != null) {
-                jobDataList = fieldData.map((dataList) => dataList.data)
-                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobDataList, jobTransaction, jobAttributesList)
+                jobDataList = jobData.map((dataList) => dataList.data)
+                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobDataList, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
             }
             if (fieldData != null) {
                 fieldDataList = fieldData.map((dataList) => dataList.data)
