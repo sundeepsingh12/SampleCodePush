@@ -7,7 +7,8 @@ import {
     START_FETCHING_URL,
     END_FETCHING_URL,
     ON_CHANGE_STATE,
-    RESET_STATE
+    RESET_STATE,
+    SCANNER_TEXT
 } from '../../lib/constants'
 
 
@@ -25,6 +26,9 @@ export default function customAppReducer(state = initialState, action) {
                         
         case END_FETCHING_URL:
             return state.set('isLoaderRunning',false) 
+        
+        case SCANNER_TEXT:
+            return state.set('scannerText',action.payload)
             
         case RESET_STATE:
             return initialState    
