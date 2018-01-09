@@ -18,9 +18,11 @@ class ArrayFieldAttribute {
             let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
             if (requiredFields.length <= 0) {
                 errorMessage = INVALID_CONFIG_ERROR
+                return { arrayRowDTO: {}, childElementsTemplate: arrayDTO, errorMessage }
+            } else {
+                let arrayRowDTO = this.addArrayRow(lastRowId, arrayDTO, arrayElements)
+                return { arrayRowDTO, childElementsTemplate: arrayDTO, errorMessage }
             }
-            let arrayRowDTO = this.addArrayRow(lastRowId, arrayDTO, arrayElements)
-            return { arrayRowDTO, childElementsTemplate: arrayDTO, errorMessage }
         }
         return
     }

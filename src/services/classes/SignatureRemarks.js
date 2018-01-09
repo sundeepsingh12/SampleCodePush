@@ -38,7 +38,7 @@ class SignatureRemarks {
         * creates remarks DataList object, which contains value and label of all remarks
         * @param {*formElement Map} nextEditable 
         */
-    filterRemarksList(fieldDataList) { //TODO add javadoc
+    filterRemarksList(fieldDataList) {
         if (fieldDataList == undefined)
             return []
         let checkCondition;
@@ -111,10 +111,9 @@ class SignatureRemarks {
      * @param {*} validation validation array
      */
     getRemarksValidation(validation) {
-        if (validation != null && validation.length > 0) {
+        if (validation && validation.length > 0) {
             let value = validation.filter((value) => value.timeOfExecution == 'MINMAX')
-            if (value[0].condition == 'TRUE')
-                return true
+            return ((value[0] && value[0].condition == 'TRUE'))
         }
         return false
     }
@@ -128,7 +127,7 @@ class SignatureRemarks {
    * @param {*} latestPositionId 
    */
     prepareSignAndNpsFieldData(signatureValue, npsValue, currentElement, fieldAttributeMasterList, jobTransactionId, latestPositionId) {
-        if (!fieldAttributeMasterList.value || fieldAttributeMasterList.value.length <= 0) return []
+        if (!fieldAttributeMasterList || !fieldAttributeMasterList.value || fieldAttributeMasterList.value.length <= 0) return []
         let fieldAttributeList = fieldAttributeMasterList.value.filter((fieldAttribute) => fieldAttribute.parentId == currentElement.fieldAttributeMasterId)
         let childDataList = []
         for (let fieldAttribute of fieldAttributeList) {

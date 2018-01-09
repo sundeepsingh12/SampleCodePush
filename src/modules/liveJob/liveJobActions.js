@@ -98,7 +98,6 @@ export function fetchAllLiveJobsList() {
             dispatch(setState(START_FETCHING_LIVE_JOB, true))
             let liveJobList = await liveJobService.getLiveJobList()
             dispatch(setState(SET_LIVE_JOB_LIST, liveJobList))
-            dispatch(setState(SET_SEARCH, ''))
         } catch (error) {
             console.log(error)
         }
@@ -108,6 +107,7 @@ export function toggleLiveJobSelection(jobId, allJobs) {
     return async function (dispatch) {
         try {
             const jobTransactions = await JSON.parse(JSON.stringify(allJobs))
+            if (!jobTransactions[jobId].jobTransactionCustomization) throw new Error('customisation not present')
             jobTransactions[jobId].jobTransactionCustomization.isChecked = !jobTransactions[jobId].jobTransactionCustomization.isChecked
             const selectedItems = await liveJobService.getSelectedJobIds(jobTransactions)
             dispatch(setState(TOGGLE_LIVE_JOB_LIST_ITEM, {
@@ -115,7 +115,7 @@ export function toggleLiveJobSelection(jobId, allJobs) {
                 jobTransactions
             }))
         } catch (error) {
-            console.log(error)
+            console.log(error.message)
         }
     }
 }
@@ -151,7 +151,7 @@ export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
                 }))
             }
         } catch (error) {
-
+            console.log(error.message)
         }
     }
 }
@@ -161,7 +161,7 @@ export function deleteExpiredJob(jobId, liveJobList) {
             let newLiveJobList = await liveJobService.deleteJob([jobId], liveJobList)
             dispatch(setState(SET_LIVE_JOB_LIST, newLiveJobList))
         } catch (error) {
-
+            console.log(error.message)
         }
     }
 }
@@ -175,6 +175,7 @@ export function selectNone(liveJobList) {
                 jobTransactions: allJobs
             }))
         } catch (error) {
+            console.log(error.message)
         }
     }
 }
@@ -189,6 +190,7 @@ export function selectAll(liveJobList) {
                 jobTransactions: allJobs
             }))
         } catch (error) {
+            console.log(error)
         }
     }
 }
