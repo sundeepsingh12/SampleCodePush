@@ -8,7 +8,8 @@ import {
     FlatList,
     TouchableHighlight,
     ActivityIndicator,
-    Modal
+    Modal,
+    Keyboard
 }
     from 'react-native'
 import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Item, Label } from 'native-base'
@@ -91,7 +92,7 @@ class BasicFormElement extends PureComponent {
         if (this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value) {
             this.props.item.isLoading = true
             this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement,
-                this.props.isSaveDisabled, this.props.item.sequenceMasterId)
+                this.props.isSaveDisabled, this.props.item.sequenceMasterId,this.props.jobTransaction)
         }
     }
 
@@ -166,7 +167,6 @@ class BasicFormElement extends PureComponent {
                 isSaveDisabled: this.props.isSaveDisabled,
                 cash: cash,
                 returnData: this._searchForReferenceValue.bind(this)
-
             }
         )
     }
@@ -177,6 +177,12 @@ class BasicFormElement extends PureComponent {
 
     onFocusEvent(currentElement) {
         this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
+        if (currentElement && !currentElement.value && currentElement.attributeTypeId == 62) {
+            currentElement.isLoading = true;
+            currentElement.editable = false;
+            Keyboard.dismiss();
+            this.props.actions.setSequenceDataAndNextFocus(currentElement.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, currentElement.sequenceMasterId, this.props.jobTransaction)
+        }
     }
 
     _onBlurEvent(currentElement) {
