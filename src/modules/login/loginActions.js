@@ -223,9 +223,7 @@ export function getSessionToken() {
       const userData = await keyValueDBService.getValueFromStore(USER)      
       if(userData && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-        dispatch(setState(SET_LOADER_IN_AUTOLOGOUT, true))
         dispatch(invalidateUserSession())
-        dispatch(setState(SET_LOADER_IN_AUTOLOGOUT, false))
       }else{
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)

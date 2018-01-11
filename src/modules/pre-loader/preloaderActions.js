@@ -303,14 +303,12 @@ export function invalidateUserSession() {
 export function autoLogout(userData) {
   return async (dispatch) => {
     try {      
-     let timeLimit = (userData) ? moment('23:59:59',"HH:mm:ss").diff(moment(new Date(),"HH:mm:ss"), 'seconds')+2 : 0
+     let timeLimit = (userData) ? moment('23:59:59',"HH:mm:ss").diff(moment(new Date(),"HH:mm:ss"), 'seconds')+5 : 0
      if(userData && userData.value.company.autoLogoutFromDevice && timeLimit){
       const timeOutId  = BackgroundTimer.setTimeout(async () => {
         if(!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
           dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-          dispatch(setState(SET_LOADER_IN_AUTOLOGOUT, true))
           dispatch(invalidateUserSession())
-          dispatch(setState(SET_LOADER_IN_AUTOLOGOUT, false))
           BackgroundTimer.clearTimeout(timeOutId);         
         }
       }, timeLimit*1000)      
