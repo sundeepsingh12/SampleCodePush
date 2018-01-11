@@ -110,8 +110,7 @@ class Home extends PureComponent {
       case CUSTOMAPP_ID: {
         ((appModule.remark) && appModule.remark.length > 1) ? this.customAppSelection(appModule) : ((appModule.remark) && appModule.remark.length == 1)
           ? this.props.actions.navigateToScene(CustomApp, {
-            customUrl: appModule.remark[0].customUrl,
-            appModule
+            customUrl: appModule.remark[0].customUrl
           }) :
           this.props.actions.navigateToScene(CustomApp, {
             appModule
@@ -141,7 +140,7 @@ class Home extends PureComponent {
         destructiveButtonIndex: BUTTONS.length - 1
       },
       buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, appModule.remark[buttonIndex].customUrl) : null
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, { customUrl : appModule.remark[buttonIndex].customUrl} ) : null
       }
     )
   }

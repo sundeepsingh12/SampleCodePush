@@ -17,6 +17,8 @@ import {
     SET_POST_ASSIGNMENT_PARAMETERS,
 } from '../../lib/constants'
 
+import _ from 'lodash'
+
 import {
     JOB_ASSIGNMENT_ID
 } from '../../lib/AttributeConstants'
@@ -34,11 +36,11 @@ export function fetchJobMasterList() {
             }))
             const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-            let jobAssignmentModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(appModulesList.value, JOB_ASSIGNMENT_ID)
+            let jobAssignmentModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(appModulesList ? appModulesList.value : null, JOB_ASSIGNMENT_ID)
             let remarks = jobAssignmentModule.length == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark) : null
             let preAssignmentList = remarks ? remarks.preAssignmentList : null
             let postAssignmentList = remarks ? remarks.postAssignmentList : null
-            let orderJobMasterList = jobMasterService.getJobMasterListFromPostAndPreAssignmentList(postAssignmentList, preAssignmentList, jobMasterList.value)
+            let orderJobMasterList = jobMasterService.getJobMasterListFromPostAndPreAssignmentList(postAssignmentList, preAssignmentList, jobMasterList ? jobMasterList.value : null)
             dispatch(setState(SET_JOB_MASTER_LIST, {
                 jobMasterList: orderJobMasterList,
                 loading: false
@@ -51,15 +53,23 @@ export function fetchJobMasterList() {
             ))
         } catch (error) {
             console.log(error)
+            dispatch(setState(SET_JOB_MASTER_LIST, {
+                jobMasterList: undefined,
+                loading: false
+            }))
         }
     }
 }
 
+/**
+ * This function fetch job transactions based on job master
+ * @param {*} jobMaster 
+ */
 export function fetchUnseenJobs(jobMaster) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, {
-                jobTransactionList: null,
+                jobTransactionMap: null,
                 loading: true
             }))
             let unseenJobTransactionDTO = await jobTransactionService.getUnseenJobTransaction(jobMaster)
@@ -70,10 +80,23 @@ export function fetchUnseenJobs(jobMaster) {
             }))
         } catch (error) {
             console.log(error)
+            dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, {
+                jobTransactionMap: null,
+                loading: false
+            }))
         }
     }
 }
 
+/**
+ * This function takes action for scanned job reference number accordingly
+ * @param {*} referenceNumber 
+ * @param {*} jobTransactionMap 
+ * @param {*} jobMaster 
+ * @param {*} isForceAssignmentAllowed 
+ * @param {*} pendingCount 
+ * @param {*} calledFromScan 
+ */
 export function checkScannedJob(referenceNumber, jobTransactionMap, jobMaster, isForceAssignmentAllowed, pendingCount, calledFromScan) {
     return async function (dispatch) {
         try {

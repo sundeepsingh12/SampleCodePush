@@ -746,12 +746,18 @@ class JobTransaction {
     }
 
     /**
-     * 
+     * This function fetch unseen job transactions which are assigned to the user
      * @param {*} jobMaster 
+     * @returns
+     * {
+     *      jobTransactionMap : {
+     *                              referenceNumber : jobTransaction
+     *                          }
+     *      pendingCount : integer
+     * }
      */
     async getUnseenJobTransaction(jobMaster) {
         let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMaster.id, UNSEEN)
-        console.log(unseenStatusId)
         let runsheetQuery = 'isClosed = true'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')

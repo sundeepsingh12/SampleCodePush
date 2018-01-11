@@ -1,4 +1,6 @@
 module.exports = {
+    //Token Error
+    TOKEN_MISSING: 'Token Missing',
 
     //common_CONSTANTS
     CANCEL: 'Cancel',

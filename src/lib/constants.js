@@ -356,6 +356,8 @@ module.exports = keyMirror({
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
     TOGGLE_ALL_JOB_TRANSACTIONS: null,
     CLEAR_BULK_STATE: null,
+    SET_BULK_SEARCH_TEXT: null,
+    SET_BULK_ERROR_MESSAGE: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -391,6 +393,7 @@ module.exports = keyMirror({
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
+    SCANNER_TEXT: null,
 
     //Job Master
     SET_JOB_MASTER_LIST: null,
