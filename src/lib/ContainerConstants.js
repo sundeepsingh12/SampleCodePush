@@ -52,6 +52,17 @@ module.exports = {
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
 
-    //Sequence container
-    SELECT_RUNSHEET_NUMBER: 'Select runsheet number'
+    //Sequence
+    SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
+    DUPLICATE_SEQUENCE_MESSAGE: 'Duplicate sequence found for this runsheet auto corrected, please save the modified sequence',
+    SAVE_SUCCESSFUL: 'Save Successful',
+    UPDATE_SEQUENCE: 'Update Sequence',
+    SAVE: 'Save',
+    WARNING_FOR_BACK: 'Sequence changes have not been save, please return and save changes',
+    WARNING: 'Warning',
+    JOB_NOT_PRESENT: 'No jobs present',
+    CURRENT_SEQUENCE_NUMBER: 'Current sequence number : ',
+    NEW_SEQUENCE_NUMBER_MESSAGE: 'Enter new sequence number to jump to',
+    JUMP_SEQUENCE: 'Jump Sequence',
+    UNTRACKED_JOBS_MESSAGE: ' jobs were not resequenced'
 }

@@ -18,7 +18,7 @@ const userSummary =  {
     "failCount": {"type": "number","required":true },
     "firstLat": {"type": ["number",null] ,"required":true},
     "firstLong": {"type": ["number",null] ,"required":true},
-    "gpsKms": {"type": "number" ,"required":true},
+    "gpsKms": {"type": ["number", null] ,"required":true},
     "haltDuration": {"type": "number" ,"required":true},
     "hubId": {"type": "number" ,"required":true},
     "id" : {"type": "number","required":true},

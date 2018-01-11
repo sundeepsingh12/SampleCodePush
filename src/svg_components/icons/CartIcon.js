@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Svg, {
     G,
     Ellipse,
@@ -7,7 +7,7 @@ import Svg, {
 } from 'react-native-svg';
 import styles from '../../themes/FeStyle'
 
-export default class CartIcon extends Component {
+export default class CartIcon extends PureComponent {
     render() {
         return (
             <Svg

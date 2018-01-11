@@ -19,6 +19,7 @@ module.exports = keyMirror({
     LOGIN_SUCCESS: null,
     LOGIN_FAILURE: null,
     LOGIN_CAMERA_SCANNER: null,
+    FORGET_PASSWORD: null,
     LOGOUT_START: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
@@ -315,6 +316,10 @@ module.exports = keyMirror({
     CLEAR_SEQUENCE_STATE: null,
     SET_RUNSHEET_NUMBER_LIST: null,
     SET_RESPONSE_MESSAGE: null,
+    CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: null,
+    SEQUENCE_LIST_ITEM_DRAGGED: null,
+    SET_REFERENCE_NO: null,
+    SET_SEQUENCE_LIST_ITEM_INDEX: null,
 
     //New Job
     NEW_JOB_MASTER: null,

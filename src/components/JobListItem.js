@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
 import styles from '../themes/FeStyle'
 
@@ -20,7 +20,7 @@ import {
   StyleProvider
 } from 'native-base'
 import moment from 'moment'
-export default class JobListItem extends Component {
+export default class JobListItem extends PureComponent {
 
   render() {
     return (
@@ -28,8 +28,8 @@ export default class JobListItem extends Component {
         onPress={this.props.onPressItem}
         onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
-        <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : {backgroundColor: '#ffffff'}]}>
-          <View style={[style.seqCircle, styles.relative,{backgroundColor : this.props.data.identifierColor}]}>
+        <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : { backgroundColor: '#ffffff' }]}>
+          <View style={[style.seqCircle, styles.relative, { backgroundColor: this.props.data.identifierColor }]}>
             <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
               {this.props.data.jobMasterIdentifier}
             </Text>
@@ -45,8 +45,9 @@ export default class JobListItem extends Component {
             {this.props.callingActivity == 'Sequence' ? <View
               style={{
                 width: 30,
-                alignSelf: 'center'
-              }}>
+                alignSelf: 'center',
+                flexBasis: '10%'
+              }} >
               <Icon
                 name="ios-menu"
                 style={[
@@ -78,7 +79,7 @@ export default class JobListItem extends Component {
    */
   renderJobListItemDetails() {
     return (
-      <View>
+      <View style={[styles.flexBasis90]}>
         <View>
           {this.props.data.line1 ?
             <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
@@ -101,7 +102,7 @@ export default class JobListItem extends Component {
           }
         </View>
         {this.props.jobEndTime ?
-          <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5}]}>
+          <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5 }]}>
             <Text style={[styles.fontWhite, styles.fontDefault, styles.fontCenter]}>
               {(moment(this.props.jobEndTime, "HH:mm:ss")).hours() + ' hours ' +
                 (moment(this.props.jobEndTime, "HH:mm:ss")).minutes() + ' minutes ' +

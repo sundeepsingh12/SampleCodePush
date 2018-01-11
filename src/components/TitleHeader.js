@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -7,7 +7,7 @@ import {
 import {Button, Body, Header, Left, Right, Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 
-class TitleHeader extends Component {
+class TitleHeader extends PureComponent {
     render() {
         return (
             <Header style={StyleSheet.flatten([styles.bgPrimary])}>

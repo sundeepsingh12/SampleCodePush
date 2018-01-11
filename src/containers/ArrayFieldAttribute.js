@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -56,7 +56,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class ArrayFieldAttribute extends Component {
+class ArrayFieldAttribute extends PureComponent {
 
     componentWillUnmount() {
         BackHandler.removeEventListener(HardwareBackPress, this._goBack)

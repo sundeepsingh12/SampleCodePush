@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { View, Text, Slider, TextInput } from 'react-native'
 import { connect } from 'react-redux'
 import { Content, Card, CardItem } from 'native-base'
@@ -24,7 +24,7 @@ function mapStateToProps(state) {
     }
 };
 
-class FixedSKUListItem extends Component {
+class FixedSKUListItem extends PureComponent {
     render() {
         return (
             <View>

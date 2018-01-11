@@ -4,7 +4,7 @@ import BulkIcon from '../../src/svg_components/icons/BulkIcon'
 import LiveIcon from '../../src/svg_components/icons/LiveIcon'
 import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
 import TaskIcon from '../../src/svg_components/icons/TaskIcon'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 module.exports = {
 
     /**

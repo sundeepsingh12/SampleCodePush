@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -14,7 +14,7 @@ import {
     ARRAY_SAROJ_FAREYE
 } from '../lib/AttributeConstants'
 
-class ExpandableDetailsList extends Component {
+class ExpandableDetailsList extends PureComponent {
 
     renderChildList(dataList) {
         let childListView = []

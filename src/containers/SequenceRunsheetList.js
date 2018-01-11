@@ -78,7 +78,6 @@ class SequenceRunsheetList extends Component {
                 buttonText: OK,
                 type: 'danger',
                 duration: 10000,
-                onClose: this.goBack
             })
         }
     }

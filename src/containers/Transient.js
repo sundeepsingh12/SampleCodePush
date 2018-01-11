@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import * as transientStatusActions from '../modules/transientStatus/transientActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -45,7 +45,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class Transient extends Component {
+class Transient extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
         return { header: null }

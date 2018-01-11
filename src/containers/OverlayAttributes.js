@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native'
 import {
     NPS_FEEDBACK,
@@ -20,7 +20,7 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators({ getNextFocusableAndEditableElements }, dispatch)
     }
 }
-class OverlayAttributes extends Component {
+class OverlayAttributes extends PureComponent {
 
     onSave = (value) => {
         this.props.actions.getNextFocusableAndEditableElements(this.props.navigation.state.params.currentElement.fieldAttributeMasterId,

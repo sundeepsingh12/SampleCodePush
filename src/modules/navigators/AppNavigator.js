@@ -23,7 +23,6 @@ import Preloader from '../../containers/Preloader'
 import Application from '../../containers/Application'
 import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
-import Logout from '../../containers/Logout'
 import Home from '../../containers/Home'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
@@ -102,7 +101,7 @@ import {
   PreloaderScreen,
 } from '../../lib/constants'
 
-class AppWithNavigationState extends React.Component {
+class AppWithNavigationState extends React.PureComponent {
 
   componentDidMount() {
     BackHandler.addEventListener(HardwareBackPress, this.onBackPress);
@@ -261,9 +260,6 @@ export const AppNavigator = StackNavigator({
   JobDetailsV2: {
     screen: JobDetailsV2,
     header: null
-  },
-  Logout: {
-    screen: Logout,
   },
   SelectFromList: {
     screen: SelectFromList,

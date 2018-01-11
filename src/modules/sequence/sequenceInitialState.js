@@ -3,13 +3,14 @@
 import { Record } from 'immutable'
 
 var InitialState = Record({
-   sequenceList:{},
-   isSequenceScreenLoading:false,
-   isResequencingDisabled:false,
-   unallocatedTransactionCount:0,
-   responseMessage:'',
-    runsheetNumberList: [] 
-   
+    sequenceList: [],
+    isSequenceScreenLoading: false,
+    isResequencingDisabled: false,
+    responseMessage: '',
+    runsheetNumberList: [],
+    searchText: '',
+    sequenceListItemIndex: -1,
+    transactionsWithChangedSeqeunceMap: {},// map having those transaction whose sequence is changed,
 })
 
 export default InitialState
