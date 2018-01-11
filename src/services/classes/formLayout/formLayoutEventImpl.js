@@ -43,7 +43,8 @@ import {
     EXTERNAL_DATA_STORE
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
-import {summaryAndPieChartService} from '../SummaryAndPieChart'
+import { summaryAndPieChartService } from '../SummaryAndPieChart'
+import { addServerSmsService } from '../AddServerSms'
 
 export default class FormLayoutEventImpl {
 
@@ -199,7 +200,8 @@ export default class FormLayoutEventImpl {
             const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
             const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionIdList) : []
             await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionIdList)
-            realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
+            let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
+            realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job, serverSmsLogs)
             await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
             await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
             userSummary.value.lastOrderTime = jobTransaction.value[0].lastTransactionTimeOnMobile
@@ -247,8 +249,8 @@ export default class FormLayoutEventImpl {
      * 
      */
 
-    async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){
-        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+    async _updateJobSummary(jobTransaction, statusId, jobTransactionIdList) {
+        const prevStatusId = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
         const count = (jobTransactionIdList) ? jobTransactionIdList.length : 1
         const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
@@ -264,20 +266,20 @@ export default class FormLayoutEventImpl {
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
 
-   /**
-     * update runSheetDb count after completing transactions.
-     * and returns an object containing runSheetArray
-     * 
-     * @param {*jobTransaction} jobTransaction 
-     * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
-     * @param {*statusCategory} statusCategory // new transaction status category
-     * 
-     */
+    /**
+      * update runSheetDb count after completing transactions.
+      * and returns an object containing runSheetArray
+      * 
+      * @param {*jobTransaction} jobTransaction 
+      * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
+      * @param {*statusCategory} statusCategory // new transaction status category
+      * 
+      */
 
-    async _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList){
-        const setRunsheetSummary = [],runSheetList = []
-        const status = ['pendingCount','failCount','successCount']
-        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+    async _updateRunsheetSummary(jobTransaction, statusCategory, jobTransactionIdList) {
+        const setRunsheetSummary = [], runSheetList = []
+        const status = ['pendingCount', 'failCount', 'successCount']
+        const prevStatusId = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
         const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, null)
         const runsheetMap = runSheetData.reduce(function (total, current) {
@@ -297,7 +299,7 @@ export default class FormLayoutEventImpl {
             runsheetMap[jobTransaction.runsheetId][status[statusCategory - 1]] += 1
             runSheetList.push(runsheetMap[jobTransaction.runsheetId])
         }
-        return {tableName : TABLE_RUNSHEET, value : runSheetList}
+        return { tableName: TABLE_RUNSHEET, value: runSheetList }
     }
 
 
@@ -323,7 +325,7 @@ export default class FormLayoutEventImpl {
                 } else if (value.attributeTypeId == SIGNATURE_AND_FEEDBACK) {
                     let npsFeedback = _.values(value.childDataList).filter(item => item.attributeTypeId == NPS_FEEDBACK)
                     npsFeedbackValue = _.isEmpty(npsFeedback) ? null : npsFeedback[0].value
-                } else if (value.attributeTypeId == RE_ATTEMPT_DATE){
+                } else if (value.attributeTypeId == RE_ATTEMPT_DATE) {
                     reAttemptDate = value.value
                 }
                 let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
@@ -523,12 +525,12 @@ export default class FormLayoutEventImpl {
             case 3: job.status = 4;// jobStatus 4 is for fail when actionOnStatus is failed
                 break;
         }
-        if(reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")){
+        if (reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")) {
             job.jobStartTime = reAttemptDate + " 00:00:00"
         }
-        if(jobId < 0){
+        if (jobId < 0) {
             job.latitude = lastTrackLog.latitude,
-            job.longitude = lastTrackLog.longitude
+                job.longitude = lastTrackLog.longitude
         }
         jobArray.push(job)
         return {
@@ -551,7 +553,7 @@ export default class FormLayoutEventImpl {
                 case 3: job.status = 4;// jobStatus 4 is for fail when actionOnStatus is failed
                     break;
             }
-            if(reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")){
+            if (reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")) {
                 job.jobStartTime = reAttemptDate + " 00:00:00"
             }
             jobArray.push(job)

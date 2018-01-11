@@ -155,10 +155,10 @@ class Sync {
    */
   async processTdcResponse(tdcContentArray, isLiveJob) {
     let tdcContentObject, jobMasterIds
-    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)   
+    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const user = await keyValueDBService.getValueFromStore(USER)
     const hub = await keyValueDBService.getValueFromStore(HUB)
-    const imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI) 
+    const imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
       let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery, jobMaster, user, hub, imei)
@@ -547,8 +547,13 @@ class Sync {
             await keyValueDBService.deleteValueFromStore('LIVE_JOB')
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
+          console.logs('jobMasterIdJobStatusIdTransactionIdDtoObject', jobMasterIdJobStatusIdTransactionIdDtoObject)
           await jobSummaryService.updateJobSummary(dataList.jobSummaries)
-          //  await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
+          try {
+            await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
+          } catch (error) {
+            console.log(error)
+          }
         }
       } else {
         isLastPageReached = true

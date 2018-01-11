@@ -304,8 +304,8 @@ module.exports = {
     Piechart: {
         enabled: false
     },
-    Start : {
-      landingTab : false
+    Start: {
+        landingTab: false
     },
     //JobStatusConstants
     UNSEEN: 'UNSEEN',
@@ -385,6 +385,7 @@ module.exports = {
     CREATION_DATE: 'CREATION_DATE',
     TRANSACTION_DATE: 'TRANSACTION_DATE',
     JOB_ETA: 'JOB_ETA',
+    TRANSACTION_COMPLETED_DATE: 'TRANSACTION_COMPLETED_DATE',
 
     //ModuleCustomization
     NEW_JOB: 'New Task',
@@ -395,7 +396,7 @@ module.exports = {
     SERVER_UNREACHABLE: 3,
     SERVER_REACHABLE: 4,
 
-     //Offline DS Actiions
-     LAST_SYNCED: 'Last synced   ',
-     NEVER_SYNCED: 'Never Synced',
+    //Offline DS Actiions
+    LAST_SYNCED: 'Last synced   ',
+    NEVER_SYNCED: 'Never Synced',
 }
