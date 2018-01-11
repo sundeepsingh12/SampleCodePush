@@ -31,7 +31,6 @@
     "react-native-google-maps-directions": "^1.1.2",
     "react-native-linear-gradient": "^2.3.0",
     "react-native-modal-datetime-picker": "^4.13.0",
-    "react-native-notifications": "^1.1.17",
     "react-native-paho-mqtt": "^0.1.1",
     "react-native-push-notification": "^3.0.2",
     "react-native-qrcode-svg": "^5.0.3",

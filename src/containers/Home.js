@@ -43,7 +43,8 @@ import {
   CUSTOMAPP_ID,
   CHOOSE_WEB_URL,
   NEWJOB_ID,
-  JOB_ASSIGNMENT_ID
+  JOB_ASSIGNMENT_ID,
+  FAREYE_UPDATES
 } from '../lib/AttributeConstants'
 
 import {
@@ -83,10 +84,14 @@ class Home extends PureComponent {
 
   componentDidMount() {
       PushNotification.configure({
-              onNotification: function(notification) {
+        onNotification: function(notification) {
         console.log( 'NOTIFICATION:', notification );
         // process the notification
-        
+         Toast.show({
+              text: `${notification.message}`,
+              position: 'top',
+              buttonText: 'OK'
+            })
         // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
         notification.finish(PushNotificationIOS.FetchResult.NoData);
     }

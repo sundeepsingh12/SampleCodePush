@@ -3,7 +3,6 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.wix.reactnativenotifications.RNNotificationsPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import io.realm.react.RealmReactPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -44,10 +43,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNNotificationsPackage(),
             new ReactNativePushNotificationPackage(),
             new RealmReactPackage(),
-            new RNNotificationsPackage(MainApplication.this),
             new LinearGradientPackage(),
             new RSSignatureCapturePackage(),
             new SvgPackage(),
