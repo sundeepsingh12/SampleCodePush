@@ -98,17 +98,11 @@ class Home extends PureComponent {
         onNotification: function(notification) {
         console.log( 'NOTIFICATION:', notification );
         // process the notification
-        //  Toast.show({
-        //       text: `${notification.message}`,
-        //       position: 'top',
-        //       buttonText: 'OK'
-        //     })
-        // <Animated.View style={{ transform: [{ translateY: this.animatedValue }], flexDirection: 'row', height: 60, backgroundColor: '#000000', position: 'absolute', left: 0, bottom: 0, right: 0, justifyContent: 'space-between', alignItems: 'center', zIndex: 10, paddingHorizontal: 10 }}>
-        //                 <Text style={[styles.fontLg, styles.fontWhite]}>
-        //                     Test
-        //                 </Text>
-        //                 <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
-        //             </Animated.View>
+         Toast.show({
+              text: `${notification.message}`,
+              position: 'top',
+              buttonText: 'OK'
+            })
         // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
         notification.finish(PushNotificationIOS.FetchResult.NoData);
     }
@@ -201,12 +195,6 @@ class Home extends PureComponent {
             <View />
           </View>
         </Body>
-          <Animated.View style={{ transform: [{ translateY: this.animatedValue }], flexDirection: 'row', height: 60, backgroundColor: '#000000', position: 'absolute', left: 0, bottom: 0, right: 0, justifyContent: 'space-between', alignItems: 'center', zIndex: 10, paddingHorizontal: 10 }}>
-                        <Text style={[styles.fontLg, styles.fontWhite]}>
-                            Test
-                        </Text>
-                        <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
-                   </Animated.View>
       </Header>
     
     )
