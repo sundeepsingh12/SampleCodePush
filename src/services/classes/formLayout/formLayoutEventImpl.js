@@ -19,6 +19,7 @@ import {
     TRANSACTION_TIME_SPENT,
     TRACK_BATTERY,
     NPSFEEDBACK_VALUE,
+    CUSTOM_NAMING,
     PENDING_SYNC_TRANSACTION_IDS
 } from '../../../lib/constants'
 
@@ -40,6 +41,9 @@ import {
     SIGNATURE_AND_FEEDBACK,
     NPS_FEEDBACK,
     RE_ATTEMPT_DATE,
+    PENDING,
+    FAIL,
+    SUCCESS,
     EXTERNAL_DATA_STORE
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
@@ -192,6 +196,10 @@ export default class FormLayoutEventImpl {
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) //to edit later
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
+                const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
+                if(customNaming.value.updateEta && jobTransaction.value[0].jobEtaTime  && (dbObjects.status[0].statusCategory == FAIL || dbObjects.status[0].statusCategory == SUCCESS)){
+                    await this._updateEtaTimeOfJobtransactions(jobTransaction.value[0], currentTime)
+                }
             }
 
             //TODO add other dbs which needs updation
@@ -209,6 +217,25 @@ export default class FormLayoutEventImpl {
         } catch (error) {
             console.log(error)
         }
+    }
+
+        async _updateEtaTimeOfJobtransactions(jobTransaction, currentTime) {
+            if (moment(currentTime).isAfter(jobTransaction.jobEtaTime)) {
+                let delayInCompletingJobTransaction = moment(currentTime).unix() - moment(jobTransaction.jobEtaTime).unix()
+                const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
+                let jobTransactionQueryToUpdateEta = '('
+                jobTransactionQueryToUpdateEta += statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+                jobTransactionQueryToUpdateEta += `) AND runsheetId = "${jobTransaction.runsheetId} "`
+                jobTransactionQueryToUpdateEta += `AND seqSelected > "${jobTransaction.seqSelected}"`
+                let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQueryToUpdateEta)
+                let jobTransactions = []
+                for (let index in jobTransactionList) {
+                    let jobTransactionData = { ...jobTransactionList[index] }
+                    jobTransactionData.jobEtaTime = moment((moment(jobTransactionData.jobEtaTime).unix() + delayInCompletingJobTransaction)*1000).format('YYYY-MM-DD HH:mm:ss') 
+                    jobTransactions.push(jobTransactionData)
+                }
+                realm.saveList(TABLE_JOB_TRANSACTION, jobTransactions)
+            }
     }
 
     async _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user, lastTrackLog) {

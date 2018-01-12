@@ -654,7 +654,7 @@ class JobTransaction {
     prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = (callingActivity != 'LiveJob') ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery) : realm.getRecordListOnQuery(TABLE_JOB, jobTransactionQuery)
-        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
+        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType, startTime, endTime } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
         if (callingActivity == 'LiveJob') {
             jobMasterId = jobTransaction[0].jobMasterId
             jobStatusId = jobTransaction[0].status
@@ -706,7 +706,9 @@ class JobTransaction {
                 cityId,
                 hubId,
                 actualAmount,
-                moneyTransactionType
+                moneyTransactionType,
+                startTime,
+                endTime,
             }
             return {
                 currentStatus,
