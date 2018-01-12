@@ -37,7 +37,7 @@ import {
   authenticationService
 } from '../../services/classes/Authentication'
 import {
-  invalidateUserSession
+  invalidateUserSessionForAutoLogout
 } from '../pre-loader/preloaderActions'
 import CONFIG from '../../lib/config'
 import {
@@ -223,7 +223,6 @@ export function getSessionToken() {
       const userData = await keyValueDBService.getValueFromStore(USER)      
       if(userData && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-        dispatch(invalidateUserSession())
       }else{
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)

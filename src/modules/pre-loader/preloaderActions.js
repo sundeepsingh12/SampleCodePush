@@ -72,7 +72,6 @@ import {
   LoginScreen,
   TOGGLE_LOGOUT,
   OTP_SUCCESS,
-  SET_LOADER_IN_AUTOLOGOUT,
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -272,6 +271,25 @@ export function downloadJobMaster() {
     }
   }
 }
+export function invalidateUserSessionForAutoLogout() {
+  return async function (dispatch) {
+    try {
+      dispatch(preLogoutRequest())
+      dispatch(setState(TOGGLE_LOGOUT, true))
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)     
+      await authenticationService.logout(token)
+      await logoutService.deleteDataBase()
+      dispatch(preLogoutSuccess())
+      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(setState(TOGGLE_LOGOUT,false))
+      dispatch(deleteSessionToken())
+       
+    } catch (error) {  
+      dispatch(startLoginScreenWithoutLogout())
+      dispatch(setState(TOGGLE_LOGOUT, false))
+    }
+  }
+}
 
 /**This method logs out the user and deletes session token from store
  *
@@ -292,7 +310,7 @@ export function invalidateUserSession() {
       dispatch(setState(TOGGLE_LOGOUT,false))
       dispatch(deleteSessionToken())
        
-    } catch (error) {
+    } catch (error) {  
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
@@ -308,7 +326,6 @@ export function autoLogout(userData) {
       const timeOutId  = BackgroundTimer.setTimeout(async () => {
         if(!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
           dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-          dispatch(invalidateUserSession())
           BackgroundTimer.clearTimeout(timeOutId);         
         }
       }, timeLimit*1000)      

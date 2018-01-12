@@ -52,7 +52,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 
 import moment from 'moment'
 import {
-  invalidateUserSession
+  invalidateUserSessionForAutoLogout
 } from '../pre-loader/preloaderActions'
 import {
   NavigationActions
@@ -125,7 +125,6 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
       const userData = await keyValueDBService.getValueFromStore(USER)      
       if(userData && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-        dispatch(invalidateUserSession())
       }else{
       let saveStoreObject = {
         showLiveJobNotification: false
