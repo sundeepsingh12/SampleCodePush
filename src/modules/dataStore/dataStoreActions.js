@@ -163,7 +163,7 @@ export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dat
 export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, itemId) {
     return async function (dispatch) {
         try {
-            if (!await dataStoreService.dataStoreValuePresentInFieldData(dataStorevalue, fieldAttributeMasterId)) {
+            if (!await dataStoreService.checkForUniqueValidation(dataStorevalue, fieldAttributeMasterId)) {
                 dispatch(setState(SHOW_DETAILS, itemId))
             } else {
                 throw new Error('This value is already added')
@@ -186,7 +186,7 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, jobTransaction) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId, jobTransaction) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {

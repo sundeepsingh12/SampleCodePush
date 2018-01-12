@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -7,6 +7,7 @@ import {
   Platform,
   FlatList,
   TouchableOpacity,
+  KeyboardAvoidingView
 }
   from 'react-native'
 import { Container, Content, Card, Button, Body, Header, Right, Icon, Toast, Footer, FooterTab, StyleProvider } from 'native-base'
@@ -31,9 +32,15 @@ import {
 import {
   SET_FORM_LAYOUT_STATE,
   SET_DRAFT,
-  SET_UPDATE_DRAFT
+  SET_UPDATE_DRAFT,
+  ERROR_MESSAGE,
+  SET_FORM_TO_INVALID
 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
+import {
+  ALERT,
+  INVALID_FORM_ALERT
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -49,7 +56,8 @@ function mapStateToProps(state) {
     currentElement: state.formLayout.currentElement,
     pieChart: state.home.pieChart,
     draftStatusId: state.formLayout.draftStatusId,
-    updateDraft: state.formLayout.updateDraft
+    updateDraft: state.formLayout.updateDraft,
+    isFormValid: state.formLayout.isFormValid
   }
 }
 
@@ -59,13 +67,24 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class FormLayout extends Component {
+class FormLayout extends PureComponent {
   componentDidUpdate() {
-    if (this.props.updateDraft) {
+    if (this.props.updateDraft && !this.props.navigation.state.params.transactionIdList) { //Draft should not be saved for bulk
       this.saveDraft()
       this.props.actions.setState(SET_UPDATE_DRAFT, false)
     }
+    if (this.props.errorMessage && this.props.errorMessage != '') {
+      Toast.show({
+        text: this.props.errorMessage,
+        position: "bottom" | "center",
+        buttonText: 'Okay',
+        type: 'danger',
+        duration: 10000
+      })
+      this.props.actions.setState(ERROR_MESSAGE, '')
+    }
   }
+
   saveDraft = () => {
     if (this.props.jobTransactionId != 0) {
       let formLayoutState = {
@@ -90,10 +109,10 @@ class FormLayout extends Component {
         title="Draft"
         message={draftMessage}
         onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={()=>this._onCancel()} />
+        onCancelPressed={() => this._onCancel()} />
     return view
   }
-  _onCancel=()=> {
+  _onCancel = () => {
     this.props.actions.setState(SET_DRAFT, null)
   }
   _goToFormLayoutWithDraft = () => {
@@ -101,7 +120,7 @@ class FormLayout extends Component {
     this.props.actions.restoreDraft(this.props.jobTransactionId, this.props.statusId, this.props.navigation.state.params.jobMasterId)
   }
   componentDidMount() {
-    this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId)
+    this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId,this.props.navigation.state.params.jobTransaction)
   }
 
   renderData = (item) => {
@@ -172,15 +191,23 @@ class FormLayout extends Component {
 
   _keyExtractor = (item, index) => item[1].key;
 
+  showInvalidFormAlert() {
+    let draftMessage = INVALID_FORM_ALERT
+    let view =
+      <CustomAlert
+        title={ALERT}
+        message={draftMessage}
+        onOkPressed={() => this.props.actions.setState(SET_FORM_TO_INVALID, {
+          isLoading: false,
+          isFormValid: true
+        })}
+      />
+    return view
+  }
+
   render() {
     const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
-    if ((this.props.errorMessage != null && this.props.errorMessage != undefined && this.props.errorMessage.length != 0)) {
-      Toast.show({
-        text: this.props.errorMessage,
-        position: 'bottom',
-        buttonText: 'Okay'
-      })
-    }
+    const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
       <Footer style={[style.footer]}>
@@ -195,8 +222,9 @@ class FormLayout extends Component {
     }
     return (
       <StyleProvider style={getTheme(platform)}>
-        <Container>
+        <KeyboardAvoidingView style = {{flex:1}} behavior='padding'>
           {draftAlert}
+          {invalidFormAlert}
           <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
             <Body>
               <View
@@ -214,7 +242,7 @@ class FormLayout extends Component {
             </Body>
           </Header>
 
-          <Content style={[styles.flex1, styles.bgWhite]}>
+          <View style={[styles.flex1, styles.bgWhite]}>
             <View style={[styles.paddingTop10, styles.paddingBottom10]}>
               <FlatList
                 data={Array.from(this.props.formElement)}
@@ -223,7 +251,8 @@ class FormLayout extends Component {
                 keyExtractor={this._keyExtractor}>
               </FlatList>
             </View>
-          </Content>
+          </View>
+
 
           <Footer style={[style.footer]}>
             <FooterTab style={[styles.padding10]}>
@@ -234,7 +263,7 @@ class FormLayout extends Component {
               </Button>
             </FooterTab>
           </Footer>
-        </Container >
+        </KeyboardAvoidingView >
       </StyleProvider >
     )
   }

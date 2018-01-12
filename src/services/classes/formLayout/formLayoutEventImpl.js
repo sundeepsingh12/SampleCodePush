@@ -22,7 +22,7 @@ import {
     PENDING_SYNC_TRANSACTION_IDS
 } from '../../../lib/constants'
 
-import CONFIG from '../.././../lib/config'
+import CONFIG from '../../../lib/config'
 
 import * as realm from '../../../repositories/realmdb'
 import { keyValueDBService } from '../KeyValueDBService.js'
@@ -39,6 +39,7 @@ import {
     DATA_STORE,
     SIGNATURE_AND_FEEDBACK,
     NPS_FEEDBACK,
+    RE_ATTEMPT_DATE,
     EXTERNAL_DATA_STORE
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
@@ -65,9 +66,9 @@ export default class FormLayoutEventImpl {
             if (key != attributeMasterId || event == NEXT_FOCUS) {
                 value.focus = false
             }
-            if (!value.value && value.value !== 0 && value.required) {
-                isSaveDisabled = true
-            }
+            // if (!value.value && value.value !== 0 && value.required) {
+            //     isSaveDisabled = true
+            // }
 
             if (value.displayValue || value.displayValue === 0) {
                 continue
@@ -172,8 +173,8 @@ export default class FormLayoutEventImpl {
             let gpsKms = (!userSummary.value.gpsKms) ? "0" : userSummary.value.gpsKms
             await keyValueDBService.validateAndSaveData(PREVIOUSLY_TRAVELLED_DISTANCE, gpsKms)
             let lastTrackLog = {
-                latitude: userSummary.value.lastLat,
-                longitude: userSummary.value.lastLng
+                latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
+                longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
             }
             let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
             if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
@@ -184,13 +185,13 @@ export default class FormLayoutEventImpl {
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
                 jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) // to edit later 
-                job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value)
+                job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) //to edit later
-                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime)
+                job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
             }
 
             //TODO add other dbs which needs updation
@@ -201,6 +202,9 @@ export default class FormLayoutEventImpl {
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
             await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
             await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
+            userSummary.value.lastOrderTime = jobTransaction.value[0].lastTransactionTimeOnMobile
+            userSummary.value.lastOrderNumber = jobTransaction.value[0].referenceNumber
+            await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
@@ -310,6 +314,7 @@ export default class FormLayoutEventImpl {
             currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length
             let fieldDataArray = []
             let npsFeedbackValue = null
+            let reAttemptDate = null
             for (var [key, value] of formLayoutObject) {
                 if (value.attributeTypeId == 61) {
                     continue
@@ -318,6 +323,8 @@ export default class FormLayoutEventImpl {
                 } else if (value.attributeTypeId == SIGNATURE_AND_FEEDBACK) {
                     let npsFeedback = _.values(value.childDataList).filter(item => item.attributeTypeId == NPS_FEEDBACK)
                     npsFeedbackValue = _.isEmpty(npsFeedback) ? null : npsFeedback[0].value
+                } else if (value.attributeTypeId == RE_ATTEMPT_DATE){
+                    reAttemptDate = value.value
                 }
                 let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
                 fieldDataArray.push(fieldDataObject)
@@ -328,7 +335,8 @@ export default class FormLayoutEventImpl {
             return {
                 tableName: TABLE_FIELD_DATA,
                 value: fieldDataArray,
-                npsFeedbackValue
+                npsFeedbackValue,
+                reAttemptDate
             }
         } catch (error) {
             console.log(error)
@@ -353,7 +361,8 @@ export default class FormLayoutEventImpl {
         return {
             tableName: TABLE_FIELD_DATA,
             value: fieldDataArray,
-            npsFeedbackValue: fieldData.npsFeedbackValue
+            npsFeedbackValue: fieldData.npsFeedbackValue,
+            reAttemptDate: fieldData.reAttemptDate
         }
     }
 
@@ -495,7 +504,7 @@ export default class FormLayoutEventImpl {
      * @param {*statusObject} status 
      * @param {*jobId} jobId 
      */
-    _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber, currentTime) {
+    _setJobDbValues(status, jobId, jobMasterId, user, hub, referenceNumber, currentTime, reAttemptDate, lastTrackLog) {
         let jobArray = []
         let realmJobObject = null
         if (jobId > 0) {
@@ -514,6 +523,13 @@ export default class FormLayoutEventImpl {
             case 3: job.status = 4;// jobStatus 4 is for fail when actionOnStatus is failed
                 break;
         }
+        if(reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")){
+            job.jobStartTime = reAttemptDate + " 00:00:00"
+        }
+        if(jobId < 0){
+            job.latitude = lastTrackLog.latitude,
+            job.longitude = lastTrackLog.longitude
+        }
         jobArray.push(job)
         return {
             tableName: TABLE_JOB,
@@ -521,10 +537,9 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    _setBulkJobDbValues(status, jobTransactions, jobMasterId, user, hub) {
+    _setBulkJobDbValues(status, jobTransactions, jobMasterId, user, hub, reAttemptDate) {
         let jobArray = []
         const query = jobTransactions.map(jobTransaction => 'id = ' + jobTransaction.jobId).join(' OR ')
-        console.log('query', query)
         let realmJobObjects = realm.getRecordListOnQuery(TABLE_JOB, query)
         for (let realmJobObject of realmJobObjects) {
             let job = Object.assign({}, realmJobObject)
@@ -535,6 +550,9 @@ export default class FormLayoutEventImpl {
                     break;
                 case 3: job.status = 4;// jobStatus 4 is for fail when actionOnStatus is failed
                     break;
+            }
+            if(reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")){
+                job.jobStartTime = reAttemptDate + " 00:00:00"
             }
             jobArray.push(job)
         }

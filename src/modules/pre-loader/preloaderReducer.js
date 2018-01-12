@@ -52,7 +52,8 @@ import {
 
   ON_MOBILE_NO_CHANGE,
   ON_OTP_CHANGE,
-  PRELOADER_SUCCESS
+  PRELOADER_SUCCESS,
+  OTP_SUCCESS,
 
 } from '../../lib/constants'
 
@@ -105,7 +106,6 @@ export default function preloaderReducer(state = initialState, action) {
     case OTP_VALIDATION_START:
       return state.set('otpDisplayMessage', 'Validating OTP')
         .set('isOtpVerificationButtonDisabled', true)
-        .set('showOtpScreen',false)
     case OTP_VALIDATION_FAILURE:
       return state.set('otpDisplayMessage', action.payload)
         .set('isOtpVerificationButtonDisabled', false)
@@ -182,6 +182,8 @@ export default function preloaderReducer(state = initialState, action) {
         .set('showOtpScreen', false)
         .set('otpDisplayMessage', '')
         .set('mobileDisplayMessage', '')
+    case OTP_SUCCESS: 
+      return state.set('showOtpScreen',false)
   }
   return state
 }

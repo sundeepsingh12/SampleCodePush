@@ -1,10 +1,13 @@
 'use strict'
 
- import fareye from './src/fareye'
+if (__DEV__) {
+    require ('./ReactotronConfig')
+}
+import fareye from './src/fareye'
 
- fareye('android')
+fareye('android')
 // import React, {
-//   Component
+//   PureComponent
 // } from 'react';
 
 // var mqtt    = require('react-native-mqtt');
@@ -15,7 +18,7 @@
 //   Text,
 // } from 'react-native';
 
-// export default class Fareye extends Component {
+// export default class Fareye extends PureComponent {
 //   render() {
 
 //         return (

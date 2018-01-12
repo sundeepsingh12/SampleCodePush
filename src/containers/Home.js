@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator,PushNotificationIOS } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator,PushNotificationIOS, Animated } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
 import {
@@ -23,9 +23,9 @@ import {
   FooterTab,
   StyleProvider,
   Toast,
-  ActionSheet
+  ActionSheet,
+ 
 } from 'native-base'
-import LinearGradient from 'react-native-linear-gradient'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -82,16 +82,33 @@ function mapDispatchToProps(dispatch) {
 
 class Home extends PureComponent {
 
+  constructor(props) {
+        super(props);
+        this.state = {
+            showTransactionList: false,
+            torchStatus: false,
+            bounceValue: new Animated.Value(240),
+            searchText: ''
+        };
+        this.animatedValue = new Animated.Value(120)
+    }
+
   componentDidMount() {
       PushNotification.configure({
         onNotification: function(notification) {
         console.log( 'NOTIFICATION:', notification );
         // process the notification
-         Toast.show({
-              text: `${notification.message}`,
-              position: 'top',
-              buttonText: 'OK'
-            })
+        //  Toast.show({
+        //       text: `${notification.message}`,
+        //       position: 'top',
+        //       buttonText: 'OK'
+        //     })
+        // <Animated.View style={{ transform: [{ translateY: this.animatedValue }], flexDirection: 'row', height: 60, backgroundColor: '#000000', position: 'absolute', left: 0, bottom: 0, right: 0, justifyContent: 'space-between', alignItems: 'center', zIndex: 10, paddingHorizontal: 10 }}>
+        //                 <Text style={[styles.fontLg, styles.fontWhite]}>
+        //                     Test
+        //                 </Text>
+        //                 <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
+        //             </Animated.View>
         // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
         notification.finish(PushNotificationIOS.FetchResult.NoData);
     }
@@ -126,8 +143,7 @@ class Home extends PureComponent {
       case CUSTOMAPP_ID: {
         ((appModule.remark) && appModule.remark.length > 1) ? this.customAppSelection(appModule) : ((appModule.remark) && appModule.remark.length == 1)
           ? this.props.actions.navigateToScene(CustomApp, {
-            customUrl: appModule.remark[0].customUrl,
-            appModule
+            customUrl: appModule.remark[0].customUrl
           }) :
           this.props.actions.navigateToScene(CustomApp, {
             appModule
@@ -157,7 +173,7 @@ class Home extends PureComponent {
         destructiveButtonIndex: BUTTONS.length - 1
       },
       buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, appModule.remark[buttonIndex].customUrl) : null
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, { customUrl : appModule.remark[buttonIndex].customUrl} ) : null
       }
     )
   }
@@ -185,6 +201,12 @@ class Home extends PureComponent {
             <View />
           </View>
         </Body>
+          <Animated.View style={{ transform: [{ translateY: this.animatedValue }], flexDirection: 'row', height: 60, backgroundColor: '#000000', position: 'absolute', left: 0, bottom: 0, right: 0, justifyContent: 'space-between', alignItems: 'center', zIndex: 10, paddingHorizontal: 10 }}>
+                        <Text style={[styles.fontLg, styles.fontWhite]}>
+                            Test
+                        </Text>
+                        <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
+                   </Animated.View>
       </Header>
     
     )
@@ -233,7 +255,6 @@ class Home extends PureComponent {
       )
     }
 
-    console.log('this.props.count', this.props.count)
     if (this.props.count) {
       return (<PieChart count={this.props.count} press={this._onPieChartPress} />)
     }

@@ -1,9 +1,11 @@
 module.exports = {
+    //Token Error
+    TOKEN_MISSING: 'Token Missing',
 
     //common_CONSTANTS
     CANCEL: 'Cancel',
     OK: 'Ok',
-    
+
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
     INTERNAL_ERROR: 'Internal Error.',
@@ -39,6 +41,11 @@ module.exports = {
     DOWNLOAD_SUCCESSFUL: 'Download Successful',
     DOWNLOAD_FAILED: 'Download Failed',
     CLOSE: 'Close',
+
+    //Form Layout Container
+    UNIQUE_VALIDATION_FAILED: 'This code is already in use',
+    INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
+    ALERT: 'Alert!',
 
     //status revert 
     REVERT_STATUS_TO: 'Revert Status to',

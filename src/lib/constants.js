@@ -19,6 +19,7 @@ module.exports = keyMirror({
     LOGIN_SUCCESS: null,
     LOGIN_FAILURE: null,
     LOGIN_CAMERA_SCANNER: null,
+    FORGET_PASSWORD: null,
     LOGOUT_START: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
@@ -67,6 +68,7 @@ module.exports = keyMirror({
     PRE_LOGOUT_FAILURE: null,
     TOGGLE_CHECKBOX: null,
     REMEMBER_ME_SET_TRUE: null,
+    OTP_SUCCESS: null,
 
     //Home Actions
     HOME_LOADING: null,
@@ -81,7 +83,7 @@ module.exports = keyMirror({
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
-    
+
     //Home Container
     PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
@@ -169,7 +171,7 @@ module.exports = keyMirror({
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
-    LAST_JOB_COMPLETED_TIME:null,
+    LAST_JOB_COMPLETED_TIME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -215,6 +217,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
+    SET_FORM_TO_INVALID: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -346,6 +349,8 @@ module.exports = keyMirror({
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
     TOGGLE_ALL_JOB_TRANSACTIONS: null,
     CLEAR_BULK_STATE: null,
+    SET_BULK_SEARCH_TEXT: null,
+    SET_BULK_ERROR_MESSAGE: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -381,6 +386,7 @@ module.exports = keyMirror({
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
+    SCANNER_TEXT: null,
 
     //Job Master
     SET_JOB_MASTER_LIST: null,

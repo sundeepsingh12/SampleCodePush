@@ -2,7 +2,7 @@
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
 import Loader from '../components/Loader'
 import Menu from './Menu'
@@ -27,7 +27,6 @@ import {
     TabHeading,
     Tabs
 } from 'native-base'
-import LinearGradient from 'react-native-linear-gradient'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -45,7 +44,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class HomeFooter extends Component {
+class HomeFooter extends PureComponent {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
       }

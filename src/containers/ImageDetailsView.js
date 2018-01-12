@@ -1,6 +1,6 @@
 
 'use strict';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
     AppRegistry,
     StyleSheet,
@@ -42,7 +42,7 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators({ ...cameraActions }, dispatch)
     }
 }
-class ImageDetailsView extends Component {
+class ImageDetailsView extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
         return { header: null }

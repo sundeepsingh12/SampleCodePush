@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, FlatList } from 'react-native'
 import { Container, Button } from 'native-base';
 import * as fixedSKUActions from '../modules/fixedSKU/fixedSKUActions'
@@ -33,7 +33,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class FixedSKUListing extends Component {
+class FixedSKUListing extends PureComponent {
   constructor(props) {
     super(props)
     let navigationState = this.props.navigation.state.params

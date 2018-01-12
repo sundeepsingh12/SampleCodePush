@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -34,12 +34,12 @@ import _ from 'lodash'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 
-class SkuListing extends Component {
+class SkuListing extends PureComponent {
 
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+    this.props.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
   }
 
   renderData(item) {
@@ -49,11 +49,11 @@ class SkuListing extends Component {
   }
 
   updateSkuActualQty(value, parentId) {
-    this.props.actions.updateSkuActualQuantityAndOtherData(value, parentId, this.props.skuListItems, this.props.skuChildItems)
+    this.props.updateSkuActualQuantityAndOtherData(value, parentId, this.props.skuListItems, this.props.skuChildItems)
   }
 
   onChangeSkuCode(skuCode) {
-    this.props.actions.changeSkuCode(skuCode)
+    this.props.changeSkuCode(skuCode)
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -129,12 +129,12 @@ class SkuListing extends Component {
     //Code incomplete
     const searchTerm = this.props.skuSearchTerm;
     if (skuSearchTerm) {
-      this.props.actions.scanSkuItem(this.props.skuListItems, searchTerm)
+      this.props.scanSkuItem(this.props.skuListItems, searchTerm)
     }
   }
 
   saveSkuList = () => {
-    this.props.actions.saveSkuListItems(
+    this.props.saveSkuListItems(
       this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
       this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
       this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
@@ -228,4 +228,4 @@ const style = StyleSheet.create({
 
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SkuListing)
+export default connect(mapStateToProps, skuListingActions)(SkuListing)

@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component,AppState} from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -12,7 +12,7 @@ import {
 }
   from 'react-native'
 import Scanner from "../components/Scanner"
-import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner } from 'native-base'
+import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner ,Icon as Iconimg} from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -23,6 +23,7 @@ import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf'
 import codePush from "react-native-code-push"
 import { QrCodeScanner } from '../lib/constants'
+import Icon from '../../native-base-theme/components/Icon';
 
 
 var style = StyleSheet.create({
@@ -66,33 +67,33 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators({ ...authActions }, dispatch)
-  }
-}
+// function mapDispatchToProps(dispatch) {
+//   return {
+//     actions: bindActionCreators({ ...authActions }, dispatch)
+//   }
+// }
 
 
-class Login extends Component {
+class Login extends PureComponent {
 
   componentDidMount() {
-    this.props.actions.checkRememberMe()
+    this.props.checkRememberMe()
   }
 
   onChangeUsername = (value) => {
-    this.props.actions.onChangeUsername(value)
+    this.props.onChangeUsername(value)
   }
 
   onChangePassword = (value) => {
-    this.props.actions.onChangePassword(value)
+    this.props.onChangePassword(value)
   }
 
   loginButtonPress = () => {
     const password = this.props.auth.form.password;
     if (password.length > 50) {
-      this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
+      this.props.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
     } else {
-      this.props.actions.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
+      this.props.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
     }
 
   }
@@ -102,15 +103,15 @@ class Login extends Component {
     const password = value.split("/")[1]
     this.onChangeUsername(username)
     this.onChangePassword(password)
-    this.props.actions.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
+    this.props.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
   }
 
   _onScaningCancelled = () => {
-    this.props.actions.stopScanner()
+    this.props.stopScanner()
   }
 
   rememberMe = () => {
-    this.props.actions.toggleCheckbox()
+    this.props.toggleCheckbox()
   }
 
   // codepushSync = () => {
@@ -172,6 +173,13 @@ class Login extends Component {
                         disabled={this.props.auth.form.isEditTextDisabled}
                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                       />
+                      <Iconimg  
+                        name='ios-help-circle-outline' 
+                        onPress={()=> {
+                          this.props.forgetPasswordRequest(this.props.auth.form.username)
+                          }
+                        } 
+                        style={{right:5, position: 'absolute', color: 'black', backgroundColor: 'white'}} />
                     </Item>
 
                     <Button
@@ -214,4 +222,4 @@ class Login extends Component {
   }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login)
+export default connect(mapStateToProps, authActions)(Login)

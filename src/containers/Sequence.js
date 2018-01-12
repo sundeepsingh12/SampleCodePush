@@ -9,7 +9,7 @@ import * as globalActions from '../modules/global/globalActions'
 
 import Loader from '../components/Loader'
 
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import {StyleSheet, View, Image, TouchableHighlight,Alert,TouchableOpacity} from 'react-native'
 
 import {ROUTE_OPTIMIZATION} from '../lib/AttributeConstants'
@@ -61,7 +61,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class Sequence extends Component {
+class Sequence extends PureComponent {
 
   static navigationOptions = ({navigation}) => {
     return {header: null}
