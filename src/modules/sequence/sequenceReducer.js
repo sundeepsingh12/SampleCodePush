@@ -14,7 +14,7 @@ import {
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEQUENCE_LIST_ITEM_DRAGGED,
     SET_REFERENCE_NO,
-    SET_SEQUENCE_LIST_ITEM_INDEX
+    SET_SEQUENCE_LIST_ITEM
 } from '../../lib/constants'
 
 
@@ -62,8 +62,8 @@ export default function sequenceReducer(state = initialState, action) {
         case SET_REFERENCE_NO:
             return state.set('searchText', action.payload)
 
-        case SET_SEQUENCE_LIST_ITEM_INDEX:
-            return state.set('sequenceListItemIndex', action.payload)
+        case SET_SEQUENCE_LIST_ITEM:
+            return state.set('currentSequenceListItemSeleceted', action.payload)
     }
     return state
 }

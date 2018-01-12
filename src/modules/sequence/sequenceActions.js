@@ -14,12 +14,14 @@ import {
     Sequence,
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEQUENCE_LIST_ITEM_DRAGGED,
-    SET_SEQUENCE_LIST_ITEM_INDEX
+    SET_SEQUENCE_LIST_ITEM
 } from '../../lib/constants'
 import {
     DUPLICATE_SEQUENCE_MESSAGE,
     SAVE_SUCCESSFUL,
-    UNTRACKED_JOBS_MESSAGE
+    UNTRACKED_JOBS_MESSAGE,
+    TOKEN_MISSING,
+    INVALID_SCAN
 } from '../../lib/ContainerConstants'
 import {
     setState, navigateToScene
@@ -31,7 +33,6 @@ export function prepareListForSequenceModule(runsheetNumber) {
         try {
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             const sequenceList = await sequenceService.getSequenceList(runsheetNumber)
-            // console.logs('sequenceList', sequenceList)
             const { isDuplicateSequenceFound, sequenceArray, transactionsWithChangedSeqeunceMap } = await sequenceService.checkForAutoSequencing(sequenceList)
             dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
                 sequenceList: sequenceArray,
@@ -52,7 +53,7 @@ export function resequenceJobsFromServer(sequenceList) {
             const sequenceRequestDto = await sequenceService.prepareRequestBody(sequenceList)
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             if (!token) {
-                throw new Error('Token Missing')
+                throw new Error(TOKEN_MISSING)
             }
             const sequenceResponse = await sequenceService.fetchResequencedJobsFromServer(token.value, sequenceRequestDto)
             const responseBody = await sequenceResponse.json
@@ -125,11 +126,11 @@ export function saveSequencedJobTransactions(transactionsWithChangedSeqeunceMap)
 export function searchReferenceNumber(searchText, sequenceList) {
     return async function (dispatch) {
         try {
-            let searchIndex = sequenceService.searchReferenceNumber(searchText, sequenceList)
-            if (searchIndex == -1) {
-                throw new Error('Invalid Scan')
+            let searchObject = sequenceService.searchReferenceNumber(searchText, sequenceList)
+            if (searchObject == -1) {
+                throw new Error(INVALID_SCANs)
             }
-            dispatch(setState(SET_SEQUENCE_LIST_ITEM_INDEX, searchIndex + 1))
+            dispatch(setState(SET_SEQUENCE_LIST_ITEM, searchObject))
         } catch (error) {
             console.log(error)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
@@ -137,3 +138,19 @@ export function searchReferenceNumber(searchText, sequenceList) {
     }
 }
 
+
+
+export function jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap) {
+    return async function (dispatch) {
+        try {
+            let { cloneSequenceList, newTransactionsWithChangedSeqeunceMap } = await sequenceService.jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap)
+            dispatch(setState(SEQUENCE_LIST_ITEM_DRAGGED, {
+                sequenceList: cloneSequenceList,
+                transactionsWithChangedSeqeunceMap: newTransactionsWithChangedSeqeunceMap,
+            }))
+        } catch (error) {
+            console.log(error)
+            dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
+        }
+    }
+}

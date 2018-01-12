@@ -9,7 +9,7 @@ var InitialState = Record({
     responseMessage: '',
     runsheetNumberList: [],
     searchText: '',
-    sequenceListItemIndex: -1,
+    currentSequenceListItemSeleceted: {},
     transactionsWithChangedSeqeunceMap: {},// map having those transaction whose sequence is changed,
 })
 

@@ -36,7 +36,7 @@ import {
   SET_RESPONSE_MESSAGE,
   HardwareBackPress,
   SET_REFERENCE_NO,
-  SET_SEQUENCE_LIST_ITEM_INDEX
+  SET_SEQUENCE_LIST_ITEM
 } from '../lib/constants'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -54,7 +54,7 @@ function mapStateToProps(state) {
     responseMessage: state.sequence.responseMessage,
     transactionsWithChangedSeqeunceMap: state.sequence.transactionsWithChangedSeqeunceMap,
     searchText: state.sequence.searchText,
-    sequenceListItemIndex: state.sequence.sequenceListItemIndex
+    currentSequenceListItemSeleceted: state.sequence.currentSequenceListItemSeleceted
   }
 }
 
@@ -76,7 +76,7 @@ class Sequence extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      newSequenceNumber: -1
+      newSequenceNumber: ''
     }
   }
 
@@ -102,11 +102,13 @@ class Sequence extends PureComponent {
     return list
   }
 
-  onRowMoved(rowParam, onPress) {
+  onRowMoved(rowParam) {
     this.props.actions.rowMoved(rowParam, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap)
-    if (onPress) {
-      this.setModalView(-1)
-    }
+  }
+
+  onJumpSequencePressed(newSequenceNumber) {
+    this.props.actions.jumpSequence(_.indexOf(this.props.sequenceList, this.props.currentSequenceListItemSeleceted), newSequenceNumber, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap)
+    this.setModalView({})
   }
 
   savePressed = () => {
@@ -162,12 +164,12 @@ class Sequence extends PureComponent {
     return true
   }
 
-  setModalView(index) {
-    this.props.actions.setState(SET_SEQUENCE_LIST_ITEM_INDEX, index)
+  setModalView(item) {
+    this.props.actions.setState(SET_SEQUENCE_LIST_ITEM, item)
     this.props.actions.setState(SET_REFERENCE_NO, '')
     this.setState(() => {
       return {
-        newSequenceNumber: -1
+        newSequenceNumber: ''
       }
     })
   }
@@ -185,15 +187,15 @@ class Sequence extends PureComponent {
   modalDialogView() {
     return <Modal animationType={"fade"}
       transparent={true}
-      visible={this.props.sequenceListItemIndex > -1}
-      onRequestClose={() => this.setModalView(-1)}
+      visible={!_.isEmpty(this.props.currentSequenceListItemSeleceted)}
+      onRequestClose={() => this.setModalView({})}
       presentationStyle={"overFullScreen"}>
       <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: '100%' }]}>
         <View style={[styles.absolute, { height: '100%', left: 0, right: 0, backgroundColor: 'rgba(0,0,0,.6)' }]}>
         </View>
         <View style={[styles.bgWhite, styles.shadow, styles.borderRadius3, { width: '90%' }]}>
           <View style={[styles.padding10, styles.marginBottom10]}>
-            <Text style={[styles.fontCenter, styles.bold, styles.marginBottom10]}>{CURRENT_SEQUENCE_NUMBER}{this.props.sequenceListItemIndex}</Text>
+            <Text style={[styles.fontCenter, styles.bold, styles.marginBottom10]}>{CURRENT_SEQUENCE_NUMBER}{this.props.currentSequenceListItemSeleceted.seqSelected}</Text>
             <Text style={[styles.fontCenter, styles.marginBottom10]}>
               {NEW_SEQUENCE_NUMBER_MESSAGE}
             </Text>
@@ -208,16 +210,13 @@ class Sequence extends PureComponent {
           <View style={[styles.row, { borderTopColor: '#d3d3d3', borderTopWidth: 1 }]}>
             <View style={{ width: '50%' }}>
               <Button transparent full
-                onPress={() => this.setModalView(-1)} >
+                onPress={() => this.setModalView({})} >
                 <Text style={[styles.fontPrimary]}>{CANCEL}</Text>
               </Button>
             </View>
             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
               <Button transparent full
-                onPress={() => this.onRowMoved({
-                  from: this.props.sequenceListItemIndex - 1,
-                  to: parseInt(this.state.newSequenceNumber) - 1
-                }, true)}>
+                onPress={() => this.onJumpSequencePressed(this.state.newSequenceNumber)}>
                 <Text style={[styles.fontPrimary]}>{JUMP_SEQUENCE}</Text>
               </Button>
             </View>
@@ -248,7 +247,6 @@ class Sequence extends PureComponent {
   }
 
   render() {
-    // console.logs('render in sequence', this.props)
     let modalDialogView = this.modalDialogView()
     let buttonView = this.getButtonView()
     let headerView = this.headerView()
@@ -284,7 +282,7 @@ class Sequence extends PureComponent {
                     shadowOpacity: .5,
 
                   }}
-                  renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(_.indexOf(this.props.sequenceList, row) + 1)} />} />
+                  renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
               </View>
               <Footer style={{
                 height: 'auto'

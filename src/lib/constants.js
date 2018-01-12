@@ -319,7 +319,7 @@ module.exports = keyMirror({
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: null,
     SEQUENCE_LIST_ITEM_DRAGGED: null,
     SET_REFERENCE_NO: null,
-    SET_SEQUENCE_LIST_ITEM_INDEX: null,
+    SET_SEQUENCE_LIST_ITEM: null,
 
     //New Job
     NEW_JOB_MASTER: null,

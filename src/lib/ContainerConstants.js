@@ -66,5 +66,19 @@ module.exports = {
     CURRENT_SEQUENCE_NUMBER: 'Current sequence number : ',
     NEW_SEQUENCE_NUMBER_MESSAGE: 'Enter new sequence number to jump to',
     JUMP_SEQUENCE: 'Jump Sequence',
-    UNTRACKED_JOBS_MESSAGE: ' jobs were not resequenced'
+    UNTRACKED_JOBS_MESSAGE: ' jobs were not resequenced',
+
+    //Exception used in sequence
+    SAME_SEQUENCE_ERROR: `New seqence can't be same as previous sequence`,
+    SEQUENCELIST_MISSING: `sequenceList not present`,
+    BLANK_NEW_SEQUENCE: `Sequence can't be left blank`,
+    CURRENT_SEQUENCE_ROW_MISSING: `currentSequenceListItemIndex missing`,
+    SEQUENCE_NOT_AN_INT: `Sequence can't be `,
+    RUNSHEET_MISSING: 'No runsheet found',
+    RUNSHEET_NUMBER_MISSING: 'Runsheet number not present',
+    TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
+    SEARCH_TEXT_MISSING: 'searchText not present',
+    SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
+    TOKEN_MISSING: 'Token missing',
+    INVALID_SCAN: 'Invalid Scan'
 }

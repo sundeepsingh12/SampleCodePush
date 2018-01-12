@@ -23,7 +23,19 @@ import {
     LANDMARK,
     POST
 } from '../../lib/AttributeConstants'
-
+import {
+    SAME_SEQUENCE_ERROR,
+    SEQUENCELIST_MISSING,
+    BLANK_NEW_SEQUENCE,
+    CURRENT_SEQUENCE_ROW_MISSING,
+    SEQUENCE_NOT_AN_INT,
+    RUNSHEET_MISSING,
+    RUNSHEET_NUMBER_MISSING,
+    TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
+    SEARCH_TEXT_MISSING,
+    SEQUENCE_REQUEST_DTO,
+    TOKEN_MISSING
+} from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import * as realm from '../../repositories/realmdb'
 import CONFIG from '../../lib/config'
@@ -32,7 +44,7 @@ class Sequence {
 
     async getSequenceList(runsheetNumber) {
         if (!runsheetNumber) {
-            throw new Error('Runsheet number not present !')
+            throw new Error(RUNSHEET_NUMBER_MISSING)
         }
         const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
@@ -117,7 +129,7 @@ class Sequence {
             runsheetNumberList.push(runsheetClone.runsheetNumber)
         })
         if (_.isEmpty(runsheetNumberList)) {
-            throw new Error('No runsheet found !')
+            throw new Error(RUNSHEET_MISSING)
         }
         return runsheetNumberList
     }
@@ -160,28 +172,25 @@ class Sequence {
 
     async updateJobTrasaction(transactionsWithChangedSeqeunceMap) {
         if (!transactionsWithChangedSeqeunceMap) {
-            throw new Error('transactionsWithChangedSeqeunceMap not present')
+            throw new Error(TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP)
         }
         let abc = realm.getAll(TABLE_JOB_TRANSACTION)
         await realm.saveList(TABLE_JOB_TRANSACTION, _.values(transactionsWithChangedSeqeunceMap))
         abc = realm.getAll(TABLE_JOB_TRANSACTION)
     }
 
-    onRowDragged(rowParam, sequenceList, transactionsWithChangedSeqeunceMap) {
+    onRowDragged(rowParam, sequenceList, transactionsWithChangedSeqeunceMap, isCalledFromJumpSequence) {
         if (!sequenceList) {
-            throw new Error('sequenceList not present')
+            throw new Error(SEQUENCELIST_MISSING)
         }
-        if (rowParam.to == rowParam.from) {
-            throw new Error(`New seqence can't be same as previous sequence`)
+        if (!isCalledFromJumpSequence && rowParam.to == rowParam.from) {
+            throw new Error(SAME_SEQUENCE_ERROR)
         }
-        if (!_.inRange(rowParam.to, 0, _.size(sequenceList)) || !_.inRange(rowParam.from, 0, _.size(sequenceList))) {
-            throw new Error('Enter valid sequence between 1 to ' + sequenceList.length)
-        }
-
         let cloneSequenceList = _.cloneDeep(sequenceList)
-        cloneSequenceList[rowParam.from].seqAssigned = cloneSequenceList[rowParam.from].seqSelected = cloneSequenceList[rowParam.to].seqSelected
-        transactionsWithChangedSeqeunceMap[cloneSequenceList[rowParam.from].id] = cloneSequenceList[rowParam.from]
-        if (rowParam.from < rowParam.to) {
+        if (!isCalledFromJumpSequence) {
+            cloneSequenceList[rowParam.from].seqAssigned = cloneSequenceList[rowParam.from].seqSelected = cloneSequenceList[rowParam.to].seqSelected
+            transactionsWithChangedSeqeunceMap[cloneSequenceList[rowParam.from].id] = cloneSequenceList[rowParam.from]
+        } if (rowParam.from < rowParam.to) {
             for (let rowIndex = rowParam.from + 1; rowIndex <= rowParam.to; rowIndex++) {
                 cloneSequenceList[rowIndex].seqSelected--
                 cloneSequenceList[rowIndex].seqAssigned--
@@ -203,15 +212,15 @@ class Sequence {
 
     searchReferenceNumber(searchText, sequenceList) {
         if (!sequenceList) {
-            throw new Error('sequenceList not present')
+            throw new Error(SEQUENCELIST_MISSING)
         }
         if (!searchText) {
-            throw new Error('searchText not present')
+            throw new Error(SEARCH_TEXT_MISSING)
         }
         let counter = 0
         for (let transaction of sequenceList) {
             if (_.isEqual(searchText, transaction.referenceNumber)) {
-                return counter
+                return transaction
             }
             counter++
         }
@@ -220,13 +229,43 @@ class Sequence {
 
     fetchResequencedJobsFromServer(token, sequenceRequestDto) {
         if (!token) {
-            throw new Error('Token missing')
+            throw new Error(TOKEN_MISSING)
         }
         if (!sequenceRequestDto) {
-            throw new Error('sequenceRequestDto missing')
+            throw new Error(SEQUENCE_REQUEST_DTO)
         }
         const sequenceResponse = RestAPIFactory(token).serviceCall(JSON.stringify(sequenceRequestDto), CONFIG.API.SEQUENCE_USING_ROUTING_API, POST)
         return sequenceResponse
+    }
+
+    jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap) {
+        if (_.isNull(currentSequenceListItemIndex) || _.isUndefined(currentSequenceListItemIndex)) {
+            throw new Error(CURRENT_SEQUENCE_ROW_MISSING)
+        } if (_.size(_.trim(newSequence)) == 0) {
+            throw new Error(BLANK_NEW_SEQUENCE)
+        } if (!parseInt(newSequence) || parseInt(newSequence) < 1) {
+            throw new Error(SEQUENCE_NOT_AN_INT + newSequence)
+        } if (!sequenceList) {
+            throw new Error(SEQUENCELIST_MISSING)
+        }
+        newSequence = parseInt(newSequence)
+        if (_.isEqual(sequenceList[currentSequenceListItemIndex].seqSelected, newSequence)) {
+            throw new Error(SAME_SEQUENCE_ERROR)
+        }
+        let index
+        if (sequenceList[currentSequenceListItemIndex].seqSelected < newSequence) {
+            for (index = currentSequenceListItemIndex + 1; index < _.size(sequenceList) && sequenceList[index].seqSelected <= newSequence; index++);
+            index--
+        } else {
+            for (index = currentSequenceListItemIndex - 1; index >= 0 && sequenceList[index].seqSelected >= newSequence; index--);
+            index++
+        }
+        sequenceList[currentSequenceListItemIndex].seqSelected = sequenceList[currentSequenceListItemIndex].seqAssigned = newSequence
+        transactionsWithChangedSeqeunceMap[sequenceList[currentSequenceListItemIndex].id] = sequenceList[currentSequenceListItemIndex]
+        return this.onRowDragged({
+            from: currentSequenceListItemIndex,
+            to: index
+        }, sequenceList, transactionsWithChangedSeqeunceMap, true)
     }
 }
 
