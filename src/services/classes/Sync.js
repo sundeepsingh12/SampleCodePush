@@ -52,8 +52,9 @@ import {
   JOB_ASSIGNMENT_ID,
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
-import NotificationsIOS, { NotificationsAndroid } from 'react-native-notifications'
-import { moduleCustomizationService } from './ModuleCustomization';
+// import NotificationsIOS, { NotificationsAndroid } from 'react-native-notifications'
+import { moduleCustomizationService } from './ModuleCustomization'
+import PushNotification from 'react-native-push-notification'
 
 class Sync {
 
@@ -575,18 +576,13 @@ class Sync {
 
   showNotification(jobMasterTitleList) {
     const alertBody = jobMasterTitleList.join()
-    if (Platform.OS === 'ios') {
-      NotificationsIOS.localNotification({
-        alertBody: `You have new updates for ${alertBody} jobs`,
-        alertTitle: FAREYE_UPDATES,
-      })
-    }
-    else {
-      NotificationsAndroid.localNotification({
-        title: FAREYE_UPDATES,
-        body: `You have new updates for ${alertBody} jobs`,
-      })
-    }
+
+    PushNotification.localNotification({
+    /* iOS and Android properties */
+    title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+    message: `You have new updates for ${alertBody} jobs`, // (required)
+    soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+});
 
   }
 

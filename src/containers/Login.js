@@ -95,6 +95,7 @@ class Login extends PureComponent {
     } else {
       this.props.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
     }
+
   }
 
   _onBarCodeRead = (value) => {
@@ -215,6 +216,7 @@ class Login extends PureComponent {
                 </View>
               </Content>
             </Container>
+            
           </StyleProvider>
     )
   }
