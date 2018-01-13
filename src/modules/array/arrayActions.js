@@ -6,9 +6,7 @@ import {
     SET_NEW_ARRAY_ROW,
     SET_ARRAY_ELEMENTS,
     SET_ERROR_MSG,
-    ON_BLUR,
     CLEAR_ARRAY_STATE,
-    UPDATE_FIELD_DATA_VALIDATION,
     NEXT_FOCUS
 
 } from '../../lib/constants'
@@ -38,6 +36,7 @@ export function addRowInArray(lastrowId, childElementsTemplate, arrayElements) {
     return async function (dispatch) {
         try {
             const newArrayRow = arrayService.addArrayRow(lastrowId, childElementsTemplate, arrayElements)
+            if (!newArrayRow) throw new Error('Row could not be added')
             dispatch(setState(SET_NEW_ARRAY_ROW, newArrayRow))
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))
@@ -49,6 +48,7 @@ export function deleteArrayRow(arrayElements, rowId, lastrowId) {
         try {
             let newArrayElements = arrayService.deleteArrayRow(arrayElements, rowId, lastrowId)
             let isSaveDisabled = arrayService.enableSaveIfRequired(newArrayElements)
+            if (!newArrayElements) throw new Error('Row could not be deleted')
             dispatch(setState(SET_ARRAY_ELEMENTS, {
                 newArrayElements,
                 isSaveDisabled
@@ -62,6 +62,7 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
     return async function (dispatch) {
         try {
             let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, isSaveDisabled, rowId, value, fieldDataList, event)
+            if (!newArrayElements) throw new Error('Row could not be deleted')
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))
@@ -74,8 +75,8 @@ export function saveArray(arrayElements, arrayParentItem, jobTransaction, latest
         try {
             if (!_.isEmpty(arrayElements)) {
                 let fieldDataListWithLatestPositionId = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction.id, latestPositionId)
+                if (!fieldDataListWithLatestPositionId) throw new Error('Array Could not be saved')
                 dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
-                dispatch(setState(SET_ERROR_MSG, ''))
                 dispatch(setState(CLEAR_ARRAY_STATE))
             }
         } catch (error) {
@@ -99,6 +100,5 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
             formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
         }
         dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, currentElement.displayValue, newArray, rowId, null, NEXT_FOCUS))
-        //   dispatch(setState('SET_ARRAY', newArray))
     }
 }

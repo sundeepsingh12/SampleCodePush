@@ -141,8 +141,8 @@ repositories {
 }
 
 dependencies {
+    compile project(':react-native-push-notification')
     compile project(':realm')
-    compile project(':react-native-notifications')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-signature-capture')
     compile project(':react-native-svg')
