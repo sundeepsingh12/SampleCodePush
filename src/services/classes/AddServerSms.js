@@ -255,8 +255,8 @@ class AddServerSms {
             let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAttributesList, fieldAttributesList)
 
             if (jobData != null) {
-                jobDataList = fieldData.map((dataList) => dataList.data)
-                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobDataList, jobTransaction, jobAttributesList)
+                jobDataList = jobData.map((dataList) => dataList.data)
+                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobDataList, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
             }
             if (fieldData != null) {
                 fieldDataList = fieldData.map((dataList) => dataList.data)
@@ -285,7 +285,7 @@ class AddServerSms {
             let jobTransaction = { ...transactionList[index] }
             if (jobTransaction) {
                 let serverSmsLog = await this.addServerSms(transactionIdDtosMap[jobTransaction.id].pendingStatusId, transactionIdDtosMap[jobTransaction.id].jobMasterId, null, jobTransaction)
-                if (serverSmsLog.value && serverSmsLog.value != []) {
+                if (serverSmsLog.value && serverSmsLog.value.length > 0) {
                     let pendingTransaction = {
                         id: jobTransaction.id, referenceNumber: jobTransaction.referenceNumber
                     }

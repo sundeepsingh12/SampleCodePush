@@ -175,11 +175,7 @@ class PostAssignmentScanner extends PureComponent {
     }
 
     checkJobTransaction(referenceNumber, search) {
-        console.log(this.props.jobTransactionMap)
         if (!search && !this.props.isManualSelectionAllowed) {
-            return
-        }
-        if (this.props.jobTransactionMap[referenceNumber] && this.props.jobTransactionMap[referenceNumber].isScanned) {
             return
         }
         this.props.actions.checkScannedJob(referenceNumber, this.props.jobTransactionMap, this.props.navigation.state.params.jobMaster, this.props.isForceAssignmentAllowed, this.props.pendingCount, search)
@@ -306,12 +302,6 @@ class PostAssignmentScanner extends PureComponent {
                                 style={[styles.flex1, { position: 'absolute', backgroundColor: 'rgba(0,0,0,.8)', top: 0, bottom: 0, left: 0, right: 0 }]}>
                             </GestureRecognizer> : null
                         }
-                        <Animated.View style={{ transform: [{ translateY: this.animatedValue }], flexDirection: 'row', height: 60, backgroundColor: '#000000', position: 'absolute', left: 0, bottom: 0, right: 0, justifyContent: 'space-between', alignItems: 'center', zIndex: 10, paddingHorizontal: 10 }}>
-                            <Text style={[styles.fontLg, styles.fontWhite]}>
-                                {this.props.scanError}
-                            </Text>
-                            <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
-                        </Animated.View>
                     </View>
 
 
@@ -361,6 +351,12 @@ class PostAssignmentScanner extends PureComponent {
                                 </Content>
                             </View>
                         </View>
+                    </Animated.View>
+                    <Animated.View style={{ transform: [{ translateY: this.animatedValue }], flexDirection: 'row', height: 60, backgroundColor: '#000000', position: 'absolute', left: 0, bottom: 0, right: 0, justifyContent: 'space-between', alignItems: 'center', zIndex: 10, paddingHorizontal: 10 }}>
+                        <Text style={[styles.fontLg, styles.fontWhite]}>
+                            {this.props.scanError}
+                        </Text>
+                        <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
                     </Animated.View>
                 </Container>
             </StyleProvider>

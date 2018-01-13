@@ -21,7 +21,9 @@ import {
     SET_FORM_LAYOUT_STATE,
     SET_UPDATE_DRAFT,
     CLEAR_BULK_STATE,
-    SET_FORM_TO_INVALID
+    SET_FORM_TO_INVALID,
+    USER,
+    AutoLogoutScreen
 } from '../../lib/constants'
 
 import {
@@ -44,7 +46,8 @@ import { performSyncService } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { UNIQUE_VALIDATION_FAILED } from '../../lib/ContainerConstants'
-import { getNextFocusableAndEditableElement } from '../array/arrayActions';
+import { getNextFocusableAndEditableElement } from '../array/arrayActions'
+import moment from 'moment'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
@@ -146,6 +149,10 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
 export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, jobTransactionIdList, pieChart) {
     return async function (dispatch) {
         try {
+            const userData = await keyValueDBService.getValueFromStore(USER)      
+            if(userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
+              dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
+            }else{
             dispatch(setState(IS_LOADING, true))
             let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement, jobTransaction)
             if (isFormValid) {
@@ -172,6 +179,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     isLoading: false,
                     isFormValid: false
                 }))
+            }
             }
         } catch (error) {
             console.log(error)

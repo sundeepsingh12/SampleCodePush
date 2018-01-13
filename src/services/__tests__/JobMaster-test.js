@@ -75,8 +75,8 @@ describe('test cases for prepareCustomizationListMap', () => {
 
 describe('test cases for prepareTabStatusIdMap', () => {
 
-  it('should return empty tabIdStatusIdsMap for undefined statusList', () => {
-    expect(jobMasterService.prepareTabStatusIdMap(undefined)).toEqual({})
+  it('should return null for undefined statusList', () => {
+    expect(jobMasterService.prepareTabStatusIdMap(undefined)).toEqual(null)
   })
 
   it('should return empty tabIdStatusIdsMap for empty statusList', () => {
@@ -390,7 +390,7 @@ describe('job master services', () => {
     jobMasterService.validateAndSortTabList = jest.fn()
     return jobMasterService.saveJobMaster(json)
       .then(() => {
-        expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(20)
+        expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(24)
         expect(jobMasterService.prepareCustomizationListMap).toHaveBeenCalledTimes(1)
         expect(jobMasterService.validateAndSortTabList).toHaveBeenCalledTimes(1)
       })
@@ -462,7 +462,72 @@ describe('job master services', () => {
         enableResequenceRestriction: true
       }]
 
-    expect(jobMasterService.getJobMaterFromJobMasterList(jobMasterId, jobMasterList)).toEqual(result)
+    expect(jobMasterService.getJobMaterFromJobMasterLists(jobMasterId, jobMasterList)).toEqual(result)
   })
 
+})
+
+describe('test cases for getJobMasterListFromPostAndPreAssignmentList', () => {
+  const postAssignmentList = [1, 2, 3]
+  const preAssignmentList = [4, 5, 6]
+  const jobMasterList = [
+    {
+      id: 1,
+      code: 'abc'
+    },
+    {
+      id: 2,
+      code: 'xyz'
+    },
+    {
+      id: 3,
+      code: 'qwe'
+    },
+    {
+      id: 4,
+      code: 'poi'
+    },
+    {
+      id: 5,
+      code: 'rty'
+    },
+    {
+      id: 6,
+      code: 'jkl'
+    },
+    {
+      id: 7,
+      code: 'asd'
+    }
+  ]
+
+  let orderJobMasterList = [
+    {
+      id: 1,
+      code: 'abc',
+      postAssignment: true
+    },
+    {
+      id: 2,
+      code: 'xyz',
+      postAssignment: true
+    },
+    {
+      id: 3,
+      code: 'qwe',
+      postAssignment: true
+    }
+  ]
+
+  it('should return empty list for undefined job master list', () => {
+    expect(jobMasterService.getJobMasterListFromPostAndPreAssignmentList([], [], undefined)).toEqual([])
+  })
+
+  it('should return empty list for empty job master list', () => {
+    expect(jobMasterService.getJobMasterListFromPostAndPreAssignmentList([], [], [])).toEqual([])
+  })
+
+  it('should return job master list', () => {
+    expect(jobMasterService.getJobMasterListFromPostAndPreAssignmentList(postAssignmentList, preAssignmentList, jobMasterList)).toEqual(orderJobMasterList)
+  })
 })

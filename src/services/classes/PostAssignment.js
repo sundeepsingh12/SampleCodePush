@@ -4,6 +4,7 @@ import {
     SHIPMENT_ALREADY_SCANNED,
     NOT_FOUND,
     FORCE_ASSIGNED,
+    TOKEN_MISSING,
 } from '../../lib/ContainerConstants'
 import {
     PENDING,
@@ -14,7 +15,7 @@ import {
 } from '../../lib/constants'
 import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from './KeyValueDBService'
-import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface'
+import { formLayoutEventsInterface } from '../classes/formLayout/FormLayoutEventInterface'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -22,6 +23,25 @@ import moment from 'moment'
 
 class PostAssignment {
 
+    /**
+     * This function checks for reference number and takes action accordingly
+     * @param {*} referenceNumber 
+     * @param {*} jobTransactionMap 
+     * @param {*} pendingStatus 
+     * @param {*} jobMaster 
+     * @param {*} isForceAssignmentAllowed 
+     * @param {*} pendingCount 
+     * @returns
+     * {
+     *      jobTransactionMap : {
+     *                              jobTransaction
+     *                              isScanned
+     *                              status
+     *                          }
+     *      pendingCount : Integer,
+     *      scanError : String
+     * }
+     */
     async checkScanResult(referenceNumber, jobTransactionMap, pendingStatus, jobMaster, isForceAssignmentAllowed, pendingCount) {
         if (jobTransactionMap[referenceNumber] && jobTransactionMap[referenceNumber].isScanned) {
             throw new Error(SHIPMENT_ALREADY_SCANNED)
@@ -48,6 +68,12 @@ class PostAssignment {
         }
     }
 
+    /**
+     * This function updates status from unseen to pending of existing job transaction,runsheet and job summary
+     * @param {*} transaction 
+     * @param {*} pendingStatus 
+     * @param {*} jobMaster 
+     */
     async updateTransactionStatus(transaction, pendingStatus, jobMaster) {
         let transactionDTOList = [], transactionList = []
         let jobTransaction = { ...transaction }
@@ -65,7 +91,6 @@ class PostAssignment {
         jobTransaction.employeeCode = user.value.employeeCode
         jobTransaction.hubCode = hub.value.code
         jobTransaction.androidPushTime = moment().format('YYYY-MM-DD HH:mm:ss')
-        // transactionIdList.push(jobTransaction.id)
         transactionList.push(jobTransaction)
         transactionDTOList.push(transactionDTO)
         let jobTransactionTableDTO = {
@@ -73,10 +98,17 @@ class PostAssignment {
             value: transactionList
         }
         realm.performBatchSave(jobTransactionTableDTO, runSheet)
-        // realm.updateTableRecordOnProperty(TABLE_JOB_TRANSACTION, 'jobStatusId', transactionIdList, pendingStatusId)
         await formLayoutEventsInterface.addTransactionsToSyncList(transactionDTOList)
     }
 
+    /**
+     * This function checks for reference number on server
+     * @param {*} referenceNumber 
+     * @param {*} jobMaster 
+     * @param {*} jobTransactionMap 
+     * @returns
+     * scanError : string
+     */
     async checkPostJobOnServer(referenceNumber, jobMaster, jobTransactionMap) {
         let referenceNumberList = [referenceNumber]
         let scanError = null
@@ -86,7 +118,7 @@ class PostAssignment {
         }])
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token || !token.value) {
-            throw new Error('Token Missing')
+            throw new Error(TOKEN_MISSING)
         }
         let postJobResponse = await RestAPIFactory(token.value).serviceCall(postData, CONFIG.API.POST_ASSIGNMENT_FORCE_ASSIGN_API, 'POST')
         let notFoundList = postJobResponse.json[0].notFoundList
@@ -111,6 +143,10 @@ class PostAssignment {
         return scanError
     }
 
+    /**
+     * This function save force assigned jobs in store
+     * @param {*} successList 
+     */
     async savePostJobOrder(successList) {
         let postOrders = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
         let postOrderList = postOrders ? postOrders.value ? postOrders.value : [] : []

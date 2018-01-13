@@ -45,6 +45,13 @@ class JobStatus {
     return jobStatusId[0]
   }
 
+  /**
+   * This function filters job status on basis of jobMasterId and jobStatusCode
+   * @param {*} jobMasterId 
+   * @param {*} jobStatusCode 
+   * @returns
+   * jobStatus
+   */
   async getStatusForJobMasterIdAndCode(jobMasterId, jobStatusCode) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
     if (!jobStatusArray || !jobStatusArray.value) {

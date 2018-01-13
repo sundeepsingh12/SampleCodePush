@@ -40,7 +40,7 @@ import { onResyncPress } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
-import {trackingService} from '../../services/classes/Tracking'
+import { trackingService } from '../../services/classes/Tracking'
 
 
 export function setState(type, payload) {
@@ -94,7 +94,7 @@ export function deleteSessionToken() {
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
-       dispatch(setState(RESET_STATE))
+      dispatch(setState(RESET_STATE))
     } catch (error) {
       throw error
     }

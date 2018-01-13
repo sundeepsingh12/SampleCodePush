@@ -3,7 +3,7 @@
 import { Record } from 'immutable'
 
 var InitialState = Record({
-   isLoaderRunning:false,
+    isLoaderRunning:false,
 })
 
 export default InitialState

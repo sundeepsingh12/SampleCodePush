@@ -22,7 +22,7 @@ import {
     PENDING_SYNC_TRANSACTION_IDS
 } from '../../../lib/constants'
 
-import CONFIG from '../.././../lib/config'
+import CONFIG from '../../../lib/config'
 
 import * as realm from '../../../repositories/realmdb'
 import { keyValueDBService } from '../KeyValueDBService.js'

@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator,PushNotificationIOS, Animated } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
 import {
@@ -23,7 +23,8 @@ import {
   FooterTab,
   StyleProvider,
   Toast,
-  ActionSheet
+  ActionSheet,
+ 
 } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -42,7 +43,8 @@ import {
   CUSTOMAPP_ID,
   CHOOSE_WEB_URL,
   NEWJOB_ID,
-  JOB_ASSIGNMENT_ID
+  JOB_ASSIGNMENT_ID,
+  FAREYE_UPDATES
 } from '../lib/AttributeConstants'
 
 import {
@@ -59,6 +61,7 @@ import {
   JobMasterListScreen,
 } from '../lib/constants'
 import _ from 'lodash'
+import PushNotification from 'react-native-push-notification'
 
 function mapStateToProps(state) {
   return {
@@ -79,7 +82,31 @@ function mapDispatchToProps(dispatch) {
 
 class Home extends PureComponent {
 
+  constructor(props) {
+        super(props);
+        this.state = {
+            showTransactionList: false,
+            torchStatus: false,
+            bounceValue: new Animated.Value(240),
+            searchText: ''
+        };
+        this.animatedValue = new Animated.Value(120)
+    }
+
   componentDidMount() {
+      PushNotification.configure({
+        onNotification: function(notification) {
+        console.log( 'NOTIFICATION:', notification );
+        // process the notification
+         Toast.show({
+              text: `${notification.message}`,
+              position: 'top',
+              buttonText: 'OK'
+            })
+        // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
+        notification.finish(PushNotificationIOS.FetchResult.NoData);
+    }
+        })
     this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
   }
 
@@ -110,8 +137,7 @@ class Home extends PureComponent {
       case CUSTOMAPP_ID: {
         ((appModule.remark) && appModule.remark.length > 1) ? this.customAppSelection(appModule) : ((appModule.remark) && appModule.remark.length == 1)
           ? this.props.actions.navigateToScene(CustomApp, {
-            customUrl: appModule.remark[0].customUrl,
-            appModule
+            customUrl: appModule.remark[0].customUrl
           }) :
           this.props.actions.navigateToScene(CustomApp, {
             appModule
@@ -141,7 +167,7 @@ class Home extends PureComponent {
         destructiveButtonIndex: BUTTONS.length - 1
       },
       buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, appModule.remark[buttonIndex].customUrl) : null
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, { customUrl : appModule.remark[buttonIndex].customUrl} ) : null
       }
     )
   }

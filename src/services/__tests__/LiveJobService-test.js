@@ -74,9 +74,101 @@ describe('test cases for requestServerForApproval', () => {
                 jobEndTime: '01:00:00'
             }
         }
+        let serviceAlertResponse = {
+            status: 200,
+            _bodyText: 'success'
+        }
+        let job = {
+            id: 1,
+            jobStartTime: 'x'
+        }
         RestAPIFactory().serviceCall = jest.fn()
-        RestAPIFactory().serviceCall.mockReturnValue(null);
-        return liveJobService.requestServerForApproval(1, 'test', liveJobMap).then((data) => {
+        RestAPIFactory().serviceCall.mockReturnValue(serviceAlertResponse);
+        return liveJobService.requestServerForApproval(1, 'test', job, liveJobMap).then((data) => {
+            expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+        })
+    })
+    it('should accept live job and fail', () => {
+        let liveJobMap = {
+            0: {
+                id: 0,
+                jobEndTime: '01:00:00'
+            }
+        }
+        let serviceAlertResponse = {
+            status: 200,
+            _bodyText: 'failed'
+        }
+        let job = {
+            id: 1,
+            jobStartTime: 'x'
+        }
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(serviceAlertResponse);
+        return liveJobService.requestServerForApproval(1, 'test', job, liveJobMap).then((data) => {
+            expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+        })
+    })
+    it('should reject live job and fail', () => {
+        let liveJobMap = {
+            0: {
+                id: 0,
+                jobEndTime: '01:00:00'
+            }
+        }
+        let serviceAlertResponse = {
+            status: 200,
+            _bodyText: 'failed'
+        }
+        let job = {
+            id: 1,
+            jobStartTime: 'x'
+        }
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(serviceAlertResponse);
+        return liveJobService.requestServerForApproval(2, 'test', job, liveJobMap).then((data) => {
+            expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+        })
+    })
+    it('should reject live job', () => {
+        let liveJobMap = {
+            0: {
+                id: 0,
+                jobEndTime: '01:00:00'
+            }
+        }
+        let serviceAlertResponse = {
+            status: 200,
+            _bodyText: 'success'
+        }
+        let job = {
+            id: 1,
+            jobStartTime: 'x'
+        }
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(serviceAlertResponse);
+        return liveJobService.requestServerForApproval(2, 'test', job, liveJobMap).then((data) => {
+            expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+        })
+    })
+    it('api response should be status 400', () => {
+        let liveJobMap = {
+            0: {
+                id: 0,
+                jobEndTime: '01:00:00'
+            }
+        }
+        let serviceAlertResponse = {
+            status: 400,
+            _bodyText: 'failed'
+        }
+        let job = {
+            id: 1,
+            jobStartTime: 'x'
+        }
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(serviceAlertResponse);
+        return liveJobService.requestServerForApproval(2, 'test', job, liveJobMap).then((data) => {
             expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
         })
     })
@@ -109,20 +201,95 @@ describe('test cases for getSelectedJobIds', () => {
     })
 })
 
-describe('test cases for deleteJob', () => {
+// describe('test cases for deleteJob', () => {
 
-    it('should delete job from db', () => {
-        let jobIdList = [0]
+//     it('should delete job from db', () => {
+//         let jobIdList = [0]
+//         let liveJobMap = {
+//             0: {
+//                 id: 0,
+//                 jobEndTime: '01:00:00'
+//             }
+//         }
+//         realm.deleteRecordsInBatch = jest.fn()
+//         return liveJobService.deleteJob(jobIdList, liveJobMap).then((data) => {
+//             expect(realm.deleteRecordsInBatch).toHaveBeenCalledTimes(1);
+//         })
+//     })
+// })
+
+describe('test cases for requestServerForApprovalForMultiple', () => {
+
+    it('should accept live job', () => {
         let liveJobMap = {
             0: {
                 id: 0,
                 jobEndTime: '01:00:00'
             }
         }
-        realm.deleteRecordsInBatch = jest.fn()
-        return liveJobService.deleteJob(jobIdList, liveJobMap).then((data) => {
-            expect(realm.deleteRecordsInBatch).toHaveBeenCalledTimes(1)
-            expect(data).toEqual([])
+        let serviceAlertResponse = {
+            status: 200,
+            _bodyText: 'success',
+            json: {
+                successCount: 1
+            }
+        }
+        let job = {
+            id: 1,
+            jobStartTime: 'x'
+        }
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(serviceAlertResponse);
+        return liveJobService.requestServerForApprovalForMultiple(1, [0], liveJobMap, 'test').then((data) => {
+            expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+        })
+    })
+    it('should reject live job', () => {
+        let liveJobMap = {
+            0: {
+                id: 0,
+                jobEndTime: '01:00:00'
+            }
+        }
+        let serviceAlertResponse = {
+            status: 200,
+            _bodyText: 'success',
+            json: {
+                failCount: 1
+            }
+        }
+        let job = {
+            id: 1,
+            jobStartTime: 'x'
+        }
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(serviceAlertResponse);
+        return liveJobService.requestServerForApprovalForMultiple(2, [0], liveJobMap, 'test').then((data) => {
+            expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
+        })
+    })
+    it('should reject live job and get status other than 200', () => {
+        let liveJobMap = {
+            0: {
+                id: 0,
+                jobEndTime: '01:00:00'
+            }
+        }
+        let serviceAlertResponse = {
+            status: 400,
+            _bodyText: 'success',
+            json: {
+                failCount: 1
+            }
+        }
+        let job = {
+            id: 1,
+            jobStartTime: 'x'
+        }
+        RestAPIFactory().serviceCall = jest.fn()
+        RestAPIFactory().serviceCall.mockReturnValue(serviceAlertResponse);
+        return liveJobService.requestServerForApprovalForMultiple(2, [0], liveJobMap, 'test').then((data) => {
+            expect(RestAPIFactory().serviceCall).toHaveBeenCalledTimes(1);
         })
     })
 })

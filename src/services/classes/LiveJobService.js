@@ -60,7 +60,7 @@ class LiveJobService {
             }
             return { newLiveJobList, toastMessage }
         } catch (e) {
-            return e.message
+            return { newLiveJobList: [], toastMessage: e.message }
         }
     }
     getSelectedJobIds(jobs) {
@@ -96,7 +96,6 @@ class LiveJobService {
             let postJson = JSON.stringify(multipleJobsDTO)
             let serviceAlertResponse = await RestAPIFactory(token.value).serviceCall(postJson, CONFIG.API.SERVICE_ALERT_JOB_MULTIPLE, 'POST')
             if (serviceAlertResponse && serviceAlertResponse.status == 200) {
-                console.log(serviceAlertResponse)
                 let successCount = serviceAlertResponse.json.successCount
                 let failCount = serviceAlertResponse.json.failCount
                 if (selectedItems.length == successCount && status == '1') {
@@ -113,7 +112,7 @@ class LiveJobService {
             }
             return { newLiveJobList, toastMessage }
         } catch (e) {
-            return e.message
+            return { newLiveJobList: [], toastMessage: e.message }
         }
     }
 }

@@ -15,7 +15,6 @@ import renderIf from '../lib/renderIf'
 import OtpScreen from './OtpScreen'
 import MobileNoScreen from './MobileNoScreen'
 import InitialSetup from './InitialSetup'
-import moment from 'moment'
 
 function mapStateToProps(state) {
     return {

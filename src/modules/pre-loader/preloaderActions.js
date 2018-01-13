@@ -271,6 +271,15 @@ export function downloadJobMaster() {
     }
   }
 }
+
+/**This method logs out the user and deletes session token from store in case of AutoLogout
+ *  It also handles when user don't have network connection
+ * 
+ * @function invalidateUserSessionForAutoLogout()
+ * 
+ * @return Navigate to LoginScreen
+ */
+
 export function invalidateUserSessionForAutoLogout() {
   return async function (dispatch) {
     try {
@@ -283,7 +292,6 @@ export function invalidateUserSessionForAutoLogout() {
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(setState(TOGGLE_LOGOUT,false))
       dispatch(deleteSessionToken())
-       
     } catch (error) {  
       dispatch(startLoginScreenWithoutLogout())
       dispatch(setState(TOGGLE_LOGOUT, false))
@@ -317,12 +325,18 @@ export function invalidateUserSession() {
   }
 }
 
+/**This method Schedule BackGround Timer for autoLogout app at midNight('00:00:00') 
+ * It is run in Background mode also. This method is call only one time .
+ * 
+ * @function autoLogout(userData)
+ * 
+ */
 
 export function autoLogout(userData) {
   return async (dispatch) => {
     try {      
-     let timeLimit = (userData) ? moment('23:59:59',"HH:mm:ss").diff(moment(new Date(),"HH:mm:ss"), 'seconds')+5 : 0
-     if(userData && userData.value.company.autoLogoutFromDevice && timeLimit){
+     if(userData && userData.value && userData.value.company &&  userData.value.company.autoLogoutFromDevice){
+      let timeLimit = moment('23:59:59',"HH:mm:ss").diff(moment(new Date(),"HH:mm:ss"), 'seconds')+5      
       const timeOutId  = BackgroundTimer.setTimeout(async () => {
         if(!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
           dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
@@ -331,7 +345,6 @@ export function autoLogout(userData) {
       }, timeLimit*1000)      
     }
     } catch (error) {
-      //Update UI here
       console.log(error)
     }
   }

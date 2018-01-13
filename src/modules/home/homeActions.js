@@ -22,7 +22,6 @@ import {
   LoginScreen,
   IS_SERVER_REACHABLE,
   AutoLogoutScreen,
-  SET_LOADER_IN_AUTOLOGOUT
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -123,7 +122,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
     let transactionIdToBeSynced
     try {
       const userData = await keyValueDBService.getValueFromStore(USER)      
-      if(userData && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
+      if(userData && userData.value && userData.value.company &&  userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
       }else{
       let saveStoreObject = {
