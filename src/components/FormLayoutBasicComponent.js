@@ -87,16 +87,6 @@ class BasicFormElement extends PureComponent {
             showDateTimePicker: false,
         }
     }
-
-    componentDidMount = () => {
-        if (this.props.item.attributeTypeId == 62 && (this.props.item.showCheckMark == undefined) && this.props.item.focus == true && !this.props.item.value) {
-            this.props.item.isLoading = true
-            this.props.actions.setSequenceDataAndNextFocus(this.props.item.fieldAttributeMasterId, this.props.formElement,
-                this.props.isSaveDisabled, this.props.item.sequenceMasterId,this.props.jobTransaction)
-        }
-    }
-
-
     navigateToScene = (item) => {
         let screenName = ''
         let cash = 0
@@ -177,9 +167,8 @@ class BasicFormElement extends PureComponent {
 
     onFocusEvent(currentElement) {
         this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
-        if (currentElement && !currentElement.value && currentElement.attributeTypeId == 62) {
-            currentElement.isLoading = true;
-            currentElement.editable = false;
+        if (currentElement && !currentElement.displayValue && currentElement.attributeTypeId == 62) {
+            currentElement.editable = false
             Keyboard.dismiss();
             this.props.actions.setSequenceDataAndNextFocus(currentElement.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, currentElement.sequenceMasterId, this.props.jobTransaction)
         }
@@ -193,7 +182,7 @@ class BasicFormElement extends PureComponent {
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, value, isSaveDisabled) {
-        if (value.length < 2) {
+        if (value.length < 2 && formElement.get(fieldAttributeMasterId).attributeTypeId != 62) {
             this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, null, this.props.jobTransaction);
         }
         else {
@@ -333,6 +322,12 @@ class BasicFormElement extends PureComponent {
                                     <Label style={[styles.fontSm, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Label>
                                     : null}
                                 <View>
+                                {renderIf((this.props.item.attributeTypeId == 62 ),
+                                                        this.props.item.displayValue ?
+                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl,styles.marginRight20,styles.absolute, { top: 10, right: 10 }, styles.fontSuccess, { marginTop: -10 }])} /> :
+                                                            ( this.props.item.isLoading) ?
+                                                                <ActivityIndicator animating={true} style={StyleSheet.flatten([styles.absolute,styles.marginRight20, { top: 10, right: 10 },{ marginTop: -10 }])} size="small" color="green" /> : null
+                                                    )}
                                     <Item stackedLabel>
                                         <Input
                                             autoCapitalize="none"

@@ -96,8 +96,7 @@ export default class FormLayoutEventImpl {
         }
         if (!isSaveDisabled) {
             formLayoutObject.get(attributeMasterId).focus = true
-        }
-        //formLayoutObject.get(nextElement).editable = true        
+        }       
         return { formLayoutObject, isSaveDisabled }
     }
 
@@ -148,7 +147,7 @@ export default class FormLayoutEventImpl {
         const url = (masterData == null) ? CONFIG.API.GET_SEQUENCE_NEXT_COUNT : CONFIG.API.GET_SEQUENCE_NEXT_COUNT + "?" + masterData
         let getSequenceData = await RestAPIFactory(token.value).serviceCall(null, url, GET)
         let json = await getSequenceData.json
-        let data = (!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null ;
+        let data = (!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null ;    
         return data
     }
 
