@@ -37,8 +37,12 @@ class SummaryAndPieChart {
     */
     async getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds, noNextStatusIds){
         const allPendingSuccessFailIds = pendingStatusIds.concat(successStatusIds,failStatusIds)
+        let runsheetQuery = 'isClosed = true'
+        const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+        let runSheetIdListQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')        
         let query = allPendingSuccessFailIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
         query = query && query.trim() !== '' ? `deleteFlag != 1 AND (${query})` : 'deleteFlag != 1'
+        query = runSheetIdListQuery && runSheetIdListQuery.trim() !== '' ? `(${query}) AND (${runSheetIdListQuery})` : query
         const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
         const allTransactionOnTodaysDate =  (allPendingSuccessFailIds) ? this.isTodaysDateTransactions(transactionList,pendingStatusIds,noNextStatusIds) : 0
         const getPendingFailSuccessCounts = await this.setAllCounts(allTransactionOnTodaysDate,pendingStatusIds,successStatusIds,failStatusIds)
@@ -71,6 +75,10 @@ class SummaryAndPieChart {
         const jobMasterSummaryList = {}, jobStatusIdMap = {}
         const todayDate =  moment().format('YYYY-MM-DD')
         let query = "deleteFlag != 1"
+        let runsheetQuery = 'isClosed = true'
+        const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+        let runSheetIdListQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')                
+        query = runSheetIdListQuery && runSheetIdListQuery.trim() !== '' ? `(${query}) AND (${runSheetIdListQuery})` : query        
         const noNextStatusMap = this.idDtoMap(noNextStatusIds)
         const pendingStatusMap = this.idDtoMap(pendingStatusIds)
         const jobTransactions = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
@@ -159,7 +167,8 @@ class SummaryAndPieChart {
 
     getAllRunSheetSummary(){
         const setRunsheetSummary = []
-        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET,null)
+        let runsheetQuery = 'isClosed = false'
+        const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         runSheetData.forEach(item => setRunsheetSummary.push([item.runsheetNumber,item.successCount,item.pendingCount,item.failCount,item.cashCollected]))
         return setRunsheetSummary;
     }
