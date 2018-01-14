@@ -43,7 +43,7 @@ class JobTransaction {
 
     getJobTransactionsForDeleteSync(statusIds, postOrderList) {
         let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : ''
-        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"` ).join(' OR ') : ''
+        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"`).join(' OR ') : ''
         query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery
         const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
         return transactionList
@@ -99,7 +99,7 @@ class JobTransaction {
                 "transactionId": unseenTransactionObject.id,
                 "unSeenStatusId": unseenTransactionObject.jobStatusId
             }
-            jobMasterIdStatusIdTransactionIdMap[unseenTransactionObject.id] = transactionIdDTO
+            jobMasterIdStatusIdTransactionIdMap[unseenTransactionObject.jobStatusId] = transactionIdDTO
         })
         return { jobMasterIdJobStatusIdTransactionIdDtoMap, jobMasterIdStatusIdTransactionIdMap }
     }
@@ -330,7 +330,7 @@ class JobTransaction {
      */
     prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap) {
         let jobTransactionCustomizationList = []
-        let jobTransactionDateTOJobTransactionsMap = {}        
+        let jobTransactionDateTOJobTransactionsMap = {}
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
@@ -492,18 +492,18 @@ class JobTransaction {
         return text
     }
 
-   async checkIdToBeSync(jobTransactionId){
-       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-       let checkId = false
-       if(pendingSyncTransactionIds && pendingSyncTransactionIds.value.length > 0){
-           for(let item of pendingSyncTransactionIds.value){
-               if(item.id == jobTransactionId){
-                   checkId = true
-                   break
-               }
-           }
-       }
-       return checkId
+    async checkIdToBeSync(jobTransactionId) {
+        let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
+        let checkId = false
+        if (pendingSyncTransactionIds && pendingSyncTransactionIds.value.length > 0) {
+            for (let item of pendingSyncTransactionIds.value) {
+                if (item.id == jobTransactionId) {
+                    checkId = true
+                    break
+                }
+            }
+        }
+        return checkId
     }
 
     /**
