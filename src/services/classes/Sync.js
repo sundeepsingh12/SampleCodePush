@@ -158,10 +158,10 @@ class Sync {
    */
   async processTdcResponse(tdcContentArray, isLiveJob) {
     let tdcContentObject, jobMasterIds
-    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)   
+    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const user = await keyValueDBService.getValueFromStore(USER)
     const hub = await keyValueDBService.getValueFromStore(HUB)
-    const imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI) 
+    const imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
       let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery, jobMaster, user, hub, imei)
@@ -552,7 +552,7 @@ class Sync {
             await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
           }
           await jobSummaryService.updateJobSummary(dataList.jobSummaries)
-          //  await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdStatusIdTransactionIdMap)
+          await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
         }
       } else {
         isLastPageReached = true

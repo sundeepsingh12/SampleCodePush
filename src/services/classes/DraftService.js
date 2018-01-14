@@ -13,7 +13,7 @@ class DraftService {
         //     await realm.deleteSingleRecord(TABLE_DRAFT, jobMasterId, 'jobMasterId')
         // }
         let draftObject = this.setFormLayoutObjectForSaving(formLayoutState, jobMasterId)
-        if (draftObject) {
+        if (draftObject && draftObject.jobTransactionId) {
             realm.save(TABLE_DRAFT, draftObject)
         }
         // let allData = realm.getAll(TABLE_DRAFT)
@@ -80,7 +80,7 @@ class DraftService {
         }
         return draftDbObject
     }
-    
+
     deleteDraftFromDb(jobTransactionId, jobMasterId) {
         if (jobTransactionId < 0) {
             realm.deleteSingleRecord(TABLE_DRAFT, jobMasterId, 'jobMasterId')

@@ -4,19 +4,19 @@ import Reactotron, {
     overlay,
     asyncStorage,
     networking
-  } from 'reactotron-react-native'
+} from 'reactotron-react-native'
 import { reactotronRedux } from 'reactotron-redux'
 
 import Immutable from 'immutable'
 
-console.logs = function() {
-    for(let i in arguments) {
+console.logs = function () {
+    for (let i in arguments) {
         Reactotron.display({
             name: 'Console Log',
             value: arguments[i],
             preview: JSON.stringify(arguments[i]),
             important: true,
-          })
+        })
     }
 }
 

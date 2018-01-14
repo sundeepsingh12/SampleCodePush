@@ -52,7 +52,8 @@ import {
     TOKEN_MISSING
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
-import {summaryAndPieChartService} from '../SummaryAndPieChart'
+import { summaryAndPieChartService } from '../SummaryAndPieChart'
+import { addServerSmsService } from '../AddServerSms'
 
 export default class FormLayoutEventImpl {
 
@@ -100,7 +101,7 @@ export default class FormLayoutEventImpl {
         }
         if (!isSaveDisabled) {
             formLayoutObject.get(attributeMasterId).focus = true
-        }       
+        }
         return { formLayoutObject, isSaveDisabled }
     }
 
@@ -140,10 +141,10 @@ export default class FormLayoutEventImpl {
         return formLayoutObject;
     }
 
-    async getSequenceAttrData(sequenceMasterId){
+    async getSequenceAttrData(sequenceMasterId) {
         if (_.isNull(sequenceMasterId) || _.isUndefined(sequenceMasterId))
-                throw new Error(SEQUENCE_ID_UNAVAILABLE)
-        const token =  await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            throw new Error(SEQUENCE_ID_UNAVAILABLE)
+        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token) {
             throw new Error(TOKEN_MISSING)
         }
@@ -151,7 +152,7 @@ export default class FormLayoutEventImpl {
         const url = (masterData == null) ? CONFIG.API.GET_SEQUENCE_NEXT_COUNT : CONFIG.API.GET_SEQUENCE_NEXT_COUNT + "?" + masterData
         let getSequenceData = await RestAPIFactory(token.value).serviceCall(null, url, GET)
         let json = await getSequenceData.json
-        let data = (!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null ;    
+        let data = (!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null;
         return data
     }
 
@@ -187,13 +188,13 @@ export default class FormLayoutEventImpl {
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) // to edit later 
+                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue) // to edit later 
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) //to edit later
+                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue) //to edit later
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
                 const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
                 if(customNaming.value.updateEta && jobTransaction.value[0].jobEtaTime  && (dbObjects.status[0].statusCategory == FAIL || dbObjects.status[0].statusCategory == SUCCESS)){
@@ -206,7 +207,8 @@ export default class FormLayoutEventImpl {
             const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
             const runSheet = (jobTransactionId >= 0) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionIdList) : []
             await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionIdList)
-            realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job)
+            let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
+            realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job, serverSmsLogs)
             await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
             await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
             userSummary.value.lastOrderTime = jobTransaction.value[0].lastTransactionTimeOnMobile
@@ -273,8 +275,8 @@ export default class FormLayoutEventImpl {
      * 
      */
 
-    async _updateJobSummary(jobTransaction,statusId,jobTransactionIdList){
-        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+    async _updateJobSummary(jobTransaction, statusId, jobTransactionIdList) {
+        const prevStatusId = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
         const count = (jobTransactionIdList) ? jobTransactionIdList.length : 1
         const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
@@ -290,20 +292,20 @@ export default class FormLayoutEventImpl {
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
 
-   /**
-     * update runSheetDb count after completing transactions.
-     * and returns an object containing runSheetArray
-     * 
-     * @param {*jobTransaction} jobTransaction 
-     * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
-     * @param {*statusCategory} statusCategory // new transaction status category
-     * 
-     */
+    /**
+      * update runSheetDb count after completing transactions.
+      * and returns an object containing runSheetArray
+      * 
+      * @param {*jobTransaction} jobTransaction 
+      * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
+      * @param {*statusCategory} statusCategory // new transaction status category
+      * 
+      */
 
-    async _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList){
-        const setRunsheetSummary = [],runSheetList = []
-        const status = ['pendingCount','failCount','successCount']
-        const prevStatusId  = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+    async _updateRunsheetSummary(jobTransaction, statusCategory, jobTransactionIdList) {
+        const setRunsheetSummary = [], runSheetList = []
+        const status = ['pendingCount', 'failCount', 'successCount']
+        const prevStatusId = (jobTransactionIdList) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
         const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, null)
         const runsheetMap = runSheetData.reduce(function (total, current) {
@@ -323,7 +325,7 @@ export default class FormLayoutEventImpl {
             runsheetMap[jobTransaction.runsheetId][status[statusCategory - 1]] += 1
             runSheetList.push(runsheetMap[jobTransaction.runsheetId])
         }
-        return {tableName : TABLE_RUNSHEET, value : runSheetList}
+        return { tableName: TABLE_RUNSHEET, value: runSheetList }
     }
 
 
@@ -349,7 +351,7 @@ export default class FormLayoutEventImpl {
                 } else if (value.attributeTypeId == SIGNATURE_AND_FEEDBACK) {
                     let npsFeedback = _.values(value.childDataList).filter(item => item.attributeTypeId == NPS_FEEDBACK)
                     npsFeedbackValue = _.isEmpty(npsFeedback) ? null : npsFeedback[0].value
-                } else if (value.attributeTypeId == RE_ATTEMPT_DATE){
+                } else if (value.attributeTypeId == RE_ATTEMPT_DATE) {
                     reAttemptDate = value.value
                 }
                 let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
@@ -479,7 +481,7 @@ export default class FormLayoutEventImpl {
         jobTransaction.longitude = lastTrackLog.longitude
         jobTransaction.trackKm = trackKms
         jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
-        jobTransaction.trackBattery = trackBattery
+        jobTransaction.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
         jobTransaction.npsFeedBack = npsFeedbackValue
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOList.push({
@@ -509,7 +511,7 @@ export default class FormLayoutEventImpl {
             jobTransaction.longitude = lastTrackLog.longitude
             jobTransaction.trackKm = trackKms
             jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
-            jobTransaction.trackBattery = trackBattery
+            jobTransaction.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
             jobTransaction.npsFeedBack = npsFeedbackValue
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOList.push({
@@ -549,12 +551,12 @@ export default class FormLayoutEventImpl {
             case 3: job.status = 4;// jobStatus 4 is for fail when actionOnStatus is failed
                 break;
         }
-        if(reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")){
+        if (reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")) {
             job.jobStartTime = reAttemptDate + " 00:00:00"
         }
-        if(jobId < 0){
+        if (jobId < 0) {
             job.latitude = lastTrackLog.latitude,
-            job.longitude = lastTrackLog.longitude
+                job.longitude = lastTrackLog.longitude
         }
         jobArray.push(job)
         return {
@@ -577,7 +579,7 @@ export default class FormLayoutEventImpl {
                 case 3: job.status = 4;// jobStatus 4 is for fail when actionOnStatus is failed
                     break;
             }
-            if(reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")){
+            if (reAttemptDate && moment().isBefore(reAttemptDate + " 00:00:00")) {
                 job.jobStartTime = reAttemptDate + " 00:00:00"
             }
             jobArray.push(job)
