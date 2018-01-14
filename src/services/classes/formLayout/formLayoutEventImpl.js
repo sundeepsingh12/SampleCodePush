@@ -44,7 +44,12 @@ import {
     PENDING,
     FAIL,
     SUCCESS,
-    EXTERNAL_DATA_STORE
+    EXTERNAL_DATA_STORE,
+    SEQUENCE_COUNT,
+    SEQUENCE_ID,
+    SEQUENCE_ID_UNAVAILABLE,
+    GET,
+    TOKEN_MISSING
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
 import {summaryAndPieChartService} from '../SummaryAndPieChart'
@@ -95,7 +100,7 @@ export default class FormLayoutEventImpl {
         }
         if (!isSaveDisabled) {
             formLayoutObject.get(attributeMasterId).focus = true
-        }
+        }       
         return { formLayoutObject, isSaveDisabled }
     }
 
@@ -135,25 +140,19 @@ export default class FormLayoutEventImpl {
         return formLayoutObject;
     }
 
-    async getSequenceAttrData(sequenceMasterId) {
-        let data = null;
-        let masterData = null;
-        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-        if (!token && token.value != null && token.value != undefined) {
-            throw new Error('Token Missing')
+    async getSequenceAttrData(sequenceMasterId){
+        if (_.isNull(sequenceMasterId) || _.isUndefined(sequenceMasterId))
+                throw new Error(SEQUENCE_ID_UNAVAILABLE)
+        const token =  await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+        if (!token) {
+            throw new Error(TOKEN_MISSING)
         }
-        if (!_.isNull(sequenceMasterId) && !_.isUndefined(sequenceMasterId)) {
-            masterData = 'sequenceMasterId=' + sequenceMasterId + '&count=' + 1;
-            const url = (masterData == null) ? CONFIG.API.GET_SEQUENCE_NEXT_COUNT : CONFIG.API.GET_SEQUENCE_NEXT_COUNT + "?" + masterData
-            let getSequenceData = await RestAPIFactory(token.value).serviceCall(null, url, 'GET')
-            if (getSequenceData) {
-                json = await getSequenceData.json
-                data = (!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null;
-            }
-        } else {
-            throw new Error('masterId unavailable')
-        }
-        return data;
+        let masterData = SEQUENCE_ID + sequenceMasterId + SEQUENCE_COUNT + 1;
+        const url = (masterData == null) ? CONFIG.API.GET_SEQUENCE_NEXT_COUNT : CONFIG.API.GET_SEQUENCE_NEXT_COUNT + "?" + masterData
+        let getSequenceData = await RestAPIFactory(token.value).serviceCall(null, url, GET)
+        let json = await getSequenceData.json
+        let data = (!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null ;    
+        return data
     }
 
     /**

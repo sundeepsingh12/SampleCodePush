@@ -323,6 +323,11 @@ module.exports = {
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
     SORTING_PLACEHOLDER: 'Enter Reference Number To Scan Package',
 
+    //Sequence Attribute
+    SEQUENCE_ID : 'sequenceMasterId=',
+    SEQUENCE_COUNT : '&count=',
+    SEQUENCE_ID_UNAVAILABLE : 'MasterId Unavailable !',
+
     //SkuListing Service
     TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
     QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
