@@ -26,14 +26,9 @@ import {
     TRANSACTION_COMPLETED_DATE
 } from '../../lib/AttributeConstants'
 import _ from 'lodash'
+import { jobDataService } from './JobData'
 class AddServerSms {
 
-    async checkSmsJobStatusForJobMaster(jobMasterId, statusId) {
-        const smsJobStatuses = await keyValueDBService.getValueFromStore(SMS_JOB_STATUS);
-        let smsForStatus = smsJobStatuses.value.filter(smsJobStatus => smsJobStatus.statusId == statusId)
-        if (smsForStatus.length <= 0)
-            return []
-    }
     /**
    * This function sets message body and returns server sms logs
    * @param {*} statusId 
@@ -49,14 +44,15 @@ class AddServerSms {
     async addServerSms(statusId, jobMasterId, fieldData, jobTransactionList) {
         if (_.isEmpty(jobTransactionList)) return []
         let serverSmsMap = await this.prepareServerSmsMap()
+        if (_.isEmpty(serverSmsMap)) return []
         let smsMapForStatus = serverSmsMap[statusId]
         if (!smsMapForStatus) return []
         let serverSmsLogs = []
         let jobAndFieldAttributes = await this.getJobFieldAttributeForJobmaster(jobMasterId)
         let user = await keyValueDBService.getValueFromStore(USER);
-
+        let jobIdToJobDataMap = jobDataService.getJobData(jobTransactionList)
         for (let jobTransaction of jobTransactionList) {
-            let serverSmsLog = this.setSmsBody(statusId, fieldData, jobTransaction, jobAndFieldAttributes.jobAttributes, jobAndFieldAttributes.fieldAttributes, user, smsMapForStatus)
+            let serverSmsLog = this.setSmsBody(statusId, fieldData, jobTransaction, jobAndFieldAttributes.jobAttributes, jobAndFieldAttributes.fieldAttributes, user, smsMapForStatus, jobIdToJobDataMap[jobTransaction.jobId])
             if (serverSmsLog && serverSmsLog.length > 0) {
                 serverSmsLogs = serverSmsLogs.concat(serverSmsLog)
             }
@@ -65,14 +61,12 @@ class AddServerSms {
         return serverSMSLogObject
     }
 
-    setSmsBody(statusId, fieldData, jobTransaction, jobAttributesList, fieldAttributesList, user, smsForStatus) {
+    setSmsBody(statusId, fieldData, jobTransaction, jobAttributesList, fieldAttributesList, user, smsForStatus, jobData) {
         let serverSmsLogs = []
-        const jobData = this.getJobData(jobTransaction)
         let fieldDataList = [];
-        if (fieldData && fieldData.value) {
-            fieldDataList = fieldData.value.filter(data => data.fieldAttributeMasterId == smsJobStatus.contactNoJobAttributeId && data.jobTransactionId == jobTransaction.id)
-        }
+
         for (let smsJobStatus of smsForStatus) {
+            if (!jobData || jobData.length < 1) break
             let serverSmsLog = {
                 userId: jobTransaction.userId,
                 companyId: jobTransaction.companyId,
@@ -82,13 +76,16 @@ class AddServerSms {
                 referenceNumber: jobTransaction.referenceNumber,
                 runsheetNumber: jobTransaction.runsheetNo,
             }
-
-            let jobDataWithContactAttribute = jobData.filter(data => data.jobAttributeMasterId == smsJobStatus.contactNoJobAttributeId && data.jobId == jobTransaction.jobId)
-            if (jobDataWithContactAttribute && jobDataWithContactAttribute.length > 0) {
-                serverSmsLog.contact = jobDataWithContactAttribute[0].value
+            if (fieldData && fieldData.value) {
+                fieldDataList = fieldData.value.filter(data => data.fieldAttributeMasterId == smsJobStatus.contactNoJobAttributeId && data.jobTransactionId == jobTransaction.id)
+            }
+            let jobDataWithContactAttribute = jobData[smsJobStatus.contactNoJobAttributeId]
+            if (jobDataWithContactAttribute && jobDataWithContactAttribute.value) {
+                serverSmsLog.contact = jobDataWithContactAttribute.value
             } else if (fieldDataList && fieldDataList.length > 0) {
                 serverSmsLog.contact = fieldDataList[0].value
             }
+
             let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAttributesList, fieldAttributesList)
             if (smsJobStatus.messageBody && smsJobStatus.messageBody.trim() != '') {
                 let messageBody = this.setSmsBodyJobData(smsJobStatus.messageBody, jobData, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
@@ -97,7 +94,7 @@ class AddServerSms {
                     messageBody = this.setSMSBodyFieldData(messageBody, fieldData.value, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap)
                     messageBody = this.checkForRecursiveData(messageBody, '', jobData, fieldData.value, jobTransaction, fieldAndJobAttrMap, user)
                 } else {
-                    messageBody = this.checkForRecursiveData(messageBody, '', jobData, fieldData, jobTransaction, fieldAndJobAttrMap, user)
+                    messageBody = this.checkForRecursiveData(messageBody, '', jobData, null, jobTransaction, fieldAndJobAttrMap, user)
                 }
                 serverSmsLog.smsBody = messageBody
                 serverSmsLog.dateTime = moment().format('YYYY-MM-DD HH:mm:ss') + ''
@@ -107,31 +104,12 @@ class AddServerSms {
         return serverSmsLogs
     }
     getKeyToAttributeMap(jobAttributesList, fieldAttributesList) {
-        let keyToJobAttributeMap = _.mapKeys(jobAttributesList, 'key')
-        let keyToFieldAttributeMap = _.mapKeys(fieldAttributesList, 'key')
+        let keyToJobAttributeMap = (jobAttributesList && jobAttributesList.length > 0) ? _.mapKeys(jobAttributesList, 'key') : {}
+        let keyToFieldAttributeMap = (fieldAttributesList && fieldAttributesList.length > 0) ? _.mapKeys(fieldAttributesList, 'key') : {}
         return { keyToJobAttributeMap, keyToFieldAttributeMap }
     }
-    /**
-      * This function returns job data for given jobtransaction
-      * @param {*} jobAttributeMasterId 
-      * @param {*} jobTransaction
-      * @returns
-      * {
-      *      serverSmsLogs,
-      *      TABLE_NAME
-      * }
-      */
-    getJobData(jobTransaction) {
-        let jobDataQuery = `jobId = ${jobTransaction.jobId}`
-        let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery, null, null)
-        let jobData = []
-        for (let index in jobDataList) {
-            let data = { ...jobDataList[index] }
-            if (!data) return jobData
-            jobData.push(data)
-        }
-        return jobData
-    }
+
+
     /**
      * This function sets message body with job data values
      * @param {String} messageBody 
@@ -141,16 +119,21 @@ class AddServerSms {
      * @returns
      * messageBody: string
      */
-    setSmsBodyJobData(messageBody, jobDataList, jobTransaction, keyToJobAttributeMap) {
+    setSmsBodyJobData(messageBody, jobDataMap, jobTransaction, keyToJobAttributeMap, jobDataList) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
-        if (!keys || !jobDataList) return messageBody
+        if (!keys) return messageBody
         for (let key of keys) {
             let keyForJob = key.slice(1, key.length - 1)
             let jobAttributeWithSameKey = keyToJobAttributeMap[keyForJob]
             if (jobAttributeWithSameKey) {
-                let jobData = jobDataList.filter(data => data.jobAttributeMasterId == jobAttributeWithSameKey.id && data.jobId == jobTransaction.jobId)
-                messageBody = (jobData[0] && jobData[0].value) ? messageBody.replace(key, jobData[0].value) : messageBody.replace(key, 'N.A.')
+                if (jobDataMap) {
+                    let jobData = jobDataMap[jobAttributeWithSameKey.id]
+                    messageBody = (jobData && jobData.value) ? messageBody.replace(key, jobData.value) : messageBody.replace(key, 'N.A.')
+                } else if (jobDataList) {
+                    let jobData = jobDataList.filter(data => data.jobAttributeMasterId == jobAttributeWithSameKey.id && data.jobId == jobTransaction.jobId)
+                    messageBody = (jobData[0] && jobData[0].value) ? messageBody.replace(key, jobData[0].value) : messageBody.replace(key, 'N.A.')
+                }
             }
         }
         return messageBody
@@ -199,7 +182,7 @@ class AddServerSms {
                     break
                 case BIKER_MOBILE:
                     let bikerNumber = user.value.mobileNumber
-                    messageBody = (bikerNumber && bikerNumber.length > 0) ? messageBody.replace(key, bikerNumber) : messageBody.replace(key, 'N.A.')
+                    messageBody = (bikerNumber) ? messageBody.replace(key, bikerNumber) : messageBody.replace(key, 'N.A.')
                     break
                 case REF_NO:
                     messageBody = messageBody.replace(key, jobTransaction.referenceNumber)
@@ -211,20 +194,20 @@ class AddServerSms {
                     messageBody = messageBody.replace(key, jobTransaction.runsheetNo)
                     break
                 case CREATION_DATE:
-                    let creationDate = moment(jobTransaction.jobCreatedAt).format('DD MMM')
+                    let creationDate = (jobTransaction.jobCreatedAt) ? moment(jobTransaction.jobCreatedAt).format('DD MMM') : 'N.A.'
                     messageBody = messageBody.replace(key, creationDate)
                     break
                 case TRANSACTION_DATE:
-                    let transactionDate = moment(jobTransaction.lastUpdatedAtServer).format('DD MMM')
+                    let transactionDate = (jobTransaction.lastUpdatedAtServer) ? moment(jobTransaction.lastUpdatedAtServer).format('DD MMM') : 'N.A.'
                     messageBody = messageBody.replace(key, transactionDate)
                     break
-                case JOB_ETA:
+                case JOB_ETA://check this
                     let jobEta = jobTransaction.jobEtaTime
-                    messageBody = (jobEta && jobEta.length > 0) ? messageBody.replace(key, moment(jobEta).format('dd MMM')) : messageBody.replace(key, '')
+                    messageBody = (jobEta && jobEta.length > 0) ? messageBody.replace(key, moment(jobEta).format('DD MMM')) : messageBody.replace(key, '')
                     break
                 case TRANSACTION_COMPLETED_DATE:
                     let lastTransactionTimeOnMobile = jobTransaction.lastTransactionTimeOnMobile
-                    messageBody = (lastTransactionTimeOnMobile && lastTransactionTimeOnMobile.length > 0) ? messageBody.replace(key, moment(lastTransactionTimeOnMobile).format('dd MMM')) : messageBody.replace(key, '')
+                    messageBody = (lastTransactionTimeOnMobile && lastTransactionTimeOnMobile.length > 0) ? messageBody.replace(key, moment(lastTransactionTimeOnMobile).format('DD MMM')) : messageBody.replace(key, '')
                     break
             }
         }
@@ -278,13 +261,13 @@ class AddServerSms {
         if (smsTemplate.body && smsTemplate.body.trim() != '') {
             let fieldDataList, jobDataList;
             let messageBody = smsTemplate.body
-            let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAttributesList, fieldAttributesList)
+            let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAttributesList.value, fieldAttributesList.value)
 
-            if (jobData != null) {
+            if (jobData) {
                 jobDataList = jobData.map((dataList) => dataList.data)
-                messageBody = this.setSmsBodyJobData(smsTemplate.body, jobDataList, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
+                messageBody = this.setSmsBodyJobData(smsTemplate.body, null, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap, jobDataList)
             }
-            if (fieldData != null) {
+            if (fieldData) {
                 fieldDataList = fieldData.map((dataList) => dataList.data)
                 messageBody = this.setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap)
             }
@@ -294,25 +277,17 @@ class AddServerSms {
             }
         }
     }
-    async prepareServerSmsMap() {
-        const smsJobStatuses = await keyValueDBService.getValueFromStore(SMS_JOB_STATUS);
-        let serverSmsMap = {}
-        for (let smsJobStatus of smsJobStatuses.value) {
-            if (!serverSmsMap[smsJobStatus.statusId]) {
-                serverSmsMap[smsJobStatus.statusId] = [smsJobStatus]
-            } else {
-                serverSmsMap[smsJobStatus.statusId] = serverSmsMap[smsJobStatus.statusId].concat(smsJobStatus)
-            }
-        }
-        return serverSmsMap
-    }
 
     async getJobFieldAttributeForJobmaster(jobMasterId) {
         let jobAttributesList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE);
         let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
-        let jobAttributes = jobAttributesList.value.filter(jobAttribute => jobAttribute.jobMasterId == jobMasterId)
-        let fieldAttributes = fieldAttributesList.value.filter(fieldAttribute => fieldAttribute.jobMasterId == jobMasterId)
-        return { jobAttributes, fieldAttributes }
+        if (jobAttributesList && jobAttributesList.value && fieldAttributesList && fieldAttributesList.value) {
+            let jobAttributes = jobAttributesList.value.filter(jobAttribute => jobAttribute.jobMasterId == jobMasterId)
+            let fieldAttributes = fieldAttributesList.value.filter(fieldAttribute => fieldAttribute.jobMasterId == jobMasterId)
+            return { jobAttributes, fieldAttributes }
+        } else {
+            return { jobAttributes: [], fieldAttributes: [] }
+        }
     }
     /**
     * This function checks if a sms is mapped to transaction's pending status and saves server sms log
@@ -321,35 +296,32 @@ class AddServerSms {
     async setServerSmsMapForPendingStatus(transactionIdDtosMap) {
         if (_.isEmpty(transactionIdDtosMap)) return
         let serverSmsMap = await this.prepareServerSmsMap()
+        if (_.isEmpty(serverSmsMap)) return
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value;
+        let user = await keyValueDBService.getValueFromStore(USER);
         let serverSmsLogs = []
         for (let jobMasterId in transactionIdDtosMap) {
-            if (transactionIdDtosMap[jobMasterId]) {
-                let statusIdTransactionIdMap = _.values(transactionIdDtosMap[jobMasterId])
-                if (statusIdTransactionIdMap && statusIdTransactionIdMap[0] && serverSmsMap[statusIdTransactionIdMap[0].pendingStatusId]) {
-                    let jobAndFieldAttributes = await this.getJobFieldAttributeForJobmaster(jobMasterId)
-                    let user = await keyValueDBService.getValueFromStore(USER);
-                    let transactionIdList = statusIdTransactionIdMap[0].transactionId.split(':')
-                    let jobTransactionQuery = transactionIdList.map(transactionId => 'id = ' + transactionId).join(' OR ')
-                    let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, null, null)
-
-                    for (let index in transactionList) {
-                        let jobTransaction = { ...transactionList[index] }
-                        if (jobTransaction) {
-                            let serverSmsLog = await this.setSmsBody(statusIdTransactionIdMap[0].pendingStatusId, null, jobTransaction, jobAndFieldAttributes.jobAttributes, jobAndFieldAttributes.fieldAttributes, user, serverSmsMap[statusIdTransactionIdMap[0].pendingStatusId])
-                            if (serverSmsLog.length > 0) {
-                                let pendingTransaction = {
-                                    id: jobTransaction.id, referenceNumber: jobTransaction.referenceNumber
-                                }
-                                serverSmsLogs = serverSmsLogs.concat(serverSmsLog)
-                                transactionsToSync = transactionsToSync.concat(pendingTransaction)
-                            }
+            let statusIdTransactionIdMap = _.values(transactionIdDtosMap[jobMasterId])
+            if (statusIdTransactionIdMap && statusIdTransactionIdMap[0] && serverSmsMap[statusIdTransactionIdMap[0].pendingStatusId]) {
+                let jobAndFieldAttributes = await this.getJobFieldAttributeForJobmaster(jobMasterId)
+                let transactionIdList = statusIdTransactionIdMap[0].transactionId.split(':')
+                let jobTransactionQuery = transactionIdList.map(transactionId => 'id = ' + transactionId).join(' OR ')
+                let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, null, null)
+                let jobIdToJobDataMap = jobDataService.getJobData(transactionList)
+                for (let index in transactionList) {
+                    let jobTransaction = { ...transactionList[index] }
+                    let serverSmsLog = await this.setSmsBody(statusIdTransactionIdMap[0].pendingStatusId, null, jobTransaction, jobAndFieldAttributes.jobAttributes, jobAndFieldAttributes.fieldAttributes, user, serverSmsMap[statusIdTransactionIdMap[0].pendingStatusId], jobIdToJobDataMap[jobTransaction.jobId])
+                    if (serverSmsLog.length > 0) {
+                        let pendingTransaction = {
+                            id: jobTransaction.id, referenceNumber: jobTransaction.referenceNumber
                         }
+                        serverSmsLogs = serverSmsLogs.concat(serverSmsLog)
+                        transactionsToSync = transactionsToSync.concat(pendingTransaction)
                     }
-                } else {
-                    return
                 }
+            } else {
+                return
             }
         }
 
@@ -369,6 +341,15 @@ class AddServerSms {
             }
         })
         return serverSmsLogsToBySynced
+    }
+    async prepareServerSmsMap() {
+        const smsJobStatuses = await keyValueDBService.getValueFromStore(SMS_JOB_STATUS);
+        let serverSmsMap = {}
+        if (!smsJobStatuses || !smsJobStatuses.value) return {}
+        for (let smsJobStatus of smsJobStatuses.value) {
+            serverSmsMap[smsJobStatus.statusId] = (!serverSmsMap[smsJobStatus.statusId]) ? [smsJobStatus] : serverSmsMap[smsJobStatus.statusId].concat(smsJobStatus)
+        }
+        return serverSmsMap
     }
 }
 

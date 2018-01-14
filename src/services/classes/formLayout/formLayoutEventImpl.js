@@ -97,7 +97,7 @@ export default class FormLayoutEventImpl {
         }
         if (!isSaveDisabled) {
             formLayoutObject.get(attributeMasterId).focus = true
-        }       
+        }
         return { formLayoutObject, isSaveDisabled }
     }
 
@@ -137,10 +137,10 @@ export default class FormLayoutEventImpl {
         return formLayoutObject;
     }
 
-    async getSequenceAttrData(sequenceMasterId){
+    async getSequenceAttrData(sequenceMasterId) {
         if (_.isNull(sequenceMasterId) || _.isUndefined(sequenceMasterId))
-                throw new Error(SEQUENCE_ID_UNAVAILABLE)
-        const token =  await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            throw new Error(SEQUENCE_ID_UNAVAILABLE)
+        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token) {
             throw new Error(TOKEN_MISSING)
         }
@@ -148,7 +148,7 @@ export default class FormLayoutEventImpl {
         const url = (masterData == null) ? CONFIG.API.GET_SEQUENCE_NEXT_COUNT : CONFIG.API.GET_SEQUENCE_NEXT_COUNT + "?" + masterData
         let getSequenceData = await RestAPIFactory(token.value).serviceCall(null, url, GET)
         let json = await getSequenceData.json
-        let data = (!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null ;    
+        let data = (!_.isNull(json[0]) && !_.isUndefined(json[0]) && !_.isEmpty(json[0])) ? json[0] : null;
         return data
     }
 
@@ -184,13 +184,13 @@ export default class FormLayoutEventImpl {
             if (jobTransactionIdList) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionIdList)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) // to edit later 
+                jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue) // to edit later 
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
             }
             else {
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, jobTransactionIdList, currentTime, user, jobTransactionAssignOrderToHub)
-                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery.value, fieldData.npsFeedbackValue) //to edit later
+                jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue) //to edit later
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
             }
 
@@ -454,7 +454,7 @@ export default class FormLayoutEventImpl {
         jobTransaction.longitude = lastTrackLog.longitude
         jobTransaction.trackKm = trackKms
         jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
-        jobTransaction.trackBattery = trackBattery
+        jobTransaction.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
         jobTransaction.npsFeedBack = npsFeedbackValue
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOList.push({
@@ -484,7 +484,7 @@ export default class FormLayoutEventImpl {
             jobTransaction.longitude = lastTrackLog.longitude
             jobTransaction.trackKm = trackKms
             jobTransaction.trackTransactionTimeSpent = trackTransactionTimeSpent * 1000
-            jobTransaction.trackBattery = trackBattery
+            jobTransaction.trackBattery = (trackBattery && trackBattery.value) ? trackBattery.value : 0
             jobTransaction.npsFeedBack = npsFeedbackValue
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOList.push({
