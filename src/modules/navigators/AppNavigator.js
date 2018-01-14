@@ -37,7 +37,6 @@ import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
-import FormDetailsV2 from '../../containers/FormDetailsV2'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import LiveJobListing from '../../containers/LiveJobListing'
@@ -413,9 +412,6 @@ export const AppNavigator = StackNavigator({
   },
   LiveJob: {
     screen: LiveJob
-  },
-  FormDetailsV2: {
-    screen: FormDetailsV2
   },
   Scanner: {
     screen: Scanner

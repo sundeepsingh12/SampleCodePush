@@ -52,9 +52,11 @@ import {
   JOB_ASSIGNMENT_ID,
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
-// import NotificationsIOS, { NotificationsAndroid } from 'react-native-notifications'
 import { moduleCustomizationService } from './ModuleCustomization'
 import PushNotification from 'react-native-push-notification'
+import {
+  JOBS_DELETED
+} from '../../lib/ContainerConstants'
 
 class Sync {
 
@@ -173,6 +175,7 @@ class Sync {
       } else if (queryType == 'update' || queryType == 'updateStatus') {
         jobMasterIds = await this.updateDataInDB(contentQuery)
       } else if (queryType == 'delete') {
+        jobMasterIds = `${JOBS_DELETED}`
         const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
         const deleteJobTransactions = {
           tableName: TABLE_JOB_TRANSACTION,
@@ -541,7 +544,7 @@ class Sync {
             await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
           }
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
-          const jobMasterTitleList = await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds)
+          const jobMasterTitleList = (jobMasterIds.constructor===Array)?await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds):jobMasterIds
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
           if (!_.isNull(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification))) {
             this.showNotification(jobMasterTitleList)
@@ -570,14 +573,17 @@ class Sync {
   }
 
   showNotification(jobMasterTitleList) {
-    const alertBody = jobMasterTitleList.join()
+
+    const alertBody = (jobMasterTitleList.constructor===Array)?jobMasterTitleList.join():jobMasterTitleList
+    const message = (jobMasterTitleList.constructor===Array)?`You have new updates for ${alertBody} jobs`:alertBody
 
     PushNotification.localNotification({
-      /* iOS and Android properties */
-      title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-      message: `You have new updates for ${alertBody} jobs`, // (required)
-      soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
-    });
+    /* iOS and Android properties */
+    title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+    message, // (required)
+    soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+});
+    
 
   }
 

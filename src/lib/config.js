@@ -12,7 +12,7 @@ module.exports = {
       url: 'https://www.fareye.co'
     },
     staging: {
-      url: 'https://dev.fareye.co'
+      url: 'https://staging.fareye.co'
     },
     port: 8083,
     PUSH_QOS: 2
