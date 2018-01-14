@@ -376,7 +376,7 @@ class JobDetailsV2 extends PureComponent {
 
   etaUpdateTimer() {
     // const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
-    console.logs("statusList", this.props.statusList)
+    // console.logs("statusList", this.props.statusList)
     // console.logs("statusIds", statusIds)    
     if(this.props.jobTransaction && this.props.jobTransaction.jobEtaTime && this.props.jobTransaction.startTime){
       return <EtaCountDownTimer endTime= {this.props.jobTransaction.jobEtaTime} startTime = {this.props.jobTransaction.startTime} />
