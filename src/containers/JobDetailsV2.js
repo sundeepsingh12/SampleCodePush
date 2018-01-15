@@ -66,6 +66,9 @@ import CallIcon from '../svg_components/icons/CallIcon'
 import RevertIcon from '../svg_components/icons/RevertIcon'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
+import EtaCountDownTimer from '../components/EtaCountDownTimer'
+import moment from 'moment'
+import { jobStatusService } from '../services/classes/JobStatus'
 
 function mapStateToProps(state) {
   return {
@@ -370,6 +373,18 @@ class JobDetailsV2 extends PureComponent {
         onCancelPressed={this._onCancel} />
     return view
   }
+
+  etaUpdateTimer() {
+    // const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
+    // console.logs("statusList", this.props.statusList)
+    // console.logs("statusIds", statusIds)    
+    if(this.props.jobTransaction && this.props.jobTransaction.jobEtaTime && this.props.jobTransaction.startTime){
+      return <EtaCountDownTimer endTime= {this.props.jobTransaction.jobEtaTime} startTime = {this.props.jobTransaction.startTime} />
+    } else {
+      return null
+    }
+  }
+
   _goToFormLayoutWithDraft = () => {
     this.props.actions.navigateToScene('FormLayout', {
       contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
@@ -390,6 +405,7 @@ class JobDetailsV2 extends PureComponent {
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
       const draftAlert = (!_.isEmpty(this.props.draftStatusInfo)) ? this.showDraftAlert() : null
+      const etaTimer = this.etaUpdateTimer()
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
@@ -461,8 +477,8 @@ class JobDetailsV2 extends PureComponent {
                     {this.props.errorMessage}
                   </Text>
                 </View> : null}
-               
-                    {statusView}
+                {etaTimer}
+                {statusView}
               </View>
 
               {/*Basic Details*/}

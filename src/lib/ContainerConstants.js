@@ -80,5 +80,6 @@ module.exports = {
     SEARCH_TEXT_MISSING: 'searchText not present',
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
     TOKEN_MISSING: 'Token missing',
-    INVALID_SCAN: 'Invalid Scan'
+    INVALID_SCAN: 'Invalid Scan',
+    JOBS_DELETED:'Jobs deleted'
 }

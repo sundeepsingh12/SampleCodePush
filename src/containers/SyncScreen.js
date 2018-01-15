@@ -76,6 +76,9 @@ class SyncScreen extends PureComponent {
     let transactionList = this.props.unsyncedTransactionList
     let transactionView = []
     for (let index in transactionList) {
+      if(!transactionList[index]){
+        continue
+      }
       transactionView.push(
         <Text key={transactionList[index].id} style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
           {transactionList[index].referenceNumber}

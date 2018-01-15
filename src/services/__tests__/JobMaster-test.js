@@ -429,41 +429,41 @@ describe('job master services', () => {
       })
   })
 
-  it('It should get job master from JobMasterList', () => {
-    let jobMasterId = 441
-    const jobMasterList = {
-      value: [
-        {
-          id: 441,
-          enableLocationMismatch: false,
-          enableManualBroadcast: false,
-          enableMultipartAssignment: false,
-          enableOutForDelivery: false,
-          enableResequenceRestriction: true
-        },
-        {
-          id: 442,
-          enableLocationMismatch: false,
-          enableManualBroadcast: false,
-          enableMultipartAssignment: false,
-          enableOutForDelivery: false,
-          enableResequenceRestriction: false
-        }
-      ]
-    }
+  // it('It should get job master from JobMasterList', () => {
+  //   let jobMasterId = 441
+  //   const jobMasterList = {
+  //     value: [
+  //       {
+  //         id: 441,
+  //         enableLocationMismatch: false,
+  //         enableManualBroadcast: false,
+  //         enableMultipartAssignment: false,
+  //         enableOutForDelivery: false,
+  //         enableResequenceRestriction: true
+  //       },
+  //       {
+  //         id: 442,
+  //         enableLocationMismatch: false,
+  //         enableManualBroadcast: false,
+  //         enableMultipartAssignment: false,
+  //         enableOutForDelivery: false,
+  //         enableResequenceRestriction: false
+  //       }
+  //     ]
+  //   }
 
-    const result = [
-      {
-        id: 441,
-        enableLocationMismatch: false,
-        enableManualBroadcast: false,
-        enableMultipartAssignment: false,
-        enableOutForDelivery: false,
-        enableResequenceRestriction: true
-      }]
+  //   const result = [
+  //     {
+  //       id: 441,
+  //       enableLocationMismatch: false,
+  //       enableManualBroadcast: false,
+  //       enableMultipartAssignment: false,
+  //       enableOutForDelivery: false,
+  //       enableResequenceRestriction: true
+  //     }]
 
-    expect(jobMasterService.getJobMaterFromJobMasterLists(jobMasterId, jobMasterList)).toEqual(result)
-  })
+  //   expect(jobMasterService.getJobMaterFromJobMasterLists(jobMasterId, jobMasterList)).toEqual(result)
+  // })
 
 })
 

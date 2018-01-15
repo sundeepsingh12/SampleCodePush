@@ -354,8 +354,8 @@ describe('jobDetail actions', () => {
         jobDetailsService.checkEnableResequence = jest.fn()
         jobDetailsService.checkEnableResequence(false);
 
-        jobMasterService.getJobMaterFromJobMasterList = jest.fn()
-        jobMasterService.getJobMaterFromJobMasterList.mockReturnValueOnce(jobMaster)
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+        jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMaster)
         const store = mockStore({})
         return store.dispatch(actions.getJobDetails(1234))
             .then(() => {
@@ -425,12 +425,12 @@ describe('location mismatch actions', () => {
     ]
     it('should not check location mismatch and throw error', () => {
         try{
-        jobMasterService.getJobMaterFromJobMasterList = jest.fn()
-        jobMasterService.getJobMaterFromJobMasterList.mockReturnValueOnce(jobMasterList)
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+        jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMasterList)
         const store = mockStore({})
         return store.dispatch(actions.checkForLocationMismatch())
             .then(() => {
-                expect(jobMasterService.getJobMaterFromJobMasterList).toHaveBeenCalledTimes(0)
+                expect(jobMasterService.getJobMasterFromJobMasterList).toHaveBeenCalledTimes(0)
             })
         }catch(error){
             expect(error.message).toEqual(message)
@@ -515,12 +515,12 @@ describe('status revert actions', () => {
     ]
     it('should not check location mismatch and throw error', () => {
         try{
-        jobMasterService.getJobMaterFromJobMasterList = jest.fn()
-        jobMasterService.getJobMaterFromJobMasterList.mockReturnValueOnce(jobMasterList)
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+        jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMasterList)
         const store = mockStore({})
         return store.dispatch(actions.checkForLocationMismatch())
             .then(() => {
-                expect(jobMasterService.getJobMaterFromJobMasterList).toHaveBeenCalledTimes(0)
+                expect(jobMasterService.getJobMasterFromJobMasterList).toHaveBeenCalledTimes(0)
             })
         }catch(error){
             expect(error.message).toEqual(message)

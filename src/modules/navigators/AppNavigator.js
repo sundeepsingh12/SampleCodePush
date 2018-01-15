@@ -37,7 +37,6 @@ import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
-import FormDetailsV2 from '../../containers/FormDetailsV2'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import LiveJobListing from '../../containers/LiveJobListing'
@@ -92,6 +91,7 @@ import { NavigationActions } from 'react-navigation'
 import Scanner from '../../components/Scanner'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import JobMaster from '../../containers/JobMaster'
+import AutoLogout from '../../containers/AutoLogout'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -264,6 +264,12 @@ export const AppNavigator = StackNavigator({
   SelectFromList: {
     screen: SelectFromList,
   },
+  AutoLogoutScreen: {
+    screen: AutoLogout,
+    navigationOptions: {
+      header: null
+    }
+  }, 
   QrCodeScanner: {
     screen: QrCodeScanner,
     navigationOptions: {
@@ -407,9 +413,6 @@ export const AppNavigator = StackNavigator({
   },
   LiveJob: {
     screen: LiveJob
-  },
-  FormDetailsV2: {
-    screen: FormDetailsV2
   },
   Scanner: {
     screen: Scanner
