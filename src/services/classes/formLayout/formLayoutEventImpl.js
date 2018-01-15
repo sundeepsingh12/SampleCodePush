@@ -498,8 +498,8 @@ export default class FormLayoutEventImpl {
 
     _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue) {
         let jobTransactionArray = [], jobTransactionDTOList = []
-        for (let jobTransaction1 of jobTransactionList) {
-            let jobTransaction = Object.assign({}, jobTransaction1) // no need to have null checks as it is called from a private method
+        for (let jobTransaction1 in jobTransactionList) {
+            let jobTransaction = Object.assign({},jobTransactionList[jobTransaction1]) // no need to have null checks as it is called from a private method
             jobTransaction.jobType = jobMaster.code
             jobTransaction.jobStatusId = status.id
             jobTransaction.statusCode = status.code
@@ -569,8 +569,8 @@ export default class FormLayoutEventImpl {
         let jobArray = []
         const query = jobTransactions.map(jobTransaction => 'id = ' + jobTransaction.jobId).join(' OR ')
         let realmJobObjects = realm.getRecordListOnQuery(TABLE_JOB, query)
-        for (let realmJobObject of realmJobObjects) {
-            let job = Object.assign({}, realmJobObject)
+        for (let realmJobObject in realmJobObjects) {
+            let job = Object.assign({},realmJobObjects[realmJobObject])
             switch (status.actionOnStatus) {
                 case 1: job.status = 3; // jobStatus 3 is for closed when actionOnStatus is success
                     break;

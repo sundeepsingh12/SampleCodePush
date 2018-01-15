@@ -7,6 +7,9 @@ import * as realm from '../../repositories/realmdb'
 import {
   jobStatusService
 } from './JobStatus'
+import {
+  RUNSHEET_MISSING
+} from '../../lib/ContainerConstants'
 
 class RunSheet {
 
@@ -50,6 +53,19 @@ class RunSheet {
     return listMap
 
   }
+
+  getRunsheets() {
+    const runsheetArray = realm.getAll(TABLE_RUNSHEET)
+    let runsheetNumberList = []
+    runsheetArray.forEach(runsheetObject => {
+        const runsheetClone = { ...runsheetObject }
+        runsheetNumberList.push(runsheetClone.runsheetNumber)
+    })
+    if (_.isEmpty(runsheetNumberList)) {
+        throw new Error(RUNSHEET_MISSING)
+    }
+    return runsheetNumberList
+}
 
 }
 
