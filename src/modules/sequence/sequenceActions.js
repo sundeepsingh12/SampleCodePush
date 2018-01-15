@@ -3,6 +3,9 @@ import {
     sequenceService
 } from '../../services/classes/Sequence'
 import {
+    runSheetService
+} from '../../services/classes/RunSheet'
+import {
     keyValueDBService
 } from '../../services/classes/KeyValueDBService'
 import {
@@ -28,6 +31,13 @@ import {
 } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 
+
+/**
+ * @param {*} runsheetNumber 
+ * 
+ * This method prepare jobTransaction list for given runsheet 
+ * and check if there is duplicate sequence number present or not
+ */
 export function prepareListForSequenceModule(runsheetNumber) {
     return async function (dispatch) {
         try {
@@ -40,12 +50,16 @@ export function prepareListForSequenceModule(runsheetNumber) {
                 transactionsWithChangedSeqeunceMap
             }))
         } catch (error) {
-            console.log(error)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
 }
 
+/**
+ * @param {*} sequenceList 
+ * 
+ * This method resequence jobs by hitting an API and getting resequenced jobs and set it to sequence list 
+ */
 export function resequenceJobsFromServer(sequenceList) {
     return async function (dispatch) {
         try {
@@ -72,26 +86,34 @@ export function resequenceJobsFromServer(sequenceList) {
     }
 }
 
-export function getRunsheets(displayName) {
+/**
+ * This method get all runsheet available and if only one runsheet is present
+ * then navigate to sequence container
+ */
+export function getRunsheets() {
     return async function (dispatch) {
         try {
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
-            const runsheetNumberList = await sequenceService.getRunsheets()
+            const runsheetNumberList = await runSheetService.getRunsheets()
             if (runsheetNumberList.length == 1) {
                 dispatch(navigateToScene(Sequence, {
                     runsheetNumber: runsheetNumberList[0],
-                    displayName
                 }))
             }
             dispatch(setState(SET_RUNSHEET_NUMBER_LIST, runsheetNumberList))
         } catch (error) {
-            console.log(error)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
 }
 
-
+/**
+ * @param {*} rowParam 
+ * @param {*} sequenceList 
+ * @param {*} transactionsWithChangedSeqeunceMap 
+ * 
+ * This method shift rows and set the new rows to sequence list
+ */
 export function rowMoved(rowParam, sequenceList, transactionsWithChangedSeqeunceMap) {
     return async function (dispatch) {
         try {
@@ -101,14 +123,16 @@ export function rowMoved(rowParam, sequenceList, transactionsWithChangedSeqeunce
                 transactionsWithChangedSeqeunceMap: newTransactionsWithChangedSeqeunceMap,
             }))
         } catch (error) {
-            console.log(error)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
 }
 
-
-
+/**
+ * @param {*} transactionsWithChangedSeqeunceMap 
+ * 
+ * This method saves transactions which have changed sequence
+ */
 export function saveSequencedJobTransactions(transactionsWithChangedSeqeunceMap) {
     return async function (dispatch) {
         try {
@@ -116,30 +140,40 @@ export function saveSequencedJobTransactions(transactionsWithChangedSeqeunceMap)
             await sequenceService.updateJobTrasaction(transactionsWithChangedSeqeunceMap)
             dispatch(setState(CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP, SAVE_SUCCESSFUL))
         } catch (error) {
-            console.log(error)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
 }
 
-
+/**
+ * @param {*} searchText 
+ * @param {*} sequenceList 
+ * 
+ * This method search transaction on given reference number
+ */
 export function searchReferenceNumber(searchText, sequenceList) {
     return async function (dispatch) {
         try {
             let searchObject = sequenceService.searchReferenceNumber(searchText, sequenceList)
-            if (searchObject == -1) {
-                throw new Error(INVALID_SCANs)
+            if (!searchObject) {
+                throw new Error(INVALID_SCAN)
             }
             dispatch(setState(SET_SEQUENCE_LIST_ITEM, searchObject))
         } catch (error) {
-            console.log(error)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
 }
 
 
-
+/**
+ * @param {*} currentSequenceListItemIndex 
+ * @param {*} newSequence 
+ * @param {*} sequenceList 
+ * @param {*} transactionsWithChangedSeqeunceMap 
+ * 
+ * This method shift rows and set the new rows to sequence list when value is entered from dialog box
+ */
 export function jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap) {
     return async function (dispatch) {
         try {
@@ -149,7 +183,6 @@ export function jumpSequence(currentSequenceListItemIndex, newSequence, sequence
                 transactionsWithChangedSeqeunceMap: newTransactionsWithChangedSeqeunceMap,
             }))
         } catch (error) {
-            console.log(error)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }

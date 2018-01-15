@@ -67,7 +67,7 @@ class SequenceRunsheetList extends Component {
     }
 
     componentDidMount() {
-        this.props.actions.getRunsheets(this.props.navigation.state.params.displayName)
+        this.props.actions.getRunsheets()
     }
 
     componentDidUpdate() {

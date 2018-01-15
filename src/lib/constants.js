@@ -311,7 +311,6 @@ module.exports = keyMirror({
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
-    TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
     CLEAR_SEQUENCE_STATE: null,
     SET_RUNSHEET_NUMBER_LIST: null,

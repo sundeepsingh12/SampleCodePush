@@ -12,7 +12,6 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 import {
     HUB,
     TABLE_JOB_TRANSACTION,
-    TABLE_RUNSHEET
 } from '../../lib/constants'
 
 import {
@@ -29,7 +28,6 @@ import {
     BLANK_NEW_SEQUENCE,
     CURRENT_SEQUENCE_ROW_MISSING,
     SEQUENCE_NOT_AN_INT,
-    RUNSHEET_MISSING,
     RUNSHEET_NUMBER_MISSING,
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEARCH_TEXT_MISSING,
@@ -42,6 +40,11 @@ import CONFIG from '../../lib/config'
 
 class Sequence {
 
+    /**
+     * 
+     * @param {*} runsheetNumber 
+     * @returns jobTransactionCustomizationList // jobTransacion List
+     */
     async getSequenceList(runsheetNumber) {
         if (!runsheetNumber) {
             throw new Error(RUNSHEET_NUMBER_MISSING)
@@ -55,6 +58,11 @@ class Sequence {
         return jobTransactionCustomizationList
     }
 
+    /**
+     * 
+     * @param {*} sequenceList 
+     * @returns sequenceRequestDto 
+     */
     async prepareRequestBody(sequenceList) {
         let sequenceRequestDto = []
         const hub = await keyValueDBService.getValueFromStore(HUB)
@@ -96,6 +104,12 @@ class Sequence {
         return sequenceRequestDto
     }
 
+    /**
+     * 
+     * @param {*} responseBody 
+     * @param {*} sequenceList
+     * @returns updatedSequenceList // sequence list with updated sequence from server response
+     */
     processSequenceResponse(responseBody, sequenceList) {
         const transactionIdSequenceMap = responseBody.transactionIdSequenceMap
         const updatedSequenceList = JSON.parse(JSON.stringify(sequenceList))
@@ -121,19 +135,14 @@ class Sequence {
         return updatedSequenceList
     }
 
-    getRunsheets() {
-        const runsheetArray = realm.getAll(TABLE_RUNSHEET)
-        let runsheetNumberList = []
-        runsheetArray.forEach(runsheetObject => {
-            const runsheetClone = { ...runsheetObject }
-            runsheetNumberList.push(runsheetClone.runsheetNumber)
-        })
-        if (_.isEmpty(runsheetNumberList)) {
-            throw new Error(RUNSHEET_MISSING)
-        }
-        return runsheetNumberList
-    }
-
+    /**
+     * 
+     * @param {*} sequenceList 
+     * @returns Object:
+                      isDuplicateSequenceFound: _.size(fequencySeqeunceMap) != _.size(sequenceArray),
+                      sequenceArray,
+                      transactionsWithChangedSeqeunceMap
+     */
     checkForAutoSequencing(sequenceList) {
         if (!sequenceList) {
             return {}
@@ -170,15 +179,27 @@ class Sequence {
         }
     }
 
+    /**
+     * 
+     * @param {*} transactionsWithChangedSeqeunceMap 
+     * save job transaction map to db
+     */
     async updateJobTrasaction(transactionsWithChangedSeqeunceMap) {
         if (!transactionsWithChangedSeqeunceMap) {
             throw new Error(TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP)
         }
-        let abc = realm.getAll(TABLE_JOB_TRANSACTION)
         await realm.saveList(TABLE_JOB_TRANSACTION, _.values(transactionsWithChangedSeqeunceMap))
-        abc = realm.getAll(TABLE_JOB_TRANSACTION)
     }
 
+    /**
+     * 
+     * @param {*} rowParam 
+     * @param {*} sequenceList 
+     * @param {*} transactionsWithChangedSeqeunceMap 
+     * @param {*} isCalledFromJumpSequence 
+     * @returns Object :  cloneSequenceList, // sequence list with new sequnece caused by shift
+                          newTransactionsWithChangedSeqeunceMap // transaction map having those transactions whose sequence has been changed
+     */
     onRowDragged(rowParam, sequenceList, transactionsWithChangedSeqeunceMap, isCalledFromJumpSequence) {
         if (!sequenceList) {
             throw new Error(SEQUENCELIST_MISSING)
@@ -210,6 +231,12 @@ class Sequence {
         }
     }
 
+    /**
+     * 
+     * @param {*} searchText 
+     * @param {*} sequenceList 
+     * @returns object : transaction object having reference number equal to searchText
+     */
     searchReferenceNumber(searchText, sequenceList) {
         if (!sequenceList) {
             throw new Error(SEQUENCELIST_MISSING)
@@ -217,16 +244,20 @@ class Sequence {
         if (!searchText) {
             throw new Error(SEARCH_TEXT_MISSING)
         }
-        let counter = 0
         for (let transaction of sequenceList) {
             if (_.isEqual(searchText, transaction.referenceNumber)) {
                 return transaction
             }
-            counter++
         }
-        return -1
+        return
     }
 
+    /**
+     * 
+     * @param {*} token 
+     * @param {*} sequenceRequestDto 
+     * return object: sequence List with sequence set by the server
+     */
     fetchResequencedJobsFromServer(token, sequenceRequestDto) {
         if (!token) {
             throw new Error(TOKEN_MISSING)
@@ -238,6 +269,15 @@ class Sequence {
         return sequenceResponse
     }
 
+    /**
+     * 
+     * @param {*} currentSequenceListItemIndex 
+     * @param {*} newSequence 
+     * @param {*} sequenceList 
+     * @param {*} transactionsWithChangedSeqeunceMap 
+     * @returns Object :  cloneSequenceList, // sequence list with new sequnece caused by shift
+                          newTransactionsWithChangedSeqeunceMap // transaction map having those transactions whose sequence has been changed
+     */
     jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap) {
         if (_.isNull(currentSequenceListItemIndex) || _.isUndefined(currentSequenceListItemIndex)) {
             throw new Error(CURRENT_SEQUENCE_ROW_MISSING)
