@@ -8,6 +8,8 @@ import {
     SET_NEW_PASSWORD,
     SET_CONFIRM_NEW_PASSWORD,
     CLEAR_PASSWORD_TEXTINPUT,
+    TOGGLE_SAVE_RESET_BUTTON,
+    RESET_STATE,
 } from '../../../lib/constants'
 import profileReducer from '../profileReducer'
 
@@ -77,4 +79,33 @@ describe('Profile  Reducer', () => {
         expect(nextState.confirmNewPassword).toBe(confirmNewPassword)
     })
 
+    it('it toggles save reset button ', () => {
+        let payload = false
+        let action = {
+            type: TOGGLE_SAVE_RESET_BUTTON,
+            payload: payload
+        }
+        let nextState = profileReducer(undefined, action)
+        expect(nextState.isSaveResetButtonDisabled).toBe(payload)
+    })
+
+    it('it Reset state ', () => {
+        let payload = false
+        let action = {
+            type: RESET_STATE,
+            payload: payload
+        }
+        let nextState = profileReducer(undefined, action)
+        expect(initialState).toBe(initialState)
+    })
+
+    it('it sets initial state ', () => {
+        let payload = false
+        let action = {
+            type: "ABCD_LKJH",
+            payload: payload
+        }
+        let nextState = profileReducer(undefined, action)
+        expect(initialState).toBe(initialState)
+    })
 })
