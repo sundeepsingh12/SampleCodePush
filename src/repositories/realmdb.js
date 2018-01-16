@@ -51,7 +51,7 @@ export function save(tableName, object) {
 export function saveList(tableName, array) {
     return realm.write(() => {
         //writing new record
-        array.forEach(data => realm.create(tableName, data));
+        array.forEach(data => realm.create(tableName, data, true));
     });
 }
 

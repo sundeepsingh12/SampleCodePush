@@ -1,5 +1,5 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   View,
@@ -67,8 +67,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class FormLayout extends Component {
-
+class FormLayout extends PureComponent {
   componentDidUpdate() {
     if (this.props.updateDraft && !this.props.navigation.state.params.transactionIdList) { //Draft should not be saved for bulk
       this.saveDraft()
@@ -223,7 +222,7 @@ class FormLayout extends Component {
     }
     return (
       <StyleProvider style={getTheme(platform)}>
-        <KeyboardAvoidingView style = {{flex:1}} behavior='padding'>
+        <Container>
           {draftAlert}
           {invalidFormAlert}
           <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
@@ -264,7 +263,7 @@ class FormLayout extends Component {
               </Button>
             </FooterTab>
           </Footer>
-        </KeyboardAvoidingView >
+        </Container >
       </StyleProvider >
     )
   }

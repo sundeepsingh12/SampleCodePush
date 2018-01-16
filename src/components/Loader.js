@@ -1,13 +1,13 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   View
 } from 'react-native'
 import { Spinner } from 'native-base'
 import styles from '../themes/FeStyle'
 
-export default class Loader extends Component {
+export default class Loader extends PureComponent {
     render() {
         return (
             <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 50}}>

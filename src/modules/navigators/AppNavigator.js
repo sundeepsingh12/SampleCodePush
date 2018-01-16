@@ -23,7 +23,6 @@ import Preloader from '../../containers/Preloader'
 import Application from '../../containers/Application'
 import Message from '../../containers/Message'
 import Utilties from '../../containers/Utilities'
-import Logout from '../../containers/Logout'
 import Home from '../../containers/Home'
 import Sequence from '../../containers/Sequence'
 import SkuDetails from '../../containers/SkuDetails'
@@ -38,7 +37,6 @@ import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
-import FormDetailsV2 from '../../containers/FormDetailsV2'
 import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import LiveJobListing from '../../containers/LiveJobListing'
@@ -47,6 +45,7 @@ import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
 import QrCodeScanner from '../../containers/QrCodeScanner'
 import CameraFieldAttribute from '../../containers/CameraFieldAttribute'
+import SequenceRunsheetList from '../../containers/SequenceRunsheetList'
 import {
   Container,
   Content,
@@ -92,6 +91,7 @@ import { NavigationActions } from 'react-navigation'
 import Scanner from '../../components/Scanner'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import JobMaster from '../../containers/JobMaster'
+import AutoLogout from '../../containers/AutoLogout'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -101,7 +101,7 @@ import {
   PreloaderScreen,
 } from '../../lib/constants'
 
-class AppWithNavigationState extends React.Component {
+class AppWithNavigationState extends React.PureComponent {
 
   componentDidMount() {
     BackHandler.addEventListener(HardwareBackPress, this.onBackPress);
@@ -261,12 +261,15 @@ export const AppNavigator = StackNavigator({
     screen: JobDetailsV2,
     header: null
   },
-  Logout: {
-    screen: Logout,
-  },
   SelectFromList: {
     screen: SelectFromList,
   },
+  AutoLogoutScreen: {
+    screen: AutoLogout,
+    navigationOptions: {
+      header: null
+    }
+  }, 
   QrCodeScanner: {
     screen: QrCodeScanner,
     navigationOptions: {
@@ -411,9 +414,6 @@ export const AppNavigator = StackNavigator({
   LiveJob: {
     screen: LiveJob
   },
-  FormDetailsV2: {
-    screen: FormDetailsV2
-  },
   Scanner: {
     screen: Scanner
   },
@@ -434,6 +434,9 @@ export const AppNavigator = StackNavigator({
   },
   ImageDetailsView: {
     screen: ImageDetailsView,
+  },
+  SequenceRunsheetList: {
+    screen: SequenceRunsheetList
   }
 },
   {

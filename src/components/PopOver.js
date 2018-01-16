@@ -1,6 +1,7 @@
+
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 
 import {
     StyleSheet,
@@ -13,7 +14,7 @@ import {
 import { Icon} from 'native-base'
 import styles from '../themes/FeStyle'
 
-export default class PopOver extends Component {
+export default class PopOver extends PureComponent {
     render() {
         return (
             <View style={StyleSheet.flatten([styles.positionAbsolute, { top: 40, right: 0 }])}>

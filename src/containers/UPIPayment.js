@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -42,7 +42,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class UPIPayment extends Component {
+class UPIPayment extends PureComponent {
 
     componentWillMount() {
         console.log(this.props)

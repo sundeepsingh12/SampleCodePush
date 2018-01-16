@@ -188,8 +188,8 @@ class JobDetails {
      let updatedJobTransaction
      let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)     
      let lastTrackLog = {
-        latitude: userSummary.value.lastLat,
-        longitude: userSummary.value.lastLng
+        latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
+        longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
      }
      let user = await keyValueDBService.getValueFromStore(USER)                
      let statusData = statusList.value.filter(list => list.id == jobTransaction.jobStatusId)

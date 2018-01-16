@@ -11,7 +11,9 @@ import {
     TOGGLE_JOB_TRANSACTION_LIST_ITEM,
     TOGGLE_ALL_JOB_TRANSACTIONS,
     RESET_STATE,
-    CLEAR_BULK_STATE
+    CLEAR_BULK_STATE,
+    SET_BULK_SEARCH_TEXT,
+    SET_BULK_ERROR_MESSAGE
 } from '../../lib/constants'
 
 
@@ -32,6 +34,9 @@ export default function bulkReducer(state = initialState, action) {
             return state.set('isLoaderRunning', false)
                 .set('bulkTransactionList', action.payload.bulkTransactions)
                 .set('isSelectAllVisible', action.payload.selectAll)
+                .set('isManualSelectionAllowed', action.payload.isManualSelectionAllowed)
+                .set('searchSelectionOnLine1Line2', action.payload.searchSelectionOnLine1Line2)
+                .set('idToSeparatorMap', action.payload.idToSeparatorMap)
 
         case TOGGLE_JOB_TRANSACTION_LIST_ITEM:
             return state.set('selectedItems', action.payload.selectedItems)
@@ -42,13 +47,20 @@ export default function bulkReducer(state = initialState, action) {
                 .set('bulkTransactionList', action.payload.bulkTransactions)
                 .set('selectAllNone', action.payload.displayText)
 
-
         case CLEAR_BULK_STATE:
             return state.set('selectedItems', [])
                 .set('bulkTransactionList', {})
-                .set('selectAllNone','Select All')
+                .set('selectAllNone', 'Select All')
+                .set('searchText', null)
+                .set('searchSelectionOnLine1Line2', null)
+                .set('idToSeparatorMap', {})
         case RESET_STATE:
             return initialState
+        case SET_BULK_SEARCH_TEXT:
+            return state.set('searchText', action.payload)
+        case SET_BULK_ERROR_MESSAGE:
+            return state.set('errorToastMessage', action.payload)
+                .set('searchText', '')
     }
     return state
 }

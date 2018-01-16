@@ -275,11 +275,12 @@ class JobMaster {
     return jobMasterTitleList
   }
 
-  getJobMaterFromJobMasterLists(jobMasterId, jobMasterList) {
-    const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
-    return jobMaster
-  }
-  async getJobMaterFromJobMasterList(jobMasterId) {
+  // getJobMaterFromJobMasterLists(jobMasterId, jobMasterList) {
+  //   const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
+  //   return jobMaster
+  // }
+  
+  async getJobMasterFromJobMasterList(jobMasterId) {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
     return jobMaster;
@@ -305,7 +306,8 @@ class JobMaster {
       if (preAssignmentList.includes(jobMaster.id)) {
         jobMaster.preAssignment = true
       }
-      if (jobMaster.postAssignment || jobMaster.preAssignment) {
+      // if (jobMaster.postAssignment || jobMaster.preAssignment) {
+      if (jobMaster.postAssignment) {
         orderJobMasterList.push(jobMaster)
       }
     }

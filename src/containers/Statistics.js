@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -28,7 +28,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class Statistics extends Component {
+class Statistics extends PureComponent {
 
     componentDidMount() {
         this.props.actions.getDataForStatisticsList()

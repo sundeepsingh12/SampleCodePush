@@ -450,6 +450,9 @@ export default {
     },
     shadow: {
         elevation: 2,
+        shadowOffset:{  width: 3,  height: 4,  },
+        shadowColor: '#d3d3d3',
+        shadowOpacity: .5,
     },
     borderLeft4: {
         borderLeftColor: themeColor,

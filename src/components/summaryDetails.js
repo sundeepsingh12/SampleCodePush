@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
 
@@ -22,7 +22,7 @@ import {
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-export default class SummaryDetails extends Component {
+export default class SummaryDetails extends PureComponent {
 
     renderParcelData = (item) => {
         return (

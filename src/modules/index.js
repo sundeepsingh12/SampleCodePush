@@ -7,7 +7,6 @@
 'use strict'
 
 import auth from './login/loginReducer'
-import device from './device/deviceReducer'
 import global from './global/globalReducer'
 import preloader from './pre-loader/preloaderReducer'
 import nav from './navigators/navigatorReducer'
@@ -46,6 +45,7 @@ import postAssignment from './postAssignment/postAssignmentReducer'
 import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 import offlineDS from './offlineDS/offlineDSReducer'
 import cameraReducer from './camera/cameraReducer'
+import autoLogout from './autoLogout/autoLogoutReducer'
 // import profile from './profile/profileReducer'
 
 
@@ -58,7 +58,6 @@ import cameraReducer from './camera/cameraReducer'
 const rootReducer = combineReducers({
   nav,
   auth,
-  device,
   global,
   home,
   jobDetails,
@@ -93,6 +92,7 @@ const rootReducer = combineReducers({
   qrCodeReducer,
   offlineDS,
   cameraReducer,
+  autoLogout
 })
 
 // const rootReducer = (state, action) => {

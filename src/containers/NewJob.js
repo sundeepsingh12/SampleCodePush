@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 
 import Loader from '../components/Loader'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
 
 import {
@@ -51,7 +51,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class NewJob extends Component {
+class NewJob extends PureComponent {
   static navigationOptions = ({ navigation }) => {
     return { header: null }
   }

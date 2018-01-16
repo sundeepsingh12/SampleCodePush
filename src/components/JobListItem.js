@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight } from 'react-native'
+import React, { PureComponent } from 'react'
+import { StyleSheet, View, Image, TouchableHighlight, Alert } from 'react-native'
 import styles from '../themes/FeStyle'
 
 import {
@@ -17,10 +17,132 @@ import {
   Title,
   Footer,
   FooterTab,
+  ActionSheet,
   StyleProvider
 } from 'native-base'
 import moment from 'moment'
-export default class JobListItem extends Component {
+import renderIf from '../lib/renderIf'
+import CallIcon from '../svg_components/icons/CallIcon'
+import {
+  SELECT_NUMBER,
+  SELECT_TEMPLATE,
+  SELECT_NUMBER_FOR_CALL,
+  CONFIRMATION,
+  CALL_CONFIRM,
+} from '../lib/AttributeConstants'
+import {
+  OK,
+  CANCEL,
+} from '../lib/ContainerConstants'
+import Communications from 'react-native-communications'
+import getDirections from 'react-native-google-maps-directions'
+
+export default class JobListItem extends PureComponent {
+
+  callButtonPressed = () => {
+    if (this.props.data.jobSwipableDetails.contactData.length > 1) {
+      let contactData = this.props.data.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
+      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      ActionSheet.show(
+        {
+          options: contactData,
+          cancelButtonIndex: contactData.length - 1,
+          title: SELECT_NUMBER_FOR_CALL
+        },
+        buttonIndex => {
+          if (buttonIndex != contactData.length - 1 && buttonIndex >= 0) {
+            this.callContact(this.props.data.jobSwipableDetails.contactData[buttonIndex])
+          }
+        }
+      )
+    }
+    else {
+      Alert.alert(CONFIRMATION + this.props.data.jobSwipableDetails.contactData[0], CALL_CONFIRM,
+        [{ text: CANCEL, onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        { text: OK, onPress: () => this.callContact(this.props.data.jobSwipableDetails.contactData[0]) },],
+        { cancelable: false })
+    }
+  }
+  callContact = (contact) => {
+    Communications.phonecall(contact, false)
+  }
+  customerCareButtonPressed = () => {
+    let customerCareTitles = this.props.data.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
+    customerCareTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+    ActionSheet.show(
+      {
+        options: customerCareTitles,
+        cancelButtonIndex: customerCareTitles.length - 1,
+        title: SELECT_NUMBER_FOR_CALL
+      },
+      buttonIndex => {
+        if (buttonIndex != customerCareTitles.length - 1 && buttonIndex >= 0) {
+          this.callContact(this.props.data.jobSwipableDetails.customerCareData[buttonIndex].mobileNumber)
+        }
+      }
+    )
+  }
+
+  navigationButtonPressed = () => {
+    const addressDatas = this.props.data.jobSwipableDetails.addressData
+    const latitude = this.props.data.jobLatitude
+    const longitude = this.props.data.jobLongitude
+    let data
+
+    if (latitude && longitude) {
+      data = {
+        source: {},
+        destination: {
+          latitude,
+          longitude
+        },
+      }
+      getDirections(data)
+    }
+    else {
+      let addressArray = []
+      Object.values(addressDatas).forEach(object => {
+        addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
+      })
+      addressArray.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      if (_.size(addressArray) > 2) {
+        ActionSheet.show(
+          {
+            options: addressArray,
+            cancelButtonIndex: addressArray.length - 1,
+            title: 'Select address for navigation'
+          },
+          buttonIndex => {
+            if (buttonIndex != addressArray.length - 1 && buttonIndex >= 0) {
+              data = {
+                source: {},
+                destination: {},
+                params: [
+                  {
+                    key: 'q',
+                    value: addressArray[buttonIndex].text
+                  }
+                ]
+              }
+              getDirections(data)
+            }
+          }
+        )
+      } else {
+        data = {
+          source: {},
+          destination: {},
+          params: [
+            {
+              key: 'q',
+              value: addressArray[0].text
+            }
+          ]
+        }
+        getDirections(data)
+      }
+    }
+  }
 
   render() {
     return (
@@ -28,8 +150,8 @@ export default class JobListItem extends Component {
         onPress={this.props.onPressItem}
         onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
-        <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : {backgroundColor: '#ffffff'}]}>
-          <View style={[style.seqCircle, styles.relative,{backgroundColor : this.props.data.identifierColor}]}>
+        <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : { backgroundColor: '#ffffff' }]}>
+          <View style={[style.seqCircle, styles.relative, { backgroundColor: this.props.data.identifierColor }]}>
             <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
               {this.props.data.jobMasterIdentifier}
             </Text>
@@ -45,8 +167,9 @@ export default class JobListItem extends Component {
             {this.props.callingActivity == 'Sequence' ? <View
               style={{
                 width: 30,
-                alignSelf: 'center'
-              }}>
+                alignSelf: 'center',
+                flexBasis: '10%'
+              }} >
               <Icon
                 name="ios-menu"
                 style={[
@@ -78,7 +201,7 @@ export default class JobListItem extends Component {
    */
   renderJobListItemDetails() {
     return (
-      <View>
+      <View style={[styles.flexBasis90]}>
         <View>
           {this.props.data.line1 ?
             <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
@@ -101,13 +224,35 @@ export default class JobListItem extends Component {
           }
         </View>
         {this.props.jobEndTime ?
-          <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5}]}>
+          <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5 }]}>
             <Text style={[styles.fontWhite, styles.fontDefault, styles.fontCenter]}>
               {(moment(this.props.jobEndTime, "HH:mm:ss")).hours() + ' hours ' +
                 (moment(this.props.jobEndTime, "HH:mm:ss")).minutes() + ' minutes ' +
                 (moment(this.props.jobEndTime, "HH:mm:ss")).seconds() + ' seconds left'}
             </Text>
           </View> : null}
+
+          {/* action buttons section */}
+          <View style={[styles.row, {marginLeft: -10}]}>
+
+            {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.showIconsInJobListing,
+                <Button transparent onPress={this.callButtonPressed}>
+                  <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+                </Button>
+            )}
+
+            {renderIf((!_.isEmpty(this.props.data.jobSwipableDetails.addressData) ||
+              (this.props.data.jobLatitude && this.props.data.jobLongitude)) && this.props.showIconsInJobListing,
+                <Button transparent onPress={this.navigationButtonPressed}>
+                  <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+                </Button>)}
+
+
+            {renderIf(this.props.data.jobSwipableDetails.customerCareData && this.props.data.jobSwipableDetails.customerCareData.length > 0 && this.props.showIconsInJobListing,
+                <Button transparent onPress={this.customerCareButtonPressed}>
+                  <CallIcon />
+                </Button>)}
+          </View>
       </View>
     )
   }

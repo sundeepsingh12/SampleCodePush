@@ -66,6 +66,9 @@ import CallIcon from '../svg_components/icons/CallIcon'
 import RevertIcon from '../svg_components/icons/RevertIcon'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
+import EtaCountDownTimer from '../components/EtaCountDownTimer'
+import moment from 'moment'
+import { jobStatusService } from '../services/classes/JobStatus'
 
 function mapStateToProps(state) {
   return {
@@ -163,8 +166,8 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
       return
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
-      contactData.push(CANCEL)
+      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
+      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -185,8 +188,8 @@ class JobDetailsV2 extends PureComponent {
   showSmsTemplateList = (contact) => {
     setTimeout(() => {
       if (this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 1) {
-        let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => sms.title)
-        msgTitles.push(CANCEL)
+        let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => ({ text: sms.title, icon: "md-arrow-dropright", iconColor: "#000000" }))
+        msgTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
         ActionSheet.show(
           {
             options: msgTitles,
@@ -214,8 +217,8 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
       return
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
-      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.slice(0)
-      contactData.push(CANCEL)
+      let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
+      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -240,8 +243,8 @@ class JobDetailsV2 extends PureComponent {
     Communications.phonecall(contact, false)
   }
   customerCareButtonPressed = () => {
-    let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => customerCare.name)
-    customerCareTitles.push(CANCEL)
+    let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
+    customerCareTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
     ActionSheet.show(
       {
         options: customerCareTitles,
@@ -275,9 +278,9 @@ class JobDetailsV2 extends PureComponent {
     else {
       let addressArray = []
       Object.values(addressDatas).forEach(object => {
-        addressArray.push(Object.values(object).join())
+        addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
       })
-      addressArray.push(CANCEL)
+      addressArray.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       if (_.size(addressArray) > 2) {
         ActionSheet.show(
           {
@@ -293,7 +296,7 @@ class JobDetailsV2 extends PureComponent {
                 params: [
                   {
                     key: 'q',
-                    value: addressArray[buttonIndex]
+                    value: addressArray[buttonIndex].text
                   }
                 ]
               }
@@ -308,7 +311,7 @@ class JobDetailsV2 extends PureComponent {
           params: [
             {
               key: 'q',
-              value: addressArray[0]
+              value: addressArray[0].text
             }
           ]
         }
@@ -370,6 +373,18 @@ class JobDetailsV2 extends PureComponent {
         onCancelPressed={this._onCancel} />
     return view
   }
+
+  etaUpdateTimer() {
+    // const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
+    // console.logs("statusList", this.props.statusList)
+    // console.logs("statusIds", statusIds)    
+    if(this.props.jobTransaction && this.props.jobTransaction.jobEtaTime && this.props.jobTransaction.startTime){
+      return <EtaCountDownTimer endTime= {this.props.jobTransaction.jobEtaTime} startTime = {this.props.jobTransaction.startTime} />
+    } else {
+      return null
+    }
+  }
+
   _goToFormLayoutWithDraft = () => {
     this.props.actions.navigateToScene('FormLayout', {
       contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
@@ -390,6 +405,7 @@ class JobDetailsV2 extends PureComponent {
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
       const draftAlert = (!_.isEmpty(this.props.draftStatusInfo)) ? this.showDraftAlert() : null
+      const etaTimer = this.etaUpdateTimer()
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
@@ -461,8 +477,8 @@ class JobDetailsV2 extends PureComponent {
                     {this.props.errorMessage}
                   </Text>
                 </View> : null}
-               
-                    {statusView}
+                {etaTimer}
+                {statusView}
               </View>
 
               {/*Basic Details*/}

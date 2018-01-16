@@ -26,8 +26,9 @@ import {
 
 } from '../../lib/constants'
 import moment from 'moment'
-import {trackingService} from './Tracking'
-import {userEventLogService} from './UserEvent'
+import { trackingService } from './Tracking'
+import { userEventLogService } from './UserEvent'
+import { addServerSmsService } from './AddServerSms'
 
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
@@ -41,7 +42,7 @@ export async function createZip(transactionIdToBeSynced) {
 
     //Prepare the SYNC_RESULTS
     var SYNC_RESULTS = {};
-     let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
+    let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
     let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
     SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
     SYNC_RESULTS.job = realmDbData.jobList;
@@ -49,14 +50,14 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
 
     SYNC_RESULTS.scannedReferenceNumberLog = [];
-    SYNC_RESULTS.serverSmsLog = realmDbData.serverSmsLogs;
+    SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, lastSyncTime);
 
-    SYNC_RESULTS.trackLog = await trackingService.getTrackLogs(realmDbData.trackLogs,lastSyncTime)
+    SYNC_RESULTS.trackLog = await trackingService.getTrackLogs(realmDbData.trackLogs, lastSyncTime)
     SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
     SYNC_RESULTS.userCommunicationLog = [];
     SYNC_RESULTS.userEventsLog = await userEventLogService.getUserEventLog(lastSyncTime)
-    SYNC_RESULTS.userExceptionLog =  [];
-   
+    SYNC_RESULTS.userExceptionLog = [];
+
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
@@ -71,7 +72,7 @@ export async function createZip(transactionIdToBeSynced) {
     const targetPath = PATH + '/sync.zip'
     const sourcePath = PATH_TEMP
     await zip(sourcePath, targetPath);
-   // await realm.deleteSpecificTableRecords(TABLE_SERVER_SMS_LOG)
+    // await realm.deleteSpecificTableRecords(TABLE_SERVER_SMS_LOG)
     // await unzip(targetPath, PATH)
     // var content = await RNFS.readFile(PATH + '/logs.json', 'base64')
     // console.log('==image', content)
@@ -98,7 +99,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
     // const formattedTime = moment(lastSyncTime.value).format('YYYY-MM-DD HH:mm:ss')
     // console.log('moment',formattedTime)
     // let trackLogQuery = `Date(trackTime) > ${formattedTime}`
-    let trackLogs = _getDataFromRealm([],null,TABLE_TRACK_LOGS)
+    let trackLogs = _getDataFromRealm([], null, TABLE_TRACK_LOGS)
     let transactionList = [],
         fieldDataList = [],
         jobList = [],

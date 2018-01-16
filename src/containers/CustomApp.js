@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, WebView, Platform, ActivityIndicator,BackHandler } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -15,7 +15,8 @@ import {
     START_FETCHING_URL,
     END_FETCHING_URL,
     ON_CHANGE_STATE,
-    QrCodeScanner
+    QrCodeScanner,
+    SCANNER_TEXT
 } from '../lib/constants'
 
 
@@ -39,6 +40,7 @@ function mapStateToProps(state) {
     return {
         isLoaderRunning : state.customApp.isLoaderRunning,
         customUrl : state.customApp.customUrl,
+        scannerText : state.customApp.scannerText
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -48,7 +50,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class CustomApp extends Component {
+class CustomApp extends PureComponent {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
@@ -88,11 +90,13 @@ class CustomApp extends Component {
     onLoadStart = () =>{
         this.props.actions.setState(START_FETCHING_URL,this.props.customUrl)
     }
-    onSetText = (value) =>{
-        this.refs.webview.injectJavascript = (value)
-        this.render()
-    }
 
+    onSetText = (value) =>{
+        let js  = `document.activeElement.value = "${value}";`
+        let jsCode = `javascript: ${js};` + Math.random()
+        this.props.actions.setState(SCANNER_TEXT,jsCode)        
+    }
+    
     componentDidMount() {
         if(this.props.navigation.state.params.customUrl != null && this.props.navigation.state.params.customUrl != undefined ){
             this.props.actions.setState(START_FETCHING_URL,this.props.navigation.state.params.customUrl)
@@ -144,7 +148,7 @@ class CustomApp extends Component {
                     <WebView
                         ref={WEBVIEW_REF}
                         style={styles.WebViewStyle} 
-                        source={{uri : this.props.customUrl}} 
+                        source={{uri : (this.props.scannerText) ? this.props.scannerText: this.props.customUrl}} 
                         javaScriptEnabled={true}
                         domStorageEnabled={true}
                         onLoadEnd = {this.onLoadEnd}

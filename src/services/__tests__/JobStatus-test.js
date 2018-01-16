@@ -83,9 +83,9 @@ describe('test cases for getStatusIdForJobMasterIdAndCode', () => {
 
 it('should return jobMasterId vs jobStatusIdMap', () => {
   const jobMasterIdJobStatusIdMap = {
-      930: 12,
-      897: 14
-    },
+    930: 12,
+    897: 14
+  },
     statusCode = 'UNSEEN',
     jobMasterIdList = [930, 897]
   keyValueDBService.getValueFromStore = jest.fn()
@@ -138,32 +138,32 @@ describe('test cases for getJobMasterIdStatusIdMap', () => {
     }
   }
   const statusList = [{
-      id: 1,
-      jobMasterId: 1,
-      nextStatusList: []
-    },
-    {
-      id: 2,
-      jobMasterId: 1,
-    },
-    {
-      id: 3,
-      jobMasterId: 2,
-      nextStatusList: [{
-        id: 4,
-        jobMasterId: 2,
-        nextStatusList: []
-      }]
-    },
-    {
+    id: 1,
+    jobMasterId: 1,
+    nextStatusList: []
+  },
+  {
+    id: 2,
+    jobMasterId: 1,
+  },
+  {
+    id: 3,
+    jobMasterId: 2,
+    nextStatusList: [{
       id: 4,
       jobMasterId: 2,
       nextStatusList: []
-    },
-    {
-      id: 5,
-      jobMasterId: 2,
-    }
+    }]
+  },
+  {
+    id: 4,
+    jobMasterId: 2,
+    nextStatusList: []
+  },
+  {
+    id: 5,
+    jobMasterId: 2,
+  }
   ]
 
   const jobMasterIdJobAttributeStatusMap = {
@@ -287,4 +287,80 @@ describe('test cases for getNonUnseenStatusIdsForStatusCategory', () => {
     })
   })
 
+})
+
+describe('test cases for getStatusForJobMasterIdAndCode', () => {
+  beforeEach(() => {
+    keyValueDBService.getValueFromStore = jest.fn()
+  })
+
+  const jobMasterId = 1
+  const jobStatusCode = 'UNSEEN'
+  it('should return job status for jobMasterId and jobStatusCode', () => {
+    keyValueDBService.getValueFromStore.mockReturnValue({
+      value: [
+        {
+          id: 123,
+          jobMasterId: 1,
+          code: 'UNSEEN'
+        },
+        {
+          id: 124,
+          jobMasterId: 1,
+          code: 'DEL'
+        },
+        {
+          id: 125,
+          jobMasterId: 1,
+          code: 'PENDING'
+        }
+      ]
+    })
+    let jobStatus = {
+      id: 123,
+      jobMasterId: 1,
+      code: 'UNSEEN'
+    }
+    return jobStatusService.getStatusForJobMasterIdAndCode(jobMasterId, jobStatusCode)
+      .then((data) => {
+        expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+        expect(data).toEqual(jobStatus)
+      })
+  })
+
+  it('should return error for job status missing', () => {
+    keyValueDBService.getValueFromStore.mockReturnValue(null)
+    return jobStatusService.getStatusForJobMasterIdAndCode(jobMasterId, jobStatusCode)
+      .catch((error) => {
+        expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+        expect(error.message).toEqual('Job status missing in store')
+      })
+  })
+
+  it('should return undefined for not containing job status', () => {
+    keyValueDBService.getValueFromStore.mockReturnValue({
+      value: [
+        {
+          id: 123,
+          jobMasterId: 1,
+          code: 'FAIL'
+        },
+        {
+          id: 124,
+          jobMasterId: 1,
+          code: 'DEL'
+        },
+        {
+          id: 125,
+          jobMasterId: 1,
+          code: 'PENDING'
+        }
+      ]
+    })
+    return jobStatusService.getStatusForJobMasterIdAndCode(jobMasterId, jobStatusCode)
+      .then((data) => {
+        expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+        expect(data).toEqual(undefined)
+      })
+  })
 })
