@@ -600,9 +600,9 @@ export default class FormLayoutEventImpl {
         return job = {
             id,
             referenceNo: referenceNumber,
-            hubId: hub.id,
-            cityId: user.cityId,
-            companyId: user.company.id,
+            hubId: (hub) ? hub.id : null,
+            cityId: (user) ? user.cityId : null,
+            companyId: (user && user.company) ? user.company.id : null,
             jobMasterId,
             status: 3,
             latitude: 0.0,

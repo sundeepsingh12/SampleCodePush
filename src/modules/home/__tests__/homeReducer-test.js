@@ -18,7 +18,7 @@ describe('home reducer', () => {
             }
         }
         let nextState = homeReducer(undefined,action)
-        expect(nextState.loading).toBe(action.payload.loading)
+        expect(nextState.moduleLoading).toBe(action.payload.loading)
         expect(nextState.newJobModules).toBe(action.payload.newJobModules)
     })
 })
