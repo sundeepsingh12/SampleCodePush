@@ -1,13 +1,15 @@
 'use strict'
 import React, { PureComponent } from 'react'
 import {
+  Alert,
   StyleSheet,
   View,
   Text,
   Platform,
   TouchableHighlight,
   Image,
-  NetInfo
+  NetInfo,
+  TouchableOpacity
 
 }
   from 'react-native'
@@ -125,17 +127,34 @@ class Login extends PureComponent {
   // }
 
   getImageView() {
+    if (this.props.auth.form.authenticationService || this.props.auth.form.isLongPress) {
+      return <Spinner />
+    }
     if (!this.props.auth.form.authenticationService) {
       return (
+        <TouchableOpacity onLongPress = {this.onLongPress}>
         <Image
           style={styles.logoStyle}
           source={require('../../images/fareye-logo.png')}
         />
+        </TouchableOpacity >
       )
     }
-    if (this.props.auth.form.authenticationService) {
-      return <Spinner />
-    }
+  }
+
+  onLongPress = () =>{
+    Alert.alert(
+      "Confirm Reset",
+      `Click OK to reset your account settings.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK', onPress: this.onLongPressResetSetting },
+      ],
+    )
+  }
+
+  onLongPressResetSetting = () => {
+    this.props.onLongPressResetSettings()
   }
 
   startScanner = () => {

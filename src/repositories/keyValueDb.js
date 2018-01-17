@@ -118,6 +118,10 @@ export class keyValueDb {
       })
   }
 
+  getAllKeysFromStore(){
+    return store.keys()
+  }
+
   updateValueInStore(schemaName, value) {
     let schemaInstance = ''
     switch (schemaName) {

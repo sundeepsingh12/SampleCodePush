@@ -27,11 +27,15 @@ import {
   USERNAME,
   AutoLogoutScreen,
   SET_LOADER_IN_AUTOLOGOUT,
-  USER
+  USER,
+  ON_LONG_PRESS_ICON,
+  RESET_STATE
 } from '../../lib/constants'
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import moment from 'moment'
+import { logoutService } from '../../services/classes/Logout'
+
 
 import {
   authenticationService
@@ -132,6 +136,13 @@ export function onChangePassword(value) {
 }
 
 
+export function onLongPressIcon(value) {
+  return {
+    type: ON_LONG_PRESS_ICON,
+    payload: value
+  }
+}
+
 export function toggleCheckbox() {
   return {
     type: TOGGLE_CHECKBOX
@@ -172,6 +183,29 @@ export function authenticateUser(username, password, rememberMe) {
       }))
     } catch (error) {
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
+    }
+  }
+}
+
+/**@function onLongPressResetSettings()
+    
+    * function reset all data on long press of icon
+    *
+    * @description -> all state, all realm data and all simple store data will be deleted
+    */
+
+export function onLongPressResetSettings() {
+  return async function (dispatch) {
+    try {
+      dispatch(onLongPressIcon(true))
+      await logoutService.deleteDataBase()
+      let allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
+      await keyValueDBService.deleteValueFromStore(allSchemaInstance)
+      dispatch(setState(RESET_STATE))
+      dispatch(onLongPressIcon(false))  
+    } catch (error) {
+      dispatch(onLongPressIcon(false))
+      console.log(erroe)
     }
   }
 }
