@@ -1,54 +1,60 @@
 
 'use strict'
 
-import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
-
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import * as sequenceActions from '../modules/sequence/sequenceActions'
 import * as globalActions from '../modules/global/globalActions'
-
 import Loader from '../components/Loader'
-
-import React, {PureComponent} from 'react'
-import {StyleSheet, View, Image, TouchableHighlight,Alert,TouchableOpacity} from 'react-native'
-
-import {ROUTE_OPTIMIZATION} from '../lib/AttributeConstants'
-
+import React, { PureComponent } from 'react'
+import {
+  StyleSheet, View, Alert, TouchableOpacity, Modal, BackHandler
+} from 'react-native'
+import { ROUTE_OPTIMIZATION, SEARCH_PLACEHOLDER } from '../lib/AttributeConstants'
+import {
+  UPDATE_SEQUENCE, SAVE,
+  WARNING_FOR_BACK, WARNING,
+  CLOSE, OK, JOB_NOT_PRESENT, CANCEL,
+  CURRENT_SEQUENCE_NUMBER, NEW_SEQUENCE_NUMBER_MESSAGE,
+  JUMP_SEQUENCE
+} from '../lib/ContainerConstants'
 import {
   Container,
-  Content,
   Header,
   Button,
   Text,
-  List,
-  ListItem,
-  Left,
   Body,
-  Right,
   Icon,
-  Title,
   Footer,
+  Item,
+  Input,
   FooterTab,
   StyleProvider,
-  Toast
+  Toast,
 } from 'native-base'
-
-import {CLEAR_SEQUENCE_STATE} from '../lib/constants'
-
+import {
+  SET_RESPONSE_MESSAGE,
+  HardwareBackPress,
+  SET_REFERENCE_NO,
+  SET_SEQUENCE_LIST_ITEM
+} from '../lib/constants'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import renderIf from '../lib/renderIf'
-import TitleHeader from '../components/TitleHeader'
 import SortableListView from 'react-native-sortable-listview'
 import JobListItem from '../components/JobListItem'
+import _ from 'lodash'
+import SearchBarV2 from '../components/SearchBarV2'
 
 function mapStateToProps(state) {
   return {
-    isSequenceScreenLoading:state.sequence.isSequenceScreenLoading,
-    sequenceList:state.sequence.sequenceList,
-    isResequencingDisabled:state.sequence.isResequencingDisabled,
-    responseMessage:state.sequence.responseMessage
+    isSequenceScreenLoading: state.sequence.isSequenceScreenLoading,
+    sequenceList: state.sequence.sequenceList,
+    isResequencingDisabled: state.sequence.isResequencingDisabled,
+    responseMessage: state.sequence.responseMessage,
+    transactionsWithChangedSeqeunceMap: state.sequence.transactionsWithChangedSeqeunceMap,
+    searchText: state.sequence.searchText,
+    currentSequenceListItemSeleceted: state.sequence.currentSequenceListItemSeleceted
   }
 }
 
@@ -63,75 +69,226 @@ function mapDispatchToProps(dispatch) {
 
 class Sequence extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    return {header: null}
+  static navigationOptions = ({ navigation }) => {
+    return { header: null }
   }
 
-  componentDidMount(){
-    this.props.actions.prepareListForSequenceModule()
+  constructor(props) {
+    super(props)
+    this.state = {
+      newSequenceNumber: ''
+    }
+  }
+
+  componentDidMount() {
+    this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber)
+    BackHandler.addEventListener(HardwareBackPress, this.goBack)
+  }
+
+  componentDidUpdate() {
+    if (this.props.responseMessage) {
+      this.showToast()
+    }
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener(HardwareBackPress, this.goBack)
   }
 
   renderList() {
-    const list = Object.values(this.props.sequenceList).sort((transaction1, transaction2) =>
-       transaction1.seqSelected - transaction2.seqSelected
+    const list = this.props.sequenceList.sort((transaction1, transaction2) =>
+      transaction1.seqSelected - transaction2.seqSelected
     )
     return list
   }
 
+  onRowMoved(rowParam) {
+    this.props.actions.rowMoved(rowParam, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap)
+  }
+
+  onJumpSequencePressed(newSequenceNumber) {
+    this.props.actions.jumpSequence(_.indexOf(this.props.sequenceList, this.props.currentSequenceListItemSeleceted), newSequenceNumber, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap)
+    this.setModalView({})
+  }
+
+  savePressed = () => {
+    this.props.actions.saveSequencedJobTransactions(this.props.transactionsWithChangedSeqeunceMap)
+  }
+
+  searchIconPressed = () => {
+    if (this.props.searchText) {
+      this.props.actions.searchReferenceNumber(this.props.searchText, this.props.sequenceList)
+    }
+  }
+
+  getButtonView() {
+    if (_.isEmpty(this.props.transactionsWithChangedSeqeunceMap)) {
+      return <Button
+        style={[styles.bgPrimary]}
+        onPress={this.showAlert}
+        disabled={this.props.isResequencingDisabled}
+        full>
+        <Text style={[styles.fontLg, styles.fontWhite, styles.padding5]}>{UPDATE_SEQUENCE}</Text>
+      </Button>
+    } else {
+      return <Button
+        onPress={this.savePressed}
+        success full>
+        <Text style={[styles.fontLg, styles.fontWhite, styles.padding5]}>{SAVE}</Text>
+      </Button>
+    }
+  }
+
+  showWarningForBack = () => {
+    Alert.alert(
+      WARNING,
+      WARNING_FOR_BACK,
+      [
+        {
+          text: CLOSE, style: 'cancel', onPress: () => {
+            this.props.navigation.goBack(null)
+            this.props.actions.setState(SET_REFERENCE_NO, '')
+          }
+        },
+        { text: OK },
+      ],
+    )
+  }
+
+  goBack = () => {
+    if (!_.isEmpty(this.props.transactionsWithChangedSeqeunceMap)) {
+      this.showWarningForBack()
+    } else {
+      this.props.navigation.goBack(null)
+    }
+    return true
+  }
+
+  setModalView(item) {
+    this.props.actions.setState(SET_SEQUENCE_LIST_ITEM, item)
+    this.props.actions.setState(SET_REFERENCE_NO, '')
+    this.setState(() => {
+      return {
+        newSequenceNumber: ''
+      }
+    })
+  }
+
+  setSearchText = (searchText) => {
+    this.props.actions.setState(SET_REFERENCE_NO, searchText)
+  }
+
+  returnValue = (searchText) => {
+    this.setSearchText(searchText)
+    this.props.actions.searchReferenceNumber(searchText, this.props.sequenceList)
+  }
+
+
+  modalDialogView() {
+    return <Modal animationType={"fade"}
+      transparent={true}
+      visible={!_.isEmpty(this.props.currentSequenceListItemSeleceted)}
+      onRequestClose={() => this.setModalView({})}
+      presentationStyle={"overFullScreen"}>
+      <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: '100%' }]}>
+        <View style={[styles.absolute, { height: '100%', left: 0, right: 0, backgroundColor: 'rgba(0,0,0,.6)' }]}>
+        </View>
+        <View style={[styles.bgWhite, styles.shadow, styles.borderRadius3, { width: '90%' }]}>
+          <View style={[styles.padding10, styles.marginBottom10]}>
+            <Text style={[styles.fontCenter, styles.bold, styles.marginBottom10]}>{CURRENT_SEQUENCE_NUMBER}{this.props.currentSequenceListItemSeleceted.seqSelected}</Text>
+            <Text style={[styles.fontCenter, styles.marginBottom10]}>
+              {NEW_SEQUENCE_NUMBER_MESSAGE}
+            </Text>
+            <Item regular>
+              <Input
+                onChangeText={(sequenceNumber) =>
+                  this.setState(() => { return { newSequenceNumber: sequenceNumber } })}
+                style={{ height: 35, fontSize: 13 }}
+                keyboardType="numeric" />
+            </Item>
+          </View>
+          <View style={[styles.row, { borderTopColor: '#d3d3d3', borderTopWidth: 1 }]}>
+            <View style={{ width: '50%' }}>
+              <Button transparent full
+                onPress={() => this.setModalView({})} >
+                <Text style={[styles.fontPrimary]}>{CANCEL}</Text>
+              </Button>
+            </View>
+            <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
+              <Button transparent full
+                onPress={() => this.onJumpSequencePressed(this.state.newSequenceNumber)}>
+                <Text style={[styles.fontPrimary]}>{JUMP_SEQUENCE}</Text>
+              </Button>
+            </View>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  }
+
+  headerView() {
+    return <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+      <Body>
+        <View
+          style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+          <TouchableOpacity style={[style.headerLeft]}
+            onPress={this.goBack}>
+            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+          </TouchableOpacity>
+          <View style={[style.headerBody]}>
+            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.runsheetNumber}</Text>
+          </View>
+          <View style={[style.headerRight]}>
+          </View>
+        </View>
+        <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />
+      </Body>
+    </Header>
+  }
+
   render() {
-    if(this.props.isSequenceScreenLoading){
-        return <Loader />  
+    let modalDialogView = this.modalDialogView()
+    let buttonView = this.getButtonView()
+    let headerView = this.headerView()
+    if (this.props.isSequenceScreenLoading) {
+      return <Loader />
     }
     else {
       if (!_.isEmpty(this.props.sequenceList)) {
-        let order = Object.keys(this.props.sequenceList)
         return (
           <StyleProvider style={getTheme(platform)}>
             <Container>
-             <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-            <Body>
-              <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                <TouchableOpacity style={[style.headerLeft]} onPress={() => { 
-                  this.props.actions.setState(CLEAR_SEQUENCE_STATE)
-                  this.props.navigation.goBack(null) }}>
-                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                </TouchableOpacity>
-                <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
-                </View>
-                <View style={[style.headerRight]}>
-                </View>
-                <View />
-              </View>
-            </Body>
-          </Header>
+              {modalDialogView}
+              {headerView}
               <View style={[styles.flex1, styles.bgWhite]}>
+
                 <SortableListView
                   style={{
                     flex: 1
                   }}
                   data={this.renderList()}
-                  onRowMoved={e => {
-                    order.splice(e.to, 0, order.splice(e.from, 1)[0])
+                  onRowMoved={rowParam => {
+                    this.onRowMoved(rowParam)
                   }}
+
                   activeOpacity={1}
                   sortRowStyle={{
-                    backgroundColor: '#f2f2f2'
+                    backgroundColor: '#000000',
+                    borderWidth: 1,
+                    borderColor: '#f4f4f4',
+                    elevation: 2,
+                    shadowOffset: { width: 3, height: 4, },
+                    shadowColor: '#d3d3d3',
+                    shadowOpacity: .5,
+
                   }}
-                  renderRow={row => <JobListItem data={row} callingActivity='Sequence' />} />
-                  {(this.props.responseMessage)?this.showToast():null}
+                  renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
               </View>
               <Footer style={{
                 height: 'auto'
               }}>
                 <FooterTab style={StyleSheet.flatten([styles.padding10])}>
-                  <Button
-                    onPress={this.showAlert}
-                    disabled={this.props.isResequencingDisabled}
-                    success full>
-                    <Text style={[styles.fontLg, styles.fontWhite]}>Update Sequence</Text>
-                  </Button>
+                  {buttonView}
                 </FooterTab>
               </Footer>
             </Container>
@@ -143,26 +300,9 @@ class Sequence extends PureComponent {
         return (
           <StyleProvider style={getTheme(platform)}>
             <Container>
-               <Header
-            style={StyleSheet.flatten([
-            styles.bgPrimary, {
-              borderBottomWidth: 0
-            }
-          ])}>
-            <Left>
-               <Button transparent onPress={() => { 
-                 this.props.actions.setState(CLEAR_SEQUENCE_STATE)
-                 this.props.navigation.goBack(null) }}>
-              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]}/>
-              </Button>
-            </Left>
-            <Body>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{this.props.navigation.state.params.displayName}</Text>
-            </Body>
-            <Right/>
-          </Header>
+              {headerView}
               <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>No jobs present</Text>
+                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{JOB_NOT_PRESENT}</Text>
               </View>
             </Container>
           </StyleProvider>
@@ -174,35 +314,39 @@ class Sequence extends PureComponent {
 
   showAlert = () => {
     Alert.alert(
-       ROUTE_OPTIMIZATION ,
-         `This will run route optimization for ${_.size(this.props.sequenceList)} job transactions`,
-         [
-    {text: 'Cancel', style: 'cancel'},
-    {text: 'OK', onPress: this.OnOkButtonPressed},
-  ],
+      ROUTE_OPTIMIZATION,
+      `This will run route optimization for ${_.size(this.props.sequenceList)} job transactions`,
+      [
+        { text: CANCEL, style: 'cancel' },
+        { text: OK, onPress: this.OnOkButtonPressed },
+      ],
     )
   }
 
   showToast() {
     Toast.show({
-              text: `${this.props.responseMessage}`,
-              position: 'bottom',
-              buttonText: 'OK'
-            })
+      text: `${this.props.responseMessage}`,
+      duration: 5000,
+      position: 'bottom',
+      buttonText: OK,
+    })
+    this.props.actions.setState(SET_RESPONSE_MESSAGE, '')
   }
 
   OnOkButtonPressed = () => {
-     const requestBody = this.props.actions.resequenceJobsFromServer(this.props.sequenceList)
+    const requestBody = this.props.actions.resequenceJobsFromServer(this.props.sequenceList)
   }
 
 }
+
 const style = StyleSheet.create({
   header: {
     borderBottomWidth: 0,
     height: 'auto',
     padding: 0,
     paddingRight: 0,
-    paddingLeft: 0
+    paddingLeft: 0,
+    paddingBottom: 10
   },
   headerLeft: {
     width: '15%',
@@ -219,6 +363,7 @@ const style = StyleSheet.create({
     width: '15%',
     padding: 15
   },
-})
+});
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sequence)

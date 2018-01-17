@@ -28,6 +28,9 @@ export function fetchUserList() {
     return async function (dispatch) {
         try {
             const userList = await keyValueDBService.getValueFromStore(USER)
+            if(!userList || !userList.value){
+                throw new Error('userList not present')
+            }
             let userDetails = {
                 nameOfUser: userList.value.firstName + ' ' + userList.value.lastName,
                 contactOfUser: userList.value.mobileNumber,
@@ -35,7 +38,7 @@ export function fetchUserList() {
             }
             dispatch(setState(FETCH_USER_DETAILS, userDetails))
         } catch (error) {
-            console.log(error)
+            console.log(error.message)
         }
     }
 }
@@ -51,33 +54,22 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
     return async function (dispatch) {
         try {
             const userPassword = await keyValueDBService.getValueFromStore(PASSWORD)
-            if (!userPassword) {
-                throw new Error(UNSAVED_PASSWORD)
-            }
             const userObject = await keyValueDBService.getValueFromStore(USER)
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject.value.username)
-            console.log("response", response)
-
-            // if (response != null && response.status == 200) {
-
-            // }
+            const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject)
 
             if (response != null && response.status == 200) {
-                await keyValueDBService.validateAndUpdateData(PASSWORD, sha256(newPassword))//change this to update
+                await keyValueDBService.validateAndUpdateData(PASSWORD, sha256(newPassword))
                 let allPasswords = {
                     currentPassword: '',
                     newPassword: '',
                     confirmNewPassword: ''
                 }
                 Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: 'OK' })
-
                 dispatch(setState(CLEAR_PASSWORD_TEXTINPUT, allPasswords))
             }
-
-
         } catch (error) {
-            console.log(error)
+            console.log(error.message)
         }
     }
 }

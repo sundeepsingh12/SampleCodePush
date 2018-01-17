@@ -258,6 +258,7 @@ module.exports = keyMirror({
     CameraAttribute: null,
     ImageDetailsView: null,
     JobDetailsV2: null,
+    SequenceRunsheetList: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -314,9 +315,14 @@ module.exports = keyMirror({
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
-    TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
     CLEAR_SEQUENCE_STATE: null,
+    SET_RUNSHEET_NUMBER_LIST: null,
+    SET_RESPONSE_MESSAGE: null,
+    CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: null,
+    SEQUENCE_LIST_ITEM_DRAGGED: null,
+    SET_REFERENCE_NO: null,
+    SET_SEQUENCE_LIST_ITEM: null,
 
     //New Job
     NEW_JOB_MASTER: null,

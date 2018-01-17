@@ -9,6 +9,7 @@ import {
     IS_RECEIVE_TOGGLE,
     FETCH_CASH_TENDERING_LIST_RETURN,
     CHANGE_AMOUNT_RETURN,
+    RESET_STATE
 } from '../../../lib/constants'
 import cashTenderingReducer from '../cashTenderingReducer'
 
@@ -95,6 +96,26 @@ describe('Cash Tendering List Reducer', () => {
         let nextState = cashTenderingReducer(undefined, action)
         expect(nextState.isReceive).toBe(false)
 
+    })
+
+    it('it Reset state ', () => {
+        let payload = false
+        let action = {
+            type: RESET_STATE,
+            payload: payload
+        }
+        let nextState = cashTenderingReducer(undefined, action)
+        expect(initialState).toBe(initialState)
+    })
+
+    it('it sets initial state ', () => {
+        let payload = false
+        let action = {
+            type: "ABCD_LKJH",
+            payload: payload
+        }
+        let nextState = cashTenderingReducer(undefined, action)
+        expect(initialState).toBe(initialState)
     })
 
 })
