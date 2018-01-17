@@ -6,6 +6,7 @@ export default class transactionLogs extends Realm.Object { }
 
 transactionLogs.schema = {
     name: TABLE_TRANSACTION_LOGS,
+    primaryKey: 'transactionId',
     properties: {
         id: { type: 'int', default: 0 },
         userId: 'int',

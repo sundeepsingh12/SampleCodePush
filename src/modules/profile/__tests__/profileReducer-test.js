@@ -10,6 +10,7 @@ import {
     CLEAR_PASSWORD_TEXTINPUT,
     TOGGLE_SAVE_RESET_BUTTON,
     RESET_STATE,
+    IS_PROFILE_LOADING,   
 } from '../../../lib/constants'
 import profileReducer from '../profileReducer'
 
@@ -97,6 +98,16 @@ describe('Profile  Reducer', () => {
         }
         let nextState = profileReducer(undefined, action)
         expect(initialState).toBe(initialState)
+    })
+
+    it('it shows and hides loader ', () => {
+        let payload = false
+        let action = {
+            type: IS_PROFILE_LOADING,
+            payload: payload
+        }
+        let nextState = profileReducer(undefined, action)
+        expect(nextState.isLoaderInProfile).toBe(payload)
     })
 
     it('it sets initial state ', () => {

@@ -3,11 +3,16 @@
 
 import {
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE,
-    ERROR_MESSAGE
+    ERROR_MESSAGE,
+    INPUT_TEXT_VALUE,
+    SELECTFROMLIST_ITEMS_LENGTH,
+    SET_FILTERED_DATA_SELECTFROMLIST,
+    RESET_STATE
 } from '../../../lib/constants'
 
 const InitialState = require('../selectFromListInitialState').default
 import selectFromListReducer from '../selectFromListReducer'
+const initialState = new InitialState()
 
 describe('selectFromList Reducer ', () => {
 
@@ -70,5 +75,46 @@ describe('selectFromList Reducer ', () => {
         }
         let nextState = selectFromListReducer(undefined, action)
         expect(nextState.errorMessage).toBe(message)
+    })
+
+    it('it should set input text value', () => {
+        const message = 'mapping of radioForMaster error'
+        const action = {
+            type: INPUT_TEXT_VALUE,
+            payload: message
+        }
+        let nextState = selectFromListReducer(undefined, action)
+        expect(nextState.searchBarInputText).toBe(message)
+    })
+
+    it('it should set length of the selectFromList Data in boolean form ', () => {
+        const message = 0
+        const action = {
+            type: SELECTFROMLIST_ITEMS_LENGTH,
+            payload: message
+        }
+        let nextState = selectFromListReducer(undefined, action)
+        expect(nextState.totalItemsInSelectFromList).toBe(message)
+    })
+
+    it('it should set filtered Data in selectfrom list', () => {
+        const payload = {
+            id: 90,
+            code: 123
+        }
+        const action = {
+            type: SET_FILTERED_DATA_SELECTFROMLIST,
+            payload: payload
+        }
+        let nextState = selectFromListReducer(undefined, action)
+        expect(nextState.filteredDataSelectFromList).toBe(payload)
+    })
+
+    it('it reset the state', () => {
+        const action = {
+            type: RESET_STATE,
+        }
+        let nextState = selectFromListReducer(undefined, action)
+        expect(initialState).toBe(initialState)
     })
 })

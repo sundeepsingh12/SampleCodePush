@@ -62,6 +62,7 @@ import {
 } from '../lib/constants'
 import _ from 'lodash'
 import PushNotification from 'react-native-push-notification'
+import { Platform } from 'react-native'
 
 function mapStateToProps(state) {
   return {
@@ -94,6 +95,7 @@ class Home extends PureComponent {
     }
 
   componentDidMount() {
+    if (Platform.OS === 'ios') {
       PushNotification.configure({
         onNotification: function(notification) {
         console.log( 'NOTIFICATION:', notification );
@@ -105,8 +107,9 @@ class Home extends PureComponent {
             })
         // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
         notification.finish(PushNotificationIOS.FetchResult.NoData);
-    }
+        }
         })
+    }
     this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
   }
 
