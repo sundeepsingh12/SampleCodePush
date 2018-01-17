@@ -25,12 +25,13 @@ import {
 
 class SummaryAndPieChart {
 
-    /**
+    /**@function getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds,noNextStatusIds)
+    * 
     * function return count object for piechart of user
-    * @param {*} pendingStatusIds 
-    * @param {*} successStatusIds 
-    * @param {*} failStatusIds 
-    * getAllStatusIdsCount(pendingStatusIds,successStatusIds,failStatusIds)
+    * @param {Array} pendingStatusIds 
+    * @param {Array} successStatusIds 
+    * @param {Array} failStatusIds 
+    * @param {Array} noNextStatusIds
     *
     *@return {pendingCounts : a, successCounts : b, failCounts : c}
     *
@@ -45,19 +46,19 @@ class SummaryAndPieChart {
         query = runSheetIdListQuery && runSheetIdListQuery.trim() !== '' ? `(${query}) AND (${runSheetIdListQuery})` : query
         const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
         const allTransactionOnTodaysDate =  (allPendingSuccessFailIds) ? this.isTodaysDateTransactions(transactionList,pendingStatusIds,noNextStatusIds) : 0
-        const getPendingFailSuccessCounts = await this.setAllCounts(allTransactionOnTodaysDate,pendingStatusIds,successStatusIds,failStatusIds)
-        const {pendingCounts,failCounts,successCounts} = getPendingFailSuccessCounts        
-        return {pendingCounts,failCounts,successCounts}
+        return await this.setAllCounts(allTransactionOnTodaysDate,pendingStatusIds,successStatusIds,failStatusIds)
+        // const {pendingCounts,failCounts,successCounts} = getPendingFailSuccessCounts        
+        // return {pendingCounts,failCounts,successCounts}
     }
 
-    /**
+    /**@function setAllJobMasterSummary(jobMasterList,jobStatusList,jobSummaryList,pendingStatusIds,noNextStatusIds)
     * function return array of jobMasters. It calculates on all jobTransactions according to statusId
     *
-    * @param {*} jobMasterList  
-    * @param {*} jobStatusList 
-    * @param {*} jobSummaryList 
-    *
-    * setAllJobMasterSummary(jobMasterList,jobStatusList,jobSummaryList)
+    * @param {Array} jobMasterList  
+    * @param {Array} jobStatusList 
+    * @param {Array} jobSummaryList 
+    * @param {Array} pendingStatusIds
+    * @param {Array} noNextStatusIds
     *
     *@return [{
         id: '12' // jobMasterId
@@ -102,14 +103,14 @@ class SummaryAndPieChart {
         return Object.values(jobMasterSummaryList)
     }
 
-    /**
+    /** @function setAllCounts(allTransactions,pendingStatusIds,successStatusIds,failStatusIds)
     * function return all count object for piechart of user on all transactions
     * It also update user summary count of pending ,fail and success 
     *
-    * @param {*} allTransactions 
-    * @param {*} pendingStatusIds 
-    * @param {*} successStatusIds 
-    * @param {*} failStatusIds 
+    * @param {Object} allTransactions 
+    * @param {Array} pendingStatusIds 
+    * @param {Array} successStatusIds 
+    * @param {Array} failStatusIds 
     *
     * setAllCounts(allTransactions,pendingStatusIds,successStatusIds,failStatusIds){
     *
@@ -143,13 +144,14 @@ class SummaryAndPieChart {
         return {pendingCounts,failCounts,successCounts}
     }
 
-    /**
+    /**@function idDtoMap(dtoList)
     * function return map for all list 
     *
-    *@param {*} dtoList
+    *@param {Array} dtoList
     * 
     *@return {listMap}
     */
+
     idDtoMap(dtoList){
         const listMap = dtoList.reduce(function ( total, current ) {
             total[ current ] =  1
@@ -158,7 +160,7 @@ class SummaryAndPieChart {
         return listMap
     }
  
-    /**
+    /**@function getAllRunSheetSummary()
     * function get all runSheet for user from runsheetDb and return
     * an array which contain runSheetNo,count and cash collected
     * 
@@ -173,12 +175,13 @@ class SummaryAndPieChart {
         return setRunsheetSummary;
     }
 
-    /**
-    * function check for all transaction according to todayDate
+    /**@function isTodaysDateTransactions(jobTransactions,pendingStatusIds,noNextStatusIds)
+    
+    * function check for all transactions of today's Date
     *
-    *@param {*} jobTransactions
+    *@param {Array} jobTransactions
     * 
-    *@return {jobTransactions}
+    *@return {Array} todayJobTransactions
     */
     
     isTodaysDateTransactions(jobTransactions,pendingStatusIds,noNextStatusIds){

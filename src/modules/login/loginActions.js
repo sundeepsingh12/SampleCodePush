@@ -220,26 +220,26 @@ export function checkRememberMe() {
 export function getSessionToken() {
   return async function (dispatch) {
     try {
-      const userData = await keyValueDBService.getValueFromStore(USER)      
-      if(userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
-          dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-      }else{
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
-      if (token && isPreloaderComplete && isPreloaderComplete.value) {
-        dispatch(NavigationActions.navigate({
-          routeName: HomeTabNavigatorScreen
-        }))
-      } else if (token) {
-        dispatch(NavigationActions.navigate({
-          routeName: PreloaderScreen
-        }))
-      } else {
-        dispatch(NavigationActions.navigate({
-          routeName: LoginScreen
-        }))
+      const userData = await keyValueDBService.getValueFromStore(USER) 
+      if(userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && isPreloaderComplete){      
+          dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
+      }else{
+        if (token && isPreloaderComplete && isPreloaderComplete.value) {
+          dispatch(NavigationActions.navigate({
+            routeName: HomeTabNavigatorScreen
+          }))
+        } else if (token) {
+          dispatch(NavigationActions.navigate({
+            routeName: PreloaderScreen
+          }))
+        } else {
+          dispatch(NavigationActions.navigate({
+            routeName: LoginScreen
+          }))
+        }
       }
-    }
     } catch (error) {
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())

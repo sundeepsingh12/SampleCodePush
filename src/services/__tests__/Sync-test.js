@@ -248,7 +248,7 @@ describe('test sync services', () => {
     sync.deleteRecordsInBatch = jest.fn()
     sync.getAssignOrderTohubEnabledJobs = jest.fn()
     sync.processTdcResponse(tdcContentArray)
-    expect(sync.saveDataFromServerInDB).toHaveBeenCalledTimes(1)
+    expect(sync.saveDataFromServerInDB).toHaveBeenCalledTimes(0)
     expect(sync.getAssignOrderTohubEnabledJobs).toHaveBeenCalledTimes(1)    
     expect(sync.updateDataInDB).not.toHaveBeenCalled()
     expect(sync.deleteRecordsInBatch).not.toHaveBeenCalled()
@@ -283,7 +283,7 @@ describe('test sync services', () => {
     sync.getAssignOrderTohubEnabledJobs = jest.fn()
     
     sync.processTdcResponse(tdcContentArray)
-    expect(sync.updateDataInDB).toHaveBeenCalledTimes(1)
+    expect(sync.updateDataInDB).toHaveBeenCalledTimes(0)
     expect(sync.getAssignOrderTohubEnabledJobs).toHaveBeenCalledTimes(1)    
     expect(sync.saveDataFromServerInDB).not.toHaveBeenCalled()
     expect(sync.deleteRecordsInBatch).not.toHaveBeenCalled()    
