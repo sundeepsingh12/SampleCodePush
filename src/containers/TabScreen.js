@@ -135,7 +135,6 @@ class TabScreen extends PureComponent {
               tabId={tabs[index].id}
               statusIdList={this.props.tabIdStatusIdMap[tabs[index].id]}
               searchText={this.props.searchText}
-              loadTabScreen={this.props.navigation.state.params.loadTabScreen}
             />
           </Tab>
         )

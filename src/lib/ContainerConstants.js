@@ -81,5 +81,9 @@ module.exports = {
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
     TOKEN_MISSING: 'Token missing',
     INVALID_SCAN: 'Invalid Scan',
-    JOBS_DELETED:'Jobs deleted'
+    SEPARATOR_MISSING: 'Separator is missing',
+    JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
+
+    //Sync service
+    JOBS_DELETED: 'Jobs deleted',
 }

@@ -175,6 +175,7 @@ module.exports = keyMirror({
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
     LAST_JOB_COMPLETED_TIME: null,
+    SHOULD_RELOAD_START: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

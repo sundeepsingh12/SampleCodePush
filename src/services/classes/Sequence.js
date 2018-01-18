@@ -12,6 +12,7 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 import {
     HUB,
     TABLE_JOB_TRANSACTION,
+    SHOULD_RELOAD_START
 } from '../../lib/constants'
 
 import {
@@ -25,14 +26,15 @@ import {
 import {
     SAME_SEQUENCE_ERROR,
     SEQUENCELIST_MISSING,
-    BLANK_NEW_SEQUENCE,
     CURRENT_SEQUENCE_ROW_MISSING,
     SEQUENCE_NOT_AN_INT,
     RUNSHEET_NUMBER_MISSING,
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEARCH_TEXT_MISSING,
     SEQUENCE_REQUEST_DTO,
-    TOKEN_MISSING
+    TOKEN_MISSING,
+    SEPARATOR_MISSING,
+    JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import * as realm from '../../repositories/realmdb'
@@ -143,7 +145,7 @@ class Sequence {
                       sequenceArray,
                       transactionsWithChangedSeqeunceMap
      */
-    checkForAutoSequencing(sequenceList) {
+    checkForAutoSequencing(sequenceList, jobMasterSeperatorMap) {
         if (!sequenceList) {
             return {}
         }
@@ -172,8 +174,17 @@ class Sequence {
                 sequenceArray.push(transactionWithSameSequence)
             }
         }
+        if (_.size(fequencySeqeunceMap) != _.size(sequenceArray)) {
+            let returnObject = this.changeSequenceInJobTransaction(sequenceArray, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap)
+            return {
+                isDuplicateSequenceFound: true,
+                sequenceArray: returnObject.sequenceArray,
+                transactionsWithChangedSeqeunceMap: returnObject.transactionsWithChangedSeqeunceMap
+            }
+        }
+
         return {
-            isDuplicateSequenceFound: _.size(fequencySeqeunceMap) != _.size(sequenceArray),
+            isDuplicateSequenceFound: false,
             sequenceArray,
             transactionsWithChangedSeqeunceMap
         }
@@ -189,6 +200,7 @@ class Sequence {
             throw new Error(TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP)
         }
         await realm.saveList(TABLE_JOB_TRANSACTION, _.values(transactionsWithChangedSeqeunceMap))
+        await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
     }
 
     /**
@@ -200,7 +212,7 @@ class Sequence {
      * @returns Object :  cloneSequenceList, // sequence list with new sequnece caused by shift
                           newTransactionsWithChangedSeqeunceMap // transaction map having those transactions whose sequence has been changed
      */
-    onRowDragged(rowParam, sequenceList, transactionsWithChangedSeqeunceMap, isCalledFromJumpSequence) {
+    onRowDragged(rowParam, sequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap, isCalledFromJumpSequence) {
         if (!sequenceList) {
             throw new Error(SEQUENCELIST_MISSING)
         }
@@ -225,9 +237,10 @@ class Sequence {
             }
         }
         cloneSequenceList.splice(rowParam.to, 0, cloneSequenceList.splice(rowParam.from, 1)[0])
+        let returnObject = this.changeSequenceInJobTransaction(cloneSequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap)
         return {
-            cloneSequenceList,
-            newTransactionsWithChangedSeqeunceMap: transactionsWithChangedSeqeunceMap
+            cloneSequenceList: returnObject.sequenceArray,
+            newTransactionsWithChangedSeqeunceMap: returnObject.transactionsWithChangedSeqeunceMap
         }
     }
 
@@ -278,11 +291,9 @@ class Sequence {
      * @returns Object :  cloneSequenceList, // sequence list with new sequnece caused by shift
                           newTransactionsWithChangedSeqeunceMap // transaction map having those transactions whose sequence has been changed
      */
-    jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap) {
+    jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap) {
         if (_.isNull(currentSequenceListItemIndex) || _.isUndefined(currentSequenceListItemIndex)) {
             throw new Error(CURRENT_SEQUENCE_ROW_MISSING)
-        } if (_.size(_.trim(newSequence)) == 0) {
-            throw new Error(BLANK_NEW_SEQUENCE)
         } if (!parseInt(newSequence) || parseInt(newSequence) < 1) {
             throw new Error(SEQUENCE_NOT_AN_INT + newSequence)
         } if (!sequenceList) {
@@ -305,7 +316,109 @@ class Sequence {
         return this.onRowDragged({
             from: currentSequenceListItemIndex,
             to: index
-        }, sequenceList, transactionsWithChangedSeqeunceMap, true)
+        }, sequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap, true)
+    }
+
+    /**
+     * 
+     * @param {*} jobMasterIdCustomizationMap 
+     * @returns jobMasterSeperatorMap // map of jobMasterId and seperator
+     */
+    createSeperatorMap(jobMasterIdCustomizationMap) {
+        if (!jobMasterIdCustomizationMap || !jobMasterIdCustomizationMap.value) {
+            throw new Error(JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING)
+        }
+        let jobMasterSeperatorMap = {}
+        for (let jobMasterCustomizationIndex in jobMasterIdCustomizationMap.value) {
+            let seperatorMap = {}
+            let jobMasterCustomizationObject = jobMasterIdCustomizationMap.value[jobMasterCustomizationIndex]
+            if (jobMasterCustomizationObject[1] && jobMasterCustomizationObject[1].routingSequenceNumber) {
+                seperatorMap['line1'] = {
+                    separator: jobMasterCustomizationObject[1].separator,
+                }
+            }
+            if (jobMasterCustomizationObject[2] && jobMasterCustomizationObject[2].routingSequenceNumber) {
+                seperatorMap['line2'] = {
+                    separator: jobMasterCustomizationObject[2].separator,
+                }
+            }
+            if (jobMasterCustomizationObject[3] && jobMasterCustomizationObject[3].routingSequenceNumber) {
+                seperatorMap['circle1'] = {
+                    separator: jobMasterCustomizationObject[3].separator,
+                }
+            }
+            if (jobMasterCustomizationObject[4] && jobMasterCustomizationObject[4].routingSequenceNumber) {
+                seperatorMap['circle2'] = {
+                    separator: jobMasterCustomizationObject[4].separator,
+                }
+            }
+            if (!_.isEmpty(seperatorMap)) {
+                jobMasterSeperatorMap[jobMasterCustomizationIndex] = seperatorMap
+            }
+        }
+        return jobMasterSeperatorMap
+    }
+
+    /**
+     * 
+     * @param {*} sequenceArray 
+     * @param {*} transactionsWithChangedSeqeunceMap 
+     * @param {*} jobMasterSeperatorMap 
+     * @returns Object: {
+            sequenceArray: // sequence List
+            transactionsWithChangedSeqeunceMap // transaction with changed seqeunce
+        }
+     */
+    changeSequenceInJobTransaction(sequenceArray, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap) {
+        if (_.isEmpty(jobMasterSeperatorMap)) {
+            return {
+                sequenceArray,
+                transactionsWithChangedSeqeunceMap
+            }
+        }
+        const cloneSequenceMap = _.mapKeys(sequenceArray, 'id')
+        for (let jobTransactionIndex in transactionsWithChangedSeqeunceMap) {
+            let jobTransacion = transactionsWithChangedSeqeunceMap[jobTransactionIndex]
+            if (!jobMasterSeperatorMap[jobTransacion.jobMasterId]) {
+                continue
+            }
+
+            let seperatorMap = jobMasterSeperatorMap[jobTransacion.jobMasterId]
+            if (seperatorMap.line1 && jobTransacion.line1) {
+                cloneSequenceMap[jobTransacion.id].line1 = jobTransacion.line1 = this.changeLineTextOrCicleText(seperatorMap.line1.separator, jobTransacion.line1, jobTransacion.seqSelected)
+            }
+            if (seperatorMap.line2 && jobTransacion.line2) {
+                cloneSequenceMap[jobTransacion.id].line2 = jobTransacion.line2 = this.changeLineTextOrCicleText(seperatorMap.line2.separator, jobTransacion.line2, jobTransacion.seqSelected)
+            }
+            if (seperatorMap.circle1 && jobTransacion.circleLine1) {
+                cloneSequenceMap[jobTransacion.id].circleLine1 = jobTransacion.circleLine1 = this.changeLineTextOrCicleText(seperatorMap.circle1.separator, jobTransacion.circleLine1, jobTransacion.seqSelected)
+            }
+            if (seperatorMap.circle2 && jobTransacion.circleLine2) {
+                cloneSequenceMap[jobTransacion.id].circleLine2 = jobTransacion.circleLine2 = this.changeLineTextOrCicleText(seperatorMap.circle2.separator, jobTransacion.circleLine2, jobTransacion.seqSelected)
+            }
+        }
+        return {
+            sequenceArray: _.values(cloneSequenceMap),
+            transactionsWithChangedSeqeunceMap
+        }
+    }
+
+    /**
+     * 
+     * @param {*} separator 
+     * @param {*} textToChange 
+     * @param {*} seqSelected 
+     * @returns string // returns text by changing seqeuence in text
+     */
+    changeLineTextOrCicleText(separator, textToChange, seqSelected) {
+        if (!separator) {
+            throw new Error(SEPARATOR_MISSING)
+        }
+        let startIndex = textToChange.indexOf('Sequence: ') + 10
+        let lastIndex = startIndex
+        for (; lastIndex < _.size(textToChange) && !_.isEqual(textToChange[lastIndex], separator); lastIndex++);// Don't remove this semi-colon
+        let finalText = textToChange.substring(0, startIndex) + seqSelected + textToChange.substring(lastIndex, _.size(textToChange))
+        return finalText
     }
 }
 
