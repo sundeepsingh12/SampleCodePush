@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
 import {
     Container,
@@ -41,7 +41,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class DataStoreDetails extends Component {
+class DataStoreDetails extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
         return { header: null }

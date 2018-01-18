@@ -46,6 +46,7 @@ import {
 
   Home,
   Login,
+  AutoLogoutScreen,
   JOB_MASTER,
   JOB_ATTRIBUTE,
   JOB_ATTRIBUTE_VALUE,
@@ -83,6 +84,8 @@ import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
 import { userEventLogService } from '../../services/classes/UserEvent'
+import BackgroundTimer from 'react-native-background-timer';
+import moment from 'moment'
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -256,6 +259,7 @@ export function downloadJobMaster() {
       const json = await jobMasters.json
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
+      dispatch(autoLogout(userObject))
     } catch (error) {
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
@@ -264,6 +268,33 @@ export function downloadJobMaster() {
       } else {
         dispatch(jobMasterDownloadFailure(error.message))
       }
+    }
+  }
+}
+
+/**This method logs out the user and deletes session token from store in case of AutoLogout
+ *  It also handles when user don't have network connection
+ * 
+ * @function invalidateUserSessionForAutoLogout()
+ * 
+ * @return Navigate to LoginScreen
+ */
+
+export function invalidateUserSessionForAutoLogout() {
+  return async function (dispatch) {
+    try {
+      dispatch(preLogoutRequest())
+      dispatch(setState(TOGGLE_LOGOUT, true))
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)     
+      await authenticationService.logout(token)
+      await logoutService.deleteDataBase()
+      dispatch(preLogoutSuccess())
+      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(setState(TOGGLE_LOGOUT,false))
+      dispatch(deleteSessionToken())
+    } catch (error) {  
+      dispatch(startLoginScreenWithoutLogout())
+      dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
 }
@@ -282,13 +313,39 @@ export function invalidateUserSession() {
       // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")      
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
-      dispatch(deleteSessionToken())
       dispatch(preLogoutSuccess())
-      dispatch(setState(TOGGLE_LOGOUT, false))
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
-    } catch (error) {
+      dispatch(setState(TOGGLE_LOGOUT,false))
+      dispatch(deleteSessionToken())
+       
+    } catch (error) {  
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
+    }
+  }
+}
+
+/**This method Schedule BackGround Timer for autoLogout app at midNight('00:00:00') 
+ * It is run in Background mode also. This method is call only one time .
+ * 
+ * @function autoLogout(userData)
+ * 
+ */
+
+export function autoLogout(userData) {
+  return async (dispatch) => {
+    try {      
+     if(userData && userData.value && userData.value.company &&  userData.value.company.autoLogoutFromDevice){
+      let timeLimit = moment('23:59:59',"HH:mm:ss").diff(moment(new Date(),"HH:mm:ss"), 'seconds')+5      
+      const timeOutId  = BackgroundTimer.setTimeout(async () => {
+        if(!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
+          dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
+          BackgroundTimer.clearTimeout(timeOutId);         
+        }
+      }, timeLimit*1000)      
+    }
+    } catch (error) {
+      console.log(error)
     }
   }
 }

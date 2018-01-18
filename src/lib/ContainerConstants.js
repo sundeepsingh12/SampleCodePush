@@ -1,4 +1,6 @@
 module.exports = {
+    //Token Error
+    TOKEN_MISSING: 'Token Missing',
 
     //common_CONSTANTS
     CANCEL: 'Cancel',
@@ -65,6 +67,34 @@ module.exports = {
     PAYMENT: 'Payment',
     ADD_PAYMENT_MODE: '+ Add',
     NUMBER: 'Number',
-    SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount'
+    SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
 
+    //Sequence
+    SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
+    DUPLICATE_SEQUENCE_MESSAGE: 'Duplicate sequence found for this runsheet auto corrected, please save the modified sequence',
+    SAVE_SUCCESSFUL: 'Save Successful',
+    UPDATE_SEQUENCE: 'Update Sequence',
+    SAVE: 'Save',
+    WARNING_FOR_BACK: 'Sequence changes have not been save, please return and save changes',
+    WARNING: 'Warning',
+    JOB_NOT_PRESENT: 'No jobs present',
+    CURRENT_SEQUENCE_NUMBER: 'Current sequence number : ',
+    NEW_SEQUENCE_NUMBER_MESSAGE: 'Enter new sequence number to jump to',
+    JUMP_SEQUENCE: 'Jump Sequence',
+    UNTRACKED_JOBS_MESSAGE: ' jobs were not resequenced',
+
+    //Exception used in sequence
+    SAME_SEQUENCE_ERROR: `New seqence can't be same as previous sequence`,
+    SEQUENCELIST_MISSING: `sequenceList not present`,
+    BLANK_NEW_SEQUENCE: `Sequence can't be left blank`,
+    CURRENT_SEQUENCE_ROW_MISSING: `currentSequenceListItemIndex missing`,
+    SEQUENCE_NOT_AN_INT: `Sequence can't be `,
+    RUNSHEET_MISSING: 'No runsheet found',
+    RUNSHEET_NUMBER_MISSING: 'Runsheet number not present',
+    TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
+    SEARCH_TEXT_MISSING: 'searchText not present',
+    SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
+    TOKEN_MISSING: 'Token missing',
+    INVALID_SCAN: 'Invalid Scan',
+    JOBS_DELETED:'Jobs deleted'
 }

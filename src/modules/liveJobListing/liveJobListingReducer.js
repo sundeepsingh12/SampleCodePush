@@ -18,6 +18,7 @@ export default function liveJobReducer(state = initialState, action) {
                 .set('selectedItems', [])
                 .set('loaderRunning', false)
                 .set('liveJobToastMessage', '')
+                .set('searchText', '')
         case TOGGLE_LIVE_JOB_LIST_ITEM:
             return state.set('liveJobList', action.payload.jobTransactions)
                 .set('selectedItems', action.payload.selectedItems)
@@ -30,7 +31,7 @@ export default function liveJobReducer(state = initialState, action) {
         case SET_LIVE_JOB_TOAST:
             return state.set('liveJobToastMessage', action.payload)
         case RESET_STATE:
-            return initialState    
+            return initialState
     }
     return state
 }

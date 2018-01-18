@@ -11,6 +11,7 @@ import {
     OBJECT,
     CASH,
     STRING,
+    TOTAL_AMOUNT,
     OBJECT_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
 

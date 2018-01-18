@@ -22,7 +22,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 /**
  * The components needed from React
  */
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import
 {
   StyleSheet,
@@ -113,7 +113,7 @@ var styles = StyleSheet.create({
 /**
  * ## App class
  */
-class Utilities extends Component {
+class Utilities extends PureComponent {
 
   handlePress () {
     // Actions.Subview({

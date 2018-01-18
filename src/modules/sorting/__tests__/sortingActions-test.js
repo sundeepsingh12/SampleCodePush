@@ -27,7 +27,6 @@ describe('sorting actions', () => {
         "4": {"id": 4, "value": "N.A"}
         }
         
-    
     let jsonData = {
             firstName : 'MANUPRA',
             lastName : 'SINGH',

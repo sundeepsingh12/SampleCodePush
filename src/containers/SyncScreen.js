@@ -9,7 +9,7 @@ import Loader from '../components/Loader'
 import ResyncLoader from '../components/ResyncLoader'
 
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native'
 
 import {
@@ -64,7 +64,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-class SyncScreen extends Component {
+class SyncScreen extends PureComponent {
 
   componentDidMount() {
     this.props.actions.startMqttService(this.props.pieChart)
@@ -76,6 +76,9 @@ class SyncScreen extends Component {
     let transactionList = this.props.unsyncedTransactionList
     let transactionView = []
     for (let index in transactionList) {
+      if(!transactionList[index]){
+        continue
+      }
       transactionView.push(
         <Text key={transactionList[index].id} style={[styles.fontDefault, styles.paddingTop10, styles.paddingBottom10]}>
           {transactionList[index].referenceNumber}

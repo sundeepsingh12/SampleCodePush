@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -87,7 +87,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-class Payment extends Component {
+class Payment extends PureComponent {
 
     static navigationOptions = ({ navigation }) => {
         return { header: null }

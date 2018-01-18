@@ -165,19 +165,45 @@ class JobData {
     }
 
 
-/**Returns parentId Vs JobData List
- * 
- * @param {*} jobDatas 
- */
+    /**Returns parentId Vs JobData List
+     * 
+     * @param {*} jobDatas 
+     */
     getParentIdJobDataListMap(jobDatas) {
         let parentIdJobDataListMap = {}
         jobDatas.forEach(jobData => {
-            let jobDataList = (parentIdJobDataListMap[jobData.parentId])?parentIdJobDataListMap[jobData.parentId]:[]
+            let jobDataList = (parentIdJobDataListMap[jobData.parentId]) ? parentIdJobDataListMap[jobData.parentId] : []
             jobDataList.push(jobData)
             parentIdJobDataListMap[jobData.parentId] = jobDataList
         })
         return parentIdJobDataListMap
     }
-}
 
+    /**Returns job data map for transaction list
+     * 
+     * @param {*} jobTransactionList 
+     */
+    getJobData(jobTransactionList) {
+        let jobDataQuery = jobTransactionList.map(jobTransaction => 'jobId = ' + jobTransaction.jobId).join(' OR ')
+        let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery, null, null)
+        let jobDataMap = {}
+        jobDataList.forEach(jobDataObj => {
+            const {
+                jobAttributeMasterId,
+                jobId,
+                parentId,
+                value
+            } = jobDataObj
+            let jobData = {
+                jobId,
+                jobAttributeMasterId,
+                value
+            }
+            jobDataMap[jobId] = jobDataMap[jobId] ? jobDataMap[jobId] : {}
+
+            jobDataMap[jobId][jobAttributeMasterId] = jobData
+        })
+        return jobDataMap
+    }
+}
 export let jobDataService = new JobData()

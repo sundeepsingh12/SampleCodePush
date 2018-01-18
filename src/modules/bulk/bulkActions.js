@@ -8,7 +8,10 @@ import {
     STOP_FETCHING_BULK_TRANSACTIONS,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM,
     TOGGLE_ALL_JOB_TRANSACTIONS,
-    CUSTOMIZATION_APP_MODULE
+    CUSTOMIZATION_APP_MODULE,
+    SET_BULK_SEARCH_TEXT,
+    CUSTOMIZATION_LIST_MAP,
+    SET_BULK_ERROR_MESSAGE
 } from '../../lib/constants'
 import {
     setState
@@ -48,7 +51,7 @@ export function getJobMasterVsStatusNameList() {
             dispatch(setState(STOP_FETCHING_BULK_CONFIG, jobMasterVsStatusList))
         } catch (error) {
             console.log(error)
-              dispatch(setState(STOP_FETCHING_BULK_CONFIG,[]))
+            dispatch(setState(STOP_FETCHING_BULK_CONFIG, []))
         }
     }
 }
@@ -61,11 +64,22 @@ export function getBulkJobTransactions(bulkParams) {
             const bulkTransactions = await bulkService.getJobListingForBulk(bulkParams)
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             const bulkModule = await moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomizationList.value, BULK_ID)
-            const selectAll = (bulkModule[0].remark) ? JSON.parse(bulkModule[0].remark).selectAll : false
-            console.log('selectAll', selectAll)
+            const bulkModuleRemark = JSON.parse(bulkModule[0].remark)
+            const selectAll = bulkModuleRemark ? bulkModuleRemark.selectAll : false
+            const jobMasterManualSelectionConfiguration = bulkModuleRemark ? bulkModuleRemark.jobMasterManualSelectionConfiguration : null
+            const isManualSelectionAllowed = bulkService.getManualSelection(jobMasterManualSelectionConfiguration, bulkParams.jobMasterId)
+            const searchSelectionOnLine1Line2 = bulkModuleRemark ? bulkModuleRemark.searchSelectionOnLine1Line2 : false
+            let idToSeparatorMap
+            if (searchSelectionOnLine1Line2) {
+                const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+                idToSeparatorMap = bulkService.getIdSeparatorMap(jobMasterIdCustomizationMap, bulkParams.jobMasterId)
+            }
             dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS, {
                 bulkTransactions,
-                selectAll
+                selectAll,
+                isManualSelectionAllowed,
+                searchSelectionOnLine1Line2,
+                idToSeparatorMap
             }))
         } catch (error) {
             console.log(error)
@@ -84,8 +98,8 @@ export function toggleListItemIsChecked(jobTransactionId, allTransactions) {
             //     selectedItems,
             //     bulkTransactions
             // }))
-            let displayText = (selectedItems.length==_.size(allTransactions))?'Select None':'Select All'
-           dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
+            let displayText = (selectedItems.length == _.size(allTransactions)) ? 'Select None' : 'Select All'
+            dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
                 selectedItems,
                 bulkTransactions,
                 displayText
@@ -111,6 +125,48 @@ export function toggleAllItems(allTransactions, selectAllNone) {
                 displayText = 'Select All'
             }
 
+            dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
+                selectedItems,
+                bulkTransactions,
+                displayText
+            }))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap) {
+    return async function (dispatch) {
+        try {
+            let searchResultObject = bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)
+            if (!searchResultObject) {
+                throw new Error('Could not search')
+            }
+            if (!searchResultObject.errorMessage && searchResultObject.errorMessage == '') {
+                if (searchResultObject.jobTransactionArray && searchResultObject.jobTransactionArray.length == 1) {
+                    dispatch(toggleListItemIsChecked(searchResultObject.jobTransactionArray[0].id, bulkTransactions))
+                    dispatch(setState(SET_BULK_SEARCH_TEXT, ''))
+                } else if (searchResultObject.jobTransactionArray && searchResultObject.jobTransactionArray.length > 1) {
+                    dispatch(toggleMultipleTransactions(searchResultObject.jobTransactionArray, bulkTransactions))
+                    dispatch(setState(SET_BULK_SEARCH_TEXT, ''))
+                }
+            } else {
+                dispatch(setState(SET_BULK_ERROR_MESSAGE, searchResultObject.errorMessage))
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+export function toggleMultipleTransactions(jobTransactionList, allTransactions) {
+    return async function (dispatch) {
+        try {
+            const bulkTransactions = await JSON.parse(JSON.stringify(allTransactions))
+            for (let jobTransaction of jobTransactionList) {
+                bulkTransactions[jobTransaction.id].isChecked = !bulkTransactions[jobTransaction.id].isChecked
+            }
+            const selectedItems = await bulkService.getSelectedTransactionIds(bulkTransactions)
+            let displayText = (selectedItems.length == _.size(allTransactions)) ? 'Select None' : 'Select All'
             dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
                 selectedItems,
                 bulkTransactions,

@@ -17,7 +17,12 @@ import {
     END_LIVEJOB_DETAILD_FETCHING,
     SET_LIVE_JOB_LIST,
     TOGGLE_LIVE_JOB_LIST_ITEM,
-    START_FETCHING_LIVE_JOB
+    START_FETCHING_LIVE_JOB,
+    SET_SEARCH,
+    TabScreen,
+    SET_MESSAGE,
+    SET_LIVE_JOB_TOAST,
+    HomeTabNavigatorScreen
 } from '../../../lib/constants'
 import CONFIG from '../../../lib/config'
 import thunk from 'redux-thunk'
@@ -312,6 +317,10 @@ describe('get job details actions', () => {
     it('should get Job Details', () => {
         const expectedActions = [
             {
+                type: SET_MESSAGE,
+                payload: ''
+            },
+            {
                 type: END_LIVEJOB_DETAILD_FETCHING,
                 payload: {
                     jobDataList,
@@ -335,6 +344,9 @@ describe('get job details actions', () => {
             .then(() => {
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(jobTransactionService.prepareParticularStatusTransactionDetails).toHaveBeenCalled()
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
     })
 })
@@ -349,7 +361,7 @@ describe('test for fetchAllLiveJobsList', () => {
         {
             type: SET_LIVE_JOB_LIST,
             payload: liveJobList
-        }
+        },
     ]
     it('should set live job list', () => {
         liveJobService.getLiveJobList = jest.fn()
@@ -367,29 +379,30 @@ describe('test for fetchAllLiveJobsList', () => {
 })
 
 describe('test for toggleLiveJobSelection', () => {
-    let jobId = 0
-    let allJobs = {
-        0: {
-            jobTransactionCustomization: { isChecked: false }
-        }
-    }
-    let jobTransactions = {
-        0: {
-            jobTransactionCustomization: { isChecked: true }
-        }
-    }
-    const selectedItems = []
 
-    const expectedActions = [
-        {
-            type: TOGGLE_LIVE_JOB_LIST_ITEM,
-            payload: {
-                selectedItems,
-                jobTransactions
+    it('should set live job list', () => {
+        let jobId = 0
+        let allJobs = {
+            0: {
+                jobTransactionCustomization: { isChecked: false }
             }
         }
-    ]
-    it('should set live job list', () => {
+        let jobTransactions = {
+            0: {
+                jobTransactionCustomization: { isChecked: true }
+            }
+        }
+        const selectedItems = []
+
+        const expectedActions = [
+            {
+                type: TOGGLE_LIVE_JOB_LIST_ITEM,
+                payload: {
+                    selectedItems,
+                    jobTransactions
+                }
+            }
+        ]
         liveJobService.getSelectedJobIds = jest.fn()
         liveJobService.getSelectedJobIds.mockReturnValue(selectedItems);
         const store = mockStore({})
@@ -400,6 +413,36 @@ describe('test for toggleLiveJobSelection', () => {
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
     })
+    it('should throw error', () => {
+        let jobId = 0
+        let allJobs = {
+            0: {
+                
+            }
+        }
+        let jobTransactions = {
+            0: {
+
+            }
+        }
+        const selectedItems = []
+
+        const expectedActions = [
+            {
+                type: TOGGLE_LIVE_JOB_LIST_ITEM,
+                payload: {
+                    selectedItems,
+                    jobTransactions
+                }
+            }
+        ]
+        liveJobService.getSelectedJobIds = jest.fn()
+        liveJobService.getSelectedJobIds.mockReturnValue(selectedItems);
+        const store = mockStore({})
+        return store.dispatch(actions.toggleLiveJobSelection(jobId, allJobs))
+            .then(() => {
+            })
+    })
 })
 
 describe('test for acceptOrRejectMultiple', () => {
@@ -407,12 +450,15 @@ describe('test for acceptOrRejectMultiple', () => {
     let jobId = 0
     const status = 1
     const selectedItems = []
-    const liveJobList = []
+    const liveJobList = {
+        newLiveJobList: [],
+        toastMessage: 'test'
+    }
 
     const expectedActions = [
         {
             type: SET_LIVE_JOB_LIST,
-            payload: liveJobList
+            payload: liveJobList.newLiveJobList
         }
     ]
     it('should set new live job list', () => {
@@ -447,8 +493,164 @@ describe('test for deleteExpiredJob', () => {
         const store = mockStore({})
         return store.dispatch(actions.deleteExpiredJob([jobId], liveJobList))
             .then(() => {
+                expect(liveJobService.deleteJob).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+})
+
+describe('test for selectNone', () => {
+    it('should unselect all transactions', () => {
+        const liveJobList = {
+            1: {
+                id: 1,
+                jobTransactionCustomization: {
+                    isChecked: true
+                }
+
+            }
+        }
+        const selectedJobs = {
+            1: {
+                id: 1,
+                jobTransactionCustomization: {
+                    isChecked: false
+                }
+
+            }
+        }
+
+        const selectedItems = []
+        const expectedActions = [
+            {
+                type: TOGGLE_LIVE_JOB_LIST_ITEM,
+                payload: {
+                    selectedItems,
+                    jobTransactions: selectedJobs
+                }
+            }
+        ]
+        const result = {
+            selectedItems,
+            jobTransactions: selectedJobs
+        }
+        const store = mockStore({})
+        return store.dispatch(actions.selectNone(liveJobList))
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+})
+describe('test for selectAll', () => {
+    it('should select all transactions', () => {
+        const liveJobList = {
+            1: {
+                id: 1,
+                jobTransactionCustomization: {
+                    isChecked: false
+                }
+
+            }
+        }
+        const selectedJobs = {
+            1: {
+                id: 1,
+                jobTransactionCustomization: {
+                    isChecked: true
+                }
+
+            }
+        }
+
+        const selectedItems = ['1']
+        const expectedActions = [
+            {
+                type: TOGGLE_LIVE_JOB_LIST_ITEM,
+                payload: {
+                    selectedItems,
+                    jobTransactions: selectedJobs
+                }
+            }
+        ]
+        const result = {
+            selectedItems,
+            jobTransactions: selectedJobs
+        }
+        const store = mockStore({})
+        return store.dispatch(actions.selectAll(liveJobList))
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+})
+describe('test for acceptOrRejectJob', () => {
+    it('should accept single job', () => {
+        const token = 'token'
+        let job = {
+            id: 1
+        }
+        const status = 1
+        const selectedItems = []
+        const liveJobList = {
+            newLiveJobList: [],
+            toastMessage: 'Something went wrong,try again'
+        }
+
+        const expectedActions = [
+            {
+                type: SET_MESSAGE,
+                payload: liveJobList.toastMessage
+            }
+        ]
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(token)
+        liveJobService.requestServerForApproval = jest.fn()
+        liveJobService.requestServerForApproval.mockReturnValue(liveJobList);
+        //NavigationActions.reset = jest.fn()
+        const store = mockStore({})
+        return store.dispatch(actions.acceptOrRejectJob(status, job, []))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(liveJobService.requestServerForApproval).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                // expect(NavigationActions.reset).toHaveBeenCalledTimes(1)
+            })
+    })
+    it('should reject single job', () => {
+        const token = 'token'
+        let job = {
+            id: 1
+        }
+        const status = 2
+        const selectedItems = []
+        const liveJobList = {
+            newLiveJobList: [],
+            toastMessage: 'Something went wrong,try again'
+        }
+
+        const expectedActions = [
+            {
+                type: SET_MESSAGE,
+                payload: liveJobList.toastMessage
+            }
+        ]
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(token)
+        liveJobService.requestServerForApproval = jest.fn()
+        liveJobService.requestServerForApproval.mockReturnValue(liveJobList);
+        //NavigationActions.reset = jest.fn()
+        const store = mockStore({})
+        return store.dispatch(actions.acceptOrRejectJob(status, job, []))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(liveJobService.requestServerForApproval).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                // expect(NavigationActions.reset).toHaveBeenCalledTimes(1)
             })
     })
 })

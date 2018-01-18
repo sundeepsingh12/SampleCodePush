@@ -39,7 +39,7 @@ export function onSave(parentObject, formElement, cashTenderingList, cashTenderi
 }
 
 export function getCashTenderingListReturn(cashTenderingList) {
-    return function (dispatch) {
+    return async function (dispatch) {
         try {
             if (!cashTenderingList) {
                 throw new Error("cashTenderingList not set Properly in getCashTenderingListReturn Action")
@@ -57,7 +57,7 @@ export function getCashTenderingListReturn(cashTenderingList) {
 }
 
 export function checkForCash(formElement, currentElement) {
-    return function (dispatch) {
+    return async function (dispatch) {
         try {
             if (!formElement || !currentElement) {
                 throw new Error("formElement or currentElement not found in checkForCash Action")

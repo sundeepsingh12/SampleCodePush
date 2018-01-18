@@ -12,6 +12,7 @@ import {
   ON_LOGIN_PASSWORD_CHANGE,
   TOGGLE_CHECKBOX,
   REMEMBER_ME_SET_TRUE,
+  ON_LONG_PRESS_ICON
 } from '../../../lib/constants'
 
 import authReducer from '../loginReducer'
@@ -38,6 +39,14 @@ describe('login reducer without initial state',() => {
         expect(nextState.form.displayMessage).toBe('')
         expect(nextState.form.isButtonDisabled).toBe(false)
         expect(nextState.form.isEditTextDisabled).toBe(false)
+    })
+    it('should set reset setting on long press',() => {
+        const action = {
+            type : ON_LONG_PRESS_ICON,
+            payload: true
+        }
+        let nextState = authReducer(undefined,action)
+        expect(nextState.form.isLongPress).toBe(true)
     })
 
     it('should set login failure',() => {

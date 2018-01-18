@@ -21,6 +21,7 @@ import {
   PASSWORD,
   LoginScreen,
   IS_SERVER_REACHABLE,
+  AutoLogoutScreen,
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -47,6 +48,14 @@ import { authenticationService } from '../../services/classes/Authentication'
 import { logoutService } from '../../services/classes/Logout'
 import _ from 'lodash'
 import { userEventLogService } from '../../services/classes/UserEvent'
+
+import moment from 'moment'
+import {
+  invalidateUserSessionForAutoLogout
+} from '../pre-loader/preloaderActions'
+import {
+  NavigationActions
+} from 'react-navigation'
 /**
  * This action enables modules for particular user
  */
@@ -68,7 +77,7 @@ export function fetchModulesList(modules, pieChart, menu) {
       if (result.pieChart[PIECHART].enabled) {
         dispatch(pieChartCount())
       }
-    } catch (error) {
+    }catch (error) {
       console.log(error)
     }
   }
@@ -112,6 +121,10 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
+      const userData = await keyValueDBService.getValueFromStore(USER)      
+      if(userData && userData.value && userData.value.company &&  userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
+        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
+      }else{
       let saveStoreObject = {
         showLiveJobNotification: false
       }
@@ -122,7 +135,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         syncStatus: 'Uploading'
       }))
       const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
-      const syncCount = responseBody.split(",")[1]
+      const syncCount = parseInt(responseBody.split(",")[1])
       //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
       if (isCalledFromHome || syncCount > 0) {
         console.log(isCalledFromHome, syncCount)
@@ -153,7 +166,8 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
     }
-    } catch (error) {
+    }
+   } catch (error) {
       if (error.code == 500 || error.code == 502) {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],

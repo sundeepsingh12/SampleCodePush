@@ -43,7 +43,7 @@ class JobTransaction {
 
     getJobTransactionsForDeleteSync(statusIds, postOrderList) {
         let query = statusIds ? statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ') : ''
-        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"` ).join(' OR ') : ''
+        let postOrderQuery = postOrderList ? postOrderList.map(referenceNumber => `referenceNumber = "${referenceNumber}"`).join(' OR ') : ''
         query = query && query.trim() !== '' ? query + ' OR ' + postOrderQuery : postOrderQuery
         const transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
         return transactionList
@@ -99,7 +99,7 @@ class JobTransaction {
                 "transactionId": unseenTransactionObject.id,
                 "unSeenStatusId": unseenTransactionObject.jobStatusId
             }
-            jobMasterIdStatusIdTransactionIdMap[unseenTransactionObject.id] = transactionIdDTO
+            jobMasterIdStatusIdTransactionIdMap[unseenTransactionObject.jobStatusId] = transactionIdDTO
         })
         return { jobMasterIdJobStatusIdTransactionIdDtoMap, jobMasterIdStatusIdTransactionIdMap }
     }
@@ -138,7 +138,9 @@ class JobTransaction {
                 trackHalt,
                 trackKm,
                 trackSmsCount,
-                trackTransactionTimeSpent
+                trackTransactionTimeSpent,
+                seqAssigned,
+                seqActual
             } = transaction
             if (index == 0) {
                 jobQuery += 'id = ' + jobId
@@ -165,7 +167,9 @@ class JobTransaction {
                 trackHalt,
                 trackKm,
                 trackSmsCount,
-                trackTransactionTimeSpent
+                trackTransactionTimeSpent,
+                seqAssigned,
+                seqActual
             }
         }
         return {
@@ -245,9 +249,12 @@ class JobTransaction {
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
         }
         else if (callingActivity == 'Sequence') {
-            let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-            //Fetch only pending status category job transactions for sequence listing
-            jobTransactionQuery = statusQuery && statusQuery.trim() !== '' ? `${jobTransactionQuery} AND (${statusQuery})` : `${jobTransactionQuery}`
+            let statusQueryWithRunsheetNo = '('
+            statusQueryWithRunsheetNo += callingActivityData.statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+            statusQueryWithRunsheetNo += `) AND runsheetNo = "${callingActivityData.runsheetNumber}"`
+            jobTransactionQuery = `deleteFlag != 1`
+            //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected
+            jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
             fieldDataList = [], fieldDataMap = {}
@@ -325,12 +332,14 @@ class JobTransaction {
      *                                          line1
      *                                          line2
      *                                          seqSelected
+     *                                          seqActual
+     *                                          seqAssigned
      *                                      }
      *                                   ]
      */
     prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap) {
         let jobTransactionCustomizationList = []
-        let jobTransactionDateTOJobTransactionsMap = {}        
+        let jobTransactionDateTOJobTransactionsMap = {}
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
@@ -362,6 +371,8 @@ class JobTransaction {
             jobTransactionCustomization.jobLongitude = job.longitude
             jobTransactionCustomization.jobId = jobTransaction.jobId
             jobTransactionCustomization.identifierColor = idJobMasterMap[jobMasterId].identifierColor
+            jobTransactionCustomization.seqActual = jobTransaction.seqActual
+            jobTransactionCustomization.seqAssigned = jobTransaction.seqAssigned
             if (callingActivity == 'LiveJob') {
                 jobTransaction.jobTransactionCustomization = jobTransactionCustomization
             }
@@ -467,6 +478,7 @@ class JobTransaction {
         finalText += this.appendText(customizationObject.trackCallDuration, jobTransaction.trackCallDuration, "Call Duration: ", customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.trackSmsCount, jobTransaction.trackSmsCount, "Sms: ", customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.trackTransactionTimeSpent, jobTransaction.trackTransactionTimeSpent, "Time Spent: ", customizationObject.separator, finalText)
+        finalText += this.appendText(customizationObject.routingSequenceNumber, jobTransaction.seqSelected, "Sequence: ", customizationObject.separator, finalText)
         return finalText
     }
 
@@ -492,18 +504,18 @@ class JobTransaction {
         return text
     }
 
-   async checkIdToBeSync(jobTransactionId){
-       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-       let checkId = false
-       if(pendingSyncTransactionIds && pendingSyncTransactionIds.value.length > 0){
-           for(let item of pendingSyncTransactionIds.value){
-               if(item.id == jobTransactionId){
-                   checkId = true
-                   break
-               }
-           }
-       }
-       return checkId
+    async checkIdToBeSync(jobTransactionId) {
+        let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
+        let checkId = false
+        if (pendingSyncTransactionIds && pendingSyncTransactionIds.value.length > 0) {
+            for (let item of pendingSyncTransactionIds.value) {
+                if (item.id == jobTransactionId) {
+                    checkId = true
+                    break
+                }
+            }
+        }
+        return checkId
     }
 
     /**
@@ -654,7 +666,7 @@ class JobTransaction {
     prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = (callingActivity != 'LiveJob') ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery) : realm.getRecordListOnQuery(TABLE_JOB, jobTransactionQuery)
-        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
+        let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType, startTime, endTime } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
         if (callingActivity == 'LiveJob') {
             jobMasterId = jobTransaction[0].jobMasterId
             jobStatusId = jobTransaction[0].status
@@ -706,7 +718,9 @@ class JobTransaction {
                 cityId,
                 hubId,
                 actualAmount,
-                moneyTransactionType
+                moneyTransactionType,
+                startTime,
+                endTime,
             }
             return {
                 currentStatus,
@@ -734,12 +748,18 @@ class JobTransaction {
     }
 
     /**
-     * 
+     * This function fetch unseen job transactions which are assigned to the user
      * @param {*} jobMaster 
+     * @returns
+     * {
+     *      jobTransactionMap : {
+     *                              referenceNumber : jobTransaction
+     *                          }
+     *      pendingCount : integer
+     * }
      */
     async getUnseenJobTransaction(jobMaster) {
         let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMaster.id, UNSEEN)
-        console.log(unseenStatusId)
         let runsheetQuery = 'isClosed = true'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')

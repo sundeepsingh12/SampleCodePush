@@ -24,8 +24,7 @@ export function getDataForJobMasterSummaryAndRunSheetSummary() {
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobStatusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY) 
-            const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
-            const { pendingStatusIds, noNextStatusIds } = allStatusIds           
+            const { pendingStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()        
             if (!jobMasterList || !jobStatusList || !jobSummaryList) {
                 throw new Error('store not available')
             }

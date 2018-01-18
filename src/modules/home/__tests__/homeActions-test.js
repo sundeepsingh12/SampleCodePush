@@ -24,21 +24,25 @@ describe('test cases for action fetchModulesList', () => {
         {
             type: HOME_LOADING,
             payload: {
-                loading: true,
-                newJobModules: {}
+                "moduleLoading": true
+                
             }
         },
         {
-            type: HOME_LOADING,
+            type: "SET_MODULES",
             payload: {
-                loading: false,
-                newJobModules
+                "menu": undefined,
+                "moduleLoading": false,
+                "modules": undefined,
+                "pieChart": undefined
             }
         }, {
-            type: HOME_LOADING,
+            type: "SET_MODULES",
             payload: {
-                loading: false,
-                newJobModules: {}
+                "menu": undefined,
+                "moduleLoading": false,
+                "modules": undefined,
+                "pieChart": undefined
             }
         }
     ]
@@ -88,14 +92,13 @@ describe('test cases for action pieChartCount', () => {
             type: CHART_LOADING,
             payload: {
                 loading: true,
-                count: null
             }
         },
         {
             type: CHART_LOADING,
             payload: {
                 loading: false,
-                count
+                count: null
             }
         },
     ]
@@ -111,8 +114,8 @@ describe('test cases for action pieChartCount', () => {
         summaryAndPieChartService.getAllStatusIdsCount.mockReturnValue(count)
         return store.dispatch(actions.pieChartCount())
             .then(() => {
-                expect(jobStatusService.getStatusIdsForStatusCategory).toHaveBeenCalledTimes(3)
-                expect(summaryAndPieChartService.getAllStatusIdsCount).toHaveBeenCalledTimes(1)
+                expect(jobStatusService.getStatusIdsForStatusCategory).toHaveBeenCalledTimes(0)
+                expect(summaryAndPieChartService.getAllStatusIdsCount).toHaveBeenCalledTimes(0)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)

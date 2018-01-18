@@ -12,6 +12,9 @@ module.exports = keyMirror({
     SET_PLATFORM: null,
     SET_VERSION: null,
 
+    //autoLogout Actions
+    SET_LOADER_IN_AUTOLOGOUT: null,
+
     //Auth Actions
     LOGIN: null,
     LOGOUT: null,
@@ -19,6 +22,7 @@ module.exports = keyMirror({
     LOGIN_SUCCESS: null,
     LOGIN_FAILURE: null,
     LOGIN_CAMERA_SCANNER: null,
+    FORGET_PASSWORD: null,
     LOGOUT_START: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
@@ -53,6 +57,7 @@ module.exports = keyMirror({
     ON_AUTH_FORM_FIELD_CHANGE: null,
     ON_LOGIN_USERNAME_CHANGE: null,
     ON_LOGIN_PASSWORD_CHANGE: null,
+    ON_LONG_PRESS_ICON: null,
 
     PRELOADER_SUCCESS: null,
     SHOW_MOBILE_NUMBER: null,
@@ -229,6 +234,7 @@ module.exports = keyMirror({
     HomeTabNavigatorScreen: null,
     JobDetails: null,
     LoginScreen: null,
+    AutoLogoutScreen: null,
     MenuScreen: null,
     PreloaderScreen: null,
     Sequence: null,
@@ -258,6 +264,7 @@ module.exports = keyMirror({
     JobDetailsV2: null,
     SplitPayment: null,
     Payment: null,
+    SequenceRunsheetList: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -314,9 +321,14 @@ module.exports = keyMirror({
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
-    TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
     CLEAR_SEQUENCE_STATE: null,
+    SET_RUNSHEET_NUMBER_LIST: null,
+    SET_RESPONSE_MESSAGE: null,
+    CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: null,
+    SEQUENCE_LIST_ITEM_DRAGGED: null,
+    SET_REFERENCE_NO: null,
+    SET_SEQUENCE_LIST_ITEM: null,
 
     //New Job
     NEW_JOB_MASTER: null,
@@ -353,6 +365,8 @@ module.exports = keyMirror({
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
     TOGGLE_ALL_JOB_TRANSACTIONS: null,
     CLEAR_BULK_STATE: null,
+    SET_BULK_SEARCH_TEXT: null,
+    SET_BULK_ERROR_MESSAGE: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -388,6 +402,7 @@ module.exports = keyMirror({
     START_FETCHING_URL: null,
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
+    SCANNER_TEXT: null,
 
     //Job Master
     SET_JOB_MASTER_LIST: null,

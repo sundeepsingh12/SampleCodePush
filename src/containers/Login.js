@@ -1,18 +1,20 @@
 'use strict'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
+  Alert,
   StyleSheet,
   View,
   Text,
   Platform,
   TouchableHighlight,
   Image,
-  NetInfo
+  NetInfo,
+  TouchableOpacity
 
 }
   from 'react-native'
 import Scanner from "../components/Scanner"
-import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner } from 'native-base'
+import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner ,Icon as Iconimg} from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -23,6 +25,7 @@ import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf'
 import codePush from "react-native-code-push"
 import { QrCodeScanner } from '../lib/constants'
+import Icon from '../../native-base-theme/components/Icon';
 
 
 var style = StyleSheet.create({
@@ -73,7 +76,7 @@ function mapStateToProps(state) {
 // }
 
 
-class Login extends Component {
+class Login extends PureComponent {
 
   componentDidMount() {
     this.props.checkRememberMe()
@@ -94,6 +97,7 @@ class Login extends Component {
     } else {
       this.props.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
     }
+
   }
 
   _onBarCodeRead = (value) => {
@@ -123,17 +127,34 @@ class Login extends Component {
   // }
 
   getImageView() {
+    if (this.props.auth.form.authenticationService || this.props.auth.form.isLongPress) {
+      return <Spinner />
+    }
     if (!this.props.auth.form.authenticationService) {
       return (
+        <TouchableOpacity onLongPress = {this.onLongPress}>
         <Image
           style={styles.logoStyle}
           source={require('../../images/fareye-logo.png')}
         />
+        </TouchableOpacity >
       )
     }
-    if (this.props.auth.form.authenticationService) {
-      return <Spinner />
-    }
+  }
+
+  onLongPress = () =>{
+    Alert.alert(
+      "Confirm Reset",
+      `Click OK to reset your account settings.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'OK', onPress: this.onLongPressResetSetting },
+      ],
+    )
+  }
+
+  onLongPressResetSetting = () => {
+    this.props.onLongPressResetSettings()
   }
 
   startScanner = () => {
@@ -171,6 +192,13 @@ class Login extends Component {
                         disabled={this.props.auth.form.isEditTextDisabled}
                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                       />
+                      <Iconimg  
+                        name='ios-help-circle-outline' 
+                        onPress={()=> {
+                          this.props.forgetPasswordRequest(this.props.auth.form.username)
+                          }
+                        } 
+                        style={{right:5, position: 'absolute', color: 'black', backgroundColor: 'white'}} />
                     </Item>
 
                     <Button
@@ -207,6 +235,7 @@ class Login extends Component {
                 </View>
               </Content>
             </Container>
+            
           </StyleProvider>
     )
   }

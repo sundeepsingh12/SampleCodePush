@@ -1,6 +1,6 @@
 'use strict'
 
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
@@ -10,7 +10,7 @@ import {
 import { Card, CardItem, Button, Body, Header, Left, Right, Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 
-class MessageHeader extends Component {
+class MessageHeader extends PureComponent {
 
     render() {
         return (

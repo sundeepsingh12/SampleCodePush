@@ -40,16 +40,8 @@ import { onResyncPress } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
-import {trackingService} from '../../services/classes/Tracking'
+import { trackingService } from '../../services/classes/Tracking'
 
-/**
- * ## set the store
- *
- * this is the Redux store
- *
- * this is here to support Hot Loading
- *
- */
 
 export function setState(type, payload) {
   return {
@@ -58,12 +50,6 @@ export function setState(type, payload) {
   }
 }
 
-export function setStore(store) {
-  return {
-    type: SET_STORE,
-    payload: store
-  }
-}
 
 //Use to navigate to other scene
 export function navigateToScene(routeName, params) {
@@ -95,7 +81,6 @@ export async function getJobListingParameters() {
 export function deleteSessionToken() {
   return async function (dispatch) {
     try {
-      await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
       await keyValueDBService.deleteValueFromStore(USER_SUMMARY)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
@@ -105,10 +90,11 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(LIVE_JOB)
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
       await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)            
+      await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
-       dispatch(setState(RESET_STATE))
+      dispatch(setState(RESET_STATE))
     } catch (error) {
       throw error
     }

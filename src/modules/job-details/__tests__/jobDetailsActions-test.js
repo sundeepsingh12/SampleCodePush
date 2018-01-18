@@ -8,7 +8,8 @@ import { jobDetailsService } from '../../../services/classes/JobDetails'
 import { jobMasterService } from '../../../services/classes/JobMaster'
 import * as realm from '../../../repositories/realmdb'
 import { jobTransactionService } from '../../../services/classes/JobTransaction'
-
+import { performSyncService, pieChartCount } from '../../home/homeActions'
+import { fetchJobs } from '../../taskList/taskListActions'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -278,7 +279,8 @@ describe('jobDetail actions', () => {
             jobStatusId: 1998,
             referenceNumber: "ZOMATO-1511121784686",
         },
-        seqSelected: 2
+        seqSelected: 2,
+        jobTime: new Date()
     }
 
     const jobDataList = []
@@ -303,28 +305,16 @@ describe('jobDetail actions', () => {
         "jobStatusId": 1998,
         "referenceNumber": "ZOMATO-1511121784686"
     }
-    const isEnableRestriction = undefined
+    let parentStatusList = []
     const jobDetailsLoading = false
+    let draftStatusInfo = undefined
+    let errorMessage = undefined
     it('should start fetching jobDetails', () => {
         expect(actions.startFetchingJobDetails()).toEqual({
             type: JOB_DETAILS_FETCHING_START,
         })
     })
-
-
-    it('should end fetching jobDetails', () => {
-        expect(actions.endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, isEnableRestriction)).toEqual({
-            type: JOB_DETAILS_FETCHING_END,
-            payload: {
-                fieldDataList,
-                jobDataList,
-                jobTransaction,
-                currentStatus,
-                isEnableRestriction
-            }
-        })
-    })
-    it('should get Job Details', () => {
+    it('should get Job Details with no error message', () => {
         const expectedActions = [
             {
                 type: JOB_DETAILS_FETCHING_START,
@@ -336,7 +326,9 @@ describe('jobDetail actions', () => {
                     jobDataList,
                     jobTransaction,
                     currentStatus,
-                    isEnableRestriction,
+                    errorMessage,
+                    draftStatusInfo,
+                    parentStatusList,
                 }
             }
         ]
@@ -351,11 +343,11 @@ describe('jobDetail actions', () => {
         jobTransactionService.prepareParticularStatusTransactionDetails = jest.fn()
         jobTransactionService.prepareParticularStatusTransactionDetails.mockReturnValueOnce(details)
 
-        jobDetailsService.checkEnableResequence = jest.fn()
-        jobDetailsService.checkEnableResequence(false);
+        jobDetailsService.checkForEnablingStatus = jest.fn()
+        jobDetailsService.checkForEnablingStatus(false);
 
-        jobMasterService.getJobMaterFromJobMasterList = jest.fn()
-        jobMasterService.getJobMaterFromJobMasterList.mockReturnValueOnce(jobMaster)
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+        jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMaster)
         const store = mockStore({})
         return store.dispatch(actions.getJobDetails(1234))
             .then(() => {
@@ -364,46 +356,274 @@ describe('jobDetail actions', () => {
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
         })
+
+        it('should get Job Details with error message for Out For Delivery ', () => {
+            const jobMaster = [
+                {
+                    id: 441,
+                    enableLocationMismatch: false,
+                    enableManualBroadcast: false,
+                    enableMultipartAssignment: false,
+                    enableOutForDelivery: true,
+                    enableResequenceRestriction: true
+                }
+            ]
+            errorMessage = "Please Scan all Parcels First"
+            const expectedActions = [
+                {
+                    type: JOB_DETAILS_FETCHING_START,
+                },
+                {
+                    type: JOB_DETAILS_FETCHING_END,
+                    payload: {
+                        fieldDataList,
+                        jobDataList,
+                        jobTransaction,
+                        currentStatus,
+                        errorMessage,
+                        draftStatusInfo,
+                        parentStatusList,
+                    }
+                }
+            ]
+            keyValueDBService.getValueFromStore = jest.fn()
+            keyValueDBService.getValueFromStore.mockReturnValueOnce(statusList)
+                .mockReturnValueOnce(jobAttributeMasterList)
+                .mockReturnValueOnce(fieldAttributeMasterList)
+                .mockReturnValueOnce(jobAttributeStatusList)
+                .mockReturnValueOnce(fieldAttributeStatusList)
+                .mockReturnValueOnce(jobMasterList)
+    
+            jobTransactionService.prepareParticularStatusTransactionDetails = jest.fn()
+            jobTransactionService.prepareParticularStatusTransactionDetails.mockReturnValueOnce(details)
+    
+            jobDetailsService.checkForEnablingStatus = jest.fn()
+            jobDetailsService.checkForEnablingStatus.mockReturnValueOnce(errorMessage);
+    
+            jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+            jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMaster)
+            const store = mockStore({})
+            return store.dispatch(actions.getJobDetails())
+                .then(() => {
+                    expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                    expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                    expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                })
+            })
+            it('should get Job Details with error message for enable_resequence_restriction ', () => {
+                const jobMaster = [
+                    {
+                        id: 441,
+                        enableLocationMismatch: false,
+                        enableManualBroadcast: false,
+                        enableMultipartAssignment: false,
+                        enableOutForDelivery: false,
+                        enableResequenceRestriction: true
+                    }
+                ]
+                errorMessage = "Please finish previous items first"
+                const expectedActions = [
+                    {
+                        type: JOB_DETAILS_FETCHING_START,
+                    },
+                    {
+                        type: JOB_DETAILS_FETCHING_END,
+                        payload: {
+                            fieldDataList,
+                            jobDataList,
+                            jobTransaction,
+                            currentStatus,
+                            errorMessage,
+                            draftStatusInfo,
+                            parentStatusList,
+                        }
+                    }
+                ]
+                keyValueDBService.getValueFromStore = jest.fn()
+                keyValueDBService.getValueFromStore.mockReturnValueOnce(statusList)
+                    .mockReturnValueOnce(jobAttributeMasterList)
+                    .mockReturnValueOnce(fieldAttributeMasterList)
+                    .mockReturnValueOnce(jobAttributeStatusList)
+                    .mockReturnValueOnce(fieldAttributeStatusList)
+                    .mockReturnValueOnce(jobMasterList)
+        
+                jobTransactionService.prepareParticularStatusTransactionDetails = jest.fn()
+                jobTransactionService.prepareParticularStatusTransactionDetails.mockReturnValueOnce(details)
+        
+                jobDetailsService.checkForEnablingStatus = jest.fn()
+                jobDetailsService.checkForEnablingStatus.mockReturnValueOnce(errorMessage);
+        
+                jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+                jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMaster)
+                const store = mockStore({})
+                return store.dispatch(actions.getJobDetails())
+                    .then(() => {
+                        expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                        expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                        expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                    })
+                })
+                it('should get Job Details with error message for job_expiry_time ', () => {
+                    const jobMaster = [
+                        {
+                            id: 441,
+                            enableLocationMismatch: false,
+                            enableManualBroadcast: false,
+                            enableMultipartAssignment: false,
+                            enableOutForDelivery: false,
+                            enableResequenceRestriction: false
+                        }
+                    ]
+                    errorMessage = 'Job Expired!'
+                    const expectedActions = [
+                        {
+                            type: JOB_DETAILS_FETCHING_START,
+                        },
+                        {
+                            type: JOB_DETAILS_FETCHING_END,
+                            payload: {
+                                fieldDataList,
+                                jobDataList,
+                                jobTransaction,
+                                currentStatus,
+                                errorMessage,
+                                draftStatusInfo,
+                                parentStatusList,
+                            }
+                        }
+                    ]
+                    keyValueDBService.getValueFromStore = jest.fn()
+                    keyValueDBService.getValueFromStore.mockReturnValueOnce(statusList)
+                        .mockReturnValueOnce(jobAttributeMasterList)
+                        .mockReturnValueOnce(fieldAttributeMasterList)
+                        .mockReturnValueOnce(jobAttributeStatusList)
+                        .mockReturnValueOnce(fieldAttributeStatusList)
+                        .mockReturnValueOnce(jobMasterList)
+            
+                    jobTransactionService.prepareParticularStatusTransactionDetails = jest.fn()
+                    jobTransactionService.prepareParticularStatusTransactionDetails.mockReturnValueOnce(details)
+            
+                    jobDetailsService.checkForEnablingStatus = jest.fn()
+                    jobDetailsService.checkForEnablingStatus.mockReturnValueOnce(errorMessage);
+            
+                    jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+                    jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMaster)
+                    const store = mockStore({})
+                    return store.dispatch(actions.getJobDetails())
+                        .then(() => {
+                            expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                            expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                            expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                        })
+                    })
+                    it('should get Job Details with Revert status list', () => {
+                        const jobMaster = [
+                            {
+                                id: 441,
+                                enableLocationMismatch: false,
+                                enableManualBroadcast: false,
+                                enableMultipartAssignment: false,
+                                enableOutForDelivery: false,
+                                enableResequenceRestriction: false,
+                                isStatusRevert: true
+                            }
+                        ]
+                        errorMessage = undefined
+                        parentStatusList = [
+                                        {
+                                        code: "itIs",
+                                        id: 16926,
+                                        name: "pending",
+                                        statusCategory: 1,
+                                        },
+                                        {
+                                        code: "it",
+                                        id: 16927,
+                                        name: "Intermediate",
+                                        statusCategory: 1,
+                                        },
+                        ]
+                        const expectedActions = [
+                            {
+                                type: JOB_DETAILS_FETCHING_START,
+                            },
+                            {
+                                type: JOB_DETAILS_FETCHING_END,
+                                payload: {
+                                    fieldDataList,
+                                    jobDataList,
+                                    jobTransaction,
+                                    currentStatus,
+                                    errorMessage,
+                                    draftStatusInfo,
+                                    parentStatusList,
+                                }
+                            }
+                        ]
+                        keyValueDBService.getValueFromStore = jest.fn()
+                        keyValueDBService.getValueFromStore.mockReturnValueOnce(statusList)
+                            .mockReturnValueOnce(jobAttributeMasterList)
+                            .mockReturnValueOnce(fieldAttributeMasterList)
+                            .mockReturnValueOnce(jobAttributeStatusList)
+                            .mockReturnValueOnce(fieldAttributeStatusList)
+                            .mockReturnValueOnce(jobMasterList)
+                
+                        jobTransactionService.prepareParticularStatusTransactionDetails = jest.fn()
+                        jobTransactionService.prepareParticularStatusTransactionDetails.mockReturnValueOnce(details)
+                
+                        jobDetailsService.getParentStatusList = jest.fn()
+                        jobDetailsService.getParentStatusList.mockReturnValueOnce(parentStatusList);
+                
+                        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+                        jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMaster)
+                        const store = mockStore({})
+                        return store.dispatch(actions.getJobDetails())
+                            .then(() => {
+                                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                            })
+                    })
     })
 
-describe('location mismatch actions', () => {
-    let jobMasterList = {
-        0: {
-                id: 3447,
-                enableFormLayout: true,
-                enableLocationMismatch: true,
-                enableManualBroadcast: false,
-                enableMultipartAssignment: false,
-                enableOutForDelivery: false,
-                enableResequenceRestriction: false,
-                enabled: true,
-                etaUpdateStatus: null,
-            },
-    }
 
-    let data = {
-        contactData: [],
-        jobTransaction: {
-            id: 3561721,
-            jobId: 4294602,
-            jobMasterId: 3453,
-            jobStatusId: 16905,
-            referenceNumber: "NITESH-1510640188486",
-        },
-        statusList: {
-            actionOnStatus: 0,
-            buttonColor: "#222f41",
-            code: "it",
-            id: 16927,
-            jobMasterId: 3447,
-            name: "Intermediate",
-            nextStatusList: [],
-            saveActivated: null,
-            sequence: 5,
-            statusCategory: 3,
-            tabId: 2117,
-            transient: true,
-        }
+describe('set All data for Revert Status ', () => {
+    const statusList = {
+        value: [
+            {
+                code: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+                name: "Success",
+                saveActivated: null,
+                sequence: 3,
+                statusCategory: 3,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+                name: "Unseen",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+                name: "Pending12",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            }
+        ]
     }
     let userSummary = {
         value: {
@@ -423,40 +643,37 @@ describe('location mismatch actions', () => {
     const expectedActions = [
 
     ]
-    it('should not check location mismatch and throw error', () => {
+    it('should start fetching jobDetails for revert Status', () => {
+        expect(actions.startFetchingJobDetails()).toEqual({
+            type: JOB_DETAILS_FETCHING_START,
+        })
+    })
+    it('should set all data on revert status', () => {
         try{
-        jobMasterService.getJobMaterFromJobMasterList = jest.fn()
-        jobMasterService.getJobMaterFromJobMasterList.mockReturnValueOnce(jobMasterList)
-        const store = mockStore({})
-        return store.dispatch(actions.checkForLocationMismatch())
-            .then(() => {
-                expect(jobMasterService.getJobMaterFromJobMasterList).toHaveBeenCalledTimes(0)
-            })
+            keyValueDBService.getValueFromStore = jest.fn()
+            keyValueDBService.getValueFromStore.mockReturnValueOnce(statusList)
+    
+            jobDetailsService.setAllDataForRevertStatus = jest.fn()
+            jobDetailsService.setAllDataForRevertStatus.mockReturnValueOnce({});
+    
+            jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+            jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMaster)
+            const store = mockStore({})
+            return store.dispatch(actions.setAllDataOnRevert())
+                .then(() => {
+                    expect(store.getActions()[1].type).toEqual(performSyncService())
+                    expect(store.getActions()[2].type).toEqual(pieChartCount())
+                    expect(store.getActions()[3].type).toEqual(fetchJobs())
+                })
         }catch(error){
-            expect(error.message).toEqual(message)
+            expect(error).toEqual(error)
         }
     })
-    it('should check location mismatch ', () => {
-        try{
-        data.jobTransaction.jobMasterId = 3447
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(userSummary)
-        jobDetailsService.checkLatLong = jest.fn()
-        jobDetailsService.checkLatLong.mockReturnValue(true)
-        const store = mockStore({})
-        return store.dispatch(actions.checkForLocationMismatch(data, 1))
-            .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
-                expect( jobDetailsService.checkLatLong).toHaveBeenCalledTimes(1)
-            })
-        }catch(error){
-            expect(error.message).toEqual(message)
-        }
-    })
+    
 })
 
 
-describe('status revert actions', () => {
+describe('check location mismatch actions', () => {
     let jobMasterList = {
         0: {
                 id: 3447,
@@ -515,12 +732,12 @@ describe('status revert actions', () => {
     ]
     it('should not check location mismatch and throw error', () => {
         try{
-        jobMasterService.getJobMaterFromJobMasterList = jest.fn()
-        jobMasterService.getJobMaterFromJobMasterList.mockReturnValueOnce(jobMasterList)
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+        jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMasterList)
         const store = mockStore({})
         return store.dispatch(actions.checkForLocationMismatch())
             .then(() => {
-                expect(jobMasterService.getJobMaterFromJobMasterList).toHaveBeenCalledTimes(0)
+                expect(jobMasterService.getJobMasterFromJobMasterList).toHaveBeenCalledTimes(0)
             })
         }catch(error){
             expect(error.message).toEqual(message)
