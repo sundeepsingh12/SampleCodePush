@@ -82,7 +82,7 @@ module.exports = keyMirror({
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
-    
+
     //Home Container
     PIECHART: null,
     FUTURE_RUNSHEET_ENABLED: null,
@@ -107,6 +107,9 @@ module.exports = keyMirror({
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
     SET_PAYMENT_INITIAL_PARAMETERS: null,
+    SET_SPLIT_PAYMENT: null,
+    SET_SELECTED_PAYMENT_MODE: null,
+    SET_SPLIT_PAYMENT_MODE_LIST: null,
 
     //UPI PaymentActions
     SET_UPI_APPROVAL: null,
@@ -170,7 +173,7 @@ module.exports = keyMirror({
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS: null,
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
-    LAST_JOB_COMPLETED_TIME:null,
+    LAST_JOB_COMPLETED_TIME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -253,6 +256,8 @@ module.exports = keyMirror({
     CameraAttribute: null,
     ImageDetailsView: null,
     JobDetailsV2: null,
+    SplitPayment: null,
+    Payment: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,

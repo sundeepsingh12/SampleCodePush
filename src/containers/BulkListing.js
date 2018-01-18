@@ -196,16 +196,15 @@ class BulkListing extends Component {
 
     
 
-    goToFormLayout(statusId, statusName) {
-      this.props.actions.navigateToScene(FormLayout, {
-        statusId,
-        statusName,
-        jobMasterId: this.props.navigation.state.params.jobMasterId,
-        transactionIdList: this.props.selectedItems,
-        jobTransaction:{}
-      }
-      )
+  goToFormLayout(statusId, statusName) {
+    this.props.actions.navigateToScene(FormLayout, {
+      statusId,
+      statusName,
+      jobMasterId: this.props.navigation.state.params.jobMasterId,
+      jobTransaction: this.props.selectedItems,
     }
+    )
+  }
 
      _goBack = () => {
        this.props.actions.setState(CLEAR_BULK_STATE)

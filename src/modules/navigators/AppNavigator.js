@@ -100,6 +100,7 @@ import {
   LoginScreen,
   PreloaderScreen,
 } from '../../lib/constants'
+import SplitPayment from '../../containers/SplitPayment'
 
 class AppWithNavigationState extends React.Component {
 
@@ -434,6 +435,9 @@ export const AppNavigator = StackNavigator({
   },
   ImageDetailsView: {
     screen: ImageDetailsView,
+  },
+  SplitPayment: {
+    screen: SplitPayment,
   }
 },
   {

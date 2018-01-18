@@ -70,7 +70,7 @@ function mapDispatchToProps(dispatch) {
 class FormLayout extends Component {
 
   componentDidUpdate() {
-    if (this.props.updateDraft && !this.props.navigation.state.params.transactionIdList) { //Draft should not be saved for bulk
+    if (this.props.updateDraft && !this.props.navigation.state.params.jobTransaction.length) { //Draft should not be saved for bulk
       this.saveDraft()
       this.props.actions.setState(SET_UPDATE_DRAFT, false)
     }
@@ -121,7 +121,7 @@ class FormLayout extends Component {
     this.props.actions.restoreDraft(this.props.jobTransactionId, this.props.statusId, this.props.navigation.state.params.jobMasterId)
   }
   componentDidMount() {
-    this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId,this.props.navigation.state.params.jobTransaction)
+    this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction)
   }
 
   renderData = (item) => {
@@ -184,7 +184,6 @@ class FormLayout extends Component {
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
-        this.props.navigation.state.params.transactionIdList,
         this.props.pieChart
       )
     }
@@ -223,7 +222,7 @@ class FormLayout extends Component {
     }
     return (
       <StyleProvider style={getTheme(platform)}>
-        <KeyboardAvoidingView style = {{flex:1}} behavior='padding'>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
           {draftAlert}
           {invalidFormAlert}
           <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>

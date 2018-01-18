@@ -79,7 +79,7 @@ export function toggleListItemIsChecked(jobTransactionId, allTransactions) {
         try {
             const bulkTransactions = await JSON.parse(JSON.stringify(allTransactions))
             bulkTransactions[jobTransactionId].isChecked = !bulkTransactions[jobTransactionId].isChecked
-            const selectedItems = await bulkService.getSelectedTransactionIds(bulkTransactions)
+            const selectedItems = await bulkService.getSelectedTransaction(bulkTransactions)
             // dispatch(setState(TOGGLE_JOB_TRANSACTION_LIST_ITEM, {
             //     selectedItems,
             //     bulkTransactions
@@ -103,7 +103,7 @@ export function toggleAllItems(allTransactions, selectAllNone) {
             let selectedItems, displayText = ''
             if (selectAllNone == 'Select All') {
                 Object.values(bulkTransactions).forEach(bulkTransaction => bulkTransaction.isChecked = true)
-                selectedItems = Object.keys(allTransactions)
+                selectedItems = await bulkService.getSelectedTransaction(bulkTransactions)
                 displayText = 'Select None'
             } else {
                 Object.values(bulkTransactions).forEach(bulkTransaction => bulkTransaction.isChecked = false)

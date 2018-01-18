@@ -6,15 +6,22 @@ import {
     View,
     Text,
     Platform,
-    TextInput
+    TextInput,
+    TouchableOpacity,
 } from 'react-native'
-import { Container, Content, Footer, FooterTab, Input, Button, Card, CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox } from 'native-base'
+import {
+    Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card,
+    CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider
+} from 'native-base'
+import getTheme from '../../native-base-theme/components';
+import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import PopOver from '../components/PopOver'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import _ from 'lodash'
 import {
     CASH,
     CHEQUE,
@@ -43,7 +50,20 @@ import {
 
 import {
     SET_PAYMENT_CHANGED_PARAMETERS,
+    SET_SPLIT_PAYMENT,
+    SplitPayment
 } from '../lib/constants'
+
+import {
+    AMOUNT_TO_BE_COLLECTED,
+    YES,
+    NO,
+    SPLIT_PAYMENT,
+    SELECT_PAYMENT_METHOD,
+    SELECT_PAYMENT_METHOD_TO_SPLIT,
+    ENTER_SPLIT_DETAILS,
+    SAVE,
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -53,8 +73,10 @@ function mapStateToProps(state) {
         moneyCollectMaster: state.payment.moneyCollectMaster,
         originalAmount: state.payment.originalAmount,
         paymentModeList: state.payment.paymentModeList,
-        selectedIndex: state.payment.selectedIndex,
+        selectedPaymentMode: state.payment.selectedPaymentMode,
         transactionNumber: state.payment.transactionNumber,
+        splitPaymentMode: state.payment.splitPaymentMode,
+        jobTransactionIdAmountMap: state.payment.jobTransactionIdAmountMap
     }
 }
 
@@ -67,8 +89,12 @@ function mapDispatchToProps(dispatch) {
 
 class Payment extends Component {
 
-    componentWillMount() {
-        this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction.jobMasterId, this.props.navigation.state.params.jobTransaction.jobId, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.jobStatusId)
+    static navigationOptions = ({ navigation }) => {
+        return { header: null }
+    }
+
+    componentDidMount() {
+        this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.jobStatusId)
     }
 
     renderPaymentModeId(modeId, type) {
@@ -120,7 +146,7 @@ class Payment extends Component {
                             SET_PAYMENT_CHANGED_PARAMETERS,
                             {
                                 actualAmount: this.props.actualAmount,
-                                selectedIndex: this.props.selectedIndex,
+                                selectedPaymentMode: this.props.selectedPaymentMode,
                                 transactionNumber: value
                             }
                         )}
@@ -134,12 +160,11 @@ class Payment extends Component {
     renderPaymentModeSelected(modeId) {
         let paymentModeSelectedView = null
         switch (modeId) {
-            case CASH.id: paymentModeSelectedView = null
-                break
             case CHEQUE.id: paymentModeSelectedView = this.renderChequeOrDD('Cheque Number')
                 break
             case DEMAND_DRAFT.id: paymentModeSelectedView = this.renderChequeOrDD('DD Number')
                 break
+            case CASH.id:
             case DISCOUNT.id:
             case EZE_TAP.id:
             case MOSAMBEE.id:
@@ -162,75 +187,166 @@ class Payment extends Component {
         return paymentModeSelectedView
     }
 
-    paymentItemView = (actualAmount, id, moneyTransactionModeId, selectedIndex, transactionNumber, type) => {
+    getPaymentModeSelectedResult(moneyTransactionModeId) {
+        if (!this.props.selectedPaymentMode) {
+            return false
+        }
+        if (this.props.splitPaymentMode != YES) {
+            return (this.props.selectedPaymentMode == moneyTransactionModeId)
+        }
+        return ((this.props.selectedPaymentMode.otherPaymentModeList && this.props.selectedPaymentMode.otherPaymentModeList[moneyTransactionModeId]) || this.props.selectedPaymentMode.cardPaymentMode == moneyTransactionModeId)
+    }
+
+    paymentItemView = (actualAmount, id, moneyTransactionModeId, selectedPaymentMode, transactionNumber, type, disabled) => {
+        let paymentSelectedResult = this.getPaymentModeSelectedResult(moneyTransactionModeId)
         return (
-            <ListItem
-                key={id}
-                icon style={StyleSheet.flatten([{ marginLeft: 0 }])}
-                onPress={() => {
-                    selectedIndex !== moneyTransactionModeId ?
-                        this.props.actions.setState(
-                            SET_PAYMENT_CHANGED_PARAMETERS,
-                            {
-                                actualAmount,
-                                selectedIndex: type ? type : moneyTransactionModeId,
-                                transactionNumber
-                            }
-                        ) : null
-                }}>
-                <Body>
-                    <Text>{this.renderPaymentModeId(moneyTransactionModeId, type)}</Text>
-                </Body>
-                <Right>
-                    <Radio selected={selectedIndex == (type ? type : moneyTransactionModeId)} style={([styles.marginRight20])} />
-                </Right>
-            </ListItem>
+            <TouchableOpacity key={id}
+                style={[styles.row, styles.alignCenter, { borderColor: paymentSelectedResult ? styles.primaryColor : '#ECECEC' }, this.props.splitPaymentMode == YES ? style.paymentCard : style.paymentList]}
+                disabled={disabled}
+                onPress={() => { this.props.actions.paymentModeSelect(this.props.selectedPaymentMode, this.props.splitPaymentMode, moneyTransactionModeId, this.props.actualAmount, this.props.transactionNumber) }}
+            >
+                <Text style={disabled ? [styles.fontDarkGray, { width: '80%' }] : [styles.fontBlack, { width: '80%' }]}>
+                    {this.renderPaymentModeId(moneyTransactionModeId, type)}
+                </Text>
+                <View style={[styles.justifyCenter, styles.row, { width: '20%' }]}>
+                    <CheckBox onPress={() => { this.props.actions.paymentModeSelect(this.props.selectedPaymentMode, this.props.splitPaymentMode, moneyTransactionModeId) }} color={disabled ? styles.fontDarkGray.color : styles.primaryColor} style={{ borderRadius: 15 }} checked={paymentSelectedResult} />
+                </View>
+            </TouchableOpacity>
         )
     }
 
     renderPaymentModeList(paymentModeList) {
+        let finalPaymentView = []
         let paymentModeView = []
-        for (let index in paymentModeList) {
-            if (paymentModeList[index].moneyTransactionModeId == NET_BANKING.id) {
+        paymentModeView.push(
+            <Text key='PaymentText' style={[styles.fontPrimary, styles.fontSm, styles.width100, styles.marginBottom10]}>
+                {!this.props.splitPaymentMode ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
+            </Text>
+        )
+        for (let index in paymentModeList.otherPaymentModeList) {
+            if (paymentModeList.otherPaymentModeList[index].moneyTransactionModeId == DISCOUNT.id && this.props.splitPaymentMode != YES) {
+                continue
+            }
+            paymentModeView.push(
+                this.paymentItemView(this.props.actualAmount, paymentModeList.otherPaymentModeList[index].id, paymentModeList.otherPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, null, false)
+            )
+        }
+        for (let index in paymentModeList.endPaymentModeList) {
+            let cardPaymentMode = false
+            if (this.props.splitPaymentMode == YES && this.props.selectedPaymentMode && this.props.selectedPaymentMode.cardPaymentMode) {
+                cardPaymentMode = this.props.selectedPaymentMode.cardPaymentMode
+            }
+            if (paymentModeList.endPaymentModeList[index].moneyTransactionModeId == NET_BANKING.id) {
                 for (let type = 97; type < 100; type++) {
                     paymentModeView.push(
-                        this.paymentItemView(this.props.actualAmount, type, paymentModeList[index].moneyTransactionModeId, this.props.selectedIndex, null, type)
+                        this.paymentItemView(this.props.actualAmount, type, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, type, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                     )
                 }
             } else {
                 paymentModeView.push(
-                    this.paymentItemView(this.props.actualAmount, paymentModeList[index].id, paymentModeList[index].moneyTransactionModeId, this.props.selectedIndex, null)
+                    this.paymentItemView(this.props.actualAmount, paymentModeList.endPaymentModeList[index].id, paymentModeList.endPaymentModeList[index].moneyTransactionModeId, this.props.selectedPaymentMode, null, null, cardPaymentMode ? cardPaymentMode == paymentModeList.endPaymentModeList[index].moneyTransactionModeId ? false : true : false)
                 )
             }
         }
-        return paymentModeView
+        finalPaymentView.push(
+            <View key='PaymentView' style={[styles.row, styles.marginTop10, styles.flexWrap, styles.justifySpaceBetween]}>
+                {paymentModeView}
+            </View>
+        )
+
+        return finalPaymentView
+    }
+
+    renderSplitView() {
+        if (!this.props.splitPaymentMode) {
+            return null
+        }
+        return (
+            <View style={[styles.marginBottom15]}>
+                <Text style={[styles.fontPrimary, styles.fontSm]}>
+                    {SPLIT_PAYMENT}
+                </Text>
+                <View style={[styles.row, styles.marginTop10]}>
+                    <TouchableOpacity onPress={() => { this.props.splitPaymentMode != YES ? this.props.actions.setState(SET_SPLIT_PAYMENT, YES) : null }}>
+                        <View style={[styles.row, styles.alignCenter]}>
+                            <CheckBox onPress={() => { this.props.splitPaymentMode != YES ? this.props.actions.setState(SET_SPLIT_PAYMENT, YES) : null }} color={styles.primaryColor} style={{ borderRadius: 15 }} checked={this.props.splitPaymentMode == YES} />
+                            <Text style={[styles.marginLeft20]}>
+                                {YES}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => { this.props.splitPaymentMode != NO ? this.props.actions.setState(SET_SPLIT_PAYMENT, NO) : null }}>
+                        <View style={[styles.row, styles.marginLeft15, styles.alignCenter]}>
+                            <CheckBox onPress={() => { this.props.splitPaymentMode != NO ? this.props.actions.setState(SET_SPLIT_PAYMENT, NO) : null }} color={styles.primaryColor} style={{ borderRadius: 15 }} checked={this.props.splitPaymentMode == NO} />
+                            <Text style={[styles.marginLeft20]}>
+                                {NO}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
     }
 
     renderAmountToBeCollected() {
-        if (this.props.isAmountEditable) {
-            return (
-                <View style={StyleSheet.flatten([styles.positionRelative, { zIndex: 1 }])} >
+        return (
+            <View style={[styles.marginBottom10]}>
+                <Text style={[styles.fontDarkGray, styles.fontSm]}>
+                    {AMOUNT_TO_BE_COLLECTED}
+                </Text>
+                <Item>
                     <Input
+                        style={[styles.paddingLeft0]}
+                        placeholder="Enter Amount"
+                        editable={this.props.isAmountEditable}
                         keyboardType="numeric"
                         KeyboardTypeIOS="number-pad"
-                        placeholder='Regular Textbox'
                         onChangeText={value => this.onTextChange(
                             'SET_ACTUAL_AMOUNT',
                             {
                                 actualAmount: value,
-                                selectedIndex: this.props.selectedIndex,
+                                selectedPaymentMode: this.props.selectedPaymentMode,
                                 transactionNumber: this.props.transactionNumber
                             }
                         )}
-                        style={StyleSheet.flatten([styles.marginTop10, styles.fontSm, { borderWidth: 1, paddingRight: 30, height: 30, borderColor: '#BDBDBD', borderRadius: 4 }])}
                         value={this.props.actualAmount != null && this.props.actualAmount != undefined ? '' + this.props.actualAmount : null}
                     />
+                </Item>
+            </View>
+        )
+    }
 
-                </View>
-            )
+    moveToSplitOrSavePayment() {
+        if (this.props.splitPaymentMode == YES) {
+            this.props.actions.navigateToScene(SplitPayment, {
+                selectedPaymentMode: this.props.selectedPaymentMode,
+                actualAmount: this.props.actualAmount,
+                originalAmount: this.props.originalAmount,
+                currentElement: this.props.navigation.state.params.currentElement,
+                formElements: this.props.navigation.state.params.formElements,
+                jobTransaction: this.props.navigation.state.params.jobTransaction,
+                moneyCollectMaster: this.props.moneyCollectMaster,
+                isSaveDisabled: this.props.navigation.state.params.isSaveDisabled,
+                latestPositionId: this.props.navigation.state.params.latestPositionId,
+                paymentContainerKey: this.props.navigation.state.key
+            })
         } else {
-            return (
-                <Text> {this.props.actualAmount} </Text>
+            this.props.actions.saveMoneyCollectObject(
+                this.props.actualAmount,
+                this.props.navigation.state.params.currentElement,
+                this.props.navigation.state.params.formElements,
+                this.props.navigation.state.params.jobTransaction.jobMasterId,
+                this.props.navigation.state.params.jobTransaction.jobId,
+                this.props.navigation.state.params.jobTransaction,
+                this.props.navigation.state.params.latestPositionId,
+                this.props.moneyCollectMaster,
+                this.props.navigation.state.params.isSaveDisabled,
+                this.props.originalAmount,
+                this.props.selectedPaymentMode,
+                this.props.transactionNumber,
+                null,
+                null,
+                this.props.jobTransactionIdAmountMap
             )
         }
     }
@@ -238,61 +354,79 @@ class Payment extends Component {
     render() {
         const amountTobeCollectedView = this.renderAmountToBeCollected()
         const paymentModeView = this.renderPaymentModeList(this.props.paymentModeList)
-        const paymentModeSelectedView = this.renderPaymentModeSelected(this.props.selectedIndex)
+        const paymentModeSelectedView = this.renderPaymentModeSelected(this.props.selectedPaymentMode)
+        const splitView = this.renderSplitView()
         return (
-            <Container>
-                <Content style={StyleSheet.flatten([styles.padding10])}>
-                    <Text>
-                        Amount to be collected
-                    </Text>
-                    {amountTobeCollectedView}
-                    <Card>
-                        <CardItem header>
-                            <Text style={StyleSheet.flatten([styles.fontLg, styles.bold])}>Payment Method</Text>
-                        </CardItem>
-                        <CardItem>
-                            <Content>
-                                <List>
-                                    {paymentModeView}
-                                </List>
-                            </Content>
-                        </CardItem>
-                    </Card>
-                    <View style={StyleSheet.flatten([styles.marginTop20, styles.marginBottom20])} >
-                        {paymentModeSelectedView}
-                    </View>
-                </Content>
-                <Footer>
-                    <FooterTab>
-                        <Button success
-                            disabled={this.props.isSaveButtonDisabled}
-                            style={StyleSheet.flatten([{ borderRadius: 0 }])}
-                            onPress={() => {
-                                this.props.actions.saveMoneyCollectObject(
-                                    this.props.actualAmount,
-                                    this.props.navigation.state.params.currentElement,
-                                    this.props.navigation.state.params.formElements,
-                                    this.props.navigation.state.params.jobTransaction.jobMasterId,
-                                    this.props.navigation.state.params.jobTransaction.jobId,
-                                    this.props.navigation.state.params.jobTransaction,
-                                    this.props.navigation.state.params.latestPositionId,
-                                    this.props.moneyCollectMaster,
-                                    this.props.navigation.state.params.isSaveDisabled,
-                                    this.props.originalAmount,
-                                    this.props.selectedIndex,
-                                    this.props.transactionNumber,
-                                    null,
-                                    null,
-                                )
-                            }}
-                        >
-                            <Text>Save</Text>
-                        </Button>
-                    </FooterTab>
-                </Footer>
-            </Container>
+            <StyleProvider style={getTheme(platform)}>
+                <Container>
+                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+                        <Body>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>
+                                <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[styles.headerBody]}>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Status</Text>
+                                </View>
+                                <View style={[styles.headerRight]}>
+                                </View>
+                                <View />
+                            </View>
+                        </Body>
+                    </Header>
+
+                    <Content style={[styles.flex1, styles.bgWhite, styles.padding10]}>
+                        {amountTobeCollectedView}
+                        {splitView}
+                        <View style={[styles.marginBottom15]}>
+                            {paymentModeView}
+                        </View>
+                        <View style={StyleSheet.flatten([styles.marginTop20, styles.marginBottom20])} >
+                            {paymentModeSelectedView}
+                        </View>
+                    </Content>
+                    <Footer style={[styles.padding10, style.footer]}>
+                        <FooterTab>
+                            <Button success
+                                disabled={this.props.isSaveButtonDisabled}
+                                style={StyleSheet.flatten([{ borderRadius: 0 }])}
+                                onPress={() => {
+                                    this.moveToSplitOrSavePayment()
+                                }}
+                            >
+                                <Text style={[styles.fontWhite]}>{this.props.splitPaymentMode == YES ? ENTER_SPLIT_DETAILS : SAVE}</Text>
+                            </Button>
+                        </FooterTab>
+                    </Footer>
+                </Container>
+            </StyleProvider>
         )
     }
 }
 
+const style = StyleSheet.create({
+
+    paymentCard: {
+        width: '49%',
+        paddingVertical: 15,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        marginBottom: 5,
+        justifyContent: 'space-between'
+    },
+    paymentList: {
+        borderBottomColor: '#ECECEC',
+        borderBottomWidth: 1,
+        paddingVertical: 15,
+        width: '100%',
+        justifyContent: 'space-between'
+    },
+    footer: {
+        height: 'auto',
+        borderTopWidth: 1,
+        borderTopColor: '#f3f3f3'
+    },
+
+});
 export default connect(mapStateToProps, mapDispatchToProps)(Payment)

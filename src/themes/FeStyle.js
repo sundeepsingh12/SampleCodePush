@@ -461,7 +461,7 @@ export default {
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0,
-        paddingBottom: 10
+        paddingBottom: 5
     },
     headerLeft: {
         width: '15%',
