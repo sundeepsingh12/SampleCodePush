@@ -379,7 +379,7 @@ module.exports = keyMirror({
     SET_CONFIRM_NEW_PASSWORD: null,
     CLEAR_PASSWORD_TEXTINPUT: null,
     TOGGLE_SAVE_RESET_BUTTON: null,
-
+    IS_PROFILE_LOADING: null,
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,

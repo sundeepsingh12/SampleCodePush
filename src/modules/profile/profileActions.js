@@ -6,6 +6,8 @@ import {
     USER,
     PASSWORD,
     CLEAR_PASSWORD_TEXTINPUT,
+    TOGGLE_SAVE_RESET_BUTTON,
+    IS_PROFILE_LOADING,
 } from '../../lib/constants'
 import sha256 from 'sha256'
 import CONFIG from '../../lib/config'
@@ -28,7 +30,7 @@ export function fetchUserList() {
     return async function (dispatch) {
         try {
             const userList = await keyValueDBService.getValueFromStore(USER)
-            if(!userList || !userList.value){
+            if (!userList || !userList.value) {
                 throw new Error('userList not present')
             }
             let userDetails = {
@@ -50,16 +52,17 @@ export function fetchUserList() {
  * @param {*} confirmNewPassword
  *  
  */
-export function checkAndResetPassword(currentPassword, newPassword, confirmNewPassword) {
+export function checkAndResetPassword(currentPassword, newPassword, confirmNewPassword, onPressGoBack) {
     return async function (dispatch) {
         try {
+            dispatch(setState(IS_PROFILE_LOADING, true))
             const userPassword = await keyValueDBService.getValueFromStore(PASSWORD)
             const userObject = await keyValueDBService.getValueFromStore(USER)
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject)
 
             if (response != null && response.status == 200) {
-                await keyValueDBService.validateAndUpdateData(PASSWORD, sha256(newPassword))
+                await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword))
                 let allPasswords = {
                     currentPassword: '',
                     newPassword: '',
@@ -67,7 +70,10 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
                 }
                 Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: 'OK' })
                 dispatch(setState(CLEAR_PASSWORD_TEXTINPUT, allPasswords))
+                dispatch(setState(TOGGLE_SAVE_RESET_BUTTON, true))
+                onPressGoBack.goBack(null)
             }
+            dispatch(setState(IS_PROFILE_LOADING, false))            
         } catch (error) {
             console.log(error.message)
         }
