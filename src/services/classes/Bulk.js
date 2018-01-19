@@ -100,6 +100,10 @@ class Bulk {
         let statusIdJobMasterIdBulkAllowedMap = {}
 
         bulkJobMasterStatusConfiguration.forEach(configurationObject => {
+            if(!configurationObject.jobMasterId || !configurationObject.statusId){
+                statusIdJobMasterIdBulkAllowedMap = {}
+                return
+            }
             let jobMasterIdBulkUpdateAllowed = {}
             jobMasterIdBulkUpdateAllowed[configurationObject.jobMasterId] = configurationObject.bulkUpdateAllowed
             statusIdJobMasterIdBulkAllowedMap[configurationObject.statusId] = jobMasterIdBulkUpdateAllowed

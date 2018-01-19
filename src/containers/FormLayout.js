@@ -222,7 +222,7 @@ class FormLayout extends PureComponent {
     }
     return (
       <StyleProvider style={getTheme(platform)}>
-        <Container>
+        <KeyboardAvoidingView style = {{flex:1}} behavior='padding'>
           {draftAlert}
           {invalidFormAlert}
           <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
@@ -263,7 +263,7 @@ class FormLayout extends PureComponent {
               </Button>
             </FooterTab>
           </Footer>
-        </Container >
+        </KeyboardAvoidingView>
       </StyleProvider >
     )
   }
