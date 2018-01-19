@@ -70,6 +70,9 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
+            if (!draftStatusId) {
+                sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction);
+            }
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
             dispatch(setState(BASIC_INFO, {
                 statusId,
@@ -98,12 +101,12 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSaveDisabled, sequenceId, jobTransaction) {
     return async function (dispatch) {
         try {
-            formElement.get(attributeMasterId).isLoading = true            
+            formElement.get(attributeMasterId).isLoading = true
             dispatch(setState(UPDATE_FIELD_DATA, formElement))
             const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
             if (sequenceData) {
                 const cloneFormElement = _.cloneDeep(formElement)
-                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, sequenceData, null, null, jobTransaction );
+                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, sequenceData, null, null, jobTransaction);
                 sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
                 dispatch(_setFormList(sortedFormAttributeDto))
             }
@@ -151,37 +154,37 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
 export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, jobTransactionIdList, pieChart) {
     return async function (dispatch) {
         try {
-            const userData = await keyValueDBService.getValueFromStore(USER)      
-            if(userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
-              dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-            }else{
-            dispatch(setState(IS_LOADING, true))
-            let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement, jobTransaction)
-            if (isFormValid) {
-                const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-                let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
-                dispatch(setState(IS_LOADING, false))
-                let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
-                if (routeName == TabScreen) {
-                    dispatch(NavigationActions.reset({
-                        index: 1,
-                        actions: [
-                            NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                            NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
-                        ]
-                    }))
-                } else {
-                    dispatch(navigateToScene(routeName, routeParam))
-                }
-                dispatch(performSyncService(pieChart))
-                dispatch(setState(CLEAR_FORM_LAYOUT))
-                dispatch(setState(CLEAR_BULK_STATE))
+            const userData = await keyValueDBService.getValueFromStore(USER)
+            if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
+                dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
-                dispatch(setState(SET_FORM_TO_INVALID, {
-                    isLoading: false,
-                    isFormValid: false
-                }))
-            }
+                dispatch(setState(IS_LOADING, true))
+                let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement, jobTransaction)
+                if (isFormValid) {
+                    const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+                    let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
+                    dispatch(setState(IS_LOADING, false))
+                    let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
+                    if (routeName == TabScreen) {
+                        dispatch(NavigationActions.reset({
+                            index: 1,
+                            actions: [
+                                NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+                                NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
+                            ]
+                        }))
+                    } else {
+                        dispatch(navigateToScene(routeName, routeParam))
+                    }
+                    dispatch(performSyncService(pieChart))
+                    dispatch(setState(CLEAR_FORM_LAYOUT))
+                    dispatch(setState(CLEAR_BULK_STATE))
+                } else {
+                    dispatch(setState(SET_FORM_TO_INVALID, {
+                        isLoading: false,
+                        isFormValid: false
+                    }))
+                }
             }
         } catch (error) {
             console.log(error)

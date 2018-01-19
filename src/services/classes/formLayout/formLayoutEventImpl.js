@@ -68,7 +68,9 @@ export default class FormLayoutEventImpl {
      * @param {*fieldAttribute value} value 
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction) {
-        this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        if (attributeMasterId && formLayoutObject.get(attributeMasterId)) {
+            this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        }
         isSaveDisabled = false
 
         for (var [key, value] of formLayoutObject) {
@@ -87,20 +89,28 @@ export default class FormLayoutEventImpl {
             value.editable = true
             if (value.required) {
                 value.focus = event == NEXT_FOCUS ? true : value.focus
-                isSaveDisabled = true
-                break
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
                 let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction)
                 let valueAfterValidation = formLayoutObject.get(value.fieldAttributeMasterId).value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
-                    continue
+                    if (value.required) {
+                        isSaveDisabled = true
+                        break
+                    } else {
+                        continue
+                    }
                 }
                 let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction)
+                if (!afterValidationResult && value.required) {
+                    break
+                }
             }
         }
         if (!isSaveDisabled) {
-            formLayoutObject.get(attributeMasterId).focus = true
+            if (formLayoutObject.get(attributeMasterId)) {
+                formLayoutObject.get(attributeMasterId).focus = true
+            }
         }
         return { formLayoutObject, isSaveDisabled }
     }
@@ -197,7 +207,7 @@ export default class FormLayoutEventImpl {
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue) //to edit later
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
                 const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
-                if(customNaming.value.updateEta && jobTransaction.value[0].jobEtaTime  && (dbObjects.status[0].statusCategory == FAIL || dbObjects.status[0].statusCategory == SUCCESS)){
+                if (customNaming.value.updateEta && jobTransaction.value[0].jobEtaTime && (dbObjects.status[0].statusCategory == FAIL || dbObjects.status[0].statusCategory == SUCCESS)) {
                     await this._updateEtaTimeOfJobtransactions(jobTransaction.value[0], currentTime)
                 }
             }
@@ -220,23 +230,23 @@ export default class FormLayoutEventImpl {
         }
     }
 
-        async _updateEtaTimeOfJobtransactions(jobTransaction, currentTime) {
-            if (moment(currentTime).isAfter(jobTransaction.jobEtaTime)) {
-                let delayInCompletingJobTransaction = moment(currentTime).unix() - moment(jobTransaction.jobEtaTime).unix()
-                const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
-                let jobTransactionQueryToUpdateEta = '('
-                jobTransactionQueryToUpdateEta += statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-                jobTransactionQueryToUpdateEta += `) AND runsheetId = "${jobTransaction.runsheetId} "`
-                jobTransactionQueryToUpdateEta += `AND seqSelected > "${jobTransaction.seqSelected}"`
-                let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQueryToUpdateEta)
-                let jobTransactions = []
-                for (let index in jobTransactionList) {
-                    let jobTransactionData = { ...jobTransactionList[index] }
-                    jobTransactionData.jobEtaTime = moment((moment(jobTransactionData.jobEtaTime).unix() + delayInCompletingJobTransaction)*1000).format('YYYY-MM-DD HH:mm:ss') 
-                    jobTransactions.push(jobTransactionData)
-                }
-                realm.saveList(TABLE_JOB_TRANSACTION, jobTransactions)
+    async _updateEtaTimeOfJobtransactions(jobTransaction, currentTime) {
+        if (moment(currentTime).isAfter(jobTransaction.jobEtaTime)) {
+            let delayInCompletingJobTransaction = moment(currentTime).unix() - moment(jobTransaction.jobEtaTime).unix()
+            const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
+            let jobTransactionQueryToUpdateEta = '('
+            jobTransactionQueryToUpdateEta += statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+            jobTransactionQueryToUpdateEta += `) AND runsheetId = "${jobTransaction.runsheetId} "`
+            jobTransactionQueryToUpdateEta += `AND seqSelected > "${jobTransaction.seqSelected}"`
+            let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQueryToUpdateEta)
+            let jobTransactions = []
+            for (let index in jobTransactionList) {
+                let jobTransactionData = { ...jobTransactionList[index] }
+                jobTransactionData.jobEtaTime = moment((moment(jobTransactionData.jobEtaTime).unix() + delayInCompletingJobTransaction) * 1000).format('YYYY-MM-DD HH:mm:ss')
+                jobTransactions.push(jobTransactionData)
             }
+            realm.saveList(TABLE_JOB_TRANSACTION, jobTransactions)
+        }
     }
 
     async _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user, lastTrackLog) {
@@ -499,7 +509,7 @@ export default class FormLayoutEventImpl {
     _setBulkJobTransactionValues(jobTransactionList, status, jobMaster, user, hub, imei, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, npsFeedbackValue) {
         let jobTransactionArray = [], jobTransactionDTOList = []
         for (let jobTransaction1 in jobTransactionList) {
-            let jobTransaction = Object.assign({},jobTransactionList[jobTransaction1]) // no need to have null checks as it is called from a private method
+            let jobTransaction = Object.assign({}, jobTransactionList[jobTransaction1]) // no need to have null checks as it is called from a private method
             jobTransaction.jobType = jobMaster.code
             jobTransaction.jobStatusId = status.id
             jobTransaction.statusCode = status.code
@@ -570,7 +580,7 @@ export default class FormLayoutEventImpl {
         const query = jobTransactions.map(jobTransaction => 'id = ' + jobTransaction.jobId).join(' OR ')
         let realmJobObjects = realm.getRecordListOnQuery(TABLE_JOB, query)
         for (let realmJobObject in realmJobObjects) {
-            let job = Object.assign({},realmJobObjects[realmJobObject])
+            let job = Object.assign({}, realmJobObjects[realmJobObject])
             switch (status.actionOnStatus) {
                 case 1: job.status = 3; // jobStatus 3 is for closed when actionOnStatus is success
                     break;
