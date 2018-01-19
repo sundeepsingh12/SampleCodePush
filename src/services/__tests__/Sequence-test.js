@@ -35,7 +35,6 @@ import {
     SEARCH_TEXT_MISSING,
     SEQUENCE_REQUEST_DTO,
     TOKEN_MISSING,
-    SEPARATOR_MISSING,
     JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
@@ -468,16 +467,7 @@ describe('test updateJobTrasaction', () => {
 
 describe('test changeLineTextOrCicleText', () => {
 
-    it('should throw separator missing error', () => {
-        const message = SEPARATOR_MISSING
-        try {
-            sequenceService.changeLineTextOrCicleText(null)
-        } catch (error) {
-            expect(error.message).toEqual(message)
-        }
-    })
-
-    it('should return changes sequence of text having no separator', () => {
+    it('should return changed sequence of text having no separator', () => {
         const textToChange = 'Sequence: 1'
         const newSequence = 2
         const finalText = 'Sequence: 2'
@@ -485,7 +475,7 @@ describe('test changeLineTextOrCicleText', () => {
         expect(sequenceService.changeLineTextOrCicleText(separator, textToChange, newSequence)).toEqual(finalText)
     })
 
-    it('should return changes sequence of text having separator', () => {
+    it('should return changed sequence of text having separator', () => {
         const textToChange = '1234&2345356&Sequence: 1'
         const newSequence = 2
         const finalText = '1234&2345356&Sequence: 2'
@@ -493,12 +483,19 @@ describe('test changeLineTextOrCicleText', () => {
         expect(sequenceService.changeLineTextOrCicleText(separator, textToChange, newSequence)).toEqual(finalText)
     })
 
-    it('should return changes sequence of text having separator and sequence in between', () => {
+    it('should return changed sequence of text having separator and sequence in between', () => {
         const textToChange = '1234&2345356&Sequence: 1&12345&25361'
         const newSequence = 2
         const finalText = '1234&2345356&Sequence: 2&12345&25361'
         const separator = '&'
         expect(sequenceService.changeLineTextOrCicleText(separator, textToChange, newSequence)).toEqual(finalText)
+    })
+
+    it('should return changed sequence and separator is missing', () => {
+        const textToChange = 'Sequence: 1'
+        const newSequence = 2
+        const finalText = 'Sequence: 2'
+        expect(sequenceService.changeLineTextOrCicleText(null, textToChange, newSequence)).toEqual(finalText)
     })
 })
 

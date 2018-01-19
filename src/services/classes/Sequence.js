@@ -33,7 +33,6 @@ import {
     SEARCH_TEXT_MISSING,
     SEQUENCE_REQUEST_DTO,
     TOKEN_MISSING,
-    SEPARATOR_MISSING,
     JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
@@ -411,12 +410,13 @@ class Sequence {
      * @returns string // returns text by changing seqeuence in text
      */
     changeLineTextOrCicleText(separator, textToChange, seqSelected) {
-        if (!separator) {
-            throw new Error(SEPARATOR_MISSING)
-        }
         let startIndex = textToChange.indexOf('Sequence: ') + 10
         let lastIndex = startIndex
-        for (; lastIndex < _.size(textToChange) && !_.isEqual(textToChange[lastIndex], separator); lastIndex++);// Don't remove this semi-colon
+        if (separator) {
+            for (; lastIndex < _.size(textToChange) && !_.isEqual(textToChange[lastIndex], separator); lastIndex++);// Don't remove this semi-colon
+        } else {
+            for (; lastIndex < _.size(textToChange); lastIndex++);// Don't remove this semi-colon
+        }
         let finalText = textToChange.substring(0, startIndex) + seqSelected + textToChange.substring(lastIndex, _.size(textToChange))
         return finalText
     }
