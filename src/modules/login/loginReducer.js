@@ -21,6 +21,7 @@ import {
   LOGIN_FAILURE,
   LOGIN_CAMERA_SCANNER,
   FORGET_PASSWORD,
+  ON_LONG_PRESS_ICON,
 
   SET_STATE,
   ON_LOGIN_USERNAME_CHANGE,
@@ -64,6 +65,11 @@ export default function authReducer(state = initialState, action) {
         .setIn(['form', 'displayMessage'], '')
         .setIn(['form', 'isButtonDisabled'], false)
         .setIn(['form','isEditTextDisabled'],false)
+
+
+    case ON_LONG_PRESS_ICON:
+          
+    return state.setIn(['form', 'isLongPress'], action.payload)
 
 
     case LOGIN_FAILURE:

@@ -57,6 +57,7 @@ module.exports = keyMirror({
     ON_AUTH_FORM_FIELD_CHANGE: null,
     ON_LOGIN_USERNAME_CHANGE: null,
     ON_LOGIN_PASSWORD_CHANGE: null,
+    ON_LONG_PRESS_ICON: null,
 
     PRELOADER_SUCCESS: null,
     SHOW_MOBILE_NUMBER: null,

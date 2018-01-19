@@ -51,7 +51,6 @@ class EtaCountDownTimer extends PureComponent {
         }
     }
     setCounterNgative = (jobEndTime, currentTime, jobStartTime) => {
-        console.log("setCounterNgative", moment(jobStartTime).diff(moment(currentTime)))
         if ((moment(jobStartTime).diff(moment(currentTime)) <= 1000) && (moment(jobEndTime).diff(moment(currentTime)) > 0) && this.state.counterNegative == 0) {
             this.setState({ counterNegative: 1 })
             let differenceInTime = this.getDifference(jobEndTime, currentTime, jobStartTime)

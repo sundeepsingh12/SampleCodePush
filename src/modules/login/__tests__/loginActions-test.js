@@ -6,6 +6,7 @@ import { jobMasterService } from '../../../services/classes/JobMaster'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { authenticationService } from '../../../services/classes/Authentication'
 import { deviceVerificationService } from '../../../services/classes/DeviceVerification'
+import { logoutService } from '../../../services/classes/Logout'
 
 var actions = require('../loginActions')
 import {
@@ -36,6 +37,8 @@ import {
     REMEMBER_ME,
 
     TABLE_USER_SUMMARY,
+    RESET_STATE,
+    ON_LONG_PRESS_ICON
 } from '../../../lib/constants'
 
 
@@ -46,24 +49,24 @@ import { NavigationActions,StackNavigator } from 'react-navigation'
  const Preloader = () => {}
  const Main = () => {}
 
- const NavigationContainer = StackNavigator(
-   {
-     application: {
-       screen: Application,
-     },
-     login: {
-       screen: Login,
-     },
-    preloader: {
-      screen: Preloader,
-     },
-     main: {
-       screen: Main,
-     }
-   }
- );
+//  const NavigationContainer = StackNavigator(
+//    {
+//      application: {
+//        screen: Application,
+//      },
+//      login: {
+//        screen: Login,
+//      },
+//     preloader: {
+//       screen: Preloader,
+//      },
+//      main: {
+//        screen: Main,
+//      }
+//    }
+//  );
 
-jest.mock('react-navigation')
+//jest.mock('react-navigation')
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
@@ -386,4 +389,39 @@ describe('loginActions', () => {
             })
     })
 
+})
+
+describe('test cases for reset Settings on long press', () => {
+    beforeEach(() => {
+        logoutService.deleteDataBase = jest.fn()
+        keyValueDBService.getAllKeysFromStore = jest.fn()
+        keyValueDBService.deleteValueFromStore = jest.fn()
+    })
+    it('should reset setting on long press on icon', () => {
+        const store = mockStore({})
+        let expectedActions = [
+            {
+                type: ON_LONG_PRESS_ICON,
+                payload: true
+            },
+            {
+                type: RESET_STATE,
+            },
+            {
+                type: ON_LONG_PRESS_ICON,
+                payload: false
+            }
+        ]
+        return store.dispatch(actions.onLongPressResetSettings())
+            .then(() => {
+                expect(logoutService.deleteDataBase).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getAllKeysFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.deleteValueFromStore).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[2].payload).toEqual(expectedActions[2].payload)
+            })
+    })
 })
