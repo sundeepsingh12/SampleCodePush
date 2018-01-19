@@ -148,7 +148,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, jobTransactionIdList, pieChart) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart) {
     return async function (dispatch) {
         try {
             const userData = await keyValueDBService.getValueFromStore(USER)      
@@ -159,7 +159,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
             let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement, jobTransaction)
             if (isFormValid) {
                 const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-                let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList, jobTransactionIdList)
+                let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
                 dispatch(setState(IS_LOADING, false))
                 let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
                 if (routeName == TabScreen) {

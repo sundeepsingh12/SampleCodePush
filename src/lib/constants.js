@@ -112,6 +112,9 @@ module.exports = keyMirror({
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
     SET_PAYMENT_INITIAL_PARAMETERS: null,
+    SET_SPLIT_PAYMENT: null,
+    SET_SELECTED_PAYMENT_MODE: null,
+    SET_SPLIT_PAYMENT_MODE_LIST: null,
 
     //UPI PaymentActions
     SET_UPI_APPROVAL: null,
@@ -259,6 +262,8 @@ module.exports = keyMirror({
     CameraAttribute: null,
     ImageDetailsView: null,
     JobDetailsV2: null,
+    SplitPayment: null,
+    Payment: null,
     SequenceRunsheetList: null,
 
     //Skulisting Actions
