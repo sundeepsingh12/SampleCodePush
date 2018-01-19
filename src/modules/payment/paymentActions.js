@@ -47,8 +47,10 @@ import {
 import {
     NO,
     YES,
+    INVALID_CONFIGURATION
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
+import { Toast } from 'native-base'
 
 export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, formData, jobStatusId) {
     return async function (dispatch) {
@@ -58,16 +60,19 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
             const jobMasterMoneyTransactionModesList = await keyValueDBService.getValueFromStore(JOB_MASTER_MONEY_TRANSACTION_MODE)
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             const paymentParameters = paymentService.getPaymentParameters(jobTransaction, fieldAttributeMasterId, jobMasterMoneyTransactionModesList.value, fieldAttributeMasterList.value, formData, jobStatusId, fieldAttributeMasterValidationList.value, modulesCustomizationList.value)
-            let isAmountEditable = paymentParameters.amountEditableObject ? true : parseInt(paymentParameters.actualAmount) ? false : true
+            let isAmountEditable = paymentParameters.amountEditableObject ? true : parseFloat(paymentParameters.actualAmount) ? false : true
+            if (!parseFloat(paymentParameters.actualAmount) && jobTransaction.length) {
+                throw new Error(INVALID_CONFIGURATION)
+            }
             dispatch(setState(
                 SET_PAYMENT_INITIAL_PARAMETERS,
                 {
-                    actualAmount: paymentParameters.actualAmount,
+                    actualAmount: Math.round((parseFloat(paymentParameters.actualAmount)) * 100) / 100,
                     isAmountEditable,
                     maxValue: paymentParameters.amountEditableObject ? paymentParameters.amountEditableObject.maxValue : null,
                     minValue: paymentParameters.amountEditableObject ? paymentParameters.amountEditableObject.minValue : null,
                     moneyCollectMaster: paymentParameters.moneyCollectMaster,
-                    originalAmount: paymentParameters.originalAmount,
+                    originalAmount: Math.round((parseFloat(paymentParameters.originalAmount)) * 100) / 100,
                     paymentModeList: paymentParameters.paymentModeList,
                     splitPaymentMode: paymentParameters.splitPaymentMode ? NO : null,
                     jobTransactionIdAmountMap: paymentParameters.jobTransactionIdAmountMap
@@ -75,6 +80,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
             ))
         } catch (error) {
             console.log(error)
+            Toast.show({ text: error.message, position: 'bottom', buttonText: 'OK', duration: 5000 })
         }
     }
 }
@@ -186,8 +192,8 @@ export function changeChequeOrDDPaymentModeList(modeTypeId, splitPaymentModeMap,
             let paymentModeObject = splitPaymentModeMapClone[modeTypeId]
             let paymentModeArray = splitPaymentModeMapClone[modeTypeId].list
             if (arrayIndex) {
-                let previousAmount = parseInt(paymentModeArray[arrayIndex].amount) ? parseInt(paymentModeArray[arrayIndex].amount) : 0
-                let totalAmount = parseInt(paymentModeObject.amount) ? parseInt(paymentModeObject.amount) : 0
+                let previousAmount = parseFloat(paymentModeArray[arrayIndex].amount) ? parseFloat(paymentModeArray[arrayIndex].amount) : 0
+                let totalAmount = parseFloat(paymentModeObject.amount) ? parseFloat(paymentModeObject.amount) : 0
                 paymentModeObject.amount = totalAmount - previousAmount
                 paymentModeArray.splice(arrayIndex, 1)
             } else {
@@ -223,10 +229,10 @@ export function setPaymentParameterForChequeOrDD(modeTypeId, arrayIndex, splitPa
             let paymentModeObject = splitPaymentModeMapClone[modeTypeId]
             let paymentModeArray = splitPaymentModeMapClone[modeTypeId].list
             if (amount || amount === '') {
-                let currentAmount = parseInt(amount) ? parseInt(amount) : 0
-                let previousAmount = parseInt(paymentModeArray[arrayIndex].amount) ? parseInt(paymentModeArray[arrayIndex].amount) : 0
-                let totalAmount = parseInt(paymentModeObject.amount) ? parseInt(paymentModeObject.amount) : 0
-                paymentModeObject.amount = totalAmount + currentAmount - previousAmount
+                let currentAmount = parseFloat(amount) ? parseFloat(amount) : 0
+                let previousAmount = parseFloat(paymentModeArray[arrayIndex].amount) ? parseFloat(paymentModeArray[arrayIndex].amount) : 0
+                let totalAmount = parseFloat(paymentModeObject.amount) ? parseFloat(paymentModeObject.amount) : 0
+                paymentModeObject.amount = Math.round((totalAmount + currentAmount - previousAmount) * 100) / 100
             }
             paymentModeArray[arrayIndex].amount = amount || amount === '' ? amount : paymentModeArray[arrayIndex].amount
             paymentModeArray[arrayIndex].transactionNumber = transactionNumber || transactionNumber === '' ? transactionNumber : paymentModeArray[arrayIndex].transactionNumber

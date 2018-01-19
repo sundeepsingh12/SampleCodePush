@@ -68,6 +68,7 @@ module.exports = {
     ADD_PAYMENT_MODE: '+ Add',
     NUMBER: 'Number',
     SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
+    INVALID_CONFIGURATION: 'Invalid Configuration',
 
     //Sequence
     SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
@@ -96,5 +97,5 @@ module.exports = {
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
     TOKEN_MISSING: 'Token missing',
     INVALID_SCAN: 'Invalid Scan',
-    JOBS_DELETED:'Jobs deleted'
+    JOBS_DELETED: 'Jobs deleted'
 }

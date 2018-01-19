@@ -220,7 +220,7 @@ class Payment extends PureComponent {
         let paymentModeView = []
         paymentModeView.push(
             <Text key='PaymentText' style={[styles.fontPrimary, styles.fontSm, styles.width100, styles.marginBottom10]}>
-                {!this.props.splitPaymentMode ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
+                {this.props.splitPaymentMode == YES ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
             </Text>
         )
         for (let index in paymentModeList.otherPaymentModeList) {
@@ -300,7 +300,7 @@ class Payment extends PureComponent {
                         placeholder="Enter Amount"
                         editable={this.props.isAmountEditable}
                         keyboardType="numeric"
-                        KeyboardTypeIOS="number-pad"
+                        KeyboardTypeIOS="decimal-pad"
                         onChangeText={value => this.onTextChange(
                             'SET_ACTUAL_AMOUNT',
                             {
@@ -309,7 +309,7 @@ class Payment extends PureComponent {
                                 transactionNumber: this.props.transactionNumber
                             }
                         )}
-                        value={this.props.actualAmount != null && this.props.actualAmount != undefined ? '' + this.props.actualAmount : null}
+                        value={this.props.actualAmount && this.props.actualAmount !== 0 ? '' + this.props.actualAmount : null}
                     />
                 </Item>
             </View>

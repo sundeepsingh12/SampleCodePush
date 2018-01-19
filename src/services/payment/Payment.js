@@ -51,7 +51,8 @@ import {
     TABLE_JOB_DATA,
 } from '../../lib/constants'
 import {
-    SPLIT_AMOUNT_ERROR
+    SPLIT_AMOUNT_ERROR,
+    INVALID_CONFIGURATION
 } from '../../lib/ContainerConstants'
 
 class Payment {
@@ -193,7 +194,7 @@ class Payment {
             }
             let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery, null, null)
             for (let jobDataIndex in jobDataList) {
-                let jobAmount = parseInt(jobDataList[jobDataIndex].value)
+                let jobAmount = parseFloat(jobDataList[jobDataIndex].value)
                 totalAmount += (jobAmount ? jobAmount : 0)
                 if (jobTransactionIdAmountMap) {
                     jobTransactionIdAmountMap[jobIdJobTransactionMap[jobDataList[jobDataIndex].jobId].jobTransactionId] = jobAmount ? jobAmount : 0
@@ -204,7 +205,7 @@ class Payment {
             originalAmount = formData[originalAmountMaster.fieldAttributeMasterId].value
             jobTransactionIdAmountMap = null
         } else if (jobTransaction.length) {
-            throw new Error('Invalid Configuration')
+            throw new Error(INVALID_CONFIGURATION)
         }
         return {
             originalAmount,
@@ -505,8 +506,8 @@ class Payment {
     checkSplitAmount(actualAmount, splitPaymentModeMap) {
         let totalSplitAmount = 0
         for (let index in splitPaymentModeMap) {
-            let amount = parseInt(splitPaymentModeMap[index].amount)
-            totalSplitAmount += (parseInt(amount) ? parseInt(amount) : 0)
+            let amount = parseFloat(splitPaymentModeMap[index].amount)
+            totalSplitAmount += (parseFloat(amount) ? parseFloat(amount) : 0)
         }
         if(totalSplitAmount == actualAmount) {
             return true
