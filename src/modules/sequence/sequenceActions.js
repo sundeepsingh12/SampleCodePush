@@ -17,7 +17,8 @@ import {
     Sequence,
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEQUENCE_LIST_ITEM_DRAGGED,
-    SET_SEQUENCE_LIST_ITEM
+    SET_SEQUENCE_LIST_ITEM,
+    CUSTOMIZATION_LIST_MAP
 } from '../../lib/constants'
 import {
     DUPLICATE_SEQUENCE_MESSAGE,
@@ -42,12 +43,15 @@ export function prepareListForSequenceModule(runsheetNumber) {
     return async function (dispatch) {
         try {
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
+            const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
+            const jobMasterSeperatorMap = sequenceService.createSeperatorMap(jobMasterIdCustomizationMap)
             const sequenceList = await sequenceService.getSequenceList(runsheetNumber)
-            const { isDuplicateSequenceFound, sequenceArray, transactionsWithChangedSeqeunceMap } = await sequenceService.checkForAutoSequencing(sequenceList)
+            const { isDuplicateSequenceFound, sequenceArray, transactionsWithChangedSeqeunceMap } = await sequenceService.checkForAutoSequencing(sequenceList, jobMasterSeperatorMap)
             dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
                 sequenceList: sequenceArray,
                 responseMessage: (isDuplicateSequenceFound) ? DUPLICATE_SEQUENCE_MESSAGE : '',
-                transactionsWithChangedSeqeunceMap
+                transactionsWithChangedSeqeunceMap,
+                jobMasterSeperatorMap
             }))
         } catch (error) {
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
@@ -114,10 +118,10 @@ export function getRunsheets() {
  * 
  * This method shift rows and set the new rows to sequence list
  */
-export function rowMoved(rowParam, sequenceList, transactionsWithChangedSeqeunceMap) {
+export function rowMoved(rowParam, sequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap) {
     return async function (dispatch) {
         try {
-            let { cloneSequenceList, newTransactionsWithChangedSeqeunceMap } = await sequenceService.onRowDragged(rowParam, sequenceList, transactionsWithChangedSeqeunceMap)
+            let { cloneSequenceList, newTransactionsWithChangedSeqeunceMap } = await sequenceService.onRowDragged(rowParam, sequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap)
             dispatch(setState(SEQUENCE_LIST_ITEM_DRAGGED, {
                 sequenceList: cloneSequenceList,
                 transactionsWithChangedSeqeunceMap: newTransactionsWithChangedSeqeunceMap,
@@ -174,10 +178,10 @@ export function searchReferenceNumber(searchText, sequenceList) {
  * 
  * This method shift rows and set the new rows to sequence list when value is entered from dialog box
  */
-export function jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap) {
+export function jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap) {
     return async function (dispatch) {
         try {
-            let { cloneSequenceList, newTransactionsWithChangedSeqeunceMap } = await sequenceService.jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap)
+            let { cloneSequenceList, newTransactionsWithChangedSeqeunceMap } = await sequenceService.jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap)
             dispatch(setState(SEQUENCE_LIST_ITEM_DRAGGED, {
                 sequenceList: cloneSequenceList,
                 transactionsWithChangedSeqeunceMap: newTransactionsWithChangedSeqeunceMap,

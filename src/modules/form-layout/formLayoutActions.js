@@ -160,14 +160,14 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
             if (isFormValid) {
                 const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                 let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
-                dispatch(setState(IS_LOADING, false))
                 let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
+                dispatch(setState(IS_LOADING, false))
                 if (routeName == TabScreen) {
                     dispatch(NavigationActions.reset({
                         index: 1,
                         actions: [
                             NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                            NavigationActions.navigate({ routeName: TabScreen, params: { loadTabScreen: true, landingTab: landingId } })
+                            NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
                         ]
                     }))
                 } else {

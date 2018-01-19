@@ -36,6 +36,7 @@ import {
 } from '../lib/ContainerConstants'
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
+import _ from 'lodash'
 
 export default class JobListItem extends PureComponent {
 
@@ -196,10 +197,41 @@ export default class JobListItem extends PureComponent {
     )
   }
 
+  /**
+   * 
+   * @param {*} data 
+   * this method is use in case previous sequence(i.e seqActual) is different from new sequence(i.e seqSelected)
+   */
+  previousAndCurrentSequenceView(data) {
+    if (_.includes(data.line1, 'Sequence') || _.includes(data.line2, 'Sequence') || _.includes(data.circleLine1, 'Sequence') || _.includes(data.circleLine2, 'Sequence')) {
+      if (data.seqActual && data.seqActual < data.seqSelected) {
+        return (
+          <View style={[styles.row]}>
+            <Icon name="md-arrow-dropdown" style={[styles.fontXl, styles.fontDanger, styles.marginTop5, styles.marginBottom5, styles.marginLeft5]} />
+            <Text style={[styles.fontDefault, styles.fontDanger, styles.italic, styles.margin5]}>
+              was {data.seqActual}
+            </Text>
+          </View>
+        )
+      }
+      else if (data.seqActual && data.seqActual > data.seqSelected) {
+        return (
+          <View style={[styles.row]}>
+            <Icon name="md-arrow-dropup" style={[styles.fontXl, styles.fontSuccess, styles.marginTop5, styles.marginBottom5, styles.marginLeft5]} />
+            <Text style={[styles.fontDefault, styles.italic, styles.fontSuccess, styles.margin5]}>
+              was {data.seqActual}
+            </Text>
+          </View>
+        )
+      }
+    }
+  }
+
   /**This function shows Line1,Line2,Circle Line1,Circle Line 2
    * 
    */
   renderJobListItemDetails() {
+    let previousAndCurrentSequenceView = this.previousAndCurrentSequenceView(this.props.data)
     return (
       <View style={[styles.flexBasis90]}>
         <View>
@@ -222,6 +254,7 @@ export default class JobListItem extends PureComponent {
             </Text>
             : null
           }
+          {previousAndCurrentSequenceView}
         </View>
         {this.props.jobEndTime ?
           <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5 }]}>
@@ -232,27 +265,27 @@ export default class JobListItem extends PureComponent {
             </Text>
           </View> : null}
 
-          {/* action buttons section */}
-          <View style={[styles.row, {marginLeft: -10}]}>
+        {/* action buttons section */}
+        <View style={[styles.row, {marginLeft: -10}]}>
 
-            {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.showIconsInJobListing,
-                <Button transparent onPress={this.callButtonPressed}>
-                  <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>
-            )}
+          {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.showIconsInJobListing,
+            <Button transparent onPress={this.callButtonPressed}>
+              <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+            </Button>
+          )}
 
-            {renderIf((!_.isEmpty(this.props.data.jobSwipableDetails.addressData) ||
-              (this.props.data.jobLatitude && this.props.data.jobLongitude)) && this.props.showIconsInJobListing,
-                <Button transparent onPress={this.navigationButtonPressed}>
-                  <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-                </Button>)}
+          {renderIf((!_.isEmpty(this.props.data.jobSwipableDetails.addressData) ||
+            (this.props.data.jobLatitude && this.props.data.jobLongitude)) && this.props.showIconsInJobListing,
+            <Button transparent onPress={this.navigationButtonPressed}>
+              <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+            </Button>)}
 
 
-            {renderIf(this.props.data.jobSwipableDetails.customerCareData && this.props.data.jobSwipableDetails.customerCareData.length > 0 && this.props.showIconsInJobListing,
-                <Button transparent onPress={this.customerCareButtonPressed}>
-                  <CallIcon />
-                </Button>)}
-          </View>
+          {renderIf(this.props.data.jobSwipableDetails.customerCareData && this.props.data.jobSwipableDetails.customerCareData.length > 0 && this.props.showIconsInJobListing,
+            <Button transparent onPress={this.customerCareButtonPressed}>
+              <CallIcon />
+            </Button>)}
+        </View>
       </View>
     )
   }

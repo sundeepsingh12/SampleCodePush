@@ -13,6 +13,7 @@ import {
   FUTURE_RUNSHEET_ENABLED,
   TAB,
   SET_SELECTED_DATE,
+  SHOULD_RELOAD_START
 } from '../../lib/constants'
 import moment from 'moment'
 import _ from 'lodash'
@@ -46,8 +47,8 @@ export function fetchJobs(date) {
     try {
       const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
       dispatch(setState(FUTURE_RUNSHEET_ENABLED, customNaming.value.enableFutureDateRunsheet))
-       if(_.isUndefined(date) && customNaming.value.enableFutureDateRunsheet) date = moment().format('YYYY-MM-DD')
-      dispatch(setState(SET_SELECTED_DATE,date))      
+      if(_.isUndefined(date) && customNaming.value.enableFutureDateRunsheet) date = moment().format('YYYY-MM-DD')
+      dispatch(setState(SET_SELECTED_DATE,date))
       dispatch(setState(JOB_LISTING_START))
       const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
       let selectedDate = customNaming.value.enableFutureDateRunsheet ? date : null
@@ -56,7 +57,28 @@ export function fetchJobs(date) {
     } catch (error) {
       //TODO handle UI
       console.log(error)
-       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList:[]}))
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList:[]}))
+    }
+  }
+}
+
+/**
+ * 
+ * @param {*} jobTransactionCustomizationList 
+ *  This action will fetch jobs if SHOULD_RELOAD_START is true in store or if jobTransactionCustomizationList is empty
+ */
+export function shouldFetchJobsOrNot(jobTransactionCustomizationList) {
+  return async function (dispatch) {
+    try {
+      let shouldFetchJobs = await keyValueDBService.getValueFromStore(SHOULD_RELOAD_START)
+      if ((shouldFetchJobs && shouldFetchJobs.value) || _.isEmpty(jobTransactionCustomizationList)) {
+        dispatch(fetchJobs(moment().format('YYYY-MM-DD')))
+      }
+      await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(false))
+    } catch (error) {
+      //TODO handle UI
+      console.log(error)
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }))
     }
   }
 }

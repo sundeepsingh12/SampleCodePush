@@ -11,7 +11,8 @@ import {
     SaveActivated,
     Transient,
     CheckoutDetails,
-    TabScreen
+    TabScreen,
+    SHOULD_RELOAD_START
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -281,6 +282,7 @@ class FormLayout {
             if (!jobTransaction.length) { //Delete draft only if not bulk
                 await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
             }
+            await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
         }
         return {
             routeName,
