@@ -50,7 +50,6 @@ export function getJobMasterVsStatusNameList() {
             const jobMasterVsStatusList = await bulkService.prepareJobMasterVsStatusList(jobMasterList.value, jobStatusList.value, modulesCustomizationList.value)
             dispatch(setState(STOP_FETCHING_BULK_CONFIG, jobMasterVsStatusList))
         } catch (error) {
-            console.log(error)
             dispatch(setState(STOP_FETCHING_BULK_CONFIG, []))
         }
     }
@@ -64,11 +63,15 @@ export function getBulkJobTransactions(bulkParams) {
             const bulkTransactions = await bulkService.getJobListingForBulk(bulkParams)
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             const bulkModule = await moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomizationList.value, BULK_ID)
-            const bulkModuleRemark = JSON.parse(bulkModule[0].remark)
-            const selectAll = bulkModuleRemark ? bulkModuleRemark.selectAll : false
-            const jobMasterManualSelectionConfiguration = bulkModuleRemark ? bulkModuleRemark.jobMasterManualSelectionConfiguration : null
-            const isManualSelectionAllowed = bulkService.getManualSelection(jobMasterManualSelectionConfiguration, bulkParams.jobMasterId)
-            const searchSelectionOnLine1Line2 = bulkModuleRemark ? bulkModuleRemark.searchSelectionOnLine1Line2 : false
+            const bulkModuleRemark = (bulkModule && bulkModule[0])?JSON.parse(bulkModule[0].remark):null
+            let selectAll = false,jobMasterManualSelectionConfiguration=null,isManualSelectionAllowed=false,searchSelectionOnLine1Line2 = false
+            if(bulkModuleRemark){
+                selectAll = bulkModuleRemark.selectAll
+                 jobMasterManualSelectionConfiguration =  bulkModuleRemark.jobMasterManualSelectionConfiguration
+                 isManualSelectionAllowed = (!jobMasterManualSelectionConfiguration)?false:bulkService.getManualSelection(jobMasterManualSelectionConfiguration, bulkParams.jobMasterId)
+                 searchSelectionOnLine1Line2 =  bulkModuleRemark.searchSelectionOnLine1Line2 
+                }
+           
             let idToSeparatorMap
             if (searchSelectionOnLine1Line2) {
                 const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
@@ -82,8 +85,9 @@ export function getBulkJobTransactions(bulkParams) {
                 idToSeparatorMap
             }))
         } catch (error) {
-            console.log(error)
-            dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS))
+            dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS,{
+                bulkTransactions:{}
+            }))
         }
     }
 }
@@ -93,11 +97,7 @@ export function toggleListItemIsChecked(jobTransactionId, allTransactions) {
         try {
             const bulkTransactions = await JSON.parse(JSON.stringify(allTransactions))
             bulkTransactions[jobTransactionId].isChecked = !bulkTransactions[jobTransactionId].isChecked
-            const selectedItems = await bulkService.getSelectedTransaction(bulkTransactions)
-            // dispatch(setState(TOGGLE_JOB_TRANSACTION_LIST_ITEM, {
-            //     selectedItems,
-            //     bulkTransactions
-            // }))
+            const selectedItems = await bulkService.getSelectedTransactionIds(bulkTransactions)
             let displayText = (selectedItems.length == _.size(allTransactions)) ? 'Select None' : 'Select All'
             dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
                 selectedItems,
@@ -105,7 +105,7 @@ export function toggleListItemIsChecked(jobTransactionId, allTransactions) {
                 displayText
             }))
         } catch (error) {
-            console.log(error)
+            //Update UI here
         }
     }
 }
@@ -131,7 +131,7 @@ export function toggleAllItems(allTransactions, selectAllNone) {
                 displayText
             }))
         } catch (error) {
-            console.log(error)
+            //Update UI here 
         }
     }
 }
@@ -154,7 +154,7 @@ export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOn
                 dispatch(setState(SET_BULK_ERROR_MESSAGE, searchResultObject.errorMessage))
             }
         } catch (error) {
-            console.log(error)
+            //Update UI here if needed
         }
     }
 }
