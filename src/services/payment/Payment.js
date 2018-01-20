@@ -50,6 +50,10 @@ import {
 import {
     TABLE_JOB_DATA,
 } from '../../lib/constants'
+import {
+    SPLIT_AMOUNT_ERROR,
+    INVALID_CONFIGURATION
+} from '../../lib/ContainerConstants'
 
 class Payment {
 
@@ -81,34 +85,76 @@ class Payment {
      *                        ]
      * }
      */
-    getPaymentParameters(jobMasterId, fieldAttributeMasterId, jobMasterMoneyTransactionModesList, fieldAttributeMasterList, formData, jobId, jobStatusId, fieldAttributeMasterValidationList, modulesCustomizationList) {
+    getPaymentParameters(jobTransaction, fieldAttributeMasterId, jobMasterMoneyTransactionModesList, fieldAttributeMasterList, formData, jobStatusId, fieldAttributeMasterValidationList, modulesCustomizationList) {
+        let jobMasterId
         const fieldAttributeMasterMapWithParentId = fieldAttributeMasterService.getFieldAttributeMasterMapWithParentId(fieldAttributeMasterList)
         const fieldValidationMap = fieldValidationService.getFieldValidationMap(fieldAttributeMasterValidationList)
         const modulesCustomizationMap = moduleCustomizationService.getModuleCustomizationMapForAppModuleId(modulesCustomizationList)
         this.setDisplayNameForPaymentModules(modulesCustomizationMap)
+        if (jobTransaction.length) {
+            jobMasterId = jobTransaction[0].jobMasterId
+        } else {
+            jobMasterId = jobTransaction.jobMasterId
+        }
         let moneyCollectMaster = fieldAttributeMasterMapWithParentId[jobMasterId]['root'][fieldAttributeMasterId]
         moneyCollectMaster.childObject = fieldAttributeMasterService.setChildFieldAttributeMaster(fieldAttributeMasterMapWithParentId[jobMasterId][fieldAttributeMasterId], fieldAttributeMasterMapWithParentId[jobMasterId])
-        jobMasterMoneyTransactionModesList = jobMasterMoneyTransactionModesList ? jobMasterMoneyTransactionModesList : []
-        let paymentModeList = []
+        let paymentModeList = {}
+        let splitPaymentMode = false
         if (moneyCollectMaster.attributeTypeId == MONEY_COLLECT) {
-            paymentModeList = jobMasterMoneyTransactionModesList.filter(jobMasterMoneyTransactionMode => jobMasterMoneyTransactionMode.jobMasterId == jobMasterId)
+            let paymentModeListObject = this.getPaymentModeList(jobMasterMoneyTransactionModesList, jobMasterId)
+            paymentModeList = paymentModeListObject.paymentModeList
+            splitPaymentMode = paymentModeListObject.splitPaymentMode
         } else if (moneyCollectMaster.attributeTypeId == MONEY_PAY) {
-            paymentModeList.push({
+            paymentModeList.otherPaymentModeList = []
+            paymentModeList.otherPaymentModeList.push({
                 id: 0,
                 moneyTransactionModeId: 1,
                 jobMasterId
             })
         }
-        let originalAmount = this.getOriginalAmount(moneyCollectMaster, formData, jobId)
+        let originalAmountObject = this.getOriginalAmount(moneyCollectMaster, formData, jobTransaction)
         let actualAmount = this.getTotalActualAmount(moneyCollectMaster, formData)
-        actualAmount = actualAmount ? actualAmount : originalAmount
+        actualAmount = actualAmount ? actualAmount : originalAmountObject.originalAmount
         let amountEditableObject = this.actualAmountEditable(moneyCollectMaster, fieldValidationMap, jobStatusId)
         return {
             actualAmount,
             amountEditableObject,
             moneyCollectMaster,
-            originalAmount,
+            originalAmount: originalAmountObject.originalAmount,
             paymentModeList,
+            splitPaymentMode,
+            jobTransactionIdAmountMap: originalAmountObject.jobTransactionIdAmountMap
+        }
+    }
+
+    /**
+     * 
+     * @param {*} jobMasterMoneyTransactionModesList 
+     * @param {*} jobMasterId 
+     */
+    getPaymentModeList(jobMasterMoneyTransactionModesList, jobMasterId) {
+        let paymentModeList = {
+            endPaymentModeList: [],
+            otherPaymentModeList: [],
+        }
+        let splitPaymentMode = false
+        for (let index in jobMasterMoneyTransactionModesList) {
+            if (jobMasterMoneyTransactionModesList[index].jobMasterId != jobMasterId) {
+                continue
+            }
+            if (jobMasterMoneyTransactionModesList[index].moneyTransactionModeId == SPLIT.id) {
+                splitPaymentMode = true
+                continue
+            }
+            if (this.checkCardPayment(jobMasterMoneyTransactionModesList[index].moneyTransactionModeId)) {
+                paymentModeList.endPaymentModeList.push(jobMasterMoneyTransactionModesList[index])
+            } else {
+                paymentModeList.otherPaymentModeList.push(jobMasterMoneyTransactionModesList[index])
+            }
+        }
+        return {
+            paymentModeList,
+            splitPaymentMode
         }
     }
 
@@ -120,22 +166,51 @@ class Payment {
      * @returns 
      * originalAmount : integer
      */
-    getOriginalAmount(moneyCollectMaster, formData, jobId) {
-        let originalAmountMaster, originalAmount
+    getOriginalAmount(moneyCollectMaster, formData, jobTransaction) {
+        let originalAmountMaster, originalAmount, jobIdJobTransactionMap = {}, totalAmount = 0, jobTransactionIdAmountMap = {}
         for (let index in moneyCollectMaster.childObject) {
             if (moneyCollectMaster.childObject[index].attributeTypeId == ORIGINAL_AMOUNT) {
                 originalAmountMaster = moneyCollectMaster.childObject[index]
                 break
             }
         }
+
         if (originalAmountMaster && originalAmountMaster.jobAttributeMasterId) {
-            let jobDataQuery = `jobId = ${jobId} AND jobAttributeMasterId = ${originalAmountMaster.jobAttributeMasterId} AND parentId = 0`
+            let jobDataQuery = null
+            if (jobTransaction.length) {
+                let jobQuery = ''
+                for (let jobTransactionIndex in jobTransaction) {
+                    if (jobTransactionIndex == 0) {
+                        jobQuery += `jobId = ${jobTransaction[jobTransactionIndex].jobId}`
+                    } else {
+                        jobQuery += ` OR jobId = ${jobTransaction[jobTransactionIndex].jobId}`
+                    }
+                    jobIdJobTransactionMap[jobTransaction[jobTransactionIndex].jobId] = jobTransaction[jobTransactionIndex]
+                }
+                jobDataQuery = `(${jobQuery}) AND jobAttributeMasterId = ${originalAmountMaster.jobAttributeMasterId} AND parentId = 0`
+            } else {
+                jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${originalAmountMaster.jobAttributeMasterId} AND parentId = 0`
+                jobTransactionIdAmountMap = null
+            }
             let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery, null, null)
-            originalAmount = jobDataList[0] ? parseInt(jobDataList[0].value) : 0
+            for (let jobDataIndex in jobDataList) {
+                let jobAmount = parseFloat(jobDataList[jobDataIndex].value)
+                totalAmount += (jobAmount ? jobAmount : 0)
+                if (jobTransactionIdAmountMap) {
+                    jobTransactionIdAmountMap[jobIdJobTransactionMap[jobDataList[jobDataIndex].jobId].jobTransactionId] = jobAmount ? jobAmount : 0
+                }
+            }
+            originalAmount = totalAmount + ''
         } else if (originalAmountMaster && originalAmountMaster.fieldAttributeMasterId) {
             originalAmount = formData[originalAmountMaster.fieldAttributeMasterId].value
+            jobTransactionIdAmountMap = null
+        } else if (jobTransaction.length) {
+            throw new Error(INVALID_CONFIGURATION)
         }
-        return originalAmount
+        return {
+            originalAmount,
+            jobTransactionIdAmountMap
+        }
     }
 
     /**
@@ -148,11 +223,11 @@ class Payment {
     getTotalActualAmount(moneyCollectMaster, formData) {
         let actualAmount
         for (let [fieldAttributeMasterId, formElement] of formData) {
-            if (formElement.attributeTypeId == SKU_ARRAY && formElement.sequence < moneyCollectMaster.sequence) {
+            if (formElement.attributeTypeId == SKU_ARRAY && formElement.positionId < moneyCollectMaster.positionId) {
                 actualAmount += this.getActualAmount(formElement.childList, SKU_ACTUAL_AMOUNT)
             }
 
-            if (formElement.attributeTypeId == FIXED_SKU && formElement.sequence < moneyCollectMaster.sequence) {
+            if (formElement.attributeTypeId == FIXED_SKU && formElement.positionId < moneyCollectMaster.positionId) {
                 actualAmount += this.getActualAmount(formElement.childList, DECIMAL)
             }
         }
@@ -218,38 +293,39 @@ class Payment {
      * @param {*} actualAmount 
      * @param {*} fieldAttributeMaster 
      * @param {*} originalAmount 
-     * @param {*} selectedIndex 
+     * @param {*} selectedPaymentMode 
      * @param {*} transactionNumber 
      * @param {*} remarks 
      * @param {*} receipt
      * @returns
      *  
      */
-    prepareMoneyCollectChildFieldDataListDTO(actualAmount, fieldAttributeMaster, originalAmount, selectedIndex, transactionNumber, remarks, receipt) {
+    prepareMoneyCollectChildFieldDataListDTO(actualAmount, fieldAttributeMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt) {
         //TODO : change key to attribute type for details object
         let moneyCollectFieldDataChildList = []
         for (let index in fieldAttributeMaster.childObject) {
             if (fieldAttributeMaster.childObject[index].attributeTypeId == ORIGINAL_AMOUNT) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, originalAmount))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, originalAmount, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].attributeTypeId == ACTUAL_AMOUNT) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].childObject) {
                 let detailsData = {}
                 detailsData.attributeTypeId = fieldAttributeMaster.childObject[index].attributeTypeId
+                detailsData.key = fieldAttributeMaster.childObject[index].key
                 detailsData.fieldAttributeMasterId = fieldAttributeMaster.childObject[index].id
                 detailsData.value = fieldAttributeMaster.childObject[index].attributeTypeId == ARRAY ? ARRAY_SAROJ_FAREYE : fieldAttributeMaster.childObject[index].attributeTypeId == OBJECT ? OBJECT_SAROJ_FAREYE : null
-                detailsData.childDataList = this.prepareMoneyCollectChildFieldDataListDTO(actualAmount, fieldAttributeMaster.childObject[index], originalAmount, selectedIndex, transactionNumber, remarks, receipt)
+                detailsData.childDataList = this.prepareMoneyCollectChildFieldDataListDTO(actualAmount, fieldAttributeMaster.childObject[index], originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt)
                 moneyCollectFieldDataChildList.push(detailsData)
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == MODE) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, this.getModeTypeFromModeTypeId(selectedIndex)))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, this.getModeTypeFromModeTypeId(selectedPaymentMode), fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == TRANSACTION_NUMBER) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, transactionNumber))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, transactionNumber, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == AMOUNT) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == RECEIPT) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, receipt))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, receipt, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == REMARKS) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, remarks))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, remarks, fieldAttributeMaster.childObject[index].key))
             }
         }
         return moneyCollectFieldDataChildList
@@ -267,12 +343,13 @@ class Payment {
      *      value
      * }
      */
-    setFieldDataKeysAndValues(attributeTypeId, fieldAttributeMasterId, value) {
+    setFieldDataKeysAndValues(attributeTypeId, fieldAttributeMasterId, value, key) {
         return (
             {
                 attributeTypeId,
                 fieldAttributeMasterId,
-                value
+                value,
+                key
             }
         )
     }
@@ -322,6 +399,7 @@ class Payment {
             case NET_BANKING_CARD_LINK.id:
             case NET_BANKING_UPI_LINK.id:
             case PAYNEAR.id:
+            case PAYTM.id:
             case PAYO.id:
             case PAYNEAR.id:
             case RAZOR_PAY.id:
@@ -356,6 +434,86 @@ class Payment {
         NET_BANKING_LINK.displayName = remarks ? remarks.netBankingCustomName ? remarks.netBankingCustomName : NET_BANKING_LINK.displayName : NET_BANKING_LINK.displayName
         NET_BANKING_CARD_LINK.displayName = remarks ? remarks.cardCustomName ? remarks.cardCustomName : NET_BANKING_CARD_LINK.displayName : NET_BANKING_CARD_LINK.displayName
         NET_BANKING_UPI_LINK.displayName = remarks ? remarks.upiCustomName ? remarks.upiCustomName : NET_BANKING_UPI_LINK.displayName : NET_BANKING_UPI_LINK.displayName
+    }
+
+    prepareSplitPaymentModeList(selectedPaymentMode) {
+        let splitPaymentModeMap = {}
+        for (let index in selectedPaymentMode.otherPaymentModeList) {
+            if (!selectedPaymentMode.otherPaymentModeList[index]) {
+                continue
+            }
+            if (index == CHEQUE.id || index == DEMAND_DRAFT.id) {
+                splitPaymentModeMap[index] = {
+                    list: [
+                        {
+                            modeTypeId: index,
+                            amount: null
+                        }
+                    ],
+                    amount: 0
+                }
+            } else {
+                splitPaymentModeMap[index] = {
+                    modeTypeId: index,
+                    amount: null
+                }
+            }
+        }
+        if (selectedPaymentMode.cardPaymentMode) {
+            splitPaymentModeMap[selectedPaymentMode.cardPaymentMode] = {
+                modeTypeId: selectedPaymentMode.cardPaymentMode,
+                amount: null
+            }
+        }
+        return splitPaymentModeMap
+    }
+
+    prepareMoneyCollectChildFieldDataListDTOForSplit(actualAmount, fieldAttributeMaster, originalAmount, splitPaymentModeMap) {
+        let moneyCollectFieldDataChildList = []
+        for (let index in fieldAttributeMaster.childObject) {
+            if (fieldAttributeMaster.childObject[index].attributeTypeId == ORIGINAL_AMOUNT) {
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, originalAmount, fieldAttributeMaster.childObject[index].key))
+            } else if (fieldAttributeMaster.childObject[index].attributeTypeId == ACTUAL_AMOUNT) {
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount, fieldAttributeMaster.childObject[index].key))
+            } else if (fieldAttributeMaster.childObject[index].childObject) {
+                let detailsData = {}
+                detailsData.attributeTypeId = fieldAttributeMaster.childObject[index].attributeTypeId
+                detailsData.fieldAttributeMasterId = fieldAttributeMaster.childObject[index].id
+                detailsData.value = fieldAttributeMaster.childObject[index].attributeTypeId == ARRAY ? ARRAY_SAROJ_FAREYE : fieldAttributeMaster.childObject[index].attributeTypeId == OBJECT ? OBJECT_SAROJ_FAREYE : null
+                detailsData.childDataList = []
+                for (let paymentMode in splitPaymentModeMap) {
+                    let childDataList = null
+                    if (this.checkCardPayment(paymentMode)) {
+                        continue
+                    }
+                    if (parseInt(paymentMode) == CHEQUE.id || parseInt(paymentMode) == DEMAND_DRAFT.id) {
+                        let paymentList = splitPaymentModeMap[paymentMode].list
+                        for (let paymentObject in paymentList) {
+                            childDataList = this.prepareMoneyCollectChildFieldDataListDTO(paymentList[paymentObject].amount, fieldAttributeMaster.childObject[index], originalAmount, parseInt(paymentMode), paymentList[paymentObject].transactionNumber, null, null)
+                            detailsData.childDataList = detailsData.childDataList.concat(childDataList)
+                        }
+                    } else {
+                        childDataList = this.prepareMoneyCollectChildFieldDataListDTO(splitPaymentModeMap[paymentMode].amount, fieldAttributeMaster.childObject[index], originalAmount, parseInt(paymentMode), null, null, null)
+                        detailsData.childDataList = detailsData.childDataList.concat(childDataList)
+                    }
+                }
+                moneyCollectFieldDataChildList.push(detailsData)
+            }
+        }
+        return moneyCollectFieldDataChildList
+    }
+
+    checkSplitAmount(actualAmount, splitPaymentModeMap) {
+        let totalSplitAmount = 0
+        for (let index in splitPaymentModeMap) {
+            let amount = parseFloat(splitPaymentModeMap[index].amount)
+            totalSplitAmount += (parseFloat(amount) ? parseFloat(amount) : 0)
+        }
+        if(totalSplitAmount == actualAmount) {
+            return true
+        }
+
+        throw new Error(SPLIT_AMOUNT_ERROR)
     }
 
 }

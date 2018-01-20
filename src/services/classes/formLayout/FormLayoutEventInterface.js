@@ -21,8 +21,8 @@ class FormLayoutEventsInterface extends FormLayoutEventImpl {
      * @param {*} statusId 
      * @param {*} jobMasterId
      */
-    saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionIdList, jobTransaction) {
-        return this.saveData(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionIdList, jobTransaction)
+    saveDataInDb(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionList) {
+        return this.saveData(formElement, jobTransactionId, statusId, jobMasterId, jobTransactionList)
     }
 
     addTransactionsToSyncList(jobTransactionList) {

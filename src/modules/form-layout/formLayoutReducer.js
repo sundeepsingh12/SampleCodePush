@@ -19,7 +19,7 @@ import {
     CLEAR_FORM_LAYOUT,
     SET_DRAFT,
     SET_UPDATE_DRAFT,
-    SET_FORM_TO_INVALID
+    SET_FORM_TO_INVALID,
 } from '../../lib/constants'
 
 const initialState = new InitialState();

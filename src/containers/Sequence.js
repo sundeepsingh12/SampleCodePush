@@ -16,7 +16,8 @@ import {
   WARNING_FOR_BACK, WARNING,
   CLOSE, OK, JOB_NOT_PRESENT, CANCEL,
   CURRENT_SEQUENCE_NUMBER, NEW_SEQUENCE_NUMBER_MESSAGE,
-  JUMP_SEQUENCE
+  JUMP_SEQUENCE,
+  BLANK_NEW_SEQUENCE
 } from '../lib/ContainerConstants'
 import {
   Container,
@@ -31,6 +32,7 @@ import {
   FooterTab,
   StyleProvider,
   Toast,
+  Label
 } from 'native-base'
 import {
   SET_RESPONSE_MESSAGE,
@@ -54,7 +56,8 @@ function mapStateToProps(state) {
     responseMessage: state.sequence.responseMessage,
     transactionsWithChangedSeqeunceMap: state.sequence.transactionsWithChangedSeqeunceMap,
     searchText: state.sequence.searchText,
-    currentSequenceListItemSeleceted: state.sequence.currentSequenceListItemSeleceted
+    currentSequenceListItemSeleceted: state.sequence.currentSequenceListItemSeleceted,
+    jobMasterSeperatorMap: state.sequence.jobMasterSeperatorMap
   }
 }
 
@@ -76,7 +79,8 @@ class Sequence extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      newSequenceNumber: ''
+      newSequenceNumber: '',
+      alertMessage: ''
     }
   }
 
@@ -103,11 +107,20 @@ class Sequence extends PureComponent {
   }
 
   onRowMoved(rowParam) {
-    this.props.actions.rowMoved(rowParam, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap)
+    this.props.actions.rowMoved(rowParam, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap, this.props.jobMasterSeperatorMap)
   }
 
   onJumpSequencePressed(newSequenceNumber) {
-    this.props.actions.jumpSequence(_.indexOf(this.props.sequenceList, this.props.currentSequenceListItemSeleceted), newSequenceNumber, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap)
+    if (_.size(_.trim(newSequenceNumber)) == 0) {
+      this.setState(() => {
+        return {
+          newSequenceNumber: '',
+          alertMessage: BLANK_NEW_SEQUENCE
+        }
+      })
+      return
+    }
+    this.props.actions.jumpSequence(_.indexOf(this.props.sequenceList, this.props.currentSequenceListItemSeleceted), newSequenceNumber, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap, this.props.jobMasterSeperatorMap)
     this.setModalView({})
   }
 
@@ -169,7 +182,8 @@ class Sequence extends PureComponent {
     this.props.actions.setState(SET_REFERENCE_NO, '')
     this.setState(() => {
       return {
-        newSequenceNumber: ''
+        newSequenceNumber: '',
+        alertMessage: ''
       }
     })
   }
@@ -202,10 +216,13 @@ class Sequence extends PureComponent {
             <Item regular>
               <Input
                 onChangeText={(sequenceNumber) =>
-                  this.setState(() => { return { newSequenceNumber: sequenceNumber } })}
+                  this.setState(() => { return { newSequenceNumber: sequenceNumber, alertMessage: '' } })}
                 style={{ height: 35, fontSize: 13 }}
                 keyboardType="numeric" />
             </Item>
+            {this.state.alertMessage ?
+              <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10, styles.marginLeft5]}>{this.state.alertMessage}</Label>
+              : null}
           </View>
           <View style={[styles.row, { borderTopColor: '#d3d3d3', borderTopWidth: 1 }]}>
             <View style={{ width: '50%' }}>
