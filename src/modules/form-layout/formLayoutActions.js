@@ -69,6 +69,7 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
         try {
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
+            let latestPositionId = sortedFormAttributesDto.latestPositionId
             const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
             if (!draftStatusId) {
                 sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction);
@@ -78,7 +79,7 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
                 statusId,
                 statusName,
                 jobTransactionId,
-                latestPositionId: sortedFormAttributesDto.latestPositionId,
+                latestPositionId,
                 draftStatusId
             }))
             dispatch(setState(IS_LOADING, false))
