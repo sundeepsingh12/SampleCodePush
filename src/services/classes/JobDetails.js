@@ -90,6 +90,22 @@ class JobDetails {
             autoIncrementId
         }
     }
+    
+    /**@function checkForEnablingStatus(enableOutForDelivery,enableResequenceRestriction,jobTime,jobMasterList,tabId,seqSelected,statusList,jobTransactionId)
+     * ## It will get all parent status list of current jobTransaction.
+     * 
+     * @param {Boolean} enableOutForDelivery - It contains boolean value to check enableOutForDelivery is enable in jobMaster 
+     * @param {Boolean} enableResequenceRestriction - It contains boolean value to check enableResequenceRestriction is enable in jobMaster
+     * @param {string} jobTime - It contains string value
+     * @param {object} jobMasterList - It contains all job masters
+     * @param {Number} tabId - It contains current tab Id
+     * @param {Number} seqSelected - It contains current transaction sequence selected
+     * @param {object} statusList - It contains all status 
+     * @param {Number} jobTransactionId - It contains current id of job transaction 
+     * 
+     *@returns {string,Boolean} It returns boolean if enableOutForDelivery,enableResequenceRestriction and jobTime cases fail
+     */
+
    async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId){
        let enableFlag = false
         if(enableOutForDelivery){
@@ -103,6 +119,16 @@ class JobDetails {
         }
         return enableFlag
     }
+    
+    /**@function getParentStatusList(statusList,currentStatus,jobTransactionId)
+     * ## It will get all parent status list of current jobTransaction.
+     * 
+     * @param {object} statusList - It contains data for all status
+     * @param {object} currentStatus - It contains current status
+     * @param {Number} jobTransactionId - It contains id of current jobTransaction
+     *
+     *@returns {Array} parentStatusList
+     */
 
     async getParentStatusList(statusList,currentStatus,jobTransactionId){
         let parentStatusList = []
@@ -122,10 +148,30 @@ class JobDetails {
         return parentStatusList
     }
 
+    /**@function checkJobExpire(jobDataList)
+     * ## It will check for job Expiry time of job Transaction if it expires ,return a string value.
+     * 
+     * @param {object} jobDataList - It contains data for transaction jobDataList
+     *
+     *@returns {string,Boolean} if jobExpire, return string else boolean
+     */
+
     checkJobExpire(jobDataList) {
         const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
         return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : false
     }
+
+    /**@function checkEnableResequence(jobMasterList,tabId,seqSelected,statusList,jobTransactionId)
+     * ## It will check for enable resequence of all job master transactions if there is any first enable resequence transaction present, it return a string value.
+     * 
+     * @param {object} jobMasterList - It contains data for all jobMasterList
+     * @param {Number} tabId - It contains data for all jobMasterList
+     * @param {Number} seqSelected - It contains data for all jobMasterList
+     * @param {object} statusList - It contains data for all jobMasterList
+     * @param {Number} jobTransactionId - It contains data for all jobMasterList
+     * 
+     *@returns {string,Boolean} if seqSelected value is greater than firstEnableSequenceTransaction seqSelected value  then return boolean else string
+     */
 
     checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId) {
         const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id)
@@ -133,6 +179,14 @@ class JobDetails {
         const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
         return !(firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : "Please finish previous items first"
     }
+
+    /**@function checkOutForDelivery(jobMasterList)
+     * ## It will check for out for delivery of all job master transactions if there is any unseen transaction present, it return a string value.
+     * 
+     * @param {object} jobMasterList - It contains data for all jobMaster
+     *
+     *@returns {string,Boolean} if unseentransaction present then return string else boolean
+     */
 
     async checkOutForDelivery(jobMasterList) {
         const jobListWithDelivery = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id)
@@ -143,15 +197,29 @@ class JobDetails {
         const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)
         return !(unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
     }
-    /**
+
+    /**@function toRadians(angle)
      * ## convert degree to radians
+     * 
      * @param {string} angle - It contains data for form layout
      *
      *@returns {string} radians value
      */
+
     toRadians(angle) {
         return angle * (Math.PI / 180);
     }
+    
+    /**@function updateTransactionOnRevert(jobTransactionData,previousStatus)
+     * ## It will update transactionData on revert status 
+     * 
+     * @param {object} jobTransactionData - It contains data for revert transaction
+     * @param {object} previousStatus - It contains [jobStatusId,statusCode]
+     * @returns {Object} --> {
+         tableName,
+         value: -> jobTransactionArray,
+       }
+     */
 
     updateTransactionOnRevert(jobTransactionData,previousStatus){
         let jobTransactionArray = [];
@@ -168,8 +236,9 @@ class JobDetails {
         }
     }
 
-    /**
+    /**@function distance(jobLat,jobLong,userLat,userLong)
      * ## find aerial distance between user location and job location
+     * 
      * @param {string} jobLat - job location latitude
      * @param {string} jobLat - job location longitude
      * @param {string} userLat - user location latitud
@@ -177,12 +246,23 @@ class JobDetails {
      * 
      * @returns {string} - distance between user and job locations
      */
+
     distance(jobLat, jobLong, userLat, userLong) {
         const theta = jobLong - userLong
         let dist = Math.sin(this.toRadians(jobLat)) * Math.sin(this.toRadians(userLat)) + Math.cos(this.toRadians(jobLat)) * Math.cos(this.toRadians(userLat)) * Math.cos(this.toRadians(theta));
         dist = (Math.acos(dist) * (180 / Math.PI)) * 60 * 1.1515 * 1.609344;
         return dist;
     }
+
+    /**@function setAllDataForRevertStatus(statusList,jobTransaction,previousStatus)
+     * ## It will set all data for revert status and update realm database
+     * 
+     * @param {Array} statusList - job location latitude
+     * @param {object} jobTransaction - user location latitud
+     * @param {object} previousStatus - user location longitude
+     * 
+     * @description --> update userSummaryDb,jobSummaryDb,runsheetDb,transactionLogDb,jobTransactionDb,jobDb for status revert action
+     */
 
     async setAllDataForRevertStatus(statusList,jobTransaction,previousStatus){
      let updatedJobTransaction
@@ -202,8 +282,9 @@ class JobDetails {
      realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog)  
     }
 
-    /**
+    /**@function checkLatLong(jobId,userLat,userLong)
      * ## check if distance between user and job is less than 100 m or not
+     * 
      * @param {string} jobId - job location latitude
      * @param {string} userLat - user location latitud
      * @param {string} userLong - user location longitude

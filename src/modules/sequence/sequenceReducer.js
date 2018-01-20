@@ -31,6 +31,7 @@ export default function sequenceReducer(state = initialState, action) {
                 .set('isSequenceScreenLoading', false)
                 .set('responseMessage', action.payload.responseMessage)
                 .set('transactionsWithChangedSeqeunceMap', action.payload.transactionsWithChangedSeqeunceMap)
+                .set('jobMasterSeperatorMap', action.payload.jobMasterSeperatorMap)
 
         case PREPARE_UPDATE_LIST:
             return state.set('sequenceList', action.payload.updatedSequenceList)

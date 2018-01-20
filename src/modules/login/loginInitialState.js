@@ -28,6 +28,7 @@ const Form = Record({
   isCameraScannerActive: false,
   isEditTextDisabled: false,
   rememberMe: false,
+  isLongPress: false,
 })
 
 /**

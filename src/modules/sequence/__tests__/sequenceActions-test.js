@@ -63,14 +63,16 @@ describe('test case for prepareListForSequenceModule', () => {
         payload: {
             sequenceList: sequenceArray,
             responseMessage: '',
-            transactionsWithChangedSeqeunceMap
+            transactionsWithChangedSeqeunceMap,
+            jobMasterSeperatorMap: {}
         }
     }, {
         type: SEQUENCE_LIST_FETCHING_STOP,
         payload: {
             sequenceList: sequenceArrayDuplcateSequence,
             responseMessage: DUPLICATE_SEQUENCE_MESSAGE,
-            transactionsWithChangedSeqeunceMap: transactionsWithChangedSeqeunceMapForDuplicateSequence
+            transactionsWithChangedSeqeunceMap: transactionsWithChangedSeqeunceMapForDuplicateSequence,
+            jobMasterSeperatorMap: {}
         }
     }, {
         type: SET_RESPONSE_MESSAGE,
@@ -78,6 +80,10 @@ describe('test case for prepareListForSequenceModule', () => {
     }]
 
     it('should prepare jobTransaction list for given runsheet and no duplicate sequence is found', () => {
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue({})
+        sequenceService.createSeperatorMap = jest.fn()
+        sequenceService.createSeperatorMap.mockReturnValue({})
         sequenceService.getSequenceList = jest.fn()
         sequenceService.getSequenceList.mockReturnValue(sequenceList)
         sequenceService.checkForAutoSequencing = jest.fn()
@@ -89,6 +95,8 @@ describe('test case for prepareListForSequenceModule', () => {
         const store = mockStore({})
         return store.dispatch(actions.prepareListForSequenceModule(runsheetNumber))
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(sequenceService.createSeperatorMap).toHaveBeenCalledTimes(1)
                 expect(sequenceService.getSequenceList).toHaveBeenCalledTimes(1)
                 expect(sequenceService.checkForAutoSequencing).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
@@ -99,6 +107,10 @@ describe('test case for prepareListForSequenceModule', () => {
     })
 
     it('should prepare jobTransaction list for given runsheet and duplicate sequence are found', () => {
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue({})
+        sequenceService.createSeperatorMap = jest.fn()
+        sequenceService.createSeperatorMap.mockReturnValue({})
         sequenceService.getSequenceList = jest.fn()
         sequenceService.getSequenceList.mockReturnValue(sequenceList)
         sequenceService.checkForAutoSequencing = jest.fn()
@@ -110,6 +122,8 @@ describe('test case for prepareListForSequenceModule', () => {
         const store = mockStore({})
         return store.dispatch(actions.prepareListForSequenceModule(runsheetNumber))
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(sequenceService.createSeperatorMap).toHaveBeenCalledTimes(1)
                 expect(sequenceService.getSequenceList).toHaveBeenCalledTimes(1)
                 expect(sequenceService.checkForAutoSequencing).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
@@ -120,12 +134,18 @@ describe('test case for prepareListForSequenceModule', () => {
     })
 
     it('should not prepare jobTransaction list for given runsheet and throw an error', () => {
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue({})
+        sequenceService.createSeperatorMap = jest.fn()
+        sequenceService.createSeperatorMap.mockReturnValue({})
         sequenceService.getSequenceList = jest.fn(() => {
             throw new Error(RUNSHEET_NUMBER_MISSING)
         })
         const store = mockStore({})
         return store.dispatch(actions.prepareListForSequenceModule())
             .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(sequenceService.createSeperatorMap).toHaveBeenCalledTimes(1)
                 expect(sequenceService.getSequenceList).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)

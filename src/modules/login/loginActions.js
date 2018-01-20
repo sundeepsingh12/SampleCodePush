@@ -27,11 +27,15 @@ import {
   USERNAME,
   AutoLogoutScreen,
   SET_LOADER_IN_AUTOLOGOUT,
-  USER
+  USER,
+  ON_LONG_PRESS_ICON,
+  RESET_STATE
 } from '../../lib/constants'
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import moment from 'moment'
+import { logoutService } from '../../services/classes/Logout'
+
 
 import {
   authenticationService
@@ -132,6 +136,13 @@ export function onChangePassword(value) {
 }
 
 
+export function onLongPressIcon(value) {
+  return {
+    type: ON_LONG_PRESS_ICON,
+    payload: value
+  }
+}
+
 export function toggleCheckbox() {
   return {
     type: TOGGLE_CHECKBOX
@@ -172,6 +183,29 @@ export function authenticateUser(username, password, rememberMe) {
       }))
     } catch (error) {
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
+    }
+  }
+}
+
+/**@function onLongPressResetSettings()
+    
+    * function reset all data on long press of icon
+    *
+    * @description -> all state, all realm data and all simple store data will be deleted
+    */
+
+export function onLongPressResetSettings() {
+  return async function (dispatch) {
+    try {
+      dispatch(onLongPressIcon(true))
+      await logoutService.deleteDataBase()
+      let allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
+      await keyValueDBService.deleteValueFromStore(allSchemaInstance)
+      dispatch(setState(RESET_STATE))
+      dispatch(onLongPressIcon(false))  
+    } catch (error) {
+      dispatch(onLongPressIcon(false))
+      console.log(erroe)
     }
   }
 }
@@ -220,26 +254,26 @@ export function checkRememberMe() {
 export function getSessionToken() {
   return async function (dispatch) {
     try {
-      const userData = await keyValueDBService.getValueFromStore(USER)      
-      if(userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
-          dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-      }else{
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
-      if (token && isPreloaderComplete && isPreloaderComplete.value) {
-        dispatch(NavigationActions.navigate({
-          routeName: HomeTabNavigatorScreen
-        }))
-      } else if (token) {
-        dispatch(NavigationActions.navigate({
-          routeName: PreloaderScreen
-        }))
-      } else {
-        dispatch(NavigationActions.navigate({
-          routeName: LoginScreen
-        }))
+      const userData = await keyValueDBService.getValueFromStore(USER) 
+      if(userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && isPreloaderComplete){      
+          dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
+      }else{
+        if (token && isPreloaderComplete && isPreloaderComplete.value) {
+          dispatch(NavigationActions.navigate({
+            routeName: HomeTabNavigatorScreen
+          }))
+        } else if (token) {
+          dispatch(NavigationActions.navigate({
+            routeName: PreloaderScreen
+          }))
+        } else {
+          dispatch(NavigationActions.navigate({
+            routeName: LoginScreen
+          }))
+        }
       }
-    }
     } catch (error) {
       dispatch(sessionTokenRequestFailure(error.message))
       dispatch(loginState())

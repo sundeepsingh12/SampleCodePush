@@ -60,7 +60,8 @@ import {
 
 import {
     NEXT_FOCUS,
-    CameraAttribute
+    CameraAttribute,
+    Payment
 } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
@@ -94,7 +95,7 @@ class BasicFormElement extends PureComponent {
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
-                screenName = 'Payment'
+                screenName = Payment
                 break
             }
             case FIXED_SKU: {
@@ -156,7 +157,7 @@ class BasicFormElement extends PureComponent {
                 latestPositionId: this.props.latestPositionId,
                 isSaveDisabled: this.props.isSaveDisabled,
                 cash: cash,
-                returnData: this._searchForReferenceValue.bind(this)
+                returnData: this._searchForReferenceValue.bind(this),
             }
         )
     }
@@ -297,7 +298,7 @@ class BasicFormElement extends PureComponent {
 
     render() {
         let modalView = this.getModalView()
-        if(this.props.item.hidden) {
+        if (this.props.item.hidden) {
             return null
         }
         switch (this.props.item.attributeTypeId) {

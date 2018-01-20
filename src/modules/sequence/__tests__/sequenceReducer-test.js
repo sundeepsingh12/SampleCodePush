@@ -29,12 +29,16 @@ describe('sequenceReducer', () => {
         const action = {
             type: SEQUENCE_LIST_FETCHING_STOP,
             payload: {
-                sequenceList: {}
+                sequenceList: {},
+                jobMasterSeperatorMap: { id: 1 },
+                transactionsWithChangedSeqeunceMap: { id: 1 }
             }
         }
         let nextState = sequenceReducer(undefined, action)
         expect(nextState.sequenceList).toBe(action.payload.sequenceList)
         expect(nextState.isSequenceScreenLoading).toBe(false)
+        expect(nextState.jobMasterSeperatorMap).toBe(action.payload.jobMasterSeperatorMap)
+        expect(nextState.transactionsWithChangedSeqeunceMap).toBe(action.payload.transactionsWithChangedSeqeunceMap)
     })
 
     it('should set sequence list item when it is pressed', () => {

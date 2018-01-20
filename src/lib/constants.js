@@ -57,6 +57,7 @@ module.exports = keyMirror({
     ON_AUTH_FORM_FIELD_CHANGE: null,
     ON_LOGIN_USERNAME_CHANGE: null,
     ON_LOGIN_PASSWORD_CHANGE: null,
+    ON_LONG_PRESS_ICON: null,
 
     PRELOADER_SUCCESS: null,
     SHOW_MOBILE_NUMBER: null,
@@ -111,6 +112,9 @@ module.exports = keyMirror({
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
     SET_PAYMENT_INITIAL_PARAMETERS: null,
+    SET_SPLIT_PAYMENT: null,
+    SET_SELECTED_PAYMENT_MODE: null,
+    SET_SPLIT_PAYMENT_MODE_LIST: null,
 
     //UPI PaymentActions
     SET_UPI_APPROVAL: null,
@@ -175,6 +179,7 @@ module.exports = keyMirror({
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
     LAST_JOB_COMPLETED_TIME: null,
+    SHOULD_RELOAD_START: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -258,6 +263,8 @@ module.exports = keyMirror({
     CameraAttribute: null,
     ImageDetailsView: null,
     JobDetailsV2: null,
+    SplitPayment: null,
+    Payment: null,
     SequenceRunsheetList: null,
 
     //Skulisting Actions
@@ -372,7 +379,7 @@ module.exports = keyMirror({
     SET_CONFIRM_NEW_PASSWORD: null,
     CLEAR_PASSWORD_TEXTINPUT: null,
     TOGGLE_SAVE_RESET_BUTTON: null,
-
+    IS_PROFILE_LOADING: null,
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,

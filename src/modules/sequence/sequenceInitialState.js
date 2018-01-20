@@ -10,6 +10,7 @@ var InitialState = Record({
     runsheetNumberList: [],
     searchText: '',
     currentSequenceListItemSeleceted: {},
+    jobMasterSeperatorMap: {},
     transactionsWithChangedSeqeunceMap: {},// map having those transaction whose sequence is changed,
 })
 
