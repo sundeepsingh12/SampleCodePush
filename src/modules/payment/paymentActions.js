@@ -55,6 +55,7 @@ import { Toast } from 'native-base'
 export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, formData, jobStatusId) {
     return async function (dispatch) {
         try {
+            dispatch(setState(CLEAR_PAYMENT_STATE))
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
             const fieldAttributeMasterValidationList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION)
             const jobMasterMoneyTransactionModesList = await keyValueDBService.getValueFromStore(JOB_MASTER_MONEY_TRANSACTION_MODE)

@@ -106,6 +106,8 @@ export default class FormLayoutEventImpl {
                 let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction)
                 if (!afterValidationResult && value.required) {
                     break
+                } else {
+                    value.focus = false
                 }
             }
         }
