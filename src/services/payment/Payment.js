@@ -319,13 +319,13 @@ class Payment {
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == MODE) {
                 moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, this.getModeTypeFromModeTypeId(selectedPaymentMode), fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == TRANSACTION_NUMBER) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, transactionNumber, fieldAttributeMaster.childObject[index].key))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, transactionNumber ? transactionNumber : 'NA', fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == AMOUNT) {
                 moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == RECEIPT) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, receipt, fieldAttributeMaster.childObject[index].key))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, receipt ? receipt : 'NA', fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].key.toLocaleLowerCase() == REMARKS) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, remarks, fieldAttributeMaster.childObject[index].key))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, remarks ? remarks : 'NA', fieldAttributeMaster.childObject[index].key))
             }
         }
         return moneyCollectFieldDataChildList

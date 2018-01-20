@@ -164,13 +164,13 @@ class FormLayout {
             }
         }
         //TODO remove this code (just a quick fix for demo)
-        if (tempFieldAttributeList.length == 1) {
-            fieldValidationService.fieldValidations(tempFieldAttributeList[0], formLayoutObject, BEFORE, jobTransaction)
-            if (tempFieldAttributeList[0].value != undefined && tempFieldAttributeList[0].value != null && tempFieldAttributeList[0].value != '') {
-                isRequiredAttributeFound = false
-            }
-            // formLayoutObject.set(tempFieldAttributeList[0].id, this.getFieldAttributeObject(tempFieldAttributeList[0], formLayoutObject.get(tempFieldAttributeList[0].id).validation, formLayoutObject.get(tempFieldAttributeList[0].id).positionId))
-        }
+        // if (tempFieldAttributeList.length == 1) {
+        //     fieldValidationService.fieldValidations(tempFieldAttributeList[0], formLayoutObject, BEFORE, jobTransaction)
+        //     if (tempFieldAttributeList[0].value != undefined && tempFieldAttributeList[0].value != null && tempFieldAttributeList[0].value != '') {
+        //         isRequiredAttributeFound = false
+        //     }
+        //     // formLayoutObject.set(tempFieldAttributeList[0].id, this.getFieldAttributeObject(tempFieldAttributeList[0], formLayoutObject.get(tempFieldAttributeList[0].id).validation, formLayoutObject.get(tempFieldAttributeList[0].id).positionId))
+        // }
         let latestPositionId = sequenceWiseSortedFieldAttributesForStatus.length
         return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId }
     }

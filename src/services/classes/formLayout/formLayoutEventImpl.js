@@ -70,7 +70,9 @@ export default class FormLayoutEventImpl {
      * @param {*fieldAttribute value} value 
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction) {
-        this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        if (attributeMasterId && formLayoutObject.get(attributeMasterId)) {
+            this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
+        }
         isSaveDisabled = false
 
         for (var [key, value] of formLayoutObject) {
@@ -89,20 +91,30 @@ export default class FormLayoutEventImpl {
             value.editable = true
             if (value.required) {
                 value.focus = event == NEXT_FOCUS ? true : value.focus
-                isSaveDisabled = true
-                break
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
                 let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction)
                 let valueAfterValidation = formLayoutObject.get(value.fieldAttributeMasterId).value
                 if (!valueAfterValidation && valueAfterValidation !== 0) {
-                    continue
+                    if (value.required) {
+                        isSaveDisabled = true
+                        break
+                    } else {
+                        continue
+                    }
                 }
                 let afterValidationResult = fieldValidationService.fieldValidations(formLayoutObject.get(value.fieldAttributeMasterId), formLayoutObject, AFTER, jobTransaction)
+                if (!afterValidationResult && value.required) {
+                    break
+                } else {
+                    value.focus = false
+                }
             }
         }
         if (!isSaveDisabled) {
-            formLayoutObject.get(attributeMasterId).focus = true
+            if (formLayoutObject.get(attributeMasterId)) {
+                formLayoutObject.get(attributeMasterId).focus = true
+            }
         }
         return { formLayoutObject, isSaveDisabled }
     }
