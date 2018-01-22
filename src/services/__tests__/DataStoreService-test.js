@@ -726,7 +726,6 @@ describe('test checkIfRecordPresentWithServerId', () => {
 
 
 describe('test searchDataStore', () => {
-    let dataStoreMasterId = 123, searchText = 'abc', searchList = ['name']
     beforeEach(() => {
         realm.getRecordListOnQuery = jest.fn()
     })
@@ -738,10 +737,76 @@ describe('test searchDataStore', () => {
             expect(error.message).toEqual(message)
         }
     })
-    it('should test checkIfRecordPresentWithServerId', () => {
-        dataStoreService.searchDataStore('temp_token').then(() => {
-            expect(realm.deleteSingleRecord).toHaveBeenCalledTimes(1)
-        })
+    it('should return listOfUniqueRecords', () => {
+        realm.getRecordListOnQuery.mockReturnValue(
+            [{
+                serverUniqueKey: 123,
+                key: 'name'
+            }, {
+                serverUniqueKey: 231,
+                key: 'num'
+            }]
+        )
+        return dataStoreService.searchDataStore('abc', 123, ['a'])
+            .then((listOfUniqueRecords) => {
+                expect(realm.deleteSingleRecord).toHaveBeenCalledTimes(1)
+                expect(listOfUniqueRecords).toEqual([
+                    {
+                        serverUniqueKey: 123,
+                        matchKey: 'name'
+                    }, {
+                        serverUniqueKey: 231,
+                        matchKey: 'num'
+                    }
+                ])
+            })
+    })
+
+    it('should return listOfUniqueRecords with same key', () => {
+        realm.getRecordListOnQuery.mockReturnValue(
+            [{
+                serverUniqueKey: 123,
+                key: 'name'
+            }, {
+                serverUniqueKey: 231,
+                key: 'name'
+            }]
+        )
+        return dataStoreService.searchDataStore('abc', 123, ['a'])
+            .then((listOfUniqueRecords) => {
+                expect(realm.deleteSingleRecord).toHaveBeenCalledTimes(1)
+                expect(listOfUniqueRecords).toEqual([
+                    {
+                        serverUniqueKey: 123,
+                        matchKey: 'name'
+                    }, {
+                        serverUniqueKey: 231,
+                        matchKey: 'name'
+                    }
+                ])
+            })
+    })
+
+    it('should return listOfUniqueRecords', () => {
+        realm.getRecordListOnQuery.mockReturnValue(
+            [{
+                serverUniqueKey: 123,
+                key: 'name'
+            }, {
+                serverUniqueKey: 123,
+                key: 'name'
+            }]
+        )
+        return dataStoreService.searchDataStore('abc', 123, ['a'])
+            .then((listOfUniqueRecords) => {
+                expect(realm.deleteSingleRecord).toHaveBeenCalledTimes(1)
+                expect(listOfUniqueRecords).toEqual([
+                    {
+                        serverUniqueKey: 123,
+                        matchKey: 'name'
+                    }
+                ])
+            })
     })
 })
 
@@ -767,9 +832,7 @@ describe('test createDataStoreAttrValueMap', () => {
             [{
                 key: 'name',
                 value: 'abhi'
-            }]
-
-            , [{
+            }], [{
                 key: '_id',
                 value: '123'
             }])
@@ -821,6 +884,71 @@ describe('test createDataStoreAttrValueMap', () => {
     })
 })
 
+
+
+describe('test checkForOfflineDsResponse', () => {
+    it('should throw searchText missing error', () => {
+        const message = 'searchText not present'
+        try {
+            dataStoreService.checkForOfflineDsResponse(null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw dataStoreMasterId missing error', () => {
+        const message = 'dataStoreMasterId not present'
+        try {
+            dataStoreService.checkForOfflineDsResponse('abc', null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    beforeEach(() => {
+        realm.getRecordListOnQuery = jest.fn()
+        dataStoreService.searchDataStore = jest.fn()
+        dataStoreService.createDataStoreAttrValueMap = jest.fn()
+    })
+
+    it('should return offline DS not present', () => {
+        realm.getRecordListOnQuery.mockReturnValue([])
+        return dataStoreService.checkForOfflineDsResponse('abc', 123)
+            .then((result) => {
+                expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+                expect(result).toEqual(
+                    { offlineDSPresent: false }
+                )
+            })
+    })
+
+    it('should return offline DS not present', () => {
+        realm.getRecordListOnQuery.mockReturnValue([{
+            uniqueIndex: true,
+            searchIndex: true,
+            key: 'name'
+        }, {
+            uniqueIndex: false,
+            searchIndex: true,
+            key: 'num'
+        }])
+        dataStoreService.searchDataStore.mockReturnValue([])
+        dataStoreService.createDataStoreAttrValueMap.mockReturnValue({})
+        return dataStoreService.checkForOfflineDsResponse('abc', 123)
+            .then((result) => {
+                expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.searchDataStore).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.createDataStoreAttrValueMap).toHaveBeenCalledTimes(1)
+
+                expect(result).toEqual(
+                    {
+                        offlineDSPresent: true,
+                        dataStoreAttrValueMap: {}
+                    }
+                )
+            })
+    })
+})
 
 function getMapFromObject(obj) {
     let strMap = new Map();

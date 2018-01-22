@@ -123,7 +123,6 @@ class DataStoreService {
                 dataStoreAttributeValueMap: itemObject.details.dataStoreAttributeValueMap
             }
             dataStoreAttrValueMap[itemCounter] = dataStoreObject
-            console.log('getDataStoreAttrValueMapFromJson', dataStoreAttrValueMap)
         }
         return dataStoreAttrValueMap
     }
@@ -446,45 +445,45 @@ class DataStoreService {
         return timeDifference
     }
 
-//     /**
-// * This function check if offline data store is present or not and if present then return the queried results
-// * @param {*} searchText
-// * @param {*} dataStoreMasterId
-// * @returns
-// * {
-//             offlineDSPresent: boolean,
-//             dataStoreAttrValueMap: map containing queried records
-//    }
-// */
-//     async checkForOfflineDsResponse(searchText, dataStoreMasterId) {
-//         if (!searchText) {
-//             throw new Error('searchText not present')
-//         }
-//         if (!dataStoreMasterId) {
-//             throw new Error('dataStoreMasterId not present')
-//         }
-//         let query = `datastoreMasterId = ${dataStoreMasterId}`
-//         let dataStoreMasterResult = await realm.getRecordListOnQuery(Datastore_Master_DB, query)
-//         if (dataStoreMasterResult.length == 0) {
-//             return { offlineDSPresent: false }
-//         }
-//         let searchList = [], uniqueKey
-//         for (let index in dataStoreMasterResult) {
-//             let dataStoreMasterAttribute = { ...dataStoreMasterResult[index] }
-//             if (dataStoreMasterAttribute.uniqueIndex) {
-//                 uniqueKey = dataStoreMasterAttribute.key
-//                 searchList.push(dataStoreMasterAttribute.key)
-//             } else if (dataStoreMasterAttribute.searchIndex) {
-//                 searchList.push(dataStoreMasterAttribute.key)
-//             }
-//         }
-//         let listOfUniqueRecords = await this.searchDataStore(searchText, dataStoreMasterId, searchList)
-//         let dataStoreAttrValueMap = await this.createDataStoreAttrValueMap(uniqueKey, listOfUniqueRecords)
-//         return {
-//             offlineDSPresent: true,
-//             dataStoreAttrValueMap
-//         }
-//     }
+    /**
+* This function check if offline data store is present or not and if present then return the queried results
+* @param {*} searchText
+* @param {*} dataStoreMasterId
+* @returns
+* {
+            offlineDSPresent: boolean,
+            dataStoreAttrValueMap: map containing queried records
+   }
+*/
+    async checkForOfflineDsResponse(searchText, dataStoreMasterId) {
+        if (!searchText) {
+            throw new Error('searchText not present')
+        }
+        if (!dataStoreMasterId) {
+            throw new Error('dataStoreMasterId not present')
+        }
+        let query = `datastoreMasterId = ${dataStoreMasterId}`
+        let dataStoreMasterResult = await realm.getRecordListOnQuery(Datastore_Master_DB, query)
+        if (dataStoreMasterResult.length == 0) {
+            return { offlineDSPresent: false }
+        }
+        let searchList = [], uniqueKey
+        for (let index in dataStoreMasterResult) {
+            let dataStoreMasterAttribute = { ...dataStoreMasterResult[index] }
+            if (dataStoreMasterAttribute.uniqueIndex) {
+                uniqueKey = dataStoreMasterAttribute.key
+                searchList.push(dataStoreMasterAttribute.key)
+            } else if (dataStoreMasterAttribute.searchIndex) {
+                searchList.push(dataStoreMasterAttribute.key)
+            }
+        }
+        let listOfUniqueRecords = await this.searchDataStore(searchText, dataStoreMasterId, searchList)
+        let dataStoreAttrValueMap = await this.createDataStoreAttrValueMap(uniqueKey, listOfUniqueRecords)
+        return {
+            offlineDSPresent: true,
+            dataStoreAttrValueMap
+        }
+    }
 
     /**
  * This function search records that contains given search text
@@ -505,7 +504,10 @@ class DataStoreService {
         let listOfUniqueRecords = []
         for (let index in queryList) {
             let resultObject = { ...queryList[index] }
-            if (listOfUniqueRecords.indexOf(resultObject.serverUniqueKey) < 0) {
+            if (_.findIndex(listOfUniqueRecords, {
+                serverUniqueKey: resultObject.serverUniqueKey,
+                matchKey: resultObject.key
+            }) < 0) {
                 listOfUniqueRecords.push({
                     serverUniqueKey: resultObject.serverUniqueKey,
                     matchKey: resultObject.key
@@ -532,7 +534,6 @@ class DataStoreService {
             let listOfAttributes = {}
             for (let index in dataStoreAttributeResult) {
                 let singleEntryOfAttrValueMap = { ...dataStoreAttributeResult[index] }
-                console.log('singleEntryOfAttrValueMap', singleEntryOfAttrValueMap)
                 listOfAttributes[singleEntryOfAttrValueMap.key] = singleEntryOfAttrValueMap.value
             }
             listOfAttributes[_id] = record.serverUniqueKey
@@ -543,7 +544,6 @@ class DataStoreService {
             dataStoreAttrValueMap[id] = dataStoreObject
             id++
         }
-        console.log('dataStoreAttrValueMap', dataStoreAttrValueMap)
         return dataStoreAttrValueMap
     }
 }
