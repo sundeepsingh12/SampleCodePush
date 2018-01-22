@@ -101,4 +101,9 @@ module.exports = {
 
     //Sync service
     JOBS_DELETED: 'Jobs deleted',
+
+    //Summary
+    REFUND: 'Refund',
+    COLLECTION_CASH: 'Collection-Cash',
+    COLLECTION_SOD: 'Collection-SOD',
 }

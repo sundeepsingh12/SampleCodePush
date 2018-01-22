@@ -197,7 +197,11 @@ class Payment {
                 let jobAmount = parseFloat(jobDataList[jobDataIndex].value)
                 totalAmount += (jobAmount ? jobAmount : 0)
                 if (jobTransactionIdAmountMap) {
-                    jobTransactionIdAmountMap[jobIdJobTransactionMap[jobDataList[jobDataIndex].jobId].jobTransactionId] = jobAmount ? jobAmount : 0
+                    let amountMap = {
+                        originalAmount: jobAmount ? jobAmount : 0,
+                        actualAmount: jobAmount ? jobAmount : 0,
+                    }
+                    jobTransactionIdAmountMap[jobIdJobTransactionMap[jobDataList[jobDataIndex].jobId].jobTransactionId] = amountMap
                 }
             }
             originalAmount = totalAmount + ''
@@ -509,7 +513,7 @@ class Payment {
             let amount = parseFloat(splitPaymentModeMap[index].amount)
             totalSplitAmount += (parseFloat(amount) ? parseFloat(amount) : 0)
         }
-        if(totalSplitAmount == actualAmount) {
+        if (totalSplitAmount == actualAmount) {
             return true
         }
 
