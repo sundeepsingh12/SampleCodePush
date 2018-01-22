@@ -9,7 +9,6 @@ import {
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
     SET_INITIAL_STATE,
-    SAVE_SUCCESSFUL,
     CLEAR_ATTR_MAP_AND_SET_LOADER,
     DISABLE_AUTO_START_SCANNER
 } from '../../lib/constants'
@@ -48,9 +47,6 @@ export default function dataStoreReducer(state = initialState, action) {
 
         case SET_INITIAL_STATE:
             return initialState
-
-        case SAVE_SUCCESSFUL:
-            return state.set('isSaveSuccessful', action.payload)
 
         case CLEAR_ATTR_MAP_AND_SET_LOADER:
             return state.set('loaderRunning', true)

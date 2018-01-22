@@ -23,6 +23,12 @@ import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } fro
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 
 
+/**
+ * 
+ * @param {*} fieldAttributeMasterId 
+ * @param {*} value 
+ * this method is used for getting data store result list from searched value when field detail item is clicked
+ */
 export function getFieldAttribute(fieldAttributeMasterId, value) {
     return async function (dispatch) {
         dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
@@ -32,6 +38,12 @@ export function getFieldAttribute(fieldAttributeMasterId, value) {
     }
 }
 
+/**
+ * 
+ * @param {*} jobAttributeMasterId 
+ * @param {*} value 
+ * this method is used for getting data store result list from searched value when job detail item is clicked 
+ */
 export function getJobAttribute(jobAttributeMasterId, value) {
     return async function (dispatch) {
         dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
@@ -54,7 +66,6 @@ export function setValidation(validationArray) {
                 dispatch(setState(SET_VALIDATIONS, validation))
             }
         } catch (error) {
-            console.log(error)
         }
     }
 }
@@ -139,13 +150,13 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
 export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId, jobTransaction) {
     return async function (dispatch) {
         try {
-            if (!calledFromArray)
+            if (!calledFromArray) {
                 dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, { latestPositionId }, jobTransaction))
-            else
+            } else {
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId, null, NEXT_FOCUS))
-
+            }
         } catch (error) {
-            console.log(error)
+
         }
     }
 }
@@ -206,6 +217,16 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
     }
 }
 
+/**
+ * 
+ * @param {*} searchText 
+ * @param {*} dataStoreMasterId 
+ * @param {*} dataStoreMasterAttributeId 
+ * @param {*} externalDataStoreUrl 
+ * @param {*} attributeKey 
+ * @param {*} attributeTypeId 
+ * // this method first checks for offline DS if present then fetch results from that if not present then check for online DS
+ */
 export function checkOfflineDS(searchText, dataStoreMasterId, dataStoreMasterAttributeId, externalDataStoreUrl, attributeKey, attributeTypeId) {
     return async function (dispatch) {
         try {

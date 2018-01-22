@@ -32,7 +32,6 @@ export function getLastSyncTime() {
                 dispatch(setState(SET_LAST_SYNC_TIME, NEVER_SYNCED))
             }
         } catch (error) {
-            console.log(error)
         }
     }
 }
