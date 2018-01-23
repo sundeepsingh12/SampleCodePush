@@ -152,7 +152,7 @@ export default class FormLayoutEventImpl {
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
         formLayoutObject.get(attributeMasterId).displayValue = (value != null && value != undefined && value.length != 0 && value.length < 64 &&
             formLayoutObject.get(attributeMasterId).attributeTypeId == 61) ? sha256(value) : value;
-        formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
+        formLayoutObject.get(attributeMasterId).childDataList = fieldDataList ? fieldDataList : formLayoutObject.get(attributeMasterId).childDataList
         if (!calledFrom) {
             formLayoutObject.get(attributeMasterId).alertMessage = null
         }
