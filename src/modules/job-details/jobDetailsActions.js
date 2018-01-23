@@ -77,7 +77,7 @@ export function getJobDetails(jobTransactionId) {
             const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value,details.currentStatus,jobTransactionId) : []
             const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
-            let isEtaTimerShow = (statusCategory == 1) ? true : false
+            let isEtaTimerShow = (statusCategory == 1)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow))
         } catch (error) {
             // To do
