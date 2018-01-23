@@ -93,6 +93,10 @@ export default class FormLayoutEventImpl {
             value.editable = true
             if (value.required) {
                 value.focus = event == NEXT_FOCUS ? true : value.focus
+                if(event != NEXT_FOCUS) {
+                    isSaveDisabled = true
+                    break
+                }
             }
             if (event == NEXT_FOCUS && value.attributeTypeId !== DATA_STORE && value.attributeTypeId !== EXTERNAL_DATA_STORE) {
                 let beforeValidationResult = fieldValidationService.fieldValidations(value, formLayoutObject, BEFORE, jobTransaction)
@@ -150,7 +154,7 @@ export default class FormLayoutEventImpl {
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
         formLayoutObject.get(attributeMasterId).displayValue = (value != null && value != undefined && value.length != 0 && value.length < 64 &&
             formLayoutObject.get(attributeMasterId).attributeTypeId == 61) ? sha256(value) : value;
-        formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
+        formLayoutObject.get(attributeMasterId).childDataList = fieldDataList ? fieldDataList : formLayoutObject.get(attributeMasterId).childDataList
         if (!calledFrom) {
             formLayoutObject.get(attributeMasterId).alertMessage = null
         }

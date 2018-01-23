@@ -47,6 +47,8 @@ module.exports = {
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
+    OPTIONAL: '(optional)',
+    SELECTED: ' Selected',
 
     //status revert 
     REVERT_STATUS_TO: 'Revert Status to',
