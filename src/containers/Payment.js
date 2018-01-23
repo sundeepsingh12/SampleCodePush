@@ -209,7 +209,7 @@ class Payment extends PureComponent {
                     {this.renderPaymentModeId(moneyTransactionModeId, type)}
                 </Text>
                 <View style={[styles.justifyCenter, styles.row, { width: '20%' }]}>
-                    <CheckBox onPress={() => { this.props.actions.paymentModeSelect(this.props.selectedPaymentMode, this.props.splitPaymentMode, moneyTransactionModeId) }} color={disabled ? styles.fontDarkGray.color : styles.primaryColor} style={{ borderRadius: 15 }} checked={paymentSelectedResult} />
+                    <CheckBox onPress={() => { this.props.actions.paymentModeSelect(this.props.selectedPaymentMode, this.props.splitPaymentMode, moneyTransactionModeId, this.props.actualAmount, this.props.transactionNumber) }} color={disabled ? styles.fontDarkGray.color : styles.primaryColor} style={{ borderRadius: 15 }} checked={paymentSelectedResult} />
                 </View>
             </TouchableOpacity>
         )
