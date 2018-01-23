@@ -41,13 +41,17 @@ import {
     SPLIT,
     TICKET_RESTAURANT,
     UPI,
-    OBJECT_SAROJ_FAREYE
+    OBJECT_SAROJ_FAREYE,
+    MONEY_PAY,
 } from '../../lib/AttributeConstants'
 
 import {
     NO,
     YES,
-    INVALID_CONFIGURATION
+    INVALID_CONFIGURATION,
+    REFUND,
+    COLLECTION_CASH,
+    COLLECTION_SOD
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import { Toast } from 'native-base'
@@ -96,6 +100,18 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
                 currentElement,
                 modeTypeId: selectedPaymentMode,
                 isCardPayment
+            }
+            if (!jobTransactionIdAmountMap) {
+                jobTransactionIdAmountMap = {}
+                jobTransactionIdAmountMap.actualAmount = actualAmount
+                jobTransactionIdAmountMap.originalAmount = originalAmount
+            }
+            if (moneyCollectMaster.attributeTypeId == MONEY_PAY) {
+                jobTransactionIdAmountMap.moneyTransactionType = REFUND
+            } else if (selectedPaymentMode == CASH.id) {
+                jobTransactionIdAmountMap.moneyTransactionType = COLLECTION_CASH
+            } else {
+                jobTransactionIdAmountMap.moneyTransactionType = COLLECTION_SOD
             }
             formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
