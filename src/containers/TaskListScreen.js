@@ -34,7 +34,6 @@ import {
   LISTING_SEARCH_VALUE
 } from '../lib/constants'
 import JobListItem from '../components/JobListItem'
-import moment from 'moment'
 
 function mapStateToProps(state) {
   return {
@@ -52,9 +51,7 @@ function mapDispatchToProps(dispatch) {
 class TaskListScreen extends PureComponent {
 
   componentDidMount() {
-    if (this.props.loadTabScreen || _.isEmpty(this.props.jobTransactionCustomizationList)) {
-      this.props.actions.fetchJobs(moment().format('YYYY-MM-DD'))
-    }
+    this.props.actions.shouldFetchJobsOrNot(this.props.jobTransactionCustomizationList)
   }
 
   navigateToScene = (item) => {

@@ -213,7 +213,7 @@ class Login extends PureComponent {
                     <View style={[styles.row, styles.flex1, styles.justifyStart, styles.marginTop15]}>
                       <CheckBox checked={this.props.auth.form.rememberMe}
                         onPress={this.rememberMe} />
-                      <Text style={{ marginLeft: 20 }}>Remember Me</Text>
+                      <Text style={{ marginLeft: 20 }} onPress={this.rememberMe}>Remember Me</Text>
                     </View>
 
                     <View style={[styles.marginTop30]}>

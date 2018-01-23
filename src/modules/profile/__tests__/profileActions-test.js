@@ -103,8 +103,8 @@ describe('cashtendering  check And Reset Password', () => {
         let confirmNewPassword = "xcVb43%3"
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue({})
-        keyValueDBService.validateAndUpdateData = jest.fn()
-        keyValueDBService.validateAndUpdateData.mockReturnValue({})
+        keyValueDBService.validateAndSaveData = jest.fn()
+        keyValueDBService.validateAndSaveData.mockReturnValue({})
         profileService.getResponse = jest.fn()
         profileService.getResponse.mockReturnValue({
             status: 200
@@ -116,7 +116,7 @@ describe('cashtendering  check And Reset Password', () => {
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(profileService.getResponse).toHaveBeenCalled()
-                expect(keyValueDBService.validateAndUpdateData).toHaveBeenCalled()
+                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalled()
                 expect(Toast.show).toHaveBeenCalled()
             })
     })

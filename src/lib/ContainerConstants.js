@@ -5,6 +5,7 @@ module.exports = {
     //common_CONSTANTS
     CANCEL: 'Cancel',
     OK: 'Ok',
+    SAVE: 'Save',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -54,6 +55,21 @@ module.exports = {
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
 
+    //Payment Container
+    YES: 'Yes',
+    NO: 'No',
+    AMOUNT_TO_BE_COLLECTED: 'Amount to be collected',
+    SPLIT_PAYMENT: 'Split Payment',
+    SELECT_PAYMENT_METHOD: 'Select Payment Method',
+    SELECT_PAYMENT_METHOD_TO_SPLIT: 'Select Payment Methods to Split',
+    ENTER_SPLIT_DETAILS: 'Enter Split Details',
+    AMOUNT: 'Amount',
+    PAYMENT: 'Payment',
+    ADD_PAYMENT_MODE: '+ Add',
+    NUMBER: 'Number',
+    SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
+    INVALID_CONFIGURATION: 'Invalid Configuration',
+
     //Sequence
     SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
     DUPLICATE_SEQUENCE_MESSAGE: 'Duplicate sequence found for this runsheet auto corrected, please save the modified sequence',
@@ -81,5 +97,8 @@ module.exports = {
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
     TOKEN_MISSING: 'Token missing',
     INVALID_SCAN: 'Invalid Scan',
-    JOBS_DELETED:'Jobs deleted'
+    JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
+
+    //Sync service
+    JOBS_DELETED: 'Jobs deleted',
 }

@@ -39,13 +39,15 @@ import {
     NEW_PASSWORD,
     CONFIRM_NEW_PASSWORD,
 } from '../lib/AttributeConstants'
+import Loader from '../components/Loader'
 
 function mapStateToProps(state) {
     return {
         currentPassword: state.profileReducer.currentPassword,
         newPassword: state.profileReducer.newPassword,
         confirmNewPassword: state.profileReducer.confirmNewPassword,
-        isSaveResetButtonDisabled: state.profileReducer.isSaveResetButtonDisabled
+        isSaveResetButtonDisabled: state.profileReducer.isSaveResetButtonDisabled,
+        isLoaderInProfile: state.profileReducer.isLoaderInProfile,
     }
 }
 
@@ -87,10 +89,13 @@ class ResetPassword extends PureComponent {
         }
     }
     _onResetPress = () => {
-        this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword)
+        this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword, this.props.navigation)
     }
 
   render() {
+    if (this.props.isLoaderInProfile) {
+      return (<Loader />)
+    } else {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -142,7 +147,7 @@ class ResetPassword extends PureComponent {
       </StyleProvider>
       )
   }
-
+  }
 };
 
 const style = StyleSheet.create({

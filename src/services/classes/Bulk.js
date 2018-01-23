@@ -89,9 +89,19 @@ class Bulk {
         return idJobTransactionCustomizationListMap
     }
 
-    getSelectedTransactionIds(jobTransactions) {
-        const selectedTransactionIds = _.filter(jobTransactions, jobTransaction => jobTransaction.isChecked == true).map(jobTransaction => jobTransaction.id)
-        return selectedTransactionIds
+    getSelectedTransaction(jobTransactions) {
+        let selectedTransactions = []
+        for (let index in jobTransactions) {
+            if (!jobTransactions[index].isChecked) {
+                continue
+            }
+            selectedTransactions.push({
+                jobTransactionId: jobTransactions[index].id,
+                jobId: jobTransactions[index].jobId,
+                jobMasterId: jobTransactions[index].jobMasterId
+            })
+        }
+        return selectedTransactions
     }
 
     _getStatusIdJobMasterIdBulkAllowedMap(bulkJobMasterStatusConfiguration) {
@@ -100,6 +110,10 @@ class Bulk {
         let statusIdJobMasterIdBulkAllowedMap = {}
 
         bulkJobMasterStatusConfiguration.forEach(configurationObject => {
+            if(!configurationObject.jobMasterId || !configurationObject.statusId){
+                statusIdJobMasterIdBulkAllowedMap = {}
+                return
+            }
             let jobMasterIdBulkUpdateAllowed = {}
             jobMasterIdBulkUpdateAllowed[configurationObject.jobMasterId] = configurationObject.bulkUpdateAllowed
             statusIdJobMasterIdBulkAllowedMap[configurationObject.statusId] = jobMasterIdBulkUpdateAllowed

@@ -9,9 +9,9 @@ import {
     SHOW_ERROR_MESSAGE,
     SET_SEARCH_TEXT,
     SHOW_DETAILS,
-    SAVE_SUCCESSFUL,
     SET_INITIAL_STATE,
-    CLEAR_ATTR_MAP_AND_SET_LOADER
+    CLEAR_ATTR_MAP_AND_SET_LOADER,
+    DISABLE_AUTO_START_SCANNER
 } from '../../../lib/constants'
 const InitialState = require('../dataStoreInitialState').default
 
@@ -123,5 +123,14 @@ describe('data Store reducer', () => {
         expect(nextState.dataStoreAttrValueMap).toEqual({})
         expect(nextState.errorMessage).toBe('')
         expect(nextState.loaderRunning).toBe(true)
+    })
+
+    it('should set isAutoStartScannerEnabled', () => {
+        const action = {
+            type: DISABLE_AUTO_START_SCANNER,
+            payload: false
+        }
+        let nextState = dataStoreReducer(undefined, action)
+        expect(nextState.isAutoStartScannerEnabled).toBe(action.payload)
     })
 })

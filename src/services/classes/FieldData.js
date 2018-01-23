@@ -109,6 +109,7 @@ class FieldData {
             fieldData.parentId = parentId
             fieldData.positionId = latestPositionId
             fieldData.value = fieldDataListDTO[index].value
+            fieldData.key = fieldDataListDTO[index].key
             if (fieldDataListDTO[index].childDataList) {
                 let fieldDataDTO = this.prepareFieldDataForTransactionSavingInState(fieldDataListDTO[index].childDataList, jobTransactionId, fieldData.positionId, latestPositionId)
                 fieldData.childDataList = fieldDataDTO.fieldDataList

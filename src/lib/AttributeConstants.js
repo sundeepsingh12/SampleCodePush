@@ -246,7 +246,6 @@ module.exports = {
     PATH: RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/CustomerImages/',
     SIGN: 'sign_',
     IMAGE_EXTENSION: '.jpg',
-    PASSWORD: 61,
 
     //SaveActivated & Transient Strings
     EMAIL: 'E-mail',

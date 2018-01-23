@@ -123,7 +123,6 @@ class DataStoreService {
                 dataStoreAttributeValueMap: itemObject.details.dataStoreAttributeValueMap
             }
             dataStoreAttrValueMap[itemCounter] = dataStoreObject
-            console.log('getDataStoreAttrValueMapFromJson', dataStoreAttrValueMap)
         }
         return dataStoreAttrValueMap
     }
@@ -505,7 +504,10 @@ class DataStoreService {
         let listOfUniqueRecords = []
         for (let index in queryList) {
             let resultObject = { ...queryList[index] }
-            if (listOfUniqueRecords.indexOf(resultObject.serverUniqueKey) < 0) {
+            if (_.findIndex(listOfUniqueRecords, {
+                serverUniqueKey: resultObject.serverUniqueKey,
+                matchKey: resultObject.key
+            }) < 0) {
                 listOfUniqueRecords.push({
                     serverUniqueKey: resultObject.serverUniqueKey,
                     matchKey: resultObject.key
@@ -542,7 +544,6 @@ class DataStoreService {
             dataStoreAttrValueMap[id] = dataStoreObject
             id++
         }
-        console.log('dataStoreAttrValueMap', dataStoreAttrValueMap)
         return dataStoreAttrValueMap
     }
 }
