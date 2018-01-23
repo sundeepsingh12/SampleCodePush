@@ -22,9 +22,9 @@ class EtaCountDownTimer extends PureComponent {
     }
 
     tick = () => {
-        let jobEndTime = moment(this.props.endTime, 'HH:mm:ss')
-        let jobStartTime = moment(this.props.startTime, 'HH:mm:ss')
-        let currentTime = moment()
+        let jobStartTime = this.props.startTime
+        let jobEndTime = this.props.endTime
+        let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
         this.setCounterNgative(jobEndTime, currentTime, jobStartTime)
         if (this.state.counterNegative == 1) {
             this.setState({
@@ -41,13 +41,13 @@ class EtaCountDownTimer extends PureComponent {
         }
     }
     getDifference = (jobEndTime, currentTime, jobStartTime) => {
-
-        if (this.state.counterNegative == 1)
-            return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
+        if (this.state.counterNegative == 1) {
+            return moment.utc(moment(jobEndTime).diff(moment(currentTime))).format("HH:mm:ss")
+        }
         else if (this.state.counterNegative == 2) {
-            return moment.utc(moment(currentTime, "HH:mm:ss").diff(moment(jobEndTime, "HH:mm:ss"))).format("HH:mm:ss")
+            return moment.utc(moment(currentTime).diff(moment(jobEndTime))).format("HH:mm:ss")
         } else {
-            return moment.utc(moment(jobStartTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
+            return moment.utc(moment(jobStartTime).diff(moment(currentTime))).format("HH:mm:ss")
         }
     }
     setCounterNgative = (jobEndTime, currentTime, jobStartTime) => {
@@ -62,16 +62,16 @@ class EtaCountDownTimer extends PureComponent {
         }
     }
     componentWillMount() {
-        let jobStartTime = moment(this.props.startTime, 'HH:mm:ss')
-        let jobEndTime = moment(this.props.endTime, 'HH:mm:ss')
-        let currentTime = moment()
-        this.setCounterNgative(jobEndTime, currentTime, jobStartTime)
 
+        let jobStartTime = this.props.startTime
+        let jobEndTime = this.props.endTime
+        let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
+        this.setCounterNgative(jobEndTime, currentTime, jobStartTime)
     }
     componentDidMount() {
-        let jobEndTime = moment(this.props.endTime, 'HH:mm:ss')
-        let jobStartTime = moment(this.props.startTime, 'HH:mm:ss')
-        let currentTime = moment()
+        let jobStartTime = this.props.startTime
+        let jobEndTime = this.props.endTime
+        let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
         let differenceInTime = this.getDifference(jobEndTime, currentTime, jobStartTime)
         this.setState({
             counter: differenceInTime

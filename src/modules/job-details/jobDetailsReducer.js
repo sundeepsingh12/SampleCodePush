@@ -29,6 +29,7 @@ export default function jobDetailsReducer(state = initialState, action) {
                         .set('errorMessage',action.payload.errorMessage)
                         .set('statusRevertList',action.payload.parentStatusList)
                         .set('draftStatusInfo', action.payload.draftStatusInfo)
+                        .set('isEtaTimerShow', action.payload.isEtaTimerShow)
         case RESET_STATE:
             return initialState
         case RESET_STATE_FOR_JOBDETAIL:

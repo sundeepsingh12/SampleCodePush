@@ -12,7 +12,8 @@ import { NavigationActions } from 'react-navigation'
 import * as realm from '../../repositories/realmdb'
 import { fetchJobs } from '../taskList/taskListActions'
 import {
-    Start
+    Start,
+    PENDING,
 } from '../../lib/AttributeConstants'
 import {
     JOB_ATTRIBUTE,
@@ -42,7 +43,7 @@ export function startFetchingJobDetails() {
 }
 
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo,parentStatusList) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo,parentStatusList, isEtaTimerShow) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -52,7 +53,8 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             currentStatus,
             errorMessage,
             parentStatusList,
-            draftStatusInfo
+            draftStatusInfo,
+            isEtaTimerShow,
         }
     }
 }
@@ -73,7 +75,9 @@ export function getJobDetails(jobTransactionId) {
                                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId) : false
             const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value,details.currentStatus,jobTransactionId) : []
             const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList))
+            const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
+            let isEtaTimerShow = (statusCategory == 1) ? true : false
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

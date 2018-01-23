@@ -15,7 +15,7 @@ import TransactionLogs from './schema/transactionLogs'
 import _ from 'lodash'
 import Draft from './schema/Draft'
 
-const schemaVersion = 41;
+const schemaVersion = 42;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft];
 
 let realm = new Realm({
