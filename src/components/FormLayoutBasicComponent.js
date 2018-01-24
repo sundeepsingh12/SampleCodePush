@@ -9,7 +9,8 @@ import {
     TouchableHighlight,
     ActivityIndicator,
     Modal,
-    Keyboard
+    Keyboard,
+    TouchableOpacity
 }
     from 'react-native'
 import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Item, Label } from 'native-base'
@@ -55,13 +56,20 @@ import {
     CAMERA_HIGH,
     CAMERA_MEDIUM,
     SCAN_OR_TEXT,
-    CONTACT_NUMBER
+    CONTACT_NUMBER,
+    ARRAY_SAROJ_FAREYE,
+    OBJECT_SAROJ_FAREYE,
 } from '../lib/AttributeConstants'
 
 import {
     NEXT_FOCUS,
-    CameraAttribute
+    CameraAttribute,
+    Payment
 } from '../lib/constants'
+import {
+    OPTIONAL,
+    SELECTED
+} from '../lib/ContainerConstants'
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
 import TimePicker from '../components/TimePicker'
@@ -94,7 +102,7 @@ class BasicFormElement extends PureComponent {
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
-                screenName = 'Payment'
+                screenName = Payment
                 break
             }
             case FIXED_SKU: {
@@ -156,7 +164,7 @@ class BasicFormElement extends PureComponent {
                 latestPositionId: this.props.latestPositionId,
                 isSaveDisabled: this.props.isSaveDisabled,
                 cash: cash,
-                returnData: this._searchForReferenceValue.bind(this)
+                returnData: this._searchForReferenceValue.bind(this),
             }
         )
     }
@@ -196,6 +204,7 @@ class BasicFormElement extends PureComponent {
                 selectFromListEnable: !this.state.selectFromListEnable
             }
         })
+        this.props.actions.fieldValidations(this.props.item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
     }
     onSaveDateTime = (value) => {
         this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction);
@@ -297,7 +306,7 @@ class BasicFormElement extends PureComponent {
 
     render() {
         let modalView = this.getModalView()
-        if(this.props.item.hidden) {
+        if (this.props.item.hidden) {
             return null
         }
         switch (this.props.item.attributeTypeId) {
@@ -311,60 +320,57 @@ class BasicFormElement extends PureComponent {
             case CONTACT_NUMBER:
                 return (
                     <View>
-                        {renderIf(!this.props.item.hidden,
-                            <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
-                                {this.props.item.label ?
-                                    <Label style={[styles.fontDefault, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
-                                        {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
-                                    </Label>
-                                    : null}
-                                {this.props.item.subLabel ?
-                                    <Label style={[styles.fontSm, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Label>
-                                    : null}
-                                <View>
-                                {renderIf((this.props.item.attributeTypeId == 62 ),
-                                                        this.props.item.displayValue ?
-                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl,styles.marginRight20,styles.absolute, { top: 10, right: 10 }, styles.fontSuccess, { marginTop: -10 }])} /> :
-                                                            ( this.props.item.isLoading) ?
-                                                                <ActivityIndicator animating={true} style={StyleSheet.flatten([styles.absolute,styles.marginRight20, { top: 10, right: 10 },{ marginTop: -10 }])} size="small" color="green" /> : null
-                                                    )}
-                                    <Item stackedLabel>
-                                        <Input
-                                            autoCapitalize="none"
-                                            placeholder={this.props.item.helpText}
-                                            placeholderTextColor={styles.fontLowGray.color}
-                                            defaultValue={this.props.item.displayValue}
-                                            style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
-                                            value={this.props.item.displayValue}
-                                            keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
-                                            editable={this.props.item.editable}
-                                            multiline={this.props.item.attributeTypeId == 2 ? true : false}
-                                            onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
-                                            onFocus={() => { this.onFocusEvent(this.props.item) }}
-                                            onEndEditing={(e) => this._onBlurEvent(this.props.item)}
-                                            secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
-                                        />
-                                    </Item>
-                                    {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ?
-                                        <TouchableHighlight
-                                            style={[styles.absolute, { top: 10, right: 10 }]}
-                                            onPress={this.goToQRCode}
-                                        >
-                                            <View>
-                                                <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)} />
-                                            </View>
-                                        </TouchableHighlight> : null}
-                                </View>
-                                {this.props.item.alertMessage ?
-                                    <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
-                                    : null}
-                                {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
+                        <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
+                            {this.props.item.label ?
+                                <Label style={[styles.fontDefault, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
+                                    {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}
+                                </Label>
+                                : null}
+                            {this.props.item.subLabel ?
+                                <Label style={[styles.fontSm, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Label>
+                                : null}
+                            <View>
+                                {renderIf((this.props.item.attributeTypeId == 62),
+                                    this.props.item.displayValue ?
+                                        <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.marginRight20, styles.absolute, { top: 10, right: 10 }, styles.fontSuccess, { marginTop: -10 }])} /> :
+                                        (this.props.item.isLoading) ?
+                                            <ActivityIndicator animating={true} style={StyleSheet.flatten([styles.absolute, styles.marginRight20, { top: 10, right: 10 }, { marginTop: -10 }])} size="small" color="green" /> : null
+                                )}
+                                <Item stackedLabel>
+                                    <Input
+                                        autoCapitalize="none"
+                                        placeholder={this.props.item.helpText}
+                                        placeholderTextColor={styles.fontLowGray.color}
+                                        defaultValue={this.props.item.displayValue}
+                                        style={[styles.paddingLeft0, (this.props.item.attributeTypeId == SCAN_OR_TEXT) ? { paddingRight: 45 } : null]}
+                                        value={this.props.item.displayValue}
+                                        keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
+                                        editable={this.props.item.editable}
+                                        multiline={this.props.item.attributeTypeId == 2 ? true : false}
+                                        onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
+                                        onFocus={() => { this.onFocusEvent(this.props.item) }}
+                                        onEndEditing={(e) => this._onBlurEvent(this.props.item)}
+                                        secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
+                                    />
+                                </Item>
+                                {(this.props.item.attributeTypeId == SCAN_OR_TEXT) ?
+                                    <TouchableHighlight
+                                        style={[styles.absolute, { top: 10, right: 10 }]}
+                                        onPress={this.goToQRCode}
+                                    >
+                                        <View>
+                                            <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)} />
+                                        </View>
+                                    </TouchableHighlight> : null}
+                            </View>
+                            {this.props.item.alertMessage ?
+                                <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
+                                : null}
+                            {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
                                 <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
                                 <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
                             </View> */}
-                            </View>
-
-                        )}
+                        </View>
                     </View>
                 )
 
@@ -382,26 +388,38 @@ class BasicFormElement extends PureComponent {
             case CAMERA:
             case CAMERA_HIGH:
             case CAMERA_MEDIUM:
-                return (
-                    renderIf(!this.props.item.hidden,
-                        <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />)
-                )
+                return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
             case NPS_FEEDBACK:
-                return (<View>
+                return <View>
                     {modalView}
-                    {renderIf(!this.props.item.hidden,
-                        <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />)}
-                </View>)
+                    <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />
+                </View>
             case CHECKBOX:
             case RADIOBUTTON:
             case DROPDOWN:
             case OPTION_RADIO_FOR_MASTER:
                 return (
-                    <View>
-                        {modalView}
-                        {renderIf(!this.props.item.hidden,
-                            <FormLayoutActivityComponent item={this.props.item} press={this._inflateModal} />)}
-                    </View>
+                    <TouchableOpacity onPress={this._inflateModal} style={[{ paddingVertical: 50 }, this.props.item.focus ? styles.borderLeft4 : null]}>
+                        <View style={[styles.marginHorizontal10]}>
+                            {modalView}
+                            <View style={[styles.borderBottomBlack, styles.relative]}>
+                                <Text style={[styles.marginBottom10, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), styles.fontDefault]}>
+                                    {this.props.item.label}
+                                    {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}
+                                </Text>
+                                {this.props.item.subLabel ?
+                                    <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Text>
+                                    : null}
+                                {this.props.item.helpText ?
+                                    <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.helpText}</Text>
+                                    : null}
+                                <Text style={[this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), styles.fontLg, styles.marginBottom10]}>
+                                    {this.props.item.value ? (this.props.item.value == ARRAY_SAROJ_FAREYE || this.props.item.value == OBJECT_SAROJ_FAREYE) ? this.props.item.childDataList ? this.props.item.childDataList.length + SELECTED : null : this.props.item.value : this.props.item.helpText}
+                                </Text>
+                                <Icon name="md-arrow-dropdown" style={[styles.absolute, styles.fontLg, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), { bottom: 10, right: 0 }]} />
+                            </View>
+                        </View>
+                    </TouchableOpacity>
                 )
             case DATE:
             case RE_ATTEMPT_DATE:

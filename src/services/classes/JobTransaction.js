@@ -138,7 +138,9 @@ class JobTransaction {
                 trackHalt,
                 trackKm,
                 trackSmsCount,
-                trackTransactionTimeSpent
+                trackTransactionTimeSpent,
+                seqAssigned,
+                seqActual
             } = transaction
             if (index == 0) {
                 jobQuery += 'id = ' + jobId
@@ -165,7 +167,9 @@ class JobTransaction {
                 trackHalt,
                 trackKm,
                 trackSmsCount,
-                trackTransactionTimeSpent
+                trackTransactionTimeSpent,
+                seqAssigned,
+                seqActual
             }
         }
         return {
@@ -245,9 +249,12 @@ class JobTransaction {
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
         }
         else if (callingActivity == 'Sequence') {
-            let statusQuery = callingActivityData.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-            //Fetch only pending status category job transactions for sequence listing
-            jobTransactionQuery = statusQuery && statusQuery.trim() !== '' ? `${jobTransactionQuery} AND (${statusQuery})` : `${jobTransactionQuery}`
+            let statusQueryWithRunsheetNo = '('
+            statusQueryWithRunsheetNo += callingActivityData.statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+            statusQueryWithRunsheetNo += `) AND runsheetNo = "${callingActivityData.runsheetNumber}"`
+            jobTransactionQuery = `deleteFlag != 1`
+            //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected
+            jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
             fieldDataList = [], fieldDataMap = {}
@@ -325,6 +332,8 @@ class JobTransaction {
      *                                          line1
      *                                          line2
      *                                          seqSelected
+     *                                          seqActual
+     *                                          seqAssigned
      *                                      }
      *                                   ]
      */
@@ -362,6 +371,8 @@ class JobTransaction {
             jobTransactionCustomization.jobLongitude = job.longitude
             jobTransactionCustomization.jobId = jobTransaction.jobId
             jobTransactionCustomization.identifierColor = idJobMasterMap[jobMasterId].identifierColor
+            jobTransactionCustomization.seqActual = jobTransaction.seqActual
+            jobTransactionCustomization.seqAssigned = jobTransaction.seqAssigned
             if (callingActivity == 'LiveJob') {
                 jobTransaction.jobTransactionCustomization = jobTransactionCustomization
             }
@@ -467,6 +478,7 @@ class JobTransaction {
         finalText += this.appendText(customizationObject.trackCallDuration, jobTransaction.trackCallDuration, "Call Duration: ", customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.trackSmsCount, jobTransaction.trackSmsCount, "Sms: ", customizationObject.separator, finalText)
         finalText += this.appendText(customizationObject.trackTransactionTimeSpent, jobTransaction.trackTransactionTimeSpent, "Time Spent: ", customizationObject.separator, finalText)
+        finalText += this.appendText(customizationObject.routingSequenceNumber, jobTransaction.seqSelected, "Sequence: ", customizationObject.separator, finalText)
         return finalText
     }
 

@@ -38,7 +38,7 @@ describe('job details reducer', () => {
                     id: 2
                 },
                 nextStatusList: undefined,
-                isEnableOutForDelivery: true
+                errorMessage: ''
             }
         }
         let nextState = jobDetailsReducer(undefined, action)
@@ -46,6 +46,6 @@ describe('job details reducer', () => {
         expect(nextState.fieldDataList).toBe(action.payload.fieldDataList)
         expect(nextState.nextStatusList).toBe(action.payload.nextStatusList)
         expect(nextState.jobDetailsLoading).toBe(false)
-        expect(nextState.isEnableOutForDelivery).toBe(action.payload.isEnableOutForDelivery)
+        expect(nextState.errorMessage).toBe(action.payload.errorMessage)
     })
 })

@@ -157,7 +157,7 @@ class RestAPI {
     const fetchRequestId = Math.floor((Math.random() * 1000) + 1);
 
     //Creating a _fetch request which will timeout in 30 seconds
-    return this.timeoutPromise(30 * 1000, new Error('Timed Out!'), this._fetch(opts, fetchRequestId))
+    return this.timeoutPromise(120 * 1000, new Error('Timed Out!'), this._fetch(opts, fetchRequestId))
       .then((res) => {
         return res;
       })
@@ -215,6 +215,7 @@ class RestAPI {
           }
         } else {
           responseBody = resp.text()
+          console.log('responseBody', responseBody)
           const message = responseBody.split(",")[0]
           if (message != 'success') {
             throw new Error(responseBody)

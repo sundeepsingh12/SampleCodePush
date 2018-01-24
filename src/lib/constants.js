@@ -57,6 +57,7 @@ module.exports = keyMirror({
     ON_AUTH_FORM_FIELD_CHANGE: null,
     ON_LOGIN_USERNAME_CHANGE: null,
     ON_LOGIN_PASSWORD_CHANGE: null,
+    ON_LONG_PRESS_ICON: null,
 
     PRELOADER_SUCCESS: null,
     SHOW_MOBILE_NUMBER: null,
@@ -112,6 +113,9 @@ module.exports = keyMirror({
     CLEAR_PAYMENT_STATE: null,
     SET_PAYMENT_CHANGED_PARAMETERS: null,
     SET_PAYMENT_INITIAL_PARAMETERS: null,
+    SET_SPLIT_PAYMENT: null,
+    SET_SELECTED_PAYMENT_MODE: null,
+    SET_SPLIT_PAYMENT_MODE_LIST: null,
 
     //UPI PaymentActions
     SET_UPI_APPROVAL: null,
@@ -176,6 +180,8 @@ module.exports = keyMirror({
     LIVE_JOB: null,
     USER_EVENT_LOG: null,
     LAST_JOB_COMPLETED_TIME: null,
+    SHOULD_RELOAD_START: null,
+    SHOULD_CREATE_BACKUP: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -261,6 +267,9 @@ module.exports = keyMirror({
     ImageDetailsView: null,
     JobDetailsV2: null,
     Backup: null,
+    SplitPayment: null,
+    Payment: null,
+    SequenceRunsheetList: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -317,9 +326,14 @@ module.exports = keyMirror({
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
-    TOGGLE_RESEQUENCE_BUTTON: null,
     PREPARE_UPDATE_LIST: null,
     CLEAR_SEQUENCE_STATE: null,
+    SET_RUNSHEET_NUMBER_LIST: null,
+    SET_RESPONSE_MESSAGE: null,
+    CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: null,
+    SEQUENCE_LIST_ITEM_DRAGGED: null,
+    SET_REFERENCE_NO: null,
+    SET_SEQUENCE_LIST_ITEM: null,
 
     //New Job
     NEW_JOB_MASTER: null,
@@ -369,7 +383,7 @@ module.exports = keyMirror({
     SET_CONFIRM_NEW_PASSWORD: null,
     CLEAR_PASSWORD_TEXTINPUT: null,
     TOGGLE_SAVE_RESET_BUTTON: null,
-
+    IS_PROFILE_LOADING: null,
     //Sorting And Printing
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
@@ -448,7 +462,8 @@ module.exports = keyMirror({
     SET_BACKUP_FILES: null,
     SET_BACKUP_VIEW: null,
     SET_UPLOADING_FILE: null,
-    SET_SYNCED_FILES: null
+    SET_SYNCED_FILES: null,
+    SET_BACKUP_TOAST: null
 })
 
 

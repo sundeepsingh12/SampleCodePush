@@ -13,7 +13,8 @@ import {
     TABLE_TRANSACTION_LOGS,
     FIELD_ATTRIBUTE,
     USER,
-    PENDING_SYNC_TRANSACTION_IDS
+    PENDING_SYNC_TRANSACTION_IDS,
+    SHOULD_CREATE_BACKUP
 } from '../../lib/constants'
 import { userEventLogService } from './UserEvent'
 import { jobSummaryService } from './JobSummary'
@@ -41,7 +42,7 @@ import {
 class Backup {
     async createBackupOnLogout() {
         let user = await keyValueDBService.getValueFromStore(USER)
-        await this.createManualBackup(user)
+        await this.createSyncedBackup(user)
         await this.createUnsyncBackupIfNeeded(user)
         await this.deleteOldBackup()
     }
@@ -64,7 +65,7 @@ class Backup {
             console.log('backup created', backupFileName)
         }
     }
-    async createManualBackup(user, syncedBackupFiles) {
+    async createSyncedBackup(user) {
         if (!user || !user.value) throw new Error('user missing')
         RNFS.mkdir(PATH);
         RNFS.mkdir(PATH_BACKUP);
@@ -79,14 +80,35 @@ class Backup {
         const sourcePath = PATH_BACKUP_TEMP
         await zip(sourcePath, targetPath);
         await RNFS.unlink(PATH_BACKUP_TEMP)
+    }
+    async createManualBackup(user, syncedBackupFiles) {
+        if (!user || !user.value) throw new Error('user missing')
+        let shouldCreateBackup = await keyValueDBService.getValueFromStore(SHOULD_CREATE_BACKUP)
+        console.log('shouldCreateBackup', shouldCreateBackup)
+        if (shouldCreateBackup && shouldCreateBackup.value) {
+            return { syncedBackupFiles, toastMessage: 'Backup already exists for this data' }
+        }
+        RNFS.mkdir(PATH);
+        RNFS.mkdir(PATH_BACKUP);
+        RNFS.mkdir(PATH_BACKUP_TEMP);
+        let json = await this.getJsonData(user.value.lastLoginTime)
+        if (!json) return
+        //Writing Object to File at TEMP location
+        await RNFS.writeFile(PATH_BACKUP_TEMP + '/logs.json', json, 'utf8');
+        const backupFileName = this.getBackupFileName(user.value)
+        //Creating ZIP file
+        const targetPath = PATH_BACKUP + '/' + backupFileName
+        const sourcePath = PATH_BACKUP_TEMP
+        await zip(sourcePath, targetPath);
+        await RNFS.unlink(PATH_BACKUP_TEMP)
         if (syncedBackupFiles) {
-            //console.log(syncedBackupFiles)
             var stat = await RNFS.stat(PATH_BACKUP + '/' + backupFileName);
             let fileNameArray = backupFileName.split('_')
             let id = _.size(syncedBackupFiles) + 1
             let syncedBackupFile = this.setBackupFileDto(backupFileName, fileNameArray[1], stat.size, stat.path, user.value.employeeCode, id, true)
             syncedBackupFiles[id] = syncedBackupFile
-            return syncedBackupFiles
+            await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(true))
+            return { syncedBackupFiles, toastMessage: 'Backup created successfully' }
         }
     }
     getBackupFileName(user, isUnsyncBackup) {

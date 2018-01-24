@@ -162,18 +162,18 @@ describe('test cases for createManualBackup', () => {
             expect(error.message).toEqual('user missing')
         })
     })
-    it('creates backup on logout', () => {
-        const user = { value: {} }
-        RNFS.mkdir = jest.fn()
-        backupService.getJsonData = jest.fn()
-        backupService.getJsonData.mockReturnValue('test')
-        RNFS.writeFile = jest.fn()
-        return backupService.createManualBackup(user).then(() => {
-            expect(RNFS.mkdir).toHaveBeenCalledTimes(3)
-            expect(backupService.getJsonData).toHaveBeenCalledTimes(1)
-            expect(RNFS.writeFile).toHaveBeenCalledTimes(1)
-        })
-    })
+    // it('creates backup on logout', () => {
+    //     const user = { value: {} }
+    //     RNFS.mkdir = jest.fn()
+    //     backupService.getJsonData = jest.fn()
+    //     backupService.getJsonData.mockReturnValue('test')
+    //     RNFS.writeFile = jest.fn()
+    //     return backupService.createManualBackup(user).then(() => {
+    //         expect(RNFS.mkdir).toHaveBeenCalledTimes(3)
+    //         expect(backupService.getJsonData).toHaveBeenCalledTimes(1)
+    //         expect(RNFS.writeFile).toHaveBeenCalledTimes(1)
+    //     })
+    // })
     it('creates backup on create manual button press', () => {
         let syncedBackupFiles = {}
         const user = { value: {} }
@@ -183,14 +183,61 @@ describe('test cases for createManualBackup', () => {
             size: 1,
             path: 'test'
         })
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(null)
         backupService.getJsonData = jest.fn()
         backupService.getJsonData.mockReturnValue('test')
         RNFS.writeFile = jest.fn()
-        return backupService.createManualBackup(user, syncedBackupFiles).then(() => {
+        return backupService.createManualBackup(user, syncedBackupFiles).then((result) => {
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
             expect(RNFS.mkdir).toHaveBeenCalledTimes(3)
             expect(backupService.getJsonData).toHaveBeenCalledTimes(1)
             expect(RNFS.writeFile).toHaveBeenCalledTimes(1)
-            expect(RNFS.stat).toHaveBeenCalledTimes(1)
+            expect(result).toEqual({
+                syncedBackupFiles, toastMessage: 'Backup created successfully'
+            })
+        })
+    })
+    it('does not create backup', () => {
+        let syncedBackupFiles = {}
+        const user = { value: {} }
+        RNFS.mkdir = jest.fn()
+        RNFS.stat = jest.fn()
+        RNFS.stat.mockReturnValue({
+            size: 1,
+            path: 'test'
+        })
+        const shouldBackupCreate = { value: true }
+        keyValueDBService.getValueFromStore = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(shouldBackupCreate)
+        backupService.getJsonData = jest.fn()
+        backupService.getJsonData.mockReturnValue('test')
+        RNFS.writeFile = jest.fn()
+        return backupService.createManualBackup(user, syncedBackupFiles).then((result) => {
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+            expect(result).toEqual({
+                syncedBackupFiles, toastMessage: 'Backup already exists for this data'
+            })
+        })
+    })
+})
+describe('test cases for createSyncedBackup', () => {
+    it('returns null for empty user', () => {
+        return backupService.createSyncedBackup().then(() => {
+        }).catch((error) => {
+            expect(error.message).toEqual('user missing')
+        })
+    })
+    it('creates backup on logout', () => {
+        const user = { value: {} }
+        RNFS.mkdir = jest.fn()
+        backupService.getJsonData = jest.fn()
+        backupService.getJsonData.mockReturnValue('test')
+        RNFS.writeFile = jest.fn()
+        return backupService.createSyncedBackup(user).then(() => {
+            expect(RNFS.mkdir).toHaveBeenCalledTimes(3)
+            expect(backupService.getJsonData).toHaveBeenCalledTimes(1)
+            expect(RNFS.writeFile).toHaveBeenCalledTimes(1)
         })
     })
 })
@@ -198,7 +245,7 @@ describe('test cases for createBackupOnLogout', () => {
 
     beforeEach(() => {
         keyValueDBService.getValueFromStore = jest.fn()
-        backupService.createManualBackup = jest.fn()
+        backupService.createSyncedBackup = jest.fn()
         backupService.createUnsyncBackupIfNeeded = jest.fn()
         backupService.deleteOldBackup = jest.fn()
     })
@@ -216,7 +263,7 @@ describe('test cases for createBackupOnLogout', () => {
         keyValueDBService.getValueFromStore.mockReturnValue(null)
         return backupService.createBackupOnLogout().then(() => {
             expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
-            expect(backupService.createManualBackup).toHaveBeenCalledTimes(1)
+            expect(backupService.createSyncedBackup).toHaveBeenCalledTimes(1)
             expect(backupService.createUnsyncBackupIfNeeded).toHaveBeenCalledTimes(1)
             expect(backupService.deleteOldBackup).toHaveBeenCalledTimes(1)
 

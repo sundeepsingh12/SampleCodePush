@@ -7,7 +7,8 @@ var InitialState = Record({
     unSyncedFiles: {},
     isLoading: false,
     backupView: 0,  //0 for files list,1 for uploading,2 for upload successful,3 for upload failure
-    fileUploading: {}
+    fileUploading: {},
+    toastMessage: ''
 })
 
 export default InitialState

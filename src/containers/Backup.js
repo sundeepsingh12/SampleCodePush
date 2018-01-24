@@ -27,15 +27,18 @@ import {
     StyleProvider,
     Footer,
     FooterTab,
-    Card
+    Card,
+    Toast
 } from 'native-base'
 import {
     //  EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
 import {
-    SET_BACKUP_VIEW
+    SET_BACKUP_VIEW,
+    SET_BACKUP_TOAST
 } from '../lib/constants'
 import _ from 'lodash'
+//import Toast from '../../native-base-theme/components/Toast';
 
 
 function mapStateToProps(state) {
@@ -44,7 +47,8 @@ function mapStateToProps(state) {
         unSyncedFiles: state.backup.unSyncedFiles,
         isLoading: state.backup.isLoading,
         backupView: state.backup.backupView,
-        fileUploading: state.backup.fileUploading
+        fileUploading: state.backup.fileUploading,
+        toastMessage: state.backup.toastMessage
     }
 };
 
@@ -64,7 +68,17 @@ class Backup extends Component {
             indexOfModal: 0,
         }
     }
-
+    componentDidUpdate() {
+        if (this.props.toastMessage && this.props.toastMessage != '') {
+            Toast.show({
+                text: this.props.toastMessage,
+                position: 'bottom',
+                buttonText: 'Okay',
+                duration: 5000
+            })
+            this.props.actions.setState(SET_BACKUP_TOAST, '')
+        }
+    }
     componentDidMount() {
         this.props.actions.getBackupList()
     }

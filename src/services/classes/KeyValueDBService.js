@@ -25,6 +25,11 @@ class KeyValueDB {
     return storeValue;
   }
 
+  getAllKeysFromStore(){
+    const keys = keyValueDB.getAllKeysFromStore()
+    return keys;
+  }
+
   deleteValueFromStore(schemaName) {
     const storeValue = keyValueDB.deleteValueFromStore(schemaName);
   }

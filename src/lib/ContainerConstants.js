@@ -5,6 +5,7 @@ module.exports = {
     //common_CONSTANTS
     CANCEL: 'Cancel',
     OK: 'Ok',
+    SAVE: 'Save',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -46,6 +47,8 @@ module.exports = {
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
+    OPTIONAL: '(optional)',
+    SELECTED: ' Selected',
 
     //status revert 
     REVERT_STATUS_TO: 'Revert Status to',
@@ -53,5 +56,56 @@ module.exports = {
     CONFIRM_REVERT: 'Confirm Revert',
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
-    JOBS_DELETED:'Jobs deleted'
+
+    //Payment Container
+    YES: 'Yes',
+    NO: 'No',
+    AMOUNT_TO_BE_COLLECTED: 'Amount to be collected',
+    SPLIT_PAYMENT: 'Split Payment',
+    SELECT_PAYMENT_METHOD: 'Select Payment Method',
+    SELECT_PAYMENT_METHOD_TO_SPLIT: 'Select Payment Methods to Split',
+    ENTER_SPLIT_DETAILS: 'Enter Split Details',
+    AMOUNT: 'Amount',
+    PAYMENT: 'Payment',
+    ADD_PAYMENT_MODE: '+ Add',
+    NUMBER: 'Number',
+    SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
+    INVALID_CONFIGURATION: 'Invalid Configuration',
+
+    //Sequence
+    SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
+    DUPLICATE_SEQUENCE_MESSAGE: 'Duplicate sequence found for this runsheet auto corrected, please save the modified sequence',
+    SAVE_SUCCESSFUL: 'Save Successful',
+    UPDATE_SEQUENCE: 'Update Sequence',
+    SAVE: 'Save',
+    WARNING_FOR_BACK: 'Sequence changes have not been save, please return and save changes',
+    WARNING: 'Warning',
+    JOB_NOT_PRESENT: 'No jobs present',
+    CURRENT_SEQUENCE_NUMBER: 'Current sequence number : ',
+    NEW_SEQUENCE_NUMBER_MESSAGE: 'Enter new sequence number to jump to',
+    JUMP_SEQUENCE: 'Jump Sequence',
+    UNTRACKED_JOBS_MESSAGE: ' jobs were not resequenced',
+
+    //Exception used in sequence
+    SAME_SEQUENCE_ERROR: `New seqence can't be same as previous sequence`,
+    SEQUENCELIST_MISSING: `sequenceList not present`,
+    BLANK_NEW_SEQUENCE: `Sequence can't be left blank`,
+    CURRENT_SEQUENCE_ROW_MISSING: `currentSequenceListItemIndex missing`,
+    SEQUENCE_NOT_AN_INT: `Sequence can't be `,
+    RUNSHEET_MISSING: 'No runsheet found',
+    RUNSHEET_NUMBER_MISSING: 'Runsheet number not present',
+    TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
+    SEARCH_TEXT_MISSING: 'searchText not present',
+    SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
+    TOKEN_MISSING: 'Token missing',
+    INVALID_SCAN: 'Invalid Scan',
+    JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
+
+    //Sync service
+    JOBS_DELETED: 'Jobs deleted',
+
+    //Summary
+    REFUND: 'Refund',
+    COLLECTION_CASH: 'Collection-Cash',
+    COLLECTION_SOD: 'Collection-SOD',
 }

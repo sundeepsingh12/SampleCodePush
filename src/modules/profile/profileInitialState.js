@@ -10,6 +10,7 @@ var InitialState = Record({
     newPassword: '',
     confirmNewPassword: '',
     isSaveResetButtonDisabled: true,
+    isLoaderInProfile: false,
 })
 
 export default InitialState

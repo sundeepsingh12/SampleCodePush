@@ -22,9 +22,11 @@ export function createManualBackup(syncedBackupFiles) {
             const user = await keyValueDBService.getValueFromStore(USER)
             if (!user || !user.value) throw new Error('User Missing')
             let backupFiles = JSON.parse(JSON.stringify(syncedBackupFiles))
-            let syncedFiles = await backupService.createManualBackup(user, backupFiles)
-            dispatch(setState(SET_SYNCED_FILES, syncedFiles))
-            dispatch(setState(SET_LOADER_BACKUP, false))
+            let backupFilesAndToastMessage = await backupService.createManualBackup(user, backupFiles)
+            if (backupFilesAndToastMessage) {
+                dispatch(setState(SET_SYNCED_FILES, backupFilesAndToastMessage))
+            }
+            //dispatch(setState(SET_LOADER_BACKUP, false))
         } catch (error) {
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
@@ -65,7 +67,7 @@ export function uploadBackupFile(index, filesMap) {
             }
         } catch (error) {
             console.log(error)
-            dispatch(setState(SET_BACKUP_VIEW, 0))
+            dispatch(setState(SET_BACKUP_VIEW, 3))
         }
     }
 }

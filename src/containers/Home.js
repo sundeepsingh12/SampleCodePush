@@ -49,7 +49,7 @@ import {
 
 import {
   TabScreen,
-  Sequence,
+  SequenceRunsheetList,
   BulkConfiguration,
   Sorting,
   LiveJobs,
@@ -62,6 +62,7 @@ import {
 } from '../lib/constants'
 import _ from 'lodash'
 import PushNotification from 'react-native-push-notification'
+import { Platform } from 'react-native'
 
 function mapStateToProps(state) {
   return {
@@ -94,6 +95,7 @@ class Home extends PureComponent {
     }
 
   componentDidMount() {
+    if (Platform.OS === 'ios') {
       PushNotification.configure({
         onNotification: function(notification) {
         console.log( 'NOTIFICATION:', notification );
@@ -105,8 +107,9 @@ class Home extends PureComponent {
             })
         // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
         notification.finish(PushNotificationIOS.FetchResult.NoData);
-    }
+        }
         })
+    }
     this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
   }
 
@@ -121,11 +124,11 @@ class Home extends PureComponent {
         break
       }
       case SEQUENCEMODULE_ID: {
-        this.props.actions.navigateToScene(Sequence,{displayName:this.props.modules.SEQUENCEMODULE.displayName})
+        this.props.actions.navigateToScene(SequenceRunsheetList, { displayName: this.props.modules.SEQUENCEMODULE.displayName })
         break
       }
       case START_ID: {
-        this.props.actions.navigateToScene(TabScreen, {remark: appModule.remark})
+        this.props.actions.navigateToScene(TabScreen, { remark: appModule.remark })
         break
       }
 
@@ -181,22 +184,22 @@ class Home extends PureComponent {
             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
             <View style={[style.headerBody]}>
               <View style={{
-                  width: 90
-                }}>
-                  <Image
-                    style={StyleSheet.flatten([
-                      styles.width100, {
-                        resizeMode: 'contain'
-                      }
-                    ])}
-                    source={FareyeLogo} />
-                </View>
+                width: 90
+              }}>
+                <Image
+                  style={StyleSheet.flatten([
+                    styles.width100, {
+                      resizeMode: 'contain'
+                    }
+                  ])}
+                  source={FareyeLogo} />
+              </View>
             </View>
             <View />
           </View>
         </Body>
       </Header>
-    
+
     )
   }
 

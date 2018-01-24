@@ -17,7 +17,13 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 import { Toast } from 'native-base'
 class ProfileService {
 
-    getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userName) {
+    getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject) {
+        if (!userObject || !userObject.value || !userObject.value.username) {
+            throw new Error('username is missing')
+        }
+        if (!userPassword) {
+            throw new Error(UNSAVED_PASSWORD)
+        }
         if (sha256(currentPassword) != userPassword.value) {
             Toast.show({ text: CHECK_CURRENT_PASSWORD, position: 'bottom', buttonText: 'OK' })
         }
@@ -32,12 +38,11 @@ class ProfileService {
         }
         else {
             //hit API
-            const url = CONFIG.API.SERVICE_RESET_PASSWORD + LOGIN + encodeURIComponent(userName)
+            const url = CONFIG.API.SERVICE_RESET_PASSWORD + LOGIN + encodeURIComponent(userObject.value.username)
             const response = RestAPIFactory(token.value).serviceCall(sha256(newPassword), url, POST)
             return response
         }
     }
-
 }
 
 export let profileService = new ProfileService()

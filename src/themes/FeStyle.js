@@ -238,6 +238,53 @@ export default {
         marginRight: 'auto'
     },
 
+    
+
+    // Margin Verticle
+    marginVerticle0: {
+        marginVerticle: 0
+    },
+    marginVerticle5: {
+        marginVerticle: 5
+    },
+    marginVerticle10: {
+        marginVerticle: 10
+    },
+    marginVerticle15: {
+        marginVerticle: 15
+    },
+    marginVerticle20: {
+        marginVerticle: 20
+    },
+    marginVerticle25: {
+        marginVerticle: 25
+    },
+    marginVerticle30: {
+        marginVerticle: 30
+    },
+
+    // Margin Horizontal
+    marginHorizontal0: {
+        marginHorizontal: 0
+    },
+    marginHorizontal5: {
+        marginHorizontal: 5
+    },
+    marginHorizontal10: {
+        marginHorizontal: 10
+    },
+    marginHorizontal15: {
+        marginHorizontal: 15
+    },
+    marginHorizontal20: {
+        marginHorizontal: 20
+    },
+    marginHorizontal25: {
+        marginHorizontal: 25
+    },
+    marginHorizontal30: {
+        marginHorizontal: 30
+    },
     //  Padding Objects
     padding5: {
         padding: 5
@@ -342,9 +389,58 @@ export default {
     paddingRight25: {
         paddingRight: 25
     },
+    
     paddingRight30: {
         paddingRight: 30
     },
+
+
+    // Padding Horizontal
+    paddingHorizontal0: {
+        paddingHorizontal: 0
+    },
+    paddingHorizontal5: {
+        paddingHorizontal: 5
+    },
+    paddingHorizontal10: {
+        paddingHorizontal: 10
+    },
+    paddingHorizontal15: {
+        paddingHorizontal: 15
+    },
+    paddingHorizontal20: {
+        paddingHorizontal: 20
+    },
+    paddingHorizontal25: {
+        paddingHorizontal: 25
+    },
+    paddingHorizontal30: {
+        paddingHorizontal: 30
+    },
+
+    // Padding Verticle
+    paddingVeticle0: {
+        paddingVeticle0: 0
+    },
+    paddingVeticle5: {
+        paddingVeticle: 5
+    },
+    paddingVeticle10: {
+        paddingVeticle: 10
+    },
+    paddingVeticle15: {
+        paddingVeticle: 15
+    },
+    paddingVeticle20: {
+        paddingVeticle: 20
+    },
+    paddingVeticle25: {
+        paddingVeticle: 25
+    },
+    paddingVeticle30: {
+        paddingVeticle: 30
+    },
+
 
     column: {
         flexDirection: 'column'
@@ -450,6 +546,9 @@ export default {
     },
     shadow: {
         elevation: 2,
+        shadowOffset:{  width: 3,  height: 4,  },
+        shadowColor: '#d3d3d3',
+        shadowOpacity: .5,
     },
     borderLeft4: {
         borderLeftColor: themeColor,
@@ -461,7 +560,7 @@ export default {
         padding: 0,
         paddingRight: 0,
         paddingLeft: 0,
-        paddingBottom: 10
+        paddingBottom: 5
     },
     headerLeft: {
         width: '15%',
@@ -533,5 +632,13 @@ export default {
     },
     textUnderline: {
         textDecorationLine: 'underline'
+    },
+    borderBottomBlack: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#000000'
+    },
+    borderBottomLightGray: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#f4f4f4'
     }
 }

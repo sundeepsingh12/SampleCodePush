@@ -85,7 +85,6 @@ export function testSave(actualAmount, currentElement, formElement, jobMasterId,
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedIndex, transactionNumber, remarks, receipt)
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransactionId, currentElement.positionId, latestPositionId)
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
-            dispatch()
         } catch (error) {
 
         }

@@ -45,6 +45,7 @@ import Summary from '../../containers/Summary'
 import CustomApp from '../../containers/CustomApp'
 import QrCodeScanner from '../../containers/QrCodeScanner'
 import CameraFieldAttribute from '../../containers/CameraFieldAttribute'
+import SequenceRunsheetList from '../../containers/SequenceRunsheetList'
 import {
   Container,
   Content,
@@ -100,6 +101,7 @@ import {
   LoginScreen,
   PreloaderScreen,
 } from '../../lib/constants'
+import SplitPayment from '../../containers/SplitPayment'
 
 class AppWithNavigationState extends React.PureComponent {
 
@@ -436,7 +438,13 @@ export const AppNavigator = StackNavigator({
     screen: ImageDetailsView,
   },
   Backup: {
-    screen: Backup
+    screen: Backup,
+  },
+  SplitPayment: {
+    screen: SplitPayment,
+  },
+  SequenceRunsheetList: {
+    screen: SequenceRunsheetList
   }
 },
   {
