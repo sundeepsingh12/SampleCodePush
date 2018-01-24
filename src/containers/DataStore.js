@@ -109,7 +109,7 @@ class DataStore extends PureComponent {
             <Card>
                 <TouchableOpacity
                     onPress={() => this.showDetails(item.id, firstValue, false)}>
-                    <View style={[style.cardLeidft]}>
+                    <View style={[style.cardLeft]}>
                         {renderIf(firstValue, <View style={[style.cardLeftTopRow]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight500, styles.fontDefault]}>{firstValue}</Text>
                         </View>)}

@@ -10,7 +10,8 @@ import {
   CHART_LOADING,
   RESET_STATE,
   LAST_SYNC_TIME,
-  TOGGLE_LOGOUT
+  TOGGLE_LOGOUT,
+  SET_UNSYNC_TRANSACTION_PRESENT
 } from '../../lib/constants'
 
 
@@ -37,13 +38,16 @@ export default function homeReducer(state = initialState, action) {
 
 
     case LAST_SYNC_TIME:
-      return state.set('lastSyncTime',action.payload)    
+      return state.set('lastSyncTime', action.payload)
 
     case RESET_STATE:
       return initialState
 
     case TOGGLE_LOGOUT:
-      return state.set('isLoggingOut',action.payload)  
+      return state.set('isLoggingOut', action.payload)
+
+    case SET_UNSYNC_TRANSACTION_PRESENT:
+      return state.set('isUnsyncTransactionOnLogout', action.payload)
   }
 
   return state

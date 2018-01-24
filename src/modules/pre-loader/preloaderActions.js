@@ -72,6 +72,8 @@ import {
   LoginScreen,
   TOGGLE_LOGOUT,
   OTP_SUCCESS,
+  PENDING_SYNC_TRANSACTION_IDS,
+  SET_UNSYNC_TRANSACTION_PRESENT
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -84,6 +86,7 @@ import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
 import { userEventLogService } from '../../services/classes/UserEvent'
+import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer';
 import moment from 'moment'
 //Action dispatched when job master downloading starts
@@ -285,14 +288,15 @@ export function invalidateUserSessionForAutoLogout() {
     try {
       dispatch(preLogoutRequest())
       dispatch(setState(TOGGLE_LOGOUT, true))
-      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)     
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      await backupService.createBackupOnLogout()
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
-      dispatch(setState(TOGGLE_LOGOUT,false))
+      dispatch(setState(TOGGLE_LOGOUT, false))
       dispatch(deleteSessionToken())
-    } catch (error) {  
+    } catch (error) {
       dispatch(startLoginScreenWithoutLogout())
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
@@ -310,15 +314,16 @@ export function invalidateUserSession() {
       dispatch(setState(TOGGLE_LOGOUT, true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       // TODO uncomment this code when run sync in logout
-      // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")      
+      // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")  
+      await backupService.createBackupOnLogout()
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
-      dispatch(setState(TOGGLE_LOGOUT,false))
+      dispatch(setState(TOGGLE_LOGOUT, false))
       dispatch(deleteSessionToken())
-       
-    } catch (error) {  
+
+    } catch (error) {
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
@@ -334,16 +339,16 @@ export function invalidateUserSession() {
 
 export function autoLogout(userData) {
   return async (dispatch) => {
-    try {      
-     if(userData && userData.value && userData.value.company &&  userData.value.company.autoLogoutFromDevice){
-      let timeLimit = moment('23:59:59',"HH:mm:ss").diff(moment(new Date(),"HH:mm:ss"), 'seconds')+5      
-      const timeOutId  = BackgroundTimer.setTimeout(async () => {
-        if(!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
-          dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-          BackgroundTimer.clearTimeout(timeOutId);         
-        }
-      }, timeLimit*1000)      
-    }
+    try {
+      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice) {
+        let timeLimit = moment('23:59:59', "HH:mm:ss").diff(moment(new Date(), "HH:mm:ss"), 'seconds') + 5
+        const timeOutId = BackgroundTimer.setTimeout(async () => {
+          if (!moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
+            dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+            BackgroundTimer.clearTimeout(timeOutId);
+          }
+        }, timeLimit * 1000)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -555,4 +560,23 @@ export function validateOtp(otpNumber) {
     }
   }
 
+}
+
+export function checkForUnsyncTransactionAndLogout() {
+  return async function (dispatch) {
+    try {
+      let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+      let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
+      console.log('isUnsyncTransactionsPresent', isUnsyncTransactionsPresent)
+      if (isUnsyncTransactionsPresent) {
+        dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
+      } else {
+        dispatch(invalidateUserSession())
+      }
+    } catch (error) {
+      console.log(error)
+      dispatch(error_400_403_Logout(error.message))
+      dispatch(setState(TOGGLE_LOGOUT, false))
+    }
+  }
 }

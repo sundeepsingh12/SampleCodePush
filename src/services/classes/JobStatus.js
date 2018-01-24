@@ -2,6 +2,8 @@ import {
   JOB_STATUS,
   UNSEEN,
   TAB,
+  PENDING,
+  SEEN
 } from '../../lib/constants'
 
 import {
@@ -189,7 +191,7 @@ class JobStatus {
     const jobStatusList = jobStatusArray.value
     let pendingStatusIds = [], failStatusIds = [], successStatusIds = [], noNextStatusIds = [];
     for (id in jobStatusList) {
-      if(jobStatusList[id].nextStatusList.length == 0){
+      if (jobStatusList[id].nextStatusList.length == 0) {
         noNextStatusIds.push(jobStatusList[id].id)
       }
       if (jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN) {
@@ -208,10 +210,10 @@ class JobStatus {
   }
 
 
-  getTabIdOnStatusId(statusList,statusId){
+  getTabIdOnStatusId(statusList, statusId) {
     let tabId
-    for(let data of statusList){
-      if(data.id == statusId){
+    for (let data of statusList) {
+      if (data.id == statusId) {
         tabId = data.tabId
         break
       }
@@ -219,12 +221,18 @@ class JobStatus {
     return tabId
   }
 
-
-
   async getStatusCategoryOnStatusId(jobStatusId) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
     const category = jobStatusArray.value.filter(jobStatus => jobStatus.id == jobStatusId && jobStatus.code != UNSEEN).map(id => id.statusCategory)
     return category[0];
+  }
+  async getNonDeliveredStatusIds() {
+    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error('Job status missing in store')
+    }
+    const filteredJobStatusIds = jobStatusArray.value.filter(jobStatus => jobStatus.code != UNSEEN && jobStatus.code != SEEN && jobStatus.code != PENDING).map(jobStatus => jobStatus.id)
+    return filteredJobStatusIds
   }
 }
 

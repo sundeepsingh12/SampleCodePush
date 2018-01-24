@@ -86,6 +86,7 @@ module.exports = keyMirror({
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
+    SET_UNSYNC_TRANSACTION_PRESENT: null,
 
     //Home Container
     PIECHART: null,
@@ -197,6 +198,7 @@ module.exports = keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
+    SEEN: null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
@@ -258,6 +260,7 @@ module.exports = keyMirror({
     CameraAttribute: null,
     ImageDetailsView: null,
     JobDetailsV2: null,
+    Backup: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -439,6 +442,13 @@ module.exports = keyMirror({
     TRACK_BATTERY: null,
     NPSFEEDBACK_VALUE: null,
     IS_SERVER_REACHABLE: null,
+
+    // backup actions
+    SET_LOADER_BACKUP: null,
+    SET_BACKUP_FILES: null,
+    SET_BACKUP_VIEW: null,
+    SET_UPLOADING_FILE: null,
+    SET_SYNCED_FILES: null
 })
 
 

@@ -136,7 +136,6 @@ function _getSyncDataFromDb(transactionIdsObject) {
         transactionLogs,
         trackLogs
     }
-
 }
 
 /**
@@ -147,7 +146,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
  * @param {*} table table name from which data is to be fetched
  * 
  */
-function _getDataFromRealm(dataType, query, table) {
+export function _getDataFromRealm(dataType, query, table) {
     if (!dataType || !table) {
         return dataType;
     }
