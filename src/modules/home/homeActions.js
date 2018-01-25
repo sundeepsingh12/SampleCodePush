@@ -22,6 +22,10 @@ import {
   LoginScreen,
   IS_SERVER_REACHABLE,
   AutoLogoutScreen,
+  SET_BACKUP_UPLOAD_VIEW,
+  SET_UPLOAD_FILE_COUNT,
+  SET_FAIL_UPLOAD_COUNT,
+  SET_BACKUP_FILES_LIST
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -48,6 +52,7 @@ import { authenticationService } from '../../services/classes/Authentication'
 import { logoutService } from '../../services/classes/Logout'
 import _ from 'lodash'
 import { userEventLogService } from '../../services/classes/UserEvent'
+import RestAPIFactory from '../../lib/RestAPIFactory'
 
 import moment from 'moment'
 import {
@@ -56,6 +61,9 @@ import {
 import {
   NavigationActions
 } from 'react-navigation'
+import { backupService } from '../../services/classes/BackupService';
+import { autoLogoutAfterUpload } from '../backup/backupActions'
+
 /**
  * This action enables modules for particular user
  */
@@ -77,7 +85,7 @@ export function fetchModulesList(modules, pieChart, menu) {
       if (result.pieChart[PIECHART].enabled) {
         dispatch(pieChartCount())
       }
-    }catch (error) {
+    } catch (error) {
       console.log(error)
     }
   }
@@ -106,7 +114,7 @@ export function pieChartCount() {
   return async (dispatch) => {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
-      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds }  = await jobStatusService.getStatusIdsForAllStatusCategory()
+      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()
       const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
       dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
@@ -121,53 +129,53 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
-      const userData = await keyValueDBService.getValueFromStore(USER)      
-      if(userData && userData.value && userData.value.company &&  userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))){      
-        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-      }else{
-      let saveStoreObject = {
-        showLiveJobNotification: false
-      }
-      keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
-      transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-      dispatch(setState(SYNC_STATUS, {
-        unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-        syncStatus: 'Uploading'
-      }))
-      const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
-      const syncCount = parseInt(responseBody.split(",")[1])
-      //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
-      if (isCalledFromHome || syncCount > 0) {
-        console.log(isCalledFromHome, syncCount)
+      const userData = await keyValueDBService.getValueFromStore(USER)
+      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
+        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+      } else {
+        let saveStoreObject = {
+          showLiveJobNotification: false
+        }
+        keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
+        transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-          syncStatus: 'Downloading'
+          syncStatus: 'Uploading'
         }))
-        const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
-        const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
-        if (isJobsPresent) {
-          if (Piechart.enabled) {
-            dispatch(pieChartCount())
+        const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
+        const syncCount = parseInt(responseBody.split(",")[1])
+        //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
+        if (isCalledFromHome || syncCount > 0) {
+          console.log(isCalledFromHome, syncCount)
+          dispatch(setState(SYNC_STATUS, {
+            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+            syncStatus: 'Downloading'
+          }))
+          const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
+          const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
+          if (isJobsPresent) {
+            if (Piechart.enabled) {
+              dispatch(pieChartCount())
+            }
+            dispatch(fetchJobs())
           }
-          dispatch(fetchJobs())
+          if (isLiveJob) {
+            dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
+          }
         }
-        if (isLiveJob) {
-          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: [],
+          syncStatus: 'OK',
+        }))
+        //Now schedule sync service which will run regularly after 2 mins
+        await dispatch(syncService(pieChart))
+        let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
+        if (_.isNull(serverReachable) || serverReachable.value == 2) {
+          await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
+          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
         }
       }
-      dispatch(setState(SYNC_STATUS, {
-        unsyncedTransactionList: [],
-        syncStatus: 'OK',
-      }))
-      //Now schedule sync service which will run regularly after 2 mins
-      await dispatch(syncService(pieChart))
-      let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-      if (_.isNull(serverReachable) || serverReachable.value == 2) {
-        await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
-        await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
-    }
-    }
-   } catch (error) {
+    } catch (error) {
       if (error.code == 500 || error.code == 502) {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -279,7 +287,7 @@ export function startMqttService(pieChart) {
 
 export function startTracking() {
   return async function (dispatch) {
-     trackingService.init()
+    trackingService.init()
   }
 }
 
@@ -316,6 +324,58 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
           await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
         }
       }
+    }
+  }
+}
+export function uploadUnsyncFiles(backupFilesList) {
+  return async function (dispatch) {
+    try {
+      const failCount = 0, successCount = 0
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      if (!token) {
+        throw new Error('Token Missing')
+      }
+      for (let backupFile of backupFilesList) {
+        try {
+          //let responseBody = 'Fail'
+          let responseBody = await RestAPIFactory(token.value).uploadZipFile(backupFile.path, backupFile.name)
+          if (responseBody && responseBody.split(",")[0] == 'success') {
+            await backupService.deleteBackupFile(null, null, backupFile.path)
+            successCount++
+            dispatch(setState(SET_UPLOAD_FILE_COUNT, successCount))
+          } else {
+            failCount++
+          }
+        } catch (error) {
+          failCount++
+        }
+      }
+      if (failCount > 0) {
+        dispatch(setState(SET_FAIL_UPLOAD_COUNT, failCount))
+      } else {
+        dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 2))
+        setTimeout(() => {
+          dispatch(autoLogoutAfterUpload(true))
+        }, 1000)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+export function readAndUploadFiles() {
+  return async function (dispatch) {
+    try {
+      dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 0))
+      dispatch(setState(SET_FAIL_UPLOAD_COUNT, 0))
+      const user = await keyValueDBService.getValueFromStore(USER)
+      let backupFilesList = await backupService.checkForUnsyncBackup(user)
+      dispatch(setState(SET_BACKUP_FILES_LIST, backupFilesList))
+      if (backupFilesList.length > 0) {
+        dispatch(uploadUnsyncFiles(backupFilesList))
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 }

@@ -11,7 +11,11 @@ import {
   RESET_STATE,
   LAST_SYNC_TIME,
   TOGGLE_LOGOUT,
-  SET_UNSYNC_TRANSACTION_PRESENT
+  SET_UNSYNC_TRANSACTION_PRESENT,
+  SET_BACKUP_UPLOAD_VIEW,
+  SET_UPLOAD_FILE_COUNT,
+  SET_FAIL_UPLOAD_COUNT,
+  SET_BACKUP_FILES_LIST
 } from '../../lib/constants'
 
 
@@ -48,6 +52,18 @@ export default function homeReducer(state = initialState, action) {
 
     case SET_UNSYNC_TRANSACTION_PRESENT:
       return state.set('isUnsyncTransactionOnLogout', action.payload)
+
+    case SET_BACKUP_UPLOAD_VIEW:
+      return state.set('backupUploadView', action.payload)
+
+    case SET_UPLOAD_FILE_COUNT:
+      return state.set('uploadingFileCount', action.payload)
+
+    case SET_FAIL_UPLOAD_COUNT:
+      return state.set('failedUploadCount', action.payload)
+
+    case SET_BACKUP_FILES_LIST:
+      return state.set('unsyncBackupFilesList', action.payload)
   }
 
   return state

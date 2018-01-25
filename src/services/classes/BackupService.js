@@ -92,6 +92,7 @@ class Backup {
         RNFS.mkdir(PATH_BACKUP);
         RNFS.mkdir(PATH_BACKUP_TEMP);
         let json = await this.getJsonData(user.value.lastLoginTime)
+        console.log('jsonbackup', json)
         if (!json) return
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_BACKUP_TEMP + '/logs.json', json, 'utf8');
@@ -217,13 +218,11 @@ class Backup {
     }
     async moveImageFilesToBackup(fieldDataList) {
         let fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-        console.log('fieldAttributes', fieldAttributes)
         if (!fieldAttributes || !fieldAttributes.value) return
         let fieldAttributesWithImage = fieldAttributes.value.filter(fieldData => fieldData.attributeTypeId == SIGNATURE ||
             fieldData.attributeTypeId == CAMERA || fieldData.attributeTypeId == CAMERA_HIGH
             || fieldData.attributeTypeId == CAMERA_MEDIUM)
         let masterIdToAttributeMap = _.mapKeys(fieldAttributesWithImage, 'id')
-        console.log('masterIdToAttributeMap', masterIdToAttributeMap)
         let imageFileNamesArray = []
         for (let fieldData of fieldDataList) {
             if (masterIdToAttributeMap[fieldData.fieldAttributeMasterId] && fieldData.value && fieldData.value != '') {
@@ -237,10 +236,12 @@ class Backup {
                 await RNFS.copyFile(PATH + '/CustomerImages/' + name[name.length - 1], PATH_BACKUP_TEMP + '/' + name[name.length - 1])
         }
     }
-    async deleteBackupFile(index, filesMap) {
+    async deleteBackupFile(index, filesMap, path) {
         try {
-            if (filesMap[index]) {
+            if (filesMap && filesMap[index]) {
                 await RNFS.unlink(filesMap[index].path)
+            } else if (path) {
+                await RNFS.unlink(path)
             }
         } catch (error) {
             console.log(error)
@@ -255,6 +256,25 @@ class Backup {
                 await RNFS.unlink(backUpFile.path)
             }
         }
+    }
+    async checkForUnsyncBackup(user) {
+        let unsyncBackupFilesList = []
+        if (!user || !user.value) return unsyncBackupFilesList
+        RNFS.mkdir(PATH_BACKUP);
+        let backUpFilesInfo = await RNFS.readDir(PATH_BACKUP)
+        for (let backUpFile of backUpFilesInfo) {
+            let fileName = backUpFile.name
+            const domain = CONFIG.FAREYE.staging.url.split('//')[1].split('.')[0]
+            let fileNameArray = fileName.split('_')
+            let fileDomainInfo = fileNameArray[0]
+            let employeeCode = fileName.substring(fileName.indexOf(fileNameArray[2]), _.size(fileName) - 4)
+            if (fileDomainInfo.split('-')[0] == domain && employeeCode.split('_')[1] == user.value.company.code) {
+                if (fileDomainInfo.split('-')[1] == 'UnSyncbackup') {
+                    unsyncBackupFilesList.push(backUpFile)
+                }
+            }
+        }
+        return unsyncBackupFilesList
     }
 }
 

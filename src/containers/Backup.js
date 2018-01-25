@@ -80,6 +80,7 @@ class Backup extends Component {
         }
     }
     componentDidMount() {
+        this.props.actions.setState(SET_BACKUP_VIEW, 0)
         this.props.actions.getBackupList()
     }
 
@@ -456,7 +457,7 @@ class Backup extends Component {
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
-                    <View style={[styles.marginTop30, styles.alignCenter]}>
+                    {/* <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
                             onPress={() => {
                                 this.props.actions.setState(SET_BACKUP_VIEW, 0)
@@ -464,7 +465,7 @@ class Backup extends Component {
                             }}  >
                             <Text style={[styles.fontPrimary]}>Close</Text>
                         </Button>
-                    </View>
+                    </View> */}
                 </View>
             </View>
         }
@@ -497,6 +498,20 @@ class Backup extends Component {
         }
 
     }
+    getLogoutView() {
+        if (this.props.backupView == 4) {
+            return <View style={[styles.flex1, styles.justifySpaceBetween]}>
+                <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
+                    <Loader />
+                    <Text style={[styles.fontBlack, styles.marginTop30]}>
+                        Logging out
+                    </Text>
+                </View>
+
+            </View>
+        }
+
+    }
     render() {
         let headerView = this.headerView()
         let loader = this.getLoader()
@@ -509,7 +524,7 @@ class Backup extends Component {
         let uploadView = this.uploadingView()
         let uploadSuccessView = this.uploadSuccessView()
         let uploadFailureView = this.failureView()
-        // if (this.props.uploadView)
+        let logoutView = this.getLogoutView()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -518,6 +533,7 @@ class Backup extends Component {
                     {uploadView}
                     {uploadSuccessView}
                     {uploadFailureView}
+                    {logoutView}
                     {renderIf(this.props.backupView == 0, <Content style={[styles.bgLightGray]}>
                         {backupButton}
                         {modalView}

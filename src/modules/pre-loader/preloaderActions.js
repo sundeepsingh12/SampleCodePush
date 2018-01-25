@@ -73,7 +73,8 @@ import {
   TOGGLE_LOGOUT,
   OTP_SUCCESS,
   PENDING_SYNC_TRANSACTION_IDS,
-  SET_UNSYNC_TRANSACTION_PRESENT
+  SET_UNSYNC_TRANSACTION_PRESENT,
+  UnsyncBackupUpload
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -457,7 +458,12 @@ export function checkAsset() {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
         dispatch(preloaderSuccess())
-        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user)
+        if (unsyncBackupFilesList.length > 0) {
+          dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
+        } else {
+          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        }
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer());
@@ -567,7 +573,6 @@ export function checkForUnsyncTransactionAndLogout() {
     try {
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
-      console.log('isUnsyncTransactionsPresent', isUnsyncTransactionsPresent)
       if (isUnsyncTransactionsPresent) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {

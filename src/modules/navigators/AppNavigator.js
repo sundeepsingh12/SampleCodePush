@@ -93,6 +93,7 @@ import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import JobMaster from '../../containers/JobMaster'
 import AutoLogout from '../../containers/AutoLogout'
 import Backup from '../../containers/Backup'
+import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -118,6 +119,7 @@ class AppWithNavigationState extends React.PureComponent {
     switch (route.routeName) {
       case ApplicationScreen:
       case LoginScreen:
+      case 'UnsyncBackupUpload':
       case PreloaderScreen: return false
       case HomeTabNavigatorScreen: {
         if (route.routes[route.index].routeName == HomeScreen) {
@@ -445,6 +447,13 @@ export const AppNavigator = StackNavigator({
   },
   SequenceRunsheetList: {
     screen: SequenceRunsheetList
+  },
+  UnsyncBackupUpload: {
+    screen: UnsyncBackupUpload,
+    navigationOptions: {
+      header: null,
+      gesturesEnabled: false
+    }
   }
 },
   {

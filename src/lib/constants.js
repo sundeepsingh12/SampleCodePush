@@ -88,6 +88,10 @@ module.exports = keyMirror({
     TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
     SET_UNSYNC_TRANSACTION_PRESENT: null,
+    SET_BACKUP_UPLOAD_VIEW: null,
+    SET_UPLOAD_FILE_COUNT: null,
+    SET_FAIL_UPLOAD_COUNT: null,
+    SET_BACKUP_FILES_LIST: null,
 
     //Home Container
     PIECHART: null,
@@ -270,6 +274,7 @@ module.exports = keyMirror({
     SplitPayment: null,
     Payment: null,
     SequenceRunsheetList: null,
+    UnsyncBackupUpload: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,

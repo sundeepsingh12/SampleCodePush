@@ -108,7 +108,11 @@ var InitialState = Record({
     count: null,
     lastSyncTime: null,
     isLoggingOut: false,
-    isUnsyncTransactionOnLogout: false
+    isUnsyncTransactionOnLogout: false,
+    backupUploadView: 0,
+    uploadingFileCount: 0,
+    failedUploadCount: 0,
+    unsyncBackupFilesList: []
 })
 
 export default InitialState
