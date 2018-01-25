@@ -186,17 +186,15 @@ class RestAPI {
   }
 
   async uploadZipFile() {
-    // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
-    // console.log('jid',jid)
+    // const jid = this._sessionToken.split(';')[0].split('=')[1]
     var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
     let responseBody = "Fail"
     await RNFetchBlob.fetch('POST', this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API, {
-      Authorization: this._sessionToken,
+      'cookie': this._sessionToken,
       'Content-Type': 'multipart/form-data',
     }, [
-        { name: 'file', filename: 'sync.zip', type: '*/*', data: RNFetchBlob.wrap(PATH + '/sync.zip') },
+        { name: 'file', filename: 'sync.zip',  data: RNFetchBlob.wrap(PATH + '/sync.zip') },
       ]).uploadProgress((written, total) => {
-        console.log('uploaded', written / total)
       }).then(async (resp) => {
         responseBody = resp.text()
         const message = responseBody.split(",")[0]
