@@ -192,12 +192,11 @@ class RestAPI {
     var filePath = (!path) ? PATH + '/sync.zip' : PATH
     let responseBody = "Fail"
     await RNFetchBlob.fetch('POST', this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API, {
-      Authorization: this._sessionToken,
+      'cookie': this._sessionToken,
       'Content-Type': 'multipart/form-data',
     }, [
-        { name: 'file', filename: (!fileName) ? 'sync.zip' : fileName, type: '*/*', data: RNFetchBlob.wrap(filePath) },
+        { name: 'file', filename: (!fileName) ? 'sync.zip' : fileName, data: RNFetchBlob.wrap(filePath) },
       ]).uploadProgress((written, total) => {
-        console.log('uploaded', written / total)
       }).then(async (resp) => {
         if (!path) {
           responseBody = resp.text()

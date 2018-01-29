@@ -61,8 +61,7 @@ export async function createZip(transactionIdToBeSynced) {
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-    const userSummaryValue = userSummary.value
-    SYNC_RESULTS.userSummary = userSummaryValue || {}
+    SYNC_RESULTS.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
     console.log(JSON.stringify(SYNC_RESULTS));
 
     //Writing Object to File at TEMP location
