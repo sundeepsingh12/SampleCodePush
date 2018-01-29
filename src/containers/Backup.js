@@ -247,13 +247,20 @@ class Backup extends Component {
         }
 
     }
+    renderList() {
+       let syncedFiles= Object.values(this.props.syncedFiles)
+        const list = syncedFiles.sort((transaction1, transaction2) =>
+          transaction2.id - transaction1.id
+        )
+        return list
+      }
     getSyncedFilesView() {
         let flatListView
         let emptyListView
         if (this.props.isLoading || this.props.backupView != 0) return
         if (!this.props.isLoading && !_.isEmpty(this.props.syncedFiles)) {
             flatListView = < FlatList
-                data={Object.values(this.props.syncedFiles)}
+                data={this.renderList()}
                 renderItem={({ item }) => this.renderSyncedData(item)
                 }
                 keyExtractor={item => item.id}
