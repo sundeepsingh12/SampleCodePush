@@ -59,6 +59,8 @@ import {
     CONTACT_NUMBER,
     ARRAY_SAROJ_FAREYE,
     OBJECT_SAROJ_FAREYE,
+    BEFORE,
+    AFTER
 } from '../lib/AttributeConstants'
 
 import {
@@ -98,7 +100,7 @@ class BasicFormElement extends PureComponent {
     navigateToScene = (item) => {
         let screenName = ''
         let cash = 0
-        this.props.actions.fieldValidations(item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
+        this.props.actions.fieldValidations(item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
@@ -165,6 +167,7 @@ class BasicFormElement extends PureComponent {
                 isSaveDisabled: this.props.isSaveDisabled,
                 cash: cash,
                 returnData: this._searchForReferenceValue.bind(this),
+                fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
             }
         )
     }
@@ -174,7 +177,7 @@ class BasicFormElement extends PureComponent {
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
         if (currentElement && !currentElement.displayValue && currentElement.attributeTypeId == 62) {
             currentElement.editable = false
             Keyboard.dismiss();
@@ -186,12 +189,12 @@ class BasicFormElement extends PureComponent {
         if (currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == QR_SCAN) {
             this.props.actions.checkUniqueValidationThenSave(currentElement, this.props.formElement, this.props.isSaveDisabled, currentElement.displayValue, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction)
         }
-        this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction)
+        this.props.actions.fieldValidations(currentElement, this.props.formElement, AFTER, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, formElement, value, isSaveDisabled) {
         if (value.length < 2 && formElement.get(fieldAttributeMasterId).attributeTypeId != 62) {
-            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, null, this.props.jobTransaction);
+            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, null, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap);
         }
         else {
             this.props.actions.updateFieldData(fieldAttributeMasterId, value, formElement);
@@ -204,10 +207,10 @@ class BasicFormElement extends PureComponent {
                 selectFromListEnable: !this.state.selectFromListEnable
             }
         })
-        this.props.actions.fieldValidations(this.props.item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
+        this.props.actions.fieldValidations(this.props.item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
     }
     onSaveDateTime = (value) => {
-        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction);
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap);
         this.setState({ showDateTimePicker: false, showNPS: false })
         //  this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction, this.props.isSaveDisabled)
     }
@@ -231,11 +234,11 @@ class BasicFormElement extends PureComponent {
                 showNPS: true
             }
         })
-        this.props.actions.fieldValidations(this.props.item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
+        this.props.actions.fieldValidations(this.props.item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
     }
     _showDateTime = () => {
         this.setState({ showDateTimePicker: true })
-        this.props.actions.fieldValidations(this.props.item, this.props.formElement, 'Before', this.props.jobTransaction, this.props.isSaveDisabled)
+        this.props.actions.fieldValidations(this.props.item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
     }
 
     getComponentLabelStyle(focus, editable) {

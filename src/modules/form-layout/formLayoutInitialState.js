@@ -38,7 +38,8 @@ var InitialState = Record({
         paymentAtEnd: {},
         draftStatusId: null,
         updateDraft: false,
-        isFormValid: true
+        isFormValid: true,
+        fieldAttributeMasterParentIdMap: {},
 })
 
 export default InitialState

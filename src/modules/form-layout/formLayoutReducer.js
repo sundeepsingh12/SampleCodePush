@@ -72,6 +72,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('jobTransactionId', action.payload.jobTransactionId)
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('draftStatusId', action.payload.draftStatusId)
+                .set('fieldAttributeMasterParentIdMap',action.payload.fieldAttributeMasterParentIdMap)
         }
 
         /**
