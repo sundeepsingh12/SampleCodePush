@@ -12,7 +12,7 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import {
-    // SET_DATA_STORE_ATTR_MAP,
+    SET_FAIL_UPLOAD_COUNT
 } from '../lib/constants'
 import {
     Container,
@@ -33,9 +33,6 @@ import {
 import {
     //  EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
-import {
-
-} from '../lib/constants'
 import _ from 'lodash'
 
 function mapStateToProps(state) {
@@ -60,34 +57,17 @@ class UnsyncBackupUpload extends Component {
     constructor(props) {
         super(props);
     }
-    componentDidUpdate() {
-        // if (this.props.toastMessage && this.props.toastMessage != '') {
-        //     Toast.show({
-        //         text: this.props.toastMessage,
-        //         position: 'bottom',
-        //         buttonText: 'Okay',
-        //         duration: 5000
-        //     })
-        //     this.props.actions.setState(SET_BACKUP_TOAST, '')
-        // }
-    }
-    componentWillMount() {
-        this.props.actions.readAndUploadFiles()
+    componentDidMount() {
+        if (this.props.navigation.state.params && this.props.navigation.state.params > 0) {
+            this.props.actions.setState(SET_FAIL_UPLOAD_COUNT, this.props.navigation.state.params)
+        } else {
+            this.props.actions.readAndUploadFiles()
+        }
     }
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
 
-    goBack = () => {
-        this.props.navigation.goBack()
-    }
-    getLoader() {
-        let loader
-        if (this.props.isLoading) {
-            loader = <Loader />
-        }
-        return loader
-    }
     uploadSuccessView() {
         if (this.props.backupUploadView == 2) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
@@ -122,6 +102,7 @@ class UnsyncBackupUpload extends Component {
                         <Button transparent style={StyleSheet.flatten([styles.padding10, styles.bgLightGray])}
                             onPress={() => {
                                 this.props.actions.readAndUploadFiles()
+                                this.props.actions.resetFailCountInStore()
                             }}  >
                             <Text style={[styles.fontBlack]}>Try Again</Text>
                         </Button>
@@ -130,6 +111,7 @@ class UnsyncBackupUpload extends Component {
                         <Button transparent style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}
                             onPress={() => {
                                 this.props.actions.navigateToScene('HomeTabNavigatorScreen')
+                                this.props.actions.resetFailCountInStore()
                             }}  >
                             <Text style={[styles.fontPrimary, styles.fontXl]}>Continue</Text>
                         </Button>

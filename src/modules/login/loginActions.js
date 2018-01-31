@@ -29,7 +29,9 @@ import {
   SET_LOADER_IN_AUTOLOGOUT,
   USER,
   ON_LONG_PRESS_ICON,
-  RESET_STATE
+  RESET_STATE,
+  BACKUP_UPLOAD_FAIL_COUNT,
+  UnsyncBackupUpload
 } from '../../lib/constants'
 
 import RestAPIFactory from '../../lib/RestAPIFactory'
@@ -202,7 +204,7 @@ export function onLongPressResetSettings() {
       let allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
       await keyValueDBService.deleteValueFromStore(allSchemaInstance)
       dispatch(setState(RESET_STATE))
-      dispatch(onLongPressIcon(false))  
+      dispatch(onLongPressIcon(false))
     } catch (error) {
       dispatch(onLongPressIcon(false))
       console.log(erroe)
@@ -256,15 +258,26 @@ export function getSessionToken() {
     try {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const isPreloaderComplete = await keyValueDBService.getValueFromStore(IS_PRELOADER_COMPLETE)
-      const userData = await keyValueDBService.getValueFromStore(USER) 
-      if(userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && isPreloaderComplete){      
-          dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen}))
-      }else{
-        if (token && isPreloaderComplete && isPreloaderComplete.value) {
+      const userData = await keyValueDBService.getValueFromStore(USER)
+      const backupUploadFailCount = await keyValueDBService.getValueFromStore(BACKUP_UPLOAD_FAIL_COUNT)
+      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')) && isPreloaderComplete) {
+        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
+      } else {
+        if (token && isPreloaderComplete && isPreloaderComplete.value && backupUploadFailCount && backupUploadFailCount.value > 0) {
           dispatch(NavigationActions.navigate({
-            routeName: HomeTabNavigatorScreen
+            routeName: UnsyncBackupUpload,
+            params: backupUploadFailCount.value
           }))
-        } else if (token) {
+        }
+        else if (token && isPreloaderComplete && isPreloaderComplete.value) {
+          dispatch(NavigationActions.reset({
+            index: 0,
+            actions: [
+              NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+            ]
+          }))
+        }
+        else if (token) {
           dispatch(NavigationActions.navigate({
             routeName: PreloaderScreen
           }))

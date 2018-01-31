@@ -25,7 +25,8 @@ import {
   SET_BACKUP_UPLOAD_VIEW,
   SET_UPLOAD_FILE_COUNT,
   SET_FAIL_UPLOAD_COUNT,
-  SET_BACKUP_FILES_LIST
+  SET_BACKUP_FILES_LIST,
+  BACKUP_UPLOAD_FAIL_COUNT
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -352,6 +353,7 @@ export function uploadUnsyncFiles(backupFilesList) {
       }
       if (failCount > 0) {
         dispatch(setState(SET_FAIL_UPLOAD_COUNT, failCount))
+        await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, failCount)
       } else {
         dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 2))
         setTimeout(() => {
@@ -374,6 +376,15 @@ export function readAndUploadFiles() {
       if (backupFilesList.length > 0) {
         dispatch(uploadUnsyncFiles(backupFilesList))
       }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+export function resetFailCountInStore() {
+  return async function (dispatch) {
+    try {
+      await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
     } catch (error) {
       console.log(error)
     }

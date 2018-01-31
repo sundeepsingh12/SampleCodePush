@@ -31,8 +31,16 @@ import {
     Toast
 } from 'native-base'
 import {
-    //  EXTERNAL_DATA_STORE,
-} from '../lib/AttributeConstants'
+    BACKUP_ALERT_MESSAGE,
+    BACKUP_ALERT_TITLE,
+    FILE_CREATED,
+    EMPLOYEE_CODE,
+    FILE_SIZE,
+    NEW,
+    UNSYNCED_FILES,
+    SYNCED_FILES,
+    CREATE_BACKUP_BUTTON
+} from '../lib/ContainerConstants'
 import {
     SET_BACKUP_VIEW,
     SET_BACKUP_TOAST
@@ -100,8 +108,8 @@ class Backup extends Component {
         return (
             <View>
                 {Alert.alert(
-                    'Manual Backup',
-                    'Do you want to create backup manually?',
+                    BACKUP_ALERT_TITLE,
+                    BACKUP_ALERT_MESSAGE,
                     _buttons,
                     { cancelable: false }
                 )}
@@ -115,68 +123,13 @@ class Backup extends Component {
         }
         return loader
     }
-    renderUnsyncedData = (item) => {
-        return (
-            <View style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
-                < View style={[styles.padding10, styles.row]} >
-                    <View style={{ width: '40%' }}>
-                        <Text>
-                            File Created
-                        </Text>
-                    </View>
-                    <View style={{ width: '50%' }}>
-                        <Text>
-                            {item.creationDate}
-                        </Text>
-                    </View>
-                    <View style={{ width: '10%' }}>
-                        <Icon onPress={() => this.setState({ indexOfModal: item.id })} size={10} style={{ height: 20, alignSelf: 'flex-end' }} name="ios-more" />
-                    </View>
-                </View >
-                <View style={[styles.padding10, styles.row]}>
-                    <View style={{ width: '40%' }}>
-                        <Text>
-                            Employee Code
-                                    </Text>
-                    </View>
-                    <View style={{ width: '50%' }}>
-                        <Text>
-                            {item.employeeCode}
-                        </Text>
-                    </View>
-                    <View style={{ width: '10%' }}>
-
-                    </View>
-                </View>
-                <View style={[styles.padding10, styles.row]}>
-                    <View style={{ width: '40%' }}>
-                        <Text>
-                            File Size
-                                    </Text>
-                    </View>
-                    <View style={{ width: '50%' }}>
-                        <Text>
-                            {item.size} kb
-                        </Text>
-                    </View>
-                    <View style={{ width: '10%' }}>
-                        {/* <View style={[styles.alignCenter, { backgroundColor: '#F6DF80', borderRadius: 3, padding: 3 }]}>
-                            <Text style={[styles.fontWhite, { fontSize: 11 }]}>
-                                New
-                        </Text>
-                        </View> */}
-                    </View>
-                </View>
-            </View>
-        )
-    }
     renderSyncedData = (item) => {
         return (
             <View style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
                 < View style={[styles.padding10, styles.row]} >
                     <View style={{ width: '40%' }}>
                         <Text>
-                            File Created
+                            {FILE_CREATED}
                         </Text>
                     </View>
                     <View style={{ width: '50%' }}>
@@ -191,8 +144,8 @@ class Backup extends Component {
                 <View style={[styles.padding10, styles.row]}>
                     <View style={{ width: '40%' }}>
                         <Text>
-                            Employee Code
-                                    </Text>
+                            {EMPLOYEE_CODE}
+                        </Text>
                     </View>
                     <View style={{ width: '50%' }}>
                         <Text>
@@ -206,8 +159,8 @@ class Backup extends Component {
                 <View style={[styles.padding10, styles.row]}>
                     <View style={{ width: '40%' }}>
                         <Text>
-                            File Size
-                                    </Text>
+                            {FILE_SIZE}
+                        </Text>
                     </View>
                     <View style={{ width: '50%' }}>
                         <Text>
@@ -217,10 +170,9 @@ class Backup extends Component {
                     <View style={{ width: '10%' }}>
                         {renderIf(item.isNew, <View style={[styles.alignCenter, { backgroundColor: '#F6DF80', borderRadius: 3, padding: 3 }]}>
                             <Text style={[styles.fontWhite, { fontSize: 11 }]}>
-                                New
-                        </Text>
+                                {NEW}
+                            </Text>
                         </View>)}
-
                     </View>
                 </View>
             </View>
@@ -233,7 +185,7 @@ class Backup extends Component {
         if (!this.props.isLoading && !_.isEmpty(this.props.unSyncedFiles)) {
             flatListView = < FlatList
                 data={Object.values(this.props.unSyncedFiles)}
-                renderItem={({ item }) => this.renderUnsyncedData(item)
+                renderItem={({ item }) => this.renderSyncedData(item)
                 }
                 keyExtractor={item => item.id}
             />
@@ -248,12 +200,12 @@ class Backup extends Component {
 
     }
     renderList() {
-       let syncedFiles= Object.values(this.props.syncedFiles)
+        let syncedFiles = Object.values(this.props.syncedFiles)
         const list = syncedFiles.sort((transaction1, transaction2) =>
-          transaction2.id - transaction1.id
+            transaction2.id - transaction1.id
         )
         return list
-      }
+    }
     getSyncedFilesView() {
         let flatListView
         let emptyListView
@@ -368,7 +320,7 @@ class Backup extends Component {
         if (!this.props.isLoading) {
             view = <View style={[styles.padding10, { borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
                 <Text style={[styles.fontLg, styles.fontBlack]}>
-                    Unsynced Files
+                    {UNSYNCED_FILES}
                 </Text>
             </View>
         }
@@ -380,8 +332,8 @@ class Backup extends Component {
         if (!this.props.isLoading) {
             view = <View style={[styles.padding10, { borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
                 <Text style={[styles.fontLg, styles.fontBlack]}>
-                    Synced Files
-                                </Text>
+                    {SYNCED_FILES}
+                </Text>
             </View>
         }
         return view
@@ -398,8 +350,8 @@ class Backup extends Component {
                     < View style={[styles.padding5, styles.row]} >
                         <View style={{ width: '40%' }}>
                             <Text>
-                                File Created
-                        </Text>
+                                {FILE_CREATED}
+                            </Text>
                         </View>
                         <View style={{ width: '50%' }}>
                             <Text>
@@ -410,8 +362,8 @@ class Backup extends Component {
                     <View style={[styles.padding5, styles.row]}>
                         <View style={{ width: '40%' }}>
                             <Text>
-                                Employee Code
-                                    </Text>
+                                {EMPLOYEE_CODE}
+                            </Text>
                         </View>
                         <View style={{ width: '50%' }}>
                             <Text>
@@ -425,8 +377,8 @@ class Backup extends Component {
                     <View style={[styles.padding5, styles.row]}>
                         <View style={{ width: '40%' }}>
                             <Text>
-                                File Size
-                                    </Text>
+                                {FILE_SIZE}
+                            </Text>
                         </View>
                         <View style={{ width: '50%' }}>
                             <Text>
@@ -444,8 +396,8 @@ class Backup extends Component {
             <View style={[styles.padding15]}>
                 <Button full style={[styles.bgWhite]} onPress={this.createBackupPressed}>
                     <Text style={[styles.fontPrimary]}>
-                        + Create Backup
-                                </Text>
+                        {CREATE_BACKUP_BUTTON}
+                    </Text>
                 </Button>
             </View>
         return button
@@ -463,16 +415,6 @@ class Backup extends Component {
                     </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
-
-                    {/* <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
-                            onPress={() => {
-                                this.props.actions.setState(SET_BACKUP_VIEW, 0)
-                                this.setState({ indexOfModal: 0 })
-                            }}  >
-                            <Text style={[styles.fontPrimary]}>Close</Text>
-                        </Button>
-                    </View> */}
                 </View>
             </View>
         }

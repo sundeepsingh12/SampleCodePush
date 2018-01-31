@@ -486,6 +486,7 @@ export function checkIfSimValidOnServer() {
       let deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
       let deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      const user = await keyValueDBService.getValueFromStore(USER)
       const response = await deviceVerificationService.checkAssetAPI(deviceIMEI.value, deviceSIM.value, token)
       if (!response)
         throw new Error('No response returned from server')
@@ -500,7 +501,12 @@ export function checkIfSimValidOnServer() {
       if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
-        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user)
+        if (unsyncBackupFilesList.length > 0) {
+          dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
+        } else {
+          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        }
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
         dispatch(showMobileNumber())
@@ -551,6 +557,7 @@ export function validateOtp(otpNumber) {
     try {
       dispatch(optValidationStart())
       const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
+      const user = await keyValueDBService.getValueFromStore(USER)
       const otpNoFromStore = deviceSIM.value.otpNumber;
       if (otpNumber != otpNoFromStore) {
         throw new Error('Please enter valid OTP')
@@ -560,7 +567,12 @@ export function validateOtp(otpNumber) {
       await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
       await keyValueDBService.deleteValueFromStore(IS_SHOW_OTP_SCREEN)
       dispatch(setState(OTP_SUCCESS))
-      dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+      let unsyncBackupFilesList = await backupService.checkForUnsyncBackup(user)
+      if (unsyncBackupFilesList.length > 0) {
+        dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
+      } else {
+        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+      }
     } catch (error) {
       dispatch(otpValidationFailure(error.message))
     }

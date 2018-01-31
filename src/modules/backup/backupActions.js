@@ -20,19 +20,22 @@ import { logoutService } from '../../services/classes/Logout'
 import { preLogoutRequest, preLogoutSuccess, } from '../pre-loader/preloaderActions'
 import { NavigationActions } from 'react-navigation'
 import { authenticationService } from '../../services/classes/Authentication'
-
+import {
+    USER_MISSING,
+    TOKEN_MISSING,
+    FILE_MISSING,
+} from '../../lib/ContainerConstants'
 export function createManualBackup(syncedBackupFiles) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_BACKUP, true))
             const user = await keyValueDBService.getValueFromStore(USER)
-            if (!user || !user.value) throw new Error('User Missing')
+            if (!user || !user.value) throw new Error(USER_MISSING)
             let backupFiles = JSON.parse(JSON.stringify(syncedBackupFiles))
             let backupFilesAndToastMessage = await backupService.createManualBackup(user, backupFiles)
             if (backupFilesAndToastMessage) {
                 dispatch(setState(SET_SYNCED_FILES, backupFilesAndToastMessage))
             }
-            //dispatch(setState(SET_LOADER_BACKUP, false))
         } catch (error) {
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
@@ -44,7 +47,7 @@ export function getBackupList() {
         try {
             dispatch(setState(SET_LOADER_BACKUP, true))
             const user = await keyValueDBService.getValueFromStore(USER)
-            if (!user || !user.value) throw new Error('User Missing')
+            if (!user || !user.value) throw new Error(USER_MISSING)
             let backupFiles = await backupService.getBackupFilesList(user.value)
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
@@ -55,14 +58,13 @@ export function getBackupList() {
 export function uploadBackupFile(index, filesMap) {
     return async function (dispatch) {
         try {
-            if (!filesMap[index]) throw new Error('File Missing')
+            if (!filesMap[index]) throw new Error(FILE_MISSING)
             dispatch(setState(SET_UPLOADING_FILE, filesMap[index]))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             if (!token) {
-                throw new Error('Token Missing')
+                throw new Error(TOKEN_MISSING)
             }
             let responseBody = await RestAPIFactory(token.value).uploadZipFile(filesMap[index].path, filesMap[index].name)
-            //console.log('tset', responseBody)
             if (responseBody && responseBody.split(",")[0] == 'success') {
                 dispatch(setState(SET_BACKUP_VIEW, 2))
                 if (index < 0) {
@@ -84,9 +86,9 @@ export function deleteBackupFile(index, filesMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_BACKUP, true))
-            if (!filesMap[index]) throw new Error('File Missing')
+            if (!filesMap[index]) throw new Error(FILE_MISSING)
             const user = await keyValueDBService.getValueFromStore(USER)
-            if (!user || !user.value) throw new Error('User Missing')
+            if (!user || !user.value) throw new Error(USER_MISSING)
             await backupService.deleteBackupFile(index, filesMap)
             let backupFiles = await backupService.getBackupFilesList(user.value)
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
@@ -115,7 +117,6 @@ export function autoLogoutAfterUpload(calledFromHome) {
         } catch (error) {
             console.log(error)
             dispatch(setState(SET_BACKUP_VIEW, 0))
-            // dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
 }

@@ -186,6 +186,7 @@ module.exports = keyMirror({
     LAST_JOB_COMPLETED_TIME: null,
     SHOULD_RELOAD_START: null,
     SHOULD_CREATE_BACKUP: null,
+    BACKUP_UPLOAD_FAIL_COUNT: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

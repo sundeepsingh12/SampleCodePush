@@ -27,17 +27,16 @@ import {
     unzip
 } from 'react-native-zip-archive'
 import _ from 'lodash'
+import { moveImageFilesToSync, _getDataFromRealm } from './SyncZip'
+import {
+    USER_MISSING,
+    BACKUP_CREATED_SUCCESS_TOAST,
+    BACKUP_ALREADY_EXISTS
+} from '../../lib/ContainerConstants'
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
 var PATH_BACKUP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUP';
 var PATH_BACKUP_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/BACKUPTEMP';
-import {
-    SIGNATURE,
-    CAMERA,
-    CAMERA_HIGH,
-    CAMERA_MEDIUM,
-    SIGNATURE_AND_FEEDBACK
-} from '../../lib/AttributeConstants'
 
 class Backup {
     async createBackupOnLogout() {
@@ -45,12 +44,12 @@ class Backup {
         await this.createSyncedBackup(user)
         await this.createUnsyncBackupIfNeeded(user)
         await this.deleteOldBackup()
+        await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(true))
     }
     async createUnsyncBackupIfNeeded(user) {
-        if (!user || !user.value) throw new Error('user missing')
+        if (!user || !user.value) throw new Error(USER_MISSING)
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         let isUnsyncTransactionPresent = await logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
-        // console.log(isUnsyncTransactionPresent)
         if (isUnsyncTransactionPresent) {
             let backupFileName = this.getBackupFileName(user.value, true)
             let syncFilePath = PATH + '/sync.zip'
@@ -62,11 +61,10 @@ class Backup {
             const sourcePath = PATH_BACKUP_TEMP
             await zip(sourcePath, targetPath);
             await RNFS.unlink(PATH_BACKUP_TEMP)
-            console.log('backup created', backupFileName)
         }
     }
     async createSyncedBackup(user) {
-        if (!user || !user.value) throw new Error('user missing')
+        if (!user || !user.value) throw new Error(USER_MISSING)
         RNFS.mkdir(PATH);
         RNFS.mkdir(PATH_BACKUP);
         RNFS.mkdir(PATH_BACKUP_TEMP);
@@ -80,28 +78,14 @@ class Backup {
         const sourcePath = PATH_BACKUP_TEMP
         await zip(sourcePath, targetPath);
         await RNFS.unlink(PATH_BACKUP_TEMP)
+        return backupFileName
     }
     async createManualBackup(user, syncedBackupFiles) {
-        if (!user || !user.value) throw new Error('user missing')
         let shouldCreateBackup = await keyValueDBService.getValueFromStore(SHOULD_CREATE_BACKUP)
-        console.log('shouldCreateBackup', shouldCreateBackup)
         if (shouldCreateBackup && shouldCreateBackup.value) {
-            return { syncedBackupFiles, toastMessage: 'Backup already exists for this data' }
+            return { syncedBackupFiles, toastMessage: BACKUP_ALREADY_EXISTS }
         }
-        RNFS.mkdir(PATH);
-        RNFS.mkdir(PATH_BACKUP);
-        RNFS.mkdir(PATH_BACKUP_TEMP);
-        let json = await this.getJsonData(user.value.lastLoginTime)
-        console.log('jsonbackup', json)
-        if (!json) return
-        //Writing Object to File at TEMP location
-        await RNFS.writeFile(PATH_BACKUP_TEMP + '/logs.json', json, 'utf8');
-        const backupFileName = this.getBackupFileName(user.value)
-        //Creating ZIP file
-        const targetPath = PATH_BACKUP + '/' + backupFileName
-        const sourcePath = PATH_BACKUP_TEMP
-        await zip(sourcePath, targetPath);
-        await RNFS.unlink(PATH_BACKUP_TEMP)
+        let backupFileName = await this.createSyncedBackup(user)
         if (syncedBackupFiles) {
             var stat = await RNFS.stat(PATH_BACKUP + '/' + backupFileName);
             let fileNameArray = backupFileName.split('_')
@@ -109,7 +93,7 @@ class Backup {
             let syncedBackupFile = this.setBackupFileDto(backupFileName, fileNameArray[1], stat.size, stat.path, user.value.employeeCode, id, true)
             syncedBackupFiles[id] = syncedBackupFile
             await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(true))
-            return { syncedBackupFiles, toastMessage: 'Backup created successfully' }
+            return { syncedBackupFiles, toastMessage: BACKUP_CREATED_SUCCESS_TOAST }
         }
     }
     getBackupFileName(user, isUnsyncBackup) {
@@ -121,7 +105,7 @@ class Backup {
     async getJsonData(dateTime) {
         let statusIdForDeliveredCode = await jobStatusService.getNonDeliveredStatusIds()
         let transactionQuery = statusIdForDeliveredCode.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-        let transactionList = this._getDataFromRealm([], transactionQuery, TABLE_JOB_TRANSACTION);
+        let transactionList = _getDataFromRealm([], transactionQuery, TABLE_JOB_TRANSACTION);
         let json = await this._getSyncDataFromDb(transactionList, dateTime)
         return json
     }
@@ -133,14 +117,14 @@ class Backup {
             transactionLogs = [],
             trackLogs = []
         let fieldDataQuery = transactionList.map(transaction => 'jobTransactionId = ' + transaction.id).join(' OR ')
-        fieldDataList = this._getDataFromRealm([], fieldDataQuery, TABLE_FIELD_DATA);
+        fieldDataList = _getDataFromRealm([], fieldDataQuery, TABLE_FIELD_DATA);
         let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
-        jobList = this._getDataFromRealm([], jobIdQuery, TABLE_JOB);
-        serverSmsLogs = this._getDataFromRealm([], null, TABLE_SERVER_SMS_LOG);
+        jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB);
+        serverSmsLogs = _getDataFromRealm([], null, TABLE_SERVER_SMS_LOG);
         let transactionLogsQuery = transactionList.map(jobTransaction => 'transactionId = ' + jobTransaction.id).join(' OR ')
-        transactionLogs = this._getDataFromRealm([], transactionLogsQuery, TABLE_TRANSACTION_LOGS);
-        trackLogs = this._getDataFromRealm([], null, TABLE_TRACK_LOGS);
-        await this.moveImageFilesToBackup(fieldDataList)
+        transactionLogs = _getDataFromRealm([], transactionLogsQuery, TABLE_TRANSACTION_LOGS);
+        trackLogs = _getDataFromRealm([], null, TABLE_TRACK_LOGS);
+        await moveImageFilesToSync(fieldDataList, PATH_BACKUP_TEMP)
         BACKUP_JSON.fieldData = fieldDataList
         BACKUP_JSON.job = jobList
         BACKUP_JSON.jobTransaction = transactionList
@@ -167,9 +151,7 @@ class Backup {
             const domain = CONFIG.FAREYE.staging.url.split('//')[1].split('.')[0]
             let fileNameArray = fileName.split('_')
             let fileDomainInfo = fileNameArray[0]
-            // console.log(fileNameArray[2])
             let employeeCode = fileName.substring(fileName.indexOf(fileNameArray[2]), _.size(fileName) - 4)
-            //console.log(employeeCode)
             if (fileDomainInfo.split('-')[0] == domain && employeeCode.split('_')[1] == user.company.code) {
                 if (fileDomainInfo.split('-')[1] == 'backup') {
                     let syncedBackupFile = this.setBackupFileDto(fileName, fileNameArray[1], backUpFile.size, backUpFile.path, employeeCode, syncedIndex, false)
@@ -182,7 +164,6 @@ class Backup {
                 }
             }
         }
-
         return { unsyncedBackupFiles, syncedBackupFiles }
     }
     setBackupFileDto(fileName, creationDate, size, path, employeeCode, id, isNew) {
@@ -195,46 +176,6 @@ class Backup {
         syncedBackupFile.id = id
         syncedBackupFile.isNew = isNew
         return syncedBackupFile
-    }
-    _getDataFromRealm(dataType, query, table) {
-        if (!dataType || !table) {
-            return dataType;
-        }
-        let data = realm.getRecordListOnQuery(table, query);
-        if (!data) {
-            return dataType;
-        }
-        if (!Array.isArray(dataType)) {
-            return Object.assign(dataType, data);
-        }
-        if (table == TABLE_FIELD_DATA) {
-            return data.map(x => Object.assign({}, x, {
-                id: 0
-            })) // send id as 0 in case of field data
-        } else {
-            return data.map(x => Object.assign({}, x))
-        }
-
-    }
-    async moveImageFilesToBackup(fieldDataList) {
-        let fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-        if (!fieldAttributes || !fieldAttributes.value) return
-        let fieldAttributesWithImage = fieldAttributes.value.filter(fieldData => fieldData.attributeTypeId == SIGNATURE ||
-            fieldData.attributeTypeId == CAMERA || fieldData.attributeTypeId == CAMERA_HIGH
-            || fieldData.attributeTypeId == CAMERA_MEDIUM)
-        let masterIdToAttributeMap = _.mapKeys(fieldAttributesWithImage, 'id')
-        let imageFileNamesArray = []
-        for (let fieldData of fieldDataList) {
-            if (masterIdToAttributeMap[fieldData.fieldAttributeMasterId] && fieldData.value && fieldData.value != '') {
-                imageFileNamesArray.push(fieldData.value)
-            }
-        }
-        for (let imageName of imageFileNamesArray) {
-            let name = imageName.split('/')
-            let fileExits = await RNFS.exists(PATH + '/CustomerImages/' + name[name.length - 1])
-            if (fileExits)
-                await RNFS.copyFile(PATH + '/CustomerImages/' + name[name.length - 1], PATH_BACKUP_TEMP + '/' + name[name.length - 1])
-        }
     }
     async deleteBackupFile(index, filesMap, path) {
         try {
