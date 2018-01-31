@@ -108,4 +108,22 @@ module.exports = {
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
     COLLECTION_SOD: 'Collection-SOD',
+
+    //Backup Exceptions
+    USER_MISSING: 'user missing',
+
+    //Backup
+    BACKUP_CREATED_SUCCESS_TOAST: 'Backup created successfully',
+    BACKUP_ALREADY_EXISTS: 'Backup already exists for this data',
+    FILE_MISSING: 'File Missing',
+    BACKUP_ALERT_TITLE: 'Manual Backup',
+    BACKUP_ALERT_MESSAGE: 'Do you want to create backup manually?',
+    FILE_CREATED: 'File Created',
+    EMPLOYEE_CODE: 'Employee Code',
+    FILE_SIZE: 'File Size',
+    NEW: 'New',
+    UNSYNCED_FILES: 'Unsynced Files',
+    SYNCED_FILES: 'Synced Files',
+    CREATE_BACKUP_BUTTON: '+ Create Backup',
+
 }

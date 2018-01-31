@@ -22,14 +22,21 @@ import {
     TABLE_SERVER_SMS_LOG,
     TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
-    LAST_SYNC_WITH_SERVER
+    LAST_SYNC_WITH_SERVER,
+    FIELD_ATTRIBUTE
 
 } from '../../lib/constants'
 import moment from 'moment'
 import { trackingService } from './Tracking'
 import { userEventLogService } from './UserEvent'
 import { addServerSmsService } from './AddServerSms'
-
+import {
+    SIGNATURE,
+    CAMERA,
+    CAMERA_HIGH,
+    CAMERA_MEDIUM,
+    SIGNATURE_AND_FEEDBACK
+} from '../../lib/AttributeConstants'
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
@@ -63,7 +70,7 @@ export async function createZip(transactionIdToBeSynced) {
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     SYNC_RESULTS.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
     console.log(JSON.stringify(SYNC_RESULTS));
-
+    await moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP)
     //Writing Object to File at TEMP location
     await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');
 
@@ -71,7 +78,6 @@ export async function createZip(transactionIdToBeSynced) {
     const targetPath = PATH + '/sync.zip'
     const sourcePath = PATH_TEMP
     await zip(sourcePath, targetPath);
-    // await realm.deleteSpecificTableRecords(TABLE_SERVER_SMS_LOG)
     // await unzip(targetPath, PATH)
     // var content = await RNFS.readFile(PATH + '/logs.json', 'base64')
     // console.log('==image', content)
@@ -81,8 +87,6 @@ export async function createZip(transactionIdToBeSynced) {
     //Deleting TEMP folder location
     await RNFS.unlink(PATH_TEMP);
     // console.log(PATH_TEMP+' removed');
-
-
 }
 
 /**
@@ -134,7 +138,6 @@ function _getSyncDataFromDb(transactionIdsObject) {
         transactionLogs,
         trackLogs
     }
-
 }
 
 /**
@@ -145,7 +148,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
  * @param {*} table table name from which data is to be fetched
  * 
  */
-function _getDataFromRealm(dataType, query, table) {
+export function _getDataFromRealm(dataType, query, table) {
     if (!dataType || !table) {
         return dataType;
     }
@@ -163,5 +166,28 @@ function _getDataFromRealm(dataType, query, table) {
     } else {
         return data.map(x => Object.assign({}, x))
     }
-
+}
+export async function moveImageFilesToSync(fieldDataList, path) {
+    let fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+    if (!fieldAttributes || !fieldAttributes.value) return
+    if (!fieldDataList || fieldDataList.length < 1) return
+    let masterIdToAttributeMap = {}
+    for (let fieldAttribute of fieldAttributes.value) {
+        if (fieldAttribute.attributeTypeId == SIGNATURE || fieldAttribute.attributeTypeId == CAMERA || fieldAttribute.attributeTypeId == CAMERA_HIGH || fieldAttribute.attributeTypeId == CAMERA_MEDIUM) {
+            masterIdToAttributeMap[fieldAttribute.id] = fieldAttribute
+        }
+    }
+    let imageFileNamesArray = []
+    for (let fieldData of fieldDataList) {
+        if (masterIdToAttributeMap[fieldData.fieldAttributeMasterId] && fieldData.value && fieldData.value != '') {
+            imageFileNamesArray.push(fieldData.value)
+        }
+    }
+    if (imageFileNamesArray.length < 1) return
+    for (let imageName of imageFileNamesArray) {
+        let name = imageName.split('/')
+        let fileExits = await RNFS.exists(PATH + '/CustomerImages/' + name[name.length - 1])
+        if (fileExits)
+            await RNFS.copyFile(PATH + '/CustomerImages/' + name[name.length - 1], path + '/' + name[name.length - 1])
+    }
 }
