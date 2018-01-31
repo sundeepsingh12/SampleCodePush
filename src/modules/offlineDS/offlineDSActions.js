@@ -16,10 +16,6 @@ import {
     LAST_SYNCED,
     NEVER_SYNCED
 } from '../../lib/AttributeConstants'
-import thunk from 'redux-thunk'
-import configureStore from 'redux-mock-store'
-const middlewares = [thunk]
-const mockStore = configureStore(middlewares)
 
 export function getLastSyncTime() {
     return async function (dispatch) {
