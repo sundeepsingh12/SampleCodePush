@@ -31,12 +31,25 @@ import {
     EXTERNAL_DATA_STORE,
     DATA_STORE,
     QR_SCAN,
-    SCAN_OR_TEXT
+    SCAN_OR_TEXT,
+    POST,
 } from '../../lib/AttributeConstants'
 import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface.js'
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout'
-
-
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import {
+    HUB,
+    USER,
+    JOB_MASTER,
+} from '../../lib/constants'
+import CONFIG from '../../lib/config'
+import RestAPIFactory from '../../lib/RestAPIFactory'
+import {
+    SMS_NOT_SENT_TRY_AGAIN_LATER,
+    EMAIL_NOT_SENT_TRY_AGAIN_LATER,
+    SMS_SENT_SUCCESSFULLY,
+    EMAIL_SENT_SUCCESSFULLY,
+} from '../../lib/ContainerConstants'
 class TransientStatusService {
 
     /**
@@ -122,7 +135,6 @@ class TransientStatusService {
       */
     getDataFromFormElement(formElement) {
         let elementsArray = []
-        let id = 0
         let amount = 0
         for (let [id, fieldDataObject] of formElement.entries()) {
             let fieldDataElement = {}
@@ -202,6 +214,9 @@ class TransientStatusService {
      *                                      false if called from saveActivatedActions
      */
     async saveDataInDbAndAddTransactionsToSyncList(previousFormLayoutState, recurringData, jobMasterId, statusId, isCalledFromFormLayout) {
+        let emailTableElement = {}
+        let emailIdInFieldData = []
+        let contactNumberInFieldData = false
         for (let counter in recurringData) {
             let formLayoutObject
             let dataForSingleTransaction = recurringData[counter]
@@ -210,9 +225,89 @@ class TransientStatusService {
             } else {
                 formLayoutObject = new Map([...previousFormLayoutState, ...dataForSingleTransaction.formLayoutState.formElement])
             }
+            let returnParams = (formLayoutObject) ? this.prepareDTOOfFromLayoutObject(formLayoutObject, emailIdInFieldData, contactNumberInFieldData) : {}
+            emailIdInFieldData = returnParams.emailIdInFieldData
+            contactNumberInFieldData = returnParams.contactNumberInFieldData
+            if (!_.isEmpty(returnParams.formattedFormLayoutObject)) {
+                emailTableElement[dataForSingleTransaction.id] = returnParams.formattedFormLayoutObject
+            }
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         }
+        return { emailTableElement, emailIdInFieldData, contactNumberInFieldData }
+    }
+
+    /**This service is used to send email or sms.
+     * 
+     * @param {*} emailIdOrSmsList  -- list of emailIds or PhoneNumbers to send 
+     * @param {*} isEmail -- it checks whether to send sms or email
+     * @param {*} totalAmount
+     * @param {*} emailTableElement -- dto
+     * @param {*} emailGeneratedFromComplete -- either called from complete button
+     *  
+     */
+
+    async sendEmailOrSms(totalAmount, emailTableElement, emailIdOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId) {
+        try {
+            const userData = await keyValueDBService.getValueFromStore(USER)
+            if (userData && userData.value && userData.value.company && userData.value.company.code &&(_.startsWith(userData.value.company.code, 'dhl') || _.startsWith(userData.value.company.code, 'Dhl') || _.startsWith(userData.value.company.code, 'DHL'))) {
+                if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
+                    emailOrSmsList = [parseInt(emailIdOrSmsList)]
+                }
+                const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+                let currentJobMasterCode = jobMasterList.value.filter((data) => data.id == jobMasterId)[0].code
+                let body = {
+                        companyCode: userData.value.company.code,
+                        emailTableElement,
+                        emailTotalCash: totalAmount,
+                    }
+                const hub = await keyValueDBService.getValueFromStore(HUB)
+                let hubcode = hub.value.code
+                const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+                let postJSON = "{\"emailIds\":" + JSON.stringify(emailIdOrSmsList) + ", \"subject\": \"" + currentJobMasterCode + "\"" + ", \"hubCode\": \"" + hubcode + "\"" + ", \"body\": " + JSON.stringify(body) + ", \"emailGeneratedFromComplete\": \"" + emailGeneratedFromComplete + "\"" + "}";
+                let jSessionId = ((token.value).split('JSESSIONID=')[1]).split(';')[0]
+                let url = (isEmail) ? CONFIG.API.SEND_EMAIL_LINK + jSessionId : CONFIG.API.SEND_SMS_LINK + jSessionId
+                let response = await RestAPIFactory(token.value).serviceCall(postJSON, url, POST)  // dhl sit https
+                if (!response || response.status != 202) {
+                    if (!isEmail) {
+                        return SMS_NOT_SENT_TRY_AGAIN_LATER
+                    } else {
+                        return EMAIL_NOT_SENT_TRY_AGAIN_LATER
+                    }
+                } else {
+                    if (!isEmail) {
+                        return SMS_SENT_SUCCESSFULLY
+                    } else {
+                        return EMAIL_SENT_SUCCESSFULLY
+                    }
+                }
+            } else return ''
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    /**
+     * 
+     * @param {*} formLayoutObject //complete form layout object
+     */
+    prepareDTOOfFromLayoutObject(formLayoutObject, emailIdInFieldData, contactNumberInFieldData) {
+        let formattedFormLayoutObject = []
+        for (let [id, fieldDataObject] of formLayoutObject.entries()) {
+            if (!fieldDataObject.hidden) {
+                formattedFormLayoutObject.push({
+                    key: fieldDataObject.key,
+                    label: fieldDataObject.label,
+                    value: (!_.isEmpty(fieldDataObject.value) && fieldDataObject) ? fieldDataObject.value : ""
+                })
+                if (emailIdInFieldData != [] && _.includes(fieldDataObject.value, '@') && _.includes(fieldDataObject.value, '.')) {
+                    emailIdInFieldData.push(fieldDataObject.value)
+                } else if (!contactNumberInFieldData && (fieldDataObject.key == "mobile_phone")) {
+                    contactNumberInFieldData = true
+                }
+            }
+        }
+        return { formattedFormLayoutObject, emailIdInFieldData, contactNumberInFieldData }
     }
 
     /**
@@ -297,6 +392,6 @@ class TransientStatusService {
         }
         return storeObject
     }
-}   
+}
 
 export let transientStatusService = new TransientStatusService()

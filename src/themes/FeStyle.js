@@ -419,26 +419,26 @@ export default {
     },
 
     // Padding Verticle
-    paddingVeticle0: {
-        paddingVeticle0: 0
+    paddingVertical0: {
+        paddingVertical0: 0
     },
-    paddingVeticle5: {
-        paddingVeticle: 5
+    paddingVertical5: {
+        paddingVertical: 5
     },
-    paddingVeticle10: {
-        paddingVeticle: 10
+    paddingVertical10: {
+        paddingVertical: 10
     },
-    paddingVeticle15: {
-        paddingVeticle: 15
+    paddingVertical15: {
+        paddingVertical: 15
     },
-    paddingVeticle20: {
-        paddingVeticle: 20
+    paddingVertical20: {
+        paddingVertical: 20
     },
-    paddingVeticle25: {
-        paddingVeticle: 25
+    paddingVertical25: {
+        paddingVertical: 25
     },
-    paddingVeticle30: {
-        paddingVeticle: 30
+    paddingVertical30: {
+        paddingVertical: 30
     },
 
 

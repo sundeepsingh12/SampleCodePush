@@ -11,7 +11,10 @@ import {
     SAVE_ACTIVATED_INITIAL_STATE,
     DELETE_ITEM_SAVE_ACTIVATED,
     HomeTabNavigatorScreen,
-    SaveActivated
+    SaveActivated,
+    SET_SAVE_ACTIVATED_TOAST_MESSAGE,
+    USER,
+    IS_COMPANY_CODE_DHL
 } from '../../lib/constants'
 import _ from 'lodash'
 
@@ -46,21 +49,52 @@ export function addTransactionAndPopulateView(formLayoutState, recurringData, co
 export function checkout(previousFormLayoutState, recurringData, jobMasterId, commonData, statusId) {
     return async function (dispatch) {
         try {
+            let responseMessage = ''
             dispatch(setState(LOADER_ACTIVE, true))
             let totalAmount = await transientStatusService.calculateTotalAmount(commonData.amount, recurringData)
-            await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(previousFormLayoutState, recurringData, jobMasterId, statusId, false)
-            dispatch(setState(LOADER_ACTIVE, false))
+            let { emailTableElement, emailIdInFieldData, contactNumberInFieldData } = await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(previousFormLayoutState, recurringData, jobMasterId, statusId, false)
+            responseMessage = await transientStatusService.sendEmailOrSms(totalAmount, emailTableElement, emailIdInFieldData, true, true, jobMasterId)
+            dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
             dispatch(navigateToScene(CheckoutDetails, {
                 commonData: commonData.commonData,
                 recurringData,
                 totalAmount,
-                jobMasterId
+                jobMasterId,
+                emailTableElement,
+                emailIdInFieldData,
+                contactNumberInFieldData
             }))
         } catch (error) {
             console.log(error)
         }
     }
 }
+
+export function sendSmsOrEmails(totalAmount, emailTableElement, jobMasterId, emailOrSmsList, isEmail, emailGeneratedFromComplete) {
+    return async function (dispatch) {
+        try {
+            let responseMessage = await transientStatusService.sendEmailOrSms(totalAmount, emailTableElement, emailOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId)
+            dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+fetchUserData
+export function fetchUserData(email, inputTextEmail) {
+    return async function (dispatch) {
+        try {
+            dispatch(setState(EMAILID_VIEW_ARRAY, { email, inputTextEmail }))
+            let userData = await keyValueDBService.getValueFromStore(USER)
+            if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(userData.value.company.code, 'dhl') || _.startsWith(userData.value.company.code, 'Dhl') || _.startsWith(userData.value.company.code, 'DHL'))) {
+                dispatch(setState(IS_COMPANY_CODE_DHL, true))
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+
 
 export function storeState(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates) {
     return async function (dispatch) {

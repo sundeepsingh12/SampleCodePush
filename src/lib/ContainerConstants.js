@@ -108,4 +108,14 @@ module.exports = {
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
     COLLECTION_SOD: 'Collection-SOD',
+
+    //Save Activated and CheckoutDetails
+    SMS_NOT_SENT_TRY_AGAIN_LATER: 'SMS not sent ,try again later',
+    EMAIL_NOT_SENT_TRY_AGAIN_LATER: 'Email not sent ,try again later',
+    SMS_SENT_SUCCESSFULLY: 'Sms sent successfully',
+    EMAIL_SENT_SUCCESSFULLY: 'Email sent successfully',
+    PLEASE_ENTER_A_VALID_EMAIL_ID: 'Please Enter a Valid Email Id',
+    MOBILE_NUMBER: 'Mobile Number',
+    ENTER_EMAIL_IDS: 'Enter Email Ids',
+    CONTACT_NUMBER_SHOULD_START_WITH_0_AND_CONTAINS_MINIMUM_OF_10_DIGITS: 'Contact Number should start with 0 and contains minimum of 10 digits',
 }

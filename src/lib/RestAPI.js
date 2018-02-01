@@ -56,8 +56,10 @@ class RestAPI {
    *  }
    */
   async _fetch(opts, fetchRequestId) {
-    let url = this.API_BASE_URL + opts.url
-    console.log('url', url)
+    let url = opts.url
+    if(!_.includes(opts.url, 'https://dhlintegration.fareye.co/app/rest/sit/dhl_send_email?jsessionId=') && !_.includes(opts.url, 'https://dhlintegration.fareye.co/app/rest/sit/dhl_send_sms?jsessionId=')){
+    url = this.API_BASE_URL + url
+    }
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
@@ -79,7 +81,7 @@ class RestAPI {
     } catch (e) {
       res.json = {}
     }
-    if (res.status != 200) {
+    if (res.status != 200 && res.status != 202) {
       throw {
         code: res.status,
         message: ((res.json && res.json.message) ? res.json.message : 'Unknow error. Retry or contact support.')
