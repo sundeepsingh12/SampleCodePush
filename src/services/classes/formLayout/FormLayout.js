@@ -12,7 +12,8 @@ import {
     Transient,
     CheckoutDetails,
     TabScreen,
-    SHOULD_RELOAD_START
+    SHOULD_RELOAD_START,
+    SHOULD_CREATE_BACKUP
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -284,6 +285,7 @@ class FormLayout {
                 await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
+            await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))
         }
         return {
             routeName,

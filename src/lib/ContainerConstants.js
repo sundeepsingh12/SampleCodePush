@@ -47,6 +47,8 @@ module.exports = {
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
+    OPTIONAL: '(optional)',
+    SELECTED: ' Selected',
 
     //status revert 
     REVERT_STATUS_TO: 'Revert Status to',
@@ -110,5 +112,27 @@ module.exports = {
     JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
     DSF_LIST_MISSING: 'DSFList is missing',
     FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
-    FORM_ELEMENT_IS_MISSING: 'formElement is missing'
+    FORM_ELEMENT_IS_MISSING: 'formElement is missing',
+    //Summary
+    REFUND: 'Refund',
+    COLLECTION_CASH: 'Collection-Cash',
+    COLLECTION_SOD: 'Collection-SOD',
+
+    //Backup Exceptions
+    USER_MISSING: 'user missing',
+
+    //Backup
+    BACKUP_CREATED_SUCCESS_TOAST: 'Backup created successfully',
+    BACKUP_ALREADY_EXISTS: 'Backup already exists for this data',
+    FILE_MISSING: 'File Missing',
+    BACKUP_ALERT_TITLE: 'Manual Backup',
+    BACKUP_ALERT_MESSAGE: 'Do you want to create backup manually?',
+    FILE_CREATED: 'File Created',
+    EMPLOYEE_CODE: 'Employee Code',
+    FILE_SIZE: 'File Size',
+    NEW: 'New',
+    UNSYNCED_FILES: 'Unsynced Files',
+    SYNCED_FILES: 'Synced Files',
+    CREATE_BACKUP_BUTTON: '+ Create Backup',
+
 }

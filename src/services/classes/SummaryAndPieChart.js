@@ -136,11 +136,11 @@ class SummaryAndPieChart {
                 failCounts++;
             }
         }
-        let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-        userSummary.value.pendingCount = pendingCounts;
-        userSummary.value.failCount = failCounts;
-        userSummary.value.successCount = successCounts;
-        await keyValueDBService.validateAndUpdateData(USER_SUMMARY, userSummary)
+        // let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+        // userSummary.value.pendingCount = pendingCounts;
+        // userSummary.value.failCount = failCounts;
+        // userSummary.value.successCount = successCounts;
+        // await keyValueDBService.validateAndUpdateData(USER_SUMMARY, userSummary)
         return {pendingCounts,failCounts,successCounts}
     }
 

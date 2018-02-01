@@ -92,6 +92,8 @@ import Scanner from '../../components/Scanner'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import JobMaster from '../../containers/JobMaster'
 import AutoLogout from '../../containers/AutoLogout'
+import Backup from '../../containers/Backup'
+import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -117,6 +119,7 @@ class AppWithNavigationState extends React.PureComponent {
     switch (route.routeName) {
       case ApplicationScreen:
       case LoginScreen:
+      case 'UnsyncBackupUpload':
       case PreloaderScreen: return false
       case HomeTabNavigatorScreen: {
         if (route.routes[route.index].routeName == HomeScreen) {
@@ -270,7 +273,7 @@ export const AppNavigator = StackNavigator({
     navigationOptions: {
       header: null
     }
-  }, 
+  },
   QrCodeScanner: {
     screen: QrCodeScanner,
     navigationOptions: {
@@ -436,11 +439,21 @@ export const AppNavigator = StackNavigator({
   ImageDetailsView: {
     screen: ImageDetailsView,
   },
+  Backup: {
+    screen: Backup,
+  },
   SplitPayment: {
     screen: SplitPayment,
   },
   SequenceRunsheetList: {
     screen: SequenceRunsheetList
+  },
+  UnsyncBackupUpload: {
+    screen: UnsyncBackupUpload,
+    navigationOptions: {
+      header: null,
+      gesturesEnabled: false
+    }
   }
 },
   {
