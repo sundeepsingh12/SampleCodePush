@@ -20,6 +20,7 @@ import {
     SET_DRAFT,
     SET_UPDATE_DRAFT,
     SET_FORM_TO_INVALID,
+    SET_DSF_REVERSE_MAP
 } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -124,6 +125,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('isLoading', action.payload.isLoading)
                 .set('errorMessage', action.payload.errorMessage)
                 .set('paymentAtEnd', action.payload.paymentAtEnd)
+                .set('dataStoreFilterReverseMap', action.payload.dataStoreFilterReverseMap)
         }
         case SET_DRAFT: {
             return state.set('draftStatusId', action.payload)
@@ -136,6 +138,9 @@ export default function formLayoutReducer(state = initialState, action) {
             return state.set('isLoading', action.payload.isLoading)
                 .set('isFormValid', action.payload.isFormValid)
         }
+
+        case SET_DSF_REVERSE_MAP:
+            return state.set('dataStoreFilterReverseMap', action.payload)
     }
     return state;
 }

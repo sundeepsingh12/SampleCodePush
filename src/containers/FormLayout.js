@@ -57,7 +57,8 @@ function mapStateToProps(state) {
     pieChart: state.home.pieChart,
     draftStatusId: state.formLayout.draftStatusId,
     updateDraft: state.formLayout.updateDraft,
-    isFormValid: state.formLayout.isFormValid
+    isFormValid: state.formLayout.isFormValid,
+    dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap
   }
 }
 
@@ -98,6 +99,7 @@ class FormLayout extends PureComponent {
         isLoading: this.props.isLoading,
         errorMessage: this.props.errorMessage,
         currentElement: this.props.currentElement,
+        dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap
       }
       this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId)
     }

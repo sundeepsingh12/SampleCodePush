@@ -226,6 +226,7 @@ module.exports = keyMirror({
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
     SET_FORM_TO_INVALID: null,
+    SET_DSF_REVERSE_MAP: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -318,6 +319,8 @@ module.exports = keyMirror({
     SAVE_SUCCESSFUL: null,
     CLEAR_ATTR_MAP_AND_SET_LOADER: null,
     DISABLE_AUTO_START_SCANNER: null,
+    SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP: null,
+    SEARCH_DATA_STORE_RESULT: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
@@ -452,6 +455,13 @@ module.exports = keyMirror({
     TRACK_BATTERY: null,
     NPSFEEDBACK_VALUE: null,
     IS_SERVER_REACHABLE: null,
+
+    //DataStoreFilter
+    SHOW_LOADER_DSF: null,
+    DATA_STORE_FILTER_LIST: null,
+    SET_DSF_SEARCH_TEXT: null,
+    SEARCHED_DATA_STORE_FILTER_LIST: null,
+    SET_DSF_INITIAL_STATE: null
 })
 
 

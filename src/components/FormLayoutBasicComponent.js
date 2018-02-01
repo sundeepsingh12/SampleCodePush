@@ -22,7 +22,7 @@ import FormLayoutActivityComponent from '../components/FormLayoutActivityCompone
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import SelectFromList from '../containers/SelectFromList'
 import QRIcon from '../svg_components/icons/QRIcon'
-
+import DataStoreFilter from '../containers/DataStoreFilter'
 import {
     MONEY_COLLECT,
     MONEY_PAY,
@@ -55,7 +55,8 @@ import {
     CAMERA_HIGH,
     CAMERA_MEDIUM,
     SCAN_OR_TEXT,
-    CONTACT_NUMBER
+    CONTACT_NUMBER,
+    DATA_STORE_FILTER
 } from '../lib/AttributeConstants'
 
 import {
@@ -86,6 +87,7 @@ class BasicFormElement extends PureComponent {
             selectFromListEnable: false,
             showNPS: false,
             showDateTimePicker: false,
+            showDataStoreFilter: false,
         }
     }
     navigateToScene = (item) => {
@@ -281,6 +283,21 @@ class BasicFormElement extends PureComponent {
                 <TimePicker onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item} />
             )
         }
+
+        if (this.state.showDataStoreFilter) {
+            return (
+                <View>
+                    <DataStoreFilter
+                        currentElement={this.props.item}
+                        formElement={this.props.formElement}
+                        isSaveDisabled={this.props.isSaveDisabled}
+                        jobTransaction={this.props.jobTransaction}
+                        latestPositionId={this.props.latestPositionId}
+                        press={this._openOrCloseDSFilterModal}
+                    />
+                </View>
+            )
+        }
         return null
     }
 
@@ -294,6 +311,14 @@ class BasicFormElement extends PureComponent {
                 isSaveDisabled: this.props.isSaveDisabled,
                 returnData: this._searchForReferenceValue.bind(this)
             })
+    }
+
+    _openOrCloseDSFilterModal = (isOpen) => {
+        this.setState(() => {
+            return {
+                showDataStoreFilter: isOpen
+            }
+        })
     }
 
     render() {
@@ -323,12 +348,12 @@ class BasicFormElement extends PureComponent {
                                     <Label style={[styles.fontSm, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Label>
                                     : null}
                                 <View>
-                                {renderIf((this.props.item.attributeTypeId == 62 ),
-                                                        this.props.item.displayValue ?
-                                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl,styles.marginRight20,styles.absolute, { top: 10, right: 10 }, styles.fontSuccess, { marginTop: -10 }])} /> :
-                                                            ( this.props.item.isLoading) ?
-                                                                <ActivityIndicator animating={true} style={StyleSheet.flatten([styles.absolute,styles.marginRight20, { top: 10, right: 10 },{ marginTop: -10 }])} size="small" color="green" /> : null
-                                                    )}
+                                    {renderIf((this.props.item.attributeTypeId == 62),
+                                        this.props.item.displayValue ?
+                                            <Icon name='ios-checkmark' style={StyleSheet.flatten([styles.fontXxxl, styles.marginRight20, styles.absolute, { top: 10, right: 10 }, styles.fontSuccess, { marginTop: -10 }])} /> :
+                                            (this.props.item.isLoading) ?
+                                                <ActivityIndicator animating={true} style={StyleSheet.flatten([styles.absolute, styles.marginRight20, { top: 10, right: 10 }, { marginTop: -10 }])} size="small" color="green" /> : null
+                                    )}
                                     <Item stackedLabel>
                                         <Input
                                             autoCapitalize="none"
@@ -412,6 +437,14 @@ class BasicFormElement extends PureComponent {
                         {modalView}
                         {renderIf(!this.props.item.hidden,
                             <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />)}
+                    </View>
+                )
+            case DATA_STORE_FILTER:
+                return (
+                    <View>
+                        {modalView}
+                        {renderIf(!this.props.item.hidden,
+                            <FormLayoutActivityComponent item={this.props.item} press={this._openOrCloseDSFilterModal} />)}
                     </View>
                 )
             default:

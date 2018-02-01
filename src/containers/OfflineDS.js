@@ -5,39 +5,22 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SearchBar from '../components/SearchBar'
 import * as globalActions from '../modules/global/globalActions'
-import renderIf from '../lib/renderIf'
-import Loader from '../components/Loader'
-import DataStoreItemDetails from '../components/DataStoreItemDetails'
-import { StyleSheet, View, TouchableOpacity, FlatList, Image, Text } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Image, Text } from 'react-native'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import {
-    SET_DATA_STORE_ATTR_MAP,
-    SET_SEARCH_TEXT,
-    SHOW_DETAILS,
-    _id,
     SET_OFFLINEDS_INITIAL_STATE,
-    QrCodeScanner,
-    DISABLE_AUTO_START_SCANNER,
-} from '../lib/constants'
+    } from '../lib/constants'
 import {
     Container,
-    Content,
     Header,
     Button,
     Body,
     Right,
     Icon,
-    List,
-    ListItem,
     StyleProvider,
-    Footer,
-    FooterTab
-} from 'native-base'
-import {
-    EXTERNAL_DATA_STORE,
-} from '../lib/AttributeConstants'
+    } from 'native-base'
 import {
     DOWNLOADING_OFFLINE_DS,
     DOWNLOAD_SUCCESSFUL,
@@ -45,7 +28,6 @@ import {
     CLOSE
 } from '../lib/ContainerConstants'
 import _ from 'lodash'
-import { downloadJobMaster } from '../modules/pre-loader/preloaderActions';
 
 
 function mapStateToProps(state) {

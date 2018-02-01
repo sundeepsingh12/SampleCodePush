@@ -46,6 +46,7 @@ import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 import offlineDS from './offlineDS/offlineDSReducer'
 import cameraReducer from './camera/cameraReducer'
 import autoLogout from './autoLogout/autoLogoutReducer'
+import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 // import profile from './profile/profileReducer'
 
 
@@ -92,7 +93,8 @@ const rootReducer = combineReducers({
   qrCodeReducer,
   offlineDS,
   cameraReducer,
-  autoLogout
+  autoLogout,
+  dataStoreFilterReducer
 })
 
 // const rootReducer = (state, action) => {

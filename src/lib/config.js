@@ -41,5 +41,6 @@ module.exports = {
     FORGET_PASSWORD: '/forgot_password/send_link_device',
     DATASTORE_MASTER: '/app/rest/data_store_attribute_master_all',
     DATASTORE_DATA_FETCH_WITH_DATETIME: '/app/rest/device/datastore_fetch_with_datetime',
+    DATA_STORE_FILTER_SEARCH: '/app/rest/distinct_data_fetch_api'
   }
 }

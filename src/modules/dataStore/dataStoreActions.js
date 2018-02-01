@@ -4,7 +4,6 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { setState } from '../global/globalActions'
 import {
-    SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
@@ -12,7 +11,10 @@ import {
     NEXT_FOCUS,
     CLEAR_ATTR_MAP_AND_SET_LOADER,
     FIELD_ATTRIBUTE,
-    JOB_ATTRIBUTE
+    JOB_ATTRIBUTE,
+    SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
+    SET_DSF_REVERSE_MAP,
+    SEARCH_DATA_STORE_RESULT
 } from '../../lib/constants'
 import {
     DATA_STORE
@@ -54,18 +56,25 @@ export function getJobAttribute(jobAttributeMasterId, value) {
 }
 
 /**
- * @param {*} validationArray 
  * 
- * This method takes validation array from current element and set all validations accordingly
+ * @param {*} currentElement 
  */
-export function setValidation(validationArray) {
+export function checkForFiltersAndValidation(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
     return async function (dispatch) {
         try {
-            if (validationArray) {
-                let validation = dataStoreService.getValidations(validationArray)
-                dispatch(setState(SET_VALIDATIONS, validation))
-            }
+            dispatch(setState(SHOW_LOADER_DS, true))
+            let returnParams = await dataStoreService.checkForFiltersAndValidations(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap)
+            dispatch(setState(SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP, {
+                dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
+                isFiltersPresent: returnParams.isFiltersPresent,
+                validation: returnParams.validation
+            }))
+            dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
         }
     }
 }
@@ -250,6 +259,26 @@ export function checkOfflineDS(searchText, dataStoreMasterId, dataStoreMasterAtt
             }
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, { errorMessage: error.message, dataStoreAttrValueMap: {} }))
+        }
+    }
+}
+
+
+export function searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap) {
+    return async function (dispatch) {
+        try {
+            dispatch(setState(SHOW_LOADER_DS, true))
+            let searchResult = await dataStoreService.searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap)
+            dispatch(setState(SEARCH_DATA_STORE_RESULT, {
+                dataStoreAttrValueMap: searchResult.dataStoreAttrValueMap,
+                cloneDataStoreAttrValueMap: searchResult.cloneDataStoreAttrValueMap,
+                searchText
+            }))
+        } catch (error) {
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
         }
     }
 }
