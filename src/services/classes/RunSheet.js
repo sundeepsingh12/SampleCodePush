@@ -43,9 +43,10 @@ class RunSheet {
         runsheetList[jobTransactionArray[index].runsheetId][status[allStatusMap[jobTransactionArray[index].jobStatusId] -1 ]] += 1
       }
     }
-    userSummary["value"][status[0]] = allCount[0], userSummary["value"][status[1]] = allCount[1], userSummary["value"][status[2]] = allCount[2]
+    if(userSummary && userSummary.value){
+        userSummary["value"][status[0]] = allCount[0], userSummary["value"][status[1]] = allCount[1], userSummary["value"][status[2]] = allCount[2]
+    }
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)    
-    let data = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     const runsheets = {
       tableName: TABLE_RUNSHEET,
       value: Object.values(runsheetList)
