@@ -118,4 +118,25 @@ module.exports = {
     MOBILE_NUMBER: 'Mobile Number',
     ENTER_EMAIL_IDS: 'Enter Email Ids',
     CONTACT_NUMBER_SHOULD_START_WITH_0_AND_CONTAINS_MINIMUM_OF_10_DIGITS: 'Contact Number should start with 0 and contains minimum of 10 digits',
+    RECEPIENTS_CONTACT_NUMBER: `Recepient's Contact Number`,
+    SEND: 'Send',
+    RECEPIENTS_EMAIL_ADDRESS: `Recepient's Email Address`,
+
+    //Backup Exceptions
+    USER_MISSING: 'user missing',
+
+    //Backup
+    BACKUP_CREATED_SUCCESS_TOAST: 'Backup created successfully',
+    BACKUP_ALREADY_EXISTS: 'Backup already exists for this data',
+    FILE_MISSING: 'File Missing',
+    BACKUP_ALERT_TITLE: 'Manual Backup',
+    BACKUP_ALERT_MESSAGE: 'Do you want to create backup manually?',
+    FILE_CREATED: 'File Created',
+    EMPLOYEE_CODE: 'Employee Code',
+    FILE_SIZE: 'File Size',
+    NEW: 'New',
+    UNSYNCED_FILES: 'Unsynced Files',
+    SYNCED_FILES: 'Synced Files',
+    CREATE_BACKUP_BUTTON: '+ Create Backup',
+
 }

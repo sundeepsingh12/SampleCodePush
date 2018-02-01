@@ -87,6 +87,11 @@ module.exports = keyMirror({
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
+    SET_UNSYNC_TRANSACTION_PRESENT: null,
+    SET_BACKUP_UPLOAD_VIEW: null,
+    SET_UPLOAD_FILE_COUNT: null,
+    SET_FAIL_UPLOAD_COUNT: null,
+    SET_BACKUP_FILES_LIST: null,
 
     //Home Container
     PIECHART: null,
@@ -184,6 +189,9 @@ module.exports = keyMirror({
     SET_SAVE_ACTIVATED_TOAST_MESSAGE: null,
     EMAILID_VIEW_ARRAY: null,
     IS_COMPANY_CODE_DHL: null,
+    SHOULD_CREATE_BACKUP: null,
+    BACKUP_UPLOAD_FAIL_COUNT: null,
+
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
     TABLE_JOB: null,
@@ -206,6 +214,7 @@ module.exports = keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
+    SEEN: null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
@@ -267,9 +276,11 @@ module.exports = keyMirror({
     CameraAttribute: null,
     ImageDetailsView: null,
     JobDetailsV2: null,
+    Backup: null,
     SplitPayment: null,
     Payment: null,
     SequenceRunsheetList: null,
+    UnsyncBackupUpload: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -456,6 +467,14 @@ module.exports = keyMirror({
     TRACK_BATTERY: null,
     NPSFEEDBACK_VALUE: null,
     IS_SERVER_REACHABLE: null,
+
+    // backup actions
+    SET_LOADER_BACKUP: null,
+    SET_BACKUP_FILES: null,
+    SET_BACKUP_VIEW: null,
+    SET_UPLOADING_FILE: null,
+    SET_SYNCED_FILES: null,
+    SET_BACKUP_TOAST: null
 })
 
 

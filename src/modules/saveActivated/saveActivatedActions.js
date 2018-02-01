@@ -14,7 +14,8 @@ import {
     SaveActivated,
     SET_SAVE_ACTIVATED_TOAST_MESSAGE,
     USER,
-    IS_COMPANY_CODE_DHL
+    IS_COMPANY_CODE_DHL,
+    EMAILID_VIEW_ARRAY,
 } from '../../lib/constants'
 import _ from 'lodash'
 
@@ -49,11 +50,10 @@ export function addTransactionAndPopulateView(formLayoutState, recurringData, co
 export function checkout(previousFormLayoutState, recurringData, jobMasterId, commonData, statusId) {
     return async function (dispatch) {
         try {
-            let responseMessage = ''
             dispatch(setState(LOADER_ACTIVE, true))
             let totalAmount = await transientStatusService.calculateTotalAmount(commonData.amount, recurringData)
             let { emailTableElement, emailIdInFieldData, contactNumberInFieldData } = await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(previousFormLayoutState, recurringData, jobMasterId, statusId, false)
-            responseMessage = await transientStatusService.sendEmailOrSms(totalAmount, emailTableElement, emailIdInFieldData, true, true, jobMasterId)
+            let responseMessage = await transientStatusService.sendEmailOrSms(totalAmount, emailTableElement, emailIdInFieldData, true, true, jobMasterId)
             dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
             dispatch(navigateToScene(CheckoutDetails, {
                 commonData: commonData.commonData,
@@ -80,13 +80,13 @@ export function sendSmsOrEmails(totalAmount, emailTableElement, jobMasterId, ema
         }
     }
 }
-fetchUserData
+
 export function fetchUserData(email, inputTextEmail) {
     return async function (dispatch) {
         try {
             dispatch(setState(EMAILID_VIEW_ARRAY, { email, inputTextEmail }))
             let userData = await keyValueDBService.getValueFromStore(USER)
-            if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(userData.value.company.code, 'dhl') || _.startsWith(userData.value.company.code, 'Dhl') || _.startsWith(userData.value.company.code, 'DHL'))) {
+            if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
                 dispatch(setState(IS_COMPANY_CODE_DHL, true))
             }
         } catch (error) {

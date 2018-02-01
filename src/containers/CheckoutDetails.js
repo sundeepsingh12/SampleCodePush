@@ -59,6 +59,9 @@ import {
     ENTER_EMAIL_IDS,
     CONTACT_NUMBER_SHOULD_START_WITH_0_AND_CONTAINS_MINIMUM_OF_10_DIGITS,
     PLEASE_ENTER_A_VALID_EMAIL_ID,
+    RECEPIENTS_CONTACT_NUMBER,
+    SEND,
+    RECEPIENTS_EMAIL_ADDRESS,
 } from '../lib/ContainerConstants'
 
 
@@ -85,10 +88,7 @@ class CheckoutDetails extends PureComponent {
     constructor(props) {
         super(props)
         this.state = {
-            isParcelSummaryVisible: false,
-            signOffSummary: false,
-            isEmailVisible: false,
-            isSmsBoxVisible: false,
+            isModalVisible: -1,
         }
     }
 
@@ -142,40 +142,25 @@ class CheckoutDetails extends PureComponent {
 
     _keyExtractor = (item, index) => item.id;
 
-    _showParcelSummary = (parcelSummaryStatus) => {
+    _showModalView = (modalStatus) => {
         this.setState(() => {
             return {
-                isParcelSummaryVisible: parcelSummaryStatus
+                isModalVisible: modalStatus
             }
         })
     }
 
-    _showEmailSummary = (emailVisible) => {
-        this.setState(() => {
-            return {
-                isEmailVisible: emailVisible
-            }
-        })
-    }
-
-    _showSMSModal = (smsModalVisible) => {
-        this.setState(() => {
-            return {
-                isSmsBoxVisible: smsModalVisible
-            }
-        })
-    }
     _sendMailToAllEmailsIds = () => {
         if ((this.props.inputTextEmailIds && this.props.inputTextEmailIds != '' && (!_.includes(this.props.inputTextEmailIds, '@') || !_.includes(this.props.inputTextEmailIds, '.'))) || (!_.size(this.props.emailIdViewArray) && (!this.props.inputTextEmailIds || this.props.inputTextEmailIds == ''))) {
             this.props.actions.setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, PLEASE_ENTER_A_VALID_EMAIL_ID)
         } else if (this.props.inputTextEmailIds && this.props.inputTextEmailIds != '' && _.includes(this.props.inputTextEmailIds, '@') && _.includes(this.props.inputTextEmailIds, '.')) {
-            this._showEmailSummary(false)
+            this._showModalView(-1)
             let emails = this.props.emailIdViewArray
             emails.push(this.props.inputTextEmailIds)
             this.props.actions.setState(EMAILID_VIEW_ARRAY, { email: emails, inputTextEmail: '' })
             this.props.actions.sendSmsOrEmails(this.props.navigation.state.params.totalAmount, this.props.navigation.state.params.emailTableElement, this.props.navigation.state.params.jobMasterId, this.props.emailIdViewArray, true, false)
         } else {
-            this._showEmailSummary(false)
+            this._showModalView(-1)
             this.props.actions.sendSmsOrEmails(this.props.navigation.state.params.totalAmount, this.props.navigation.state.params.emailTableElement, this.props.navigation.state.params.jobMasterId, this.props.emailIdViewArray, true, false)
         }
     }
@@ -183,7 +168,7 @@ class CheckoutDetails extends PureComponent {
         if ((!this.props.inputTextToSendSms && (this.props.inputTextToSendSms) == '') || (this.props.inputTextToSendSms[0] != '0') || (_.size(this.props.inputTextToSendSms) < 10) || (!_.isNumber(this.props.inputTextToSendSms))) {
             this.props.actions.setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, CONTACT_NUMBER_SHOULD_START_WITH_0_AND_CONTAINS_MINIMUM_OF_10_DIGITS)
         } else {
-            this._showSMSModal(false)
+            this._showModalView(-1)
             this.props.actions.sendSmsOrEmails(this.props.navigation.state.params.totalAmount, this.props.navigation.state.params.emailTableElement, this.props.navigation.state.params.jobMasterId, this.props.inputTextToSendSms, false, false)
         }
     }
@@ -192,7 +177,7 @@ class CheckoutDetails extends PureComponent {
         if (this.props.navigation.state.params.contactNumberInFieldData) {
             this.props.actions.sendSmsOrEmails(this.props.navigation.state.params.totalAmount, this.props.navigation.state.params.emailTableElement, this.props.navigation.state.params.jobMasterId, [], false, false)
         } else {
-            this._showSMSModal(true)
+            this._showModalView(4)
         }
     }
 
@@ -219,14 +204,14 @@ class CheckoutDetails extends PureComponent {
             <Modal animationType={"fade"}
                 transparent={true}
                 visible={true}
-                onRequestClose={() => this._showSMSModal(false)}
+                onRequestClose={() => this._showModalView(-1)}
                 presentationStyle={"overFullScreen"}>
                 <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: '100%' }]}>
                     <View style={[styles.absolute, { height: '100%', left: 0, right: 0, backgroundColor: 'rgba(0,0,0,.6)' }]}>
                     </View>
                     <View style={[styles.bgWhite, styles.shadow, styles.borderRadius3, { width: '90%' }]}>
                         <View style={[styles.padding10, styles.marginBottom10, styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.borderBottomLightGray]}>
-                            <Text style={[styles.bold, styles.marginBottom10]}>Recepient's Contact Number</Text>
+                            <Text style={[styles.bold, styles.marginBottom10]}>{RECEPIENTS_CONTACT_NUMBER}</Text>
                         </View>
                         <View style={[styles.paddingHorizontal10]}>
                             <Item >
@@ -242,14 +227,14 @@ class CheckoutDetails extends PureComponent {
                         <View style={[styles.row, { borderTopColor: '#d3d3d3', borderTopWidth: 1 }]}>
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
-                                    onPress={() => { this._showSMSModal(false) }} >
+                                    onPress={() => { this._showModalView(-1) }} >
                                     <Text style={[styles.fontPrimary]}>{CANCEL}</Text>
                                 </Button>
                             </View>
                             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
                                 <Button transparent full
                                     onPress={() => { this._sendSmsToTheNumberEntered() }} >
-                                    <Text style={[styles.fontPrimary]}>Send</Text>
+                                    <Text style={[styles.fontPrimary]}>{SEND}</Text>
                                 </Button>
                             </View>
                         </View>
@@ -266,9 +251,7 @@ class CheckoutDetails extends PureComponent {
         this.props.actions.setState(EMAILID_VIEW_ARRAY, { email: copyOfEmails, inputTextEmail: this.props.inputTextEmailIds })
     }
     _showAllEmailIds = () => {
-        if (_.isEmpty(this.props.emailIdViewArray)) {
-            return null
-        } else {
+        if (!_.isEmpty(this.props.emailIdViewArray)) {
             let view = []
             let emails = this.props.emailIdViewArray
             for (let counter in emails) {
@@ -293,14 +276,14 @@ class CheckoutDetails extends PureComponent {
             <Modal animationType={"fade"}
                 transparent={true}
                 visible={true}
-                onRequestClose={() => this._showEmailSummary(false)}
+                onRequestClose={() => this._showModalView(-1)}
                 presentationStyle={"overFullScreen"}>
                 <View style={[styles.relative, styles.alignCenter, styles.justifyCenter, { height: '100%' }]}>
                     <View style={[styles.absolute, { height: '100%', left: 0, right: 0, backgroundColor: 'rgba(0,0,0,.6)' }]}>
                     </View>
                     <View style={[styles.bgWhite, styles.shadow, styles.borderRadius3, { width: '90%' }]}>
                         <View style={[styles.padding10, styles.marginBottom10, styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.borderBottomLightGray]}>
-                            <Text style={[styles.bold, styles.marginBottom10]}>Recepient's Email Address</Text>
+                            <Text style={[styles.bold, styles.marginBottom10]}>{RECEPIENTS_EMAIL_ADDRESS}</Text>
                             <Text style={[styles.marginBottom10, styles.fontSm]}>
                                 Total {_.size(this.props.emailIdViewArray)}
                             </Text>
@@ -322,14 +305,14 @@ class CheckoutDetails extends PureComponent {
                         <View style={[styles.row, { borderTopColor: '#d3d3d3', borderTopWidth: 1 }]}>
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
-                                    onPress={() => { this._showEmailSummary(false) }} >
+                                    onPress={() => { this._showModalView(-1) }} >
                                     <Text style={[styles.fontPrimary]}>{CANCEL}</Text>
                                 </Button>
                             </View>
                             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
                                 <Button transparent full
                                     onPress={() => { this._sendMailToAllEmailsIds() }}>
-                                    <Text style={[styles.fontPrimary]}>Send</Text>
+                                    <Text style={[styles.fontPrimary]}>{SEND}</Text>
                                 </Button>
                             </View>
                         </View>
@@ -339,15 +322,8 @@ class CheckoutDetails extends PureComponent {
         )
     }
 
-    _signOffSummary = (signOffSummary) => {
-        this.setState(() => {
-            return {
-                signOffSummary: signOffSummary
-            }
-        })
-    }
-
     _checkForEmailSmsPrintViewButton = () => {
+        console.logs("this.props.companyCodeDhl", this.props.companyCodeDhl)
         if (this.props.companyCodeDhl) {
             return (
                 <View style={[styles.bgWhite]} >
@@ -364,7 +340,7 @@ class CheckoutDetails extends PureComponent {
                         </ListItem>
                     </List>
                     <List>
-                        <ListItem style={[style.jobListItem]} onPress={() => { this._showEmailSummary(true) }}>
+                        <ListItem style={[style.jobListItem]} onPress={() => { this._showModalView(3) }}>
                             <View style={[styles.row, styles.alignCenter]}>
                                 <Icon name="md-mail" style={[styles.fontLg, styles.fontPrimary]} />
                                 <Text style={[styles.fontDefault, styles.fontWeight400, styles.marginLeft10]}>{EMAIL}</Text>
@@ -386,7 +362,7 @@ class CheckoutDetails extends PureComponent {
                             </Right>
                         </ListItem>
                     </List>
-                </View >
+                </View>
             )
         }
     }
@@ -398,18 +374,18 @@ class CheckoutDetails extends PureComponent {
                 <Loader />
             )
         }
-        if (this.state.isSmsBoxVisible) {
+        if (this.state.isModalVisible == 4) {
             return this._showSmsBoxModal()
         }
-        if (this.state.isEmailVisible) {
+        if (this.state.isModalVisible == 3) {
             return this._showEmailModal()
         }
-        if (this.state.isParcelSummaryVisible) {
-            return (<SummaryDetails recurringData={this.props.navigation.state.params.recurringData} showParcelSummary={this._showParcelSummary} />)
+        if (this.state.isModalVisible == 1) {
+            return (<SummaryDetails recurringData={this.props.navigation.state.params.recurringData} showParcelSummary={this._showModalView} />)
         }
-        if (this.state.signOffSummary) {
+        if (this.state.isModalVisible == 2) {
             return (
-                <ReviewSaveActivatedDetails commonData={this.props.navigation.state.params.signOfData} headerTitle={Sign_Off_Summary} reviewCommonData={this._signOffSummary} />
+                <ReviewSaveActivatedDetails commonData={this.props.navigation.state.params.signOfData} headerTitle={Sign_Off_Summary} reviewCommonData={this._showModalView} />
             )
         }
         return (
@@ -454,7 +430,7 @@ class CheckoutDetails extends PureComponent {
 
                         <View style={[styles.marginTop10, styles.bgWhite]}>
                             <List>
-                                <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} onPress={() => { this._showParcelSummary(true) }}>
+                                <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} onPress={() => { this._showModalView(1) }}>
                                     <View style={[styles.row, styles.alignCenter]}>
                                         <Text style={[styles.fontDefault, styles.fontWeight400]}>{View_Parcel_Summary}</Text>
                                     </View>
@@ -466,7 +442,7 @@ class CheckoutDetails extends PureComponent {
                         </View>
                         {renderIf(this.props.navigation.state.params.signOfData, <View style={[styles.marginTop10, styles.bgWhite]}>
                             <List>
-                                <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} onPress={() => { this._signOffSummary(true) }}>
+                                <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} onPress={() => { this._showModalView(2) }}>
                                     <View style={[styles.row, styles.alignCenter]}>
                                         <Text style={[styles.fontDefault, styles.fontWeight400]}>{View_SignOff_Summary}</Text>
                                     </View>

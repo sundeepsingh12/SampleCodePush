@@ -250,7 +250,7 @@ class TransientStatusService {
     async sendEmailOrSms(totalAmount, emailTableElement, emailIdOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId) {
         try {
             const userData = await keyValueDBService.getValueFromStore(USER)
-            if (userData && userData.value && userData.value.company && userData.value.company.code &&(_.startsWith(userData.value.company.code, 'dhl') || _.startsWith(userData.value.company.code, 'Dhl') || _.startsWith(userData.value.company.code, 'DHL'))) {
+            if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
                 if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
                     emailOrSmsList = [parseInt(emailIdOrSmsList)]
                 }
@@ -294,11 +294,11 @@ class TransientStatusService {
     prepareDTOOfFromLayoutObject(formLayoutObject, emailIdInFieldData, contactNumberInFieldData) {
         let formattedFormLayoutObject = []
         for (let [id, fieldDataObject] of formLayoutObject.entries()) {
-            if (!fieldDataObject.hidden) {
+            if (fieldDataObject && !fieldDataObject.hidden) {
                 formattedFormLayoutObject.push({
                     key: fieldDataObject.key,
                     label: fieldDataObject.label,
-                    value: (!_.isEmpty(fieldDataObject.value) && fieldDataObject) ? fieldDataObject.value : ""
+                    value: (fieldDataObject.value && !_.isEmpty(fieldDataObject.value)) ? fieldDataObject.value : ""
                 })
                 if (emailIdInFieldData != [] && _.includes(fieldDataObject.value, '@') && _.includes(fieldDataObject.value, '.')) {
                     emailIdInFieldData.push(fieldDataObject.value)
