@@ -135,4 +135,6 @@ module.exports = {
     SYNCED_FILES: 'Synced Files',
     CREATE_BACKUP_BUTTON: '+ Create Backup',
 
+    //DataStore
+    SUGGESTIONS: 'Suggestions'
 }

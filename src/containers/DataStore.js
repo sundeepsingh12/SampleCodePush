@@ -34,7 +34,7 @@ import {
     EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
 import _ from 'lodash'
-
+import { SUGGESTIONS } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         isSearchEnabled: state.dataStore.isSearchEnabled,
@@ -220,7 +220,7 @@ class DataStore extends PureComponent {
 
     getSuggestionsText() {
         if (!this.props.loaderRunning && !_.isEmpty(this.props.dataStoreAttrValueMap)) {
-            return <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>Suggestions</Text>
+            return <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>{SUGGESTIONS}</Text>
         }
     }
 
