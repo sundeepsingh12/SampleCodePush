@@ -252,7 +252,7 @@ class TransientStatusService {
             const userData = await keyValueDBService.getValueFromStore(USER)
             if (userData && userData.value && userData.value.company && userData.value.company.code && (_.startsWith(_.toLower(userData.value.company.code), 'dhl'))) {
                 if (!_.isEmpty(emailIdOrSmsList) && !isEmail) {
-                    emailOrSmsList = [parseInt(emailIdOrSmsList)]
+                    emailIdOrSmsList = [_.trim(emailIdOrSmsList)]
                 }
                 const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
                 let currentJobMasterCode = jobMasterList.value.filter((data) => data.id == jobMasterId)[0].code

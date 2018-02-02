@@ -40,7 +40,8 @@ import {
     Return_To_Home,
     View_SignOff_Summary,
     View_Parcel_Summary,
-    Sign_Off_Summary
+    Sign_Off_Summary,
+    REGEX_TO_CHECK_PHONE_NUMBER
 } from '../lib/AttributeConstants'
 import Loader from '../components/Loader'
 import { connect } from 'react-redux'
@@ -165,7 +166,7 @@ class CheckoutDetails extends PureComponent {
         }
     }
     _sendSmsToTheNumberEntered = () => {
-        if ((!this.props.inputTextToSendSms && (this.props.inputTextToSendSms) == '') || (this.props.inputTextToSendSms[0] != '0') || (_.size(this.props.inputTextToSendSms) < 10) || (!_.isNumber(this.props.inputTextToSendSms))) {
+        if (!this.props.inputTextToSendSms || (this.props.inputTextToSendSms) == '' || (this.props.inputTextToSendSms[0] != '0') || !REGEX_TO_CHECK_PHONE_NUMBER.test(this.props.inputTextToSendSms)) {
             this.props.actions.setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, CONTACT_NUMBER_SHOULD_START_WITH_0_AND_CONTAINS_MINIMUM_OF_10_DIGITS)
         } else {
             this._showModalView(-1)
@@ -323,7 +324,6 @@ class CheckoutDetails extends PureComponent {
     }
 
     _checkForEmailSmsPrintViewButton = () => {
-        console.logs("this.props.companyCodeDhl", this.props.companyCodeDhl)
         if (this.props.companyCodeDhl) {
             return (
                 <View style={[styles.bgWhite]} >
