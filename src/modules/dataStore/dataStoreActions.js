@@ -58,6 +58,10 @@ export function getJobAttribute(jobAttributeMasterId, value) {
 /**
  * 
  * @param {*} currentElement 
+ * @param {*} formElement 
+ * @param {*} jobTransaction 
+ * @param {*} dataStoreFilterReverseMap 
+ * this actions check for filters and validations
  */
 export function checkForFiltersAndValidation(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
     return async function (dispatch) {
@@ -263,7 +267,13 @@ export function checkOfflineDS(searchText, dataStoreMasterId, dataStoreMasterAtt
     }
 }
 
-
+/**
+ * 
+ * @param {*} searchText 
+ * @param {*} dataStoreAttrValueMap 
+ * @param {*} cloneDataStoreAttrValueMap 
+ * this action filters dataStoreAttrMap and set results
+ */
 export function searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap) {
     return async function (dispatch) {
         try {

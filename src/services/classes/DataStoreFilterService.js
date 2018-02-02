@@ -48,18 +48,36 @@ class DataStoreFilterService {
         }
     }
 
+    /**
+     * 
+     * @param {*} token 
+     * @param {*} postJSON 
+     * @returns {dataStoreFilterResponse} response from server
+     */
     fetchDSF(token, postJSON) {
         const url = CONFIG.API.DATA_STORE_FILTER_SEARCH
         const dataStoreFilterResponse = RestAPIFactory(token.value).serviceCall(postJSON, url, POST)
         return dataStoreFilterResponse
     }
 
+    /**
+     * 
+     * @param {*} currentElement 
+     * @param {*} formElement 
+     * @param {*} jobTransaction 
+     * @param {*} jobAttributes 
+     * @param {*} dataStoreFilterReverseMap 
+     * @returns {dataStoreFilterReverseMap,dataStoreAttributeIdtoValueMap}
+     */
     prepareDataStoreFilterMap(currentElement, formElement, jobTransaction, jobAttributes, dataStoreFilterReverseMap) {
         if (!currentElement) {
             throw new Error(CURRENT_ELEMENT_MISSING)
         }
         if (!currentElement.dataStoreFilterMapping || _.isEqual(currentElement.dataStoreFilterMapping, '[]')) {
-            return {}
+            return {
+                dataStoreAttributeIdtoValueMap: {},
+                dataStoreFilterReverseMap
+            }
         }
         if (!jobAttributes || !jobAttributes.value) {
             throw new Error(JOBATTRIBUTES_MISSING)
@@ -78,6 +96,19 @@ class DataStoreFilterService {
         }
     }
 
+    /**
+     * 
+     * @param {*} key 
+     * @param {*} fieldAttributeMasterId 
+     * @param {*} formElement 
+     * @param {*} jobTransaction 
+     * @param {*} jobAttributes 
+     * @param {*} dataStoreAttributeIdtoValueMap 
+     * @param {*} dataStoreFilterReverseMap 
+     * @returns {dataStoreAttributeIdtoValueMap,dataStoreFilterReverseMap}
+     * this method will create object of mapped attribute which is use for fetching DSF data
+     * it also gives dataStoreFilterReverseMap
+     */
     parseKey(key, fieldAttributeMasterId, formElement, jobTransaction, jobAttributes, dataStoreAttributeIdtoValueMap, dataStoreFilterReverseMap) {
         if (key[0] == 'F') {
             let fieldAttributeKey = fieldValidationService.splitKey(key, false)
@@ -109,6 +140,14 @@ class DataStoreFilterService {
         }
     }
 
+    /**
+     * 
+     * @param {*} dataStoreFilterList 
+     * @param {*} cloneDataStoreFilterList 
+     * @param {*} searchText
+     * @returns {dataStoreFilterList,cloneDataStoreFilterList}
+     * returns filtered dataStoreFilterList according to searchText and cloneDataStoreFilterList which is origonal DSF list 
+     */
     searchDSFList(dataStoreFilterList, cloneDataStoreFilterList, searchText) {
         if (!dataStoreFilterList) {
             throw new Error(DSF_LIST_MISSING)
@@ -128,6 +167,15 @@ class DataStoreFilterService {
         }
     }
 
+
+    /**
+     * 
+     * @param {*} fieldAttributeMasterId 
+     * @param {*} dataStoreFilterReverseMap 
+     * @param {*} formElement
+     * @returns {formElement}
+     * this method clear value and displayValue of mapped attribute recursively 
+     */
     clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, formElement) {
         if (!fieldAttributeMasterId) {
             throw new Error(FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING)

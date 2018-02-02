@@ -315,7 +315,6 @@ module.exports = keyMirror({
     FETCH_CASH_TENDERING_LIST_RETURN: null,
     CHANGE_AMOUNT_RETURN: null,
     //Data Store
-    SET_VALIDATIONS: null,
     SET_DATA_STORE_ATTR_MAP: null,
     SHOW_LOADER_DS: null,
     SHOW_ERROR_MESSAGE: null,

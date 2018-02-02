@@ -555,8 +555,16 @@ class DataStoreService {
         return dataStoreAttrValueMap
     }
 
+    /**
+     * 
+     * @param {*} currentElement 
+     * @param {*} formElement 
+     * @param {*} jobTransaction 
+     * @param {*} dataStoreFilterReverseMap
+     * @returns { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validation}
+     * this method checks for filters present and if filters are not present then it checks for validation 
+     */
     async checkForFiltersAndValidations(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
-        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!currentElement) {
             throw new Error(CURRENT_ELEMENT_MISSING)
         }
@@ -576,6 +584,7 @@ class DataStoreService {
                 validation
             }
         }
+        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)        
         let returnParams = await dataStoreFilterService.fetchDataForFilter(token, currentElement, true, formElement, jobTransaction, dataStoreFilterReverseMap)
         let dataStoreAttrValueMap = await this.createDataStoreAttrValueMapInCaseOfFilter(returnParams.dataStoreFilterResponse, currentElement.dataStoreAttributeId)
         return {
@@ -586,6 +595,13 @@ class DataStoreService {
         }
     }
 
+    /**
+     * 
+     * @param {Object} dataStoreResponse 
+     * @param {number} dataStoreAttributeId 
+     * @returns {dataStoreAttrValueMap}
+     * this function return dataStoreAttrValueMap making appropriate structure using dataStoreResponse
+     */
     createDataStoreAttrValueMapInCaseOfFilter(dataStoreResponse, dataStoreAttributeId) {
         let dataStoreAttrValueMap = {}
         if (!dataStoreResponse) {
@@ -613,6 +629,14 @@ class DataStoreService {
         return dataStoreAttrValueMap
     }
 
+    /**
+     * 
+     * @param {String} searchText 
+     * @param {Object} dataStoreAttrValueMap 
+     * @param {Object} cloneDataStoreAttrValueMap 
+     * @returns {dataStoreAttrValueMap,cloneDataStoreAttrValueMap}
+     * This method search values from data store attr map and return filtered map along with cloned origonal map
+     */
     searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap) {
         if (!searchText) {
             throw new Error(SEARCH_TEXT_MISSING)

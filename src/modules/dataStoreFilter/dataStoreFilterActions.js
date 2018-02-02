@@ -13,6 +13,15 @@ import CONFIG from '../../lib/config'
 import _ from 'lodash'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 
+
+/**
+ * 
+ * @param {*} currentElement 
+ * @param {*} formElement 
+ * @param {*} jobTransaction 
+ * @param {*} dataStoreFilterReverseMap 
+ * this action sets dataStoreFilterResponse and dataStoreFilterReverseMap by fetching data from server
+ */
 export function getDSFListContent(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
     return async function (dispatch) {
         try {
@@ -27,7 +36,13 @@ export function getDSFListContent(currentElement, formElement, jobTransaction, d
     }
 }
 
-
+/**
+ * 
+ * @param {*} dataStoreFilterList 
+ * @param {*} cloneDataStoreFilterList 
+ * @param {*} searchText 
+ * this action filters dataStoreFilterList using searchText
+ */
 export function getFilteredResults(dataStoreFilterList, cloneDataStoreFilterList, searchText) {
     return async function (dispatch) {
         try {
