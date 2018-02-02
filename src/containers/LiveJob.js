@@ -46,7 +46,8 @@ function mapStateToProps(state) {
         currentStatus: state.liveJob.currentStatus,
         jobDataList: state.liveJob.jobDataList,
         jobTransaction: state.liveJob.jobTransaction,
-        toastMessage: state.liveJob.toastMessage
+        toastMessage: state.liveJob.toastMessage,
+        isLoading: state.liveJob.isLoading
     }
 }
 
@@ -70,10 +71,39 @@ class LiveJob extends PureComponent {
         clearInterval(this.state.timer);
     }
 
+    getLoader() {
+        let loader
+        if (this.props.isLoading) {
+            loader = <Loader />
+        }
+        return loader
+    }
     tick = () => {
-        this.setState({
-            counter: moment(this.state.counter, 'HH:mm:ss').subtract(1, 'seconds')
-        });
+        let jobEndTime = moment(this.props.navigation.state.params.liveJobList[this.props.navigation.state.params.job.id].jobEndTime, 'HH:mm:ss')
+        let currentTime = moment()
+        this.setCounterNgative(jobEndTime, currentTime)
+        if (this.state.counterNegative) {
+            this.setState({
+                counter: moment(this.state.counter, 'HH:mm:ss').add(1, 'seconds')
+            });
+        } else {
+            this.setState({
+                counter: moment(this.state.counter, 'HH:mm:ss').subtract(1, 'seconds')
+            });
+        }
+    }
+    getDifference = (jobEndTime, currentTime) => {
+        if (this.state.counterNegative)
+            return moment.utc(moment(currentTime, "HH:mm:ss").diff(moment(jobEndTime, "HH:mm:ss"))).format("HH:mm:ss")
+        else {
+            return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
+        }
+    }
+    setCounterNgative = (jobEndTime, currentTime) => {
+
+        if (moment(jobEndTime).diff(moment(currentTime)) <= 0) {
+            this.setState({ counterNegative: true })
+        }
     }
     getJobEndTime = () => {
         let jobEndTime = moment(this.props.navigation.state.params.liveJobList[this.props.navigation.state.params.job.id].jobEndTime, 'HH:mm:ss')
@@ -83,13 +113,17 @@ class LiveJob extends PureComponent {
         // }
         return moment.utc(moment(jobEndTime, "HH:mm:ss").diff(moment(currentTime, "HH:mm:ss"))).format("HH:mm:ss")
     }
-    // componentWillMount() {
-    //     this.props.actions.setState(SET_LIVE_JOB_TOAST, '')
-    // }
+    componentWillMount() {
+        let jobEndTime = moment(this.props.navigation.state.params.liveJobList[this.props.navigation.state.params.job.id].jobEndTime, 'HH:mm:ss')
+        let currentTime = moment()
+        this.setCounterNgative(jobEndTime, currentTime)
+    }
     componentDidMount() {
-        let endTime = this.getJobEndTime()
+        let jobEndTime = moment(this.props.navigation.state.params.liveJobList[this.props.navigation.state.params.job.id].jobEndTime, 'HH:mm:ss')
+        let currentTime = moment()
+        let differenceInTime = this.getDifference(jobEndTime, currentTime)
         this.setState({
-            counter: endTime
+            counter: differenceInTime
         })
         let timer = setInterval(this.tick, 1000);
         this.setState({ timer });
@@ -101,10 +135,39 @@ class LiveJob extends PureComponent {
                 text: this.props.toastMessage,
                 position: 'bottom',
                 buttonText: 'Okay',
+                duration: 5000
             })
         }
     }
+    renderTime() {
+        if (this.props.isLoading) return
+        if (this.state.counterNegative) {
+            return (
+                <View style={[styles.heightAuto, styles.bgWarning]}>
+                    <Text style={[styles.alignSelfCenter, styles.fontWhite]}>
+                        <Text>
+                            {'Delayed by ' + (moment(this.state.counter, "HH:mm:ss")).hours() + ' hours ' +
+                                (moment(this.state.counter, "HH:mm:ss")).minutes() + ' minutes ' +
+                                (moment(this.state.counter, "HH:mm:ss")).seconds() + ' seconds'} </Text>
+                    </Text>
+                </View>
+            )
+        } else {
+            return (
+                <View style={[styles.heightAuto, styles.bgWarning]}>
+                    <Text style={[styles.alignSelfCenter, styles.fontWhite]}>
+                        <Text>
+                            {(moment(this.state.counter, "HH:mm:ss")).hours() + ' hours ' +
+                                (moment(this.state.counter, "HH:mm:ss")).minutes() + ' minutes ' +
+                                (moment(this.state.counter, "HH:mm:ss")).seconds() + ' seconds left'}
+                        </Text>
+                    </Text>
+                </View>)
+        }
+    }
     render() {
+        let remainingTime = this.renderTime()
+        let loader = this.getLoader()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
@@ -146,37 +209,33 @@ class LiveJob extends PureComponent {
                                 </View>
                             </View>
                         </View>
-                        <View style={[styles.heightAuto, styles.bgWarning]}>
-                            <Text style={[styles.alignSelfCenter, styles.fontWhite]}>
-                                {
-                                    (moment(this.state.counter, "HH:mm:ss")).hours() + ' hours ' +
-                                    (moment(this.state.counter, "HH:mm:ss")).minutes() + ' minutes ' +
-                                    (moment(this.state.counter, "HH:mm:ss")).seconds() + ' seconds left'
-                                }
-                            </Text>
-                        </View>
-                        <View style={[styles.row, styles.bgWhite]}>
-                            <View style={[styles.padding10, styles.paddingRight5, styles.flexBasis50]}>
-                                <Button full style={[styles.bgDanger]} onPress={() => this.props.actions.acceptOrRejectJob(2, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList)}>
-                                    <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
-                                </Button>
-                            </View>
-                            <View style={[styles.padding10, styles.paddingLeft5, styles.flexBasis50]}>
-                                <Button full style={[styles.bgSuccess]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.navigation.state.params.job, this.props.navigation.state.params.liveJobList)}>
-                                    <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
-                                </Button>
-                            </View>
-                        </View>
+                        {loader}
+
+                        {remainingTime}
+
+                        {renderIf(!this.state.counterNegative && !this.props.isLoading,
+                            <View style={[styles.row, styles.bgWhite]}>
+                                <View style={[styles.padding10, styles.paddingRight5, styles.flexBasis50]}>
+                                    <Button full style={[styles.bgDanger]} onPress={() => this.props.actions.acceptOrRejectJob(2, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)}>
+                                        <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
+                                    </Button>
+                                </View>
+                                <View style={[styles.padding10, styles.paddingLeft5, styles.flexBasis50]}>
+                                    <Button full style={[styles.bgSuccess]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)}>
+                                        <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
+                                    </Button>
+                                </View>
+                            </View>)}
                     </View>
                     <Content>
                         {/*Basic Details*/}
-                        <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
-                            <ExpandableHeader
-                                title={'Basic Details'}
-                                dataList={this.props.jobDataList}
-                            />
-                        </View>
-
+                        {renderIf(!this.props.isLoading,
+                            <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+                                <ExpandableHeader
+                                    title={'Basic Details'}
+                                    dataList={this.props.jobDataList}
+                                />
+                            </View>)}
                     </Content>
                     <Footer style={[style.footer]}>
 
@@ -189,7 +248,6 @@ class LiveJob extends PureComponent {
 
 
 const style = StyleSheet.create({
-    //  styles.column, styles.paddingLeft0, styles.paddingRight0, {height: 'auto'}
     header: {
         borderBottomWidth: 0,
         height: 'auto',

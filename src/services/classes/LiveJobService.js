@@ -39,7 +39,7 @@ class LiveJobService {
         }
     }
     async requestServerForApproval(status, token, job, liveJobList) {
-        let postJson = "{\"jobId\":\"" + job.id + "\", \"jobDate\":\"" + job.jobStartTime + "\", \"statusId\":\"" + status + "\"}"
+        let postJson = "{\"jobId\":\"" + job.id + "\",\"jobDate\":\"" + job.jobStartTime + "\",\"statusId\":\"" + status + "\"}"
         try {
             let toastMessage = '', newLiveJobList
             let serviceAlertResponse = await RestAPIFactory(token.value).serviceCall(postJson, CONFIG.API.SERVICE_ALERT_JOB, 'POST')

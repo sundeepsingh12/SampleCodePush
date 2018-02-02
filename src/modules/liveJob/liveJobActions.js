@@ -22,7 +22,8 @@ import {
     TabScreen,
     SET_MESSAGE,
     SET_LIVE_JOB_TOAST,
-    HomeTabNavigatorScreen
+    HomeTabNavigatorScreen,
+    SET_LIVE_JOB_LOADER
 } from '../../lib/constants'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -31,6 +32,7 @@ export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_MESSAGE, ''))
+            dispatch(setState(SET_LIVE_JOB_LOADER, true))
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
@@ -67,7 +69,7 @@ export function acceptOrRejectJob(status, job, liveJobList) {
                     index: 1,
                     actions: [
                         NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                        NavigationActions.navigate({ routeName: TabScreen })
+                        NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: false } })
                     ]
                 }))
             } else if (status == 2 && _.isEmpty(serverResponse.newLiveJobList)) {
@@ -131,7 +133,7 @@ export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
                     index: 1,
                     actions: [
                         NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-                        NavigationActions.navigate({ routeName: TabScreen })
+                        NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: false } })
                     ]
                 }))
             } else if (status == 2 && _.isEmpty(serverResponseForLive.newLiveJobList)) {
