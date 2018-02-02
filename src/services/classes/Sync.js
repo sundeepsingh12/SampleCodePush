@@ -320,8 +320,10 @@ class Sync {
     let jobQuery = jobIds.map(jobId => 'id = ' + jobId.id).join(' OR ')
     jobQuery = jobQuery + ' AND status = 6'
     let jobsInDbList = await realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
-    if (jobsInDbList.length <= 0)
+    if (jobsInDbList.length <= 0){
+      await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(true))
       return
+    }
     await realm.deleteRecordsInBatch(jobDatas, jobTransactions, jobs, fieldDatas)
     return
   }
@@ -546,10 +548,9 @@ class Sync {
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
           const jobMasterTitleList = (jobMasterIds.constructor===Array)?await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds):jobMasterIds
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
-          if (!_.isNull(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value.showLiveJobNotification))) {
+          if (!_.isNull(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value))) {
             this.showNotification(jobMasterTitleList)
-            await keyValueDBService.deleteValueFromStore('LIVE_JOB')
-            await keyValueDBService.validateAndUpdateData('LIVE_JOB', { showLiveJobNotification: false })
+            await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
           }
           await jobSummaryService.updateJobSummary(dataList.jobSummaries)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)

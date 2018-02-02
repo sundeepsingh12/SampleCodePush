@@ -403,6 +403,7 @@ module.exports = keyMirror({
     SET_SEARCH: null,
     SET_MESSAGE: null,
     SET_LIVE_JOB_TOAST: null,
+    SET_LIVE_JOB_LOADER: null,
 
     //Summary
     SET_SUMMARY_FOR_JOBMASTER: null,
