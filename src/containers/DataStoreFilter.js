@@ -98,7 +98,7 @@ class DataStoreFilter extends PureComponent {
         this.props.actions.setState(SET_DSF_SEARCH_TEXT, searchText)
         if (searchText != '') {
             this.props.actions.getFilteredResults(this.props.dataStoreFilterList, this.props.cloneDataStoreFilterList, searchText)
-        } else {
+        } else if(!_.isEmpty(this.props.cloneDataStoreFilterList))  {
             this.props.actions.setState(DATA_STORE_FILTER_LIST, this.props.cloneDataStoreFilterList)
         }
     }
