@@ -40,6 +40,7 @@ var InitialState = Record({
         updateDraft: false,
         isFormValid: true,
         fieldAttributeMasterParentIdMap: {},
+        modalFieldAttributeMasterId: null
 })
 
 export default InitialState

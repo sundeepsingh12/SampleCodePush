@@ -6,6 +6,7 @@ module.exports = {
     CANCEL: 'Cancel',
     OK: 'Ok',
     SAVE: 'Save',
+    DONE: 'DONE',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -108,4 +109,7 @@ module.exports = {
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
     COLLECTION_SOD: 'Collection-SOD',
+
+    //Multiple Option Container
+    NO_OPTIONS_PRESENT: 'No options Present',
 }

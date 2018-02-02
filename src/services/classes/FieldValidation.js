@@ -9,6 +9,7 @@ import { fieldAttributeMasterService } from './FieldAttributeMaster'
 import {
     AFTER,
     ALERT_MESSAGE,
+    ARRAY_SAROJ_FAREYE,
     ASSIGN,
     ASSIGN_BY_MATHEMATICAL_FORMULA,
     ASSIGN_DATE_TIME,
@@ -27,6 +28,7 @@ import {
     MAX,
     MIN,
     NOT_EQUAL_TO,
+    OBJECT_SAROJ_FAREYE,
     RE_ATTEMPT_DATE,
     REGEX,
     REQUIRED_FALSE,
@@ -177,6 +179,10 @@ class FieldValidation {
             fieldAttributeMasterId = fieldAttributeMasterId != NaN ? fieldAttributeMasterId : id
             if (!formElement.get(fieldAttributeMasterId) && fieldAttributeMasterParentIdMap) {
                 return (this.getChildFieldAttribute(fieldAttributeMasterId, formElement, fieldAttributeMasterParentIdMap))
+            } else if (formElement.get(fieldAttributeMasterId).displayValue == ARRAY_SAROJ_FAREYE || formElement.get(fieldAttributeMasterId).displayValue == OBJECT_SAROJ_FAREYE) {
+                let childList = this.getChildFieldDataValue(formElement.get(fieldAttributeMasterId).childDataList, fieldAttributeMasterId)
+                console.log(childList)
+                return childList
             }
             return formElement.get(fieldAttributeMasterId) ? formElement.get(fieldAttributeMasterId).displayValue : null
         } else if (key[0] == 'J') {

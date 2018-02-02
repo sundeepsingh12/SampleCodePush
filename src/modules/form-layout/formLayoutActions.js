@@ -23,7 +23,8 @@ import {
     CLEAR_BULK_STATE,
     SET_FORM_TO_INVALID,
     USER,
-    AutoLogoutScreen
+    AutoLogoutScreen,
+    SET_OPTION_ATTRIBUTE_ERROR
 } from '../../lib/constants'
 
 import {
@@ -48,6 +49,10 @@ import { dataStoreService } from '../../services/classes/DataStoreService'
 import { UNIQUE_VALIDATION_FAILED } from '../../lib/ContainerConstants'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import moment from 'moment'
+import getTheme from '../../../native-base-theme/components';
+import platform from '../../../native-base-theme/variables/platform';
+import styles from '../../themes/FeStyle'
+import { Toast } from 'native-base'
 
 export function _setFormList(sortedFormAttributesDto) {
     return {
@@ -137,23 +142,35 @@ export function updateFieldData(attributeId, value, formElement) {
     }
 }
 
-export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap) {
+export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, modalPresent) {
     return function (dispatch) {
-        const cloneFormElement = _.cloneDeep(formElement)
-        cloneFormElement.get(attributeMasterId).displayValue = value
-        cloneFormElement.get(attributeMasterId).childDataList = fieldDataListObject.fieldDataList
-        let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
-        cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
-        const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, fieldDataListObject.fieldDataList, NEXT_FOCUS, jobTransaction);
-        dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
-            {
-                formElement: updatedFieldDataObject.formLayoutObject,
-                latestPositionId: fieldDataListObject.latestPositionId,
-                isSaveDisabled: updatedFieldDataObject.isSaveDisabled
+        try {
+            const cloneFormElement = _.cloneDeep(formElement)
+            cloneFormElement.get(attributeMasterId).displayValue = value
+            cloneFormElement.get(attributeMasterId).childDataList = fieldDataListObject.fieldDataList
+            let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
+            cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
+            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction);
+            dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
+                {
+                    formElement: updatedFieldDataObject.formLayoutObject,
+                    latestPositionId: fieldDataListObject.latestPositionId,
+                    isSaveDisabled: updatedFieldDataObject.isSaveDisabled,
+                    modalFieldAttributeMasterId: validationsResult ? null : modalPresent ? attributeMasterId : null
+                }
+            ))
+            if (validationsResult && !modalPresent) {
+                dispatch(NavigationActions.back())
             }
-        ))
-        if(validationsResult) {
-            dispatch(NavigationActions.back())
+            if (!validationsResult && cloneFormElement.get(attributeMasterId).alertMessage) {
+                if (modalPresent) {
+                    dispatch(setState(SET_OPTION_ATTRIBUTE_ERROR, { error: cloneFormElement.get(attributeMasterId).alertMessage }))
+                } else {
+                    Toast.show({ text: cloneFormElement.get(attributeMasterId).alertMessage, position: 'bottom', buttonText: 'OK', duration: 5000 })
+                }
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 }

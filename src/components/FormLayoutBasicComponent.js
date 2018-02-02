@@ -22,6 +22,7 @@ import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import SelectFromList from '../containers/SelectFromList'
+import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
 import QRIcon from '../svg_components/icons/QRIcon'
 
 import {
@@ -66,7 +67,8 @@ import {
 import {
     NEXT_FOCUS,
     CameraAttribute,
-    Payment
+    Payment,
+    SET_MODAL_FIELD_ATTRIBUTE
 } from '../lib/constants'
 import {
     OPTIONAL,
@@ -78,7 +80,8 @@ import TimePicker from '../components/TimePicker'
 
 function mapStateToProps(state) {
     return {
-        formElement: state.formLayout.formElement
+        formElement: state.formLayout.formElement,
+        modalFieldAttributeMasterId: state.formLayout.modalFieldAttributeMasterId
     }
 }
 
@@ -89,14 +92,6 @@ function mapDispatchToProps(dispatch) {
 }
 class BasicFormElement extends PureComponent {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            selectFromListEnable: false,
-            showNPS: false,
-            showDateTimePicker: false,
-        }
-    }
     navigateToScene = (item) => {
         let screenName = ''
         let cash = 0
@@ -202,42 +197,26 @@ class BasicFormElement extends PureComponent {
     }
 
     _inflateModal = () => {
-        this.setState(previousState => {
-            return {
-                selectFromListEnable: !this.state.selectFromListEnable
-            }
-        })
-        this.props.actions.fieldValidations(this.props.item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
+
     }
     onSaveDateTime = (value) => {
         this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap);
-        this.setState({ showDateTimePicker: false, showNPS: false })
         //  this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction, this.props.isSaveDisabled)
     }
 
     cancelDateTimePicker = () => {
-        this.setState({ showDateTimePicker: false, showNPS: false })
+
     }
     _dropModal = () => {
-        this.setModalVisible(false)
+
     }
     setModalVisible = (visible) => {
-        this.setState(() => {
-            return {
-                showNPS: visible,
-            }
-        })
+
     }
     _showNPS = () => {
-        this.setState(previousState => {
-            return {
-                showNPS: true
-            }
-        })
         this.props.actions.fieldValidations(this.props.item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
     }
     _showDateTime = () => {
-        this.setState({ showDateTimePicker: true })
         this.props.actions.fieldValidations(this.props.item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
     }
 
@@ -250,22 +229,27 @@ class BasicFormElement extends PureComponent {
     }
 
     getModalView() {
-        if (this.state.selectFromListEnable) {
+        if (!this.props.modalFieldAttributeMasterId || this.props.modalFieldAttributeMasterId !== this.props.item.fieldAttributeMasterId) {
+            return null
+        }
+        let attributeTypeId = this.props.formElement.get(this.props.modalFieldAttributeMasterId).attributeTypeId
+        console.log(attributeTypeId)
+        if (attributeTypeId == CHECKBOX || attributeTypeId == OPTION_RADIO_FOR_MASTER || attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN) {
             return (
                 <View>
-                    <SelectFromList
+                    <MultipleOptionsAttribute
                         currentElement={this.props.item}
                         formElements={this.props.formElement}
                         isSaveDisabled={this.props.isSaveDisabled}
                         jobTransaction={this.props.jobTransaction}
                         jobStatusId={this.props.jobStatusId}
                         latestPositionId={this.props.latestPositionId}
-                        press={this._inflateModal}
+                        fieldAttributeMasterParentIdMap={ this.props.fieldAttributeMasterParentIdMap}
                     />
                 </View>
             )
         }
-        if (this.state.showNPS) {
+        if (false) {
             return (
                 <View>
                     <Modal
@@ -287,7 +271,7 @@ class BasicFormElement extends PureComponent {
                 </View>
             )
         }
-        if (this.state.showDateTimePicker) {
+        if (false) {
             return (
                 <TimePicker onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item} />
             )
@@ -307,11 +291,43 @@ class BasicFormElement extends PureComponent {
             })
     }
 
+    getMultipleOptionCardView(modalView) {
+        return (
+            <TouchableOpacity
+                style={[{ paddingVertical: 50 }, this.props.item.focus ? styles.borderLeft4 : null]}
+                onPress={() => { this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, this.props.item.fieldAttributeMasterId) }}
+                disabled={this.props.modalFieldAttributeMasterId ? true : false}
+            >
+                <View style={[styles.marginHorizontal10]}>
+                    {modalView}
+                    <View style={[styles.borderBottomBlack, styles.relative]}>
+                        <Text style={[styles.marginBottom10, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), styles.fontDefault]}>
+                            {this.props.item.label}
+                            {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}
+                        </Text>
+                        {this.props.item.subLabel ?
+                            <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Text>
+                            : null}
+                        {this.props.item.helpText ?
+                            <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.helpText}</Text>
+                            : null}
+                        <Text style={[this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), styles.fontLg, styles.marginBottom10]}>
+                            {this.props.item.value ? (this.props.item.value == ARRAY_SAROJ_FAREYE || this.props.item.value == OBJECT_SAROJ_FAREYE) ? this.props.item.childDataList ? this.props.item.childDataList.length + SELECTED : null : this.props.item.value : this.props.item.helpText}
+                        </Text>
+                        <Icon name="md-arrow-dropdown" style={[styles.absolute, styles.fontLg, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), { bottom: 10, right: 0 }]} />
+                    </View>
+                </View>
+            </TouchableOpacity>
+        )
+    }
+
     render() {
-        let modalView = this.getModalView()
         if (this.props.item.hidden) {
             return null
         }
+        let modalView = this.getModalView()
+        let multipleOptionCardView = this.getMultipleOptionCardView(modalView)
+
         switch (this.props.item.attributeTypeId) {
             case STRING:
             case TEXT:
@@ -369,10 +385,6 @@ class BasicFormElement extends PureComponent {
                             {this.props.item.alertMessage ?
                                 <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{this.props.item.alertMessage}</Label>
                                 : null}
-                            {/* <View style={[styles.row, styles.jus, styles.alignCenter, styles.paddingTop10, styles.paddingBottom5]}>
-                                <Icon name="md-information-circle" style={[styles.fontDanger, styles.fontLg]} />
-                                <Text style={[styles.fontSm, styles.fontDanger, styles.marginLeft5]}>error Message</Text>
-                            </View> */}
                         </View>
                     </View>
                 )
@@ -402,27 +414,9 @@ class BasicFormElement extends PureComponent {
             case DROPDOWN:
             case OPTION_RADIO_FOR_MASTER:
                 return (
-                    <TouchableOpacity onPress={this._inflateModal} style={[{ paddingVertical: 50 }, this.props.item.focus ? styles.borderLeft4 : null]}>
-                        <View style={[styles.marginHorizontal10]}>
-                            {modalView}
-                            <View style={[styles.borderBottomBlack, styles.relative]}>
-                                <Text style={[styles.marginBottom10, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), styles.fontDefault]}>
-                                    {this.props.item.label}
-                                    {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}
-                                </Text>
-                                {this.props.item.subLabel ?
-                                    <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.subLabel}</Text>
-                                    : null}
-                                {this.props.item.helpText ?
-                                    <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.helpText}</Text>
-                                    : null}
-                                <Text style={[this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), styles.fontLg, styles.marginBottom10]}>
-                                    {this.props.item.value ? (this.props.item.value == ARRAY_SAROJ_FAREYE || this.props.item.value == OBJECT_SAROJ_FAREYE) ? this.props.item.childDataList ? this.props.item.childDataList.length + SELECTED : null : this.props.item.value : this.props.item.helpText}
-                                </Text>
-                                <Icon name="md-arrow-dropdown" style={[styles.absolute, styles.fontLg, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), { bottom: 10, right: 0 }]} />
-                            </View>
-                        </View>
-                    </TouchableOpacity>
+                    <View>
+                        {multipleOptionCardView}
+                    </View>
                 )
             case DATE:
             case RE_ATTEMPT_DATE:
@@ -430,8 +424,7 @@ class BasicFormElement extends PureComponent {
                 return (
                     <View>
                         {modalView}
-                        {renderIf(!this.props.item.hidden,
-                            <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />)}
+                        <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />
                     </View>
                 )
             default:
