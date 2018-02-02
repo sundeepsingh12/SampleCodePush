@@ -72,7 +72,7 @@ class NewJob {
             navigationParams = {
                 calledFromNewJob: true,
                 jobMasterId: jobMaster.id,
-                navigationFormLayoutStates: saveActivatedData.value[jobMaster.id].saveActivatedState.arrayFormElement,
+                navigationFormLayoutStates: saveActivatedData.value[jobMaster.id].navigationFormLayoutStates,
                 jobTransaction: saveActivatedData.value[jobMaster.id].navigationParams.jobTransaction,
                 contactData: saveActivatedData.value[jobMaster.id].navigationParams.contactData,
                 currentStatus: saveActivatedData.value[jobMaster.id].navigationParams.currentStatus
@@ -85,7 +85,10 @@ class NewJob {
                 commonData: saveActivatedData.value[jobMaster.id].navigationParams.commonData,
                 recurringData: saveActivatedData.value[jobMaster.id].navigationParams.recurringData,
                 signOfData: saveActivatedData.value[jobMaster.id].navigationParams.signOfData,
-                totalAmount: saveActivatedData.value[jobMaster.id].navigationParams.totalAmount
+                totalAmount: saveActivatedData.value[jobMaster.id].navigationParams.totalAmount,
+                emailTableElement: saveActivatedData.value[jobMaster.id].navigationParams.emailTableElement,
+                emailIdInFieldData: saveActivatedData.value[jobMaster.id].navigationParams.emailIdInFieldData,
+                contactNumberInFieldData: saveActivatedData.value[jobMaster.id].navigationParams.contactNumberInFieldData
             }
         }
         return {

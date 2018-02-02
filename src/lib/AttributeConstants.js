@@ -260,7 +260,7 @@ module.exports = {
     Yes_Checkout: 'Yes,Checkout',
     Total: 'Total :',
     Select_Next_Status: 'Select Next Status',
-
+    REGEX_TO_CHECK_PHONE_NUMBER: /^[0-9]{10,25}$/,
 
     TOKEN_MISSING: 'Token Missing',
     LOGIN: '?login=',

@@ -134,10 +134,6 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
       if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
       } else {
-        let saveStoreObject = {
-          showLiveJobNotification: false
-        }
-        keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
         transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -258,10 +254,7 @@ export function startMqttService(pieChart) {
       client.on('messageReceived', message => {
         console.log('message.payloadString', message.payloadString)
         if (message.payloadString == 'Live Job Notification') {
-          let saveStoreObject = {
-            showLiveJobNotification: true
-          }
-          keyValueDBService.validateAndSaveData('LIVE_JOB', saveStoreObject)
+          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
           dispatch(performSyncService(pieChart, true, true))
         } else {
           dispatch(performSyncService(pieChart, true))
@@ -288,7 +281,7 @@ export function startMqttService(pieChart) {
 
 export function startTracking() {
   return async function (dispatch) {
-    trackingService.init()
+    // trackingService.init()
   }
 }
 

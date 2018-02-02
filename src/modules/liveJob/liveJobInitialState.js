@@ -7,7 +7,8 @@ var InitialState = Record({
     jobTransaction: null,
     currentStatus: null,
     liveJobDetailsLoading: false,
-    toastMessage: ''
+    toastMessage: '',
+    isLoading: false
 })
 
 export default InitialState
