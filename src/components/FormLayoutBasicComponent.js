@@ -196,28 +196,16 @@ class BasicFormElement extends PureComponent {
         }
     }
 
-    _inflateModal = () => {
-
-    }
     onSaveDateTime = (value) => {
-        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap);
-        //  this.props.actions.fieldValidations(currentElement, this.props.formElement, 'After', this.props.jobTransaction, this.props.isSaveDisabled)
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap, true)
     }
 
-    cancelDateTimePicker = () => {
+    onPressModal = () => {
+        this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, this.props.item.fieldAttributeMasterId)
+    }
 
-    }
-    _dropModal = () => {
-
-    }
-    setModalVisible = (visible) => {
-
-    }
-    _showNPS = () => {
-        this.props.actions.fieldValidations(this.props.item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
-    }
-    _showDateTime = () => {
-        this.props.actions.fieldValidations(this.props.item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
+    onCloseModal = () => {
+        this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
     }
 
     getComponentLabelStyle(focus, editable) {
@@ -244,25 +232,24 @@ class BasicFormElement extends PureComponent {
                         jobTransaction={this.props.jobTransaction}
                         jobStatusId={this.props.jobStatusId}
                         latestPositionId={this.props.latestPositionId}
-                        fieldAttributeMasterParentIdMap={ this.props.fieldAttributeMasterParentIdMap}
+                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
                     />
                 </View>
             )
         }
-        if (false) {
+        if (attributeTypeId == NPS_FEEDBACK) {
             return (
                 <View>
                     <Modal
                         animationType="slide"
                         transparent={true}
-                        visible={this.state.showNPS}
-                        onRequestClose={this._dropModal}>
+                        onRequestClose={this.onCloseModal}>
                         <TouchableHighlight
                             style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
                             <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
                                 <View>
-                                    < NPSFeedback
-                                        onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item}
+                                    <NPSFeedback
+                                        onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item}
                                     />
                                 </View>
                             </TouchableHighlight>
@@ -271,9 +258,9 @@ class BasicFormElement extends PureComponent {
                 </View>
             )
         }
-        if (false) {
+        if (attributeTypeId == TIME || attributeTypeId == DATE || attributeTypeId == RE_ATTEMPT_DATE) {
             return (
-                <TimePicker onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={this.props.item} />
+                <TimePicker onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item} />
             )
         }
         return null
@@ -407,7 +394,7 @@ class BasicFormElement extends PureComponent {
             case NPS_FEEDBACK:
                 return <View>
                     {modalView}
-                    <FormLayoutActivityComponent item={this.props.item} press={this._showNPS} />
+                    <FormLayoutActivityComponent item={this.props.item} press={this.onPressModal} />
                 </View>
             case CHECKBOX:
             case RADIOBUTTON:
@@ -424,7 +411,7 @@ class BasicFormElement extends PureComponent {
                 return (
                     <View>
                         {modalView}
-                        <FormLayoutActivityComponent item={this.props.item} press={this._showDateTime} />
+                        <FormLayoutActivityComponent item={this.props.item} press={this.onPressModal} />
                     </View>
                 )
             default:
