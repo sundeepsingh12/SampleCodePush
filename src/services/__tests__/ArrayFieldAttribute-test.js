@@ -6,6 +6,7 @@ import {
     OBJECT_SAROJ_FAREYE,
     INVALID_CONFIG_ERROR
 } from '../../lib/AttributeConstants'
+import { backupService } from '../classes/BackupService';
 describe('test cases for getSortedArrayChildElements', () => {
     it('should return null arrayElements when arrayelements is not empty', () => {
         expect(arrayService.getSortedArrayChildElements(0, { test: 1 }, {})).toEqual(undefined)

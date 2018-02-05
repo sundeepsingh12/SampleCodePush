@@ -24,7 +24,8 @@ import {
   SAVE_ACTIVATED,
   LIVE_JOB,
   USER_EVENT_LOG,
-  PENDING_SYNC_TRANSACTION_IDS
+  PENDING_SYNC_TRANSACTION_IDS,
+  SHOULD_CREATE_BACKUP
 } from '../../lib/constants'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -91,6 +92,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
       await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)            
       await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
+      await keyValueDBService.deleteValueFromStore(SHOULD_CREATE_BACKUP)
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0

@@ -56,8 +56,10 @@ class RestAPI {
    *  }
    */
   async _fetch(opts, fetchRequestId) {
-    let url = this.API_BASE_URL + opts.url
-    console.log('url', url)
+    let url = opts.url
+    if(!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK)){
+    url = this.API_BASE_URL + url
+    }
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
@@ -79,7 +81,7 @@ class RestAPI {
     } catch (e) {
       res.json = {}
     }
-    if (res.status != 200) {
+    if (res.status != 200 && res.status != 202) {
       throw {
         code: res.status,
         message: ((res.json && res.json.message) ? res.json.message : 'Unknow error. Retry or contact support.')
@@ -185,31 +187,40 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile() {
+  async uploadZipFile(path, fileName) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
     // console.log('jid',jid)
-    var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
+    var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
+    var filePath = (!path) ? PATH + '/sync.zip' : PATH
     let responseBody = "Fail"
     await RNFetchBlob.fetch('POST', this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API, {
-      Authorization: this._sessionToken,
+      'cookie': this._sessionToken,
       'Content-Type': 'multipart/form-data',
     }, [
-        { name: 'file', filename: 'sync.zip', type: '*/*', data: RNFetchBlob.wrap(PATH + '/sync.zip') },
+        { name: 'file', filename: (!fileName) ? 'sync.zip' : fileName, data: RNFetchBlob.wrap(filePath) },
       ]).uploadProgress((written, total) => {
-        console.log('uploaded', written / total)
       }).then(async (resp) => {
-        responseBody = resp.text()
-        const message = responseBody.split(",")[0]
-        const syncCount = responseBody.split(",")[1]
-        if (message == 'success') {
-          //do something
-          const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
-          await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
-          await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-          // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-        }
-        else {
-          throw new Error(responseBody)
+        if (!path) {
+          responseBody = resp.text()
+          const message = responseBody.split(",")[0]
+          const syncCount = responseBody.split(",")[1]
+          if (message == 'success') {
+            //do something
+            const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+            await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
+            await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+            // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+          }
+          else {
+            throw new Error(responseBody)
+          }
+        } else {
+          responseBody = resp.text()
+          console.log('responseBody', responseBody)
+          const message = responseBody.split(",")[0]
+          if (message != 'success') {
+            throw new Error(responseBody)
+          }
         }
       }).catch(err => {
         throw {

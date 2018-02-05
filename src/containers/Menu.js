@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity,Alert } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
 
 import Loader from '../components/Loader'
 
@@ -35,7 +35,8 @@ import CustomAlert from '../components/CustomAlert'
 import {
   PROFILE_ID,
   STATISTIC_ID,
-  OFFLINEDATASTORE_ID
+  OFFLINEDATASTORE_ID,
+  BACKUP_ID
 } from '../lib/AttributeConstants'
 
 import {
@@ -48,7 +49,9 @@ import {
   OFFLINEDATASTORE,
   BACKUP,
   BLUETOOTH,
-  OfflineDS
+  OfflineDS,
+  Backup,
+  SET_UNSYNC_TRANSACTION_PRESENT
 } from '../lib/constants'
 
 function mapStateToProps(state) {
@@ -57,7 +60,8 @@ function mapStateToProps(state) {
     errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
     isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
     menu: state.home.menu,
-    isLoggingOut:state.home.isLoggingOut
+    isLoggingOut: state.home.isLoggingOut,
+    isUnsyncTransactionOnLogout: state.home.isUnsyncTransactionOnLogout
   }
 };
 
@@ -120,10 +124,14 @@ class Menu extends PureComponent {
       }
 
       case OFFLINEDATASTORE_ID: {
-        this.props.actions.navigateToScene(OfflineDS,{displayName:this.props.menu.OFFLINEDATASTORE.displayName})
+        this.props.actions.navigateToScene(OfflineDS, { displayName: this.props.menu.OFFLINEDATASTORE.displayName })
         break
       }
-      
+
+      case BACKUP_ID: {
+        this.props.actions.navigateToScene(Backup, { displayName: this.props.menu.BACKUP.displayName })
+        break
+      }
       // default:
       //   Toast.show({
       //     text: `Under development!Coming Soon`,
@@ -156,12 +164,25 @@ class Menu extends PureComponent {
   startLoginScreenWithoutLogout = () => {
     this.props.actions.startLoginScreenWithoutLogout()
   }
-
+  getUnsyncTransactionPresentAlert() {
+    if (this.props.isUnsyncTransactionOnLogout) {
+      return Alert.alert('Confirm Log Out', 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+        [{ text: 'CANCEL', onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
+        {
+          text: 'OK', onPress: () => {
+            this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
+            this.props.actions.invalidateUserSession()
+          }
+        },],
+        { cancelable: false })
+    }
+  }
 
   render() {
     let profileView = this.renderModuleView([this.props.menu[PROFILE], this.props.menu[STATISTIC]], 1)
     let paymentView = this.renderModuleView([this.props.menu[EZETAP], this.props.menu[MSWIPE]], 2)
     let deviceView = this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3)
+    let unsyncTransactionPresentAlert = this.getUnsyncTransactionPresentAlert()
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -183,8 +204,9 @@ class Menu extends PureComponent {
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
 
-          {renderIf(this.props.isLoggingOut,<Loader />)}
+          {renderIf(this.props.isLoggingOut, <Loader />)}
 
+          {unsyncTransactionPresentAlert}
 
           {renderIf(!this.props.isLoggingOut, <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
             {/*card 1*/}
@@ -255,7 +277,7 @@ class Menu extends PureComponent {
               </View>
             </TouchableOpacity>
           </Content>)}
-         
+
           {/* <Footer style={[style.footer]}>
             <FooterTab>
               <Button onPress={() => { this.props.actions.navigateToScene('JobDetailsV2') }}>
@@ -290,7 +312,8 @@ class Menu extends PureComponent {
   }
 
   logoutButtonPressed = () => {
-    this.props.actions.invalidateUserSession()
+    this.props.actions.checkForUnsyncTransactionAndLogout()
+    // this.props.actions.invalidateUserSession()
   }
 
 }

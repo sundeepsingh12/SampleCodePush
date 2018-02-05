@@ -161,6 +161,14 @@ export default class FormLayoutEventImpl {
         return formLayoutObject;
     }
 
+    /**@function getSequenceAttrData(sequenceMasterId)
+     * It hits api to get sequence attr data from server.
+     * 
+     * @param {Number} sequenceMasterId 
+     * 
+     * @returns {float}  -> data
+     */
+
     async getSequenceAttrData(sequenceMasterId) {
         if (_.isNull(sequenceMasterId) || _.isUndefined(sequenceMasterId))
             throw new Error(SEQUENCE_ID_UNAVAILABLE)
@@ -216,46 +224,66 @@ export default class FormLayoutEventImpl {
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) //to edit later
                 job = this._setJobDbValues(dbObjects.status[0], dbObjects.jobTransaction.jobId, jobMasterId, dbObjects.user.value, dbObjects.hub.value, dbObjects.jobTransaction.referenceNumber, currentTime, fieldData.reAttemptDate, lastTrackLog)
-                const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
-                if (customNaming.value.updateEta && jobTransaction.value[0].jobEtaTime && (dbObjects.status[0].statusCategory == FAIL || dbObjects.status[0].statusCategory == SUCCESS)) {
-                    await this._updateEtaTimeOfJobtransactions(jobTransaction.value[0], currentTime)
-                }
             }
-
             //TODO add other dbs which needs updation
+            const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
+            if (customNaming && customNaming.value && customNaming.value.updateEta) {
+                await this._getRunsheetIdToUpdateJobTransactions(jobTransaction.value, currentTime, dbObjects.status[0].statusCategory)
+            }
             const prevStatusId = (jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
             const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
-            const runSheet = (jobTransactionId >= 0 || jobTransactionList.length) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList) : []
+            const runSheet = (jobTransactionId >= 0 || jobTransactionList.length) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList) : []            
+            await this._updateUserSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList,userSummary,jobTransaction.value[0], statusId)            
             await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionList)
             let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job, serverSmsLogs)
             await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
             await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
-            userSummary.value.lastOrderTime = jobTransaction.value[0].lastTransactionTimeOnMobile
-            userSummary.value.lastOrderNumber = jobTransaction.value[0].referenceNumber
-            await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
         }
     }
 
-    async _updateEtaTimeOfJobtransactions(jobTransaction, currentTime) {
-        if (moment(currentTime).isAfter(jobTransaction.jobEtaTime)) {
-            let delayInCompletingJobTransaction = moment(currentTime).unix() - moment(jobTransaction.jobEtaTime).unix()
-            const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
-            let jobTransactionQueryToUpdateEta = '('
-            jobTransactionQueryToUpdateEta += statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-            jobTransactionQueryToUpdateEta += `) AND runsheetId = "${jobTransaction.runsheetId} "`
-            jobTransactionQueryToUpdateEta += `AND seqSelected > "${jobTransaction.seqSelected}"`
-            let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQueryToUpdateEta)
+    async _getRunsheetIdToUpdateJobTransactions(jobTransaction, currentTime, statusCategory) {
+        try {
+            let runsheetIdToJobTransactionMap = {}
+            let delayInCompletingJobTransaction = null
+            for (let index in jobTransaction) {
+                if (jobTransaction[index].jobEtaTime && (statusCategory == FAIL || statusCategory == SUCCESS) && moment(currentTime).isAfter(jobTransaction[index].jobEtaTime)) {
+                    if (_.isEmpty(runsheetIdToJobTransactionMap) || !runsheetIdToJobTransactionMap[jobTransaction[index].runsheetId] || jobTransaction[index].seqSelected > runsheetIdToJobTransactionMap[jobTransaction[index].runsheetId].seqSelected) {
+                        delayInCompletingJobTransaction = moment(currentTime).unix() - moment(jobTransaction[index].jobEtaTime).unix()
+                        runsheetIdToJobTransactionMap[jobTransaction[index].runsheetId] = jobTransaction[index].seqSelected
+                    }
+                }
+            }
+            if (!_.isNull(delayInCompletingJobTransaction) && !_.isEmpty(runsheetIdToJobTransactionMap)) {
+                await this._updateEtaTimeOfJobtransactions(delayInCompletingJobTransaction, runsheetIdToJobTransactionMap)
+            }
+        } catch (error) {
+            console.log("_getRunsheetIdToUpdateJobTransactions", error.message)
+        }
+    }
+
+    async _updateEtaTimeOfJobtransactions(delayInCompletingJobTransaction, runsheetIdToJobTransactionMap) {
+        try {
             let jobTransactions = []
-            for (let index in jobTransactionList) {
-                let jobTransactionData = { ...jobTransactionList[index] }
-                jobTransactionData.jobEtaTime = moment((moment(jobTransactionData.jobEtaTime).unix() + delayInCompletingJobTransaction) * 1000).format('YYYY-MM-DD HH:mm:ss')
-                jobTransactions.push(jobTransactionData)
+            const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
+            for (let index in runsheetIdToJobTransactionMap) {
+                let jobTransactionQueryToUpdateEta = '('
+                jobTransactionQueryToUpdateEta += statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+                jobTransactionQueryToUpdateEta += `) AND runsheetId = "${index} "`
+                jobTransactionQueryToUpdateEta += `AND seqSelected > "${runsheetIdToJobTransactionMap[index]}"`
+                let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQueryToUpdateEta)
+                for (let index in jobTransactionList) {
+                    let jobTransactionData = { ...jobTransactionList[index] }
+                    jobTransactionData.jobEtaTime = moment((moment(jobTransactionData.jobEtaTime).unix() + delayInCompletingJobTransaction) * 1000).format('YYYY-MM-DD HH:mm:ss')
+                    jobTransactions.push(jobTransactionData)
+                }
             }
             realm.saveList(TABLE_JOB_TRANSACTION, jobTransactions)
+        } catch (error) {
+            console.log("_updateEtaTimeOfJobtransactions", error.message)
         }
     }
 
@@ -286,12 +314,38 @@ export default class FormLayoutEventImpl {
         return transactionLogs
     }
 
-    /**
+    /**@function _updateUserSummary(jobTransaction,statusCategory,jobTransactionIdList,userSummary,jobTransactionValue)
+     * update userSummaryDb  after completing transactions.
+     * 
+     * @param {object} jobTransaction 
+     * @param {Number} statusCategory
+     * @param {Array}  jobTransactionIdList // case of bulk
+     * @param {object} userSummary
+     * @param {object} jobTransactionValue // new transaction status Id
+     * 
+     */
+
+    async _updateUserSummary(jobTransaction, statusCategory, jobTransactionIdList,userSummary,jobTransactionValue,nextStatusId) {
+        const status = ['pendingCount', 'failCount', 'successCount']
+        const prevStatusId = (jobTransactionIdList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+        const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
+        const jobTransactionId = (jobTransactionIdList.length) ? jobTransaction[0].id : jobTransaction.id
+        const count = (jobTransactionIdList.length) ? jobTransactionIdList.length : 1
+        userSummary["value"][status[prevStatusCategory - 1]] = (userSummary["value"][status[prevStatusCategory - 1]] - count >= 0 && prevStatusId != nextStatusId ) ? userSummary["value"][status[prevStatusCategory - 1]] - count : userSummary["value"][status[prevStatusCategory - 1]] 
+        userSummary["value"][status[statusCategory -1]] += count 
+        if(jobTransactionValue){
+            userSummary.value.lastOrderTime = jobTransactionValue.lastTransactionTimeOnMobile
+            userSummary.value.lastOrderNumber = jobTransactionValue.referenceNumber 
+        } 
+        await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
+    }
+
+    /**@function _updateJobSummary(jobTransaction,statusId,jobTransactionIdList)
      * update jobSummaryDb count after completing transactions.
      * 
-     * @param {*jobTransaction} jobTransaction 
-     * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
-     * @param {*statusId} statusId // new transaction status Id
+     * @param {object} jobTransaction 
+     * @param {Array} jobTransactionIdList // case of bulk
+     * @param {Number} statusId // new transaction status Id
      * 
      */
 
@@ -312,14 +366,15 @@ export default class FormLayoutEventImpl {
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
 
-    /**
+    /**@function _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList)
       * update runSheetDb count after completing transactions.
-      * and returns an object containing runSheetArray
+      *   and returns an object containing tablename and runSheetArray
       * 
       * @param {*jobTransaction} jobTransaction 
       * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
       * @param {*statusCategory} statusCategory // new transaction status category
       * 
+      * @returns {Object}  -> { tablename : TABLE, value : []}
       */
 
     async _updateRunsheetSummary(jobTransaction, statusCategory, jobTransactionList) {
@@ -562,7 +617,7 @@ export default class FormLayoutEventImpl {
         jobTransaction.jobType = jobMaster.code
         jobTransaction.jobStatusId = status.id
         jobTransaction.statusCode = status.code
-        jobTransaction.employeeCode = user.employeeCode
+        jobTransaction.employeeCode = (user) ? user.employeeCode : null
         jobTransaction.hubCode = hub.code
         jobTransaction.lastTransactionTimeOnMobile = currentTime
         jobTransaction.imeiNumber = imei.imeiNumber
@@ -778,4 +833,3 @@ export default class FormLayoutEventImpl {
     }
 
 }
-
