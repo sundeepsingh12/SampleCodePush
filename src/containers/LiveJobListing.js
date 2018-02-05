@@ -235,7 +235,6 @@ const style = StyleSheet.create({
         paddingLeft: 0,
         paddingBottom: 10
     },
-
     headerLeft: {
         width: '15%',
         paddingTop: 10,

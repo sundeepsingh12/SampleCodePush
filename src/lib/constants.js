@@ -185,6 +185,10 @@ module.exports = keyMirror({
     USER_EVENT_LOG: null,
     LAST_JOB_COMPLETED_TIME: null,
     SHOULD_RELOAD_START: null,
+    CONTACT_NUMBER_TO_SEND_SMS: null,
+    SET_SAVE_ACTIVATED_TOAST_MESSAGE: null,
+    EMAILID_VIEW_ARRAY: null,
+    IS_COMPANY_CODE_DHL: null,
     SHOULD_CREATE_BACKUP: null,
     BACKUP_UPLOAD_FAIL_COUNT: null,
 
@@ -201,6 +205,7 @@ module.exports = keyMirror({
     DataStore_DB: null,
     TABLE_TRANSACTION_LOGS: null,
     TABLE_DRAFT: null,
+    SEND_EMAIL_OR_SMS: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -403,6 +408,7 @@ module.exports = keyMirror({
     SET_SEARCH: null,
     SET_MESSAGE: null,
     SET_LIVE_JOB_TOAST: null,
+    SET_LIVE_JOB_LOADER: null,
 
     //Summary
     SET_SUMMARY_FOR_JOBMASTER: null,
