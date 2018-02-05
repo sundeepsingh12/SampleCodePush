@@ -7,6 +7,7 @@ import {
 import {
     keyValueDBService
 } from './KeyValueDBService'
+import { jobTransactionService } from './JobTransaction'
 import {
     jobSummaryService
 } from './JobSummary'
@@ -23,7 +24,10 @@ import {
     TABLE_RUNSHEET,
     TABLE_TRANSACTION_LOGS,
     LAST_SYNC_WITH_SERVER,
-    FIELD_ATTRIBUTE
+    FIELD_ATTRIBUTE,
+    JOB_STATUS,
+    JOB_MASTER,
+    UNSEEN
 
 } from '../../lib/constants'
 import moment from 'moment'
@@ -67,6 +71,7 @@ export async function createZip(transactionIdToBeSynced) {
 
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
+    await updateUserSummaryNextJobTransactionId()
     const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
     SYNC_RESULTS.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
     console.log(JSON.stringify(SYNC_RESULTS));
@@ -87,6 +92,17 @@ export async function createZip(transactionIdToBeSynced) {
     //Deleting TEMP folder location
     await RNFS.unlink(PATH_TEMP);
     // console.log(PATH_TEMP+' removed');
+}
+
+export async function updateUserSummaryNextJobTransactionId () {
+    const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id)
+    const statusMap = statusList.value.filter((status) => status.statusCategory == 1 && status.code !== UNSEEN).map(obj => obj.id)
+    const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
+    let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+    userSummary.value.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null
+    await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
 }
 
 /**
