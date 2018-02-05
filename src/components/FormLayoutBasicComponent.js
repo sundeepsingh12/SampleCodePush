@@ -52,6 +52,7 @@ import {
     OBJECT,
     CASH,
     OPTION_RADIO_FOR_MASTER,
+    OPTION_RADIO_VALUE,
     QR_SCAN,
     CAMERA,
     CAMERA_HIGH,
@@ -221,7 +222,6 @@ class BasicFormElement extends PureComponent {
             return null
         }
         let attributeTypeId = this.props.formElement.get(this.props.modalFieldAttributeMasterId).attributeTypeId
-        console.log(attributeTypeId)
         if (attributeTypeId == CHECKBOX || attributeTypeId == OPTION_RADIO_FOR_MASTER || attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN) {
             return (
                 <View>
@@ -278,6 +278,29 @@ class BasicFormElement extends PureComponent {
             })
     }
 
+    getValueTextForMultipleOption() {
+        if (!this.props.item.value) {
+            return this.props.item.helpText
+        }
+
+        if (this.props.item.value == ARRAY_SAROJ_FAREYE && this.props.item.childDataList) {
+            return this.props.item.childDataList.length + SELECTED
+        }
+
+        if (this.props.item.value == OBJECT_SAROJ_FAREYE && this.props.item.childDataList) {
+            for (let index in this.props.item.childDataList) {
+                if (this.props.item.childDataList[index].attributeTypeId == OPTION_RADIO_VALUE) {
+                    return this.props.item.childDataList[index].value
+                }
+            }
+        }
+
+        if (this.props.item.value != ARRAY_SAROJ_FAREYE && this.props.item.value != OBJECT_SAROJ_FAREYE) {
+            return this.props.item.value
+        }
+        return null
+    }
+
     getMultipleOptionCardView(modalView) {
         return (
             <TouchableOpacity
@@ -299,7 +322,7 @@ class BasicFormElement extends PureComponent {
                             <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(this.props.item.editable)]}>{this.props.item.helpText}</Text>
                             : null}
                         <Text style={[this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), styles.fontLg, styles.marginBottom10]}>
-                            {this.props.item.value ? (this.props.item.value == ARRAY_SAROJ_FAREYE || this.props.item.value == OBJECT_SAROJ_FAREYE) ? this.props.item.childDataList ? this.props.item.childDataList.length + SELECTED : null : this.props.item.value : this.props.item.helpText}
+                            {this.getValueTextForMultipleOption()}
                         </Text>
                         <Icon name="md-arrow-dropdown" style={[styles.absolute, styles.fontLg, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), { bottom: 10, right: 0 }]} />
                     </View>

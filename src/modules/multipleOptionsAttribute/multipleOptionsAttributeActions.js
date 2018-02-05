@@ -13,12 +13,14 @@ import {
     CHECKBOX,
     // RADIOBUTTON,
     ARRAY_SAROJ_FAREYE,
-    // OPTION_RADIO_FOR_MASTER,
+    OPTION_RADIO_FOR_MASTER,
     OBJECT_SAROJ_FAREYE,
+    OPTION_RADIO_VALUE,
     // DROPDOWN
 } from '../../lib/AttributeConstants'
 import {
     FIELD_ATTRIBUTE_VALUE,
+    FIELD_ATTRIBUTE,
     SET_OPTIONS_LIST
 } from '../../lib/constants'
 import {
@@ -35,7 +37,6 @@ export function getOptionsList(fieldAttributeMasterId, formElement) {
                 return
             }
             let childDataList = []
-            console.log(formElement.get(fieldAttributeMasterId).value)
             childDataList = formElement.get(fieldAttributeMasterId).childDataList ? formElement.get(fieldAttributeMasterId).childDataList : formElement.get(fieldAttributeMasterId).value ? childDataList.concat(formElement.get(fieldAttributeMasterId)) : []
             let selectedOptionsMap = {}
             for (let index in childDataList) {
@@ -57,25 +58,29 @@ export function getOptionsListFromJobData(currentElement, jobTransaction) {
     return async function (dispatch) {
         try {
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+            let selectedOption
             if (!fieldAttributeMasterList || !fieldAttributeMasterList.value || jobTransaction.length) {
                 return
             }
 
+            for (let index in currentElement.childDataList) {
+                if (currentElement.childDataList[index].attributeTypeId == OPTION_RADIO_VALUE) {
+                    selectedOption = currentElement.childDataList[index].value
+                }
+            }
+
             let fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMapWithParentId(fieldAttributeMasterList.value)
-            let childMap = fieldAttributeMasterMap[jobTransaction.jobMasterId][currentElement.positionId]
-            let optionsList = multipleOptionsAttributeService.getOptionsListForJobData(childMap, currentElement)
-            // let query = Array.from(jobFieldAttributeMapId.map(item => `jobAttributeMasterId = ${item.jobAttributeMasterId}`)).join(' OR ')
-            // query = `(${query}) AND jobId = ${jobId}`
-            // const jobDatas = realm.getRecordListOnQuery(TABLE_JOB_DATA, query)
-            // const parentIdJobDataListMap = jobDataService.getParentIdJobDataListMap(jobDatas)
-            // const selectFromListData = selectFromListDataService.getListDataForRadioMasterAttr(parentIdJobDataListMap, currentElement)
-            // if (!jobFieldAttributeMapId || (_.keys(selectFromListData).length === 0 && selectFromListData.constructor === Object)) {
-            //     throw new Error('mapping of radioForMaster error')
-            // }
-            // selectFromListState.radioMasterDto = jobFieldAttributeMapId
-            // selectFromListState.selectListData = selectFromListData
-            // dispatch(setState(SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE, selectFromListState))
+            let fieldAttributeMasterObject = fieldAttributeMasterMap[jobTransaction.jobMasterId][currentElement.fieldAttributeMasterId]
+            let fieldAttributeMasterChildList
+            for (let index in fieldAttributeMasterObject) {
+                fieldAttributeMasterChildList = fieldAttributeMasterMap[jobTransaction.jobMasterId][index]
+            }
+            let optionsMap = multipleOptionsAttributeService.getOptionsListForJobData(fieldAttributeMasterChildList, currentElement, jobTransaction, selectedOption)
+            dispatch(setState(SET_OPTIONS_LIST, {
+                optionsMap
+            }))
         } catch (error) {
+            console.log(error)
             // dispatch(setState(ERROR_MESSAGE, error.message))
             // dispatch(setState(ERROR_MESSAGE, ''))
         }
@@ -96,15 +101,22 @@ export function toggleCheckStatus(optionsMap, id) {
     }
 }
 
-export function saveOptionsFieldData(optionsMap, currentElement, latestPositionId, formElement, isSaveDisabled, jobTransaction, calledFromArray, rowId, fieldAttributeMasterParentIdMap, value) {
+export function saveOptionsFieldData(optionsMap, currentElement, latestPositionId, formElement, isSaveDisabled, jobTransaction, calledFromArray, rowId, fieldAttributeMasterParentIdMap, item) {
     return async function (dispatch) {
         try {
             let optionFieldDataList, fieldDataListObject = {
                 latestPositionId
             }
-            let fieldDataValue = value ? value : currentElement.attributeTypeId == CHECKBOX ? ARRAY_SAROJ_FAREYE : OBJECT_SAROJ_FAREYE
-            if (!value) {
-                optionFieldDataList = multipleOptionsAttributeService.prepareOptionFieldData(optionsMap, currentElement)
+            let fieldDataValue
+            if (currentElement.attributeTypeId == CHECKBOX) {
+                fieldDataValue = ARRAY_SAROJ_FAREYE
+            } else if (currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
+                fieldDataValue = OBJECT_SAROJ_FAREYE
+            } else {
+                fieldDataValue = item ? item.code : null
+            }
+            if (fieldDataValue == ARRAY_SAROJ_FAREYE || fieldDataValue == OBJECT_SAROJ_FAREYE) {
+                optionFieldDataList = currentElement.attributeTypeId == CHECKBOX ? multipleOptionsAttributeService.prepareOptionFieldData(optionsMap, currentElement) : multipleOptionsAttributeService.prepareOptionFieldDataFromJobData(item)
                 fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(optionFieldDataList, jobTransaction.id, currentElement.positionId, latestPositionId)
             }
             if (calledFromArray) {

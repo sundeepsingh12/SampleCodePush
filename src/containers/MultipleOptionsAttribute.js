@@ -68,7 +68,7 @@ class MultipleOptionsAttribute extends PureComponent {
     componentDidMount() {
         let formElement = this.props.calledFromArray ? this.props.formElements.formLayoutObject : this.props.formElements
         if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
-            // this.props.actions.gettingDataForRadioMaster(this.props.currentElement, this.props.jobTransaction)
+            this.props.actions.getOptionsListFromJobData(this.props.currentElement, this.props.jobTransaction)
         } else {
             this.props.actions.getOptionsList(this.props.currentElement.fieldAttributeMasterId, formElement, this.props.currentElement.attributeTypeId)
         }
@@ -103,7 +103,7 @@ class MultipleOptionsAttribute extends PureComponent {
                         this.props.calledFromArray,
                         this.props.rowId,
                         this.props.fieldAttributeMasterParentIdMap,
-                        item.code
+                        item
                     )
                 }}>
                 {fieldAttributeView}
