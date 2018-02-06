@@ -112,7 +112,6 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.navigation.state.params.latestPositionId,
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.isSaveDisabled)
-        this.props.navigation.goBack()
     }
     static navigationOptions = ({ navigation }) => {
         return { header: null }

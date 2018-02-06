@@ -38,6 +38,11 @@ module.exports = {
     SERVICE_ALERT_JOB: '/app/rest/device/broadcast_job_confirmation',
     SERVICE_ALERT_JOB_MULTIPLE: '/app/rest/device/broadcast_job_confirmation_multiple',
     SERVICE_DSA_EXTERNAL: '/app/rest/data_search_api_for_external_data_store',
-    FORGET_PASSWORD: '/forgot_password/send_link_device'
+    FORGET_PASSWORD: '/forgot_password/send_link_device',
+    DATASTORE_MASTER: '/app/rest/data_store_attribute_master_all',
+    DATASTORE_DATA_FETCH_WITH_DATETIME: '/app/rest/device/datastore_fetch_with_datetime',
+    DATA_STORE_FILTER_SEARCH: '/app/rest/distinct_data_fetch_api',
+    SEND_EMAIL_LINK: 'https://dhlintegration.fareye.co/app/rest/sit/dhl_send_email?jsessionId=',
+    SEND_SMS_LINK: 'https://dhlintegration.fareye.co/app/rest/sit/dhl_send_sms?jsessionId=',
   }
 }

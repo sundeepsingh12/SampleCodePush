@@ -4,7 +4,6 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { setState } from '../global/globalActions'
 import {
-    SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
@@ -12,7 +11,10 @@ import {
     NEXT_FOCUS,
     CLEAR_ATTR_MAP_AND_SET_LOADER,
     FIELD_ATTRIBUTE,
-    JOB_ATTRIBUTE
+    JOB_ATTRIBUTE,
+    SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
+    SET_DSF_REVERSE_MAP,
+    SEARCH_DATA_STORE_RESULT
 } from '../../lib/constants'
 import {
     DATA_STORE
@@ -23,6 +25,12 @@ import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } fro
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 
 
+/**
+ * 
+ * @param {*} fieldAttributeMasterId 
+ * @param {*} value 
+ * this method is used for getting data store result list from searched value when field detail item is clicked
+ */
 export function getFieldAttribute(fieldAttributeMasterId, value) {
     return async function (dispatch) {
         dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
@@ -32,6 +40,12 @@ export function getFieldAttribute(fieldAttributeMasterId, value) {
     }
 }
 
+/**
+ * 
+ * @param {*} jobAttributeMasterId 
+ * @param {*} value 
+ * this method is used for getting data store result list from searched value when job detail item is clicked 
+ */
 export function getJobAttribute(jobAttributeMasterId, value) {
     return async function (dispatch) {
         dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
@@ -42,19 +56,29 @@ export function getJobAttribute(jobAttributeMasterId, value) {
 }
 
 /**
- * @param {*} validationArray 
  * 
- * This method takes validation array from current element and set all validations accordingly
+ * @param {*} currentElement 
+ * @param {*} formElement 
+ * @param {*} jobTransaction 
+ * @param {*} dataStoreFilterReverseMap 
+ * this actions check for filters and validations
  */
-export function setValidation(validationArray) {
+export function checkForFiltersAndValidation(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
     return async function (dispatch) {
         try {
-            if (validationArray) {
-                let validation = dataStoreService.getValidations(validationArray)
-                dispatch(setState(SET_VALIDATIONS, validation))
-            }
+            dispatch(setState(SHOW_LOADER_DS, true))
+            let returnParams = await dataStoreService.checkForFiltersAndValidations(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap)
+            dispatch(setState(SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP, {
+                dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
+                isFiltersPresent: returnParams.isFiltersPresent,
+                validation: returnParams.validation
+            }))
+            dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
-            console.log(error)
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
         }
     }
 }
@@ -136,16 +160,16 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId, jobTransaction) {
+export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId, jobTransaction, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         try {
-            if (!calledFromArray)
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, { latestPositionId }, jobTransaction))
-            else
+            if (!calledFromArray) {
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap))
+            } else {
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId, null, NEXT_FOCUS))
-
+            }
         } catch (error) {
-            console.log(error)
+
         }
     }
 }
@@ -186,12 +210,12 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
  * @param {*} isSaveDisabled 
  * @param {*} dataStorevalue 
  */
-export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId, jobTransaction) {
+export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, calledFromArray, rowId, latestPositionId, jobTransaction, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         try {
             if (!calledFromArray) {
                 let formElementResult = dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements)
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, { latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElementResult, isSaveDisabled, dataStorevalue, { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap, true))
             } else {
                 let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formElements[rowId].formLayoutObject)
                 formElements[rowId].formLayoutObject = formElementResult
@@ -206,6 +230,16 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
     }
 }
 
+/**
+ * 
+ * @param {*} searchText 
+ * @param {*} dataStoreMasterId 
+ * @param {*} dataStoreMasterAttributeId 
+ * @param {*} externalDataStoreUrl 
+ * @param {*} attributeKey 
+ * @param {*} attributeTypeId 
+ * // this method first checks for offline DS if present then fetch results from that if not present then check for online DS
+ */
 export function checkOfflineDS(searchText, dataStoreMasterId, dataStoreMasterAttributeId, externalDataStoreUrl, attributeKey, attributeTypeId) {
     return async function (dispatch) {
         try {
@@ -229,6 +263,32 @@ export function checkOfflineDS(searchText, dataStoreMasterId, dataStoreMasterAtt
             }
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, { errorMessage: error.message, dataStoreAttrValueMap: {} }))
+        }
+    }
+}
+
+/**
+ * 
+ * @param {*} searchText 
+ * @param {*} dataStoreAttrValueMap 
+ * @param {*} cloneDataStoreAttrValueMap 
+ * this action filters dataStoreAttrMap and set results
+ */
+export function searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap) {
+    return async function (dispatch) {
+        try {
+            dispatch(setState(SHOW_LOADER_DS, true))
+            let searchResult = await dataStoreService.searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap)
+            dispatch(setState(SEARCH_DATA_STORE_RESULT, {
+                dataStoreAttrValueMap: searchResult.dataStoreAttrValueMap,
+                cloneDataStoreAttrValueMap: searchResult.cloneDataStoreAttrValueMap,
+                searchText
+            }))
+        } catch (error) {
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
         }
     }
 }

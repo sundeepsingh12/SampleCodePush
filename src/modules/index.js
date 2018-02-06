@@ -14,6 +14,7 @@ import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
 import selectFromList from './selectFromList/selectFromListReducer'
+import multipleOptionsAttribute from './multipleOptionsAttribute/multipleOptionsAttributeReducer'
 import skuListing from './skulisting/skuListingReducer'
 import payment from './payment/paymentReducer'
 import upiPayment from './cardTypePaymentModules/upiPayment/upiPaymentReducer'
@@ -46,6 +47,8 @@ import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 import offlineDS from './offlineDS/offlineDSReducer'
 import cameraReducer from './camera/cameraReducer'
 import autoLogout from './autoLogout/autoLogoutReducer'
+import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
+import backup from './backup/backupReducer'
 // import profile from './profile/profileReducer'
 
 
@@ -61,8 +64,8 @@ const rootReducer = combineReducers({
   global,
   home,
   jobDetails,
-  selectFromList,
   skuListing,
+  selectFromList,
   listing,
   payment,
   preloader,
@@ -92,7 +95,10 @@ const rootReducer = combineReducers({
   qrCodeReducer,
   offlineDS,
   cameraReducer,
-  autoLogout
+  autoLogout,
+  dataStoreFilterReducer,
+  backup,
+  multipleOptionsAttribute,
 })
 
 // const rootReducer = (state, action) => {

@@ -67,8 +67,9 @@ class SignatureAndNps extends PureComponent {
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.isSaveDisabled,
             this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.state.params.latestPositionId)
-        this.props.navigation.goBack()
+            this.props.navigation.state.params.latestPositionId,
+            this.props.navigation.state.params.fieldAttributeMasterParentIdMap
+        )
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -84,7 +85,6 @@ class SignatureAndNps extends PureComponent {
             })
         } else {
             this.refs["sign"].saveImage();
-            this.refs["sign"].resetImage();
         }
     }
 
@@ -102,7 +102,7 @@ class SignatureAndNps extends PureComponent {
     }
     goBack = () => {
         this.setState({ isLandscape: 'portrait' })
-        this.props.navigation.goBack()
+        this.props.navigation.goBack(null)
     }
     render() {
         return (
@@ -112,7 +112,7 @@ class SignatureAndNps extends PureComponent {
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => this.goBack}>
+                                <TouchableOpacity style={[style.headerLeft]} onPress={this.goBack}>
                                     <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[style.headerBody]}>

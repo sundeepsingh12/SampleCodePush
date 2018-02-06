@@ -19,6 +19,7 @@ import {
     DATA_STORE_MASTER_ID,
     SEARCH_VALUE,
     GET,
+    EXTERNAL_DATA_STORE,
     EXTERNAL_DATA_STORE_URL,
     DATA_STORE_ATTR_KEY,
     DATA_STORE,
@@ -27,7 +28,14 @@ import * as realm from '../../repositories/realmdb'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import moment from 'moment'
 import { keyValueDb } from '../../repositories/keyValueDb'
+import { dataStoreFilterService } from '../../services/classes/DataStoreFilterService'
 import _ from 'lodash'
+import { jobTransactionService } from './JobTransaction'
+import {
+    SEARCH_TEXT_MISSING,
+    DATA_STORE_MAP_MISSING,
+    CURRENT_ELEMENT_MISSING
+} from '../../lib/ContainerConstants'
 class DataStoreService {
 
     /**
@@ -123,7 +131,6 @@ class DataStoreService {
                 dataStoreAttributeValueMap: itemObject.details.dataStoreAttributeValueMap
             }
             dataStoreAttrValueMap[itemCounter] = dataStoreObject
-            console.log('getDataStoreAttrValueMapFromJson', dataStoreAttrValueMap)
         }
         return dataStoreAttrValueMap
     }
@@ -505,7 +512,10 @@ class DataStoreService {
         let listOfUniqueRecords = []
         for (let index in queryList) {
             let resultObject = { ...queryList[index] }
-            if (listOfUniqueRecords.indexOf(resultObject.serverUniqueKey) < 0) {
+            if (_.findIndex(listOfUniqueRecords, {
+                serverUniqueKey: resultObject.serverUniqueKey,
+                matchKey: resultObject.key
+            }) < 0) {
                 listOfUniqueRecords.push({
                     serverUniqueKey: resultObject.serverUniqueKey,
                     matchKey: resultObject.key
@@ -542,8 +552,109 @@ class DataStoreService {
             dataStoreAttrValueMap[id] = dataStoreObject
             id++
         }
-        console.log('dataStoreAttrValueMap', dataStoreAttrValueMap)
         return dataStoreAttrValueMap
+    }
+
+    /**
+     * 
+     * @param {*} currentElement 
+     * @param {*} formElement 
+     * @param {*} jobTransaction 
+     * @param {*} dataStoreFilterReverseMap
+     * @returns { dataStoreAttrValueMap, dataStoreFilterReverseMap, isFiltersPresent, validation}
+     * this method checks for filters present and if filters are not present then it checks for validation 
+     */
+    async checkForFiltersAndValidations(currentElement, formElement, jobTransaction, dataStoreFilterReverseMap) {
+        if (!currentElement) {
+            throw new Error(CURRENT_ELEMENT_MISSING)
+        }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        if (!currentElement.dataStoreFilterMapping || _.isEqual(currentElement.dataStoreFilterMapping, '[]') || currentElement.attributeTypeId == EXTERNAL_DATA_STORE) {
+            validation = (currentElement.validation) ?
+                this.getValidations(currentElement.validation) : validation
+            return {
+                dataStoreAttrValueMap: {},
+                dataStoreFilterReverseMap,
+                isFiltersPresent: false,
+                validation
+            }
+        }
+        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)        
+        let returnParams = await dataStoreFilterService.fetchDataForFilter(token, currentElement, true, formElement, jobTransaction, dataStoreFilterReverseMap)
+        let dataStoreAttrValueMap = await this.createDataStoreAttrValueMapInCaseOfFilter(returnParams.dataStoreFilterResponse, currentElement.dataStoreAttributeId)
+        return {
+            dataStoreAttrValueMap,
+            dataStoreFilterReverseMap: returnParams.dataStoreFilterReverseMap,
+            isFiltersPresent: true,
+            validation
+        }
+    }
+
+    /**
+     * 
+     * @param {Object} dataStoreResponse 
+     * @param {number} dataStoreAttributeId 
+     * @returns {dataStoreAttrValueMap}
+     * this function return dataStoreAttrValueMap making appropriate structure using dataStoreResponse
+     */
+    createDataStoreAttrValueMapInCaseOfFilter(dataStoreResponse, dataStoreAttributeId) {
+        let dataStoreAttrValueMap = {}
+        if (!dataStoreResponse) {
+            return dataStoreAttrValueMap
+        }
+        for (let dataStoreObjectCounter in dataStoreResponse) {
+            let dataStoreObject = dataStoreResponse[dataStoreObjectCounter]
+            let uniqueKey, uniqueValue
+            let dataStoreAttributeValueMap = {}
+            for (let dataStoreItemCounter in dataStoreObject) {
+                let innerJsonObject = dataStoreObject[dataStoreItemCounter]
+                if (_.isEqual(innerJsonObject['attributeId'], dataStoreAttributeId)) {
+                    uniqueKey = innerJsonObject['key']
+                    uniqueValue = innerJsonObject['value']
+                }
+                dataStoreAttributeValueMap[innerJsonObject['key']] = innerJsonObject['value']
+            }
+            let objectForDS = {
+                id: uniqueValue,
+                uniqueKey,
+                dataStoreAttributeValueMap
+            }
+            dataStoreAttrValueMap[uniqueValue] = objectForDS
+        }
+        return dataStoreAttrValueMap
+    }
+
+    /**
+     * 
+     * @param {String} searchText 
+     * @param {Object} dataStoreAttrValueMap 
+     * @param {Object} cloneDataStoreAttrValueMap 
+     * @returns {dataStoreAttrValueMap,cloneDataStoreAttrValueMap}
+     * This method search values from data store attr map and return filtered map along with cloned origonal map
+     */
+    searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap) {
+        if (!searchText) {
+            throw new Error(SEARCH_TEXT_MISSING)
+        }
+        if (!dataStoreAttrValueMap) {
+            throw new Error(DATA_STORE_MAP_MISSING)
+        }
+        if (_.isEmpty(cloneDataStoreAttrValueMap)) {
+            cloneDataStoreAttrValueMap = _.cloneDeep(dataStoreAttrValueMap)
+        } else {
+            dataStoreAttrValueMap = _.cloneDeep(cloneDataStoreAttrValueMap)
+        }
+        let filteredData = _.values(dataStoreAttrValueMap).filter(DSObject => (DSObject.id.toUpperCase()).indexOf(searchText.toUpperCase()) == 0)
+        dataStoreAttrValueMap = _.mapKeys(filteredData, 'id')
+        return {
+            dataStoreAttrValueMap,
+            cloneDataStoreAttrValueMap
+        }
     }
 }
 

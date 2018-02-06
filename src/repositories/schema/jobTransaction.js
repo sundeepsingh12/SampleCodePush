@@ -18,7 +18,7 @@ JobTransaction.schema = {
               androidPushTime  :  'string?',
               lastUpdatedAtServer  :     'string'   ,
               lastTransactionTimeOnMobile  :  'string?',
-              jobEtaTime  :  'string?', // todo
+              jobEtaTime  :  'string?',
               seqSelected  : 'int' ,
               seqActual  :  'int?',
               seqAssigned  : 'int?',

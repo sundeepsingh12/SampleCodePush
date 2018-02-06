@@ -238,6 +238,53 @@ export default {
         marginRight: 'auto'
     },
 
+    
+
+    // Margin Verticle
+    marginVerticle0: {
+        marginVerticle: 0
+    },
+    marginVerticle5: {
+        marginVerticle: 5
+    },
+    marginVerticle10: {
+        marginVerticle: 10
+    },
+    marginVerticle15: {
+        marginVerticle: 15
+    },
+    marginVerticle20: {
+        marginVerticle: 20
+    },
+    marginVerticle25: {
+        marginVerticle: 25
+    },
+    marginVerticle30: {
+        marginVerticle: 30
+    },
+
+    // Margin Horizontal
+    marginHorizontal0: {
+        marginHorizontal: 0
+    },
+    marginHorizontal5: {
+        marginHorizontal: 5
+    },
+    marginHorizontal10: {
+        marginHorizontal: 10
+    },
+    marginHorizontal15: {
+        marginHorizontal: 15
+    },
+    marginHorizontal20: {
+        marginHorizontal: 20
+    },
+    marginHorizontal25: {
+        marginHorizontal: 25
+    },
+    marginHorizontal30: {
+        marginHorizontal: 30
+    },
     //  Padding Objects
     padding5: {
         padding: 5
@@ -342,9 +389,58 @@ export default {
     paddingRight25: {
         paddingRight: 25
     },
+    
     paddingRight30: {
         paddingRight: 30
     },
+
+
+    // Padding Horizontal
+    paddingHorizontal0: {
+        paddingHorizontal: 0
+    },
+    paddingHorizontal5: {
+        paddingHorizontal: 5
+    },
+    paddingHorizontal10: {
+        paddingHorizontal: 10
+    },
+    paddingHorizontal15: {
+        paddingHorizontal: 15
+    },
+    paddingHorizontal20: {
+        paddingHorizontal: 20
+    },
+    paddingHorizontal25: {
+        paddingHorizontal: 25
+    },
+    paddingHorizontal30: {
+        paddingHorizontal: 30
+    },
+
+    // Padding Verticle
+    paddingVertical0: {
+        paddingVertical0: 0
+    },
+    paddingVertical5: {
+        paddingVertical: 5
+    },
+    paddingVertical10: {
+        paddingVertical: 10
+    },
+    paddingVertical15: {
+        paddingVertical: 15
+    },
+    paddingVertical20: {
+        paddingVertical: 20
+    },
+    paddingVertical25: {
+        paddingVertical: 25
+    },
+    paddingVertical30: {
+        paddingVertical: 30
+    },
+
 
     column: {
         flexDirection: 'column'
@@ -536,5 +632,13 @@ export default {
     },
     textUnderline: {
         textDecorationLine: 'underline'
+    },
+    borderBottomBlack: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#000000'
+    },
+    borderBottomLightGray: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#f4f4f4'
     }
 }

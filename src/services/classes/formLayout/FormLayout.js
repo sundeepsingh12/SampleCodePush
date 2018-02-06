@@ -12,7 +12,12 @@ import {
     Transient,
     CheckoutDetails,
     TabScreen,
-    SHOULD_RELOAD_START
+    SHOULD_RELOAD_START,
+    FIELD_ATTRIBUTE,
+    FIELD_ATTRIBUTE_STATUS,
+    FIELD_ATTRIBUTE_VALIDATION,
+    FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+    SHOULD_CREATE_BACKUP
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -33,10 +38,10 @@ class FormLayout {
         if (!statusId) {
             throw new Error('Missing statusId');
         }
-        const fieldAttributes = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE');
-        const fieldAttributeStatusList = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE_STATUS');
-        const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE_VALIDATION');
-        const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore('FIELD_ATTRIBUTE_VALIDATION_CONDITION');
+        const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+        const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS);
+        const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION);
+        const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION_CONDITION);
 
         if (!fieldAttributes || !fieldAttributes.value || !fieldAttributeStatusList || !fieldAttributeStatusList.value) {
             throw new Error('Value of fieldAttributes or fieldAttribute Status missing')
@@ -50,27 +55,37 @@ class FormLayout {
         let fieldAttributeMap = {}; //map for root field attributes
         let fieldAttributeValidationMap = {};
         let arrayMainObject = {};
+        let fieldAttributeMasterParentIdMap = {}
         if (fieldAttributeMasterIdFromArray) {
             arrayMainObject = fieldAttributes.value.filter(fieldAttributeObject => (fieldAttributeObject.parentId == fieldAttributeMasterIdFromArray &&
                 fieldAttributeObject.attributeTypeId == OBJECT))
         }
 
         for (const fieldAttribute of fieldAttributes.value) {
-            if (fieldAttributeMasterIdFromArray) {
-                if (fieldAttribute.parentId == arrayMainObject[0].id) {
-                    fieldAttributeMap[fieldAttribute.id] = fieldAttribute
+            if (fieldAttribute)
+                if (fieldAttributeMasterIdFromArray) {
+                    if (fieldAttribute.parentId == arrayMainObject[0].id) {
+                        fieldAttributeMap[fieldAttribute.id] = fieldAttribute
+                    }
+                } else {
+                    fieldAttributeMap[fieldAttribute.id] = fieldAttribute;
                 }
-            } else if (!fieldAttribute.parentId) {
-                fieldAttributeMap[fieldAttribute.id] = fieldAttribute;
-            }
         }
 
         let sequenceWiseSortedFieldAttributesForStatus = []
 
         for (let index in filedAttributesMappedToStatus) {
-            if (fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) {
+            fieldAttributeMasterParentIdMap[filedAttributesMappedToStatus[index].fieldAttributeId] = fieldAttributeMasterIdFromArray ? {} : fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId
+            if(fieldAttributeMasterIdFromArray) {
+                if(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) {
+                    sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
+                }
+            } else if(!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId) {
                 sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
             }
+            // if ((fieldAttributeMasterIdFromArray && fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) || (!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId)) {
+            //     sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
+            // }
         } //getting fieldAttribute list
 
         const fieldAttributeMasterValidationMap = this.getFieldAttributeValidationMap(fieldAttributeMasterValidation.value);
@@ -81,6 +96,7 @@ class FormLayout {
             return sequenceWiseFormLayout
         }
         else {
+            sequenceWiseFormLayout.fieldAttributeMasterParentIdMap = fieldAttributeMasterParentIdMap
             return sequenceWiseFormLayout
         }
 
@@ -209,7 +225,7 @@ class FormLayout {
      * @param {*positionId} positionId 
      */
     getFieldAttributeObject(fieldAttribute, validationArray, positionId) {
-        const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl } = fieldAttribute
+        const { label, subLabel, helpText, key, required, hidden, attributeTypeId, dataStoreAttributeId, dataStoreMasterId, externalDataStoreMasterUrl, dataStoreFilterMapping } = fieldAttribute
         return {
             label,
             subLabel,
@@ -229,6 +245,7 @@ class FormLayout {
             dataStoreMasterId,
             dataStoreAttributeId,
             externalDataStoreMasterUrl,
+            dataStoreFilterMapping
         };
     }
 
@@ -283,6 +300,7 @@ class FormLayout {
                 await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
+            await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))
         }
         return {
             routeName,

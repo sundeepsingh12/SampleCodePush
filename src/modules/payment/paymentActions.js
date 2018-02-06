@@ -41,13 +41,17 @@ import {
     SPLIT,
     TICKET_RESTAURANT,
     UPI,
-    OBJECT_SAROJ_FAREYE
+    OBJECT_SAROJ_FAREYE,
+    MONEY_PAY,
 } from '../../lib/AttributeConstants'
 
 import {
     NO,
     YES,
-    INVALID_CONFIGURATION
+    INVALID_CONFIGURATION,
+    REFUND,
+    COLLECTION_CASH,
+    COLLECTION_SOD
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import { Toast } from 'native-base'
@@ -97,13 +101,24 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
                 modeTypeId: selectedPaymentMode,
                 isCardPayment
             }
+            if (!jobTransactionIdAmountMap) {
+                jobTransactionIdAmountMap = {}
+                jobTransactionIdAmountMap.actualAmount = actualAmount
+                jobTransactionIdAmountMap.originalAmount = originalAmount
+            }
+            if (moneyCollectMaster.attributeTypeId == MONEY_PAY) {
+                jobTransactionIdAmountMap.moneyTransactionType = REFUND
+            } else if (selectedPaymentMode == CASH.id) {
+                jobTransactionIdAmountMap.moneyTransactionType = COLLECTION_CASH
+            } else {
+                jobTransactionIdAmountMap.moneyTransactionType = COLLECTION_SOD
+            }
             formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))
             dispatch(setState(CLEAR_PAYMENT_STATE))
-            dispatch(NavigationActions.back())
         } catch (error) {
             console.log(error)
         }
@@ -127,7 +142,7 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formEl
             //     paymentAtEnd
             // }))
             dispatch(setState(CLEAR_PAYMENT_STATE))
-            dispatch(NavigationActions.back({ key: paymentContainerKey }))
+            dispatch(NavigationActions.back())
         } catch (error) {
             console.log(error)
         }

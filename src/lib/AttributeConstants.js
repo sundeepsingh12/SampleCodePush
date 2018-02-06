@@ -25,6 +25,7 @@ module.exports = {
     COUNT_DOWN_TIMER: 34,
     DATE: 3,
     DATA_STORE: 44,
+    DATA_STORE_FILTER: 64,
     DECIMAL: 13,
     DROPDOWN: 10,
     EXTERNAL_DATA_STORE: 63,
@@ -259,7 +260,7 @@ module.exports = {
     Yes_Checkout: 'Yes,Checkout',
     Total: 'Total :',
     Select_Next_Status: 'Select Next Status',
-
+    REGEX_TO_CHECK_PHONE_NUMBER: /^[0-9]{10,25}$/,
 
     TOKEN_MISSING: 'Token Missing',
     LOGIN: '?login=',
@@ -323,9 +324,9 @@ module.exports = {
     SORTING_PLACEHOLDER: 'Enter Reference Number To Scan Package',
 
     //Sequence Attribute
-    SEQUENCE_ID : 'sequenceMasterId=',
-    SEQUENCE_COUNT : '&count=',
-    SEQUENCE_ID_UNAVAILABLE : 'MasterId Unavailable !',
+    SEQUENCE_ID: 'sequenceMasterId=',
+    SEQUENCE_COUNT: '&count=',
+    SEQUENCE_ID_UNAVAILABLE: 'MasterId Unavailable !',
 
     //SkuListing Service
     TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',

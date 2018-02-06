@@ -8,9 +8,12 @@ import {
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import * as realm from '../../repositories/realmdb'
 import moment from 'moment'
-import { keyValueDBService } from '../classes/KeyValueDBService';
+import { keyValueDBService } from '../classes/KeyValueDBService'
+import { dataStoreFilterService } from '../classes/DataStoreFilterService'
+import { EXTERNAL_DATA_STORE, DATA_STORE } from '../../lib/AttributeConstants'
+import { SEARCH_TEXT_MISSING, DATA_STORE_MAP_MISSING, CURRENT_ELEMENT_MISSING } from '../../lib/ContainerConstants'
 
-describe('test getValidationsArray', () => {
+describe('test getValidations', () => {
     it('should return validation array having all validations', () => {
         const validationArray = [{
             timeOfExecution: REMARKS,
@@ -409,6 +412,16 @@ describe('test getJobAttribute', () => {
         const jobAttributeMasterId = 123
         expect(dataStoreService.getFieldAttribute(jobAttributes, jobAttributeMasterId)).toEqual([{ id: 123 }])
     })
+
+    it('should return undefined', () => {
+        const jobAttributes = [{
+            id: 123
+        }, {
+            id: 456
+        }]
+        const jobAttributeMasterId = 4567
+        expect(dataStoreService.getFieldAttribute(jobAttributes, jobAttributeMasterId)).toEqual([])
+    })
 })
 
 
@@ -642,6 +655,11 @@ describe('test fetchDatastoreAndSaveInDB', () => {
     })
 
 
+    beforeEach(() => {
+        dataStoreService.fetchDataStore = jest.fn()
+        dataStoreService.saveDataStoreToDB = jest.fn()
+    })
+
     it('should return totalElements && numberOfElements', () => {
         const dataStoreJsonResponse = {
             content: [{
@@ -658,9 +676,7 @@ describe('test fetchDatastoreAndSaveInDB', () => {
             totalElements: 5000,
             numberOfElements: 500
         }
-        dataStoreService.fetchDataStore = jest.fn()
         dataStoreService.fetchDataStore.mockReturnValue({ status: 200, json: dataStoreJsonResponse })
-        dataStoreService.saveDataStoreToDB = jest.fn()
         dataStoreService.fetchDatastoreAndSaveInDB('temp_token').then(() => {
             expect(dataStoreService.fetchDataStore).toHaveBeenCalledTimes(1)
             expect(dataStoreService.saveDataStoreToDB).toHaveBeenCalledTimes(1)
@@ -671,6 +687,528 @@ describe('test fetchDatastoreAndSaveInDB', () => {
         })
     })
 })
+
+describe('test saveDataStoreToDB', () => {
+    beforeEach(() => {
+        realm.getAll = jest.fn()
+        realm.performBatchSave = jest.fn()
+        dataStoreService.saveDataStoreToDB = jest.fn()
+    })
+    it('should return undefined when dataStoreJsonResponse is missing', () => {
+        expect(dataStoreService.saveDataStoreToDB()).toEqual(undefined)
+    })
+
+    it('should test saveDataStoreToDB', () => {
+        realm.getAll.mockReturnValue(12)
+        dataStoreService.fetchDatastoreAndSaveInDB('temp_token').then(() => {
+            expect(realm.getAll).toHaveBeenCalledTimes(1)
+            expect(realm.performBatchSave).toHaveBeenCalledTimes(1)
+            expect(dataStoreService.saveDataStoreToDB).toHaveBeenCalledTimes(1)
+        })
+    })
+})
+
+describe('test checkIfRecordPresentWithServerId', () => {
+    beforeEach(() => {
+        realm.deleteSingleRecord = jest.fn()
+    })
+    it('should throw serverUniqueKey missing error', () => {
+        const message = 'serverUniqueKey missing'
+        try {
+            dataStoreService.checkIfRecordPresentWithServerId()
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+    it('should test checkIfRecordPresentWithServerId', () => {
+        dataStoreService.checkIfRecordPresentWithServerId('temp_token').then(() => {
+            expect(realm.deleteSingleRecord).toHaveBeenCalledTimes(1)
+        })
+    })
+})
+
+
+describe('test searchDataStore', () => {
+    beforeEach(() => {
+        realm.getRecordListOnQuery = jest.fn()
+    })
+    it('should throw searchList missing error', () => {
+        const message = 'searchList not present'
+        try {
+            dataStoreService.searchDataStore()
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+    it('should return listOfUniqueRecords', () => {
+        realm.getRecordListOnQuery.mockReturnValue(
+            [{
+                serverUniqueKey: 123,
+                key: 'name'
+            }, {
+                serverUniqueKey: 231,
+                key: 'num'
+            }]
+        )
+        return dataStoreService.searchDataStore('abc', 123, ['a'])
+            .then((listOfUniqueRecords) => {
+                expect(realm.deleteSingleRecord).toHaveBeenCalledTimes(1)
+                expect(listOfUniqueRecords).toEqual([
+                    {
+                        serverUniqueKey: 123,
+                        matchKey: 'name'
+                    }, {
+                        serverUniqueKey: 231,
+                        matchKey: 'num'
+                    }
+                ])
+            })
+    })
+
+    it('should return listOfUniqueRecords with same key', () => {
+        realm.getRecordListOnQuery.mockReturnValue(
+            [{
+                serverUniqueKey: 123,
+                key: 'name'
+            }, {
+                serverUniqueKey: 231,
+                key: 'name'
+            }]
+        )
+        return dataStoreService.searchDataStore('abc', 123, ['a'])
+            .then((listOfUniqueRecords) => {
+                expect(realm.deleteSingleRecord).toHaveBeenCalledTimes(1)
+                expect(listOfUniqueRecords).toEqual([
+                    {
+                        serverUniqueKey: 123,
+                        matchKey: 'name'
+                    }, {
+                        serverUniqueKey: 231,
+                        matchKey: 'name'
+                    }
+                ])
+            })
+    })
+
+    it('should return listOfUniqueRecords', () => {
+        realm.getRecordListOnQuery.mockReturnValue(
+            [{
+                serverUniqueKey: 123,
+                key: 'name'
+            }, {
+                serverUniqueKey: 123,
+                key: 'name'
+            }]
+        )
+        return dataStoreService.searchDataStore('abc', 123, ['a'])
+            .then((listOfUniqueRecords) => {
+                expect(realm.deleteSingleRecord).toHaveBeenCalledTimes(1)
+                expect(listOfUniqueRecords).toEqual([
+                    {
+                        serverUniqueKey: 123,
+                        matchKey: 'name'
+                    }
+                ])
+            })
+    })
+})
+
+
+describe('test createDataStoreAttrValueMap', () => {
+    it('should throw listOfUniqueRecords missing error', () => {
+        const message = 'listOfUniqueRecords not present'
+        try {
+            dataStoreService.createDataStoreAttrValueMap(null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should return dataStoreAttrValueMap', () => {
+        const listOfUniqueRecords = [{
+            serverUniqueKey: '123',
+            matchKey: 'name'
+        }]
+        const uniqueKey = 'name'
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue(
+            [{
+                key: 'name',
+                value: 'abhi'
+            }], [{
+                key: '_id',
+                value: '123'
+            }])
+
+        const dataStoreAttrValueMap = {
+            0: {
+                id: 0,
+                uniqueKey,
+                matchKey: 'name',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        expect(dataStoreService.createDataStoreAttrValueMap(uniqueKey, listOfUniqueRecords)).toEqual(dataStoreAttrValueMap)
+    })
+
+    it('should return dataStoreAttrValueMap', () => {
+        const listOfUniqueRecords = [{
+            serverUniqueKey: '123',
+            matchKey: 'name'
+        }]
+        const uniqueKey = null
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue(
+            [{
+                key: 'name',
+                value: 'abhi'
+            }]
+
+            , [{
+                key: '_id',
+                value: '123'
+            }])
+
+        const dataStoreAttrValueMap = {
+            0: {
+                id: 0,
+                uniqueKey: '_id',
+                matchKey: 'name',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        expect(dataStoreService.createDataStoreAttrValueMap(uniqueKey, listOfUniqueRecords)).toEqual(dataStoreAttrValueMap)
+    })
+})
+
+describe('test checkForOfflineDsResponse', () => {
+    it('should throw searchText missing error', () => {
+        const message = 'searchText not present'
+        try {
+            dataStoreService.checkForOfflineDsResponse(null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    it('should throw dataStoreMasterId missing error', () => {
+        const message = 'dataStoreMasterId not present'
+        try {
+            dataStoreService.checkForOfflineDsResponse('abc', null)
+        } catch (error) {
+            expect(error.message).toEqual(message)
+        }
+    })
+
+    beforeEach(() => {
+        realm.getRecordListOnQuery = jest.fn()
+        dataStoreService.searchDataStore = jest.fn()
+        dataStoreService.createDataStoreAttrValueMap = jest.fn()
+    })
+
+    it('should return offline DS not present', () => {
+        realm.getRecordListOnQuery.mockReturnValue([])
+        return dataStoreService.checkForOfflineDsResponse('abc', 123)
+            .then((result) => {
+                expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+                expect(result).toEqual(
+                    { offlineDSPresent: false }
+                )
+            })
+    })
+
+    it('should return offline DS not present', () => {
+        realm.getRecordListOnQuery.mockReturnValue([{
+            uniqueIndex: true,
+            searchIndex: true,
+            key: 'name'
+        }, {
+            uniqueIndex: false,
+            searchIndex: true,
+            key: 'num'
+        }])
+        dataStoreService.searchDataStore.mockReturnValue([])
+        dataStoreService.createDataStoreAttrValueMap.mockReturnValue({})
+        return dataStoreService.checkForOfflineDsResponse('abc', 123)
+            .then((result) => {
+                expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.searchDataStore).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.createDataStoreAttrValueMap).toHaveBeenCalledTimes(1)
+
+                expect(result).toEqual(
+                    {
+                        offlineDSPresent: true,
+                        dataStoreAttrValueMap: {}
+                    }
+                )
+            })
+    })
+})
+
+describe('test searchDataStoreAttributeValueMap', () => {
+    it('should throw searchText missing error', () => {
+        try {
+            dataStoreService.searchDataStoreAttributeValueMap(null)
+        } catch (error) {
+            expect(error.message).toEqual(SEARCH_TEXT_MISSING)
+        }
+    })
+
+    it('should throw data store map missing error', () => {
+        try {
+            dataStoreService.searchDataStoreAttributeValueMap('123', null)
+        } catch (error) {
+            expect(error.message).toEqual(DATA_STORE_MAP_MISSING)
+        }
+    })
+
+    it('should return dataStoreAttrValueMap and cloneDataStoreAttrValueMap when cloneDataStoreAttrValueMap is empty', () => {
+        const dataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        const cloneDataStoreAttrValueMap = {}
+        expect(dataStoreService.searchDataStoreAttributeValueMap('1', dataStoreAttrValueMap, cloneDataStoreAttrValueMap)).toEqual({
+            dataStoreAttrValueMap,
+            cloneDataStoreAttrValueMap: dataStoreAttrValueMap
+        })
+    })
+
+    it('should return dataStoreAttrValueMap and cloneDataStoreAttrValueMap when cloneDataStoreAttrValueMap is not empty', () => {
+        const dataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        const cloneDataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        expect(dataStoreService.searchDataStoreAttributeValueMap('1', dataStoreAttrValueMap, cloneDataStoreAttrValueMap)).toEqual({
+            dataStoreAttrValueMap,
+            cloneDataStoreAttrValueMap: dataStoreAttrValueMap
+        })
+    })
+
+    it('should return empty dataStoreAttrValueMap and cloneDataStoreAttrValueMap when cloneDataStoreAttrValueMap is not empty', () => {
+        const dataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        const cloneDataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        expect(dataStoreService.searchDataStoreAttributeValueMap('2', dataStoreAttrValueMap, cloneDataStoreAttrValueMap)).toEqual({
+            dataStoreAttrValueMap: {},
+            cloneDataStoreAttrValueMap: dataStoreAttrValueMap
+        })
+    })
+})
+
+describe('test createDataStoreAttrValueMapInCaseOfFilter', () => {
+    it('should return empty dataStoreAttrValueMap as dataStoreResponse is not defined', () => {
+        const dataStoreAttrValueMap = {}
+        expect(dataStoreService.createDataStoreAttrValueMapInCaseOfFilter(null, 1)).toEqual({})
+    })
+
+    it('should return dataStoreAttrValueMap', () => {
+        const dataStoreResponse = [[{
+            attributeId: 123,
+            key: 'name',
+            value: 'temp'
+        }, {
+            attributeId: 1234,
+            key: 'class',
+            value: '12'
+        }]]
+
+        const dataStoreAttrValueMap = {
+            'temp': {
+                id: 'temp',
+                uniqueKey: 'name',
+                dataStoreAttributeValueMap: {
+                    'name': 'temp',
+                    'class': '12'
+                }
+            }
+        }
+        expect(dataStoreService.createDataStoreAttrValueMapInCaseOfFilter(dataStoreResponse, 123)).toEqual(dataStoreAttrValueMap)
+    })
+})
+
+describe('test checkForFiltersAndValidations', () => {
+    beforeEach(() => {
+        dataStoreService.getValidations = jest.fn()
+        keyValueDBService.getValueFromStore = jest.fn()
+        dataStoreFilterService.fetchDataForFilter = jest.fn()
+        dataStoreService.createDataStoreAttrValueMapInCaseOfFilter = jest.fn()
+    })
+    it('should throw current element missing error', () => {
+        try {
+            dataStoreService.checkForFiltersAndValidations(null)
+        } catch (error) {
+            expect(error.message).toEqual(CURRENT_ELEMENT_MISSING)
+        }
+    })
+
+    it('should return isFiltersPresent to false and check for validations and validations are also not present', () => {
+        const currentElement = { id: 1 }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: false,
+                        validation
+                    }
+                )
+            })
+    })
+
+    it('should return isFiltersPresent to false, check for validations and validations are also not present and dataStoreFilterMapping is []', () => {
+        const currentElement = { id: 1, dataStoreFilterMapping: '[]' }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: false,
+                        validation
+                    }
+                )
+            })
+    })
+
+    it('should return isFiltersPresent to false, check for validations and validations are also not present and attribute type id is 63', () => {
+        const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: EXTERNAL_DATA_STORE }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: false,
+                        validation
+                    }
+                )
+            })
+    })
+
+    it('should return isFiltersPresent to false, check for validations and validations are present and attribute type id is 63', () => {
+        const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: EXTERNAL_DATA_STORE, validation: [{ timeOfExecution: REMARKS }] }
+        let validation = {
+            isScannerEnabled: true,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        dataStoreService.getValidations.mockReturnValue({
+            isScannerEnabled: true,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        })
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(dataStoreService.getValidations).toHaveBeenCalledTimes(1)
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: false,
+                        validation
+                    }
+                )
+            })
+    })
+
+    it('should return isFiltersPresent to true and dataStoreAttrValueMap', () => {
+        const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: DATA_STORE, validation: [{ timeOfExecution: REMARKS }] }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        keyValueDBService.getValueFromStore.mockReturnValue({})
+        dataStoreFilterService.fetchDataForFilter.mockReturnValue({
+            dataStoreFilterResponse: {},
+            dataStoreFilterReverseMap: {}
+        })
+        dataStoreService.createDataStoreAttrValueMapInCaseOfFilter.mockReturnValue({})
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.createDataStoreAttrValueMapInCaseOfFilter).toHaveBeenCalledTimes(1)
+                expect(dataStoreFilterService.fetchDataForFilter).toHaveBeenCalledTimes(1)
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: true,
+                        validation
+                    }
+                )
+            })
+    })
+})
+
 
 function getMapFromObject(obj) {
     let strMap = new Map();

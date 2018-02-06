@@ -151,9 +151,9 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
     await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
-    await keyValueDBService.validateAndSaveData(HUB,json.hub)
-    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER,moment().format('YYYY-MM-DD HH:mm:ss'))
-    await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))  
+    await keyValueDBService.validateAndSaveData(HUB, json.hub)
+    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment().format('YYYY-MM-DD HH:mm:ss'))
+    await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
   }
 
   /**
@@ -255,7 +255,8 @@ class JobMaster {
       throw new Error("Server time format incorrect")
     }
     const currentTimeInMillis = moment()
-    if (Math.abs(currentTimeInMillis - serverTimeInMillis) > 15 * 60 * 1000) {
+    let diffIntime = Math.abs(moment(currentTimeInMillis).diff(serverTimeInMillis, 'minutes'))
+    if (diffIntime > 15) {
       throw new Error("Time mismatch. Please correct time on Device")
     }
     return true
@@ -264,7 +265,7 @@ class JobMaster {
   async getJobMasterTitleListFromIds(jobMasterIdList) {
     const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
     let jobMasterTitleList = []
-    if(_.isUndefined(jobMasterIdList)){
+    if (_.isUndefined(jobMasterIdList)) {
       return null
     }
     jobMasters.value.forEach(jobMaster => {
@@ -279,11 +280,17 @@ class JobMaster {
   //   const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
   //   return jobMaster
   // }
-  
+
   async getJobMasterFromJobMasterList(jobMasterId) {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
     return jobMaster;
+  }
+
+  async getJobMasterWithEnableResequence(){
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMasterIdWithEnableResequence = jobMasterList && jobMasterList.value ? jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id) : null
+    return jobMasterIdWithEnableResequence
   }
 
   /**

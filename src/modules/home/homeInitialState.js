@@ -54,7 +54,7 @@ var InitialState = Record({
             appModuleId: 20,
             displayName: JOB_ASSIGNMENT_DISPLAY,
             enabled: false,
-            icon: <JobAssignmentIcon width = {30} height = {30} />
+            icon: <JobAssignmentIcon width={30} height={30} />
         }
     },
     menu: {
@@ -90,7 +90,7 @@ var InitialState = Record({
             enabled: false,
         }
     },
-     pieChart: {
+    pieChart: {
         PIECHART: {
             appModuleId: 5,
             displayName: 'Pie Chart',
@@ -106,8 +106,13 @@ var InitialState = Record({
     moduleLoading: false,
     chartLoading: false,
     count: null,
-    lastSyncTime:null,
-    isLoggingOut:false
+    lastSyncTime: null,
+    isLoggingOut: false,
+    isUnsyncTransactionOnLogout: false,
+    backupUploadView: 0,
+    uploadingFileCount: 0,
+    failedUploadCount: 0,
+    unsyncBackupFilesList: []
 })
 
 export default InitialState

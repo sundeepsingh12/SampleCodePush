@@ -84,7 +84,8 @@ function mapStateToProps(state) {
     errorMessage: state.jobDetails.errorMessage,
     statusList: state.jobDetails.statusList,
     statusRevertList: state.jobDetails.statusRevertList,
-    draftStatusInfo: state.jobDetails.draftStatusInfo
+    draftStatusInfo: state.jobDetails.draftStatusInfo,
+    isEtaTimerShow: state.jobDetails.isEtaTimerShow,
   }
 }
 
@@ -375,14 +376,14 @@ class JobDetailsV2 extends PureComponent {
   }
 
   etaUpdateTimer() {
-    // const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
-    // console.logs("statusList", this.props.statusList)
-    // console.logs("statusIds", statusIds)    
-    if(this.props.jobTransaction && this.props.jobTransaction.jobEtaTime && this.props.jobTransaction.startTime){
-      return <EtaCountDownTimer endTime= {this.props.jobTransaction.jobEtaTime} startTime = {this.props.jobTransaction.startTime} />
-    } else {
-      return null
+    if (this.props.jobTransaction && this.props.jobTransaction.jobEtaTime && this.props.jobTransaction.startTime && this.props.isEtaTimerShow) {
+      let etaStartTime = ((moment().format('YYYY-MM-DD ')).concat(this.props.jobTransaction.startTime)).concat(":00")
+      if (moment(this.props.jobTransaction.jobEtaTime).format('HH:mm') != this.props.jobTransaction.endTime) {
+        etaStartTime = moment((moment(etaStartTime).unix() + moment(this.props.jobTransaction.jobEtaTime).unix() - moment(((moment().format('YYYY-MM-DD ')).concat(this.props.jobTransaction.endTime)).concat(":00")).unix()) * 1000).format('YYYY-MM-DD HH:mm:ss')
+      }
+      return <EtaCountDownTimer endTime={this.props.jobTransaction.jobEtaTime} startTime={etaStartTime} />
     }
+    return null
   }
 
   _goToFormLayoutWithDraft = () => {
