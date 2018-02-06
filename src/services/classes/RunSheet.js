@@ -1,7 +1,6 @@
 import {
   TABLE_RUNSHEET,
-  TABLE_JOB_TRANSACTION,
-  USER_SUMMARY
+  TABLE_JOB_TRANSACTION
 } from '../../lib/constants'
 
 import * as realm from '../../repositories/realmdb'
@@ -11,7 +10,6 @@ import {
 import {
   RUNSHEET_MISSING
 } from '../../lib/ContainerConstants'
-import {keyValueDBService} from './KeyValueDBService'
 
 class RunSheet {
 
@@ -19,7 +17,7 @@ class RunSheet {
    * 
    * @param {*} jobSummaries 
    */
-  async updateRunSheetAndUserSummary() {
+  async updateRunSheetSummary() {
     let query = "deleteFlag != 1";
     const status = ['pendingCount','failCount','successCount']
     const jobTransactionArray = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
@@ -30,23 +28,16 @@ class RunSheet {
     let allStatusMap =  { ...pendingStatusMap, ...failStatusMap, ...successStatusMap};
     const runsheetArray = realm.getAll(TABLE_RUNSHEET)
     let runsheetList = {}
-    let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY) 
     runsheetArray.forEach(runsheetObject => {
       const runsheetCLone = { ...runsheetObject } 
       runsheetCLone.pendingCount = 0 ; runsheetCLone.failCount = 0 ; runsheetCLone.successCount = 0 ;
       runsheetList[runsheetObject.id] = { ...runsheetCLone }
     })
-    let pendingCount = 0,failCount = 0,successCount = 0,allCount = [0,0,0]
     for (let index in jobTransactionArray) {
-      allCount[allStatusMap[jobTransactionArray[index].jobStatusId]-1]  += 1
       if (allStatusMap[jobTransactionArray[index].jobStatusId] && (runsheetList[jobTransactionArray[index].runsheetId])) {
         runsheetList[jobTransactionArray[index].runsheetId][status[allStatusMap[jobTransactionArray[index].jobStatusId] -1 ]] += 1
       }
     }
-    if(userSummary && userSummary.value){
-        userSummary["value"][status[0]] = allCount[0], userSummary["value"][status[1]] = allCount[1], userSummary["value"][status[2]] = allCount[2]
-    }
-    await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)    
     const runsheets = {
       tableName: TABLE_RUNSHEET,
       value: Object.values(runsheetList)
