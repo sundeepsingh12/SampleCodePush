@@ -240,6 +240,7 @@ module.exports = keyMirror({
     NEXT_FOCUS: null,
     SET_FORM_TO_INVALID: null,
     SET_DSF_REVERSE_MAP: null,
+    SET_MODAL_FIELD_ATTRIBUTE: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -478,6 +479,10 @@ module.exports = keyMirror({
     SEARCHED_DATA_STORE_FILTER_LIST: null,
     SET_DSF_INITIAL_STATE: null,
 
+    //Multiple Options Attribute Actions
+    SET_OPTIONS_LIST: null,
+    SET_OPTION_ATTRIBUTE_ERROR: null,
+    SET_OPTION_SEARCH_INPUT: null,
     // backup actions
     SET_LOADER_BACKUP: null,
     SET_BACKUP_FILES: null,

@@ -39,7 +39,9 @@ var InitialState = Record({
         draftStatusId: null,
         updateDraft: false,
         isFormValid: true,
-        dataStoreFilterReverseMap: {}
+        dataStoreFilterReverseMap: {},
+        fieldAttributeMasterParentIdMap: {},
+        modalFieldAttributeMasterId: null
 })
 
 export default InitialState

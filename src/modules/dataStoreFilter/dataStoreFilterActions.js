@@ -31,7 +31,7 @@ export function getDSFListContent(currentElement, formElement, jobTransaction, d
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
-           
+
         }
     }
 }
@@ -53,19 +53,19 @@ export function getFilteredResults(dataStoreFilterList, cloneDataStoreFilterList
                 cloneDataStoreFilterList: searchResult.cloneDataStoreFilterList
             }))
         } catch (error) {
-           
+
         }
     }
 }
 
 
-export function onSave(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, latestPositionId, jobTransaction, dataStoreFilterReverseMap) {
+export function onSave(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, latestPositionId, jobTransaction, dataStoreFilterReverseMap, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         try {
             formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formElement))
-            dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, { latestPositionId }, jobTransaction))
+            dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap, true))
         } catch (error) {
-            
+
         }
     }
 }

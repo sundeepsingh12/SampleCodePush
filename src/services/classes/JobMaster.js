@@ -287,6 +287,12 @@ class JobMaster {
     return jobMaster;
   }
 
+  async getJobMasterWithEnableResequence(){
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMasterIdWithEnableResequence = jobMasterList && jobMasterList.value ? jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id) : null
+    return jobMasterIdWithEnableResequence
+  }
+
   /**
    * This function prepares job master list on the basis of pre and post assignment list
    * @param {*} postAssignmentList 

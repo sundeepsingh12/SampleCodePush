@@ -6,6 +6,8 @@ module.exports = {
     CANCEL: 'Cancel',
     OK: 'Ok',
     SAVE: 'Save',
+    DONE: 'DONE',
+    DISMISS: 'DISMISS',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -118,6 +120,8 @@ module.exports = {
     COLLECTION_CASH: 'Collection-Cash',
     COLLECTION_SOD: 'Collection-SOD',
 
+    //Multiple Option Container
+    NO_OPTIONS_PRESENT: 'No options Present',
     //Save Activated and CheckoutDetails
     SMS_NOT_SENT_TRY_AGAIN_LATER: 'SMS not sent ,try again later',
     EMAIL_NOT_SENT_TRY_AGAIN_LATER: 'Email not sent ,try again later',

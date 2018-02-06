@@ -66,7 +66,7 @@ class DataStoreFilter extends PureComponent {
 
     _dropModal() {
         this.props.actions.setState(SET_DSF_INITIAL_STATE)
-        this.props.press(false)
+        this.props.onClose()
     }
 
     dataStoreFilterItemDetails(item) {
@@ -79,7 +79,8 @@ class DataStoreFilter extends PureComponent {
                     item,
                     this.props.latestPositionId,
                     this.props.jobTransaction,
-                    this.props.dataStoreFilterReverseMap)
+                    this.props.dataStoreFilterReverseMap,
+                    this.props.fieldAttributeMasterParentIdMap)
                 this._dropModal()
             }}>
             <View style={[styles.row, styles.alignCenter]}>
@@ -98,7 +99,7 @@ class DataStoreFilter extends PureComponent {
         this.props.actions.setState(SET_DSF_SEARCH_TEXT, searchText)
         if (searchText != '') {
             this.props.actions.getFilteredResults(this.props.dataStoreFilterList, this.props.cloneDataStoreFilterList, searchText)
-        } else if(!_.isEmpty(this.props.cloneDataStoreFilterList))  {
+        } else if (!_.isEmpty(this.props.cloneDataStoreFilterList)) {
             this.props.actions.setState(DATA_STORE_FILTER_LIST, this.props.cloneDataStoreFilterList)
         }
     }
