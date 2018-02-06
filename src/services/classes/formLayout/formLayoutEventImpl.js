@@ -161,14 +161,6 @@ export default class FormLayoutEventImpl {
         return formLayoutObject;
     }
 
-    /**@function getSequenceAttrData(sequenceMasterId)
-     * It hits api to get sequence attr data from server.
-     * 
-     * @param {Number} sequenceMasterId 
-     * 
-     * @returns {float}  -> data
-     */
-
     async getSequenceAttrData(sequenceMasterId) {
         if (_.isNull(sequenceMasterId) || _.isUndefined(sequenceMasterId))
             throw new Error(SEQUENCE_ID_UNAVAILABLE)
@@ -232,13 +224,15 @@ export default class FormLayoutEventImpl {
             }
             const prevStatusId = (jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
             const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
-            const runSheet = (jobTransactionId >= 0 || jobTransactionList.length) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList) : []            
-            await this._updateUserSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList,userSummary,jobTransaction.value[0], statusId)            
+            const runSheet = (jobTransactionId >= 0 || jobTransactionList.length) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList) : []
             await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionList)
             let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job, serverSmsLogs)
             await keyValueDBService.validateAndSaveData(LAST_JOB_COMPLETED_TIME, moment().format('YYYY-MM-DD HH:mm:ss'))
             await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
+            userSummary.value.lastOrderTime = jobTransaction.value[0].lastTransactionTimeOnMobile
+            userSummary.value.lastOrderNumber = jobTransaction.value[0].referenceNumber
+            await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
             return jobTransaction.jobTransactionDTOList
         } catch (error) {
             console.log(error)
@@ -314,38 +308,12 @@ export default class FormLayoutEventImpl {
         return transactionLogs
     }
 
-    /**@function _updateUserSummary(jobTransaction,statusCategory,jobTransactionIdList,userSummary,jobTransactionValue)
-     * update userSummaryDb  after completing transactions.
-     * 
-     * @param {object} jobTransaction 
-     * @param {Number} statusCategory
-     * @param {Array}  jobTransactionIdList // case of bulk
-     * @param {object} userSummary
-     * @param {object} jobTransactionValue // new transaction status Id
-     * 
-     */
-
-    async _updateUserSummary(jobTransaction, statusCategory, jobTransactionIdList,userSummary,jobTransactionValue,nextStatusId) {
-        const status = ['pendingCount', 'failCount', 'successCount']
-        const prevStatusId = (jobTransactionIdList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
-        const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
-        const jobTransactionId = (jobTransactionIdList.length) ? jobTransaction[0].id : jobTransaction.id
-        const count = (jobTransactionIdList.length) ? jobTransactionIdList.length : 1
-        userSummary["value"][status[prevStatusCategory - 1]] = (userSummary["value"][status[prevStatusCategory - 1]] - count >= 0 && prevStatusId != nextStatusId ) ? userSummary["value"][status[prevStatusCategory - 1]] - count : userSummary["value"][status[prevStatusCategory - 1]] 
-        userSummary["value"][status[statusCategory -1]] += count 
-        if(jobTransactionValue){
-            userSummary.value.lastOrderTime = jobTransactionValue.lastTransactionTimeOnMobile
-            userSummary.value.lastOrderNumber = jobTransactionValue.referenceNumber 
-        } 
-        await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
-    }
-
-    /**@function _updateJobSummary(jobTransaction,statusId,jobTransactionIdList)
+    /**
      * update jobSummaryDb count after completing transactions.
      * 
-     * @param {object} jobTransaction 
-     * @param {Array} jobTransactionIdList // case of bulk
-     * @param {Number} statusId // new transaction status Id
+     * @param {*jobTransaction} jobTransaction 
+     * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
+     * @param {*statusId} statusId // new transaction status Id
      * 
      */
 
@@ -366,15 +334,14 @@ export default class FormLayoutEventImpl {
         await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummaryList)
     }
 
-    /**@function _updateRunsheetSummary(jobTransaction,statusCategory,jobTransactionIdList)
+    /**
       * update runSheetDb count after completing transactions.
-      *   and returns an object containing tablename and runSheetArray
+      * and returns an object containing runSheetArray
       * 
       * @param {*jobTransaction} jobTransaction 
       * @param {*jobTransactionIdList} jobTransactionIdList // case of bulk
       * @param {*statusCategory} statusCategory // new transaction status category
       * 
-      * @returns {Object}  -> { tablename : TABLE, value : []}
       */
 
     async _updateRunsheetSummary(jobTransaction, statusCategory, jobTransactionList) {
@@ -617,7 +584,7 @@ export default class FormLayoutEventImpl {
         jobTransaction.jobType = jobMaster.code
         jobTransaction.jobStatusId = status.id
         jobTransaction.statusCode = status.code
-        jobTransaction.employeeCode = (user) ? user.employeeCode : null
+        jobTransaction.employeeCode = user.employeeCode
         jobTransaction.hubCode = hub.code
         jobTransaction.lastTransactionTimeOnMobile = currentTime
         jobTransaction.imeiNumber = imei.imeiNumber
@@ -833,3 +800,4 @@ export default class FormLayoutEventImpl {
     }
 
 }
+

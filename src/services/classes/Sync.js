@@ -567,7 +567,7 @@ class Sync {
       }
     }
     if (isJobsPresent) {
-      await runSheetService.updateRunSheetAndUserSummary()
+      await runSheetService.updateRunSheetSummary()
     }
     return isJobsPresent
 
