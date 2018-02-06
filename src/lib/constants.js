@@ -239,6 +239,7 @@ module.exports = keyMirror({
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
     SET_FORM_TO_INVALID: null,
+    SET_MODAL_FIELD_ATTRIBUTE: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -469,13 +470,17 @@ module.exports = keyMirror({
     NPSFEEDBACK_VALUE: null,
     IS_SERVER_REACHABLE: null,
 
+    //Multiple Options Attribute Actions
+    SET_OPTIONS_LIST: null,
+    SET_OPTION_ATTRIBUTE_ERROR: null,
+    SET_OPTION_SEARCH_INPUT: null,
     // backup actions
     SET_LOADER_BACKUP: null,
     SET_BACKUP_FILES: null,
     SET_BACKUP_VIEW: null,
     SET_UPLOADING_FILE: null,
     SET_SYNCED_FILES: null,
-    SET_BACKUP_TOAST: null
+    SET_BACKUP_TOAST: null,
 })
 
 

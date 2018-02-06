@@ -119,7 +119,6 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
             //     paymentAtEnd
             // }))
             dispatch(setState(CLEAR_PAYMENT_STATE))
-            dispatch(NavigationActions.back())
         } catch (error) {
             console.log(error)
         }
@@ -143,7 +142,7 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formEl
             //     paymentAtEnd
             // }))
             dispatch(setState(CLEAR_PAYMENT_STATE))
-            dispatch(NavigationActions.back({ key: paymentContainerKey }))
+            dispatch(NavigationActions.back())
         } catch (error) {
             console.log(error)
         }
