@@ -39,8 +39,11 @@ import {
     CAMERA,
     CAMERA_HIGH,
     CAMERA_MEDIUM,
-    SIGNATURE_AND_FEEDBACK
+    SIGNATURE_AND_FEEDBACK,
+    PENDING
 } from '../../lib/AttributeConstants'
+import { jobStatusService } from './JobStatus'
+import { jobMasterService } from './JobMaster'
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
@@ -71,8 +74,8 @@ export async function createZip(transactionIdToBeSynced) {
 
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
-    await updateUserSummaryNextJobTransactionId()
-    const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+    
+    const userSummary = await updateUserSummaryNextJobTransactionId()
     SYNC_RESULTS.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
     console.log(JSON.stringify(SYNC_RESULTS));
     await moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP)
@@ -94,15 +97,17 @@ export async function createZip(transactionIdToBeSynced) {
     // console.log(PATH_TEMP+' removed');
 }
 
-export async function updateUserSummaryNextJobTransactionId () {
-    const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-    const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id)
-    const statusMap = statusList.value.filter((status) => status.statusCategory == 1 && status.code !== UNSEEN).map(obj => obj.id)
-    const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
+async function updateUserSummaryNextJobTransactionId () {
+    const statusMap = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
+    const jobMasterIdWithEnableResequence = await jobMasterService.getJobMasterWithEnableResequence()
+    const firstEnableSequenceTransaction = (jobMasterIdWithEnableResequence && statusMap) ? jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap) : null
     let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+    if (!userSummary || !userSummary.value) {
+        throw new Error('Job status missing in store')
+    }
     userSummary.value.nextJobTransactionId = firstEnableSequenceTransaction ? firstEnableSequenceTransaction.id : null
     await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
+    return userSummary
 }
 
 /**
