@@ -58,6 +58,7 @@ function mapStateToProps(state) {
     draftStatusId: state.formLayout.draftStatusId,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
+    dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
   }
 }
@@ -99,6 +100,7 @@ class FormLayout extends PureComponent {
         isLoading: this.props.isLoading,
         errorMessage: this.props.errorMessage,
         currentElement: this.props.currentElement,
+        dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
         fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
       }
       this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId)

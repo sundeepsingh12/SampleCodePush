@@ -93,8 +93,8 @@ export default class FormLayoutEventImpl {
             value.editable = true
             if (value.required) {
                 value.focus = event == NEXT_FOCUS ? true : value.focus
+                isSaveDisabled = true
                 if (event != NEXT_FOCUS) {
-                    isSaveDisabled = true
                     break
                 }
             }

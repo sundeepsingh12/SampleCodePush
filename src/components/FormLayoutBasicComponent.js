@@ -24,7 +24,7 @@ import * as cashTenderingActions from '../modules/cashTendering/cashTenderingAct
 import SelectFromList from '../containers/SelectFromList'
 import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
 import QRIcon from '../svg_components/icons/QRIcon'
-
+import DataStoreFilter from '../containers/DataStoreFilter'
 import {
     MONEY_COLLECT,
     MONEY_PAY,
@@ -59,6 +59,7 @@ import {
     CAMERA_MEDIUM,
     SCAN_OR_TEXT,
     CONTACT_NUMBER,
+    DATA_STORE_FILTER,
     ARRAY_SAROJ_FAREYE,
     OBJECT_SAROJ_FAREYE,
     BEFORE,
@@ -163,7 +164,7 @@ class BasicFormElement extends PureComponent {
                 isSaveDisabled: this.props.isSaveDisabled,
                 cash: cash,
                 returnData: this._searchForReferenceValue.bind(this),
-                fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
+                fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
             }
         )
     }
@@ -261,6 +262,22 @@ class BasicFormElement extends PureComponent {
         if (attributeTypeId == TIME || attributeTypeId == DATE || attributeTypeId == RE_ATTEMPT_DATE) {
             return (
                 <TimePicker onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item} />
+            )
+        }
+
+        if (attributeTypeId == DATA_STORE_FILTER) {
+            return (
+                <View>
+                    <DataStoreFilter
+                        currentElement={this.props.item}
+                        formElement={this.props.formElement}
+                        isSaveDisabled={this.props.isSaveDisabled}
+                        jobTransaction={this.props.jobTransaction}
+                        latestPositionId={this.props.latestPositionId}
+                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
+                        onClose={this.onCloseModal}
+                    />
+                </View>
             )
         }
         return null
@@ -431,6 +448,13 @@ class BasicFormElement extends PureComponent {
             case DATE:
             case RE_ATTEMPT_DATE:
             case TIME:
+                return (
+                    <View>
+                        {modalView}
+                        <FormLayoutActivityComponent item={this.props.item} press={this.onPressModal} />
+                    </View>
+                )
+            case DATA_STORE_FILTER:
                 return (
                     <View>
                         {modalView}
