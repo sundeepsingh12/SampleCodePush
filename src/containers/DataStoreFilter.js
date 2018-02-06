@@ -42,26 +42,11 @@ function mapDispatchToProps(dispatch) {
 
 class DataStoreFilter extends PureComponent {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            modalVisible: true,
-        }
-    }
-
     componentDidMount() {
         this.props.actions.getDSFListContent(this.props.currentElement,
             this.props.formElement,
             this.props.jobTransaction,
             this.props.dataStoreFilterReverseMap)
-    }
-
-    setModalVisible = (visible) => {
-        this.setState(() => {
-            return {
-                modalVisible: true,
-            }
-        })
     }
 
     _dropModal() {
@@ -128,7 +113,7 @@ class DataStoreFilter extends PureComponent {
             <Modal
                 animationType="slide"
                 transparent={true}
-                visible={this.state.modalVisible}
+                visible={true}
                 onRequestClose={() => this._dropModal()}>
                 <TouchableHighlight
                     onPress={() => this._dropModal()}
