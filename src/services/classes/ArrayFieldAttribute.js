@@ -12,19 +12,18 @@ import { fieldDataService } from '../../services/classes/FieldData'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 
 class ArrayFieldAttribute {
-    getSortedArrayChildElements(lastRowId, arrayElements, arrayDTO) {
-        if (_.isEmpty(arrayElements)) {
-            let errorMessage;
-            let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
-            if (requiredFields.length <= 0) {
-                errorMessage = INVALID_CONFIG_ERROR
-                return { arrayRowDTO: {}, childElementsTemplate: arrayDTO, errorMessage }
-            } else {
-                let arrayRowDTO = this.addArrayRow(lastRowId, arrayDTO, arrayElements)
-                return { arrayRowDTO, childElementsTemplate: arrayDTO, errorMessage }
-            }
+    getSortedArrayChildElements(arrayDTO) {
+        let errorMessage;
+        let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
+        if (requiredFields.length <= 0) {
+            errorMessage = INVALID_CONFIG_ERROR
+            return { arrayRowDTO: {}, childElementsTemplate: arrayDTO, errorMessage }
+        } else {
+            let arrayMainObject = arrayDTO.arrayMainObject
+            let arrayTemplate = _.omit(arrayDTO, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
+            let arrayRowDTO = this.addArrayRow(0, arrayTemplate, {})
+            return { arrayRowDTO, childElementsTemplate: arrayTemplate, errorMessage, arrayMainObject }
         }
-        return
     }
 
     addArrayRow(lastRowId, childElementsTemplate, arrayElements) {
@@ -44,7 +43,7 @@ class ArrayFieldAttribute {
         let newArrayElements = _.omit(cloneArrayElements, [rowId])
         return newArrayElements
     }
-    prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId) {
+    prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId, arrayMainObject) {
         let arrayChildDataList = []
         for (let rowId in arrayElements) {
             let arrayObject = {}
@@ -53,8 +52,8 @@ class ArrayFieldAttribute {
                 childDataList.push({ fieldAttributeMasterId: arrayRowElement.fieldAttributeMasterId, attributeTypeId: arrayRowElement.attributeTypeId, value: arrayRowElement.value })
             }
             arrayObject = {
-                fieldAttributeMasterId: arrayElements[rowId].arrayMainObject.id,
-                attributeTypeId: arrayElements[rowId].arrayMainObject.attributeTypeId,
+                fieldAttributeMasterId: arrayMainObject.id,
+                attributeTypeId: arrayMainObject.attributeTypeId,
                 value: OBJECT_SAROJ_FAREYE,
                 childDataList
             }
@@ -88,6 +87,33 @@ class ArrayFieldAttribute {
             newArrayElements: cloneArrayElements,
             isSaveDisabled: _isSaveDisabled
         }
+    }
+
+    setInitialArray(currentElement, formElement, arrayTemplate) {
+        let arrayValue = formElement.get(currentElement.fieldAttributeMasterId)
+        let arrayElements = {}
+        let rowId = 0
+        let arrayMainObject = arrayTemplate.arrayMainObject
+        let childElementsTemplate = _.omit(arrayTemplate, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
+        if (arrayValue.value == ARRAY_SAROJ_FAREYE && arrayValue.childDataList) {
+            for (let index in arrayValue.childDataList) {
+                let arrayObjectSarojFareye = arrayValue.childDataList[index].childDataList
+                let formLayoutObject = new Map()
+                let arrayRow = {}
+                for (let index in arrayObjectSarojFareye) {
+                    let fieldAttribute = { ...childElementsTemplate.formLayoutObject.get(arrayObjectSarojFareye[index].fieldAttributeMasterId) }
+                    fieldAttribute.value = arrayObjectSarojFareye[index].value
+                    fieldAttribute.editable = true
+                    formLayoutObject.set(arrayObjectSarojFareye[index].fieldAttributeMasterId, fieldAttribute)
+                }
+                arrayElements[rowId] = { formLayoutObject, rowId, allRequiredFieldsFilled: true }
+                rowId++
+            }
+        }
+        const arrayRowDTO = {
+            arrayElements, lastRowId: rowId, isSaveDisabled: false
+        }
+        return { childElementsTemplate, arrayRowDTO, arrayMainObject }
     }
 }
 

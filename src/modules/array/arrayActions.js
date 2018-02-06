@@ -7,8 +7,8 @@ import {
     SET_ARRAY_ELEMENTS,
     SET_ERROR_MSG,
     CLEAR_ARRAY_STATE,
-    NEXT_FOCUS
-
+    NEXT_FOCUS,
+    SET_ARRAY_ISLOADING
 } from '../../lib/constants'
 import { ARRAY_SAROJ_FAREYE, AFTER } from '../../lib/AttributeConstants'
 import _ from 'lodash'
@@ -16,22 +16,22 @@ import { setState } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 
-export function getSortedArrayChildElements(fieldAttributeMasterId, jobStatusId, lastrowId, arrayElements, latestPositionId) {
-    return async function (dispatch) {
-        try {
-            const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, fieldAttributeMasterId)
-            const arrayDTO = await arrayService.getSortedArrayChildElements(lastrowId, arrayElements, sequenceWiseRootFieldAttributes)
-            if (!arrayDTO) return
-            if (arrayDTO.errorMessage) {
-                throw new Error(arrayDTO.errorMessage)
-            } else {
-                dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
-            }
-        } catch (error) {
-            dispatch(setState(SET_ERROR_MSG, error.message))
-        }
-    }
-}
+// export function getSortedArrayChildElements(fieldAttributeMasterId, jobStatusId, lastrowId, arrayElements, latestPositionId) {
+//     return async function (dispatch) {
+//         try {
+//             const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, fieldAttributeMasterId)
+//             const arrayDTO = await arrayService.getSortedArrayChildElements(lastrowId, arrayElements, sequenceWiseRootFieldAttributes)
+//             if (!arrayDTO) return
+//             if (arrayDTO.errorMessage) {
+//                 throw new Error(arrayDTO.errorMessage)
+//             } else {
+//                 dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
+//             }
+//         } catch (error) {
+//             dispatch(setState(SET_ERROR_MSG, error.message))
+//         }
+//     }
+// }
 export function addRowInArray(lastrowId, childElementsTemplate, arrayElements) {
     return async function (dispatch) {
         try {
@@ -70,14 +70,16 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
     }
 }
 
-export function saveArray(arrayElements, arrayParentItem, jobTransaction, latestPositionId, formElement, isSaveDisabled) {
+export function saveArray(arrayElements, arrayParentItem, jobTransaction, latestPositionId, formElement, isSaveDisabled, arrayMainObject) {
     return async function (dispatch) {
         try {
             if (!_.isEmpty(arrayElements)) {
-                let fieldDataListWithLatestPositionId = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction.id, latestPositionId)
+                let fieldDataListWithLatestPositionId = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction.id, latestPositionId, arrayMainObject)
                 if (!fieldDataListWithLatestPositionId) throw new Error('Array Could not be saved')
                 dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
                 dispatch(setState(CLEAR_ARRAY_STATE))
+            } else {
+                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, '', { latestPositionId }, jobTransaction))
             }
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))
@@ -100,5 +102,30 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
             formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
         }
         dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, currentElement.displayValue, newArray, rowId, null, NEXT_FOCUS))
+    }
+}
+
+export function setInitialArray(currentElement, formElement, jobStatusId, jobTransaction) {
+    return async function (dispatch) {
+        try {
+            dispatch(setState(SET_ARRAY_ISLOADING, true))
+            const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, currentElement.fieldAttributeMasterId, jobTransaction)
+            if (!formElement.get(currentElement.fieldAttributeMasterId).value || formElement.get(currentElement.fieldAttributeMasterId).value == '') {
+                const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, currentElement.fieldAttributeMasterId, jobTransaction)
+                const arrayDTO = await arrayService.getSortedArrayChildElements(sequenceWiseRootFieldAttributes)
+                if (!arrayDTO) return
+                if (arrayDTO.errorMessage) {
+                    throw new Error(arrayDTO.errorMessage)
+                } else {
+                    dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
+                }
+            } else {
+                let arrayState = arrayService.setInitialArray(currentElement, formElement, sequenceWiseRootFieldAttributes)
+                dispatch(setState(SET_ARRAY_CHILD_LIST, arrayState))
+            }
+        } catch (error) {
+            dispatch(setState(SET_ERROR_MSG, error.message))
+            dispatch(setState(SET_ARRAY_ISLOADING, false))
+        }
     }
 }
