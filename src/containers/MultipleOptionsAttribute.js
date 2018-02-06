@@ -41,7 +41,8 @@ import {
 } from '../lib/constants'
 import {
     DONE,
-    NO_OPTIONS_PRESENT
+    NO_OPTIONS_PRESENT,
+    DISMISS
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -247,7 +248,7 @@ class MultipleOptionsAttribute extends PureComponent {
                                 <Text style={[styles.fontLg, styles.fontWhite]}>
                                     {this.props.error}
                                 </Text>
-                                <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
+                                <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>{DISMISS}</Text>
                             </Animated.View>
                         </View>
                     </View>

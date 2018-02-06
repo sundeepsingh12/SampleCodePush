@@ -7,6 +7,7 @@ module.exports = {
     OK: 'Ok',
     SAVE: 'Save',
     DONE: 'DONE',
+    DISMISS: 'DISMISS',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',

@@ -20,9 +20,7 @@ export function getSortedArrayChildElements(fieldAttributeMasterId, jobStatusId,
     return async function (dispatch) {
         try {
             const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, fieldAttributeMasterId)
-            console.log(sequenceWiseRootFieldAttributes)
             const arrayDTO = await arrayService.getSortedArrayChildElements(lastrowId, arrayElements, sequenceWiseRootFieldAttributes)
-            console.log(arrayDTO)
             if (!arrayDTO) return
             if (arrayDTO.errorMessage) {
                 throw new Error(arrayDTO.errorMessage)

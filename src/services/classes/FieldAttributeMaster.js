@@ -80,15 +80,6 @@ class FieldAttributeMaster {
         }
         return childObjectList
     }
-
-    /**
-     * This function filters fieldAttributeValueList on basis of fieldAttributeMasterId
-     * @param {*} fieldAttributeValueList 
-     * @param {*} fieldAttributeMasterId 
-     */
-    filterFieldAttributeValueList(fieldAttributeValueList, fieldAttributeMasterId) {
-        return fieldAttributeValueList.filter(item => item.fieldAttributeMasterId == fieldAttributeMasterId)
-    }
 }
 
 export let fieldAttributeMasterService = new FieldAttributeMaster()

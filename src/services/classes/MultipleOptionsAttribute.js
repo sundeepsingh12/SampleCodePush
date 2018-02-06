@@ -18,11 +18,7 @@ class MultipleOptionsAttribute {
         let optionMap = {}
         for (let index in optionList) {
             optionMap[optionList[index].id] = optionList[index]
-            if (selectedOptionsMap[optionList[index].code]) {
-                optionMap[optionList[index].id].selected = true
-            } else {
-                optionMap[optionList[index].id].selected = false
-            }
+            optionMap[optionList[index].id].selected = selectedOptionsMap[optionList[index].code] ? true : false
         }
         return optionMap
     }

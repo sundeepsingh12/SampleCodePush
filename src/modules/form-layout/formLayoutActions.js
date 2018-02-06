@@ -142,7 +142,7 @@ export function updateFieldData(attributeId, value, formElement) {
     }
 }
 
-export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, modalPresent) {
+export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, modalPresent, containerValue) {
     return function (dispatch) {
         try {
             const cloneFormElement = _.cloneDeep(formElement)
@@ -150,6 +150,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
             cloneFormElement.get(attributeMasterId).childDataList = fieldDataListObject.fieldDataList
             let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
             cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
+            cloneFormElement.get(attributeMasterId).containerValue = validationsResult ? containerValue : null
             const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction);
             dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
                 {

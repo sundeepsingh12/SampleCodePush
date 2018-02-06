@@ -6,26 +6,20 @@ import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { multipleOptionsAttributeService } from '../../services/classes/MultipleOptionsAttribute'
-// import { jobDataService } from '../../services/classes/JobData'
 import { fieldAttributeMasterService } from '../../services/classes/FieldAttributeMaster'
-// import * as realm from '../../repositories/realmdb'
+import { fieldAttributeValueMasterService } from '../../services/classes/FieldAttributeValueMaster'
 import {
     CHECKBOX,
-    // RADIOBUTTON,
     ARRAY_SAROJ_FAREYE,
     OPTION_RADIO_FOR_MASTER,
     OBJECT_SAROJ_FAREYE,
     OPTION_RADIO_VALUE,
-    // DROPDOWN
 } from '../../lib/AttributeConstants'
 import {
     FIELD_ATTRIBUTE_VALUE,
     FIELD_ATTRIBUTE,
     SET_OPTIONS_LIST
 } from '../../lib/constants'
-import {
-    // AFTER
-} from '../../lib/AttributeConstants'
 import _ from 'lodash'
 
 export function getOptionsList(fieldAttributeMasterId, formElement) {
@@ -42,7 +36,7 @@ export function getOptionsList(fieldAttributeMasterId, formElement) {
             for (let index in childDataList) {
                 selectedOptionsMap[childDataList[index].value] = true
             }
-            optionList = fieldAttributeMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, fieldAttributeMasterId)
+            optionList = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, fieldAttributeMasterId)
             let optionsMap = multipleOptionsAttributeService.changeOptionStatus(optionList, selectedOptionsMap)
             dispatch(setState(SET_OPTIONS_LIST, {
                 optionsMap
@@ -81,8 +75,7 @@ export function getOptionsListFromJobData(currentElement, jobTransaction) {
             }))
         } catch (error) {
             console.log(error)
-            // dispatch(setState(ERROR_MESSAGE, error.message))
-            // dispatch(setState(ERROR_MESSAGE, ''))
+            dispatch(setState(ERROR_MESSAGE, error.message))
         }
     }
 }
@@ -107,13 +100,14 @@ export function saveOptionsFieldData(optionsMap, currentElement, latestPositionI
             let optionFieldDataList, fieldDataListObject = {
                 latestPositionId
             }
-            let fieldDataValue
+            let fieldDataValue, containerValue
             if (currentElement.attributeTypeId == CHECKBOX) {
                 fieldDataValue = ARRAY_SAROJ_FAREYE
             } else if (currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
                 fieldDataValue = OBJECT_SAROJ_FAREYE
             } else {
                 fieldDataValue = item ? item.code : null
+                containerValue = item ? item.name : null
             }
             if (fieldDataValue == ARRAY_SAROJ_FAREYE || fieldDataValue == OBJECT_SAROJ_FAREYE) {
                 optionFieldDataList = currentElement.attributeTypeId == CHECKBOX ? multipleOptionsAttributeService.prepareOptionFieldData(optionsMap, currentElement) : multipleOptionsAttributeService.prepareOptionFieldDataFromJobData(item)
@@ -123,7 +117,7 @@ export function saveOptionsFieldData(optionsMap, currentElement, latestPositionI
                 dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, fieldDataValue, formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS))
                 return
             }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, fieldDataValue, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, true))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, fieldDataValue, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, true, containerValue))
         } catch (error) {
             console.log(error)
         }
