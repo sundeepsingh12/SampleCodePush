@@ -67,7 +67,7 @@ class MultipleOptionsAttribute extends PureComponent {
     }
 
     componentDidMount() {
-        let formElement = this.props.calledFromArray ? this.props.formElements.formLayoutObject : this.props.formElements
+        let formElement = this.props.calledFromArray ? this.props.formElements[this.props.rowId].formLayoutObject : this.props.formElements
         if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
             this.props.actions.getOptionsListFromJobData(this.props.currentElement, this.props.jobTransaction)
         } else {
@@ -196,7 +196,11 @@ class MultipleOptionsAttribute extends PureComponent {
                 animationType="slide"
                 transparent={true}
                 onRequestClose={() => {
-                    this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
+                    if (this.props.calledFromArray) {
+                        this.props.onCloseModal(this.props.currentElement.fieldAttributeMasterId)
+                    } else {
+                        this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
+                    }
                     this.props.actions.setState(SET_OPTION_ATTRIBUTE_ERROR, { error: null })
                 }}
             >
@@ -205,7 +209,11 @@ class MultipleOptionsAttribute extends PureComponent {
                         <TouchableHighlight
                             style={{ backgroundColor: 'rgba(0,0,0,.5)', flex: 1 }}
                             onPress={() => {
-                                this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
+                                if (this.props.calledFromArray) {
+                                    this.props.onCloseModal(this.props.currentElement.fieldAttributeMasterId)
+                                } else {
+                                    this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
+                                }
                                 this.props.actions.setState(SET_OPTION_ATTRIBUTE_ERROR, { error: null })
                             }}
                         >

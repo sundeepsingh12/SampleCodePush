@@ -8,30 +8,26 @@ import {
     SET_ERROR_MSG,
     CLEAR_ARRAY_STATE,
     NEXT_FOCUS,
-    SET_ARRAY_ISLOADING
+    SET_ARRAY_ISLOADING,
 } from '../../lib/constants'
 import { ARRAY_SAROJ_FAREYE, AFTER } from '../../lib/AttributeConstants'
 import _ from 'lodash'
 import { setState } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
+import { NavigationActions } from 'react-navigation'
 
-// export function getSortedArrayChildElements(fieldAttributeMasterId, jobStatusId, lastrowId, arrayElements, latestPositionId) {
-//     return async function (dispatch) {
-//         try {
-//             const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, fieldAttributeMasterId)
-//             const arrayDTO = await arrayService.getSortedArrayChildElements(lastrowId, arrayElements, sequenceWiseRootFieldAttributes)
-//             if (!arrayDTO) return
-//             if (arrayDTO.errorMessage) {
-//                 throw new Error(arrayDTO.errorMessage)
-//             } else {
-//                 dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
-//             }
-//         } catch (error) {
-//             dispatch(setState(SET_ERROR_MSG, error.message))
-//         }
-//     }
-// }
+export function showOrDropModal(fieldAttributeMasterId, arrayElements, rowId, idToSet, isSaveDisabled) {
+    return async function (dispatch) {
+        try {
+            let newArray = _.cloneDeep(arrayElements)
+            newArray[rowId].modalFieldAttributeMasterId = idToSet
+            dispatch(setState(SET_ARRAY_ELEMENTS, { newArrayElements: newArray, isSaveDisabled }))
+        } catch (error) {
+            dispatch(setState(SET_ERROR_MSG, error.message))
+        }
+    }
+}
 export function addRowInArray(lastrowId, childElementsTemplate, arrayElements) {
     return async function (dispatch) {
         try {
@@ -58,12 +54,24 @@ export function deleteArrayRow(arrayElements, rowId, lastrowId) {
         }
     }
 }
-export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, fieldDataList, event) {
+export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, fieldDataList, event, backPress, containerValue) {
     return async function (dispatch) {
         try {
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, isSaveDisabled, rowId, value, fieldDataList, event)
+            let cloneArrayElements = _.cloneDeep(arrayElements)
+            let arrayRow = cloneArrayElements[rowId]
+            arrayRow.formLayoutObject.get(attributeMasterId).displayValue = value
+            arrayRow.formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
+            arrayRow.modalFieldAttributeMasterId = null
+            let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject.get(attributeMasterId), arrayRow.formLayoutObject, AFTER, null)
+            arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
+            arrayRow.formLayoutObject.get(attributeMasterId).containerValue = (validationsResult) ? containerValue : null
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, fieldDataList, event)
             if (!newArrayElements) throw new Error('Row could not be deleted')
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
+
+            if (validationsResult && backPress) {
+                dispatch(NavigationActions.back())
+            }
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))
         }

@@ -49,7 +49,13 @@ class ArrayFieldAttribute {
             let arrayObject = {}
             let childDataList = []
             for (let [key, arrayRowElement] of arrayElements[rowId].formLayoutObject) {
-                childDataList.push({ fieldAttributeMasterId: arrayRowElement.fieldAttributeMasterId, attributeTypeId: arrayRowElement.attributeTypeId, value: arrayRowElement.value })
+                if (arrayRowElement.value == ARRAY_SAROJ_FAREYE || arrayRowElement.value == OBJECT_SAROJ_FAREYE) {
+                    let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayRowElement.childDataList, jobTransactionId, arrayRowElement.positionId, latestPositionId)
+                    arrayRowElement.childDataList = fieldDataListWithLatestPositionId.fieldDataList
+                    latestPositionId = fieldDataListWithLatestPositionId.latestPositionId
+                }
+
+                childDataList.push(arrayRowElement)
             }
             arrayObject = {
                 fieldAttributeMasterId: arrayMainObject.id,
@@ -75,11 +81,8 @@ class ArrayFieldAttribute {
         }
         return isSaveDisabled
     }
-    findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, isSaveDisabled, rowId, value, fieldDataList, event) {
-        let cloneArrayElements = _.cloneDeep(arrayElements)
+    findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, fieldDataList, event) {
         let arrayRow = cloneArrayElements[rowId]
-        arrayRow.formLayoutObject.get(attributeMasterId).displayValue = value
-        arrayRow.formLayoutObject.get(attributeMasterId).value = value
         let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, event);
         arrayRow.allRequiredFieldsFilled = (!sortedArrayElements.isSaveDisabled) ? true : false
         let _isSaveDisabled = this.enableSaveIfRequired(cloneArrayElements)
@@ -104,6 +107,7 @@ class ArrayFieldAttribute {
                     let fieldAttribute = { ...childElementsTemplate.formLayoutObject.get(arrayObjectSarojFareye[index].fieldAttributeMasterId) }
                     fieldAttribute.value = arrayObjectSarojFareye[index].value
                     fieldAttribute.editable = true
+                    fieldAttribute.childDataList = arrayObjectSarojFareye[index].childDataList
                     formLayoutObject.set(arrayObjectSarojFareye[index].fieldAttributeMasterId, fieldAttribute)
                 }
                 arrayElements[rowId] = { formLayoutObject, rowId, allRequiredFieldsFilled: true }

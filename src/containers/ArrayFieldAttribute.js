@@ -47,7 +47,7 @@ function mapStateToProps(state) {
         isSaveDisabled: state.array.isSaveDisabled,
         errorMessage: state.array.errorMessage,
         arrayMainObject: state.array.arrayMainObject,
-        isLoading: state.array.isLoading
+        isLoading: state.array.isLoading,
     }
 }
 function mapDispatchToProps(dispatch) {
