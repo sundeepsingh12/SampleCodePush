@@ -168,7 +168,6 @@ class DataStore extends PureComponent {
             this.props.navigation.state.params.jobTransaction
         )
         this.setDetailsFor()
-        this._goBack()
     }
 
     setDetailsFor = () => {
@@ -241,7 +240,6 @@ class DataStore extends PureComponent {
                                             this.props.navigation.state.params.rowId,
                                             this.props.navigation.state.params.jobTransaction
                                         )
-                                        this._goBack()
                                     }}>
                                     <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                                 </Button>

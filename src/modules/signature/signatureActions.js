@@ -57,11 +57,11 @@ export function setIsRemarksValidation(validation) {
     }
 }
 
-export function saveSignatureAndRating(result, rating, currentElement, formElement, isSaveDisabled, jobTransaction, latestPositionId) {
+export function saveSignatureAndRating(result, rating, currentElement, formElement, isSaveDisabled, jobTransaction, latestPositionId, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         const signatureValue = await signatureService.saveFile(result, moment())
         const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
         const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransaction.id, latestPositionId)
-        dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
+        dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap))
     }
 }

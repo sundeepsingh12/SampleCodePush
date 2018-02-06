@@ -57,7 +57,8 @@ function mapStateToProps(state) {
     pieChart: state.home.pieChart,
     draftStatusId: state.formLayout.draftStatusId,
     updateDraft: state.formLayout.updateDraft,
-    isFormValid: state.formLayout.isFormValid
+    isFormValid: state.formLayout.isFormValid,
+    fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
   }
 }
 
@@ -98,6 +99,7 @@ class FormLayout extends PureComponent {
         isLoading: this.props.isLoading,
         errorMessage: this.props.errorMessage,
         currentElement: this.props.currentElement,
+        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
       }
       this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId)
     }
@@ -132,6 +134,7 @@ class FormLayout extends PureComponent {
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
         latestPositionId={this.props.latestPositionId}
+        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
       />
     )
   }
