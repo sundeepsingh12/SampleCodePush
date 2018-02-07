@@ -2,7 +2,6 @@
 var actions = require('../dataStoreActions')
 var formLayoutActions = require('../../form-layout/formLayoutActions')
 import {
-    SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
@@ -11,6 +10,9 @@ import {
     SPECIAL,
     SHOW_DETAILS,
     CLEAR_ATTR_MAP_AND_SET_LOADER,
+    SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
+    SET_DSF_REVERSE_MAP,
+    SEARCH_DATA_STORE_RESULT
 } from '../../../lib/constants'
 import {
     DATA_STORE,
@@ -23,72 +25,6 @@ import thunk from 'redux-thunk'
 import configureStore from 'redux-mock-store'
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
-
-
-describe('test for setValidation', () => {
-
-    const validationsResult = {
-        isScannerEnabled: true,
-        isAutoStartScannerEnabled: false,
-        isSearchEnabled: true,
-        isMinMaxValidation: false
-    }
-
-    const expectedActions = [
-        {
-            type: SET_VALIDATIONS,
-            payload: validationsResult
-        }
-    ]
-
-    const validationArray = [{
-        timeOfExecution: REMARKS,
-        condition: 'true'
-    },
-    {
-        timeOfExecution: REMARKS,
-        condition: 'false'
-    },
-    {
-        timeOfExecution: MINMAX,
-        condition: 'true'
-    },
-    {
-        timeOfExecution: SPECIAL,
-        condition: 'true'
-    }]
-
-    it('should set all validation using validation array from currentElement', () => {
-        dataStoreService.getValidations = jest.fn()
-        dataStoreService.getValidations.mockReturnValue(validationsResult);
-        const store = mockStore({})
-        return store.dispatch(actions.setValidation(validationArray))
-            .then(() => {
-                expect(dataStoreService.getValidations).toHaveBeenCalledTimes(1)
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-            })
-    })
-
-    it('should throw an error', () => {
-        dataStoreService.getValidations = jest.fn(() => {
-            throw new Error('error')
-        })
-        const store = mockStore({})
-        return store.dispatch(actions.setValidation(validationArray))
-            .then(() => {
-
-            })
-    })
-
-    it('should return nothing when validation array is null', () => {
-        const store = mockStore({})
-        return store.dispatch(actions.setValidation(null))
-            .then(() => {
-
-            })
-    })
-})
 
 describe('test for fillKeysAndSave', () => {
 
@@ -486,8 +422,6 @@ describe('test for getJobAttribute', () => {
 })
 
 
-
-
 describe('test for checkOfflineDS', () => {
 
     const expectedActions = [{
@@ -586,6 +520,127 @@ describe('test for onSave', () => {
             })
     })
 })
+
+
+describe('test for checkForFiltersAndValidation', () => {
+
+    const expectedActions = [{
+        type: SHOW_LOADER_DS,
+        payload: true
+    }, {
+        type: SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
+        payload: {
+            dataStoreAttrValueMap: {
+                id: 1
+            },
+            isFiltersPresent: false,
+            validation: {}
+        }
+    }, {
+        type: SHOW_ERROR_MESSAGE,
+        payload: {
+            dataStoreAttrValueMap: {},
+            errorMessage: 'error'
+        }
+    }, {
+        type: SET_DSF_REVERSE_MAP,
+        payload: {}
+    }]
+
+    it('should set dataStoreAttrValueMap, isFiltersPresent, validation and dataStoreFilterReverseMap', () => {
+        dataStoreService.checkForFiltersAndValidations = jest.fn()
+        dataStoreService.checkForFiltersAndValidations.mockReturnValue({
+            dataStoreAttrValueMap: {
+                id: 1
+            },
+            isFiltersPresent: false,
+            validation: {},
+            dataStoreFilterReverseMap: {}
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.checkForFiltersAndValidation('temp', 1234, null, null))
+            .then(() => {
+                expect(dataStoreService.checkForFiltersAndValidations).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                expect(store.getActions()[2].type).toEqual(expectedActions[3].type)
+                expect(store.getActions()[2].payload).toEqual(expectedActions[3].payload)
+            })
+    })
+
+    it('should throw an error', () => {
+        dataStoreService.checkForFiltersAndValidations = jest.fn(() => {
+            throw new Error('error')
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.checkForFiltersAndValidation('temp', 1234, null, null))
+            .then(() => {
+                expect(dataStoreService.checkForFiltersAndValidations).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[2].payload)
+            })
+    })
+})
+
+
+describe('test for searchDataStoreAttributeValueMap', () => {
+
+    const expectedActions = [{
+        type: SHOW_LOADER_DS,
+        payload: true
+    }, {
+        type: SEARCH_DATA_STORE_RESULT,
+        payload: {
+            dataStoreAttrValueMap: {},
+            cloneDataStoreAttrValueMap: {},
+            searchText: 'abc'
+        }
+    }, {
+        type: SHOW_ERROR_MESSAGE,
+        payload: {
+            dataStoreAttrValueMap: {},
+            errorMessage: 'error'
+        }
+    }]
+
+    it('should set dataStoreAttrValueMap, cloneDataStoreAttrValueMap and searchText', () => {
+        dataStoreService.searchDataStoreAttributeValueMap = jest.fn()
+        dataStoreService.searchDataStoreAttributeValueMap.mockReturnValue({
+            dataStoreAttrValueMap: {},
+            cloneDataStoreAttrValueMap: {},
+            searchText: 'abc'
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.searchDataStoreAttributeValueMap('abc', {}, null))
+            .then(() => {
+                expect( dataStoreService.searchDataStoreAttributeValueMap).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+            })
+    })
+
+    it('should throw an error', () => {
+        dataStoreService.searchDataStoreAttributeValueMap = jest.fn(() => {
+            throw new Error('error')
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.searchDataStoreAttributeValueMap('temp', 1234, null, null))
+            .then(() => {
+                expect( dataStoreService.searchDataStoreAttributeValueMap).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[2].payload)
+            })
+    })
+})
+
 
 
 function getMapFromObject(obj) {

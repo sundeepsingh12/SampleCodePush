@@ -106,6 +106,15 @@ module.exports = {
     //Sync service
     JOBS_DELETED: 'Jobs deleted',
 
+    //Data Store service
+    DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
+    CURRENT_ELEMENT_MISSING: 'currentElement Missing',
+
+    //Data Store Filter
+    JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
+    DSF_LIST_MISSING: 'DSFList is missing',
+    FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
+    FORM_ELEMENT_IS_MISSING: 'formElement is missing',
     //Summary
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
@@ -143,4 +152,6 @@ module.exports = {
     SYNCED_FILES: 'Synced Files',
     CREATE_BACKUP_BUTTON: '+ Create Backup',
 
+    //DataStore
+    SUGGESTIONS: 'Suggestions'
 }

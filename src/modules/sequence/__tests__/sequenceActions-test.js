@@ -1,16 +1,6 @@
 'use strict'
 'use strict'
 var actions = require('../sequenceActions')
-import {
-    SET_VALIDATIONS,
-    SET_DATA_STORE_ATTR_MAP,
-    SHOW_LOADER_DS,
-    SHOW_ERROR_MESSAGE,
-    REMARKS,
-    MINMAX,
-    SPECIAL,
-    SHOW_DETAILS,
-} from '../../../lib/constants'
 import CONFIG from '../../../lib/config'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { sequenceService } from '../../../services/classes/Sequence'
@@ -24,7 +14,6 @@ import {
     PREPARE_UPDATE_LIST,
     SET_RUNSHEET_NUMBER_LIST,
     SET_RESPONSE_MESSAGE,
-    Sequence,
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEQUENCE_LIST_ITEM_DRAGGED,
     SET_SEQUENCE_LIST_ITEM

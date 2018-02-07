@@ -8,7 +8,10 @@ import {
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import * as realm from '../../repositories/realmdb'
 import moment from 'moment'
-import { keyValueDBService } from '../classes/KeyValueDBService';
+import { keyValueDBService } from '../classes/KeyValueDBService'
+import { dataStoreFilterService } from '../classes/DataStoreFilterService'
+import { EXTERNAL_DATA_STORE, DATA_STORE } from '../../lib/AttributeConstants'
+import { SEARCH_TEXT_MISSING, DATA_STORE_MAP_MISSING, CURRENT_ELEMENT_MISSING } from '../../lib/ContainerConstants'
 
 describe('test getValidations', () => {
     it('should return validation array having all validations', () => {
@@ -884,8 +887,6 @@ describe('test createDataStoreAttrValueMap', () => {
     })
 })
 
-
-
 describe('test checkForOfflineDsResponse', () => {
     it('should throw searchText missing error', () => {
         const message = 'searchText not present'
@@ -949,6 +950,265 @@ describe('test checkForOfflineDsResponse', () => {
             })
     })
 })
+
+describe('test searchDataStoreAttributeValueMap', () => {
+    it('should throw searchText missing error', () => {
+        try {
+            dataStoreService.searchDataStoreAttributeValueMap(null)
+        } catch (error) {
+            expect(error.message).toEqual(SEARCH_TEXT_MISSING)
+        }
+    })
+
+    it('should throw data store map missing error', () => {
+        try {
+            dataStoreService.searchDataStoreAttributeValueMap('123', null)
+        } catch (error) {
+            expect(error.message).toEqual(DATA_STORE_MAP_MISSING)
+        }
+    })
+
+    it('should return dataStoreAttrValueMap and cloneDataStoreAttrValueMap when cloneDataStoreAttrValueMap is empty', () => {
+        const dataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        const cloneDataStoreAttrValueMap = {}
+        expect(dataStoreService.searchDataStoreAttributeValueMap('1', dataStoreAttrValueMap, cloneDataStoreAttrValueMap)).toEqual({
+            dataStoreAttrValueMap,
+            cloneDataStoreAttrValueMap: dataStoreAttrValueMap
+        })
+    })
+
+    it('should return dataStoreAttrValueMap and cloneDataStoreAttrValueMap when cloneDataStoreAttrValueMap is not empty', () => {
+        const dataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        const cloneDataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        expect(dataStoreService.searchDataStoreAttributeValueMap('1', dataStoreAttrValueMap, cloneDataStoreAttrValueMap)).toEqual({
+            dataStoreAttrValueMap,
+            cloneDataStoreAttrValueMap: dataStoreAttrValueMap
+        })
+    })
+
+    it('should return empty dataStoreAttrValueMap and cloneDataStoreAttrValueMap when cloneDataStoreAttrValueMap is not empty', () => {
+        const dataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        const cloneDataStoreAttrValueMap = {
+            123: {
+                id: '123',
+                uniqueKey: '_id',
+                dataStoreAttributeValueMap: {
+                    'name': 'abhi',
+                    '_id': '123'
+                }
+            }
+        }
+        expect(dataStoreService.searchDataStoreAttributeValueMap('2', dataStoreAttrValueMap, cloneDataStoreAttrValueMap)).toEqual({
+            dataStoreAttrValueMap: {},
+            cloneDataStoreAttrValueMap: dataStoreAttrValueMap
+        })
+    })
+})
+
+describe('test createDataStoreAttrValueMapInCaseOfFilter', () => {
+    it('should return empty dataStoreAttrValueMap as dataStoreResponse is not defined', () => {
+        const dataStoreAttrValueMap = {}
+        expect(dataStoreService.createDataStoreAttrValueMapInCaseOfFilter(null, 1)).toEqual({})
+    })
+
+    it('should return dataStoreAttrValueMap', () => {
+        const dataStoreResponse = [[{
+            attributeId: 123,
+            key: 'name',
+            value: 'temp'
+        }, {
+            attributeId: 1234,
+            key: 'class',
+            value: '12'
+        }]]
+
+        const dataStoreAttrValueMap = {
+            'temp': {
+                id: 'temp',
+                uniqueKey: 'name',
+                dataStoreAttributeValueMap: {
+                    'name': 'temp',
+                    'class': '12'
+                }
+            }
+        }
+        expect(dataStoreService.createDataStoreAttrValueMapInCaseOfFilter(dataStoreResponse, 123)).toEqual(dataStoreAttrValueMap)
+    })
+})
+
+describe('test checkForFiltersAndValidations', () => {
+    beforeEach(() => {
+        dataStoreService.getValidations = jest.fn()
+        keyValueDBService.getValueFromStore = jest.fn()
+        dataStoreFilterService.fetchDataForFilter = jest.fn()
+        dataStoreService.createDataStoreAttrValueMapInCaseOfFilter = jest.fn()
+    })
+    it('should throw current element missing error', () => {
+        try {
+            dataStoreService.checkForFiltersAndValidations(null)
+        } catch (error) {
+            expect(error.message).toEqual(CURRENT_ELEMENT_MISSING)
+        }
+    })
+
+    it('should return isFiltersPresent to false and check for validations and validations are also not present', () => {
+        const currentElement = { id: 1 }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: false,
+                        validation
+                    }
+                )
+            })
+    })
+
+    it('should return isFiltersPresent to false, check for validations and validations are also not present and dataStoreFilterMapping is []', () => {
+        const currentElement = { id: 1, dataStoreFilterMapping: '[]' }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: false,
+                        validation
+                    }
+                )
+            })
+    })
+
+    it('should return isFiltersPresent to false, check for validations and validations are also not present and attribute type id is 63', () => {
+        const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: EXTERNAL_DATA_STORE }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: false,
+                        validation
+                    }
+                )
+            })
+    })
+
+    it('should return isFiltersPresent to false, check for validations and validations are present and attribute type id is 63', () => {
+        const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: EXTERNAL_DATA_STORE, validation: [{ timeOfExecution: REMARKS }] }
+        let validation = {
+            isScannerEnabled: true,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        dataStoreService.getValidations.mockReturnValue({
+            isScannerEnabled: true,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        })
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(dataStoreService.getValidations).toHaveBeenCalledTimes(1)
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: false,
+                        validation
+                    }
+                )
+            })
+    })
+
+    it('should return isFiltersPresent to true and dataStoreAttrValueMap', () => {
+        const currentElement = { id: 1, dataStoreFilterMapping: '[J[123]]', attributeTypeId: DATA_STORE, validation: [{ timeOfExecution: REMARKS }] }
+        let validation = {
+            isScannerEnabled: false,
+            isAutoStartScannerEnabled: false,
+            isMinMaxValidation: false,
+            isSearchEnabled: false
+        }
+        keyValueDBService.getValueFromStore.mockReturnValue({})
+        dataStoreFilterService.fetchDataForFilter.mockReturnValue({
+            dataStoreFilterResponse: {},
+            dataStoreFilterReverseMap: {}
+        })
+        dataStoreService.createDataStoreAttrValueMapInCaseOfFilter.mockReturnValue({})
+        return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
+            .then((result) => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.createDataStoreAttrValueMapInCaseOfFilter).toHaveBeenCalledTimes(1)
+                expect(dataStoreFilterService.fetchDataForFilter).toHaveBeenCalledTimes(1)
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        dataStoreFilterReverseMap: {},
+                        isFiltersPresent: true,
+                        validation
+                    }
+                )
+            })
+    })
+})
+
 
 function getMapFromObject(obj) {
     let strMap = new Map();
