@@ -238,41 +238,39 @@ class ArrayBasicComponent extends PureComponent {
             case CONTACT_NUMBER:
                 return (
                     <View>
-                        {renderIf(!item.hidden,
-                            <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
-                                <Item stackedLabel>
-                                    {item.label ?
-                                        <Label style={[styles.fontDefault, this.getComponentLabelStyle(item.focus, item.editable)]}>{item.label}
-                                            {item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
-                                        </Label>
-                                        : null}
-                                    {item.subLabel ?
-                                        <Label style={[styles.fontSm, this.getComponentSubLabelStyle(item.editable)]}>{item.subLabel}</Label>
-                                        : null}
-                                    <Input
-                                        autoCapitalize="none"
-                                        placeholder={item.helpText}
-                                        defaultValue={item.value}
-                                        value={item.value}
-                                        keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
-                                        editable={item.editable}
-                                        multiline={item.attributeTypeId == 2 ? true : false}
-                                        onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
-                                        onFocus={() => { this.onFocusEvent(item) }}
-                                        onBlur={(e) => this._onBlurEvent(item)}
-                                        secureTextEntry={item.attributeTypeId == 61 ? true : false}
-                                    />
-                                </Item>
-                                {(item.attributeTypeId == SCAN_OR_TEXT) ?
-                                    <TouchableHighlight
-                                        style={[styles.absolute, { bottom: 50, right: 10 }]}
-                                        onPress={() => this.goToQRCode(item)} >
-                                        <View>
-                                            <QRIcon width={30} height={30} color={this.getComponentLabelStyle(item.focus, item.editable)} />
-                                        </View>
-                                    </TouchableHighlight> : null}
-                            </View>
-                        )}
+                        <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
+                            <Item stackedLabel>
+                                {item.label ?
+                                    <Label style={[styles.fontDefault, this.getComponentLabelStyle(item.focus, item.editable)]}>{item.label}
+                                        {item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
+                                    </Label>
+                                    : null}
+                                {item.subLabel ?
+                                    <Label style={[styles.fontSm, this.getComponentSubLabelStyle(item.editable)]}>{item.subLabel}</Label>
+                                    : null}
+                                <Input
+                                    autoCapitalize="none"
+                                    placeholder={item.helpText}
+                                    defaultValue={item.value}
+                                    value={item.value}
+                                    keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
+                                    editable={item.editable}
+                                    multiline={item.attributeTypeId == 2 ? true : false}
+                                    onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
+                                    onFocus={() => { this.onFocusEvent(item) }}
+                                    onBlur={(e) => this._onBlurEvent(item)}
+                                    secureTextEntry={item.attributeTypeId == 61 ? true : false}
+                                />
+                            </Item>
+                            {(item.attributeTypeId == SCAN_OR_TEXT) ?
+                                <TouchableHighlight
+                                    style={[styles.absolute, { bottom: 50, right: 10 }]}
+                                    onPress={() => this.goToQRCode(item)} >
+                                    <View>
+                                        <QRIcon width={30} height={30} color={this.getComponentLabelStyle(item.focus, item.editable)} />
+                                    </View>
+                                </TouchableHighlight> : null}
+                        </View>
                     </View>
                 )
 
@@ -303,44 +301,10 @@ class ArrayBasicComponent extends PureComponent {
             case EXTERNAL_DATA_STORE:
                 return (
                     <View>
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={
-                                () => {
-                                    this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
-                                    this.props.actions.navigateToScene('DataStore',
-                                        {
-                                            currentElement: item,
-                                            formElements: this.props.arrayElements,
-                                            jobStatusId: this.props.jobStatusId,
-                                            jobTransaction: this.props.jobTransaction,
-                                            latestPositionId: this.props.latestPositionId,
-                                            isSaveDisabled: this.props.isSaveDisabled,
-                                            calledFromArray: true,
-                                            rowId: this.props.arrayRow.rowId
-                                        })
-                                }} />)}
-                    </View>
-                )
-            case QR_SCAN:
-                return (
-                    <View>
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={
-                                () => {
-                                    this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
-                                    this.goToQRCode(item)
-                                }} />)}
-                    </View>
-                )
-            case CAMERA:
-            case CAMERA_MEDIUM:
-            case CAMERA_HIGH:
-                return (<View>
-                    {renderIf(!item.hidden,
                         <FormLayoutActivityComponent item={item} press={
                             () => {
                                 this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
-                                this.props.actions.navigateToScene('CameraAttribute',
+                                this.props.actions.navigateToScene('DataStore',
                                     {
                                         currentElement: item,
                                         formElements: this.props.arrayElements,
@@ -351,7 +315,38 @@ class ArrayBasicComponent extends PureComponent {
                                         calledFromArray: true,
                                         rowId: this.props.arrayRow.rowId
                                     })
-                            }} />)}
+                            }} />
+                    </View>
+                )
+            case QR_SCAN:
+                return (
+                    <View>
+                        <FormLayoutActivityComponent item={item} press={
+                            () => {
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                                this.goToQRCode(item)
+                            }} />
+                    </View>
+                )
+            case CAMERA:
+            case CAMERA_MEDIUM:
+            case CAMERA_HIGH:
+                return (<View>
+                    <FormLayoutActivityComponent item={item} press={
+                        () => {
+                            this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                            this.props.actions.navigateToScene('CameraAttribute',
+                                {
+                                    currentElement: item,
+                                    formElements: this.props.arrayElements,
+                                    jobStatusId: this.props.jobStatusId,
+                                    jobTransaction: this.props.jobTransaction,
+                                    latestPositionId: this.props.latestPositionId,
+                                    isSaveDisabled: this.props.isSaveDisabled,
+                                    calledFromArray: true,
+                                    rowId: this.props.arrayRow.rowId
+                                })
+                        }} />
                 </View>
                 )
             default:
@@ -372,8 +367,6 @@ class ArrayBasicComponent extends PureComponent {
                     <Button style={styles.bgGray} onPress={() => this.props.actions.deleteArrayRow(this.props.arrayElements, this.props.arrayRow.rowId, this.props.lastRowId)}>
                         <Text style={[styles.fontBlack, styles.fontDefault]}> Remove </Text>
                     </Button>
-                    {/* <Icon name="md-remove-circle" style={[styles.fontDanger, styles.fontXxl, styles.fontLeft]}
-                        onPress={() => this.props.actions.deleteArrayRow(this.props.arrayElements, this.props.arrayRow.rowId, this.props.lastRowId)} /> */}
                 </View>
             </View >
         );
