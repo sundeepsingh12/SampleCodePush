@@ -297,8 +297,6 @@ class AddServerSms {
         if (_.isEmpty(transactionIdDtosMap)) return
         let serverSmsMap = await this.prepareServerSmsMap()
         if (_.isEmpty(serverSmsMap)) return
-        let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-        let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value;
         let user = await keyValueDBService.getValueFromStore(USER);
         let serverSmsLogs = []
         for (let jobMasterId in transactionIdDtosMap) {
@@ -313,11 +311,7 @@ class AddServerSms {
                     let jobTransaction = { ...transactionList[index] }
                     let serverSmsLog = await this.setSmsBody(statusIdTransactionIdMap[0].pendingStatusId, null, jobTransaction, jobAndFieldAttributes.jobAttributes, jobAndFieldAttributes.fieldAttributes, user, serverSmsMap[statusIdTransactionIdMap[0].pendingStatusId], jobIdToJobDataMap[jobTransaction.jobId])
                     if (serverSmsLog.length > 0) {
-                        let pendingTransaction = {
-                            id: jobTransaction.id, referenceNumber: jobTransaction.referenceNumber
-                        }
                         serverSmsLogs = serverSmsLogs.concat(serverSmsLog)
-                        transactionsToSync = transactionsToSync.concat(pendingTransaction)
                     }
                 }
             } else {
@@ -330,7 +324,6 @@ class AddServerSms {
             serverSmsLogList = this.saveServerSmsLog(serverSmsLogs)
             await realm.performBatchSave(serverSmsLogList)
         }
-        await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync);
     }
     getServerSmsLogs(serverSmsLogs, lastSyncTime) {
         let serverSmsLogsToBySynced = []
