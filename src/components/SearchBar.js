@@ -13,8 +13,9 @@ import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import QRIcon from '../svg_components/icons/QRIcon'
+import _ from 'lodash'
 export default class SearchBar extends PureComponent {
-    
+
     _startScanner() {
         if (this.props.isScannerEnabled) {
             return <Button small transparent
@@ -23,6 +24,15 @@ export default class SearchBar extends PureComponent {
                 autoFocus={this.props.isAutoStartScannerEnabled} >
                 <QRIcon width={30} height={30} color={styles.fontBlack} />
             </Button>
+        }
+    }
+
+    callDataStoreSearchMethods(searchText) {
+        if (!this.props.isFiltersPresent) {
+            this.props.setSearchText(searchText)
+            this.props.fetchDataStoreAttrValueMap(searchText, false)
+        } else {
+            this.props.searchDataStoreAttributeValueMap(searchText)
         }
     }
 
@@ -44,14 +54,13 @@ export default class SearchBar extends PureComponent {
                             <Input
                                 placeholder={'Search'}
                                 onChangeText={(searchText) => {
-                                    this.props.setSearchText(searchText)
-                                    this.props.fetchDataStoreAttrValueMap(searchText, false)
+                                    this.callDataStoreSearchMethods(searchText)
                                 }}
                                 value={this.props.searchText}
                                 style={[style.headerSearch, styles.bgGray]} />
                             {scanner}
                         </View>
-                        {renderIf(this.props.searchText.length > 2, <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
+                        {renderIf(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent, <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
                             <Text style={[styles.fontDefault, styles.fontWhite, styles.paddingTop10, styles.paddingBottom10]}
                                 onPress={() => {
                                     this.props.fetchDataStoreAttrValueMap(this.props.searchText, true)

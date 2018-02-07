@@ -6,6 +6,8 @@ module.exports = {
     CANCEL: 'Cancel',
     OK: 'Ok',
     SAVE: 'Save',
+    DONE: 'DONE',
+    DISMISS: 'DISMISS',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -104,8 +106,52 @@ module.exports = {
     //Sync service
     JOBS_DELETED: 'Jobs deleted',
 
+    //Data Store service
+    DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
+    CURRENT_ELEMENT_MISSING: 'currentElement Missing',
+
+    //Data Store Filter
+    JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
+    DSF_LIST_MISSING: 'DSFList is missing',
+    FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
+    FORM_ELEMENT_IS_MISSING: 'formElement is missing',
     //Summary
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
     COLLECTION_SOD: 'Collection-SOD',
+
+    //Multiple Option Container
+    NO_OPTIONS_PRESENT: 'No options Present',
+    //Save Activated and CheckoutDetails
+    SMS_NOT_SENT_TRY_AGAIN_LATER: 'SMS not sent ,try again later',
+    EMAIL_NOT_SENT_TRY_AGAIN_LATER: 'Email not sent ,try again later',
+    SMS_SENT_SUCCESSFULLY: 'Sms sent successfully',
+    EMAIL_SENT_SUCCESSFULLY: 'Email sent successfully',
+    PLEASE_ENTER_A_VALID_EMAIL_ID: 'Please Enter a Valid Email Id',
+    MOBILE_NUMBER: 'Mobile Number',
+    ENTER_EMAIL_IDS: 'Enter Email Ids',
+    CONTACT_NUMBER_SHOULD_START_WITH_0_AND_CONTAINS_MINIMUM_OF_10_DIGITS: 'Contact Number should start with 0 and contains minimum of 10 digits',
+    RECEPIENTS_CONTACT_NUMBER: `Recepient's Contact Number`,
+    SEND: 'Send',
+    RECEPIENTS_EMAIL_ADDRESS: `Recepient's Email Address`,
+
+    //Backup Exceptions
+    USER_MISSING: 'user missing',
+
+    //Backup
+    BACKUP_CREATED_SUCCESS_TOAST: 'Backup created successfully',
+    BACKUP_ALREADY_EXISTS: 'Backup already exists for this data',
+    FILE_MISSING: 'File Missing',
+    BACKUP_ALERT_TITLE: 'Manual Backup',
+    BACKUP_ALERT_MESSAGE: 'Do you want to create backup manually?',
+    FILE_CREATED: 'File Created',
+    EMPLOYEE_CODE: 'Employee Code',
+    FILE_SIZE: 'File Size',
+    NEW: 'New',
+    UNSYNCED_FILES: 'Unsynced Files',
+    SYNCED_FILES: 'Synced Files',
+    CREATE_BACKUP_BUTTON: '+ Create Backup',
+
+    //DataStore
+    SUGGESTIONS: 'Suggestions'
 }

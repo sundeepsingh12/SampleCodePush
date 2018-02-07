@@ -92,6 +92,8 @@ import Scanner from '../../components/Scanner'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import JobMaster from '../../containers/JobMaster'
 import AutoLogout from '../../containers/AutoLogout'
+import Backup from '../../containers/Backup'
+import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -101,6 +103,11 @@ import {
   PreloaderScreen,
 } from '../../lib/constants'
 import SplitPayment from '../../containers/SplitPayment'
+import {
+  createReduxBoundAddListener,
+  createReactNavigationReduxMiddleware,
+} from 'react-navigation-redux-helpers';
+
 
 class AppWithNavigationState extends React.PureComponent {
 
@@ -117,6 +124,7 @@ class AppWithNavigationState extends React.PureComponent {
     switch (route.routeName) {
       case ApplicationScreen:
       case LoginScreen:
+      case 'UnsyncBackupUpload':
       case PreloaderScreen: return false
       case HomeTabNavigatorScreen: {
         if (route.routes[route.index].routeName == HomeScreen) {
@@ -138,7 +146,8 @@ class AppWithNavigationState extends React.PureComponent {
         <AppNavigator navigation={
           addNavigationHelpers({
             dispatch: this.props.dispatch,
-            state: this.props.nav
+            state: this.props.nav,
+            addListener
           })
         }
         />
@@ -270,7 +279,7 @@ export const AppNavigator = StackNavigator({
     navigationOptions: {
       header: null
     }
-  }, 
+  },
   QrCodeScanner: {
     screen: QrCodeScanner,
     navigationOptions: {
@@ -436,11 +445,21 @@ export const AppNavigator = StackNavigator({
   ImageDetailsView: {
     screen: ImageDetailsView,
   },
+  Backup: {
+    screen: Backup,
+  },
   SplitPayment: {
     screen: SplitPayment,
   },
   SequenceRunsheetList: {
     screen: SequenceRunsheetList
+  },
+  UnsyncBackupUpload: {
+    screen: UnsyncBackupUpload,
+    navigationOptions: {
+      header: null,
+      gesturesEnabled: false
+    }
   }
 },
   {
@@ -448,6 +467,13 @@ export const AppNavigator = StackNavigator({
       backgroundColor: 'white'
     }
   });
+
+  const middleware = createReactNavigationReduxMiddleware(
+    "root",
+    state => state.nav,
+  );
+  const addListener = createReduxBoundAddListener("root");
+  // end for react-navigation 1.0.0-beta.30
 
 // const AppWithNavigationState = ({ dispatch, nav }) => (
 //   <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />

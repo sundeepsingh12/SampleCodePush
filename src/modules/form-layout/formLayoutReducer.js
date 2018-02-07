@@ -20,6 +20,8 @@ import {
     SET_DRAFT,
     SET_UPDATE_DRAFT,
     SET_FORM_TO_INVALID,
+    SET_DSF_REVERSE_MAP,
+    SET_MODAL_FIELD_ATTRIBUTE
 } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -57,6 +59,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('isSaveDisabled', action.payload.isSaveDisabled ? true : false)
                 .set('updateDraft', true)
+                .set('modalFieldAttributeMasterId',action.payload.modalFieldAttributeMasterId)
         }
 
         case UPDATE_PAYMENT_AT_END: {
@@ -72,6 +75,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('jobTransactionId', action.payload.jobTransactionId)
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('draftStatusId', action.payload.draftStatusId)
+                .set('fieldAttributeMasterParentIdMap', action.payload.fieldAttributeMasterParentIdMap)
         }
 
         /**
@@ -124,6 +128,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('isLoading', action.payload.isLoading)
                 .set('errorMessage', action.payload.errorMessage)
                 .set('paymentAtEnd', action.payload.paymentAtEnd)
+                .set('dataStoreFilterReverseMap', action.payload.dataStoreFilterReverseMap)
         }
         case SET_DRAFT: {
             return state.set('draftStatusId', action.payload)
@@ -135,6 +140,13 @@ export default function formLayoutReducer(state = initialState, action) {
         case SET_FORM_TO_INVALID: {
             return state.set('isLoading', action.payload.isLoading)
                 .set('isFormValid', action.payload.isFormValid)
+        }
+
+        case SET_DSF_REVERSE_MAP:
+            return state.set('dataStoreFilterReverseMap', action.payload)
+            
+        case SET_MODAL_FIELD_ATTRIBUTE: {
+            return state.set('modalFieldAttributeMasterId', action.payload)
         }
     }
     return state;

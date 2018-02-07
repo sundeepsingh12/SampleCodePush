@@ -289,9 +289,16 @@ class JobTransaction {
 
     }
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
+        let runsheetQuery = 'isClosed = false'
+        const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+        if (_.isEmpty(jobMasterIdList) || _.isEmpty(runsheetList)) {
+            return null
+        }
+        let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
         let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
         let jobStatusQuery = statusMap.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-        const jobTransactionQuery = `deleteFlag != 1 AND (${jobMasterQuery}) AND (${jobStatusQuery})`
+        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
+        jobTransactionQuery = `(${jobTransactionQuery}) AND (${jobMasterQuery}) AND (${jobStatusQuery})`
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, SEQ_SELECTED)
         return jobTransactionList[0]
     }

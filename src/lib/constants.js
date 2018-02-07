@@ -87,6 +87,11 @@ module.exports = keyMirror({
     SET_MODULES: null,
     TOGGLE_LOGOUT: null,
     SEARCH_TAP: null,
+    SET_UNSYNC_TRANSACTION_PRESENT: null,
+    SET_BACKUP_UPLOAD_VIEW: null,
+    SET_UPLOAD_FILE_COUNT: null,
+    SET_FAIL_UPLOAD_COUNT: null,
+    SET_BACKUP_FILES_LIST: null,
 
     //Home Container
     PIECHART: null,
@@ -180,6 +185,12 @@ module.exports = keyMirror({
     USER_EVENT_LOG: null,
     LAST_JOB_COMPLETED_TIME: null,
     SHOULD_RELOAD_START: null,
+    CONTACT_NUMBER_TO_SEND_SMS: null,
+    SET_SAVE_ACTIVATED_TOAST_MESSAGE: null,
+    EMAILID_VIEW_ARRAY: null,
+    IS_COMPANY_CODE_DHL: null,
+    SHOULD_CREATE_BACKUP: null,
+    BACKUP_UPLOAD_FAIL_COUNT: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -194,6 +205,7 @@ module.exports = keyMirror({
     DataStore_DB: null,
     TABLE_TRANSACTION_LOGS: null,
     TABLE_DRAFT: null,
+    SEND_EMAIL_OR_SMS: null,
 
     //Home Actions
     IS_LAST_PAGE: null,
@@ -202,6 +214,7 @@ module.exports = keyMirror({
     //Status Codes
     UNSEEN: null,
     PENDING: null,
+    SEEN: null,
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
@@ -226,6 +239,8 @@ module.exports = keyMirror({
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
     SET_FORM_TO_INVALID: null,
+    SET_DSF_REVERSE_MAP: null,
+    SET_MODAL_FIELD_ATTRIBUTE: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -263,9 +278,11 @@ module.exports = keyMirror({
     CameraAttribute: null,
     ImageDetailsView: null,
     JobDetailsV2: null,
+    Backup: null,
     SplitPayment: null,
     Payment: null,
     SequenceRunsheetList: null,
+    UnsyncBackupUpload: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -304,7 +321,6 @@ module.exports = keyMirror({
     FETCH_CASH_TENDERING_LIST_RETURN: null,
     CHANGE_AMOUNT_RETURN: null,
     //Data Store
-    SET_VALIDATIONS: null,
     SET_DATA_STORE_ATTR_MAP: null,
     SHOW_LOADER_DS: null,
     SHOW_ERROR_MESSAGE: null,
@@ -318,6 +334,8 @@ module.exports = keyMirror({
     SAVE_SUCCESSFUL: null,
     CLEAR_ATTR_MAP_AND_SET_LOADER: null,
     DISABLE_AUTO_START_SCANNER: null,
+    SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP: null,
+    SEARCH_DATA_STORE_RESULT: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
@@ -393,6 +411,7 @@ module.exports = keyMirror({
     SET_SEARCH: null,
     SET_MESSAGE: null,
     SET_LIVE_JOB_TOAST: null,
+    SET_LIVE_JOB_LOADER: null,
 
     //Summary
     SET_SUMMARY_FOR_JOBMASTER: null,
@@ -452,6 +471,25 @@ module.exports = keyMirror({
     TRACK_BATTERY: null,
     NPSFEEDBACK_VALUE: null,
     IS_SERVER_REACHABLE: null,
+
+    //DataStoreFilter
+    SHOW_LOADER_DSF: null,
+    DATA_STORE_FILTER_LIST: null,
+    SET_DSF_SEARCH_TEXT: null,
+    SEARCHED_DATA_STORE_FILTER_LIST: null,
+    SET_DSF_INITIAL_STATE: null,
+
+    //Multiple Options Attribute Actions
+    SET_OPTIONS_LIST: null,
+    SET_OPTION_ATTRIBUTE_ERROR: null,
+    SET_OPTION_SEARCH_INPUT: null,
+    // backup actions
+    SET_LOADER_BACKUP: null,
+    SET_BACKUP_FILES: null,
+    SET_BACKUP_VIEW: null,
+    SET_UPLOADING_FILE: null,
+    SET_SYNCED_FILES: null,
+    SET_BACKUP_TOAST: null,
 })
 
 

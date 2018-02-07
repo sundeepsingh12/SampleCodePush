@@ -38,7 +38,10 @@ var InitialState = Record({
         paymentAtEnd: {},
         draftStatusId: null,
         updateDraft: false,
-        isFormValid: true
+        isFormValid: true,
+        dataStoreFilterReverseMap: {},
+        fieldAttributeMasterParentIdMap: {},
+        modalFieldAttributeMasterId: null
 })
 
 export default InitialState

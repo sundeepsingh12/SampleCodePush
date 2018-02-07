@@ -67,8 +67,9 @@ class SignatureAndNps extends PureComponent {
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.isSaveDisabled,
             this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.state.params.latestPositionId)
-        this.props.navigation.goBack()
+            this.props.navigation.state.params.latestPositionId,
+            this.props.navigation.state.params.fieldAttributeMasterParentIdMap
+        )
     }
 
     static navigationOptions = ({ navigation }) => {
@@ -84,7 +85,6 @@ class SignatureAndNps extends PureComponent {
             })
         } else {
             this.refs["sign"].saveImage();
-            this.refs["sign"].resetImage();
         }
     }
 
