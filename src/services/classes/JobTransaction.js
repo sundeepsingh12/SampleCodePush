@@ -247,6 +247,12 @@ class JobTransaction {
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         if (callingActivity == 'Bulk') {
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
+            if(callingActivityData.groupId){
+                let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
+                let jobList = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
+                let query = jobList.map((job) => `jobId = ${job.id}`).join(' OR ')
+                jobTransactionQuery = query && query.trim() !== '' ? `(${jobTransactionQuery}) AND (${query})` : `(${jobTransactionQuery})`
+            }
         }
         else if (callingActivity == 'Sequence') {
             let statusQueryWithRunsheetNo = '('
@@ -680,6 +686,13 @@ class JobTransaction {
             jobId = jobTransaction[0].id
             referenceNumber = jobTransaction[0].referenceNo
         }
+        let jobDataQuery = 'id = ' + jobId
+        let jobData = realm.getRecordListOnQuery(TABLE_JOB, jobDataQuery)
+        let groupId =  jobData[0] && jobData[0].groupId ? jobData[0].groupId : null
+        // if(groupId){
+        //     let allGroupIdTransactionsLength = this.getGroupidTransactions(jobMasterId,groupId)
+        //     groupId =  groupId + ':' + allGroupIdTransactionsLength 
+        // } 
         const jobMasterJobAttributeMasterMap = jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)
         const jobAttributeMasterMap = jobMasterJobAttributeMasterMap[jobMasterId] ? jobMasterJobAttributeMasterMap[jobMasterId] : {}
         const jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
@@ -735,7 +748,8 @@ class JobTransaction {
                 jobDataObject,
                 jobTransactionDisplay,
                 seqSelected,
-                jobTime
+                jobTime,
+                groupId
             }
         }
         else {
@@ -752,6 +766,14 @@ class JobTransaction {
                 jobTransactionDisplay,
             }
         }
+    }
+   async getGroupidTransactions(jobMasterId,groupId,tabId,statusCategory){
+        let jobStatusList = await jobStatusService.getNonUnseenStatusIdsForStatusCategoryAndTabId(statusCategory,tabId)
+        let jobStatusQuery = jobStatusList.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+        let jobQuery = `jobMasterId = ${jobMasterId} AND groupId = '${groupId}'`
+        let jobList = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
+        let jobTransactionSize = jobList ? jobList.length : 0
+        return jobTransactionSize
     }
 
     /**

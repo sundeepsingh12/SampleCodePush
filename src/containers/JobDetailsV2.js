@@ -46,7 +46,7 @@ import {
   DataStoreDetails,
   ImageDetailsView,
   RESET_STATE_FOR_JOBDETAIL,
-
+  BulkListing
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -86,6 +86,7 @@ function mapStateToProps(state) {
     statusRevertList: state.jobDetails.statusRevertList,
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
+    groupId: state.jobDetails.groupId,
   }
 }
 
@@ -119,6 +120,25 @@ class JobDetailsV2 extends PureComponent {
   }
   renderStatusList(statusList) {
     let statusView = []
+    let groupId = this.props.groupId ? this.props.groupId.split(':') : null
+    if(this.props.groupId && groupId && parseInt(groupId[1]) > 1){
+      statusView.push(
+        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = { () => this.updateTransactionForGroupId(groupId[0])}>
+        <View style = {[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+            <View style={[styles.row, styles.alignCenter]}>
+                <View>
+                  <RevertIcon color={styles.fontPrimary}/>
+                </View>
+                <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Initiate Updating group {groupId[0]}</Text>
+                <Right>
+                  <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+                </Right>
+            </View>
+        </View>
+    </TouchableOpacity> 
+      )
+      return statusView
+    }
     for (let index in statusList) {
       statusView.push(
         <ListItem
@@ -331,6 +351,16 @@ class JobDetailsV2 extends PureComponent {
         { text: OK, onPress: () => this._onGoToPreviousStatus(statusData) }
       ],
     )
+  }
+  updateTransactionForGroupId (groupId){
+
+    this.props.actions.navigateToScene(BulkListing, {
+      jobMasterId: this.props.jobTransaction.jobMasterId,      
+      statusId: this.props.currentStatus.id,
+      nextStatusList : this.props.currentStatus.nextStatusList,
+      groupId
+    })
+
   }
   selectStatusToRevert =  () => {
     if(this.props.statusRevertList[0] == 1){
