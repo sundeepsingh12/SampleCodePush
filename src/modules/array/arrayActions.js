@@ -78,16 +78,16 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
     }
 }
 
-export function saveArray(arrayElements, arrayParentItem, jobTransaction, latestPositionId, formElement, isSaveDisabled, arrayMainObject) {
+export function saveArray(arrayElements, arrayParentItem, jobTransaction, latestPositionId, formElement, isSaveDisabled, arrayMainObject, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         try {
             if (!_.isEmpty(arrayElements)) {
                 let fieldDataListWithLatestPositionId = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction.id, latestPositionId, arrayMainObject)
                 if (!fieldDataListWithLatestPositionId) throw new Error('Array Could not be saved')
-                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
+                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction, fieldAttributeMasterParentIdMap))
                 dispatch(setState(CLEAR_ARRAY_STATE))
             } else {
-                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, '', { latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, '', { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap))
             }
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))

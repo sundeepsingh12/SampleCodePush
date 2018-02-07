@@ -166,7 +166,7 @@ export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dat
             if (!calledFromArray) {
                 dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElements, isSaveDisabled, dataStorevalue, { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap))
             } else {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId, null, NEXT_FOCUS))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId, null, NEXT_FOCUS, true))
             }
         } catch (error) {
 

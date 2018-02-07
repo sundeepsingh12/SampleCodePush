@@ -77,6 +77,7 @@ class ArrayFieldAttribute extends PureComponent {
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
                 jobStatusId={this.props.jobStatusId}
                 latestPositionId={this.props.navigation.state.params.latestPositionId}
+                fieldAttributeMasterParentIdMap={this.props.navigation.state.params.fieldAttributeMasterParentIdMap}
             />
         )
     }
@@ -101,7 +102,8 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.navigation.state.params.latestPositionId,
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.isSaveDisabled,
-            this.props.arrayMainObject)
+            this.props.arrayMainObject,
+            this.props.navigation.state.params.fieldAttributeMasterParentIdMap)
     }
     static navigationOptions = ({ navigation }) => {
         return { header: null }

@@ -136,6 +136,7 @@ class ArrayBasicComponent extends PureComponent {
                         calledFromArray={true}
                         rowId={this.props.arrayRow.rowId}
                         onCloseModal={this.onCloseModal}
+                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
                     />
                 </View>
             )
@@ -197,7 +198,7 @@ class ArrayBasicComponent extends PureComponent {
                 style={[{ paddingVertical: 50 }, item.focus ? styles.borderLeft4 : null]}
                 onPress={() => this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
                 }
-                disabled={this.props.modalFieldAttributeMasterId ? true : false}
+                disabled={!item.editable || this.props.modalFieldAttributeMasterId ? true : false}
             >
                 <View style={[styles.marginHorizontal10]}>
                     {modalView}
@@ -313,7 +314,8 @@ class ArrayBasicComponent extends PureComponent {
                                         latestPositionId: this.props.latestPositionId,
                                         isSaveDisabled: this.props.isSaveDisabled,
                                         calledFromArray: true,
-                                        rowId: this.props.arrayRow.rowId
+                                        rowId: this.props.arrayRow.rowId,
+                                        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
                                     })
                             }} />
                     </View>
@@ -344,7 +346,8 @@ class ArrayBasicComponent extends PureComponent {
                                     latestPositionId: this.props.latestPositionId,
                                     isSaveDisabled: this.props.isSaveDisabled,
                                     calledFromArray: true,
-                                    rowId: this.props.arrayRow.rowId
+                                    rowId: this.props.arrayRow.rowId,
+                                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
                                 })
                         }} />
                 </View>
