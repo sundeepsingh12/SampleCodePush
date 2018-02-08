@@ -12,7 +12,7 @@ import { fieldDataService } from '../../services/classes/FieldData'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 
 class ArrayFieldAttribute {
-    getSortedArrayChildElements(arrayDTO) {
+    getSortedArrayChildElements(arrayDTO, jobTransaction) {
         let errorMessage;
         let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
         if (requiredFields.length <= 0) {
@@ -21,16 +21,17 @@ class ArrayFieldAttribute {
         } else {
             let arrayMainObject = arrayDTO.arrayMainObject
             let arrayTemplate = _.omit(arrayDTO, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
-            let arrayRowDTO = this.addArrayRow(0, arrayTemplate, {})
+            let arrayRowDTO = this.addArrayRow(0, arrayTemplate, {}, jobTransaction)
             return { arrayRowDTO, childElementsTemplate: arrayTemplate, errorMessage, arrayMainObject }
         }
     }
 
-    addArrayRow(lastRowId, childElementsTemplate, arrayElements) {
+    addArrayRow(lastRowId, childElementsTemplate, arrayElements, jobTransaction) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
         cloneArrayElements[lastRowId] = childElementsTemplate
         cloneArrayElements[lastRowId].rowId = lastRowId
         cloneArrayElements[lastRowId].allRequiredFieldsFilled = false
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, cloneArrayElements[lastRowId].formLayoutObject, true, null, null, NEXT_FOCUS, jobTransaction);
         return {
             arrayElements: cloneArrayElements,
             lastRowId: (lastRowId + 1),
@@ -81,9 +82,9 @@ class ArrayFieldAttribute {
         }
         return isSaveDisabled
     }
-    findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, fieldDataList, event) {
+    findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, fieldDataList, event, fieldAttributeMasterParentIdMap) {
         let arrayRow = cloneArrayElements[rowId]
-        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, event);
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, event, null, fieldAttributeMasterParentIdMap);
         arrayRow.allRequiredFieldsFilled = (!sortedArrayElements.isSaveDisabled) ? true : false
         let _isSaveDisabled = this.enableSaveIfRequired(cloneArrayElements)
         return {

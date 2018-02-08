@@ -196,9 +196,7 @@ class MultipleOptionsAttribute extends PureComponent {
                 animationType="slide"
                 transparent={true}
                 onRequestClose={() => {
-                    if (this.props.calledFromArray) {
-                        this.props.onCloseModal(this.props.currentElement.fieldAttributeMasterId)
-                    } else {
+                    if (!this.props.calledFromArray) {
                         this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
                     }
                     this.props.actions.setState(SET_OPTION_ATTRIBUTE_ERROR, { error: null })

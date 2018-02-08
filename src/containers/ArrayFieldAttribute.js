@@ -38,6 +38,7 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
+import { TOTAL_COUNT, ADD, SAVE } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -59,13 +60,15 @@ function mapDispatchToProps(dispatch) {
 class ArrayFieldAttribute extends PureComponent {
 
     componentDidMount() {
-        this.props.actions.clearArrayState()
         this.props.actions.setInitialArray(
             this.props.navigation.state.params.currentElement,
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.jobStatusId,
             this.props.navigation.state.params.jobTransaction
         )
+    }
+    componentWillUnmount() {
+        this.props.actions.clearArrayState()
     }
     renderData = (arrayRow) => {
         return (
@@ -92,7 +95,8 @@ class ArrayFieldAttribute extends PureComponent {
         else {
             this.props.actions.addRowInArray(this.props.lastRowId,
                 this.props.childElementsTemplate,
-                this.props.arrayElements)
+                this.props.arrayElements,
+                this.props.navigation.state.params.jobTransaction)
         }
     }
     savePressed = () => {
@@ -164,14 +168,14 @@ class ArrayFieldAttribute extends PureComponent {
                         style={[style.footer, styles.bgWhite]}>
                         <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
                             <Text
-                                style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>Total Count : {_.size(this.props.arrayElements)}</Text>
+                                style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
                             <Button bordered success small onPress={this.addPressed}>
-                                <Text style={[styles.fontSuccess, styles.padding10]}>Add</Text>
+                                <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
                             </Button>
                         </View>
                         <View style={[styles.bgPrimary]}>
                             <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
-                                <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
+                                <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
                             </Button>
                         </View>
                     </Footer>

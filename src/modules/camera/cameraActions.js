@@ -16,7 +16,7 @@ export function saveImage(result, fieldAttributeMasterId, formElement, isSaveDis
     return async function (dispatch) {
         const value = await signatureService.saveFile(result, moment(), true)
         if (calledFromArray) {
-            dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId, [], NEXT_FOCUS, true))
+            dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId, [], NEXT_FOCUS, 1, null))
         } else {
             dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }, jobTransaction))
         }

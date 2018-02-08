@@ -115,7 +115,7 @@ export function saveOptionsFieldData(optionsMap, currentElement, latestPositionI
                 fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(optionFieldDataList, jobTransaction.id, currentElement.positionId, latestPositionId)
             }
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, fieldDataValue, formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS, false, containerValue))
+                dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, fieldDataValue, formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS, 2, containerValue, fieldAttributeMasterParentIdMap))
                 return
             }
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, fieldDataValue, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, true, containerValue))

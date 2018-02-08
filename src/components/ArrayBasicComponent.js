@@ -1,4 +1,4 @@
-'use strict' //Comment Review import
+'use strict'
 import React, { PureComponent } from 'react'
 import {
     StyleSheet,
@@ -43,7 +43,9 @@ import {
     CONTACT_NUMBER,
     ARRAY_SAROJ_FAREYE,
     OBJECT_SAROJ_FAREYE,
-    OPTION_RADIO_VALUE
+    OPTION_RADIO_VALUE,
+    AFTER,
+    BEFORE,
 } from '../lib/AttributeConstants'
 import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
@@ -53,6 +55,7 @@ import QRIcon from '../svg_components/icons/QRIcon'
 import {
     ON_BLUR,
     NEXT_FOCUS,
+    CameraAttribute,
 } from '../lib/constants'
 import {
     OPTIONAL,
@@ -67,18 +70,18 @@ function mapDispatchToProps(dispatch) {
 class ArrayBasicComponent extends PureComponent {
 
     _searchForReferenceValue = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, null, null, null, this.props.fieldAttributeMasterParentIdMap);
     }
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
     }
 
     _onBlurEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId) {
-        this.props.actions.getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, ON_BLUR);
+        this.props.actions.getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, ON_BLUR, null, null, this.props.fieldAttributeMasterParentIdMap);
     }
 
     _styleNextFocusable(isFocusable) {
@@ -337,7 +340,7 @@ class ArrayBasicComponent extends PureComponent {
                     <FormLayoutActivityComponent item={item} press={
                         () => {
                             this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
-                            this.props.actions.navigateToScene('CameraAttribute',
+                            this.props.actions.navigateToScene(CameraAttribute,
                                 {
                                     currentElement: item,
                                     formElements: this.props.arrayElements,
