@@ -46,6 +46,7 @@ class ArrayFieldAttribute {
     }
     prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId, arrayMainObject) {
         let arrayChildDataList = []
+        let isSaveDisabled = false
         for (let rowId in arrayElements) {
             let arrayObject = {}
             let childDataList = []
@@ -55,7 +56,10 @@ class ArrayFieldAttribute {
                     arrayRowElement.childDataList = fieldDataListWithLatestPositionId.fieldDataList
                     latestPositionId = fieldDataListWithLatestPositionId.latestPositionId
                 }
-
+                if (arrayRowElement.required && (!arrayRowElement.value || arrayRowElement.value == '')) {
+                    isSaveDisabled = true
+                    break
+                }
                 childDataList.push(arrayRowElement)
             }
             arrayObject = {
@@ -69,7 +73,7 @@ class ArrayFieldAttribute {
         arrayParentItem.value = ARRAY_SAROJ_FAREYE
         arrayParentItem.childDataList = arrayChildDataList
         let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayParentItem.childDataList, jobTransactionId, arrayParentItem.positionId, latestPositionId)
-        return fieldDataListWithLatestPositionId
+        return { fieldDataListWithLatestPositionId, isSaveDisabled }
     }
     enableSaveIfRequired(arrayElements) {
         let isSaveDisabled = false;
@@ -78,6 +82,7 @@ class ArrayFieldAttribute {
         for (let rowId in arrayElements) {
             if (!arrayElements[rowId].allRequiredFieldsFilled) {
                 isSaveDisabled = true
+                break
             }
         }
         return isSaveDisabled

@@ -11,13 +11,14 @@ import {
     SET_ARRAY_ISLOADING,
     SET_OPTION_ATTRIBUTE_ERROR
 } from '../../lib/constants'
-import { ARRAY_SAROJ_FAREYE, AFTER } from '../../lib/AttributeConstants'
+import { ARRAY_SAROJ_FAREYE, AFTER, ADD_TOAST } from '../../lib/AttributeConstants'
 import _ from 'lodash'
 import { setState } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { NavigationActions } from 'react-navigation'
 import { DELETE_ROW_ERROR, ADD_ROW_ERROR, SAVE_ARRAY_ERROR } from '../../lib/ContainerConstants'
+import { Toast } from 'native-base'
 
 export function showOrDropModal(fieldAttributeMasterId, arrayElements, rowId, idToSet, isSaveDisabled) {
     return async function (dispatch) {
@@ -64,11 +65,10 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
             arrayRow.formLayoutObject.get(attributeMasterId).displayValue = value
             arrayRow.formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
             let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject.get(attributeMasterId), arrayRow.formLayoutObject, AFTER, null)
-            arrayRow.formLayoutObject.get(attributeMasterId).displayValue = (validationsResult) ? value : null
             arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
             arrayRow.formLayoutObject.get(attributeMasterId).containerValue = (validationsResult) ? containerValue : null
             arrayRow.modalFieldAttributeMasterId = (validationsResult) ? null : (backPressOrModalPresent == 2) ? attributeMasterId : null
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult) ? value : null, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
             if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
             if (validationsResult && backPressOrModalPresent == 1) {
@@ -78,10 +78,11 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
                 if (backPressOrModalPresent == 2) {
                     dispatch(setState(SET_OPTION_ATTRIBUTE_ERROR, { error: arrayRow.formLayoutObject.get(attributeMasterId).alertMessage }))
                 } else {
-                    Toast.show({ text: cloneFormElement.get(attributeMasterId).alertMessage, position: 'bottom', buttonText: 'OK', duration: 5000 })
+                    Toast.show({ text: arrayRow.formLayoutObject.get(attributeMasterId).alertMessage, position: 'bottom', buttonText: 'OK', duration: 5000 })
                 }
             }
         } catch (error) {
+            console.log(error)
             dispatch(setState(SET_ERROR_MSG, error.message))
         }
     }
@@ -91,14 +92,19 @@ export function saveArray(arrayElements, arrayParentItem, jobTransaction, latest
     return async function (dispatch) {
         try {
             if (!_.isEmpty(arrayElements)) {
-                let fieldDataListWithLatestPositionId = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction.id, latestPositionId, arrayMainObject)
-                if (!fieldDataListWithLatestPositionId) throw new Error(SAVE_ARRAY_ERROR)
-                dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction, fieldAttributeMasterParentIdMap))
-                dispatch(setState(CLEAR_ARRAY_STATE))
+                let fieldDataListSaveDisabled = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction.id, latestPositionId, arrayMainObject)
+                if (!fieldDataListSaveDisabled) throw new Error(SAVE_ARRAY_ERROR)
+                if (fieldDataListSaveDisabled.isSaveDisabled) {
+                    dispatch(setState(SET_ARRAY_ELEMENTS, { newArrayElements: arrayElements, isSaveDisabled: fieldDataListSaveDisabled.isSaveDisabled }))
+                    Toast.show({ text: ADD_TOAST, position: 'bottom', buttonText: 'OK', duration: 5000 })
+                } else {
+                    dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListSaveDisabled.fieldDataListWithLatestPositionId, jobTransaction, fieldAttributeMasterParentIdMap))
+                    dispatch(setState(CLEAR_ARRAY_STATE))
+                }
             } else {
                 dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formElement, isSaveDisabled, '', { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap))
+                dispatch(setState(CLEAR_ARRAY_STATE))
             }
-            dispatch(setState(CLEAR_ARRAY_STATE))
         } catch (error) {
             dispatch(setState(SET_ERROR_MSG, error.message))
         }

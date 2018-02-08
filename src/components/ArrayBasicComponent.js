@@ -256,7 +256,7 @@ class ArrayBasicComponent extends PureComponent {
                                     autoCapitalize="none"
                                     placeholder={item.helpText}
                                     defaultValue={item.value}
-                                    value={item.value}
+                                    value={item.displayValue}
                                     keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                     editable={item.editable}
                                     multiline={item.attributeTypeId == 2 ? true : false}
