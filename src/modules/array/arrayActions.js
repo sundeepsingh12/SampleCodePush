@@ -65,10 +65,10 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
             arrayRow.formLayoutObject.get(attributeMasterId).displayValue = value
             arrayRow.formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
             let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject.get(attributeMasterId), arrayRow.formLayoutObject, AFTER, null)
-            arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
+            arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult && backPressOrModalPresent) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
             arrayRow.formLayoutObject.get(attributeMasterId).containerValue = (validationsResult) ? containerValue : null
             arrayRow.modalFieldAttributeMasterId = (validationsResult) ? null : (backPressOrModalPresent == 2) ? attributeMasterId : null
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult && backPressOrModalPresent) ? value : null, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
             if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
             if (validationsResult && backPressOrModalPresent == 1) {
@@ -87,7 +87,15 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
         }
     }
 }
+export function getNextFocusableForArrayWithoutChildDatalist(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, event, fieldAttributeMasterParentIdMap) {
+    return async function (dispatch) {
+        let cloneArrayElements = _.cloneDeep(arrayElements)
+        let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, null, event, fieldAttributeMasterParentIdMap)
+        if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
+        dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
 
+    }
+}
 export function saveArray(arrayElements, arrayParentItem, jobTransaction, latestPositionId, formElement, isSaveDisabled, arrayMainObject, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         try {
@@ -125,7 +133,7 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
         if (timeOfExecution == AFTER) {
             formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
         }
-        dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, currentElement.displayValue, newArray, rowId, null, NEXT_FOCUS))
+        dispatch(getNextFocusableForArrayWithoutChildDatalist(currentElement.fieldAttributeMasterId, isSaveDisabled, currentElement.displayValue, newArray, rowId, NEXT_FOCUS, null))
     }
 }
 

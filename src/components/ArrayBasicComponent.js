@@ -70,18 +70,18 @@ function mapDispatchToProps(dispatch) {
 class ArrayBasicComponent extends PureComponent {
 
     _searchForReferenceValue = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, null, null, null, this.props.fieldAttributeMasterParentIdMap);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, null, null, null, this.props.fieldAttributeMasterParentIdMap);
     }
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
     }
 
     _onBlurEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId) {
-        this.props.actions.getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, ON_BLUR, null, null, this.props.fieldAttributeMasterParentIdMap);
+        this.props.actions.getNextFocusableForArrayWithoutChildDatalist(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, this.props.fieldAttributeMasterParentIdMap);
     }
 
     _styleNextFocusable(isFocusable) {
@@ -91,7 +91,7 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     onSaveDateTime = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, false);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, false);
     }
     onPressModal = (fieldAttributeMasterId) => {
         this.props.actions.showOrDropModal(fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
@@ -260,7 +260,7 @@ class ArrayBasicComponent extends PureComponent {
                                     keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                     editable={item.editable}
                                     multiline={item.attributeTypeId == 2 ? true : false}
-                                    onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
+                                    onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
                                     onFocus={() => { this.onFocusEvent(item) }}
                                     onBlur={(e) => this._onBlurEvent(item)}
                                     secureTextEntry={item.attributeTypeId == 61 ? true : false}
@@ -274,6 +274,9 @@ class ArrayBasicComponent extends PureComponent {
                                         <QRIcon width={30} height={30} color={this.getComponentLabelStyle(item.focus, item.editable)} />
                                     </View>
                                 </TouchableHighlight> : null}
+                            {item.alertMessage ?
+                                <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{item.alertMessage}</Label>
+                                : null}
                         </View>
                     </View>
                 )
@@ -307,7 +310,7 @@ class ArrayBasicComponent extends PureComponent {
                     <View>
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
                                 this.props.actions.navigateToScene('DataStore',
                                     {
                                         currentElement: item,
@@ -339,7 +342,7 @@ class ArrayBasicComponent extends PureComponent {
                 return (<View>
                     <FormLayoutActivityComponent item={item} press={
                         () => {
-                            this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                            this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
                             this.props.actions.navigateToScene(CameraAttribute,
                                 {
                                     currentElement: item,

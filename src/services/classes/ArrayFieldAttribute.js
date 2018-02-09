@@ -111,7 +111,7 @@ class ArrayFieldAttribute {
                 let arrayRow = {}
                 for (let index in arrayObjectSarojFareye) {
                     let fieldAttribute = { ...childElementsTemplate.formLayoutObject.get(arrayObjectSarojFareye[index].fieldAttributeMasterId) }
-                    fieldAttribute.value = arrayObjectSarojFareye[index].value
+                    fieldAttribute.value = fieldAttribute.displayValue = arrayObjectSarojFareye[index].value
                     fieldAttribute.editable = true
                     fieldAttribute.childDataList = arrayObjectSarojFareye[index].childDataList
                     formLayoutObject.set(arrayObjectSarojFareye[index].fieldAttributeMasterId, fieldAttribute)
