@@ -17,7 +17,7 @@ import {
 }
   from 'react-native'
 
-import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Header, Separator, Icon, Footer, FooterTab, Button } from 'native-base';
+import { Form, Item, Input, Container, Content, ListItem, CheckBox, List, Body, Left, Right, Header, Separator, Icon, Footer, FooterTab, Button, Toast } from 'native-base';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as taskListActions from '../modules/taskList/taskListActions'
@@ -31,7 +31,8 @@ import {
   TABLE_RUNSHEET,
   TABLE_JOB_TRANSACTION,
   SEARCH_TAP,
-  LISTING_SEARCH_VALUE
+  LISTING_SEARCH_VALUE,
+  BulkListing
 } from '../lib/constants'
 import JobListItem from '../components/JobListItem'
 
@@ -39,6 +40,7 @@ function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
     isRefreshing: state.listing.isRefreshing,
+    jobIdGroupIdMap : state.listing.jobIdGroupIdMap
   }
 }
 
@@ -59,16 +61,18 @@ class TaskListScreen extends PureComponent {
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
+        groupId: (!_.isEmpty(this.props.jobIdGroupIdMap.jobIdGroupIdMap) && this.props.jobIdGroupIdMap.jobIdGroupIdMap[item.jobId]) ? this.props.jobIdGroupIdMap.jobIdGroupIdMap[item.jobId] : null
       }
     )
   }
 
-  renderData = (item) => {
+  renderData = (item,lastId) => {
     return (
       <JobListItem
         data={item}
         showIconsInJobListing = {true}
         onPressItem={() => { this.navigateToScene(item) }}
+        lastId = {lastId}
       />
     )
   }
@@ -152,6 +156,86 @@ class TaskListScreen extends PureComponent {
     )
   }
 
+  flatlistForGroupTransactions() {
+    return (
+      <FlatList
+        data={this.getGroupWiseTransactions(this.props.jobTransactionCustomizationList, this.props.jobIdGroupIdMap.jobIdGroupIdMap, this.props.statusIdList)}
+        renderItem={({ item }) => {
+          return(
+            <View>
+              {(item.groupId) ? <TouchableOpacity style={[styles.row, styles.padding10, styles.justifyStart, styles.alignCenter, {height: 70}]}   onPress={() => this.updateTransactionForGroupId(item)}>
+                <View style={{position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: 40,top:40, left: 36}}></View>
+                  <View style={[styles.borderRadius50,{backgroundColor : item.color,width: 16, height: 16, marginLeft: 20}]}>
+                  </View>
+                  <View style={{marginLeft: 34,marginTop: 12}}>
+                    <Text style={[styles.fontLg, styles.fontWeight500, styles.fontBlack]}> {item.groupId}</Text>
+                    <Text style={[styles.fontSm, styles.fontDarkGray]}>Total : {item.total} </Text>
+                  </View>
+                  <Icon name="ios-arrow-forward" style={{marginLeft: 'auto',color: '#a3a3a3'}}/>
+
+              </TouchableOpacity> : null}
+              {this.renderGroupTransactions(item)}
+              </View>
+          )
+        }}
+        keyExtractor={item => String(item.key)}
+      />
+    )
+  }
+  renderGroupTransactions(items){
+    let jobTransactions = items.jobTransactions.sort(function (transaction1, transaction2) {
+      return transaction1.seqSelected - transaction2.seqSelected
+    })
+    let lastId = (items.groupId) ? jobTransactions[items.total-1]['id'] : null
+    return (
+      <FlatList
+        data={jobTransactions}
+        renderItem={({ item }) => this.renderData(item,lastId)}
+        keyExtractor={item => String(item.id)}
+      />
+    )  
+  } 
+
+  updateTransactionForGroupId (item){
+    let jobTransaction = item.jobTransactions[0]
+    if(this.props.jobIdGroupIdMap.statusIdNextStatusListMap[jobTransaction.statusId].length > 0){
+    this.props.actions.navigateToScene(BulkListing, {
+      jobMasterId: jobTransaction.jobMasterId,      
+      statusId: jobTransaction.statusId,
+      nextStatusList : this.props.jobIdGroupIdMap.statusIdNextStatusListMap[jobTransaction.statusId],
+      groupId: item.groupId
+    }) }else{
+      Toast.show({
+        text: 'No NextStatus Available',  position: 'bottom', buttonText: 'Ok'
+      })
+    }
+
+  }
+  getGroupWiseTransactions(jobTransactionCustomizationList, jobIdGroupIdMap, statusIdList) {
+    let groupTransactionsObject = {},groupIdTransactionIdMap = {},index = 0
+    for (let value of jobTransactionCustomizationList) {
+      if (statusIdList.includes(value.statusId)) {
+        let groupId = jobIdGroupIdMap[value.jobId] ? jobIdGroupIdMap[value.jobId] : null
+        if (!groupId) {
+          groupTransactionsObject[value.id] = { groupId: null,key: value.id,seqSelected: value.seqSelected, total: 1, jobTransactions: [value] }
+        }else if(groupId && !groupIdTransactionIdMap[groupId]){
+          groupTransactionsObject[value.id] = { groupId, key: value.id, color: value.identifierColor, seqSelected: value.seqSelected, total: 1, jobTransactions: [value] }
+          groupIdTransactionIdMap[groupId] = value.id
+        }else{
+          groupTransactionsObject[groupIdTransactionIdMap[groupId]]['seqSelected'] = groupTransactionsObject[groupIdTransactionIdMap[groupId]]['seqSelected'] > value.seqSelected ? 
+                    value.seqSelected : groupTransactionsObject[groupIdTransactionIdMap[groupId]]['seqSelected']
+          groupTransactionsObject[groupIdTransactionIdMap[groupId]]['total'] += 1
+          groupTransactionsObject[groupIdTransactionIdMap[groupId]]['jobTransactions'].push(value)
+        }
+        }
+    }
+    let groupTransactionsArray = Object.values(groupTransactionsObject)
+    groupTransactionsArray.sort(function (transaction1, transaction2) {
+      return transaction1.seqSelected - transaction2.seqSelected
+    })
+    return groupTransactionsArray
+  }
+
   sectionlist() {
     return (
       <SectionList
@@ -166,7 +250,8 @@ class TaskListScreen extends PureComponent {
     if (this.props.isRefreshing) {
       return <Loader />
     } else {
-      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList)) ? this.sectionlist() : this.flatlist()
+      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList)) ? this.sectionlist()  :
+                    !_.isEmpty(this.props.jobIdGroupIdMap.jobIdGroupIdMap) ? this.flatlistForGroupTransactions() :  this.flatlist()
       return (
         <Container>
           <Content>

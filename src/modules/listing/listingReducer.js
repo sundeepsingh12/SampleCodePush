@@ -17,6 +17,7 @@ export default function listingReducer(state = initialState, action) {
         case JOB_LISTING_END:
             return state.set('jobTransactionCustomizationList', action.payload.jobTransactionCustomizationList)
                         .set('isRefreshing', false)
+                        .set('jobIdGroupIdMap', action.payload.jobIdGroupIdMap)
         case RESET_STATE:
             return initialState                
     }

@@ -227,6 +227,13 @@ class JobTransaction {
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         let customerCareMap = customerCareService.getCustomerCareMap(jobTransactionCustomizationListParametersDTO.customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
+        let jobMasterWithEnableMultiPart = jobTransactionCustomizationListParametersDTO.jobMasterList ? this.getEnableMultiPartJobMaster(jobTransactionCustomizationListParametersDTO.jobMasterList) : []
+        let jobIdGroupIdMap = jobMasterWithEnableMultiPart.length > 0 ? this.getJobIdGroupIdMap(jobMasterWithEnableMultiPart) : {}
+        let statusIdNextStatusListMap = {},jobIdGroupIdStatusObject = {}
+        if(!_.isEmpty(jobIdGroupIdMap)){
+            jobTransactionCustomizationListParametersDTO.statusList.forEach((jobStatus) => {statusIdNextStatusListMap[jobStatus.id] = jobStatus.nextStatusList}) 
+            jobIdGroupIdStatusObject = {jobIdGroupIdMap,statusIdNextStatusListMap}
+        }
         let runsheetQuery
         if (selectedDate && selectedDate != "All") {
             runsheetQuery = `startDate BEGINSWITH '${selectedDate}' AND isClosed = false`
@@ -235,9 +242,9 @@ class JobTransaction {
         } else {
             runsheetQuery = 'isClosed = true'
         }
-        const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+        const runsheetList = _.isEmpty(jobIdGroupIdMap) ? realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery) : []
         let runsheetIdToStartDateMap = {}
-        if (selectedDate && selectedDate == "All") {
+        if (selectedDate && selectedDate == "All" && runsheetList.length > 0) {
             runsheetList.forEach(runsheetListObject => { runsheetIdToStartDateMap[runsheetListObject.id] = moment(runsheetListObject.startDate).format('YYYY-MM-DD') })
         }
         let jobTransactionQuery = selectedDate ? runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ') : runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
@@ -291,7 +298,7 @@ class JobTransaction {
         }
         let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap)
-        return jobTransactionCustomizationList
+        return {jobTransactionCustomizationList,jobIdGroupIdStatusObject }
 
     }
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
@@ -317,6 +324,19 @@ class JobTransaction {
         }
     }
 
+    getEnableMultiPartJobMaster(jobMasterList){
+        let jobMasterListWithEnableMultiPart =  jobMasterList.filter(jobMaster => jobMaster.enableMultipartAssignment == true)
+        return jobMasterListWithEnableMultiPart
+    }
+
+    getJobIdGroupIdMap(jobMasterListWithEnableMultiPart){
+        let jobMasterQuery = jobMasterListWithEnableMultiPart.map(jobMasterId => 'jobMasterId = ' + jobMasterId.id).join(' OR ')
+        let jobQuery =  `groupId != null AND (${jobMasterQuery})` 
+        let jobList = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
+        let jobIdGroupIdMap = {}
+        jobList.forEach(job => {jobIdGroupIdMap[job.id] = job.groupId})
+        return jobIdGroupIdMap
+    }
     /**
      * This function prepares jobTransactionCustomizationList for list of job transactions
      * @param {*} jobTransactionMap 
@@ -402,7 +422,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             return jobTransactionMap
         } else {
-            return (!_.isEmpty(runsheetIdToStartDateMap)) ? jobTransactionDateTOJobTransactionsMap : jobTransactionCustomizationList
+            return !_.isEmpty(runsheetIdToStartDateMap) ? jobTransactionDateTOJobTransactionsMap :  jobTransactionCustomizationList
         }
     }
 
@@ -685,14 +705,7 @@ class JobTransaction {
             jobStatusId = jobTransaction[0].status
             jobId = jobTransaction[0].id
             referenceNumber = jobTransaction[0].referenceNo
-        }
-        let jobDataQuery = 'id = ' + jobId
-        let jobData = realm.getRecordListOnQuery(TABLE_JOB, jobDataQuery)
-        let groupId =  jobData[0] && jobData[0].groupId ? jobData[0].groupId : null
-        // if(groupId){
-        //     let allGroupIdTransactionsLength = this.getGroupidTransactions(jobMasterId,groupId)
-        //     groupId =  groupId + ':' + allGroupIdTransactionsLength 
-        // } 
+        } 
         const jobMasterJobAttributeMasterMap = jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)
         const jobAttributeMasterMap = jobMasterJobAttributeMasterMap[jobMasterId] ? jobMasterJobAttributeMasterMap[jobMasterId] : {}
         const jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
@@ -748,8 +761,7 @@ class JobTransaction {
                 jobDataObject,
                 jobTransactionDisplay,
                 seqSelected,
-                jobTime,
-                groupId
+                jobTime
             }
         }
         else {
@@ -766,14 +778,6 @@ class JobTransaction {
                 jobTransactionDisplay,
             }
         }
-    }
-   async getGroupidTransactions(jobMasterId,groupId,tabId,statusCategory){
-        let jobStatusList = await jobStatusService.getNonUnseenStatusIdsForStatusCategoryAndTabId(statusCategory,tabId)
-        let jobStatusQuery = jobStatusList.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-        let jobQuery = `jobMasterId = ${jobMasterId} AND groupId = '${groupId}'`
-        let jobList = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
-        let jobTransactionSize = jobList ? jobList.length : 0
-        return jobTransactionSize
     }
 
     /**

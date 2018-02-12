@@ -64,6 +64,8 @@ import {
 import Communications from 'react-native-communications'
 import CallIcon from '../svg_components/icons/CallIcon'
 import RevertIcon from '../svg_components/icons/RevertIcon'
+import GroupIcon from '../svg_components/icons/GroupIcon'
+
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
@@ -86,7 +88,6 @@ function mapStateToProps(state) {
     statusRevertList: state.jobDetails.statusRevertList,
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
-    groupId: state.jobDetails.groupId,
   }
 }
 
@@ -120,18 +121,18 @@ class JobDetailsV2 extends PureComponent {
   }
   renderStatusList(statusList) {
     let statusView = []
-    let groupId = this.props.groupId ? this.props.groupId.split(':') : null
-    if(this.props.groupId && groupId && parseInt(groupId[1]) > 1){
+    let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
+    if(groupId && statusList.length > 0){
       statusView.push(
-        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = { () => this.updateTransactionForGroupId(groupId[0])}>
+        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = { () => this.updateTransactionForGroupId(groupId)} key = {groupId}>
         <View style = {[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
             <View style={[styles.row, styles.alignCenter]}>
-                <View>
-                  <RevertIcon color={styles.fontPrimary}/>
+                <View style = {[styles.marginTop12]}>
+                  <GroupIcon />
                 </View>
-                <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Initiate Updating group {groupId[0]}</Text>
+                <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Initiate Updating group {groupId}</Text>
                 <Right>
-                  <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+                  <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} /> 
                 </Right>
             </View>
         </View>

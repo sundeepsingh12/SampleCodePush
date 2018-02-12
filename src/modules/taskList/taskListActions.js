@@ -52,12 +52,12 @@ export function fetchJobs(date) {
       dispatch(setState(JOB_LISTING_START))
       const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
       let selectedDate = customNaming.value.enableFutureDateRunsheet ? date : null
-      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,null,null,selectedDate)
-      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }))
+      let {jobTransactionCustomizationList,jobIdGroupIdStatusObject } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,null,null,selectedDate)
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList, jobIdGroupIdMap : jobIdGroupIdStatusObject }))
     } catch (error) {
       //TODO handle UI
       console.log(error)
-      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList:[]}))
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList:[],jobIdGroupIdMap : {}}))
     }
   }
 }

@@ -209,14 +209,6 @@ class JobStatus {
     return { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds }
   }
 
-  async getNonUnseenStatusIdsForStatusCategoryAndTabId(statusCategory,tabId) {
-    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
-    if (!jobStatusArray || !jobStatusArray.value) {
-      throw new Error('Job status missing in store')
-    }
-    const filteredJobStatusIds = jobStatusArray.value.filter(jobStatus => jobStatus.statusCategory == statusCategory && jobStatus.tabId == tabId && jobStatus.code != UNSEEN).map(jobStatus => jobStatus.id)
-    return filteredJobStatusIds
-  }
 
 
   getTabIdOnStatusId(statusList, statusId) {

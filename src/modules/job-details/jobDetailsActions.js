@@ -44,7 +44,7 @@ export function startFetchingJobDetails() {
 }
 
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo,parentStatusList, isEtaTimerShow, groupId) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo,parentStatusList, isEtaTimerShow) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -55,8 +55,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             errorMessage,
             parentStatusList,
             draftStatusInfo,
-            isEtaTimerShow,
-            groupId,
+            isEtaTimerShow
         }
     }
 }
@@ -79,9 +78,7 @@ export function getJobDetails(jobTransactionId) {
             const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             let isEtaTimerShow = (statusCategory == 1)
-            let groupId = details && details.groupId ? details.groupId : null
-            groupId = (groupId) ? await jobTransactionService.getGroupidTransactions(details.jobTransactionDisplay.jobMasterId,groupId,details.currentStatus.tabId,details.currentStatus.statusCategory) : null
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, groupId))
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
