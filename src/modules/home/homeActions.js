@@ -294,7 +294,7 @@ export function startMqttService(pieChart) {
 
 export function startTracking() {
   return async function (dispatch) {
-    // trackingService.init()
+    trackingService.init()
   }
 }
 

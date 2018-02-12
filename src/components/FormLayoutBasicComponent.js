@@ -323,7 +323,7 @@ class BasicFormElement extends PureComponent {
             <TouchableOpacity
                 style={[{ paddingVertical: 50 }, this.props.item.focus ? styles.borderLeft4 : null]}
                 onPress={() => { this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, this.props.item.fieldAttributeMasterId) }}
-                disabled={this.props.modalFieldAttributeMasterId ? true : false}
+                disabled={!this.props.item.editable || this.props.modalFieldAttributeMasterId ? true : false}
             >
                 <View style={[styles.marginHorizontal10]}>
                     {modalView}
