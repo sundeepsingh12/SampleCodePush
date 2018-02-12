@@ -66,9 +66,9 @@ class SequenceRunsheetList extends Component {
         return { header: null }
     }
 
-    componentDidMount() {
-        this.props.actions.getRunsheets()
-    }
+    // componentDidMount() {
+    //     this.props.actions.getRunsheets()
+    // }
 
     componentDidUpdate() {
         if (this.props.responseMessage) {

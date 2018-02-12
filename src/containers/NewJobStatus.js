@@ -37,7 +37,6 @@ function mapStateToProps(state) {
   return {
     jobMasterList: state.newJob.jobMasterList,
     statusList: state.newJob.statusList,
-    statusList1: state.newJob.statusList,
     negativeId: state.newJob.negativeId
   }
 };
@@ -58,9 +57,9 @@ class NewJobStatus extends PureComponent {
     return { header: null }
   }
 
-  componentWillMount() {
-    this.props.actions.getStatusAndIdForJobMaster(this.props.navigation.state.params.jobMaster.id)
-  }
+  // componentWillMount() {
+  //   this.props.actions.getStatusAndIdForJobMaster(this.props.navigation.state.params.jobMaster.id)
+  // }
 
   renderData = (item) => {
     return (

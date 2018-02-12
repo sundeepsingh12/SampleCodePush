@@ -62,9 +62,9 @@ class JobMaster extends PureComponent {
         }
     }
 
-    componentDidMount() {
-        this.props.actions.fetchJobMasterList()
-    }
+    // componentDidMount() {
+    //     this.props.actions.fetchJobMasterList()
+    // }
 
     renderData = (item) => {
         return (

@@ -3,7 +3,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator,PushNotificationIOS, Animated } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated } from 'react-native'
 import Loader from '../components/Loader'
 import HomeFooter from './HomeFooter'
 import {
@@ -24,7 +24,7 @@ import {
   StyleProvider,
   Toast,
   ActionSheet,
- 
+
 } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -63,6 +63,9 @@ import {
 import _ from 'lodash'
 import PushNotification from 'react-native-push-notification'
 import { Platform } from 'react-native'
+import { getJobMasterVsStatusNameList } from '../modules/bulk/bulkActions'
+import { getRunsheets } from '../modules/sequence/sequenceActions'
+import { fetchJobMasterList } from '../modules/postAssignment/postAssignmentActions'
 
 function mapStateToProps(state) {
   return {
@@ -77,38 +80,38 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...homeActions, ...globalActions }, dispatch)
+    actions: bindActionCreators({ ...homeActions, ...globalActions, getJobMasterVsStatusNameList, getRunsheets, fetchJobMasterList }, dispatch)
   }
 }
 
 class Home extends PureComponent {
 
   constructor(props) {
-        super(props);
-        this.state = {
-            showTransactionList: false,
-            torchStatus: false,
-            bounceValue: new Animated.Value(240),
-            searchText: ''
-        };
-        this.animatedValue = new Animated.Value(120)
-    }
+    super(props);
+    this.state = {
+      showTransactionList: false,
+      torchStatus: false,
+      bounceValue: new Animated.Value(240),
+      searchText: ''
+    };
+    this.animatedValue = new Animated.Value(120)
+  }
 
   componentDidMount() {
     if (Platform.OS === 'ios') {
       PushNotification.configure({
-        onNotification: function(notification) {
-        console.log( 'NOTIFICATION:', notification );
-        // process the notification
-         Toast.show({
-              text: `${notification.message}`,
-              position: 'top',
-              buttonText: 'OK'
-            })
-        // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
-        notification.finish(PushNotificationIOS.FetchResult.NoData);
+        onNotification: function (notification) {
+          console.log('NOTIFICATION:', notification);
+          // process the notification
+          Toast.show({
+            text: `${notification.message}`,
+            position: 'top',
+            buttonText: 'OK'
+          })
+          // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
+          notification.finish(PushNotificationIOS.FetchResult.NoData);
         }
-        })
+      })
     }
     this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
   }
@@ -116,7 +119,7 @@ class Home extends PureComponent {
   navigateToScene = (appModule) => {
     switch (appModule.appModuleId) {
       case BULK_ID: {
-        this.props.actions.navigateToScene(BulkConfiguration)
+        this.props.actions.getJobMasterVsStatusNameList()
         break
       }
       case LIVE_ID: {
@@ -124,7 +127,7 @@ class Home extends PureComponent {
         break
       }
       case SEQUENCEMODULE_ID: {
-        this.props.actions.navigateToScene(SequenceRunsheetList, { displayName: this.props.modules.SEQUENCEMODULE.displayName })
+        this.props.actions.getRunsheets(this.props.modules.SEQUENCEMODULE.displayName)
         break
       }
       case START_ID: {
@@ -149,13 +152,12 @@ class Home extends PureComponent {
       }
 
       case JOB_ASSIGNMENT_ID: {
-        this.props.actions.navigateToScene(JobMasterListScreen)
+        this.props.actions.fetchJobMasterList()
+        //this.props.actions.navigateToScene(JobMasterListScreen)
       }
 
       default:
-        (appModule.appModuleId == NEWJOB_ID) ? this.props.actions.navigateToScene(NewJob, {
-          jobMasterIdList: appModule.jobMasterIdList
-        }) : null
+        (appModule.appModuleId == NEWJOB_ID) ? this.props.actions.navigateToNewJob(appModule.jobMasterIdList) : null
 
     }
   }
@@ -170,7 +172,7 @@ class Home extends PureComponent {
         destructiveButtonIndex: BUTTONS.length - 1
       },
       buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, { customUrl : appModule.remark[buttonIndex].customUrl} ) : null
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, { customUrl: appModule.remark[buttonIndex].customUrl }) : null
       }
     )
   }
