@@ -8,7 +8,8 @@ import {
     POPULATE_DATA,
     JOB_MASTER,
     FormLayout,
-    SET_ERROR_MSG_FOR_NEW_JOB
+    SET_ERROR_MSG_FOR_NEW_JOB,
+    NewJobStatus
 } from '../../lib/constants'
 import {
     NEW_JOB_CONFIGURATION_ERROR
@@ -35,7 +36,7 @@ export function getMastersWithNewJob() {
 export function getMastersFromMasterIds(jobMasterIds) {
     return async function (dispatch) {
         const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
-        let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters.value, jobMasterIds)
+        let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
         if (_.size(mastersWithNewJob) == 1) {
             dispatch(redirectToContainer(mastersWithNewJob[0]))
         } else if (_.size(mastersWithNewJob) == 0) {
@@ -85,10 +86,20 @@ export function redirectToContainer(jobMaster) {
         try {
             let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
             let returnParams = await newJob.checkForNextContainer(jobMaster, saveActivatedData)
-            if (returnParams.stateParam) {
-                await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
+            if (returnParams.screenName == NewJobStatus) {
+                let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMaster.id);
+                if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
+                    dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, jobMaster.id))
+                } else {
+                    dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
+                    dispatch(navigateToScene(NewJobStatus, returnParams.navigationParams))
+                }
+            } else {
+                if (returnParams.stateParam) {
+                    await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
+                }
+                dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
             }
-            dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
         } catch (error) {
             console.log(error)
         }

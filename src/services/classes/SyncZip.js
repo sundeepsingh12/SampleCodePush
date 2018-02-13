@@ -74,7 +74,7 @@ export async function createZip(transactionIdToBeSynced) {
 
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
-    
+
     const userSummary = await updateUserSummaryNextJobTransactionId()
     SYNC_RESULTS.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
     await moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP)
@@ -96,7 +96,7 @@ export async function createZip(transactionIdToBeSynced) {
     // console.log(PATH_TEMP+' removed');
 }
 
-async function updateUserSummaryNextJobTransactionId () {
+async function updateUserSummaryNextJobTransactionId() {
     const statusMap = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
     const jobMasterIdWithEnableResequence = await jobMasterService.getJobMasterWithEnableResequence()
     const firstEnableSequenceTransaction = (jobMasterIdWithEnableResequence && statusMap) ? jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap) : null
@@ -128,6 +128,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
         serverSmsLogs = [],
         transactionLogs = []
     if (!transactionIdsObject || !transactionIdsObject.value) {
+           serverSmsLogs = _getDataFromRealm([], null, TABLE_SERVER_SMS_LOG)
         return {
             fieldDataList,
             transactionList,
