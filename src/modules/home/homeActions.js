@@ -402,7 +402,6 @@ export function navigateToNewJob(jobMasterIds) {
     try {
       const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
       let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
-      debugger
       if (_.size(mastersWithNewJob) == 1) {
         let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
         let returnParams = await newJob.checkForNextContainer(mastersWithNewJob[0], saveActivatedData)

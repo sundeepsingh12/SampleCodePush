@@ -51,10 +51,6 @@ class BulkConfiguration extends PureComponent {
     return { header: null }
   }
 
-  // componentDidMount(){
-  //     this.props.actions.getJobMasterVsStatusNameList()
-  // }
-
   renderData = (item) => {
     return (
 

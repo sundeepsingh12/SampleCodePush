@@ -56,10 +56,6 @@ class NewJob extends PureComponent {
     return { header: null }
   }
 
-  // componentDidMount() {
-  //   this.props.actions.getMastersFromMasterIds(this.props.navigation.state.params.jobMasterIdList)
-  // }
-
   componentDidUpdate() {
     if (this.props.newJobError != '') {
       Toast.show({
