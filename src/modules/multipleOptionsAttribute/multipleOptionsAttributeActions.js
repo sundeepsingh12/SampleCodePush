@@ -18,7 +18,8 @@ import {
 import {
     FIELD_ATTRIBUTE_VALUE,
     FIELD_ATTRIBUTE,
-    SET_OPTIONS_LIST
+    SET_OPTIONS_LIST,
+    NEXT_FOCUS
 } from '../../lib/constants'
 import _ from 'lodash'
 
@@ -114,7 +115,7 @@ export function saveOptionsFieldData(optionsMap, currentElement, latestPositionI
                 fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(optionFieldDataList, jobTransaction.id, currentElement.positionId, latestPositionId)
             }
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, fieldDataValue, formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS))
+                dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, fieldDataValue, formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS, 2, containerValue, fieldAttributeMasterParentIdMap))
                 return
             }
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, fieldDataValue, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, true, containerValue))

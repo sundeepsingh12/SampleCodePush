@@ -47,7 +47,6 @@ import { performSyncService } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { UNIQUE_VALIDATION_FAILED } from '../../lib/ContainerConstants'
-import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import moment from 'moment'
 import getTheme from '../../../native-base-theme/components';
 import platform from '../../../native-base-theme/variables/platform';
