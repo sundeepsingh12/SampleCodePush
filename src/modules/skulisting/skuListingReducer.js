@@ -26,7 +26,8 @@ export default function skuListingReducer(state = initialState, action) {
                         .set('skuObjectValidation',action.payload.skuObjectValidation)
                         .set('skuChildItems',action.payload.skuArrayChildAttributes)
                         .set('skuObjectAttributeId',action.payload.skuObjectAttributeId)
-
+                        .set('skuValidationForImageAndReason',action.payload.skuValidationForImageAndReason)
+                        .set('reasonsList', action.payload.reasonsList)
         case  SHOW_SEARCH_BAR :
             return state.set('isSearchBarVisible',true)     
         
@@ -35,8 +36,8 @@ export default function skuListingReducer(state = initialState, action) {
 
         case UPDATE_SKU_ACTUAL_QUANTITY:
           return state.set('skuListItems',action.payload.skuListItems)
-                      .set('skuChildItems',action.payload.skuRootChildElements)    
-                      
+                      .set('skuChildItems',action.payload.skuRootChildElements) 
+
         case RESET_STATE:
             return initialState              
     

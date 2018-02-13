@@ -41,7 +41,9 @@ export function setExistingImage(item) {
         if (item.value && item.value != '') {
             const result = await signatureService.getImageData(item.value)
             dispatch(setState(SET_IMAGE_DATA, result))
-            dispatch(setState(SET_SHOW_IMAGE, true))
+            if (result) {
+                dispatch(setState(SET_SHOW_IMAGE, true))
+            }
         }
     }
 }

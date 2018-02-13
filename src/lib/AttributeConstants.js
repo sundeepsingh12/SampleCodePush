@@ -64,6 +64,8 @@ module.exports = {
     SKU_ARRAY: 17,
     SKU_CODE: 51,
     SKU_ORIGINAL_QUANTITY: 15,
+    SKU_PHOTO: 55,
+    SKU_REASON: 56,
     SKU_UNIT_PRICE: 14,
     STRING: 1,
     TEXT: 2,
@@ -333,6 +335,8 @@ module.exports = {
     QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
     TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
+    REASON: 'Reason',
+    OPEN_CAMERA: 'Open Camera',
 
     //Sequence Container
     ROUTE_OPTIMIZATION: 'Route optimisation',

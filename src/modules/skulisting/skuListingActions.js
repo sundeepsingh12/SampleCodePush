@@ -6,6 +6,9 @@ import {
     SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
+    SET_IMAGE_DATA,
+    SET_SHOW_IMAGE,
+    VIEW_IMAGE_DATA,
 } from '../../lib/constants'
 
 import {
@@ -14,6 +17,8 @@ import {
 import {
     fieldAttributeValidation
 } from '../../services/classes/FieldAttributeValidation'
+import { signatureService } from '../../services/classes/SignatureRemarks'
+import moment from 'moment'
 
 import {
     SKU_ORIGINAL_QUANTITY,
@@ -22,8 +27,10 @@ import {
     TOTAL_ORIGINAL_QUANTITY,
     TOTAL_ACTUAL_QUANTITY,
     SKU_ACTUAL_AMOUNT,
-    ARRAY_SAROJ_FAREYE
+    ARRAY_SAROJ_FAREYE,
+    SKU_PHOTO,
 } from '../../lib/AttributeConstants'
+import { NavigationActions } from 'react-navigation'
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
@@ -40,13 +47,16 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
             dispatch(setState(SKU_LIST_FETCHING_START))
             const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMasterId)
             const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId[0])
-            const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation)
+            const skuValidationForImageAndReason = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(fieldAttributeMasterId)
+            const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation, skuValidationForImageAndReason)
             const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap, skuData.attributeTypeIdValueMap)
             dispatch(setState(SKU_LIST_FETCHING_STOP, {
                 skuListItems: skuData.skuObjectListDto,
                 skuObjectValidation,
                 skuArrayChildAttributes,
-                skuObjectAttributeId: skuListingDto.childFieldAttributeId[0]
+                skuObjectAttributeId: skuListingDto.childFieldAttributeId[0],
+                skuValidationForImageAndReason,
+                reasonsList: skuData.reasonsList,
             }))
             if (skuListingDto.isSkuCodePresent)
                 dispatch(setState(SHOW_SEARCH_BAR))
@@ -72,10 +82,17 @@ export function scanSkuItem(skuListItems, skuCode) {
  *This method updates SkuActualQuantity of a particular list item and TotalActualQuantity,
  * TotalOriginalQuantity & SkuActualAmount as well,Called when actualQuantity is changed by user
  */
-export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItems, skuChildElements) {
+export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason) {
     return async function (dispatch) {
         try {
-            const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, parentId, skuListItems, skuChildElements)
+            if(rowItem.attributeTypeId == SKU_PHOTO){
+                value = await signatureService.saveFile(value, moment(), true)
+                dispatch(NavigationActions.back())
+                dispatch(setState(SET_IMAGE_DATA, ''))
+                dispatch(setState(SET_SHOW_IMAGE, false))
+                dispatch(setState(VIEW_IMAGE_DATA, ''))
+            }
+            const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason)
             dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, {
                 skuListItems: updatedSkuArray.updatedObject,
                 skuRootChildElements: updatedSkuArray.updatedChildElements

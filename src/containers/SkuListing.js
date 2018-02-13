@@ -39,21 +39,21 @@ class SkuListing extends PureComponent {
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    this.props.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
   }
 
   renderData(item) {
     return (
-      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} />
+      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList = {this.props.reasonsList}/>
     )
   }
 
-  updateSkuActualQty(value, parentId) {
-    this.props.updateSkuActualQuantityAndOtherData(value, parentId, this.props.skuListItems, this.props.skuChildItems)
+  updateSkuActualQty(value, rowItem) {
+    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason)
   }
 
   onChangeSkuCode(skuCode) {
-    this.props.changeSkuCode(skuCode)
+    this.props.actions.changeSkuCode(skuCode)
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -129,20 +129,17 @@ class SkuListing extends PureComponent {
     //Code incomplete
     const searchTerm = this.props.skuSearchTerm;
     if (skuSearchTerm) {
-      this.props.scanSkuItem(this.props.skuListItems, searchTerm)
+      this.props.actions.scanSkuItem(this.props.skuListItems, searchTerm)
     }
   }
-
+  
   saveSkuList = () => {
-    this.props.saveSkuListItems(
-      this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
-      this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
-      this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-      this.props.navigation.state.params.isSaveDisabled, this.props.navigation
-    )
-
+      this.props.actions.saveSkuListItems(
+        this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
+        this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
+        this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
+        this.props.navigation.state.params.isSaveDisabled, this.props.navigation)
   }
-
 }
 
 function mapStateToProps(state) {
@@ -154,6 +151,8 @@ function mapStateToProps(state) {
     skuObjectValidation: state.skuListing.skuObjectValidation,
     skuChildItems: state.skuListing.skuChildItems,
     skuObjectAttributeId: state.skuListing.skuObjectAttributeId,
+    skuValidationForImageAndReason: state.skuListing.skuValidationForImageAndReason,
+    reasonsList: state.skuListing.reasonsList,
   }
 }
 
@@ -228,4 +227,4 @@ const style = StyleSheet.create({
 
 });
 
-export default connect(mapStateToProps, skuListingActions)(SkuListing)
+export default connect(mapStateToProps, mapDispatchToProps)(SkuListing)
