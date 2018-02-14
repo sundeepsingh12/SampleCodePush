@@ -139,4 +139,12 @@ module.exports = {
     SYNCED_FILES: 'Synced Files',
     CREATE_BACKUP_BUTTON: '+ Create Backup',
 
+    //Tracking constants
+    ENTER: 'ENTER',
+    EXIT: 'EXIT',
+
+    //GeoFencing Service
+    HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
+    FENCE_LAT_LONG_MISSING: 'fenceLatLongObject not present'
+
 }

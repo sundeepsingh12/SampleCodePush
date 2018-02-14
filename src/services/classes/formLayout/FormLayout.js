@@ -13,11 +13,13 @@ import {
     CheckoutDetails,
     TabScreen,
     SHOULD_RELOAD_START,
-    SHOULD_CREATE_BACKUP
+    SHOULD_CREATE_BACKUP,
+    GEO_FENCING
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
 import { fieldValidationService } from '../FieldValidation';
+import { trackingService } from '../Tracking'
 
 class FormLayout {
 
@@ -285,6 +287,7 @@ class FormLayout {
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))
+            await this.addNewGeoFenceAndDeletePreviousFence()
         }
         return {
             routeName,
@@ -307,6 +310,11 @@ class FormLayout {
             }
         }
         return true
+    }
+
+    async addNewGeoFenceAndDeletePreviousFence() {
+        let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+        await trackingService.removeGeofence(fenceIdentifier)
     }
 }
 

@@ -191,6 +191,9 @@ module.exports = keyMirror({
     IS_COMPANY_CODE_DHL: null,
     SHOULD_CREATE_BACKUP: null,
     BACKUP_UPLOAD_FAIL_COUNT: null,
+    HUB_LAT_LONG: null,
+    GEO_FENCING: null,
+    LAT_LONG_GEO_FENCE: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

@@ -57,6 +57,8 @@ import PushNotification from 'react-native-push-notification'
 import {
   JOBS_DELETED
 } from '../../lib/ContainerConstants'
+import { geoFencingService } from './GeoFencingService'
+import { trackingService } from './Tracking'
 
 class Sync {
 
@@ -554,6 +556,7 @@ class Sync {
           }
           await jobSummaryService.updateJobSummary(dataList.jobSummaries)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
+          await this.addGeoFence(true)
         }
       } else {
         isLastPageReached = true
@@ -579,12 +582,12 @@ class Sync {
     const message = (jobMasterTitleList.constructor===Array)?`You have new updates for ${alertBody} jobs`:alertBody
 
     PushNotification.localNotification({
-    /* iOS and Android properties */
-    title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-    message, // (required)
-    soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
-});
-    
+      /* iOS and Android properties */
+      title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+      message, // (required)
+      soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+    });
+
 
   }
 
@@ -605,6 +608,22 @@ class Sync {
       timeDifference = `${differenceInSeconds} seconds ago`
     }
     return timeDifference
+  }
+
+  async addGeoFence(fenceForInitialJob) {
+    try {
+      let { fencePresent, jobMasterIdListWithEnableResequenceRestriction, openRunsheetList } = await geoFencingService.checkForEnableResequenceRestrictionAndCheckAllowOffRouteNotification()
+      console.logs('fencePresent', fencePresent)
+      if (!fencePresent && !_.isEmpty(jobMasterIdListWithEnableResequenceRestriction) && !_.isEmpty(openRunsheetList)) {
+        let { meanLatLong, radius, transactionIdIdentifier } = await geoFencingService.getLatLng(jobMasterIdListWithEnableResequenceRestriction, openRunsheetList, fenceForInitialJob)
+        if (radius && meanLatLong && meanLatLong.latitude && meanLatLong.longitude) {
+          await trackingService.addGeoFence(meanLatLong, radius, transactionIdIdentifier.toString())
+        }
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
   }
 }
 

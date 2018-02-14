@@ -74,7 +74,8 @@ import {
   OTP_SUCCESS,
   PENDING_SYNC_TRANSACTION_IDS,
   SET_UNSYNC_TRANSACTION_PRESENT,
-  UnsyncBackupUpload
+  UnsyncBackupUpload,
+  GEO_FENCING
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -90,6 +91,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer';
 import moment from 'moment'
+import { trackingService } from '../../services/classes/Tracking'
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -296,6 +298,8 @@ export function invalidateUserSessionForAutoLogout() {
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(setState(TOGGLE_LOGOUT, false))
+      let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
     } catch (error) {
       dispatch(startLoginScreenWithoutLogout())
@@ -322,6 +326,8 @@ export function invalidateUserSession() {
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(setState(TOGGLE_LOGOUT, false))
+      let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
 
     } catch (error) {
