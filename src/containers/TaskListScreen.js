@@ -40,7 +40,7 @@ function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
     isRefreshing: state.listing.isRefreshing,
-    jobIdGroupIdMap : state.listing.jobIdGroupIdMap
+    statusNextStatusListMap : state.listing.statusNextStatusListMap
   }
 }
 
@@ -56,22 +56,22 @@ class TaskListScreen extends PureComponent {
     this.props.actions.shouldFetchJobsOrNot(this.props.jobTransactionCustomizationList)
   }
 
-  navigateToScene = (item) => {
+  navigateToScene = (item,groupId) => {
     this.props.actions.navigateToScene('JobDetailsV2',
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
-        groupId: (!_.isEmpty(this.props.jobIdGroupIdMap.jobIdGroupIdMap) && this.props.jobIdGroupIdMap.jobIdGroupIdMap[item.jobId]) ? this.props.jobIdGroupIdMap.jobIdGroupIdMap[item.jobId] : null
+        groupId
       }
     )
   }
 
-  renderData = (item,lastId) => {
+  renderData = (item,lastId,groupId) => {
     return (
       <JobListItem
         data={item}
         showIconsInJobListing = {true}
-        onPressItem={() => { this.navigateToScene(item) }}
+        onPressItem={() => { this.navigateToScene(item,groupId) }}
         lastId = {lastId}
       />
     )
@@ -159,7 +159,7 @@ class TaskListScreen extends PureComponent {
   flatlistForGroupTransactions() {
     return (
       <FlatList
-        data={this.getGroupWiseTransactions(this.props.jobTransactionCustomizationList, this.props.jobIdGroupIdMap.jobIdGroupIdMap, this.props.statusIdList)}
+        data={this.getGroupWiseTransactions(this.props.jobTransactionCustomizationList,this.props.tabId)}
         renderItem={({ item }) => {
           return(
             <View>
@@ -190,7 +190,8 @@ class TaskListScreen extends PureComponent {
     return (
       <FlatList
         data={jobTransactions}
-        renderItem={({ item }) => this.renderData(item,lastId)}
+        renderItem={({ item }) => this.renderData(item,lastId,items.groupId)}
+        legacyImplementation = {true}
         keyExtractor={item => String(item.id)}
       />
     )  
@@ -198,11 +199,11 @@ class TaskListScreen extends PureComponent {
 
   updateTransactionForGroupId (item){
     let jobTransaction = item.jobTransactions[0]
-    if(this.props.jobIdGroupIdMap.statusIdNextStatusListMap[jobTransaction.statusId].length > 0){
+    if(this.props.statusNextStatusListMap[jobTransaction.statusId].length > 0){
     this.props.actions.navigateToScene(BulkListing, {
       jobMasterId: jobTransaction.jobMasterId,      
       statusId: jobTransaction.statusId,
-      nextStatusList : this.props.jobIdGroupIdMap.statusIdNextStatusListMap[jobTransaction.statusId],
+      nextStatusList : this.props.statusNextStatusListMap[jobTransaction.statusId],
       groupId: item.groupId
     }) }else{
       Toast.show({
@@ -211,25 +212,9 @@ class TaskListScreen extends PureComponent {
     }
 
   }
-  getGroupWiseTransactions(jobTransactionCustomizationList, jobIdGroupIdMap, statusIdList) {
+  getGroupWiseTransactions(jobTransactionCustomizationList,tabId) {
     let groupTransactionsObject = {},groupIdTransactionIdMap = {},index = 0
-    for (let value of jobTransactionCustomizationList) {
-      if (statusIdList.includes(value.statusId)) {
-        let groupId = jobIdGroupIdMap[value.jobId] ? jobIdGroupIdMap[value.jobId] : null
-        if (!groupId) {
-          groupTransactionsObject[value.id] = { groupId: null,key: value.id,seqSelected: value.seqSelected, total: 1, jobTransactions: [value] }
-        }else if(groupId && !groupIdTransactionIdMap[groupId]){
-          groupTransactionsObject[value.id] = { groupId, key: value.id, color: value.identifierColor, seqSelected: value.seqSelected, total: 1, jobTransactions: [value] }
-          groupIdTransactionIdMap[groupId] = value.id
-        }else{
-          groupTransactionsObject[groupIdTransactionIdMap[groupId]]['seqSelected'] = groupTransactionsObject[groupIdTransactionIdMap[groupId]]['seqSelected'] > value.seqSelected ? 
-                    value.seqSelected : groupTransactionsObject[groupIdTransactionIdMap[groupId]]['seqSelected']
-          groupTransactionsObject[groupIdTransactionIdMap[groupId]]['total'] += 1
-          groupTransactionsObject[groupIdTransactionIdMap[groupId]]['jobTransactions'].push(value)
-        }
-        }
-    }
-    let groupTransactionsArray = Object.values(groupTransactionsObject)
+    let groupTransactionsArray = Object.values(jobTransactionCustomizationList[tabId])
     groupTransactionsArray.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
@@ -250,8 +235,8 @@ class TaskListScreen extends PureComponent {
     if (this.props.isRefreshing) {
       return <Loader />
     } else {
-      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList)) ? this.sectionlist()  :
-                    !_.isEmpty(this.props.jobIdGroupIdMap.jobIdGroupIdMap) ? this.flatlistForGroupTransactions() :  this.flatlist()
+      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList)) ? this.props.jobTransactionCustomizationList['isGrouping'] ? 
+                   this.flatlistForGroupTransactions() : this.sectionlist()  : this.flatlist()
       return (
         <Container>
           <Content>

@@ -130,7 +130,7 @@ class JobDetailsV2 extends PureComponent {
                 <View style = {[styles.marginTop12]}>
                   <GroupIcon />
                 </View>
-                <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Initiate Updating group {groupId}</Text>
+                <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Update Group</Text>
                 <Right>
                   <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} /> 
                 </Right>

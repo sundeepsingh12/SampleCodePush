@@ -228,11 +228,10 @@ class JobTransaction {
         let customerCareMap = customerCareService.getCustomerCareMap(jobTransactionCustomizationListParametersDTO.customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
         let jobMasterWithEnableMultiPart = jobTransactionCustomizationListParametersDTO.jobMasterList ? this.getEnableMultiPartJobMaster(jobTransactionCustomizationListParametersDTO.jobMasterList) : []
-        let jobIdGroupIdMap = jobMasterWithEnableMultiPart.length > 0 ? this.getJobIdGroupIdMap(jobMasterWithEnableMultiPart) : {}
+        let jobIdGroupIdMap = jobMasterWithEnableMultiPart.length  > 0 && callingActivity == 'AllTasks'? this.getJobIdGroupIdMap(jobMasterWithEnableMultiPart) : {}
         let statusIdNextStatusListMap = {},jobIdGroupIdStatusObject = {}
         if(!_.isEmpty(jobIdGroupIdMap)){
             jobTransactionCustomizationListParametersDTO.statusList.forEach((jobStatus) => {statusIdNextStatusListMap[jobStatus.id] = jobStatus.nextStatusList}) 
-            jobIdGroupIdStatusObject = {jobIdGroupIdMap,statusIdNextStatusListMap}
         }
         let runsheetQuery
         if (selectedDate && selectedDate != "All") {
@@ -297,8 +296,10 @@ class JobTransaction {
             fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
         }
         let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
-        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap)
-        return {jobTransactionCustomizationList,jobIdGroupIdStatusObject }
+        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, 
+            jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap, jobIdGroupIdMap,jobTransactionCustomizationListParametersDTO.statusList,jobTransactionCustomizationListParametersDTO.tabList)
+            //jobTransactionCustomizationList = (callingActivity != 'Bulk' && !_.isEmpty(jobIdGroupIdMap)) ? this.getGroupWiseTransactions(jobTransactionCustomizationList,jobIdGroupIdMap,jobTransactionCustomizationListParametersDTO.statusList,jobTransactionCustomizationListParametersDTO.tabList) : jobTransactionCustomizationList
+        return {jobTransactionCustomizationList, statusNextStatusListMap : statusIdNextStatusListMap}
 
     }
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
@@ -337,6 +338,29 @@ class JobTransaction {
         jobList.forEach(job => {jobIdGroupIdMap[job.id] = job.groupId})
         return jobIdGroupIdMap
     }
+
+    // getGroupWiseTransactions(jobTransactionCustomizationList, jobIdGroupIdMap, statusList, tabList) {
+    //     let statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
+    //     let tabIdGroupTransactionsMap = {},groupIdTransactionIdMap = {},groupIdTabKey = ''
+    //     tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
+    //     tabIdGroupTransactionsMap['isGrouping'] = true
+    //     for (let value of jobTransactionCustomizationList) {
+    //         let groupId = jobIdGroupIdMap[value.jobId] ? jobIdGroupIdMap[value.jobId] : null
+    //         groupIdTabKey = groupId ? groupId+'&'+statusIdsTabIdsMap[value.statusId] : null
+    //         if (!groupId) {
+    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][value.id] = { groupId: null,key: value.id,seqSelected: value.seqSelected, total: 1, jobTransactions: [value] }
+    //         }else if((groupId && !tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]])){
+    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][value.id] = { groupId, key: value.id, color: value.identifierColor, seqSelected: value.seqSelected, total: 1, jobTransactions: [value] }
+    //             groupIdTransactionIdMap[groupIdTabKey] = value.id
+    //         }else{
+    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected'] = tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected'] > value.seqSelected ? 
+    //                 value.seqSelected : tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected']
+    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['total'] += 1
+    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['jobTransactions'].push(value)
+    //         }  
+    //     }
+    //     return tabIdGroupTransactionsMap
+    //   }
     /**
      * This function prepares jobTransactionCustomizationList for list of job transactions
      * @param {*} jobTransactionMap 
@@ -370,11 +394,16 @@ class JobTransaction {
      *                                      }
      *                                   ]
      */
-    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap) {
+    prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap, jobIdGroupIdMap, statusList, tabList) {
         let jobTransactionCustomizationList = []
-        let jobTransactionDateTOJobTransactionsMap = {}
+        let jobTransactionDateTOJobTransactionsMap = {},tabIdGroupTransactionsMap = {}, groupIdTransactionIdMap = {}, statusIdsTabIdsMap = {}
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
+        }
+        if(!_.isEmpty(jobIdGroupIdMap)){
+            statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
+            tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
+            tabIdGroupTransactionsMap['isGrouping'] = true 
         }
         for (var index in jobTransactionMap) {
             let jobTransaction = jobTransactionMap[index]
@@ -411,7 +440,22 @@ class JobTransaction {
             }
             jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
             jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
-            if (!_.isEmpty(runsheetIdToStartDateMap)) {
+            if (!_.isEmpty(jobIdGroupIdMap)) {
+                let groupId = jobIdGroupIdMap[jobTransactionCustomization.jobId] ? jobIdGroupIdMap[jobTransactionCustomization.jobId] : null
+                let groupIdTabKey = groupId ? groupId + '&' + statusIdsTabIdsMap[jobTransactionCustomization.statusId] : null
+                if (!groupId) {
+                    tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][jobTransactionCustomization.id] = { groupId: null, key: jobTransactionCustomization.id, seqSelected: jobTransactionCustomization.seqSelected, total: 1, jobTransactions: [jobTransactionCustomization] }
+                } else if ((groupId && !tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]])) {
+                    tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][jobTransactionCustomization.id] = { groupId, key: jobTransactionCustomization.id, color: jobTransactionCustomization.identifierColor, seqSelected: jobTransactionCustomization.seqSelected, total: 1, jobTransactions: [jobTransactionCustomization] }
+                    groupIdTransactionIdMap[groupIdTabKey] = jobTransactionCustomization.id
+                } else {
+                    tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected'] = tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected'] > jobTransactionCustomization.seqSelected ?
+                    jobTransactionCustomization.seqSelected : tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected']
+                    tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['total'] += 1
+                    tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['jobTransactions'].push(jobTransactionCustomization)
+                }
+            }
+            else if (!_.isEmpty(runsheetIdToStartDateMap)) {
                 let jobTransactionsArray = (jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]]) ? jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]] : []
                 jobTransactionsArray.push(jobTransactionCustomization)
                 jobTransactionDateTOJobTransactionsMap[runsheetIdToStartDateMap[jobTransaction.runsheetId]] = jobTransactionsArray
@@ -422,7 +466,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             return jobTransactionMap
         } else {
-            return !_.isEmpty(runsheetIdToStartDateMap) ? jobTransactionDateTOJobTransactionsMap :  jobTransactionCustomizationList
+            return !_.isEmpty(runsheetIdToStartDateMap) ? jobTransactionDateTOJobTransactionsMap : (!_.isEmpty(jobIdGroupIdMap)) ? tabIdGroupTransactionsMap :  jobTransactionCustomizationList
         }
     }
 
