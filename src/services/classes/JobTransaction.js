@@ -220,17 +220,15 @@ class JobTransaction {
      *                                      }
      *                                  ]
      */
-    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData, selectedDate) {
+    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData, selectedDate,jobIdGroupIdMap) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobTransactionCustomizationListParametersDTO.jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobTransactionCustomizationListParametersDTO.jobAttributeStatusList)
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(jobTransactionCustomizationListParametersDTO.statusList, jobAttributeStatusMap)
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         let customerCareMap = customerCareService.getCustomerCareMap(jobTransactionCustomizationListParametersDTO.customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
-        let jobMasterWithEnableMultiPart = jobTransactionCustomizationListParametersDTO.jobMasterList ? this.getEnableMultiPartJobMaster(jobTransactionCustomizationListParametersDTO.jobMasterList) : []
-        let jobIdGroupIdMap = jobMasterWithEnableMultiPart.length  > 0 && callingActivity == 'AllTasks'? this.getJobIdGroupIdMap(jobMasterWithEnableMultiPart) : {}
         let statusIdNextStatusListMap = {},jobIdGroupIdStatusObject = {}
-        if(!_.isEmpty(jobIdGroupIdMap)){
+        if(jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)){
             jobTransactionCustomizationListParametersDTO.statusList.forEach((jobStatus) => {statusIdNextStatusListMap[jobStatus.id] = jobStatus.nextStatusList}) 
         }
         let runsheetQuery
@@ -241,7 +239,7 @@ class JobTransaction {
         } else {
             runsheetQuery = 'isClosed = true'
         }
-        const runsheetList = _.isEmpty(jobIdGroupIdMap) ? realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery) : []
+        const runsheetList = jobIdGroupIdMap && _.isEmpty(jobIdGroupIdMap) ? realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery) : []
         let runsheetIdToStartDateMap = {}
         if (selectedDate && selectedDate == "All" && runsheetList.length > 0) {
             runsheetList.forEach(runsheetListObject => { runsheetIdToStartDateMap[runsheetListObject.id] = moment(runsheetListObject.startDate).format('YYYY-MM-DD') })
@@ -330,12 +328,12 @@ class JobTransaction {
         return jobMasterListWithEnableMultiPart
     }
 
-    getJobIdGroupIdMap(jobMasterListWithEnableMultiPart){
-        let jobMasterQuery = jobMasterListWithEnableMultiPart.map(jobMasterId => 'jobMasterId = ' + jobMasterId.id).join(' OR ')
-        let jobQuery =  `groupId != null AND (${jobMasterQuery})` 
-        let jobList = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
+    getJobIdGroupIdMap(jobMasterListWithEnableMultiPart) {
+        let jobMasterQuery = jobMasterListWithEnableMultiPart.map(jobMaster => 'jobMasterId = ' + jobMaster.id).join(' OR ')
+        let jobQuery = `groupId != null AND (${jobMasterQuery})`
+        let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
         let jobIdGroupIdMap = {}
-        jobList.forEach(job => {jobIdGroupIdMap[job.id] = job.groupId})
+        jobList.forEach(job => { jobIdGroupIdMap[job.id] = job.groupId })
         return jobIdGroupIdMap
     }
 
@@ -400,7 +398,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
-        if(!_.isEmpty(jobIdGroupIdMap)){
+        if(jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)){
             statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
             tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
             tabIdGroupTransactionsMap['isGrouping'] = true 
@@ -440,7 +438,7 @@ class JobTransaction {
             }
             jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
             jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
-            if (!_.isEmpty(jobIdGroupIdMap)) {
+            if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
                 let groupId = jobIdGroupIdMap[jobTransactionCustomization.jobId] ? jobIdGroupIdMap[jobTransactionCustomization.jobId] : null
                 let groupIdTabKey = groupId ? groupId + '&' + statusIdsTabIdsMap[jobTransactionCustomization.statusId] : null
                 if (!groupId) {
@@ -466,7 +464,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             return jobTransactionMap
         } else {
-            return !_.isEmpty(runsheetIdToStartDateMap) ? jobTransactionDateTOJobTransactionsMap : (!_.isEmpty(jobIdGroupIdMap)) ? tabIdGroupTransactionsMap :  jobTransactionCustomizationList
+            return !_.isEmpty(runsheetIdToStartDateMap) ? jobTransactionDateTOJobTransactionsMap : (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) ? tabIdGroupTransactionsMap :  jobTransactionCustomizationList
         }
     }
 

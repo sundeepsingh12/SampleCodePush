@@ -119,6 +119,26 @@ class TaskListScreen extends PureComponent {
       this.props.actions.setState(SEARCH_TAP,{jobTransaction : jobTransactionArray[0],scanner}) : this.props.actions.setState(SEARCH_TAP,null) 
     return jobTransactionArray;
   }
+  renderSearchListForGroupId(searchTextValue, groupTransactionsArray) {
+    let searchText = _.toLower(searchTextValue.searchText)
+    let jobTransactionArray = [],transactionList = []
+    for(let value of groupTransactionsArray) {
+      transactionList = []
+      for(let transaction of value.jobTransactions){
+        let values = [transaction.referenceNumber, transaction.runsheetNo, transaction.line1, transaction.line2, transaction.circleLine1, transaction.circleLine2]
+        if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
+          transactionList.push(transaction)
+        }
+      }
+      if(transactionList.length > 0){
+      value.total = transactionList.length
+      value.jobTransactions = transactionList
+      value.seqSelected = value.jobTransactions[0].seqSelected
+      jobTransactionArray.push(value)
+      }
+    }
+    return jobTransactionArray;
+  }
 
   renderList() {
     let list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
@@ -163,7 +183,7 @@ class TaskListScreen extends PureComponent {
         renderItem={({ item }) => {
           return(
             <View>
-              {(item.groupId) ? <TouchableOpacity style={[styles.row, styles.padding10, styles.justifyStart, styles.alignCenter, {height: 70}]}   onPress={() => this.updateTransactionForGroupId(item)}>
+              {(item.groupId && item.jobTransactions.length > 0) ? <TouchableOpacity style={[styles.row, styles.padding10, styles.justifyStart, styles.alignCenter, {height: 70}]}   onPress={() => this.updateTransactionForGroupId(item)}>
                 <View style={{position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: 40,top:40, left: 36}}></View>
                   <View style={[styles.borderRadius50,{backgroundColor : item.color,width: 16, height: 16, marginLeft: 20}]}>
                   </View>
@@ -186,7 +206,7 @@ class TaskListScreen extends PureComponent {
     let jobTransactions = items.jobTransactions.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
-    let lastId = (items.groupId) ? jobTransactions[items.total-1]['id'] : null
+    let lastId = (items.groupId && items.total > 0) ? jobTransactions[items.total-1]['id'] : null
     return (
       <FlatList
         data={jobTransactions}
@@ -213,8 +233,8 @@ class TaskListScreen extends PureComponent {
 
   }
   getGroupWiseTransactions(jobTransactionCustomizationList,tabId) {
-    let groupTransactionsObject = {},groupIdTransactionIdMap = {},index = 0
-    let groupTransactionsArray = Object.values(jobTransactionCustomizationList[tabId])
+    let list = Object.values(jobTransactionCustomizationList[tabId])
+    let groupTransactionsArray = (_.trim(this.props.searchText)) ? this.renderSearchListForGroupId(this.props.searchText, _.cloneDeep(list)) : list
     groupTransactionsArray.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
@@ -235,7 +255,7 @@ class TaskListScreen extends PureComponent {
     if (this.props.isRefreshing) {
       return <Loader />
     } else {
-      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList)) ? this.props.jobTransactionCustomizationList['isGrouping'] ? 
+      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList) && this.props.jobTransactionCustomizationList) ? this.props.jobTransactionCustomizationList['isGrouping'] ? 
                    this.flatlistForGroupTransactions() : this.sectionlist()  : this.flatlist()
       return (
         <Container>

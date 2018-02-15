@@ -66,8 +66,8 @@ export function getBulkJobTransactions(bulkParams) {
             const bulkModuleRemark = (bulkModule && bulkModule[0])?JSON.parse(bulkModule[0].remark):null
             let selectAll = false,jobMasterManualSelectionConfiguration=null,isManualSelectionAllowed=false,searchSelectionOnLine1Line2 = false
             if(bulkModuleRemark){
-                selectAll = bulkModuleRemark.selectAll
-                 jobMasterManualSelectionConfiguration =  bulkModuleRemark.jobMasterManualSelectionConfiguration
+                selectAll = (!bulkParams.groupId) ? bulkModuleRemark.selectAll : false
+                jobMasterManualSelectionConfiguration =  bulkModuleRemark.jobMasterManualSelectionConfiguration
                  isManualSelectionAllowed = (!jobMasterManualSelectionConfiguration)?false:bulkService.getManualSelection(jobMasterManualSelectionConfiguration, bulkParams.jobMasterId)
                  searchSelectionOnLine1Line2 =  bulkModuleRemark.searchSelectionOnLine1Line2 
                 }
