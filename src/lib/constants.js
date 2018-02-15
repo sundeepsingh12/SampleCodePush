@@ -313,6 +313,7 @@ module.exports = keyMirror({
     SET_ARRAY_ELEMENTS: null,
     SET_ERROR_MSG: null,
     CLEAR_ARRAY_STATE: null,
+    SET_ARRAY_ISLOADING: null,
     //CashTendering
     CHANGE_AMOUNT: null,
     IS_CASH_TENDERING_LOADER_RUNNING: null,

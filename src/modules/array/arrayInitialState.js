@@ -8,7 +8,8 @@ var InitialState = Record({
     isLoading: false,
     lastRowId: 0,
     childElementsTemplate: {},
-    errorMessage: ''
+    errorMessage: '',
+    arrayMainObject: {},
 })
 
 export default InitialState

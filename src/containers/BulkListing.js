@@ -176,8 +176,8 @@ class BulkListing extends PureComponent {
                   <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                     <TouchableOpacity style={[style.headerLeft, styles.paddingTop10]} onPress={() => {
-                      this.props.actions.setState(CLEAR_BULK_STATE)
                       this.props.navigation.goBack(null)
+                      this.props.actions.setState(CLEAR_BULK_STATE)
                     }}>
                       <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                     </TouchableOpacity>

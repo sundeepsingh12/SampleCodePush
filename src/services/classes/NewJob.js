@@ -21,13 +21,14 @@ class NewJob {
     }
 
     getMastersFromMasterIds(jobMasters, jobMasterIds) {
-        if (!jobMasters) {
+        if (!jobMasters || !jobMasters.value) {
             throw new Error('configuration issues with job master')
         }
-        if (!jobMasterIds) {
-            throw new Error('configuration issues with next status in job master')
+        if (jobMasterIds) {
+            return jobMasters.value.filter(jobMaster => _.indexOf(jobMasterIds, jobMaster.id) >= 0 && jobMaster.allowAddNew)
+        } else {
+            return jobMasters.value.filter(jobMaster => jobMaster.allowAddNew);
         }
-        return jobMasters.filter(jobMaster => _.indexOf(jobMasterIds, jobMaster.id) >= 0 && jobMaster.allowAddNew)
     }
 
     async getNextPendingStatusForJobMaster(jobMasterId) {

@@ -5,7 +5,6 @@ import {
     Text,
     FlatList,
     TouchableOpacity,
-    BackHandler
 }
     from 'react-native'
 import { connect } from 'react-redux'
@@ -38,16 +37,18 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
-import {
-    HardwareBackPress
-} from '../lib/constants'
+import Loader from '../components/Loader'
+import { TOTAL_COUNT, ADD, SAVE } from '../lib/ContainerConstants'
+
 function mapStateToProps(state) {
     return {
         arrayElements: state.array.arrayElements,
         lastRowId: state.array.lastRowId,
         childElementsTemplate: state.array.childElementsTemplate,
         isSaveDisabled: state.array.isSaveDisabled,
-        errorMessage: state.array.errorMessage
+        errorMessage: state.array.errorMessage,
+        arrayMainObject: state.array.arrayMainObject,
+        isLoading: state.array.isLoading,
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -58,25 +59,16 @@ function mapDispatchToProps(dispatch) {
 
 class ArrayFieldAttribute extends PureComponent {
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener(HardwareBackPress, this._goBack)
-    }
-
-    _goBack = () => {
-        this.props.navigation.goBack()
-        this.props.actions.clearArrayState()
-        return true
-    }
-
     componentDidMount() {
-        this.props.actions.getSortedArrayChildElements(
-            this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
+        this.props.actions.setInitialArray(
+            this.props.navigation.state.params.currentElement,
+            this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.jobStatusId,
-            this.props.lastRowId,
-            this.props.arrayElements,
-            this.props.navigation.state.params.latestPositionId
+            this.props.navigation.state.params.jobTransaction
         )
-        //   BackHandler.addEventListener(HardwareBackPress, this._goBack)
+    }
+    componentWillUnmount() {
+        this.props.actions.clearArrayState()
     }
     renderData = (arrayRow) => {
         return (
@@ -88,6 +80,7 @@ class ArrayFieldAttribute extends PureComponent {
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
                 jobStatusId={this.props.jobStatusId}
                 latestPositionId={this.props.navigation.state.params.latestPositionId}
+                fieldAttributeMasterParentIdMap={this.props.navigation.state.params.fieldAttributeMasterParentIdMap}
             />
         )
     }
@@ -102,7 +95,8 @@ class ArrayFieldAttribute extends PureComponent {
         else {
             this.props.actions.addRowInArray(this.props.lastRowId,
                 this.props.childElementsTemplate,
-                this.props.arrayElements)
+                this.props.arrayElements,
+                this.props.navigation.state.params.jobTransaction)
         }
     }
     savePressed = () => {
@@ -111,7 +105,9 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.navigation.state.params.jobTransaction,
             this.props.navigation.state.params.latestPositionId,
             this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.isSaveDisabled)
+            this.props.navigation.state.params.isSaveDisabled,
+            this.props.arrayMainObject,
+            this.props.navigation.state.params.fieldAttributeMasterParentIdMap)
     }
     static navigationOptions = ({ navigation }) => {
         return { header: null }
@@ -120,7 +116,28 @@ class ArrayFieldAttribute extends PureComponent {
         this.props.navigation.goBack()
         this.props.actions.clearArrayState()
     }
+    getLoader() {
+        let loader
+        if (this.props.isLoading) {
+            loader = <Loader />
+        }
+        return loader
+    }
+    getListView() {
+        let list
+        if (!this.props.isLoading) {
+            list =
+                <FlatList
+                    data={Object.values(this.props.arrayElements)}
+                    renderItem={(item) => this.renderData(item)}
+                    keyExtractor={item => item.rowId}>
+                </FlatList>
+        }
+        return list
+    }
     render() {
+        let loader = this.getLoader()
+        let list = this.getListView()
         return (
             < StyleProvider style={getTheme(platform)} >
                 <Container>
@@ -143,25 +160,22 @@ class ArrayFieldAttribute extends PureComponent {
                     {renderIf(this.props.errorMessage != '',
                         <CustomAlert title='Alert' message={this.props.errorMessage} onOkPressed={this.backPressed} />
                     )}
+                    {loader}
                     <Content style={[styles.flex1, styles.bgWhite]}>
-                        <FlatList
-                            data={Object.values(this.props.arrayElements)}
-                            renderItem={(item) => this.renderData(item)} //TODO add comments for item[1] 
-                            keyExtractor={item => item.rowId}>
-                        </FlatList>
+                        {list}
                     </Content>
                     <Footer
                         style={[style.footer, styles.bgWhite]}>
                         <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
                             <Text
-                                style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>Total Count : {_.size(this.props.arrayElements)}</Text>
+                                style={[styles.fontDefault, styles.fontBlack, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.arrayElements)}</Text>
                             <Button bordered success small onPress={this.addPressed}>
-                                <Text style={[styles.fontSuccess, styles.padding10]}>Add</Text>
+                                <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
                             </Button>
                         </View>
                         <View style={[styles.bgPrimary]}>
                             <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
-                                <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
+                                <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
                             </Button>
                         </View>
                     </Footer>

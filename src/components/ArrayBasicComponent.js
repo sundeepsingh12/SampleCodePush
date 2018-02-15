@@ -1,4 +1,4 @@
-'use strict' //Comment Review import
+'use strict'
 import React, { PureComponent } from 'react'
 import {
     StyleSheet,
@@ -7,7 +7,8 @@ import {
     Platform,
     FlatList,
     TouchableHighlight,
-    Modal
+    Modal,
+    TouchableOpacity
 }
     from 'react-native'
 import { Container, Content, Footer, Thumbnail, FooterTab, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, TextInput, Item, Label } from 'native-base';
@@ -39,17 +40,27 @@ import {
     SCAN_OR_TEXT,
     SEQUENCE,
     PASSWORD,
-    CONTACT_NUMBER
+    CONTACT_NUMBER,
+    ARRAY_SAROJ_FAREYE,
+    OBJECT_SAROJ_FAREYE,
+    OPTION_RADIO_VALUE,
+    AFTER,
+    BEFORE,
 } from '../lib/AttributeConstants'
 import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
-import SelectFromList from '../containers/SelectFromList'
+import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
 import * as globalActions from '../modules/global/globalActions'
 import QRIcon from '../svg_components/icons/QRIcon'
 import {
     ON_BLUR,
-    NEXT_FOCUS
+    NEXT_FOCUS,
+    CameraAttribute,
 } from '../lib/constants'
+import {
+    OPTIONAL,
+    SELECTED
+} from '../lib/ContainerConstants'
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...arrayActions, ...globalActions }, dispatch)
@@ -58,31 +69,19 @@ function mapDispatchToProps(dispatch) {
 
 class ArrayBasicComponent extends PureComponent {
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            showDateTimePicker: false,
-            showNPS: false,
-            // showRadioButton: false,
-            // showDropdown: false,
-            // showCheckbox: false,
-            // showRadioMaster: false
-            selectFromListId: null
-        };
-    }
     _searchForReferenceValue = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, null, null, null, this.props.fieldAttributeMasterParentIdMap);
     }
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
     }
 
     _onBlurEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId) {
-        this.props.actions.getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, ON_BLUR);
+        this.props.actions.getNextFocusableForArrayWithoutChildDatalist(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, this.props.fieldAttributeMasterParentIdMap);
     }
 
     _styleNextFocusable(isFocusable) {
@@ -92,31 +91,16 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     onSaveDateTime = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS);
-        // this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS)
-        //item.displayValue = value
-        //this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'After', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
-        this.setState({ showDateTimePicker: false, showNPS: false })
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, false);
+    }
+    onPressModal = (fieldAttributeMasterId) => {
+        this.props.actions.showOrDropModal(fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
     }
 
-    cancelDateTimePicker = () => {
-        this.setState({ showDateTimePicker: false, showNPS: false })
+    onCloseModal = (item) => {
+        this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, null, this.props.isSaveDisabled)
     }
-    _dropModal = () => {
-        this.setModalVisible(false)
-    }
-    setModalVisible = (visible) => {
-        this.setState(() => {
-            return {
-                showNPS: visible,
-                showDateTimePicker: visible,
 
-            }
-        })
-    }
-    _inflateModal = (item) => {
-        this.setState({ selectFromListId: -1 })
-    }
     getComponentLabelStyle(focus, editable) {
         return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
     }
@@ -137,7 +121,116 @@ class ArrayBasicComponent extends PureComponent {
                 calledFromArray: true
             })
     }
+    getModalView(item) {
+        if (!this.props.arrayRow.modalFieldAttributeMasterId || this.props.arrayRow.modalFieldAttributeMasterId !== item.fieldAttributeMasterId) {
+            return null
+        }
+        let attributeTypeId = item.attributeTypeId
+        if (attributeTypeId == CHECKBOX || attributeTypeId == OPTION_RADIO_FOR_MASTER || attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN) {
+            return (
+                <View>
+                    <MultipleOptionsAttribute
+                        currentElement={item}
+                        formElements={this.props.arrayElements}
+                        isSaveDisabled={this.props.isSaveDisabled}
+                        jobTransaction={this.props.jobTransaction}
+                        jobStatusId={this.props.jobStatusId}
+                        latestPositionId={this.props.latestPositionId}
+                        calledFromArray={true}
+                        rowId={this.props.arrayRow.rowId}
+                        onCloseModal={this.onCloseModal}
+                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
+                    />
+                </View>
+            )
+        }
+        if (attributeTypeId == NPS_FEEDBACK) {
+            return (
+                <View>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        onRequestClose={() => this.onCloseModal(item)}>
+                        <TouchableHighlight
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                                <View>
+                                    <NPSFeedback
+                                        onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item}
+                                    />
+                                </View>
+                            </TouchableHighlight>
+                        </TouchableHighlight>
+                    </Modal>
+                </View>
+            )
+        }
+        if (attributeTypeId == TIME || attributeTypeId == DATE || attributeTypeId == RE_ATTEMPT_DATE) {
+            return (
+                <TimePicker onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item} />
+            )
+        }
+        return null
+    }
+    getValueTextForMultipleOption(item) {
+        if (!item.value) {
+            return item.helpText
+        }
+
+        if (item.value == ARRAY_SAROJ_FAREYE && item.childDataList) {
+            return item.childDataList.length + SELECTED
+        }
+
+        if (item.value == OBJECT_SAROJ_FAREYE && item.childDataList) {
+            for (let index in item.childDataList) {
+                if (item.childDataList[index].attributeTypeId == OPTION_RADIO_VALUE) {
+                    return item.childDataList[index].value
+                }
+            }
+        }
+
+        if (item.value != ARRAY_SAROJ_FAREYE && item.value != OBJECT_SAROJ_FAREYE) {
+            return item.containerValue
+        }
+        return null
+    }
+
+    getMultipleOptionCardView(modalView, item) {
+        return (
+            <TouchableOpacity
+                style={[{ paddingVertical: 50 }, item.focus ? styles.borderLeft4 : null]}
+                onPress={() => this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
+                }
+                disabled={!item.editable || this.props.modalFieldAttributeMasterId ? true : false}
+            >
+                <View style={[styles.marginHorizontal10]}>
+                    {modalView}
+                    <View style={[styles.borderBottomBlack, styles.relative]}>
+                        <Text style={[styles.marginBottom10, this.getComponentLabelStyle(item.focus, item.editable), styles.fontDefault]}>
+                            {item.label}
+                            {item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}
+                        </Text>
+                        {item.subLabel ?
+                            <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(item.editable)]}>{item.subLabel}</Text>
+                            : null}
+                        {item.helpText ?
+                            <Text style={[styles.fontSm, styles.marginBottom10, this.getComponentSubLabelStyle(item.editable)]}>{item.helpText}</Text>
+                            : null}
+                        <Text style={[this.getComponentLabelStyle(item.focus, item.editable), styles.fontLg, styles.marginBottom10]}>
+                            {this.getValueTextForMultipleOption(item)}
+                        </Text>
+                        <Icon name="md-arrow-dropdown" style={[styles.absolute, styles.fontLg, this.getComponentLabelStyle(item.focus, item.editable), { bottom: 10, right: 0 }]} />
+                    </View>
+                </View>
+            </TouchableOpacity>
+        )
+    }
     _renderData(item) {
+        if (item.hidden) {
+            return null
+        }
+        let modalView = this.getModalView(item)
+        let multipleOptionCardView = this.getMultipleOptionCardView(modalView, item)
         switch (item.attributeTypeId) {
             case STRING:
             case TEXT:
@@ -149,41 +242,42 @@ class ArrayBasicComponent extends PureComponent {
             case CONTACT_NUMBER:
                 return (
                     <View>
-                        {renderIf(!item.hidden,
-                            <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
-                                <Item stackedLabel>
-                                    {item.label ?
-                                        <Label style={[styles.fontDefault, this.getComponentLabelStyle(item.focus, item.editable)]}>{item.label}
-                                            {item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
-                                        </Label>
-                                        : null}
-                                    {item.subLabel ?
-                                        <Label style={[styles.fontSm, this.getComponentSubLabelStyle(item.editable)]}>{item.subLabel}</Label>
-                                        : null}
-                                    <Input
-                                        autoCapitalize="none"
-                                        placeholder={item.helpText}
-                                        defaultValue={item.value}
-                                        value={item.value}
-                                        keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
-                                        editable={item.editable}
-                                        multiline={item.attributeTypeId == 2 ? true : false}
-                                        onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.arrayRow.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
-                                        onFocus={() => { this.onFocusEvent(item) }}
-                                        onBlur={(e) => this._onBlurEvent(item)}
-                                        secureTextEntry={item.attributeTypeId == 61 ? true : false}
-                                    />
-                                </Item>
-                                {(item.attributeTypeId == SCAN_OR_TEXT) ?
-                                    <TouchableHighlight
-                                        style={[styles.absolute, { bottom: 50, right: 10 }]}
-                                        onPress={() => this.goToQRCode(item)} >
-                                        <View>
-                                            <QRIcon width={30} height={30} color={this.getComponentLabelStyle(item.focus, item.editable)} />
-                                        </View>
-                                    </TouchableHighlight> : null}
-                            </View>
-                        )}
+                        <View style={[styles.bgWhite, styles.paddingTop30, styles.paddingLeft10, styles.paddingRight10, item.focus ? { borderLeftColor: styles.primaryColor, borderLeftWidth: 5 } : null]}>
+                            <Item stackedLabel>
+                                {item.label ?
+                                    <Label style={[styles.fontDefault, this.getComponentLabelStyle(item.focus, item.editable)]}>{item.label}
+                                        {item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> (optional)</Text>}
+                                    </Label>
+                                    : null}
+                                {item.subLabel ?
+                                    <Label style={[styles.fontSm, this.getComponentSubLabelStyle(item.editable)]}>{item.subLabel}</Label>
+                                    : null}
+                                <Input
+                                    autoCapitalize="none"
+                                    placeholder={item.helpText}
+                                    defaultValue={item.value}
+                                    value={item.displayValue}
+                                    keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
+                                    editable={item.editable}
+                                    multiline={item.attributeTypeId == 2 ? true : false}
+                                    onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
+                                    onFocus={() => { this.onFocusEvent(item) }}
+                                    onBlur={(e) => this._onBlurEvent(item)}
+                                    secureTextEntry={item.attributeTypeId == 61 ? true : false}
+                                />
+                            </Item>
+                            {(item.attributeTypeId == SCAN_OR_TEXT) ?
+                                <TouchableHighlight
+                                    style={[styles.absolute, { bottom: 50, right: 10 }]}
+                                    onPress={() => this.goToQRCode(item)} >
+                                    <View>
+                                        <QRIcon width={30} height={30} color={this.getComponentLabelStyle(item.focus, item.editable)} />
+                                    </View>
+                                </TouchableHighlight> : null}
+                            {item.alertMessage ?
+                                <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{item.alertMessage}</Label>
+                                : null}
+                        </View>
                     </View>
                 )
 
@@ -192,165 +286,32 @@ class ArrayBasicComponent extends PureComponent {
             case TIME:
                 return (
                     <View>
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ showDateTimePicker: true })} />
-                        )}
-                        {renderIf(this.state.showDateTimePicker,
-                            <TimePicker onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={item} />
-                        )}
-                    </View>)
+                        {modalView}
+                        <FormLayoutActivityComponent item={item} press={() => this.onPressModal(item.fieldAttributeMasterId)} />
+                    </View>
+                )
             case NPS_FEEDBACK:
-                return (
-                    <View>
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ showNPS: true })} />
-                        )}
-                        {renderIf(this.state.showNPS,
-                            <Modal
-                                animationType="slide"
-                                transparent={true}
-                                visible={this.state.showNPS}
-                                onRequestClose={this._dropModal}>
-                                <TouchableHighlight
-                                    style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
-                                    <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
-                                        <View>
-                                            < NPSFeedback
-                                                onSave={this.onSaveDateTime} onCancel={this.cancelDateTimePicker} item={item}
-                                            />
-                                        </View>
-                                    </TouchableHighlight>
-                                </TouchableHighlight>
-                            </Modal>
-                        )}
-                    </View>
-                )
+                return <View>
+                    {modalView}
+                    <FormLayoutActivityComponent item={item} press={() => this.onPressModal(item.fieldAttributeMasterId)} />
+                </View>
             case CHECKBOX:
-                return (
-                    <View>{
-                        renderIf(this.state.selectFromListId == item.fieldAttributeMasterId,
-                            <SelectFromList
-                                currentElement={item}
-                                formElements={this.props.arrayElements}
-                                isSaveDisabled={this.props.isSaveDisabled}
-                                jobTransaction={this.props.jobTransaction}
-                                jobStatusId={this.props.jobStatusId}
-                                latestPositionId={this.props.latestPositionId}
-                                press={this._inflateModal(item)}
-                                calledFromArray={true}
-                                rowId={this.props.arrayRow.rowId}
-                            />
-                        )}
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ selectFromListId: item.fieldAttributeMasterId })} />
-                        )}
-                    </View>
-                )
             case RADIOBUTTON:
-                return (
-                    <View>{
-                        renderIf(this.state.selectFromListId == item.fieldAttributeMasterId,
-                            <SelectFromList
-                                currentElement={item}
-                                formElements={this.props.arrayElements}
-                                isSaveDisabled={this.props.isSaveDisabled}
-                                jobTransaction={this.props.jobTransaction}
-                                jobStatusId={this.props.jobStatusId}
-                                latestPositionId={this.props.latestPositionId}
-                                press={this._inflateModal}
-                                calledFromArray={true}
-                                rowId={this.props.arrayRow.rowId}
-                            />
-                        )}
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ selectFromListId: item.fieldAttributeMasterId })} />
-                        )}
-                    </View>
-                )
             case DROPDOWN:
-                return (
-                    <View>{
-                        renderIf(this.state.selectFromListId == item.fieldAttributeMasterId,
-                            <SelectFromList
-                                currentElement={item}
-                                formElements={this.props.arrayElements}
-                                isSaveDisabled={this.props.isSaveDisabled}
-                                jobTransaction={this.props.jobTransaction}
-                                jobStatusId={this.props.jobStatusId}
-                                latestPositionId={this.props.latestPositionId}
-                                press={this._inflateModal}
-                                calledFromArray={true}
-                                rowId={this.props.arrayRow.rowId}
-                            />
-                        )}
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ selectFromListId: item.fieldAttributeMasterId })} />
-                        )}
-                    </View>
-                )
             case OPTION_RADIO_FOR_MASTER:
                 return (
-                    <View>{
-                        renderIf(this.state.selectFromListId == item.fieldAttributeMasterId,
-                            <SelectFromList
-                                currentElement={item}
-                                formElements={this.props.arrayElements}
-                                isSaveDisabled={this.props.isSaveDisabled}
-                                jobTransaction={this.props.jobTransaction}
-                                jobStatusId={this.props.jobStatusId}
-                                latestPositionId={this.props.latestPositionId}
-                                press={this._inflateModal}
-                                calledFromArray={true}
-                                rowId={this.props.arrayRow.rowId}
-                            />
-                        )}
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={() => this.setState({ selectFromListId: item.fieldAttributeMasterId })} />
-                        )}
+                    <View>
+                        {multipleOptionCardView}
                     </View>
                 )
             case DATA_STORE:
             case EXTERNAL_DATA_STORE:
                 return (
                     <View>
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={
-                                () => {
-                                    this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
-                                    this.props.actions.navigateToScene('DataStore',
-                                        {
-                                            currentElement: item,
-                                            formElements: this.props.arrayElements,
-                                            jobStatusId: this.props.jobStatusId,
-                                            jobTransaction: this.props.jobTransaction,
-                                            latestPositionId: this.props.latestPositionId,
-                                            isSaveDisabled: this.props.isSaveDisabled,
-                                            calledFromArray: true,
-                                            rowId: this.props.arrayRow.rowId
-                                        })
-                                }} />)}
-                    </View>
-                )
-            case QR_SCAN:
-                return (
-                    <View>
-                        {renderIf(!item.hidden,
-                            <FormLayoutActivityComponent item={item} press={
-                                () => {
-                                    this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
-                                    this.goToQRCode(item)
-                                }} />)}
-                    </View>
-                )
-            case CAMERA:
-            case CAMERA_MEDIUM:
-            case CAMERA_HIGH:
-                return (<View>
-                    {renderIf(!item.hidden,
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
-                                this.props.actions.navigateToScene('CameraAttribute',
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+                                this.props.actions.navigateToScene('DataStore',
                                     {
                                         currentElement: item,
                                         formElements: this.props.arrayElements,
@@ -359,9 +320,42 @@ class ArrayBasicComponent extends PureComponent {
                                         latestPositionId: this.props.latestPositionId,
                                         isSaveDisabled: this.props.isSaveDisabled,
                                         calledFromArray: true,
-                                        rowId: this.props.arrayRow.rowId
+                                        rowId: this.props.arrayRow.rowId,
+                                        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
                                     })
-                            }} />)}
+                            }} />
+                    </View>
+                )
+            case QR_SCAN:
+                return (
+                    <View>
+                        <FormLayoutActivityComponent item={item} press={
+                            () => {
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                                this.goToQRCode(item)
+                            }} />
+                    </View>
+                )
+            case CAMERA:
+            case CAMERA_MEDIUM:
+            case CAMERA_HIGH:
+                return (<View>
+                    <FormLayoutActivityComponent item={item} press={
+                        () => {
+                            this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+                            this.props.actions.navigateToScene(CameraAttribute,
+                                {
+                                    currentElement: item,
+                                    formElements: this.props.arrayElements,
+                                    jobStatusId: this.props.jobStatusId,
+                                    jobTransaction: this.props.jobTransaction,
+                                    latestPositionId: this.props.latestPositionId,
+                                    isSaveDisabled: this.props.isSaveDisabled,
+                                    calledFromArray: true,
+                                    rowId: this.props.arrayRow.rowId,
+                                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                                })
+                        }} />
                 </View>
                 )
             default:
@@ -382,8 +376,6 @@ class ArrayBasicComponent extends PureComponent {
                     <Button style={styles.bgGray} onPress={() => this.props.actions.deleteArrayRow(this.props.arrayElements, this.props.arrayRow.rowId, this.props.lastRowId)}>
                         <Text style={[styles.fontBlack, styles.fontDefault]}> Remove </Text>
                     </Button>
-                    {/* <Icon name="md-remove-circle" style={[styles.fontDanger, styles.fontXxl, styles.fontLeft]}
-                        onPress={() => this.props.actions.deleteArrayRow(this.props.arrayElements, this.props.arrayRow.rowId, this.props.lastRowId)} /> */}
                 </View>
             </View >
         );

@@ -18,7 +18,8 @@ import {
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEQUENCE_LIST_ITEM_DRAGGED,
     SET_SEQUENCE_LIST_ITEM,
-    CUSTOMIZATION_LIST_MAP
+    CUSTOMIZATION_LIST_MAP,
+    SequenceRunsheetList
 } from '../../lib/constants'
 import {
     DUPLICATE_SEQUENCE_MESSAGE,
@@ -94,17 +95,22 @@ export function resequenceJobsFromServer(sequenceList) {
  * This method get all runsheet available and if only one runsheet is present
  * then navigate to sequence container
  */
-export function getRunsheets() {
+export function getRunsheets(displayName) {
     return async function (dispatch) {
         try {
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             const runsheetNumberList = await runSheetService.getRunsheets()
+            dispatch(setState(SET_RUNSHEET_NUMBER_LIST, runsheetNumberList))
             if (runsheetNumberList.length == 1) {
                 dispatch(navigateToScene(Sequence, {
-                    runsheetNumber: runsheetNumberList[0],
+                    runsheetNumber: runsheetNumberList[0]
                 }))
             }
-            dispatch(setState(SET_RUNSHEET_NUMBER_LIST, runsheetNumberList))
+            if (runsheetNumberList.length > 1) {
+                dispatch(navigateToScene(SequenceRunsheetList, {
+                    displayName
+                }))
+            }
         } catch (error) {
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
