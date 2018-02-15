@@ -33,7 +33,9 @@ import {
 import {
     fieldAttributeStatusService
 } from './FieldAttributeStatus'
-
+import {
+    SELECT_ANY_REASON,
+} from '../../lib/ContainerConstants'
 class SkuListing {
 
       async getSkuListingDto(fieldAttributeMasterId) {
@@ -252,8 +254,8 @@ class SkuListing {
      * childElementsArray : []
      */
 
-    prepareSkuListChildElementsForSaving(skuListItems,skuRootChildItems,skuObjectAttributeId){
-
+    prepareSkuListChildElementsForSaving(skuListItems,skuRootChildItems,skuObjectAttributeId, skuValidationForImageAndReason){
+    let ShouldProceedOrNot = true 
         if(!skuObjectAttributeId){
             throw new Error('Sku Object AttributeId missing')
         }
@@ -264,15 +266,12 @@ class SkuListing {
             let childElementsArray = []
             for(let index in skuListItems){
                 const childDataList = []
+                const originalQuantityValue = parseInt(skuListItems[index].filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)[0])
+                const actualQuantityValue = parseInt(skuListItems[index].filter(object => object.attributeTypeId == SKU_ACTUAL_QUANTITY).map(item => item.value)[0])
                 skuListItems[index].forEach(skuItem=>{
-                    // let value
-                    // if (skuItem.attributeTypeId == SKU_PHOTO) {
-                    //     value = imageSavedValueOfSKU
-                    // } else if (skuItem.attributeTypeId == SKU_REASON) {
-                    //     value = selectedReason
-                    // } else {
-                    //     value = skuItem.value
-                    // }
+                    if ((skuValidationForImageAndReason && skuItem.attributeTypeId == SKU_PHOTO && skuItem.value == OPEN_CAMERA && ((actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')) || (actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')) || (actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')))) || (skuItem.attributeTypeId == SKU_REASON && skuValidationForImageAndReason && (skuItem.value == REASON || skuItem.value == SELECT_ANY_REASON) && (actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')) || (actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')) || (actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')))) {
+                        ShouldProceedOrNot = false
+                    }
                     const skuObjectChild = {
                     attributeTypeId:skuItem.attributeTypeId,
                     value:skuItem.value,
@@ -292,7 +291,7 @@ class SkuListing {
                 childElementsArray.push(skuRootChildItems[index])
             }
             console.log('childElementsArray',childElementsArray)
-            return childElementsArray
+            return (ShouldProceedOrNot) ? childElementsArray : null
     }
 
     prepareUpdatedSkuArray(value,rowItem,skuListItems,skuChildElements, skuValidationForImageAndReason){

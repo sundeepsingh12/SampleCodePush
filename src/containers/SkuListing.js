@@ -138,7 +138,7 @@ class SkuListing extends PureComponent {
         this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
         this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
         this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-        this.props.navigation.state.params.isSaveDisabled, this.props.navigation)
+        this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason)
   }
 }
 

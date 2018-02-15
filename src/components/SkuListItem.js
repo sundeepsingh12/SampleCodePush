@@ -77,22 +77,47 @@ class SkuListItem extends PureComponent {
             return <Item label={reason.name + ""} value={reason.code + ''} key={reason.id + ""} />
         })
     }
-    _displaySkuItems(rowItem) {
+    _displaySkuItems(rowItem, originalQuantityValue) {
         if (!_.isEmpty(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
-            return (<Picker
-                mode="dropdown"
-                selectedValue={rowItem.value}
-                onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
-                <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={987654321} />
-                {this._populateSkuItems(this.props.reasonsList)}
-            </Picker>)
+            return (
+            <View style={[{flexBasis: '60%', height: 40}]}>
+                <Picker 
+                    mode="dropdown"
+                    selectedValue={rowItem.value}
+                    onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
+                    <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={987654321} />
+                    {this._populateSkuItems(this.props.reasonsList)}
+                </Picker>
+            </View>)
         } else if (!_.isEmpty(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
-            let view= <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10]}
-                    onPress={() => {this.props.actions.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) })}}>
-                    {OPEN_CAMERA}
-                </Text>
-            return view
-        } else {
+                return (<Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10]}
+                        onPress={() => {this.props.actions.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) })}}>
+                        {OPEN_CAMERA}
+                    </Text>)
+            
+        } else if(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY){
+            let quantitySelector
+            if (originalQuantityValue <= 1) {
+                quantitySelector = 
+                <View>
+                <CheckBox style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
+                </View>
+            }
+            else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
+    
+                quantitySelector = <Picker
+                    mode="dropdown"
+                    selectedValue={rowItem.value}
+                    onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)} >
+                    {this._populateItems(originalQuantityValue)}
+                </Picker>
+            }
+            return (
+                <View style={[{flexBasis: '60%', height: 40}]}>
+                    {quantitySelector}
+                </View>
+            )
+        }else {
             return (
                 <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10]}>
                     {(rowItem.attributeTypeId == SKU_REASON || rowItem.attributeTypeId == SKU_PHOTO) ? NA :rowItem.value}
@@ -102,27 +127,15 @@ class SkuListItem extends PureComponent {
     }
 
     renderListRow(rowItem, originalQuantityValue) {
-
-        const isSkuActualQuantity = (rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY)
         if (rowItem.attributeTypeId != SKU_ORIGINAL_QUANTITY) {
-            let skuItemDisplay = this._displaySkuItems(rowItem)
             return (
-                <View key={rowItem.autoIncrementId} style={[style.card, styles.row]}>
-
-                    {!isSkuActualQuantity ? <View style={[style.cardLeft]}>
-                        <View style={{ width: '100%' }}>
-                            <Text style={[styles.flexBasis40, styles.fontSm, styles.paddingTop10, styles.paddingBottom10, styles.paddingRight10]} >
+                <View key={rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal5, {height: 50}]}>
+                        <View style={[styles.row]}>
+                            <Text style={[styles.flexBasis40, styles.fontSm, styles.justifyCenter]} >
                                 {rowItem.label}
                             </Text>
-                            <View >
-                            {skuItemDisplay}
-                        </View>
-                        </View>
-                    </View> :
-                        <View style={{ width: '100%' }}>
-                            {this.checkSkuItemQuantity(rowItem, originalQuantityValue)}
-                        </View>
-                    }
+                            {this._displaySkuItems(rowItem, originalQuantityValue)}
+                        </View> 
                 </View>
             )
         }
@@ -130,7 +143,7 @@ class SkuListItem extends PureComponent {
     render() {
         const originalQuantityValue = this.props.item.filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)
         return (
-            <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
+            <Content style={[styles.flex1,styles.bgLightGray]}>
                 <View style={[style.card]} >
                     {this.props.item.map(object => this.renderListRow(object, originalQuantityValue))}
                 </View>
@@ -164,7 +177,6 @@ const style = StyleSheet.create({
         paddingRight: 0
     },
     card: {
-        paddingLeft: 10,
         marginBottom: 10,
         backgroundColor: '#ffffff',
         elevation: 1,
@@ -175,11 +187,6 @@ const style = StyleSheet.create({
         },
         shadowOpacity: 0.5,
         shadowRadius: 2
-    },
-    cardLeft: {
-        flex: 0.85,
-        borderRightColor: '#f3f3f3',
-        borderRightWidth: 1
     },
     cardLeftTopRow: {
         flexDirection: 'row',
