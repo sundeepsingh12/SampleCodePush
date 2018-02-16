@@ -32,12 +32,12 @@ class ExpandableDetailsView extends PureComponent {
                     </View>
                     <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
                         <Text style={[styles.fontDefault, styles.fontPrimary]}>
-                            {this.state.showDropdown ? 'Tap to hide' : 'Tap to show'}
+                        {this.props.childDataList.length == 0 ? 'N.A' : this.state.showDropdown ? 'Tap to hide' : 'Tap to show'}
                         </Text>
                     </View>
                 </View>
 
-                {renderIf(this.state.showDropdown,
+                {renderIf(this.state.showDropdown && this.props.childDataList.length > 0,
                     <ExpandableDetailsList
                         key={this.props.id}
                         dataList={this.props.childDataList}
