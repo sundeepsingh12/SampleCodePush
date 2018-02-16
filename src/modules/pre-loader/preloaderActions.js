@@ -326,8 +326,10 @@ export function invalidateUserSession() {
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(setState(TOGGLE_LOGOUT, false))
-      let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
-      await trackingService.inValidateStoreVariables(fenceIdentifier)
+      // below 2 lines are used to delete geofence on logout 
+      // <---- DON'T REMOVE THESE LINES --->
+      // let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      // await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
 
     } catch (error) {

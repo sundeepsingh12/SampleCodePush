@@ -14,7 +14,9 @@ var InitialState = Record({
     searchText: '',
     detailsVisibleFor: -1,
     isSaveSuccessful: false,
-    value: ''
+    value: '',
+    isFiltersPresent: false,
+    cloneDataStoreAttrValueMap: {}
 })
 
 export default InitialState

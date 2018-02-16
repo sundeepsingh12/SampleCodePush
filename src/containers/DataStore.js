@@ -18,6 +18,7 @@ import {
     SET_INITIAL_STATE,
     QrCodeScanner,
     DISABLE_AUTO_START_SCANNER,
+    SHOW_LOADER_DS
 } from '../lib/constants'
 import {
     FooterTab,
@@ -33,7 +34,7 @@ import {
     EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
 import _ from 'lodash'
-
+import { SUGGESTIONS } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         isSearchEnabled: state.dataStore.isSearchEnabled,
@@ -45,6 +46,9 @@ function mapStateToProps(state) {
         errorMessage: state.dataStore.errorMessage,
         searchText: state.dataStore.searchText,
         detailsVisibleFor: state.dataStore.detailsVisibleFor,
+        dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
+        isFiltersPresent: state.dataStore.isFiltersPresent,
+        cloneDataStoreAttrValueMap: state.dataStore.cloneDataStoreAttrValueMap
     }
 };
 
@@ -64,9 +68,11 @@ class DataStore extends PureComponent {
     }
 
     componentDidMount() {
-        console.log(this.props.navigation.state.params.currentElement)
-        this.props.actions.setState(SET_INITIAL_STATE)
-        this.props.actions.setValidation(this.props.navigation.state.params.currentElement.validation)
+        this.props.actions.checkForFiltersAndValidation(
+            this.props.navigation.state.params.currentElement,
+            this.props.navigation.state.params.formElements,
+            this.props.navigation.state.params.jobTransaction,
+            this.props.dataStoreFilterReverseMap)
     }
 
     componentDidUpdate() {
@@ -136,6 +142,17 @@ class DataStore extends PureComponent {
         this.props.actions.setState(SET_SEARCH_TEXT, searchText)
     }
 
+    searchDataStoreAttributeValueMap = (searchText) => {
+        if (searchText != '') {
+            this.props.actions.searchDataStoreAttributeValueMap(searchText, this.props.dataStoreAttrValueMap, this.props.cloneDataStoreAttrValueMap)
+        } else {
+            this.props.actions.setState(SET_DATA_STORE_ATTR_MAP, {
+                dataStoreAttrValueMap: this.props.cloneDataStoreAttrValueMap,
+                searchText: ''
+            })
+        }
+    }
+
     fetchDataStoreAttrValueMap = _.debounce((searchText, manualSearch) => {
         if ((this.props.isSearchEnabled || manualSearch) && searchText.length > 2) {
             this.props.actions.checkOfflineDS(searchText,
@@ -147,12 +164,16 @@ class DataStore extends PureComponent {
             )
         }
         if (searchText.length <= 2) {
-            this.props.actions.setState(SET_DATA_STORE_ATTR_MAP, {})
+            this.props.actions.setState(SET_DATA_STORE_ATTR_MAP, {
+                dataStoreAttrValueMap: this.props.cloneDataStoreAttrValueMap,
+                searchText
+            })
         }
     }, 500)
 
 
     _goBack = () => {
+        this.props.actions.setState(SET_INITIAL_STATE)
         this.props.navigation.goBack(null)
     }
 
@@ -165,14 +186,10 @@ class DataStore extends PureComponent {
             this.props.navigation.state.params.calledFromArray,
             this.props.navigation.state.params.rowId,
             this.props.navigation.state.params.latestPositionId,
-            this.props.navigation.state.params.jobTransaction
+            this.props.navigation.state.params.jobTransaction,
+            this.props.navigation.state.params.fieldAttributeMasterParentIdMap
         )
-        this.setDetailsFor()
         this._goBack()
-    }
-
-    setDetailsFor = () => {
-        this.props.actions.setState(SHOW_DETAILS, -1)
     }
 
     _searchDataStore = (value) => {
@@ -197,16 +214,21 @@ class DataStore extends PureComponent {
     }
 
     getLoader() {
-        let loader
         if (this.props.loaderRunning) {
-            loader = <Loader />
+            return <Loader />
         }
-        return loader
+    }
+
+    getSuggestionsText() {
+        if (!this.props.loaderRunning && !_.isEmpty(this.props.dataStoreAttrValueMap)) {
+            return <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>{SUGGESTIONS}</Text>
+        }
     }
 
     render() {
         let flatListView = this.flatListView()
         let loader = this.getLoader()
+        let suggestionsText = this.getSuggestionsText()
         if (this.props.detailsVisibleFor == -1) {
             return (
                 < Container >
@@ -218,15 +240,17 @@ class DataStore extends PureComponent {
                         goBack={this._goBack}
                         searchText={this.props.searchText}
                         setSearchText={this.setSearchText}
-                        scanner={this.scanner} />
+                        scanner={this.scanner}
+                        isFiltersPresent={this.props.isFiltersPresent}
+                        searchDataStoreAttributeValueMap={this.searchDataStoreAttributeValueMap} />
+
                     <Content style={[styles.marginLeft10]}>
                         {loader}
-                        {renderIf(!this.props.loaderRunning && !_.isEmpty(this.props.dataStoreAttrValueMap),
-                            <Text style={[styles.fontWeight400, styles.fontDarkGray, styles.fontSm]}>Suggestions</Text>)}
+                        {suggestionsText}
                         {flatListView}
                     </Content>
                     {renderIf(this.props.isMinMaxValidation &&
-                        this.props.searchText.length > 2 &&
+                        _.size(this.props.searchText) > 2 &&
                         this.props.navigation.state.params.currentElement.attributeTypeId != 63,
                         <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                             <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
@@ -239,9 +263,9 @@ class DataStore extends PureComponent {
                                             this.props.searchText,
                                             this.props.navigation.state.params.calledFromArray,
                                             this.props.navigation.state.params.rowId,
-                                            this.props.navigation.state.params.jobTransaction
+                                            this.props.navigation.state.params.jobTransaction,
+                                            this.props.navigation.state.params.fieldAttributeMasterParentIdMap
                                         )
-                                        this._goBack()
                                     }}>
                                     <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                                 </Button>

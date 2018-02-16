@@ -29,7 +29,7 @@ export default class NonExpandableDetailsView extends PureComponent {
     _openURL(url) {
         Linking.openURL(url).
             catch(error =>
-                console.error(IMAGE_LOADING_ERROR, error));
+                console.log(IMAGE_LOADING_ERROR, error));
     }
 
     render() {

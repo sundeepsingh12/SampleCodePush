@@ -92,6 +92,7 @@ module.exports = keyMirror({
     SET_UPLOAD_FILE_COUNT: null,
     SET_FAIL_UPLOAD_COUNT: null,
     SET_BACKUP_FILES_LIST: null,
+    SET_TRANSACTION_SERVICE_STARTED: null,
 
     //Home Container
     PIECHART: null,
@@ -242,6 +243,8 @@ module.exports = keyMirror({
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
     SET_FORM_TO_INVALID: null,
+    SET_DSF_REVERSE_MAP: null,
+    SET_MODAL_FIELD_ATTRIBUTE: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -314,6 +317,7 @@ module.exports = keyMirror({
     SET_ARRAY_ELEMENTS: null,
     SET_ERROR_MSG: null,
     CLEAR_ARRAY_STATE: null,
+    SET_ARRAY_ISLOADING: null,
     //CashTendering
     CHANGE_AMOUNT: null,
     IS_CASH_TENDERING_LOADER_RUNNING: null,
@@ -322,7 +326,6 @@ module.exports = keyMirror({
     FETCH_CASH_TENDERING_LIST_RETURN: null,
     CHANGE_AMOUNT_RETURN: null,
     //Data Store
-    SET_VALIDATIONS: null,
     SET_DATA_STORE_ATTR_MAP: null,
     SHOW_LOADER_DS: null,
     SHOW_ERROR_MESSAGE: null,
@@ -336,6 +339,8 @@ module.exports = keyMirror({
     SAVE_SUCCESSFUL: null,
     CLEAR_ATTR_MAP_AND_SET_LOADER: null,
     DISABLE_AUTO_START_SCANNER: null,
+    SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP: null,
+    SEARCH_DATA_STORE_RESULT: null,
 
     //Sequence Module Actions
     SEQUENCE_LIST_FETCHING_START: null,
@@ -472,13 +477,24 @@ module.exports = keyMirror({
     NPSFEEDBACK_VALUE: null,
     IS_SERVER_REACHABLE: null,
 
+    //DataStoreFilter
+    SHOW_LOADER_DSF: null,
+    DATA_STORE_FILTER_LIST: null,
+    SET_DSF_SEARCH_TEXT: null,
+    SEARCHED_DATA_STORE_FILTER_LIST: null,
+    SET_DSF_INITIAL_STATE: null,
+
+    //Multiple Options Attribute Actions
+    SET_OPTIONS_LIST: null,
+    SET_OPTION_ATTRIBUTE_ERROR: null,
+    SET_OPTION_SEARCH_INPUT: null,
     // backup actions
     SET_LOADER_BACKUP: null,
     SET_BACKUP_FILES: null,
     SET_BACKUP_VIEW: null,
     SET_UPLOADING_FILE: null,
     SET_SYNCED_FILES: null,
-    SET_BACKUP_TOAST: null
+    SET_BACKUP_TOAST: null,
 })
 
 

@@ -51,7 +51,8 @@ function mapStateToProps(state) {
     syncStatus: state.home.syncStatus,
     unsyncedTransactionList: state.home.unsyncedTransactionList,
     pieChart: state.home.pieChart,
-    lastSyncTime: state.home.lastSyncTime
+    lastSyncTime: state.home.lastSyncTime,
+    transactionServiceStarted: state.home.transactionServiceStarted,
   }
 }
 
@@ -69,7 +70,7 @@ class SyncScreen extends PureComponent {
   componentDidMount() {
     this.props.actions.startMqttService(this.props.pieChart)
     this.props.actions.performSyncService(this.props.pieChart, true)
-    this.props.actions.startTracking()
+    this.props.actions.startTracking(this.props.transactionServiceStarted)
   }
 
   getTransactionView() {
@@ -204,7 +205,7 @@ class SyncScreen extends PureComponent {
 
   }
 
-  render() { 
+  render() {
 
     if(this.props.syncStatus == 'LOADING') {
       return <Loader />

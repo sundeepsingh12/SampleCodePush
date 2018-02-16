@@ -6,6 +6,8 @@ module.exports = {
     CANCEL: 'Cancel',
     OK: 'Ok',
     SAVE: 'Save',
+    DONE: 'DONE',
+    DISMISS: 'DISMISS',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -104,11 +106,22 @@ module.exports = {
     //Sync service
     JOBS_DELETED: 'Jobs deleted',
 
+    //Data Store service
+    DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
+    CURRENT_ELEMENT_MISSING: 'currentElement Missing',
+
+    //Data Store Filter
+    JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
+    DSF_LIST_MISSING: 'DSFList is missing',
+    FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
+    FORM_ELEMENT_IS_MISSING: 'formElement is missing',
     //Summary
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
     COLLECTION_SOD: 'Collection-SOD',
 
+    //Multiple Option Container
+    NO_OPTIONS_PRESENT: 'No options Present',
     //Save Activated and CheckoutDetails
     SMS_NOT_SENT_TRY_AGAIN_LATER: 'SMS not sent ,try again later',
     EMAIL_NOT_SENT_TRY_AGAIN_LATER: 'Email not sent ,try again later',
@@ -145,6 +158,16 @@ module.exports = {
 
     //GeoFencing Service
     HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
-    FENCE_LAT_LONG_MISSING: 'fenceLatLongObject not present'
+    FENCE_LAT_LONG_MISSING: 'fenceLatLongObject not present',
 
+    //DataStore
+    SUGGESTIONS: 'Suggestions',
+
+    //Array
+    TOTAL_COUNT: 'Total Count : ',
+    ADD: 'Add',
+    SAVE: 'Save',
+    ADD_ROW_ERROR: 'Row could not be added',
+    DELETE_ROW_ERROR: 'Row could not be deleted',
+    SAVE_ARRAY_ERROR: 'Array Could not be saved',
 }

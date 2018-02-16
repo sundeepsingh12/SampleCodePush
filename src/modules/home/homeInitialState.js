@@ -112,7 +112,8 @@ var InitialState = Record({
     backupUploadView: 0,
     uploadingFileCount: 0,
     failedUploadCount: 0,
-    unsyncBackupFilesList: []
+    unsyncBackupFilesList: [],
+    transactionServiceStarted: false,
 })
 
 export default InitialState

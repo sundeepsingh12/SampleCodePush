@@ -24,6 +24,13 @@ import {
 
 class GeoFencingService {
 
+    /**
+     * This method is use to get mean lat long, radius, transactionIdIdentifier which is a transactionId of current Job
+     * @param {*} jobMasterIdListWithEnableResequenceRestriction 
+     * @param {*} openRunsheetList 
+     * @param {*} fenceForInitialJob 
+     * @returns { meanLatLong, radius, transactionIdIdentifier}
+     */
     async getLatLng(jobMasterIdListWithEnableResequenceRestriction, openRunsheetList, fenceForInitialJob) {
         let hubLatLong = await keyValueDBService.getValueFromStore(HUB_LAT_LONG)
         let latLongObject, transactionIdIdentifier
@@ -36,9 +43,7 @@ class GeoFencingService {
             if (!fenceLatLongObject || !fenceLatLongObject.value) {
                 throw new Error(FENCE_LAT_LONG_MISSING)
             }
-            console.logs('fenceLatLongObject', fenceLatLongObject)
             let returnLatLngParams = await this.getjobTransactionLatLongList(jobMasterIdListWithEnableResequenceRestriction, fenceLatLongObject.value.latLongObject.currentLatLong, openRunsheetList, hubLatLong)
-            console.logs('returnLatLngParams', returnLatLngParams)
             latLongObject = returnLatLngParams.latLongObject
             transactionIdIdentifier = returnLatLngParams.transactionIdIdentifier
             await keyValueDBService.deleteValueFromStore(LAT_LONG_GEO_FENCE)
@@ -54,6 +59,11 @@ class GeoFencingService {
         }
     }
 
+    /**
+     * Calculate center of polygon which is made from 3 pair of lat long
+     * @param {*} listOfLatLong
+     * @returns {latitude, longitude} //mean lat long
+     */
     findCentreOfPolygon(listOfLatLong) {
         let centroidX = 0, centroidY = 0
         for (let latLong of listOfLatLong) {
@@ -66,6 +76,13 @@ class GeoFencingService {
         }
     }
 
+    /**
+     * calculate radius in meters and adding a leverage of 800 meters 
+     * and the radius is farthest distance from mean lat long from the list of lat long
+     * @param {*} meanLatLong 
+     * @param {*} listOfLatLong
+     * @returns {radius} 
+     */
     calculateRadius(meanLatLong, listOfLatLong) {
         let radius = 0
         for (let latLong of listOfLatLong) {
@@ -74,9 +91,14 @@ class GeoFencingService {
                 radius = distance
             }
         }
-        return radius * 1000 // Converting to meters from km
+        return (radius * 1000) + 800 // Converting to meters from km and adding 800 meters as leverage
     }
 
+    /**
+     * Creates an array from object of lat long
+     * @param {*} jobTransactionLatLongList 
+     * @returns {listOfLatLong} //Array 
+     */
     getListOfLatLong(jobTransactionLatLongList) {
         let listOfLatLong = []
         for (let index in jobTransactionLatLongList) {
@@ -91,6 +113,17 @@ class GeoFencingService {
         return listOfLatLong
     }
 
+    /**
+     * gives lat long object having previousLatLng{ lat long of previous job or hub}, currentLatLong{ lat long of current job },
+     * nextLatLong{ lat long of next job or hub if current job is last job} lat long 
+     * 
+     * {transactionIdIdentifier} this is transactionId of currentJob 
+     * @param {*} jobMasterIdListWithEnableResequenceRestriction 
+     * @param {*} previousLatLng 
+     * @param {*} openRunsheetList 
+     * @param {*} hubLatLong
+     * @returns {latLongObject, transactionIdIdentifier}
+     */
     async getjobTransactionLatLongList(jobMasterIdListWithEnableResequenceRestriction, previousLatLng, openRunsheetList, hubLatLong) {
         if (!hubLatLong || !hubLatLong.value) {
             throw new Error(HUB_LAT_LONG_MISSING)
@@ -129,6 +162,10 @@ class GeoFencingService {
         return { latLongObject, transactionIdIdentifier }
     }
 
+
+    /**
+     * check for job masters having Enable Resequence Restriction and company having allowOffRouteNotification as true
+     */
     async checkForEnableResequenceRestrictionAndCheckAllowOffRouteNotification() {
         let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
         if (fenceIdentifier && fenceIdentifier.value) {

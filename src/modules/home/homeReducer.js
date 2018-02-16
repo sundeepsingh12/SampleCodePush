@@ -15,7 +15,8 @@ import {
   SET_BACKUP_UPLOAD_VIEW,
   SET_UPLOAD_FILE_COUNT,
   SET_FAIL_UPLOAD_COUNT,
-  SET_BACKUP_FILES_LIST
+  SET_BACKUP_FILES_LIST,
+  SET_TRANSACTION_SERVICE_STARTED,
 } from '../../lib/constants'
 
 
@@ -64,6 +65,9 @@ export default function homeReducer(state = initialState, action) {
 
     case SET_BACKUP_FILES_LIST:
       return state.set('unsyncBackupFilesList', action.payload)
+
+    case SET_TRANSACTION_SERVICE_STARTED:
+      return state.set('transactionServiceStarted', action.payload)
   }
 
   return state

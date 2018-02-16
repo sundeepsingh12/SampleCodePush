@@ -3,7 +3,6 @@
 import dataStoreReducer from '../dataStoreReducer'
 
 import {
-    SET_VALIDATIONS,
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER_DS,
     SHOW_ERROR_MESSAGE,
@@ -11,7 +10,9 @@ import {
     SHOW_DETAILS,
     SET_INITIAL_STATE,
     CLEAR_ATTR_MAP_AND_SET_LOADER,
-    DISABLE_AUTO_START_SCANNER
+    DISABLE_AUTO_START_SCANNER,
+    SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
+    SEARCH_DATA_STORE_RESULT
 } from '../../../lib/constants'
 const InitialState = require('../dataStoreInitialState').default
 
@@ -26,23 +27,6 @@ describe('data Store reducer', () => {
         let nextState = dataStoreReducer(undefined, action)
         expect(nextState.loaderRunning).toBe(action.payload)
         expect(nextState.errorMessage).toBe('')
-    })
-
-    it('should set all Validations', () => {
-        const action = {
-            type: SET_VALIDATIONS,
-            payload: {
-                isScannerEnabled: true,
-                isAutoStartScannerEnabled: false,
-                isMinMaxValidation: true,
-                isSearchEnabled: false
-            }
-        }
-        let nextState = dataStoreReducer(undefined, action)
-        expect(nextState.isScannerEnabled).toBe(action.payload.isScannerEnabled)
-        expect(nextState.isAutoStartScannerEnabled).toBe(action.payload.isAutoStartScannerEnabled)
-        expect(nextState.isMinMaxValidation).toBe(action.payload.isMinMaxValidation)
-        expect(nextState.isSearchEnabled).toBe(action.payload.isSearchEnabled)
     })
 
     it('should set dataStoreAttrValueMap, loaderRunning to false, errorMessage to empty and value to search text', () => {
@@ -64,6 +48,7 @@ describe('data Store reducer', () => {
         expect(nextState.value).toBe(action.payload.searchText)
         expect(nextState.loaderRunning).toBe(false)
         expect(nextState.errorMessage).toBe('')
+        expect(nextState.searchText).toBe(action.payload.searchText)
     })
 
     it('should set errorMessage, loaderRunning to false and dataStoreAttrValueMap to {}', () => {
@@ -132,5 +117,45 @@ describe('data Store reducer', () => {
         }
         let nextState = dataStoreReducer(undefined, action)
         expect(nextState.isAutoStartScannerEnabled).toBe(action.payload)
+    })
+
+    it('should set dataStoreAttrValueMap, cloneDataStoreAttrValueMap, searchText and loaderRunning to false', () => {
+        const action = {
+            type: SEARCH_DATA_STORE_RESULT,
+            payload: {
+                dataStoreAttrValueMap: {},
+                cloneDataStoreAttrValueMap: {},
+                searchText: 'temp'
+            }
+        }
+        let nextState = dataStoreReducer(undefined, action)
+        expect(nextState.dataStoreAttrValueMap).toBe(action.payload.dataStoreAttrValueMap)
+        expect(nextState.cloneDataStoreAttrValueMap).toBe(action.payload.cloneDataStoreAttrValueMap)
+        expect(nextState.searchText).toBe(action.payload.searchText)
+        expect(nextState.loaderRunning).toBe(false)
+    })
+
+    it('should set dataStoreAttrValueMap, isFiltersPresent, isScannerEnabled, isAutoStartScannerEnabled, isMinMaxValidation, isSearchEnabled and loaderRunning to false', () => {
+        const action = {
+            type: SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
+            payload: {
+                dataStoreAttrValueMap: {},
+                isFiltersPresent: false,
+                validation: {
+                    isScannerEnabled: false,
+                    isAutoStartScannerEnabled: false,
+                    isSearchEnabled: false,
+                    isMinMaxValidation: false,
+                }
+            }
+        }
+        let nextState = dataStoreReducer(undefined, action)
+        expect(nextState.dataStoreAttrValueMap).toBe(action.payload.dataStoreAttrValueMap)
+        expect(nextState.isFiltersPresent).toBe(action.payload.isFiltersPresent)
+        expect(nextState.isScannerEnabled).toBe(action.payload.validation.isScannerEnabled)
+        expect(nextState.isAutoStartScannerEnabled).toBe(action.payload.validation.isAutoStartScannerEnabled)
+        expect(nextState.isSearchEnabled).toBe(action.payload.validation.isSearchEnabled)
+        expect(nextState.isMinMaxValidation).toBe(action.payload.validation.isMinMaxValidation)
+        expect(nextState.loaderRunning).toBe(false)
     })
 })

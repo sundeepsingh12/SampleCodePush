@@ -48,18 +48,16 @@ class Tracking {
                 let fenceObject = keyValueDBService.getValueFromStore(GEO_FENCING)
                 fenceObject.then(object => {
                     if (object && object.value && geofence.action != object.value.status) {
-                        keyValueDBService.deleteValueFromStore(GEO_FENCING).then(() => {
-                            keyValueDBService.validateAndSaveData(GEO_FENCING, {
-                                identifier: geofence.identifier,
-                                status: geofence.action
-                            }).then(() => {
-                                this.showNotification(geofence)
-                            })
+                        keyValueDBService.validateAndSaveData(GEO_FENCING, {
+                            identifier: geofence.identifier,
+                            status: geofence.action
+                        }).then(() => {
+                            this.showNotification(geofence)
                         })
                     }
                 })
             } catch (error) {
-                console.error("An error occurred in my code!", error);
+                console.log("An error occurred in my code!", error);
             }
         })
 
@@ -108,27 +106,35 @@ class Tracking {
         BackgroundGeolocation.removeListeners()
     }
 
+    /**
+     * @param {*} fenceIdentifier 
+     * This method is use to delete geo fence by giving identifier saved in store and called when auto logout takes place
+     */
     inValidateStoreVariables(fenceIdentifier) {
         if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) {
             BackgroundGeolocation.removeGeofence(fenceIdentifier.value.identifier, () => {
                 this.deleteFence()
                 this.deleteLatLong()
-                console.logs("Successfully removed geofence")
+                // console.logs("Successfully removed geofence")
             }, (error) => {
-                console.logs("Failed to remove geofence", error)
+                // console.logs("Failed to remove geofence", error)
             })
         }
     }
 
-    removeGeofence(fenceIdentifier) {
+    /**
+     * This method is use to delete geo fence by giving identifier, add another fence and is called when transaction is completed from formLayout
+     * @param {*} fenceIdentifier 
+     * 
+     */
+    removeGeofenceAndAddAnotherGeoFence(fenceIdentifier) {
         if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) {
             BackgroundGeolocation.removeGeofence(fenceIdentifier.value.identifier, () => {
-                keyValueDBService.deleteValueFromStore(GEO_FENCING).then(() => {
-                    sync.addGeoFence(false)
-                })
-                console.logs("Successfully removed geofence")
+                this.deleteFence()
+                sync.addGeoFence(false)
+                // console.logs("Successfully removed geofence")
             }, (error) => {
-                console.logs("Failed to remove geofence", error)
+                // console.logs("Failed to remove geofence", error)
             })
         }
     }
@@ -177,6 +183,13 @@ class Tracking {
         return trackLogsToBeSynced
     }
 
+    /**
+     * This method is use to add a geofence by giving it a lat long, radius 
+     * and an identifier which is transactionId of current job which FE has to do next
+     * @param {*} meanLatLong 
+     * @param {*} radius 
+     * @param {*} transactionIdIdentifier 
+     */
     addGeoFence(meanLatLong, radius, transactionIdIdentifier) {
         let fenceObject = {
             identifier: transactionIdIdentifier,
@@ -188,14 +201,19 @@ class Tracking {
         }
         BackgroundGeolocation.addGeofence(fenceObject, () => {
             console.log('- addGeofence success: ', fenceObject)
-            console.logs('- addGeofence success: ', fenceObject)
+            // console.logs('- addGeofence success: ', fenceObject)
             this.storeFence(fenceObject.identifier, ENTER)
         }, (error) => {
             console.log('- addGeofence error: ', error)
-            console.logs('- addGeofence error: ', error)
+            // console.logs('- addGeofence error: ', error)
         })
     }
 
+    /**
+     * store fence object to store
+     * @param {*} identifier 
+     * @param {*} status 
+     */
     storeFence(identifier, status) {
         let objectToStore = {
             identifier,
@@ -204,23 +222,35 @@ class Tracking {
         keyValueDBService.validateAndSaveData(GEO_FENCING, objectToStore)
     }
 
+    /**
+     * delete fence object identifier
+     */
     deleteFence() {
         keyValueDBService.deleteValueFromStore(GEO_FENCING)
     }
 
+    /**
+     * delete lat long object
+     */
     deleteLatLong() {
         keyValueDBService.deleteValueFromStore(LAT_LONG_GEO_FENCE)
     }
 
+    /**
+     * This method loop through all the geofences present and it is not used anywhere, it's just for testing
+     */
     getGeofences() {
         BackgroundGeolocation.getGeofences((geofences) => {
-            console.logs('geofences', geofences)
             for (let fence = 0; fence < geofences.length; fence++) {
                 let geofence = geofences[fence]
             }
         })
     }
 
+    /**
+     * This method shows a notification to the user when fence is crossed
+     * @param {*} geofence 
+     */
     showNotification(geofence) {
         let message, eventId
         if (geofence.action == ENTER) {
@@ -239,7 +269,12 @@ class Tracking {
         this.updateUserEvent(geofence, message, eventId)
     }
 
-
+    /**
+     * This method update user event log DB when geofence is crossed
+     * @param {*} geofence 
+     * @param {*} outOfRouteMessage 
+     * @param {*} eventId 
+     */
     async updateUserEvent(geofence, outOfRouteMessage, eventId) {
         let fenceLatLongObject = await keyValueDBService.getValueFromStore(LAT_LONG_GEO_FENCE)
         if (fenceLatLongObject && fenceLatLongObject.value) {
