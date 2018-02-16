@@ -127,18 +127,13 @@ class Sync {
    * 
    * @return tdcResponse object
    */
-  async downloadDataFromServer(pageNumber, pageSize, isLiveJob) {
+  async downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
     let formData = null
-    const user = await keyValueDBService.getValueFromStore(USER)
-    if (!user || !user.value) {
-      throw new Error('Value of user missing')
-    }
-    const isCustomErpPullActivated = user.value.company.customErpPullActivated
-    if (!isCustomErpPullActivated) {
+    if (!erpPull) {
       formData = 'pageNumber=' + pageNumber + '&pageSize=' + pageSize
     }
     let url = ''
@@ -320,7 +315,7 @@ class Sync {
     let jobQuery = jobIds.map(jobId => 'id = ' + jobId.id).join(' OR ')
     jobQuery = jobQuery + ' AND status = 6'
     let jobsInDbList = await realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
-    if (jobsInDbList.length <= 0){
+    if (jobsInDbList.length <= 0) {
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(true))
       return
     }
@@ -508,7 +503,7 @@ class Sync {
    * 
    * Returns true if any job present in sync table on server side
    */
-  async downloadAndDeleteDataFromServer(isLiveJob) {
+  async downloadAndDeleteDataFromServer(isLiveJob, erpPull, user) {
     let pageNumber = 0,
       pageSize = 3, currentPage
     if (isLiveJob)
@@ -520,7 +515,7 @@ class Sync {
     let postAssignmentList = jobAssignmentModule.length == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark).postAssignmentList : null
     const unseenStatusIds = postAssignmentList && postAssignmentList.length > 0 ? await jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(postAssignmentList, UNSEEN) : await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
-      const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob)
+      const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull)
       if (tdcResponse) {
         json = await tdcResponse.json
         isLastPageReached = json.last
@@ -546,7 +541,7 @@ class Sync {
             await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
           }
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
-          const jobMasterTitleList = (jobMasterIds.constructor===Array)?await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds):jobMasterIds
+          const jobMasterTitleList = (jobMasterIds.constructor === Array) ? await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds) : jobMasterIds
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
           if (!_.isNull(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value))) {
             this.showNotification(jobMasterTitleList)
@@ -554,6 +549,10 @@ class Sync {
           }
           await jobSummaryService.updateJobSummary(dataList.jobSummaries)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
+          if (erpPull) {
+            user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')
+            await keyValueDBService.validateAndSaveData(USER, user)
+          }
         }
       } else {
         isLastPageReached = true
@@ -564,6 +563,7 @@ class Sync {
         } else {
           pageNumber = 0
         }
+        erpPull = false
       }
     }
     if (isJobsPresent) {
@@ -575,16 +575,16 @@ class Sync {
 
   showNotification(jobMasterTitleList) {
 
-    const alertBody = (jobMasterTitleList.constructor===Array)?jobMasterTitleList.join():jobMasterTitleList
-    const message = (jobMasterTitleList.constructor===Array)?`You have new updates for ${alertBody} jobs`:alertBody
+    const alertBody = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
+    const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${alertBody} jobs` : alertBody
 
     PushNotification.localNotification({
-    /* iOS and Android properties */
-    title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-    message, // (required)
-    soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
-});
-    
+      /* iOS and Android properties */
+      title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+      message, // (required)
+      soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+    });
+
 
   }
 
