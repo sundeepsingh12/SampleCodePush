@@ -1,6 +1,6 @@
 'use strict'
 
-import { setState } from '../global/globalActions'
+import { setState, navigateToScene } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -15,6 +15,8 @@ import {
     SET_POST_ASSIGNMENT_ERROR,
     SET_POST_SCAN_SUCCESS,
     SET_POST_ASSIGNMENT_PARAMETERS,
+    JobMasterListScreen,
+    PostAssignmentScanner
 } from '../../lib/constants'
 
 import _ from 'lodash'
@@ -51,6 +53,12 @@ export function fetchJobMasterList() {
                     isForceAssignmentAllowed: remarks ? remarks.isForceAssignmentAllowed : null
                 }
             ))
+            if (orderJobMasterList && orderJobMasterList.length == 1) {
+                dispatch(navigateToScene(PostAssignmentScanner, { jobMaster: orderJobMasterList[0] }))
+            }
+            if (orderJobMasterList && orderJobMasterList.length > 1) {
+                dispatch(navigateToScene(JobMasterListScreen))
+            }
         } catch (error) {
             console.log(error)
             dispatch(setState(SET_JOB_MASTER_LIST, {
@@ -130,6 +138,7 @@ export function checkScannedJob(referenceNumber, jobTransactionMap, jobMaster, i
                 }, 3000);
             }
         } catch (error) {
+            console.log(error)
             dispatch(setState(SET_POST_ASSIGNMENT_ERROR, {
                 error: error.message
             }))

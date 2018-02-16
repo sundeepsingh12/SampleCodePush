@@ -12,26 +12,26 @@ import { fieldDataService } from '../../services/classes/FieldData'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 
 class ArrayFieldAttribute {
-    getSortedArrayChildElements(lastRowId, arrayElements, arrayDTO) {
-        if (_.isEmpty(arrayElements)) {
-            let errorMessage;
-            let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
-            if (requiredFields.length <= 0) {
-                errorMessage = INVALID_CONFIG_ERROR
-                return { arrayRowDTO: {}, childElementsTemplate: arrayDTO, errorMessage }
-            } else {
-                let arrayRowDTO = this.addArrayRow(lastRowId, arrayDTO, arrayElements)
-                return { arrayRowDTO, childElementsTemplate: arrayDTO, errorMessage }
-            }
+    getSortedArrayChildElements(arrayDTO, jobTransaction) {
+        let errorMessage;
+        let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
+        if (requiredFields.length <= 0) {
+            errorMessage = INVALID_CONFIG_ERROR
+            return { arrayRowDTO: {}, childElementsTemplate: arrayDTO, errorMessage }
+        } else {
+            let arrayMainObject = arrayDTO.arrayMainObject
+            let arrayTemplate = _.omit(arrayDTO, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
+            let arrayRowDTO = this.addArrayRow(0, arrayTemplate, {}, jobTransaction)
+            return { arrayRowDTO, childElementsTemplate: arrayTemplate, errorMessage, arrayMainObject }
         }
-        return
     }
 
-    addArrayRow(lastRowId, childElementsTemplate, arrayElements) {
+    addArrayRow(lastRowId, childElementsTemplate, arrayElements, jobTransaction) {
         let cloneArrayElements = _.cloneDeep(arrayElements)
         cloneArrayElements[lastRowId] = childElementsTemplate
         cloneArrayElements[lastRowId].rowId = lastRowId
         cloneArrayElements[lastRowId].allRequiredFieldsFilled = false
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, cloneArrayElements[lastRowId].formLayoutObject, true, null, null, NEXT_FOCUS, jobTransaction);
         return {
             arrayElements: cloneArrayElements,
             lastRowId: (lastRowId + 1),
@@ -44,17 +44,27 @@ class ArrayFieldAttribute {
         let newArrayElements = _.omit(cloneArrayElements, [rowId])
         return newArrayElements
     }
-    prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId) {
+    prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId, arrayMainObject) {
         let arrayChildDataList = []
+        let isSaveDisabled = false
         for (let rowId in arrayElements) {
             let arrayObject = {}
             let childDataList = []
             for (let [key, arrayRowElement] of arrayElements[rowId].formLayoutObject) {
-                childDataList.push({ fieldAttributeMasterId: arrayRowElement.fieldAttributeMasterId, attributeTypeId: arrayRowElement.attributeTypeId, value: arrayRowElement.value })
+                if (arrayRowElement.value == ARRAY_SAROJ_FAREYE || arrayRowElement.value == OBJECT_SAROJ_FAREYE) {
+                    let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayRowElement.childDataList, jobTransactionId, arrayRowElement.positionId, latestPositionId)
+                    arrayRowElement.childDataList = fieldDataListWithLatestPositionId.fieldDataList
+                    latestPositionId = fieldDataListWithLatestPositionId.latestPositionId
+                }
+                if (arrayRowElement.required && (!arrayRowElement.value || arrayRowElement.value == '')) {
+                    isSaveDisabled = true
+                    break
+                }
+                childDataList.push(arrayRowElement)
             }
             arrayObject = {
-                fieldAttributeMasterId: arrayElements[rowId].arrayMainObject.id,
-                attributeTypeId: arrayElements[rowId].arrayMainObject.attributeTypeId,
+                fieldAttributeMasterId: arrayMainObject.id,
+                attributeTypeId: arrayMainObject.attributeTypeId,
                 value: OBJECT_SAROJ_FAREYE,
                 childDataList
             }
@@ -63,7 +73,7 @@ class ArrayFieldAttribute {
         arrayParentItem.value = ARRAY_SAROJ_FAREYE
         arrayParentItem.childDataList = arrayChildDataList
         let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayParentItem.childDataList, jobTransactionId, arrayParentItem.positionId, latestPositionId)
-        return fieldDataListWithLatestPositionId
+        return { fieldDataListWithLatestPositionId, isSaveDisabled }
     }
     enableSaveIfRequired(arrayElements) {
         let isSaveDisabled = false;
@@ -72,22 +82,48 @@ class ArrayFieldAttribute {
         for (let rowId in arrayElements) {
             if (!arrayElements[rowId].allRequiredFieldsFilled) {
                 isSaveDisabled = true
+                break
             }
         }
         return isSaveDisabled
     }
-    findNextEditableAndSetSaveDisabled(attributeMasterId, arrayElements, isSaveDisabled, rowId, value, fieldDataList, event) {
-        let cloneArrayElements = _.cloneDeep(arrayElements)
+    findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, fieldDataList, event, fieldAttributeMasterParentIdMap) {
         let arrayRow = cloneArrayElements[rowId]
-        arrayRow.formLayoutObject.get(attributeMasterId).displayValue = value
-        arrayRow.formLayoutObject.get(attributeMasterId).value = value
-        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, event);
+        let sortedArrayElements = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, arrayRow.formLayoutObject, isSaveDisabled, value, fieldDataList, event, null, fieldAttributeMasterParentIdMap);
         arrayRow.allRequiredFieldsFilled = (!sortedArrayElements.isSaveDisabled) ? true : false
         let _isSaveDisabled = this.enableSaveIfRequired(cloneArrayElements)
         return {
             newArrayElements: cloneArrayElements,
             isSaveDisabled: _isSaveDisabled
         }
+    }
+
+    setInitialArray(currentElement, formElement, arrayTemplate) {
+        let arrayValue = formElement.get(currentElement.fieldAttributeMasterId)
+        let arrayElements = {}
+        let rowId = 0
+        let arrayMainObject = arrayTemplate.arrayMainObject
+        let childElementsTemplate = _.omit(arrayTemplate, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
+        if (arrayValue.value == ARRAY_SAROJ_FAREYE && arrayValue.childDataList) {
+            for (let index in arrayValue.childDataList) {
+                let arrayObjectSarojFareye = arrayValue.childDataList[index].childDataList
+                let formLayoutObject = new Map()
+                let arrayRow = {}
+                for (let index in arrayObjectSarojFareye) {
+                    let fieldAttribute = { ...childElementsTemplate.formLayoutObject.get(arrayObjectSarojFareye[index].fieldAttributeMasterId) }
+                    fieldAttribute.value = fieldAttribute.displayValue = arrayObjectSarojFareye[index].value
+                    fieldAttribute.editable = true
+                    fieldAttribute.childDataList = arrayObjectSarojFareye[index].childDataList
+                    formLayoutObject.set(arrayObjectSarojFareye[index].fieldAttributeMasterId, fieldAttribute)
+                }
+                arrayElements[rowId] = { formLayoutObject, rowId, allRequiredFieldsFilled: true }
+                rowId++
+            }
+        }
+        const arrayRowDTO = {
+            arrayElements, lastRowId: rowId, isSaveDisabled: false
+        }
+        return { childElementsTemplate, arrayRowDTO, arrayMainObject }
     }
 }
 

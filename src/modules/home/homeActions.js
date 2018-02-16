@@ -28,7 +28,14 @@ import {
   SET_BACKUP_FILES_LIST,
   BACKUP_UPLOAD_FAIL_COUNT,
   SET_ERP_PULL_ACTIVATED,
-  ERP_SYNC_STATUS
+  ERP_SYNC_STATUS,
+  JOB_MASTER,
+  SAVE_ACTIVATED,
+  NewJobStatus,
+  NEW_JOB_STATUS,
+  NEW_JOB_MASTER,
+  POPULATE_DATA,
+  NewJob
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -38,7 +45,9 @@ import {
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
 } from '../../lib/AttributeConstants'
-
+import {
+  NEW_JOB_CONFIGURATION_ERROR
+} from '../../lib/ContainerConstants'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -56,6 +65,7 @@ import { logoutService } from '../../services/classes/Logout'
 import _ from 'lodash'
 import { userEventLogService } from '../../services/classes/UserEvent'
 import RestAPIFactory from '../../lib/RestAPIFactory'
+import { newJob } from '../../services/classes/NewJob'
 
 import moment from 'moment'
 import {
@@ -66,7 +76,10 @@ import {
 } from 'react-navigation'
 import { backupService } from '../../services/classes/BackupService';
 import { autoLogoutAfterUpload } from '../backup/backupActions'
-
+import { redirectToFormLayout } from '../newJob/newJobActions'
+import {
+  Toast
+} from 'native-base'
 /**
  * This action enables modules for particular user
  */
@@ -304,7 +317,7 @@ export function startMqttService(pieChart) {
 
 export function startTracking() {
   return async function (dispatch) {
-    // trackingService.init()
+    trackingService.init()
   }
 }
 
@@ -401,6 +414,47 @@ export function resetFailCountInStore() {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+export function navigateToNewJob(jobMasterIds) {
+  return async function (dispatch) {
+    try {
+      const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
+      let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
+      if (_.size(mastersWithNewJob) == 1) {
+        let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
+        let returnParams = await newJob.checkForNextContainer(mastersWithNewJob[0], saveActivatedData)
+        if (returnParams.screenName == NewJobStatus) {
+          let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(mastersWithNewJob[0].id);
+          if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
+            dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, mastersWithNewJob[0].id))
+          } else {
+            dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
+            dispatch(navigateToScene(NewJobStatus, returnParams.navigationParams))
+          }
+        } else {
+          if (returnParams.stateParam) {
+            await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
+          }
+          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
+        }
+      } else if (_.size(mastersWithNewJob) == 0) {
+        Toast.show({
+          text: NEW_JOB_CONFIGURATION_ERROR,
+          position: "bottom" | "center",
+          buttonText: 'Okay',
+          type: 'danger',
+          duration: 10000
+        })
+        // dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
+      } else {
+        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
+        dispatch(navigateToScene(NewJob))
+      }
     } catch (error) {
       console.log(error)
     }

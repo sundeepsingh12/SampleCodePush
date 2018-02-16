@@ -161,5 +161,13 @@ module.exports = {
     CREATE_BACKUP_BUTTON: '+ Create Backup',
 
     //DataStore
-    SUGGESTIONS: 'Suggestions'
+    SUGGESTIONS: 'Suggestions',
+
+    //Array
+    TOTAL_COUNT: 'Total Count : ',
+    ADD: 'Add',
+    SAVE: 'Save',
+    ADD_ROW_ERROR: 'Row could not be added',
+    DELETE_ROW_ERROR: 'Row could not be deleted',
+    SAVE_ARRAY_ERROR: 'Array Could not be saved',
 }
