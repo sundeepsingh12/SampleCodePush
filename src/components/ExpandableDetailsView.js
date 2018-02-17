@@ -20,8 +20,19 @@ class ExpandableDetailsView extends PureComponent {
             showDropdown: false
         }
     }
+    checkForChildData(childDataList) {
+        if (this.props.childDataList && this.props.childDataList.length > 0) {
+            for(let data of childDataList){
+                if (data.childDataList && data.childDataList.length > 0) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
 
     render() {
+        const isChildData = this.checkForChildData(this.props.childDataList)
         return (
             <TouchableOpacity onPress={() => { this.setState({ showDropdown: !this.state.showDropdown }) }}>
                 <View style={[styles.row, styles.paddingLeft10, styles.paddingRight10]}>
@@ -32,12 +43,12 @@ class ExpandableDetailsView extends PureComponent {
                     </View>
                     <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
                         <Text style={[styles.fontDefault, styles.fontPrimary]}>
-                        {this.props.childDataList.length == 0 ? 'N.A' : this.state.showDropdown ? 'Tap to hide' : 'Tap to show'}
+                        {(!isChildData) ? 'N.A' : this.state.showDropdown ? 'Tap to hide' : 'Tap to show'}
                         </Text>
                     </View>
                 </View>
 
-                {renderIf(this.state.showDropdown && this.props.childDataList.length > 0,
+                {renderIf(this.state.showDropdown && isChildData,
                     <ExpandableDetailsList
                         key={this.props.id}
                         dataList={this.props.childDataList}

@@ -121,6 +121,8 @@ class BulkListing extends PureComponent {
             placeholderTextColor={'rgba(255,255,255,.6)'}
             selectionColor={'rgba(224, 224, 224,.5)'}
             style={[style.headerSearch]}
+            returnKeyType = {"search"}
+            keyboardAppearance = {"dark"}
             underlineColorAndroid={'transparent'}
             onChangeText={(searchText) => {
               this.props.actions.setState(SET_BULK_SEARCH_TEXT, searchText)
