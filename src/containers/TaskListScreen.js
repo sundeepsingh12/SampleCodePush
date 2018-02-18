@@ -171,7 +171,7 @@ class TaskListScreen extends PureComponent {
       <FlatList
         data={this.renderList()}
         renderItem={({ item }) => this.renderData(item)}
-        keyExtractor={item => item.id}
+        keyExtractor={item => String(item.id)}
       />
     )
   }

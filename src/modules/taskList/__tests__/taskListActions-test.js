@@ -59,13 +59,29 @@ describe('test cases for action fetchTabs', () => {
 })
 
 describe('test cases for action fetchJobs', () => {
+    beforeEach(() => {
+        keyValueDBService.getValueFromStore = jest.fn()
+        jobTransactionService.getAllJobTransactionsCustomizationList = jest.fn()
+        transactionCustomizationService.getJobListingParameters = jest.fn()
+        jobTransactionService.getEnableMultiPartJobMaster = jest.fn()
+        jobTransactionService.getJobIdGroupIdMap = jest.fn()
+    })
+
+    let jobMasterWithEnableMultiPart = [{
+        id: 1
+    },
+    {
+        id: 2
+    }]
+
+    let jobIdGroupIdMap = {
+        "1" : "xyz",
+        "2" : "abc"
+    }
     it('should fetch jobs', () => {
-        const jobTransactionCustomizationList = [
-            {
-                line1: 'xyz',
-                line2: 'abc'
-            }
-        ]
+        const jobTransactionCustomizationList = []
+
+        const statusNextStatusListMap = {}
         const expectedActions = [
             {
                 type: JOB_LISTING_START,
@@ -73,19 +89,20 @@ describe('test cases for action fetchJobs', () => {
             {
                 type: JOB_LISTING_END,
                 payload: {
-                    jobTransactionCustomizationList
+                    jobTransactionCustomizationList,
+                    statusNextStatusListMap
                 }
             }
         ]
-        jobTransactionService.getAllJobTransactionsCustomizationList = jest.fn()
-        jobTransactionService.getAllJobTransactionsCustomizationList.mockReturnValue(jobTransactionCustomizationList)
-        transactionCustomizationService.getJobListingParameters = jest.fn()
+        jobTransactionService.getEnableMultiPartJobMaster.mockReturnValue(jobMasterWithEnableMultiPart)
+        jobTransactionService.getJobIdGroupIdMap.mockReturnValue(jobIdGroupIdMap)
         transactionCustomizationService.getJobListingParameters.mockReturnValue({})
+        jobTransactionService.getAllJobTransactionsCustomizationList.mockReturnValueOnce({jobTransactionCustomizationList, statusNextStatusListMap })
         const store = mockStore({})
         return store.dispatch(actions.fetchJobs())
             .then(() => {
-                expect(transactionCustomizationService.getJobListingParameters).toHaveBeenCalledTimes(1)
-                expect(jobTransactionService.getAllJobTransactionsCustomizationList).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(jobTransactionService.getAllJobTransactionsCustomizationList).toHaveBeenCalledTimes(0)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)

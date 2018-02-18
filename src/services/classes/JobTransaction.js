@@ -296,10 +296,20 @@ class JobTransaction {
         let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
         let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, 
             jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap, jobIdGroupIdMap,jobTransactionCustomizationListParametersDTO.statusList,jobTransactionCustomizationListParametersDTO.tabList)
-            //jobTransactionCustomizationList = (callingActivity != 'Bulk' && !_.isEmpty(jobIdGroupIdMap)) ? this.getGroupWiseTransactions(jobTransactionCustomizationList,jobIdGroupIdMap,jobTransactionCustomizationListParametersDTO.statusList,jobTransactionCustomizationListParametersDTO.tabList) : jobTransactionCustomizationList
         return {jobTransactionCustomizationList, statusNextStatusListMap : statusIdNextStatusListMap}
 
     }
+
+    /** @function getFirstTransactionWithEnableSequence(jobMasterIdList,statusMap)
+    * function return jobTransaction with top most sequencea among all transaction
+    *
+    * @param {Array} jobMasterIdList //jobMasterId List with enable resequence restriction
+    * 
+    * @param {Array} statusMap //jobStatusId List with current tabId
+    * 
+    *@return {Object} {jobTransactionList[0]}
+    */
+
     getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
         let runsheetQuery = 'isClosed = false'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
@@ -312,7 +322,7 @@ class JobTransaction {
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         jobTransactionQuery = `(${jobTransactionQuery}) AND (${jobMasterQuery}) AND (${jobStatusQuery})`
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, SEQ_SELECTED)
-        return jobTransactionList[0]
+        return jobTransactionList && jobTransactionList.length > 0 ? jobTransactionList[0] : {}
     }
 
     updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
@@ -323,10 +333,26 @@ class JobTransaction {
         }
     }
 
+  /** @function getEnableMultiPartJobMaster(jobMasterList)
+    * function return List of all jobMaster With enable multipart assignment 
+    *
+    *@param {Array} jobMasterList //all jobMasterList 
+    * 
+    *@return {Array} jobMasterListWithEnableMultiPart
+    */
+
     getEnableMultiPartJobMaster(jobMasterList){
         let jobMasterListWithEnableMultiPart =  jobMasterList.filter(jobMaster => jobMaster.enableMultipartAssignment == true)
         return jobMasterListWithEnableMultiPart
     }
+
+   /** @function getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)
+    * function return map of jobId verses groupId whose groupid is not null
+    *
+    * @param {Array} jobMasterListWithEnableMultiPart //jobMasterList with enable multipart assignment
+    * 
+    *@return {Object} {jobIdGroupIdMap}
+    */
 
     getJobIdGroupIdMap(jobMasterListWithEnableMultiPart) {
         let jobMasterQuery = jobMasterListWithEnableMultiPart.map(jobMaster => 'jobMasterId = ' + jobMaster.id).join(' OR ')
@@ -337,28 +363,6 @@ class JobTransaction {
         return jobIdGroupIdMap
     }
 
-    // getGroupWiseTransactions(jobTransactionCustomizationList, jobIdGroupIdMap, statusList, tabList) {
-    //     let statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
-    //     let tabIdGroupTransactionsMap = {},groupIdTransactionIdMap = {},groupIdTabKey = ''
-    //     tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
-    //     tabIdGroupTransactionsMap['isGrouping'] = true
-    //     for (let value of jobTransactionCustomizationList) {
-    //         let groupId = jobIdGroupIdMap[value.jobId] ? jobIdGroupIdMap[value.jobId] : null
-    //         groupIdTabKey = groupId ? groupId+'&'+statusIdsTabIdsMap[value.statusId] : null
-    //         if (!groupId) {
-    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][value.id] = { groupId: null,key: value.id,seqSelected: value.seqSelected, total: 1, jobTransactions: [value] }
-    //         }else if((groupId && !tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]])){
-    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][value.id] = { groupId, key: value.id, color: value.identifierColor, seqSelected: value.seqSelected, total: 1, jobTransactions: [value] }
-    //             groupIdTransactionIdMap[groupIdTabKey] = value.id
-    //         }else{
-    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected'] = tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected'] > value.seqSelected ? 
-    //                 value.seqSelected : tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected']
-    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['total'] += 1
-    //             tabIdGroupTransactionsMap[statusIdsTabIdsMap[value.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['jobTransactions'].push(value)
-    //         }  
-    //     }
-    //     return tabIdGroupTransactionsMap
-    //   }
     /**
      * This function prepares jobTransactionCustomizationList for list of job transactions
      * @param {*} jobTransactionMap 

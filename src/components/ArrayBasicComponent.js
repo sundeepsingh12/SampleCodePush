@@ -369,7 +369,7 @@ class ArrayBasicComponent extends PureComponent {
                     <FlatList
                         data={Array.from(this.props.arrayRow.formLayoutObject)}
                         renderItem={(item) => this._renderData(item.item[1])}
-                        keyExtractor={item => item[0]}
+                        keyExtractor={item => String(item[0])}
                     />
                 </View>
                 <View style={[styles.flexBasis10, styles.alignCenter, styles.justifyCenter, styles.padding10]}>

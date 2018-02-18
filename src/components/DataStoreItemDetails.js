@@ -67,7 +67,7 @@ export default class DataStoreItemDetails extends PureComponent {
                     < FlatList
                         data={this.createDetails(this.props.selectedElement.dataStoreAttributeValueMap)}
                         renderItem={({ item }) => this.renderData(item)}
-                        keyExtractor={item => item.id}
+                        keyExtractor={item => String(item.id)}
                     />
                 </Content>
                 <Footer style={{ height: 'auto', backgroundColor: 'white' }}>

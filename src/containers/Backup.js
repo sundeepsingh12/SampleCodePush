@@ -187,7 +187,7 @@ class Backup extends Component {
                 data={Object.values(this.props.unSyncedFiles)}
                 renderItem={({ item }) => this.renderSyncedData(item)
                 }
-                keyExtractor={item => item.id}
+                keyExtractor={item => String(item.id)}
             />
             return flatListView
         } else if (_.isEmpty(this.props.unSyncedFiles)) {
@@ -215,7 +215,7 @@ class Backup extends Component {
                 data={this.renderList()}
                 renderItem={({ item }) => this.renderSyncedData(item)
                 }
-                keyExtractor={item => item.id}
+                keyExtractor={item => String(item.id)}
             />
             return flatListView
         } else if (_.isEmpty(this.props.syncedFiles)) {
