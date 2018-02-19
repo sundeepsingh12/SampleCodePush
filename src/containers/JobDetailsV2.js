@@ -46,7 +46,7 @@ import {
   DataStoreDetails,
   ImageDetailsView,
   RESET_STATE_FOR_JOBDETAIL,
-
+  SHOW_DROPDOWN
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -86,6 +86,7 @@ function mapStateToProps(state) {
     statusRevertList: state.jobDetails.statusRevertList,
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
+    isShowDropdown: state.jobDetails.isShowDropdown
   }
 }
 
@@ -109,6 +110,7 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
+    this.props.actions.setState(SHOW_DROPDOWN,null)
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
@@ -117,25 +119,46 @@ class JobDetailsV2 extends PureComponent {
   navigateToCameraDetails = (navigationParam) => {
     this.props.actions.navigateToScene(ImageDetailsView, navigationParam)
   }
+
+  statusDataItem(statusList,index,minIndexDropDown) {
+    if((index < minIndexDropDown) || (this.props.isShowDropdown)){
+    return(
+      <ListItem
+        key={statusList[index].id}
+        style={[style.jobListItem, styles.justifySpaceBetween]}
+        onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
+      >
+        <View style={[styles.row, styles.alignCenter]}>
+          <View style={[style.statusCircle, { backgroundColor: statusList[index].buttonColor }]}></View>
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
+        </View>
+        <Right>
+          <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+        </Right>
+      </ListItem> 
+    )
+  }
+  }
+
   renderStatusList(statusList) {
     let statusView = []
+    let minIndexDropDown = (this.props.statusRevertList && this.props.statusRevertList.length > 0) ? 3 : 4  
     for (let index in statusList) {
       statusView.push(
-        <ListItem
-          key={statusList[index].id}
-          style={[style.jobListItem, styles.justifySpaceBetween]}
-          onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
-        >
-
-          <View style={[styles.row, styles.alignCenter]}>
-            <View style={[style.statusCircle, { backgroundColor: statusList[index].buttonColor }]}></View>
-            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
-          </View>
-          <Right>
-            <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-          </Right>
-        </ListItem>
+        this.statusDataItem(statusList,index,minIndexDropDown)
       )
+      if(index == minIndexDropDown-1 && statusList.length > minIndexDropDown){ 
+      statusView.push(
+      <ListItem
+        key={1}
+        style={[style.jobListItem, styles.justifySpaceBetween]}
+        onPress={() => { this.props.actions.setState(SHOW_DROPDOWN,!this.props.isShowDropdown)}}
+      >
+        <View style={[styles.row, styles.alignCenter]}>
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{statusList.length-minIndexDropDown} More</Text>
+          <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
+        </View>
+      </ListItem>)}
     }
     return statusView
   }
@@ -405,7 +428,7 @@ class JobDetailsV2 extends PureComponent {
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo)) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null) ? this.showDraftAlert() : null
       const etaTimer = this.etaUpdateTimer()
       return (
         <StyleProvider style={getTheme(platform)}>
@@ -562,13 +585,13 @@ const style = StyleSheet.create({
     minHeight: 70,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     paddingLeft: 10,
     backgroundColor: '#ffffff'
   },
   seqCircle: {
     width: 56,
     height: 56,
+    marginTop:12,
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center'

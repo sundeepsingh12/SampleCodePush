@@ -640,5 +640,9 @@ export default {
     borderBottomLightGray: {
         borderBottomWidth: 1,
         borderBottomColor: '#f4f4f4'
+    },
+    borderBottomGray: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#d4d4d4'
     }
 }
