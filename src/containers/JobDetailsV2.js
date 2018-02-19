@@ -46,6 +46,7 @@ import {
   DataStoreDetails,
   ImageDetailsView,
   RESET_STATE_FOR_JOBDETAIL,
+  BulkListing,
   SHOW_DROPDOWN
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
@@ -64,11 +65,15 @@ import {
 import Communications from 'react-native-communications'
 import CallIcon from '../svg_components/icons/CallIcon'
 import RevertIcon from '../svg_components/icons/RevertIcon'
+import GroupIcon from '../svg_components/icons/GroupIcon'
+
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { jobStatusService } from '../services/classes/JobStatus'
+
+import {UPDATE_GROUP} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -142,6 +147,25 @@ class JobDetailsV2 extends PureComponent {
 
   renderStatusList(statusList) {
     let statusView = []
+    let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
+    if(groupId && statusList.length > 0){
+      statusView.push(
+        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = { () => this.updateTransactionForGroupId(groupId)} key = {groupId}>
+        <View style = {[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+            <View style={[styles.row, styles.alignCenter]}>
+                <View style = {[styles.marginTop12]}>
+                  <GroupIcon />
+                </View>
+                <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
+                <Right>
+                  <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} /> 
+                </Right>
+            </View>
+        </View>
+    </TouchableOpacity> 
+      )
+      return statusView
+    }
     let minIndexDropDown = (this.props.statusRevertList && this.props.statusRevertList.length > 0) ? 3 : 4  
     for (let index in statusList) {
       statusView.push(
@@ -354,6 +378,16 @@ class JobDetailsV2 extends PureComponent {
         { text: OK, onPress: () => this._onGoToPreviousStatus(statusData) }
       ],
     )
+  }
+  updateTransactionForGroupId (groupId){
+
+    this.props.actions.navigateToScene(BulkListing, {
+      jobMasterId: this.props.jobTransaction.jobMasterId,      
+      statusId: this.props.currentStatus.id,
+      nextStatusList : this.props.currentStatus.nextStatusList,
+      groupId
+    })
+
   }
   selectStatusToRevert =  () => {
     if(this.props.statusRevertList[0] == 1){

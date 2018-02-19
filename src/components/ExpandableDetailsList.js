@@ -61,7 +61,7 @@ class ExpandableDetailsList extends PureComponent {
                     <FlatList
                         data={this.props.dataList}
                         renderItem={({ item }) => this.renderData(item)}
-                        keyExtractor={item => item.id}
+                        keyExtractor={item => String(item.id)}
                     />
                 </List>
             </View>

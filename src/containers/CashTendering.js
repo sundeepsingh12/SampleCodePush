@@ -115,7 +115,7 @@ class CashTendering extends PureComponent {
                                     fieldData_1.sequence - fieldData_2.sequence
                                 )}
                             renderItem={({ item }) => this.renderData(item)}
-                            keyExtractor={item => item.id}
+                            keyExtractor={item => String(item.id)}
                         />
                         <Text style={{ marginBottom: 10, marginTop: 10 }}>
                             Total Amount : {parseInt(this.props.totalAmount)}
@@ -142,7 +142,7 @@ class CashTendering extends PureComponent {
                         <FlatList
                             data={(Object.values(this.props.cashTenderingListReturn)).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence)}
                             renderItem={({ item }) => this.renderData(item)}
-                            keyExtractor={item => item.id}
+                            keyExtractor={item => String(item.id)}
                         />
                         <Text style={{ marginBottom: 10, marginTop: 10 }}>
                             Total Amount To Return : {parseInt(this.props.totalAmountReturn)}

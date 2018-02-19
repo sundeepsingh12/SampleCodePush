@@ -98,7 +98,7 @@ class DataStoreFilter extends PureComponent {
                         < FlatList
                             data={this.props.dataStoreFilterList}
                             renderItem={({ item }) => this.dataStoreFilterItemDetails(item)}
-                            keyExtractor={item => item}
+                            keyExtractor={item => String(item)}
                         />
                     </List>
                 </View>

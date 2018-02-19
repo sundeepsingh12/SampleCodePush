@@ -95,7 +95,7 @@ class SortingListing extends PureComponent {
                             <FlatList
                                 data={(Object.values(this.props.sortingDetails))}
                                 renderItem={({ item }) => this.renderData(item)}
-                                keyExtractor={item => item.id}
+                                keyExtractor={item => String(item.id)}
                             />
                         </View>
                     </View>

@@ -56,7 +56,7 @@ class Statistics extends PureComponent {
                   </TouchableHighlight>
                 )
               }}
-              keyExtractor={item => item.id}
+              keyExtractor={item => String(item.id)}
             />
             )
         }

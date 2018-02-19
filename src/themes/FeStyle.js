@@ -165,6 +165,9 @@ export default {
     marginTop10: {
         marginTop: 10
     },
+    marginTop12: {
+        marginTop: 12
+    },
     marginTop15: {
         marginTop: 15
     },
@@ -543,6 +546,9 @@ export default {
     },
     borderRadius3: {
         borderRadius: 3
+    },
+    borderRadius50: {
+        borderRadius: 50
     },
     shadow: {
         elevation: 2,

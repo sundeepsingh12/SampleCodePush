@@ -52,7 +52,7 @@ class Sequence {
         }
         const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        const jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Sequence', {
+        const {jobTransactionCustomizationList} = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Sequence', {
             statusIds,
             runsheetNumber
         })

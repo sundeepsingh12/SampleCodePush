@@ -162,7 +162,7 @@ class SaveActivated extends PureComponent {
         return true
     }
 
-    _keyExtractor = (item, index) => item.id;
+    _keyExtractor = (item, index) => String(item.id);
 
 
     renderData = (item) => {

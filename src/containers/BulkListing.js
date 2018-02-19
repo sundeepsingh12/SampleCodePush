@@ -224,7 +224,7 @@ class BulkListing extends PureComponent {
                       <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
                     </Button>
                     <View style={[style.headerBody]}>
-                      <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Bulk Update</Text>
+                      <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{(this.props.navigation.state.params.groupId) ? this.props.navigation.state.params.groupId :'Bulk Update'}</Text>
                     </View>
                     <View style={[style.headerRight]}>
                       {this.props.isSelectAllVisible ?
@@ -241,7 +241,7 @@ class BulkListing extends PureComponent {
               <FlatList
                 data={this.renderList()}
                 renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => item.id}
+                keyExtractor={item => String(item.id)}
               />
 
               <Footer
