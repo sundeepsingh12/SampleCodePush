@@ -24,10 +24,8 @@ import {
     POST
 } from '../../lib/AttributeConstants'
 import {
-    SAME_SEQUENCE_ERROR,
     SEQUENCELIST_MISSING,
     CURRENT_SEQUENCE_ROW_MISSING,
-    SEQUENCE_NOT_AN_INT,
     RUNSHEET_NUMBER_MISSING,
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEARCH_TEXT_MISSING,
@@ -215,9 +213,6 @@ class Sequence {
         if (!sequenceList) {
             throw new Error(SEQUENCELIST_MISSING)
         }
-        if (!isCalledFromJumpSequence && rowParam.to == rowParam.from) {
-            throw new Error(SAME_SEQUENCE_ERROR)
-        }
         let cloneSequenceList = _.cloneDeep(sequenceList)
         if (!isCalledFromJumpSequence) {
             cloneSequenceList[rowParam.from].seqAssigned = cloneSequenceList[rowParam.from].seqSelected = cloneSequenceList[rowParam.to].seqSelected
@@ -293,14 +288,8 @@ class Sequence {
     jumpSequence(currentSequenceListItemIndex, newSequence, sequenceList, transactionsWithChangedSeqeunceMap, jobMasterSeperatorMap) {
         if (_.isNull(currentSequenceListItemIndex) || _.isUndefined(currentSequenceListItemIndex)) {
             throw new Error(CURRENT_SEQUENCE_ROW_MISSING)
-        } if (!parseInt(newSequence) || parseInt(newSequence) < 1) {
-            throw new Error(SEQUENCE_NOT_AN_INT + newSequence)
         } if (!sequenceList) {
             throw new Error(SEQUENCELIST_MISSING)
-        }
-        newSequence = parseInt(newSequence)
-        if (_.isEqual(sequenceList[currentSequenceListItemIndex].seqSelected, newSequence)) {
-            throw new Error(SAME_SEQUENCE_ERROR)
         }
         let index
         if (sequenceList[currentSequenceListItemIndex].seqSelected < newSequence) {
