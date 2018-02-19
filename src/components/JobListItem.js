@@ -300,13 +300,13 @@ const style = StyleSheet.create({
     minHeight: 70,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     paddingLeft: 10
   },
   seqCircle: {
     width: 56,
     height: 56,
     borderRadius: 28,
+    marginTop: 12,
     justifyContent: 'center',
     alignItems: 'center'
   },
