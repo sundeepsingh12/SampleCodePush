@@ -12,6 +12,7 @@ import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
+import _ from 'lodash'
 import { N_A, TAP_TO_HIDE, TAP_TO_SHOW} from '../lib/ContainerConstants'
 
 class ExpandableDetailsView extends PureComponent {
@@ -22,12 +23,10 @@ class ExpandableDetailsView extends PureComponent {
         }
     }
     checkForChildData(childDataList) {
-        if (this.props.childDataList && this.props.childDataList.length > 0) {
-            for(let data of childDataList){
-                if (data.childDataList && data.childDataList.length > 0) {
+            for(let data in childDataList){
+                if (!_.isEmpty(childDataList[data].childDataList)) {
                     return true
-                }
-            }
+                }  
         }
         return false
     }
