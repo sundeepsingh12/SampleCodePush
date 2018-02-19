@@ -12,6 +12,7 @@ import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
+import { N_A, TAP_TO_HIDE, TAP_TO_SHOW} from '../lib/ContainerConstants'
 
 class ExpandableDetailsView extends PureComponent {
     constructor(props) {
@@ -43,7 +44,7 @@ class ExpandableDetailsView extends PureComponent {
                     </View>
                     <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
                         <Text style={[styles.fontDefault, styles.fontPrimary]}>
-                        {(!isChildData) ? 'N.A' : this.state.showDropdown ? 'Tap to hide' : 'Tap to show'}
+                        {(!isChildData) ? N_A : this.state.showDropdown ? TAP_TO_HIDE : TAP_TO_SHOW}
                         </Text>
                     </View>
                 </View>
