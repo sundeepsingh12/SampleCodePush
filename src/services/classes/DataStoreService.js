@@ -193,24 +193,25 @@ class DataStoreService {
       * @returns 
       * boolean
       */
-    checkForUniqueValidation(fieldAttributeValue, fieldAttributeMasterId) {
+    checkForUniqueValidation(fieldAttributeValue, fieldAttribute) {
         if (!fieldAttributeValue) {
             throw new Error('fieldAttributeValue missing in currentElement')
         }
-        if (!fieldAttributeMasterId) {
+        if (!fieldAttribute.fieldAttributeMasterId) {
             throw new Error('fieldAttributeMasterId missing in currentElement')
         }
-        let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttributeMasterId}`
-        let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
-        for (let index in fieldDataList) {
-            let fieldData = { ...fieldDataList[index] }
-            if (fieldData.value == fieldAttributeValue) {
-                return true
-            }
+        if (this.checkIfUniqueConditionExists(fieldAttribute)) {
+            let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttribute.fieldAttributeMasterId} AND value = '${fieldAttribute.displayValue}'`
+            let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
+            return (fieldDataList && fieldDataList.length >= 1)
         }
         return false
     }
 
+    checkIfUniqueConditionExists(fieldAttribute) {
+        let minMaxValidation = fieldAttribute.validation.filter(validation => validation.timeOfExecution == MINMAX)
+        return (minMaxValidation.length > 0 && minMaxValidation[0].condition == 'true')
+    }
     /**
      * This function return fieldAttribute with matching fieldAttributeMasterId
      * @param {*} fieldAttributes
@@ -584,7 +585,7 @@ class DataStoreService {
                 validation
             }
         }
-        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)        
+        const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         let returnParams = await dataStoreFilterService.fetchDataForFilter(token, currentElement, true, formElement, jobTransaction, dataStoreFilterReverseMap)
         let dataStoreAttrValueMap = await this.createDataStoreAttrValueMapInCaseOfFilter(returnParams.dataStoreFilterResponse, currentElement.dataStoreAttributeId)
         return {

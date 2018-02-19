@@ -3,15 +3,22 @@ import _ from 'lodash'
 import {
     ARRAY_SAROJ_FAREYE,
     OBJECT_SAROJ_FAREYE,
-    INVALID_CONFIG_ERROR
+    INVALID_CONFIG_ERROR,
+    AFTER
 } from '../../lib/AttributeConstants'
 import {
     NEXT_FOCUS,
+    TABLE_FIELD_DATA,
+    
 } from '../../lib/constants'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
+import { dataStoreService } from '../../services/classes/DataStoreService'
+import { fieldValidationService } from '../../services/classes/FieldValidation'
+import * as realm from '../../repositories/realmdb'
 
 class ArrayFieldAttribute {
+
     getSortedArrayChildElements(arrayDTO, jobTransaction) {
         let errorMessage;
         let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
@@ -44,7 +51,7 @@ class ArrayFieldAttribute {
         let newArrayElements = _.omit(cloneArrayElements, [rowId])
         return newArrayElements
     }
-    prepareArrayForSaving(arrayElements, arrayParentItem, jobTransactionId, latestPositionId, arrayMainObject) {
+    prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction, latestPositionId, arrayMainObject) {
         let arrayChildDataList = []
         let isSaveDisabled = false
         for (let rowId in arrayElements) {
@@ -52,10 +59,12 @@ class ArrayFieldAttribute {
             let childDataList = []
             for (let [key, arrayRowElement] of arrayElements[rowId].formLayoutObject) {
                 if (arrayRowElement.value == ARRAY_SAROJ_FAREYE || arrayRowElement.value == OBJECT_SAROJ_FAREYE) {
-                    let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayRowElement.childDataList, jobTransactionId, arrayRowElement.positionId, latestPositionId)
+                    let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayRowElement.childDataList, jobTransaction.id, arrayRowElement.positionId, latestPositionId)
                     arrayRowElement.childDataList = fieldDataListWithLatestPositionId.fieldDataList
                     latestPositionId = fieldDataListWithLatestPositionId.latestPositionId
                 }
+                let afterValidationResult = fieldValidationService.fieldValidations(arrayRowElement, arrayElements[rowId].formLayoutObject, AFTER, jobTransaction)
+                arrayRowElement.value = afterValidationResult && !arrayRowElement.alertMessage ? arrayRowElement.displayValue : null
                 if (arrayRowElement.required && (!arrayRowElement.value || arrayRowElement.value == '')) {
                     isSaveDisabled = true
                     break
@@ -72,7 +81,7 @@ class ArrayFieldAttribute {
         }
         arrayParentItem.value = ARRAY_SAROJ_FAREYE
         arrayParentItem.childDataList = arrayChildDataList
-        let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayParentItem.childDataList, jobTransactionId, arrayParentItem.positionId, latestPositionId)
+        let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayParentItem.childDataList, jobTransaction.id, arrayParentItem.positionId, latestPositionId)
         return { fieldDataListWithLatestPositionId, isSaveDisabled }
     }
     enableSaveIfRequired(arrayElements) {
@@ -125,6 +134,28 @@ class ArrayFieldAttribute {
         }
         return { childElementsTemplate, arrayRowDTO, arrayMainObject }
     }
+    checkforUniqueValidation(currentElement, arrayElements, currentRow) {
+        if (!currentElement) {
+            throw new Error('fieldAttributeValue missing in currentElement')
+        }
+        if (!currentRow) {
+            throw new Error('array row missing')
+        }
+        let isValuePresentInAnotherRow = false
+        if (dataStoreService.checkIfUniqueConditionExists(currentElement)) {
+            let fieldDataQuery = `fieldAttributeMasterId =  ${currentElement.fieldAttributeMasterId} AND value = '${currentElement.displayValue}'`
+            let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
+            if (fieldDataList && fieldDataList.length >= 1) return true
+            for (let rowId in arrayElements) {
+                if (arrayElements[rowId].formLayoutObject.get(currentElement.fieldAttributeMasterId).value && arrayElements[rowId].formLayoutObject.get(currentElement.fieldAttributeMasterId).value == currentElement.displayValue) {
+                    isValuePresentInAnotherRow = true
+                    break
+                }
+            }
+        }
+        return isValuePresentInAnotherRow
+    }
 }
+
 
 export let arrayService = new ArrayFieldAttribute()
