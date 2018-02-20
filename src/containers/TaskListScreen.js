@@ -183,7 +183,7 @@ class TaskListScreen extends PureComponent {
         renderItem={({ item }) => {
           return(
             <View>
-              {(item.groupId && item.jobTransactions.length > 0) ? <TouchableOpacity style={[styles.row, styles.padding10, styles.justifyStart, styles.alignCenter, {height: 70}]}   onPress={() => this.updateTransactionForGroupId(item)}>
+              {(item.groupId && item.jobTransactions.length > 1) ? <TouchableOpacity style={[styles.row, styles.padding10, styles.justifyStart, styles.alignCenter, {height: 70}]}   onPress={() => this.updateTransactionForGroupId(item)}>
                 <View style={{position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: 40,top:40, left: 36}}></View>
                   <View style={[styles.borderRadius50,{backgroundColor : item.color,width: 16, height: 16, marginLeft: 20}]}>
                   </View>
@@ -206,11 +206,15 @@ class TaskListScreen extends PureComponent {
     let jobTransactions = items.jobTransactions.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
-    let lastId = (items.groupId && items.total > 0) ? jobTransactions[items.total-1]['id'] : null
+    let groupId = null,lastId = null
+    if(items.groupId && items.total > 1){
+      lastId = jobTransactions[items.total-1]['id']
+      groupId = items.groupId
+    }
     return (
       <FlatList
         data={jobTransactions}
-        renderItem={({ item }) => this.renderData(item,lastId,items.groupId)}
+        renderItem={({ item }) => this.renderData(item,lastId,groupId)}
         legacyImplementation = {true}
         keyExtractor={item => String(item.id)}
       />

@@ -7,6 +7,7 @@ module.exports = {
     OK: 'Ok',
     DONE: 'DONE',
     DISMISS: 'DISMISS',
+    CLOSE: 'Close',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -19,6 +20,14 @@ module.exports = {
     UNSYNCED_TASKS: 'Unsynced Tasks',
     UPLOADING: 'Uploading ...',
     AUTHENTICATING: 'Authenticating...',
+    SYNC: 'Sync',
+    ERP_SYNC_OK_TEXT: 'All data downloaded perfectly.',
+    DAYS_AGO: ' days ago',
+    HOURS_AGO: ' hours ago',
+    MINUTES_AGO: ' minutes ago',
+    SECONDS_AGO: ' seconds ago',
+    RESYNC_IN: 'Resync in',
+    ERP_SYNC: 'ERP Sync',
 
     //Post Assignment Container
     SHIPMENT_NOT_FOUND: 'Scanned Shipment Not Found',
@@ -42,7 +51,6 @@ module.exports = {
     DOWNLOADING_OFFLINE_DS: 'Downloading',
     DOWNLOAD_SUCCESSFUL: 'Download Successful',
     DOWNLOAD_FAILED: 'Download Failed',
-    CLOSE: 'Close',
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',

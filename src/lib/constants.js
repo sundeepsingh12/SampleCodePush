@@ -92,6 +92,8 @@ module.exports = keyMirror({
     SET_UPLOAD_FILE_COUNT: null,
     SET_FAIL_UPLOAD_COUNT: null,
     SET_BACKUP_FILES_LIST: null,
+    SET_ERP_PULL_ACTIVATED: null,
+    ERP_SYNC_STATUS: null,
 
     //Home Container
     PIECHART: null,
