@@ -10,6 +10,7 @@ import QRIcon from '../svg_components/icons/QRIcon'
 import * as globalActions from '../modules/global/globalActions'
 import {WEBVIEW_REF, ENTER_URL_HERE, HTTP} from '../lib/AttributeConstants'
 import renderIf from '../lib/renderIf'
+import { INVALID_URL_OR_NO_INTERNET } from '../lib/ContainerConstants'
 
 import {
     START_FETCHING_URL,
@@ -56,7 +57,7 @@ class CustomApp extends PureComponent {
     }
     onError (message) {
         Toast.show({
-            text: message.description,
+            text: INVALID_URL_OR_NO_INTERNET,
             position: 'bottom',
             buttonText: 'Ok'
              })
@@ -76,10 +77,7 @@ class CustomApp extends PureComponent {
     onLoadEnd = () =>{
         this.props.actions.setState(END_FETCHING_URL,{})
     }
-    // onCancel = () =>{
-    //     this.refs[WEBVIEW_REF].stopLoading();
-    //     this.props.actions.setState(END_FETCHING_URL,{})
-    //  } 
+ 
     onSubmit(value){
         if(!/^[a-zA-Z-_]+:/.test(value)) {
             value = HTTP + value;
@@ -144,7 +142,7 @@ class CustomApp extends PureComponent {
                         </View>
                         </Body>
                     </Header>
-
+                    {this.props.customUrl || (this.props.scannerText)? 
                     <WebView
                         ref={WEBVIEW_REF}
                         style={styles.WebViewStyle} 
@@ -154,7 +152,7 @@ class CustomApp extends PureComponent {
                         onLoadEnd = {this.onLoadEnd}
                         onLoadStart = {this.onLoadStart} 
                         onError = {(event) => this.onError(event.nativeEvent)}
-                    />
+                    /> : null}
                     <Footer style={[style.footer]}>
                         <FooterTab>
                             <Button full style={[styles.bgWhite]} onPress = {this.goBack}>
