@@ -18,6 +18,7 @@ const user = {
         "currentJobMasterVersion": { "type": "number" },
         "company": { "$ref": "/company", "required": true },
         "last_login": { "type": "string", },
+        "lastERPSyncWithServer": { "type": ["string", null] }
     }
 };
 

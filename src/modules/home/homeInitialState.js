@@ -22,7 +22,8 @@ var InitialState = Record({
             displayName: 'All Tasks',
             enabled: false,
             icon: <TaskIcon />
-        }, LIVE: {
+        },
+        LIVE: {
             appModuleId: 13,
             displayName: 'Live',
             enabled: false,
@@ -33,17 +34,20 @@ var InitialState = Record({
             displayName: 'Bulk Update',
             enabled: false,
             icon: <BulkIcon />,
-        }, SEQUENCEMODULE: {
+        },
+        SEQUENCEMODULE: {
             appModuleId: 2,
             displayName: 'Sequence',
             enabled: false,
             icon: <SequenceIcon />,
-        }, SORTING: {
+        },
+        SORTING: {
             appModuleId: 26,
             displayName: SORTING_DISPLAY,
             enabled: false,
             icon: <SortParcelIcon />,
-        }, CUSTOMAPP: {
+        },
+        CUSTOMAPP: {
             appModuleId: 12,
             displayName: CUSTOM_APP_DISPLAY,
             enabled: false,
@@ -102,6 +106,7 @@ var InitialState = Record({
         },
     },
     syncStatus: null,
+    erpSyncStatus: null,
     unsyncedTransactionList: [],
     moduleLoading: false,
     chartLoading: false,
@@ -112,7 +117,10 @@ var InitialState = Record({
     backupUploadView: 0,
     uploadingFileCount: 0,
     failedUploadCount: 0,
-    unsyncBackupFilesList: []
+    unsyncBackupFilesList: [],
+    customErpPullActivated: null,
+    erpModalVisible: false,
+    lastErpSyncTime: null,
 })
 
 export default InitialState
