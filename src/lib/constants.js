@@ -302,6 +302,7 @@ module.exports = keyMirror({
     IS_LOADER_RUNNING: null,
     CHANGE_QUANTITY: null,
     SET_FIXED_SKU: null,
+    SET_TOAST_ERROR_MESSAGE: null,
 
     //Signature Actions
     SET_FIELD_DATA_LIST: null,

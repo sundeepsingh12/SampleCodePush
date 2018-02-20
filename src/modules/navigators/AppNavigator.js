@@ -354,7 +354,7 @@ export const AppNavigator = StackNavigator({
   FixedSKUListing: {
     screen: FixedSKUListing,
     navigationOptions: {
-      title: 'FixedSKU',
+      header: null
     }
   },
   Signature: {
@@ -468,12 +468,12 @@ export const AppNavigator = StackNavigator({
     }
   });
 
-  const middleware = createReactNavigationReduxMiddleware(
-    "root",
-    state => state.nav,
-  );
-  const addListener = createReduxBoundAddListener("root");
-  // end for react-navigation 1.0.0-beta.30
+const middleware = createReactNavigationReduxMiddleware(
+  "root",
+  state => state.nav,
+);
+const addListener = createReduxBoundAddListener("root");
+// end for react-navigation 1.0.0-beta.30
 
 // const AppWithNavigationState = ({ dispatch, nav }) => (
 //   <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />

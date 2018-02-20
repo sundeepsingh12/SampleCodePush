@@ -6,7 +6,8 @@ import {
     IS_LOADER_RUNNING,
     CHANGE_QUANTITY,
     SET_FIXED_SKU,
-    RESET_STATE
+    RESET_STATE,
+    SET_TOAST_ERROR_MESSAGE
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -22,7 +23,9 @@ export default function fixedSKUReducer(state = initialState, action) {
             return state.set('fixedSKUList', action.payload.fixedSKUList)
                 .set('isLoaderRunning', action.payload.isLoaderRunning)
         case RESET_STATE:
-            return initialState        
+            return initialState
+        case SET_TOAST_ERROR_MESSAGE:
+            return state.set('errorMessage', action.payload)
     }
     return state
 }
