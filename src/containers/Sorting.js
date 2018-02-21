@@ -95,7 +95,7 @@ class SortingListing extends PureComponent {
                             <FlatList
                                 data={(Object.values(this.props.sortingDetails))}
                                 renderItem={({ item }) => this.renderData(item)}
-                                keyExtractor={item => item.id}
+                                keyExtractor={item => String(item.id)}
                             />
                         </View>
                     </View>
@@ -169,6 +169,8 @@ class Sorting extends PureComponent {
                                         value={this.props.searchRefereneceValue.value}
                                         onChangeText={this._onChangeReferenceValue}
                                         placeholder={SORTING_PLACEHOLDER}
+                                        returnKeyType = {"search"}
+                                        keyboardAppearance = {"dark"}
                                         placeholderTextColor={'rgba(255,255,255,.4)'}
                                         style={[style.headerSearch]} />
                                     <Button small transparent style={[style.inputInnerBtn]} onPress={() => this._searchForReferenceValue(this.props.searchRefereneceValue.value)}>

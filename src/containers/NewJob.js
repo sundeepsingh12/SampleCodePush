@@ -83,7 +83,7 @@ class NewJob extends PureComponent {
     )
   }
 
-  _keyExtractor = (item, index) => item.id
+  _keyExtractor = (item, index) => String(item.id)
 
   render() {
     return (

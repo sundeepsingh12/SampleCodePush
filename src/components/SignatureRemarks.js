@@ -29,7 +29,7 @@ class SignatureRemarks extends PureComponent {
                     <FlatList
                         data={this.props.fieldDataList}
                         renderItem={({ item }) => this.renderData(item)}
-                        keyExtractor={item => item.fieldAttributeMasterId}
+                        keyExtractor={item => String(item.fieldAttributeMasterId)}
                     />
                 </View>
             </StyleProvider>

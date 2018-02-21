@@ -193,7 +193,7 @@ class FormLayout extends PureComponent {
     }
   }
 
-  _keyExtractor = (item, index) => item[1].key;
+  _keyExtractor = (item, index) => String(item[1].key);
 
   showInvalidFormAlert() {
     let draftMessage = INVALID_FORM_ALERT

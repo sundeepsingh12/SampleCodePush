@@ -97,7 +97,7 @@ class SequenceRunsheetList extends Component {
         )
     }
 
-    _keyExtractor = (item, index) => item;
+    _keyExtractor = (item, index) => String(item);
 
     render() {
         return (

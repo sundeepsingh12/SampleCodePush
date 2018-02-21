@@ -16,7 +16,7 @@ import _ from 'lodash'
 class LiveJobService {
     async getLiveJobList() {
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        const jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'LiveJob', null)
+        const {jobTransactionCustomizationList} = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'LiveJob', null)
         const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id')
         const liveJobsWithValidTime = await this.checkJobExpiry(idJobTransactionCustomizationListMap)
         return liveJobsWithValidTime

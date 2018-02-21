@@ -130,7 +130,7 @@ class ArrayFieldAttribute extends PureComponent {
                 <FlatList
                     data={Object.values(this.props.arrayElements)}
                     renderItem={(item) => this.renderData(item)}
-                    keyExtractor={item => item.rowId}>
+                    keyExtractor={item => String(item.rowId)}>
                 </FlatList>
         }
         return list
