@@ -55,11 +55,12 @@ class CustomApp extends PureComponent {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
-    onError (message) {
+    onError () {
         Toast.show({
             text: INVALID_URL_OR_NO_INTERNET,
             position: 'bottom',
-            buttonText: 'Ok'
+            buttonText: 'Okay',
+            duration: 5000
              })
     }  
 
@@ -123,6 +124,8 @@ class CustomApp extends PureComponent {
                                         onEndEditing = {(event) => this.onSubmit(event.nativeEvent.text)}
                                         placeholder={ENTER_URL_HERE}
                                         placeholderTextColor={'rgba(255,255,255,.4)'}
+                                        returnKeyType = {"search"}
+                                        keyboardAppearance = {"dark"}
                                         style={[style.headerSearch]} />
                                 </View> :
                                 <Text numberOfLines={1} ellipsizeMode={'tail'} style={[styles.fontCenter, styles.fontWhite, styles.fontDefault, styles.alignCenter]}>{this.props.customUrl}</Text> )} 
@@ -142,17 +145,16 @@ class CustomApp extends PureComponent {
                         </View>
                         </Body>
                     </Header>
-                    {this.props.customUrl || (this.props.scannerText)? 
+                    {this.props.customUrl || (this.props.scannerText) || (!this.props.navigation.state.params.customUrl) ? 
                     <WebView
                         ref={WEBVIEW_REF}
-                        style={styles.WebViewStyle} 
                         source={{uri : (this.props.scannerText) ? this.props.scannerText: this.props.customUrl}} 
                         javaScriptEnabled={true}
                         domStorageEnabled={true}
                         onLoadEnd = {this.onLoadEnd}
                         onLoadStart = {this.onLoadStart} 
-                        onError = {(event) => this.onError(event.nativeEvent)}
-                    /> : null}
+                        onError = {(event) => this.onError()}
+                    /> : null }
                     <Footer style={[style.footer]}>
                         <FooterTab>
                             <Button full style={[styles.bgWhite]} onPress = {this.goBack}>
@@ -162,11 +164,12 @@ class CustomApp extends PureComponent {
                                 <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
                             </Button>
                         </FooterTab>
+                        { (this.props.navigation.state.params.customUrl) ? 
                         <FooterTab>
                             <Button style={{alignItems: 'flex-end', height: 40, width:40}} onPress = {() =>   this.props.navigation.navigate(QrCodeScanner, {returnData: this.onSetText.bind(this)})}>
                                 <QRIcon width={30} height={30} color = {styles.fontBlack}/>  
                             </Button>
-                        </FooterTab>
+                        </FooterTab> : null }
                     </Footer>
                 </Container>
 
