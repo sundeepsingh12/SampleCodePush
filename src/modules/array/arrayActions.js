@@ -133,7 +133,7 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
             let isValuePresentInAnotherTransaction = false
             let validationsResult = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
             if (timeOfExecution == AFTER) {
-                isValuePresentInAnotherTransaction = (currentElement.attributeTypeId == TEXT || currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == STRING || currentElement.attributeTypeId == QR_SCAN) ? arrayService.checkforUniqueValidation(currentElement, newArray, formElement) : false
+                isValuePresentInAnotherTransaction = (currentElement.attributeTypeId == TEXT || currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == STRING || currentElement.attributeTypeId == QR_SCAN) ? arrayService.checkforUniqueValidation(currentElement, newArray, rowId) : false
                 if (scanValue) formElement.get(currentElement.fieldAttributeMasterId).displayValue = scanValue
                 formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
             }

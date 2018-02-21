@@ -9,7 +9,7 @@ import {
 import {
     NEXT_FOCUS,
     TABLE_FIELD_DATA,
-    
+
 } from '../../lib/constants'
 import { fieldDataService } from '../../services/classes/FieldData'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
@@ -134,12 +134,9 @@ class ArrayFieldAttribute {
         }
         return { childElementsTemplate, arrayRowDTO, arrayMainObject }
     }
-    checkforUniqueValidation(currentElement, arrayElements, currentRow) {
+    checkforUniqueValidation(currentElement, arrayElements, currentRowId) {
         if (!currentElement) {
             throw new Error('fieldAttributeValue missing in currentElement')
-        }
-        if (!currentRow) {
-            throw new Error('array row missing')
         }
         let isValuePresentInAnotherRow = false
         if (dataStoreService.checkIfUniqueConditionExists(currentElement)) {
@@ -147,6 +144,8 @@ class ArrayFieldAttribute {
             let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
             if (fieldDataList && fieldDataList.length >= 1) return true
             for (let rowId in arrayElements) {
+                if (rowId == currentRowId)
+                    continue
                 if (arrayElements[rowId].formLayoutObject.get(currentElement.fieldAttributeMasterId).value && arrayElements[rowId].formLayoutObject.get(currentElement.fieldAttributeMasterId).value == currentElement.displayValue) {
                     isValuePresentInAnotherRow = true
                     break
