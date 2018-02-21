@@ -23,6 +23,7 @@ import {
     NEXT_FOCUS,
     SET_ADV_DROPDOWN_MESSAGE_OBJECT,
     SET_MODAL_FIELD_ATTRIBUTE,
+    SET_OPTION_ATTRIBUTE_ERROR
 } from '../../lib/constants'
 import _ from 'lodash'
 
@@ -141,10 +142,10 @@ export function showAdvanceDropdownMessage(item) {
             }
             dispatch(setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {
                 code: itemCodeObject.code,
-                message: itemMessage
+                itemMessage
             }))
         } catch (error) {
-            console.log(error)
+            dispatch(setState(SET_OPTION_ATTRIBUTE_ERROR, error.message))
         }
     }
 }

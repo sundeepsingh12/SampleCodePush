@@ -130,6 +130,7 @@ module.exports = {
 
     //Multiple Option Container
     NO_OPTIONS_PRESENT: 'No options Present',
+    MULTIPLE_SELECT_OPTIONS: 'Multiple Select Options',
     //Save Activated and CheckoutDetails
     SMS_NOT_SENT_TRY_AGAIN_LATER: 'SMS not sent ,try again later',
     EMAIL_NOT_SENT_TRY_AGAIN_LATER: 'Email not sent ,try again later',

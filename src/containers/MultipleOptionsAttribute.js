@@ -45,7 +45,8 @@ import {
 import {
     DONE,
     NO_OPTIONS_PRESENT,
-    DISMISS
+    DISMISS,
+    MULTIPLE_SELECT_OPTIONS
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -80,7 +81,7 @@ class MultipleOptionsAttribute extends PureComponent {
     }
 
     renderOptionView(item) {
-        let fieldAttributeView = null,checkForIcon = false
+        let fieldAttributeView = null, checkForIcon = false
         if (this.props.currentElement.attributeTypeId == CHECKBOX) {
             fieldAttributeView = <CheckBox
                 checked={item.selected}
@@ -120,8 +121,8 @@ class MultipleOptionsAttribute extends PureComponent {
                     <Text style={[styles.marginLeft10]}>{item.name}</Text>
                 </Body>
                 {checkForIcon ? <Right>
-                                    <Icon name="ios-arrow-forward" />
-                                </Right> : null}
+                    <Icon name="ios-arrow-forward" />
+                </Right> : null}
             </ListItem>
         )
     }
@@ -191,11 +192,73 @@ class MultipleOptionsAttribute extends PureComponent {
             </View>
         )
     }
+    getAdvanceDropDownModal() {
+        return (<View style={[styles.flex1, styles.column]}>
+            <View style={{ flex: .4 }}>
+                <TouchableHighlight
+                    style={{ backgroundColor: 'rgba(0,0,0,.5)', flex: 1 }}
+                    onPress={() => {
+                        this.props.actions.setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {})
+                    }}
+                >
+                    {/* Added empty view because touchableheghlight must have a child */}
+                    <View />
+                </TouchableHighlight>
+            </View>
+            <View style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                <View style={{ height: '100%' }}>
+                    <View style={[styles.bgLightGray]}>
+                        <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
+                            <Text style={[styles.padding10]}>{MULTIPLE_SELECT_OPTIONS}</Text>
+                            <TouchableHighlight
+                                onPress={() => {
+                                    this.props.actions.saveOptionsFieldData(
+                                        this.props.optionsMap,
+                                        this.props.currentElement,
+                                        this.props.latestPositionId,
+                                        this.props.formElements,
+                                        this.props.isSaveDisabled,
+                                        this.props.jobTransaction,
+                                        this.props.calledFromArray,
+                                        this.props.rowId,
+                                        this.props.fieldAttributeMasterParentIdMap,
+                                        this.props.advanceDropdownMessageObject
+                                    )
+                                }}>
+                                <Text style={[styles.fontPrimary, styles.padding10]}> {DONE} </Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                    <View searchBar style={[styles.padding5]}>
+                        <Item rounded style={{ height: 30, backgroundColor: '#ffffff' }}>
+                            <Input
+                                style={[styles.fontSm, styles.fontDarkGray, styles.justifyCenter, { marginTop: 0, lineHeight: 10, marginBottom: 0 }]}
+                                value={this.props.advanceDropdownMessageObject.code}
+                                editable={false}
+                            />
+                            <Icon style={[styles.fontSm]} name="md-close"
+                                onPress={() => {
+                                    this.props.actions.setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {})
+                                }}
+                            />
+                        </Item>
+                    </View>
+                    <ScrollView style={[styles.paddingBottom10]}>
+                        <View>
+                            <Text style={[styles.padding10]}>
+                                {this.props.advanceDropdownMessageObject.itemMessage}
+                            </Text>
+                        </View>
+                        {/*This view is empty because bottom sheet margin from bottom  */}
+                    </ScrollView>
+                </View>
+            </View>
+        </View>)
+    }
     getModalView() {
         let optionsList = this.sortOptionsMap()
         let listView = this.renderListViewData(optionsList)
         let searchBarView = null
-        let advanceDropdownModal = null
         if (this.props.error) {
             this.callToast()
         }
@@ -204,68 +267,7 @@ class MultipleOptionsAttribute extends PureComponent {
         }
         let view
         if (!_.isEmpty(this.props.advanceDropdownMessageObject)) {
-            view =
-                <View style={[styles.flex1, styles.column]}>
-                    <View style={{ flex: .4 }}>
-                        <TouchableHighlight
-                            style={{ backgroundColor: 'rgba(0,0,0,.5)', flex: 1 }}
-                            onPress={() => {
-                                this.props.actions.setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {})
-                            }}
-                        >
-                            {/* Added empty view because touchableheghlight must have a child */}
-                            <View />
-                        </TouchableHighlight>
-                    </View>
-                    <View style={{ backgroundColor: '#ffffff', flex: .6 }}>
-                        <View style={{ height: '100%' }}>
-                            <View style={[styles.bgLightGray]}>
-                                <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
-                                    <Text style={[styles.padding10]}>Multiple Select Options</Text>
-                                    <TouchableHighlight
-                                        onPress={() => {
-                                            this.props.actions.saveOptionsFieldData(
-                                                this.props.optionsMap,
-                                                this.props.currentElement,
-                                                this.props.latestPositionId,
-                                                this.props.formElements,
-                                                this.props.isSaveDisabled,
-                                                this.props.jobTransaction,
-                                                this.props.calledFromArray,
-                                                this.props.rowId,
-                                                this.props.fieldAttributeMasterParentIdMap,
-                                                this.props.advanceDropdownMessageObject
-                                            )
-                                        }}>
-                                        <Text style={[styles.fontPrimary, styles.padding10]}> {DONE} </Text>
-                                    </TouchableHighlight>
-                                </View>
-                            </View>
-                            <View searchBar style={[styles.padding5]}>
-                                <Item rounded style={{ height: 30, backgroundColor: '#ffffff' }}>
-                                    <Input
-                                        style={[styles.fontSm, styles.fontDarkGray, styles.justifyCenter, { marginTop: 0, lineHeight: 10, marginBottom: 0 }]}
-                                        value={this.props.advanceDropdownMessageObject.code}
-                                        editable={false}
-                                    />
-                                    <Icon style={[styles.fontSm]} name="md-close"
-                                        onPress={() => {
-                                            this.props.actions.setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {})
-                                        }}
-                                    />
-                                </Item>
-                            </View>
-                            <ScrollView style={[styles.paddingBottom10]}>
-                                <View>
-                                    <Text style={[styles.padding10]}>
-                                        {this.props.advanceDropdownMessageObject.message}
-                                    </Text>
-                                </View>
-                                {/*This view is empty because bottom sheet margin from bottom  */}
-                            </ScrollView>
-                        </View>
-                    </View>
-                </View>
+            view = this.getAdvanceDropDownModal()
         } else {
             view =
                 <View style={[styles.flex1, styles.column]}>
