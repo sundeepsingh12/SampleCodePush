@@ -56,14 +56,6 @@ class NewJob extends PureComponent {
     return { header: null }
   }
 
-  componentDidMount() {
-    if (this.props.navigation.state.params.jobMasterIdList) {
-      this.props.actions.getMastersFromMasterIds(this.props.navigation.state.params.jobMasterIdList)
-    } else {
-      this.props.actions.getMastersWithNewJob()
-    }
-  }
-
   componentDidUpdate() {
     if (this.props.newJobError != '') {
       Toast.show({
@@ -73,13 +65,12 @@ class NewJob extends PureComponent {
         type: 'danger',
         duration: 10000
       })
-     this.props.actions.setState(SET_ERROR_MSG_FOR_NEW_JOB, '')
+      this.props.actions.setState(SET_ERROR_MSG_FOR_NEW_JOB, '')
     }
   }
 
   renderData = (item) => {
     return (
-
       <ListItem style={[style.jobListItem, styles.justifySpaceBetween]}
         onPress={() => this.props.actions.redirectToContainer(item)}>
         <View>
@@ -92,7 +83,7 @@ class NewJob extends PureComponent {
     )
   }
 
-  _keyExtractor = (item, index) => item.id
+  _keyExtractor = (item, index) => String(item.id)
 
   render() {
     return (

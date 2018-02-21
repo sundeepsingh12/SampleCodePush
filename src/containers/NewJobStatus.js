@@ -37,7 +37,6 @@ function mapStateToProps(state) {
   return {
     jobMasterList: state.newJob.jobMasterList,
     statusList: state.newJob.statusList,
-    statusList1: state.newJob.statusList,
     negativeId: state.newJob.negativeId
   }
 };
@@ -58,10 +57,6 @@ class NewJobStatus extends PureComponent {
     return { header: null }
   }
 
-  componentWillMount() {
-    this.props.actions.getStatusAndIdForJobMaster(this.props.navigation.state.params.jobMaster.id)
-  }
-
   renderData = (item) => {
     return (
       <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.redirectToFormLayout(item,
@@ -78,7 +73,7 @@ class NewJobStatus extends PureComponent {
     )
   }
 
-  _keyExtractor = (item, index) => item.id;
+  _keyExtractor = (item, index) => String(item.id);
 
   render() {
     return (

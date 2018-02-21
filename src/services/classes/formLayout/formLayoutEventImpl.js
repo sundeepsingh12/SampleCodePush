@@ -213,7 +213,7 @@ export default class FormLayoutEventImpl {
                 return formLayoutObject // return undefined or empty object if formLayoutObject is empty
             }
             let fieldData, jobTransaction, job, dbObjects
-            if (jobTransactionList.length) { //Case of bulk
+            if (jobTransactionList && jobTransactionList.length) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
                 jobTransaction = this._setBulkJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) // to edit later 
@@ -230,10 +230,10 @@ export default class FormLayoutEventImpl {
             if (customNaming && customNaming.value && customNaming.value.updateEta) {
                 await this._getRunsheetIdToUpdateJobTransactions(jobTransaction.value, currentTime, dbObjects.status[0].statusCategory)
             }
-            const prevStatusId = (jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
+            const prevStatusId = (jobTransactionList && jobTransactionList.length) ? dbObjects.jobTransaction[0].jobStatusId : dbObjects.jobTransaction.jobStatusId
             const transactionLog = await this._updateTransactionLogs(jobTransaction.value, statusId, prevStatusId, jobMasterId, user, lastTrackLog)
-            const runSheet = (jobTransactionId >= 0 || jobTransactionList.length) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList) : []            
-            await this._updateUserSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList,userSummary,jobTransaction.value[0], statusId)            
+            const runSheet = (jobTransactionId >= 0 || (jobTransactionList && jobTransactionList.length)) ? await this._updateRunsheetSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList) : []
+            await this._updateUserSummary(dbObjects.jobTransaction, dbObjects.status[0].statusCategory, jobTransactionList, userSummary, jobTransaction.value[0], statusId)
             await this._updateJobSummary(dbObjects.jobTransaction, statusId, jobTransactionList)
             let serverSmsLogs = await addServerSmsService.addServerSms(statusId, jobMasterId, fieldData, jobTransaction.value)
             realm.performBatchSave(fieldData, jobTransaction, transactionLog, runSheet, job, serverSmsLogs)
@@ -325,18 +325,18 @@ export default class FormLayoutEventImpl {
      * 
      */
 
-    async _updateUserSummary(jobTransaction, statusCategory, jobTransactionIdList,userSummary,jobTransactionValue,nextStatusId) {
+    async _updateUserSummary(jobTransaction, statusCategory, jobTransactionIdList, userSummary, jobTransactionValue, nextStatusId) {
         const status = ['pendingCount', 'failCount', 'successCount']
         const prevStatusId = (jobTransactionIdList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
         const jobTransactionId = (jobTransactionIdList.length) ? jobTransaction[0].id : jobTransaction.id
         const count = (jobTransactionIdList.length) ? jobTransactionIdList.length : 1
-        userSummary["value"][status[prevStatusCategory - 1]] = (userSummary["value"][status[prevStatusCategory - 1]] - count >= 0 && prevStatusId != nextStatusId ) ? userSummary["value"][status[prevStatusCategory - 1]] - count : userSummary["value"][status[prevStatusCategory - 1]] 
-        userSummary["value"][status[statusCategory -1]] += count 
-        if(jobTransactionValue){
+        userSummary["value"][status[prevStatusCategory - 1]] = (userSummary["value"][status[prevStatusCategory - 1]] - count >= 0 && prevStatusId != nextStatusId) ? userSummary["value"][status[prevStatusCategory - 1]] - count : userSummary["value"][status[prevStatusCategory - 1]]
+        userSummary["value"][status[statusCategory - 1]] += count
+        if (jobTransactionValue) {
             userSummary.value.lastOrderTime = jobTransactionValue.lastTransactionTimeOnMobile
-            userSummary.value.lastOrderNumber = jobTransactionValue.referenceNumber 
-        } 
+            userSummary.value.lastOrderNumber = jobTransactionValue.referenceNumber
+        }
         await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)
     }
 

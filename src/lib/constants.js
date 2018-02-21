@@ -92,6 +92,8 @@ module.exports = keyMirror({
     SET_UPLOAD_FILE_COUNT: null,
     SET_FAIL_UPLOAD_COUNT: null,
     SET_BACKUP_FILES_LIST: null,
+    SET_ERP_PULL_ACTIVATED: null,
+    ERP_SYNC_STATUS: null,
 
     //Home Container
     PIECHART: null,
@@ -112,6 +114,7 @@ module.exports = keyMirror({
     JOB_DETAILS_FETCHING_END: null,
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
+    SHOW_DROPDOWN: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,

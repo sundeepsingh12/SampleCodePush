@@ -22,6 +22,7 @@ import {
     CheckBox,
     Radio,
     Body,
+    Right
 } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
@@ -79,7 +80,7 @@ class MultipleOptionsAttribute extends PureComponent {
     }
 
     renderOptionView(item) {
-        let fieldAttributeView = null
+        let fieldAttributeView = null,checkForIcon = false
         if (this.props.currentElement.attributeTypeId == CHECKBOX) {
             fieldAttributeView = <CheckBox
                 checked={item.selected}
@@ -91,6 +92,7 @@ class MultipleOptionsAttribute extends PureComponent {
         }
         else if (this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER || (this.props.currentElement.attributeTypeId == DROPDOWN)) {
             fieldAttributeView = item.selected ? <Icon name="md-checkmark-circle" style={[styles.fontXl, styles.fontSuccess]} /> : null
+            checkForIcon = true
         }
         return (
             <ListItem
@@ -117,6 +119,9 @@ class MultipleOptionsAttribute extends PureComponent {
                 <Body>
                     <Text style={[styles.marginLeft10]}>{item.name}</Text>
                 </Body>
+                {checkForIcon ? <Right>
+                                    <Icon name="ios-arrow-forward" />
+                                </Right> : null}
             </ListItem>
         )
     }

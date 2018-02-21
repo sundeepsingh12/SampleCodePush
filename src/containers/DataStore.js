@@ -207,7 +207,7 @@ class DataStore extends PureComponent {
             flatListView = < FlatList
                 data={Object.values(this.props.dataStoreAttrValueMap)}
                 renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => item.id}
+                keyExtractor={item => String(item.id)}
             />
         }
         return flatListView

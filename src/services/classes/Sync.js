@@ -127,18 +127,13 @@ class Sync {
    * 
    * @return tdcResponse object
    */
-  async downloadDataFromServer(pageNumber, pageSize, isLiveJob) {
+  async downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
     let formData = null
-    const user = await keyValueDBService.getValueFromStore(USER)
-    if (!user || !user.value) {
-      throw new Error('Value of user missing')
-    }
-    const isCustomErpPullActivated = user.value.company.customErpPullActivated
-    if (!isCustomErpPullActivated) {
+    if (!erpPull) {
       formData = 'pageNumber=' + pageNumber + '&pageSize=' + pageSize
     }
     let url = ''
@@ -172,7 +167,9 @@ class Sync {
       const queryType = tdcContentObject.type
       if (queryType == 'insert') {
         jobMasterIds = await this.saveDataFromServerInDB(contentQuery, isLiveJob)
-      } else if (queryType == 'update' || queryType == 'updateStatus') {
+      } else if (queryType == 'update') {
+        jobMasterIds = await this.insertOrUpdateDataInDb(contentQuery)
+      } else if (queryType == 'updateStatus') {
         jobMasterIds = await this.updateDataInDB(contentQuery)
       } else if (queryType == 'delete') {
         jobMasterIds = `${JOBS_DELETED}`
@@ -320,7 +317,7 @@ class Sync {
     let jobQuery = jobIds.map(jobId => 'id = ' + jobId.id).join(' OR ')
     jobQuery = jobQuery + ' AND status = 6'
     let jobsInDbList = await realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
-    if (jobsInDbList.length <= 0){
+    if (jobsInDbList.length <= 0) {
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(true))
       return
     }
@@ -377,7 +374,101 @@ class Sync {
     const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
     return jobMasterIds
   }
+  async insertOrUpdateDataInDb(contentQuery) {
+    const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+    const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
+    const jobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => !jobTransaction.negativeJobTransactionId)
+      .map(jobTransaction => jobTransaction.id)
+    const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
+      .map(newJobTransaction => newJobTransaction.negativeJobTransactionId);
+    let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
 
+    const runsheets = {
+      tableName: TABLE_RUNSHEET,
+      valueList: runsheetIds,
+      propertyName: 'id'
+    }
+    const jobDatas = {
+      tableName: TABLE_JOB_DATA,
+      valueList: jobIds,
+      propertyName: 'jobId'
+    }
+    const newJobTransactions = {
+      tableName: TABLE_JOB_TRANSACTION,
+      valueList: newJobTransactionsIds,
+      propertyName: 'id'
+    }
+    const newJobs = {
+      tableName: TABLE_JOB,
+      valueList: newJobTransactionsIds,
+      propertyName: 'id'
+    }
+    const jobFieldData = {
+      tableName: TABLE_FIELD_DATA,
+      valueList: concatinatedJobTransactionsIdsAndNewJobTransactionsIds,
+      propertyName: 'jobTransactionId'
+    }
+    //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
+    //So it's necessary to delete existing JobData First in case of update query
+    if (contentQuery.fieldData && contentQuery.fieldData.length > 0) {
+      await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
+    } else {
+      await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs)
+    }
+    let jobTransactions = (jobTransactionsIds.length > 0) ? await this.getTransactionForUpdateQuery(contentQuery.jobTransactions, jobTransactionsIds) : []
+    if (jobTransactions.length > 0) {
+      contentQuery.jobTransactions = jobTransactions
+    }
+    let jobs = (jobIds.length > 0) ? await this.getJobForUpdateQuery(contentQuery.job, jobIds) : []
+    if (jobs.length > 0) {
+      contentQuery.job = jobs
+    }
+    const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
+    return jobMasterIds
+  }
+  async getJobForUpdateQuery(jobs, jobIds) {
+    let jobArray = []
+    let jobQuery = jobIds.map(jobId => 'id = ' + jobId).join(' OR ')
+    let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery, null, null)
+    let existingTransactionsMap = {}
+    for (let index in jobList) {
+      let job = { ...jobList[index] }
+      let newJob = _.omit(job, ['status'])
+      existingTransactionsMap[job.id] = newJob
+    }
+    if (_.isEmpty(existingTransactionsMap)) { return jobs }
+    for (let job of jobs) {
+      if (existingTransactionsMap[job.id]) {
+        let updatedJobTransaction = JSON.parse(JSON.stringify(existingTransactionsMap[job.id]))
+        jobArray.push(updatedJobTransaction)
+      } else {
+        jobArray.push(job)
+      }
+    }
+    return jobArray
+  }
+  async getTransactionForUpdateQuery(jobTransactions, jobTransactionIds) {
+    let jobTransactionArray = []
+    let jobTransactionQuery = jobTransactionIds.map(transactionId => 'id = ' + transactionId).join(' OR ')
+    let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, null, null)
+    let existingTransactionsMap = {}
+    for (let index in transactionList) {
+      let jobTransaction = { ...transactionList[index] }
+      let newJobTransaction = _.omit(jobTransaction, ['jobStatusId', 'actualAmount', 'originalAmount', 'moneyTransactionType', 'trackKm', 'trackHalt', 'trackCallCount', 'trackCallDuration',
+        'trackSmsCount', 'latitude', 'longitude', 'trackBattery', 'seqSelected', 'seqActual', 'seqAssigned', 'lastTransactionTimeOnMobile', 'statusCode', 'jobEtaTime', 'npsFeedBack'])
+      existingTransactionsMap[jobTransaction.id] = newJobTransaction
+    }
+    if (_.isEmpty(existingTransactionsMap)) { return jobTransactions }
+    for (let jobTransaction of jobTransactions) {
+      if (existingTransactionsMap[jobTransaction.id]) {
+        let updatedJobTransaction = JSON.parse(JSON.stringify(existingTransactionsMap[jobTransaction.id]))
+        jobTransactionArray.push(updatedJobTransaction)
+      } else {
+        jobTransactionArray.push(jobTransaction)
+      }
+    }
+    return jobTransactionArray
+  }
   /**POST API
    * 
    * Request Body
@@ -508,7 +599,7 @@ class Sync {
    * 
    * Returns true if any job present in sync table on server side
    */
-  async downloadAndDeleteDataFromServer(isLiveJob) {
+  async downloadAndDeleteDataFromServer(isLiveJob, erpPull, user) {
     let pageNumber = 0,
       pageSize = 3, currentPage
     if (isLiveJob)
@@ -520,7 +611,7 @@ class Sync {
     let postAssignmentList = jobAssignmentModule.length == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark).postAssignmentList : null
     const unseenStatusIds = postAssignmentList && postAssignmentList.length > 0 ? await jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(postAssignmentList, UNSEEN) : await jobStatusService.getAllIdsForCode(UNSEEN)
     while (!isLastPageReached) {
-      const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob)
+      const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull)
       if (tdcResponse) {
         json = await tdcResponse.json
         isLastPageReached = json.last
@@ -546,7 +637,7 @@ class Sync {
             await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
           }
           await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
-          const jobMasterTitleList = (jobMasterIds.constructor===Array)?await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds):jobMasterIds
+          const jobMasterTitleList = (jobMasterIds.constructor === Array) ? await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds) : jobMasterIds
           let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
           if (!_.isNull(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value))) {
             this.showNotification(jobMasterTitleList)
@@ -554,6 +645,10 @@ class Sync {
           }
           await jobSummaryService.updateJobSummary(dataList.jobSummaries)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
+          if (erpPull) {
+            user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')
+            await keyValueDBService.validateAndSaveData(USER, user)
+          }
         }
       } else {
         isLastPageReached = true
@@ -564,6 +659,7 @@ class Sync {
         } else {
           pageNumber = 0
         }
+        erpPull = false
       }
     }
     if (isJobsPresent) {
@@ -575,16 +671,16 @@ class Sync {
 
   showNotification(jobMasterTitleList) {
 
-    const alertBody = (jobMasterTitleList.constructor===Array)?jobMasterTitleList.join():jobMasterTitleList
-    const message = (jobMasterTitleList.constructor===Array)?`You have new updates for ${alertBody} jobs`:alertBody
+    const alertBody = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
+    const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${alertBody} jobs` : alertBody
 
     PushNotification.localNotification({
-    /* iOS and Android properties */
-    title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-    message, // (required)
-    soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
-});
-    
+      /* iOS and Android properties */
+      title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
+      message, // (required)
+      soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+    });
+
 
   }
 

@@ -328,7 +328,7 @@ class BasicFormElement extends PureComponent {
             >
                 <View style={[styles.marginHorizontal10]}>
                     {modalView}
-                    <View style={[styles.borderBottomBlack, styles.relative]}>
+                    <View style={[styles.borderBottomGray, styles.relative]}>
                         <Text style={[styles.marginBottom10, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable), styles.fontDefault]}>
                             {this.props.item.label}
                             {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}

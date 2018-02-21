@@ -71,7 +71,7 @@ class FixedSKUListing extends PureComponent {
           <FlatList
             data={Object.values(this.props.fixedSKUList)}
             renderItem={({ item }) => this.renderData(item)}
-            keyExtractor={item => item.id}
+            keyExtractor={item => String(item.id)}
           />
           <Text style={{ marginBottom: 10, marginTop: 10 }}>
             Total Quantity : {parseInt(this.props.totalQuantity)}

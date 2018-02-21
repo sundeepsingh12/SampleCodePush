@@ -46,18 +46,21 @@ export function fetchJobs(date) {
   return async function (dispatch) {
     try {
       const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
-      dispatch(setState(FUTURE_RUNSHEET_ENABLED, customNaming.value.enableFutureDateRunsheet))
-      if(_.isUndefined(date) && customNaming.value.enableFutureDateRunsheet) date = moment().format('YYYY-MM-DD')
-      dispatch(setState(SET_SELECTED_DATE,date))
       dispatch(setState(JOB_LISTING_START))
       const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-      let selectedDate = customNaming.value.enableFutureDateRunsheet ? date : null
-      let jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,null,null,selectedDate)
-      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }))
+      let jobMasterListWithMultipart = jobTransactionService.getEnableMultiPartJobMaster(jobTransactionCustomizationListParametersDTO.jobMasterList)
+      let jobIdGroupIdMap = jobMasterListWithMultipart && jobMasterListWithMultipart.length > 0 ?  jobTransactionService.getJobIdGroupIdMap(jobMasterListWithMultipart) : {}
+      let enableFutureDateRunsheet = customNaming && customNaming.value && customNaming.value.enableFutureDateRunsheet && _.isEmpty(jobIdGroupIdMap) ? customNaming.value.enableFutureDateRunsheet : false
+      dispatch(setState(FUTURE_RUNSHEET_ENABLED, enableFutureDateRunsheet))
+      if(_.isUndefined(date) && customNaming.value.enableFutureDateRunsheet) date = moment().format('YYYY-MM-DD')
+      dispatch(setState(SET_SELECTED_DATE,date))
+      let selectedDate = customNaming.value.enableFutureDateRunsheet && _.isEmpty(jobIdGroupIdMap) ? date : null
+      let {jobTransactionCustomizationList,statusNextStatusListMap } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,'AllTasks',null,selectedDate,jobIdGroupIdMap)
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList, statusNextStatusListMap}))
     } catch (error) {
       //TODO handle UI
       console.log(error)
-      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList:[]}))
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList:[],statusNextStatusListMap : {}}))
     }
   }
 }
