@@ -14,12 +14,16 @@ import {
     OPTION_RADIO_FOR_MASTER,
     OBJECT_SAROJ_FAREYE,
     OPTION_RADIO_VALUE,
+    ADVANCE_DROPDOWN
 } from '../../lib/AttributeConstants'
 import {
     FIELD_ATTRIBUTE_VALUE,
     FIELD_ATTRIBUTE,
     SET_OPTIONS_LIST,
-    NEXT_FOCUS
+    NEXT_FOCUS,
+    SET_ADV_DROPDOWN_MESSAGE_OBJECT,
+    SET_MODAL_FIELD_ATTRIBUTE,
+    SET_OPTION_ATTRIBUTE_ERROR
 } from '../../lib/constants'
 import _ from 'lodash'
 
@@ -106,6 +110,10 @@ export function saveOptionsFieldData(optionsMap, currentElement, latestPositionI
                 fieldDataValue = ARRAY_SAROJ_FAREYE
             } else if (currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
                 fieldDataValue = OBJECT_SAROJ_FAREYE
+            } else if (currentElement.attributeTypeId == ADVANCE_DROPDOWN) {
+                fieldDataValue = containerValue = item ? item.code : null
+                dispatch(setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {
+                }))
             } else {
                 fieldDataValue = item ? item.code : null
                 containerValue = item ? item.name : null
@@ -121,6 +129,23 @@ export function saveOptionsFieldData(optionsMap, currentElement, latestPositionI
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, fieldDataValue, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, true, containerValue))
         } catch (error) {
             console.log(error)
+        }
+    }
+}
+export function showAdvanceDropdownMessage(item) {
+    return async function (dispatch) {
+        try {
+            let itemCodeObject = JSON.parse(item.code)
+            let itemMessage = ''
+            for (let message of itemCodeObject.message) {
+                itemMessage += message.key + '\n' + message.value + '\n\n'
+            }
+            dispatch(setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {
+                code: itemCodeObject.code,
+                itemMessage
+            }))
+        } catch (error) {
+            dispatch(setState(SET_OPTION_ATTRIBUTE_ERROR, error.message))
         }
     }
 }

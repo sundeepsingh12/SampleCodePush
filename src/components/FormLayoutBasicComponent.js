@@ -63,7 +63,8 @@ import {
     ARRAY_SAROJ_FAREYE,
     OBJECT_SAROJ_FAREYE,
     BEFORE,
-    AFTER
+    AFTER,
+    ADVANCE_DROPDOWN
 } from '../lib/AttributeConstants'
 
 import {
@@ -223,7 +224,7 @@ class BasicFormElement extends PureComponent {
             return null
         }
         let attributeTypeId = this.props.formElement.get(this.props.modalFieldAttributeMasterId).attributeTypeId
-        if (attributeTypeId == CHECKBOX || attributeTypeId == OPTION_RADIO_FOR_MASTER || attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN) {
+        if (attributeTypeId == CHECKBOX || attributeTypeId == OPTION_RADIO_FOR_MASTER || attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN || attributeTypeId == ADVANCE_DROPDOWN) {
             return (
                 <View>
                     <MultipleOptionsAttribute
@@ -440,6 +441,7 @@ class BasicFormElement extends PureComponent {
             case RADIOBUTTON:
             case DROPDOWN:
             case OPTION_RADIO_FOR_MASTER:
+            case ADVANCE_DROPDOWN:
                 return (
                     <View>
                         {multipleOptionCardView}
