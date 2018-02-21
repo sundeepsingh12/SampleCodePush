@@ -6,7 +6,8 @@ import {
     SET_OPTIONS_LIST,
     RESET_STATE,
     SET_OPTION_ATTRIBUTE_ERROR,
-    SET_OPTION_SEARCH_INPUT
+    SET_OPTION_SEARCH_INPUT,
+    SET_ADV_DROPDOWN_MESSAGE_OBJECT
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -22,6 +23,9 @@ export default function multipleOptionsAttributeReducer(state = initialState, ac
         }
         case SET_OPTION_SEARCH_INPUT: {
             return state.set('searchInput', action.payload.searchInput)
+        }
+        case SET_ADV_DROPDOWN_MESSAGE_OBJECT: {
+            return state.set('advanceDropdownMessageObject', action.payload)
         }
         case RESET_STATE: {
             return initialState
