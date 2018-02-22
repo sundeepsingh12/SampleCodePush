@@ -305,6 +305,7 @@ module.exports = keyMirror({
     CHANGE_QUANTITY: null,
     SET_FIXED_SKU: null,
     SET_TOAST_ERROR_MESSAGE: null,
+    RESET_STATE_FIXED_SKU: null,
 
     //Signature Actions
     SET_FIELD_DATA_LIST: null,

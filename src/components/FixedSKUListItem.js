@@ -62,21 +62,20 @@ class FixedSKUListItem extends PureComponent {
                     </View>
                     <View style={{ marginTop: 5, marginBottom: 5, height: 1, backgroundColor: '#f2f2f2' }} />
                     <View style={[styles.flex1, styles.row, styles.paddingBottom5]}>
-                        <Slider style={[styles.flexBasis80, {
-                            width: 300,
-                            flexDirection: 'column',
-                        }]}
-                            value={parseInt(this.props.item.childDataList[FIXED_SKU_QUANTITY].value)}
-                            maximumValue={9999}
-                            minimumValue={0}
-                            onSlidingComplete={(quantity) => {
-                                let payload = {
-                                    id: this.props.item.id,
-                                    quantity: quantity
-                                }
-                                this.props.actions.onChangeQuantity(this.props.fixedSKUList, this.props.totalQuantity, payload)
-                            }}
-                        />
+                        <View style={[styles.flexBasis80]}>
+                            <Slider
+                                value={parseInt(this.props.item.childDataList[FIXED_SKU_QUANTITY].value)}
+                                maximumValue={9999}
+                                minimumValue={0}
+                                onSlidingComplete={(quantity) => {
+                                    let payload = {
+                                        id: this.props.item.id,
+                                        quantity: quantity
+                                    }
+                                    this.props.actions.onChangeQuantity(this.props.fixedSKUList, this.props.totalQuantity, payload)
+                                }}
+                            />
+                        </View>
                         <Input
                             style={[styles.flexBasis20, { borderColor: '#00796B', borderWidth: 1, height: 40 }]}
                             editable={true}

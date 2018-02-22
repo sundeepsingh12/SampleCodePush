@@ -10,7 +10,7 @@ import { ARRAY_SAROJ_FAREYE } from '../lib/AttributeConstants'
 import * as globalActions from '../modules/global/globalActions'
 import FixedSKUListItem from '../components/FixedSKUListItem'
 import styles from '../themes/FeStyle'
-import { SET_TOAST_ERROR_MESSAGE } from '../lib/constants'
+import { SET_TOAST_ERROR_MESSAGE, RESET_STATE_FIXED_SKU } from '../lib/constants'
 import { OK, SAVE, TOTAL_QUANTITY } from '../lib/ContainerConstants'
 
 let style = StyleSheet.create({
@@ -110,6 +110,11 @@ class FixedSKUListing extends PureComponent {
     }
   }
 
+  goBack() {
+    this.props.actions.setState(RESET_STATE_FIXED_SKU)
+    this.props.navigation.goBack()
+  }
+
   render() {
     if (this.props.isLoaderRunning) {
       return (
@@ -123,7 +128,7 @@ class FixedSKUListing extends PureComponent {
             <Body>
               <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
+                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.goBack() }}>
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
