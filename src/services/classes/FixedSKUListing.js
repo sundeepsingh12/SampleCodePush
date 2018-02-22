@@ -76,7 +76,7 @@ class FixedSKUListing {
         for (let fixedSKUObjectCounter in fixedSKUList) {
             let fixedSKUChilDataList = fixedSKUList[fixedSKUObjectCounter].childDataList
             if (fixedSKUChilDataList && fixedSKUChilDataList[FIXED_SKU_QUANTITY].value != '') {
-                totalAmount += (parseInt(fixedSKUChilDataList[FIXED_SKU_UNIT_PRICE].value) * parseInt(fixedSKUChilDataList[FIXED_SKU_QUANTITY].value))
+                totalAmount += (fixedSKUChilDataList[FIXED_SKU_UNIT_PRICE].value) * (fixedSKUChilDataList[FIXED_SKU_QUANTITY].value)
             }
         }
         fixedSKUList[TOTAL_AMOUNT].value = totalAmount
