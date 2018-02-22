@@ -179,4 +179,7 @@ module.exports = {
 
      //Job_DetailsV2
      UPDATE_GROUP : 'Update Group',
+
+     //Cash Tendering
+     NOT_REQUIRED : 'NOT REQUIRED',
 }

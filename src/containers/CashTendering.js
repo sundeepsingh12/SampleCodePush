@@ -75,7 +75,6 @@ class CashTendering extends PureComponent {
             Toast.show({ text: "More, money to pay", position: 'bottom', buttonText: 'OK' })
         }
         else {
-            this.props.actions.setState(IS_RECEIVE_TOGGLE, false)
             this.props.actions.navigateToScene('CashTendering',
                 {
                     currentElement: this.props.navigation.state.params['currentElement'],
@@ -87,6 +86,7 @@ class CashTendering extends PureComponent {
                     cash: this.props.navigation.state.params['cash']
                 }
             )
+            this.props.actions.setState(IS_RECEIVE_TOGGLE, false)
         }
     }
 

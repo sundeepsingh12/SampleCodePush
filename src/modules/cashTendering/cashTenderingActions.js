@@ -17,9 +17,12 @@ import {
 import {
     ARRAY_SAROJ_FAREYE,
 } from '../../lib/AttributeConstants'
+import { Toast } from 'native-base'
 
-import { setState } from '../global/globalActions'
-
+import { setState, navigateToScene } from '../global/globalActions'
+import {
+    NOT_REQUIRED
+} from '../../lib/ContainerConstants'
 export function onSave(parentObject, formElement, cashTenderingList, cashTenderingListReturn, isSaveDisabled, latestPositionId, jobTransaction, isReceive) {
     return async function (dispatch) {
         try {
@@ -56,14 +59,19 @@ export function getCashTenderingListReturn(cashTenderingList) {
     }
 }
 
-export function checkForCash(formElement, currentElement) {
+export function checkForCash(routeParams) {
     return async function (dispatch) {
         try {
-            if (!formElement || !currentElement) {
-                throw new Error("formElement or currentElement not found in checkForCash Action")
+            if (!routeParams.formElements || !routeParams.currentElement) {
+                throw new Error("formElements or currentElement not found in checkForCash Action")
             }
-            let cash = CashTenderingService.checkForCashInMoneyCollect(formElement, currentElement)
-            return cash
+            let cash = CashTenderingService.checkForCashInMoneyCollect(routeParams.formElements, routeParams.currentElement)
+            if (cash > 0) {
+                routeParams.cash = cash
+                dispatch(navigateToScene('CashTendering', routeParams))
+            } else {
+                { Toast.show({ text: NOT_REQUIRED, position: 'bottom', buttonText: 'Okay' }) }
+            }
         } catch (error) {
             console.log(error)
         }
