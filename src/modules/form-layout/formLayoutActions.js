@@ -102,7 +102,9 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = _.cloneDeep(formElement)
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, null, event, jobTransaction, fieldAttributeMasterParentIdMap);
         dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributeDto))
-        dispatch(setState(SET_UPDATE_DRAFT, true))
+        if (value) {
+            dispatch(setState(SET_UPDATE_DRAFT, true))
+        }
     }
 }
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSaveDisabled, sequenceId, jobTransaction, fieldAttributeMasterParentIdMap) {
