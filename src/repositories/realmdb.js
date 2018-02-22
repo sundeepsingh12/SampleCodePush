@@ -14,6 +14,8 @@ import DatastoreSchema from './schema/DatastoreSchema'
 import TransactionLogs from './schema/transactionLogs'
 import _ from 'lodash'
 import Draft from './schema/Draft'
+var crypto = require("crypto-js");
+import DeviceInfo from 'react-native-device-info'
 
 const schemaVersion = 42;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft];
@@ -36,7 +38,8 @@ import {
     TABLE_TRANSACTION_LOGS,
     DataStore_DB,
     Datastore_Master_DB,
-    TABLE_DRAFT
+    TABLE_DRAFT,
+    DEVICE_IMEI,
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -60,11 +63,23 @@ export function saveList(tableName, array) {
  * @param {*} tableNamesVsDataList 
  */
 export function performBatchSave(...tableNamesVsDataList) {
+    let imeiNumber = DeviceInfo.getUniqueID()
     return realm.write(() => {
         tableNamesVsDataList.forEach(record => {
             try {
-                if (!_.isEmpty(record.value) && !_.isUndefined(record.value))
-                    record.value.forEach(data => realm.create(record.tableName, data, true))
+                if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
+                    if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
+                        let records = record.value
+                        for (let data in records) {
+                            let copyOfData = _.cloneDeep(records[data])
+                            copyOfData.value = (crypto.AES.encrypt(JSON.stringify(copyOfData.value), imeiNumber)).toString()
+                            realm.create(record.tableName, copyOfData, true)
+                        }
+                        // record.value.forEach(data => realm.create(record.tableName, crypto.AES.encrypt(JSON.stringify(data), b), true))
+                    } else {
+                        record.value.forEach(data => realm.create(record.tableName, data, true))
+                    }
+                }
             } catch (error) {
                 console.log(error)
             }
@@ -169,6 +184,7 @@ export function filterRecordList(recordList, query) {
 
 export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
     let records
+    let imeiNumber = DeviceInfo.getUniqueID()
     if (query) {
         records = realm.objects(tableName).filtered(query)
     } else {
@@ -176,6 +192,16 @@ export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
     }
     if (isSorted && sortProperty) {
         records = records.sorted(`${sortProperty}`)
+    }
+    if (tableName == TABLE_FIELD_DATA || tableName == TABLE_JOB_DATA) {
+        let recordList = []
+        for (let index in records) {
+            let recordData = { ...records[index] }
+            let recordDataInBytes = crypto.AES.decrypt(recordData.value, imeiNumber)
+            recordData.value = JSON.parse(recordDataInBytes.toString(crypto.enc.Utf8))
+            recordList.push(recordData)
+        }
+        return recordList
     }
     return records
 }

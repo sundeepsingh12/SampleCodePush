@@ -54,11 +54,12 @@ class JobDetails {
      *                         }
      * }
      */
-    prepareDataObject(id, positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId, isObject) {
+    prepareDataObject(id, positionId, tableName, dbQuery, attributeMasterMap, attributeMap, isJob, autoIncrementId, isObject) {
         let dataMap = {}
         let dataQuery = isJob ? 'jobId = ' + id + ' AND parentId = ' + positionId : 'jobTransactionId = ' + id + ' AND parentId = ' + positionId
+        dataQuery = (dbQuery) ? dbQuery + ' AND (' + dataQuery + ')' : dataQuery
         let dataList = isObject ? {} : []
-        let filteredDataList = realm.filterRecordList(realmDBDataList, dataQuery)
+        let filteredDataList = realm.getRecordListOnQuery(tableName, dataQuery)
         for (let index in filteredDataList) {
             let data = { ...filteredDataList[index] }
             let attributeMaster = isJob ? attributeMasterMap[data.jobAttributeMasterId] : attributeMasterMap[data.fieldAttributeMasterId]
@@ -73,7 +74,7 @@ class JobDetails {
                 dataObject.attributeTypeId = attributeMaster.attributeTypeId
                 dataObject.id = ++autoIncrementId
                 if (data.value == OBJECT_SAROJ_FAREYE || data.value == ARRAY_SAROJ_FAREYE) {
-                    let childDataObject = this.prepareDataObject(id, data.positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId)
+                    let childDataObject = this.prepareDataObject(id, data.positionId, tableName, dbQuery, attributeMasterMap, attributeMap, isJob, autoIncrementId)
                     autoIncrementId = childDataObject.autoIncrementId
                     dataMap[attributeMaster.attributeTypeId][attributeMaster.id].childDataMap = childDataObject.dataMap
                     dataObject.childDataList = childDataObject.dataList
