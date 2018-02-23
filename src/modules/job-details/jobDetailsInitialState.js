@@ -17,6 +17,7 @@ var InitialState = Record({
     statusRevertList: [],
     draftStatusInfo: {},
     isEtaTimerShow: false,
+    isShowDropdown: null
 })
 
 export default InitialState

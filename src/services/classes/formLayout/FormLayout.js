@@ -320,7 +320,7 @@ class FormLayout {
                 continue
             }
             let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction)
-            currentObject.value = afterValidationResult ? currentObject.displayValue : null
+            currentObject.value = afterValidationResult && !currentObject.alertMessage ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
                 return false
             }

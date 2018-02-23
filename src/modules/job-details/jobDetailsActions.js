@@ -55,7 +55,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             errorMessage,
             parentStatusList,
             draftStatusInfo,
-            isEtaTimerShow,
+            isEtaTimerShow
         }
     }
 }

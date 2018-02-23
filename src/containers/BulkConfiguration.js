@@ -100,7 +100,7 @@ class BulkConfiguration extends PureComponent {
               <FlatList
                 data={this.props.bulkConfigList}
                 renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => item.id}>
+                keyExtractor={item => String(item.id)}>
               </FlatList>
             </List>
 

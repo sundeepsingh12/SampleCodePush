@@ -121,6 +121,8 @@ class BulkListing extends PureComponent {
             placeholderTextColor={'rgba(255,255,255,.6)'}
             selectionColor={'rgba(224, 224, 224,.5)'}
             style={[style.headerSearch]}
+            returnKeyType = {"search"}
+            keyboardAppearance = {"dark"}
             underlineColorAndroid={'transparent'}
             onChangeText={(searchText) => {
               this.props.actions.setState(SET_BULK_SEARCH_TEXT, searchText)
@@ -222,7 +224,7 @@ class BulkListing extends PureComponent {
                       <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
                     </Button>
                     <View style={[style.headerBody]}>
-                      <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Bulk Update</Text>
+                      <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{(this.props.navigation.state.params.groupId) ? this.props.navigation.state.params.groupId :'Bulk Update'}</Text>
                     </View>
                     <View style={[style.headerRight]}>
                       {this.props.isSelectAllVisible ?
@@ -239,7 +241,7 @@ class BulkListing extends PureComponent {
               <FlatList
                 data={this.renderList()}
                 renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => item.id}
+                keyExtractor={item => String(item.id)}
               />
 
               <Footer

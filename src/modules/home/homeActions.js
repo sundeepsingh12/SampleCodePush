@@ -27,6 +27,8 @@ import {
   SET_FAIL_UPLOAD_COUNT,
   SET_BACKUP_FILES_LIST,
   BACKUP_UPLOAD_FAIL_COUNT,
+  SET_ERP_PULL_ACTIVATED,
+  ERP_SYNC_STATUS,
   JOB_MASTER,
   SAVE_ACTIVATED,
   NewJobStatus,
@@ -91,17 +93,30 @@ export function fetchModulesList(modules, pieChart, menu) {
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
       const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu)
+      const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? true : false
       dispatch(setState(SET_MODULES, {
         moduleLoading: false,
         modules: result.modules,
         pieChart: result.pieChart,
-        menu: result.menu
+        menu: result.menu,
       }))
       if (result.pieChart[PIECHART].enabled) {
         dispatch(pieChartCount())
       }
     } catch (error) {
       console.log(error)
+    }
+  }
+}
+
+export function checkCustomErpPullActivated() {
+  return async function (dispatch) {
+    try {
+      const user = await keyValueDBService.getValueFromStore(USER)
+      const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
+      dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
+    } catch (error) {
+
     }
   }
 }
@@ -140,7 +155,7 @@ export function pieChartCount() {
   }
 }
 
-export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
+export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPull) {
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
@@ -149,21 +164,24 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
       } else {
         transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-        dispatch(setState(SYNC_STATUS, {
-          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-          syncStatus: 'Uploading'
-        }))
-        const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
-        const syncCount = parseInt(responseBody.split(",")[1])
+        const syncCount = 0
+        if (!erpPull) {
+          dispatch(setState(SYNC_STATUS, {
+            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+            syncStatus: 'Uploading'
+          }))
+          const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
+          syncCount = parseInt(responseBody.split(",")[1])
+        }
         //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
         if (isCalledFromHome || syncCount > 0) {
           console.log(isCalledFromHome, syncCount)
-          dispatch(setState(SYNC_STATUS, {
+          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
             unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
             syncStatus: 'Downloading'
           }))
-          const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
-          const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
+          const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, userData.value)
+          const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true, erpPull, userData.value)
           if (isJobsPresent) {
             if (Piechart.enabled) {
               dispatch(pieChartCount())
@@ -174,9 +192,11 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
             dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
           }
         }
-        dispatch(setState(SYNC_STATUS, {
+        dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
           unsyncedTransactionList: [],
           syncStatus: 'OK',
+          erpModalVisible: true,
+          lastErpSyncTime: userData.value.lastERPSyncWithServer
         }))
         //Now schedule sync service which will run regularly after 2 mins
         await dispatch(syncService(pieChart))
@@ -187,8 +207,9 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         }
       }
     } catch (error) {
+      console.log(error)
       if (error.code == 500 || error.code == 502) {
-        dispatch(setState(SYNC_STATUS, {
+        dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'INTERNALSERVERERROR'
         }))
@@ -213,20 +234,22 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
           return (reachability.type !== 'none' && reachability.type !== 'unknown')
         });
         if (connectionInfo) {
-          dispatch(setState(SYNC_STATUS, {
+          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
             unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
             syncStatus: 'ERROR'
           }))
         } else {
-          dispatch(setState(SYNC_STATUS, {
+          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
             unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
             syncStatus: 'NOINTERNET'
           }))
         }
       }
     } finally {
-      const difference = await sync.calculateDifference()
-      dispatch(setState(LAST_SYNC_TIME, difference))
+      if (!erpPull) {
+        const difference = await sync.calculateDifference()
+        dispatch(setState(LAST_SYNC_TIME, difference))
+      }
     }
   }
 }

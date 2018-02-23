@@ -12,7 +12,7 @@ import {
     Modal,
     ScrollView,
     Animated,
-    Dimensions
+    Dimensions,
 } from 'react-native'
 import {
     Icon,
@@ -22,6 +22,7 @@ import {
     CheckBox,
     Radio,
     Body,
+    Right
 } from 'native-base'
 import * as globalActions from '../modules/global/globalActions'
 import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
@@ -32,17 +33,20 @@ import {
     DROPDOWN,
     OPTION_RADIO_FOR_MASTER,
     SEARCH,
-    OK
+    OK,
+    ADVANCE_DROPDOWN
 } from '../lib/AttributeConstants'
 import {
     SET_MODAL_FIELD_ATTRIBUTE,
     SET_OPTION_ATTRIBUTE_ERROR,
     SET_OPTION_SEARCH_INPUT,
+    SET_ADV_DROPDOWN_MESSAGE_OBJECT
 } from '../lib/constants'
 import {
     DONE,
     NO_OPTIONS_PRESENT,
-    DISMISS
+    DISMISS,
+    MULTIPLE_SELECT_OPTIONS
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -50,6 +54,7 @@ function mapStateToProps(state) {
         optionsMap: state.multipleOptionsAttribute.optionsMap,
         error: state.multipleOptionsAttribute.error,
         searchInput: state.multipleOptionsAttribute.searchInput,
+        advanceDropdownMessageObject: state.multipleOptionsAttribute.advanceDropdownMessageObject
     }
 }
 
@@ -76,7 +81,7 @@ class MultipleOptionsAttribute extends PureComponent {
     }
 
     renderOptionView(item) {
-        let fieldAttributeView = null
+        let fieldAttributeView = null, checkForIcon = false
         if (this.props.currentElement.attributeTypeId == CHECKBOX) {
             fieldAttributeView = <CheckBox
                 checked={item.selected}
@@ -88,29 +93,36 @@ class MultipleOptionsAttribute extends PureComponent {
         }
         else if (this.props.currentElement.attributeTypeId == RADIOBUTTON || this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER || (this.props.currentElement.attributeTypeId == DROPDOWN)) {
             fieldAttributeView = item.selected ? <Icon name="md-checkmark-circle" style={[styles.fontXl, styles.fontSuccess]} /> : null
+            checkForIcon = true
         }
         return (
             <ListItem
                 button
                 key={item.id}
                 onPress={() => {
-                    this.props.currentElement.attributeTypeId == CHECKBOX ? this.props.actions.toggleCheckStatus(this.props.optionsMap, item.id) : this.props.actions.saveOptionsFieldData(
-                        this.props.optionsMap,
-                        this.props.currentElement,
-                        this.props.latestPositionId,
-                        this.props.formElements,
-                        this.props.isSaveDisabled,
-                        this.props.jobTransaction,
-                        this.props.calledFromArray,
-                        this.props.rowId,
-                        this.props.fieldAttributeMasterParentIdMap,
-                        item
-                    )
+                    this.props.currentElement.attributeTypeId == CHECKBOX ? this.props.actions.toggleCheckStatus(this.props.optionsMap, item.id) :
+                        (this.props.currentElement.attributeTypeId == ADVANCE_DROPDOWN ? this.props.actions.showAdvanceDropdownMessage(item) :
+                            this.props.actions.saveOptionsFieldData(
+                                this.props.optionsMap,
+                                this.props.currentElement,
+                                this.props.latestPositionId,
+                                this.props.formElements,
+                                this.props.isSaveDisabled,
+                                this.props.jobTransaction,
+                                this.props.calledFromArray,
+                                this.props.rowId,
+                                this.props.fieldAttributeMasterParentIdMap,
+                                item
+                            ))
+
                 }}>
                 {fieldAttributeView}
                 <Body>
                     <Text style={[styles.marginLeft10]}>{item.name}</Text>
                 </Body>
+                {checkForIcon ? <Right>
+                    <Icon name="ios-arrow-forward" />
+                </Right> : null}
             </ListItem>
         )
     }
@@ -165,6 +177,7 @@ class MultipleOptionsAttribute extends PureComponent {
                         <Input placeholder={SEARCH}
                             style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 10 }]}
                             value={this.props.searchInput}
+                            keyboardType={(this.props.currentElement.attributeTypeId == ADVANCE_DROPDOWN) ? 'numeric' : 'default'}
                             onChangeText={(text) => {
                                 this.props.actions.setState(SET_OPTION_SEARCH_INPUT, { searchInput: text })
                             }}
@@ -179,37 +192,90 @@ class MultipleOptionsAttribute extends PureComponent {
             </View>
         )
     }
-
-    render() {
+    getAdvanceDropDownModal() {
+        return (<View style={[styles.flex1, styles.column]}>
+            <View style={{ flex: .4 }}>
+                <TouchableHighlight
+                    style={{ backgroundColor: 'rgba(0,0,0,.5)', flex: 1 }}
+                    onPress={() => {
+                        this.props.actions.setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {})
+                    }}
+                >
+                    {/* Added empty view because touchableheghlight must have a child */}
+                    <View />
+                </TouchableHighlight>
+            </View>
+            <View style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                <View style={{ height: '100%' }}>
+                    <View style={[styles.bgLightGray]}>
+                        <View style={[styles.row, styles.justifySpaceBetween, styles.bgLightGray]}>
+                            <Text style={[styles.padding10]}>{MULTIPLE_SELECT_OPTIONS}</Text>
+                            <TouchableHighlight
+                                onPress={() => {
+                                    this.props.actions.saveOptionsFieldData(
+                                        this.props.optionsMap,
+                                        this.props.currentElement,
+                                        this.props.latestPositionId,
+                                        this.props.formElements,
+                                        this.props.isSaveDisabled,
+                                        this.props.jobTransaction,
+                                        this.props.calledFromArray,
+                                        this.props.rowId,
+                                        this.props.fieldAttributeMasterParentIdMap,
+                                        this.props.advanceDropdownMessageObject
+                                    )
+                                }}>
+                                <Text style={[styles.fontPrimary, styles.padding10]}> {DONE} </Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                    <View searchBar style={[styles.padding5]}>
+                        <Item rounded style={{ height: 30, backgroundColor: '#ffffff' }}>
+                            <Input
+                                style={[styles.fontSm, styles.fontDarkGray, styles.justifyCenter, { marginTop: 0, lineHeight: 10, marginBottom: 0 }]}
+                                value={this.props.advanceDropdownMessageObject.code}
+                                editable={false}
+                            />
+                            <Icon style={[styles.fontSm]} name="md-close"
+                                onPress={() => {
+                                    this.props.actions.setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {})
+                                }}
+                            />
+                        </Item>
+                    </View>
+                    <ScrollView style={[styles.paddingBottom10]}>
+                        <View>
+                            <Text style={[styles.padding10]}>
+                                {this.props.advanceDropdownMessageObject.itemMessage}
+                            </Text>
+                        </View>
+                        {/*This view is empty because bottom sheet margin from bottom  */}
+                    </ScrollView>
+                </View>
+            </View>
+        </View>)
+    }
+    getModalView() {
         let optionsList = this.sortOptionsMap()
         let listView = this.renderListViewData(optionsList)
         let searchBarView = null
         if (this.props.error) {
             this.callToast()
         }
-        if (this.props.currentElement.attributeTypeId == DROPDOWN && (optionsList.length > 29 || this.props.searchInput)) {
+        if ((this.props.currentElement.attributeTypeId == DROPDOWN && (optionsList.length > 29 || this.props.searchInput)) || this.props.currentElement.attributeTypeId == ADVANCE_DROPDOWN) {
             searchBarView = this.getSearchBarView()
         }
-
-        return (
-            <Modal
-                animationType="slide"
-                transparent={true}
-                onRequestClose={() => {
-                    if (!this.props.calledFromArray) {
-                        this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
-                    }
-                    this.props.actions.setState(SET_OPTION_ATTRIBUTE_ERROR, { error: null })
-                }}
-            >
+        let view
+        if (!_.isEmpty(this.props.advanceDropdownMessageObject)) {
+            view = this.getAdvanceDropDownModal()
+        } else {
+            view =
                 <View style={[styles.flex1, styles.column]}>
                     <View style={{ flex: .4 }}>
                         <TouchableHighlight
                             style={{ backgroundColor: 'rgba(0,0,0,.5)', flex: 1 }}
                             onPress={() => {
-                                if (this.props.calledFromArray) {
-                                    this.props.onCloseModal(this.props.currentElement.fieldAttributeMasterId)
-                                } else {
+                                if (!this.props.calledFromArray) {
                                     this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
                                 }
                                 this.props.actions.setState(SET_OPTION_ATTRIBUTE_ERROR, { error: null })
@@ -259,9 +325,28 @@ class MultipleOptionsAttribute extends PureComponent {
                         </View>
                     </View>
                 </View>
+        }
+        return view
+    }
+    render() {
+        let modalView = this.getModalView()
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => {
+                    if (!this.props.calledFromArray) {
+                        this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
+                    }
+                    this.props.actions.setState(SET_OPTION_ATTRIBUTE_ERROR, { error: null })
+                }}
+            >
+                {modalView}
             </Modal>
+
         )
     }
 }
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(MultipleOptionsAttribute)

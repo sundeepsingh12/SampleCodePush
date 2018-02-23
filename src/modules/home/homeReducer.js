@@ -1,6 +1,7 @@
 'use strict'
 
 import InitialState from './homeInitialState'
+import React from 'react'
 
 const initialState = new InitialState()
 import {
@@ -17,6 +18,8 @@ import {
   SET_FAIL_UPLOAD_COUNT,
   SET_BACKUP_FILES_LIST,
   SET_TRANSACTION_SERVICE_STARTED,
+  SET_ERP_PULL_ACTIVATED,
+  ERP_SYNC_STATUS
 } from '../../lib/constants'
 
 
@@ -33,9 +36,19 @@ export default function homeReducer(state = initialState, action) {
         .set('menu', action.payload.menu)
         .set('moduleLoading', action.payload.moduleLoading)
 
+    case SET_ERP_PULL_ACTIVATED: {
+      return state.set('customErpPullActivated', action.payload.customErpPullActivated)
+    }
+
     case SYNC_STATUS:
       return state.set('unsyncedTransactionList', action.payload.unsyncedTransactionList)
         .set('syncStatus', action.payload.syncStatus)
+
+    case ERP_SYNC_STATUS: {
+      return state.set('erpSyncStatus', action.payload.syncStatus)
+        .set('erpModalVisible', action.payload.erpModalVisible ? true : false)
+        .set('lastErpSyncTime', action.payload.lastErpSyncTime)
+    }
 
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)
@@ -45,8 +58,9 @@ export default function homeReducer(state = initialState, action) {
     case LAST_SYNC_TIME:
       return state.set('lastSyncTime', action.payload)
 
-    case RESET_STATE:
+    case RESET_STATE: {
       return initialState
+    }
 
     case TOGGLE_LOGOUT:
       return state.set('isLoggingOut', action.payload)

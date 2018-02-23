@@ -26,10 +26,8 @@ import {
     POST
 } from '../../lib/AttributeConstants'
 import {
-    SAME_SEQUENCE_ERROR,
     SEQUENCELIST_MISSING,
     CURRENT_SEQUENCE_ROW_MISSING,
-    SEQUENCE_NOT_AN_INT,
     RUNSHEET_NUMBER_MISSING,
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEARCH_TEXT_MISSING,
@@ -131,28 +129,10 @@ describe('test jumpSequence', () => {
         }
     })
 
-    it('should throw sequence not an int error', () => {
-        const message = SEQUENCE_NOT_AN_INT + ','
-        try {
-            sequenceService.jumpSequence('abc', ',')
-        } catch (error) {
-            expect(error.message).toEqual(message)
-        }
-    })
-
     it('should throw sequenceList missing error', () => {
         const message = SEQUENCELIST_MISSING
         try {
             sequenceService.jumpSequence('1', '2', null)
-        } catch (error) {
-            expect(error.message).toEqual(message)
-        }
-    })
-
-    it('should throw same sequence error', () => {
-        const message = SAME_SEQUENCE_ERROR
-        try {
-            sequenceService.jumpSequence(0, '1', sequenceList)
         } catch (error) {
             expect(error.message).toEqual(message)
         }
@@ -184,11 +164,11 @@ describe('test jumpSequence', () => {
                 seqAssigned: 1
             }
         }
-        expect(sequenceService.jumpSequence(1, '1', sequenceList, {})).toEqual({ cloneSequenceList, newTransactionsWithChangedSeqeunceMap: transactionsWithChangedSeqeunceMap })
+        expect(sequenceService.jumpSequence(1, 1, sequenceList, {})).toEqual({ cloneSequenceList, newTransactionsWithChangedSeqeunceMap: transactionsWithChangedSeqeunceMap })
     })
 
     it('should return sequenceList and transactionMap having changed sequence where from < to', () => {
-        const cloneSequenceList = [{
+        const sequenceCloneList = [{
             referenceNumber: '234',
             id: 234,
             seqSelected: 0,
@@ -213,7 +193,7 @@ describe('test jumpSequence', () => {
                 seqAssigned: 0
             }
         }
-        expect(sequenceService.jumpSequence(0, '3', sequenceList, {})).toEqual({ cloneSequenceList, newTransactionsWithChangedSeqeunceMap: transactionsWithChangedSeqeunceMap })
+        expect(sequenceService.jumpSequence(0, 3, sequenceList, {})).toEqual({ cloneSequenceList: sequenceCloneList, newTransactionsWithChangedSeqeunceMap: transactionsWithChangedSeqeunceMap })
     })
 })
 
@@ -236,15 +216,6 @@ describe('test onRowDragged', () => {
         const message = SEQUENCELIST_MISSING
         try {
             sequenceService.onRowDragged('1', null)
-        } catch (error) {
-            expect(error.message).toEqual(message)
-        }
-    })
-
-    it('should throw same sequence error', () => {
-        const message = SAME_SEQUENCE_ERROR
-        try {
-            sequenceService.onRowDragged({ to: 1, from: 1 }, sequenceList, {}, false)
         } catch (error) {
             expect(error.message).toEqual(message)
         }

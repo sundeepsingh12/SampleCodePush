@@ -53,6 +53,7 @@ function mapStateToProps(state) {
     pieChart: state.home.pieChart,
     lastSyncTime: state.home.lastSyncTime,
     transactionServiceStarted: state.home.transactionServiceStarted,
+    customErpPullActivated: state.home.customErpPullActivated,
   }
 }
 
@@ -69,7 +70,7 @@ class SyncScreen extends PureComponent {
 
   componentDidMount() {
     this.props.actions.startMqttService(this.props.pieChart)
-    this.props.actions.performSyncService(this.props.pieChart, true)
+    this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated')
     this.props.actions.startTracking(this.props.transactionServiceStarted)
   }
 
@@ -77,7 +78,7 @@ class SyncScreen extends PureComponent {
     let transactionList = this.props.unsyncedTransactionList
     let transactionView = []
     for (let index in transactionList) {
-      if(!transactionList[index]){
+      if (!transactionList[index]) {
         continue
       }
       transactionView.push(
@@ -133,7 +134,7 @@ class SyncScreen extends PureComponent {
             {SYNC_OK_TEXT}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RE_SYNC} </Text>
             </Button>
           </View>
@@ -150,7 +151,7 @@ class SyncScreen extends PureComponent {
             {INTERNAL_SERVER_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -168,7 +169,7 @@ class SyncScreen extends PureComponent {
             {NO_INTERNET}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -195,7 +196,7 @@ class SyncScreen extends PureComponent {
             {INTERNAL_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true) }}>
+            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -207,7 +208,7 @@ class SyncScreen extends PureComponent {
 
   render() {
 
-    if(this.props.syncStatus == 'LOADING') {
+    if (this.props.syncStatus == 'LOADING') {
       return <Loader />
     }
 

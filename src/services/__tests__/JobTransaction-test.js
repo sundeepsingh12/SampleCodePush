@@ -1,6 +1,7 @@
 'use strict'
 import { jobTransactionService } from '../classes/JobTransaction'
 import { jobStatusService } from '../classes/JobStatus'
+import { jobMasterService } from '../classes/JobMaster'
 import { jobAttributeMasterService } from '../classes/JobAttributeMaster'
 import { jobService } from '../classes/Job'
 import { jobDataService } from '../classes/JobData'
@@ -726,6 +727,7 @@ describe('test cases for prepareJobCustomizationList', () => {
     jobTransactionService.setJobSwipableDetails = jest.fn()
     jobTransactionService.setJobSwipableDetails.mockReturnValueOnce('test1')
     jobTransactionService.setJobSwipableDetails.mockReturnValueOnce('test2')
+    jobMasterService.prepareStatusTabIdMap = jest.fn()
   })
 
   const jobMap = {
@@ -736,6 +738,17 @@ describe('test cases for prepareJobCustomizationList', () => {
     3: {
       id: 3,
       jobMasterId: 3
+    }
+  }
+
+  const idJobMasterMap = {
+    "3" : {
+      identifier : "123",
+      identifierColor : "#000000"
+    },
+    "4" : {
+      identifier : "124",
+      identifierColor : "#000000"
     }
   }
 
@@ -844,31 +857,270 @@ describe('test cases for prepareJobCustomizationList', () => {
       }
     }
 
-    const result = [
-      {
-        line1: 'xyz',
-        line2: 'abc',
-        circleLine1: 'lmn',
-        circleLine2: 'def',
+    const result = [{
+      "circleLine1": "lmn",
+      "circleLine2": "def",
+      "id": 1,
+      "identifierColor": "#000000",
+      "jobId": 2,
+      "jobLatitude": undefined,
+      "jobLongitude": undefined,
+      "jobMasterId": 3,
+      "jobMasterIdentifier": "123",
+      "jobSwipableDetails": "test1",
+      "line1": "xyz",
+      "line2": "abc",
+      "referenceNumber": "refno", 
+      "runsheetId": undefined, 
+      "runsheetNo": undefined, 
+      "seqActual": undefined, 
+      "seqAssigned": undefined, 
+      "seqSelected": 10, 
+      "statusId": 11
+    }, {
+        "circleLine1": "test",
+        "circleLine2": "test", 
+        "id": 2, 
+        "identifierColor": "#000000", 
+        "jobId": 3, 
+        "jobLatitude": undefined, 
+        "jobLongitude": undefined, 
+        "jobMasterId": 3, 
+        "jobMasterIdentifier": "123", 
+        "jobSwipableDetails": "test2", 
+        "line1": "test", 
+        "line2": "test", 
+        "referenceNumber": "refno", 
+        "runsheetId": undefined, 
+        "runsheetNo": undefined, 
+        "seqActual": undefined, 
+        "seqAssigned": undefined, 
+        "seqSelected": 12, 
+        "statusId": 11
+      }]
+    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap,idJobMasterMap)).toEqual(result)
+    expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(8)
+    expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
+  })
+
+  it('should prepare job customization list for groupId', () => {
+    const jobTransactionMap = {
+      1: {
         id: 1,
+        jobId: 2,
         jobMasterId: 3,
-        jobSwipableDetails: 'test1',
         seqSelected: 10,
-        statusId: 11
+        jobStatusId: 11,
+        referenceNumber: 'refno'
+      },
+      2: {
+        id: 2,
+        jobId: 3,
+        jobMasterId: 3,
+        seqSelected: 12,
+        jobStatusId: 14,
+        referenceNumber: 'refno'
+      }
+    }
+
+    const jobIdGroupIdMap = {
+      "1" : "abc",
+      "2" : "xyz",
+    }
+
+    const tabList = [
+      {
+        id : 123,
+        name : "pending"
       },
       {
-        line1: 'test',
-        line2: 'test',
-        circleLine1: 'test',
-        circleLine2: 'test',
-        id: 2,
-        jobMasterId: 3,
-        jobSwipableDetails: 'test2',
-        seqSelected: 12,
-        statusId: 11
+        id : 124,
+        name : "success"
+      },
+      {
+        id : 125,
+        name : "fail"
       }
     ]
-    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap)).toEqual(result)
+
+    const statusList = {
+      value: [
+          {
+              code: "Success123",
+              id: 11,
+              jobMasterId: 3,
+              name: "Success",
+              saveActivated: null,
+              sequence: 3,
+              statusCategory: 3,
+              tabId: 124,
+              transient: false,
+          },
+          {
+              code: "FAIL",
+              id: 12,
+              jobMasterId: 441,
+              name: "fail",
+              saveActivated: null,
+              sequence: 23,
+              statusCategory: 3,
+              tabId: 125,
+              transient: false,
+          },
+          {
+              code: "PENDING",
+              id: 14,
+              jobMasterId: 441,
+              name: "Pending12",
+              saveActivated: null,
+              sequence: 23,
+              statusCategory: 1,
+              tabId: 123,
+              transient: false,
+          }
+      ]
+  }
+  const statusIdsTabIdsMap = {
+    11 : 124,
+    12 : 125,
+    14 : 123
+  }
+
+    const result = {
+      "123":
+        {
+          "2":
+            {
+              "groupId": null,
+              "jobTransactions": [{
+                "circleLine1": "test",
+                "circleLine2": "test",
+                "id": 2,
+                "identifierColor": "#000000",
+                "jobId": 3,
+                "jobLatitude": undefined,
+                "jobLongitude": undefined,
+                "jobMasterId": 3,
+                "jobMasterIdentifier": "123",
+                "jobSwipableDetails": "test2",
+                "line1": "test",
+                "line2": "test",
+                "referenceNumber": "refno",
+                "runsheetId": undefined,
+                "runsheetNo": undefined,
+                "seqActual": undefined,
+                "seqAssigned": undefined,
+                "seqSelected": 12,
+                "statusId": 14
+              }],
+              "key": 2,
+              "seqSelected": 12,
+              "total": 1
+            }
+        },
+      "124": {
+        "1": {
+          "color": "#000000",
+          "groupId": "xyz",
+          "jobTransactions": [{
+            "circleLine1": "lmn",
+            "circleLine2": "def",
+            "id": 1,
+            "identifierColor": "#000000",
+            "jobId": 2,
+            "jobLatitude": undefined,
+            "jobLongitude": undefined,
+            "jobMasterId": 3,
+            "jobMasterIdentifier": "123",
+            "jobSwipableDetails": "test1",
+            "line1": "xyz",
+            "line2": "abc",
+            "referenceNumber": "refno",
+            "runsheetId": undefined,
+            "runsheetNo": undefined,
+            "seqActual": undefined,
+            "seqAssigned": undefined,
+            "seqSelected": 10,
+            "statusId": 11
+          }],
+          "key": 1,
+          "seqSelected": 10,
+          "total": 1
+        }
+      },
+      "125": {},
+      "isGrouping": true
+    }
+
+      
+    jobMasterService.prepareStatusTabIdMap.mockReturnValue(statusIdsTabIdsMap)
+    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap,idJobMasterMap,null, null, jobIdGroupIdMap, statusList, tabList)).toEqual(result)
+    expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(8)
+    expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
+  })
+
+  it('should prepare job customization list if jobIdGroupIdMap is null', () => {
+    const jobTransactionMap = {
+      1: {
+        id: 1,
+        jobId: 2,
+        jobMasterId: 3,
+        seqSelected: 10,
+        jobStatusId: 11,
+        referenceNumber: 'refno'
+      },
+      2: {
+        id: 2,
+        jobId: 3,
+        jobMasterId: 3,
+        seqSelected: 12,
+        jobStatusId: 11,
+        referenceNumber: 'refno'
+      }
+    }
+    const jobIdGroupIdMap = {}
+    const result = [{
+      "circleLine1": "lmn",
+      "circleLine2": "def",
+      "id": 1,
+      "identifierColor": "#000000",
+      "jobId": 2,
+      "jobLatitude": undefined,
+      "jobLongitude": undefined,
+      "jobMasterId": 3,
+      "jobMasterIdentifier": "123",
+      "jobSwipableDetails": "test1",
+      "line1": "xyz",
+      "line2": "abc",
+      "referenceNumber": "refno", 
+      "runsheetId": undefined, 
+      "runsheetNo": undefined, 
+      "seqActual": undefined, 
+      "seqAssigned": undefined, 
+      "seqSelected": 10, 
+      "statusId": 11
+    }, {
+        "circleLine1": "test",
+        "circleLine2": "test", 
+        "id": 2, 
+        "identifierColor": "#000000", 
+        "jobId": 3, 
+        "jobLatitude": undefined, 
+        "jobLongitude": undefined, 
+        "jobMasterId": 3, 
+        "jobMasterIdentifier": "123", 
+        "jobSwipableDetails": "test2", 
+        "line1": "test", 
+        "line2": "test", 
+        "referenceNumber": "refno", 
+        "runsheetId": undefined, 
+        "runsheetNo": undefined, 
+        "seqActual": undefined, 
+        "seqAssigned": undefined, 
+        "seqSelected": 12, 
+        "statusId": 11
+      }]
+    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap,idJobMasterMap, null, null, jobIdGroupIdMap )).toEqual(result)
     expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(8)
     expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
   })
@@ -892,31 +1144,49 @@ describe('test cases for prepareJobCustomizationList', () => {
         referenceNumber: 'refno'
       }
     }
-    const result = [
-      {
-        line1: 'xyz',
-        line2: 'abc',
-        circleLine1: 'lmn',
-        circleLine2: 'def',
-        id: 1,
-        jobMasterId: 3,
-        jobSwipableDetails: 'test1',
-        seqSelected: 10,
-        statusId: 11
-      },
-      {
-        line1: 'refno',
-        line2: '',
-        circleLine1: '',
-        circleLine2: '',
-        id: 2,
-        jobMasterId: 4,
-        jobSwipableDetails: 'test2',
-        seqSelected: 12,
-        statusId: 11
-      }
-    ]
-    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap)).toEqual(result)
+    const result = [{
+      "circleLine1": "lmn",
+      "circleLine2": "def",
+      "id": 1,
+      "identifierColor": "#000000",
+      "jobId": 2,
+      "jobLatitude": undefined,
+      "jobLongitude": undefined,
+      "jobMasterId": 3,
+      "jobMasterIdentifier": "123",
+      "jobSwipableDetails": "test1",
+      "line1": "xyz",
+      "line2": "abc",
+      "referenceNumber": "refno",
+      "runsheetId": undefined,
+      "runsheetNo": undefined,
+      "seqActual": undefined,
+      "seqAssigned": undefined,
+      "seqSelected": 10,
+      "statusId": 11
+    }, {
+      "circleLine1": "",
+      "circleLine2": "",
+      "id": 2,
+      "identifierColor": "#000000",
+      "jobId": 3,
+      "jobLatitude": undefined,
+      "jobLongitude": undefined,
+      "jobMasterId": 4,
+      "jobMasterIdentifier": "124",
+      "jobSwipableDetails": "test2",
+      "line1": "",
+      "line2": "",
+      "referenceNumber": "refno",
+      "runsheetId": undefined,
+      "runsheetNo": undefined,
+      "seqActual": undefined,
+      "seqAssigned": undefined,
+      "seqSelected": 12,
+      "statusId": 11
+    }]
+
+    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap)).toEqual(result)
     expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(4)
     expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
   })
@@ -956,7 +1226,7 @@ describe('test cases for getAllJobTransactionsCustomizationList', () => {
     expect(jobStatusService.getJobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
     expect(customerCareService.getCustomerCareMap).toHaveBeenCalledTimes(1)
     expect(smsTemplateService.getSMSTemplateMap).toHaveBeenCalledTimes(1)
-    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(2)
+    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
     expect(jobTransactionService.getJobTransactionMapAndQuery).not.toHaveBeenCalled()
     expect(jobTransactionService.prepareJobCustomizationList).not.toHaveBeenCalled()
     expect(jobService.getJobMap).not.toHaveBeenCalled()
@@ -1052,15 +1322,30 @@ describe('test Job Transaction services', () => {
     }]
 
     const jobMasterIdJobStatusIdTransactionIdDtoMap = {
-      930: {
-        4814: {
-          jobMasterId: 930,
-          pendingStatusId: 4813,
-          transactionId: "2560784",
-          unSeenStatusId: 4814
-        }
+      "jobMasterIdJobStatusIdTransactionIdDtoMap":
+        {
+          "930":
+            {
+              "4814":
+                {
+                  "jobMasterId": 930,
+                  "pendingStatusId": 4813,
+                  "transactionId": "2560784",
+                  "unSeenStatusId": 4814
+                }
+            }
+        },
+      "jobMasterIdStatusIdTransactionIdMap": {
+        "4814":
+          {
+            "jobMasterId": 930,
+            "pendingStatusId": 4813,
+            "transactionId": 2560784,
+            "unSeenStatusId": 4814
+          }
       }
     }
+
     jobTransactionService.getUnseenTransactionsJobMasterIds = jest.fn()
     jobTransactionService.getUnseenTransactionsJobMasterIds.mockReturnValueOnce(
       [930]
@@ -1102,6 +1387,78 @@ describe('test Job Transaction services', () => {
   })
 })
 
+describe('test for get EnableMultiPart JobMaster List', () => {
+  let jobMasterList = [
+    {
+      id: '1',
+      enableMultipartAssignment: true,
+      
+    },
+    {
+      id: '2',
+      enableMultipartAssignment: true,
+    },
+    {
+      id: '3',
+      enableMultipartAssignment: false,
+    }
+  ]
+  let resultData = [
+    {
+      id: '1',
+      enableMultipartAssignment: true,
+      
+    },
+    {
+      id: '2',
+      enableMultipartAssignment: true,
+    },
+  ]
+  it('should get jobMasterList with enable Multipart Assignment', () => {
+    expect(jobTransactionService.getEnableMultiPartJobMaster(jobMasterList)).toEqual(resultData)
+  })
+})
+
+describe('test for get jobIdGroupIdMap', () => {
+  beforeEach(() => {
+    realm.getRecordListOnQuery = jest.fn()
+  })
+  let jobMasterListWithEnableMultiPart = [441, 442, 443]
+  let jobList = [
+    {
+      id: '1',
+      groupId: '1',
+      
+    },
+    {
+      id: '2',
+      groupId: '2',
+    },
+    {
+      id: '3',
+      groupId: '4',
+    }
+  ]
+  let resultData = {
+    "1" : "1",
+    "2" : "2",
+    "3" : "4"
+  }
+  it('should get jobIdGroupIdMap for all groupId', () => {
+    realm.getRecordListOnQuery.mockReturnValue(jobList)
+    expect(jobTransactionService.getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)).toEqual(resultData)
+    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+  })
+  
+  jobMasterListWithEnableMultiPart = []
+  jobList = []
+  resultData = {} 
+  it('should get empty jobIdGroupIdMap if multipart is disabled', () => {
+    realm.getRecordListOnQuery.mockReturnValue(jobList)
+    expect(jobTransactionService.getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)).toEqual(resultData)
+    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+  })
+})
 
 describe('test for enable resequence restriction ', () => {
   const jobMasterIdList = [441, 442]
@@ -1149,7 +1506,7 @@ describe('test for enable resequence restriction ', () => {
     realm.getRecordListOnQuery = jest.fn()
     realm.getRecordListOnQuery.mockReturnValueOnce(jobTransactionList)
     jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap)
-    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(2)
 
   })
 })

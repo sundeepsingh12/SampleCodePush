@@ -231,6 +231,20 @@ class JobMaster {
     return tabIdStatusIdsMap
   }
 
+
+  prepareStatusTabIdMap(jobStatus) {
+    if (!jobStatus) {
+      return null
+    }
+    let statusIdsTabIdsMap = {}
+    jobStatus.forEach(jobStatusObject => {
+      if (jobStatusObject.code == UNSEEN) {
+        return
+      }
+      statusIdsTabIdsMap[jobStatusObject.id] = jobStatusObject.tabId
+    })
+    return statusIdsTabIdsMap
+  }
   /**
    * 
    * @param {*} tabs 

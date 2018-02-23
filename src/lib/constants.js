@@ -93,6 +93,8 @@ module.exports = keyMirror({
     SET_FAIL_UPLOAD_COUNT: null,
     SET_BACKUP_FILES_LIST: null,
     SET_TRANSACTION_SERVICE_STARTED: null,
+    SET_ERP_PULL_ACTIVATED: null,
+    ERP_SYNC_STATUS: null,
 
     //Home Container
     PIECHART: null,
@@ -113,6 +115,7 @@ module.exports = keyMirror({
     JOB_DETAILS_FETCHING_END: null,
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
+    SHOW_DROPDOWN: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -305,6 +308,8 @@ module.exports = keyMirror({
     IS_LOADER_RUNNING: null,
     CHANGE_QUANTITY: null,
     SET_FIXED_SKU: null,
+    SET_TOAST_ERROR_MESSAGE: null,
+    RESET_STATE_FIXED_SKU: null,
 
     //Signature Actions
     SET_FIELD_DATA_LIST: null,
@@ -488,6 +493,7 @@ module.exports = keyMirror({
     SET_OPTIONS_LIST: null,
     SET_OPTION_ATTRIBUTE_ERROR: null,
     SET_OPTION_SEARCH_INPUT: null,
+    SET_ADV_DROPDOWN_MESSAGE_OBJECT: null,
     // backup actions
     SET_LOADER_BACKUP: null,
     SET_BACKUP_FILES: null,
