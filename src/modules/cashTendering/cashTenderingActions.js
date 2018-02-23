@@ -21,13 +21,18 @@ import { Toast } from 'native-base'
 
 import { setState, navigateToScene } from '../global/globalActions'
 import {
-    NOT_REQUIRED
+    NOT_REQUIRED,
+    OK,
+    CASHTENDERINGLIST_NOT_SAVE_PROPERLY,
+    FORMELEMENT_OR_CURRENTELEMENT_NOT_FOUND,
+    TOTAL_AMOUNT_NOT_SET,
+    FIELD_ATTRIBUTE_NOT_SET,
 } from '../../lib/ContainerConstants'
 export function onSave(parentObject, formElement, cashTenderingList, cashTenderingListReturn, isSaveDisabled, latestPositionId, jobTransaction, isReceive) {
     return async function (dispatch) {
         try {
             if (!cashTenderingList) {
-                throw new Error("cashTenderingList not set Properly onSave action")
+                throw new Error(CASHTENDERINGLIST_NOT_SAVE_PROPERLY)
             }
             let cashTenderingListCombined = (isReceive) ? cashTenderingList : Object.assign({}, cashTenderingList, cashTenderingListReturn)
             let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(cashTenderingListCombined, jobTransaction.id, parentObject.positionId, latestPositionId)
@@ -45,7 +50,7 @@ export function getCashTenderingListReturn(cashTenderingList) {
     return async function (dispatch) {
         try {
             if (!cashTenderingList) {
-                throw new Error("cashTenderingList not set Properly in getCashTenderingListReturn Action")
+                throw new Error(CASHTENDERINGLIST_NOT_SAVE_PROPERLY)
             }
             dispatch(setState(IS_CASH_TENDERING_LOADER_RUNNING, true))
             let cashTenderingListReturn = CashTenderingService.initializeValuesOfDenominations(cashTenderingList)
@@ -63,14 +68,14 @@ export function checkForCash(routeParams) {
     return async function (dispatch) {
         try {
             if (!routeParams.formElements || !routeParams.currentElement) {
-                throw new Error("formElements or currentElement not found in checkForCash Action")
+                throw new Error(FORMELEMENT_OR_CURRENTELEMENT_NOT_FOUND)
             }
             let cash = CashTenderingService.checkForCashInMoneyCollect(routeParams.formElements, routeParams.currentElement)
             if (cash > 0) {
                 routeParams.cash = cash
                 dispatch(navigateToScene('CashTendering', routeParams))
             } else {
-                { Toast.show({ text: NOT_REQUIRED, position: 'bottom', buttonText: 'Okay' }) }
+                { Toast.show({ text: NOT_REQUIRED, position: 'bottom', buttonText: OK }) }
             }
         } catch (error) {
             console.log(error)
@@ -82,10 +87,10 @@ export function onChangeQuantity(cashTenderingList, totalAmount, payload, isRece
     return async function (dispatch) {
         try {
             if (!cashTenderingList) {
-                throw new Error("cashTenderingList not set Properly in onChangeQuantity Action")
+                throw new Error(CASHTENDERINGLIST_NOT_SAVE_PROPERLY)
             }
             if (totalAmount == null || totalAmount == undefined || totalAmount == NaN) {
-                throw new Error("totalAmount not set Properly in onChangeQuantity Action")
+                throw new Error(TOTAL_AMOUNT_NOT_SET)
             }
             let payload1 = await CashTenderingService.calculateQuantity(cashTenderingList, totalAmount, payload)
             if (isReceive == true) {
@@ -103,7 +108,7 @@ export function fetchCashTenderingList(fieldAttributeMasterId) {
     return async function (dispatch) {
         try {
             if (fieldAttributeMasterId == null || fieldAttributeMasterId == undefined || fieldAttributeMasterId == NaN) {
-                throw new Error("fieldAttributeMasterId not set Properly in fetchCashTenderingList Action")
+                throw new Error(FIELD_ATTRIBUTE_NOT_SET)
             }
             dispatch(setState(IS_CASH_TENDERING_LOADER_RUNNING, true))
             const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)

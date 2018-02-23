@@ -96,22 +96,13 @@ class CashTendering extends PureComponent {
         }
     }
 
-    render() {
-        if (this.props.isCashTenderingLoaderRunning) {
-            return (
-                <Loader />
-            )
-        }
-        let amountToCollectOrReturn, totalAmountInCashTendering
+    _checkIfCashCollectOrReturn = () => {
+        let amountToCollectOrReturn
         if (this.props.isReceive) {
             amountToCollectOrReturn = (
                 <View style={[styles.paddingHorizontal10, styles.paddingVertical15, styles.bgWhite]}>
                     <Text style={[styles.fontLg, styles.fontBlack]}>{AMOUNT_TO_COLLECT} {this.props.navigation.state.params['cash']}</Text>
                 </View>
-            )
-            totalAmountInCashTendering = (
-                <Text
-                    style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_AMOUNT} {parseInt(this.props.totalAmount)}</Text>
             )
         } else {
             amountToCollectOrReturn = (
@@ -119,11 +110,33 @@ class CashTendering extends PureComponent {
                     <Text style={[styles.fontLg, styles.fontBlack]}>{AMOUNT_TO_RETURN}  {this.props.totalAmount - this.props.navigation.state.params['cash']} </Text>
                 </View>
             )
+        }
+        return amountToCollectOrReturn
+    }
+
+    _totalAmountInCashTenderingToCollectOrReturn = () => {
+        let totalAmountInCashTendering
+        if (this.props.isReceive) {
+            totalAmountInCashTendering = (
+                <Text
+                    style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_AMOUNT} {parseInt(this.props.totalAmount)}</Text>
+            )
+        } else {
             totalAmountInCashTendering = (
                 <Text
                     style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_AMOUNT_RETURNING} {parseInt(this.props.totalAmountReturn)}</Text>
             )
         }
+        return totalAmountInCashTendering
+    }
+    render() {
+        if (this.props.isCashTenderingLoaderRunning) {
+            return (
+                <Loader />
+            )
+        }
+        let amountToCollectOrReturn = this._checkIfCashCollectOrReturn()
+        let totalAmountInCashTendering = this._totalAmountInCashTenderingToCollectOrReturn()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
