@@ -180,6 +180,14 @@ module.exports = {
      //Job_DetailsV2
      UPDATE_GROUP : 'Update Group',
 
-     //Cash Tendering
-     NOT_REQUIRED : 'NOT REQUIRED',
+    //Cash Tendering
+    NOT_REQUIRED: 'NOT REQUIRED',
+    MORE_MONEY_TO_PAY: 'More Money to Pay.',
+    LESS_MONEY_TO_PAY: 'Less Money to Pay.',
+    AMOUNT_TO_COLLECT: 'Amount to Collect: ',
+    AMOUNT_TO_RETURN: 'Amount to Return: ',
+    TOTAL_AMOUNT: 'Total Amount: ',
+    TOTAL_AMOUNT_RETURNING: 'Total Amount Returning: ',
+    COLLECT_CASH: 'Collect Cash',
+    RETURN_CASH: 'Return Cash',
 }

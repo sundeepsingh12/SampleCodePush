@@ -335,7 +335,7 @@ export const AppNavigator = StackNavigator({
   CashTendering: {
     screen: CashTendering,
     navigationOptions: {
-      title: 'Collect Cash',
+      header: null
     }
   },
   TaskListScreen: {
