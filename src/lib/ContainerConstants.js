@@ -5,9 +5,9 @@ module.exports = {
     //common_CONSTANTS
     CANCEL: 'Cancel',
     OK: 'Ok',
-    SAVE: 'Save',
     DONE: 'DONE',
     DISMISS: 'DISMISS',
+    CLOSE: 'Close',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -20,6 +20,14 @@ module.exports = {
     UNSYNCED_TASKS: 'Unsynced Tasks',
     UPLOADING: 'Uploading ...',
     AUTHENTICATING: 'Authenticating...',
+    SYNC: 'Sync',
+    ERP_SYNC_OK_TEXT: 'All data downloaded perfectly.',
+    DAYS_AGO: ' days ago',
+    HOURS_AGO: ' hours ago',
+    MINUTES_AGO: ' minutes ago',
+    SECONDS_AGO: ' seconds ago',
+    RESYNC_IN: 'Resync in',
+    ERP_SYNC: 'ERP Sync',
 
     //Post Assignment Container
     SHIPMENT_NOT_FOUND: 'Scanned Shipment Not Found',
@@ -43,7 +51,6 @@ module.exports = {
     DOWNLOADING_OFFLINE_DS: 'Downloading',
     DOWNLOAD_SUCCESSFUL: 'Download Successful',
     DOWNLOAD_FAILED: 'Download Failed',
-    CLOSE: 'Close',
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
@@ -122,6 +129,7 @@ module.exports = {
 
     //Multiple Option Container
     NO_OPTIONS_PRESENT: 'No options Present',
+    MULTIPLE_SELECT_OPTIONS: 'Multiple Select Options',
     //Save Activated and CheckoutDetails
     SMS_NOT_SENT_TRY_AGAIN_LATER: 'SMS not sent ,try again later',
     EMAIL_NOT_SENT_TRY_AGAIN_LATER: 'Email not sent ,try again later',
@@ -160,8 +168,19 @@ module.exports = {
     //Array
     TOTAL_COUNT: 'Total Count : ',
     ADD: 'Add',
-    SAVE: 'Save',
     ADD_ROW_ERROR: 'Row could not be added',
     DELETE_ROW_ERROR: 'Row could not be deleted',
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
+
+    //Expandable Details View
+    TAP_TO_HIDE: 'Tap to hide',
+    TAP_TO_SHOW: 'Tap to show',
+    N_A: 'N.A',
+
+    //Job_DetailsV2
+    UPDATE_GROUP: 'Update Group',
+
+    //Fixed SKU
+    QUANTITY_NOT_A_NUMBER: `Quantity can't be `,
+    TOTAL_QUANTITY: 'Total Quantity : '
 }

@@ -27,6 +27,7 @@ Job.schema = {
       createdAt: { type: 'string', default: '' },
       attemptCount: { type: 'int', default: 1 },
       jobEndTime: 'string?',
-      currentProcessId: { type: 'int', default: 0,optional:true}
+      currentProcessId: { type: 'int', default: 0,optional:true},
+      groupId: { type: 'string', default: null,  optional:true },
   }
 }

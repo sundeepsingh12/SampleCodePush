@@ -46,7 +46,8 @@ import {
   DataStoreDetails,
   ImageDetailsView,
   RESET_STATE_FOR_JOBDETAIL,
-
+  BulkListing,
+  SHOW_DROPDOWN
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -64,11 +65,15 @@ import {
 import Communications from 'react-native-communications'
 import CallIcon from '../svg_components/icons/CallIcon'
 import RevertIcon from '../svg_components/icons/RevertIcon'
+import GroupIcon from '../svg_components/icons/GroupIcon'
+
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { jobStatusService } from '../services/classes/JobStatus'
+
+import {UPDATE_GROUP} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -86,6 +91,7 @@ function mapStateToProps(state) {
     statusRevertList: state.jobDetails.statusRevertList,
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
+    isShowDropdown: state.jobDetails.isShowDropdown
   }
 }
 
@@ -109,6 +115,7 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
+    this.props.actions.setState(SHOW_DROPDOWN,null)
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
@@ -117,25 +124,65 @@ class JobDetailsV2 extends PureComponent {
   navigateToCameraDetails = (navigationParam) => {
     this.props.actions.navigateToScene(ImageDetailsView, navigationParam)
   }
+
+  statusDataItem(statusList,index,minIndexDropDown) {
+    if((index < minIndexDropDown) || (this.props.isShowDropdown)){
+    return(
+      <ListItem
+        key={statusList[index].id}
+        style={[style.jobListItem, styles.justifySpaceBetween]}
+        onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
+      >
+        <View style={[styles.row, styles.alignCenter]}>
+          <View style={[style.statusCircle, { backgroundColor: statusList[index].buttonColor }]}></View>
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
+        </View>
+        <Right>
+          <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+        </Right>
+      </ListItem> 
+    )
+  }
+  }
+
   renderStatusList(statusList) {
     let statusView = []
+    let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
+    if(groupId && statusList.length > 0){
+      statusView.push(
+        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = { () => this.updateTransactionForGroupId(groupId)} key = {groupId}>
+        <View style = {[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+            <View style={[styles.row, styles.alignCenter]}>
+                <View style = {[styles.marginTop12]}>
+                  <GroupIcon />
+                </View>
+                <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
+                <Right>
+                  <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} /> 
+                </Right>
+            </View>
+        </View>
+    </TouchableOpacity> 
+      )
+      return statusView
+    }
+    let minIndexDropDown = (this.props.statusRevertList && this.props.statusRevertList.length > 0) ? 3 : 4  
     for (let index in statusList) {
       statusView.push(
-        <ListItem
-          key={statusList[index].id}
-          style={[style.jobListItem, styles.justifySpaceBetween]}
-          onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
-        >
-
-          <View style={[styles.row, styles.alignCenter]}>
-            <View style={[style.statusCircle, { backgroundColor: statusList[index].buttonColor }]}></View>
-            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
-          </View>
-          <Right>
-            <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-          </Right>
-        </ListItem>
+        this.statusDataItem(statusList,index,minIndexDropDown)
       )
+      if(index == minIndexDropDown-1 && statusList.length > minIndexDropDown){ 
+      statusView.push(
+      <ListItem
+        key={1}
+        style={[style.jobListItem, styles.justifySpaceBetween]}
+        onPress={() => { this.props.actions.setState(SHOW_DROPDOWN,!this.props.isShowDropdown)}}
+      >
+        <View style={[styles.row, styles.alignCenter]}>
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{statusList.length-minIndexDropDown} More</Text>
+          <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
+        </View>
+      </ListItem>)}
     }
     return statusView
   }
@@ -332,6 +379,16 @@ class JobDetailsV2 extends PureComponent {
       ],
     )
   }
+  updateTransactionForGroupId (groupId){
+
+    this.props.actions.navigateToScene(BulkListing, {
+      jobMasterId: this.props.jobTransaction.jobMasterId,      
+      statusId: this.props.currentStatus.id,
+      nextStatusList : this.props.currentStatus.nextStatusList,
+      groupId
+    })
+
+  }
   selectStatusToRevert =  () => {
     if(this.props.statusRevertList[0] == 1){
       { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom'| "center", buttonText: 'Okay' ,type: 'danger',duration: 5000 }) }
@@ -405,7 +462,7 @@ class JobDetailsV2 extends PureComponent {
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo)) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null) ? this.showDraftAlert() : null
       const etaTimer = this.etaUpdateTimer()
       return (
         <StyleProvider style={getTheme(platform)}>
@@ -562,13 +619,13 @@ const style = StyleSheet.create({
     minHeight: 70,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     paddingLeft: 10,
     backgroundColor: '#ffffff'
   },
   seqCircle: {
     width: 56,
     height: 56,
+    marginTop:12,
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center'

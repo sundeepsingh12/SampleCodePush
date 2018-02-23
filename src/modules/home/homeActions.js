@@ -26,7 +26,16 @@ import {
   SET_UPLOAD_FILE_COUNT,
   SET_FAIL_UPLOAD_COUNT,
   SET_BACKUP_FILES_LIST,
-  BACKUP_UPLOAD_FAIL_COUNT
+  BACKUP_UPLOAD_FAIL_COUNT,
+  SET_ERP_PULL_ACTIVATED,
+  ERP_SYNC_STATUS,
+  JOB_MASTER,
+  SAVE_ACTIVATED,
+  NewJobStatus,
+  NEW_JOB_STATUS,
+  NEW_JOB_MASTER,
+  POPULATE_DATA,
+  NewJob
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -36,7 +45,9 @@ import {
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
 } from '../../lib/AttributeConstants'
-
+import {
+  NEW_JOB_CONFIGURATION_ERROR
+} from '../../lib/ContainerConstants'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import CONFIG from '../../lib/config'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -54,6 +65,7 @@ import { logoutService } from '../../services/classes/Logout'
 import _ from 'lodash'
 import { userEventLogService } from '../../services/classes/UserEvent'
 import RestAPIFactory from '../../lib/RestAPIFactory'
+import { newJob } from '../../services/classes/NewJob'
 
 import moment from 'moment'
 import {
@@ -64,7 +76,10 @@ import {
 } from 'react-navigation'
 import { backupService } from '../../services/classes/BackupService';
 import { autoLogoutAfterUpload } from '../backup/backupActions'
-
+import { redirectToFormLayout } from '../newJob/newJobActions'
+import {
+  Toast
+} from 'native-base'
 /**
  * This action enables modules for particular user
  */
@@ -77,17 +92,30 @@ export function fetchModulesList(modules, pieChart, menu) {
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
       const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu)
+      const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? true : false
       dispatch(setState(SET_MODULES, {
         moduleLoading: false,
         modules: result.modules,
         pieChart: result.pieChart,
-        menu: result.menu
+        menu: result.menu,
       }))
       if (result.pieChart[PIECHART].enabled) {
         dispatch(pieChartCount())
       }
     } catch (error) {
       console.log(error)
+    }
+  }
+}
+
+export function checkCustomErpPullActivated() {
+  return async function (dispatch) {
+    try {
+      const user = await keyValueDBService.getValueFromStore(USER)
+      const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
+      dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
+    } catch (error) {
+
     }
   }
 }
@@ -126,7 +154,7 @@ export function pieChartCount() {
   }
 }
 
-export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
+export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPull) {
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
@@ -135,21 +163,24 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
       } else {
         transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-        dispatch(setState(SYNC_STATUS, {
-          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-          syncStatus: 'Uploading'
-        }))
-        const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
-        const syncCount = parseInt(responseBody.split(",")[1])
+        const syncCount = 0
+        if (!erpPull) {
+          dispatch(setState(SYNC_STATUS, {
+            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+            syncStatus: 'Uploading'
+          }))
+          const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
+          syncCount = parseInt(responseBody.split(",")[1])
+        }
         //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
         if (isCalledFromHome || syncCount > 0) {
           console.log(isCalledFromHome, syncCount)
-          dispatch(setState(SYNC_STATUS, {
+          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
             unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
             syncStatus: 'Downloading'
           }))
-          const isJobsPresent = await sync.downloadAndDeleteDataFromServer()
-          const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true)
+          const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, userData.value)
+          const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true, erpPull, userData.value)
           if (isJobsPresent) {
             if (Piechart.enabled) {
               dispatch(pieChartCount())
@@ -160,9 +191,11 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
             dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
           }
         }
-        dispatch(setState(SYNC_STATUS, {
+        dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
           unsyncedTransactionList: [],
           syncStatus: 'OK',
+          erpModalVisible: true,
+          lastErpSyncTime: userData.value.lastERPSyncWithServer
         }))
         //Now schedule sync service which will run regularly after 2 mins
         await dispatch(syncService(pieChart))
@@ -173,8 +206,9 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
         }
       }
     } catch (error) {
+      console.log(error)
       if (error.code == 500 || error.code == 502) {
-        dispatch(setState(SYNC_STATUS, {
+        dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
           syncStatus: 'INTERNALSERVERERROR'
         }))
@@ -199,20 +233,22 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob) {
           return (reachability.type !== 'none' && reachability.type !== 'unknown')
         });
         if (connectionInfo) {
-          dispatch(setState(SYNC_STATUS, {
+          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
             unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
             syncStatus: 'ERROR'
           }))
         } else {
-          dispatch(setState(SYNC_STATUS, {
+          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
             unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
             syncStatus: 'NOINTERNET'
           }))
         }
       }
     } finally {
-      const difference = await sync.calculateDifference()
-      dispatch(setState(LAST_SYNC_TIME, difference))
+      if (!erpPull) {
+        const difference = await sync.calculateDifference()
+        dispatch(setState(LAST_SYNC_TIME, difference))
+      }
     }
   }
 }
@@ -378,6 +414,47 @@ export function resetFailCountInStore() {
   return async function (dispatch) {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+export function navigateToNewJob(jobMasterIds) {
+  return async function (dispatch) {
+    try {
+      const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
+      let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
+      if (_.size(mastersWithNewJob) == 1) {
+        let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
+        let returnParams = await newJob.checkForNextContainer(mastersWithNewJob[0], saveActivatedData)
+        if (returnParams.screenName == NewJobStatus) {
+          let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(mastersWithNewJob[0].id);
+          if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
+            dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, mastersWithNewJob[0].id))
+          } else {
+            dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
+            dispatch(navigateToScene(NewJobStatus, returnParams.navigationParams))
+          }
+        } else {
+          if (returnParams.stateParam) {
+            await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
+          }
+          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
+        }
+      } else if (_.size(mastersWithNewJob) == 0) {
+        Toast.show({
+          text: NEW_JOB_CONFIGURATION_ERROR,
+          position: "bottom" | "center",
+          buttonText: 'Okay',
+          type: 'danger',
+          duration: 10000
+        })
+        // dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
+      } else {
+        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
+        dispatch(navigateToScene(NewJob))
+      }
     } catch (error) {
       console.log(error)
     }

@@ -66,10 +66,6 @@ class SequenceRunsheetList extends Component {
         return { header: null }
     }
 
-    componentDidMount() {
-        this.props.actions.getRunsheets()
-    }
-
     componentDidUpdate() {
         if (this.props.responseMessage) {
             Toast.show({
@@ -101,7 +97,7 @@ class SequenceRunsheetList extends Component {
         )
     }
 
-    _keyExtractor = (item, index) => item;
+    _keyExtractor = (item, index) => String(item);
 
     render() {
         return (

@@ -56,6 +56,8 @@ export default class SearchBar extends PureComponent {
                                 onChangeText={(searchText) => {
                                     this.callDataStoreSearchMethods(searchText)
                                 }}
+                                returnKeyType = {"search"}
+                                keyboardAppearance = {"dark"}
                                 value={this.props.searchText}
                                 style={[style.headerSearch, styles.bgGray]} />
                             {scanner}

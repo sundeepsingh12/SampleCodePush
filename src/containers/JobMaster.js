@@ -62,10 +62,6 @@ class JobMaster extends PureComponent {
         }
     }
 
-    componentDidMount() {
-        this.props.actions.fetchJobMasterList()
-    }
-
     renderData = (item) => {
         return (
 
@@ -80,7 +76,7 @@ class JobMaster extends PureComponent {
         )
     }
 
-    _keyExtractor = (item, index) => item.id
+    _keyExtractor = (item, index) => String(item.id)
 
     render() {
         if(this.props.loading) {

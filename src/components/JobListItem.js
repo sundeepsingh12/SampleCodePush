@@ -152,7 +152,8 @@ export default class JobListItem extends PureComponent {
         onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
         <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : { backgroundColor: '#ffffff' }]}>
-          <View style={[style.seqCircle, styles.relative, { backgroundColor: this.props.data.identifierColor }]}>
+        {this.props.lastId != null ? <View style={{position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: (this.props.lastId != this.props.data.id) ? '100%' : '50%',top:0, left: 36, zIndex: 1}}></View> : null}
+          <View style={[style.seqCircle, styles.relative, { backgroundColor: this.props.data.identifierColor, zIndex: 3 }]}>
             <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
               {this.props.data.jobMasterIdentifier}
             </Text>
@@ -299,13 +300,13 @@ const style = StyleSheet.create({
     minHeight: 70,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     paddingLeft: 10
   },
   seqCircle: {
     width: 56,
     height: 56,
     borderRadius: 28,
+    marginTop: 12,
     justifyContent: 'center',
     alignItems: 'center'
   },

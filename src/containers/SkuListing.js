@@ -95,7 +95,7 @@ class SkuListing extends PureComponent {
               <FlatList
                 data={_.values(this.props.skuListItems)}
                 renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => _.values(this.props.skuListItems).indexOf(item)}
+                keyExtractor={item => String(_.values(this.props.skuListItems).indexOf(item))}
               />
             </Content>
 

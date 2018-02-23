@@ -11,13 +11,13 @@ import {
     SET_ARRAY_ISLOADING,
     SET_OPTION_ATTRIBUTE_ERROR
 } from '../../lib/constants'
-import { ARRAY_SAROJ_FAREYE, AFTER, ADD_TOAST } from '../../lib/AttributeConstants'
+import { ARRAY_SAROJ_FAREYE, AFTER, ADD_TOAST, TEXT, STRING, SCAN_OR_TEXT, QR_SCAN } from '../../lib/AttributeConstants'
 import _ from 'lodash'
 import { setState } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { NavigationActions } from 'react-navigation'
-import { DELETE_ROW_ERROR, ADD_ROW_ERROR, SAVE_ARRAY_ERROR } from '../../lib/ContainerConstants'
+import { DELETE_ROW_ERROR, ADD_ROW_ERROR, SAVE_ARRAY_ERROR, UNIQUE_VALIDATION_FAILED } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 
 export function showOrDropModal(fieldAttributeMasterId, arrayElements, rowId, idToSet, isSaveDisabled) {
@@ -100,7 +100,7 @@ export function saveArray(arrayElements, arrayParentItem, jobTransaction, latest
     return async function (dispatch) {
         try {
             if (!_.isEmpty(arrayElements)) {
-                let fieldDataListSaveDisabled = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction.id, latestPositionId, arrayMainObject)
+                let fieldDataListSaveDisabled = await arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, jobTransaction, latestPositionId, arrayMainObject)
                 if (!fieldDataListSaveDisabled) throw new Error(SAVE_ARRAY_ERROR)
                 if (fieldDataListSaveDisabled.isSaveDisabled) {
                     dispatch(setState(SET_ARRAY_ELEMENTS, { newArrayElements: arrayElements, isSaveDisabled: fieldDataListSaveDisabled.isSaveDisabled }))
@@ -125,18 +125,27 @@ export function clearArrayState() {
     }
 }
 
-export function fieldValidationsArray(currentElement, arrayElements, timeOfExecution, jobTransaction, rowId, isSaveDisabled) {
+export function fieldValidationsArray(currentElement, arrayElements, timeOfExecution, jobTransaction, rowId, isSaveDisabled, scanValue) {
     return function (dispatch) {
-        let newArray = _.cloneDeep(arrayElements)
-        let formElement = newArray[rowId].formLayoutObject
-        let validationsResult = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
-        if (timeOfExecution == AFTER) {
-            formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+        try {
+            let newArray = _.cloneDeep(arrayElements)
+            let formElement = newArray[rowId].formLayoutObject
+            let isValuePresentInAnotherTransaction = false
+            let validationsResult = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
+            if (timeOfExecution == AFTER) {
+                isValuePresentInAnotherTransaction = (currentElement.attributeTypeId == TEXT || currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == STRING || currentElement.attributeTypeId == QR_SCAN) ? arrayService.checkforUniqueValidation(currentElement, newArray, rowId) : false
+                if (scanValue) formElement.get(currentElement.fieldAttributeMasterId).displayValue = scanValue
+                formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+            }
+            if (isValuePresentInAnotherTransaction) {
+                formElement.get(currentElement.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
+            }
+            dispatch(getNextFocusableForArrayWithoutChildDatalist(currentElement.fieldAttributeMasterId, isSaveDisabled, (!scanValue) ? currentElement.displayValue : scanValue, newArray, rowId, NEXT_FOCUS, null))
+        } catch (error) {
+            console.log(error)
         }
-        dispatch(getNextFocusableForArrayWithoutChildDatalist(currentElement.fieldAttributeMasterId, isSaveDisabled, currentElement.displayValue, newArray, rowId, NEXT_FOCUS, null))
     }
 }
-
 export function setInitialArray(currentElement, formElement, jobStatusId, jobTransaction) {
     return async function (dispatch) {
         try {

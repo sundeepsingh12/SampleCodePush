@@ -96,7 +96,7 @@ class SummaryAndPieChart {
             if(jobStatusList[id].code == UNSEEN ){
               continue
             }
-            jobMasterSummaryList[ jobStatusList[id].jobMasterId ][jobStatusList[id].statusCategory].list.push([jobStatusIdCountMap[jobStatusList[id].id] , jobStatusList[id].name, jobStatusList[id].id]);
+            jobMasterSummaryList[ jobStatusList[id].jobMasterId ][jobStatusList[id].statusCategory].list.push({count :jobStatusIdCountMap[jobStatusList[id].id] , name : jobStatusList[id].name, id :jobStatusList[id].id});
             jobMasterSummaryList[ jobStatusList[id].jobMasterId ][jobStatusList[id].statusCategory].count += jobStatusIdCountMap[jobStatusList[id].id];
             jobMasterSummaryList[ jobStatusList[id].jobMasterId ].count +=  jobStatusIdCountMap[jobStatusList[id].id];
         }

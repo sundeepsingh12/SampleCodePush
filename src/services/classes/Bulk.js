@@ -84,7 +84,7 @@ class Bulk {
 
     async getJobListingForBulk(bulkData) {
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        const jobTransactionCustomizationList = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Bulk', bulkData)
+        let {jobTransactionCustomizationList} = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Bulk', bulkData)
         const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id')
         return idJobTransactionCustomizationListMap
     }

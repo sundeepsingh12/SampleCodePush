@@ -123,7 +123,7 @@ class SkuListing {
                 skuActualQuantityObject = {
                     label: idFieldAttributeMap.get(SKU_ACTUAL_QUANTITY).label,
                     attributeTypeId: idFieldAttributeMap.get(SKU_ACTUAL_QUANTITY).attributeTypeId,
-                    value: (skuObjectValidation.leftKey == 0) ? '0' : originalQuantityValue,
+                    value: (skuObjectValidation && skuObjectValidation.leftKey == 0) ? '0' : originalQuantityValue,
                     id: idFieldAttributeMap.get(SKU_ACTUAL_QUANTITY).id,
                     parentId,
                     autoIncrementId: autoIncrementId++
@@ -220,7 +220,7 @@ class SkuListing {
         if(!skuRootChildElements){
             throw new Error('Sku child elements missing')
         }
-        const rightKey = skuObjectValidation.rightKey
+        const rightKey = (skuObjectValidation) ? skuObjectValidation.rightKey : null
         console.log('skuObjectValidation',skuObjectValidation)
         let message
         if(!rightKey) return
