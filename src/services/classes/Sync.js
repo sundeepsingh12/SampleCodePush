@@ -709,7 +709,6 @@ class Sync {
   async addGeoFence(fenceForInitialJob) {
     try {
       let { fencePresent, jobMasterIdListWithEnableResequenceRestriction, openRunsheetList } = await geoFencingService.checkForEnableResequenceRestrictionAndCheckAllowOffRouteNotification()
-      console.logs('fencePresent', fencePresent)
       if (!fencePresent && !_.isEmpty(jobMasterIdListWithEnableResequenceRestriction) && !_.isEmpty(openRunsheetList)) {
         let { meanLatLong, radius, transactionIdIdentifier } = await geoFencingService.getLatLng(jobMasterIdListWithEnableResequenceRestriction, openRunsheetList, fenceForInitialJob)
         if (radius && meanLatLong && meanLatLong.latitude && meanLatLong.longitude) {

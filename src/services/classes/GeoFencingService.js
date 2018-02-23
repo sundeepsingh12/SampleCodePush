@@ -102,14 +102,12 @@ class GeoFencingService {
     getListOfLatLong(jobTransactionLatLongList) {
         let listOfLatLong = []
         for (let index in jobTransactionLatLongList) {
-            if (jobTransactionLatLongList[index]) {
                 let latLongSplitArray = jobTransactionLatLongList[index].split(',')
                 listOfLatLong.push({
                     latitude: latLongSplitArray[0],
                     longitude: latLongSplitArray[1]
                 })
             }
-        }
         return listOfLatLong
     }
 
