@@ -5,7 +5,6 @@ module.exports = {
     //common_CONSTANTS
     CANCEL: 'Cancel',
     OK: 'Ok',
-    SAVE: 'Save',
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
@@ -167,15 +166,17 @@ module.exports = {
     //Array
     TOTAL_COUNT: 'Total Count : ',
     ADD: 'Add',
-    SAVE: 'Save',
     ADD_ROW_ERROR: 'Row could not be added',
     DELETE_ROW_ERROR: 'Row could not be deleted',
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
 
     //Expandable Details View
-     TAP_TO_HIDE : 'Tap to hide',
-     TAP_TO_SHOW : 'Tap to show',
-     N_A : 'N.A',
+    TAP_TO_HIDE: 'Tap to hide',
+    TAP_TO_SHOW: 'Tap to show',
+    N_A: 'N.A',
+
+    //Job_DetailsV2
+    UPDATE_GROUP: 'Update Group',
 
      //Job_DetailsV2
      UPDATE_GROUP : 'Update Group',
@@ -190,4 +191,7 @@ module.exports = {
     TOTAL_AMOUNT_RETURNING: 'Total Amount Returning: ',
     COLLECT_CASH: 'Collect Cash',
     RETURN_CASH: 'Return Cash',
+    //Fixed SKU
+    QUANTITY_NOT_A_NUMBER: `Quantity can't be `,
+    TOTAL_QUANTITY: 'Total Quantity : '
 }

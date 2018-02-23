@@ -15,17 +15,17 @@ import * as cashTenderingActions from '../modules/cashTendering/cashTenderingAct
 import { IS_RECEIVE_TOGGLE, CHANGE_AMOUNT, CHANGE_AMOUNT_RETURN } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import {
-MORE_MONEY_TO_PAY,
-LESS_MONEY_TO_PAY,
-AMOUNT_TO_COLLECT,
-AMOUNT_TO_RETURN,
-TOTAL_AMOUNT,
-TOTAL_AMOUNT_RETURNING,
-SAVE,
-COLLECT_CASH,
-RETURN_CASH,
-OK
-  } from '../lib/ContainerConstants'
+    MORE_MONEY_TO_PAY,
+    LESS_MONEY_TO_PAY,
+    AMOUNT_TO_COLLECT,
+    AMOUNT_TO_RETURN,
+    TOTAL_AMOUNT,
+    TOTAL_AMOUNT_RETURNING,
+    SAVE,
+    COLLECT_CASH,
+    RETURN_CASH,
+    OK
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -49,7 +49,7 @@ class CashTendering extends PureComponent {
     componentDidMount() {
         if (this.props.isReceive) {
             this.props.actions.fetchCashTenderingList(this.props.navigation.state.params['currentElement'].fieldAttributeMasterId)
-        } 
+        }
     }
 
     renderData = (item) => {
@@ -60,7 +60,7 @@ class CashTendering extends PureComponent {
         }
     }
 
-    _onSavePressReturn(){
+    _onSavePressReturn() {
         let cashToReturn = this.props.totalAmount - this.props.navigation.state.params['cash']
         if (cashToReturn == this.props.totalAmountReturn) {
             this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
@@ -68,16 +68,16 @@ class CashTendering extends PureComponent {
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
             this.props.actions.setState(CHANGE_AMOUNT_RETURN, { cashTenderingList: {}, totalAmount: 0 })
             this.props.navigation.goBack('FormLayout')
-        } else if (cashToReturn > this.props.totalAmountReturn) { Toast.show({ text: MORE_MONEY_TO_PAY, position: 'bottom', buttonText: OK }) }
-        else { Toast.show({ text: LESS_MONEY_TO_PAY, position: 'bottom', buttonText: OK }) }
+        } else if (cashToReturn > this.props.totalAmountReturn) { Toast.show({ text: MORE_MONEY_TO_PAY, position: 'bottom', buttonText: OK, duration: 3000 }) }
+        else { Toast.show({ text: LESS_MONEY_TO_PAY, position: 'bottom', buttonText: OK, duration: 3000 }) }
     }
 
-    _onSavePress(){
+    _onSavePress() {
         if (this.props.navigation.state.params['cash'] > 0 && this.props.navigation.state.params['cash'] == this.props.totalAmount) {
             this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, null, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
         } else if (this.props.navigation.state.params['cash'] > this.props.totalAmount) {
-            Toast.show({ text: MORE_MONEY_TO_PAY, position: 'bottom', buttonText: OK })
+            Toast.show({ text: MORE_MONEY_TO_PAY, position: 'bottom', buttonText: OK, duration: 3000 })
         }
         else {
             this.props.actions.getCashTenderingListReturn(JSON.parse(JSON.stringify(this.props.cashTenderingList)))
@@ -111,7 +111,7 @@ class CashTendering extends PureComponent {
             )
             totalAmountInCashTendering = (
                 <Text
-                style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_AMOUNT} {parseInt(this.props.totalAmount)}</Text>
+                    style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_AMOUNT} {parseInt(this.props.totalAmount)}</Text>
             )
         } else {
             amountToCollectOrReturn = (
@@ -121,10 +121,10 @@ class CashTendering extends PureComponent {
             )
             totalAmountInCashTendering = (
                 <Text
-                                style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_AMOUNT_RETURNING} {parseInt(this.props.totalAmountReturn)}</Text>
+                    style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_AMOUNT_RETURNING} {parseInt(this.props.totalAmountReturn)}</Text>
             )
         }
-            return (
+        return (
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
                     <Header searchBar style={[styles.bgPrimary, style.header]}>
@@ -132,10 +132,10 @@ class CashTendering extends PureComponent {
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                                 <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[style.headerBody]}>
-                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.isReceive) ? 'Collect Cash' : 'Return Cash'}</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.isReceive) ? 'Collect Cash' : 'Return Cash'}</Text>
                                 </View>
                                 <View style={[style.headerRight]}>
                                 </View>
@@ -143,23 +143,23 @@ class CashTendering extends PureComponent {
                             </View>
                         </Body>
                     </Header>
-                        {amountToCollectOrReturn}
+                    {amountToCollectOrReturn}
                     <Content style={[styles.flex1, styles.bgWhite, styles.marginTop5]}>
                         <FlatList
-                            data={(Object.values((this.props.isReceive) ? this.props.cashTenderingList : this.props.cashTenderingListReturn)).sort((fieldData_1, fieldData_2) =>fieldData_1.sequence - fieldData_2.sequence)}
+                            data={(Object.values((this.props.isReceive) ? this.props.cashTenderingList : this.props.cashTenderingListReturn)).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence)}
                             renderItem={({ item }) => this.renderData(item)}
                             keyExtractor={item => String(item.id)}
                         />
                     </Content>
                     <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
-                    {totalAmountInCashTendering}
+                        {totalAmountInCashTendering}
                         <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>
                             <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
                         </Button>
                     </Footer>
                 </Container>
             </StyleProvider>
-            )
+        )
     }
 }
 const style = StyleSheet.create({
@@ -185,6 +185,6 @@ const style = StyleSheet.create({
         width: '15%',
         padding: 15
     }
-  });
-  
+});
+
 export default connect(mapStateToProps, mapDispatchToProps)(CashTendering)

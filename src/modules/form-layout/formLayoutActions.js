@@ -29,7 +29,9 @@ import {
 
 import {
     AFTER,
-    Start
+    Start,
+    STRING,
+    TEXT
 } from '../../lib/AttributeConstants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -102,7 +104,9 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = _.cloneDeep(formElement)
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, null, event, jobTransaction, fieldAttributeMasterParentIdMap);
         dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributeDto))
-        dispatch(setState(SET_UPDATE_DRAFT, true))
+        if (value) {
+            dispatch(setState(SET_UPDATE_DRAFT, true))
+        }
     }
 }
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSaveDisabled, sequenceId, jobTransaction, fieldAttributeMasterParentIdMap) {
@@ -220,9 +224,14 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
 export function fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, isSaveDisabled, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         let cloneFormElement = _.cloneDeep(formElement)
+        let isValuePresentInAnotherTransaction = false
         let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, fieldAttributeMasterParentIdMap)
         if (timeOfExecution == AFTER) {
-            cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+            isValuePresentInAnotherTransaction = (currentElement.attributeTypeId == TEXT || currentElement.attributeTypeId == STRING) ? await dataStoreService.checkForUniqueValidation(currentElement.displayValue, currentElement) : false
+            cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+        }
+        if (isValuePresentInAnotherTransaction) {
+            cloneFormElement.get(currentElement.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
         }
         dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS, jobTransaction))
     }
@@ -259,7 +268,7 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
 export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSaveDisabled, value, latestPositionId, jobTransaction) {
     return async function (dispatch) {
         try {
-            let isValuePresentInAnotherTransaction = await dataStoreService.checkForUniqueValidation(value, fieldAtrribute.fieldAttributeMasterId)
+            let isValuePresentInAnotherTransaction = await dataStoreService.checkForUniqueValidation(value, fieldAtrribute)
             let cloneFormElement = _.cloneDeep(formElement)
             if (isValuePresentInAnotherTransaction) {
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
@@ -272,7 +281,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
                 dispatch(setState(SET_UPDATE_DRAFT, true))
             } else {
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = ''
-                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, value, latestPositionId, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, value, latestPositionId, jobTransaction, null, true))
             }
         }
         catch (error) {

@@ -426,42 +426,40 @@ class Sync {
     const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
     return jobMasterIds
   }
-  async getJobForUpdateQuery(jobs, jobIds) {
+  getJobForUpdateQuery(jobs, jobIds) {
     let jobArray = []
     let jobQuery = jobIds.map(jobId => 'id = ' + jobId).join(' OR ')
     let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery, null, null)
     let existingTransactionsMap = {}
     for (let index in jobList) {
-      let job = { ...jobList[index] }
-      let newJob = _.omit(job, ['status'])
-      existingTransactionsMap[job.id] = newJob
+      let jobInDb = { ...jobList[index] }
+      existingTransactionsMap[jobInDb.id] = jobInDb
     }
     if (_.isEmpty(existingTransactionsMap)) { return jobs }
     for (let job of jobs) {
       if (existingTransactionsMap[job.id]) {
-        let updatedJobTransaction = JSON.parse(JSON.stringify(existingTransactionsMap[job.id]))
-        jobArray.push(updatedJobTransaction)
+        let updatedJob = _.omit(job, ['status'])
+        jobArray.push(updatedJob)
       } else {
         jobArray.push(job)
       }
     }
     return jobArray
   }
-  async getTransactionForUpdateQuery(jobTransactions, jobTransactionIds) {
+  getTransactionForUpdateQuery(jobTransactions, jobTransactionIds) {
     let jobTransactionArray = []
     let jobTransactionQuery = jobTransactionIds.map(transactionId => 'id = ' + transactionId).join(' OR ')
     let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, null, null)
     let existingTransactionsMap = {}
     for (let index in transactionList) {
-      let jobTransaction = { ...transactionList[index] }
-      let newJobTransaction = _.omit(jobTransaction, ['jobStatusId', 'actualAmount', 'originalAmount', 'moneyTransactionType', 'trackKm', 'trackHalt', 'trackCallCount', 'trackCallDuration',
-        'trackSmsCount', 'latitude', 'longitude', 'trackBattery', 'seqSelected', 'seqActual', 'seqAssigned', 'lastTransactionTimeOnMobile', 'statusCode', 'jobEtaTime', 'npsFeedBack'])
-      existingTransactionsMap[jobTransaction.id] = newJobTransaction
+      let jobTransactionInDb = { ...transactionList[index] }
+      existingTransactionsMap[jobTransactionInDb.id] = jobTransactionInDb
     }
     if (_.isEmpty(existingTransactionsMap)) { return jobTransactions }
     for (let jobTransaction of jobTransactions) {
       if (existingTransactionsMap[jobTransaction.id]) {
-        let updatedJobTransaction = JSON.parse(JSON.stringify(existingTransactionsMap[jobTransaction.id]))
+        let updatedJobTransaction = _.omit(jobTransaction, ['jobStatusId', 'actualAmount', 'originalAmount', 'moneyTransactionType', 'trackKm', 'trackHalt', 'trackCallCount', 'trackCallDuration',
+          'trackSmsCount', 'latitude', 'longitude', 'trackBattery', 'seqSelected', 'seqActual', 'seqAssigned', 'lastTransactionTimeOnMobile', 'statusCode', 'jobEtaTime', 'npsFeedBack'])
         jobTransactionArray.push(updatedJobTransaction)
       } else {
         jobTransactionArray.push(jobTransaction)

@@ -46,6 +46,7 @@ import {
     OPTION_RADIO_VALUE,
     AFTER,
     BEFORE,
+    ADVANCE_DROPDOWN
 } from '../lib/AttributeConstants'
 import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
@@ -70,7 +71,7 @@ function mapDispatchToProps(dispatch) {
 class ArrayBasicComponent extends PureComponent {
 
     _searchForReferenceValue = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, null, null, null, this.props.fieldAttributeMasterParentIdMap);
+        this.props.actions.fieldValidationsArray(item, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, value)
     }
     onFocusEvent(currentElement) {
         this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
@@ -126,7 +127,7 @@ class ArrayBasicComponent extends PureComponent {
             return null
         }
         let attributeTypeId = item.attributeTypeId
-        if (attributeTypeId == CHECKBOX || attributeTypeId == OPTION_RADIO_FOR_MASTER || attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN) {
+        if (attributeTypeId == CHECKBOX || attributeTypeId == OPTION_RADIO_FOR_MASTER || attributeTypeId == RADIOBUTTON || attributeTypeId == DROPDOWN || attributeTypeId == ADVANCE_DROPDOWN) {
             return (
                 <View>
                     <MultipleOptionsAttribute
@@ -299,6 +300,7 @@ class ArrayBasicComponent extends PureComponent {
             case RADIOBUTTON:
             case DROPDOWN:
             case OPTION_RADIO_FOR_MASTER:
+            case ADVANCE_DROPDOWN:
                 return (
                     <View>
                         {multipleOptionCardView}

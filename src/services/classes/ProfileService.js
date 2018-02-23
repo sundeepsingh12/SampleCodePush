@@ -25,16 +25,16 @@ class ProfileService {
             throw new Error(UNSAVED_PASSWORD)
         }
         if (sha256(currentPassword) != userPassword.value) {
-            Toast.show({ text: CHECK_CURRENT_PASSWORD, position: 'bottom', buttonText: 'OK' })
+            Toast.show({ text: CHECK_CURRENT_PASSWORD, position: 'bottom', buttonText: 'OK', duration: 5000 })
         }
         else if (newPassword != confirmNewPassword) {
-            Toast.show({ text: MATCH_NEW_AND_CONFIRM_PASSWORD, position: 'bottom', buttonText: 'OK' })
+            Toast.show({ text: MATCH_NEW_AND_CONFIRM_PASSWORD, position: 'bottom', buttonText: 'OK', duration: 5000 })
         }
         else if (newPassword == currentPassword) {
-            Toast.show({ text: CURRENT_AND_NEW_PASSWORD_CHECK, position: 'bottom', buttonText: 'OK' })
+            Toast.show({ text: CURRENT_AND_NEW_PASSWORD_CHECK, position: 'bottom', buttonText: 'OK', duration: 5000 })
         }
         else if (!REGEX_TO_VALIDATE_PASSWORD.test(newPassword)) {
-            Toast.show({ text: VALIDATE_PASSWORD, position: 'bottom', buttonText: 'OK' })
+            Toast.show({ text: VALIDATE_PASSWORD, position: 'bottom', buttonText: 'OK', duration: 6000 })
         }
         else {
             //hit API

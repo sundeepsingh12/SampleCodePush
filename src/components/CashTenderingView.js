@@ -3,7 +3,7 @@
 import React, { PureComponent } from 'react'
 import { View, Text, TextInput, Input } from 'react-native'
 import { connect } from 'react-redux'
-import { Content, Card, CardItem } from 'native-base';
+import { Content, Card, CardItem, Toast } from 'native-base';
 import {
     NUMBER, DECIMAL, STRING,
 } from '../lib/AttributeConstants'
@@ -11,7 +11,10 @@ import * as cashTenderingActions from '../modules/cashTendering/cashTenderingAct
 import { bindActionCreators } from 'redux'
 import styles from '../themes/FeStyle'
 
-
+import {
+    QUANTITY_NOT_A_NUMBER,
+    OK
+} from '../lib/ContainerConstants'
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...cashTenderingActions }, dispatch)
@@ -31,7 +34,7 @@ function mapStateToProps(state) {
 class CashTenderingView extends PureComponent {
     render() {
         return (
-            <View style={[styles.bgWhite, styles.row,styles.justifySpaceBetween, styles.alignCenter, styles.padding10, styles.borderBottomLightGray]}>
+            <View style={[styles.bgWhite, styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.padding10, styles.borderBottomLightGray]}>
                 <View >
                     <Text style={[styles.fontLg]}>{this.props.item.view}</Text>
                 </View>
@@ -56,6 +59,10 @@ class CashTenderingView extends PureComponent {
     }
 
     _onChangeText = (quantity) => {
+        if (quantity && !parseInt(quantity) && parseInt(quantity) != 0) {
+            { Toast.show({ text: QUANTITY_NOT_A_NUMBER + quantity, position: "bottom" | "center", buttonText: OK, duration: 3000 }) }
+            return
+        }
         {
             let payload = {
                 id: this.props.item.id,
