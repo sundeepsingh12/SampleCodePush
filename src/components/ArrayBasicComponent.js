@@ -70,7 +70,7 @@ function mapDispatchToProps(dispatch) {
 class ArrayBasicComponent extends PureComponent {
 
     _searchForReferenceValue = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, null, null, null, this.props.fieldAttributeMasterParentIdMap);
+        this.props.actions.fieldValidationsArray(item, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, value)
     }
     onFocusEvent(currentElement) {
         this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
