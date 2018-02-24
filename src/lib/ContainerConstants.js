@@ -159,6 +159,10 @@ module.exports = {
     UNSYNCED_FILES: 'Unsynced Files',
     SYNCED_FILES: 'Synced Files',
     CREATE_BACKUP_BUTTON: '+ Create Backup',
+    UPLOAD:'Upload',
+    UPLOAD_SUCCESSFUL:' Upload Successful',
+    UPLOAD_FAILED:'Upload Failed',
+    LOGGING_OUT:'Logging out',
 
     //DataStore
     SUGGESTIONS: 'Suggestions',
@@ -198,5 +202,9 @@ module.exports = {
 
     //Fixed SKU
     QUANTITY_NOT_A_NUMBER: `Quantity can't be `,
-    TOTAL_QUANTITY: 'Total Quantity : '
+    TOTAL_QUANTITY: 'Total Quantity : ',
+
+    //Statistics
+    STATISTICS: 'STATISTICS'
+
 }
