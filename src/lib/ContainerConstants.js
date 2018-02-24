@@ -182,6 +182,24 @@ module.exports = {
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
 
+     //Job_DetailsV2
+     UPDATE_GROUP : 'Update Group',
+
+    //Cash Tendering
+    NOT_REQUIRED: 'NOT REQUIRED',
+    MORE_MONEY_TO_PAY: 'More Money to Pay.',
+    LESS_MONEY_TO_PAY: 'Less Money to Pay.',
+    AMOUNT_TO_COLLECT: 'Amount to Collect: ',
+    AMOUNT_TO_RETURN: 'Amount to Return: ',
+    TOTAL_AMOUNT: 'Total Amount: ',
+    TOTAL_AMOUNT_RETURNING: 'Total Amount Returning: ',
+    COLLECT_CASH: 'Collect Cash',
+    RETURN_CASH: 'Return Cash',
+    CASHTENDERINGLIST_NOT_SAVE_PROPERLY: 'CashTenderingList not set Properly',
+    FORMELEMENT_OR_CURRENTELEMENT_NOT_FOUND: 'formElements or currentElement not found',
+    TOTAL_AMOUNT_NOT_SET: 'totalAmount not set Properly',
+    FIELD_ATTRIBUTE_NOT_SET: 'fieldAttributeMasterId not set Properly',
+
     //Fixed SKU
     QUANTITY_NOT_A_NUMBER: `Quantity can't be `,
     TOTAL_QUANTITY: 'Total Quantity : ',
