@@ -72,6 +72,7 @@ class CustomApp extends PureComponent {
     }
 
     onReload = () =>{
+        if(this.props.customUrl)
         this.refs[WEBVIEW_REF].reload()
     }
      
@@ -87,6 +88,7 @@ class CustomApp extends PureComponent {
     }
 
     onLoadStart = () =>{
+        if(this.props.customUrl)
         this.props.actions.setState(START_FETCHING_URL,this.props.customUrl)
     }
 
