@@ -2,6 +2,9 @@ module.exports = {
     //Token Error
     TOKEN_MISSING: 'Token Missing',
 
+    //CustomApp
+    INVALID_URL_OR_NO_INTERNET : "Invalid Url or No Internet",
+
     //common_CONSTANTS
     CANCEL: 'Cancel',
     OK: 'Ok',
