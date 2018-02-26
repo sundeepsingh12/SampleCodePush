@@ -50,15 +50,13 @@ class Authentication {
      * @param {*} rememberMe 
      */
     saveLoginCredentials(username, password, rememberMe) {
-        // if (rememberMe) {
             keyValueDBService.validateAndSaveData(USERNAME, username)
             keyValueDBService.validateAndSaveData(PASSWORD, password)
-            keyValueDBService.validateAndSaveData(REMEMBER_ME, rememberMe)
-        // } else {
         if (!rememberMe) {            
-            // keyValueDBService.deleteValueFromStore(USERNAME)
-            // keyValueDBService.deleteValueFromStore(PASSWORD)
             keyValueDBService.deleteValueFromStore(REMEMBER_ME)
+        }
+        else{
+            keyValueDBService.validateAndSaveData(REMEMBER_ME, rememberMe)
         }
     }
 
