@@ -39,7 +39,8 @@ import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
 import SearchBarV2 from '../components/SearchBarV2'
 import {
-    SET_SEARCH
+    SET_SEARCH,
+    SET_LIVE_JOB_TOAST
 } from '../lib/constants'
 function mapStateToProps(state) {
     return {
@@ -59,6 +60,12 @@ function mapDispatchToProps(dispatch) {
 
 class LiveJobListing extends PureComponent {
 
+    constructor(props) {
+        super(props)
+        this.state = {
+            isScannerUsed: false,
+        };
+    }
     componentWillMount() {
         this.props.actions.fetchAllLiveJobsList()
         if (this.props.navigation.state.params && this.props.navigation.state.params.callAlarm == true) {
@@ -72,7 +79,9 @@ class LiveJobListing extends PureComponent {
                 text: this.props.liveJobToastMessage,
                 position: 'bottom',
                 buttonText: 'Okay',
+                duration: 5000
             })
+            this.props.actions.setState(SET_LIVE_JOB_TOAST, '')
         }
     }
     static navigationOptions = ({ navigation }) => {
@@ -132,6 +141,10 @@ class LiveJobListing extends PureComponent {
                     jobTransactionArray.push(value)
                 }
             })
+            if (_.isEmpty(jobTransactionArray) && this.state.isScannerUsed) {
+                this.props.actions.setState(SET_LIVE_JOB_TOAST, 'Invalid Scan')
+                this.setState({ isScannerUsed: false })
+            }
             return jobTransactionArray;
         }
     }
@@ -185,7 +198,11 @@ class LiveJobListing extends PureComponent {
                                             </View>
                                             <View />
                                         </View>
-                                        <SearchBarV2 placeholder='Filter Reference Numbers' setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation} returnValue={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} searchText={this.props.searchText} />
+                                        <SearchBarV2 placeholder='Filter Reference Numbers' setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation}
+                                            returnValue={(searchText) => {
+                                                this.props.actions.setState(SET_SEARCH, searchText)
+                                                this.setState({ isScannerUsed: true })
+                                            }} searchText={this.props.searchText} onPress={() => this.props.actions.setState(SET_SEARCH, this.props.searchText)} />
                                     </Body>
                                 </Header>
                             )}
