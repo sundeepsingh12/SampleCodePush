@@ -73,7 +73,7 @@ import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { jobStatusService } from '../services/classes/JobStatus'
 
-import {UPDATE_GROUP} from '../lib/ContainerConstants'
+import { UPDATE_GROUP, JOB_EXPIRED, DETAILS } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -91,7 +91,8 @@ function mapStateToProps(state) {
     statusRevertList: state.jobDetails.statusRevertList,
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
-    isShowDropdown: state.jobDetails.isShowDropdown
+    isShowDropdown: state.jobDetails.isShowDropdown,
+    jobExpiryTime: state.jobDetails.jobExpiryTime
   }
 }
 
@@ -206,12 +207,24 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onCheckLocationMismatch = (statusList, jobTransaction) => {
-    const FormLayoutObject = {
-      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
-      jobTransaction,
-      statusList
+    const jobAttributeTime = (this.props.jobExpiryTime) ? this.props.jobExpiryTime[Object.keys(this.props.jobExpiryTime)[0]] : null
+    if ((jobAttributeTime != null) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) {
+      Alert.alert(
+        DETAILS,
+        JOB_EXPIRED,
+        [
+          { text: OK, style: CANCEL },
+        ],
+      )
     }
-    this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+    else {
+      const FormLayoutObject = {
+        contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+        jobTransaction,
+        statusList
+      }
+      this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+    }
   }
   chatButtonPressed = () => {
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
@@ -465,7 +478,7 @@ class JobDetailsV2 extends PureComponent {
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.errorMessage) ? this.showDraftAlert() : null
       const etaTimer = this.etaUpdateTimer()
       return (
         <StyleProvider style={getTheme(platform)}>

@@ -184,6 +184,9 @@ module.exports = {
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+    JOB_EXPIRED: 'Job Expired!',
+    DETAILS: "Details",
+
 
      //Job_DetailsV2
      UPDATE_GROUP : 'Update Group',
