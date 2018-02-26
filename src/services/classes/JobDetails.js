@@ -20,6 +20,7 @@ import {
     USER_SUMMARY
 } from '../../lib/constants'
 import { keyValueDBService } from './KeyValueDBService'
+import _ from 'lodash'
 
 
 class JobDetails {
@@ -106,12 +107,12 @@ class JobDetails {
      *@returns {string,Boolean} It returns boolean if enableOutForDelivery,enableResequenceRestriction and jobTime cases fail
      */
 
-   async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId){
+   async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId, actionOnStatus){
        let enableFlag = false
         if(enableOutForDelivery){
             enableFlag =  await this.checkOutForDelivery(jobMasterList)
         }
-        if(!enableFlag && enableResequenceRestriction){
+        if(!enableFlag && enableResequenceRestriction && actionOnStatus != 1){
             enableFlag =  this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
         }
         if(!enableFlag && jobTime){
@@ -177,7 +178,7 @@ class JobDetails {
         const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id)
         const statusMap = statusList.value.filter((status) => status.tabId == tabId && status.code !== UNSEEN).map(obj => obj.id)
         const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
-        return !(firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : "Please finish previous items first"
+        return !(!_.isEmpty(firstEnableSequenceTransaction) && firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : "Please finish previous items first"
     }
 
     /**@function checkOutForDelivery(jobMasterList)
@@ -195,7 +196,7 @@ class JobDetails {
             return mapOfUnseenStatusWithJobMaster[key];
         });
         const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)
-        return !(unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
+        return !(unseenTransactions && unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
     }
 
     /**@function toRadians(angle)
