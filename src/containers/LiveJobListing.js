@@ -42,6 +42,16 @@ import {
     SET_SEARCH,
     SET_LIVE_JOB_TOAST
 } from '../lib/constants'
+import {
+    INVALID_SCAN,
+    LIVE_TASKS,
+    NO_JOBS_PRESENT,
+    FILTER_REF_NO,
+    SELECT_ALL,
+    ACCEPT,
+    REJECT,
+    SELECTED
+} from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         liveJobList: state.liveJobList.liveJobList,
@@ -66,7 +76,7 @@ class LiveJobListing extends PureComponent {
             isScannerUsed: false,
         };
     }
-    componentWillMount() {
+    componentDidMount() {
         this.props.actions.fetchAllLiveJobsList()
         if (this.props.navigation.state.params && this.props.navigation.state.params.callAlarm == true) {
             // Vibration.vibrate()
@@ -142,7 +152,7 @@ class LiveJobListing extends PureComponent {
                 }
             })
             if (_.isEmpty(jobTransactionArray) && this.state.isScannerUsed) {
-                this.props.actions.setState(SET_LIVE_JOB_TOAST, 'Invalid Scan')
+                this.props.actions.setState(SET_LIVE_JOB_TOAST, INVALID_SCAN)
                 this.setState({ isScannerUsed: false })
             }
             return jobTransactionArray;
@@ -167,12 +177,12 @@ class LiveJobListing extends PureComponent {
                                     </Button>
                                 </Left>
                                 <Body>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Live Tasks</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{LIVE_TASKS}</Text>
                                 </Body>
                                 <Right />
                             </Header>
                             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>No jobs present</Text>
+                                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
                             </View>
                         </Container>
                     </StyleProvider>
@@ -192,13 +202,13 @@ class LiveJobListing extends PureComponent {
                                                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                             </TouchableOpacity>
                                             <View style={[style.headerBody]}>
-                                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Live Tasks</Text>
+                                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{LIVE_TASKS}</Text>
                                             </View>
                                             <View style={[style.headerRight]}>
                                             </View>
                                             <View />
                                         </View>
-                                        <SearchBarV2 placeholder='Filter Reference Numbers' setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation}
+                                        <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation}
                                             returnValue={(searchText) => {
                                                 this.props.actions.setState(SET_SEARCH, searchText)
                                                 this.setState({ isScannerUsed: true })
@@ -219,13 +229,13 @@ class LiveJobListing extends PureComponent {
                                                         }}>
                                                         <Icon name="md-close" style={[styles.fontWhite, styles.fontXl]} />
                                                     </TouchableOpacity>
-                                                    <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + ' Selected'} </Text>
+                                                    <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
                                                 </View>
-                                                <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> SELECT ALL </Text>
+                                                <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
                                             </View>
                                             <View style={[styles.row]}>
-                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(1)}> ACCEPT </Text>
-                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(2)}> REJECT </Text>
+                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(1)}> {ACCEPT} </Text>
+                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(2)}> {REJECT} </Text>
                                             </View>
                                         </View>
                                     </Body>
