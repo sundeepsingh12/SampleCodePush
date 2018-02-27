@@ -64,11 +64,15 @@ export function saveList(tableName, array) {
  */
 export function performBatchSave(...tableNamesVsDataList) {
     return realm.write(() => {
+    let imeiNumber = DeviceInfo.getUniqueID()
         tableNamesVsDataList.forEach(record => {
             try {
                 if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
                     if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
-                        _encryptedPerformBatchSave(record)
+                        for (let data in record.value) {
+                            record.value[data].value = _encryptData(record.value[data].value, imeiNumber)
+                            realm.create(record.tableName, record.value[data], true)
+                        }
                     } else {
                         record.value.forEach(data => realm.create(record.tableName, data, true))
                     }
@@ -80,12 +84,8 @@ export function performBatchSave(...tableNamesVsDataList) {
     })
 }
 
-export function _encryptedPerformBatchSave(record){
-    let imeiNumber = DeviceInfo.getUniqueID()
-    for (let data in record.value) {
-        record.value[data].value = (crypto.AES.encrypt(JSON.stringify(record.value[data].value), imeiNumber)).toString()
-        realm.create(record.tableName, record.value[data], true)
-    }
+export function _encryptData(dataToEncrypt, encryptionKey) {
+    return (crypto.AES.encrypt(JSON.stringify(dataToEncrypt), encryptionKey)).toString()
 }
 
 export function deleteRecords() {
@@ -194,21 +194,21 @@ export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
         records = records.sorted(`${sortProperty}`)
     }
     if (tableName == TABLE_FIELD_DATA || tableName == TABLE_JOB_DATA) {
-        records = _getRecordListOnQueryDecrypted(records)
+        let imeiNumber = DeviceInfo.getUniqueID()
+        let recordList = []
+        for (let index in records) {
+            let recordData = { ...records[index] }
+            recordData.value = _decryptData(recordData.value, imeiNumber)
+            recordList.push(recordData)
+        }
+        return recordList
     }
     return records
 }
 
-export function _getRecordListOnQueryDecrypted(records){
-    let imeiNumber = DeviceInfo.getUniqueID()
-    let recordList = []
-    for (let index in records) {
-        let recordData = { ...records[index] }
-        let recordDataInBytes = crypto.AES.decrypt(recordData.value, imeiNumber)
-        recordData.value = JSON.parse(recordDataInBytes.toString(crypto.enc.Utf8))
-        recordList.push(recordData)
-    }
-    return recordList
+export function _decryptData(dataToDecrypt, decryptionKey) {
+    let recordDataInBytes = crypto.AES.decrypt(dataToDecrypt, decryptionKey)
+    return JSON.parse(recordDataInBytes.toString(crypto.enc.Utf8))
 }
 
 export function updateRealmDb(tableName, transactionIdSequenceMap) {
