@@ -145,6 +145,7 @@ class Sorting extends PureComponent {
 
     render() {
         const renderView = this._renderContent()
+        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : 'Sorting'        
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -156,7 +157,7 @@ class Sorting extends PureComponent {
                                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Sorting</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
                                 </View>
                                 <View style={[style.headerRight]}>
                                 </View>

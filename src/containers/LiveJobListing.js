@@ -137,6 +137,7 @@ class LiveJobListing extends PureComponent {
     }
 
     render() {
+        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : 'Live Tasks'
         if (this.props.loaderRunning) {
             return <Loader />
         }
@@ -154,7 +155,7 @@ class LiveJobListing extends PureComponent {
                                     </Button>
                                 </Left>
                                 <Body>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Live Tasks</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{headerView}</Text>
                                 </Body>
                                 <Right />
                             </Header>

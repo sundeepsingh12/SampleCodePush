@@ -29,7 +29,7 @@ import { jobStatusService } from '../../services/classes/JobStatus';
 /**
  * This action fetch job master list for order assignment module
  */
-export function fetchJobMasterList() {
+export function fetchJobMasterList(displayName) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_JOB_MASTER_LIST, {
@@ -57,7 +57,7 @@ export function fetchJobMasterList() {
                 dispatch(navigateToScene(PostAssignmentScanner, { jobMaster: orderJobMasterList[0] }))
             }
             if (orderJobMasterList && orderJobMasterList.length > 1) {
-                dispatch(navigateToScene(JobMasterListScreen))
+                dispatch(navigateToScene(JobMasterListScreen,{displayName}))
             }
         } catch (error) {
             console.log(error)

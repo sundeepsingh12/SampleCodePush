@@ -79,6 +79,7 @@ class BulkConfiguration extends PureComponent {
     if (this.props.isLoaderRunning) {
       return <Loader />
     }
+    let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : 'Bulk Update'
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -90,7 +91,7 @@ class BulkConfiguration extends PureComponent {
               </Button>
             </Left>
             <Body>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Bulk Update</Text>
+              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{headerView}</Text>
             </Body>
             <Right />
           </Header>
