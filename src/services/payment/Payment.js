@@ -210,6 +210,8 @@ class Payment {
             jobTransactionIdAmountMap = null
         } else if (jobTransaction.length) {
             throw new Error(INVALID_CONFIGURATION)
+        } else {
+            jobTransactionIdAmountMap = null
         }
         return {
             originalAmount,
