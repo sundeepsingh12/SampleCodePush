@@ -159,7 +159,8 @@ class JobData {
         if (jobAttributeMapQuery !== undefined && jobAttributeMapQuery !== null && jobAttributeMapQuery.length !== 0) {
             jobDataQuery += ' AND (' + jobAttributeMapQuery + ')'
         }
-        let jobDataObject = jobDetailsService.prepareDataObject(jobId, 0, TABLE_JOB_DATA, jobDataQuery, jobAttributeMasterMap, jobAttributeMap, true, 0, true)
+        let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
+        let jobDataObject = jobDetailsService.prepareDataObject(jobId, 0, jobDataList, jobAttributeMasterMap, jobAttributeMap, true, 0, true)
         return jobDataObject
     }
 

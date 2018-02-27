@@ -73,7 +73,8 @@ class FieldData {
         if (fieldAttributeMapQuery !== undefined && fieldAttributeMapQuery !== null && fieldAttributeMapQuery.length !== 0) {
             fieldDataQuery += ' AND (' + fieldAttributeMapQuery + ')'
         }
-        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, TABLE_FIELD_DATA, fieldDataQuery, fieldAttributeMasterMap, fieldAttributeMap, false, 0, true)
+        let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery)
+        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false, 0,true)
         return fieldDataObject
     }
 
