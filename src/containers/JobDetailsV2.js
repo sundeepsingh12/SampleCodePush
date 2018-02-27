@@ -207,8 +207,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onCheckLocationMismatch = (statusList, jobTransaction) => {
-    const jobAttributeTime = (this.props.jobExpiryTime) ? this.props.jobExpiryTime[Object.keys(this.props.jobExpiryTime)[0]] : null
-    if ((jobAttributeTime != null) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) {
+    if ((this.props.jobExpiryTime != null) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(this.props.jobExpiryTime)) {
       Alert.alert(
         DETAILS,
         JOB_EXPIRED,
