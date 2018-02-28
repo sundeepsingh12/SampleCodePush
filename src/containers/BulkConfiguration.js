@@ -31,6 +31,7 @@ import { StyleSheet, View, TouchableHighlight, FlatList } from 'react-native'
 import Loader from '../components/Loader'
 import * as globalActions from '../modules/global/globalActions'
 import { BulkListing } from '../lib/constants'
+import {BULK_UPDATE} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -79,7 +80,7 @@ class BulkConfiguration extends PureComponent {
     if (this.props.isLoaderRunning) {
       return <Loader />
     }
-    let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : 'Bulk Update'
+    let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : BULK_UPDATE
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>

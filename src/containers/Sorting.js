@@ -35,6 +35,7 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import {SORTING_SEARCH_VALUE,QrCodeScanner} from '../lib/constants'
+import { SORTING } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -145,7 +146,7 @@ class Sorting extends PureComponent {
 
     render() {
         const renderView = this._renderContent()
-        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : 'Sorting'        
+        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : SORTING        
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>

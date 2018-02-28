@@ -57,11 +57,10 @@ class JobDetails {
      */
     prepareDataObject(id, positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId, isObject) {
         let dataMap = {}
-        let dataQuery = isJob ? 'jobId = ' + id + ' AND parentId = ' + positionId : 'jobTransactionId = ' + id + ' AND parentId = ' + positionId
         let dataList = isObject ? {} : []
-        let filteredDataList = realm.filterRecordList(realmDBDataList, dataQuery)
+        let filteredDataList = isJob ? realmDBDataList.filter(arrayItem =>(arrayItem.parentId == positionId && arrayItem.jobId == id)) : realmDBDataList.filter(arrayItem =>(arrayItem.parentId == positionId && arrayItem.jobTransactionId == id))
         for (let index in filteredDataList) {
-            let data = { ...filteredDataList[index] }
+            let data = filteredDataList[index]
             let attributeMaster = isJob ? attributeMasterMap[data.jobAttributeMasterId] : attributeMasterMap[data.fieldAttributeMasterId]
             let attributeStatus = attributeMaster ? attributeMap[attributeMaster.id] : undefined
             if (attributeMaster && attributeStatus && !attributeMaster.hidden && data.value !== undefined && data.value !== null && data.value.trim() != '') {

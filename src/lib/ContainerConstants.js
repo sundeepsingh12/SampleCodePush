@@ -3,7 +3,7 @@ module.exports = {
     TOKEN_MISSING: 'Token Missing',
 
     //CustomApp
-    INVALID_URL_OR_NO_INTERNET : "Invalid Url or No Internet",
+    INVALID_URL_OR_NO_INTERNET: "Invalid Url or No Internet",
 
     //common_CONSTANTS
     CANCEL: 'Cancel',
@@ -49,6 +49,7 @@ module.exports = {
 
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
+    NEW_TASK : 'New Task',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -162,10 +163,10 @@ module.exports = {
     UNSYNCED_FILES: 'Unsynced Files',
     SYNCED_FILES: 'Synced Files',
     CREATE_BACKUP_BUTTON: '+ Create Backup',
-    UPLOAD:'Upload',
-    UPLOAD_SUCCESSFUL:' Upload Successful',
-    UPLOAD_FAILED:'Upload Failed',
-    LOGGING_OUT:'Logging out',
+    UPLOAD: 'Upload',
+    UPLOAD_SUCCESSFUL: ' Upload Successful',
+    UPLOAD_FAILED: 'Upload Failed',
+    LOGGING_OUT: 'Logging out',
 
     //DataStore
     SUGGESTIONS: 'Suggestions',
@@ -188,8 +189,8 @@ module.exports = {
     DETAILS: "Details",
 
 
-     //Job_DetailsV2
-     UPDATE_GROUP : 'Update Group',
+    //Job_DetailsV2
+    UPDATE_GROUP: 'Update Group',
 
     //Cash Tendering
     NOT_REQUIRED: 'NOT REQUIRED',
@@ -211,6 +212,19 @@ module.exports = {
     TOTAL_QUANTITY: 'Total Quantity : ',
 
     //Statistics
-    STATISTICS: 'STATISTICS'
+    STATISTICS: 'STATISTICS',
 
+    //Live job
+    LIVE_TASKS: 'Live Tasks',
+    NO_JOBS_PRESENT: 'No jobs present',
+    FILTER_REF_NO: 'Filter Reference Numbers',
+    SELECT_ALL: 'SELECT ALL',
+    ACCEPT: 'ACCEPT',
+    REJECT: 'REJECT',
+
+    //Bulk Listing 
+    BULK_UPDATE: 'Bulk Update',
+
+    //Sorting
+    SORTING : 'Sorting',
 }
