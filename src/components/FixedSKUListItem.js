@@ -82,6 +82,7 @@ class FixedSKUListItem extends PureComponent {
                             maxLength={4}
                             placeholder={'0'}
                             keyboardType={'numeric'}
+                            returnKeyType='done'
                             value={(this.props.item.childDataList[FIXED_SKU_QUANTITY].value == 0) ? '' : (this.props.item.childDataList[FIXED_SKU_QUANTITY].value).toString()}
                             onChangeText={(quantity) => {
                                 let payload = {

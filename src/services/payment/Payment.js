@@ -206,7 +206,7 @@ class Payment {
             }
             originalAmount = totalAmount + ''
         } else if (originalAmountMaster && originalAmountMaster.fieldAttributeMasterId) {
-            originalAmount = formData[originalAmountMaster.fieldAttributeMasterId].value
+            originalAmount = formData.get(originalAmountMaster.fieldAttributeMasterId) ? formData.get(originalAmountMaster.fieldAttributeMasterId).value : null
             jobTransactionIdAmountMap = null
         } else if (jobTransaction.length) {
             throw new Error(INVALID_CONFIGURATION)
@@ -225,14 +225,14 @@ class Payment {
      * totalActualAmount : integer
      */
     getTotalActualAmount(moneyCollectMaster, formData) {
-        let actualAmount
+        let actualAmount = 0
         for (let [fieldAttributeMasterId, formElement] of formData) {
-            if (formElement.attributeTypeId == SKU_ARRAY && formElement.positionId < moneyCollectMaster.positionId) {
-                actualAmount += this.getActualAmount(formElement.childList, SKU_ACTUAL_AMOUNT)
+            if (formElement.attributeTypeId == SKU_ARRAY && formElement.positionId < formData.get(moneyCollectMaster.id).positionId) {
+                actualAmount += this.getActualAmount(formElement, SKU_ACTUAL_AMOUNT)
             }
 
-            if (formElement.attributeTypeId == FIXED_SKU && formElement.positionId < moneyCollectMaster.positionId) {
-                actualAmount += this.getActualAmount(formElement.childList, DECIMAL)
+            if (formElement.attributeTypeId == FIXED_SKU && formElement.positionId < formData.get(moneyCollectMaster.id).positionId) {
+                actualAmount += this.getActualAmount(formElement, DECIMAL)
             }
         }
         return actualAmount
@@ -283,7 +283,8 @@ class Payment {
      * @returns
      * actualAmount : integer
      */
-    getActualAmount(childList, property) {
+    getActualAmount(formElement, property) {
+        let childList = formElement.childDataList
         for (let index in childList) {
             if (childList[index].attributeTypeId == property) {
                 return childList[index].value
