@@ -331,14 +331,6 @@ module.exports = {
     SEQUENCE_COUNT: '&count=',
     SEQUENCE_ID_UNAVAILABLE: 'MasterId Unavailable !',
 
-    //SkuListing Service
-    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
-    QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
-    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
-    QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
-    REASON: 'Reason',
-    OPEN_CAMERA: 'Open Camera',
-
     //Sequence Container
     ROUTE_OPTIMIZATION: 'Route optimisation',
 

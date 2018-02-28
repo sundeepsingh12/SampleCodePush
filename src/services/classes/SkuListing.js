@@ -20,21 +20,21 @@ import {
     SKU_UNIT_PRICE,
     OBJECT,
     OBJECT_SAROJ_FAREYE,
-    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY,
-    QTY_NOT_ZERO,
-    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY,
-    QTY_ZERO,
     SKU_PHOTO,
     SKU_REASON,
-    NA,
-    REASON,
-    OPEN_CAMERA,
+    NA
 } from '../../lib/AttributeConstants'
 import {
     fieldAttributeStatusService
 } from './FieldAttributeStatus'
 import {
     SELECT_ANY_REASON,
+    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY,
+    QTY_NOT_ZERO,
+    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY,
+    QTY_ZERO,
+    REASON,
+    OPEN_CAMERA,
 } from '../../lib/ContainerConstants'
 class SkuListing {
 
@@ -209,7 +209,6 @@ class SkuListing {
     }
 
     getFinalCheckForValidation(skuObjectValidation,skuRootChildElements){
-        console.log('skuRootChildElements',skuRootChildElements)
         
         if(!skuObjectValidation){
             throw new Error('Sku Object validation missing')
@@ -218,7 +217,6 @@ class SkuListing {
             throw new Error('Sku child elements missing')
         }
         const rightKey = (skuObjectValidation) ? skuObjectValidation.rightKey : null
-        console.log('skuObjectValidation',skuObjectValidation)
         let message
         if(!rightKey) return
         if (rightKey!= null && rightKey.includes("1")) {
@@ -231,8 +229,6 @@ class SkuListing {
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ORIGINAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value!=skuRootChildElements[TOTAL_ORIGINAL_QUANTITY].value)
                         message = TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY
                 } else if (rightKey.includes("4")) {
-                    console.log('4>>>>')
-                    console.log('vv',skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value)
                     if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value!=0)
                         message = QTY_ZERO
                 }
@@ -287,7 +283,6 @@ class SkuListing {
             for(let index in skuRootChildItems){
                 childElementsArray.push(skuRootChildItems[index])
             }
-            console.log('childElementsArray',childElementsArray)
             return (ShouldProceedOrNot) ? childElementsArray : null
     }
 
