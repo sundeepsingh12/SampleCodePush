@@ -65,6 +65,7 @@ class OtpScreen extends PureComponent{
                                         placeholder='OTP'
                                         value={this.props.otpNumber}
                                         keyboardType='numeric'
+                                        returnKeyType='done'
                                         maxLength={6}
                                         onChangeText={this.onChangeOtp}
                                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, { height: 40 }]}

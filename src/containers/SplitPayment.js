@@ -105,6 +105,7 @@ class SplitPayment extends Component {
                             placeholder=""
                             keyboardType="numeric"
                             KeyboardTypeIOS="number-pad"
+                            returnKeyType='done'
                             editable={paymentView ? false : true}
                             onChangeText={value => this.props.actions.setPaymentAmount(modeTypeId, value, this.props.splitPaymentModeMap)}
                             value={amount && amount !== 0 ? amount + '' : null}
@@ -135,6 +136,7 @@ class SplitPayment extends Component {
                             placeholder=""
                             keyboardType="numeric"
                             KeyboardTypeIOS="number-pad"
+                            returnKeyType='done'
                             onChangeText={value => { this.props.actions.setPaymentParameterForChequeOrDD(modeTypeId, id, this.props.splitPaymentModeMap, null, value) }}
                             value={transactionNumber && transactionNumber !== 0 ? transactionNumber + '' : null}
                         />
@@ -150,6 +152,7 @@ class SplitPayment extends Component {
                             placeholder=""
                             keyboardType="numeric"
                             KeyboardTypeIOS="number-pad"
+                            returnKeyType='done'
                             onChangeText={value => { this.props.actions.setPaymentParameterForChequeOrDD(modeTypeId, id, this.props.splitPaymentModeMap, value, null) }}
                             value={amount && amount !== 0 ? amount + '' : null}
                         />
@@ -242,6 +245,7 @@ class SplitPayment extends Component {
                                     placeholder=""
                                     keyboardType="numeric"
                                     KeyboardTypeIOS="number-pad"
+                                    returnKeyType='done'
                                     editable={false}
                                     value={this.props.navigation.state.params.actualAmount + ''}
                                 />

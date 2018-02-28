@@ -152,7 +152,7 @@ export default class FormLayoutEventImpl {
      * @param {*} calledFrom 
      */
     updateFieldInfo(attributeMasterId, value, formLayoutObject, calledFrom, fieldDataList) {
-        formLayoutObject.get(attributeMasterId).displayValue = (value != null && value != undefined && value.length != 0 && value.length < 64 &&
+        formLayoutObject.get(attributeMasterId).displayValue = (value != null && value != undefined && calledFrom == NEXT_FOCUS && value.length != 0 && value.length < 64 &&
             formLayoutObject.get(attributeMasterId).attributeTypeId == 61) ? sha256(value) : value;
         formLayoutObject.get(attributeMasterId).childDataList = fieldDataList ? fieldDataList : formLayoutObject.get(attributeMasterId).childDataList
         if (!calledFrom) {
@@ -327,10 +327,10 @@ export default class FormLayoutEventImpl {
 
     async _updateUserSummary(jobTransaction, statusCategory, jobTransactionIdList, userSummary, jobTransactionValue, nextStatusId) {
         const status = ['pendingCount', 'failCount', 'successCount']
-        const prevStatusId = (jobTransactionIdList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+        const prevStatusId = (jobTransactionIdList && jobTransactionIdList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
-        const jobTransactionId = (jobTransactionIdList.length) ? jobTransaction[0].id : jobTransaction.id
-        const count = (jobTransactionIdList.length) ? jobTransactionIdList.length : 1
+        const jobTransactionId = (jobTransactionIdList && jobTransactionIdList.length) ? jobTransaction[0].id : jobTransaction.id
+        const count = (jobTransactionIdList && jobTransactionIdList.length) ? jobTransactionIdList.length : 1
         userSummary["value"][status[prevStatusCategory - 1]] = (userSummary["value"][status[prevStatusCategory - 1]] - count >= 0 && prevStatusId != nextStatusId) ? userSummary["value"][status[prevStatusCategory - 1]] - count : userSummary["value"][status[prevStatusCategory - 1]]
         userSummary["value"][status[statusCategory - 1]] += count
         if (jobTransactionValue) {
@@ -350,9 +350,9 @@ export default class FormLayoutEventImpl {
      */
 
     async _updateJobSummary(jobTransaction, statusId, jobTransactionList) {
-        const prevStatusId = (jobTransactionList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+        const prevStatusId = (jobTransactionList && jobTransactionList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
-        const count = (jobTransactionList.length) ? jobTransactionList.length : 1
+        const count = (jobTransactionList && jobTransactionList.length) ? jobTransactionList.length : 1
         const jobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
         jobSummaryList.value.forEach(item => {
             item.updatedTime = currentDate
@@ -380,14 +380,14 @@ export default class FormLayoutEventImpl {
     async _updateRunsheetSummary(jobTransaction, statusCategory, jobTransactionList) {
         const setRunsheetSummary = [], runSheetList = []
         const status = ['pendingCount', 'failCount', 'successCount']
-        const prevStatusId = (jobTransactionList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
+        const prevStatusId = (jobTransactionList && jobTransactionList.length) ? jobTransaction[0].jobStatusId : jobTransaction.jobStatusId
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId)
         const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, null)
         const runsheetMap = runSheetData.reduce(function (total, current) {
             total[current.id] = Object.assign({}, current);
             return total;
         }, {});
-        if (jobTransactionList.length) {
+        if (jobTransactionList && jobTransactionList.length) {
             for (id in jobTransaction) {
                 let prevCount = runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory - 1]]
                 runsheetMap[jobTransaction[id].runsheetId][status[prevStatusCategory - 1]] = (prevCount > 0) ? prevCount - 1 : 0
@@ -584,7 +584,7 @@ export default class FormLayoutEventImpl {
 
         let jobTransaction = null
         let jobTransactionDBObject = null
-        if (jobTransactionList.length) {
+        if (jobTransactionList && jobTransactionList.length) {
             let query = jobTransactionList.map(jobTransactionObject => `id = ${jobTransactionObject.jobTransactionId}`).join(' OR ')
             jobTransaction = []
             jobTransactionDBObject = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query, false)

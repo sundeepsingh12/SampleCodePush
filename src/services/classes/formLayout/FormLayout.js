@@ -76,11 +76,11 @@ class FormLayout {
 
         for (let index in filedAttributesMappedToStatus) {
             fieldAttributeMasterParentIdMap[filedAttributesMappedToStatus[index].fieldAttributeId] = fieldAttributeMasterIdFromArray ? {} : fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId
-            if(fieldAttributeMasterIdFromArray) {
-                if(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) {
+            if (fieldAttributeMasterIdFromArray) {
+                if (fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) {
                     sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
                 }
-            } else if(!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId) {
+            } else if (!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId) {
                 sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
             }
             // if ((fieldAttributeMasterIdFromArray && fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) || (!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId)) {
@@ -313,12 +313,13 @@ class FormLayout {
             throw new Error('formElement is missing')
         }
         for (let [id, currentObject] of formElement.entries()) {
-            if (!currentObject.required || currentObject.value || currentObject.value === 0) {
-                continue
-            }
             let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction)
             currentObject.value = afterValidationResult && !currentObject.alertMessage ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
+                return false
+            } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 6 && !Number.isInteger(Number(currentObject.value))) {
+                return false
+            } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
                 return false
             }
         }

@@ -56,6 +56,7 @@ class MobileNoScreen extends PureComponent{
                                         placeholder='Mobile Number'
                                         value={this.props.mobileNumber}
                                         keyboardType='numeric'
+                                        returnKeyType='done'
                                         onChangeText={this.onChangeMobileNo}
                                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                                     />

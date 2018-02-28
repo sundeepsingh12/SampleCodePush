@@ -10,7 +10,7 @@ import {
     ActivityIndicator,
     Modal,
     Keyboard,
-    TouchableOpacity
+    TouchableOpacity,
 }
     from 'react-native'
 import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Item, Label } from 'native-base'
@@ -97,7 +97,6 @@ class BasicFormElement extends PureComponent {
 
     navigateToScene = (item) => {
         let screenName = ''
-        let cash = 0
         this.props.actions.fieldValidations(item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
@@ -110,13 +109,16 @@ class BasicFormElement extends PureComponent {
                 break
             }
             case CASH_TENDERING: {
-                cash = this.props.actions.checkForCash(this.props.formElement, this.props.item)
-                if (cash > 0) {
-                    screenName = 'CashTendering'
-                } else {
-                    screenName = null
-                    { Toast.show({ text: "NOT REQUIRED", position: 'bottom', buttonText: 'Okay' }) }
-                }
+                this.props.actions.checkForCash({
+                    currentElement: item,
+                    formElements: this.props.formElement,
+                    jobStatusId: this.props.jobStatusId,
+                    jobTransaction: this.props.jobTransaction,
+                    latestPositionId: this.props.latestPositionId,
+                    isSaveDisabled: this.props.isSaveDisabled,
+                    returnData: this._searchForReferenceValue.bind(this),
+                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                })
                 break
             }
             case SIGNATURE: {
@@ -163,7 +165,6 @@ class BasicFormElement extends PureComponent {
                 jobTransaction: this.props.jobTransaction,
                 latestPositionId: this.props.latestPositionId,
                 isSaveDisabled: this.props.isSaveDisabled,
-                cash: cash,
                 returnData: this._searchForReferenceValue.bind(this),
                 fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
             }
@@ -393,6 +394,7 @@ class BasicFormElement extends PureComponent {
                                         value={this.props.item.displayValue}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
+                                        returnKeyType='done'
                                         multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                         onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
                                         onFocus={() => { this.onFocusEvent(this.props.item) }}

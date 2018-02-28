@@ -209,6 +209,9 @@ class DataStoreService {
     }
 
     checkIfUniqueConditionExists(fieldAttribute) {
+        if (!fieldAttribute.validation || fieldAttribute.validation.length <= 0) {
+            return
+        }
         let minMaxValidation = fieldAttribute.validation.filter(validation => validation.timeOfExecution == MINMAX)
         return (minMaxValidation.length > 0 && minMaxValidation[0].condition == 'true')
     }

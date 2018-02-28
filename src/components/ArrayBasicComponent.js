@@ -260,6 +260,7 @@ class ArrayBasicComponent extends PureComponent {
                                     value={item.displayValue}
                                     keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                     editable={item.editable}
+                                    returnKeyType='done'
                                     multiline={item.attributeTypeId == 2 ? true : false}
                                     onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
                                     onFocus={() => { this.onFocusEvent(item) }}
