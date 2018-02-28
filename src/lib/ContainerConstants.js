@@ -49,6 +49,7 @@ module.exports = {
 
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
+    NEW_TASK : 'New Task',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -220,4 +221,10 @@ module.exports = {
     SELECT_ALL: 'SELECT ALL',
     ACCEPT: 'ACCEPT',
     REJECT: 'REJECT',
+
+    //Bulk Listing 
+    BULK_UPDATE: 'Bulk Update',
+
+    //Sorting
+    SORTING : 'Sorting',
 }
