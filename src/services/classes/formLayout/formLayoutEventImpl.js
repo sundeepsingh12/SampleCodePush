@@ -584,7 +584,7 @@ export default class FormLayoutEventImpl {
 
         let jobTransaction = null
         let jobTransactionDBObject = null
-        if (jobTransactionList.length) {
+        if (jobTransactionList && jobTransactionList.length) {
             let query = jobTransactionList.map(jobTransactionObject => `id = ${jobTransactionObject.jobTransactionId}`).join(' OR ')
             jobTransaction = []
             jobTransactionDBObject = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query, false)

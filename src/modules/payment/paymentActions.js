@@ -51,7 +51,8 @@ import {
     INVALID_CONFIGURATION,
     REFUND,
     COLLECTION_CASH,
-    COLLECTION_SOD
+    COLLECTION_SOD,
+    VALID_AMOUNT_ERROR
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import { Toast } from 'native-base'
@@ -93,6 +94,10 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
 export function saveMoneyCollectObject(actualAmount, currentElement, formElement, jobMasterId, jobId, jobTransaction, latestPositionId, moneyCollectMaster, isSaveDisabled, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap) {
     return async function (dispatch) {
         try {
+            if (!Number(actualAmount)) {
+                Toast.show({ text: VALID_AMOUNT_ERROR, position: 'bottom', buttonText: 'OK', duration: 5000 })
+                return
+            }
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt)
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransaction.id, currentElement.positionId, latestPositionId)
             const isCardPayment = paymentService.checkCardPayment(selectedPaymentMode)

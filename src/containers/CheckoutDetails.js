@@ -219,6 +219,7 @@ class CheckoutDetails extends PureComponent {
                                 <Input placeholder={MOBILE_NUMBER}
                                     value={this.props.inputTextToSendSms}
                                     keyboardType='numeric'
+                                    returnKeyType='done'
                                     onChangeText={this.onChangeMobileNo}
                                     style={[styles.fontSm]} />
                             </Item>

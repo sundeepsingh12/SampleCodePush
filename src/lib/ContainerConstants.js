@@ -84,6 +84,7 @@ module.exports = {
     NUMBER: 'Number',
     SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
     INVALID_CONFIGURATION: 'Invalid Configuration',
+    VALID_AMOUNT_ERROR: 'Please enter valid amount',
 
     //Sequence
     SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
@@ -187,7 +188,6 @@ module.exports = {
     UPDATE_GROUP: 'Update Group',
     JOB_EXPIRED: 'Job Expired!',
     DETAILS: "Details",
-
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',

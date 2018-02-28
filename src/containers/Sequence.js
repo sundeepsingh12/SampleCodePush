@@ -232,7 +232,8 @@ class Sequence extends PureComponent {
                 onChangeText={(sequenceNumber) =>
                   this.setState(() => { return { newSequenceNumber: sequenceNumber, alertMessage: '' } })}
                 style={{ height: 40, fontSize: 13 }}
-                keyboardType="numeric" />
+                keyboardType="numeric"
+                returnKeyType='done' />
             </Item>
             {this.state.alertMessage ?
               <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10, styles.marginLeft5]}>{this.state.alertMessage}</Label>

@@ -10,7 +10,7 @@ import {
     ActivityIndicator,
     Modal,
     Keyboard,
-    TouchableOpacity
+    TouchableOpacity,
 }
     from 'react-native'
 import { Container, Content, Input, Card, CardItem, Button, Body, Header, Left, Right, Icon, Toast, Item, Label } from 'native-base'
@@ -394,6 +394,7 @@ class BasicFormElement extends PureComponent {
                                         value={this.props.item.displayValue}
                                         keyboardType={(this.props.item.attributeTypeId == 6 || this.props.item.attributeTypeId == 13 || this.props.item.attributeTypeId == CONTACT_NUMBER) ? 'numeric' : 'default'}
                                         editable={this.props.item.editable}
+                                        returnKeyType='done'
                                         multiline={this.props.item.attributeTypeId == 2 ? true : false}
                                         onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
                                         onFocus={() => { this.onFocusEvent(this.props.item) }}
