@@ -74,7 +74,7 @@ class FieldData {
             fieldDataQuery += ' AND (' + fieldAttributeMapQuery + ')'
         }
         let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery)
-        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false, 0, true)
+        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false, 0,true)
         return fieldDataObject
     }
 
