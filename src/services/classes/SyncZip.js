@@ -77,7 +77,6 @@ export async function createZip(transactionIdToBeSynced) {
 
     const userSummary = await updateUserSummaryNextJobTransactionId()
     SYNC_RESULTS.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
-    console.log(JSON.stringify(SYNC_RESULTS));
     await moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP)
     //Writing Object to File at TEMP location
     await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');
