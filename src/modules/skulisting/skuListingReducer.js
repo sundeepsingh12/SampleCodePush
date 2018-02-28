@@ -10,6 +10,7 @@ import {
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
     RESET_STATE,
+    UPDATE_SKU_LIST_ITEMS,
 } from '../../lib/constants'
 
 
@@ -37,6 +38,9 @@ export default function skuListingReducer(state = initialState, action) {
         case UPDATE_SKU_ACTUAL_QUANTITY:
           return state.set('skuListItems',action.payload.skuListItems)
                       .set('skuChildItems',action.payload.skuRootChildElements) 
+
+        case UPDATE_SKU_LIST_ITEMS:
+            return state.set('skuListItems', action.payload)
 
         case RESET_STATE:
             return initialState              

@@ -15,9 +15,8 @@ import {
     REASON,
     NA    
 } from '../lib/AttributeConstants'
-import { CheckBox, Picker, Content } from 'native-base'
+import { CheckBox, Picker, Content, Icon } from 'native-base'
 import _ from 'lodash'
-import * as globalActions from '../modules/global/globalActions'
 import {
     CameraAttribute,
 } from '../lib/constants'
@@ -28,34 +27,8 @@ import {
 } from '../lib/ContainerConstants'
 const Item = Picker.Item;
 
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators({ ...globalActions }, dispatch)
-    }
-}
-
 class SkuListItem extends PureComponent {
 
-    checkSkuItemQuantity(rowItem, originalQuantityValue) {
-        let quantitySelector
-        if (originalQuantityValue <= 1) {
-            quantitySelector = <CheckBox style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
-        }
-        else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
-
-            quantitySelector = <Picker
-                mode="dropdown"
-                selectedValue={rowItem.value}
-                onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)} >
-                {this._populateItems(originalQuantityValue)}
-            </Picker>
-        }
-        return (
-            <View>
-                {quantitySelector}
-            </View>
-        )
-    }
     changeSkuActualQuantity(selectedValue, rowItem) {
         //Call parent component using callback
         this.props.updateSkuActualQuantity(selectedValue, rowItem)
@@ -77,8 +50,13 @@ class SkuListItem extends PureComponent {
             return <Item label={reason.name + ""} value={reason.code + ''} key={reason.id + ""} />
         })
     }
+
+    _getIconForImageAlreadyCaptured(rowItem){
+        return (rowItem.value != OPEN_CAMERA) ? <Icon name="ios-checkmark-circle" style={[styles.fontXl, styles.fontSuccess, styles.fontXxl, styles.paddingTop10]} /> : null
+    }
+
     _displaySkuItems(rowItem, originalQuantityValue) {
-        if (!_.isEmpty(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
+        if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
             return (
             <View style={[{flexBasis: '60%', height: 40}]}>
                 <Picker 
@@ -89,11 +67,16 @@ class SkuListItem extends PureComponent {
                     {this._populateSkuItems(this.props.reasonsList)}
                 </Picker>
             </View>)
-        } else if (!_.isEmpty(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
-                return (<Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10]}
-                        onPress={() => {this.props.actions.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) })}}>
-                        {OPEN_CAMERA}
-                    </Text>)
+        } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
+        let isImageAlreadyCaptured = this._getIconForImageAlreadyCaptured(rowItem)
+                return (
+                    <View style={[styles.row, styles.justifyCenter]}>
+                        <Text style={[styles.flexBasis30, styles.fontDefault, styles.padding10]}
+                            onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
+                            {OPEN_CAMERA}
+                        </Text>
+                        {isImageAlreadyCaptured}
+                    </View>)
             
         } else if(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY){
             let quantitySelector
@@ -131,7 +114,7 @@ class SkuListItem extends PureComponent {
             return (
                 <View key={rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal5, {height: 50}]}>
                         <View style={[styles.row]}>
-                            <Text style={[styles.flexBasis40, styles.fontSm, styles.justifyCenter]} >
+                            <Text style={[styles.flexBasis40, styles.fontSm, styles.justifyCenter, styles.paddingTop10]} >
                                 {rowItem.label}
                             </Text>
                             {this._displaySkuItems(rowItem, originalQuantityValue)}
@@ -206,4 +189,4 @@ const style = StyleSheet.create({
 
 });
 
-export default connect(null, mapDispatchToProps)(SkuListItem)
+export default SkuListItem

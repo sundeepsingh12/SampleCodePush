@@ -81,7 +81,6 @@ class SkuListing {
      * idFieldAttributeMap - fieldAttributeTypeId/JobAttributeId Vs FieldAttribute Map
      */
         async prepareSkuListingData(idFieldAttributeMap, jobId,skuObjectValidation, skuValidationForImageAndReason) {
-            try{
             if(!jobId){
                 throw new Error('Job id missing')
             }
@@ -129,11 +128,11 @@ class SkuListing {
                     autoIncrementId: autoIncrementId++
                 }
                 innerArray.push(skuActualQuantityObject)
-                if (idFieldAttributeMap.get(SKU_REASON)) {
+                    if (idFieldAttributeMap.get(SKU_REASON)) {
                     let skuReason = {
                         label: idFieldAttributeMap.get(SKU_REASON).label,
                         attributeTypeId: idFieldAttributeMap.get(SKU_REASON).attributeTypeId,
-                        value: ((originalQuantityValue != 0 && skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')) || (originalQuantityValue == 0 && _.includes(this.props.skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty'))) ? REASON : '',
+                        value: ((originalQuantityValue != 0 && skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty') && skuObjectValidation && skuObjectValidation.leftKey != 0) || (originalQuantityValue == 0 && _.includes(this.props.skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty') && skuObjectValidation && skuObjectValidation.leftKey == 0)) ? REASON : null,
                         id: idFieldAttributeMap.get(SKU_REASON).id,
                         parentId,
                         autoIncrementId: autoIncrementId++
@@ -144,7 +143,7 @@ class SkuListing {
                     let skuPhoto = {
                         label: idFieldAttributeMap.get(SKU_PHOTO).label,
                         attributeTypeId: idFieldAttributeMap.get(SKU_PHOTO).attributeTypeId,
-                        value: ((originalQuantityValue != 0 && skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')) || (originalQuantityValue == 0 && _.includes(this.props.skuValidationForImageAndReason.leftKey, 'imageAtZeroQty'))) ? OPEN_CAMERA : '',
+                        value: ((originalQuantityValue != 0 && skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty') && skuObjectValidation && skuObjectValidation.leftKey != 0) || (originalQuantityValue == 0 && _.includes(this.props.skuValidationForImageAndReason.leftKey, 'imageAtZeroQty') && skuObjectValidation && skuObjectValidation.leftKey != 0)) ? OPEN_CAMERA : null,
                         id: idFieldAttributeMap.get(SKU_PHOTO).id,
                         parentId,
                         autoIncrementId: autoIncrementId
@@ -171,8 +170,6 @@ class SkuListing {
                 attributeTypeIdValueMap,
                 reasonsList,
             }
-        } catch(error){
-        }
     }
 
     getSkuChildAttributes(idFieldAttributeMap,attributeTypeIdValueMap){
@@ -190,20 +187,20 @@ class SkuListing {
         }
 
         const totalActualQty = {
-            id:idFieldAttributeMap.get(TOTAL_ACTUAL_QUANTITY).id,
+            fieldAttributeMasterId:idFieldAttributeMap.get(TOTAL_ACTUAL_QUANTITY).id,
             value:attributeTypeIdValueMap[TOTAL_ACTUAL_QUANTITY],
             attributeTypeId:TOTAL_ACTUAL_QUANTITY
         }
         childAttributesList[TOTAL_ACTUAL_QUANTITY]=totalActualQty
         const totalOriginalQty = {
-            id:idFieldAttributeMap.get(TOTAL_ORIGINAL_QUANTITY).id,
+            fieldAttributeMasterId:idFieldAttributeMap.get(TOTAL_ORIGINAL_QUANTITY).id,
             value:attributeTypeIdValueMap[TOTAL_ORIGINAL_QUANTITY],
             attributeTypeId:TOTAL_ORIGINAL_QUANTITY
         }
         childAttributesList[TOTAL_ORIGINAL_QUANTITY]=totalOriginalQty
 
           const skuActualAmount = {
-            id:idFieldAttributeMap.get(SKU_ACTUAL_AMOUNT).id,
+            fieldAttributeMasterId:idFieldAttributeMap.get(SKU_ACTUAL_AMOUNT).id,
             value:attributeTypeIdValueMap[SKU_ACTUAL_AMOUNT],
             attributeTypeId:SKU_ACTUAL_AMOUNT
         }
@@ -308,29 +305,20 @@ class SkuListing {
                     isUnitPricePresent = true
 
                 } else if (item.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                    if(rowItem.parentId==item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY){
-                        item.value=value
+                    if (rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                        item.value = value
                     }
                     actualQuantity = item.value
                     totalActualQuantity += parseInt(item.value)
-                }
-                else if(item.attributeTypeId==SKU_UNIT_PRICE){
+                } else if (item.attributeTypeId == SKU_UNIT_PRICE) {
                     unitPrice = item.value
-                } else if(item.attributeTypeId==SKU_REASON && rowItem.parentId==item.parentId){
-                    if(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY){
-                        item.value = (skuValidationForImageAndReason && ((value == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')) || (value == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')) || (value != 0 && value != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')))) ? REASON : ''
-                    } else if(rowItem.attributeTypeId == SKU_REASON){
-                        item.value = value
-                    }
-                } else if(item.attributeTypeId==SKU_PHOTO && rowItem.parentId==item.parentId){
-                    if(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY){
-                        item.value = (skuValidationForImageAndReason && ((value == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')) || (value == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')) || (value != 0 && value != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')))) ? OPEN_CAMERA : ''
-                    } else if(rowItem.attributeTypeId == SKU_PHOTO){
-                        item.value = value
-                    }
+                } else if (item.attributeTypeId == SKU_REASON && rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                    item.value = (skuValidationForImageAndReason && ((value == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')) || (value == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')) || (value != 0 && value != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')))) ? REASON : null
+                } else if (item.attributeTypeId == SKU_PHOTO && rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                    item.value = (skuValidationForImageAndReason && ((value == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')) || (value == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')) || (value != 0 && value != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')))) ? OPEN_CAMERA : null
                 }
-                if(!isUnitPricePresent){
-                    skuActualAmount +=(unitPrice * actualQuantity)
+                if (!isUnitPricePresent) {
+                    skuActualAmount += (unitPrice * actualQuantity)
                 }
             })
         }

@@ -463,6 +463,8 @@ module.exports = keyMirror({
     SET_SHOW_IMAGE: null,
     SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
+    SET_SHOW_VIEW_IMAGE: null,
+    UPDATE_SKU_LIST_ITEMS: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,

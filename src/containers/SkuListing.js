@@ -33,6 +33,7 @@ import renderIf from '../lib/renderIf'
 import _ from 'lodash'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
+import * as globalActions from '../modules/global/globalActions'
 
 class SkuListing extends PureComponent {
 
@@ -44,7 +45,7 @@ class SkuListing extends PureComponent {
 
   renderData(item) {
     return (
-      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList = {this.props.reasonsList}/>
+      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList = {this.props.reasonsList} navigateToScene = {this.props.actions.navigateToScene.bind(this)}/>
     )
   }
 
@@ -158,7 +159,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...skuListingActions }, dispatch)
+    actions: bindActionCreators({ ...skuListingActions, ...globalActions }, dispatch)
   }
 }
 

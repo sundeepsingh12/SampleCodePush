@@ -6,9 +6,8 @@ import {
     SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
-    SET_IMAGE_DATA,
-    SET_SHOW_IMAGE,
-    VIEW_IMAGE_DATA,
+    SET_SHOW_VIEW_IMAGE,
+    UPDATE_SKU_LIST_ITEMS
 } from '../../lib/constants'
 
 import {
@@ -29,6 +28,7 @@ import {
     SKU_ACTUAL_AMOUNT,
     ARRAY_SAROJ_FAREYE,
     SKU_PHOTO,
+    SKU_REASON,
 } from '../../lib/AttributeConstants'
 import { NavigationActions } from 'react-navigation'
 
@@ -85,18 +85,22 @@ export function scanSkuItem(skuListItems, skuCode) {
 export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason) {
     return async function (dispatch) {
         try {
-            if(rowItem.attributeTypeId == SKU_PHOTO){
-                value = await signatureService.saveFile(value, moment(), true)
-                dispatch(NavigationActions.back())
-                dispatch(setState(SET_IMAGE_DATA, ''))
-                dispatch(setState(SET_SHOW_IMAGE, false))
-                dispatch(setState(VIEW_IMAGE_DATA, ''))
+            if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
+                if (rowItem.attributeTypeId == SKU_PHOTO) {
+                    value = await signatureService.saveFile(value, moment(), true)
+                    dispatch(NavigationActions.back())
+                    dispatch(setState(SET_SHOW_VIEW_IMAGE, {imageData: '', showImage: false, viewData: '' }))
+                }
+                let copyOfskuListItems = _.cloneDeep(skuListItems)
+                copyOfskuListItems[rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
+                dispatch(setState(UPDATE_SKU_LIST_ITEMS, copyOfskuListItems))
+            } else {
+                const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason)
+                dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, {
+                    skuListItems: updatedSkuArray.updatedObject,
+                    skuRootChildElements: updatedSkuArray.updatedChildElements
+                }))
             }
-            const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason)
-            dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, {
-                skuListItems: updatedSkuArray.updatedObject,
-                skuRootChildElements: updatedSkuArray.updatedChildElements
-            }))
         } catch (error) {
             console.log(error)
         }
