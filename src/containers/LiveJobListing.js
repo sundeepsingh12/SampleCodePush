@@ -212,7 +212,10 @@ class LiveJobListing extends PureComponent {
                                             returnValue={(searchText) => {
                                                 this.props.actions.setState(SET_SEARCH, searchText)
                                                 this.setState({ isScannerUsed: true })
-                                            }} searchText={this.props.searchText} onPress={() => this.props.actions.setState(SET_SEARCH, this.props.searchText)} />
+                                            }} searchText={this.props.searchText} onPress={() => {
+                                                this.props.actions.setState(SET_SEARCH, this.props.searchText)
+                                                this.setState({ isScannerUsed: true })
+                                            }} />
                                     </Body>
                                 </Header>
                             )}
