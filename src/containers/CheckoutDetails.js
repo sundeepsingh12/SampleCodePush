@@ -141,7 +141,7 @@ class CheckoutDetails extends PureComponent {
         )
     }
 
-    _keyExtractor = (item, index) => item.id;
+    _keyExtractor = (item, index) => String(item.id);
 
     _showModalView = (modalStatus) => {
         this.setState(() => {
@@ -219,6 +219,7 @@ class CheckoutDetails extends PureComponent {
                                 <Input placeholder={MOBILE_NUMBER}
                                     value={this.props.inputTextToSendSms}
                                     keyboardType='numeric'
+                                    returnKeyType='done'
                                     onChangeText={this.onChangeMobileNo}
                                     style={[styles.fontSm]} />
                             </Item>

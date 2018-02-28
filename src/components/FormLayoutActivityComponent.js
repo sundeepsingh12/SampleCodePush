@@ -52,8 +52,8 @@ class FormLayoutActivityComponent extends PureComponent {
             case DATA_STORE: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             case MONEY_COLLECT:
             case MONEY_PAY: return <BankCardIcon width={26} height={19} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case NPS_FEEDBACK:
             case SIGNATURE: return <SignatureIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case NPS_FEEDBACK:
             case SIGNATURE_AND_FEEDBACK: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             case SKU_ARRAY: return <CartIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
             case DATE:

@@ -31,6 +31,7 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as newJobActions from '../modules/newJob/newJobActions'
 import * as globalActions from '../modules/global/globalActions'
+import { NEW_TASK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -83,9 +84,10 @@ class NewJob extends PureComponent {
     )
   }
 
-  _keyExtractor = (item, index) => item.id
+  _keyExtractor = (item, index) => String(item.id)
 
   render() {
+    let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : NEW_TASK
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -97,7 +99,7 @@ class NewJob extends PureComponent {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>New Task</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>

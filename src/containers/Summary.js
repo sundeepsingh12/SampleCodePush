@@ -67,35 +67,38 @@ const itemWidth = slideWidth;
 
 const SLIDER_1_FIRST_ITEM = 0;
 class SummaryListing extends PureComponent {
-       
-        renderData(status,item) {
-            return status.map(function(status, i){
-              return(
-                <View style={[styles.padding10, {borderBottomColor: '#d3d3d3', borderBottomWidth:1}]} key={i} >
+
+    renderData(status, item) {
+        return status.map(function (status, i) {
+            return (
+                <View style={[styles.padding10, { borderBottomColor: '#d3d3d3', borderBottomWidth: 1 }]} key={String(i)}>
                     <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
                         <Text style={[styles.fontLg, styles.fontWeight500]}>
                             {status}
                         </Text>
                         <Text style={[styles.fontDefault, styles.fontWeight500]}>
-                            {item[i+1].count}
+                            {item[i + 1].count}
                         </Text>
                     </View>
                     <View style={[styles.marginTop5]}>
                         <FlatList
-                            data={item[i+1].list}
+                            data={item[i + 1].list}
+                            extraData={this.state}
                             renderItem={({ item }) => {
                                 return (
                                     <Text style={[styles.fontDefault]}>
-                                        {item[1]} -  {item[0]}
+                                        {item.name} -  {item.count}
                                     </Text>
-                                )}}
-                            keyExtractor={item => item[2]}
+                                )
+                            }}
+                            listKey={(items) => String(items.id)}
+                            keyExtractor={(items) => String(items.id)}
                         />
                     </View>
                 </View>
-              );
-            });
-          }
+            );
+        });
+    }
     
         render() {
             return (
@@ -264,7 +267,7 @@ class Summary extends PureComponent {
                             </View>                                                             
                         )}
                     }
-                    keyExtractor={item => item.id}
+                    keyExtractor={item => String(item.id)}
                 />  
             </Content>
         )

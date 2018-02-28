@@ -12,6 +12,8 @@ import { Icon } from 'native-base'
 import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
+import _ from 'lodash'
+import { N_A, TAP_TO_HIDE, TAP_TO_SHOW} from '../lib/ContainerConstants'
 
 class ExpandableDetailsView extends PureComponent {
     constructor(props) {
@@ -20,8 +22,17 @@ class ExpandableDetailsView extends PureComponent {
             showDropdown: false
         }
     }
+    checkForChildData(childDataList) {
+            for(let data in childDataList){
+                if (!_.isEmpty(childDataList[data].childDataList)) {
+                    return true
+                }  
+        }
+        return false
+    }
 
     render() {
+        const isChildData = this.checkForChildData(this.props.childDataList)
         return (
             <TouchableOpacity onPress={() => { this.setState({ showDropdown: !this.state.showDropdown }) }}>
                 <View style={[styles.row, styles.paddingLeft10, styles.paddingRight10]}>
@@ -32,12 +43,12 @@ class ExpandableDetailsView extends PureComponent {
                     </View>
                     <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
                         <Text style={[styles.fontDefault, styles.fontPrimary]}>
-                            {this.state.showDropdown ? 'Tap to hide' : 'Tap to show'}
+                        {(!isChildData) ? N_A : this.state.showDropdown ? TAP_TO_HIDE : TAP_TO_SHOW}
                         </Text>
                     </View>
                 </View>
 
-                {renderIf(this.state.showDropdown,
+                {renderIf(this.state.showDropdown && isChildData,
                     <ExpandableDetailsList
                         key={this.props.id}
                         dataList={this.props.childDataList}

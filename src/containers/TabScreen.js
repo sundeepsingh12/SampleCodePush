@@ -251,7 +251,7 @@ class TabScreen extends PureComponent {
             </Body>
           </Header>
           <Tabs
-            style={styles.bgPrimary}
+            tabBarBackgroundColor={styles.bgPrimary.backgroundColor}
             initialPage = {landingValue}
             tabBarUnderlineStyle={[styles.bgWhite]}
             renderTabBar={() => <ScrollableTab />}>

@@ -76,9 +76,10 @@ class JobMaster extends PureComponent {
         )
     }
 
-    _keyExtractor = (item, index) => item.id
+    _keyExtractor = (item, index) => String(item.id)
 
     render() {
+        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : JOB_MASTER_HEADER
         if(this.props.loading) {
             return(
                 <Loader/>
@@ -100,7 +101,7 @@ class JobMaster extends PureComponent {
                                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} onPress={() => { this.props.navigation.goBack(null) }} />
                                 </View>
                                 <View style={{ width: '70%' }}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{JOB_MASTER_HEADER}</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
                                 </View>
                                 <View style={{ width: '15%' }}>
                                     <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}></Text>

@@ -206,10 +206,12 @@ class Payment {
             }
             originalAmount = totalAmount + ''
         } else if (originalAmountMaster && originalAmountMaster.fieldAttributeMasterId) {
-            originalAmount = formData[originalAmountMaster.fieldAttributeMasterId].value
+            originalAmount = formData.get(originalAmountMaster.fieldAttributeMasterId) ? formData.get(originalAmountMaster.fieldAttributeMasterId).value : null
             jobTransactionIdAmountMap = null
         } else if (jobTransaction.length) {
             throw new Error(INVALID_CONFIGURATION)
+        } else {
+            jobTransactionIdAmountMap = null
         }
         return {
             originalAmount,
@@ -225,14 +227,14 @@ class Payment {
      * totalActualAmount : integer
      */
     getTotalActualAmount(moneyCollectMaster, formData) {
-        let actualAmount
+        let actualAmount = 0
         for (let [fieldAttributeMasterId, formElement] of formData) {
-            if (formElement.attributeTypeId == SKU_ARRAY && formElement.positionId < moneyCollectMaster.positionId) {
-                actualAmount += this.getActualAmount(formElement.childList, SKU_ACTUAL_AMOUNT)
+            if (formElement.attributeTypeId == SKU_ARRAY && formElement.positionId < formData.get(moneyCollectMaster.id).positionId) {
+                actualAmount += this.getActualAmount(formElement, SKU_ACTUAL_AMOUNT)
             }
 
-            if (formElement.attributeTypeId == FIXED_SKU && formElement.positionId < moneyCollectMaster.positionId) {
-                actualAmount += this.getActualAmount(formElement.childList, DECIMAL)
+            if (formElement.attributeTypeId == FIXED_SKU && formElement.positionId < formData.get(moneyCollectMaster.id).positionId) {
+                actualAmount += this.getActualAmount(formElement, DECIMAL)
             }
         }
         return actualAmount
@@ -283,7 +285,8 @@ class Payment {
      * @returns
      * actualAmount : integer
      */
-    getActualAmount(childList, property) {
+    getActualAmount(formElement, property) {
+        let childList = formElement.childDataList
         for (let index in childList) {
             if (childList[index].attributeTypeId == property) {
                 return childList[index].value
@@ -309,7 +312,7 @@ class Payment {
         let moneyCollectFieldDataChildList = []
         for (let index in fieldAttributeMaster.childObject) {
             if (fieldAttributeMaster.childObject[index].attributeTypeId == ORIGINAL_AMOUNT) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, originalAmount, fieldAttributeMaster.childObject[index].key))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, originalAmount ? originalAmount : 0, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].attributeTypeId == ACTUAL_AMOUNT) {
                 moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].childObject) {
@@ -359,8 +362,10 @@ class Payment {
     }
 
     /**
-     * 
+     * This function return s mode type for corresponding payment mode id
      * @param {*} modeTypeId 
+     * @return 
+     * string
      */
     getModeTypeFromModeTypeId(modeTypeId) {
         switch (modeTypeId) {
@@ -388,8 +393,10 @@ class Payment {
     }
 
     /**
-     * 
+     * This function check payment mode is of card type
      * @param {*} modeTypeId 
+     * @returns
+     * boolean
      */
     checkCardPayment(modeTypeId) {
         switch (modeTypeId) {
@@ -440,6 +447,21 @@ class Payment {
         NET_BANKING_UPI_LINK.displayName = remarks ? remarks.upiCustomName ? remarks.upiCustomName : NET_BANKING_UPI_LINK.displayName : NET_BANKING_UPI_LINK.displayName
     }
 
+    /**
+     * This function prepares splitPaymentModeMap for selected payment modes
+     * @param {*} selectedPaymentMode 
+     * @returns
+     * splitPaymentModeMap : {
+     *                          modeTypeId,
+     *                          amount,
+     *                          list(in case of cheque or dd): [
+     *                                  {
+     *                                      modeTypeId,
+     *                                      amount
+     *                                  }
+     *                                ]
+     *                       }
+     */
     prepareSplitPaymentModeList(selectedPaymentMode) {
         let splitPaymentModeMap = {}
         for (let index in selectedPaymentMode.otherPaymentModeList) {
@@ -472,6 +494,13 @@ class Payment {
         return splitPaymentModeMap
     }
 
+    /**
+     * This function prepares childFieldDataListDTO for moneycollect in split payment mode
+     * @param {*} actualAmount 
+     * @param {*} fieldAttributeMaster 
+     * @param {*} originalAmount 
+     * @param {*} splitPaymentModeMap 
+     */
     prepareMoneyCollectChildFieldDataListDTOForSplit(actualAmount, fieldAttributeMaster, originalAmount, splitPaymentModeMap) {
         let moneyCollectFieldDataChildList = []
         for (let index in fieldAttributeMaster.childObject) {
@@ -507,9 +536,19 @@ class Payment {
         return moneyCollectFieldDataChildList
     }
 
+    /**
+     * This function compares actual amount and total split amount
+     * @param {*} actualAmount 
+     * @param {*} splitPaymentModeMap 
+     * @returns
+     * boolean or error
+     */
     checkSplitAmount(actualAmount, splitPaymentModeMap) {
         let totalSplitAmount = 0
         for (let index in splitPaymentModeMap) {
+            if (!Number(splitPaymentModeMap[index].amount)) {
+                break
+            }
             let amount = parseFloat(splitPaymentModeMap[index].amount)
             totalSplitAmount += (parseFloat(amount) ? parseFloat(amount) : 0)
         }

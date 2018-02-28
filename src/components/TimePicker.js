@@ -73,6 +73,7 @@ class TimePicker extends PureComponent {
                 onConfirm={this._onConfirm}
                 onCancel={this._onCancel}
                 mode={mode}
+                date={new Date()}
                 minimumDate={minimum}
                 maximumDate={maximum}
             />

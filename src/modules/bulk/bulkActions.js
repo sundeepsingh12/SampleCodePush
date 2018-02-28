@@ -34,7 +34,7 @@ import {
 import _ from 'lodash'
 
 
-export function getJobMasterVsStatusNameList() {
+export function getJobMasterVsStatusNameList(displayName) {
     return async function (dispatch) {
         try {
             dispatch(setState(START_FETCHING_BULK_CONFIG))
@@ -53,7 +53,7 @@ export function getJobMasterVsStatusNameList() {
             const jobMasterVsStatusList = await bulkService.prepareJobMasterVsStatusList(jobMasterList.value, jobStatusList.value, modulesCustomizationList.value)
             dispatch(setState(STOP_FETCHING_BULK_CONFIG, jobMasterVsStatusList))
             if (jobMasterVsStatusList && jobMasterVsStatusList.length > 1) {
-                dispatch(navigateToScene(BulkConfiguration))
+                dispatch(navigateToScene(BulkConfiguration,{displayName}))
             }
             if (jobMasterVsStatusList && jobMasterVsStatusList.length == 1) {
                 dispatch(navigateToScene(BulkListing, {
@@ -76,15 +76,15 @@ export function getBulkJobTransactions(bulkParams) {
             const bulkTransactions = await bulkService.getJobListingForBulk(bulkParams)
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             const bulkModule = await moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomizationList.value, BULK_ID)
-            const bulkModuleRemark = (bulkModule && bulkModule[0]) ? JSON.parse(bulkModule[0].remark) : null
-            let selectAll = false, jobMasterManualSelectionConfiguration = null, isManualSelectionAllowed = false, searchSelectionOnLine1Line2 = false
-            if (bulkModuleRemark) {
-                selectAll = bulkModuleRemark.selectAll
-                jobMasterManualSelectionConfiguration = bulkModuleRemark.jobMasterManualSelectionConfiguration
-                isManualSelectionAllowed = (!jobMasterManualSelectionConfiguration) ? false : bulkService.getManualSelection(jobMasterManualSelectionConfiguration, bulkParams.jobMasterId)
-                searchSelectionOnLine1Line2 = bulkModuleRemark.searchSelectionOnLine1Line2
-            }
-
+            const bulkModuleRemark = (bulkModule && bulkModule[0])?JSON.parse(bulkModule[0].remark):null
+            let selectAll = false,jobMasterManualSelectionConfiguration=null,isManualSelectionAllowed=false,searchSelectionOnLine1Line2 = false
+            if(bulkModuleRemark){
+                selectAll = (!bulkParams.groupId) ? bulkModuleRemark.selectAll : false
+                jobMasterManualSelectionConfiguration =  bulkModuleRemark.jobMasterManualSelectionConfiguration
+                 isManualSelectionAllowed = (!jobMasterManualSelectionConfiguration)?false:bulkService.getManualSelection(jobMasterManualSelectionConfiguration, bulkParams.jobMasterId)
+                 searchSelectionOnLine1Line2 =  bulkModuleRemark.searchSelectionOnLine1Line2 
+                }
+           
             let idToSeparatorMap
             if (searchSelectionOnLine1Line2) {
                 const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)

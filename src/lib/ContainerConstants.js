@@ -2,12 +2,15 @@ module.exports = {
     //Token Error
     TOKEN_MISSING: 'Token Missing',
 
+    //CustomApp
+    INVALID_URL_OR_NO_INTERNET: "Invalid Url or No Internet",
+
     //common_CONSTANTS
     CANCEL: 'Cancel',
     OK: 'Ok',
-    SAVE: 'Save',
     DONE: 'DONE',
     DISMISS: 'DISMISS',
+    CLOSE: 'Close',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -20,6 +23,14 @@ module.exports = {
     UNSYNCED_TASKS: 'Unsynced Tasks',
     UPLOADING: 'Uploading ...',
     AUTHENTICATING: 'Authenticating...',
+    SYNC: 'Sync',
+    ERP_SYNC_OK_TEXT: 'All data downloaded perfectly.',
+    DAYS_AGO: ' days ago',
+    HOURS_AGO: ' hours ago',
+    MINUTES_AGO: ' minutes ago',
+    SECONDS_AGO: ' seconds ago',
+    RESYNC_IN: 'Resync in',
+    ERP_SYNC: 'ERP Sync',
 
     //Post Assignment Container
     SHIPMENT_NOT_FOUND: 'Scanned Shipment Not Found',
@@ -38,12 +49,12 @@ module.exports = {
 
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
+    NEW_TASK : 'New Task',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
     DOWNLOAD_SUCCESSFUL: 'Download Successful',
     DOWNLOAD_FAILED: 'Download Failed',
-    CLOSE: 'Close',
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
@@ -73,6 +84,7 @@ module.exports = {
     NUMBER: 'Number',
     SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
     INVALID_CONFIGURATION: 'Invalid Configuration',
+    VALID_AMOUNT_ERROR: 'Please enter valid amount',
 
     //Sequence
     SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
@@ -122,6 +134,7 @@ module.exports = {
 
     //Multiple Option Container
     NO_OPTIONS_PRESENT: 'No options Present',
+    MULTIPLE_SELECT_OPTIONS: 'Multiple Select Options',
     //Save Activated and CheckoutDetails
     SMS_NOT_SENT_TRY_AGAIN_LATER: 'SMS not sent ,try again later',
     EMAIL_NOT_SENT_TRY_AGAIN_LATER: 'Email not sent ,try again later',
@@ -151,15 +164,76 @@ module.exports = {
     UNSYNCED_FILES: 'Unsynced Files',
     SYNCED_FILES: 'Synced Files',
     CREATE_BACKUP_BUTTON: '+ Create Backup',
+    UPLOAD: 'Upload',
+    UPLOAD_SUCCESSFUL: ' Upload Successful',
+    UPLOAD_FAILED: 'Upload Failed',
+    LOGGING_OUT: 'Logging out',
 
     //DataStore
     SUGGESTIONS: 'Suggestions',
 
+    //SKU
+    SELECT_ANY_REASON: 'Select any Reason',
+     TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
+     QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
+     TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
+     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
+     REASON: 'Reason',
+     OPEN_CAMERA: 'Open Camera',
+
     //Array
     TOTAL_COUNT: 'Total Count : ',
     ADD: 'Add',
-    SAVE: 'Save',
     ADD_ROW_ERROR: 'Row could not be added',
     DELETE_ROW_ERROR: 'Row could not be deleted',
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
+
+    //Expandable Details View
+    TAP_TO_HIDE: 'Tap to hide',
+    TAP_TO_SHOW: 'Tap to show',
+    N_A: 'N.A',
+
+    //Job_DetailsV2
+    UPDATE_GROUP: 'Update Group',
+    JOB_EXPIRED: 'Job Expired!',
+    DETAILS: "Details",
+
+    //Job_DetailsV2
+    UPDATE_GROUP: 'Update Group',
+
+    //Cash Tendering
+    NOT_REQUIRED: 'NOT REQUIRED',
+    MORE_MONEY_TO_PAY: 'More Money to Pay.',
+    LESS_MONEY_TO_PAY: 'Less Money to Pay.',
+    AMOUNT_TO_COLLECT: 'Amount to Collect: ',
+    AMOUNT_TO_RETURN: 'Amount to Return: ',
+    TOTAL_AMOUNT: 'Total Amount: ',
+    TOTAL_AMOUNT_RETURNING: 'Total Amount Returning: ',
+    COLLECT_CASH: 'Collect Cash',
+    RETURN_CASH: 'Return Cash',
+    CASHTENDERINGLIST_NOT_SAVE_PROPERLY: 'CashTenderingList not set Properly',
+    FORMELEMENT_OR_CURRENTELEMENT_NOT_FOUND: 'formElements or currentElement not found',
+    TOTAL_AMOUNT_NOT_SET: 'totalAmount not set Properly',
+    FIELD_ATTRIBUTE_NOT_SET: 'fieldAttributeMasterId not set Properly',
+
+    //Fixed SKU
+    QUANTITY_NOT_A_NUMBER: `Quantity can't be `,
+    TOTAL_QUANTITY: 'Total Quantity : ',
+
+    //Statistics
+    STATISTICS: 'STATISTICS',
+
+    //Live job
+    LIVE_TASKS: 'Live Tasks',
+    NO_JOBS_PRESENT: 'No jobs present',
+    FILTER_REF_NO: 'Filter Reference Numbers',
+    SELECT_ALL: 'SELECT ALL',
+    ACCEPT: 'ACCEPT',
+    REJECT: 'REJECT',
+
+    //Bulk Listing 
+    BULK_UPDATE: 'Bulk Update',
+
+    //Sorting
+    SORTING : 'Sorting',
 }

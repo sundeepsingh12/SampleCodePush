@@ -140,7 +140,11 @@ class SignatureRemarks {
     }
     async getImageData(value) {
         let imageName = value.split('/')
-        let result = await RNFS.readFile(PATH + imageName[imageName.length - 1], 'base64');
+        let fileExits = await RNFS.exists(PATH + imageName[imageName.length - 1])
+        let result
+        if (fileExits) {
+            result = await RNFS.readFile(PATH + imageName[imageName.length - 1], 'base64');
+        }
         return result
     }
 }

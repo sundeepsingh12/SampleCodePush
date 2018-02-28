@@ -2,7 +2,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import SearchBar from '../components/SearchBar'
 import * as globalActions from '../modules/global/globalActions'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
@@ -11,9 +10,7 @@ import { StyleSheet, View, TouchableOpacity, FlatList, Image, Text, Alert, Modal
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
-import {
-    // SET_DATA_STORE_ATTR_MAP,
-} from '../lib/constants'
+
 import {
     Container,
     Content,
@@ -39,14 +36,20 @@ import {
     NEW,
     UNSYNCED_FILES,
     SYNCED_FILES,
-    CREATE_BACKUP_BUTTON
+    CREATE_BACKUP_BUTTON,
+    UPLOAD,
+    UPLOADING,
+    CANCEL,
+    UPLOAD_SUCCESSFUL,
+    UPLOAD_FAILED,
+    CLOSE,
+    LOGGING_OUT
 } from '../lib/ContainerConstants'
 import {
     SET_BACKUP_VIEW,
     SET_BACKUP_TOAST
 } from '../lib/constants'
 import _ from 'lodash'
-//import Toast from '../../native-base-theme/components/Toast';
 
 
 function mapStateToProps(state) {
@@ -187,7 +190,7 @@ class Backup extends Component {
                 data={Object.values(this.props.unSyncedFiles)}
                 renderItem={({ item }) => this.renderSyncedData(item)
                 }
-                keyExtractor={item => item.id}
+                keyExtractor={item => String(item.id)}
             />
             return flatListView
         } else if (_.isEmpty(this.props.unSyncedFiles)) {
@@ -215,7 +218,7 @@ class Backup extends Component {
                 data={this.renderList()}
                 renderItem={({ item }) => this.renderSyncedData(item)
                 }
-                keyExtractor={item => item.id}
+                keyExtractor={item => String(item.id)}
             />
             return flatListView
         } else if (_.isEmpty(this.props.syncedFiles)) {
@@ -262,12 +265,12 @@ class Backup extends Component {
                             <View style={[styles.bgWhite, styles.justifyEnd]}>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.syncedFiles)}>
                                     <Text style={[styles.fontPrimary, styles.fontXl]}>
-                                        Upload
+                                        {UPLOAD}
                                     </Text>
                                 </Button>
                                 <Button full transparent style={{ height: 60 }} onPress={() => this.setState({ indexOfModal: 0 })}>
                                     <Text style={[styles.fontDarkGray, styles.fontXl]}>
-                                        Cancel
+                                       {CANCEL}
                                     </Text>
                                 </Button>
                             </View>
@@ -289,7 +292,7 @@ class Backup extends Component {
                             <View style={[styles.bgWhite, styles.justifyEnd]}>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.unSyncedFiles)}>
                                     <Text style={[styles.fontPrimary, styles.fontXl]}>
-                                        Upload
+                                    {UPLOAD}
                                     </Text>
                                 </Button>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={
@@ -304,7 +307,7 @@ class Backup extends Component {
                                 </Button>
                                 <Button full transparent style={{ height: 60 }} onPress={() => this.setState({ indexOfModal: 0 })}>
                                     <Text style={[styles.fontDarkGray, styles.fontXl]}>
-                                        Cancel
+                                       {CANCEL}
                                     </Text>
                                 </Button>
                             </View>
@@ -314,6 +317,7 @@ class Backup extends Component {
         }
         return modal
     }
+
     getUnsyncedFilesHeader() {
         let view
         if (this.props.backupView != 0) return
@@ -326,6 +330,7 @@ class Backup extends Component {
         }
         return view
     }
+
     getSyncedFilesHeader() {
         let view
         if (this.props.backupView != 0) return
@@ -338,13 +343,14 @@ class Backup extends Component {
         }
         return view
     }
+
     uploadingView() {
         if (this.props.backupView == 1) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.justifyCenter, styles.flexBasis100, styles.padding10]}>
                     <View style={[styles.padding5, styles.row, styles.justifySpaceBetween,]}>
                         <Text style={[styles.fontBlack, styles.fontXl]}>
-                            Uploading...
+                           {UPLOADING}
                     </Text>
                     </View>
                     < View style={[styles.padding5, styles.row]} >
@@ -390,6 +396,7 @@ class Backup extends Component {
             </View>
         }
     }
+
     createBackupButton() {
         if (this.props.isLoading || this.props.backupView != 0) return
         let button =
@@ -402,6 +409,7 @@ class Backup extends Component {
             </View>
         return button
     }
+
     uploadSuccessView() {
         if (this.props.backupView == 2) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
@@ -411,7 +419,7 @@ class Backup extends Component {
                         source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
-                        Upload Successful
+                       {UPLOAD_SUCCESSFUL}
                     </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
@@ -419,6 +427,7 @@ class Backup extends Component {
             </View>
         }
     }
+
     failureView() {
         if (this.props.backupView == 3) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
@@ -428,7 +437,7 @@ class Backup extends Component {
                         source={require('../../images/fareye-default-iconset/error.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
-                        Upload Failed
+                       {UPLOAD_FAILED}
                     </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
@@ -439,7 +448,7 @@ class Backup extends Component {
                                 this.props.actions.setState(SET_BACKUP_VIEW, 0)
                                 this.setState({ indexOfModal: 0 })
                             }}  >
-                            <Text style={[styles.fontPrimary]}>Close</Text>
+                            <Text style={[styles.fontPrimary]}>{CLOSE}</Text>
                         </Button>
                     </View>
                 </View>
@@ -447,13 +456,14 @@ class Backup extends Component {
         }
 
     }
+
     getLogoutView() {
         if (this.props.backupView == 4) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Loader />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
-                        Logging out
+                        {LOGGING_OUT}
                     </Text>
                 </View>
 
@@ -461,6 +471,7 @@ class Backup extends Component {
         }
 
     }
+
     render() {
         let headerView = this.headerView()
         let loader = this.getLoader()
@@ -531,7 +542,5 @@ const style = StyleSheet.create({
     }
 });
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(Backup)

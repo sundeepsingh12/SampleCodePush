@@ -1,5 +1,4 @@
 import React from 'react'
-import moment from 'moment'
 import {
   connect
 } from 'react-redux'
@@ -94,6 +93,7 @@ import JobMaster from '../../containers/JobMaster'
 import AutoLogout from '../../containers/AutoLogout'
 import Backup from '../../containers/Backup'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
+import HomeTabNavigator from '../../containers/HomeTabNavigator'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -156,84 +156,6 @@ class AppWithNavigationState extends React.PureComponent {
   }
 }
 
-export const HomeTabNavigator = TabNavigator({
-  HomeScreen: {
-    screen: Home,
-    navigationOptions: {
-      header: null,
-      gesturesEnabled: false,
-      title: 'Home',
-      tabBarIcon: ({ tintColor }) => (
-        <Icon
-          name='ios-home'
-          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
-        />
-      ),
-    }
-  },
-  SyncScreen: {
-    screen: SyncScreen,
-    navigationOptions: {
-      header: null,
-      title: 'Sync',
-      gesturesEnabled: false,
-      tabBarIcon: ({ tintColor }) => (
-        <Icon
-          name='ios-sync'
-          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
-        />
-      ),
-    }
-  },
-  MenuScreen: {
-    screen: Menu,
-    navigationOptions: {
-      header: null,
-      title: 'Menu',
-      gesturesEnabled: false,
-      tabBarIcon: ({ tintColor }) => (
-        <Icon
-          name='md-menu'
-          style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
-        />
-      ),
-
-
-    }
-  }
-},
-  {
-    tabBarPosition: 'bottom',
-    animationEnabled: true,
-    tabBarOptions: {
-      showIcon: true,
-      activeTintColor: styles.bgPrimary.backgroundColor,
-      inactiveTintColor: '#aaaaaa',
-      style: {
-        backgroundColor: '#ffffff',
-        borderTopWidth: 1,
-        borderTopColor: '#f3f3f3',
-      },
-      labelStyle: {
-        fontSize: 12,
-        marginTop: 0,
-        fontWeight: '600'
-
-      },
-      tabStyle: {
-        alignItems: 'center',
-        height: 50,
-        paddingTop: 10,
-        paddingBottom: 10
-      },
-      indicatorStyle: {
-        height: 0
-      }
-
-    }
-  }
-);
-
 export const AppNavigator = StackNavigator({
   ApplicationScreen: {
     screen: Application,
@@ -290,7 +212,7 @@ export const AppNavigator = StackNavigator({
   Statistics: {
     screen: Statistics,
     navigationOptions: {
-      title: 'STATISTICS : ' + moment(new Date()).format('DD-MM-YYYY'),
+      header: null,
     }
   },
   Sorting: {
@@ -354,7 +276,7 @@ export const AppNavigator = StackNavigator({
   FixedSKUListing: {
     screen: FixedSKUListing,
     navigationOptions: {
-      title: 'FixedSKU',
+      header: null
     }
   },
   Signature: {
@@ -412,7 +334,7 @@ export const AppNavigator = StackNavigator({
   CashTendering: {
     screen: CashTendering,
     navigationOptions: {
-      title: 'Collect Cash',
+      header: null
     }
   },
   TaskListScreen: {
@@ -468,12 +390,12 @@ export const AppNavigator = StackNavigator({
     }
   });
 
-  const middleware = createReactNavigationReduxMiddleware(
-    "root",
-    state => state.nav,
-  );
-  const addListener = createReduxBoundAddListener("root");
-  // end for react-navigation 1.0.0-beta.30
+const middleware = createReactNavigationReduxMiddleware(
+  "root",
+  state => state.nav,
+);
+const addListener = createReduxBoundAddListener("root");
+// end for react-navigation 1.0.0-beta.30
 
 // const AppWithNavigationState = ({ dispatch, nav }) => (
 //   <AppNavigator navigation={addNavigationHelpers({ dispatch, state: nav })} />

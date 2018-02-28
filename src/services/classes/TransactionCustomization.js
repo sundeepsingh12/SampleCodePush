@@ -9,6 +9,7 @@ import {
     JOB_MASTER,
     JOB_STATUS,
     SMS_TEMPLATE,
+    TAB
 } from '../../lib/constants'
 
 class TransactionCustomization {
@@ -33,6 +34,7 @@ class TransactionCustomization {
         const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
         const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
         const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+        const tabList  = await keyValueDBService.getValueFromStore(TAB)
         return {
             customerCareList: customerCareList.value,
             jobAttributeMasterList: jobAttributeMasterList.value,
@@ -40,7 +42,8 @@ class TransactionCustomization {
             jobMasterList: jobMasterList.value,
             jobMasterIdCustomizationMap: jobMasterIdCustomizationMap.value,
             smsTemplateList: smsTemplateList.value,
-            statusList: statusList.value
+            statusList: statusList.value,
+            tabList: tabList.value
         }
     }
 }

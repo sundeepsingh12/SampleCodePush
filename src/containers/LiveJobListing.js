@@ -39,8 +39,19 @@ import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
 import SearchBarV2 from '../components/SearchBarV2'
 import {
-    SET_SEARCH
+    SET_SEARCH,
+    SET_LIVE_JOB_TOAST
 } from '../lib/constants'
+import {
+    INVALID_SCAN,
+    LIVE_TASKS,
+    NO_JOBS_PRESENT,
+    FILTER_REF_NO,
+    SELECT_ALL,
+    ACCEPT,
+    REJECT,
+    SELECTED
+} from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         liveJobList: state.liveJobList.liveJobList,
@@ -59,7 +70,13 @@ function mapDispatchToProps(dispatch) {
 
 class LiveJobListing extends PureComponent {
 
-    componentWillMount() {
+    constructor(props) {
+        super(props)
+        this.state = {
+            isScannerUsed: false,
+        };
+    }
+    componentDidMount() {
         this.props.actions.fetchAllLiveJobsList()
         if (this.props.navigation.state.params && this.props.navigation.state.params.callAlarm == true) {
             // Vibration.vibrate()
@@ -72,7 +89,9 @@ class LiveJobListing extends PureComponent {
                 text: this.props.liveJobToastMessage,
                 position: 'bottom',
                 buttonText: 'Okay',
+                duration: 5000
             })
+            this.props.actions.setState(SET_LIVE_JOB_TOAST, '')
         }
     }
     static navigationOptions = ({ navigation }) => {
@@ -132,11 +151,16 @@ class LiveJobListing extends PureComponent {
                     jobTransactionArray.push(value)
                 }
             })
+            if (_.isEmpty(jobTransactionArray) && this.state.isScannerUsed) {
+                this.props.actions.setState(SET_LIVE_JOB_TOAST, INVALID_SCAN)
+                this.setState({ isScannerUsed: false })
+            }
             return jobTransactionArray;
         }
     }
 
     render() {
+        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : LIVE_TASKS
         if (this.props.loaderRunning) {
             return <Loader />
         }
@@ -154,12 +178,12 @@ class LiveJobListing extends PureComponent {
                                     </Button>
                                 </Left>
                                 <Body>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>Live Tasks</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{headerView}</Text>
                                 </Body>
                                 <Right />
                             </Header>
                             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>No jobs present</Text>
+                                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
                             </View>
                         </Container>
                     </StyleProvider>
@@ -179,13 +203,20 @@ class LiveJobListing extends PureComponent {
                                                 <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                             </TouchableOpacity>
                                             <View style={[style.headerBody]}>
-                                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Live Tasks</Text>
+                                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{LIVE_TASKS}</Text>
                                             </View>
                                             <View style={[style.headerRight]}>
                                             </View>
                                             <View />
                                         </View>
-                                        <SearchBarV2 placeholder='Filter Reference Numbers' setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation} returnValue={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} searchText={this.props.searchText} />
+                                        <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation}
+                                            returnValue={(searchText) => {
+                                                this.props.actions.setState(SET_SEARCH, searchText)
+                                                this.setState({ isScannerUsed: true })
+                                            }} searchText={this.props.searchText} onPress={() => {
+                                                this.props.actions.setState(SET_SEARCH, this.props.searchText)
+                                                this.setState({ isScannerUsed: true })
+                                            }} />
                                     </Body>
                                 </Header>
                             )}
@@ -202,13 +233,13 @@ class LiveJobListing extends PureComponent {
                                                         }}>
                                                         <Icon name="md-close" style={[styles.fontWhite, styles.fontXl]} />
                                                     </TouchableOpacity>
-                                                    <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + ' Selected'} </Text>
+                                                    <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
                                                 </View>
-                                                <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> SELECT ALL </Text>
+                                                <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
                                             </View>
                                             <View style={[styles.row]}>
-                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(1)}> ACCEPT </Text>
-                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(2)}> REJECT </Text>
+                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(1)}> {ACCEPT} </Text>
+                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(2)}> {REJECT} </Text>
                                             </View>
                                         </View>
                                     </Body>
@@ -217,7 +248,7 @@ class LiveJobListing extends PureComponent {
                             <FlatList
                                 data={this.renderList()}
                                 renderItem={({ item }) => this.renderData(item)}
-                                keyExtractor={item => item.id}
+                                keyExtractor={item => String(item.id)}
                             />
                         </Container>
                     </StyleProvider>

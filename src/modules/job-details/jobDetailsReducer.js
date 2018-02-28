@@ -9,6 +9,7 @@ import {
     IS_MISMATCHING_LOCATION,
     RESET_STATE,
     RESET_STATE_FOR_JOBDETAIL,
+    SHOW_DROPDOWN
 } from '../../lib/constants'
 
 
@@ -30,13 +31,16 @@ export default function jobDetailsReducer(state = initialState, action) {
                         .set('statusRevertList',action.payload.parentStatusList)
                         .set('draftStatusInfo', action.payload.draftStatusInfo)
                         .set('isEtaTimerShow', action.payload.isEtaTimerShow)
+                        .set('jobExpiryTime',action.payload.jobExpiryTime)
         case RESET_STATE:
             return initialState
         case RESET_STATE_FOR_JOBDETAIL:
             return state.set('errorMessage',false) 
                         .set('statusRevertList',[])
                         .set('jobDetailsLoading',false)
-                        .set('draftStatusInfo', {})              
+                        .set('draftStatusInfo', {}) 
+        case SHOW_DROPDOWN:
+            return state.set('isShowDropdown',action.payload)            
     }
     return state
 }
