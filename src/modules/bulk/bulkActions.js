@@ -34,7 +34,7 @@ import {
 import _ from 'lodash'
 
 
-export function getJobMasterVsStatusNameList() {
+export function getJobMasterVsStatusNameList(displayName) {
     return async function (dispatch) {
         try {
             dispatch(setState(START_FETCHING_BULK_CONFIG))
@@ -53,7 +53,7 @@ export function getJobMasterVsStatusNameList() {
             const jobMasterVsStatusList = await bulkService.prepareJobMasterVsStatusList(jobMasterList.value, jobStatusList.value, modulesCustomizationList.value)
             dispatch(setState(STOP_FETCHING_BULK_CONFIG, jobMasterVsStatusList))
             if (jobMasterVsStatusList && jobMasterVsStatusList.length > 1) {
-                dispatch(navigateToScene(BulkConfiguration))
+                dispatch(navigateToScene(BulkConfiguration,{displayName}))
             }
             if (jobMasterVsStatusList && jobMasterVsStatusList.length == 1) {
                 dispatch(navigateToScene(BulkListing, {

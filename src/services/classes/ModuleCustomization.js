@@ -76,11 +76,12 @@ class ModuleCustomization {
      * @param {*} pieChart
      * @param {*} menu
      */
-    getActiveModules(moduleCustomizationList, user, modules, pieChart, menu) {
+    getActiveModules(moduleCustomizationList, user, modules, pieChart, menu, newJobModules) {
         let serialNumber = 0
         if (!user || !user.userType) {
             throw new Error(USER_NOT_FOUND)
         }
+        let cloneNewJobModules = _.cloneDeep(newJobModules)
         let cloneModules = _.cloneDeep(modules)
         let clonePieChart = _.cloneDeep(pieChart)
         let cloneMenu = _.cloneDeep(menu)
@@ -170,7 +171,7 @@ class ModuleCustomization {
                     {
                         let newJobModuleParams = this.setModuleDetailsForNewJob(moduleCustomizationList[index], user, serialNumber)
                         serialNumber = newJobModuleParams.serialNumber
-                        cloneModules = _.merge(cloneModules, newJobModuleParams.appModuleObject)
+                        cloneNewJobModules = _.merge(cloneNewJobModules, newJobModuleParams.appModuleObject)
                         break
                     }
                 case JOB_ASSIGNMENT_ID: {
@@ -180,6 +181,7 @@ class ModuleCustomization {
             }
         }
         return {
+            newJobModules : cloneNewJobModules,
             modules: cloneModules,
             pieChart: clonePieChart,
             menu: cloneMenu

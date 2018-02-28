@@ -210,6 +210,8 @@ class Payment {
             jobTransactionIdAmountMap = null
         } else if (jobTransaction.length) {
             throw new Error(INVALID_CONFIGURATION)
+        } else {
+            jobTransactionIdAmountMap = null
         }
         return {
             originalAmount,
@@ -310,7 +312,7 @@ class Payment {
         let moneyCollectFieldDataChildList = []
         for (let index in fieldAttributeMaster.childObject) {
             if (fieldAttributeMaster.childObject[index].attributeTypeId == ORIGINAL_AMOUNT) {
-                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, originalAmount, fieldAttributeMaster.childObject[index].key))
+                moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, originalAmount ? originalAmount : 0, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].attributeTypeId == ACTUAL_AMOUNT) {
                 moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].childObject) {
