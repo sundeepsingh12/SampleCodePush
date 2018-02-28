@@ -360,8 +360,10 @@ class Payment {
     }
 
     /**
-     * 
+     * This function return s mode type for corresponding payment mode id
      * @param {*} modeTypeId 
+     * @return 
+     * string
      */
     getModeTypeFromModeTypeId(modeTypeId) {
         switch (modeTypeId) {
@@ -389,8 +391,10 @@ class Payment {
     }
 
     /**
-     * 
+     * This function check payment mode is of card type
      * @param {*} modeTypeId 
+     * @returns
+     * boolean
      */
     checkCardPayment(modeTypeId) {
         switch (modeTypeId) {
@@ -441,6 +445,21 @@ class Payment {
         NET_BANKING_UPI_LINK.displayName = remarks ? remarks.upiCustomName ? remarks.upiCustomName : NET_BANKING_UPI_LINK.displayName : NET_BANKING_UPI_LINK.displayName
     }
 
+    /**
+     * This function prepares splitPaymentModeMap for selected payment modes
+     * @param {*} selectedPaymentMode 
+     * @returns
+     * splitPaymentModeMap : {
+     *                          modeTypeId,
+     *                          amount,
+     *                          list(in case of cheque or dd): [
+     *                                  {
+     *                                      modeTypeId,
+     *                                      amount
+     *                                  }
+     *                                ]
+     *                       }
+     */
     prepareSplitPaymentModeList(selectedPaymentMode) {
         let splitPaymentModeMap = {}
         for (let index in selectedPaymentMode.otherPaymentModeList) {
@@ -473,6 +492,13 @@ class Payment {
         return splitPaymentModeMap
     }
 
+    /**
+     * This function prepares childFieldDataListDTO for moneycollect in split payment mode
+     * @param {*} actualAmount 
+     * @param {*} fieldAttributeMaster 
+     * @param {*} originalAmount 
+     * @param {*} splitPaymentModeMap 
+     */
     prepareMoneyCollectChildFieldDataListDTOForSplit(actualAmount, fieldAttributeMaster, originalAmount, splitPaymentModeMap) {
         let moneyCollectFieldDataChildList = []
         for (let index in fieldAttributeMaster.childObject) {
@@ -508,9 +534,19 @@ class Payment {
         return moneyCollectFieldDataChildList
     }
 
+    /**
+     * This function compares actual amount and total split amount
+     * @param {*} actualAmount 
+     * @param {*} splitPaymentModeMap 
+     * @returns
+     * boolean or error
+     */
     checkSplitAmount(actualAmount, splitPaymentModeMap) {
         let totalSplitAmount = 0
         for (let index in splitPaymentModeMap) {
+            if (!Number(splitPaymentModeMap[index].amount)) {
+                break
+            }
             let amount = parseFloat(splitPaymentModeMap[index].amount)
             totalSplitAmount += (parseFloat(amount) ? parseFloat(amount) : 0)
         }

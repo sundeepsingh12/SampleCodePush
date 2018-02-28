@@ -3,7 +3,7 @@ module.exports = {
     TOKEN_MISSING: 'Token Missing',
 
     //CustomApp
-    INVALID_URL_OR_NO_INTERNET : "Invalid Url or No Internet",
+    INVALID_URL_OR_NO_INTERNET: "Invalid Url or No Internet",
 
     //common_CONSTANTS
     CANCEL: 'Cancel',
@@ -83,6 +83,7 @@ module.exports = {
     NUMBER: 'Number',
     SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
     INVALID_CONFIGURATION: 'Invalid Configuration',
+    VALID_AMOUNT_ERROR: 'Please enter valid amount',
 
     //Sequence
     SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
@@ -162,10 +163,10 @@ module.exports = {
     UNSYNCED_FILES: 'Unsynced Files',
     SYNCED_FILES: 'Synced Files',
     CREATE_BACKUP_BUTTON: '+ Create Backup',
-    UPLOAD:'Upload',
-    UPLOAD_SUCCESSFUL:' Upload Successful',
-    UPLOAD_FAILED:'Upload Failed',
-    LOGGING_OUT:'Logging out',
+    UPLOAD: 'Upload',
+    UPLOAD_SUCCESSFUL: ' Upload Successful',
+    UPLOAD_FAILED: 'Upload Failed',
+    LOGGING_OUT: 'Logging out',
 
     //DataStore
     SUGGESTIONS: 'Suggestions',
@@ -185,8 +186,8 @@ module.exports = {
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
 
-     //Job_DetailsV2
-     UPDATE_GROUP : 'Update Group',
+    //Job_DetailsV2
+    UPDATE_GROUP: 'Update Group',
 
     //Cash Tendering
     NOT_REQUIRED: 'NOT REQUIRED',
