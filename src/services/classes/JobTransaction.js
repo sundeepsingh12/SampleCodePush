@@ -239,12 +239,12 @@ class JobTransaction {
         } else {
             runsheetQuery = 'isClosed = true'
         }
-        const runsheetList = jobIdGroupIdMap && _.isEmpty(jobIdGroupIdMap) ? realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery) : []
+        const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let runsheetIdToStartDateMap = {}
-        if (selectedDate && selectedDate == "All" && runsheetList.length > 0) {
+        if (selectedDate && selectedDate == "All" && jobIdGroupIdMap && _.isEmpty(jobIdGroupIdMap)) {
             runsheetList.forEach(runsheetListObject => { runsheetIdToStartDateMap[runsheetListObject.id] = moment(runsheetListObject.startDate).format('YYYY-MM-DD') })
         }
-        let jobTransactionQuery = selectedDate ? runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ') : runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
+        let jobTransactionQuery = selectedDate && jobIdGroupIdMap && _.isEmpty(jobIdGroupIdMap) ? runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ') : runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
         if (selectedDate && (!jobTransactionQuery || jobTransactionQuery.trim() == '')) {
             return []
         }

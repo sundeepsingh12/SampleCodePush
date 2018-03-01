@@ -1,9 +1,10 @@
 'use strict'
 import {
     NEXT_FOCUS,
-    VIEW_IMAGE_DATA,
     SET_IMAGE_DATA,
-    SET_SHOW_IMAGE
+    VIEW_IMAGE_DATA,
+    SET_SHOW_IMAGE,
+    SET_SHOW_VIEW_IMAGE,
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
@@ -20,9 +21,11 @@ export function saveImage(result, fieldAttributeMasterId, formElement, isSaveDis
         } else {
             dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }, jobTransaction))
         }
-        dispatch(setState(SET_IMAGE_DATA, ''))
-        dispatch(setState(SET_SHOW_IMAGE, false))
-        dispatch(setState(VIEW_IMAGE_DATA, ''))
+        dispatch(setState(SET_SHOW_VIEW_IMAGE, {
+            imageData: '',
+            showImage: false,
+            viewData: ''
+        }))
     }
 }
 export function getImageData(value) {
@@ -41,7 +44,9 @@ export function setExistingImage(item) {
         if (item.value && item.value != '') {
             const result = await signatureService.getImageData(item.value)
             dispatch(setState(SET_IMAGE_DATA, result))
-            dispatch(setState(SET_SHOW_IMAGE, true))
+            if (result) {
+                dispatch(setState(SET_SHOW_IMAGE, true))
+            }
         }
     }
 }

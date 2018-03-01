@@ -1,5 +1,4 @@
 import React from 'react'
-import moment from 'moment'
 import {
   connect
 } from 'react-redux'
@@ -226,7 +225,7 @@ export const AppNavigator = StackNavigator({
   Statistics: {
     screen: Statistics,
     navigationOptions: {
-      title: 'STATISTICS : ' + moment(new Date()).format('DD-MM-YYYY'),
+      header: null,
     }
   },
   Sorting: {
@@ -290,7 +289,7 @@ export const AppNavigator = StackNavigator({
   FixedSKUListing: {
     screen: FixedSKUListing,
     navigationOptions: {
-      title: 'FixedSKU',
+      header: null
     }
   },
   Signature: {
@@ -348,7 +347,7 @@ export const AppNavigator = StackNavigator({
   CashTendering: {
     screen: CashTendering,
     navigationOptions: {
-      title: 'Collect Cash',
+      header: null
     }
   },
   TaskListScreen: {

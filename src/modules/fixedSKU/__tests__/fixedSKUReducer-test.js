@@ -3,7 +3,9 @@
 import {
     IS_LOADER_RUNNING,
     CHANGE_QUANTITY,
-    SET_FIXED_SKU
+    SET_FIXED_SKU,
+    SET_TOAST_ERROR_MESSAGE,
+    RESET_STATE
 } from '../../../lib/constants'
 
 import fixedSKUReducer from '../fixedSKUReducer'
@@ -54,5 +56,23 @@ describe('FixedSKU reducer', () => {
         let nextState = fixedSKUReducer(undefined, action)
         expect(nextState.fixedSKUList).toBe(action.payload.fixedSKUList)
         expect(nextState.totalQuantity).toBe(action.payload.totalQuantity)
+    })
+
+    it('should set errorMessage', () => {
+        const action = {
+            type: SET_TOAST_ERROR_MESSAGE,
+            payload: 'temp'
+        }
+        let nextState = fixedSKUReducer(undefined, action)
+        expect(nextState.errorMessage).toBe(action.payload)
+    })
+
+    it('should set initial state', () => {
+        const action = {
+            type: RESET_STATE,
+        }
+        const result = new InitialState()
+        let nextState = fixedSKUReducer(undefined, action)
+        expect(nextState).toEqual(result)
     })
 })

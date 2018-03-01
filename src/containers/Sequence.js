@@ -17,7 +17,10 @@ import {
   CLOSE, OK, JOB_NOT_PRESENT, CANCEL,
   CURRENT_SEQUENCE_NUMBER, NEW_SEQUENCE_NUMBER_MESSAGE,
   JUMP_SEQUENCE,
-  BLANK_NEW_SEQUENCE
+  BLANK_NEW_SEQUENCE,
+  SEQUENCE_NOT_AN_INT,
+  SAME_SEQUENCE_ERROR,
+  NOT_A_NUMBER,
 } from '../lib/ContainerConstants'
 import {
   Container,
@@ -110,14 +113,30 @@ class Sequence extends PureComponent {
     this.props.actions.rowMoved(rowParam, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap, this.props.jobMasterSeperatorMap)
   }
 
+  setAlertMessage(alertMessage) {
+    this.setState(() => {
+      return {
+        alertMessage: alertMessage
+      }
+    })
+  }
+
   onJumpSequencePressed(newSequenceNumber) {
     if (_.size(_.trim(newSequenceNumber)) == 0) {
-      this.setState(() => {
-        return {
-          newSequenceNumber: '',
-          alertMessage: BLANK_NEW_SEQUENCE
-        }
-      })
+      this.setAlertMessage(BLANK_NEW_SEQUENCE)
+      return
+    }
+    else if (newSequenceNumber.includes('.') || newSequenceNumber.includes(',') || newSequenceNumber.includes('-')) {
+      this.setAlertMessage(NOT_A_NUMBER)
+      return
+    }
+    else if (parseInt(newSequenceNumber) < 1) {
+      this.setAlertMessage(SEQUENCE_NOT_AN_INT + newSequenceNumber)
+      return
+    }
+    newSequenceNumber = parseInt(newSequenceNumber)
+    if (_.isEqual(this.props.currentSequenceListItemSeleceted.seqSelected, newSequenceNumber)) {
+      this.setAlertMessage(SAME_SEQUENCE_ERROR)
       return
     }
     this.props.actions.jumpSequence(_.indexOf(this.props.sequenceList, this.props.currentSequenceListItemSeleceted), newSequenceNumber, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap, this.props.jobMasterSeperatorMap)
@@ -217,8 +236,9 @@ class Sequence extends PureComponent {
               <Input
                 onChangeText={(sequenceNumber) =>
                   this.setState(() => { return { newSequenceNumber: sequenceNumber, alertMessage: '' } })}
-                style={{ height: 35, fontSize: 13 }}
-                keyboardType="numeric" />
+                style={{ height: 40, fontSize: 13 }}
+                keyboardType="numeric"
+                returnKeyType='done' />
             </Item>
             {this.state.alertMessage ?
               <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10, styles.marginLeft5]}>{this.state.alertMessage}</Label>

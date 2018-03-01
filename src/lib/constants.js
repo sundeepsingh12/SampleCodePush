@@ -304,6 +304,8 @@ module.exports = keyMirror({
     IS_LOADER_RUNNING: null,
     CHANGE_QUANTITY: null,
     SET_FIXED_SKU: null,
+    SET_TOAST_ERROR_MESSAGE: null,
+    RESET_STATE_FIXED_SKU: null,
 
     //Signature Actions
     SET_FIELD_DATA_LIST: null,
@@ -464,6 +466,8 @@ module.exports = keyMirror({
     SET_SHOW_IMAGE: null,
     SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
+    SET_SHOW_VIEW_IMAGE: null,
+    UPDATE_SKU_LIST_ITEMS: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
@@ -490,6 +494,7 @@ module.exports = keyMirror({
     SET_OPTIONS_LIST: null,
     SET_OPTION_ATTRIBUTE_ERROR: null,
     SET_OPTION_SEARCH_INPUT: null,
+    SET_ADV_DROPDOWN_MESSAGE_OBJECT: null,
     // backup actions
     SET_LOADER_BACKUP: null,
     SET_BACKUP_FILES: null,
