@@ -172,10 +172,13 @@ module.exports = {
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
 
     //Expandable Details View
-     TAP_TO_HIDE : 'Tap to hide',
-     TAP_TO_SHOW : 'Tap to show',
-     N_A : 'N.A',
+    TAP_TO_HIDE: 'Tap to hide',
+    TAP_TO_SHOW: 'Tap to show',
+    N_A: 'N.A',
 
-     //Job_DetailsV2
-     UPDATE_GROUP : 'Update Group',
+    //Job_DetailsV2
+    UPDATE_GROUP: 'Update Group',
+
+    //Save Activated
+    EDIT: 'Edit'
 }

@@ -237,7 +237,10 @@ export function saveDraftInDb(formLayoutState, jobMasterId) {
 export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
     return async function (dispatch) {
         let formLayoutState = draftService.restoreDraftFromDb(jobTransactionId, statusId, jobMasterId)
-        dispatch(setState(SET_FORM_LAYOUT_STATE, formLayoutState))
+        dispatch(setState(SET_FORM_LAYOUT_STATE, {
+            editableFormLayoutState: formLayoutState,
+            statusName: formLayoutState.statusName
+        }))
     }
 }
 
@@ -247,7 +250,7 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
             dispatch(restoreDraft(jobTransactionId, statusId))
         } else {
             if (editableFormLayoutState) {
-                dispatch(setState(SET_FORM_LAYOUT_STATE, editableFormLayoutState))
+                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
             }
             else {
                 dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))

@@ -313,9 +313,6 @@ class FormLayout {
             throw new Error('formElement is missing')
         }
         for (let [id, currentObject] of formElement.entries()) {
-            if (!currentObject.required || currentObject.value || currentObject.value === 0) {
-                continue
-            }
             let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction)
             currentObject.value = afterValidationResult ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
