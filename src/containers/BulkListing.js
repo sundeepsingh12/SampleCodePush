@@ -96,12 +96,12 @@ class BulkListing extends PureComponent {
 
   componentDidMount() {
     this.props.actions.getBulkJobTransactions(this.props.navigation.state.params)
-    BackHandler.addEventListener(HardwareBackPress, this._goBack)
+    // BackHandler.addEventListener(HardwareBackPress, this._goBack)
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener(HardwareBackPress, this._goBack)
-  }
+  // componentWillUnmount() {
+  //   BackHandler.removeEventListener(HardwareBackPress, this._goBack)
+  // }
 
   static navigationOptions = ({ navigation }) => {
     return {
@@ -140,7 +140,7 @@ class BulkListing extends PureComponent {
           </Button>
         </View>
         <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => {
-          BackHandler.removeEventListener(HardwareBackPress, this._goBack)
+          // BackHandler.removeEventListener(HardwareBackPress, this._goBack)
           this.props.navigation.navigate(QrCodeScanner, { returnData: this._setQrValue.bind(this) })
         }} >
           <QRIcon width={30} height={30} color={styles.fontWhite} />
@@ -179,7 +179,7 @@ class BulkListing extends PureComponent {
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                     <TouchableOpacity style={[style.headerLeft, styles.paddingTop10]} onPress={() => {
                       this.props.navigation.goBack(null)
-                      this.props.actions.setState(CLEAR_BULK_STATE)
+                      // this.props.actions.setState(CLEAR_BULK_STATE)
                     }}>
                       <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                     </TouchableOpacity>
@@ -218,7 +218,7 @@ class BulkListing extends PureComponent {
                   <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
                     <Button transparent onPress={() => {
-                      this.props.actions.setState(CLEAR_BULK_STATE)
+                      // this.props.actions.setState(CLEAR_BULK_STATE)
                       this.props.navigation.goBack(null)
                     }}>
                       <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
@@ -262,7 +262,7 @@ class BulkListing extends PureComponent {
                         }
                       }
                     ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
-                    BackHandler.removeEventListener(HardwareBackPress, this._goBack)
+                    // BackHandler.removeEventListener(HardwareBackPress, this._goBack)
                   }}
                   success full
                   disabled={_.isEmpty(this.props.selectedItems)}
@@ -288,9 +288,9 @@ class BulkListing extends PureComponent {
     )
   }
 
-  _goBack = () => {
-    this.props.actions.setState(CLEAR_BULK_STATE)
-  }
+  // _goBack = () => {
+  //   this.props.actions.setState(CLEAR_BULK_STATE)
+  // }
 }
 
 const style = StyleSheet.create({
