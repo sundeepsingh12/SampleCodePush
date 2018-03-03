@@ -20,6 +20,7 @@ import {
   BLANK_NEW_SEQUENCE,
   SEQUENCE_NOT_AN_INT,
   SAME_SEQUENCE_ERROR,
+  NOT_A_NUMBER,
 } from '../lib/ContainerConstants'
 import {
   Container,
@@ -125,7 +126,11 @@ class Sequence extends PureComponent {
       this.setAlertMessage(BLANK_NEW_SEQUENCE)
       return
     }
-    else if (!parseInt(newSequenceNumber) || parseInt(newSequenceNumber) < 1) {
+    else if (newSequenceNumber.includes('.') || newSequenceNumber.includes(',') || newSequenceNumber.includes('-')) {
+      this.setAlertMessage(NOT_A_NUMBER)
+      return
+    }
+    else if (parseInt(newSequenceNumber) < 1) {
       this.setAlertMessage(SEQUENCE_NOT_AN_INT + newSequenceNumber)
       return
     }
