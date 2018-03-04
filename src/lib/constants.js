@@ -380,7 +380,6 @@ module.exports = keyMirror({
     TotalAmount: null,
     Discard: null,
     Keep: null,
-    Cancel: null,
     Checkout: null,
     SHOW_DISCARD_ALERT: null,
     RETURN_TO_HOME: null,

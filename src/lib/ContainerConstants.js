@@ -11,6 +11,7 @@ module.exports = {
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
+    VERIFY:'Verify',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -122,6 +123,7 @@ module.exports = {
     //Data Store service
     DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
     CURRENT_ELEMENT_MISSING: 'currentElement Missing',
+    CONFIRM:'Confirm',
 
     //Data Store Filter
     JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
@@ -169,6 +171,7 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
+    LOGOUT_UNSYNCED_TRANSACTIONS:'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
 
     //DataStore
     SUGGESTIONS: 'Suggestions',
@@ -188,6 +191,9 @@ module.exports = {
     ADD_ROW_ERROR: 'Row could not be added',
     DELETE_ROW_ERROR: 'Row could not be deleted',
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
+    ADD_TOAST: 'Please fill required fields first',
+    INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
+    REMOVE:'Remove',
 
     //Expandable Details View
     TAP_TO_HIDE: 'Tap to hide',
@@ -201,9 +207,15 @@ module.exports = {
     EDIT: 'Edit',
     JOB_EXPIRED: 'Job Expired!',
     DETAILS: "Details",
-
-    //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+
+    //JOb List
+    SELECT_NUMBER: 'Select number for message',
+    SELECT_TEMPLATE: 'Select template for message',
+    SELECT_NUMBER_FOR_CALL: 'Select number for call',
+    CALL_CONFIRM: 'Do you want to proceed with the call?',
+    CONFIRMATION: 'Confirmation: ',
+    SELECT_ADDRESS_NAVIGATION:'Select address for navigation',
 
     //Cash Tendering
     NOT_REQUIRED: 'NOT REQUIRED',
@@ -237,7 +249,47 @@ module.exports = {
 
     //Bulk Listing 
     BULK_UPDATE: 'Bulk Update',
+    SELECT_STATUS_FOR_BULK: 'Select Status you would like to Bulk Update',
+    NEXT_POSSIBLE_STATUS: 'Next possible status',
 
     //Sorting
-    SORTING: 'Sorting',
+    SORTING : 'Sorting',
+    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
+    FAILURE_SORTING: 'Searching failed, Please try again !',
+    SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
+
+    //Save Activated
+    Do_you_want_to_checkout: 'Do you want to checkout?',
+    Discard_these_jobs: 'Discard these jobs?',
+
+    //Profile
+    CHECK_IF_PASSWORD_ENTERED: "Please Enter Password",
+    CHECK_CURRENT_PASSWORD: "Current Password is wrong Please try again",
+    MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
+    VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
+    CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
+    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..", 
+    UNSAVED_PASSWORD: 'Password not saved before',
+
+    //Error Message for NonExpandableDetailsView
+    IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+
+    //Signature
+    IMPROPER_SIGNATURE:'Improper signature. Please make your full signature.',
+
+    //Login
+    CONFIRM_RESET:'Confirm Reset',
+    RESET_ACCOUNT_SETTINGS:'Click OK to reset your account settings.',
+    REMEMBER_ME:'Remember Me',
+
+    //Preloader
+    SETTING_UP:'Setting you up...',
+    DOWNLOAD_SETTINGS:'Downloading settings',
+    APPLYING_SETTINGS:'Applying settings',
+    VERIFY_HANDSET:'Verifying handset',
+    VERIFY_MOBILE:'Verify your mobile',
+    OTP_CODE_SENT:'OTP code hasbeen sent to',
+    ENTER_MOBILE:'Enter your mobile',
+    SEND_OTP:'Send OTP',
+
 }

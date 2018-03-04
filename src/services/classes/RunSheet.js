@@ -28,7 +28,7 @@ class RunSheet {
     const failStatusMap = this.idDtoMap(allStatusIds.failStatusIds, 2)
     const successStatusMap = this.idDtoMap(allStatusIds.successStatusIds, 3)
     let allStatusMap =  { ...pendingStatusMap, ...failStatusMap, ...successStatusMap};
-    const runsheetArray = realm.getAll(TABLE_RUNSHEET)
+    const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET)
     let runsheetList = {}
     let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY) 
     runsheetArray.forEach(runsheetObject => {
@@ -64,7 +64,7 @@ class RunSheet {
   }
 
   getRunsheets() {
-    const runsheetArray = realm.getAll(TABLE_RUNSHEET)
+    const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET)
     let runsheetNumberList = []
     runsheetArray.forEach(runsheetObject => {
         const runsheetClone = { ...runsheetObject }

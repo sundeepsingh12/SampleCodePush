@@ -38,7 +38,8 @@ import {
 import CustomAlert from "../components/CustomAlert"
 import {
   ALERT,
-  INVALID_FORM_ALERT
+  INVALID_FORM_ALERT,
+  OK
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -78,7 +79,7 @@ class FormLayout extends PureComponent {
       Toast.show({
         text: this.props.errorMessage,
         position: "bottom" | "center",
-        buttonText: 'Okay',
+        buttonText: OK,
         type: 'danger',
         duration: 10000
       })

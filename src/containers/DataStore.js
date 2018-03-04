@@ -34,7 +34,7 @@ import {
     EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
 import _ from 'lodash'
-import { SUGGESTIONS } from '../lib/ContainerConstants'
+import { SUGGESTIONS,OK } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         isSearchEnabled: state.dataStore.isSearchEnabled,
@@ -52,9 +52,6 @@ function mapStateToProps(state) {
     }
 };
 
-/*
- * Bind all the actions
- */
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...dataStoreActions, ...globalActions }, dispatch)
@@ -84,7 +81,7 @@ class DataStore extends PureComponent {
             Toast.show({
                 text: this.props.errorMessage,
                 position: "bottom" | "center",
-                buttonText: 'Okay',
+                buttonText: OK,
                 type: 'danger',
                 duration: 5000
             })

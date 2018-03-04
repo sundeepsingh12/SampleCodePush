@@ -4,7 +4,6 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
 
@@ -23,7 +22,7 @@ import {
   Right,
   Icon,
   StyleProvider
-} from 'native-base';
+} from 'native-base'
 
 
 import getTheme from '../../native-base-theme/components'

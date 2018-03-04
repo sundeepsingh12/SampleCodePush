@@ -10,7 +10,7 @@ import QRIcon from '../svg_components/icons/QRIcon'
 import * as globalActions from '../modules/global/globalActions'
 import {WEBVIEW_REF, ENTER_URL_HERE, HTTP} from '../lib/AttributeConstants'
 import renderIf from '../lib/renderIf'
-import { INVALID_URL_OR_NO_INTERNET } from '../lib/ContainerConstants'
+import { INVALID_URL_OR_NO_INTERNET,OK } from '../lib/ContainerConstants'
 
 import {
     START_FETCHING_URL,
@@ -59,7 +59,7 @@ class CustomApp extends PureComponent {
         Toast.show({
             text: INVALID_URL_OR_NO_INTERNET,
             position: 'bottom',
-            buttonText: 'Okay',
+            buttonText: OK,
             duration: 5000
              })
     }  

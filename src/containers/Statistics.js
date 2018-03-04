@@ -33,16 +33,10 @@ function mapStateToProps(state) {
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-         actions: bindActionCreators({ ...statisticsActions }, dispatch)
-    }
-}
-
 class Statistics extends PureComponent {
 
     componentDidMount() {
-        this.props.actions.getDataForStatisticsList()
+        this.props.getDataForStatisticsList()
     }
     render() {
         const listData = this.props.statisticsListItems
@@ -108,4 +102,4 @@ const style = StyleSheet.create({
   }
 
 });
-export default connect(mapStateToProps, mapDispatchToProps)(Statistics)
+export default connect(mapStateToProps, statisticsActions)(Statistics)

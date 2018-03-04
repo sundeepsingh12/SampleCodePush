@@ -43,7 +43,6 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-
 class HomeFooter extends PureComponent {
     static navigationOptions = ({ navigation }) => {
         return { header: null }

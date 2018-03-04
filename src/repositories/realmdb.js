@@ -131,58 +131,6 @@ export function updateTableRecordOnProperty(tableName, property, valueList, newV
     });
 }
 
-/**A generic method for filtering out records from a table 
- * based on a property and then deleting them
- * 
- * @param {*} tableName 
- * @param {*} valueList 
- * @param {*} property 
- */
-export function deleteRecordList(tableName, valueList, property) {
-    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => property + ' = "' + value + '"').join(' OR '));
-    realm.write(() => {
-        realm.delete(filteredRecords)
-    });
-}
-
-
-export function updateRecordOnMultipleProperty(tableName, valueList, propertyList, count) {
-    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
-    realm.write(() => {
-        _.forEach(filteredRecords, record => record[propertyList[record.id]] += count[record.id])
-    });
-}
-
-/**
- * 
- * @param {*} tableName 
- */
-export function getAll(tableName) {
-    return realm.objects(tableName);
-}
-
-// export function updateRecordOnTableListData(tableName,tableListData,valueList) {
-//     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
-//     realm.write(() => {
-//         _.forEach(filteredRecords, record => record = tableListData[record.id])
-//     });
-// }
-
-/**A generic method for getting value list based on particular property in Table
- * Eg - Returning all JobTransactionIds From Db
- * @param {*} tableName 
- * @param {*} property 
- */
-export function getRecordListOnProperty(tableName, property) {
-    let records = realm.objects(tableName).map(data => data[property])
-    return records
-}
-
-export function filterRecordList(recordList, query) {
-    let records = recordList.filtered(query)
-    return records
-}
-
 export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
     let records
     if (query) {

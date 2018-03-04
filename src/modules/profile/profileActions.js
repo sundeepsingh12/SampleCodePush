@@ -13,9 +13,8 @@ import sha256 from 'sha256'
 import CONFIG from '../../lib/config'
 import { Toast } from 'native-base'
 import {
-    UNSAVED_PASSWORD,
     PASSWORD_RESET_SUCCESSFULLY,
-} from '../../lib/AttributeConstants'
+} from '../../lib/ContainerConstants'
 import { setState } from '../global/globalActions'
 
 import { profileService } from '../../services/classes/ProfileService'

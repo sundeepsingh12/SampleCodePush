@@ -5,9 +5,7 @@ import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
-
 import Loader from '../components/Loader'
-
 import {
   Container,
   Content,
@@ -53,6 +51,12 @@ import {
   Backup,
   SET_UNSYNC_TRANSACTION_PRESENT
 } from '../lib/constants'
+
+import {
+ OK,
+ CANCEL,
+ LOGOUT_UNSYNCED_TRANSACTIONS
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -166,10 +170,10 @@ class Menu extends PureComponent {
   }
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
-      return Alert.alert('Confirm Log Out', 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
-        [{ text: 'CANCEL', onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
+      return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS,
+        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
         {
-          text: 'OK', onPress: () => {
+          text: OK, onPress: () => {
             this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
             this.props.actions.invalidateUserSession()
           }
@@ -305,8 +309,8 @@ class Menu extends PureComponent {
       "Logout",
       `Are you sure you want to Logout?`,
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'OK', onPress: this.logoutButtonPressed },
+        { text: CANCEL, style: 'cancel' },
+        { text: OK, onPress: this.logoutButtonPressed },
       ],
     )
   }

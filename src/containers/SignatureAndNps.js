@@ -27,6 +27,10 @@ import NPSFeedback from '../components/NPSFeedback'
 import * as signatureActions from '../modules/signature/signatureActions'
 import SignatureCapture from 'react-native-signature-capture';
 import renderIf from '../lib/renderIf'
+import {
+   IMPROPER_SIGNATURE,
+   OK
+  } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         isRemarksValidation: state.signature.isRemarksValidation,
@@ -78,9 +82,9 @@ class SignatureAndNps extends PureComponent {
     saveSign = () => {
         if (this.state.isSaveDisabled) {
             Toast.show({
-                text: 'Improper signature. Please make your full signature.',
+                text: IMPROPER_SIGNATURE,
                 position: "bottom" | "center",
-                buttonText: 'Okay',
+                buttonText: OK,
                 duration: 5000
             })
         } else {

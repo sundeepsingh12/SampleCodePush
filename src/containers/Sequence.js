@@ -10,7 +10,7 @@ import React, { PureComponent } from 'react'
 import {
   StyleSheet, View, Alert, TouchableOpacity, Modal, BackHandler
 } from 'react-native'
-import { ROUTE_OPTIMIZATION, SEARCH_PLACEHOLDER } from '../lib/AttributeConstants'
+import { ROUTE_OPTIMIZATION, FILTER_REF_NO } from '../lib/AttributeConstants'
 import {
   UPDATE_SEQUENCE, SAVE,
   WARNING_FOR_BACK, WARNING,
@@ -278,7 +278,7 @@ class Sequence extends PureComponent {
           <View style={[style.headerRight]}>
           </View>
         </View>
-        <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />
+        <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />
       </Body>
     </Header>
   }

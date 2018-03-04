@@ -11,10 +11,10 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SignatureRemarks from '../components/SignatureRemarks'
 import * as signatureActions from '../modules/signature/signatureActions'
-import SignatureCapture from 'react-native-signature-capture';
+import SignatureCapture from 'react-native-signature-capture'
 import renderIf from '../lib/renderIf'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import {
     Container,
@@ -25,10 +25,15 @@ import {
     Icon,
     StyleProvider,
     Toast
-} from 'native-base';
+} from 'native-base'
 import {
     SIGNATURE,
 } from '../lib/AttributeConstants'
+import {
+    OK,
+    IMPROPER_SIGNATURE
+} from '../lib/ContainerConstants'
+
 function mapStateToProps(state) {
     return {
         isRemarksValidation: state.signature.isRemarksValidation,
@@ -77,9 +82,9 @@ class Signature extends PureComponent {
     saveSign = () => {
         if (this.state.isSaveDisabled) {
             Toast.show({
-                text: 'Improper signature. Please make your full signature.',
+                text: IMPROPER_SIGNATURE,
                 position: "bottom" | "center",
-                buttonText: 'Okay',
+                buttonText: OK,
                 duration: 5000
             })
         } else {

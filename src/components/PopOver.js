@@ -8,7 +8,6 @@ import {
     View,
     Text,
     Platform,
-    SegmentedControlIOS
 }
     from 'react-native'
 import { Icon} from 'native-base'

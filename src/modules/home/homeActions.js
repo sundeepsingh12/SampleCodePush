@@ -46,7 +46,8 @@ import {
   SERVER_UNREACHABLE,
 } from '../../lib/AttributeConstants'
 import {
-  NEW_JOB_CONFIGURATION_ERROR
+  NEW_JOB_CONFIGURATION_ERROR,
+  OK
 } from '../../lib/ContainerConstants'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import CONFIG from '../../lib/config'
@@ -447,7 +448,7 @@ export function navigateToNewJob(jobMasterIds,displayName) {
         Toast.show({
           text: NEW_JOB_CONFIGURATION_ERROR,
           position: "bottom" | "center",
-          buttonText: 'Okay',
+          buttonText: OK,
           type: 'danger',
           duration: 10000
         })

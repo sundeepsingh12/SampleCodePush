@@ -31,7 +31,7 @@ import { StyleSheet, View, TouchableHighlight, FlatList } from 'react-native'
 import Loader from '../components/Loader'
 import * as globalActions from '../modules/global/globalActions'
 import { BulkListing } from '../lib/constants'
-import {BULK_UPDATE} from '../lib/ContainerConstants'
+import {BULK_UPDATE,SELECT_STATUS_FOR_BULK} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -97,7 +97,7 @@ class BulkConfiguration extends PureComponent {
             <Right />
           </Header>
           <Content>
-            <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Status you would like to Bulk Update</Text>
+            <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>{SELECT_STATUS_FOR_BULK}</Text>
             <List>
               <FlatList
                 data={this.props.bulkConfigList}

@@ -4,7 +4,6 @@ import * as transientStatusActions from '../modules/transientStatus/transientAct
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as globalActions from '../modules/global/globalActions'
-import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import { View, TouchableOpacity, FlatList, StyleSheet } from 'react-native'
@@ -27,7 +26,7 @@ import {
     List,
     ListItem,
     Right,
-} from 'native-base';
+} from 'native-base'
 import _ from 'lodash'
 
 function mapStateToProps(state) {
@@ -38,9 +37,6 @@ function mapStateToProps(state) {
     }
 };
 
-/*
- * Bind all the actions
- */
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...transientStatusActions, ...globalActions }, dispatch)

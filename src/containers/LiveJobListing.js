@@ -50,7 +50,8 @@ import {
     SELECT_ALL,
     ACCEPT,
     REJECT,
-    SELECTED
+    SELECTED,
+    OK
 } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
@@ -88,7 +89,7 @@ class LiveJobListing extends PureComponent {
             Toast.show({
                 text: this.props.liveJobToastMessage,
                 position: 'bottom',
-                buttonText: 'Okay',
+                buttonText: OK,
                 duration: 5000
             })
             this.props.actions.setState(SET_LIVE_JOB_TOAST, '')
