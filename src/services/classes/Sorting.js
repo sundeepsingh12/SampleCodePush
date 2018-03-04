@@ -3,7 +3,8 @@
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import _ from 'lodash'
 import CONFIG from '.././../lib/config'
-import { REF_UNAVAILABLE, REFERENCE_NO, GET, FAILURE_SORTING, NA } from '../../lib/AttributeConstants'
+import { REFERENCE_NO, GET,  NA } from '../../lib/AttributeConstants'
+import {REF_UNAVAILABLE,FAILURE_SORTING,} from '../../lib/ContainerConstants'
 
 class Sorting {
 

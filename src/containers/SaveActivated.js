@@ -42,11 +42,14 @@ import {
     HardwareBackPress
 } from '../lib/constants'
 import {
-    Discard_these_jobs,
-    Do_you_want_to_checkout,
     Yes_Checkout,
     Total,
 } from '../lib/AttributeConstants'
+
+import {
+    Discard_these_jobs,
+    Do_you_want_to_checkout
+} from '../lib/ContainerConstants'
 
 import _ from 'lodash'
 
@@ -60,9 +63,6 @@ function mapStateToProps(state) {
     }
 };
 
-/*
- * Bind all the actions
- */
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...globalActions, ...saveActivatedActions }, dispatch)

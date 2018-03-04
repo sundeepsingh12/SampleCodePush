@@ -10,11 +10,14 @@ import {
     Icon,
     Footer,
     FooterTab,
-} from 'native-base';
+} from 'native-base'
 import {
     _id,
 } from '../lib/constants'
-import platform from '../../native-base-theme/variables/platform';
+import {
+    SAVE,
+    CONFIRM
+  } from '../lib/ContainerConstants'
 import styles from '../themes/FeStyle'
 export default class DataStoreItemDetails extends PureComponent {
 
@@ -53,7 +56,7 @@ export default class DataStoreItemDetails extends PureComponent {
                             style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
                             <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.paddingRight5, styles.paddingLeft5]} onPress={() => { this.props.goBack(-1, null, true) }} />
                             <Text
-                                style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Confirm</Text>
+                                style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{CONFIRM}</Text>
                             <View />
                         </View>
                         <View style={[styles.row,]}>
@@ -76,7 +79,7 @@ export default class DataStoreItemDetails extends PureComponent {
                             onPress={() => {
                                 this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])
                             }}>
-                            <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
+                            <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
                         </Button>
                     </FooterTab>
                 </Footer>

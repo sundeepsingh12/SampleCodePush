@@ -63,6 +63,7 @@ import {
     RECEPIENTS_CONTACT_NUMBER,
     SEND,
     RECEPIENTS_EMAIL_ADDRESS,
+    OK
 } from '../lib/ContainerConstants'
 
 
@@ -117,7 +118,7 @@ class CheckoutDetails extends PureComponent {
             Toast.show({
                 text: this.props.errorToastMessage,
                 position: 'bottom',
-                buttonText: 'Okay',
+                buttonText: OK,
                 duration: 5000
             })
             this.props.actions.setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, '')

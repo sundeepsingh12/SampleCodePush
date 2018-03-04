@@ -38,7 +38,7 @@ import renderIf from '../lib/renderIf'
 import TitleHeader from '../components/TitleHeader'
 import JobListItem from '../components/JobListItem'
 import _ from 'lodash'
-import { NEXT_POSSIBLE_STATUS, SEARCH_PLACEHOLDER } from '../lib/AttributeConstants'
+import { NEXT_POSSIBLE_STATUS, FILTER_REF_NO,OK,CANCEL } from '../lib/ContainerConstants'
 import { FormLayout, CLEAR_BULK_STATE, HardwareBackPress, SET_BULK_SEARCH_TEXT, SET_BULK_ERROR_MESSAGE } from '../lib/constants'
 import QRIcon from '../svg_components/icons/QRIcon'
 import { QrCodeScanner } from '../lib/constants'
@@ -78,7 +78,7 @@ class BulkListing extends PureComponent {
       Toast.show({
         text: this.props.errorToastMessage,
         position: 'bottom',
-        buttonText: 'Okay',
+        buttonText: OK,
         duration: 5000
       })
       this.props.actions.setState(SET_BULK_ERROR_MESSAGE, '')
@@ -117,7 +117,7 @@ class BulkListing extends PureComponent {
       <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10]}>
         <View style={[styles.relative, { width: '85%', height: 30 }]}>
           <TextInput
-            placeholder={SEARCH_PLACEHOLDER}
+            placeholder={FILTER_REF_NO}
             placeholderTextColor={'rgba(255,255,255,.6)'}
             selectionColor={'rgba(224, 224, 224,.5)'}
             style={[style.headerSearch]}
@@ -207,7 +207,7 @@ class BulkListing extends PureComponent {
             { text: object.name, icon: "md-arrow-dropright", iconColor: "#000000" }
           nextStatusNames.push(statusObject)
         })
-        nextStatusNames.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+        nextStatusNames.push({ text:CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
         const nextStatusIds = this.props.navigation.state.params.nextStatusList.map(nextStatus => nextStatus.id)
 
         return (

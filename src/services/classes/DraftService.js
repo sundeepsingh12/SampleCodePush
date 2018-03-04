@@ -8,21 +8,10 @@ import * as realm from '../../repositories/realmdb'
 class DraftService {
 
     saveDraftInDb(formLayoutState, jobMasterId) {
-        //  console.log('formLayout state', formLayoutState)
-        // if (formLayoutState.jobTransactionId < 0) {
-        //     await realm.deleteSingleRecord(TABLE_DRAFT, jobMasterId, 'jobMasterId')
-        // }
         let draftObject = this.setFormLayoutObjectForSaving(formLayoutState, jobMasterId)
         if (draftObject && draftObject.jobTransactionId) {
             realm.save(TABLE_DRAFT, draftObject)
         }
-        // let allData = realm.getAll(TABLE_DRAFT)
-        // for (let index in allData) {
-        //     let draft = { ...allData[index] }
-        //     if (draft) {
-        //         console.log('draft records', index, draft)
-        //     }
-        // }
     }
     setFormLayoutObjectForSaving(formLayoutState, jobMasterId) {
         if (!formLayoutState || !formLayoutState.formElement) return
@@ -87,13 +76,6 @@ class DraftService {
         } else {
             realm.deleteSingleRecord(TABLE_DRAFT, jobTransactionId, 'jobTransactionId')
         }
-        // let allData = realm.getAll(TABLE_DRAFT)
-        // for (let index in allData) {
-        //     let draft = { ...allData[index] }
-        //     if (draft) {
-        //         console.log('draft records', index, draft)
-        //     }
-        // }
     }
 }
 

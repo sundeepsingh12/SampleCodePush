@@ -13,10 +13,9 @@ import {
     Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card,
     CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider
 } from 'native-base'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import PopOver from '../components/PopOver'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'

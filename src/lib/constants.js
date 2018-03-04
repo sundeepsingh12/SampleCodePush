@@ -379,7 +379,6 @@ module.exports = keyMirror({
     TotalAmount: null,
     Discard: null,
     Keep: null,
-    Cancel: null,
     Checkout: null,
 
     //Bulk Module

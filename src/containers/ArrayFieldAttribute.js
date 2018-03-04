@@ -12,7 +12,6 @@ import { bindActionCreators } from 'redux'
 import * as arrayActions from '../modules/array/arrayActions'
 import ArrayBasicComponent from '../components/ArrayBasicComponent.js'
 import CustomAlert from '../components/CustomAlert.js'
-import { ADD_TOAST } from '../lib/AttributeConstants'
 import {
     Container,
     Content,
@@ -38,7 +37,7 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
-import { TOTAL_COUNT, ADD, SAVE } from '../lib/ContainerConstants'
+import { TOTAL_COUNT, ADD, SAVE,ADD_TOAST,OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -89,7 +88,7 @@ class ArrayFieldAttribute extends PureComponent {
             Toast.show({
                 text: ADD_TOAST,
                 position: 'bottom',
-                buttonText: 'Okay',
+                buttonText: OK,
             })
         }
         else {

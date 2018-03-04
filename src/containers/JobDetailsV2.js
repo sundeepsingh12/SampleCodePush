@@ -11,7 +11,15 @@ import {
   REVERT_NOT_ALLOWED_INCASE_OF_SYNCING,
   PRESS_OK_TO_CONFIRM_REVERT_TO,
   CANCEL,
-  CONFIRM_REVERT
+  CONFIRM_REVERT,
+  UPDATE_GROUP, 
+  JOB_EXPIRED, 
+  DETAILS,  
+  SELECT_NUMBER,
+  SELECT_TEMPLATE,
+  SELECT_NUMBER_FOR_CALL,
+  CONFIRMATION,
+  CALL_CONFIRM,
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
@@ -52,11 +60,6 @@ import {
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
 import {
-  SELECT_NUMBER,
-  SELECT_TEMPLATE,
-  SELECT_NUMBER_FOR_CALL,
-  CONFIRMATION,
-  CALL_CONFIRM,
   LANDMARK,
   PINCODE,
   ADDRESS_LINE_1,
@@ -73,7 +76,6 @@ import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { jobStatusService } from '../services/classes/JobStatus'
 
-import { UPDATE_GROUP, JOB_EXPIRED, DETAILS } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -406,10 +408,10 @@ class JobDetailsV2 extends PureComponent {
   }
   selectStatusToRevert =  () => {
     if(this.props.statusRevertList[0] == 1){
-      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom'| "center", buttonText: 'Okay' ,type: 'danger',duration: 5000 }) }
+      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom'| "center", buttonText: OK ,type: 'danger',duration: 5000 }) }
     }
     else if(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType){
-      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom'| "center", buttonText: 'Okay', type: 'danger', duration: 5000 }) }      
+      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom'| "center", buttonText: OK, type: 'danger', duration: 5000 }) }      
     }else{
     this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
     }

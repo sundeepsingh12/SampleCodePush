@@ -7,7 +7,6 @@ import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
-import ResyncLoader from '../components/ResyncLoader'
 import SearchBarV2 from '../components/SearchBarV2'
 
 import React, { PureComponent } from 'react'
@@ -41,8 +40,8 @@ import DateTimePicker from 'react-native-modal-datetime-picker'
 import moment from 'moment'
 
 import {
-  SEARCH_PLACEHOLDER
-} from '../lib/AttributeConstants'
+  FILTER_REF_NO
+} from '../lib/ContainerConstants'
 import {
   START,
   IS_CALENDAR_VISIBLE,
@@ -247,7 +246,7 @@ class TabScreen extends PureComponent {
                 <View style={[style.headerRight]}>
                 </View>
               </View>
-              <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.onPress} />
+              <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.onPress} />
             </Body>
           </Header>
           <Tabs

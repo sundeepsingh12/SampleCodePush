@@ -60,7 +60,8 @@ import {
 } from '../lib/constants'
 import {
     OPTIONAL,
-    SELECTED
+    SELECTED,
+    REMOVE
 } from '../lib/ContainerConstants'
 function mapDispatchToProps(dispatch) {
     return {
@@ -377,7 +378,7 @@ class ArrayBasicComponent extends PureComponent {
                 </View>
                 <View style={[styles.flexBasis10, styles.alignCenter, styles.justifyCenter, styles.padding10]}>
                     <Button style={styles.bgGray} onPress={() => this.props.actions.deleteArrayRow(this.props.arrayElements, this.props.arrayRow.rowId, this.props.lastRowId)}>
-                        <Text style={[styles.fontBlack, styles.fontDefault]}> Remove </Text>
+                        <Text style={[styles.fontBlack, styles.fontDefault]}> {REMOVE} </Text>
                     </Button>
                 </View>
             </View >
