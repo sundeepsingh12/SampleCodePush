@@ -50,7 +50,7 @@ module.exports = {
 
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
-    NEW_TASK : 'New Task',
+    NEW_TASK: 'New Task',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -107,6 +107,7 @@ module.exports = {
     BLANK_NEW_SEQUENCE: `Sequence can't be left blank`,
     CURRENT_SEQUENCE_ROW_MISSING: `currentSequenceListItemIndex missing`,
     SEQUENCE_NOT_AN_INT: `Sequence can't be `,
+    NOT_A_NUMBER: 'Please enter a number',
     RUNSHEET_MISSING: 'No runsheet found',
     RUNSHEET_NUMBER_MISSING: 'Runsheet number not present',
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
@@ -177,12 +178,12 @@ module.exports = {
 
     //SKU
     SELECT_ANY_REASON: 'Select any Reason',
-     TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
-     QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
-     TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
-     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
-     REASON: 'Reason',
-     OPEN_CAMERA: 'Open Camera',
+    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
+    QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
+    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
+    QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
+    REASON: 'Reason',
+    OPEN_CAMERA: 'Open Camera',
 
     //Array
     TOTAL_COUNT: 'Total Count : ',
@@ -201,6 +202,9 @@ module.exports = {
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+
+    //Save Activated
+    EDIT: 'Edit',
     JOB_EXPIRED: 'Job Expired!',
     DETAILS: "Details",
     UPDATE_GROUP: 'Update Group',

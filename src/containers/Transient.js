@@ -10,6 +10,7 @@ import { View, TouchableOpacity, FlatList, StyleSheet } from 'react-native'
 import {
     SET_FORM_LAYOUT_STATE,
     FormLayout,
+    SET_TRANSIENT_BACK_PRESSED
 } from '../lib/constants'
 
 import {
@@ -32,6 +33,7 @@ function mapStateToProps(state) {
     return {
         formLayoutStates: state.transientStatus.formLayoutStates,
         loaderRunning: state.transientStatus.loaderRunning,
+        transientBackPressed: state.transientStatus.transientBackPressed
     }
 };
 
@@ -69,9 +71,19 @@ class Transient extends PureComponent {
         })
     }
 
+    componentDidUpdate() {
+        if (this.props.transientBackPressed) {
+            this._goBack()
+            this.props.actions.setState(SET_TRANSIENT_BACK_PRESSED, false)
+        }
+    }
+
     _goBack = () => {
         this.props.navigation.goBack()
-        this.props.actions.setState(SET_FORM_LAYOUT_STATE, this.props.formLayoutStates[this.props.navigation.state.params.currentStatus.id])
+        this.props.actions.setState(SET_FORM_LAYOUT_STATE, {
+            editableFormLayoutState: this.props.formLayoutStates[this.props.navigation.state.params.currentStatus.id],
+            statusName: this.props.navigation.state.params.currentStatus.name
+        })
     }
 
     renderData = (item) => {

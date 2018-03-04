@@ -9,7 +9,7 @@ import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 
 
-import { StyleSheet, View, TouchableOpacity, FlatList, Alert, BackHandler } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, FlatList, Alert } from 'react-native'
 
 import {
     Container,
@@ -33,18 +33,20 @@ import styles from '../themes/FeStyle'
 import CheckoutDetails from '../containers/CheckoutDetails'
 import ReviewSaveActivatedDetails from '../components/ReviewSaveActivatedDetails'
 import {
-    SET_FORM_LAYOUT_STATE,
     FormLayout,
     Discard,
     Keep,
     Cancel,
     Checkout,
-    HardwareBackPress
+    SHOW_DISCARD_ALERT,
 } from '../lib/constants'
 import {
     Yes_Checkout,
     Total,
 } from '../lib/AttributeConstants'
+import {
+    EDIT
+} from './../lib/ContainerConstants'
 
 import {
     Discard_these_jobs,
@@ -60,6 +62,7 @@ function mapStateToProps(state) {
         isSignOffVisible: state.saveActivated.isSignOffVisible,
         loading: state.saveActivated.loading,
         headerTitle: state.saveActivated.headerTitle,
+        showDiscardAlert: state.saveActivated.showDiscardAlert
     }
 };
 
@@ -86,10 +89,13 @@ class SaveActivated extends PureComponent {
         return { header: null }
     }
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener(HardwareBackPress, this._goBack)
+    componentDidUpdate() {
+        if (this.props.showDiscardAlert) {
+            this.discardAlert()
+            this.props.actions.setState(SHOW_DISCARD_ALERT, false)
+        }
     }
-    
+
     componentDidMount() {
         if (!this.props.navigation.state.params.calledFromNewJob) {
             this.props.actions.addTransactionAndPopulateView(
@@ -105,7 +111,6 @@ class SaveActivated extends PureComponent {
                 this.props.navigation.state.params.navigationFormLayoutStates
             )
         }
-        BackHandler.addEventListener(HardwareBackPress, this._goBack)
     }
 
     signOff = (statusId) => {
@@ -140,17 +145,14 @@ class SaveActivated extends PureComponent {
     }
 
     _discard = () => {
-        if (!this.props.navigation.state.params.calledFromNewJob) {
-            this.props.actions.clearStateAndStore(false, this.props.navigation.state.params.jobMasterId)
-            this.props.actions.setState(SET_FORM_LAYOUT_STATE,
-                _.values(this.props.navigation.state.params.navigationFormLayoutStates)[_.size(this.props.navigation.state.params.navigationFormLayoutStates) - 1])
-            this.props.navigation.goBack()
-        } else {
-            this.props.actions.clearStateAndStore(true, this.props.navigation.state.params.jobMasterId)
-        }
+        this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
     }
 
     _goBack = () => {
+        this.discardAlert()
+    }
+
+    discardAlert() {
         Alert.alert(
             Discard_these_jobs,
             '',
@@ -159,7 +161,6 @@ class SaveActivated extends PureComponent {
                 { text: Keep, style: 'cancel' },
             ],
         )
-        return true
     }
 
     _keyExtractor = (item, index) => String(item.id);
@@ -178,15 +179,16 @@ class SaveActivated extends PureComponent {
         )
     }
 
-    renderRecurringData = (item) => {
+    renderRecurringData = (item, textCounter) => {
+        let showText = (item.textToShow) ? item.textToShow : textCounter
         return (
             <View style={[styles.bgWhite, { borderBottomColor: '#f5f5f5', borderBottomWidth: 1 }]}>
                 <ListItem style={[style.jobListItem, styles.justifySpaceBetween]} >
-                    <TouchableOpacity style={[styles.flexBasis85, styles.row, styles.alignCenter]}
+                    <TouchableOpacity style={[styles.flexBasis90, styles.row, styles.alignCenter]}
                         onPress={() => { this.review(true, item.fieldDataArray, true, item.textToShow, item.id) }}>
-                        <Text style={[styles.fontDefault]}>{item.textToShow}</Text>
+                        <Text style={[styles.fontDefault]}>{showText}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.flexBasis15]}
+                    <TouchableOpacity style={[styles.flexBasis10]}
                         onPress={() => {
                             this.props.actions.deleteItem(
                                 item.id,
@@ -201,7 +203,7 @@ class SaveActivated extends PureComponent {
                                 this.props.headerTitle
                             )
                         }}>
-                        <Icon name="md-trash" style={[styles.fontLg, styles.fontDarkGray, styles.alignSelfEnd]} />
+                        <Icon name="md-trash" style={[styles.fontXl, styles.fontDarkGray, styles.alignSelfCenter]} />
                     </TouchableOpacity>
                 </ListItem>
             </View>
@@ -263,7 +265,7 @@ class SaveActivated extends PureComponent {
             jobTransactionId: itemId,
             jobTransaction,
             statusId: this.props.navigation.state.params.currentStatus.id,
-            statusName: this.props.navigation.state.params.currentStatus.name,
+            statusName: EDIT,
             jobMasterId: this.props.navigation.state.params.jobMasterId,
             navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
             editableFormLayoutState: this.props.recurringData[itemId].formLayoutState
@@ -272,6 +274,7 @@ class SaveActivated extends PureComponent {
 
 
     render() {
+        let textCounter = 1
         if (this.props.loading) {
             return (
                 <Loader />
@@ -342,7 +345,7 @@ class SaveActivated extends PureComponent {
                         <FlatList
                             data={_.values(this.props.recurringData)}
                             extraData={this.state}
-                            renderItem={(item) => this.renderRecurringData(item.item)}
+                            renderItem={(item) => this.renderRecurringData(item.item, textCounter++)}
                             keyExtractor={this._keyExtractor}>
                         </FlatList>
                     </Content>

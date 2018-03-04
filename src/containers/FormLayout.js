@@ -30,7 +30,6 @@ import {
 } from '../lib/AttributeConstants'
 
 import {
-  SET_FORM_LAYOUT_STATE,
   SET_DRAFT,
   SET_UPDATE_DRAFT,
   ERROR_MESSAGE,

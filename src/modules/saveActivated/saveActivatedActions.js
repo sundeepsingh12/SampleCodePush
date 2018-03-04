@@ -108,7 +108,7 @@ export function storeState(saveActivatedState, screenName, jobMasterId, navigati
 }
 
 
-export function clearStateAndStore(goToHome, jobMasterId) {
+export function clearStateAndStore(jobMasterId) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
@@ -116,9 +116,7 @@ export function clearStateAndStore(goToHome, jobMasterId) {
             delete saveActivatedData.value[jobMasterId]
             await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, saveActivatedData.value)
             dispatch(setState(SAVE_ACTIVATED_INITIAL_STATE, {}))
-            if (goToHome) {
-                dispatch(navigateToScene(HomeTabNavigatorScreen, {}))
-            }
+            dispatch(navigateToScene(HomeTabNavigatorScreen, {}))
         } catch (error) {
             console.log(error)
         }
@@ -129,6 +127,7 @@ export function clearStateAndStore(goToHome, jobMasterId) {
 export function deleteItem(itemId, recurringData, commonData, navigationParams, statusName) {
     return async function (dispatch) {
         try {
+            dispatch(setState(LOADER_ACTIVE, true))
             recurringData = await transientStatusService.deleteRecurringItem(itemId, recurringData)
             await dispatch(storeState({
                 commonData,
