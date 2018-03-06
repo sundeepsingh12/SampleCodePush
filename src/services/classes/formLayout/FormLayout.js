@@ -24,7 +24,7 @@ import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
 import { fieldValidationService } from '../FieldValidation';
 import { trackingService } from '../Tracking'
-
+import { sync } from '../Sync'
 class FormLayout {
 
     /**
@@ -78,11 +78,11 @@ class FormLayout {
 
         for (let index in filedAttributesMappedToStatus) {
             fieldAttributeMasterParentIdMap[filedAttributesMappedToStatus[index].fieldAttributeId] = fieldAttributeMasterIdFromArray ? {} : fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId
-            if(fieldAttributeMasterIdFromArray) {
-                if(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) {
+            if (fieldAttributeMasterIdFromArray) {
+                if (fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) {
                     sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
                 }
-            } else if(!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId) {
+            } else if (!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId) {
                 sequenceWiseSortedFieldAttributesForStatus.push(fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId])
             }
             // if ((fieldAttributeMasterIdFromArray && fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId]) || (!fieldAttributeMap[filedAttributesMappedToStatus[index].fieldAttributeId].parentId)) {
@@ -328,9 +328,18 @@ class FormLayout {
         return true
     }
 
+    /**
+     * This method adds a geoFence using lat long of job that is just completed , 
+     * lat long of next job which FE has to complete and the second job which FE has to complete.
+     */
     async addNewGeoFenceAndDeletePreviousFence() {
         let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
-        await trackingService.removeGeofenceAndAddAnotherGeoFence(fenceIdentifier)
+        /* identify the fence and in case of job master have enable resequence restriction in job master setting and
+        allowOffRouteNotification in company setting then only a fence is added while saving  
+        */
+        if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) { //check for identifier in store
+            sync.addGeoFence(false)
+        }
     }
 }
 

@@ -10,18 +10,19 @@ import {
     TRACK_BATTERY,
     USER,
     GEO_FENCING,
-    LAT_LONG_GEO_FENCE
+    LAT_LONG_GEO_FENCE,
+    GEO_FENCE_STATUS
 } from '../../lib/constants'
 import { userSummaryService } from './UserSummary'
 import {
     FAREYE_UPDATES
 } from '../../lib/AttributeConstants'
 import {
-    ENTER
+    ENTER,
+    INSIDE_BOUNDARY,
+    OUTSIDE_BOUNDARY
 } from '../../lib/ContainerConstants'
 import { userEventLogService } from './UserEvent'
-import { sync } from './Sync'
-
 class Tracking {
 
     init() {
@@ -45,19 +46,21 @@ class Tracking {
         // This event fires when the user get into a fence or get out of a fence 
         BackgroundGeolocation.on('geofence', (geofence) => {
             try {
-                let fenceObject = keyValueDBService.getValueFromStore(GEO_FENCING)
-                fenceObject.then(object => {
-                    if (object && object.value && geofence.action != object.value.status) {
-                        keyValueDBService.validateAndSaveData(GEO_FENCING, {
-                            identifier: geofence.identifier,
-                            status: geofence.action
-                        }).then(() => {
-                            this.showNotification(geofence)
-                        })
+                //Check status of FE i.e. inside boundary or outside boundary (in terms of library EXIT and ENTER)
+                let fenceObject = keyValueDBService.getValueFromStore(GEO_FENCE_STATUS)
+                fenceObject.then(status => {
+                    //If status is mutually exclusive to geo fence action then show notification
+                    if (status && status.value && geofence.action != status.value) {
+                        //first save current status of geofence then show notification
+                        keyValueDBService.validateAndSaveData(GEO_FENCE_STATUS, geofence.action)
+                            .then(() => {
+                                this.showNotification(geofence)
+                            })
                     }
                 })
             } catch (error) {
-                console.log("An error occurred in my code!", error);
+                //TODO
+                console.log("An error occurred in my code!", error)
             }
         })
 
@@ -111,30 +114,31 @@ class Tracking {
      * This method is use to delete geo fence by giving identifier saved in store and called when auto logout takes place
      */
     inValidateStoreVariables(fenceIdentifier) {
+        //if fence is present then delete the fence in case of auto logout
         if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) {
             BackgroundGeolocation.removeGeofence(fenceIdentifier.value.identifier, () => {
-                this.deleteFence()
-                this.deleteLatLong()
-                // console.logs("Successfully removed geofence")
+                this.deleteFence() // delete fence identifier
+                this.deleteLatLongAndStatus() // delete fence lat long object and status object
+                console.log("Successfully removed geofence")
             }, (error) => {
-                // console.logs("Failed to remove geofence", error)
+                //TODO
+                console.log("Failed to remove geofence", error)
             })
         }
     }
 
     /**
-     * This method is use to delete geo fence by giving identifier, add another fence and is called when transaction is completed from formLayout
+     * This method is called when a job is completed and we have to delete its fence and identifier
      * @param {*} fenceIdentifier 
-     * 
      */
-    removeGeofenceAndAddAnotherGeoFence(fenceIdentifier) {
+    removeGeofence(fenceIdentifier) {
         if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) {
             BackgroundGeolocation.removeGeofence(fenceIdentifier.value.identifier, () => {
                 this.deleteFence()
-                sync.addGeoFence(false)
-                // console.logs("Successfully removed geofence")
+                console.log("Successfully removed geofence")
             }, (error) => {
-                // console.logs("Failed to remove geofence", error)
+                //TODO
+                console.log("Failed to remove geofence", error)
             })
         }
     }
@@ -184,13 +188,18 @@ class Tracking {
     }
 
     /**
-     * This method is use to add a geofence by giving it a lat long, radius 
-     * and an identifier which is transactionId of current job which FE has to do next
+     * This method is use to add a geofence by giving it a lat long, radius, 
+     * an identifier which is transactionId of current job which FE has to do next
+     * and status i.e. currently FE is inside boundary or outside boundary 
      * @param {*} meanLatLong 
      * @param {*} radius 
      * @param {*} transactionIdIdentifier 
+     * @param {*} status
      */
-    addGeoFence(meanLatLong, radius, transactionIdIdentifier) {
+    addGeoFence(meanLatLong, radius, transactionIdIdentifier, status) {
+        /* object which is added as a fence in Background-GeoLocation Library
+            it will notifyOnEntry and notifyOnExit
+           */
         let fenceObject = {
             identifier: transactionIdIdentifier,
             latitude: meanLatLong.latitude,
@@ -201,25 +210,30 @@ class Tracking {
         }
         BackgroundGeolocation.addGeofence(fenceObject, () => {
             console.log('- addGeofence success: ', fenceObject)
-            // console.logs('- addGeofence success: ', fenceObject)
-            this.storeFence(fenceObject.identifier, ENTER)
+            // if status is present then this is not an inital job and another fence is present
+            if (status && status.value) {
+                this.storeFence(fenceObject.identifier, status.value)
+            } else {// case of inital job and no fence is present and we assume that FE is inside fence
+                this.storeFence(fenceObject.identifier, ENTER)
+            }
         }, (error) => {
+            //TODO
             console.log('- addGeofence error: ', error)
             // console.logs('- addGeofence error: ', error)
         })
     }
 
     /**
-     * store fence object to store
+     * store fence object to store and status of FE
      * @param {*} identifier 
      * @param {*} status 
      */
     storeFence(identifier, status) {
         let objectToStore = {
-            identifier,
-            status
+            identifier
         }
         keyValueDBService.validateAndSaveData(GEO_FENCING, objectToStore)
+        keyValueDBService.validateAndSaveData(GEO_FENCE_STATUS, status)
     }
 
     /**
@@ -230,13 +244,14 @@ class Tracking {
     }
 
     /**
-     * delete lat long object
+     * delete lat long object and status of FE
      */
-    deleteLatLong() {
+    deleteLatLongAndStatus() {
         keyValueDBService.deleteValueFromStore(LAT_LONG_GEO_FENCE)
+        keyValueDBService.deleteValueFromStore(GEO_FENCE_STATUS)
     }
 
-    /**
+    /**<----- DO NOT DELETE THIS METHOD ----->
      * This method loop through all the geofences present and it is not used anywhere, it's just for testing
      */
     getGeofences() {
@@ -255,18 +270,18 @@ class Tracking {
         let message, eventId
         if (geofence.action == ENTER) {
             eventId = 20
-            message = "inside boundary"
+            message = INSIDE_BOUNDARY
         } else {
             eventId = 19
-            message = "out of boundary"
+            message = OUTSIDE_BOUNDARY
         }
         PushNotification.localNotification({
             /* iOS and Android properties */
-            title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-            message, // (required)
-            soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+            title: FAREYE_UPDATES,
+            message,
+            soundName: 'default'
         })
-        this.updateUserEvent(geofence, message, eventId)
+        this.updateUserEvent(geofence, message, eventId)// update user event with appropriate eventId
     }
 
     /**
@@ -276,8 +291,10 @@ class Tracking {
      * @param {*} eventId 
      */
     async updateUserEvent(geofence, outOfRouteMessage, eventId) {
+        //Object of lat long contians last lat long of previous completed job, job which is to be completed next and second job to be completed
         let fenceLatLongObject = await keyValueDBService.getValueFromStore(LAT_LONG_GEO_FENCE)
         if (fenceLatLongObject && fenceLatLongObject.value) {
+            //decription added for testing purpose
             let description = outOfRouteMessage + "previous:" + fenceLatLongObject.value.latLongObject.previousLatLong + ",current:" + fenceLatLongObject.value.latLongObject.currentLatLong + ",next:" + fenceLatLongObject.value.latLongObject.nextLatLong + ",radius:" + fenceLatLongObject.value.radius + ",centre:" + fenceLatLongObject.value.meanLatLong.latitude + "," + fenceLatLongObject.value.meanLatLong.longitude
             await userEventLogService.addUserEventLog(eventId, description)
         }

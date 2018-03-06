@@ -197,6 +197,7 @@ module.exports = keyMirror({
     BACKUP_UPLOAD_FAIL_COUNT: null,
     HUB_LAT_LONG: null,
     GEO_FENCING: null,
+    GEO_FENCE_STATUS: null,
     LAT_LONG_GEO_FENCE: null,
 
     //Realm Tables

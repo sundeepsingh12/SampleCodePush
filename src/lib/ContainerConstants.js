@@ -163,6 +163,10 @@ module.exports = {
     //Tracking constants
     ENTER: 'ENTER',
     EXIT: 'EXIT',
+    INSIDE_BOUNDARY: 'inside boundary',
+    OUTSIDE_BOUNDARY: 'out of boundary',
+
+
 
     //GeoFencing Service
     HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',

@@ -45,6 +45,7 @@ import {
   CUSTOMIZATION_APP_MODULE,
   POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
   LAST_SYNC_WITH_SERVER,
+  GEO_FENCE_STATUS
 } from '../../lib/constants'
 
 import {
@@ -704,18 +705,42 @@ class Sync {
     return timeDifference
   }
 
+  /**
+   * This method adds geo fence if there is a job master having enable resequence restriction and company having allowOffRouteNotificartion
+   * @param {*} fenceForInitialJob // true if it is called from sync which is the case of initial job 
+   *                                   false if it is called after saving job transaction i.e. subsequent jobs       
+   */
   async addGeoFence(fenceForInitialJob) {
     try {
-      let { fencePresent, jobMasterIdListWithEnableResequenceRestriction, openRunsheetList } = await geoFencingService.checkForEnableResequenceRestrictionAndCheckAllowOffRouteNotification()
-      console.logs('fencePresent', fencePresent, jobMasterIdListWithEnableResequenceRestriction, openRunsheetList)
-      if (!fencePresent && !_.isEmpty(jobMasterIdListWithEnableResequenceRestriction) && !_.isEmpty(openRunsheetList)) {
+      /*In case for initial job we check if fence is present or not if present we do not add another fence
+        In case it is called from formLayout i.e. not an initial job then we first delete the fence which is present then add another fence  
+      */
+
+      /*This method returns jobMasterIdListWithEnableResequenceRestriction if offRouteNotification is on in compant setting and there is no fence present
+          it also returns openRunsheet List                                                                                                                                                                                                      
+      */
+      let { fencePresent, jobMasterIdListWithEnableResequenceRestriction, openRunsheetList } = await geoFencingService.checkForEnableResequenceRestrictionAndCheckAllowOffRouteNotification(fenceForInitialJob)
+
+      /*if fenceForInitialJob is false and fence present then we add another fence after deletopenRunsheetListing previous fence 
+        here we also check for non empty jobMasterIdListWithEnableResequenceRestriction and non empty openRunsheetList */
+      if ((!fencePresent || !fenceForInitialJob) && !_.isEmpty(jobMasterIdListWithEnableResequenceRestriction) && !_.isEmpty()) {
+        /* below method returns mean lat long, radius and identifier which is used to add a geofence
+         */
         let { meanLatLong, radius, transactionIdIdentifier } = await geoFencingService.getLatLng(jobMasterIdListWithEnableResequenceRestriction, openRunsheetList, fenceForInitialJob)
+        /*
+         here status is used to identify if FE is inside boundary or outside boundary and is passed when new fence is added
+         */
+        let status = await keyValueDBService.getValueFromStore(GEO_FENCE_STATUS)
+        /*  
+         if radius is not defined or zero and mean lat long is undefined then do not add geo fence
+         */
         if (radius && meanLatLong && meanLatLong.latitude && meanLatLong.longitude) {
-          await trackingService.addGeoFence(meanLatLong, radius, transactionIdIdentifier.toString())
+          await trackingService.addGeoFence(meanLatLong, radius, transactionIdIdentifier.toString(), status)
         }
       }
     }
     catch (error) {
+      //TODO
       console.log(error)
     }
   }
