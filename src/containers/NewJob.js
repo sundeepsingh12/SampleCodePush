@@ -1,11 +1,8 @@
-
 'use strict'
 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
 import Loader from '../components/Loader'
-
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native'
 
@@ -31,7 +28,7 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as newJobActions from '../modules/newJob/newJobActions'
 import * as globalActions from '../modules/global/globalActions'
-import { NEW_TASK } from '../lib/ContainerConstants'
+import { NEW_TASK,OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -62,7 +59,7 @@ class NewJob extends PureComponent {
       Toast.show({
         text: this.props.newJobError,
         position: "bottom" | "center",
-        buttonText: 'Okay',
+        buttonText: OK,
         type: 'danger',
         duration: 10000
       })

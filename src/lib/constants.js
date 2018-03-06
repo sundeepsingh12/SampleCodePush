@@ -366,6 +366,7 @@ module.exports = keyMirror({
     LOADER_IS_RUNNING: null,
     SHOW_CHECKOUT_DETAILS: null,
     SET_INITIAL_STATE_TRANSIENT_STATUS: null,
+    SET_TRANSIENT_BACK_PRESSED: null,
 
     //Save Activated
     POPULATE_DATA: null,
@@ -379,8 +380,9 @@ module.exports = keyMirror({
     TotalAmount: null,
     Discard: null,
     Keep: null,
-    Cancel: null,
     Checkout: null,
+    SHOW_DISCARD_ALERT: null,
+    RETURN_TO_HOME: null,
 
     //Bulk Module
     START_FETCHING_BULK_CONFIG: null,

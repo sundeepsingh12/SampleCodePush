@@ -3,9 +3,11 @@ import _ from 'lodash'
 import {
     ARRAY_SAROJ_FAREYE,
     OBJECT_SAROJ_FAREYE,
-    INVALID_CONFIG_ERROR,
     AFTER
 } from '../../lib/AttributeConstants'
+import {
+    INVALID_CONFIG_ERROR,
+} from '../../lib/ContainerConstants'
 import {
     NEXT_FOCUS,
     TABLE_FIELD_DATA,

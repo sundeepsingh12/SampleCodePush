@@ -43,7 +43,8 @@ import {
     UPLOAD_SUCCESSFUL,
     UPLOAD_FAILED,
     CLOSE,
-    LOGGING_OUT
+    LOGGING_OUT,
+    OK
 } from '../lib/ContainerConstants'
 import {
     SET_BACKUP_VIEW,
@@ -63,9 +64,6 @@ function mapStateToProps(state) {
     }
 };
 
-/*
- * Bind all the actions
- */
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...globalActions, ...backupActions }, dispatch)
@@ -84,7 +82,7 @@ class Backup extends Component {
             Toast.show({
                 text: this.props.toastMessage,
                 position: 'bottom',
-                buttonText: 'Okay',
+                buttonText: OK,
                 duration: 5000
             })
             this.props.actions.setState(SET_BACKUP_TOAST, '')
@@ -105,7 +103,7 @@ class Backup extends Component {
     createBackupPressed = () => {
 
         var _buttons = new Array();
-        _buttons.push({ text: 'Cancel', onPress: this.props.onCancelPressed, style: 'cancel' });
+        _buttons.push({ text: CANCEL, onPress: this.props.onCancelPressed, style: 'cancel' });
         _buttons.push({ text: 'Create', onPress: () => this.props.actions.createManualBackup(this.props.syncedFiles) });
 
         return (

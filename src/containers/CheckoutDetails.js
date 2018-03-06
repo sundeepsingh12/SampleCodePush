@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
-import { StyleSheet, View, FlatList, TouchableOpacity, BackHandler, Modal } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Modal } from 'react-native'
 
 import {
     Container,
@@ -28,11 +28,11 @@ import {
     Receipt,
     SMS,
     TotalAmount,
-    HardwareBackPress,
     CONTACT_NUMBER_TO_SEND_SMS,
     SET_SAVE_ACTIVATED_TOAST_MESSAGE,
     EMAILID_VIEW_ARRAY,
     USER,
+    RETURN_TO_HOME,
 } from '../lib/constants'
 
 import {
@@ -63,6 +63,7 @@ import {
     RECEPIENTS_CONTACT_NUMBER,
     SEND,
     RECEPIENTS_EMAIL_ADDRESS,
+    OK
 } from '../lib/ContainerConstants'
 
 
@@ -73,7 +74,8 @@ function mapStateToProps(state) {
         errorToastMessage: state.saveActivated.errorToastMessage,
         inputTextEmailIds: state.saveActivated.inputTextEmailIds,
         emailIdViewArray: state.saveActivated.emailIdViewArray,
-        companyCodeDhl: state.saveActivated.companyCodeDhl
+        companyCodeDhl: state.saveActivated.companyCodeDhl,
+        isReturnToHome: state.saveActivated.isReturnToHome,
     }
 };
 /*
@@ -106,10 +108,6 @@ class CheckoutDetails extends PureComponent {
             })
         }
         this.props.actions.fetchUserData(this.props.navigation.state.params.emailIdInFieldData, this.props.inputTextEmailIds)
-        BackHandler.addEventListener(HardwareBackPress, () => {
-            this.props.actions.clearStateAndStore(true, this.props.navigation.state.params.jobMasterId)
-            return true
-        })
     }
 
     componentDidUpdate() {
@@ -117,10 +115,14 @@ class CheckoutDetails extends PureComponent {
             Toast.show({
                 text: this.props.errorToastMessage,
                 position: 'bottom',
-                buttonText: 'Okay',
+                buttonText: OK,
                 duration: 5000
             })
             this.props.actions.setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, '')
+        }
+        if (this.props.isReturnToHome) {
+            this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
+            this.props.actions.setState(RETURN_TO_HOME, false)
         }
     }
 
@@ -129,16 +131,18 @@ class CheckoutDetails extends PureComponent {
     }
 
     renderData = (item) => {
-        return (
-            <View style={[styles.row, styles.paddingRight15, styles.paddingLeft15]}>
-                <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault]}>{item.label}</Text>
+        if (item.value) {
+            return (
+                <View style={[styles.row, styles.paddingRight15, styles.paddingLeft15]}>
+                    <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
+                        <Text style={[styles.fontDefault]}>{item.label}</Text>
+                    </View>
+                    <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
+                        <Text style={[styles.fontDefault, styles.fontBlack]}>{item.value}</Text>
+                    </View>
                 </View>
-                <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault, styles.fontBlack]}>{item.value}</Text>
-                </View>
-            </View>
-        )
+            )
+        }
     }
 
     _keyExtractor = (item, index) => String(item.id);
@@ -457,7 +461,7 @@ class CheckoutDetails extends PureComponent {
                     <Footer style={[style.footer]}>
                         <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>
                             <Button onPress={() => {
-                                this.props.actions.clearStateAndStore(true, this.props.navigation.state.params.jobMasterId)
+                                this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
                             }}>
                                 <Text style={[styles.fontPrimary, styles.fontDefault]}>{Return_To_Home}</Text>
                             </Button>

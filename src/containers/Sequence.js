@@ -10,7 +10,7 @@ import React, { PureComponent } from 'react'
 import {
   StyleSheet, View, Alert, TouchableOpacity, Modal, BackHandler
 } from 'react-native'
-import { ROUTE_OPTIMIZATION, SEARCH_PLACEHOLDER } from '../lib/AttributeConstants'
+import { ROUTE_OPTIMIZATION, FILTER_REF_NO } from '../lib/AttributeConstants'
 import {
   UPDATE_SEQUENCE, SAVE,
   WARNING_FOR_BACK, WARNING,
@@ -20,6 +20,7 @@ import {
   BLANK_NEW_SEQUENCE,
   SEQUENCE_NOT_AN_INT,
   SAME_SEQUENCE_ERROR,
+  NOT_A_NUMBER,
 } from '../lib/ContainerConstants'
 import {
   Container,
@@ -125,7 +126,11 @@ class Sequence extends PureComponent {
       this.setAlertMessage(BLANK_NEW_SEQUENCE)
       return
     }
-    else if (!parseInt(newSequenceNumber) || parseInt(newSequenceNumber) < 1) {
+    else if (newSequenceNumber.includes('.') || newSequenceNumber.includes(',') || newSequenceNumber.includes('-')) {
+      this.setAlertMessage(NOT_A_NUMBER)
+      return
+    }
+    else if (parseInt(newSequenceNumber) < 1) {
       this.setAlertMessage(SEQUENCE_NOT_AN_INT + newSequenceNumber)
       return
     }
@@ -273,7 +278,7 @@ class Sequence extends PureComponent {
           <View style={[style.headerRight]}>
           </View>
         </View>
-        <SearchBarV2 placeholder={SEARCH_PLACEHOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />
+        <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />
       </Body>
     </Header>
   }

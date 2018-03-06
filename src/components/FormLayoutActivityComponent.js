@@ -4,7 +4,6 @@ import {
     StyleSheet,
     View,
     Text,
-    Platform,
     TouchableHighlight,
 } from 'react-native'
 import { Container, Card, CardItem, Body, Icon, Right } from 'native-base'

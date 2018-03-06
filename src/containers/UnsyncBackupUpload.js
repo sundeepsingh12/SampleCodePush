@@ -30,9 +30,6 @@ import {
     Card,
     Toast
 } from 'native-base'
-import {
-    //  EXTERNAL_DATA_STORE,
-} from '../lib/AttributeConstants'
 import _ from 'lodash'
 
 function mapStateToProps(state) {
@@ -44,9 +41,6 @@ function mapStateToProps(state) {
     }
 };
 
-/*
- * Bind all the actions
- */
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...globalActions, ...homeActions }, dispatch)

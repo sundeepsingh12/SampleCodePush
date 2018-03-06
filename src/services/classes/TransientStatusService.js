@@ -86,16 +86,16 @@ class TransientStatusService {
         let priority = -1, textToShow = ''
         let savedJobDetailsObject = {}
         for (let [id, currentObject] of formLayoutState.formElement.entries()) {
-            if (currentObject.attributeTypeId == SCAN_OR_TEXT && priority < 4) {
+            if (currentObject.attributeTypeId == SCAN_OR_TEXT && currentObject.value && priority < 4) {
                 priority = 4
                 textToShow = currentObject.value
                 break
             }
-            else if (currentObject.attributeTypeId == EXTERNAL_DATA_STORE && priority < 3) {
+            else if (currentObject.attributeTypeId == EXTERNAL_DATA_STORE && currentObject.value && priority < 3) {
                 priority = 3
                 textToShow = currentObject.value
             }
-            else if (currentObject.attributeTypeId == DATA_STORE && priority < 2) {
+            else if (currentObject.attributeTypeId == DATA_STORE && currentObject.value && priority < 2) {
                 priority = 2
                 textToShow = currentObject.value
             }
@@ -103,9 +103,6 @@ class TransientStatusService {
                 priority = 1
                 textToShow = currentObject.value
             }
-        }
-        if (priority == -1) {
-            textToShow = _.size(recurringData) + 1
         }
         let { elementsArray, amount } = this.getDataFromFormElement(formLayoutState.formElement)
         differentData[jobTransaction.id] = {
@@ -231,7 +228,7 @@ class TransientStatusService {
             if (!_.isEmpty(returnParams.formattedFormLayoutObject)) {
                 emailTableElement[dataForSingleTransaction.id] = returnParams.formattedFormLayoutObject
             }
-            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId)
+            let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, dataForSingleTransaction.id, statusId, jobMasterId, [])
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         }
         return { emailTableElement, emailIdInFieldData, contactNumberInFieldData }
@@ -257,10 +254,10 @@ class TransientStatusService {
                 const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
                 let currentJobMasterCode = jobMasterList.value.filter((data) => data.id == jobMasterId)[0].code
                 let body = {
-                        companyCode: userData.value.company.code,
-                        emailTableElement,
-                        emailTotalCash: totalAmount,
-                    }
+                    companyCode: userData.value.company.code,
+                    emailTableElement,
+                    emailTotalCash: totalAmount,
+                }
                 const hub = await keyValueDBService.getValueFromStore(HUB)
                 let hubcode = hub.value.code
                 const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)

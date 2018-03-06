@@ -6,6 +6,7 @@ var InitialState = Record({
     formLayoutStates: {},
     currentStatus: {},
     loaderRunning: false,
+    transientBackPressed: false,
 })
 
 export default InitialState

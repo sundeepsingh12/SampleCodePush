@@ -1,4 +1,3 @@
-
 'use strict'
 
 import React, { PureComponent } from 'react'
@@ -16,7 +15,7 @@ class CountDownTimer extends PureComponent {
         counterNegative: false,
     }
     componentWillUnmount() {
-        clearInterval(this.state.timer);
+        clearInterval(this.state.timer)
     }
 
     tick = () => {
