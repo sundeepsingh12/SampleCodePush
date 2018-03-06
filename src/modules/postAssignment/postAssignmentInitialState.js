@@ -1,6 +1,6 @@
 'use strict'
 
-const { Record } = require('immutable')
+import { Record } from 'immutable'
 
 var InitialState = Record({
     jobTransactionMap: null,

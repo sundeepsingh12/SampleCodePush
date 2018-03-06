@@ -58,6 +58,10 @@
   "jest": {
     "preset": "react-native",
     "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/modules/**",
+      "src/services/**"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!react-native|native-base|react-clone-referenced-element)"
     ]

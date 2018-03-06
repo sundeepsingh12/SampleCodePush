@@ -49,7 +49,7 @@ module.exports = {
 
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
-    NEW_TASK : 'New Task',
+    NEW_TASK: 'New Task',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -85,6 +85,8 @@ module.exports = {
     SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
     INVALID_CONFIGURATION: 'Invalid Configuration',
     VALID_AMOUNT_ERROR: 'Please enter valid amount',
+    VALIDATION_AMOUNT_ERROR_LEFT: 'Amount should be greater than or equal to',
+    VALIDATION_AMOUNT_ERROR_RIGHT: 'and less than or equal to',
 
     //Sequence
     SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
@@ -174,12 +176,12 @@ module.exports = {
 
     //SKU
     SELECT_ANY_REASON: 'Select any Reason',
-     TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
-     QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
-     TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
-     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
-     REASON: 'Reason',
-     OPEN_CAMERA: 'Open Camera',
+    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
+    QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
+    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
+    QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
+    REASON: 'Reason',
+    OPEN_CAMERA: 'Open Camera',
 
     //Array
     TOTAL_COUNT: 'Total Count : ',
@@ -235,5 +237,5 @@ module.exports = {
     BULK_UPDATE: 'Bulk Update',
 
     //Sorting
-    SORTING : 'Sorting',
+    SORTING: 'Sorting',
 }

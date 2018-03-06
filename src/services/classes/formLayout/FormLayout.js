@@ -308,12 +308,12 @@ class FormLayout {
         }
     }
 
-    isFormValid(formElement, jobTransaction) {
+    isFormValid(formElement, jobTransaction, fieldAttributeMasterParentIdMap) {
         if (!formElement) {
             throw new Error('formElement is missing')
         }
         for (let [id, currentObject] of formElement.entries()) {
-            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction)
+            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
             currentObject.value = afterValidationResult && !currentObject.alertMessage ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
                 return false

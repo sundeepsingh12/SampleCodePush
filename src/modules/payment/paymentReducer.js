@@ -1,6 +1,6 @@
 'use strict'
 
-const InitialState = require('./paymentInitialState').default
+import InitialState from './paymentInitialState'
 
 const initialState = new InitialState()
 import {
@@ -13,27 +13,14 @@ import {
 } from '../../lib/constants'
 
 import {
-  CASH,
   CHEQUE,
   DEMAND_DRAFT,
-  DISCOUNT,
-  EZE_TAP,
-  MOSAMBEE,
-  MOSAMBEE_WALLET,
-  MPAY,
-  M_SWIPE,
-  NET_BANKING,
-  NOT_PAID,
-  PAYNEAR,
-  PAYO,
-  PAYTM,
-  POS,
-  RAZOR_PAY,
-  SODEXO,
-  SPLIT,
-  TICKET_RESTAURANT,
-  UPI,
 } from '../../lib/AttributeConstants'
+
+import {
+  VALIDATION_AMOUNT_ERROR_LEFT,
+  VALIDATION_AMOUNT_ERROR_RIGHT,
+} from '../../lib/ContainerConstants'
 
 
 export default function paymentReducer(state = initialState, action) {
@@ -58,21 +45,21 @@ export default function paymentReducer(state = initialState, action) {
       let minValue = state.minValue
       let maxValue = state.maxValue
       let isSaveButtonDisabled, paymentError
-      if (!actualAmount || !action.payload.selectedPaymentMode) {
+      if (!actualAmount || !action.payload.selectedPaymentMode) {    //Checking actual amount and selectedPaymentMode to be valid
         isSaveButtonDisabled = true
-      } else if (action.payload.selectedPaymentMode !== CHEQUE.id && action.payload.selectedPaymentMode !== DEMAND_DRAFT.id) {
+      } else if (action.payload.selectedPaymentMode !== CHEQUE.id && action.payload.selectedPaymentMode !== DEMAND_DRAFT.id) {       //Checking selectedPaymentMode for cheque or dd
         isSaveButtonDisabled = false
         transactionNumber = null
-      } else if (transactionNumber && transactionNumber.trim().length > 3) {
+      } else if (transactionNumber && transactionNumber.trim().length > 3) {      //Checking transactionNumber for length greater than 3
         isSaveButtonDisabled = false
       } else {
         isSaveButtonDisabled = true
       }
 
-      if ((maxValue == null || maxValue == undefined || maxValue == NaN || minValue == null || minValue == undefined || minValue == NaN) || (actualAmount >= minValue && actualAmount <= maxValue)) {
+      if ((!Number(maxValue) || !Number(minValue)) || (actualAmount >= minValue && actualAmount <= maxValue)) {  //Checking if maxValue or min value present then actual amount lies within the range
         paymentError = null
       } else {
-        paymentError = `Amount should be greater than or equal to ${minValue} and less than or equal to ${maxValue}`
+        paymentError = `${VALIDATION_AMOUNT_ERROR_LEFT} ${minValue} ${VALIDATION_AMOUNT_ERROR_RIGHT} ${maxValue}`
         isSaveButtonDisabled = true
       }
 

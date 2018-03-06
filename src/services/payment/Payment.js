@@ -128,9 +128,15 @@ class Payment {
     }
 
     /**
-     * 
+     * This function prepares payment mode list and check if split payment mode is active
      * @param {*} jobMasterMoneyTransactionModesList 
      * @param {*} jobMasterId 
+     * @returns
+     * paymentModeList : {
+     *                      endPaymentModeList
+     *                      otherPaymentModeList
+     *                   }
+     * splitPaymentMode : boolean
      */
     getPaymentModeList(jobMasterMoneyTransactionModesList, jobMasterId) {
         let paymentModeList = {
@@ -164,7 +170,15 @@ class Payment {
      * @param {*} formData 
      * @param {*} jobId 
      * @returns 
-     * originalAmount : integer
+     * {
+     *      originalAmount : integer
+     *      jobTransactionIdAmountMap(for bulk): {
+     *                                     jobTransactionId :  {
+     *                                                              originalAmount
+     *                                                              actualAmount
+     *                                                         }
+     *                                 }
+     * }
      */
     getOriginalAmount(moneyCollectMaster, formData, jobTransaction) {
         let originalAmountMaster, originalAmount, jobIdJobTransactionMap = {}, totalAmount = 0, jobTransactionIdAmountMap = {}
@@ -175,9 +189,10 @@ class Payment {
             }
         }
 
+        //If original amount is mapped with job attribute
         if (originalAmountMaster && originalAmountMaster.jobAttributeMasterId) {
             let jobDataQuery = null
-            if (jobTransaction.length) {
+            if (jobTransaction.length) { // Is multiple job transaction ie case of bulk
                 let jobQuery = ''
                 for (let jobTransactionIndex in jobTransaction) {
                     if (jobTransactionIndex == 0) {
@@ -205,7 +220,7 @@ class Payment {
                 }
             }
             originalAmount = totalAmount + ''
-        } else if (originalAmountMaster && originalAmountMaster.fieldAttributeMasterId) {
+        } else if (originalAmountMaster && originalAmountMaster.fieldAttributeMasterId) { //If original amount is mapped with field attribute
             originalAmount = formData.get(originalAmountMaster.fieldAttributeMasterId) ? formData.get(originalAmountMaster.fieldAttributeMasterId).value : null
             jobTransactionIdAmountMap = null
         } else if (jobTransaction.length) {
@@ -229,10 +244,12 @@ class Payment {
     getTotalActualAmount(moneyCollectMaster, formData) {
         let actualAmount = 0
         for (let [fieldAttributeMasterId, formElement] of formData) {
+            // Check if sku present in form element and its sequence is before money collect
             if (formElement.attributeTypeId == SKU_ARRAY && formElement.positionId < formData.get(moneyCollectMaster.id).positionId) {
                 actualAmount += this.getActualAmount(formElement, SKU_ACTUAL_AMOUNT)
             }
 
+            // Check if fixed sku present in form element and its sequence is before money collect
             if (formElement.attributeTypeId == FIXED_SKU && formElement.positionId < formData.get(moneyCollectMaster.id).positionId) {
                 actualAmount += this.getActualAmount(formElement, DECIMAL)
             }
@@ -288,6 +305,7 @@ class Payment {
     getActualAmount(formElement, property) {
         let childList = formElement.childDataList
         for (let index in childList) {
+            //Get value for property given
             if (childList[index].attributeTypeId == property) {
                 return childList[index].value
             }
@@ -305,7 +323,17 @@ class Payment {
      * @param {*} remarks 
      * @param {*} receipt
      * @returns
-     *  
+     * moneyCollectFieldDataChildList : [
+     *                                      {
+     *                                         attributeTypeId
+     *                                         fieldAttributeMasterId
+     *                                         value
+     *                                         key
+     *                                         childDataList : [
+     *                                                              moneyCollectFieldDataChildList
+     *                                                         ]
+     *                                      }
+     *                                  ]
      */
     prepareMoneyCollectChildFieldDataListDTO(actualAmount, fieldAttributeMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt) {
         //TODO : change key to attribute type for details object
@@ -452,14 +480,16 @@ class Payment {
      * @param {*} selectedPaymentMode 
      * @returns
      * splitPaymentModeMap : {
-     *                          modeTypeId,
-     *                          amount,
-     *                          list(in case of cheque or dd): [
-     *                                  {
-     *                                      modeTypeId,
-     *                                      amount
-     *                                  }
-     *                                ]
+     *                          modeTypeId : {
+     *                                          modeTypeId,
+     *                                          amount,
+     *                                          list(in case of cheque or dd): [
+     *                                              {
+     *                                                  modeTypeId,
+     *                                                  amount
+     *                                              }
+     *                                          ]
+     *                                       }
      *                       }
      */
     prepareSplitPaymentModeList(selectedPaymentMode) {
@@ -485,6 +515,7 @@ class Payment {
                 }
             }
         }
+        //To set split mode for card type
         if (selectedPaymentMode.cardPaymentMode) {
             splitPaymentModeMap[selectedPaymentMode.cardPaymentMode] = {
                 modeTypeId: selectedPaymentMode.cardPaymentMode,
@@ -500,6 +531,18 @@ class Payment {
      * @param {*} fieldAttributeMaster 
      * @param {*} originalAmount 
      * @param {*} splitPaymentModeMap 
+     * @returns
+     * moneyCollectFieldDataChildList : [
+     *                                      {
+     *                                         attributeTypeId
+     *                                         fieldAttributeMasterId
+     *                                         value
+     *                                         key
+     *                                         childDataList : [
+     *                                                              moneyCollectFieldDataChildList
+     *                                                         ]
+     *                                      }
+     *                                  ]
      */
     prepareMoneyCollectChildFieldDataListDTOForSplit(actualAmount, fieldAttributeMaster, originalAmount, splitPaymentModeMap) {
         let moneyCollectFieldDataChildList = []
@@ -508,7 +551,7 @@ class Payment {
                 moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, originalAmount, fieldAttributeMaster.childObject[index].key))
             } else if (fieldAttributeMaster.childObject[index].attributeTypeId == ACTUAL_AMOUNT) {
                 moneyCollectFieldDataChildList.push(this.setFieldDataKeysAndValues(fieldAttributeMaster.childObject[index].attributeTypeId, fieldAttributeMaster.childObject[index].id, actualAmount, fieldAttributeMaster.childObject[index].key))
-            } else if (fieldAttributeMaster.childObject[index].childObject) {
+            } else if (fieldAttributeMaster.childObject[index].childObject) { // Check if field attribute has child
                 let detailsData = {}
                 detailsData.attributeTypeId = fieldAttributeMaster.childObject[index].attributeTypeId
                 detailsData.fieldAttributeMasterId = fieldAttributeMaster.childObject[index].id
@@ -516,7 +559,7 @@ class Payment {
                 detailsData.childDataList = []
                 for (let paymentMode in splitPaymentModeMap) {
                     let childDataList = null
-                    if (this.checkCardPayment(paymentMode)) {
+                    if (this.checkCardPayment(parseInt(paymentMode))) {
                         continue
                     }
                     if (parseInt(paymentMode) == CHEQUE.id || parseInt(paymentMode) == DEMAND_DRAFT.id) {
@@ -546,12 +589,14 @@ class Payment {
     checkSplitAmount(actualAmount, splitPaymentModeMap) {
         let totalSplitAmount = 0
         for (let index in splitPaymentModeMap) {
+            //Check if amount is valid ie number or float
             if (!Number(splitPaymentModeMap[index].amount)) {
                 break
             }
             let amount = parseFloat(splitPaymentModeMap[index].amount)
             totalSplitAmount += (parseFloat(amount) ? parseFloat(amount) : 0)
         }
+        //Check if total split amount is equal to actual amount
         if (totalSplitAmount == actualAmount) {
             return true
         }

@@ -179,7 +179,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         try {
             const userData = await keyValueDBService.getValueFromStore(USER)
@@ -187,7 +187,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
                 dispatch(setState(IS_LOADING, true))
-                let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement, jobTransaction)
+                let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap)
                 if (isFormValid) {
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                     let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
