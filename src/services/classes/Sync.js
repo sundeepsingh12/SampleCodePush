@@ -723,7 +723,7 @@ class Sync {
 
       /*if fenceForInitialJob is false and fence present then we add another fence after deletopenRunsheetListing previous fence 
         here we also check for non empty jobMasterIdListWithEnableResequenceRestriction and non empty openRunsheetList */
-      if ((!fencePresent || !fenceForInitialJob) && !_.isEmpty(jobMasterIdListWithEnableResequenceRestriction) && !_.isEmpty()) {
+      if ((!fencePresent || !fenceForInitialJob) && !_.isEmpty(jobMasterIdListWithEnableResequenceRestriction) && !_.isEmpty(openRunsheetList)) {
         /* below method returns mean lat long, radius and identifier which is used to add a geofence
          */
         let { meanLatLong, radius, transactionIdIdentifier } = await geoFencingService.getLatLng(jobMasterIdListWithEnableResequenceRestriction, openRunsheetList, fenceForInitialJob)
