@@ -221,7 +221,6 @@ export function forgetPasswordRequest(username) {
       let data = new FormData()
       data.append('usernameToResetPass', username)
       dispatch(forgetPassword())
-      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const response = await RestAPIFactory().serviceCall(data, CONFIG.API.FORGET_PASSWORD, 'LOGIN')
       dispatch(loginFailure(response.json.message.replace(/<\/?[^>]+(>|$)/g, "")))
     } catch (error) {

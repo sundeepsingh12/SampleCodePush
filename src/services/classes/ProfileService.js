@@ -13,7 +13,7 @@ import { Toast } from 'native-base'
 
 import {
     CHECK_IF_PASSWORD_ENTERED,
-    CHECK_CURRENT_PASSWORD, 
+    CHECK_CURRENT_PASSWORD,
     MATCH_NEW_AND_CONFIRM_PASSWORD,
     VALIDATE_PASSWORD,
     CURRENT_AND_NEW_PASSWORD_CHECK,
@@ -22,12 +22,20 @@ import {
 } from '../../lib/ContainerConstants'
 
 class ProfileService {
-
+/**
+ * 
+ * @param {*} currentPassword 
+ * @param {*} newPassword 
+ * @param {*} confirmNewPassword 
+ * @param {*} userPassword 
+ * @param {*} token // session token of a user
+ * @param {*} userObject // user details
+ */
     getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject) {
-        if (!userObject || !userObject.value || !userObject.value.username) {
-            throw new Error('username is missing')
+        if (!userObject || !userObject.value || !userObject.value.username) { // validates user details
+            throw new Error(USERNAME_IS_MISSING)
         }
-        if (!userPassword) {
+        if (!userPassword) { // validates if value of userpassword is not empty.
             throw new Error(UNSAVED_PASSWORD)
         }
         if (sha256(currentPassword) != userPassword.value) {
@@ -45,7 +53,7 @@ class ProfileService {
         else {
             //hit API
             const url = CONFIG.API.SERVICE_RESET_PASSWORD + LOGIN + encodeURIComponent(userObject.value.username)
-            const response = RestAPIFactory(token.value).serviceCall(sha256(newPassword), url, POST)
+            const response = RestAPIFactory(token.value).serviceCall(sha256(newPassword), url, POST) // hits api to reset password. 
             return response
         }
     }

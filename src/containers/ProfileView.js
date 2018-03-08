@@ -24,6 +24,12 @@ import {
 
 import * as profileActions from '../modules/profile/profileActions'
 import * as globalActions from '../modules/global/globalActions'
+import {
+  RESET_PASSWORD,
+  CONTACT_NUMBER,
+  EMAIL,
+  PROFILE,
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -68,7 +74,7 @@ class ProfileView extends PureComponent {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Profile</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{PROFILE}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>
@@ -90,7 +96,7 @@ class ProfileView extends PureComponent {
                   {this.props.name}
                 </Text>
                 <Text style={[styles.fontLg, styles.fontPrimary, styles.fontWeight500, styles.marginTop10]} onPress={this._onResetButtonPress}>
-                  Reset Password
+                  {RESET_PASSWORD}
                 </Text>
               </View>
             </View>
@@ -99,7 +105,7 @@ class ProfileView extends PureComponent {
             <View style={[styles.bgWhite, styles.marginBottom10, styles.padding10]}>
               <View style={[styles.marginBottom5]}>
                 <Text style={[styles.fontXs, styles.fontDarkGray, styles.fontWeight300, styles.lineHeight20]}>
-                  Contact Number
+                  {CONTACT_NUMBER}
                 </Text>
                 <Text
                   style={[styles.fontDefault, styles.fontWeight300, styles.lineHeight20]}>
@@ -108,7 +114,7 @@ class ProfileView extends PureComponent {
               </View>
               <View style={[styles.marginBottom5]}>
                 <Text style={[styles.fontXs, styles.fontDarkGray, styles.fontWeight300, styles.lineHeight20]}>
-                  Email
+                  {EMAIL}
                 </Text>
                 <Text
                   style={[styles.fontDefault, styles.fontWeight300, styles.lineHeight20]}>
