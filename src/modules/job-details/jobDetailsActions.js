@@ -66,7 +66,6 @@ export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails())
-            throw new Error('Test Error')
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)

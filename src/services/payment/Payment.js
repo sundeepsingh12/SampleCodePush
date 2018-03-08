@@ -101,10 +101,12 @@ class Payment {
         let paymentModeList = {}
         let splitPaymentMode = false
         if (moneyCollectMaster.attributeTypeId == MONEY_COLLECT) {
+            //Getting payment mode list for this job master
             let paymentModeListObject = this.getPaymentModeList(jobMasterMoneyTransactionModesList, jobMasterId)
             paymentModeList = paymentModeListObject.paymentModeList
             splitPaymentMode = paymentModeListObject.splitPaymentMode
         } else if (moneyCollectMaster.attributeTypeId == MONEY_PAY) {
+            //Adding cah payment mode to payment mode list for money pay as money pay has only one payment mode
             paymentModeList.otherPaymentModeList = []
             paymentModeList.otherPaymentModeList.push({
                 id: 0,
@@ -145,13 +147,16 @@ class Payment {
         }
         let splitPaymentMode = false
         for (let index in jobMasterMoneyTransactionModesList) {
+            //Checking jobMasterId of money transaction mode list
             if (jobMasterMoneyTransactionModesList[index].jobMasterId != jobMasterId) {
                 continue
             }
+            //Checking if money transaction mode is split
             if (jobMasterMoneyTransactionModesList[index].moneyTransactionModeId == SPLIT.id) {
                 splitPaymentMode = true
                 continue
             }
+            //Checking if money transaction mode is of card type
             if (this.checkCardPayment(jobMasterMoneyTransactionModesList[index].moneyTransactionModeId)) {
                 paymentModeList.endPaymentModeList.push(jobMasterMoneyTransactionModesList[index])
             } else {
@@ -223,7 +228,7 @@ class Payment {
         } else if (originalAmountMaster && originalAmountMaster.fieldAttributeMasterId) { //If original amount is mapped with field attribute
             originalAmount = formData.get(originalAmountMaster.fieldAttributeMasterId) ? formData.get(originalAmountMaster.fieldAttributeMasterId).value : null
             jobTransactionIdAmountMap = null
-        } else if (jobTransaction.length) {
+        } else if (jobTransaction.length) { // If case of bulk and money collect if not mapped
             throw new Error(INVALID_CONFIGURATION)
         } else {
             jobTransactionIdAmountMap = null
@@ -281,7 +286,7 @@ class Payment {
             return null
         }
         let rightKey = actualAmountValidation.rightKey ? actualAmountValidation.rightKey.split(',') : []
-        if (rightKey.includes('' + jobStatusId)) {
+        if (rightKey.includes('' + jobStatusId)) { // Checking if actual amount validation contains this statusId on which job is updated
             let leftKey = actualAmountValidation.leftKey.split('||')
             let minValueList = leftKey[0].split(',')
             let maxValueList = leftKey[1].split(',')
@@ -495,6 +500,7 @@ class Payment {
     prepareSplitPaymentModeList(selectedPaymentMode) {
         let splitPaymentModeMap = {}
         for (let index in selectedPaymentMode.otherPaymentModeList) {
+            //Check if payment mode is selected in case of split
             if (!selectedPaymentMode.otherPaymentModeList[index]) {
                 continue
             }

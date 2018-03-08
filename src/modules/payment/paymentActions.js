@@ -136,7 +136,6 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))
-            dispatch(setState(CLEAR_PAYMENT_STATE))
         } catch (error) {
             console.log(error)
         }
@@ -176,6 +175,7 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formEl
             dispatch(NavigationActions.back())
         } catch (error) {
             console.log(error)
+            Toast.show({ text: error.message, position: 'bottom', buttonText: 'OK', duration: 5000 })
         }
     }
 }
@@ -191,21 +191,19 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formEl
 export function paymentModeSelect(selectedPaymentMode, splitPaymentMode, modeTypeId, actualAmount, transactionNumber) {
     return async function (dispatch) {
         try {
-            let tempSelectedPaymentMode = _.cloneDeep(selectedPaymentMode), isSaveButtonDisabled = true, otherPaymentEnable = false
-            if (splitPaymentMode != YES) {      //Check if payment mode is not split
-                //Check if payment mode is Cheque or DD
-                if (modeTypeId == CHEQUE.id || modeTypeId == DEMAND_DRAFT.id) {
-                    //Check if payment mode is Cheque or DD and actual amount and transaction number are valid strings
-                    if (actualAmount && transactionNumber) {
-                        isSaveButtonDisabled = false
-                    }
-                } else {
-                    //Check if payment mode is not Cheque or DD and actual amount is valid string
-                    if (actualAmount) {
-                        isSaveButtonDisabled = false
-                    }
+            let tempSelectedPaymentMode = _.cloneDeep(selectedPaymentMode), isSaveButtonDisabled = false, otherPaymentEnable = false
+            //Check if actual amount is valid string
+            if (!actualAmount) {
+                isSaveButtonDisabled = true
+            }
+            //Check if payment mode is not split
+            if (splitPaymentMode != YES) {
+                //Check if payment mode is Cheque or DD and actual amount and transaction number are valid strings
+                if (parseInt(modeTypeId) == CHEQUE.id || parseInt(modeTypeId) == DEMAND_DRAFT.id) {
+                    isSaveButtonDisabled = true
                 }
                 tempSelectedPaymentMode = modeTypeId
+                otherPaymentEnable = true
             } else if (!paymentService.checkCardPayment(parseInt(modeTypeId))) {
                 tempSelectedPaymentMode = tempSelectedPaymentMode ? tempSelectedPaymentMode : {}
                 let otherPaymentModeList = tempSelectedPaymentMode.otherPaymentModeList ? tempSelectedPaymentMode.otherPaymentModeList : {}
@@ -222,8 +220,8 @@ export function paymentModeSelect(selectedPaymentMode, splitPaymentMode, modeTyp
             }
 
             //Check if actual amount is valid string and payment modes in split are all filled
-            if (actualAmount && (tempSelectedPaymentMode.cardPaymentMode || otherPaymentEnable)) {
-                isSaveButtonDisabled = false
+            if (!tempSelectedPaymentMode.cardPaymentMode && !otherPaymentEnable) {
+                isSaveButtonDisabled = true
             }
             dispatch(setState(SET_SELECTED_PAYMENT_MODE, { selectedPaymentMode: tempSelectedPaymentMode, isSaveButtonDisabled }))
 

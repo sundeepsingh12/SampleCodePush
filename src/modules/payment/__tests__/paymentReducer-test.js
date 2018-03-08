@@ -67,6 +67,7 @@ describe('payment reducer', () => {
         let nextState = paymentReducer(undefined, action)
         expect(nextState.selectedPaymentMode).toBe(action.payload.selectedPaymentMode)
         expect(nextState.isSaveButtonDisabled).toBe(action.payload.isSaveButtonDisabled)
+        expect(nextState.transactionNumber).toBe(null)
     })
 
     it('should set selected split payment mode list', () => {

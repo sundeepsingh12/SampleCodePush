@@ -79,6 +79,7 @@ export default function paymentReducer(state = initialState, action) {
     case SET_SELECTED_PAYMENT_MODE: {
       return state.set('selectedPaymentMode', action.payload.selectedPaymentMode)
         .set('isSaveButtonDisabled', action.payload.isSaveButtonDisabled)
+        .set('transactionNumber', null)
     }
 
     case SET_SPLIT_PAYMENT_MODE_LIST: {
