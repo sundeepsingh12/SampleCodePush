@@ -12,9 +12,9 @@ import {
   PRESS_OK_TO_CONFIRM_REVERT_TO,
   CANCEL,
   CONFIRM_REVERT,
-  UPDATE_GROUP, 
-  JOB_EXPIRED, 
-  DETAILS,  
+  UPDATE_GROUP,
+  JOB_EXPIRED,
+  DETAILS,
   SELECT_NUMBER,
   SELECT_TEMPLATE,
   SELECT_NUMBER_FOR_CALL,
@@ -118,7 +118,10 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
-    this.props.actions.setState(SHOW_DROPDOWN,null)
+    // reset dropdown state only when required
+    if (this.props.isShowDropdown) {
+      this.props.actions.setState(SHOW_DROPDOWN, null)
+    }
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
@@ -128,24 +131,24 @@ class JobDetailsV2 extends PureComponent {
     this.props.actions.navigateToScene(ImageDetailsView, navigationParam)
   }
 
-  statusDataItem(statusList,index,minIndexDropDown) {
-    if((index < minIndexDropDown) || (this.props.isShowDropdown)){
-    return(
-      <ListItem
-        key={statusList[index].id}
-        style={[style.jobListItem, styles.justifySpaceBetween]}
-        onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
-      >
-        <View style={[styles.row, styles.alignCenter]}>
-          <View style={[style.statusCircle, { backgroundColor: statusList[index].buttonColor }]}></View>
-          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
-        </View>
-        <Right>
-          <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-        </Right>
-      </ListItem> 
-    )
-  }
+  statusDataItem(statusList, index, minIndexDropDown) {
+    if ((index < minIndexDropDown) || (this.props.isShowDropdown)) {
+      return (
+        <ListItem
+          key={statusList[index].id}
+          style={[style.jobListItem, styles.justifySpaceBetween]}
+          onPress={() => this._onCheckLocationMismatch(statusList[index], this.props.jobTransaction)}
+        >
+          <View style={[styles.row, styles.alignCenter]}>
+            <View style={[style.statusCircle, { backgroundColor: statusList[index].buttonColor }]}></View>
+            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{statusList[index].name}</Text>
+          </View>
+          <Right>
+            <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+          </Right>
+        </ListItem>
+      )
+    }
   }
 
   renderStatusList(statusList) {
@@ -154,41 +157,42 @@ class JobDetailsV2 extends PureComponent {
       return statusView
     }
     let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
-    if(groupId && statusList.length > 0){
+    if (groupId && statusList.length > 0) {
       statusView.push(
-        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = { () => this.updateTransactionForGroupId(groupId)} key = {groupId}>
-        <View style = {[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={() => this.updateTransactionForGroupId(groupId)} key={groupId}>
+          <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
             <View style={[styles.row, styles.alignCenter]}>
-                <View style = {[styles.marginTop12]}>
-                  <GroupIcon />
-                </View>
-                <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
-                <Right>
-                  <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} /> 
-                </Right>
+              <View style={[styles.marginTop12]}>
+                <GroupIcon />
+              </View>
+              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
+              <Right>
+                <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+              </Right>
             </View>
-        </View>
-    </TouchableOpacity> 
+          </View>
+        </TouchableOpacity>
       )
       return statusView
     }
-    let minIndexDropDown = (this.props.statusRevertList && this.props.statusRevertList.length > 0) ? 3 : 4  
+    let minIndexDropDown = (this.props.statusRevertList && this.props.statusRevertList.length > 0) ? 3 : 4
     for (let index in statusList) {
       statusView.push(
-        this.statusDataItem(statusList,index,minIndexDropDown)
+        this.statusDataItem(statusList, index, minIndexDropDown)
       )
-      if(index == minIndexDropDown-1 && statusList.length > minIndexDropDown){ 
-      statusView.push(
-      <ListItem
-        key={1}
-        style={[style.jobListItem, styles.justifySpaceBetween]}
-        onPress={() => { this.props.actions.setState(SHOW_DROPDOWN,!this.props.isShowDropdown)}}
-      >
-        <View style={[styles.row, styles.alignCenter]}>
-          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{statusList.length-minIndexDropDown} More</Text>
-          <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
-        </View>
-      </ListItem>)}
+      if (index == minIndexDropDown - 1 && statusList.length > minIndexDropDown) {
+        statusView.push(
+          <ListItem
+            key={1}
+            style={[style.jobListItem, styles.justifySpaceBetween]}
+            onPress={() => { this.props.actions.setState(SHOW_DROPDOWN, !this.props.isShowDropdown) }}
+          >
+            <View style={[styles.row, styles.alignCenter]}>
+              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{statusList.length - minIndexDropDown} More</Text>
+              <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
+            </View>
+          </ListItem>)
+      }
     }
     return statusView
   }
@@ -232,7 +236,7 @@ class JobDetailsV2 extends PureComponent {
       return
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
       let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
-      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      contactData.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -254,7 +258,7 @@ class JobDetailsV2 extends PureComponent {
     setTimeout(() => {
       if (this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 1) {
         let msgTitles = this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.map(sms => ({ text: sms.title, icon: "md-arrow-dropright", iconColor: "#000000" }))
-        msgTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+        msgTitles.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
         ActionSheet.show(
           {
             options: msgTitles,
@@ -283,7 +287,7 @@ class JobDetailsV2 extends PureComponent {
       return
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length > 1) {
       let contactData = this.props.navigation.state.params.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
-      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      contactData.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -309,7 +313,7 @@ class JobDetailsV2 extends PureComponent {
   }
   customerCareButtonPressed = () => {
     let customerCareTitles = this.props.navigation.state.params.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
-    customerCareTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+    customerCareTitles.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
     ActionSheet.show(
       {
         options: customerCareTitles,
@@ -345,7 +349,7 @@ class JobDetailsV2 extends PureComponent {
       Object.values(addressDatas).forEach(object => {
         addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
       })
-      addressArray.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      addressArray.push({ text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
       if (_.size(addressArray) > 2) {
         ActionSheet.show(
           {
@@ -386,41 +390,41 @@ class JobDetailsV2 extends PureComponent {
 
 
   }
-  alertForStatusRevert(statusData){
+  alertForStatusRevert(statusData) {
     Alert.alert(
       CONFIRM_REVERT,
-      PRESS_OK_TO_CONFIRM_REVERT_TO+statusData[1],
+      PRESS_OK_TO_CONFIRM_REVERT_TO + statusData[1],
       [
         { text: CANCEL, style: CANCEL },
         { text: OK, onPress: () => this._onGoToPreviousStatus(statusData) }
       ],
     )
   }
-  updateTransactionForGroupId (groupId){
+  updateTransactionForGroupId(groupId) {
 
     this.props.actions.navigateToScene(BulkListing, {
-      jobMasterId: this.props.jobTransaction.jobMasterId,      
+      jobMasterId: this.props.jobTransaction.jobMasterId,
       statusId: this.props.currentStatus.id,
-      nextStatusList : this.props.currentStatus.nextStatusList,
+      nextStatusList: this.props.currentStatus.nextStatusList,
       groupId
     })
 
   }
-  selectStatusToRevert =  () => {
-    if(this.props.statusRevertList[0] == 1){
-      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom'| "center", buttonText: OK ,type: 'danger',duration: 5000 }) }
+  selectStatusToRevert = () => {
+    if (this.props.statusRevertList[0] == 1) {
+      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
     }
-    else if(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType){
-      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom'| "center", buttonText: OK, type: 'danger', duration: 5000 }) }      
-    }else{
-    this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
+    else if (this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType) {
+      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
+    } else {
+      this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
     }
-  } 
-  _onGoToPreviousStatus = (statusData) =>{
-    this.props.actions.setAllDataOnRevert(this.props.jobTransaction,statusData,this.props.navigation)
+  }
+  _onGoToPreviousStatus = (statusData) => {
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation)
   }
 
-  statusRevertSelection(statusList){
+  statusRevertSelection(statusList) {
     let BUTTONS = statusList.map(list => list[1])
     BUTTONS.push(CANCEL)
     ActionSheet.show(
@@ -474,8 +478,8 @@ class JobDetailsV2 extends PureComponent {
   render() {
     if (this.props.jobDetailsLoading) {
       return (
-           <Loader />
-         )
+        <Loader />
+      )
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
@@ -531,20 +535,20 @@ class JobDetailsV2 extends PureComponent {
               </View>
             </Header>
             <Content>
-              { !this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0  ?
-              <TouchableOpacity style={[styles.marginTop5, styles.bgWhite,styles.paddingBottom15]} onPress = {this.selectStatusToRevert}>
-                  <View style = {[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
-                      <View style={[styles.row, styles.alignCenter]}>
-                          <View>
-                            <RevertIcon color={styles.fontPrimary}/>
-                          </View>
-                          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Revert Status</Text>
-                          <Right>
-                            <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-                          </Right>
+              {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
+                <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={this.selectStatusToRevert}>
+                  <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+                    <View style={[styles.row, styles.alignCenter]}>
+                      <View>
+                        <RevertIcon color={styles.fontPrimary} />
                       </View>
+                      <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Revert Status</Text>
+                      <Right>
+                        <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+                      </Right>
+                    </View>
                   </View>
-              </TouchableOpacity> : null} 
+                </TouchableOpacity> : null}
 
               <View style={[styles.marginTop5, styles.bgWhite]}>
                 {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
@@ -642,7 +646,7 @@ const style = StyleSheet.create({
   seqCircle: {
     width: 56,
     height: 56,
-    marginTop:12,
+    marginTop: 12,
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center'
@@ -667,7 +671,7 @@ const style = StyleSheet.create({
     height: 10,
     borderRadius: 5
   },
-  
+
   footer: {
     height: 'auto',
     backgroundColor: '#ffffff',

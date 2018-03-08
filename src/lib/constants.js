@@ -94,11 +94,10 @@ module.exports = keyMirror({
     SET_BACKUP_FILES_LIST: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
+    SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
 
     //Home Container
     PIECHART: null,
-    FUTURE_RUNSHEET_ENABLED: null,
-    SET_SELECTED_DATE: null,
     IS_CALENDAR_VISIBLE: null,
     SYNC_ERROR: null,
     SYNC_STATUS: null,
