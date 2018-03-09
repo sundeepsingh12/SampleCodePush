@@ -446,6 +446,7 @@ class JobTransaction {
             jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
             jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
             if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
+
                 let groupId = jobIdGroupIdMap[jobTransactionCustomization.jobId] ? jobIdGroupIdMap[jobTransactionCustomization.jobId] : null
                 let groupIdTabKey = groupId ? groupId + '&' + statusIdsTabIdsMap[jobTransactionCustomization.statusId] : null
                 if (!groupId) {
@@ -658,16 +659,13 @@ class JobTransaction {
      * @param {*} jobAttributeMap 
      * @param {*} job 
      * @returns
-     * CombinedAddressList : [String(complete address ie combination of address line 1 , address line 2, landmark, pincode))]
+     * addressDataForJob 
      */
     setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job) {
         let addressDataForJob = {},
             combinedAddressList = []
         jobAttributeMap = jobAttributeMap ? jobAttributeMap : {}
         let tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id] ? jobDataDetailsForListing.addressMap[job.id] : []
-        if (job.latitude !== undefined && job.longitude !== undefined && job.latitude !== null && job.longitude !== null && (job.latitude != 0.0 || job.longitude != 0.0)) {
-            combinedAddressList.push(job.latitude + ',' + job.longitude)
-        }
         tempAddressDataForJob.forEach(address => {
             if (!jobAttributeMap[address.jobAttributeMasterId]) {
                 return
@@ -676,14 +674,6 @@ class JobTransaction {
             addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence][jobAttributeMasterMap[address.jobAttributeMasterId].attributeTypeId] = address.value
         })
         return addressDataForJob
-        // for (let index in addressDataForJob) {
-        //     let combinedAddress = ''
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_1], '', null, null)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_2], '', ',', combinedAddress)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][LANDMARK], '', ',', combinedAddress)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][PINCODE], '', ',', combinedAddress)
-        //     combinedAddressList.push(combinedAddress)
-        // }
     }
 
     /**

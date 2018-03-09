@@ -158,7 +158,8 @@ class TabScreen extends PureComponent {
       searchText: (!searchText) ? this.props.searchText.searchText : searchText, scanner: true
     })
   }
-  // renders calender component TaskListCalender
+  
+  //Renders calender component TaskListCalender
   _renderCalendar = () => {
     //Return no calender view if future runsheet is not enabled
     if (!this.props.isFutureRunsheetEnabled) {

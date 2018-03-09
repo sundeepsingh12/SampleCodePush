@@ -202,6 +202,7 @@ module.exports = {
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+    DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
 
     //Save Activated
     EDIT: 'Edit',

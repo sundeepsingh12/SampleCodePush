@@ -20,6 +20,7 @@ import {
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
   CALL_CONFIRM,
+  DRAFT_RESTORE_MESSAGE
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
@@ -55,7 +56,8 @@ import {
   ImageDetailsView,
   RESET_STATE_FOR_JOBDETAIL,
   BulkListing,
-  SHOW_DROPDOWN
+  SHOW_DROPDOWN,
+  SET_DRAFT_INFO_JOBDETAILS
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -75,7 +77,6 @@ import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { jobStatusService } from '../services/classes/JobStatus'
-
 
 function mapStateToProps(state) {
   return {
@@ -439,17 +440,17 @@ class JobDetailsV2 extends PureComponent {
       }
     )
   }
-
+  _onCancelDraft = () => {
+    this.props.actions.setState(SET_DRAFT_INFO_JOBDETAILS, {})
+  }
   showDraftAlert() {
-    // let draftStatus = this.props.currentStatus.nextStatusList.filter(nextStatus => nextStatus.id == this.props.draftStatusId)
-    // let draftMessage = (draftStatus.length > 0) ? 'Do you want to restore draft for ' + draftStatus[0].name + '?' : 'Do you want to restore draft?'
-    let draftMessage = 'Do you want to restore draft for ' + this.props.draftStatusInfo.name + '?'
+    let draftMessage = DRAFT_RESTORE_MESSAGE + this.props.draftStatusInfo.name + '?'
     let view =
       <CustomAlert
         title="Draft"
         message={draftMessage}
         onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={this._onCancel} />
+        onCancelPressed={this._onCancelDraft} />
     return view
   }
 
@@ -465,6 +466,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _goToFormLayoutWithDraft = () => {
+    //this.props.actions.setState(SET_DRAFT_INFO_JOBDETAILS, {})
     this.props.actions.navigateToScene('FormLayout', {
       contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
