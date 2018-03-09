@@ -26,12 +26,13 @@ export default class SearchBarV2 extends PureComponent {
                         placeholderTextColor={'rgba(255,255,255,.6)'}
                         selectionColor={'rgba(224, 224, 224,.5)'}
                         style={[style.headerSearch]}
-                        returnKeyType = {"search"}
-                        keyboardAppearance = {"dark"}
-                        underlineColorAndroid= {'transparent'}
+                        returnKeyType={"search"}
+                        keyboardAppearance={"dark"}
+                        underlineColorAndroid={'transparent'}
                         onChangeText={(searchText) => {
                             this.props.setSearchText(searchText)
                         }}
+                        onEndEditing={this.onPress}
                         value={this.props.searchText} />
                     <Button small transparent style={[style.inputInnerBtn]} onPress={this.onPress}>
                         <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />

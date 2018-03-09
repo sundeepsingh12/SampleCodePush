@@ -71,7 +71,7 @@ import _ from 'lodash'
 import PushNotification from 'react-native-push-notification'
 import { Platform } from 'react-native'
 import { getJobMasterVsStatusNameList } from '../modules/bulk/bulkActions'
-import { getRunsheets } from '../modules/sequence/sequenceActions'
+import { getRunsheetsForSequence } from '../modules/sequence/sequenceActions'
 import { fetchJobMasterList } from '../modules/postAssignment/postAssignmentActions'
 
 function mapStateToProps(state) {
@@ -88,7 +88,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...homeActions, ...globalActions, getJobMasterVsStatusNameList, getRunsheets, fetchJobMasterList }, dispatch)
+    actions: bindActionCreators({ ...homeActions, ...globalActions, getJobMasterVsStatusNameList, getRunsheetsForSequence, fetchJobMasterList }, dispatch)
   }
 }
 
@@ -135,7 +135,7 @@ class Home extends PureComponent {
         break
       }
       case SEQUENCEMODULE_ID: {
-        this.props.actions.getRunsheets(this.props.modules.SEQUENCEMODULE.displayName)
+        this.props.actions.getRunsheetsForSequence(this.props.modules.SEQUENCEMODULE.displayName)
         break
       }
       case START_ID: {

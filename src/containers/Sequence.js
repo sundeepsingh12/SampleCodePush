@@ -8,7 +8,7 @@ import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
 import React, { PureComponent } from 'react'
 import {
-  StyleSheet, View, Alert, TouchableOpacity, Modal, BackHandler
+  StyleSheet, View, Alert, TouchableOpacity, Modal
 } from 'react-native'
 import { ROUTE_OPTIMIZATION, FILTER_REF_NO } from '../lib/AttributeConstants'
 import {
@@ -18,7 +18,6 @@ import {
   CURRENT_SEQUENCE_NUMBER, NEW_SEQUENCE_NUMBER_MESSAGE,
   JUMP_SEQUENCE,
   BLANK_NEW_SEQUENCE,
-  SEQUENCE_NOT_AN_INT,
   SAME_SEQUENCE_ERROR,
   NOT_A_NUMBER,
 } from '../lib/ContainerConstants'
@@ -39,9 +38,10 @@ import {
 } from 'native-base'
 import {
   SET_RESPONSE_MESSAGE,
-  HardwareBackPress,
   SET_REFERENCE_NO,
-  SET_SEQUENCE_LIST_ITEM
+  SET_SEQUENCE_LIST_ITEM,
+  SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST,
+  SET_SEQUENCE_BACK_ENABLED
 } from '../lib/constants'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -60,7 +60,8 @@ function mapStateToProps(state) {
     transactionsWithChangedSeqeunceMap: state.sequence.transactionsWithChangedSeqeunceMap,
     searchText: state.sequence.searchText,
     currentSequenceListItemSeleceted: state.sequence.currentSequenceListItemSeleceted,
-    jobMasterSeperatorMap: state.sequence.jobMasterSeperatorMap
+    jobMasterSeperatorMap: state.sequence.jobMasterSeperatorMap,
+    backEnabledFromAppNavigator: state.sequence.backEnabledFromAppNavigator,
   }
 }
 
@@ -75,33 +76,37 @@ function mapDispatchToProps(dispatch) {
 
 class Sequence extends PureComponent {
 
+  //newSequenceNumber :- used for new sequence entered by the user in input
+  //alertMessage :- alert message used when user enter wrong sequence in input
+  state = {
+    newSequenceNumber: '',
+    alertMessage: ''
+  }
+
   static navigationOptions = ({ navigation }) => {
     return { header: null }
   }
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      newSequenceNumber: '',
-      alertMessage: ''
-    }
-  }
-
   componentDidMount() {
     this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber)
-    BackHandler.addEventListener(HardwareBackPress, this.goBack)
   }
 
+  /** 
+   * When we set some response message this method get triggered and show a toast and it will also check if hardware back is pressed or not if pressed call goBack()
+  */
   componentDidUpdate() {
     if (this.props.responseMessage) {
       this.showToast()
     }
+    if (this.props.backEnabledFromAppNavigator) {
+      this.goBack()
+      this.props.actions.setState(SET_SEQUENCE_BACK_ENABLED, false)
+    }
   }
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener(HardwareBackPress, this.goBack)
-  }
-
+  /** 
+   * This method will sort list of trasaction according to seqSelected and will return it to SortableListView
+  */
   renderList() {
     const list = this.props.sequenceList.sort((transaction1, transaction2) =>
       transaction1.seqSelected - transaction2.seqSelected
@@ -109,68 +114,84 @@ class Sequence extends PureComponent {
     return list
   }
 
+  /**
+   * This method is called when user drag and drop a list item of SortableListView
+   * @param {*Object} rowParam //it contains index of list item before and after drop, it also contains list item which is moved
+   */
   onRowMoved(rowParam) {
     this.props.actions.rowMoved(rowParam, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap, this.props.jobMasterSeperatorMap)
   }
 
+  /**
+   * Change state and set alertMessage
+   * @param {*} alertMessage
+   */
   setAlertMessage(alertMessage) {
-    this.setState(() => {
-      return {
-        alertMessage: alertMessage
-      }
-    })
+    this.setState({ alertMessage })
+    return
   }
 
+  /**
+   * when jump Sequence button is pressed we check the input if it is appropriate or not 
+   * if appropriate we change the sequence of job transaction
+   * @param {*String} newSequenceNumber 
+   */
   onJumpSequencePressed(newSequenceNumber) {
+    // new seqeunce number should not be empty or an empty string
     if (_.size(_.trim(newSequenceNumber)) == 0) {
-      this.setAlertMessage(BLANK_NEW_SEQUENCE)
-      return
+      return this.setAlertMessage(BLANK_NEW_SEQUENCE)
     }
-    else if (newSequenceNumber.includes('.') || newSequenceNumber.includes(',') || newSequenceNumber.includes('-')) {
-      this.setAlertMessage(NOT_A_NUMBER)
-      return
+    //new sequence number should not include '.' or ',' or '-' or a negative number
+    else if (isNaN(newSequenceNumber) || newSequenceNumber.includes('.') || parseInt(newSequenceNumber) < 1) {
+      return this.setAlertMessage(NOT_A_NUMBER)
     }
-    else if (parseInt(newSequenceNumber) < 1) {
-      this.setAlertMessage(SEQUENCE_NOT_AN_INT + newSequenceNumber)
-      return
+    //previous sequence number should not be equal to new sequence number entered by the user
+    else if (_.isEqual(this.props.currentSequenceListItemSeleceted.seqSelected, parseInt(newSequenceNumber))) {
+      return this.setAlertMessage(SAME_SEQUENCE_ERROR)
     }
-    newSequenceNumber = parseInt(newSequenceNumber)
-    if (_.isEqual(this.props.currentSequenceListItemSeleceted.seqSelected, newSequenceNumber)) {
-      this.setAlertMessage(SAME_SEQUENCE_ERROR)
-      return
-    }
-    this.props.actions.jumpSequence(_.indexOf(this.props.sequenceList, this.props.currentSequenceListItemSeleceted), newSequenceNumber, this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap, this.props.jobMasterSeperatorMap)
+    this.props.actions.jumpSequence(_.indexOf(this.props.sequenceList, this.props.currentSequenceListItemSeleceted), parseInt(newSequenceNumber), this.props.sequenceList, this.props.transactionsWithChangedSeqeunceMap, this.props.jobMasterSeperatorMap)
+    //close the modal
     this.setModalView({})
   }
 
+  /**
+   * After changing the sequence save button gets activated and on pressing save button this method is called
+   */
   savePressed = () => {
     this.props.actions.saveSequencedJobTransactions(this.props.transactionsWithChangedSeqeunceMap)
   }
 
+  /**
+   * This method is called when user enter reference number and search all job Trnasaction according to reference number by pressing search icon
+   */
   searchIconPressed = () => {
     if (this.props.searchText) {
       this.props.actions.searchReferenceNumber(this.props.searchText, this.props.sequenceList)
     }
   }
 
+  /**
+   * If sequence is changed by user or auto sequence takes place then save get activated by the below method,
+   * if there is no change in sequence then update sequence from server get activated
+   */
   getButtonView() {
-    if (_.isEmpty(this.props.transactionsWithChangedSeqeunceMap)) {
-      return <Button
-        style={[styles.bgPrimary]}
-        onPress={this.showAlert}
-        disabled={this.props.isResequencingDisabled}
-        full>
-        <Text style={[styles.fontLg, styles.fontWhite, styles.padding5]}>{UPDATE_SEQUENCE}</Text>
-      </Button>
-    } else {
-      return <Button
+    return _.isEmpty(this.props.transactionsWithChangedSeqeunceMap) ? <Button
+      style={[styles.bgPrimary]}
+      onPress={this.showAlert}
+      disabled={this.props.isResequencingDisabled}
+      full>
+      <Text style={[styles.fontLg, styles.fontWhite, styles.padding5]}>{UPDATE_SEQUENCE}</Text>
+    </Button>
+      : <Button
         onPress={this.savePressed}
         success full>
         <Text style={[styles.fontLg, styles.fontWhite, styles.padding5]}>{SAVE}</Text>
       </Button>
-    }
   }
 
+  /**
+   * Shows a alert if save is activated and user presses back button
+   */
   showWarningForBack = () => {
     Alert.alert(
       WARNING,
@@ -178,8 +199,7 @@ class Sequence extends PureComponent {
       [
         {
           text: CLOSE, style: 'cancel', onPress: () => {
-            this.props.navigation.goBack(null)
-            this.props.actions.setState(SET_REFERENCE_NO, '')
+            this.clearStateAndGoBack()
           }
         },
         { text: OK },
@@ -187,36 +207,48 @@ class Sequence extends PureComponent {
     )
   }
 
-  goBack = () => {
-    if (!_.isEmpty(this.props.transactionsWithChangedSeqeunceMap)) {
-      this.showWarningForBack()
-    } else {
-      this.props.navigation.goBack(null)
-    }
-    return true
+  /**
+   * It will go back and clear state except runsheet list which is used by SequenceRunsheetList container
+   */
+  clearStateAndGoBack() {
+    this.props.actions.setState(SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST)
+    this.props.navigation.goBack()
   }
 
+  /**
+   * when user presses back button this method gets triggered
+   */
+  goBack = () => {
+    !_.isEmpty(this.props.transactionsWithChangedSeqeunceMap) ? this.showWarningForBack() : this.clearStateAndGoBack()
+  }
+
+  /**
+   * Set modal visible for an item which is clicked and close modal when required
+   * @param {*} item 
+   */
   setModalView(item) {
     this.props.actions.setState(SET_SEQUENCE_LIST_ITEM, item)
-    this.props.actions.setState(SET_REFERENCE_NO, '')
-    this.setState(() => {
-      return {
-        newSequenceNumber: '',
-        alertMessage: ''
-      }
-    })
+    this.setState({ newSequenceNumber: '', alertMessage: '' })
   }
 
+  /**
+   * set search text from search bar component
+   */
   setSearchText = (searchText) => {
     this.props.actions.setState(SET_REFERENCE_NO, searchText)
   }
 
+  /**
+   * used for setting search text but in this case search text is set by QR Scanner
+   */
   returnValue = (searchText) => {
     this.setSearchText(searchText)
     this.props.actions.searchReferenceNumber(searchText, this.props.sequenceList)
   }
 
-
+  /**
+   * inflate modal when SortableListView item is pressed
+   */
   modalDialogView() {
     return <Modal animationType={"fade"}
       transparent={true}
@@ -235,7 +267,7 @@ class Sequence extends PureComponent {
             <Item regular>
               <Input
                 onChangeText={(sequenceNumber) =>
-                  this.setState(() => { return { newSequenceNumber: sequenceNumber, alertMessage: '' } })}
+                  this.setState({ newSequenceNumber: sequenceNumber, alertMessage: '' })}
                 style={{ height: 40, fontSize: 13 }}
                 keyboardType="numeric"
                 returnKeyType='done' />
@@ -263,6 +295,9 @@ class Sequence extends PureComponent {
     </Modal>
   }
 
+  /**
+   * inflate header view
+   */
   headerView() {
     return <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
       <Body>
@@ -278,49 +313,48 @@ class Sequence extends PureComponent {
           <View style={[style.headerRight]}>
           </View>
         </View>
-        <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />
+        {!_.isEmpty(this.props.sequenceList) && !this.props.isSequenceScreenLoading ? <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
       </Body>
     </Header>
+  }
+
+  /**
+   * view for loader will be shown when isSequenceScreenLoading is enabled
+   */
+  loaderView() {
+    return (this.props.isSequenceScreenLoading) ? <Loader /> : null
+  }
+
+  /**
+   * if no jobs are present then show a message
+   */
+  viewForNoJobPresent() {
+    return (!this.props.isSequenceScreenLoading) ? <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+      <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{JOB_NOT_PRESENT}</Text>
+    </View> : null
   }
 
   render() {
     let modalDialogView = this.modalDialogView()
     let buttonView = this.getButtonView()
     let headerView = this.headerView()
-    if (this.props.isSequenceScreenLoading) {
-      return <Loader />
-    }
-    else {
-      if (!_.isEmpty(this.props.sequenceList)) {
-        return (
-          <StyleProvider style={getTheme(platform)}>
-            <Container>
-              {modalDialogView}
-              {headerView}
-              <View style={[styles.flex1, styles.bgWhite]}>
-
-                <SortableListView
-                  style={{
-                    flex: 1
-                  }}
-                  data={this.renderList()}
-                  onRowMoved={rowParam => {
-                    this.onRowMoved(rowParam)
-                  }}
-
-                  activeOpacity={1}
-                  sortRowStyle={{
-                    backgroundColor: '#000000',
-                    borderWidth: 1,
-                    borderColor: '#f4f4f4',
-                    elevation: 2,
-                    shadowOffset: { width: 3, height: 4, },
-                    shadowColor: '#d3d3d3',
-                    shadowOpacity: .5,
-
-                  }}
-                  renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
-              </View>
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container>
+          {headerView}
+          {modalDialogView}
+          {this.loaderView()}
+          {!_.isEmpty(this.props.sequenceList) && !this.props.isSequenceScreenLoading ?
+            <View style={[styles.flex1, styles.bgWhite]}>
+              <SortableListView
+                style={{ flex: 1 }}
+                data={this.renderList()}
+                onRowMoved={rowParam => {
+                  this.onRowMoved(rowParam)
+                }}
+                activeOpacity={1}
+                sortRowStyle={style.sortableListStyle}
+                renderRow={row => <JobListItem data={row} callingActivity='Sequence' onPressItem={() => this.setModalView(row)} />} />
               <Footer style={{
                 height: 'auto'
               }}>
@@ -328,27 +362,16 @@ class Sequence extends PureComponent {
                   {buttonView}
                 </FooterTab>
               </Footer>
-            </Container>
-          </StyleProvider>
-
-        )
-      }
-      else {
-        return (
-          <StyleProvider style={getTheme(platform)}>
-            <Container>
-              {headerView}
-              <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{JOB_NOT_PRESENT}</Text>
-              </View>
-            </Container>
-          </StyleProvider>
-        )
-      }
-    }
-
+            </View>
+            : this.viewForNoJobPresent()}
+        </Container>
+      </StyleProvider>
+    )
   }
 
+  /**
+   * It will show alert when update sequence is pressed
+   */
   showAlert = () => {
     Alert.alert(
       ROUTE_OPTIMIZATION,
@@ -360,6 +383,9 @@ class Sequence extends PureComponent {
     )
   }
 
+  /**
+   * It will show toast 
+   */
   showToast() {
     Toast.show({
       text: `${this.props.responseMessage}`,
@@ -370,10 +396,12 @@ class Sequence extends PureComponent {
     this.props.actions.setState(SET_RESPONSE_MESSAGE, '')
   }
 
+  /**
+   * When user want to run optimization from server i.e. resequencing of jobs takes place from server
+   */
   OnOkButtonPressed = () => {
     const requestBody = this.props.actions.resequenceJobsFromServer(this.props.sequenceList)
   }
-
 }
 
 const style = StyleSheet.create({
@@ -400,6 +428,15 @@ const style = StyleSheet.create({
     width: '15%',
     padding: 15
   },
+  sortableListStyle: {
+    backgroundColor: '#000000',
+    borderWidth: 1,
+    borderColor: '#f4f4f4',
+    elevation: 2,
+    shadowOffset: { width: 3, height: 4, },
+    shadowColor: '#d3d3d3',
+    shadowOpacity: .5,
+  }
 });
 
 
