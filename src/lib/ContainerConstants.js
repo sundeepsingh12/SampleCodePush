@@ -86,6 +86,8 @@ module.exports = {
     SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
     INVALID_CONFIGURATION: 'Invalid Configuration',
     VALID_AMOUNT_ERROR: 'Please enter valid amount',
+    VALIDATION_AMOUNT_ERROR_LEFT: 'Amount should be greater than or equal to',
+    VALIDATION_AMOUNT_ERROR_RIGHT: 'and less than or equal to',
 
     //Sequence
     SELECT_RUNSHEET_NUMBER: 'Select runsheet number',

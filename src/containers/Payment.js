@@ -141,7 +141,7 @@ class Payment extends PureComponent {
                         keyboardType="numeric"
                         KeyboardTypeIOS="number-pad"
                         returnKeyType='done'
-                        defaultValue={this.props.transactionNumber}
+                        value={this.props.transactionNumber}
                         placeholder='Regular Textbox'
                         onChangeText={value => this.onTextChange(
                             SET_PAYMENT_CHANGED_PARAMETERS,

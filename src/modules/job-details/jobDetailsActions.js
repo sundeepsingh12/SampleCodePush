@@ -86,6 +86,7 @@ export function getJobDetails(jobTransactionId) {
             // To do
             // Handle exceptions and change state accordingly
             console.log(error)
+            dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
 }
@@ -139,6 +140,7 @@ export function setAllDataOnRevert(jobTransaction, statusTo, navigation) {
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
             console.log(error)
+            dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
 }
