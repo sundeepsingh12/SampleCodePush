@@ -383,7 +383,7 @@ class DataStoreService {
         if (!dataStoreJsonResponse) {
             return
         }
-        let dataStoreId = realm.getAll(DataStore_DB).length
+        let dataStoreId = realm.getRecordListOnQuery(DataStore_DB).length
         let dataStoreList = []
         for (let dataStore of dataStoreJsonResponse.content) {
             for (let attribute in dataStore.dataStoreAttributeValueMap) {

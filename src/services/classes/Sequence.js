@@ -71,6 +71,7 @@ class Sequence {
         _.forEach(sequenceList, object => {
             let autoAssignAddressDTO = {},
                 address1, address2, locality, pincode
+            //check if jobSwipableDetails present and if present then check it has addressData
             if (!_.isEmpty(object.jobSwipableDetails && !_.isEmpty(object.jobSwipableDetails.addressData))) {
                 (object.jobSwipableDetails.addressData).forEach(object => {
                     if (object[ADDRESS_LINE_1]) {
@@ -118,6 +119,7 @@ class Sequence {
         const transactionIdSequenceMap = responseBody.transactionIdSequenceMap
         const updatedSequenceList = JSON.parse(JSON.stringify(sequenceList))//clone sequenceList
         let position = 1
+        //this block sets seqSelected for transaction which are allocated i.e. have some kind of location parameter
         if (transactionIdSequenceMap) {
             for (let transaction of updatedSequenceList) {
                 if (transactionIdSequenceMap[transaction.id]) {
@@ -126,6 +128,7 @@ class Sequence {
                 }
             }
         }
+        //this block sets seqselected for unallocated transaction
         const unAllocatedTransactionIds = responseBody.unAllocatedTransactionIds
         if (unAllocatedTransactionIds) {
             for (let transaction in updatedSequenceList) {

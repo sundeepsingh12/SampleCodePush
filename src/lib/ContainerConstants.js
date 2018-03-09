@@ -115,6 +115,8 @@ module.exports = {
     TOKEN_MISSING: 'Token missing',
     INVALID_SCAN: 'Invalid Scan',
     JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
+    AUTO_ROUTING_MESSAGE: 'This will run route optimization for ',
+    AUTO_ROUTING_EXTRA_MESSAGE: ' job transactions',
 
     //Sync service
     JOBS_DELETED: 'Jobs deleted',

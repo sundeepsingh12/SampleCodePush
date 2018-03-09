@@ -20,6 +20,8 @@ import {
   BLANK_NEW_SEQUENCE,
   SAME_SEQUENCE_ERROR,
   NOT_A_NUMBER,
+  AUTO_ROUTING_MESSAGE,
+  AUTO_ROUTING_EXTRA_MESSAGE
 } from '../lib/ContainerConstants'
 import {
   Container,
@@ -375,7 +377,7 @@ class Sequence extends PureComponent {
   showAlert = () => {
     Alert.alert(
       ROUTE_OPTIMIZATION,
-      `This will run route optimization for ${_.size(this.props.sequenceList)} job transactions`,
+      AUTO_ROUTING_MESSAGE + _.size(this.props.sequenceList) + AUTO_ROUTING_EXTRA_MESSAGE,
       [
         { text: CANCEL, style: 'cancel' },
         { text: OK, onPress: this.OnOkButtonPressed },

@@ -27,7 +27,7 @@ class JobSummary {
     if(!jobSummariesInStore || !jobSummariesInStore.value){
       throw new Error('Unable to update Job Summary')
     }
-    const jobSummaryIdJobSummaryObjectMap = {}
+    let jobSummaryIdJobSummaryObjectMap = {}
     const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')    
     jobSummaries.forEach(jobSummaryObject => {  
          jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
