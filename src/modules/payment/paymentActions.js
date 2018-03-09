@@ -24,23 +24,6 @@ import {
     CASH,
     CHEQUE,
     DEMAND_DRAFT,
-    DISCOUNT,
-    EZE_TAP,
-    MOSAMBEE,
-    MOSAMBEE_WALLET,
-    MPAY,
-    M_SWIPE,
-    NET_BANKING,
-    NOT_PAID,
-    PAYNEAR,
-    PAYO,
-    PAYTM,
-    POS,
-    RAZOR_PAY,
-    SODEXO,
-    SPLIT,
-    TICKET_RESTAURANT,
-    UPI,
     OBJECT_SAROJ_FAREYE,
     MONEY_PAY,
 } from '../../lib/AttributeConstants'
@@ -57,6 +40,13 @@ import {
 import _ from 'lodash'
 import { Toast } from 'native-base'
 
+/**
+ * This action sets initial payment parameters
+ * @param {*} jobTransaction 
+ * @param {*} fieldAttributeMasterId 
+ * @param {*} formData 
+ * @param {*} jobStatusId 
+ */
 export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, formData, jobStatusId) {
     return async function (dispatch) {
         try {
@@ -67,6 +57,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             const paymentParameters = paymentService.getPaymentParameters(jobTransaction, fieldAttributeMasterId, jobMasterMoneyTransactionModesList.value, fieldAttributeMasterList.value, formData, jobStatusId, fieldAttributeMasterValidationList.value, modulesCustomizationList.value)
             let isAmountEditable = paymentParameters.amountEditableObject ? true : parseFloat(paymentParameters.actualAmount) ? false : true
+            //In case of bulk actual amount should not be null
             if (!parseFloat(paymentParameters.actualAmount) && jobTransaction.length) {
                 throw new Error(INVALID_CONFIGURATION)
             }
@@ -91,9 +82,28 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
     }
 }
 
+/**
+ * This action preapres and saves money collect field data in form layout state
+ * @param {*} actualAmount 
+ * @param {*} currentElement 
+ * @param {*} formElement 
+ * @param {*} jobMasterId 
+ * @param {*} jobId 
+ * @param {*} jobTransaction 
+ * @param {*} latestPositionId 
+ * @param {*} moneyCollectMaster 
+ * @param {*} isSaveDisabled 
+ * @param {*} originalAmount 
+ * @param {*} selectedPaymentMode 
+ * @param {*} transactionNumber 
+ * @param {*} remarks 
+ * @param {*} receipt 
+ * @param {*} jobTransactionIdAmountMap 
+ */
 export function saveMoneyCollectObject(actualAmount, currentElement, formElement, jobMasterId, jobId, jobTransaction, latestPositionId, moneyCollectMaster, isSaveDisabled, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap) {
     return async function (dispatch) {
         try {
+            //While saving actual amount should be a number
             if (!Number(actualAmount)) {
                 Toast.show({ text: VALID_AMOUNT_ERROR, position: 'bottom', buttonText: 'OK', duration: 5000 })
                 return
@@ -106,11 +116,14 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
                 modeTypeId: selectedPaymentMode,
                 isCardPayment
             }
+            //Initialising jobTransactionIdAmountMap in case of null for saving actual and original amount in job transaction
             if (!jobTransactionIdAmountMap) {
                 jobTransactionIdAmountMap = {}
                 jobTransactionIdAmountMap.actualAmount = actualAmount
                 jobTransactionIdAmountMap.originalAmount = originalAmount
             }
+
+            //Setting moneyTransactionType in jobTransactionIdAmountMap for saving moneyTransactionType in job transaction
             if (moneyCollectMaster.attributeTypeId == MONEY_PAY) {
                 jobTransactionIdAmountMap.moneyTransactionType = REFUND
             } else if (selectedPaymentMode == CASH.id) {
@@ -123,13 +136,25 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))
-            dispatch(setState(CLEAR_PAYMENT_STATE))
         } catch (error) {
             console.log(error)
         }
     }
 }
 
+/**
+ * This action preapres and saves money collect field data in form layout state for split payment mode
+ * @param {*} actualAmount 
+ * @param {*} currentElement 
+ * @param {*} formElement 
+ * @param {*} jobTransaction 
+ * @param {*} latestPositionId 
+ * @param {*} moneyCollectMaster 
+ * @param {*} isSaveDisabled 
+ * @param {*} originalAmount 
+ * @param {*} splitPaymentModeMap 
+ * @param {*} paymentContainerKey 
+ */
 export function saveMoneyCollectSplitObject(actualAmount, currentElement, formElement, jobTransaction, latestPositionId, moneyCollectMaster, isSaveDisabled, originalAmount, splitPaymentModeMap, paymentContainerKey) {
     return async function (dispatch) {
         try {
@@ -150,26 +175,36 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formEl
             dispatch(NavigationActions.back())
         } catch (error) {
             console.log(error)
+            Toast.show({ text: error.message, position: 'bottom', buttonText: 'OK', duration: 5000 })
         }
     }
 }
 
+/**
+ * This action changes UI for selected payment mode accordingly
+ * @param {*} selectedPaymentMode 
+ * @param {*} splitPaymentMode 
+ * @param {*} modeTypeId 
+ * @param {*} actualAmount 
+ * @param {*} transactionNumber 
+ */
 export function paymentModeSelect(selectedPaymentMode, splitPaymentMode, modeTypeId, actualAmount, transactionNumber) {
     return async function (dispatch) {
         try {
-            let tempSelectedPaymentMode = _.cloneDeep(selectedPaymentMode), isSaveButtonDisabled = true, otherPaymentEnable = false
+            let tempSelectedPaymentMode = _.cloneDeep(selectedPaymentMode), isSaveButtonDisabled = false, otherPaymentEnable = false
+            //Check if actual amount is valid string
+            if (!actualAmount) {
+                isSaveButtonDisabled = true
+            }
+            //Check if payment mode is not split
             if (splitPaymentMode != YES) {
-                if (modeTypeId == CHEQUE.id || modeTypeId == DEMAND_DRAFT.id) {
-                    if (actualAmount && transactionNumber) {
-                        isSaveButtonDisabled = false
-                    }
-                } else {
-                    if (actualAmount) {
-                        isSaveButtonDisabled = false
-                    }
+                //Check if payment mode is Cheque or DD and actual amount and transaction number are valid strings
+                if (parseInt(modeTypeId) == CHEQUE.id || parseInt(modeTypeId) == DEMAND_DRAFT.id) {
+                    isSaveButtonDisabled = true
                 }
                 tempSelectedPaymentMode = modeTypeId
-            } else if (!paymentService.checkCardPayment(modeTypeId)) {
+                otherPaymentEnable = true
+            } else if (!paymentService.checkCardPayment(parseInt(modeTypeId))) {
                 tempSelectedPaymentMode = tempSelectedPaymentMode ? tempSelectedPaymentMode : {}
                 let otherPaymentModeList = tempSelectedPaymentMode.otherPaymentModeList ? tempSelectedPaymentMode.otherPaymentModeList : {}
                 otherPaymentModeList[modeTypeId] = otherPaymentModeList[modeTypeId] ? false : true
@@ -183,8 +218,10 @@ export function paymentModeSelect(selectedPaymentMode, splitPaymentMode, modeTyp
                     otherPaymentEnable = true
                 }
             }
-            if (actualAmount && (tempSelectedPaymentMode.cardPaymentMode || otherPaymentEnable)) {
-                isSaveButtonDisabled = false
+
+            //Check if actual amount is valid string and payment modes in split are all filled
+            if (!tempSelectedPaymentMode.cardPaymentMode && !otherPaymentEnable) {
+                isSaveButtonDisabled = true
             }
             dispatch(setState(SET_SELECTED_PAYMENT_MODE, { selectedPaymentMode: tempSelectedPaymentMode, isSaveButtonDisabled }))
 
@@ -194,6 +231,10 @@ export function paymentModeSelect(selectedPaymentMode, splitPaymentMode, modeTyp
     }
 }
 
+/**
+ * This action sets splitPaymentModeMap for split payment screen
+ * @param {*} selectedPaymentMode 
+ */
 export function getSplitPaymentModeList(selectedPaymentMode) {
     return async function (dispatch) {
         try {
@@ -206,13 +247,20 @@ export function getSplitPaymentModeList(selectedPaymentMode) {
     }
 }
 
+/**
+ * This action add or remove cheque or dd row from list in case of split payment
+ * @param {*} modeTypeId 
+ * @param {*} splitPaymentModeMap 
+ * @param {*} arrayIndex 
+ */
 export function changeChequeOrDDPaymentModeList(modeTypeId, splitPaymentModeMap, arrayIndex) {
     return async function (dispatch) {
         try {
             let splitPaymentModeMapClone = _.cloneDeep(splitPaymentModeMap)
             let paymentModeObject = splitPaymentModeMapClone[modeTypeId]
             let paymentModeArray = splitPaymentModeMapClone[modeTypeId].list
-            if (arrayIndex) {
+            //If array index is present means have to remove row else add row
+            if (arrayIndex || arrayIndex === 0) {
                 let previousAmount = parseFloat(paymentModeArray[arrayIndex].amount) ? parseFloat(paymentModeArray[arrayIndex].amount) : 0
                 let totalAmount = parseFloat(paymentModeObject.amount) ? parseFloat(paymentModeObject.amount) : 0
                 paymentModeObject.amount = totalAmount - previousAmount
@@ -230,6 +278,12 @@ export function changeChequeOrDDPaymentModeList(modeTypeId, splitPaymentModeMap,
     }
 }
 
+/**
+ * This action sets amount for particular payment mode in split payment mode
+ * @param {*} modeTypeId 
+ * @param {*} amount 
+ * @param {*} splitPaymentModeMap 
+ */
 export function setPaymentAmount(modeTypeId, amount, splitPaymentModeMap) {
     return async function (dispatch) {
         try {
@@ -243,6 +297,14 @@ export function setPaymentAmount(modeTypeId, amount, splitPaymentModeMap) {
     }
 }
 
+/**
+ * This action sets payment parameters for particular cheque or dd row in split payment mode
+ * @param {*} modeTypeId 
+ * @param {*} arrayIndex 
+ * @param {*} splitPaymentModeMap 
+ * @param {*} amount 
+ * @param {*} transactionNumber 
+ */
 export function setPaymentParameterForChequeOrDD(modeTypeId, arrayIndex, splitPaymentModeMap, amount, transactionNumber) {
     return async function (dispatch) {
         try {
