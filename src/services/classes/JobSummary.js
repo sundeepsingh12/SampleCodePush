@@ -15,31 +15,34 @@ import * as realm from '../../repositories/realmdb'
 
 class JobSummary {
 
-  /**
-   * 
-   * @param {*} jobSummaries 
-   */
-  async updateJobSummary(jobSummaries) {
-    if(_.isUndefined(jobSummaries) || _.isNull(jobSummaries) || _.isEmpty(jobSummaries)) {
-      return
-    }
-    const jobSummariesInStore = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+/**@function updateJobSummary(statusCountMap)
+  * 
+  * function caculate jobSummary count and save in store
+  * 
+  *@param {Object} statusCountMap // map of status id and count
+  *
+  *@description => update jobSummary count and updatedTime and update in store 
+  *
+  */
+
+  async updateJobSummary(statusCountMap) {
+    let jobSummariesInStore = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
     if(!jobSummariesInStore || !jobSummariesInStore.value){
       throw new Error('Unable to update Job Summary')
     }
-    const jobSummaryIdJobSummaryObjectMap = {}
     const currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')    
-    jobSummaries.forEach(jobSummaryObject => {  
-         jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id] = jobSummaryObject
-    })
     jobSummariesInStore.value.forEach(jobSummaryObject => {
-      if (jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id]) {
+      if (statusCountMap[jobSummaryObject.jobStatusId]) { // check for jobStatusId in statusCount map
         jobSummaryObject.updatedTime = currentDate
-        jobSummaryObject.count = jobSummaryIdJobSummaryObjectMap[jobSummaryObject.id].count
+        jobSummaryObject.count = statusCountMap[jobSummaryObject.jobStatusId]
+      }else if(jobSummaryObject.count > 0){ //check for jobSummaryObject count greater than 0 whose jobStatusId is not in map of statusCountMap 
+        jobSummaryObject.updatedTime = currentDate
+        jobSummaryObject.count = 0
       }
     })
-    await keyValueDBService.validateAndUpdateData(JOB_SUMMARY, jobSummariesInStore)
+    await keyValueDBService.validateAndSaveData(JOB_SUMMARY, jobSummariesInStore.value) // update jobSummary  in store
   }
+  
   /**A generic method for getting jobSummary from store given a particular jobStatusId and jobMasterId
    * 
    * @param {*} jobMasterId 
