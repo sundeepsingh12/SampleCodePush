@@ -94,6 +94,11 @@ module.exports = keyMirror({
     SET_BACKUP_FILES_LIST: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
+    //Pages
+    PAGES_LOADING: null,
+    SET_PAGES_UTILITY_N_PIESUMMARY: null,
+    PAGES: null,
+    PAGES_ADDITIONAL_UTILITY: null,
 
     //Home Container
     PIECHART: null,
@@ -385,8 +390,6 @@ module.exports = keyMirror({
     RETURN_TO_HOME: null,
 
     //Bulk Module
-    START_FETCHING_BULK_CONFIG: null,
-    STOP_FETCHING_BULK_CONFIG: null,
     START_FETCHING_BULK_TRANSACTIONS: null,
     STOP_FETCHING_BULK_TRANSACTIONS: null,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
@@ -394,6 +397,7 @@ module.exports = keyMirror({
     CLEAR_BULK_STATE: null,
     SET_BULK_SEARCH_TEXT: null,
     SET_BULK_ERROR_MESSAGE: null,
+    SET_BULK_TRANSACTION_PARAMETERS: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,

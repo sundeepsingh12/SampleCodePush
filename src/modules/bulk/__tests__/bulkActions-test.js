@@ -1,7 +1,5 @@
 'use strict'
 import {
-    START_FETCHING_BULK_CONFIG,
-    STOP_FETCHING_BULK_CONFIG,
     JOB_MASTER,
     JOB_STATUS,
     START_FETCHING_BULK_TRANSACTIONS,
@@ -21,88 +19,6 @@ import configureStore from 'redux-mock-store'
 import { bulkService } from '../../../services/classes/Bulk';
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
-describe('test for getJobMasterVsStatusNameList', () => {
-    const expectedActions = [
-        {
-            type: START_FETCHING_BULK_CONFIG,
-        }, {
-            type: STOP_FETCHING_BULK_CONFIG,
-            payload: []
-        }
-    ]
-    const jobMasterList = {
-        value: []
-    }
-    const jobStatusList = {
-        value: []
-    }
-    const modulesCustomizationList = {
-        value: []
-    }
-    it('should set job master vs status list', () => {
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMasterList)
-            .mockReturnValueOnce(jobStatusList)
-            .mockReturnValueOnce(modulesCustomizationList)
-        bulkService.prepareJobMasterVsStatusList = jest.fn()
-        bulkService.prepareJobMasterVsStatusList.mockReturnValue([])
-        const store = mockStore({})
-        return store.dispatch(actions.getJobMasterVsStatusNameList())
-            .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
-                expect(bulkService.prepareJobMasterVsStatusList).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
-            })
-    })
-    it('should throw error for job master', () => {
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce([])
-            .mockReturnValueOnce(jobStatusList)
-            .mockReturnValueOnce(modulesCustomizationList)
-        bulkService.prepareJobMasterVsStatusList = jest.fn()
-        bulkService.prepareJobMasterVsStatusList.mockReturnValue([])
-        const message = 'Job master missing'
-        const store = mockStore({})
-        return store.dispatch(actions.getJobMasterVsStatusNameList())
-            .then(() => {
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
-            })
-    })
-    it('should throw error for job status', () => {
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMasterList)
-            .mockReturnValueOnce([])
-            .mockReturnValueOnce(modulesCustomizationList)
-        bulkService.prepareJobMasterVsStatusList = jest.fn()
-        bulkService.prepareJobMasterVsStatusList.mockReturnValue([])
-        const message = 'Job master missing'
-        const store = mockStore({})
-        return store.dispatch(actions.getJobMasterVsStatusNameList())
-            .then(() => {
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
-            })
-    })
-    it('should throw error Module customization missing', () => {
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMasterList)
-            .mockReturnValueOnce(jobStatusList)
-            .mockReturnValueOnce([])
-        bulkService.prepareJobMasterVsStatusList = jest.fn()
-        bulkService.prepareJobMasterVsStatusList.mockReturnValue([])
-        const message = 'Job master missing'
-        const store = mockStore({})
-        return store.dispatch(actions.getJobMasterVsStatusNameList())
-            .then(() => {
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
-            })
-    })
-})
 
 describe('test for toggleListItemIsChecked', () => {
     const jobTransactionId = 1

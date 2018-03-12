@@ -53,9 +53,9 @@ import {
 } from '../lib/constants'
 
 import {
- OK,
- CANCEL,
- LOGOUT_UNSYNCED_TRANSACTIONS
+  OK,
+  CANCEL,
+  LOGOUT_UNSYNCED_TRANSACTIONS
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -183,9 +183,9 @@ class Menu extends PureComponent {
   }
 
   render() {
-    let profileView = this.renderModuleView([this.props.menu[PROFILE], this.props.menu[STATISTIC]], 1)
-    let paymentView = this.renderModuleView([this.props.menu[EZETAP], this.props.menu[MSWIPE]], 2)
-    let deviceView = this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3)
+    let profileView = this.props.menu ? this.renderModuleView([this.props.menu[PROFILE], this.props.menu[STATISTIC]], 1) : null
+    let paymentView = this.props.menu ? this.renderModuleView([this.props.menu[EZETAP], this.props.menu[MSWIPE]], 2) : null
+    let deviceView = this.props.menu ? this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3) : null
     let unsyncTransactionPresentAlert = this.getUnsyncTransactionPresentAlert()
     return (
       <StyleProvider style={getTheme(platform)}>

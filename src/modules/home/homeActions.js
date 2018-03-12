@@ -1,6 +1,13 @@
 'use strict'
-
 import {
+  // ACTIONS
+  PAGES_LOADING,
+  SET_PAGES_UTILITY_N_PIESUMMARY,
+  //SCHEMAS
+  PAGES,
+  PAGES_ADDITIONAL_UTILITY,
+  //ROUTE NAME FOR NAVIGATION
+  TabScreen,
   CUSTOMIZATION_APP_MODULE,
   HOME_LOADING,
   CHART_LOADING,
@@ -35,77 +42,172 @@ import {
   NEW_JOB_STATUS,
   NEW_JOB_MASTER,
   POPULATE_DATA,
-  NewJob
+  NewJob,
+  BulkListing
 } from '../../lib/constants'
+
 import {
-  SERVICE_ALREADY_SCHEDULED,
-  FAIL,
-  SUCCESS,
-  Piechart,
+  //PAGE SCREEN ID's
+  PAGE_BACKUP,
+  PAGE_BLUETOOTH_PAIRING,
+  PAGE_BULK_UPDATE,
+  PAGE_CUSTOM_WEB_PAGE,
+  PAGE_EZETAP_INITIALIZE,
+  PAGE_INLINE_UPDATE,
+  PAGE_JOB_ASSIGNMENT,
+  PAGE_LIVE_JOB,
+  PAGE_MOSAMBEE_INITIALIZE,
+  PAGE_MSWIPE_INITIALIZE,
+  PAGE_NEW_JOB,
+  PAGE_OFFLINE_DATASTORE,
+  PAGE_OUTSCAN,
+  PAGE_PAYNEAR_INITIALIZE,
+  PAGE_PICKUP,
+  PAGE_PROFILE,
+  PAGE_SEQUENCING,
+  PAGE_SORTING_PRINTING,
+  PAGE_STATISTICS,
+  PAGE_TABS,
+  //PAGE UTILITY ID's
+  PAGE_MESSAGING,
+  PAGE_SUMMARY_PIECHART,
+  //ERROR MESSAGES
+  UNKNOWN_PAGE_TYPE,
+  //Others
   SERVER_REACHABLE,
   SERVER_UNREACHABLE,
+  Piechart,
+  SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
-import {
-  NEW_JOB_CONFIGURATION_ERROR,
-  OK
-} from '../../lib/ContainerConstants'
-import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
-import CONFIG from '../../lib/config'
+import { Toast } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { sync } from '../../services/classes/Sync'
-import BackgroundTimer from 'react-native-background-timer'
-import { setState, navigateToScene, deleteSessionToken } from '../global/globalActions'
-import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
-import { Client } from 'react-native-paho-mqtt'
-import { fetchJobs } from '../taskList/taskListActions'
-import { NetInfo } from 'react-native'
-import { jobStatusService } from '../../services/classes/JobStatus'
+import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
-import { authenticationService } from '../../services/classes/Authentication'
-import { logoutService } from '../../services/classes/Logout'
-import _ from 'lodash'
+import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
-import RestAPIFactory from '../../lib/RestAPIFactory'
-import { newJob } from '../../services/classes/NewJob'
-
+import { setState, navigateToScene } from '../global/globalActions'
+import CONFIG from '../../lib/config'
+import { Client } from 'react-native-paho-mqtt'
+import { sync } from '../../services/classes/Sync'
+import { NetInfo } from 'react-native'
 import moment from 'moment'
-import {
-  invalidateUserSessionForAutoLogout
-} from '../pre-loader/preloaderActions'
-import {
-  NavigationActions
-} from 'react-navigation'
-import { backupService } from '../../services/classes/BackupService';
-import { autoLogoutAfterUpload } from '../backup/backupActions'
-import { redirectToFormLayout } from '../newJob/newJobActions'
-import {
-  Toast
-} from 'native-base'
-/**
- * This action enables modules for particular user
- */
-export function fetchModulesList(modules, pieChart, menu, newJobModules) {
+import BackgroundTimer from 'react-native-background-timer'
+import { fetchJobs } from '../taskList/taskListActions'
+
+/** 
+ * Function which updates STATE when component is mounted
+ * - List of pages for showing on Home Page
+ * - List of additional utilities for activating on Home Page (Piechart and Messaging)
+ * - Summary counts for rendring Pie-chart
+*/
+export function fetchPagesAndPiechart() {
   return async function (dispatch) {
     try {
-      dispatch(setState(HOME_LOADING, {
-        moduleLoading: true
-      }))
-      const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
-      const user = await keyValueDBService.getValueFromStore(USER)
-      const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu, newJobModules)
-      const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? true : false
-      dispatch(setState(SET_MODULES, {
-        moduleLoading: false,
-        modules: result.modules,
-        newJobModules: result.newJobModules,
-        pieChart: result.pieChart,
-        menu: result.menu,
-      }))
-      if (result.pieChart[PIECHART].enabled) {
-        dispatch(pieChartCount())
+      dispatch(setState(PAGES_LOADING, { pagesLoading: true }));
+      //Fetching list of Pages
+      const pageList = await keyValueDBService.getValueFromStore(PAGES);
+      //TODO : Reduce the list to only show MAIN_MENU items, Group by "Group name" and Sort by sequence
+
+      //Fetching list of Home screen Utilities 
+      const utilityList = await keyValueDBService.getValueFromStore(PAGES_ADDITIONAL_UTILITY);
+      //Looping over Utility list to check if Piechart and Messaging are enabled
+      let pieChartEnabled = false;
+      let messagingEnabled = false;
+      _.each(utilityList.value, function (utility) {
+        (utility.utilityID == PAGE_SUMMARY_PIECHART) ? pieChartEnabled = utility.enabled : null;
+        (utility.utilityID == PAGE_MESSAGING) ? messagingEnabled = utility.enabled : null;
+      })
+
+      //Fetching Summary count for Pie-chart
+      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()
+      const pieChartSummaryCount = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
+
+      //Finally updating state
+      dispatch(setState(SET_PAGES_UTILITY_N_PIESUMMARY, { pageList, pieChartEnabled, messagingEnabled, pieChartSummaryCount }));
+    } catch (error) {
+      //TODO : show proper error code message ERROR CODE 600
+      //Save the error in exception logs
+      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
+    }
+  }
+}
+
+/** 
+ * Function to navigate to a new page
+ * @Params : pageObject (sample below)
+ * {
+ * 	"id": 2,
+ * 	"name": "Print Dispatch lables",
+ * 	"groupName": "Group 1",
+ * 	"icon": "ios-happy",
+ * 	"userType": "field-executive",
+ * 	"jobMasterIds": [65],
+ * 	"manualSelection": true,
+ * 	"menuLocation": "MAIN",
+ * 	"screenTypeId": 1,
+ * 	"sequenceNumber": 2,
+ * 	"additionalParams": {
+ *    "statusId": 245,
+ * 	  "temp": "xyz",
+ *  }
+*/
+//TODO Move this to Globalfunction if feasible
+export function navigateToPage(pageObject) {
+  return async function (dispatch) {
+    try {
+      console.log('navigateToPage', pageObject)
+      switch (pageObject.screenTypeId) {
+        case PAGE_BACKUP:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_BLUETOOTH_PAIRING:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_BULK_UPDATE: {
+          dispatch(navigateToScene(BulkListing, { pageObject }));
+          break;
+        }
+        case PAGE_CUSTOM_WEB_PAGE:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_EZETAP_INITIALIZE:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_INLINE_UPDATE:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_JOB_ASSIGNMENT:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_LIVE_JOB:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_MOSAMBEE_INITIALIZE:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_MSWIPE_INITIALIZE:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_NEW_JOB:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_OFFLINE_DATASTORE:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_OUTSCAN:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_PAYNEAR_INITIALIZE:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_PICKUP:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_PROFILE:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_SEQUENCING:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_SORTING_PRINTING:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_STATISTICS:
+          throw new Error("CODE it, if you want to use it !");
+        case PAGE_TABS:
+          dispatch(navigateToScene(TabScreen, pageObject));
+          break;
+        default:
+          throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
       }
     } catch (error) {
+      //TODO : show proper error code message ERROR CODE 600
+      //Save the error in exception logs
       console.log(error)
+      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'Lets Code', type: 'danger', duration: 50000 })
     }
   }
 }
@@ -117,41 +219,75 @@ export function checkCustomErpPullActivated() {
       const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
-
-    }
-  }
-}
-
-/**
- * This services schedules sync service at interval of 2 minutes
- */
-export function syncService(pieChart) {
-  return async (dispatch) => {
-    try {
-      if (CONFIG.intervalId) {
-        throw new Error(SERVICE_ALREADY_SCHEDULED)
-      }
-      CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
-        dispatch(performSyncService(pieChart))
-      }, CONFIG.SYNC_SERVICE_DELAY)
-    } catch (error) {
-      //Update UI here
       console.log(error)
     }
   }
 }
 
-export function pieChartCount() {
-  return async (dispatch) => {
-    try {
-      dispatch(setState(CHART_LOADING, { loading: true }))
-      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
-      dispatch(setState(CHART_LOADING, { loading: false, count }))
-    } catch (error) {
-      //Update UI here
-      console.log(error)
-      dispatch(setState(CHART_LOADING, { loading: false, count: null }))
+export function startTracking() {
+  return async function (dispatch) {
+    trackingService.init()
+  }
+}
+
+export function startMqttService(pieChart) {
+  return async function (dispatch) {
+    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+    //Check if user session is alive
+    if (token && token.value) {
+      console.log('registerMqttClient')
+      const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
+      console.log('uri', uri)
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const clientId = `FE_${userObject.value.id}`
+      const storage = {
+        setItem: (key, item) => {
+          storage[key] = item;
+        },
+        getItem: (key) => storage[key],
+        removeItem: (key) => {
+          delete storage[key]
+        },
+      };
+
+      // Create a client instance 
+      const client = new Client({
+        uri,
+        clientId,
+        storage
+      })
+
+      // set event handlers 
+      client.on('connectionLost', responseObject => {
+        console.log('connectionLost', responseObject)
+        if (responseObject.errorCode !== 0) {
+          console.log(responseObject.errorMessage);
+        }
+      })
+      client.on('messageReceived', message => {
+        console.log('message.payloadString', message.payloadString)
+        if (message.payloadString == 'Live Job Notification') {
+          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+          dispatch(performSyncService(pieChart, true, true))
+        } else {
+          dispatch(performSyncService(pieChart, true))
+        }
+      })
+
+      // connect the client 
+      client.connect()
+        .then(() => {
+          // Once a connection has been made, make a subscription 
+          console.log('onConnect')
+          return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
+        })
+        .catch(responseObject => {
+          console.log('catch', responseObject)
+          if (responseObject.errorCode !== 0) {
+            console.log('onConnectionLost:' + responseObject.errorMessage);
+            // dispatch(startMqttService())
+          }
+        })
     }
   }
 }
@@ -160,6 +296,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
+      // await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
       const userData = await keyValueDBService.getValueFromStore(USER)
       if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
@@ -255,210 +392,36 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
   }
 }
 
-export function startMqttService(pieChart) {
-  return async function (dispatch) {
-    const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    //Check if user session is alive
-    if (token && token.value) {
-      console.log('registerMqttClient')
-      const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
-      console.log('uri', uri)
-      const userObject = await keyValueDBService.getValueFromStore(USER)
-      const clientId = `FE_${userObject.value.id}`
-      const storage = {
-        setItem: (key, item) => {
-          storage[key] = item;
-        },
-        getItem: (key) => storage[key],
-        removeItem: (key) => {
-          delete storage[key]
-        },
-      };
-
-      // Create a client instance 
-      const client = new Client({
-        uri,
-        clientId,
-        storage
-      })
-
-      // set event handlers 
-      client.on('connectionLost', responseObject => {
-        console.log('connectionLost', responseObject)
-        if (responseObject.errorCode !== 0) {
-          console.log(responseObject.errorMessage);
-        }
-      })
-      client.on('messageReceived', message => {
-        console.log('message.payloadString', message.payloadString)
-        if (message.payloadString == 'Live Job Notification') {
-          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-          dispatch(performSyncService(pieChart, true, true))
-        } else {
-          dispatch(performSyncService(pieChart, true))
-        }
-      })
-
-      // connect the client 
-      client.connect()
-        .then(() => {
-          // Once a connection has been made, make a subscription 
-          console.log('onConnect')
-          return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
-        })
-        .catch(responseObject => {
-          console.log('catch', responseObject)
-          if (responseObject.errorCode !== 0) {
-            console.log('onConnectionLost:' + responseObject.errorMessage);
-            // dispatch(startMqttService())
-          }
-        })
-    }
-  }
-}
-
-export function startTracking() {
-  return async function (dispatch) {
-    trackingService.init()
-  }
-}
-
-export function reAuthenticateUser(transactionIdToBeSynced) {
-  return async function (dispatch) {
+/**
+ * This services schedules sync service at interval of 2 minutes
+ */
+export function syncService(pieChart) {
+  return async (dispatch) => {
     try {
-      dispatch(setState(SYNC_STATUS, {
-        unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-        syncStatus: 'RE_AUTHENTICATING'
-      }))
-      let username = await keyValueDBService.getValueFromStore(USERNAME)
-      let password = await keyValueDBService.getValueFromStore(PASSWORD)
-      const authenticationResponse = await authenticationService.login(username.value, password.value)
-      let cookie = authenticationResponse.headers.map['set-cookie'][0]
-      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
-      dispatch(performSyncService())
+      if (CONFIG.intervalId) {
+        throw new Error(SERVICE_ALREADY_SCHEDULED)
+      }
+      CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
+        dispatch(performSyncService(pieChart))
+      }, CONFIG.SYNC_SERVICE_DELAY)
     } catch (error) {
-      if (error.code == 401) {
-        dispatch(setState(SYNC_STATUS, {
-          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-          syncStatus: 'LOADING'
-        }))
-        await logoutService.deleteDataBase()
-        dispatch(deleteSessionToken())
-        dispatch(navigateToScene(LoginScreen))
-      } else {
-        dispatch(setState(SYNC_STATUS, {
-          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-          syncStatus: 'ERROR'
-        }))
-        let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable.value == 1) {
-          await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
-          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
-        }
-      }
-    }
-  }
-}
-export function uploadUnsyncFiles(backupFilesList) {
-  return async function (dispatch) {
-    try {
-      const failCount = 0, successCount = 0
-      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-      if (!token) {
-        throw new Error('Token Missing')
-      }
-      for (let backupFile of backupFilesList) {
-        try {
-          //let responseBody = 'Fail'
-          let responseBody = await RestAPIFactory(token.value).uploadZipFile(backupFile.path, backupFile.name)
-          if (responseBody && responseBody.split(",")[0] == 'success') {
-            await backupService.deleteBackupFile(null, null, backupFile.path)
-            successCount++
-            dispatch(setState(SET_UPLOAD_FILE_COUNT, successCount))
-          } else {
-            failCount++
-          }
-        } catch (error) {
-          failCount++
-        }
-      }
-      if (failCount > 0) {
-        dispatch(setState(SET_FAIL_UPLOAD_COUNT, failCount))
-        await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, failCount)
-      } else {
-        dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 2))
-        setTimeout(() => {
-          dispatch(autoLogoutAfterUpload(true))
-        }, 1000)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-}
-export function readAndUploadFiles() {
-  return async function (dispatch) {
-    try {
-      dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 0))
-      dispatch(setState(SET_FAIL_UPLOAD_COUNT, 0))
-      const user = await keyValueDBService.getValueFromStore(USER)
-      let backupFilesList = await backupService.checkForUnsyncBackup(user)
-      dispatch(setState(SET_BACKUP_FILES_LIST, backupFilesList))
-      if (backupFilesList.length > 0) {
-        dispatch(uploadUnsyncFiles(backupFilesList))
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-}
-export function resetFailCountInStore() {
-  return async function (dispatch) {
-    try {
-      await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
-    } catch (error) {
+      //Update UI here
       console.log(error)
     }
   }
 }
 
-export function navigateToNewJob(jobMasterIds,displayName) {
-  return async function (dispatch) {
+export function pieChartCount() {
+  return async (dispatch) => {
     try {
-      const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
-      let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
-      if (_.size(mastersWithNewJob) == 1) {
-        let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
-        let returnParams = await newJob.checkForNextContainer(mastersWithNewJob[0], saveActivatedData)
-        if (returnParams.screenName == NewJobStatus) {
-          let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(mastersWithNewJob[0].id);
-          if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
-            dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, mastersWithNewJob[0].id))
-          } else {
-            dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
-            dispatch(navigateToScene(NewJobStatus, returnParams.navigationParams))
-          }
-        } else {
-          if (returnParams.stateParam) {
-            await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
-          }
-          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, {displayName}))
-        }
-      } else if (_.size(mastersWithNewJob) == 0) {
-        Toast.show({
-          text: NEW_JOB_CONFIGURATION_ERROR,
-          position: "bottom" | "center",
-          buttonText: OK,
-          type: 'danger',
-          duration: 10000
-        })
-        // dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
-      } else {
-        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
-        dispatch(navigateToScene(NewJob,{displayName}))
-      }
+      dispatch(setState(CHART_LOADING, { loading: true }))
+      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()
+      const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
+      dispatch(setState(CHART_LOADING, { loading: false, count }))
     } catch (error) {
+      //Update UI here
       console.log(error)
+      dispatch(setState(CHART_LOADING, { loading: false, count: null }))
     }
   }
 }

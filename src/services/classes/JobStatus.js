@@ -235,6 +235,21 @@ class JobStatus {
     const filteredJobStatusIds = jobStatusArray.value.filter(jobStatus => jobStatus.code != UNSEEN && jobStatus.code != SEEN && jobStatus.code != PENDING).map(jobStatus => jobStatus.id)
     return filteredJobStatusIds
   }
+
+  /**
+   * This function return status for corresponding statusId
+   * @param {*} jobStatusList 
+   * @param {*} jobStatusId 
+   * @returns
+   * JobStatus
+   */
+  getJobStatusForJobStatusId(jobStatusList, jobStatusId) {
+    if (!jobStatusId) {
+      return []
+    }
+    jobStatusList = jobStatusList ? jobStatusList : []
+    return jobStatusList.filter(jobStatus => jobStatus.id == jobStatusId)[0]
+  }
 }
 
 export let jobStatusService = new JobStatus()

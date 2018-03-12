@@ -82,8 +82,15 @@ export class keyValueDb {
       case 'USER_EVENT_LOG':
         schemaInstance = require('../repositories/schema/userEventLog');
         break;
-      case 'HUB': 
-      schemaInstance = require('../repositories/schema/hub');
+      case 'HUB':
+        schemaInstance = require('../repositories/schema/hub');
+        break;
+      case 'PAGES':
+        schemaInstance = require('../repositories/schema/pages');
+        break;
+      case 'PAGES_ADDITIONAL_UTILITY':
+        schemaInstance = require('../repositories/schema/pagesAdditionalUtilities');
+        break;
       default:
         checkCondition = true;
     }
@@ -118,7 +125,7 @@ export class keyValueDb {
       })
   }
 
-  getAllKeysFromStore(){
+  getAllKeysFromStore() {
     return store.keys()
   }
 
@@ -130,7 +137,7 @@ export class keyValueDb {
         break;
       case 'JOB_STATUS':
         schemaInstance = require('../repositories/schema/jobStatus');
-        break; 
+        break;
       case 'USER_SUMMARY':
         schemaInstance = require('../repositories/schema/userSummary');
         break;

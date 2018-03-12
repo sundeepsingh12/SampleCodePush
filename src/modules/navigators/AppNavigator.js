@@ -217,7 +217,10 @@ export const AppNavigator = StackNavigator({
     }
   },
   HomeTabNavigatorScreen: {
-    screen: HomeTabNavigator
+    screen: HomeTabNavigator,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
   },
   Sequence: {
     screen: Sequence,

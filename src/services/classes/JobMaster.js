@@ -33,6 +33,8 @@ import {
   TRANSACTION_TIME_SPENT,
   HUB,
   LAST_SYNC_WITH_SERVER,
+  PAGES,
+  PAGES_ADDITIONAL_UTILITY,
 } from '../../lib/constants'
 
 import {
@@ -154,6 +156,10 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(HUB, json.hub)
     await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment().format('YYYY-MM-DD HH:mm:ss'))
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
+    let samplePageJson = require('../../repositories/pagesSample');
+    let sampleAdditionalUtilitySample = require('../../repositories/pagesAddtionalUtilitiesSample');
+    await keyValueDBService.validateAndSaveData(PAGES, samplePageJson);
+    await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, sampleAdditionalUtilitySample);
   }
 
   /**
