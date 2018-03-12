@@ -6,7 +6,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
     "release": "cd android && ./gradlew assembleRelease",
-    "postinstall": "rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
+    "postinstall": "./src/scripts/camera.sh && rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
   },
   "dependencies": {
     "crypto-js": "^3.1.9-1",
@@ -22,7 +22,7 @@
     "react-native-background-fetch": "^2.4.0",
     "react-native-background-geolocation": "^2.11.0",
     "react-native-background-timer": "^2.0.1",
-    "react-native-camera": "^0.12.0",
+    "react-native-camera": "^1.0.2",
     "react-native-cancelable-fetch": "^0.1.1",
     "react-native-code-push": "^5.2.1",
     "react-native-communications": "^2.2.1",
