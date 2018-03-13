@@ -14,7 +14,7 @@ import {
     Animated,
     Alert
 } from 'react-native'
-import { RNCamera } from 'react-native-camera'
+import Camera from 'react-native-camera'
 import {
     Input,
     Container,
@@ -30,7 +30,7 @@ import SearchBarV2 from '../components/SearchBarV2'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures'
+import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
 import TorchOnIcon from '../svg_components/icons/TorchOnIcon'
 import TorchOffIcon from '../svg_components/icons/TorchOffIcon'
 import * as postAssignmentActions from '../modules/postAssignment/postAssignmentActions'
@@ -44,9 +44,6 @@ import {
 import {
     FORCE_ASSIGNED,
     POST_SEARCH_PLACEHOLDER,
-    DISMISS,
-    OK,
-    PENDING
 } from '../lib/ContainerConstants'
 
 import {
@@ -207,7 +204,7 @@ class PostAssignmentScanner extends PureComponent {
         if (this.props.error) {
             Alert.alert('Error', this.props.error,
                 [{
-                    text: OK, onPress: () => this.props.actions.setState(SET_POST_ASSIGNMENT_ERROR, {
+                    text: 'OK', onPress: () => this.props.actions.setState(SET_POST_ASSIGNMENT_ERROR, {
                         error: null
                     }), style: 'cancel'
                 }],
@@ -217,20 +214,25 @@ class PostAssignmentScanner extends PureComponent {
     }
 
     componentWillUnmount() {
-
-        //This is done so that count gets updated in PieChart
         if (Piechart.enabled) {
             this.props.actions.pieChartCount()
         }
-
-        //This is done so that list is refreshed when we go to Start Tab(Now jobs which were unseen have become pending)
         this.props.actions.fetchJobs()
-
     }
 
-    renderHeader(){
+    render() {
+        if (this.props.scanError && this.props.scanError !== '') {
+            this.callToast()
+        }
+        const transactionView = this.getTransactionView(this.props.jobTransactionMap)
+        const alertView = this.getAlertView()
+        if (this.props.loading) {
+            return <Loader />
+        }
         return (
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])} hasTabs>
+            <StyleProvider style={getTheme(platform)}>
+                <Container>
+                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])} hasTabs>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -260,19 +262,15 @@ class PostAssignmentScanner extends PureComponent {
                             </View>
                         </Body>
                     </Header>
-        )
-    }
 
-    renderCamera(){
-        return (
-            <View style={[styles.relative, styles.flex1]}>
-                        <RNCamera
+                    <View style={[styles.relative, styles.flex1]}>
+                        <Camera
                             ref="cam"
-                            flashMode={this.state.torchStatus ? RNCamera.Constants.FlashMode.on : RNCamera.Constants.FlashMode.off}
+                            torchMode={this.state.torchStatus ? Camera.constants.FlashMode.on : Camera.constants.FlashMode.off}
                             playSoundOnCapture={true}
                             onBarCodeRead={this._onBarcodeRead.bind(this)}
                             style={style.preview}
-                            >
+                            aspect={Camera.constants.Aspect.fill}>
 
                             <View style={{ width: 200, height: 200, justifyContent: 'space-between' }}>
                                 <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
@@ -292,7 +290,7 @@ class PostAssignmentScanner extends PureComponent {
                                     />
                                 </View> : null
                             }
-                        </RNCamera>
+                        </Camera>
                         <TouchableHighlight onPress={() => { this.setState({ torchStatus: !this.state.torchStatus }) }} style={[styles.alignCenter, styles.justifyCenter, { position: 'absolute', borderRadius: 5, top: 10, left: 10, backgroundColor: 'rgba(158, 158, 158,.6)', padding: 5 }]}>
                             <View>
                                 {this.state.torchStatus ? <TorchOnIcon width={32} height={32} /> : <TorchOffIcon width={32} height={32} />}
@@ -305,24 +303,7 @@ class PostAssignmentScanner extends PureComponent {
                             </GestureRecognizer> : null
                         }
                     </View>
-        )
-    }
 
-    render() {
-        if (this.props.scanError && this.props.scanError !== '') {
-            this.callToast()
-        }
-        const transactionView = this.getTransactionView(this.props.jobTransactionMap)
-        const alertView = this.getAlertView()
-        if (this.props.loading) {
-            return <Loader />
-        }
-        return (
-            <StyleProvider style={getTheme(platform)}>
-                <Container>
-                    {this.renderHeader()}
-
-                    {this.renderCamera()}
 
                     <Animated.View
                         style={[style.subView,
@@ -361,7 +342,7 @@ class PostAssignmentScanner extends PureComponent {
 
                                     <View style={{ backgroundColor: '#ffffff', borderTopLeftRadius: 5, borderTopRightRadius: 5, borderBottomColor: '#f3f3f3', borderBottomWidth: 3, paddingTop: 15, paddingBottom: 15, paddingLeft: 10, paddingRight: 10 }}>
                                         <Text style={[styles.fontBlack]}>
-                                            {PENDING} : {this.props.pendingCount}
+                                            Pending : {this.props.pendingCount}
                                         </Text>
                                     </View>
                                 </GestureRecognizer>
@@ -375,7 +356,7 @@ class PostAssignmentScanner extends PureComponent {
                         <Text style={[styles.fontLg, styles.fontWhite]}>
                             {this.props.scanError}
                         </Text>
-                        <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>{DISMISS}</Text>
+                        <Text onPress={() => this.closeToast()} style={[styles.fontLg, styles.padding10, { color: '#FFE200' }]}>DISMISS</Text>
                     </Animated.View>
                 </Container>
             </StyleProvider>
