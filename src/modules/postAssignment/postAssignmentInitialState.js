@@ -8,8 +8,8 @@ var InitialState = Record({
     pendingCount: 0,
     error: null,
     scanSuccess: false,
-    // isManualSelectionAllowed: false,
-    // isForceAssignmentAllowed: false,
+    isManualSelectionAllowed: false,
+    isForceAssignmentAllowed: false,
     scanError: null
 })
 

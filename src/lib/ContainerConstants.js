@@ -39,7 +39,6 @@ module.exports = {
     NOT_FOUND: 'Not Found',
     FORCE_ASSIGNED: 'Force Assigned',
     POST_SEARCH_PLACEHOLDER: 'Enter Reference Number To Scan Package',
-    PENDING:'Pending',
 
     //Home Constants
     JOB_ASSIGNMENT_DISPLAY: 'Job Assignment',
