@@ -64,13 +64,14 @@ import {
   JOB_ASSIGNMENT,
   PIECHART,
   SUMMARY,
-  PostAssignmentScanner
+  JobMasterListScreen,
 } from '../lib/constants'
 import _ from 'lodash'
 import PushNotification from 'react-native-push-notification'
 import { Platform } from 'react-native'
 import { getJobMasterVsStatusNameList } from '../modules/bulk/bulkActions'
 import { getRunsheets } from '../modules/sequence/sequenceActions'
+import { fetchJobMasterList } from '../modules/postAssignment/postAssignmentActions'
 
 function mapStateToProps(state) {
   return {
@@ -86,7 +87,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...homeActions, ...globalActions, getJobMasterVsStatusNameList, getRunsheets }, dispatch)
+    actions: bindActionCreators({ ...homeActions, ...globalActions, getJobMasterVsStatusNameList, getRunsheets, fetchJobMasterList }, dispatch)
   }
 }
 
@@ -158,9 +159,8 @@ class Home extends PureComponent {
       }
 
       case JOB_ASSIGNMENT_ID: {
-        // this.props.actions.fetchJobMasterList(this.props.modules.JOB_ASSIGNMENT.displayName)
+        this.props.actions.fetchJobMasterList(this.props.modules.JOB_ASSIGNMENT.displayName)
         //this.props.actions.navigateToScene(JobMasterListScreen)
-        this.props.actions.navigateToScene(PostAssignmentScanner)
       }
 
       default:
