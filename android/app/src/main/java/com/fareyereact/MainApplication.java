@@ -3,7 +3,6 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import org.reactnative.camera.RNCameraPackage;
 import io.realm.react.RealmReactPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -13,6 +12,7 @@ import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
 import com.rnziparchive.RNZipArchivePackage;
 import com.rnfs.RNFSPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.microsoft.codepush.react.CodePush;
@@ -43,7 +43,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNCameraPackage(),
             new RealmReactPackage(),
             new ReactNativePushNotificationPackage(),
             new LinearGradientPackage(),
@@ -53,6 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
             new RNZipArchivePackage(),
             new RNFSPackage(),
             new RNFetchBlobPackage(),
+            new RCTCameraPackage(),
             new VectorIconsPackage(),
             new RNDeviceInfo(),
             new CodePush(getResources().getString(R.string.reactNativeCodePush_androidDeploymentKey), getApplicationContext(), BuildConfig.DEBUG),

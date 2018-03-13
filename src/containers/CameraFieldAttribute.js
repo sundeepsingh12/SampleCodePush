@@ -24,7 +24,7 @@ import {
 } from 'native-base';
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 
-import { RNCamera } from 'react-native-camera'
+import Camera from 'react-native-camera';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
@@ -91,14 +91,14 @@ class CameraFieldAttribute extends PureComponent {
 
             }
         }
-        this.setState({ torchOff: RNCamera.constants.FlashMode.off })
+        this.setState({ torchOff: Camera.constants.FlashMode.off })
         this.props.actions.setExistingImage(this.props.navigation.state.params.currentElement)
     }
     _setTorchOn = () => {
-        this.setState({ torchOff: RNCamera.constants.FlashMode.on })
+        this.setState({ torchOff: Camera.constants.FlashMode.on })
     }
     _setTorchOff = () => {
-        this.setState({ torchOff: RNCamera.constants.FlashMode.off })
+        this.setState({ torchOff: Camera.constants.FlashMode.off })
     }
     toggleCameraType = () => {
         this.setState(previousState => {
@@ -114,7 +114,7 @@ class CameraFieldAttribute extends PureComponent {
     }
     renderTorch() {
         let view
-        if (this.state.torchOff == RNCamera.constants.FlashMode.off) {
+        if (this.state.torchOff == Camera.constants.FlashMode.off) {
             view =
                 <TouchableOpacity style={[styles.flexBasis33_3, styles.alignCenter]}>
                     <Icon name="ios-flash-outline" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this._setTorchOn()} />
@@ -135,17 +135,17 @@ class CameraFieldAttribute extends PureComponent {
                 <StyleProvider style={getTheme(platform)}>
                     <Container>
                         <View style={{ flex: 1 }}>
-                            <RNCamera
+                            <Camera
                                 ref={(cam) => {
                                     this.camera = cam;
                                 }}
                                 captureQuality={this.state.quality}
                                 style={style.preview}
-                                aspect={RNCamera.constants.Aspect.fill}
-                                captureTarget={RNCamera.constants.CaptureTarget.memory}
+                                aspect={Camera.constants.Aspect.fill}
+                                captureTarget={Camera.constants.CaptureTarget.memory}
                                 flashMode={this.state.torchOff}
                                 type={this.state.cameraType}
-                                orientation={RNCamera.constants.Orientation.portrait}>
+                                orientation={Camera.constants.Orientation.portrait}>
                                 <View style={[styles.absolute, styles.padding10, { top: 0, left: 0 }]}>
                                     <Icon
                                         name="md-close"
@@ -154,7 +154,7 @@ class CameraFieldAttribute extends PureComponent {
                                             this.props.navigation.goBack()
                                         }} />
                                 </View>
-                            </RNCamera>
+                            </Camera>
                         </View>
                         <View style={[style.cameraFooter]}>
                             {/* <View style={[styles.row, styles.justifySpaceBetween, styles.paddingTop10, styles.paddingBottom10, { borderBottomColor: 'rgba(0,0,0,.1)', borderBottomWidth: 1 }]}> */}
