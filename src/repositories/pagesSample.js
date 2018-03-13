@@ -14,7 +14,8 @@ const pagesSample = [{
     "additionalParams": {
         "temp": "xyz",
         "statusId": 2010,
-        "selectAll": true
+        "selectAll": true,
+        "searchSelectionOnLine1Line2": true
     }
 }, {
     "id": 2,

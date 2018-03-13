@@ -42,7 +42,9 @@ import {
   OK,
   CANCEL,
   UPDATE_ALL_SELECTED,
-  BULK_UPDATE
+  BULK_UPDATE,
+  NO_JOBS_PRESENT,
+  TOTAL_COUNT
 } from '../lib/ContainerConstants'
 
 import {
@@ -117,13 +119,7 @@ class BulkListing extends PureComponent {
 
   componentDidMount() {
     this.props.actions.getBulkJobTransactions(this.props.navigation.state.params)
-    BackHandler.addEventListener(HardwareBackPress, this._goBack)
   }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener(HardwareBackPress, this._goBack)
-  }
-
 
   _setQrValue = (value) => {
     if (value && value != '')
@@ -138,7 +134,7 @@ class BulkListing extends PureComponent {
             placeholder={FILTER_REF_NO}
             placeholderTextColor={'rgba(255,255,255,.6)'}
             selectionColor={'rgba(224, 224, 224,.5)'}
-            style={[style.headerSearch]}
+            style={[styles.headerSearch]}
             returnKeyType={"search"}
             keyboardAppearance={"dark"}
             underlineColorAndroid={'transparent'}
@@ -150,7 +146,7 @@ class BulkListing extends PureComponent {
                 this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems)
             }}
             value={this.props.searchText} />
-          <Button small transparent style={[style.inputInnerBtn]} onPress={() => {
+          <Button small transparent style={[styles.inputInnerBtn]} onPress={() => {
             if (this.props.searchText && this.props.searchText != '')
               this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems)
           }}>
@@ -158,7 +154,6 @@ class BulkListing extends PureComponent {
           </Button>
         </View>
         <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => {
-          BackHandler.removeEventListener(HardwareBackPress, this._goBack)
           this.props.navigation.navigate(QrCodeScanner, { returnData: this._setQrValue.bind(this) })
         }} >
           <QRIcon width={30} height={30} color={styles.fontWhite} />
@@ -174,6 +169,7 @@ class BulkListing extends PureComponent {
     else {
       let jobTransactionArray = []
       let searchText = this.props.searchText
+      // Function for filtering on basis of reference number, runsheet number, line1, line2, circleline1, circleline2
       _.forEach(this.props.bulkTransactionList, function (value) {
         let values = [value.runsheetNo, value.referenceNumber, value.line1, value.line2, value.circleLine1, value.circleLine2]
         if (_.some(values, (data) => _.includes(_.toLower(data), _.toLower(searchText)))) {
@@ -184,6 +180,111 @@ class BulkListing extends PureComponent {
     }
   }
 
+  getBulkEmptyView() {
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container>
+          <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.padding5])}>
+            <Body>
+              <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <TouchableOpacity style={[styles.headerLeft, styles.paddingTop10]} onPress={() => {
+                  this.props.navigation.goBack(null)
+                }}>
+                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                </TouchableOpacity>
+                <View style={[style.headerBody]}>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{BULK_UPDATE}</Text>
+                </View>
+                <View style={[style.headerRight]}>
+                </View>
+                <View />
+              </View>
+            </Body>
+          </Header>
+
+          <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+            <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
+          </View>
+        </Container>
+      </StyleProvider>
+    )
+  }
+
+  getBulkTransactionView() {
+    let nextStatusNames = []
+    this.props.nextStatusList.forEach(object => {
+      let statusObject =
+        { text: object.name, icon: "md-arrow-dropright", iconColor: "#000000" }
+      nextStatusNames.push(statusObject)
+    })
+    nextStatusNames.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
+    const nextStatusIds = this.props.nextStatusList.map(nextStatus => nextStatus.id)
+
+    return (
+      <StyleProvider style={getTheme(platform)}>
+        <Container>
+          <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            <Body>
+              <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
+                <TouchableOpacity style={[styles.headerLeft, styles.paddingTop10]} onPress={() => {
+                  this.props.navigation.goBack(null)
+                }}>
+                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                </TouchableOpacity>
+                <View style={[style.headerBody]}>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{(this.props.navigation.state.params.groupId) ? this.props.navigation.state.params.groupId : BULK_UPDATE}</Text>
+                </View>
+                <View style={[style.headerRight]}>
+                  {this.props.isSelectAllVisible ?
+                    <Text
+                      onPress={this.selectAll}
+                      style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{this.props.selectAllNone}</Text>
+                    : null}
+                </View>
+                <View />
+              </View>
+              {this.searchBarView()}
+            </Body>
+          </Header>
+          <FlatList
+            data={this.renderList()}
+            renderItem={({ item }) => this.renderData(item)}
+            keyExtractor={item => String(item.id)}
+          />
+
+          <Footer
+            style={[{ height: 'auto' }, styles.column, styles.padding10]}>
+            <Text
+              style={[styles.fontSm, styles.marginBottom10]}>{TOTAL_COUNT} {_.size(this.props.selectedItems)}</Text>
+            <Button
+              onPress={() => {
+                (nextStatusNames.length > 2) ? ActionSheet.show(
+                  {
+                    options: nextStatusNames,
+                    cancelButtonIndex: nextStatusNames.length - 1,
+                    title: NEXT_POSSIBLE_STATUS
+                  },
+                  buttonIndex => {
+                    if (buttonIndex >= 0 && buttonIndex != nextStatusNames.length - 1) {
+                      this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex].text)
+                    }
+                  }
+                ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
+              }}
+              success full
+              disabled={_.isEmpty(this.props.selectedItems)}
+            >
+              <Text style={[styles.fontLg, styles.fontWhite]}>{UPDATE_ALL_SELECTED}</Text>
+            </Button>
+          </Footer>
+
+        </Container>
+      </StyleProvider>
+    )
+  }
+
   render() {
     if (this.props.isLoaderRunning) {
       return <Loader />
@@ -191,108 +292,11 @@ class BulkListing extends PureComponent {
     else {
       if (_.isEmpty(this.props.bulkTransactionList)) {
         return (
-          <StyleProvider style={getTheme(platform)}>
-            <Container>
-              <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.padding5])}>
-                <Body>
-                  <View
-                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                    <TouchableOpacity style={[style.headerLeft, styles.paddingTop10]} onPress={() => {
-                      this.props.navigation.goBack(null)
-                      this.props.actions.setState(CLEAR_BULK_STATE)
-                    }}>
-                      <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                    </TouchableOpacity>
-                    <View style={[style.headerBody]}>
-                      <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{BULK_UPDATE}</Text>
-                    </View>
-                    <View style={[style.headerRight]}>
-                    </View>
-                    <View />
-                  </View>
-                </Body>
-              </Header>
-
-              <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>No jobs present</Text>
-              </View>
-            </Container>
-          </StyleProvider>
+          this.getBulkEmptyView()
         )
       } else {
-        let nextStatusNames = []
-        const searchBarView = this.searchBarView()
-        this.props.nextStatusList.forEach(object => {
-          let statusObject =
-            { text: object.name, icon: "md-arrow-dropright", iconColor: "#000000" }
-          nextStatusNames.push(statusObject)
-        })
-        nextStatusNames.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
-        const nextStatusIds = this.props.nextStatusList.map(nextStatus => nextStatus.id)
-
         return (
-          <StyleProvider style={getTheme(platform)}>
-            <Container>
-              <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                <Body>
-                  <View
-                    style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
-                    <Button transparent onPress={() => {
-                      this.props.actions.setState(CLEAR_BULK_STATE)
-                      this.props.navigation.goBack(null)
-                    }}>
-                      <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
-                    </Button>
-                    <View style={[style.headerBody]}>
-                      <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{(this.props.navigation.state.params.groupId) ? this.props.navigation.state.params.groupId : BULK_UPDATE}}</Text>
-                    </View>
-                    <View style={[style.headerRight]}>
-                      {this.props.isSelectAllVisible ?
-                        <Text
-                          onPress={this.selectAll}
-                          style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{this.props.selectAllNone}</Text>
-                        : null}
-                    </View>
-                    <View />
-                  </View>
-                  {searchBarView}
-                </Body>
-              </Header>
-              <FlatList
-                data={this.renderList()}
-                renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => String(item.id)}
-              />
-
-              <Footer
-                style={[{ height: 'auto' }, styles.column, styles.padding10]}>
-                <Text
-                  style={[styles.fontSm, styles.marginBottom10]}>Total Count : {this.props.selectedItems.length}</Text>
-                <Button
-                  onPress={() => {
-                    (nextStatusNames.length > 2) ? ActionSheet.show(
-                      {
-                        options: nextStatusNames,
-                        cancelButtonIndex: nextStatusNames.length - 1,
-                        title: NEXT_POSSIBLE_STATUS
-                      },
-                      buttonIndex => {
-                        if (buttonIndex >= 0 && buttonIndex != nextStatusNames.length - 1) {
-                          this.goToFormLayout(nextStatusIds[buttonIndex], nextStatusNames[buttonIndex].text)
-                        }
-                      }
-                    ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
-                    BackHandler.removeEventListener(HardwareBackPress, this._goBack)
-                  }}
-                  success full
-                  disabled={_.isEmpty(this.props.selectedItems)}
-                >
-                  <Text style={[styles.fontLg, styles.fontWhite]}>{UPDATE_ALL_SELECTED}</Text>
-                </Button>
-              </Footer>
-
-            </Container>
-          </StyleProvider>
+          this.getBulkTransactionView()
         )
       }
     }
@@ -307,10 +311,6 @@ class BulkListing extends PureComponent {
     }
     )
   }
-
-  _goBack = () => {
-    this.props.actions.setState(CLEAR_BULK_STATE)
-  }
 }
 
 const style = StyleSheet.create({
@@ -323,13 +323,6 @@ const style = StyleSheet.create({
     paddingBottom: 10
   },
 
-  headerLeft: {
-    width: '15%',
-    paddingTop: 0,
-    paddingBottom: 0,
-    paddingLeft: 10,
-    paddingRight: 10
-  },
   headerBody: {
     width: '50%',
     paddingTop: 10,
@@ -344,24 +337,7 @@ const style = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10
   },
-  headerSearch: {
-    paddingLeft: 10,
-    paddingRight: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.20)',
-    borderRadius: 2,
-    paddingTop: 0,
-    paddingBottom: 0,
-    height: 30,
-    color: '#fff',
-    fontSize: 11
-  },
-  inputInnerBtn: {
-    position: 'absolute',
-    top: 0,
-    right: 5,
-    paddingLeft: 0,
-    paddingRight: 0
-  },
+
   headerQRButton: {
     position: 'absolute',
     right: 5,

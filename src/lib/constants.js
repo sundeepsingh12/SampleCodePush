@@ -270,7 +270,6 @@ module.exports = keyMirror({
     CheckoutDetails: null,
     NewJob: null,
     NewJobStatus: null,
-    BulkConfiguration: null,
     BulkListing: null,
     Sorting: null,
     ProfileView: null,

@@ -15,6 +15,10 @@ import {
     SET_BULK_TRANSACTION_PARAMETERS
 } from '../../lib/constants'
 
+import {
+    SELECT_ALL
+} from '../../lib/ContainerConstants'
+
 
 export default function bulkReducer(state = initialState, action) {
     if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
@@ -23,6 +27,11 @@ export default function bulkReducer(state = initialState, action) {
 
         case START_FETCHING_BULK_TRANSACTIONS: {
             return state.set('isLoaderRunning', true)
+                .set('isSelectAllVisible', false)
+                .set('bulkTransactionList', {})
+                .set('selectedItems', {})
+                .set('searchText', null)
+                .set('selectAllNone', SELECT_ALL)
         }
 
         case STOP_FETCHING_BULK_TRANSACTIONS:

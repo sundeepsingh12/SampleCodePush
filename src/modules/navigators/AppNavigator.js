@@ -32,7 +32,6 @@ import NewJob from '../../containers/NewJob'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
-import BulkConfiguration from '../../containers/BulkConfiguration'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import LiveJobListing from '../../containers/LiveJobListing'
 import LiveJob from '../../containers/LiveJob'
@@ -74,7 +73,6 @@ import SaveActivated from '../../containers/SaveActivated'
 import Transient from '../../containers/Transient'
 import CheckoutDetails from '../../containers/CheckoutDetails'
 import CashTendering from '../../containers/CashTendering'
-import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
@@ -315,9 +313,6 @@ export const AppNavigator = StackNavigator({
   },
   SignatureAndNps: {
     screen: SignatureAndNps
-  },
-  BulkConfiguration: {
-    screen: BulkConfiguration
   },
   BulkListing: {
     screen: BulkListing
