@@ -49,13 +49,15 @@ import {
   BLUETOOTH,
   OfflineDS,
   Backup,
-  SET_UNSYNC_TRANSACTION_PRESENT
+  SET_UNSYNC_TRANSACTION_PRESENT,
+  ERROR_400_403_LOGOUT_FAILURE,
 } from '../lib/constants'
 
 import {
- OK,
- CANCEL,
- LOGOUT_UNSYNCED_TRANSACTIONS
+  OK,
+  CANCEL,
+  LOGOUT_UNSYNCED_TRANSACTIONS,
+  CONFIRM_LOGOUT,
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -166,16 +168,20 @@ class Menu extends PureComponent {
   }
 
   startLoginScreenWithoutLogout = () => {
-    this.props.actions.startLoginScreenWithoutLogout()
+    if (this.props.errorMessage_403_400_Logout && (this.props.errorMessage_403_400_Logout.code == 400 || this.props.errorMessage_403_400_Logout.code == 403)) {
+      this.props.actions.startLoginScreenWithoutLogout()
+    } else {
+      this.props.actions.setState(ERROR_400_403_LOGOUT_FAILURE, '')
+    }
   }
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
-      return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS,
+      return Alert.alert(CONFIRM_LOGOUT, LOGOUT_UNSYNCED_TRANSACTIONS,
         [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
         {
           text: OK, onPress: () => {
             this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
-            this.props.actions.invalidateUserSession()
+            this.props.actions.invalidateUserSession(true)
           }
         },],
         { cancelable: false })
@@ -187,6 +193,7 @@ class Menu extends PureComponent {
     let paymentView = this.renderModuleView([this.props.menu[EZETAP], this.props.menu[MSWIPE]], 2)
     let deviceView = this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3)
     let unsyncTransactionPresentAlert = this.getUnsyncTransactionPresentAlert()
+    // let customAlert = this.getViewForCustomAlert
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -201,10 +208,10 @@ class Menu extends PureComponent {
               </View>
             </Body>
           </Header>
-          {renderIf(this.props.isErrorType_403_400_Logout,
+          {(this.props.isErrorType_403_400_Logout &&
             <CustomAlert
               title="Unauthorised Device"
-              message={this.props.errorMessage_403_400_Logout}
+              message={this.props.errorMessage_403_400_Logout.message}
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
 

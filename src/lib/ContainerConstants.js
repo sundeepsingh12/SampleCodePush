@@ -171,8 +171,23 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
-    LOGOUT_UNSYNCED_TRANSACTIONS:'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
-
+    LOGOUT_UNSYNCED_TRANSACTIONS: ' You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    THERE_ARE_NO_UNSYNCED_FILES: 'There are no Unsynced Files.',
+    DELETE: 'Delete',
+    THERE_ARE_NO_SYNCED_FILES: 'There are no Synced Files',
+    kB: 'kB',
+    UNABLE_TO_UPLOAD: 'Unable to upload',
+    BACKUP_FILE: 'backup file',
+    TRY_AGAIN: 'Try Again',
+    CONTINUE: 'Continue',
+    UNSYNCED_BACKUP_FILES_FOUND: 'Unsynced Backup Files Found',
+    UPLOADED: 'Uploaded',
+    UNSYNCED_BACKUP_FILES: 'Unsynced Backup Files',
+    CONFIRM_LOGOUT: 'Confirm Log Out, ',
+    TRANSACTIONLIST_IS_MISSING: 'Transaction List is missing',
+    SOME_PROCESS_ARE_STILL_WORKING_PLEASE_RE_TRY_AFTER_FEW_MINUTES: 'Some processes are still working. Please re-try after few minutes.',
+    LOGOUT_UNSUCCESSFUL: 'Logout Unsuccessful',
+    
     //DataStore
     SUGGESTIONS: 'Suggestions',
 
@@ -292,4 +307,7 @@ module.exports = {
     ENTER_MOBILE:'Enter your mobile',
     SEND_OTP:'Send OTP',
 
+    // Job Summary
+    UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
+    VALUE_OF_JOBSUMMARY_IS_MISSING: 'Value of JobSummary is missing',
 }

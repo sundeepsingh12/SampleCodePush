@@ -50,7 +50,7 @@ import {
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS,
   OTP_SUCCESS,
-
+  ERROR_400_403_LOGOUT_FAILURE,
 } from '../../lib/constants'
 
 /**
@@ -178,6 +178,11 @@ export default function preloaderReducer(state = initialState, action) {
         .set('showOtpScreen', false)
         .set('otpDisplayMessage', '')
         .set('mobileDisplayMessage', '')
+
+    case ERROR_400_403_LOGOUT_FAILURE:
+      return state.set('isErrorType_403_400_Logout', false)
+        .set('errorMessage_403_400_Logout', action.payload)
+
     case OTP_SUCCESS: 
       return state.set('showOtpScreen',false)
   }

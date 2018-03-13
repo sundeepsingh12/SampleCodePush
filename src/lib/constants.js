@@ -66,6 +66,7 @@ module.exports = keyMirror({
     ON_MOBILE_NO_CHANGE: null,
     ON_OTP_CHANGE: null,
     ERROR_400_403_LOGOUT: null,
+    ERROR_400_403_LOGOUT_FAILURE: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
@@ -192,7 +193,7 @@ module.exports = keyMirror({
     SET_SAVE_ACTIVATED_TOAST_MESSAGE: null,
     EMAILID_VIEW_ARRAY: null,
     IS_COMPANY_CODE_DHL: null,
-    SHOULD_CREATE_BACKUP: null,
+    BACKUP_ALREADY_EXIST: null,
     BACKUP_UPLOAD_FAIL_COUNT: null,
 
     //Realm Tables

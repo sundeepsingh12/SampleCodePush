@@ -90,6 +90,9 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer';
 import moment from 'moment'
+import { SOME_PROCESS_ARE_STILL_WORKING_PLEASE_RE_TRY_AFTER_FEW_MINUTES, LOGOUT_UNSUCCESSFUL, OK } from '../../lib/ContainerConstants'
+import { Toast } from 'native-base'
+
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -268,7 +271,7 @@ export function downloadJobMaster() {
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error.message))
+        dispatch(error_400_403_Logout(error))
       } else {
         dispatch(jobMasterDownloadFailure(error.message))
       }
@@ -308,24 +311,42 @@ export function invalidateUserSessionForAutoLogout() {
  *
  * @return {Function}
  */
-export function invalidateUserSession() {
+export function invalidateUserSession(createBackup) {
   return async function (dispatch) {
     try {
+      console.logs("responsssse")
       dispatch(preLogoutRequest())
       dispatch(setState(TOGGLE_LOGOUT, true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      console.logs("token",token)
       // TODO uncomment this code when run sync in logout
       // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")  
-      await backupService.createBackupOnLogout()
-      await authenticationService.logout(token)
-      await logoutService.deleteDataBase()
-      dispatch(preLogoutSuccess())
-      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      if (createBackup) {
+        await backupService.createBackupOnLogout()
+      }
+      let response = await authenticationService.logout(token) // hit logout api
+      const userData = await keyValueDBService.getValueFromStore(USER)
+      console.logs("response",response)
+      // logout only when status code is 200 or the current date doesn't match with the user's last_login_time.
+      if ((response && response.status == 200) || (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')))) {
+       console.logs("responses",response)
+        await logoutService.deleteDataBase() //delete database.
+        dispatch(preLogoutSuccess())
+        dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+        dispatch(deleteSessionToken())
+      } else {
+        Toast.show({ text: LOGOUT_UNSUCCESSFUL, position: 'bottom', buttonText: OK, duration: 5000 })
+      }
       dispatch(setState(TOGGLE_LOGOUT, false))
-      dispatch(deleteSessionToken())
-
     } catch (error) {
-      dispatch(error_400_403_Logout(error.message))
+      console.logs("error", error)
+      // if (error.code == 403 || error.code == 400) {
+        // clear user session without Logout API call
+        // Logout API will return 500 as the session is pre-cleared on Server
+        dispatch(error_400_403_Logout(error))
+      // } else {
+        // Toast.show({ text: LOGOUT_UNSUCCESSFUL, position: 'bottom', buttonText: OK, duration: 5000 })
+      // }
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
@@ -515,7 +536,7 @@ export function checkIfSimValidOnServer() {
       if (error.code == 403 || error.code == 400) {
         // clear user session without Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error.message))
+        dispatch(error_400_403_Logout(error))
       } else {
         dispatch(checkAssetFailure(error.message))
       }
@@ -588,11 +609,11 @@ export function checkForUnsyncTransactionAndLogout() {
       if (isUnsyncTransactionsPresent) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {
-        dispatch(invalidateUserSession())
+        dispatch(invalidateUserSession(true))
       }
     } catch (error) {
       console.log(error)
-      dispatch(error_400_403_Logout(error.message))
+      dispatch(error_400_403_Logout(error))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
