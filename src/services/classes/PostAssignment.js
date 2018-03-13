@@ -88,8 +88,8 @@ class PostAssignment {
         jobTransaction.jobStatusId = pendingStatus.id
         jobTransaction.jobType = jobMaster.code
         jobTransaction.statusCode = PENDING
-        jobTransaction.employeeCode = user.value.employeeCode
-        jobTransaction.hubCode = hub.value.code
+        jobTransaction.employeeCode = (user && user.value)?user.value.employeeCode:''
+        jobTransaction.hubCode = (hub && hub.value)?hub.value.code:''
         jobTransaction.androidPushTime = moment().format('YYYY-MM-DD HH:mm:ss')
         transactionList.push(jobTransaction)
         transactionDTOList.push(transactionDTO)

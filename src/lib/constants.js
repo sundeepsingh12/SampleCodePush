@@ -273,7 +273,6 @@ module.exports = keyMirror({
     Summary: null,
     CustomApp: null,
     PostAssignmentScanner: null,
-    JobMasterListScreen: null,
     DataStoreDetails: null,
     LiveJobs: null,
     QrCodeScanner: null,
