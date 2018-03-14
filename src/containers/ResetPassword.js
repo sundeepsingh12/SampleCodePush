@@ -56,7 +56,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-
 class ResetPassword extends PureComponent {
 
   static navigationOptions = ({ navigation }) => {
@@ -88,60 +87,71 @@ class ResetPassword extends PureComponent {
     }
   }
   _onResetPress = () => {
-    this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword, this.props.navigation)
+    this.props.actions.checkAndResetPassword(this.props.currentPassword, this.props.newPassword, this.props.confirmNewPassword)
+  }
+
+  _getHeaderView() {
+    return <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+      <Body>
+        <View
+          style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+          <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+          </TouchableOpacity>
+          <View style={[style.headerBody]}>
+            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{RESET_PASSWORD}</Text>
+          </View>
+          <View style={[style.headerRight]}>
+          </View>
+          <View />
+        </View>
+      </Body>
+    </Header>
+  }
+
+  _getPasswordDetails() {
+    return <Content style={[styles.flex1, styles.bgWhite]}>
+      <View style={[styles.bgWhite, styles.padding10, styles.marginTop30]}>
+        <Item stackedLabel style={[styles.marginBottom15]}>
+          <Label style={[styles.fontPrimary, styles.fontSm]}>{CURRENT_PASSWORD}</Label>
+          <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setCurrentPassword} value={this.props.currentPassword} />
+        </Item>
+        <Item stackedLabel style={[styles.marginBottom15]}>
+          <Label style={[styles.fontPrimary, styles.fontSm]}>{NEW_PASSWORD}</Label>
+          <Label style={[styles.fontDarkGray, styles.fontXs]}>{MINIMUM_REQUIREMENT_FOR_PASSWORD}</Label>
+          <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setNewPassword} value={this.props.newPassword} />
+        </Item>
+        <Item stackedLabel style={[styles.marginBottom15]}>
+          <Label style={[styles.fontPrimary, styles.fontSm]}>{CONFIRM_NEW_PASSWORD}</Label>
+          <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setConfirmNewPassword} value={this.props.confirmNewPassword} />
+        </Item>
+      </View>
+    </Content>
+  }
+
+  _getFooterView() {
+    return <Footer style={[style.footer]}>
+      <FooterTab style={[styles.padding10]}>
+        <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
+          <Text style={[styles.fontLg, styles.fontWhite]}>{RESET_PASSWORD}</Text>
+        </Button>
+      </FooterTab>
+    </Footer>
   }
 
   render() {
     if (this.props.isLoaderInProfile) {
       return (<Loader />)
     } else {
+      let headerView = this._getHeaderView()
+      let passwordDetails = this._getPasswordDetails()
+      let footerView = this._getFooterView()
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
-
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-              <Body>
-                <View
-                  style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                  <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                  </TouchableOpacity>
-                  <View style={[style.headerBody]}>
-                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{RESET_PASSWORD}</Text>
-                  </View>
-                  <View style={[style.headerRight]}>
-                  </View>
-                  <View />
-                </View>
-              </Body>
-            </Header>
-
-            <Content style={[styles.flex1, styles.bgWhite]}>
-              {/*card 1*/}
-              <View style={[styles.bgWhite, styles.padding10, styles.marginTop30]}>
-                <Item stackedLabel style={[styles.marginBottom15]}>
-                  <Label style={[styles.fontPrimary, styles.fontSm]}>{CURRENT_PASSWORD}</Label>
-                  <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setCurrentPassword} value={this.props.currentPassword} />
-                </Item>
-                <Item stackedLabel style={[styles.marginBottom15]}>
-                  <Label style={[styles.fontPrimary, styles.fontSm]}>{NEW_PASSWORD}</Label>
-                  <Label style={[styles.fontDarkGray, styles.fontXs]}>{MINIMUM_REQUIREMENT_FOR_PASSWORD}</Label>
-                  <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setNewPassword} value={this.props.newPassword} />
-                </Item>
-                <Item stackedLabel style={[styles.marginBottom15]}>
-                  <Label style={[styles.fontPrimary, styles.fontSm]}>{CONFIRM_NEW_PASSWORD}</Label>
-                  <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setConfirmNewPassword} value={this.props.confirmNewPassword} />
-                </Item>
-              </View>
-
-            </Content>
-            <Footer style={[style.footer]}>
-              <FooterTab style={[styles.padding10]}>
-                <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
-                  <Text style={[styles.fontLg, styles.fontWhite]}>{RESET_PASSWORD}</Text>
-                </Button>
-              </FooterTab>
-            </Footer>
+            {headerView}
+            {passwordDetails}
+            {footerView}
           </Container>
         </StyleProvider>
       )
@@ -181,8 +191,6 @@ const style = StyleSheet.create({
     height: 50,
     fontSize: 14
   }
-
 });
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(ResetPassword)
