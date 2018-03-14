@@ -650,5 +650,24 @@ export default {
     borderBottomGray: {
         borderBottomWidth: 1,
         borderBottomColor: '#d4d4d4'
+    },
+    // Profile UI
+    profileHeaderLeft: {
+        width: '15%',
+        padding: 15
+    },
+    profilePic: {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+    },
+    footer: {
+        height: 'auto',
+        borderTopWidth: 1,
+        borderTopColor: '#f3f3f3'
+    },
+    inputType: {
+        height: 50,
+        fontSize: 14
     }
 }

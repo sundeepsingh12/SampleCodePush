@@ -91,17 +91,17 @@ class ResetPassword extends PureComponent {
   }
 
   _getHeaderView() {
-    return <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+    return <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
       <Body>
         <View
           style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-          <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+          <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
             <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
           </TouchableOpacity>
-          <View style={[style.headerBody]}>
+          <View style={[styles.headerBody, styles.paddingTop15]}>
             <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{RESET_PASSWORD}</Text>
           </View>
-          <View style={[style.headerRight]}>
+          <View style={[styles.headerRight]}>
           </View>
           <View />
         </View>
@@ -114,23 +114,23 @@ class ResetPassword extends PureComponent {
       <View style={[styles.bgWhite, styles.padding10, styles.marginTop30]}>
         <Item stackedLabel style={[styles.marginBottom15]}>
           <Label style={[styles.fontPrimary, styles.fontSm]}>{CURRENT_PASSWORD}</Label>
-          <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setCurrentPassword} value={this.props.currentPassword} />
+          <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setCurrentPassword} value={this.props.currentPassword} />
         </Item>
         <Item stackedLabel style={[styles.marginBottom15]}>
           <Label style={[styles.fontPrimary, styles.fontSm]}>{NEW_PASSWORD}</Label>
           <Label style={[styles.fontDarkGray, styles.fontXs]}>{MINIMUM_REQUIREMENT_FOR_PASSWORD}</Label>
-          <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setNewPassword} value={this.props.newPassword} />
+          <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setNewPassword} value={this.props.newPassword} />
         </Item>
         <Item stackedLabel style={[styles.marginBottom15]}>
           <Label style={[styles.fontPrimary, styles.fontSm]}>{CONFIRM_NEW_PASSWORD}</Label>
-          <Input style={[style.inputType]} secureTextEntry={true} onChangeText={this._setConfirmNewPassword} value={this.props.confirmNewPassword} />
+          <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setConfirmNewPassword} value={this.props.confirmNewPassword} />
         </Item>
       </View>
     </Content>
   }
 
   _getFooterView() {
-    return <Footer style={[style.footer]}>
+    return <Footer style={[styles.footer]}>
       <FooterTab style={[styles.padding10]}>
         <Button success full onPress={this._onResetPress} disabled={this.props.isSaveResetButtonDisabled}>
           <Text style={[styles.fontLg, styles.fontWhite]}>{RESET_PASSWORD}</Text>
@@ -143,54 +143,17 @@ class ResetPassword extends PureComponent {
     if (this.props.isLoaderInProfile) {
       return (<Loader />)
     } else {
-      let headerView = this._getHeaderView()
-      let passwordDetails = this._getPasswordDetails()
-      let footerView = this._getFooterView()
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
-            {headerView}
-            {passwordDetails}
-            {footerView}
+            {this._getHeaderView()}
+            {this._getPasswordDetails()}
+            {this._getFooterView()}
           </Container>
         </StyleProvider>
       )
     }
   }
 };
-
-const style = StyleSheet.create({
-  header: {
-    borderBottomWidth: 0,
-    height: 'auto',
-    padding: 0,
-    paddingRight: 0,
-    paddingLeft: 0
-  },
-  headerLeft: {
-    width: '15%',
-    padding: 15
-  },
-  headerBody: {
-    width: '70%',
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 10,
-    paddingRight: 10
-  },
-  headerRight: {
-    width: '15%',
-    padding: 15
-  },
-  footer: {
-    height: 'auto',
-    borderTopWidth: 1,
-    borderTopColor: '#f3f3f3'
-  },
-  inputType: {
-    height: 50,
-    fontSize: 14
-  }
-});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ResetPassword)

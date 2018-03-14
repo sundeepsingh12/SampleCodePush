@@ -58,14 +58,13 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY) // gets the user session token key
             const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject) // this function validates all parameters and then hit api to change password and returns the response.
 
-            if (response && response.status == 200) { // password will only be set when response status is 200.
-                await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword)) // new password gets saved after the response status is checked
-                let allPasswords = { currentPassword: '', newPassword: '', confirmNewPassword: '' } // resets data in all password fields
-                Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: OK, duration: 6000 })
-                dispatch(setState(CLEAR_PASSWORD_TEXTINPUT))
-                dispatch(NavigationActions.back())  // automatically goes on the previous screen.
-            }
+            await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword)) // new password gets saved after the response status is checked
+            let allPasswords = { currentPassword: '', newPassword: '', confirmNewPassword: '' } // resets data in all password fields
+            Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: OK, duration: 6000 })
+            dispatch(setState(CLEAR_PASSWORD_TEXTINPUT))
+            dispatch(NavigationActions.back())  // automatically goes on the previous screen.
         } catch (error) {
+            Toast.show({ text: error.message, position: 'bottom', buttonText: OK, duration: 6000 })
             console.log(error.message) // to do update later
         } finally {
             dispatch(setState(IS_PROFILE_LOADING, false))
