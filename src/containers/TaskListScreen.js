@@ -149,16 +149,6 @@ class TaskListScreen extends PureComponent {
     return jobTransactionArray
   }
 
-  renderItem = (row) => {
-    return (
-      <JobListItem
-        data={row.item}
-        showIconsInJobListing = {true}
-        onPressItem={() => { this.navigateToScene(row.item) }}
-      />
-    )
-  }
-
   renderSectionHeader = (row) => {
     return (
       <Separator bordered>
@@ -250,8 +240,9 @@ class TaskListScreen extends PureComponent {
     return (
       <SectionList
         sections={this.renderListForAll()}
-        renderItem={this.renderItem}
+        renderItem={({ item }) => this.renderData(item)}
         renderSectionHeader={this.renderSectionHeader}
+        keyExtractor={item => String(item.id)}
       />
     )
   }
