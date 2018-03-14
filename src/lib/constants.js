@@ -109,12 +109,16 @@ module.exports = keyMirror({
     JOB_LISTING_START: null,
     JOB_LISTING_END: null,
 
+    //Draft
+    DARFT_STATUS_INFO: null,
+
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
     JOB_DETAILS_FETCHING_END: null,
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
+    SET_DRAFT_JOB_DETAILS_INFO: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,

@@ -55,7 +55,8 @@ import {
   ImageDetailsView,
   RESET_STATE_FOR_JOBDETAIL,
   BulkListing,
-  SHOW_DROPDOWN
+  SHOW_DROPDOWN,
+  SET_DRAFT_JOB_DETAILS_INFO
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -206,6 +207,10 @@ class JobDetailsV2 extends PureComponent {
   }
   _onCancel = () => {
     this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
+  }
+
+  _onCancelForDraft = () =>{
+    this.props.actions.setState(SET_DRAFT_JOB_DETAILS_INFO, {})
   }
 
   _onCheckLocationMismatch = (statusList, jobTransaction) => {
@@ -445,7 +450,7 @@ class JobDetailsV2 extends PureComponent {
         title="Draft"
         message={draftMessage}
         onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={this._onCancel} />
+        onCancelPressed={this._onCancelForDraft} />
     return view
   }
 
@@ -470,6 +475,8 @@ class JobDetailsV2 extends PureComponent {
       jobMasterId: this.props.jobTransaction.jobMasterId,
       isDraftRestore: true
     })
+    this.props.actions.setState(SET_DRAFT_JOB_DETAILS_INFO, {})
+
   }
   render() {
     if (this.props.jobDetailsLoading) {
@@ -479,19 +486,19 @@ class JobDetailsV2 extends PureComponent {
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.errorMessage) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
       const etaTimer = this.etaUpdateTimer()
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
             {draftAlert}
             <View>
-              {renderIf(this.props.statusList,
+              {this.props.statusList ? 
                 <CustomAlert
                   title="Details"
                   message="You are not at location. Do you want to continue?"
                   onOkPressed={this._onGoToNextStatus}
-                  onCancelPressed={this._onCancel} />)}
+                  onCancelPressed={this._onCancel} /> : null}
             </View>
             <Header style={[style.header]}>
               <View style={style.seqCard}>
@@ -527,7 +534,7 @@ class JobDetailsV2 extends PureComponent {
                       name="md-close"
                       style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
                   </View>
-                </TouchableOpacity >
+                </TouchableOpacity>
               </View>
             </Header>
             <Content>
