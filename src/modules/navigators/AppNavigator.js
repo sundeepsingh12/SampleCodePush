@@ -74,7 +74,6 @@ import SaveActivated from '../../containers/SaveActivated'
 import Transient from '../../containers/Transient'
 import CheckoutDetails from '../../containers/CheckoutDetails'
 import CashTendering from '../../containers/CashTendering'
-import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
@@ -217,7 +216,10 @@ export const AppNavigator = StackNavigator({
     }
   },
   HomeTabNavigatorScreen: {
-    screen: HomeTabNavigator
+    screen: HomeTabNavigator,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
   },
   Sequence: {
     screen: Sequence,

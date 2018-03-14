@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated } from 'react-native'
 import Loader from '../components/Loader'
-import HomeFooter from './HomeFooter'
 import {
   Container,
   Content,

@@ -308,17 +308,15 @@ export function invalidateUserSessionForAutoLogout() {
 }
 
 /**This method logs out the user and deletes session token from store
- *
+ * @param {*} createBackup if it is called from backup class 
  * @return {Function}
  */
 export function invalidateUserSession(createBackup) {
   return async function (dispatch) {
     try {
-      console.logs("responsssse")
       dispatch(preLogoutRequest())
       dispatch(setState(TOGGLE_LOGOUT, true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-      console.logs("token",token)
       // TODO uncomment this code when run sync in logout
       // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")  
       if (createBackup) {
@@ -326,10 +324,8 @@ export function invalidateUserSession(createBackup) {
       }
       let response = await authenticationService.logout(token) // hit logout api
       const userData = await keyValueDBService.getValueFromStore(USER)
-      console.logs("response",response)
       // logout only when status code is 200 or the current date doesn't match with the user's last_login_time.
       if ((response && response.status == 200) || (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')))) {
-       console.logs("responses",response)
         await logoutService.deleteDataBase() //delete database.
         dispatch(preLogoutSuccess())
         dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
@@ -339,14 +335,9 @@ export function invalidateUserSession(createBackup) {
       }
       dispatch(setState(TOGGLE_LOGOUT, false))
     } catch (error) {
-      console.logs("error", error)
-      // if (error.code == 403 || error.code == 400) {
-        // clear user session without Logout API call
-        // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error))
-      // } else {
-        // Toast.show({ text: LOGOUT_UNSUCCESSFUL, position: 'bottom', buttonText: OK, duration: 5000 })
-      // }
+      // clear user session without Logout API call
+      // Logout API will return 500 as the session is pre-cleared on Server
+      dispatch(error_400_403_Logout(error))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }

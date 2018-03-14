@@ -171,6 +171,7 @@ class FormLayout extends PureComponent {
       isLoading: this.props.isLoading,
       errorMessage: this.props.errorMessage,
       currentElement: this.props.currentElement,
+      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
     }
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
