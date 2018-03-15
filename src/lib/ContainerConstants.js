@@ -177,7 +177,7 @@ module.exports = {
     THERE_ARE_NO_UNSYNCED_FILES: 'There are no Unsynced Files.',
     DELETE: 'Delete',
     THERE_ARE_NO_SYNCED_FILES: 'There are no Synced Files',
-    kB: 'kB',
+    KB: 'KB',
     UNABLE_TO_UPLOAD: 'Unable to upload',
     BACKUP_FILE: 'backup file',
     TRY_AGAIN: 'Try Again',
@@ -189,7 +189,9 @@ module.exports = {
     TRANSACTIONLIST_IS_MISSING: 'Transaction List is missing',
     SOME_PROCESS_ARE_STILL_WORKING_PLEASE_RE_TRY_AFTER_FEW_MINUTES: 'Some processes are still working. Please re-try after few minutes.',
     LOGOUT_UNSUCCESSFUL: 'Logout Unsuccessful',
-    
+    MB: 'MB',
+    TRY_AFTER_CLEARING_YOUR_STORAGE_DATA: 'Please Try again after clearing your storage data.',
+
     //DataStore
     SUGGESTIONS: 'Suggestions',
 

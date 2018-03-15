@@ -42,7 +42,8 @@ import {
     THERE_ARE_NO_UNSYNCED_FILES,
     DELETE,
     THERE_ARE_NO_SYNCED_FILES,
-    kB,
+    KB,
+    MB,
 } from '../lib/ContainerConstants'
 import {
     SET_BACKUP_VIEW,
@@ -122,6 +123,13 @@ class Backup extends Component {
         }
         return loader
     }
+    _getViewOfSize(size) {
+        if (size >= 1024) {
+            return <Text>{+(Math.round(size / 1024 + "e+2") + "e-2")} {MB}</Text>
+        } else {
+            return <Text>{size} {KB}</Text>
+        }
+    }
     renderSyncedData = (item) => {
         return (
             <View style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
@@ -162,12 +170,10 @@ class Backup extends Component {
                         </Text>
                     </View>
                     <View style={{ width: '50%' }}>
-                        <Text>
-                            {item.size} {kB}
-                        </Text>
+                        {this._getViewOfSize(item.size)}
                     </View>
                     <View style={{ width: '10%' }}>
-                    {renderIf(item.isNew, <View style={[styles.alignCenter, { backgroundColor: '#F6DF80', borderRadius: 3, padding: 3 }]}>
+                        {renderIf(item.isNew, <View style={[styles.alignCenter, { backgroundColor: '#F6DF80', borderRadius: 3, padding: 3 }]}>
                             <Text style={[styles.fontWhite, { fontSize: 11 }]}>
                                 {NEW}
                             </Text>
@@ -383,9 +389,7 @@ class Backup extends Component {
                             </Text>
                         </View>
                         <View style={{ width: '50%' }}>
-                            <Text>
-                                {this.props.fileUploading.size} {kB}
-                            </Text>
+                            {this._getViewOfSize(this.props.fileUploading.size)}
                         </View>
                     </View>
                 </View>

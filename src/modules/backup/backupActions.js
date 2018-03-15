@@ -8,7 +8,8 @@ import {
     SET_UPLOADING_FILE,
     SET_SYNCED_FILES,
     LoginScreen,
-    SET_BACKUP_UPLOAD_VIEW
+    SET_BACKUP_UPLOAD_VIEW,
+    SET_BACKUP_TOAST,
 } from '../../lib/constants'
 import _ from 'lodash'
 import { setState, deleteSessionToken } from '../global/globalActions'
@@ -23,10 +24,9 @@ import {
     USER_MISSING,
     TOKEN_MISSING,
     FILE_MISSING,
-    SOME_PROCESS_ARE_STILL_WORKING,
-    PLEASE_RE_TRY_AFTER_FEW_MINUTES,
     LOGOUT_UNSUCCESSFUL,
     OK,
+    TRY_AFTER_CLEARING_YOUR_STORAGE_DATA,
 } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import moment from 'moment'
@@ -47,7 +47,7 @@ export function createManualBackup(syncedBackupFiles) {
                 dispatch(setState(SET_SYNCED_FILES, backupFilesAndToastMessage))
             }
         } catch (error) {
-            dispatch(setState(SET_LOADER_BACKUP, false)) // to do add exception logs
+            dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))    // to do add exception logs
         }
     }
 }
@@ -143,7 +143,7 @@ export function autoLogoutAfterUpload(calledFromHome) {
                 dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
                 dispatch(deleteSessionToken())
             } else {
-            Toast.show({ text: LOGOUT_UNSUCCESSFUL, position: 'bottom', buttonText: OK, duration: 5000 })
+                Toast.show({ text: LOGOUT_UNSUCCESSFUL, position: 'bottom', buttonText: OK, duration: 5000 })
             }
         } catch (error) {
             console.log(error)// to do add exception logs
