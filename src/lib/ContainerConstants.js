@@ -70,6 +70,7 @@ module.exports = {
     CONFIRM_REVERT: 'Confirm Revert',
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
+    REVERT_STATUS:'Revert Status',
 
     //Payment Container
     YES: 'Yes',
@@ -205,6 +206,7 @@ module.exports = {
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
     YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
+    MORE:'More',
     
 
     //Save Activated

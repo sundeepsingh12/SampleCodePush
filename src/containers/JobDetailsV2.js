@@ -21,6 +21,9 @@ import {
   CONFIRMATION,
   CALL_CONFIRM,
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
+  SELECT_ADDRESS_NAVIGATION,
+  REVERT_STATUS,
+  MORE
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
@@ -187,7 +190,7 @@ class JobDetailsV2 extends PureComponent {
             onPress={() => { this.props.actions.setState(SHOW_DROPDOWN, !this.props.isShowDropdown) }}
           >
             <View style={[styles.row, styles.alignCenter]}>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{statusList.length - minIndexDropDown} More</Text>
+              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{statusList.length - minIndexDropDown} {MORE}</Text>
               <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
             </View>
           </ListItem>)
@@ -358,7 +361,7 @@ class JobDetailsV2 extends PureComponent {
           {
             options: addressArray,
             cancelButtonIndex: addressArray.length - 1,
-            title: 'Select address for navigation'
+            title: SELECT_ADDRESS_NAVIGATION
           },
           buttonIndex => {
             if (buttonIndex != addressArray.length - 1 && buttonIndex >= 0) {
@@ -390,9 +393,8 @@ class JobDetailsV2 extends PureComponent {
         getDirections(data)
       }
     }
-
-
   }
+
   alertForStatusRevert(statusData) {
     Alert.alert(
       CONFIRM_REVERT,
@@ -403,16 +405,16 @@ class JobDetailsV2 extends PureComponent {
       ],
     )
   }
-  updateTransactionForGroupId(groupId) {
 
+  updateTransactionForGroupId(groupId) {
     this.props.actions.navigateToScene(BulkListing, {
       jobMasterId: this.props.jobTransaction.jobMasterId,
       statusId: this.props.currentStatus.id,
       nextStatusList: this.props.currentStatus.nextStatusList,
       groupId
     })
-
   }
+
   selectStatusToRevert = () => {
     if (this.props.statusRevertList[0] == 1) {
       { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
@@ -423,6 +425,7 @@ class JobDetailsV2 extends PureComponent {
       this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
     }
   }
+
   _onGoToPreviousStatus = (statusData) => {
     this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation)
   }
@@ -466,15 +469,23 @@ class JobDetailsV2 extends PureComponent {
     )
   }
 
+  showJobMasterIdentifier(){
+    return(
+      <View style={[style.seqCircle, { backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor }]}>
+      <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
+        {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
+      </Text>
+    </View>
+    )
+  }
+
+
   showHeaderView() {
     return (
       <Header style={[style.header]}>
         <View style={style.seqCard}>
-          <View style={[style.seqCircle, { backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor }]}>
-            <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-              {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
-            </Text>
-          </View>
+        {this.showJobMasterIdentifier()}
+        
           <View style={style.seqCardDetail}>
             <View>
               <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
@@ -489,23 +500,46 @@ class JobDetailsV2 extends PureComponent {
               </Text>
             </View>
           </View>
-          <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
-            <View
-              style={{
-                width: 40,
-                alignSelf: 'flex-start',
-                alignItems: 'center',
-                paddingTop: 10,
-                flex: 1
-              }}>
-              <Icon
-                name="md-close"
-                style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
-            </View>
-          </TouchableOpacity>
+          {this.showCloseIcon()}
+         
         </View>
       </Header>
     )
+  }
+
+  showCloseIcon(){
+    return (
+      <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
+      <View
+        style={{
+          width: 40,
+          alignSelf: 'flex-start',
+          alignItems: 'center',
+          paddingTop: 10,
+          flex: 1
+        }}>
+        <Icon
+          name="md-close"
+          style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
+      </View>
+    </TouchableOpacity>
+    )
+  }
+
+  showRevertView (){
+    <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={this.selectStatusToRevert}>
+    <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+      <View style={[styles.row, styles.alignCenter]}>
+        <View>
+          <RevertIcon color={styles.fontPrimary} />
+        </View>
+        <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{REVERT_STATUS}</Text>
+        <Right>
+          <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+        </Right>
+      </View>
+    </View>
+  </TouchableOpacity>
   }
 
   showContentView() {
@@ -513,19 +547,7 @@ class JobDetailsV2 extends PureComponent {
     const etaTimer = this.etaUpdateTimer()
     return (<Content>
       {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
-        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={this.selectStatusToRevert}>
-          <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
-            <View style={[styles.row, styles.alignCenter]}>
-              <View>
-                <RevertIcon color={styles.fontPrimary} />
-              </View>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >Revert Status</Text>
-              <Right>
-                <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-              </Right>
-            </View>
-          </View>
-        </TouchableOpacity> : null}
+        this.showRevertView(): null}
 
       <View style={[styles.marginTop5, styles.bgWhite]}>
         {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
@@ -538,56 +560,61 @@ class JobDetailsV2 extends PureComponent {
       </View>
 
       {/*Basic Details*/}
-      <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
-        <ExpandableHeader
-          title={'Basic Details'}
-          navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-          dataList={this.props.jobDataList}
-        />
-      </View>
+     {this.showJobDetails()}
 
-      {/*Payment Details*/}
-      <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
-        <ExpandableHeader
-          title={'Field Details'}
-          dataList={this.props.fieldDataList}
-          navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-          navigateToCameraDetails={this.navigateToCameraDetails} />
-      </View>
+      {/*Field Details*/}
+     {this.showFieldDetails()}
     </Content>
+    )
+  }
+
+  showJobDetails(){
+    return (
+      <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+      <ExpandableHeader
+        title={'Basic Details'}
+        navigateToDataStoreDetails={this.navigateToDataStoreDetails}
+        dataList={this.props.jobDataList}
+      />
+    </View>
+    )
+  }
+
+  showFieldDetails(){
+    return (
+    <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+    <ExpandableHeader
+      title={'Field Details'}
+      dataList={this.props.fieldDataList}
+      navigateToDataStoreDetails={this.navigateToDataStoreDetails}
+      navigateToCameraDetails={this.navigateToCameraDetails} />
+  </View>
     )
   }
 
   showFooterView() {
     return (
       <Footer style={[style.footer]}>
-        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData
-          && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0
-          && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData
-          && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
+        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0  && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData  && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
           <FooterTab>
             <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
               <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
             </Button>
           </FooterTab>
         )}
-
         {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
-          <FooterTab>
-            <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-              <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-            </Button>
-          </FooterTab>
+           <FooterTab>
+           <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
+             <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+           </Button>
+         </FooterTab>
         )}
-
-        {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||
-          (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
+        {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||  (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
           <FooterTab>
             <Button full onPress={this.navigationButtonPressed}>
               <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
             </Button>
           </FooterTab>)}
-
         {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
           <FooterTab>
             <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
@@ -645,7 +672,6 @@ class JobDetailsV2 extends PureComponent {
     }
   }
 }
-
 
 const style = StyleSheet.create({
   header: {
