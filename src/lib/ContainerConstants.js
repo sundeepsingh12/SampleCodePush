@@ -204,6 +204,8 @@ module.exports = {
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+    YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
+    
 
     //Save Activated
     EDIT: 'Edit',
