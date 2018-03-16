@@ -209,6 +209,9 @@ export default class FormLayoutEventImpl {
                 longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
             }
             let currentTime = moment().format('YYYY-MM-DD HH:mm:ss')
+            if (!formLayoutObject && Object.keys(formLayoutObject).length == 0) {
+                return formLayoutObject // return undefined or empty object if formLayoutObject is empty
+            }
             let fieldData, jobTransaction, job, dbObjects
             if (jobTransactionList && jobTransactionList.length) { //Case of bulk
                 fieldData = this._saveFieldDataForBulk(formLayoutObject, jobTransactionList)
