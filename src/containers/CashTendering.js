@@ -129,41 +129,55 @@ class CashTendering extends PureComponent {
         }
         return totalAmountInCashTendering
     }
+
+    showHeaderView(){
+        return(
+            <Header searchBar style={[styles.bgPrimary, style.header]}>
+                <Body>
+                    <View
+                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                        </TouchableOpacity>
+                        <View style={[style.headerBody]}>
+                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.isReceive) ? 'Collect Cash' : 'Return Cash'}</Text>
+                        </View>
+                        <View style={[style.headerRight]}>
+                        </View>
+                        <View />
+                    </View>
+                </Body>
+            </Header>
+        )
+    }
+
+    showFlatList(){
+        return (
+            <Content style={[styles.flex1, styles.bgWhite, styles.marginTop5]}>
+                <FlatList
+                    data={(Object.values((this.props.isReceive) ? this.props.cashTenderingList : this.props.cashTenderingListReturn)).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence)}
+                    renderItem={({ item }) => this.renderData(item)}
+                    keyExtractor={item => String(item.id)}
+                />
+            </Content>
+        )
+    }
+
     render() {
         if (this.props.isCashTenderingLoaderRunning) {
             return (
                 <Loader />
             )
         }
-        let amountToCollectOrReturn = this._checkIfCashCollectOrReturn()
         let totalAmountInCashTendering = this._totalAmountInCashTenderingToCollectOrReturn()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
-                    <Header searchBar style={[styles.bgPrimary, style.header]}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{(this.props.isReceive) ? 'Collect Cash' : 'Return Cash'}</Text>
-                                </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
-                    {amountToCollectOrReturn}
-                    <Content style={[styles.flex1, styles.bgWhite, styles.marginTop5]}>
-                        <FlatList
-                            data={(Object.values((this.props.isReceive) ? this.props.cashTenderingList : this.props.cashTenderingListReturn)).sort((fieldData_1, fieldData_2) => fieldData_1.sequence - fieldData_2.sequence)}
-                            renderItem={({ item }) => this.renderData(item)}
-                            keyExtractor={item => String(item.id)}
-                        />
-                    </Content>
+                {this.showHeaderView()}
+                  
+                    {this._checkIfCashCollectOrReturn()}
+                    {this.showFlatList()}
+                   
                     <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
                         {totalAmountInCashTendering}
                         <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>
