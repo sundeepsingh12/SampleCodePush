@@ -19,7 +19,6 @@ import {
 } from '../../lib/ContainerConstants'
 import { jobStatusService } from '../classes/JobStatus'
 import { runSheetService } from '../classes/RunSheet'
-import { jobDetailsService } from '../classes/JobDetails'
 
 describe('test findCentreOfPolygon', () => {
     it('should return an object having mean lat long', () => {
@@ -50,8 +49,8 @@ describe('test calculateRadius', () => {
             latitude: 50,
             longitude: 50
         }
-        jobDetailsService.distance = jest.fn()
-        jobDetailsService.distance.mockReturnValue(0.5)
+        geoFencingService.distance = jest.fn()
+        geoFencingService.distance.mockReturnValue(0.5)
         expect(geoFencingService.calculateRadius(mean, latLongArray)).toEqual(1300)
     })
 })

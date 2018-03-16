@@ -20,6 +20,7 @@ import {
     USER_SUMMARY
 } from '../../lib/constants'
 import { keyValueDBService } from './KeyValueDBService'
+import { geoFencingService } from './GeoFencingService';
 
 
 class JobDetails {
@@ -197,18 +198,6 @@ class JobDetails {
         const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)
         return !(unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
     }
-
-    /**@function toRadians(angle)
-     * ## convert degree to radians
-     * 
-     * @param {string} angle - It contains data for form layout
-     *
-     *@returns {string} radians value
-     */
-
-    toRadians(angle) {
-        return angle * (Math.PI / 180);
-    }
     
     /**@function updateTransactionOnRevert(jobTransactionData,previousStatus)
      * ## It will update transactionData on revert status 
@@ -234,24 +223,6 @@ class JobDetails {
             tableName: TABLE_JOB_TRANSACTION,
             value: jobTransactionArray,
         }
-    }
-
-    /**@function distance(jobLat,jobLong,userLat,userLong)
-     * ## find aerial distance between user location and job location
-     * 
-     * @param {string} jobLat - job location latitude
-     * @param {string} jobLat - job location longitude
-     * @param {string} userLat - user location latitud
-     * @param {string} userLong - user location longitude
-     * 
-     * @returns {string} - distance between user and job locations
-     */
-
-    distance(jobLat, jobLong, userLat, userLong) {
-        const theta = jobLong - userLong
-        let dist = Math.sin(this.toRadians(jobLat)) * Math.sin(this.toRadians(userLat)) + Math.cos(this.toRadians(jobLat)) * Math.cos(this.toRadians(userLat)) * Math.cos(this.toRadians(theta));
-        dist = (Math.acos(dist) * (180 / Math.PI)) * 60 * 1.1515 * 1.609344;
-        return dist;
     }
 
     /**@function setAllDataForRevertStatus(statusList,jobTransaction,previousStatus)
@@ -296,7 +267,7 @@ class JobDetails {
         let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0];
         if (!jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong)
             return false
-        const dist = this.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
+        const dist = geoFencingService.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
         return (dist * 1000 >= 100)
     }
 }

@@ -81,7 +81,7 @@ export default function homeReducer(state = initialState, action) {
       return state.set('unsyncBackupFilesList', action.payload)
 
     case SET_TRANSACTION_SERVICE_STARTED:
-      return state.set('transactionServiceStarted', action.payload)
+      return state.set('trackingServiceStarted', action.payload)
   }
 
   return state

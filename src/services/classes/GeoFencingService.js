@@ -6,7 +6,8 @@ import {
     TABLE_JOB_TRANSACTION,
     TABLE_JOB,
     GEO_FENCING,
-    LAT_LONG_GEO_FENCE
+    LAT_LONG_GEO_FENCE,
+    GEO_FENCE_STATUS,
 } from '../../lib/constants'
 import {
     PENDING
@@ -16,7 +17,6 @@ import { keyValueDBService } from './KeyValueDBService'
 import _ from 'lodash'
 import { jobStatusService } from './JobStatus'
 import { runSheetService } from './RunSheet'
-import { jobDetailsService } from './JobDetails'
 import {
     HUB_LAT_LONG_MISSING,
     FENCE_LAT_LONG_MISSING
@@ -107,7 +107,7 @@ class GeoFencingService {
     calculateRadius(meanLatLong, listOfLatLong) {
         let radius = 0
         for (let latLong of listOfLatLong) {
-            let distance = jobDetailsService.distance(meanLatLong.latitude, meanLatLong.longitude, latLong.latitude, latLong.longitude)
+            let distance = this.distance(meanLatLong.latitude, meanLatLong.longitude, latLong.latitude, latLong.longitude)
             if (radius < distance) {
                 radius = distance
             }
@@ -218,6 +218,91 @@ class GeoFencingService {
             openRunsheetList
         }
     }
+
+
+    /**@function distance(firstLat,firstLong,secondLat,secondLong)
+     * ## find aerial distance between two location
+     * 
+     * @param {string} firstLat - first location latitude
+     * @param {string} firstLong - first location longitude
+     * @param {string} secondLat - second location latitude
+     * @param {string} secondLong - second location longitude
+     * 
+     * @returns {string} - distance between two location
+     */
+
+    distance(firstLat, firstLong, secondLat, secondLong) {
+        const theta = firstLong - secondLong
+        let dist = Math.sin(this.toRadians(firstLat)) * Math.sin(this.toRadians(secondLat)) + Math.cos(this.toRadians(firstLat)) * Math.cos(this.toRadians(secondLat)) * Math.cos(this.toRadians(theta));
+        dist = (Math.acos(dist) * (180 / Math.PI)) * 60 * 1.1515 * 1.609344;
+        return dist;
+    }
+
+
+    /**
+   * This method adds geo fence if there is a job master having enable resequence restriction and company having allowOffRouteNotificartion
+   * @param {*} fenceForInitialJob // true if it is called from sync which is the case of initial job 
+   *                                   false if it is called after saving job transaction i.e. subsequent jobs       
+   */
+    async addGeoFence(fenceForInitialJob) {
+        try {
+            /*In case for initial job we check if fence is present or not if present we do not add another fence
+              In case it is called from formLayout i.e. not an initial job then we first delete the fence which is present then add another fence  
+            */
+
+            /*This method returns jobMasterIdListWithEnableResequenceRestriction if offRouteNotification is on in compant setting and there is no fence present
+                it also returns openRunsheet List                                                                                                                                                                                                      
+            */
+            let { fencePresent, jobMasterIdListWithEnableResequenceRestriction, openRunsheetList } = await this.checkForEnableResequenceRestrictionAndCheckAllowOffRouteNotification(fenceForInitialJob)
+            /*if fenceForInitialJob is false and fence present then we add another fence after deletopenRunsheetListing previous fence 
+              here we also check for non empty jobMasterIdListWithEnableResequenceRestriction and non empty openRunsheetList */
+            if ((!fencePresent || !fenceForInitialJob) && !_.isEmpty(jobMasterIdListWithEnableResequenceRestriction) && !_.isEmpty(openRunsheetList)) {
+                /* below method returns mean lat long, radius and identifier which is used to add a geofence
+                 */
+                let { meanLatLong, radius, transactionIdIdentifier } = await this.getLatLng(jobMasterIdListWithEnableResequenceRestriction, openRunsheetList, fenceForInitialJob)
+                /*
+                 here status is used to identify if FE is inside boundary or outside boundary and is passed when new fence is added
+                 */
+                let status = await keyValueDBService.getValueFromStore(GEO_FENCE_STATUS)
+                /*  
+                 if radius is not defined or zero and mean lat long is undefined then do not add geo fence
+                 */
+                if (radius && meanLatLong && meanLatLong.latitude && meanLatLong.longitude) {
+                    await trackingService.addGeoFence(meanLatLong, radius, transactionIdIdentifier.toString(), status)
+                }
+            }
+        }
+        catch (error) {
+            //TODO
+            console.log(error)
+        }
+    }
+
+    /**
+     * This method adds a geoFence using lat long of job that is just completed , 
+     * lat long of next job which FE has to complete and the second job which FE has to complete.
+     */
+    async addNewGeoFenceAndDeletePreviousFence() {
+        let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+        /* identify the fence and in case of job master have enable resequence restriction in job master setting and
+        allowOffRouteNotification in company setting then only a fence is added while saving  
+        */
+        if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) { //check for identifier in store
+            this.addGeoFence(false)
+        }
+    }
+
+    /**@function toRadians(angle)
+     * ## convert degree to radians
+     * 
+     * @param {string} angle - It contains data for form layout
+     *
+     *@returns {string} radians value
+     */
+    toRadians(angle) {
+        return angle * (Math.PI / 180);
+    }
+
 }
 
 export let geoFencingService = new GeoFencingService()

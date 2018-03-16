@@ -23,8 +23,7 @@ import {
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
 import { fieldValidationService } from '../FieldValidation';
-import { trackingService } from '../Tracking'
-import { sync } from '../Sync'
+import { geoFencingService } from '../GeoFencingService.js';
 class FormLayout {
 
     /**
@@ -303,7 +302,7 @@ class FormLayout {
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))
-            await this.addNewGeoFenceAndDeletePreviousFence()
+            await geoFencingService.addNewGeoFenceAndDeletePreviousFence()
         }
         return {
             routeName,
@@ -326,20 +325,6 @@ class FormLayout {
             }
         }
         return true
-    }
-
-    /**
-     * This method adds a geoFence using lat long of job that is just completed , 
-     * lat long of next job which FE has to complete and the second job which FE has to complete.
-     */
-    async addNewGeoFenceAndDeletePreviousFence() {
-        let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
-        /* identify the fence and in case of job master have enable resequence restriction in job master setting and
-        allowOffRouteNotification in company setting then only a fence is added while saving  
-        */
-        if (fenceIdentifier && fenceIdentifier.value && fenceIdentifier.value.identifier) { //check for identifier in store
-            sync.addGeoFence(false)
-        }
     }
 }
 

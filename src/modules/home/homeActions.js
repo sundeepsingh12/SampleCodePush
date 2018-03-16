@@ -316,11 +316,11 @@ export function startMqttService(pieChart) {
   }
 }
 
-export function startTracking(transactionServiceStarted) {
+export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
-    if (!transactionServiceStarted) {
+    if (!trackingServiceStarted) {
       trackingService.init()
-      dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))
+      dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
     }
   }
 }

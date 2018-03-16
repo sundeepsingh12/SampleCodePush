@@ -52,7 +52,7 @@ function mapStateToProps(state) {
     unsyncedTransactionList: state.home.unsyncedTransactionList,
     pieChart: state.home.pieChart,
     lastSyncTime: state.home.lastSyncTime,
-    transactionServiceStarted: state.home.transactionServiceStarted,
+    trackingServiceStarted: state.home.trackingServiceStarted,
     customErpPullActivated: state.home.customErpPullActivated,
   }
 }
@@ -71,7 +71,7 @@ class SyncScreen extends PureComponent {
   componentDidMount() {
     this.props.actions.startMqttService(this.props.pieChart)
     this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated')
-    this.props.actions.startTracking(this.props.transactionServiceStarted)
+    this.props.actions.startTracking(this.props.trackingServiceStarted)
   }
 
   getTransactionView() {
