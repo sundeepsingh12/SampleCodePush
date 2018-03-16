@@ -265,7 +265,7 @@ module.exports = {
     //Exceptions and Error
     //Profile Service
     REGEX_TO_VALIDATE_PASSWORD: /(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}/,
-   
+
     // App Modules Constants
     BACKUP_ID: 17,
     BLUETOOTH_ID: 16,
@@ -284,6 +284,7 @@ module.exports = {
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
     JOB_ASSIGNMENT_ID: 20,
+    PAGE_NEW_JOB: 2,
     Piechart: {
         enabled: false
     },
@@ -319,7 +320,7 @@ module.exports = {
     //Error Messages
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
-    
+
 
     //Custom App
     WEBVIEW_REF: 'webview',

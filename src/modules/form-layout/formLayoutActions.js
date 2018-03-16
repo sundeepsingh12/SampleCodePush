@@ -8,7 +8,7 @@ import {
     STATUS_NAME,
     ON_BLUR,
     TOOGLE_HELP_TEXT,
-    BASIC_INFO,
+    SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
@@ -40,7 +40,7 @@ import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState, navigateToScene } from '../global/globalActions'
-import { transientStatusService } from '../../services/classes/TransientStatusService'
+import { transientStatusAndSaveActivatedService } from '../../services/classes/TransientStatusAndSaveActivatedService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
 
@@ -75,26 +75,27 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
         try {
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
-            let latestPositionId = sortedFormAttributesDto.latestPositionId
+            let { latestPositionId, noFieldAttributeMappedWithStatus } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
             if (!draftStatusId) {
                 sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
             }
-            dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
-            dispatch(setState(BASIC_INFO, {
+            dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
                 statusId,
                 statusName,
                 jobTransactionId,
                 latestPositionId,
                 draftStatusId,
-                fieldAttributeMasterParentIdMap
+                fieldAttributeMasterParentIdMap,
+                noFieldAttributeMappedWithStatus: (noFieldAttributeMappedWithStatus || sortedFormAttributesDto.isAllAttributeHidden),
+                formLayoutObject: sortedFormAttributesDto.formLayoutObject,
+                isSaveDisabled: sortedFormAttributesDto.isSaveDisabled,
+                isLoading: false
             }))
-            dispatch(setState(IS_LOADING, false))
         } catch (error) {
             console.log(error)
-            dispatch(setState(IS_LOADING, false))
-            dispatch(_setErrorMessage(error))
+            dispatch(setState(ERROR_MESSAGE, error))
         }
     }
 }

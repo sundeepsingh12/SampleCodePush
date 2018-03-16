@@ -1,7 +1,7 @@
 'use strict'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { transientStatusService } from '../../services/classes/TransientStatusService'
+import { transientStatusAndSaveActivatedService } from '../../services/classes/TransientStatusAndSaveActivatedService'
 import { setState, navigateToScene } from '../global/globalActions'
 import {
     LOADER_ACTIVE,
@@ -16,6 +16,7 @@ import {
     USER,
     IS_COMPANY_CODE_DHL,
     EMAILID_VIEW_ARRAY,
+    SHOULD_RELOAD_START,
 } from '../../lib/constants'
 import _ from 'lodash'
 
@@ -24,11 +25,11 @@ export function addTransactionAndPopulateView(formLayoutState, recurringData, co
         try {
             dispatch(setState(LOADER_ACTIVE, true))
             if (_.isEmpty(commonData)) {
-                let returnParams = await transientStatusService.populateCommonData(navigationFormLayoutStates)
+                let returnParams = await transientStatusAndSaveActivatedService.populateCommonData(navigationFormLayoutStates)
                 commonData = { commonData: returnParams.commonData, amount: returnParams.totalAmount }
                 statusName = returnParams.statusName
             }
-            let { differentData } = await transientStatusService.saveRecurringData(formLayoutState, recurringData, navigationParams.jobTransaction, navigationParams.currentStatus.id)
+            let { differentData } = await transientStatusAndSaveActivatedService.saveRecurringData(formLayoutState, recurringData, navigationParams.jobTransaction, navigationParams.currentStatus.id)
             await dispatch(storeState({
                 commonData,
                 differentData,
@@ -51,9 +52,10 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
-            let totalAmount = await transientStatusService.calculateTotalAmount(commonData.amount, recurringData)
-            let { emailTableElement, emailIdInFieldData, contactNumberInFieldData } = await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(previousFormLayoutState, recurringData, jobMasterId, statusId, false)
-            let responseMessage = await transientStatusService.sendEmailOrSms(totalAmount, emailTableElement, emailIdInFieldData, true, true, jobMasterId)
+            let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(commonData.amount, recurringData)
+            let { emailTableElement, emailIdInFieldData, contactNumberInFieldData } = await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(previousFormLayoutState, recurringData, jobMasterId, statusId, false)
+            let responseMessage = await transientStatusAndSaveActivatedService.sendEmailOrSms(totalAmount, emailTableElement, emailIdInFieldData, true, true, jobMasterId)
+            await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))//after completing jobs set start module to reload itself so that new job which is created here will be visible
             dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
             dispatch(navigateToScene(CheckoutDetails, {
                 commonData: commonData.commonData,
@@ -73,7 +75,7 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
 export function sendSmsOrEmails(totalAmount, emailTableElement, jobMasterId, emailOrSmsList, isEmail, emailGeneratedFromComplete) {
     return async function (dispatch) {
         try {
-            let responseMessage = await transientStatusService.sendEmailOrSms(totalAmount, emailTableElement, emailOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId)
+            let responseMessage = await transientStatusAndSaveActivatedService.sendEmailOrSms(totalAmount, emailTableElement, emailOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId)
             dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
         } catch (error) {
             console.log(error)
@@ -99,7 +101,7 @@ export function fetchUserData(email, inputTextEmail) {
 export function storeState(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates) {
     return async function (dispatch) {
         try {
-            let storeObject = await transientStatusService.createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates)
+            let storeObject = await transientStatusAndSaveActivatedService.createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates)
             await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, storeObject)
         } catch (error) {
             console.log(error)
@@ -128,7 +130,7 @@ export function deleteItem(itemId, recurringData, commonData, navigationParams, 
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
-            recurringData = await transientStatusService.deleteRecurringItem(itemId, recurringData)
+            recurringData = await transientStatusAndSaveActivatedService.deleteRecurringItem(itemId, recurringData)
             await dispatch(storeState({
                 commonData,
                 differentData: recurringData,

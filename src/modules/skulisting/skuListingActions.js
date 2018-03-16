@@ -7,7 +7,9 @@ import {
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
     SET_SHOW_VIEW_IMAGE,
-    UPDATE_SKU_LIST_ITEMS
+    UPDATE_SKU_LIST_ITEMS,
+    SkuListing,
+    NEXT_FOCUS,
 } from '../../lib/constants'
 
 import {
@@ -29,17 +31,20 @@ import {
     ARRAY_SAROJ_FAREYE,
     SKU_PHOTO,
     SKU_REASON,
+    NA,
 } from '../../lib/AttributeConstants'
 import { NavigationActions } from 'react-navigation'
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import {
-    setState
+    setState, navigateToScene
 } from '../global/globalActions'
 import {
     Toast
 } from 'native-base'
+import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
+import { SKIP_SKU_MESSAGE, OK } from '../../lib/ContainerConstants'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {
     return async function (dispatch) {
@@ -89,7 +94,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                 if (rowItem.attributeTypeId == SKU_PHOTO) {
                     value = await signatureService.saveFile(value, moment(), true)
                     dispatch(NavigationActions.back())
-                    dispatch(setState(SET_SHOW_VIEW_IMAGE, {imageData: '', showImage: false, viewData: '' }))
+                    dispatch(setState(SET_SHOW_VIEW_IMAGE, { imageData: '', showImage: false, viewData: '' }))
                 }
                 let copyOfskuListItems = _.cloneDeep(skuListItems)
                 copyOfskuListItems[rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
@@ -125,8 +130,8 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                     Toast.show({
                         text: `Please Fill all the Required Details`,
                         position: 'bottom',
-                        buttonText: 'OK'
-                    }) 
+                        buttonText: OK
+                    })
                 } else {
                     let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, latestPositionId)
                     dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
@@ -136,7 +141,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                 Toast.show({
                     text: `${message}`,
                     position: 'bottom',
-                    buttonText: 'OK'
+                    buttonText: OK
                 })
             }
         } catch (error) {
@@ -152,6 +157,34 @@ export function changeSkuCode(skuCode) {
         type: SKU_CODE_CHANGE,
         payload: {
             skuCode
+        }
+    }
+}
+
+/**
+ * This method checks if SKU is in new job or normal job
+ * if in new job then show toast message and skip SKU by saving NA in it
+ * else open SkuListing
+ * @param {*} routeParams 
+ */
+export function checkForNewJob(routeParams) {
+    return async function (dispatch) {
+        try {
+            let { currentElement, formElements, jobTransaction, latestPositionId, isSaveDisabled, fieldAttributeMasterParentIdMap } = routeParams
+            //case of new job
+            if (jobTransaction.id < 0 && jobTransaction.jobId < 0) {
+                Toast.show({
+                    text: SKIP_SKU_MESSAGE,
+                    position: 'bottom',
+                    buttonText: OK, duration: 5000
+                })
+                dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, formElements, isSaveDisabled, NA, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap))// save NA as value
+            } else {
+                dispatch(navigateToScene(SkuListing, routeParams))//navigate to SkuListing
+            }
+        } catch (error) {
+            //TODO
+            console.log(error)
         }
     }
 }

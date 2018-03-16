@@ -17,7 +17,6 @@ import {
   Text,
   List,
   ListItem,
-  Left,
   Body,
   Right,
   Icon,
@@ -30,16 +29,25 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as newJobActions from '../modules/newJob/newJobActions'
 import * as globalActions from '../modules/global/globalActions'
+import { SELECT_TYPE_FOR } from '../lib/ContainerConstants'
 
 
+/**
+ * This method convert state of new job {see newJobInitialState.js} to props of this container
+ * @param {*} state 
+ */
 function mapStateToProps(state) {
   return {
     jobMasterList: state.newJob.jobMasterList,
     statusList: state.newJob.statusList,
     negativeId: state.newJob.negativeId
   }
-};
+}
 
+/**
+ * This method convert all the actions present in newJobActions.js and globalActions.js to props of this container
+ * @param {*} dispatch 
+ */
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators({
@@ -52,15 +60,23 @@ function mapDispatchToProps(dispatch) {
 
 class NewJobStatus extends PureComponent {
 
+  /**
+   * remove default header of this container as we are using custom header
+   */
   static navigationOptions = ({ navigation }) => {
     return { header: null }
   }
 
+  /**
+   * renders a single list item of flat list which shows list of jobStatus
+   */
   renderData = (item) => {
     return (
-      <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.redirectToFormLayout(item,
-        this.props.negativeId,
-        this.props.navigation.state.params.jobMaster.id)}>
+      <ListItem style={[style.jobListItem]}
+        onPress={() => this.props.actions.redirectToFormLayout(item,
+          this.props.negativeId,
+          this.props.navigation.state.params.jobMasterId,
+          this.props.navigation.state.params.jobMasterName)}>
         <View style={[styles.row, styles.alignCenter]}>
           <View style={[style.statusCircle, { backgroundColor: item.buttonColor }]}></View>
           <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]}>{item.name}</Text>
@@ -72,12 +88,13 @@ class NewJobStatus extends PureComponent {
     )
   }
 
-  _keyExtractor = (item, index) => String(item.id);
+  _keyExtractor = (item, index) => String(item.id)
 
   render() {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
+
           <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
             <Body>
               <View
@@ -86,15 +103,16 @@ class NewJobStatus extends PureComponent {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>New Task</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.jobMasterName}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>
               </View>
             </Body>
           </Header>
+
           <Content style={[styles.bgWhite]}>
-            <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Type for {this.props.navigation.state.params.jobMaster.title}</Text>
+            <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>{SELECT_TYPE_FOR}{this.props.navigation.state.params.jobMasterName}</Text>
             <List>
               <FlatList
                 data={(this.props.statusList)}
@@ -104,12 +122,12 @@ class NewJobStatus extends PureComponent {
               </FlatList>
             </List>
           </Content>
+
         </Container>
       </StyleProvider>
     )
   }
-
-};
+}
 
 const style = StyleSheet.create({
   header: {
@@ -146,7 +164,7 @@ const style = StyleSheet.create({
     height: 10,
     borderRadius: 5
   },
-});
+})
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewJobStatus)

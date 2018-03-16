@@ -60,6 +60,7 @@ function mapStateToProps(state) {
     isFormValid: state.formLayout.isFormValid,
     dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
+    noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
   }
 }
 
@@ -245,9 +246,21 @@ class FormLayout extends PureComponent {
     )
   }
 
+  /**
+   * When a status doesn't have any visible attribute mapped then show this view
+   */
+  emptyFieldAttributeForStatusView() {
+    if (this.props.noFieldAttributeMappedWithStatus) {
+      return <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+        <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}> No visible attribute mapped</Text>
+      </View>
+    }
+  }
+
   render() {
     const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
+    let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -268,7 +281,7 @@ class FormLayout extends PureComponent {
         {draftAlert}
         {invalidFormAlert}
         {headerView}
-
+        {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList
@@ -286,7 +299,7 @@ class FormLayout extends PureComponent {
         {draftAlert}
         {invalidFormAlert}
         {headerView}
-
+        {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList

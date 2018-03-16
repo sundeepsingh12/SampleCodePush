@@ -41,7 +41,8 @@ var InitialState = Record({
         isFormValid: true,
         dataStoreFilterReverseMap: {},
         fieldAttributeMasterParentIdMap: {},
-        modalFieldAttributeMasterId: null
+        modalFieldAttributeMasterId: null,
+        noFieldAttributeMappedWithStatus: false,
 })
 
 export default InitialState

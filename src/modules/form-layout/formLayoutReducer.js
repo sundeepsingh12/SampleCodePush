@@ -8,7 +8,7 @@ import {
     DISABLE_SAVE,
     UPDATE_FIELD_DATA,
     TOOGLE_HELP_TEXT,
-    BASIC_INFO,
+    SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
     RESET_STATE,
     ERROR_MESSAGE,
@@ -67,15 +67,19 @@ export default function formLayoutReducer(state = initialState, action) {
         }
 
         /**
-         * set basic info like statusId, statusName, jobTransactionId, latestPositionId
+         * set basic info like statusId, statusName, jobTransactionId, latestPositionId etc
          */
-        case BASIC_INFO: {
+        case SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT: {
             return state.set('statusId', action.payload.statusId)
                 .set('statusName', action.payload.statusName)
                 .set('jobTransactionId', action.payload.jobTransactionId)
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('draftStatusId', action.payload.draftStatusId)
                 .set('fieldAttributeMasterParentIdMap', action.payload.fieldAttributeMasterParentIdMap)
+                .set('noFieldAttributeMappedWithStatus', action.payload.noFieldAttributeMappedWithStatus)
+                .set('formElement', action.payload.formLayoutObject)
+                .set('isSaveDisabled', action.payload.isSaveDisabled)
+                .set('isLoading', action.payload.isLoading)
         }
 
         /**
@@ -101,10 +105,11 @@ export default function formLayoutReducer(state = initialState, action) {
         }
 
         /**
-         * sets error message
+         * sets error message and isLoading to false
          */
         case ERROR_MESSAGE: {
             return state.set('errorMessage', action.payload)
+                .set('isLoading', false)
         }
 
         case UPDATE_FIELD_DATA_VALIDATION: {

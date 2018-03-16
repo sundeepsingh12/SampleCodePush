@@ -54,7 +54,6 @@ import {
   LiveJobs,
   Summary,
   CustomApp,
-  NewJob,
   START,
   BULK,
   LIVE,
@@ -130,7 +129,7 @@ class Home extends PureComponent {
         break
       }
       case LIVE_ID: {
-        this.props.actions.navigateToScene(LiveJobs,{displayName : this.props.modules.LIVE.displayName})
+        this.props.actions.navigateToScene(LiveJobs, { displayName: this.props.modules.LIVE.displayName })
         break
       }
       case SEQUENCEMODULE_ID: {
@@ -143,7 +142,7 @@ class Home extends PureComponent {
       }
 
       case SORTING_ID: {
-        this.props.actions.navigateToScene(Sorting,{displayName : this.props.modules.SORTING.displayName})
+        this.props.actions.navigateToScene(Sorting, { displayName: this.props.modules.SORTING.displayName })
         break
       }
 
@@ -161,11 +160,33 @@ class Home extends PureComponent {
       case JOB_ASSIGNMENT_ID: {
         this.props.actions.fetchJobMasterList(this.props.modules.JOB_ASSIGNMENT.displayName)
         //this.props.actions.navigateToScene(JobMasterListScreen)
+        break
       }
 
+      case NEWJOB_ID: {
+        //TODO : This is a dummy array remove when concept of pages is added 
+        let dummyPageObject = [{
+          "id": 1,
+          "name": "New job dummy",
+          "groupName": "Group 1",
+          "icon": "ios-hammer",
+          "userType": "field-executive",
+          "jobMasterIds": [331253],//dummy jobMasterId
+          "manualSelection": true,
+          "menuLocation": "MAIN",
+          "screenTypeId": 2,
+          "sequenceNumber": 1,
+          "additionalParams": {
+            "temp": "xyz",
+            "statusId": 2010,
+            "selectAll": true,
+            "searchSelectionOnLine1Line2": true
+          }
+        }]
+        this.props.actions.navigateToPage(dummyPageObject[0])
+        break
+      }
       default:
-        (appModule.appModuleId == NEWJOB_ID) ? this.props.actions.navigateToNewJob(appModule.jobMasterIdList,appModule.displayName) : null
-
     }
   }
   customAppSelection(appModule) {
@@ -286,7 +307,7 @@ class Home extends PureComponent {
           <Content>
             {pieChartView}
             <List>
-            {moduleView}
+              {moduleView}
             </List>
           </Content>
         </Container>

@@ -1,106 +1,69 @@
 'use strict'
 import {
-    NEW_JOB_MASTER,
     NEW_JOB_STATUS,
     SAVE_ACTIVATED,
-    SaveActivated,
-    CheckoutDetails,
     POPULATE_DATA,
-    JOB_MASTER,
     FormLayout,
-    SET_ERROR_MSG_FOR_NEW_JOB,
-    NewJobStatus
+    NewJobStatus,
 } from '../../lib/constants'
-import {
-    NEW_JOB_CONFIGURATION_ERROR
-} from '../../lib/ContainerConstants'
 import { newJob } from '../../services/classes/NewJob'
 import { setState, navigateToScene } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { transientStatusService } from '../../services/classes/TransientStatusService'
 import _ from 'lodash'
 
-
-export function getMastersWithNewJob() {
-    return async function (dispatch) {
-        let mastersWithNewJob = await newJob.getMastersWithNewJob();
-        if (_.size(mastersWithNewJob) == 1) {
-            dispatch(redirectToContainer(mastersWithNewJob[0]))
-        } else if (_.size(mastersWithNewJob) == 0) {
-            dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
-        }
-        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob));
-    }
-}
-
-export function getMastersFromMasterIds(jobMasterIds) {
-    return async function (dispatch) {
-        const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
-        let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
-        if (_.size(mastersWithNewJob) == 1) {
-            dispatch(redirectToContainer(mastersWithNewJob[0]))
-        } else if (_.size(mastersWithNewJob) == 0) {
-            dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
-        }
-        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
-    }
-}
-
-export function getStatusAndIdForJobMaster(jobMasterId) {
-    return async function (dispatch) {
-        if (!jobMasterId) {
-            // fire error action for missing jobMasterId
-        }
-        //initially reset the statusList
-        dispatch(setState(NEW_JOB_STATUS, []));
-        let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMasterId);
-        if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
-            dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, jobMasterId))
-        }
-        dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
-    }
-}
-
-export function redirectToFormLayout(status, negativeId, jobMasterId) {
+/**
+ * It will navigate to FormLayout container
+ * @param {*} status 
+ * @param {*} negativeId 
+ * @param {*} jobMasterId 
+ */
+export function redirectToFormLayout(status, negativeId, jobMasterId, jobMasterName) {
     return async function (dispatch) {
         try {
             dispatch(navigateToScene(FormLayout, {
                 statusId: status.id,
                 statusName: status.name,
                 jobTransactionId: negativeId,
-                jobMasterId: jobMasterId,
+                jobMasterId,
                 jobTransaction: {
                     id: negativeId,
-                    jobMasterId: jobMasterId,
+                    jobMasterId,
                     jobId: negativeId,
                 }
             }))
         } catch (error) {
-
+            //TODO
+            console.log(error)
         }
     }
 }
 
-export function redirectToContainer(jobMaster) {
+/**
+ * This method is called from home container and is use to check which container to navigate to
+ * @param {*} jobMasterId 
+ * @param {*} jobMasterName 
+ */
+export function redirectToContainer(jobMasterId, jobMasterName) {
     return async function (dispatch) {
         try {
-            let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
-            let returnParams = await newJob.checkForNextContainer(jobMaster, saveActivatedData)
-            if (returnParams.screenName == NewJobStatus) {
-                let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMaster.id);
-                if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
-                    dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, jobMaster.id))
-                } else {
+            let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)//get saveActiavted data
+            let returnParams = await newJob.checkForNextContainer(jobMasterId, saveActivatedData, jobMasterName)//from saveActivated data check which container to go to
+            if (returnParams.screenName == NewJobStatus) {//if screenName is NewJobStatus get nextStatusList of pending status
+                let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMasterId)
+                if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {//if there is only one status directly navigate to formLayout
+                    dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, jobMasterId, jobMasterName))
+                } else {//if more than one status is present then set status List and navigate to NewJobStatus
                     dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
                     dispatch(navigateToScene(NewJobStatus, returnParams.navigationParams))
                 }
-            } else {
-                if (returnParams.stateParam) {
+            } else {//this is the case of saveActivated data which is present so navigate to saveActivated container or CheckoutDetails container depending upon screeName
+                if (returnParams.stateParam) {//if state params is present then populate state of saveActivated
                     await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
                 }
                 dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
             }
         } catch (error) {
+            //TODO
             console.log(error)
         }
     }

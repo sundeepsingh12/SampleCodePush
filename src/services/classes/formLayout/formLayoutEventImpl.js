@@ -72,6 +72,7 @@ export default class FormLayoutEventImpl {
      * @param {*fieldAttribute value} value 
      */
     findNextFocusableAndEditableElements(attributeMasterId, formLayoutObject, isSaveDisabled, value, fieldDataList, event, jobTransaction, fieldAttributeMasterParentIdMap) {
+        let isAllAttributeHidden = true //this is a check if there are all hidden attribute or not
         if (attributeMasterId && formLayoutObject.get(attributeMasterId)) {
             this.updateFieldInfo(attributeMasterId, value, formLayoutObject, event, fieldDataList);
         }
@@ -89,7 +90,9 @@ export default class FormLayoutEventImpl {
             if (value.displayValue || value.displayValue === 0) {
                 continue
             }
-
+            if (!value.hidden) {//if any visible attribute present then set isAllAttributeHidden to false
+                isAllAttributeHidden = false
+            }
             value.editable = true
             if (value.required) {
                 value.focus = event == NEXT_FOCUS ? true : value.focus
@@ -122,7 +125,7 @@ export default class FormLayoutEventImpl {
                 formLayoutObject.get(attributeMasterId).focus = true
             }
         }
-        return { formLayoutObject, isSaveDisabled }
+        return { formLayoutObject, isSaveDisabled, isAllAttributeHidden }
     }
 
     /**
@@ -220,6 +223,7 @@ export default class FormLayoutEventImpl {
                 job = this._setBulkJobDbValues(dbObjects.status[0], dbObjects.jobTransaction, jobMasterId, dbObjects.user.value, dbObjects.hub.value, fieldData.reAttemptDate)
             }
             else {
+                jobTransactionId = await this.changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList)//In case of new job change jobTransactionId
                 fieldData = this._saveFieldData(formLayoutObject, jobTransactionId)
                 dbObjects = await this._getDbObjects(jobTransactionId, statusId, jobMasterId, currentTime, user, jobTransactionList)
                 jobTransaction = this._setJobTransactionValues(dbObjects.jobTransaction, dbObjects.status[0], dbObjects.jobMaster[0], dbObjects.user.value, dbObjects.hub.value, dbObjects.imei.value, currentTime, lastTrackLog, trackKms, trackTransactionTimeSpent, trackBattery, fieldData.npsFeedbackValue, fieldData.amountMap) //to edit later
@@ -832,4 +836,22 @@ export default class FormLayoutEventImpl {
         return
     }
 
+    /**
+     * In case of new job get jobTransaction with most negative Id and subtract 1 from it
+     * @param {*} jobTransactionId 
+     * @param {*} jobTransactionList 
+     */
+    changeJobTransactionIdInCaseOfNewJob(jobTransactionId, jobTransactionList) {
+        return (jobTransactionId < 0 && jobTransactionList && !jobTransactionList.referenceNumber) ? this.makeNegativeJobTransactionId() : jobTransactionId//if it is not a case of new job then return jobTransactionId
+    }
+
+    /**
+     * query job transaction table and find all jobTransaction in ascending order of id
+     * and return id - 1 as transactionId for next job transaction which we have to save 
+     */
+    makeNegativeJobTransactionId() {
+        let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, null, true, 'id')
+        let jobTransactionObjectWithMostNegativeJobTransactionId = { ...jobTransaction[0] }//use only first job as it has most negative or lowest jobTransactionId
+        return (_.isEmpty(jobTransactionObjectWithMostNegativeJobTransactionId) || jobTransactionObjectWithMostNegativeJobTransactionId.id > 0) ? -1 : jobTransactionObjectWithMostNegativeJobTransactionId.id - 1 //if no job is present or first queried job has positive id then return -1 as trasactionId
+    }
 }

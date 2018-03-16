@@ -225,6 +225,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA: null,
     STATUS_NAME: null,
     BASIC_INFO: null,
+    SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT: null,
     ON_BLUR: null,
     TOOGLE_HELP_TEXT: null,
     IS_LOADING: null,
@@ -263,7 +264,6 @@ module.exports = keyMirror({
     SaveActivated: null,
     Transient: null,
     CheckoutDetails: null,
-    NewJob: null,
     NewJobStatus: null,
     BulkConfiguration: null,
     BulkListing: null,
@@ -356,9 +356,7 @@ module.exports = keyMirror({
     SET_SEQUENCE_LIST_ITEM: null,
 
     //New Job
-    NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
-    SET_ERROR_MSG_FOR_NEW_JOB: null,
 
     //Transient
     ADD_FORM_LAYOUT_STATE: null,

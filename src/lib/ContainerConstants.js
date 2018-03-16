@@ -11,7 +11,7 @@ module.exports = {
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
-    VERIFY:'Verify',
+    VERIFY: 'Verify',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -51,6 +51,9 @@ module.exports = {
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
     NEW_TASK: 'New Task',
+    SELECT_TYPE_FOR: 'Select Type for ',
+    CONFIGURATION_ISSUES_WITH_PENDING_STATUS: 'Configuration issues with PENDING status',
+    JOB_MASTER_MISSING: 'jobMaster not present',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -125,7 +128,7 @@ module.exports = {
     //Data Store service
     DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
     CURRENT_ELEMENT_MISSING: 'currentElement Missing',
-    CONFIRM:'Confirm',
+    CONFIRM: 'Confirm',
 
     //Data Store Filter
     JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
@@ -173,7 +176,7 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
-    LOGOUT_UNSYNCED_TRANSACTIONS:'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    LOGOUT_UNSYNCED_TRANSACTIONS: 'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
 
     //DataStore
     SUGGESTIONS: 'Suggestions',
@@ -186,6 +189,7 @@ module.exports = {
     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
     REASON: 'Reason',
     OPEN_CAMERA: 'Open Camera',
+    SKIP_SKU_MESSAGE: 'Skipping this attribute, not allowed in new job',
 
     //Array
     TOTAL_COUNT: 'Total Count : ',
@@ -195,7 +199,7 @@ module.exports = {
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
-    REMOVE:'Remove',
+    REMOVE: 'Remove',
 
     //Expandable Details View
     TAP_TO_HIDE: 'Tap to hide',
@@ -217,7 +221,7 @@ module.exports = {
     SELECT_NUMBER_FOR_CALL: 'Select number for call',
     CALL_CONFIRM: 'Do you want to proceed with the call?',
     CONFIRMATION: 'Confirmation: ',
-    SELECT_ADDRESS_NAVIGATION:'Select address for navigation',
+    SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
 
     //Cash Tendering
     NOT_REQUIRED: 'NOT REQUIRED',
@@ -255,7 +259,7 @@ module.exports = {
     NEXT_POSSIBLE_STATUS: 'Next possible status',
 
     //Sorting
-    SORTING : 'Sorting',
+    SORTING: 'Sorting',
     REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
@@ -270,27 +274,27 @@ module.exports = {
     MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
     VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
     CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
-    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..", 
+    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
     UNSAVED_PASSWORD: 'Password not saved before',
 
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
 
     //Signature
-    IMPROPER_SIGNATURE:'Improper signature. Please make your full signature.',
+    IMPROPER_SIGNATURE: 'Improper signature. Please make your full signature.',
 
     //Login
-    CONFIRM_RESET:'Confirm Reset',
-    RESET_ACCOUNT_SETTINGS:'Click OK to reset your account settings.',
-    REMEMBER_ME:'Remember Me',
+    CONFIRM_RESET: 'Confirm Reset',
+    RESET_ACCOUNT_SETTINGS: 'Click OK to reset your account settings.',
+    REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP:'Setting you up...',
-    DOWNLOAD_SETTINGS:'Downloading settings',
-    APPLYING_SETTINGS:'Applying settings',
-    VERIFY_HANDSET:'Verifying handset',
-    VERIFY_MOBILE:'Verify your mobile',
-    OTP_CODE_SENT:'OTP code hasbeen sent to',
-    ENTER_MOBILE:'Enter your mobile',
-    SEND_OTP:'Send OTP',
+    SETTING_UP: 'Setting you up...',
+    DOWNLOAD_SETTINGS: 'Downloading settings',
+    APPLYING_SETTINGS: 'Applying settings',
+    VERIFY_HANDSET: 'Verifying handset',
+    VERIFY_MOBILE: 'Verify your mobile',
+    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    ENTER_MOBILE: 'Enter your mobile',
+    SEND_OTP: 'Send OTP',
 }

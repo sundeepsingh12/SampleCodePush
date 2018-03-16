@@ -150,7 +150,7 @@ class JobDetailsV2 extends PureComponent {
 
   renderStatusList(statusList) {
     let statusView = []
-    if (this.props.jobTransaction.id < 0 && this.props.jobDataList.length < 1) {
+    if (this.props.jobTransaction.id < 0 && this.props.jobTransaction.jobId < 0 && this.props.jobDataList.length < 1) {//In case of new job which is not synced with server do not show status button
       return statusView
     }
     let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null

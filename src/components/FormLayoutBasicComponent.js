@@ -79,6 +79,7 @@ import {
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
 import TimePicker from '../components/TimePicker'
+import { checkForNewJob } from '../modules/skulisting/skuListingActions'
 
 function mapStateToProps(state) {
     return {
@@ -89,7 +90,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions, checkForNewJob }, dispatch)
     }
 }
 class BasicFormElement extends PureComponent {
@@ -125,7 +126,16 @@ class BasicFormElement extends PureComponent {
                 break
             }
             case SKU_ARRAY: {
-                screenName = 'SkuListing'
+                this.props.actions.checkForNewJob({
+                    currentElement: item,
+                    formElements: this.props.formElement,
+                    jobStatusId: this.props.jobStatusId,
+                    jobTransaction: this.props.jobTransaction,
+                    latestPositionId: this.props.latestPositionId,
+                    isSaveDisabled: this.props.isSaveDisabled,
+                    returnData: this._searchForReferenceValue.bind(this),
+                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                })
                 break
             }
             case EXTERNAL_DATA_STORE:
@@ -156,18 +166,20 @@ class BasicFormElement extends PureComponent {
             }
         }
 
-        this.props.actions.navigateToScene(screenName,
-            {
-                currentElement: item,
-                formElements: this.props.formElement,
-                jobStatusId: this.props.jobStatusId,
-                jobTransaction: this.props.jobTransaction,
-                latestPositionId: this.props.latestPositionId,
-                isSaveDisabled: this.props.isSaveDisabled,
-                returnData: this._searchForReferenceValue.bind(this),
-                fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
-            }
-        )
+        if (screenName) {
+            this.props.actions.navigateToScene(screenName,
+                {
+                    currentElement: item,
+                    formElements: this.props.formElement,
+                    jobStatusId: this.props.jobStatusId,
+                    jobTransaction: this.props.jobTransaction,
+                    latestPositionId: this.props.latestPositionId,
+                    isSaveDisabled: this.props.isSaveDisabled,
+                    returnData: this._searchForReferenceValue.bind(this),
+                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                }
+            )
+        }
     }
 
     _searchForReferenceValue = (value) => {
