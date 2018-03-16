@@ -53,7 +53,7 @@ import {
   NavigationActions
 } from 'react-navigation'
 
-import { setState } from '../global/globalActions'
+import { setState, resetNavigationState } from '../global/globalActions'
 
 /**
  * ## State actions
@@ -270,12 +270,7 @@ export function getSessionToken() {
           }))
         }
         else if (token && isPreloaderComplete && isPreloaderComplete.value) {
-          dispatch(NavigationActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-            ]
-          }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
         else if (token) {
           dispatch(NavigationActions.navigate({

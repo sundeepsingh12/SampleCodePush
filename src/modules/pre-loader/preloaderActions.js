@@ -81,7 +81,7 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, resetNavigationState } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -462,7 +462,7 @@ export function checkAsset() {
         if (unsyncBackupFilesList.length > 0) {
           dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         } else {
-          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
@@ -505,7 +505,7 @@ export function checkIfSimValidOnServer() {
         if (unsyncBackupFilesList.length > 0) {
           dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         } else {
-          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
@@ -571,7 +571,7 @@ export function validateOtp(otpNumber) {
       if (unsyncBackupFilesList.length > 0) {
         dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
       } else {
-        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
       }
     } catch (error) {
       dispatch(otpValidationFailure(error.message))

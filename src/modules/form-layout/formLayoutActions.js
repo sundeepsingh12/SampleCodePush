@@ -30,8 +30,6 @@ import {
 import {
     AFTER,
     Start,
-    STRING,
-    TEXT
 } from '../../lib/AttributeConstants'
 
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
@@ -223,47 +221,63 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
 
 export function fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, isSaveDisabled, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
-        let cloneFormElement = _.cloneDeep(formElement)
-        let isValuePresentInAnotherTransaction = false
-        let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, fieldAttributeMasterParentIdMap)
-        if (timeOfExecution == AFTER) {
-            isValuePresentInAnotherTransaction = (currentElement.attributeTypeId == TEXT || currentElement.attributeTypeId == STRING) ? await dataStoreService.checkForUniqueValidation(currentElement.displayValue, currentElement) : false
-            cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+        try {
+            let cloneFormElement = _.cloneDeep(formElement)
+            let isValuePresentInAnotherTransaction = false
+            let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, fieldAttributeMasterParentIdMap)
+            if (timeOfExecution == AFTER) {
+                isValuePresentInAnotherTransaction = formLayoutService.checkUniqueValidation(currentElement)
+                cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
+            }
+            if (isValuePresentInAnotherTransaction) {
+                cloneFormElement.get(currentElement.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
+            }
+            dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS, jobTransaction))
         }
-        if (isValuePresentInAnotherTransaction) {
-            cloneFormElement.get(currentElement.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
+        catch (error) {
+            console.log(error) //to do update ui
         }
-        dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS, jobTransaction))
     }
 }
-
 export function saveDraftInDb(formLayoutState, jobMasterId) {
     return async function (dispatch) {
-        draftService.saveDraftInDb(formLayoutState, jobMasterId)
+        try {
+            draftService.saveDraftInDb(formLayoutState, jobMasterId)
+        } catch (error) {
+            console.log(error) //to do update ui
+        }
     }
 }
 
 export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
     return async function (dispatch) {
-        let formLayoutState = draftService.restoreDraftFromDb(jobTransactionId, statusId, jobMasterId)
-        dispatch(setState(SET_FORM_LAYOUT_STATE, {
-            editableFormLayoutState: formLayoutState,
-            statusName: formLayoutState.statusName
-        }))
+        try {
+            let formLayoutState = draftService.restoreDraftFromDb(jobTransactionId, statusId, jobMasterId)
+            dispatch(setState(SET_FORM_LAYOUT_STATE, {
+                editableFormLayoutState: formLayoutState,
+                statusName: formLayoutState.statusName
+            }))
+        } catch (error) {
+            console.log(error) //to do update ui
+        }
     }
 }
 
 export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
-        if (isDraftRestore) {
-            dispatch(restoreDraft(jobTransactionId, statusId))
-        } else {
-            if (editableFormLayoutState) {
-                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
+        try {
+            if (isDraftRestore) {
+                dispatch(restoreDraft(jobTransactionId, statusId))
+            } else {
+                if (editableFormLayoutState) {
+                    dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
+                }
+                else {
+                    dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
+                }
             }
-            else {
-                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
-            }
+        } catch (error) {
+            console.log(error) //to do update ui
         }
     }
 }
