@@ -84,9 +84,6 @@ export function getJobDetails(jobTransactionId) {
             let isEtaTimerShow = (statusCategory == 1)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime))
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
-            console.log(error)
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
