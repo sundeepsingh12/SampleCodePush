@@ -110,6 +110,8 @@ class TaskListScreen extends PureComponent {
     // Navigate to job details page when single transaction is searched
     if (_.size(jobTransactionArray) == 1 && scanner && isEqualMatchFound) {
       this.navigateToScene(jobTransactionArray[0], groupId)
+    }else if(scanner){
+      this.props.actions.setState(LISTING_SEARCH_VALUE,{searchText, scanner : false})
     }
     return jobTransactionArray
   }
