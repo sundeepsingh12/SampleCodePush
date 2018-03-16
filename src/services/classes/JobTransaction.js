@@ -27,6 +27,7 @@ import { fieldAttributeMasterService } from './FieldAttributeMaster'
 import { jobMasterService } from './JobMaster'
 import _ from 'lodash'
 import moment from 'moment'
+import { formLayoutEventsInterface } from './formLayout/FormLayoutEventInterface';
 
 class JobTransaction {
 
@@ -742,22 +743,30 @@ class JobTransaction {
      *                              }
      * } 
      */
-    prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
+    async prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = (callingActivity != 'LiveJob') ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery) : realm.getRecordListOnQuery(TABLE_JOB, jobTransactionQuery)
         let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType, startTime, endTime } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
-        if (callingActivity == 'LiveJob') {
-            jobMasterId = jobTransaction[0].jobMasterId
-            jobStatusId = jobTransaction[0].status
-            jobId = jobTransaction[0].id
-            referenceNumber = jobTransaction[0].referenceNo
-        } 
         const jobMasterJobAttributeMasterMap = jobAttributeMasterService.getJobMasterJobAttributeMasterMap(jobAttributeMasterList)
         const jobAttributeMasterMap = jobMasterJobAttributeMasterMap[jobMasterId] ? jobMasterJobAttributeMasterMap[jobMasterId] : {}
         const jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobAttributeStatusList)
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         const statusIdStatusMap = jobStatusObject.statusIdStatusMap
+        const checkForSeenStatus = jobStatusService.isSeenStatusCode(jobStatusId,statusIdStatusMap)
+        if(checkForSeenStatus && callingActivity != 'LiveJob') {
+            jobStatusId = checkForSeenStatus,
+            lastUpdatedAtServer = moment().format('YYYY-MM-DD HH:mm:ss')
+            let jobTransactionList =  await formLayoutEventsInterface.saveData([], jobTransactionId, checkForSeenStatus, jobMasterId)
+            await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
+        }
+        if (callingActivity == 'LiveJob') {
+            jobMasterId = jobTransaction[0].jobMasterId
+            jobStatusId = jobTransaction[0].status
+            jobId = jobTransaction[0].id
+            referenceNumber = jobTransaction[0].referenceNo
+        } 
+        let currentStatus = statusIdStatusMap[jobStatusId]
         const fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList)
         const fieldAttributeStatusMap = fieldAttributeMasterService.getFieldAttributeStatusMap(fieldAttributeStatusList)
         let jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobMasterId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] : {} : jobAttributeMasterMap
@@ -775,7 +784,6 @@ class JobTransaction {
                 }
             }
         }
-        let currentStatus = statusIdStatusMap[jobStatusId]
         jobDataObject.dataList = Object.values(jobDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
         if (callingActivity != 'LiveJob') {
             fieldDataObject.dataList = Object.values(fieldDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
@@ -807,7 +815,8 @@ class JobTransaction {
                 jobDataObject,
                 jobTransactionDisplay,
                 seqSelected,
-                jobTime
+                jobTime,
+                checkForSeenStatus
             }
         }
         else {

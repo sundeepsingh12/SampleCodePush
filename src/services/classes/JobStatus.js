@@ -222,6 +222,16 @@ class JobStatus {
     return tabId
   }
 
+  isSeenStatusCode(jobStatusId, statusIdStatusMap){ 
+    const nextStatusList = statusIdStatusMap[jobStatusId].nextStatusList
+    for (let id in nextStatusList) {
+      if((_.isEqual(_.toLower(nextStatusList[id].code), 'seen'))){
+         return nextStatusList[id].id
+      }
+    }
+    return false
+  }
+
   async getStatusCategoryOnStatusId(jobStatusId) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
     const category = jobStatusArray.value.filter(jobStatus => jobStatus.id == jobStatusId && jobStatus.code != UNSEEN).map(id => id.statusCategory)
