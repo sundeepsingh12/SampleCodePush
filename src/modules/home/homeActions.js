@@ -35,7 +35,8 @@ import {
   NEW_JOB_STATUS,
   NEW_JOB_MASTER,
   POPULATE_DATA,
-  NewJob
+  NewJob,
+  SET_TRANSACTION_SERVICE_STARTED,
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -317,9 +318,12 @@ export function startMqttService(pieChart) {
   }
 }
 
-export function startTracking() {
+export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
-    trackingService.init()
+    if (!trackingServiceStarted) {
+      trackingService.init()
+      dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+    }
   }
 }
 

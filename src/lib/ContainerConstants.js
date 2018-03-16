@@ -176,6 +176,18 @@ module.exports = {
     LOGGING_OUT: 'Logging out',
     LOGOUT_UNSYNCED_TRANSACTIONS:'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
 
+    //Tracking constants
+    ENTER: 'ENTER',
+    EXIT: 'EXIT',
+    INSIDE_BOUNDARY: 'inside boundary',
+    OUTSIDE_BOUNDARY: 'out of boundary',
+
+
+
+    //GeoFencing Service
+    HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
+    FENCE_LAT_LONG_MISSING: 'fenceLatLongObject not present',
+
     //DataStore
     SUGGESTIONS: 'Suggestions',
 
