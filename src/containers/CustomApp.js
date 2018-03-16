@@ -107,44 +107,79 @@ class CustomApp extends PureComponent {
     componentWillUnmount() {
         this.props.actions.setState(ON_CHANGE_STATE)
     }
+
+    showUrlInputView(){
+        return (
+            <View style={[style.headerBody]} t>
+                {!this.props.navigation.state.params.customUrl ?
+                    <View style={[{ height: 30 }]}>
+                        <Input
+                            onEndEditing={(event) => this.onSubmit(event.nativeEvent.text)}
+                            placeholder={ENTER_URL_HERE}
+                            placeholderTextColor={'rgba(255,255,255,.4)'}
+                            returnKeyType={"search"}
+                            keyboardAppearance={"dark"}
+                            style={[style.headerSearch]} />
+                    </View> :
+                    <Text numberOfLines={1} ellipsizeMode={'tail'} style={[styles.fontCenter, styles.fontWhite, styles.fontDefault, styles.alignCenter]}>{this.props.customUrl}</Text>}
+            </View>  
+        )
+    }
         
+
+    showFooterView(){
+        return(
+            <Footer style={[style.footer]}>
+                <FooterTab>
+                    <Button full style={[styles.bgWhite]} onPress={this.goBack}>
+                        <Icon name="ios-arrow-back" style={[styles.fontLg, styles.fontBlack]} />
+                    </Button>
+                    <Button full style={[styles.bgWhite]} onPress={this.goForward}>
+                        <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
+                    </Button>
+                </FooterTab>
+                {(this.props.navigation.state.params.customUrl) ?
+                    <FooterTab>
+                        <Button style={{ alignItems: 'flex-end', height: 40, width: 40 }} onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this.onSetText.bind(this) })}>
+                            <QRIcon width={30} height={30} color={styles.fontBlack} />
+                        </Button>
+                    </FooterTab> : null}
+            </Footer>
+        )
+    }
+
+    showBody(){
+        return (
+            <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
+                    <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                </TouchableOpacity>
+                {this.showUrlInputView()}
+
+                {!(this.props.isLoaderRunning) ?
+                    <TouchableOpacity style={[style.headerRight]} onPress={this.onReload}>
+                        <Icon name="md-refresh" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                    </TouchableOpacity> :
+                    <View style={[style.headerRight]}  >
+                        <ActivityIndicator
+                            animating={this.props.isLoaderRunning}
+                            color={'#ffffff'}
+                            style={style.ActivityIndicatorStyle}
+                        />
+                    </View>
+                }
+            </View>
+        )
+    }
+
     render(){
             return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
                         <Body>
-                        <View
-                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
-                                <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                            </TouchableOpacity>
-                            <View style={[style.headerBody]}t>
-                            {renderIf( this.props.navigation.state,(!this.props.navigation.state.params.customUrl)?
-                                <View style={[{height: 30 }]}>
-                                    <Input
-                                        onEndEditing = {(event) => this.onSubmit(event.nativeEvent.text)}
-                                        placeholder={ENTER_URL_HERE}
-                                        placeholderTextColor={'rgba(255,255,255,.4)'}
-                                        returnKeyType = {"search"}
-                                        keyboardAppearance = {"dark"}
-                                        style={[style.headerSearch]} />
-                                </View> :
-                                <Text numberOfLines={1} ellipsizeMode={'tail'} style={[styles.fontCenter, styles.fontWhite, styles.fontDefault, styles.alignCenter]}>{this.props.customUrl}</Text> )} 
-                            </View>                          
-                                {renderIf(this.props, !(this.props.isLoaderRunning) ?
-                                <TouchableOpacity  style={[style.headerRight]} onPress = {this.onReload}>
-                                <Icon name="md-refresh" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]}  />
-                                </TouchableOpacity> :
-                                 <View style={[style.headerRight]}  >
-                                <ActivityIndicator
-                                    animating = {this.props.isLoaderRunning}
-                                    color={'#ffffff'}
-                                    style={style.ActivityIndicatorStyle}
-                                /> 
-                                </View>
-                        )}
-                        </View>
+                       {this.showBody()}
                         </Body>
                     </Header>
                     {this.props.customUrl || (this.props.scannerText) || (!this.props.navigation.state.params.customUrl) ? 
@@ -157,22 +192,8 @@ class CustomApp extends PureComponent {
                         onLoadStart = {this.onLoadStart} 
                         onError = {(event) => this.onError()}
                     /> : null }
-                    <Footer style={[style.footer]}>
-                        <FooterTab>
-                            <Button full style={[styles.bgWhite]} onPress = {this.goBack}>
-                                <Icon name="ios-arrow-back" style={[styles.fontLg, styles.fontBlack]} />
-                            </Button>
-                            <Button full style={[styles.bgWhite]} onPress = {this.goForward}>
-                                <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
-                            </Button>
-                        </FooterTab>
-                        { (this.props.navigation.state.params.customUrl) ? 
-                        <FooterTab>
-                            <Button style={{alignItems: 'flex-end', height: 40, width:40}} onPress = {() =>   this.props.navigation.navigate(QrCodeScanner, {returnData: this.onSetText.bind(this)})}>
-                                <QRIcon width={30} height={30} color = {styles.fontBlack}/>  
-                            </Button>
-                        </FooterTab> : null }
-                    </Footer>
+                    {this.showFooterView()}
+                   
                 </Container>
 
             </StyleProvider>

@@ -115,6 +115,7 @@ module.exports = keyMirror({
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
+    SET_DRAFT_JOB_DETAILS_INFO: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,

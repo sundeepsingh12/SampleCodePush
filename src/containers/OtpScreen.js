@@ -49,6 +49,48 @@ class OtpScreen extends PureComponent{
         this.props.actions.validateOtp(this.props.otpNumber)
     }
 
+    showOtpInputView(){
+        return(
+            <View style={[styles.marginTop30]}>
+            <Item rounded>
+                <Input
+                    placeholder='OTP'
+                    value={this.props.otpNumber}
+                    keyboardType='numeric'
+                    returnKeyType='done'
+                    maxLength={6}
+                    onChangeText={this.onChangeOtp}
+                    style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, { height: 40 }]}
+                />
+            </Item>
+        </View>
+
+        )
+    }
+
+    showVerifyButton(){
+        return (
+            <View style={[styles.marginBottom10]}>
+                <Button onPress={this.validateOtp} full rounded
+                    disabled={this.props.isOtpVerificationButtonDisabled}>
+                    <Text style={[styles.fontWhite]}>{VERIFY}</Text>
+                </Button>
+            </View>
+        )
+    }
+
+    showCloseButton(){
+        return (
+            <View>
+                <Button onPress={this.props.invalidateUserSession} full rounded danger
+                    disabled={this.props.isOtpScreenLogoutDisabled}
+                    style={[styles.bgDanger]}>
+                    <Text style={[styles.fontWhite]}>{CLOSE}</Text>
+                </Button>
+            </View>
+        )
+    }
+
     render() {
         return (
             <Modal
@@ -64,39 +106,17 @@ class OtpScreen extends PureComponent{
                                 <Text style={[feStyle.fontSm, feStyle.fontDarkGray, feStyle.marginTop10]}>{OTP_CODE_SENT}</Text>
                                 <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>{this.props.mobileNumber}</Text>
                             </View>
-                            <View style={[styles.marginTop30]}>
-                                <Item rounded>
-                                    <Input
-                                        placeholder='OTP'
-                                        value={this.props.otpNumber}
-                                        keyboardType='numeric'
-                                        returnKeyType='done'
-                                        maxLength={6}
-                                        onChangeText={this.onChangeOtp}
-                                        style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, { height: 40 }]}
-                                    />
-                                </Item>
-                            </View>
 
+                            {this.showOtpInputView()}
+                        
                             <Text style={{ textAlign: 'center', color: '#333333', marginBottom: 10 }}>
                                 {this.props.otpDisplayMessage}
                             </Text>
                             <View style={[styles.justifyCenter]}>
-                                <View style={[styles.marginBottom10]}>
-                                    <Button onPress={this.validateOtp} full rounded
-                                        disabled={this.props.isOtpVerificationButtonDisabled}>
-                                        <Text style={[styles.fontWhite]}>{VERIFY}</Text>
-                                    </Button>
-                                </View>
-                                <View>
-                                    <Button onPress={this.props.invalidateUserSession} full rounded danger
-                                        disabled={this.props.isOtpScreenLogoutDisabled}
-                                        style={[styles.bgDanger]}>
-                                        <Text style={[styles.fontWhite]}>{CLOSE}</Text>
-                                    </Button>
-                                </View>
+                            {this.showVerifyButton()}
+                            {this.showCloseButton()}
+                               
                             </View>
-
                         </View>
                     </Content>
                 </StyleProvider>
