@@ -1,15 +1,20 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import { View, Text, TextInput } from 'react-native'
+import { View, Text, TextInput, Input } from 'react-native'
 import { connect } from 'react-redux'
-import { Content, Card, CardItem } from 'native-base';
+import { Content, Card, CardItem, Toast } from 'native-base'
 import {
     NUMBER, DECIMAL, STRING,
 } from '../lib/AttributeConstants'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import { bindActionCreators } from 'redux'
+import styles from '../themes/FeStyle'
 
+import {
+    QUANTITY_NOT_A_NUMBER,
+    OK
+} from '../lib/ContainerConstants'
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -25,29 +30,27 @@ function mapStateToProps(state) {
         totalAmountReturn: state.cashTenderingReducer.totalAmountReturn,
         cashTenderingListReturn: state.cashTenderingReducer.cashTenderingListReturn,
     }
-};
+}
 
 class CashTenderingView extends PureComponent {
     render() {
         return (
-            <View>
-                <Content>
-                    <Card style={{ flexDirection: 'row' }}>
-                        <CardItem >
-                            <Text>{this.props.item.view}  -  </Text>
-                        </CardItem>
-                        <CardItem>
-                            <TextInput style={{ justifyContent: 'flex-end', alignItems: 'flex-end' }}
-                                editable={true}
-                                maxLength={4}
-                                placeholder={'0'}
-                                keyboardType={'numeric'}
-                                value={this._checkValueOfDenominations(this.props.item)}
-                                onChangeText={this._onChangeText}
-                            />
-                        </CardItem>
-                    </Card>
-                </Content>
+            <View style={[styles.bgWhite, styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.padding10, styles.borderBottomLightGray]}>
+                <View >
+                    <Text style={[styles.fontLg]}>{this.props.item.view}</Text>
+                </View>
+                <View >
+                    <Text style={[styles.fontLg]}>  -  </Text>
+                </View>
+                <View>
+                    <TextInput style={[styles.flexBasis20, styles.fontLg, { borderColor: '#00796B', borderWidth: 1, height: 40, width: 70 }]}
+                        editable={true}
+                        placeholder={'0'}
+                        keyboardType={'numeric'}
+                        value={this._checkValueOfDenominations(this.props.item)}
+                        onChangeText={this._onChangeText}
+                    />
+                </View>
             </View>
         )
     }
@@ -57,6 +60,10 @@ class CashTenderingView extends PureComponent {
     }
 
     _onChangeText = (quantity) => {
+        if (quantity && !parseInt(quantity) && parseInt(quantity) != 0) {
+            { Toast.show({ text: QUANTITY_NOT_A_NUMBER + quantity, position: "bottom" | "center", buttonText: OK, duration: 3000 }) }
+            return
+        }
         {
             let payload = {
                 id: this.props.item.id,
@@ -69,7 +76,6 @@ class CashTenderingView extends PureComponent {
             }
         }
     }
-
 
 }
 export default connect(mapStateToProps, mapDispatchToProps)(CashTenderingView)

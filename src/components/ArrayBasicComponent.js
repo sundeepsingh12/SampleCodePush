@@ -60,7 +60,8 @@ import {
 } from '../lib/constants'
 import {
     OPTIONAL,
-    SELECTED
+    SELECTED,
+    REMOVE
 } from '../lib/ContainerConstants'
 function mapDispatchToProps(dispatch) {
     return {
@@ -260,6 +261,7 @@ class ArrayBasicComponent extends PureComponent {
                                     value={item.displayValue}
                                     keyboardType={(item.attributeTypeId == 6 || item.attributeTypeId == 13) ? 'numeric' : 'default'}
                                     editable={item.editable}
+                                    returnKeyType='done'
                                     multiline={item.attributeTypeId == 2 ? true : false}
                                     onChangeText={value => this._getNextFocusableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId)}
                                     onFocus={() => { this.onFocusEvent(item) }}
@@ -376,7 +378,7 @@ class ArrayBasicComponent extends PureComponent {
                 </View>
                 <View style={[styles.flexBasis10, styles.alignCenter, styles.justifyCenter, styles.padding10]}>
                     <Button style={styles.bgGray} onPress={() => this.props.actions.deleteArrayRow(this.props.arrayElements, this.props.arrayRow.rowId, this.props.lastRowId)}>
-                        <Text style={[styles.fontBlack, styles.fontDefault]}> Remove </Text>
+                        <Text style={[styles.fontBlack, styles.fontDefault]}> {REMOVE} </Text>
                     </Button>
                 </View>
             </View >

@@ -1,6 +1,6 @@
 {
   "name": "FareyeReact",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -9,25 +9,26 @@
     "postinstall": "rm ./node_modules/react-native/local-cli/core/__fixtures__/files/package.json"
   },
   "dependencies": {
+    "crypto-js": "^3.1.9-1",
     "immutable": "^3.8.2",
-    "jest-cli": "^22.4.0",
+    "jest-cli": "^22.4.2",
     "jsonschema": "^1.2.2",
     "keymirror": "^0.1.1",
     "lodash": "^4.17.5",
-    "moment": "^2.20.1",
+    "moment": "^2.21.0",
     "native-base": "^2.3.9",
     "react": "^16.2.0",
     "react-native": "^0.53.3",
-    "react-native-background-fetch": "^2.3.0",
+    "react-native-background-fetch": "^2.4.0",
     "react-native-background-geolocation": "^2.11.0",
-    "react-native-background-timer": "^2.0.0",
+    "react-native-background-timer": "^2.0.1",
     "react-native-camera": "^0.12.0",
     "react-native-cancelable-fetch": "^0.1.1",
     "react-native-code-push": "^5.2.1",
     "react-native-communications": "^2.2.1",
     "react-native-device-info": "^0.15.3",
     "react-native-fetch-blob": "^0.10.8",
-    "react-native-fs": "^2.9.10",
+    "react-native-fs": "^2.9.11",
     "react-native-google-maps-directions": "^1.1.2",
     "react-native-linear-gradient": "^2.4.0",
     "react-native-modal-datetime-picker": "^4.13.0",
@@ -43,10 +44,10 @@
     "react-native-swipe-gestures": "^1.0.2",
     "react-native-vector-icons": "^4.5.0",
     "react-native-zip-archive": "^2.2.1",
-    "react-navigation": "^1.1.2",
-    "react-navigation-redux-helpers": "^1.0.1",
+    "react-navigation": "^1.4.0",
+    "react-navigation-redux-helpers": "^1.0.2",
     "react-redux": "^5.0.7",
-    "realm": "^2.2.10",
+    "realm": "^2.2.13",
     "redux": "^3.7.2",
     "redux-logger": "3.0.6",
     "redux-mock-store": "^1.5.1",
@@ -57,6 +58,10 @@
   "jest": {
     "preset": "react-native",
     "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/modules/**",
+      "src/services/**"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!react-native|native-base|react-clone-referenced-element)"
     ]

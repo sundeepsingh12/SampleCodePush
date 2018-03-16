@@ -371,6 +371,7 @@ module.exports = keyMirror({
     LOADER_IS_RUNNING: null,
     SHOW_CHECKOUT_DETAILS: null,
     SET_INITIAL_STATE_TRANSIENT_STATUS: null,
+    SET_TRANSIENT_BACK_PRESSED: null,
 
     //Save Activated
     POPULATE_DATA: null,
@@ -384,8 +385,9 @@ module.exports = keyMirror({
     TotalAmount: null,
     Discard: null,
     Keep: null,
-    Cancel: null,
     Checkout: null,
+    SHOW_DISCARD_ALERT: null,
+    RETURN_TO_HOME: null,
 
     //Bulk Module
     START_FETCHING_BULK_CONFIG: null,
@@ -468,6 +470,8 @@ module.exports = keyMirror({
     SET_SHOW_IMAGE: null,
     SET_IMAGE_DATA: null,
     VIEW_IMAGE_DATA: null,
+    SET_SHOW_VIEW_IMAGE: null,
+    UPDATE_SKU_LIST_ITEMS: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,

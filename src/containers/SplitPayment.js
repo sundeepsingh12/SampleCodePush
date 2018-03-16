@@ -13,10 +13,9 @@ import {
     Container, Content, Header, Footer, FooterTab, Input, Button, Item, Card,
     CardItem, Icon, Left, Right, List, ListItem, Radio, Body, CheckBox, StyleProvider
 } from 'native-base'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import PopOver from '../components/PopOver'
 import * as paymentActions from '../modules/payment/paymentActions'
 import * as globalActions from '../modules/global/globalActions'
 import { bindActionCreators } from 'redux'
@@ -105,6 +104,7 @@ class SplitPayment extends Component {
                             placeholder=""
                             keyboardType="numeric"
                             KeyboardTypeIOS="number-pad"
+                            returnKeyType='done'
                             editable={paymentView ? false : true}
                             onChangeText={value => this.props.actions.setPaymentAmount(modeTypeId, value, this.props.splitPaymentModeMap)}
                             value={amount && amount !== 0 ? amount + '' : null}
@@ -135,6 +135,7 @@ class SplitPayment extends Component {
                             placeholder=""
                             keyboardType="numeric"
                             KeyboardTypeIOS="number-pad"
+                            returnKeyType='done'
                             onChangeText={value => { this.props.actions.setPaymentParameterForChequeOrDD(modeTypeId, id, this.props.splitPaymentModeMap, null, value) }}
                             value={transactionNumber && transactionNumber !== 0 ? transactionNumber + '' : null}
                         />
@@ -150,6 +151,7 @@ class SplitPayment extends Component {
                             placeholder=""
                             keyboardType="numeric"
                             KeyboardTypeIOS="number-pad"
+                            returnKeyType='done'
                             onChangeText={value => { this.props.actions.setPaymentParameterForChequeOrDD(modeTypeId, id, this.props.splitPaymentModeMap, value, null) }}
                             value={amount && amount !== 0 ? amount + '' : null}
                         />
@@ -242,6 +244,7 @@ class SplitPayment extends Component {
                                     placeholder=""
                                     keyboardType="numeric"
                                     KeyboardTypeIOS="number-pad"
+                                    returnKeyType='done'
                                     editable={false}
                                     value={this.props.navigation.state.params.actualAmount + ''}
                                 />

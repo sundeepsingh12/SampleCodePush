@@ -6,6 +6,8 @@ import {
     SHOW_SEARCH_BAR,
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
+    SET_SHOW_VIEW_IMAGE,
+    UPDATE_SKU_LIST_ITEMS
 } from '../../lib/constants'
 
 import {
@@ -14,6 +16,8 @@ import {
 import {
     fieldAttributeValidation
 } from '../../services/classes/FieldAttributeValidation'
+import { signatureService } from '../../services/classes/SignatureRemarks'
+import moment from 'moment'
 
 import {
     SKU_ORIGINAL_QUANTITY,
@@ -22,8 +26,11 @@ import {
     TOTAL_ORIGINAL_QUANTITY,
     TOTAL_ACTUAL_QUANTITY,
     SKU_ACTUAL_AMOUNT,
-    ARRAY_SAROJ_FAREYE
+    ARRAY_SAROJ_FAREYE,
+    SKU_PHOTO,
+    SKU_REASON,
 } from '../../lib/AttributeConstants'
+import { NavigationActions } from 'react-navigation'
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
@@ -40,13 +47,16 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
             dispatch(setState(SKU_LIST_FETCHING_START))
             const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMasterId)
             const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId[0])
-            const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation)
+            const skuValidationForImageAndReason = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(fieldAttributeMasterId)
+            const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation, skuValidationForImageAndReason)
             const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap, skuData.attributeTypeIdValueMap)
             dispatch(setState(SKU_LIST_FETCHING_STOP, {
                 skuListItems: skuData.skuObjectListDto,
                 skuObjectValidation,
                 skuArrayChildAttributes,
-                skuObjectAttributeId: skuListingDto.childFieldAttributeId[0]
+                skuObjectAttributeId: skuListingDto.childFieldAttributeId[0],
+                skuValidationForImageAndReason,
+                reasonsList: skuData.reasonsList,
             }))
             if (skuListingDto.isSkuCodePresent)
                 dispatch(setState(SHOW_SEARCH_BAR))
@@ -72,14 +82,25 @@ export function scanSkuItem(skuListItems, skuCode) {
  *This method updates SkuActualQuantity of a particular list item and TotalActualQuantity,
  * TotalOriginalQuantity & SkuActualAmount as well,Called when actualQuantity is changed by user
  */
-export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItems, skuChildElements) {
+export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason) {
     return async function (dispatch) {
         try {
-            const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, parentId, skuListItems, skuChildElements)
-            dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, {
-                skuListItems: updatedSkuArray.updatedObject,
-                skuRootChildElements: updatedSkuArray.updatedChildElements
-            }))
+            if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
+                if (rowItem.attributeTypeId == SKU_PHOTO) {
+                    value = await signatureService.saveFile(value, moment(), true)
+                    dispatch(NavigationActions.back())
+                    dispatch(setState(SET_SHOW_VIEW_IMAGE, {imageData: '', showImage: false, viewData: '' }))
+                }
+                let copyOfskuListItems = _.cloneDeep(skuListItems)
+                copyOfskuListItems[rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
+                dispatch(setState(UPDATE_SKU_LIST_ITEMS, copyOfskuListItems))
+            } else {
+                const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason)
+                dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, {
+                    skuListItems: updatedSkuArray.updatedObject,
+                    skuRootChildElements: updatedSkuArray.updatedChildElements
+                }))
+            }
         } catch (error) {
             console.log(error)
         }
@@ -94,14 +115,22 @@ export function updateSkuActualQuantityAndOtherData(value, parentId, skuListItem
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, latestPositionId, parentObject, formElement, isSaveDisabled, navigation) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, latestPositionId, parentObject, formElement, isSaveDisabled, navigation, skuValidationForImageAndReason) {
     return async function (dispatch) {
         try {
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
             if (!message) {
-                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId)
-                let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, latestPositionId)
-                dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
+                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId, skuValidationForImageAndReason)
+                if (_.isNull(skuChildElements)) {
+                    Toast.show({
+                        text: `Please Fill all the Required Details`,
+                        position: 'bottom',
+                        buttonText: 'OK'
+                    }) 
+                } else {
+                    let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, latestPositionId)
+                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
+                }
             }
             else {
                 Toast.show({

@@ -23,16 +23,18 @@ import styles from '../themes/FeStyle'
 export default class ReviewSaveActivatedDetails extends PureComponent {
 
     renderData = (item) => {
-        return (
-            <View style={[styles.row, styles.paddingLeft10, styles.paddingRight10]}>
-                <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault]}>{item.label}</Text>
+        if (item.value) {
+            return (
+                <View style={[styles.row, styles.paddingLeft10, styles.paddingRight10]}>
+                    <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
+                        <Text style={[styles.fontDefault]}>{item.label}</Text>
+                    </View>
+                    <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
+                        <Text style={[styles.fontDefault, styles.fontBlack]}>{item.value}</Text>
+                    </View>
                 </View>
-                <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault, styles.fontBlack]}>{item.value}</Text>
-                </View>
-            </View>
-        )
+            )
+        }
     }
 
     _keyExtractor = (item, index) => String(item.id);
@@ -50,14 +52,14 @@ export default class ReviewSaveActivatedDetails extends PureComponent {
                                 <View
                                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
                                     <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.reviewCommonData(false, {}) }}>
-                                        <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                        <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.fontLeft, styles.padding15]} />
                                     </TouchableOpacity>
                                     <View style={[style.headerBody]}>
                                         <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.headerTitle}</Text>
                                     </View>
                                     <View style={[style.headerRight]}>
                                         {renderIf(this.props.isEditVisible,
-                                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontDefault, styles.alignCenter]}
+                                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontDefault, styles.alignCenter, styles.padding15]}
                                                 onPress={() => this.props.edit(this.props.itemId)}>
                                                 {Edit}
                                             </Text>)}
@@ -89,7 +91,6 @@ const style = StyleSheet.create({
     },
     headerLeft: {
         width: '15%',
-        padding: 15
     },
     headerBody: {
         width: '70%',
@@ -100,9 +101,6 @@ const style = StyleSheet.create({
     },
     headerRight: {
         width: '20%',
-        paddingRight: 20,
-        paddingTop: 15,
-        paddingBottom: 15,
         paddingRight: 15
     },
     footer: {

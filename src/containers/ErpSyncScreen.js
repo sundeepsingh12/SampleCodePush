@@ -50,8 +50,8 @@ import {
   ERP_SYNC_STATUS
 } from '../lib/constants'
 import ErpSyncIcon from '../svg_components/icons/ErpSyncIcon'
-import getTheme from '../../native-base-theme/components';
-import platform from '../../native-base-theme/variables/platform';
+import getTheme from '../../native-base-theme/components'
+import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import * as homeActions from '../modules/home/homeActions'
 import * as globalActions from '../modules/global/globalActions'
@@ -181,11 +181,7 @@ class ErpSyncScreen extends PureComponent {
       let erySyncDiffTimeInSecondsFinal = 300 - erySyncDiffTimeInSeconds
       let min = parseInt(erySyncDiffTimeInSecondsFinal / 60)
       let sec = parseInt(erySyncDiffTimeInSecondsFinal % 60)
-      if (min > 0) {
-        message = `${RESYNC_IN} ${min} : ${sec}`
-      } else {
-        message = `${RESYNC_IN} ${sec}`
-      }
+      message = (min > 0)?`${RESYNC_IN} ${min} : ${sec}`:`${RESYNC_IN} ${sec}`
       this.setState({ erpSyncTimer: message })
     }
 

@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated } from 'react-native'
 import Loader from '../components/Loader'
-import HomeFooter from './HomeFooter'
 import {
   Container,
   Content,
@@ -56,6 +55,13 @@ import {
   Summary,
   CustomApp,
   NewJob,
+  START,
+  BULK,
+  LIVE,
+  SEQUENCEMODULE,
+  SORTING,
+  CUSTOMAPP,
+  JOB_ASSIGNMENT,
   PIECHART,
   SUMMARY,
   JobMasterListScreen,
@@ -69,6 +75,7 @@ import { fetchJobMasterList } from '../modules/postAssignment/postAssignmentActi
 
 function mapStateToProps(state) {
   return {
+    newJobModules: state.home.newJobModules,
     modules: state.home.modules,
     pieChart: state.home.pieChart,
     menu: state.home.menu,
@@ -113,17 +120,17 @@ class Home extends PureComponent {
         }
       })
     }
-    this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu)
+    this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu, this.props.newJobModules)
   }
 
   navigateToScene = (appModule) => {
     switch (appModule.appModuleId) {
       case BULK_ID: {
-        this.props.actions.getJobMasterVsStatusNameList()
+        this.props.actions.getJobMasterVsStatusNameList(this.props.modules.BULK.displayName)
         break
       }
       case LIVE_ID: {
-        this.props.actions.navigateToScene(LiveJobs)
+        this.props.actions.navigateToScene(LiveJobs,{displayName : this.props.modules.LIVE.displayName})
         break
       }
       case SEQUENCEMODULE_ID: {
@@ -136,7 +143,7 @@ class Home extends PureComponent {
       }
 
       case SORTING_ID: {
-        this.props.actions.navigateToScene(Sorting)
+        this.props.actions.navigateToScene(Sorting,{displayName : this.props.modules.SORTING.displayName})
         break
       }
 
@@ -152,12 +159,12 @@ class Home extends PureComponent {
       }
 
       case JOB_ASSIGNMENT_ID: {
-        this.props.actions.fetchJobMasterList()
+        this.props.actions.fetchJobMasterList(this.props.modules.JOB_ASSIGNMENT.displayName)
         //this.props.actions.navigateToScene(JobMasterListScreen)
       }
 
       default:
-        (appModule.appModuleId == NEWJOB_ID) ? this.props.actions.navigateToNewJob(appModule.jobMasterIdList) : null
+        (appModule.appModuleId == NEWJOB_ID) ? this.props.actions.navigateToNewJob(appModule.jobMasterIdList,appModule.displayName) : null
 
     }
   }
@@ -257,7 +264,16 @@ class Home extends PureComponent {
 
   render() {
     const headerView = this.headerView()
-    const moduleView = this.moduleView(_.values(this.props.modules))
+    let list = []
+    list = list.concat(this.props.modules[START],
+      this.props.modules[LIVE],
+      this.props.modules[BULK],
+      this.props.modules[SEQUENCEMODULE],
+      _.values(this.props.newJobModules),
+      this.props.modules[SORTING],
+      this.props.modules[JOB_ASSIGNMENT],
+      this.props.modules[CUSTOMAPP])
+    const moduleView = this.moduleView(list)
     const pieChartView = this.pieChartView()
 
     if (this.props.moduleLoading) {
@@ -270,7 +286,7 @@ class Home extends PureComponent {
           <Content>
             {pieChartView}
             <List>
-              {moduleView}
+            {moduleView}
             </List>
           </Content>
         </Container>

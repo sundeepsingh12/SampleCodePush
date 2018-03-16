@@ -13,6 +13,8 @@ var InitialState = Record({
     inputTextEmailIds: '',
     emailIdViewArray: [],
     companyCodeDhl: false,
+    showDiscardAlert: false,
+    isReturnToHome: false,
 })
 
 export default InitialState

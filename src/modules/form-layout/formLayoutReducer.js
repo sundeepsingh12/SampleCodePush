@@ -59,7 +59,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('isSaveDisabled', action.payload.isSaveDisabled ? true : false)
                 .set('updateDraft', true)
-                .set('modalFieldAttributeMasterId',action.payload.modalFieldAttributeMasterId)
+                .set('modalFieldAttributeMasterId', action.payload.modalFieldAttributeMasterId)
         }
 
         case UPDATE_PAYMENT_AT_END: {
@@ -118,17 +118,17 @@ export default function formLayoutReducer(state = initialState, action) {
          * back pressed from TransientStatus container
          */
         case SET_FORM_LAYOUT_STATE: {
-            return state.set('currentElement', action.payload.currentElement)
-                .set('latestPositionId', action.payload.latestPositionId)
-                .set('isSaveDisabled', action.payload.isSaveDisabled)
-                .set('statusId', action.payload.statusId)
-                .set('jobTransactionId', action.payload.jobTransactionId)
+            return state.set('currentElement', action.payload.editableFormLayoutState.currentElement)
+                .set('latestPositionId', action.payload.editableFormLayoutState.latestPositionId)
+                .set('isSaveDisabled', action.payload.editableFormLayoutState.isSaveDisabled)
+                .set('statusId', action.payload.editableFormLayoutState.statusId)
+                .set('jobTransactionId', action.payload.editableFormLayoutState.jobTransactionId)
                 .set('statusName', action.payload.statusName)
-                .set('formElement', action.payload.formElement)
-                .set('isLoading', action.payload.isLoading)
-                .set('errorMessage', action.payload.errorMessage)
-                .set('paymentAtEnd', action.payload.paymentAtEnd)
-                .set('dataStoreFilterReverseMap', action.payload.dataStoreFilterReverseMap)
+                .set('formElement', action.payload.editableFormLayoutState.formElement)
+                .set('isLoading', action.payload.editableFormLayoutState.isLoading)
+                .set('errorMessage', action.payload.editableFormLayoutState.errorMessage)
+                .set('paymentAtEnd', action.payload.editableFormLayoutState.paymentAtEnd)
+                .set('dataStoreFilterReverseMap', action.payload.editableFormLayoutState.dataStoreFilterReverseMap)
         }
         case SET_DRAFT: {
             return state.set('draftStatusId', action.payload)
@@ -144,7 +144,7 @@ export default function formLayoutReducer(state = initialState, action) {
 
         case SET_DSF_REVERSE_MAP:
             return state.set('dataStoreFilterReverseMap', action.payload)
-            
+
         case SET_MODAL_FIELD_ATTRIBUTE: {
             return state.set('modalFieldAttributeMasterId', action.payload)
         }

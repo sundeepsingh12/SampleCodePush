@@ -41,7 +41,6 @@ class ExpandableHeader extends PureComponent {
                         navigateToCameraDetails={this.props.navigateToCameraDetails} />
                 )}
             </View>
-
         )
     }
 }

@@ -8,6 +8,10 @@ import {
     from 'react-native'
 import React, { PureComponent } from 'react'
 import renderIf from '../lib/renderIf'
+import {
+    SAVE,
+    CANCEL
+} from '../lib/ContainerConstants'
 
 class NPSFeedback extends PureComponent {
 
@@ -40,12 +44,12 @@ class NPSFeedback extends PureComponent {
                     <View style={{ flexDirection: "row" }}>
                         <TouchableHighlight style={styles.buttonStyle}
                             onPress={() => { this.props.onSave(this.state.starCount, this.props.item) }} >
-                            <Text>Save</Text>
+                            <Text>{SAVE}</Text>
                         </TouchableHighlight>
 
                         <TouchableHighlight style={styles.buttonStyle}
                             onPress={() => { this.props.onCancel() }} >
-                            <Text>Cancel</Text>
+                            <Text>{CANCEL}</Text>
                         </TouchableHighlight>
                     </View>)}
             </View>

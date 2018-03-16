@@ -22,6 +22,7 @@ import {
     Button,
 
 } from 'native-base';
+import * as skuListingActions from '../modules/skulisting/skuListingActions'
 
 import Camera from 'react-native-camera';
 import { bindActionCreators } from 'redux'
@@ -42,7 +43,8 @@ import TorchOnIcon from '../svg_components/icons/TorchOnIcon'
 import {
     CAMERA,
     CAMERA_HIGH,
-    CAMERA_MEDIUM
+    CAMERA_MEDIUM,
+    SKU_PHOTO
 } from '../lib/AttributeConstants'
 
 function mapStateToProps(state) {
@@ -54,7 +56,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...globalActions, ...cameraActions }, dispatch)
+        actions: bindActionCreators({ ...globalActions, ...cameraActions, ...skuListingActions }, dispatch)
     }
 }
 
@@ -82,6 +84,8 @@ class CameraFieldAttribute extends PureComponent {
             case CAMERA_MEDIUM: this.setState({ quality: 'medium' })
                 break
             case CAMERA_HIGH: this.setState({ quality: 'high' })
+                break
+            case SKU_PHOTO: this.setState({ quality: 'high' })
                 break
             default: {
 
@@ -143,13 +147,13 @@ class CameraFieldAttribute extends PureComponent {
                                 type={this.state.cameraType}
                                 orientation={Camera.constants.Orientation.portrait}>
                                 <View style={[styles.absolute, styles.padding10, { top: 0, left: 0 }]}>
-                                <Icon
-                                    name="md-close"
-                                    style={[styles.fontXxxl, styles.fontWhite]}
-                                    onPress={() => {
-                                        this.props.navigation.goBack()
-                                    }} />
-                            </View>
+                                    <Icon
+                                        name="md-close"
+                                        style={[styles.fontXxxl, styles.fontWhite]}
+                                        onPress={() => {
+                                            this.props.navigation.goBack()
+                                        }} />
+                                </View>
                             </Camera>
                         </View>
                         <View style={[style.cameraFooter]}>
@@ -207,7 +211,11 @@ class CameraFieldAttribute extends PureComponent {
                         <View style={[styles.width100, styles.absolute, styles.heightAuto, styles.padding10, { bottom: 0 }]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, styles.flex1]}>
                                 <TouchableOpacity style={[styles.justifyCenter, styles.alignCenter, styles.bgSuccess, { width: 70, height: 70, borderRadius: 35 }]} onPress={() => {
-                                    this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.jobTransaction)
+                                    if (this.props.navigation.state.params.currentElement.attributeTypeId == SKU_PHOTO) {
+                                        this.props.navigation.state.params.changeSkuActualQuantity(this.props.imageData, this.props.navigation.state.params.currentElement)
+                                    } else {
+                                        this.props.actions.saveImage(this.props.imageData, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.isSaveDisabled, this.props.navigation.state.params.calledFromArray, this.props.navigation.state.params.rowId, this.props.navigation.state.params.latestPositionId, this.props.navigation.state.params.jobTransaction)
+                                    }
                                 }}>
                                     <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXxxl]} />
                                 </TouchableOpacity>

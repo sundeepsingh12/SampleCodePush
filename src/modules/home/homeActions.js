@@ -47,7 +47,8 @@ import {
   SERVER_UNREACHABLE,
 } from '../../lib/AttributeConstants'
 import {
-  NEW_JOB_CONFIGURATION_ERROR
+  NEW_JOB_CONFIGURATION_ERROR,
+  OK
 } from '../../lib/ContainerConstants'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import CONFIG from '../../lib/config'
@@ -84,7 +85,7 @@ import {
 /**
  * This action enables modules for particular user
  */
-export function fetchModulesList(modules, pieChart, menu) {
+export function fetchModulesList(modules, pieChart, menu, newJobModules) {
   return async function (dispatch) {
     try {
       dispatch(setState(HOME_LOADING, {
@@ -92,11 +93,12 @@ export function fetchModulesList(modules, pieChart, menu) {
       }))
       const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
       const user = await keyValueDBService.getValueFromStore(USER)
-      const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu)
+      const result = moduleCustomizationService.getActiveModules(appModulesList.value, user.value, modules, pieChart, menu, newJobModules)
       const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? true : false
       dispatch(setState(SET_MODULES, {
         moduleLoading: false,
         modules: result.modules,
+        newJobModules: result.newJobModules,
         pieChart: result.pieChart,
         menu: result.menu,
       }))
@@ -424,7 +426,7 @@ export function resetFailCountInStore() {
   }
 }
 
-export function navigateToNewJob(jobMasterIds) {
+export function navigateToNewJob(jobMasterIds,displayName) {
   return async function (dispatch) {
     try {
       const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
@@ -444,20 +446,20 @@ export function navigateToNewJob(jobMasterIds) {
           if (returnParams.stateParam) {
             await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
           }
-          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
+          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, {displayName}))
         }
       } else if (_.size(mastersWithNewJob) == 0) {
         Toast.show({
           text: NEW_JOB_CONFIGURATION_ERROR,
           position: "bottom" | "center",
-          buttonText: 'Okay',
+          buttonText: OK,
           type: 'danger',
           duration: 10000
         })
         // dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
       } else {
         dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
-        dispatch(navigateToScene(NewJob))
+        dispatch(navigateToScene(NewJob,{displayName}))
       }
     } catch (error) {
       console.log(error)

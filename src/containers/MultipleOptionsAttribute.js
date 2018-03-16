@@ -33,7 +33,6 @@ import {
     DROPDOWN,
     OPTION_RADIO_FOR_MASTER,
     SEARCH,
-    OK,
     ADVANCE_DROPDOWN
 } from '../lib/AttributeConstants'
 import {
@@ -178,6 +177,7 @@ class MultipleOptionsAttribute extends PureComponent {
                             style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 10 }]}
                             value={this.props.searchInput}
                             keyboardType={(this.props.currentElement.attributeTypeId == ADVANCE_DROPDOWN) ? 'numeric' : 'default'}
+                            returnKeyType='done'
                             onChangeText={(text) => {
                                 this.props.actions.setState(SET_OPTION_SEARCH_INPUT, { searchInput: text })
                             }}

@@ -24,15 +24,14 @@ import moment from 'moment'
 import renderIf from '../lib/renderIf'
 import CallIcon from '../svg_components/icons/CallIcon'
 import {
+  SELECT_NUMBER_FOR_CALL,
   SELECT_NUMBER,
   SELECT_TEMPLATE,
-  SELECT_NUMBER_FOR_CALL,
-  CONFIRMATION,
-  CALL_CONFIRM,
-} from '../lib/AttributeConstants'
-import {
   OK,
   CANCEL,
+  CALL_CONFIRM,
+  CONFIRMATION,
+  SELECT_ADDRESS_NAVIGATION
 } from '../lib/ContainerConstants'
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
@@ -43,7 +42,7 @@ export default class JobListItem extends PureComponent {
   callButtonPressed = () => {
     if (this.props.data.jobSwipableDetails.contactData.length > 1) {
       let contactData = this.props.data.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
-      contactData.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      contactData.push( { text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -69,7 +68,7 @@ export default class JobListItem extends PureComponent {
   }
   customerCareButtonPressed = () => {
     let customerCareTitles = this.props.data.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
-    customerCareTitles.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+    customerCareTitles.push( { text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
     ActionSheet.show(
       {
         options: customerCareTitles,
@@ -105,13 +104,13 @@ export default class JobListItem extends PureComponent {
       Object.values(addressDatas).forEach(object => {
         addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
       })
-      addressArray.push( { text: "Cancel", icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      addressArray.push( { text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
       if (_.size(addressArray) > 2) {
         ActionSheet.show(
           {
             options: addressArray,
             cancelButtonIndex: addressArray.length - 1,
-            title: 'Select address for navigation'
+            title: SELECT_ADDRESS_NAVIGATION
           },
           buttonIndex => {
             if (buttonIndex != addressArray.length - 1 && buttonIndex >= 0) {

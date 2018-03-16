@@ -30,7 +30,6 @@ import {
 } from '../lib/AttributeConstants'
 
 import {
-  SET_FORM_LAYOUT_STATE,
   SET_DRAFT,
   SET_UPDATE_DRAFT,
   ERROR_MESSAGE,
@@ -39,7 +38,8 @@ import {
 import CustomAlert from "../components/CustomAlert"
 import {
   ALERT,
-  INVALID_FORM_ALERT
+  INVALID_FORM_ALERT,
+  OK
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -79,7 +79,7 @@ class FormLayout extends PureComponent {
       Toast.show({
         text: this.props.errorMessage,
         position: "bottom" | "center",
-        buttonText: 'Okay',
+        buttonText: OK,
         type: 'danger',
         duration: 10000
       })
@@ -171,6 +171,7 @@ class FormLayout extends PureComponent {
       isLoading: this.props.isLoading,
       errorMessage: this.props.errorMessage,
       currentElement: this.props.currentElement,
+      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
     }
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
@@ -209,9 +210,45 @@ class FormLayout extends PureComponent {
     return view
   }
 
+  getHeaderView() {
+    return (
+      <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+        <Body>
+          <View
+            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+            </TouchableOpacity>
+            <View style={[style.headerBody]}>
+              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.statusName}</Text>
+            </View>
+            <View style={[style.headerRight]}>
+            </View>
+            <View />
+          </View>
+        </Body>
+      </Header>
+    )
+  }
+
+  getFooterView() {
+    return (
+      <Footer style={[style.footer]}>
+        <FooterTab style={[styles.padding10]}>
+          <Button success full
+            onPress={() => this.saveJobTransaction()}
+            disabled={this.props.isSaveDisabled}>
+            <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+          </Button>
+        </FooterTab>
+      </Footer>
+    )
+  }
+
   render() {
     const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
+    let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
       <Footer style={[style.footer]}>
@@ -224,50 +261,48 @@ class FormLayout extends PureComponent {
         </FooterTab>
       </Footer>
     }
+    const headerView = this.getHeaderView()
+    const footerView = this.getFooterView()
+    if (Platform.OS == 'ios') {
+      formView = <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+        {draftAlert}
+        {invalidFormAlert}
+        {headerView}
+
+        <View style={[styles.flex1, styles.bgWhite]}>
+          <View style={[styles.paddingTop10, styles.paddingBottom10]}>
+            <FlatList
+              data={Array.from(this.props.formElement)}
+              extraData={this.state}
+              renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+              keyExtractor={this._keyExtractor}>
+            </FlatList>
+          </View>
+        </View>
+        {footerView}
+      </KeyboardAvoidingView >
+    } else {
+      formView = <Container>
+        {draftAlert}
+        {invalidFormAlert}
+        {headerView}
+
+        <View style={[styles.flex1, styles.bgWhite]}>
+          <View style={[styles.paddingTop10, styles.paddingBottom10]}>
+            <FlatList
+              data={Array.from(this.props.formElement)}
+              extraData={this.state}
+              renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
+              keyExtractor={this._keyExtractor}>
+            </FlatList>
+          </View>
+        </View>
+        {footerView}
+      </Container >
+    }
     return (
       <StyleProvider style={getTheme(platform)}>
-        <Container>
-          {draftAlert}
-          {invalidFormAlert}
-          <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-            <Body>
-              <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                </TouchableOpacity>
-                <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.statusName}</Text>
-                </View>
-                <View style={[style.headerRight]}>
-                </View>
-                <View />
-              </View>
-            </Body>
-          </Header>
-
-          <View style={[styles.flex1, styles.bgWhite]}>
-            <View style={[styles.paddingTop10, styles.paddingBottom10]}>
-              <FlatList
-                data={Array.from(this.props.formElement)}
-                extraData={this.state}
-                renderItem={(item) => this.renderData(item.item[1])} //item[1] contains the formLayoutObject as Array.from on map makes it array with 0 index containing key and 1st index containing object
-                keyExtractor={this._keyExtractor}>
-              </FlatList>
-            </View>
-          </View>
-
-
-          <Footer style={[style.footer]}>
-            <FooterTab style={[styles.padding10]}>
-              <Button success full
-                onPress={() => this.saveJobTransaction()}
-                disabled={this.props.isSaveDisabled}>
-                <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
-              </Button>
-            </FooterTab>
-          </Footer>
-        </Container >
+        {formView}
       </StyleProvider >
     )
   }

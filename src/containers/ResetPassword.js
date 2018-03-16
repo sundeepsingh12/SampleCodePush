@@ -34,11 +34,6 @@ import {
     SET_CONFIRM_NEW_PASSWORD,
     TOGGLE_SAVE_RESET_BUTTON,
 } from '../lib/constants'
-import {
-    CONFIRM_CURRENT_PASSWORD,
-    NEW_PASSWORD,
-    CONFIRM_NEW_PASSWORD,
-} from '../lib/AttributeConstants'
 import Loader from '../components/Loader'
 
 function mapStateToProps(state) {

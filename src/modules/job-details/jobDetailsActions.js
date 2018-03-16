@@ -14,6 +14,7 @@ import { fetchJobs } from '../taskList/taskListActions'
 import {
     Start,
     PENDING,
+    JOB_EXPIRY_TIME
 } from '../../lib/AttributeConstants'
 import {
     JOB_ATTRIBUTE,
@@ -44,7 +45,7 @@ export function startFetchingJobDetails() {
 }
 
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo,parentStatusList, isEtaTimerShow) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -55,7 +56,8 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             errorMessage,
             parentStatusList,
             draftStatusInfo,
-            isEtaTimerShow
+            isEtaTimerShow,
+            jobExpiryTime
         }
     }
 }
@@ -63,7 +65,7 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
 export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
-            dispatch(startFetchingJobDetails()) 
+            dispatch(startFetchingJobDetails())
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
             const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
@@ -72,17 +74,20 @@ export function getJobDetails(jobTransactionId) {
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
-            const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery, 
-                                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId) : false
-            const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value,details.currentStatus,jobTransactionId) : []
+            const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
+                jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId, details.currentStatus.actionOnStatus) : false
+            const jobExpiryData = (!errorMessage && details.jobDataObject.dataMap[JOB_EXPIRY_TIME]) ? (Object.values(details.jobDataObject.dataMap[JOB_EXPIRY_TIME])[0]) : null
+            const jobExpiryTime = jobExpiryData && jobExpiryData.data ? jobExpiryData.data.value : null
+            const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
             const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             let isEtaTimerShow = (statusCategory == 1)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow))
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly
             console.log(error)
+            dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
 }
@@ -93,7 +98,7 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
             let fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
             let user = await keyValueDBService.getValueFromStore(USER);
             await addServerSmsService.sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user)
-        }catch (error) {
+        } catch (error) {
 
         }
     }
@@ -111,28 +116,30 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
  *
  */
 
-export function setAllDataOnRevert(jobTransaction,statusTo,navigation) {
+export function setAllDataOnRevert(jobTransaction, statusTo, navigation) {
     return async function (dispatch) {
         try {
-            dispatch(startFetchingJobDetails());    
-            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)            
-            await jobDetailsService.setAllDataForRevertStatus(statusList,jobTransaction,statusTo)
-            dispatch(performSyncService())     
-            dispatch(pieChartCount())                                                           
+            dispatch(startFetchingJobDetails());
+            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+            await jobDetailsService.setAllDataForRevertStatus(statusList, jobTransaction, statusTo)
+            dispatch(performSyncService())
+            dispatch(pieChartCount())
             dispatch(fetchJobs())
-            let landingId = (Start.landingTab)  ? jobStatusService.getTabIdOnStatusId(statusList.value,statusTo[0]): false    
-            if(landingId){ 
+            let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : false
+            if (landingId) {
                 await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
-            dispatch(NavigationActions.reset({
-                index: 1,
-                actions: [
-                    NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                    NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
-                ]
-            }))}else{ dispatch(navigation.goBack())      }      
+                dispatch(NavigationActions.reset({
+                    index: 1,
+                    actions: [
+                        NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+                        NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
+                    ]
+                }))
+            } else { dispatch(navigation.goBack()) }
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
-            console.log(error)            
+            console.log(error)
+            dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
 }

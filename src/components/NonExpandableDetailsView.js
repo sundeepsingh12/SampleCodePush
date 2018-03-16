@@ -12,7 +12,6 @@ import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import { Icon } from 'native-base'
 import {
-    IMAGE_LOADING_ERROR,
     VIEW_TEXT_LABEL,
     IMAGE_URL,
     DATA_STORE,
@@ -23,6 +22,9 @@ import {
     CAMERA_MEDIUM,
     SIGNATURE_AND_FEEDBACK
 } from '../lib/AttributeConstants'
+import {
+    IMAGE_LOADING_ERROR,
+} from '../lib/ContainerConstants'
 import CountDownTimer from './CountDownTimer'
 export default class NonExpandableDetailsView extends PureComponent {
 

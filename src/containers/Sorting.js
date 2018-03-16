@@ -11,7 +11,7 @@ import QRCode from 'react-native-qrcode-svg'
 import QRIcon from '../svg_components/icons/QRIcon'
 import _ from 'lodash'
 import Camera from 'react-native-camera'
-import { NA, SORTING_PLACEHOLDER, SEARCH_INFO } from '../lib/AttributeConstants'
+import { NA} from '../lib/AttributeConstants'
 import * as sortingActions from '../modules/sorting/sortingActions'
 import * as globalActions from '../modules/global/globalActions'
 import React, { PureComponent } from 'react'
@@ -35,6 +35,7 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import {SORTING_SEARCH_VALUE,QrCodeScanner} from '../lib/constants'
+import { SORTING,SEARCH_INFO,POST_SEARCH_PLACEHOLDER,OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -116,7 +117,7 @@ class Sorting extends PureComponent {
             Toast.show({
                 text: this.props.errorMessage,
                 position: 'bottom' | "center", 
-                buttonText: 'Okay',
+                buttonText: OK,
                 type: 'danger',
                 duration: 5000
             })
@@ -145,6 +146,7 @@ class Sorting extends PureComponent {
 
     render() {
         const renderView = this._renderContent()
+        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : SORTING        
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -156,7 +158,7 @@ class Sorting extends PureComponent {
                                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Sorting</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
                                 </View>
                                 <View style={[style.headerRight]}>
                                 </View>
@@ -168,7 +170,7 @@ class Sorting extends PureComponent {
                                     <Input
                                         value={this.props.searchRefereneceValue.value}
                                         onChangeText={this._onChangeReferenceValue}
-                                        placeholder={SORTING_PLACEHOLDER}
+                                        placeholder={POST_SEARCH_PLACEHOLDER}
                                         returnKeyType = {"search"}
                                         keyboardAppearance = {"dark"}
                                         placeholderTextColor={'rgba(255,255,255,.4)'}

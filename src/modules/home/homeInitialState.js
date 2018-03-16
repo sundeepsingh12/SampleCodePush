@@ -105,6 +105,7 @@ var InitialState = Record({
             enabled: false,
         },
     },
+    newJobModules: {},
     syncStatus: null,
     erpSyncStatus: null,
     unsyncedTransactionList: [],

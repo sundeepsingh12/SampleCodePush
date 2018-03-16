@@ -10,6 +10,7 @@ import QRIcon from '../svg_components/icons/QRIcon'
 import * as globalActions from '../modules/global/globalActions'
 import {WEBVIEW_REF, ENTER_URL_HERE, HTTP} from '../lib/AttributeConstants'
 import renderIf from '../lib/renderIf'
+import { INVALID_URL_OR_NO_INTERNET,OK } from '../lib/ContainerConstants'
 
 import {
     START_FETCHING_URL,
@@ -54,11 +55,12 @@ class CustomApp extends PureComponent {
     static navigationOptions = ({ navigation }) => {
         return { header: null }
     }
-    onError (message) {
+    onError () {
         Toast.show({
-            text: message.description,
+            text: INVALID_URL_OR_NO_INTERNET,
             position: 'bottom',
-            buttonText: 'Ok'
+            buttonText: OK,
+            duration: 5000
              })
     }  
 
@@ -70,16 +72,14 @@ class CustomApp extends PureComponent {
     }
 
     onReload = () =>{
+        if(this.props.customUrl)
         this.refs[WEBVIEW_REF].reload()
     }
      
     onLoadEnd = () =>{
         this.props.actions.setState(END_FETCHING_URL,{})
     }
-    // onCancel = () =>{
-    //     this.refs[WEBVIEW_REF].stopLoading();
-    //     this.props.actions.setState(END_FETCHING_URL,{})
-    //  } 
+ 
     onSubmit(value){
         if(!/^[a-zA-Z-_]+:/.test(value)) {
             value = HTTP + value;
@@ -88,6 +88,7 @@ class CustomApp extends PureComponent {
     }
 
     onLoadStart = () =>{
+        if(this.props.customUrl)
         this.props.actions.setState(START_FETCHING_URL,this.props.customUrl)
     }
 
@@ -125,6 +126,8 @@ class CustomApp extends PureComponent {
                                         onEndEditing = {(event) => this.onSubmit(event.nativeEvent.text)}
                                         placeholder={ENTER_URL_HERE}
                                         placeholderTextColor={'rgba(255,255,255,.4)'}
+                                        returnKeyType = {"search"}
+                                        keyboardAppearance = {"dark"}
                                         style={[style.headerSearch]} />
                                 </View> :
                                 <Text numberOfLines={1} ellipsizeMode={'tail'} style={[styles.fontCenter, styles.fontWhite, styles.fontDefault, styles.alignCenter]}>{this.props.customUrl}</Text> )} 
@@ -144,17 +147,16 @@ class CustomApp extends PureComponent {
                         </View>
                         </Body>
                     </Header>
-
+                    {this.props.customUrl || (this.props.scannerText) || (!this.props.navigation.state.params.customUrl) ? 
                     <WebView
                         ref={WEBVIEW_REF}
-                        style={styles.WebViewStyle} 
                         source={{uri : (this.props.scannerText) ? this.props.scannerText: this.props.customUrl}} 
                         javaScriptEnabled={true}
                         domStorageEnabled={true}
                         onLoadEnd = {this.onLoadEnd}
                         onLoadStart = {this.onLoadStart} 
-                        onError = {(event) => this.onError(event.nativeEvent)}
-                    />
+                        onError = {(event) => this.onError()}
+                    /> : null }
                     <Footer style={[style.footer]}>
                         <FooterTab>
                             <Button full style={[styles.bgWhite]} onPress = {this.goBack}>
@@ -164,11 +166,12 @@ class CustomApp extends PureComponent {
                                 <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
                             </Button>
                         </FooterTab>
+                        { (this.props.navigation.state.params.customUrl) ? 
                         <FooterTab>
                             <Button style={{alignItems: 'flex-end', height: 40, width:40}} onPress = {() =>   this.props.navigation.navigate(QrCodeScanner, {returnData: this.onSetText.bind(this)})}>
                                 <QRIcon width={30} height={30} color = {styles.fontBlack}/>  
                             </Button>
-                        </FooterTab>
+                        </FooterTab> : null }
                     </Footer>
                 </Container>
 

@@ -35,6 +35,7 @@ export default function homeReducer(state = initialState, action) {
         .set('pieChart', action.payload.pieChart)
         .set('menu', action.payload.menu)
         .set('moduleLoading', action.payload.moduleLoading)
+        .set('newJobModules',action.payload.newJobModules)
 
     case SET_ERP_PULL_ACTIVATED: {
       return state.set('customErpPullActivated', action.payload.customErpPullActivated)

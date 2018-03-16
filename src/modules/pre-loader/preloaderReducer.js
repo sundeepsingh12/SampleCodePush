@@ -1,8 +1,4 @@
-/**
- * # preloaderReducer.js
- *
- *
- */
+
 'use strict'
 /**
  * ## Imports

@@ -14,6 +14,8 @@ import DatastoreSchema from './schema/DatastoreSchema'
 import TransactionLogs from './schema/transactionLogs'
 import _ from 'lodash'
 import Draft from './schema/Draft'
+import crypto from 'crypto-js'
+import DeviceInfo from 'react-native-device-info'
 
 const schemaVersion = 42;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft];
@@ -36,7 +38,8 @@ import {
     TABLE_TRANSACTION_LOGS,
     DataStore_DB,
     Datastore_Master_DB,
-    TABLE_DRAFT
+    TABLE_DRAFT,
+    DEVICE_IMEI,
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -61,15 +64,28 @@ export function saveList(tableName, array) {
  */
 export function performBatchSave(...tableNamesVsDataList) {
     return realm.write(() => {
+    let imeiNumber = DeviceInfo.getUniqueID()
         tableNamesVsDataList.forEach(record => {
             try {
-                if (!_.isEmpty(record.value) && !_.isUndefined(record.value))
-                    record.value.forEach(data => realm.create(record.tableName, data, true))
+                if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
+                    if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
+                        for (let data in record.value) {
+                            record.value[data].value = _encryptData(record.value[data].value, imeiNumber)
+                            realm.create(record.tableName, record.value[data], true)
+                        }
+                    } else {
+                        record.value.forEach(data => realm.create(record.tableName, data, true))
+                    }
+                }
             } catch (error) {
                 console.log(error)
             }
         })
     })
+}
+
+export function _encryptData(dataToEncrypt, encryptionKey) {
+    return (crypto.AES.encrypt(JSON.stringify(dataToEncrypt), encryptionKey)).toString()
 }
 
 export function deleteRecords() {
@@ -115,58 +131,6 @@ export function updateTableRecordOnProperty(tableName, property, valueList, newV
     });
 }
 
-/**A generic method for filtering out records from a table 
- * based on a property and then deleting them
- * 
- * @param {*} tableName 
- * @param {*} valueList 
- * @param {*} property 
- */
-export function deleteRecordList(tableName, valueList, property) {
-    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => property + ' = "' + value + '"').join(' OR '));
-    realm.write(() => {
-        realm.delete(filteredRecords)
-    });
-}
-
-
-export function updateRecordOnMultipleProperty(tableName, valueList, propertyList, count) {
-    let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
-    realm.write(() => {
-        _.forEach(filteredRecords, record => record[propertyList[record.id]] += count[record.id])
-    });
-}
-
-/**
- * 
- * @param {*} tableName 
- */
-export function getAll(tableName) {
-    return realm.objects(tableName);
-}
-
-// export function updateRecordOnTableListData(tableName,tableListData,valueList) {
-//     let filteredRecords = realm.objects(tableName).filtered(valueList.map(value => 'id = "' + value + '"').join(' OR '));
-//     realm.write(() => {
-//         _.forEach(filteredRecords, record => record = tableListData[record.id])
-//     });
-// }
-
-/**A generic method for getting value list based on particular property in Table
- * Eg - Returning all JobTransactionIds From Db
- * @param {*} tableName 
- * @param {*} property 
- */
-export function getRecordListOnProperty(tableName, property) {
-    let records = realm.objects(tableName).map(data => data[property])
-    return records
-}
-
-export function filterRecordList(recordList, query) {
-    let records = recordList.filtered(query)
-    return records
-}
-
 export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
     let records
     if (query) {
@@ -177,7 +141,22 @@ export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
     if (isSorted && sortProperty) {
         records = records.sorted(`${sortProperty}`)
     }
+    if (tableName == TABLE_FIELD_DATA || tableName == TABLE_JOB_DATA) {
+        let imeiNumber = DeviceInfo.getUniqueID()
+        let recordList = []
+        for (let index in records) {
+            let recordData = { ...records[index] }
+            recordData.value = _decryptData(recordData.value, imeiNumber)
+            recordList.push(recordData)
+        }
+        return recordList
+    }
     return records
+}
+
+export function _decryptData(dataToDecrypt, decryptionKey) {
+    let recordDataInBytes = crypto.AES.decrypt(dataToDecrypt, decryptionKey)
+    return JSON.parse(recordDataInBytes.toString(crypto.enc.Utf8))
 }
 
 export function updateRealmDb(tableName, transactionIdSequenceMap) {

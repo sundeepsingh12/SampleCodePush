@@ -11,7 +11,15 @@ import {
   REVERT_NOT_ALLOWED_INCASE_OF_SYNCING,
   PRESS_OK_TO_CONFIRM_REVERT_TO,
   CANCEL,
-  CONFIRM_REVERT
+  CONFIRM_REVERT,
+  UPDATE_GROUP, 
+  JOB_EXPIRED, 
+  DETAILS,  
+  SELECT_NUMBER,
+  SELECT_TEMPLATE,
+  SELECT_NUMBER_FOR_CALL,
+  CONFIRMATION,
+  CALL_CONFIRM,
 } from '../lib/ContainerConstants'
 
 import React, { PureComponent } from 'react'
@@ -52,11 +60,6 @@ import {
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
 import {
-  SELECT_NUMBER,
-  SELECT_TEMPLATE,
-  SELECT_NUMBER_FOR_CALL,
-  CONFIRMATION,
-  CALL_CONFIRM,
   LANDMARK,
   PINCODE,
   ADDRESS_LINE_1,
@@ -73,7 +76,6 @@ import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { jobStatusService } from '../services/classes/JobStatus'
 
-import {UPDATE_GROUP} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -91,7 +93,8 @@ function mapStateToProps(state) {
     statusRevertList: state.jobDetails.statusRevertList,
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
-    isShowDropdown: state.jobDetails.isShowDropdown
+    isShowDropdown: state.jobDetails.isShowDropdown,
+    jobExpiryTime: state.jobDetails.jobExpiryTime
   }
 }
 
@@ -147,6 +150,9 @@ class JobDetailsV2 extends PureComponent {
 
   renderStatusList(statusList) {
     let statusView = []
+    if (this.props.jobTransaction.id < 0 && this.props.jobDataList.length < 1) {
+      return statusView
+    }
     let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
     if(groupId && statusList.length > 0){
       statusView.push(
@@ -203,12 +209,23 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onCheckLocationMismatch = (statusList, jobTransaction) => {
-    const FormLayoutObject = {
-      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
-      jobTransaction,
-      statusList
+    if ((this.props.jobExpiryTime != null) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(this.props.jobExpiryTime)) {
+      Alert.alert(
+        DETAILS,
+        JOB_EXPIRED,
+        [
+          { text: OK, style: CANCEL },
+        ],
+      )
     }
-    this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+    else {
+      const FormLayoutObject = {
+        contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
+        jobTransaction,
+        statusList
+      }
+      this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
+    }
   }
   chatButtonPressed = () => {
     if (this.props.navigation.state.params.jobSwipableDetails.contactData.length == 0)
@@ -391,10 +408,10 @@ class JobDetailsV2 extends PureComponent {
   }
   selectStatusToRevert =  () => {
     if(this.props.statusRevertList[0] == 1){
-      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom'| "center", buttonText: 'Okay' ,type: 'danger',duration: 5000 }) }
+      { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom'| "center", buttonText: OK ,type: 'danger',duration: 5000 }) }
     }
     else if(this.props.jobTransaction.actualAmount && this.props.jobTransaction.actualAmount != 0.0 && this.props.jobTransaction.moneyTransactionType){
-      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom'| "center", buttonText: 'Okay', type: 'danger', duration: 5000 }) }      
+      { Toast.show({ text: REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT, position: 'bottom'| "center", buttonText: OK, type: 'danger', duration: 5000 }) }      
     }else{
     this.props.statusRevertList.length == 1 ? this.alertForStatusRevert(this.props.statusRevertList[0]) : this.statusRevertSelection(this.props.statusRevertList)
     }
@@ -462,7 +479,7 @@ class JobDetailsV2 extends PureComponent {
     }
     else {
       const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.errorMessage) ? this.showDraftAlert() : null
       const etaTimer = this.etaUpdateTimer()
       return (
         <StyleProvider style={getTheme(platform)}>

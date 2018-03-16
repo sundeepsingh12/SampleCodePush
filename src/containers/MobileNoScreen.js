@@ -12,6 +12,11 @@ import styles from '../themes/FeStyle'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
+import {
+    ENTER_MOBILE,
+    CLOSE,
+    SEND_OTP
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -48,7 +53,7 @@ class MobileNoScreen extends PureComponent{
                     <Content style={[styles.marginLeft30, styles.marginRight30]}>
                         <View style={[styles.bgWhite, styles.flex1, styles.column, { paddingTop: 70 }]}>
                             <View style={[styles.alignCenter, styles.column]}>
-                                <Text style={[styles.fontWeight500, styles.fontXxl, styles.fontBlack]}>Enter your mobile</Text>
+                                <Text style={[styles.fontWeight500, styles.fontXxl, styles.fontBlack]}>{ENTER_MOBILE}</Text>
                             </View>
                             <View style={[styles.marginTop30]}>
                                 <Item rounded>
@@ -56,6 +61,7 @@ class MobileNoScreen extends PureComponent{
                                         placeholder='Mobile Number'
                                         value={this.props.mobileNumber}
                                         keyboardType='numeric'
+                                        returnKeyType='done'
                                         onChangeText={this.onChangeMobileNo}
                                         style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
                                     />
@@ -68,14 +74,14 @@ class MobileNoScreen extends PureComponent{
                                 <View style={[styles.marginBottom10]}>
                                     <Button onPress={this.getOtp} full rounded
                                         disabled={this.props.isGenerateOtpButtonDisabled}>
-                                        <Text style={[styles.fontWhite]}>Send OTP</Text>
+                                        <Text style={[styles.fontWhite]}>{SEND_OTP}</Text>
                                     </Button>
                                 </View>
                                 <View>
                                     <Button onPress={this.props.invalidateUserSession} full rounded danger
                                         disabled={this.props.isMobileScreenLogoutDisabled}
                                         style={[styles.bgDanger]}>
-                                        <Text style={[styles.fontWhite]}>Close</Text>
+                                        <Text style={[styles.fontWhite]}>{CLOSE}</Text>
                                     </Button>
                                 </View>
                             </View>

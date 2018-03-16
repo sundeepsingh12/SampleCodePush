@@ -39,6 +39,9 @@ import {
 } from '../lib/constants'
 import moment from 'moment'
 import { NavigationActions } from 'react-navigation'
+import {
+    OK
+} from '../lib/ContainerConstants'
 
 
 function mapStateToProps(state) {
@@ -50,7 +53,6 @@ function mapStateToProps(state) {
         isLoading: state.liveJob.isLoading
     }
 }
-
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -134,7 +136,7 @@ class LiveJob extends PureComponent {
             Toast.show({
                 text: this.props.toastMessage,
                 position: 'bottom',
-                buttonText: 'Okay',
+                buttonText: OK,
                 duration: 5000
             })
         }

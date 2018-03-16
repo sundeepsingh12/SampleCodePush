@@ -13,7 +13,6 @@ import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
-import selectFromList from './selectFromList/selectFromListReducer'
 import multipleOptionsAttribute from './multipleOptionsAttribute/multipleOptionsAttributeReducer'
 import skuListing from './skulisting/skuListingReducer'
 import payment from './payment/paymentReducer'
@@ -65,7 +64,6 @@ const rootReducer = combineReducers({
   home,
   jobDetails,
   skuListing,
-  selectFromList,
   listing,
   payment,
   preloader,

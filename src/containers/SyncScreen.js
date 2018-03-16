@@ -6,7 +6,6 @@ import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Preloader from '../containers/Preloader'
 import Loader from '../components/Loader'
-import ResyncLoader from '../components/ResyncLoader'
 
 
 import React, { PureComponent } from 'react'
