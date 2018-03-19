@@ -362,8 +362,8 @@ class Sequence extends PureComponent {
 
   showToast() {
     Toast.show({
-      text: (this.props.responseMessage.message) ? this.props.responseMessage.message  : this.props.responseMessage ,
-      duration: (this.props.responseMessage.message) ? Number.MAX_SAFE_INTEGER : 5000,
+      text: `${this.props.responseMessage}`,
+      duration: Number.MAX_SAFE_INTEGER,
       position: 'bottom',
       buttonText: OK,
     })

@@ -50,7 +50,7 @@ export function prepareListForSequenceModule(runsheetNumber) {
             const { isDuplicateSequenceFound, sequenceArray, transactionsWithChangedSeqeunceMap } = await sequenceService.checkForAutoSequencing(sequenceList, jobMasterSeperatorMap)
             dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
                 sequenceList: sequenceArray,
-                responseMessage: (isDuplicateSequenceFound) ? {message : DUPLICATE_SEQUENCE_MESSAGE}: '',
+                responseMessage: (isDuplicateSequenceFound) ? DUPLICATE_SEQUENCE_MESSAGE : '',
                 transactionsWithChangedSeqeunceMap,
                 jobMasterSeperatorMap
             }))
