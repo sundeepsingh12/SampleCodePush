@@ -286,8 +286,17 @@ module.exports = {
     MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
     VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
     CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
-    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..", 
+    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
     UNSAVED_PASSWORD: 'Password not saved before',
+    RESET_PASSWORD: 'Reset Password',
+    CONTACT_NUMBER: 'Contact Number',
+    EMAIL: 'Email',
+    PROFILE: 'Profile',
+    MINIMUM_REQUIREMENT_FOR_PASSWORD: 'Min. 8 characters required, including capital letter, symbol and number.',
+    CURRENT_PASSWORD: 'Current Password',
+    NEW_PASSWORD: 'New Password',
+    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
+    USERNAME_IS_MISSING: 'Username is missing',
 
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
