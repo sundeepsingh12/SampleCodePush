@@ -70,6 +70,7 @@ module.exports = {
     CONFIRM_REVERT: 'Confirm Revert',
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
+    REVERT_STATUS:'Revert Status',
 
     //Payment Container
     YES: 'Yes',
@@ -175,6 +176,18 @@ module.exports = {
     LOGGING_OUT: 'Logging out',
     LOGOUT_UNSYNCED_TRANSACTIONS:'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
 
+    //Tracking constants
+    ENTER: 'ENTER',
+    EXIT: 'EXIT',
+    INSIDE_BOUNDARY: 'inside boundary',
+    OUTSIDE_BOUNDARY: 'out of boundary',
+
+
+
+    //GeoFencing Service
+    HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
+    FENCE_LAT_LONG_MISSING: 'fenceLatLongObject not present',
+
     //DataStore
     SUGGESTIONS: 'Suggestions',
 
@@ -204,6 +217,9 @@ module.exports = {
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+    YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
+    MORE:'More',
+    
 
     //Save Activated
     EDIT: 'Edit',

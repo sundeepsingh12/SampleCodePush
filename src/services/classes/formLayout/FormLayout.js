@@ -18,17 +18,18 @@ import {
     CheckoutDetails,
     TabScreen,
     SHOULD_RELOAD_START,
+    SHOULD_CREATE_BACKUP,
+    GEO_FENCING,
     FIELD_ATTRIBUTE,
     FIELD_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_VALIDATION,
     FIELD_ATTRIBUTE_VALIDATION_CONDITION,
-    SHOULD_CREATE_BACKUP
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
-import { fieldValidationService } from '../FieldValidation';
-import { dataStoreService } from '../DataStoreService.js';
-
+import { fieldValidationService } from '../FieldValidation'
+import { dataStoreService } from '../DataStoreService.js'
+import { geoFencingService } from '../GeoFencingService.js'
 class FormLayout {
 
     /**
@@ -307,6 +308,7 @@ class FormLayout {
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))
+            await geoFencingService.addNewGeoFenceAndDeletePreviousFence()
         }
         return {
             routeName,

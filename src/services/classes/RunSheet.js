@@ -75,6 +75,15 @@ class RunSheet {
     }
     return runsheetNumberList
 }
+  getOpenRunsheets() {
+    let runSheetQuery = `isClosed = false`
+    const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET, runSheetQuery)
+    let runsheetNumberList = []
+    runsheetArray.forEach(runsheetObject => {
+      runsheetNumberList.push({ ...runsheetObject })
+    })
+    return runsheetNumberList
+  }
 
 }
 

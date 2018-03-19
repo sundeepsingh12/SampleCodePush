@@ -108,7 +108,7 @@ export function resetNavigationState(index, actions) {
   return async function (dispatch) {
     dispatch(NavigationActions.reset({
       index: 0,
-      actions: actions
+      actions
     }))
   }
 }
