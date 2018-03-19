@@ -3,7 +3,12 @@ import { transientStatusService } from '../TransientStatusService.js'
 import {
     AFTER,
     BEFORE,
-    OBJECT
+    OBJECT,
+    STRING,
+    TEXT,
+    DECIMAL,
+    SCAN_OR_TEXT,
+    QR_SCAN
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import {
@@ -22,8 +27,10 @@ import {
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
-import { fieldValidationService } from '../FieldValidation';
-import { geoFencingService } from '../GeoFencingService.js';
+import { fieldValidationService } from '../FieldValidation'
+import { dataStoreService } from '../DataStoreService.js'
+import { geoFencingService } from '../GeoFencingService.js'
+import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../../lib/ContainerConstants'
 class FormLayout {
 
     /**
@@ -316,16 +323,33 @@ class FormLayout {
         }
         for (let [id, currentObject] of formElement.entries()) {
             let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
-            currentObject.value = afterValidationResult && !currentObject.alertMessage ? currentObject.displayValue : null
+            let uniqueValidationResult = this.checkUniqueValidation(currentObject)
+            if (uniqueValidationResult) {
+                currentObject.alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
+            }
+            currentObject.value = afterValidationResult && !uniqueValidationResult ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
-                return false
+                return { isFormValid: false, formElement }
             } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 6 && !Number.isInteger(Number(currentObject.value))) {
-                return false
+                return { isFormValid: false, formElement }
             } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
-                return false
+                return { isFormValid: false, formElement }
             }
         }
-        return true
+        return { isFormValid: true, formElement }
+    }
+
+    checkUniqueValidation(currentObject) {
+        switch (currentObject.attributeTypeId) {
+            case STRING:
+            case TEXT:
+            case DECIMAL:
+            case SCAN_OR_TEXT:
+            case QR_SCAN:
+                return dataStoreService.checkForUniqueValidation(currentObject.displayValue, currentObject)
+            default:
+                false
+        }
     }
 }
 

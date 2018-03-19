@@ -250,6 +250,7 @@ module.exports = keyMirror({
     SET_FORM_TO_INVALID: null,
     SET_DSF_REVERSE_MAP: null,
     SET_MODAL_FIELD_ATTRIBUTE: null,
+    SET_FORM_INVALID_AND_FORM_ELEMENT: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,

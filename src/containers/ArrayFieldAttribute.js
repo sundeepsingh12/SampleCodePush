@@ -37,7 +37,7 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
-import { TOTAL_COUNT, ADD, SAVE,ADD_TOAST,OK } from '../lib/ContainerConstants'
+import { TOTAL_COUNT, ADD, SAVE, ADD_TOAST, OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {

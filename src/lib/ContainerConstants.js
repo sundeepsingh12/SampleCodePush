@@ -11,7 +11,7 @@ module.exports = {
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
-    VERIFY:'Verify',
+    VERIFY: 'Verify',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -59,6 +59,7 @@ module.exports = {
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
+    UNIQUE_VALIDATION_FAILED_FORMLAYOUT: 'This value is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
     OPTIONAL: '(optional)',
@@ -70,7 +71,7 @@ module.exports = {
     CONFIRM_REVERT: 'Confirm Revert',
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
-    REVERT_STATUS:'Revert Status',
+    REVERT_STATUS: 'Revert Status',
 
     //Payment Container
     YES: 'Yes',
@@ -126,7 +127,7 @@ module.exports = {
     //Data Store service
     DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
     CURRENT_ELEMENT_MISSING: 'currentElement Missing',
-    CONFIRM:'Confirm',
+    CONFIRM: 'Confirm',
 
     //Data Store Filter
     JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
@@ -174,7 +175,7 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
-    LOGOUT_UNSYNCED_TRANSACTIONS:'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    LOGOUT_UNSYNCED_TRANSACTIONS: 'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
 
     //Tracking constants
     ENTER: 'ENTER',
@@ -208,7 +209,7 @@ module.exports = {
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
-    REMOVE:'Remove',
+    REMOVE: 'Remove',
 
     //Expandable Details View
     TAP_TO_HIDE: 'Tap to hide',
@@ -218,8 +219,8 @@ module.exports = {
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
     YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
-    MORE:'More',
-    
+    MORE: 'More',
+
 
     //Save Activated
     EDIT: 'Edit',
@@ -233,7 +234,7 @@ module.exports = {
     SELECT_NUMBER_FOR_CALL: 'Select number for call',
     CALL_CONFIRM: 'Do you want to proceed with the call?',
     CONFIRMATION: 'Confirmation: ',
-    SELECT_ADDRESS_NAVIGATION:'Select address for navigation',
+    SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
 
     //Cash Tendering
     NOT_REQUIRED: 'NOT REQUIRED',
@@ -271,7 +272,7 @@ module.exports = {
     NEXT_POSSIBLE_STATUS: 'Next possible status',
 
     //Sorting
-    SORTING : 'Sorting',
+    SORTING: 'Sorting',
     REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
@@ -302,20 +303,20 @@ module.exports = {
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
 
     //Signature
-    IMPROPER_SIGNATURE:'Improper signature. Please make your full signature.',
+    IMPROPER_SIGNATURE: 'Improper signature. Please make your full signature.',
 
     //Login
-    CONFIRM_RESET:'Confirm Reset',
-    RESET_ACCOUNT_SETTINGS:'Click OK to reset your account settings.',
-    REMEMBER_ME:'Remember Me',
+    CONFIRM_RESET: 'Confirm Reset',
+    RESET_ACCOUNT_SETTINGS: 'Click OK to reset your account settings.',
+    REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP:'Setting you up...',
-    DOWNLOAD_SETTINGS:'Downloading settings',
-    APPLYING_SETTINGS:'Applying settings',
-    VERIFY_HANDSET:'Verifying handset',
-    VERIFY_MOBILE:'Verify your mobile',
-    OTP_CODE_SENT:'OTP code hasbeen sent to',
-    ENTER_MOBILE:'Enter your mobile',
-    SEND_OTP:'Send OTP',
+    SETTING_UP: 'Setting you up...',
+    DOWNLOAD_SETTINGS: 'Downloading settings',
+    APPLYING_SETTINGS: 'Applying settings',
+    VERIFY_HANDSET: 'Verifying handset',
+    VERIFY_MOBILE: 'Verify your mobile',
+    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    ENTER_MOBILE: 'Enter your mobile',
+    SEND_OTP: 'Send OTP',
 }
