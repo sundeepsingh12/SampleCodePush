@@ -24,7 +24,8 @@ import {
     SET_FORM_TO_INVALID,
     USER,
     AutoLogoutScreen,
-    SET_OPTION_ATTRIBUTE_ERROR
+    SET_OPTION_ATTRIBUTE_ERROR,
+    SET_FORM_INVALID_AND_FORM_ELEMENT
 } from '../../lib/constants'
 
 import {
@@ -46,7 +47,7 @@ import _ from 'lodash'
 import { performSyncService } from '../home/homeActions'
 import { draftService } from '../../services/classes/DraftService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
-import { UNIQUE_VALIDATION_FAILED } from '../../lib/ContainerConstants'
+import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../lib/ContainerConstants'
 import moment from 'moment'
 import getTheme from '../../../native-base-theme/components';
 import platform from '../../../native-base-theme/variables/platform';
@@ -180,16 +181,17 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
 export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         try {
+            let cloneFormLayoutState = _.cloneDeep(formLayoutState)
             const userData = await keyValueDBService.getValueFromStore(USER)
             if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
                 dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
                 dispatch(setState(IS_LOADING, true))
-                let isFormValid = await formLayoutService.isFormValid(formLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap)
-                if (isFormValid) {
+                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap)
+                if (isFormValidAndFormElement.isFormValid) {
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-                    let { routeName, routeParam } = await formLayoutService.saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
-                    let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, formLayoutState.statusId) : false
+                    let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
+                    let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : false
                     dispatch(setState(IS_LOADING, false))
                     if (routeName == TabScreen) {
                         dispatch(NavigationActions.reset({
@@ -206,9 +208,10 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     dispatch(setState(CLEAR_FORM_LAYOUT))
                     dispatch(setState(CLEAR_BULK_STATE))
                 } else {
-                    dispatch(setState(SET_FORM_TO_INVALID, {
+                    dispatch(setState(SET_FORM_INVALID_AND_FORM_ELEMENT, {
                         isLoading: false,
-                        isFormValid: false
+                        isFormValid: false,
+                        formElement: isFormValidAndFormElement.formElement
                     }))
                 }
             }
@@ -230,7 +233,7 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
                 cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
             }
             if (isValuePresentInAnotherTransaction) {
-                cloneFormElement.get(currentElement.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
+                cloneFormElement.get(currentElement.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
             }
             dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS, jobTransaction))
         }
@@ -288,7 +291,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
             let isValuePresentInAnotherTransaction = await dataStoreService.checkForUniqueValidation(value, fieldAtrribute)
             let cloneFormElement = _.cloneDeep(formElement)
             if (isValuePresentInAnotherTransaction) {
-                cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED
+                cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).displayValue = value
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).value = null
                 dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, {

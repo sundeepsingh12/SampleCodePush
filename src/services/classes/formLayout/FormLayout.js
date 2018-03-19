@@ -30,6 +30,7 @@ import { draftService } from '../DraftService.js'
 import { fieldValidationService } from '../FieldValidation'
 import { dataStoreService } from '../DataStoreService.js'
 import { geoFencingService } from '../GeoFencingService.js'
+import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../../lib/ContainerConstants'
 class FormLayout {
 
     /**
@@ -323,16 +324,19 @@ class FormLayout {
         for (let [id, currentObject] of formElement.entries()) {
             let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
             let uniqueValidationResult = this.checkUniqueValidation(currentObject)
+            if (uniqueValidationResult) {
+                currentObject.alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
+            }
             currentObject.value = afterValidationResult && !uniqueValidationResult ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
-                return false
+                return { isFormValid: false, formElement }
             } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 6 && !Number.isInteger(Number(currentObject.value))) {
-                return false
+                return { isFormValid: false, formElement }
             } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
-                return false
+                return { isFormValid: false, formElement }
             }
         }
-        return true
+        return { isFormValid: true, formElement }
     }
 
     checkUniqueValidation(currentObject) {
