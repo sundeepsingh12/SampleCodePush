@@ -754,7 +754,6 @@ class JobTransaction {
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         const statusIdStatusMap = jobStatusObject.statusIdStatusMap
         const checkForSeenStatus = (callingActivity != 'LiveJob') ? jobStatusService.isSeenStatusCode(jobStatusId,statusIdStatusMap) : false
-        console.logs(checkForSeenStatus)
         if(checkForSeenStatus) {
             jobStatusId = checkForSeenStatus,
             lastUpdatedAtServer = moment().format('YYYY-MM-DD HH:mm:ss')
