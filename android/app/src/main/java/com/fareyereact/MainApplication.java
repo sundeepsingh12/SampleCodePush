@@ -3,6 +3,7 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
 import io.realm.react.RealmReactPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -43,6 +44,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RCTBluetoothSerialPackage(),
             new RealmReactPackage(),
             new ReactNativePushNotificationPackage(),
             new LinearGradientPackage(),

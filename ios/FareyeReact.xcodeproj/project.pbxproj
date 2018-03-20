@@ -72,6 +72,7 @@
 		FB303808CAEC4CB999F550B3 /* libRSSignatureCapture.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA1A1F66A6184FEABBBE1DC8 /* libRSSignatureCapture.a */; };
 		F8384C559242415F8CCED235 /* libRealmReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BD54A6EC92B43B7AB5FCE59 /* libRealmReact.a */; };
 		4D48D30A8E47438B8C754A42 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FC3DF98F2C014B3285292D34 /* libc++.tbd */; };
+		116C4307662E4196B98B6A36 /* libRCTBluetoothSerial.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EAD6927C039A451C909EBD6C /* libRCTBluetoothSerial.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -717,6 +718,8 @@
 		0755C78D8BE04A3BBD5F27DA /* RealmReact.xcodeproj */ = {isa = PBXFileReference; name = "RealmReact.xcodeproj"; path = "../node_modules/realm/react-native/ios/RealmReact.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		3BD54A6EC92B43B7AB5FCE59 /* libRealmReact.a */ = {isa = PBXFileReference; name = "libRealmReact.a"; path = "libRealmReact.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		FC3DF98F2C014B3285292D34 /* libc++.tbd */ = {isa = PBXFileReference; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = sourcecode.text-based-dylib-definition; explicitFileType = undefined; includeInIndex = 0; };
+		56A8F83B0E214EFFA2A1EFBB /* RCTBluetoothSerial.xcodeproj */ = {isa = PBXFileReference; name = "RCTBluetoothSerial.xcodeproj"; path = "../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		EAD6927C039A451C909EBD6C /* libRCTBluetoothSerial.a */ = {isa = PBXFileReference; name = "libRCTBluetoothSerial.a"; path = "libRCTBluetoothSerial.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -764,6 +767,7 @@
 				FB303808CAEC4CB999F550B3 /* libRSSignatureCapture.a in Frameworks */,
 				F8384C559242415F8CCED235 /* libRealmReact.a in Frameworks */,
 				4D48D30A8E47438B8C754A42 /* libc++.tbd in Frameworks */,
+				116C4307662E4196B98B6A36 /* libRCTBluetoothSerial.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1186,6 +1190,7 @@
 				D57C7032FE564278BCEAD80C /* BVLinearGradient.xcodeproj */,
 				2D938CCB876F47648B28DA3B /* RSSignatureCapture.xcodeproj */,
 				0755C78D8BE04A3BBD5F27DA /* RealmReact.xcodeproj */,
+				56A8F83B0E214EFFA2A1EFBB /* RCTBluetoothSerial.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -2242,12 +2247,14 @@
 					"$(SRCROOT)/../node_modules/react-native-linear-gradient/BVLinearGradient",
 					"$(SRCROOT)/../node_modules/react-native-signature-capture/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = FareyeReactTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -2286,12 +2293,14 @@
 					"$(SRCROOT)/../node_modules/react-native-linear-gradient/BVLinearGradient",
 					"$(SRCROOT)/../node_modules/react-native-signature-capture/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = FareyeReactTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -2334,6 +2343,7 @@
 					"$(SRCROOT)/../node_modules/react-native-signature-capture/ios/**",
 					"$(SRCROOT)/../node_modules/react-native/Libraries/PushNotificationIOS/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = FareyeReact/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2380,6 +2390,7 @@
 					"$(SRCROOT)/../node_modules/react-native-signature-capture/ios/**",
 					"$(SRCROOT)/../node_modules/react-native/Libraries/PushNotificationIOS/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = FareyeReact/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2430,11 +2441,13 @@
 					"$(SRCROOT)/../node_modules/react-native-linear-gradient/BVLinearGradient",
 					"$(SRCROOT)/../node_modules/react-native-signature-capture/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = "FareyeReact-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -2482,11 +2495,13 @@
 					"$(SRCROOT)/../node_modules/react-native-linear-gradient/BVLinearGradient",
 					"$(SRCROOT)/../node_modules/react-native-signature-capture/ios/**",
 					"$(SRCROOT)/../node_modules/realm/src/**",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 				);
 				INFOPLIST_FILE = "FareyeReact-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -2517,6 +2532,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.FareyeReact-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2541,6 +2557,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.FareyeReact-tvOSTests";
