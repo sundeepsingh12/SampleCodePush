@@ -22,6 +22,7 @@ import {
 import { keyValueDBService } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
 import _ from 'lodash'
+import { draftService } from './DraftService'
 
 
 class JobDetails {
@@ -122,7 +123,7 @@ class JobDetails {
     }
     
     /**@function getParentStatusList(statusList,currentStatus,jobTransactionId)
-     * ## It will get all parent status list of current jobTransaction.
+     * ## It will get all parent status list of current jobTransaction.It will not add status of UNSEEN and SEEN code
      * 
      * @param {object} statusList - It contains data for all status
      * @param {object} currentStatus - It contains current status
@@ -134,7 +135,7 @@ class JobDetails {
     async getParentStatusList(statusList,currentStatus,jobTransactionId){
         let parentStatusList = []
         for(let status of statusList){
-            if(status.code === UNSEEN)
+            if(status.code === UNSEEN || _.isEqual(_.toLower(status.code), 'seen' )) 
                 continue
             for(let nextStatus of status.nextStatusList){
                 if(currentStatus.id === nextStatus.id){
@@ -252,6 +253,7 @@ class JobDetails {
      updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction,previousStatus)  
      await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value)       
      realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog)  
+     await draftService.deleteDraftFromDb(jobTransaction.id)
     }
 
     /**@function checkLatLong(jobId,userLat,userLong)
