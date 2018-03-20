@@ -469,13 +469,13 @@ class JobDetailsV2 extends PureComponent {
     )
   }
 
-  showJobMasterIdentifier(){
-    return(
+  showJobMasterIdentifier() {
+    return (
       <View style={[style.seqCircle, { backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor }]}>
-      <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-        {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
-      </Text>
-    </View>
+        <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
+          {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
+        </Text>
+      </View>
     )
   }
 
@@ -484,8 +484,8 @@ class JobDetailsV2 extends PureComponent {
     return (
       <Header style={[style.header]}>
         <View style={style.seqCard}>
-        {this.showJobMasterIdentifier()}
-        
+          {this.showJobMasterIdentifier()}
+
           <View style={style.seqCardDetail}>
             <View>
               <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
@@ -501,45 +501,47 @@ class JobDetailsV2 extends PureComponent {
             </View>
           </View>
           {this.showCloseIcon()}
-         
+
         </View>
       </Header>
     )
   }
 
-  showCloseIcon(){
+  showCloseIcon() {
     return (
       <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
-      <View
-        style={{
-          width: 40,
-          alignSelf: 'flex-start',
-          alignItems: 'center',
-          paddingTop: 10,
-          flex: 1
-        }}>
-        <Icon
-          name="md-close"
-          style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
-      </View>
-    </TouchableOpacity>
+        <View
+          style={{
+            width: 40,
+            alignSelf: 'flex-start',
+            alignItems: 'center',
+            paddingTop: 10,
+            flex: 1
+          }}>
+          <Icon
+            name="md-close"
+            style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
+        </View>
+      </TouchableOpacity>
     )
   }
 
-  showRevertView (){
-    <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={this.selectStatusToRevert}>
-    <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
-      <View style={[styles.row, styles.alignCenter]}>
-        <View>
-          <RevertIcon color={styles.fontPrimary} />
+  showRevertView() {
+    return (
+      <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={this.selectStatusToRevert}>
+        <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+          <View style={[styles.row, styles.alignCenter]}>
+            <View>
+              <RevertIcon color={styles.fontPrimary} />
+            </View>
+            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{REVERT_STATUS}</Text>
+            <Right>
+              <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+            </Right>
+          </View>
         </View>
-        <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{REVERT_STATUS}</Text>
-        <Right>
-          <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-        </Right>
-      </View>
-    </View>
-  </TouchableOpacity>
+      </TouchableOpacity>
+    )
   }
 
   showContentView() {
@@ -547,7 +549,7 @@ class JobDetailsV2 extends PureComponent {
     const etaTimer = this.etaUpdateTimer()
     return (<Content>
       {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
-        this.showRevertView(): null}
+        this.showRevertView() : null}
 
       <View style={[styles.marginTop5, styles.bgWhite]}>
         {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
@@ -560,42 +562,42 @@ class JobDetailsV2 extends PureComponent {
       </View>
 
       {/*Basic Details*/}
-     {this.showJobDetails()}
+      {this.showJobDetails()}
 
       {/*Field Details*/}
-     {this.showFieldDetails()}
+      {this.showFieldDetails()}
     </Content>
     )
   }
 
-  showJobDetails(){
+  showJobDetails() {
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
-      <ExpandableHeader
-        title={'Basic Details'}
-        navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-        dataList={this.props.jobDataList}
-      />
-    </View>
+        <ExpandableHeader
+          title={'Basic Details'}
+          navigateToDataStoreDetails={this.navigateToDataStoreDetails}
+          dataList={this.props.jobDataList}
+        />
+      </View>
     )
   }
 
-  showFieldDetails(){
+  showFieldDetails() {
     return (
-    <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
-    <ExpandableHeader
-      title={'Field Details'}
-      dataList={this.props.fieldDataList}
-      navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-      navigateToCameraDetails={this.navigateToCameraDetails} />
-  </View>
+      <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+        <ExpandableHeader
+          title={'Field Details'}
+          dataList={this.props.fieldDataList}
+          navigateToDataStoreDetails={this.navigateToDataStoreDetails}
+          navigateToCameraDetails={this.navigateToCameraDetails} />
+      </View>
     )
   }
 
   showFooterView() {
     return (
       <Footer style={[style.footer]}>
-        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0  && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData  && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
+        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
           <FooterTab>
             <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
               <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
@@ -603,13 +605,13 @@ class JobDetailsV2 extends PureComponent {
           </FooterTab>
         )}
         {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
-           <FooterTab>
-           <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-             <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-           </Button>
-         </FooterTab>
+          <FooterTab>
+            <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
+              <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+            </Button>
+          </FooterTab>
         )}
-        {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||  (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
+        {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
           <FooterTab>
             <Button full onPress={this.navigationButtonPressed}>
               <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
