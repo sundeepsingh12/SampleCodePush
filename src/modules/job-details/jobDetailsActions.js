@@ -73,20 +73,18 @@ export function getJobDetails(jobTransactionId) {
             const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
             const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
             const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
+            if(details.checkForSeenStatus) dispatch(performSyncService())
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId, details.currentStatus.actionOnStatus) : false
             const jobExpiryData = (!errorMessage && details.jobDataObject.dataMap[JOB_EXPIRY_TIME]) ? (Object.values(details.jobDataObject.dataMap[JOB_EXPIRY_TIME])[0]) : null
             const jobExpiryTime = jobExpiryData && jobExpiryData.data ? jobExpiryData.data.value : null
-            const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
+            const parentStatusList = (jobMaster[0].isStatusRevert) && !_.isEqual(_.toLower(details.currentStatus.code), 'seen')  ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
             const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             let isEtaTimerShow = (statusCategory == 1)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime))
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
-            console.log(error)
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }

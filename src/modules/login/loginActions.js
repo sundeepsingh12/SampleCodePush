@@ -53,7 +53,7 @@ import {
   NavigationActions
 } from 'react-navigation'
 
-import { setState } from '../global/globalActions'
+import { setState, resetNavigationState } from '../global/globalActions'
 
 /**
  * ## State actions
@@ -219,7 +219,6 @@ export function forgetPasswordRequest(username) {
       let data = new FormData()
       data.append('usernameToResetPass', username)
       dispatch(forgetPassword())
-      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       const response = await RestAPIFactory().serviceCall(data, CONFIG.API.FORGET_PASSWORD, 'LOGIN')
       dispatch(loginFailure(response.json.message.replace(/<\/?[^>]+(>|$)/g, "")))
     } catch (error) {
@@ -268,12 +267,7 @@ export function getSessionToken() {
           }))
         }
         else if (token && isPreloaderComplete && isPreloaderComplete.value) {
-          dispatch(NavigationActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-            ]
-          }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
         else if (token) {
           dispatch(NavigationActions.navigate({

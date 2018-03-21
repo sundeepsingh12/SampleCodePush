@@ -19,6 +19,7 @@ import {
   SET_UPLOAD_FILE_COUNT,
   SET_FAIL_UPLOAD_COUNT,
   SET_BACKUP_FILES_LIST,
+  SET_TRANSACTION_SERVICE_STARTED,
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS
 } from '../../lib/constants'
@@ -89,6 +90,8 @@ export default function homeReducer(state = initialState, action) {
     case SET_BACKUP_FILES_LIST:
       return state.set('unsyncBackupFilesList', action.payload)
 
+    case SET_TRANSACTION_SERVICE_STARTED:
+      return state.set('trackingServiceStarted', action.payload)
   }
   return state;
 }

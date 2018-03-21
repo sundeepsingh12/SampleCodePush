@@ -25,6 +25,7 @@ var InitialState = Record({
     uploadingFileCount: 0,
     failedUploadCount: 0,
     unsyncBackupFilesList: [],
+    trackingServiceStarted: false,
     customErpPullActivated: null,
     erpModalVisible: false,
     lastErpSyncTime: null,

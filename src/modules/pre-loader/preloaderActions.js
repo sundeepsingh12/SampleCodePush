@@ -74,14 +74,15 @@ import {
   OTP_SUCCESS,
   PENDING_SYNC_TRANSACTION_IDS,
   SET_UNSYNC_TRANSACTION_PRESENT,
-  UnsyncBackupUpload
+  UnsyncBackupUpload,
+  GEO_FENCING
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, resetNavigationState } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -90,6 +91,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer';
 import moment from 'moment'
+import { trackingService } from '../../services/classes/Tracking'
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -296,6 +298,8 @@ export function invalidateUserSessionForAutoLogout() {
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(setState(TOGGLE_LOGOUT, false))
+      let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
     } catch (error) {
       dispatch(startLoginScreenWithoutLogout())
@@ -322,6 +326,10 @@ export function invalidateUserSession() {
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(setState(TOGGLE_LOGOUT, false))
+      // below 2 lines are used to delete geofence on logout 
+      // <---- DON'T REMOVE THESE LINES --->
+      // let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      // await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
 
     } catch (error) {
@@ -462,7 +470,7 @@ export function checkAsset() {
         if (unsyncBackupFilesList.length > 0) {
           dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         } else {
-          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
@@ -505,7 +513,7 @@ export function checkIfSimValidOnServer() {
         if (unsyncBackupFilesList.length > 0) {
           dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         } else {
-          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
@@ -571,7 +579,7 @@ export function validateOtp(otpNumber) {
       if (unsyncBackupFilesList.length > 0) {
         dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
       } else {
-        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
       }
     } catch (error) {
       dispatch(otpValidationFailure(error.message))

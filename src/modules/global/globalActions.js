@@ -71,7 +71,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
       await keyValueDBService.deleteValueFromStore(LIVE_JOB)
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-      await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)            
+      await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)
       await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
       await keyValueDBService.deleteValueFromStore(SHOULD_CREATE_BACKUP)
       await trackingService.destroy()
@@ -81,6 +81,16 @@ export function deleteSessionToken() {
     } catch (error) {
       throw error
     }
+  }
+}
+
+//Use to reset navigation state
+export function resetNavigationState(index, actions) {
+  return async function (dispatch) {
+    dispatch(NavigationActions.reset({
+      index: 0,
+      actions
+    }))
   }
 }
 

@@ -35,6 +35,7 @@ import {
   LAST_SYNC_WITH_SERVER,
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
+  HUB_LAT_LONG,
 } from '../../lib/constants'
 
 import {
@@ -160,6 +161,9 @@ class JobMaster {
     let sampleAdditionalUtilitySample = require('../../repositories/pagesAddtionalUtilitiesSample');
     await keyValueDBService.validateAndSaveData(PAGES, samplePageJson);
     await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, sampleAdditionalUtilitySample);
+    if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {
+      await keyValueDBService.validateAndSaveData(HUB_LAT_LONG, json.hubLatLng)
+    }
   }
 
   /**

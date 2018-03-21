@@ -43,7 +43,8 @@ import {
   NEW_JOB_MASTER,
   POPULATE_DATA,
   NewJob,
-  BulkListing
+  BulkListing,
+  SET_TRANSACTION_SERVICE_STARTED,
 } from '../../lib/constants'
 
 import {
@@ -225,9 +226,12 @@ export function checkCustomErpPullActivated() {
   }
 }
 
-export function startTracking() {
+export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
-    trackingService.init()
+    if (!trackingServiceStarted) {
+      trackingService.init()
+      dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+    }
   }
 }
 
@@ -403,6 +407,43 @@ export function pieChartCount() {
       //Update UI here
       console.log(error)
       dispatch(setState(CHART_LOADING, { loading: false, count: null }))
+    }
+  }
+}
+
+export function reAuthenticateUser(transactionIdToBeSynced) {
+  return async function (dispatch) {
+    try {
+      dispatch(setState(SYNC_STATUS, {
+        unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+        syncStatus: 'RE_AUTHENTICATING'
+      }))
+      let username = await keyValueDBService.getValueFromStore(USERNAME)
+      let password = await keyValueDBService.getValueFromStore(PASSWORD)
+      const authenticationResponse = await authenticationService.login(username.value, password.value)
+      let cookie = authenticationResponse.headers.map['set-cookie'][0]
+      await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
+      dispatch(performSyncService())
+    } catch (error) {
+      if (error.code == 401) {
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+          syncStatus: 'LOADING'
+        }))
+        await logoutService.deleteDataBase()
+        dispatch(deleteSessionToken())
+        dispatch(navigateToScene(LoginScreen))
+      } else {
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
+          syncStatus: 'ERROR'
+        }))
+        let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
+        if (_.isNull(serverReachable) || serverReachable.value == 1) {
+          await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
+          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
+        }
+      }
     }
   }
 }

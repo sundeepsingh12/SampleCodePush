@@ -66,6 +66,7 @@ module.exports = {
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
+    UNIQUE_VALIDATION_FAILED_FORMLAYOUT: 'This value is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
     OPTIONAL: '(optional)',
@@ -77,6 +78,7 @@ module.exports = {
     CONFIRM_REVERT: 'Confirm Revert',
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
+    REVERT_STATUS: 'Revert Status',
 
     //Payment Container
     YES: 'Yes',
@@ -182,6 +184,18 @@ module.exports = {
     LOGOUT_UNSYNCED_TRANSACTIONS_TITLE: 'Confirm Log Out',
     LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE: 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
 
+    //Tracking constants
+    ENTER: 'ENTER',
+    EXIT: 'EXIT',
+    INSIDE_BOUNDARY: 'inside boundary',
+    OUTSIDE_BOUNDARY: 'out of boundary',
+
+
+
+    //GeoFencing Service
+    HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
+    FENCE_LAT_LONG_MISSING: 'fenceLatLongObject not present',
+
     //DataStore
     SUGGESTIONS: 'Suggestions',
 
@@ -210,6 +224,9 @@ module.exports = {
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+    YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
+    MORE: 'More',
+
 
     //Save Activated
     EDIT: 'Edit',
@@ -279,6 +296,15 @@ module.exports = {
     CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
     PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
     UNSAVED_PASSWORD: 'Password not saved before',
+    RESET_PASSWORD: 'Reset Password',
+    CONTACT_NUMBER: 'Contact Number',
+    EMAIL: 'Email',
+    PROFILE: 'Profile',
+    MINIMUM_REQUIREMENT_FOR_PASSWORD: 'Min. 8 characters required, including capital letter, symbol and number.',
+    CURRENT_PASSWORD: 'Current Password',
+    NEW_PASSWORD: 'New Password',
+    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
+    USERNAME_IS_MISSING: 'Username is missing',
 
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
@@ -300,5 +326,4 @@ module.exports = {
     OTP_CODE_SENT: 'OTP code hasbeen sent to',
     ENTER_MOBILE: 'Enter your mobile',
     SEND_OTP: 'Send OTP',
-
 }

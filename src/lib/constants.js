@@ -92,6 +92,7 @@ module.exports = keyMirror({
     SET_UPLOAD_FILE_COUNT: null,
     SET_FAIL_UPLOAD_COUNT: null,
     SET_BACKUP_FILES_LIST: null,
+    SET_TRANSACTION_SERVICE_STARTED: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
     //Pages
@@ -120,6 +121,7 @@ module.exports = keyMirror({
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
+    SET_DRAFT_JOB_DETAILS_INFO: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -199,6 +201,10 @@ module.exports = keyMirror({
     IS_COMPANY_CODE_DHL: null,
     SHOULD_CREATE_BACKUP: null,
     BACKUP_UPLOAD_FAIL_COUNT: null,
+    HUB_LAT_LONG: null,
+    GEO_FENCING: null,
+    GEO_FENCE_STATUS: null,
+    LAT_LONG_GEO_FENCE: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -249,6 +255,7 @@ module.exports = keyMirror({
     SET_FORM_TO_INVALID: null,
     SET_DSF_REVERSE_MAP: null,
     SET_MODAL_FIELD_ATTRIBUTE: null,
+    SET_FORM_INVALID_AND_FORM_ELEMENT: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,

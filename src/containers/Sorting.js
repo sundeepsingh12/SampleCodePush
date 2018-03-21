@@ -70,22 +70,36 @@ class SortingListing extends PureComponent {
         )
     }
 
+    showSearchResultTitle(){
+        return (
+            <View style={[style.card, styles.row, styles.paddingTop15, styles.paddingBottom10]}>
+                <Text>
+                    Search Result:
+            </Text>
+            </View>
+        )
+    }
+
+    showQrCodeLogo(){
+        return (
+            <View style={style.qrBox}>
+                <QRCode
+                    value={this.props.sortingDetails[0].value}
+                    size={68}
+                    logoBackgroundColor='transparent'
+                />
+            </View>
+        )
+    }
+
     render() {
         return (
             <View style={[styles.bgWhite]}>
-                <View style={[style.card, styles.row, styles.paddingTop15, styles.paddingBottom10]}>
-                    <Text>
-                        Search Result:
-                    </Text>
-                </View>
+            {this.showSearchResultTitle()}
+               
                 <View style={style.resultCard}>
-                    <View style={style.qrBox}>
-                        <QRCode
-                            value={this.props.sortingDetails[0].value}
-                            size={68}
-                            logoBackgroundColor='transparent'
-                        />
-                    </View>
+                {this.showQrCodeLogo()}
+                   
                     <View style={style.resultCardDetail}>
                         <View style={{ borderBottomWidth: 1, borderBottomColor: '#f3f3f3', marginBottom: 10, paddingBottom: 10 }}>
                             <Text style={[styles.fontDefault]}>
@@ -144,41 +158,53 @@ class Sorting extends PureComponent {
         }
     }
 
+    showReferenceNoInputView(){
+        return (
+            <View style={[styles.relative, { width: '85%', height: 33 }]}>
+                <Input
+                    value={this.props.searchRefereneceValue.value}
+                    onChangeText={this._onChangeReferenceValue}
+                    placeholder={POST_SEARCH_PLACEHOLDER}
+                    returnKeyType={"search"}
+                    keyboardAppearance={"dark"}
+                    placeholderTextColor={'rgba(255,255,255,.4)'}
+                    style={[style.headerSearch]} />
+                <Button small transparent style={[style.inputInnerBtn]} onPress={() => this._searchForReferenceValue(this.props.searchRefereneceValue.value)}>
+                    <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
+                </Button>
+            </View>
+        )
+    }
+
+    showTitleAndBackArrow(){
+        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : SORTING 
+        return (
+            <View
+                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(this._onChangeReferenceValue('')) }}>
+                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                </TouchableOpacity>
+                <View style={[style.headerBody]}>
+                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
+                </View>
+                <View style={[style.headerRight]}>
+                </View>
+            </View>
+        )
+    }
+
     render() {
         const renderView = this._renderContent()
-        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : SORTING        
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
                         <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(this._onChangeReferenceValue('')) }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
-                                </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                            </View>
+                            {this.showTitleAndBackArrow()}
 
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10, styles.paddingBottom10]}>
-                                <View style={[styles.relative, { width: '85%', height: 33 }]}>
-                                    <Input
-                                        value={this.props.searchRefereneceValue.value}
-                                        onChangeText={this._onChangeReferenceValue}
-                                        placeholder={POST_SEARCH_PLACEHOLDER}
-                                        returnKeyType = {"search"}
-                                        keyboardAppearance = {"dark"}
-                                        placeholderTextColor={'rgba(255,255,255,.4)'}
-                                        style={[style.headerSearch]} />
-                                    <Button small transparent style={[style.inputInnerBtn]} onPress={() => this._searchForReferenceValue(this.props.searchRefereneceValue.value)}>
-                                        <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
-                                    </Button>
-                                </View>
+                            <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10, styles.paddingBottom10]}>
+                               {this.showReferenceNoInputView()}
+                               
                                 <TouchableOpacity style={[{ width: '15%' },styles.marginLeft15]} onPress = {() =>   this.props.navigation.navigate(QrCodeScanner, {returnData: this._searchForReferenceValue.bind(this)})} >
                                      <QRIcon width={30} height={30} color = {styles.fontWhite} />  
                                 </TouchableOpacity>
@@ -192,7 +218,6 @@ class Sorting extends PureComponent {
             </StyleProvider>
         )
     }
-
 };
 
 const style = StyleSheet.create({

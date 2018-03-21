@@ -42,6 +42,7 @@ import PushNotification from 'react-native-push-notification'
 import {
   JOBS_DELETED
 } from '../../lib/ContainerConstants'
+import { geoFencingService } from './GeoFencingService'
 
 class Sync {
 
@@ -614,6 +615,7 @@ class Sync {
             user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')
             await keyValueDBService.validateAndSaveData(USER, user)
           }
+          await geoFencingService.addGeoFence(true)
         }
       } else {
         isLastPageReached = true
