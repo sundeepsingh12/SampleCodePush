@@ -84,7 +84,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 26
     buildToolsVersion "23.0.1"
 
     defaultConfig {
@@ -141,6 +141,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':lottie-react-native')
     compile project(':react-native-bluetooth-serial')
     compile project(':realm')
     compile project(':react-native-push-notification')

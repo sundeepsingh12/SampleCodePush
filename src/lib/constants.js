@@ -293,6 +293,7 @@ module.exports = keyMirror({
     Payment: null,
     SequenceRunsheetList: null,
     UnsyncBackupUpload: null,
+    BluetoothListing:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
