@@ -17,6 +17,9 @@ module.exports = {
     NO_JOBS_PRESENT: 'No jobs present',
     TOTAL_COUNT: 'Total Count : ',
 
+    //Common Error Strings
+    JOB_STATUS_MISSING: 'Job status missing in store',
+
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
     INTERNAL_ERROR: 'Internal Error.',
@@ -176,7 +179,8 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
-    LOGOUT_UNSYNCED_TRANSACTIONS: 'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    LOGOUT_UNSYNCED_TRANSACTIONS_TITLE: 'Confirm Log Out',
+    LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE: 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
 
     //DataStore
     SUGGESTIONS: 'Suggestions',

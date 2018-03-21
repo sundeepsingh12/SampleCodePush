@@ -633,7 +633,8 @@ export default class FormLayoutEventImpl {
         jobTransactionArray.push(jobTransaction)
         jobTransactionDTOList.push({
             id: jobTransaction.id,
-            referenceNumber: jobTransaction.referenceNumber
+            referenceNumber: jobTransaction.referenceNumber,
+            jobId: jobTransaction.jobId
         })
         return {
             tableName: TABLE_JOB_TRANSACTION,
@@ -666,7 +667,8 @@ export default class FormLayoutEventImpl {
             jobTransactionArray.push(jobTransaction)
             jobTransactionDTOList.push({
                 id: jobTransaction.id,
-                referenceNumber: jobTransaction.referenceNumber
+                referenceNumber: jobTransaction.referenceNumber,
+                jobId: jobTransaction.jobId
             })
         }
         return {
@@ -827,8 +829,9 @@ export default class FormLayoutEventImpl {
     async addToSyncList(jobTransactionList) {
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
         let transactionsToSync = (!pendingSyncTransactionIds || !pendingSyncTransactionIds.value) ? [] : pendingSyncTransactionIds.value; // if there is no pending transactions then assign empty array else its existing values
-        transactionsToSync = transactionsToSync.concat(jobTransactionList)
-        await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, transactionsToSync)
+        //UnionWith is used to remove duplicacy ie if same job tarnsaction is present in jobTransactionList and transactionsToSync
+        let totalTransactionsToSync = _.unionWith(transactionsToSync, jobTransactionList, _.isEqual);
+        await keyValueDBService.validateAndSaveData(PENDING_SYNC_TRANSACTION_IDS, totalTransactionsToSync)
         return
     }
 

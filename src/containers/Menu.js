@@ -55,7 +55,8 @@ import {
 import {
   OK,
   CANCEL,
-  LOGOUT_UNSYNCED_TRANSACTIONS
+  LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
+  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -170,7 +171,7 @@ class Menu extends PureComponent {
   }
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
-      return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS,
+      return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS_TITLE, LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
         [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
         {
           text: OK, onPress: () => {

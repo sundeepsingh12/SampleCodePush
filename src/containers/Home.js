@@ -33,6 +33,8 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
+import { Platform } from 'react-native'
+import PushNotification from 'react-native-push-notification'
 
 function mapStateToProps(state) {
   return {
@@ -51,6 +53,19 @@ function mapDispatchToProps(dispatch) {
 
 class Home extends PureComponent {
   componentDidMount() {
+    if (Platform.OS === 'ios') {
+      PushNotification.configure({
+        onNotification: function (notification) {
+          console.log('NOTIFICATION:', notification);
+          Toast.show({
+            text: `${notification.message}`,
+            position: 'top',
+            buttonText: 'OK'
+          })
+          notification.finish(PushNotificationIOS.FetchResult.NoData);
+        }
+      })
+    }
     this.props.actions.fetchPagesAndPiechart();
   }
 

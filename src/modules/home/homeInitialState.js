@@ -12,7 +12,7 @@ var InitialState = Record({
         failCounts: 0,
     },
     customErpPullActivated: false,
-    syncStatus: null,
+    syncStatus: 'OK',
     erpSyncStatus: null,
     unsyncedTransactionList: [],
     moduleLoading: false,

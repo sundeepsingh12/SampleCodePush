@@ -93,6 +93,8 @@ import { NetInfo } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
+import { utilitiesService } from '../../services/classes/Utilities'
+import { transactionCustomizationService } from '../../services/classes/TransactionCustomization';
 
 /** 
  * Function which updates STATE when component is mounted
@@ -155,7 +157,6 @@ export function fetchPagesAndPiechart() {
 export function navigateToPage(pageObject) {
   return async function (dispatch) {
     try {
-      console.log('navigateToPage', pageObject)
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
           throw new Error("CODE it, if you want to use it !");
@@ -235,9 +236,7 @@ export function startMqttService(pieChart) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     //Check if user session is alive
     if (token && token.value) {
-      console.log('registerMqttClient')
       const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
-      console.log('uri', uri)
       const userObject = await keyValueDBService.getValueFromStore(USER)
       const clientId = `FE_${userObject.value.id}`
       const storage = {
@@ -258,14 +257,10 @@ export function startMqttService(pieChart) {
       })
 
       // set event handlers 
+      //TODO connection re-establishment on connection lost
       client.on('connectionLost', responseObject => {
-        console.log('connectionLost', responseObject)
-        if (responseObject.errorCode !== 0) {
-          console.log(responseObject.errorMessage);
-        }
       })
       client.on('messageReceived', message => {
-        console.log('message.payloadString', message.payloadString)
         if (message.payloadString == 'Live Job Notification') {
           keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
           dispatch(performSyncService(pieChart, true, true))
@@ -278,7 +273,6 @@ export function startMqttService(pieChart) {
       client.connect()
         .then(() => {
           // Once a connection has been made, make a subscription 
-          console.log('onConnect')
           return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
         })
         .catch(responseObject => {
@@ -294,95 +288,82 @@ export function startMqttService(pieChart) {
 
 export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPull) {
   return async function (dispatch) {
-    let transactionIdToBeSynced
+    let syncStoreDTO
     try {
-      // await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-      const userData = await keyValueDBService.getValueFromStore(USER)
-      if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
-        dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
-      } else {
-        transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-        const syncCount = 0
-        if (!erpPull) {
-          dispatch(setState(SYNC_STATUS, {
-            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-            syncStatus: 'Uploading'
-          }))
-          const responseBody = await sync.createAndUploadZip(transactionIdToBeSynced)
-          syncCount = parseInt(responseBody.split(",")[1])
-        }
-        //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
-        if (isCalledFromHome || syncCount > 0) {
-          console.log(isCalledFromHome, syncCount)
-          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
-            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-            syncStatus: 'Downloading'
-          }))
-          const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, userData.value)
-          const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true, erpPull, userData.value)
-          if (isJobsPresent) {
-            if (Piechart.enabled) {
-              dispatch(pieChartCount())
-            }
-            dispatch(fetchJobs())
-          }
-          if (isLiveJob) {
-            dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
-          }
-        }
-        dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
-          unsyncedTransactionList: [],
-          syncStatus: 'OK',
-          erpModalVisible: true,
-          lastErpSyncTime: userData.value.lastERPSyncWithServer
+      syncStoreDTO = await transactionCustomizationService.getSyncParamaters()
+      const userData = syncStoreDTO.user
+      const autoLogoutEnabled = userData ? userData.company ? userData.company.autoLogoutFromDevice : null : null
+      const lastLoginTime = userData ? userData.lastLoginTime : null
+      if (autoLogoutEnabled && !moment(moment(lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
+        dispatch(navigateToScene(AutoLogoutScreen));
+        return
+      }
+      const syncCount = 0
+      if (!erpPull) {
+        dispatch(setState(SYNC_STATUS, {
+          unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
+          syncStatus: 'Uploading'
         }))
-        //Now schedule sync service which will run regularly after 2 mins
-        await dispatch(syncService(pieChart))
-        let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable.value == 2) {
-          await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
-          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
+        const responseBody = await sync.createAndUploadZip(syncStoreDTO)
+        syncCount = parseInt(responseBody.split(",")[1])
+      }
+
+      //Downloading starts here
+      //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
+      if (isCalledFromHome || syncCount > 0) {
+        dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
+          unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
+          syncStatus: 'Downloading'
+        }))
+        const isJobsPresent = await sync.downloadAndDeleteDataFromServer(null, erpPull, syncStoreDTO);
+        // check if live job module is present
+        const isLiveJobsPresent = await sync.downloadAndDeleteDataFromServer(true, erpPull, syncStoreDTO);
+        if (isJobsPresent) {
+          if (Piechart.enabled) {
+            dispatch(pieChartCount())
+          }
+          dispatch(fetchJobs())
         }
+        if (isLiveJob) {
+          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
+        }
+      }
+      dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
+        unsyncedTransactionList: [],
+        syncStatus: 'OK',
+        erpModalVisible: true,
+        lastErpSyncTime: userData.lastERPSyncWithServer
+      }))
+      //Now schedule sync service which will run regularly after 2 mins
+      await dispatch(syncService(pieChart))
+      let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
+      if (_.isNull(serverReachable) || serverReachable.value == 2) {
+        await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
+        await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
       }
     } catch (error) {
       console.log(error)
+      let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
-        dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
-          unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-          syncStatus: 'INTERNALSERVERERROR'
-        }))
-        let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
-        if (_.isNull(serverReachable) || serverReachable.value == 1) {
-          await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
-          await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
-        }
+        syncStatus = 'INTERNALSERVERERROR'
       } else if (error.code == 401) {
-        dispatch(reAuthenticateUser(transactionIdToBeSynced))
-      } else {
-        let connectionInfo = await NetInfo.getConnectionInfo().then(reachability => {
-          if (reachability.type === 'unknown') {
-            return new Promise(resolve => {
-              const handleFirstConnectivityChangeIOS = isConnected => {
-                NetInfo.isConnected.removeEventListener('connectionChange', handleFirstConnectivityChangeIOS);
-                resolve(isConnected);
-              };
-              NetInfo.isConnected.addEventListener('connectionChange', handleFirstConnectivityChangeIOS);
-            });
-          }
-          return (reachability.type !== 'none' && reachability.type !== 'unknown')
-        });
-        if (connectionInfo) {
-          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
-            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-            syncStatus: 'ERROR'
-          }))
-        } else {
-          dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
-            unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
-            syncStatus: 'NOINTERNET'
-          }))
-        }
+        dispatch(reAuthenticateUser(syncStoreDTO.transactionIdToBeSynced))
       }
+      else {
+        let connectionInfo = await utilitiesService.checkInternetConnection()
+        syncStatus = (connectionInfo) ? 'ERROR' : 'NOINTERNET'
+
+      }
+      //Update Javadoc
+      let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
+      if (_.isNull(serverReachable) || serverReachable.value == 1) {
+        await userEventLogService.addUserEventLog(SERVER_UNREACHABLE, "")
+        await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
+      }
+      dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
+        unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
+        syncStatus
+      }))
     } finally {
       if (!erpPull) {
         const difference = await sync.calculateDifference()

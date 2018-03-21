@@ -282,13 +282,12 @@ class JobMaster {
     return true
   }
 
-  async getJobMasterTitleListFromIds(jobMasterIdList) {
-    const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
+  getJobMasterTitleListFromIds(jobMasterIdList, jobMasterList) {
     let jobMasterTitleList = []
     if (_.isUndefined(jobMasterIdList)) {
       return null
     }
-    jobMasters.value.forEach(jobMaster => {
+    jobMasterList.forEach(jobMaster => {
       if (jobMasterIdList.includes(jobMaster.id)) {
         jobMasterTitleList.push(jobMaster.title)
       }
@@ -296,18 +295,13 @@ class JobMaster {
     return jobMasterTitleList
   }
 
-  // getJobMaterFromJobMasterLists(jobMasterId, jobMasterList) {
-  //   const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
-  //   return jobMaster
-  // }
-
   async getJobMasterFromJobMasterList(jobMasterId) {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)
     return jobMaster;
   }
 
-  async getJobMasterWithEnableResequence(){
+  async getJobMasterWithEnableResequence() {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const jobMasterIdWithEnableResequence = jobMasterList && jobMasterList.value ? jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id) : null
     return jobMasterIdWithEnableResequence
@@ -339,6 +333,17 @@ class JobMaster {
       }
     }
     return orderJobMasterList
+  }
+
+  //This loop gets jobMaster map for job master of which assignOrderToHub is enabled
+  getJobMasterMapWithAssignOrderToHub(jobMasterList) {
+    let jobMasterWithAssignOrderToHubEnabled = {}
+    for (let jobMaster in jobMasterList) {
+      if (jobMasterList[jobMaster].assignOrderToHub) {
+        jobMasterWithAssignOrderToHubEnabled[jobMasterList[jobMaster].id] = jobMasterList[jobMaster]
+      }
+    }
+    return jobMasterWithAssignOrderToHubEnabled
   }
 
 }

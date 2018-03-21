@@ -87,12 +87,12 @@ class Tracking {
             'trackTime': moment(location.timestamp).format('YYYY-MM-DD HH:mm:ss'),
             'userId': user.value.id
         }
-        realm.save(TABLE_TRACK_LOGS, track_record)        
+        realm.save(TABLE_TRACK_LOGS, track_record)
         await userSummaryService._updateUserSummary(location.coords.latitude, location.coords.longitude)
         await keyValueDBService.validateAndSaveData(TRACK_BATTERY, location.battery.level * 100)
     }
 
- 
+
 
     onError(error) {
         console.log('error', error)
@@ -110,14 +110,22 @@ class Tracking {
         // console.log('- [js]motionchanged: ', JSON.stringify(location));
     }
 
-    getTrackLogs(trackLogs, lastSyncTime) {
-        let trackLogsToBeSynced = []
-        trackLogs.forEach(trackLog => {
-            if (moment(trackLog.trackTime).isAfter(lastSyncTime.value)) {
-                trackLogsToBeSynced.push(trackLog)
+    /**
+     * This function return track log that are to be synced with server
+     * @param {*} trackLogsList 
+     * @param {*} lastSyncTime 
+     * @returns
+     * [trackLogs]
+     */
+    getTrackLogs(trackLogsList, lastSyncTime) {
+        let trackLogsToBeSynced = [];
+        for (let trackLog in trackLogsList) {
+            // If track log captured time is after last sync time with server then has to be sent to server
+            if (moment(trackLogsList[trackLog].trackTime).isAfter(lastSyncTime)) {
+                trackLogsToBeSynced.push(trackLogsList[trackLog]);
             }
-        })
-        return trackLogsToBeSynced
+        }
+        return trackLogsToBeSynced;
     }
 }
 

@@ -2,30 +2,15 @@ import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import * as realm from '../../repositories/realmdb'
 import { createZip } from './SyncZip'
-import {
-  keyValueDBService
-} from './KeyValueDBService'
+import { keyValueDBService } from './KeyValueDBService'
 import moment from 'moment'
-
-import {
-  jobStatusService
-} from './JobStatus'
-import {
-  jobTransactionService
-} from './JobTransaction'
-
-import {
-  runSheetService
-} from './RunSheet'
-
-import {
-  jobSummaryService
-} from './JobSummary'
+import { jobStatusService } from './JobStatus'
+import { jobTransactionService } from './JobTransaction'
+import { runSheetService } from './RunSheet'
+import { jobSummaryService } from './JobSummary'
 import { addServerSmsService } from './AddServerSms'
-
-import {
-  jobMasterService
-} from './JobMaster'
+import { jobMasterService } from './JobMaster'
+import { syncZipService } from './SyncZip'
 import _ from 'lodash'
 
 import {
@@ -60,12 +45,12 @@ import {
 
 class Sync {
 
-  async createAndUploadZip(transactionIdToBeSynced) {
+  async createAndUploadZip(syncStoreDTO) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
-    await createZip(transactionIdToBeSynced)
+    await syncZipService.createZip(syncStoreDTO)
     const responseBody = await RestAPIFactory(token.value).uploadZipFile()
     return responseBody
   }
@@ -151,16 +136,15 @@ class Sync {
    * 
    * @param {*} tdcResponse 
    */
-  async processTdcResponse(tdcContentArray, isLiveJob) {
+  async processTdcResponse(tdcContentArray, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
     let tdcContentObject, jobMasterIds
-    const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
-    const user = await keyValueDBService.getValueFromStore(USER)
-    const hub = await keyValueDBService.getValueFromStore(HUB)
-    const imei = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
+    //Prepare jobMasterWithAssignOrderToHubEnabledhere only and if it is non empty,then only hit store for below 4 lines
+    // const jobMaster = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const { jobMasterList } = syncStoreDTO
+    //This loop gets jobMaster map for job master of which assignOrderToHub is enabled
     for (tdcContentObject of tdcContentArray) {
       let contentQuery = JSON.parse(tdcContentObject.query)
-      let allJobsToTransaction = await this.getAssignOrderTohubEnabledJobs(contentQuery, jobMaster, user, hub, imei)
-
+      let allJobsToTransaction = _.isEmpty(jobMasterMapWithAssignOrderToHubEnabled) ? [] : this.getAssignOrderTohubEnabledJobs(contentQuery, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
       if (allJobsToTransaction.length) {
         contentQuery.jobTransactions = (contentQuery.jobTransactions) ? allJobsToTransaction.concat(contentQuery.jobTransactions) : allJobsToTransaction
       }
@@ -173,15 +157,15 @@ class Sync {
         jobMasterIds = await this.updateDataInDB(contentQuery)
       } else if (queryType == 'delete') {
         jobMasterIds = `${JOBS_DELETED}`
-        const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+        const jobIds = contentQuery.job.map(jobObject => jobObject.id)
         const deleteJobTransactions = {
           tableName: TABLE_JOB_TRANSACTION,
           valueList: jobIds,
           propertyName: 'jobId'
         }
-        await realm.deleteRecordsInBatch(deleteJobTransactions)
+        realm.deleteRecordsInBatch(deleteJobTransactions)
       } else if (queryType == 'deleteBroadcast') {
-        const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
+        const jobIds = contentQuery.job.map(jobObject => jobObject.id)
         const deleteJobs = {
           tableName: TABLE_JOB,
           valueList: jobIds,
@@ -192,43 +176,37 @@ class Sync {
           valueList: jobIds,
           propertyName: 'jobId'
         }
-        await realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
+        realm.deleteRecordsInBatch(deleteJobTransactions, deleteJobData)
       }
     }
     return jobMasterIds
   }
 
-  async getAssignOrderTohubEnabledJobs(query, jobMaster, user, hub, imei) {
+  getAssignOrderTohubEnabledJobs(query, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap) {
     let allJobsToTransactions = []
-    let jobMasterWithAssignOrderToHubEnabled = {}
-    jobMaster.value.forEach(jobMasterObject => {
-      if (jobMasterObject.assignOrderToHub) {
-        jobMasterWithAssignOrderToHubEnabled[jobMasterObject.id] = jobMasterObject.code
-      }
-    })
     let transactionList = query.jobTransactions
-    let transactionListIdMap = _.values(transactionList).reduce((object, item) => {
-      object[item.jobId] = item.jobId
-      return object
-    }, {})
-
+    let jobIdJobIdMap = {}
+    for (let jobTransaction in transactionList) {
+      jobIdJobIdMap[transactionList[jobTransaction].jobId] = transactionList[jobTransaction].jobId
+    }
     for (let jobs of query.job) {
-      let jobMasterid = jobMasterWithAssignOrderToHubEnabled[jobs.jobMasterId]
-      if ((_.isEmpty(transactionListIdMap) || !transactionListIdMap[jobs.id]) && jobMasterid) {
-        let unassignedTransactions = await this._createTransactionsOfUnassignedJobs(jobs, jobMaster.value, user, hub, imei, jobMasterWithAssignOrderToHubEnabled)
+      let jobMasterId = jobMasterMapWithAssignOrderToHubEnabled[jobs.jobMasterId]
+      //Make transactions for those whose job transaction node is null
+      if (jobMasterId && (!jobIdJobIdMap[jobs.id])) {
+        let unassignedTransactions = this.createTransactionsOfUnassignedJobs(jobs, syncStoreDTO, jobMasterWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
         allJobsToTransactions.push(unassignedTransactions)
       }
     }
     return allJobsToTransactions
   }
 
-  async _createTransactionsOfUnassignedJobs(job, jobMaster, user, hub, imei, jobMasterIdvsCode) {
-    let jobstatusid = await jobStatusService.getStatusIdForJobMasterIdAndCode(job.jobMasterId, "PENDING")
-    let jobtransaction = await this._getDefaultValuesForJobTransaction(-job.id, jobstatusid, job.referenceNo, user.value, hub.value, imei.value, jobMasterIdvsCode)
+  createTransactionsOfUnassignedJobs(job, syncStoreDTO, jobMasterIdvsCode, jobMasterIdJobStatusIdOfPendingCodeMap) {
+    let jobStatusId = jobMasterIdJobStatusIdOfPendingCodeMap[job.jobMasterId];
+    let jobtransaction = this.getDefaultValuesForJobTransaction(-job.id, jobStatusId, job.referenceNo, syncStoreDTO.user, syncStoreDTO.hub, syncStoreDTO.imei, jobMasterIdvsCode);
     return jobtransaction
   }
 
-  _getDefaultValuesForJobTransaction(id, statusid, referenceNumber, user, hub, imei, jobMasterIdVSCode) {
+  getDefaultValuesForJobTransaction(id, statusid, referenceNumber, user, hub, imei, jobMasterIdVSCode) {
     //TODO some values like lat/lng and battery are not valid values, update them as their library is added
     return jobTransaction = {
       id,
@@ -258,8 +236,8 @@ class Sync {
       lastTransactionTimeOnMobile: moment().format('YYYY-MM-DD HH:mm:ss'),
       deleteFlag: 0,
       attemptCount: 1,
-      jobType: _.values(jobMasterIdVSCode)[0],
-      jobMasterId: Number(_.keys(jobMasterIdVSCode)[0]),
+      jobType: _.values(jobMasterIdVSCode)[0], // single value pass in param
+      jobMasterId: Number(_.keys(jobMasterIdVSCode)[0]), // single value pass in param
       employeeCode: user.employeeCode,
       hubCode: hub.code,
       statusCode: "PENDING",
@@ -308,24 +286,31 @@ class Sync {
     if (isLiveJob) {
       await this.saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     }
-    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+    realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     const jobMasterIds = this.getJobMasterIds(contentQuery.job)
     return jobMasterIds
   }
-  async saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets) {
-    let jobIds = jobs.value;
-    let jobQuery = jobIds.map(jobId => 'id = ' + jobId.id).join(' OR ')
+
+  async saveLiveJobData(jobs, jobDatas) {
+    let jobQuery = jobs.value.map(jobId => 'id = ' + jobId.id).join(' OR ')
+    // job status 
+    // 1 : unassigned
+    // 2 : assigned
+    // 6 : live job
     jobQuery = jobQuery + ' AND status = 6'
-    let jobsInDbList = await realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
-    if (jobsInDbList.length <= 0) {
+    let jobsInDbList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
+    if (jobsInDbList.length == 0) {
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(true))
       return
     }
-    await realm.deleteRecordsInBatch(jobDatas, jobTransactions, jobs, fieldDatas)
+    // only delete job data
+    realm.deleteRecordsInBatch(jobDatas)
     return
   }
+
+
   getJobMasterIds(jobList) {
-    let jobMasterIds = new Set()
+    let jobMasterIds = {}
     jobMasterIds = jobList.map(job => job.jobMasterId)
     return jobMasterIds
   }
@@ -335,19 +320,14 @@ class Sync {
    * @param {*} query 
    */
   async updateDataInDB(contentQuery) {
-    const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
-    const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
-    const jobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => !jobTransaction.negativeJobTransactionId)
-      .map(jobTransaction => jobTransaction.id)
-    const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
-      .map(newJobTransaction => newJobTransaction.negativeJobTransactionId);
+    /*TODO Current logic of deleting field data and job data is wrong.
+    It will be wrong if same contentArray has field data length of one job but not of another job then the field data of 
+    both jobs would be deleted and insert but at insert field data of one job will be found resulting in deletion of
+    field data of 2nd job.Same goes for job data
+    */
+    const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+    let { jobTransactionsIds, newJobTransactionsIds } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
-
-    const runsheets = {
-      tableName: TABLE_RUNSHEET,
-      valueList: runsheetIds,
-      propertyName: 'id'
-    }
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
       valueList: jobIds,
@@ -370,24 +350,15 @@ class Sync {
     }
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
-    await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
+    realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
     const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
     return jobMasterIds
   }
+
   async insertOrUpdateDataInDb(contentQuery) {
-    const jobIds = await contentQuery.job.map(jobObject => jobObject.id)
-    const runsheetIds = await contentQuery.runSheet.map(runsheetObject => runsheetObject.id)
-    const jobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => !jobTransaction.negativeJobTransactionId)
-      .map(jobTransaction => jobTransaction.id)
-    const newJobTransactionsIds = contentQuery.jobTransactions.filter(jobTransaction => jobTransaction.negativeJobTransactionId && jobTransaction.negativeJobTransactionId < 0)
-      .map(newJobTransaction => newJobTransaction.negativeJobTransactionId);
+    const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+    let { jobTransactionsIds, newJobTransactionsIds } = this.getJobTransactionAndNewJobTransactionIds(contentQuery.jobTransactions)
     let concatinatedJobTransactionsIdsAndNewJobTransactionsIds = _.concat(jobTransactionsIds, newJobTransactionsIds)
-
-    const runsheets = {
-      tableName: TABLE_RUNSHEET,
-      valueList: runsheetIds,
-      propertyName: 'id'
-    }
     const jobDatas = {
       tableName: TABLE_JOB_DATA,
       valueList: jobIds,
@@ -410,22 +381,19 @@ class Sync {
     }
     //JobData Db has no Primary Key,and there is no feature of autoIncrement Id In Realm React native currently
     //So it's necessary to delete existing JobData First in case of update query
+    //Check is wrong (fails in case normal and new job are coming together)
     if (contentQuery.fieldData && contentQuery.fieldData.length > 0) {
-      await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
+      realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs, jobFieldData)
     } else {
-      await realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs)
+      realm.deleteRecordsInBatch(jobDatas, newJobTransactions, newJobs)
     }
-    let jobTransactions = (jobTransactionsIds.length > 0) ? await this.getTransactionForUpdateQuery(contentQuery.jobTransactions, jobTransactionsIds) : []
-    if (jobTransactions.length > 0) {
-      contentQuery.jobTransactions = jobTransactions
-    }
-    let jobs = (jobIds.length > 0) ? await this.getJobForUpdateQuery(contentQuery.job, jobIds) : []
-    if (jobs.length > 0) {
-      contentQuery.job = jobs
-    }
+    //check update to _.empty
+    contentQuery.jobTransactions = (jobTransactionsIds.length > 0) ? this.getTransactionForUpdateQuery(contentQuery.jobTransactions, jobTransactionsIds) : []
+    contentQuery.job = (jobIds.length > 0) ? this.getJobForUpdateQuery(contentQuery.job, jobIds) : []
     const jobMasterIds = await this.saveDataFromServerInDB(contentQuery)
     return jobMasterIds
   }
+
   getJobForUpdateQuery(jobs, jobIds) {
     let jobArray = []
     let jobQuery = jobIds.map(jobId => 'id = ' + jobId).join(' OR ')
@@ -435,28 +403,32 @@ class Sync {
       let jobInDb = { ...jobList[index] }
       existingTransactionsMap[jobInDb.id] = jobInDb
     }
-    if (_.isEmpty(existingTransactionsMap)) { return jobs }
+    if (_.isEmpty(existingTransactionsMap)) {
+      return jobs
+    }
     for (let job of jobs) {
-      if (existingTransactionsMap[job.id]) {
-        let updatedJob = _.omit(job, ['status'])
-        jobArray.push(updatedJob)
-      } else {
-        jobArray.push(job)
-      }
+      let updatedJob = (existingTransactionsMap[job.id]) ? _.omit(job, ['status']) : job
+      jobArray.push(updatedJob)
     }
     return jobArray
   }
+
   getTransactionForUpdateQuery(jobTransactions, jobTransactionIds) {
     let jobTransactionArray = []
     let jobTransactionQuery = jobTransactionIds.map(transactionId => 'id = ' + transactionId).join(' OR ')
-    let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, null, null)
+    let transactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
     let existingTransactionsMap = {}
     for (let index in transactionList) {
+      //no need for whole job transaction
       let jobTransactionInDb = { ...transactionList[index] }
       existingTransactionsMap[jobTransactionInDb.id] = jobTransactionInDb
     }
+    //This is case of when job are added after user has logged in (query type still comes 'update')
+    //Need server side changes here,it should be 'insert'
     if (_.isEmpty(existingTransactionsMap)) { return jobTransactions }
+
     for (let jobTransaction of jobTransactions) {
+      //Use ternary here
       if (existingTransactionsMap[jobTransaction.id]) {
         let updatedJobTransaction = _.omit(jobTransaction, ['jobStatusId', 'actualAmount', 'originalAmount', 'moneyTransactionType', 'trackKm', 'trackHalt', 'trackCallCount', 'trackCallDuration',
           'trackSmsCount', 'latitude', 'longitude', 'trackBattery', 'seqSelected', 'seqActual', 'seqAssigned', 'lastTransactionTimeOnMobile', 'statusCode', 'jobEtaTime', 'npsFeedBack'])
@@ -597,17 +569,15 @@ class Sync {
    * 
    * Returns true if any job present in sync table on server side
    */
-  async downloadAndDeleteDataFromServer(isLiveJob, erpPull, user) {
-    let pageNumber = 0,
-      pageSize = 3, currentPage
-    if (isLiveJob)
-      pageSize = 200
-    let isLastPageReached = false,
-      json, isJobsPresent = false, jobMasterIds
+  async downloadAndDeleteDataFromServer(isLiveJob, erpPull, syncStoreDTO) {
+    let pageNumber = 0, currentPage, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap
+    let pageSize = isLiveJob ? 200 : 3
+    let isLastPageReached = false, json, isJobsPresent = false, jobMasterIds
     const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
     let jobAssignmentModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(appModulesList.value, JOB_ASSIGNMENT_ID)
-    let postAssignmentList = jobAssignmentModule.length == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark).postAssignmentList : null
-    const unseenStatusIds = postAssignmentList && postAssignmentList.length > 0 ? await jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(postAssignmentList, UNSEEN) : await jobStatusService.getAllIdsForCode(UNSEEN)
+    let postAssignmentList = _.size(jobAssignmentModule) == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark).postAssignmentList : null
+    const unseenStatusIds = postAssignmentList && _.size(postAssignmentList) > 0 ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, postAssignmentList, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
+    let jobMasterTitleList = []
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull)
       if (tdcResponse) {
@@ -615,33 +585,30 @@ class Sync {
         isLastPageReached = json.last
         currentPage = json.number
         if (!_.isNull(json.content) && !_.isUndefined(json.content) && !_.isEmpty(json.content)) {
-          jobMasterIds = await this.processTdcResponse(json.content, isLiveJob)
+          jobMasterMapWithAssignOrderToHubEnabled = jobMasterService.getJobMasterMapWithAssignOrderToHub(syncStoreDTO.jobMasterList)
+          jobMasterIdJobStatusIdOfPendingCodeMap = jobStatusService.getStatusIdForJobMasterIdFilteredOnCodeMap(syncStoreDTO.statusList, PENDING)
+          jobStatusIdJobSummaryMap = jobSummaryService.getJobStatusIdJobSummaryMap(syncStoreDTO.jobSummaryList)
+          jobMasterIds = await this.processTdcResponse(json.content, isLiveJob, syncStoreDTO, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
         } else {
           isLastPageReached = true
         }
-        const successSyncIds = await this.getSyncIdFromResponse(json.content)
+        const successSyncIds = this.getSyncIdFromResponse(json.content)
         //Dont hit delete sync API if successSyncIds empty
         //Delete Data from server code starts here
 
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
-          const unseenTransactions = postOrderList ? await jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : await jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
-          const jobMasterIdJobStatusIdTransactionIdDtoObject = await jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions)
-          const dataList = await this.getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
+          const unseenTransactions = postOrderList ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
+          const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap)
           const messageIdDTOs = []
           if (!isLiveJob) {
-            await this.deleteDataFromServer(successSyncIds, messageIdDTOs, dataList.transactionIdDtos, dataList.jobSummaries)
+            await this.deleteDataFromServer(successSyncIds, messageIdDTOs, jobMasterIdJobStatusIdTransactionIdDtoObject.transactionIdDtos, jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries)
             await keyValueDBService.deleteValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
           }
-          await jobTransactionService.updateJobTransactionStatusId(dataList.transactionIdDtos)
-          const jobMasterTitleList = (jobMasterIds.constructor === Array) ? await jobMasterService.getJobMasterTitleListFromIds(jobMasterIds) : jobMasterIds
-          let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB')
-          if (!_.isNull(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value))) {
-            this.showNotification(jobMasterTitleList)
-            await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-          }
-          await jobSummaryService.updateJobSummary(dataList.jobSummaries)
+          realm.saveList(TABLE_JOB_TRANSACTION, jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
+          jobMasterTitleList = jobMasterTitleList.concat(jobMasterService.getJobMasterTitleListFromIds(jobMasterIds, syncStoreDTO.jobMasterList))
+          await jobSummaryService.updateJobSummaryForSync(jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries, jobStatusIdJobSummaryMap)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
           if (erpPull) {
             user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -660,26 +627,26 @@ class Sync {
         erpPull = false
       }
     }
+    let showLiveJobNotification = await keyValueDBService.getValueFromStore('LIVE_JOB');
+    if (!_.isEmpty(jobMasterTitleList) && (!isLiveJob || (showLiveJobNotification && showLiveJobNotification.value))) {
+      this.showNotification(_.uniq(jobMasterTitleList))
+      await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+    }
     if (isJobsPresent) {
       await runSheetService.updateRunSheetAndUserSummary()
     }
     return isJobsPresent
-
   }
 
   showNotification(jobMasterTitleList) {
-
     const alertBody = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
     const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${alertBody} jobs` : alertBody
-
     PushNotification.localNotification({
       /* iOS and Android properties */
       title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
       message, // (required)
       soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
     });
-
-
   }
 
   async calculateDifference() {
@@ -699,6 +666,21 @@ class Sync {
       timeDifference = `${differenceInSeconds} seconds ago`
     }
     return timeDifference
+  }
+
+  getJobTransactionAndNewJobTransactionIds(jobTransactionList) {
+    let jobTransactionsIds = [], newJobTransactionsIds = []
+    for (let jobTransaction in jobTransactionList) {
+      if (!jobTransactionList[jobTransaction].negativeJobTransactionId) {
+        jobTransactionsIds.push(jobTransactionList[jobTransaction].id)
+      } else if (jobTransactionList[jobTransaction].negativeJobTransactionId < 0) {
+        newJobTransactionsIds.push(jobTransactionList[jobTransaction].negativeJobTransactionId)
+      }
+    }
+    return {
+      jobTransactionsIds,
+      newJobTransactionsIds
+    }
   }
 }
 
