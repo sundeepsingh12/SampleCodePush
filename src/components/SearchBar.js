@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react'
-import renderIf from '../lib/renderIf'
 import { StyleSheet, View } from 'react-native'
 import {
     Header,
@@ -43,7 +42,7 @@ export default class SearchBar extends PureComponent {
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.goBack() }} />
+                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.paddingRight10, styles.paddingLeft10, styles.fontXxl]} onPress={() => { this.props.goBack() }} />
                         <Text
                             style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.title}</Text>
                         <View />
@@ -56,18 +55,19 @@ export default class SearchBar extends PureComponent {
                                 onChangeText={(searchText) => {
                                     this.callDataStoreSearchMethods(searchText)
                                 }}
-                                returnKeyType = {"search"}
-                                keyboardAppearance = {"dark"}
+                                returnKeyType={"search"}
+                                keyboardAppearance={"dark"}
                                 value={this.props.searchText}
                                 style={[style.headerSearch, styles.bgGray]} />
                             {scanner}
                         </View>
-                        {renderIf(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent, <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
-                            <Text style={[styles.fontDefault, styles.fontWhite, styles.paddingTop10, styles.paddingBottom10]}
-                                onPress={() => {
-                                    this.props.fetchDataStoreAttrValueMap(this.props.searchText, true)
-                                }}>Search</Text>
-                        </View>)}
+                        {(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent) ?
+                            <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
+                                <Text style={[styles.fontDefault, styles.fontWhite, styles.paddingTop10, styles.paddingBottom10]}
+                                    onPress={() => {
+                                        this.props.fetchDataStoreAttrValueMap(this.props.searchText, true)
+                                    }}>Search</Text>
+                            </View> : null}
                     </View>
                 </Body>
             </Header>

@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import SearchBar from '../components/SearchBar'
 import * as globalActions from '../modules/global/globalActions'
-import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
 import styles from '../themes/FeStyle'
 import DataStoreItemDetails from '../components/DataStoreItemDetails'
@@ -34,7 +33,7 @@ import {
     EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
 import _ from 'lodash'
-import { SUGGESTIONS,OK } from '../lib/ContainerConstants'
+import { SUGGESTIONS, OK } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         isSearchEnabled: state.dataStore.isSearchEnabled,
@@ -83,7 +82,7 @@ class DataStore extends PureComponent {
                 position: "bottom" | "center",
                 buttonText: OK,
                 type: 'danger',
-                duration: 5000
+                duration: 3000
             })
         }
     }
@@ -113,12 +112,12 @@ class DataStore extends PureComponent {
                 <TouchableOpacity
                     onPress={() => this.showDetails(item.id, firstValue, false)}>
                     <View style={[style.cardLeft]}>
-                        {renderIf(firstValue, <View style={[style.cardLeftTopRow]}>
+                        {firstValue ? <View style={[style.cardLeftTopRow]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight500, styles.fontDefault]}>{firstValue}</Text>
-                        </View>)}
-                        {renderIf(secondValue, <View style={[styles.row]}>
+                        </View> : null}
+                        {secondValue ? <View style={[styles.row]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight400, styles.fontSm]}>{secondValue}</Text>
-                        </View>)}
+                        </View> : null}
                     </View>
                 </TouchableOpacity>
             </Card >
@@ -223,8 +222,8 @@ class DataStore extends PureComponent {
     }
 
     render() {
-        let flatListView = this.flatListView()
         let loader = this.getLoader()
+        let flatListView = this.flatListView()
         let suggestionsText = this.getSuggestionsText()
         if (this.props.detailsVisibleFor == -1) {
             return (
@@ -242,13 +241,12 @@ class DataStore extends PureComponent {
                         searchDataStoreAttributeValueMap={this.searchDataStoreAttributeValueMap} />
 
                     <Content style={[styles.marginLeft10]}>
-                        {loader}
                         {suggestionsText}
                         {flatListView}
                     </Content>
-                    {renderIf(this.props.isMinMaxValidation &&
+                    {(this.props.isMinMaxValidation &&
                         _.size(this.props.searchText) > 2 &&
-                        this.props.navigation.state.params.currentElement.attributeTypeId != 63,
+                        this.props.navigation.state.params.currentElement.attributeTypeId != 63) ?
                         <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                             <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
                                 <Button success full style={styles.bgPrimary}
@@ -267,8 +265,7 @@ class DataStore extends PureComponent {
                                     <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                                 </Button>
                             </FooterTab>
-                        </Footer>)
-                    }
+                        </Footer> : null}
                 </Container >
             )
         }
@@ -278,6 +275,13 @@ class DataStore extends PureComponent {
                 goBack={this.showDetails}
                 onSave={this.onSave} />
         )
+    }
+
+    /**
+     * clear state when container unMount
+     */
+    componentWillUnmount() {
+        this.props.actions.setState(SET_INITIAL_STATE)
     }
 }
 
