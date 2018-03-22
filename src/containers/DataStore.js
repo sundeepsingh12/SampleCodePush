@@ -86,6 +86,7 @@ class DataStore extends PureComponent {
             })
         }
     }
+
     getTextData(item) {
         let firstValue = item.dataStoreAttributeValueMap[item.matchKey]
         let secondValue
@@ -112,15 +113,15 @@ class DataStore extends PureComponent {
                 <TouchableOpacity
                     onPress={() => this.showDetails(item.id, firstValue, false)}>
                     <View style={[style.cardLeft]}>
-                        {firstValue ? <View style={[style.cardLeftTopRow]}>
+                        {firstValue && <View style={[style.cardLeftTopRow]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight500, styles.fontDefault]}>{firstValue}</Text>
-                        </View> : null}
-                        {secondValue ? <View style={[styles.row]}>
+                        </View>}
+                        {secondValue && <View style={[styles.row]}>
                             <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10, styles.fontWeight400, styles.fontSm]}>{secondValue}</Text>
-                        </View> : null}
+                        </View>}
                     </View>
                 </TouchableOpacity>
-            </Card >
+            </Card>
         )
     }
 
@@ -244,9 +245,8 @@ class DataStore extends PureComponent {
                         {suggestionsText}
                         {flatListView}
                     </Content>
-                    {(this.props.isMinMaxValidation &&
-                        _.size(this.props.searchText) > 2 &&
-                        this.props.navigation.state.params.currentElement.attributeTypeId != 63) ?
+                    {(this.props.isMinMaxValidation && _.size(this.props.searchText) > 2 &&
+                        this.props.navigation.state.params.currentElement.attributeTypeId != 63) &&
                         <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                             <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
                                 <Button success full style={styles.bgPrimary}
@@ -265,7 +265,7 @@ class DataStore extends PureComponent {
                                     <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
                                 </Button>
                             </FooterTab>
-                        </Footer> : null}
+                        </Footer>}
                 </Container >
             )
         }
