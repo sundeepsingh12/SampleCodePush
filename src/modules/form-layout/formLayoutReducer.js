@@ -17,7 +17,6 @@ import {
     UPDATE_FIELD_DATA_VALIDATION,
     SET_FORM_LAYOUT_STATE,
     CLEAR_FORM_LAYOUT,
-    SET_DRAFT,
     SET_UPDATE_DRAFT,
     SET_FORM_TO_INVALID,
     SET_DSF_REVERSE_MAP,
@@ -74,7 +73,6 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('statusName', action.payload.statusName)
                 .set('jobTransactionId', action.payload.jobTransactionId)
                 .set('latestPositionId', action.payload.latestPositionId)
-                .set('draftStatusId', action.payload.draftStatusId)
                 .set('fieldAttributeMasterParentIdMap', action.payload.fieldAttributeMasterParentIdMap)
                 .set('noFieldAttributeMappedWithStatus', action.payload.noFieldAttributeMappedWithStatus)
                 .set('formElement', action.payload.formLayoutObject)
@@ -135,9 +133,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('paymentAtEnd', action.payload.editableFormLayoutState.paymentAtEnd)
                 .set('dataStoreFilterReverseMap', action.payload.editableFormLayoutState.dataStoreFilterReverseMap)
         }
-        case SET_DRAFT: {
-            return state.set('draftStatusId', action.payload)
-        }
+
         case SET_UPDATE_DRAFT: {
             return state.set('updateDraft', action.payload)
         }

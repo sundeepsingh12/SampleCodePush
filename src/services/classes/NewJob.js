@@ -19,18 +19,13 @@ class NewJob {
      * get nextStatusList of pending status mapped to jobMaster and there should be only one pending status present with a particular jobMaster
      * @param {*} jobMasterId 
      */
-    async getNextPendingStatusForJobMaster(jobMasterId) {
+    async getNextPendingStatusForJobMaster(jobMasterId, statusId) {
         const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)//get all status
-        const pendingStatusList = statusList.value.filter(status => status.jobMasterId == jobMasterId && status.code == PENDING)//filter those status whose code is Pending and whose jobMasterId is as given in function parameters
-        if (!pendingStatusList || pendingStatusList.length != 1) {
-            throw new Error(CONFIGURATION_ISSUES_WITH_PENDING_STATUS)// there should be exactly 1 status in PENDING if not throw an error
+        if (!statusList || !statusList.value) {
+            throw new Error(CONFIGURATION_ISSUES_WITH_PENDING_STATUS)
         }
-        let nextPendingStatus = pendingStatusList[0].nextStatusList//get nextStatusList of pending status
-        let negativeId = -1//initially set -1 as trasactionId we will change this id before saving the transaction in DB
-        return {
-            nextPendingStatus,
-            negativeId
-        }
+        const pendingStatusList = statusList.value.filter(status => status.jobMasterId == jobMasterId && status.id == statusId)//filter those status whose code is Pending and whose jobMasterId is as given in function parameters
+        return pendingStatusList[0]
     }
 
     /**
@@ -38,19 +33,16 @@ class NewJob {
      * @param {*} jobMasterId 
      * @param {*} saveActivatedData 
      */
-    checkForNextContainer(jobMasterId, saveActivatedData, jobMasterName) {
-        if (!jobMasterId || !jobMasterName) {
+    checkForNextContainer(pageObject, saveActivatedData) {
+        if (!pageObject) {
             throw new Error(JOB_MASTER_MISSING)
         }
         let navigationParams, stateParam, screenName
+        let jobMasterId = pageObject.jobMasterIds[0]
         //if save activated data is not present or save activated data is present but not with that jobMaster which is been clicked than NewJobStatus is the next container
         if (!saveActivatedData || !saveActivatedData.value[jobMasterId]) {
             return {
                 screenName: NewJobStatus,
-                navigationParams: {
-                    jobMasterId,
-                    jobMasterName
-                }
             }
         }//if saveActivated data is present and it has screenName of SaveActivated then navigate to SaveActivated Container
         else if (saveActivatedData.value[jobMasterId].screenName == SaveActivated) {

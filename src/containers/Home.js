@@ -64,6 +64,7 @@ import {
   PIECHART,
   SUMMARY,
   JobMasterListScreen,
+  SET_NEWJOB_DRAFT_INFO
 } from '../lib/constants'
 import _ from 'lodash'
 import PushNotification from 'react-native-push-notification'
@@ -71,6 +72,7 @@ import { Platform } from 'react-native'
 import { getJobMasterVsStatusNameList } from '../modules/bulk/bulkActions'
 import { getRunsheets } from '../modules/sequence/sequenceActions'
 import { fetchJobMasterList } from '../modules/postAssignment/postAssignmentActions'
+import DraftModal from '../components/DraftModal'
 
 function mapStateToProps(state) {
   return {
@@ -81,6 +83,7 @@ function mapStateToProps(state) {
     moduleLoading: state.home.moduleLoading,
     chartLoading: state.home.chartLoading,
     count: state.home.count,
+    draftNewJobInfo: state.home.draftNewJobInfo
   }
 }
 
@@ -171,14 +174,14 @@ class Home extends PureComponent {
           "groupName": "Group 1",
           "icon": "ios-hammer",
           "userType": "field-executive",
-          "jobMasterIds": [331253],//dummy jobMasterId
+          "jobMasterIds": [432],//dummy jobMasterId
           "manualSelection": true,
           "menuLocation": "MAIN",
           "screenTypeId": 2,
           "sequenceNumber": 1,
           "additionalParams": {
             "temp": "xyz",
-            "statusId": 2010,
+            "statusId": 2018,
             "selectAll": true,
             "searchSelectionOnLine1Line2": true
           }
@@ -282,7 +285,12 @@ class Home extends PureComponent {
 
     return null
   }
-
+  getNewJobDraftModal() {
+    if (!_.isEmpty(this.props.draftNewJobInfo)) {
+      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
+    }
+    return null
+  }
   render() {
     const headerView = this.headerView()
     let list = []
@@ -296,7 +304,7 @@ class Home extends PureComponent {
       this.props.modules[CUSTOMAPP])
     const moduleView = this.moduleView(list)
     const pieChartView = this.pieChartView()
-
+    const newJobDraftModal = this.getNewJobDraftModal()
     if (this.props.moduleLoading) {
       return (<Loader />)
     }
@@ -305,6 +313,7 @@ class Home extends PureComponent {
         <Container style={StyleSheet.flatten([styles.bgWhite])}>
           {headerView}
           <Content>
+            {newJobDraftModal}
             {pieChartView}
             <List>
               {moduleView}

@@ -270,7 +270,7 @@ class FormLayout {
                 contactData, currentStatus, jobTransaction, jobMasterId,
                 navigationFormLayoutStates
             }
-            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+            await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
 
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
@@ -282,7 +282,7 @@ class FormLayout {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
             await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
-            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+            await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
 
         }
         else if (currentStatus.transient) {
@@ -299,7 +299,7 @@ class FormLayout {
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
             if (!jobTransaction.length) { //Delete draft only if not bulk
-                await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+                await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))

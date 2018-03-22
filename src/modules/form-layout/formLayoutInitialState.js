@@ -36,7 +36,6 @@ var InitialState = Record({
         isLoading: false,
         errorMessage: '',
         paymentAtEnd: {},
-        draftStatusId: null,
         updateDraft: false,
         isFormValid: true,
         dataStoreFilterReverseMap: {},

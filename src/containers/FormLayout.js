@@ -30,7 +30,6 @@ import {
 } from '../lib/AttributeConstants'
 
 import {
-  SET_DRAFT,
   SET_UPDATE_DRAFT,
   ERROR_MESSAGE,
   SET_FORM_TO_INVALID
@@ -55,7 +54,6 @@ function mapStateToProps(state) {
     errorMessage: state.formLayout.errorMessage,
     currentElement: state.formLayout.currentElement,
     pieChart: state.home.pieChart,
-    draftStatusId: state.formLayout.draftStatusId,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
     dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
@@ -104,28 +102,14 @@ class FormLayout extends PureComponent {
         dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
         fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
       }
-      this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId)
+      this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction)
     }
   }
-  showDraftAlert() {
-    let draftMessage = 'Do you want to restore draft for ' + this.props.statusName + '?'
-    let view =
-      <CustomAlert
-        title="Draft"
-        message={draftMessage}
-        onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={() => this._onCancel()} />
-    return view
-  }
-  _onCancel = () => {
-    this.props.actions.setState(SET_DRAFT, null)
-  }
-  _goToFormLayoutWithDraft = () => {
-    this.props.actions.setState(SET_DRAFT, null)
-    this.props.actions.restoreDraft(this.props.jobTransactionId, this.props.statusId, this.props.navigation.state.params.jobMasterId)
-  }
+
   componentDidMount() {
-    this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction)
+    if (!this.props.navigation.state.params.isDraftRestore) {
+      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction)
+    }
   }
 
   renderData = (item) => {
@@ -258,7 +242,6 @@ class FormLayout extends PureComponent {
   }
 
   render() {
-    const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
     let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
     let formView = null
@@ -278,7 +261,6 @@ class FormLayout extends PureComponent {
     const footerView = this.getFooterView()
     if (Platform.OS == 'ios') {
       formView = <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-        {draftAlert}
         {invalidFormAlert}
         {headerView}
         {emptyFieldAttributeForStatusView}
@@ -296,7 +278,6 @@ class FormLayout extends PureComponent {
       </KeyboardAvoidingView >
     } else {
       formView = <Container>
-        {draftAlert}
         {invalidFormAlert}
         {headerView}
         {emptyFieldAttributeForStatusView}

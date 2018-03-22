@@ -39,6 +39,7 @@ import {
     Cancel,
     Checkout,
     SHOW_DISCARD_ALERT,
+    SET_SAVE_ACTIVATED_DRAFT
 } from '../lib/constants'
 import {
     Yes_Checkout,
@@ -52,7 +53,7 @@ import {
     Discard_these_jobs,
     Do_you_want_to_checkout
 } from '../lib/ContainerConstants'
-
+import DraftModal from '../components/DraftModal'
 import _ from 'lodash'
 
 function mapStateToProps(state) {
@@ -62,7 +63,8 @@ function mapStateToProps(state) {
         isSignOffVisible: state.saveActivated.isSignOffVisible,
         loading: state.saveActivated.loading,
         headerTitle: state.saveActivated.headerTitle,
-        showDiscardAlert: state.saveActivated.showDiscardAlert
+        showDiscardAlert: state.saveActivated.showDiscardAlert,
+        draftStatusInfo: state.saveActivated.draftStatusInfo
     }
 };
 
@@ -111,6 +113,7 @@ class SaveActivated extends PureComponent {
                 this.props.navigation.state.params.navigationFormLayoutStates
             )
         }
+        this.props.actions.checkIfDraftExists(this.props.navigation.state.params.jobMasterId)
     }
 
     signOff = (statusId) => {
@@ -131,8 +134,8 @@ class SaveActivated extends PureComponent {
 
     navigateToFormLayout = (statusId, statusName) => {
         let cloneJobTransaction = _.cloneDeep(this.props.navigation.state.params.jobTransaction)
-        cloneJobTransaction.id--
-        cloneJobTransaction.jobId--
+        let lastIndex = parseInt(_.findLastKey(this.props.recurringData))
+        cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,
             jobTransactionId: cloneJobTransaction.id,
@@ -271,10 +274,19 @@ class SaveActivated extends PureComponent {
             editableFormLayoutState: this.props.recurringData[itemId].formLayoutState
         })
     }
+    draftOkPress = () => {
+        this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.navigation.state.params.jobTransaction)
+    }
+    draftModal() {
+        if (!_.isEmpty(this.props.draftStatusInfo)) {
+            return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={this.draftOkPress} onCancelPress={() => this.props.actions.setState(SET_SAVE_ACTIVATED_DRAFT, {})} onRequestClose={() => this.props.actions.setState(SET_SAVE_ACTIVATED_DRAFT, {})} />
 
-
+        }
+        return null
+    }
     render() {
         let textCounter = 1
+        let draftModalView = this.draftModal()
         if (this.props.loading) {
             return (
                 <Loader />
@@ -309,6 +321,7 @@ class SaveActivated extends PureComponent {
                     </Header>
 
                     <Content style={[styles.flex1, styles.bgLightGray]}>
+                        {draftModalView}
                         {/*Senders Details*/}
                         <View style={[styles.bgWhite]}>
                             <List>

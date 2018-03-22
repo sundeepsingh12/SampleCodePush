@@ -77,16 +77,12 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
             let { latestPositionId, noFieldAttributeMappedWithStatus } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
-            const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
-            if (!draftStatusId) {
-                sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
-            }
+            sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
             dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
                 statusId,
                 statusName,
                 jobTransactionId,
                 latestPositionId,
-                draftStatusId,
                 fieldAttributeMasterParentIdMap,
                 noFieldAttributeMappedWithStatus: (noFieldAttributeMappedWithStatus || sortedFormAttributesDto.isAllAttributeHidden),
                 formLayoutObject: sortedFormAttributesDto.formLayoutObject,
@@ -238,33 +234,19 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
     }
 }
 
-export function saveDraftInDb(formLayoutState, jobMasterId) {
+export function saveDraftInDb(formLayoutState, jobMasterId, jobTransaction) {
     return async function (dispatch) {
-        draftService.saveDraftInDb(formLayoutState, jobMasterId)
-    }
-}
-
-export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
-    return async function (dispatch) {
-        let formLayoutState = draftService.restoreDraftFromDb(jobTransactionId, statusId, jobMasterId)
-        dispatch(setState(SET_FORM_LAYOUT_STATE, {
-            editableFormLayoutState: formLayoutState,
-            statusName: formLayoutState.statusName
-        }))
+        draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
     }
 }
 
 export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
-        if (isDraftRestore) {
-            dispatch(restoreDraft(jobTransactionId, statusId))
-        } else {
-            if (editableFormLayoutState) {
-                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
-            }
-            else {
-                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
-            }
+        if (editableFormLayoutState) {
+            dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
+        }
+        else {
+            dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
         }
     }
 }
@@ -289,6 +271,37 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
             }
         }
         catch (error) {
+            console.log(error)
+        }
+    }
+}
+
+export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft) {
+    return async function (dispatch) {
+        try {
+            let draftRestored = draftService.getFormLayoutStateFromDraft(draft)
+            dispatch(setState(SET_FORM_LAYOUT_STATE, {
+                editableFormLayoutState: draftRestored.formLayoutState,
+                statusName: draftRestored.formLayoutState.statusName
+            }))
+            if (!jobTransaction) {
+                jobTransaction = {
+                    id: draftRestored.formLayoutState.jobTransactionId,
+                    jobMasterId: draft.jobMasterId,
+                    jobId: draftRestored.formLayoutState.jobTransactionId,
+                }
+            }
+            dispatch(navigateToScene('FormLayout', {
+                contactData,
+                jobTransactionId: jobTransaction.id,
+                jobTransaction: jobTransaction,
+                statusId: draftRestored.formLayoutState.statusId,
+                statusName: draftRestored.formLayoutState.statusName,
+                jobMasterId: draft.jobMasterId,
+                navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : null,
+                isDraftRestore: true
+            }))
+        } catch (error) {
             console.log(error)
         }
     }

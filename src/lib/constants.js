@@ -94,6 +94,7 @@ module.exports = keyMirror({
     SET_BACKUP_FILES_LIST: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
+    SET_NEWJOB_DRAFT_INFO: null,
 
     //Home Container
     PIECHART: null,
@@ -115,6 +116,7 @@ module.exports = keyMirror({
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
+    SET_JOBDETAILS_DRAFT_INFO: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -236,7 +238,6 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
     CLEAR_FORM_LAYOUT: null,
-    SET_DRAFT: null,
     SET_UPDATE_DRAFT: null,
 
     UPDATE_FIELD_DATA_VALIDATION: null,
@@ -381,6 +382,7 @@ module.exports = keyMirror({
     Checkout: null,
     SHOW_DISCARD_ALERT: null,
     RETURN_TO_HOME: null,
+    SET_SAVE_ACTIVATED_DRAFT: null,
 
     //Bulk Module
     START_FETCHING_BULK_CONFIG: null,

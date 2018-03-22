@@ -18,7 +18,8 @@ import {
   SET_FAIL_UPLOAD_COUNT,
   SET_BACKUP_FILES_LIST,
   SET_ERP_PULL_ACTIVATED,
-  ERP_SYNC_STATUS
+  ERP_SYNC_STATUS,
+  SET_NEWJOB_DRAFT_INFO
 } from '../../lib/constants'
 
 
@@ -34,7 +35,7 @@ export default function homeReducer(state = initialState, action) {
         .set('pieChart', action.payload.pieChart)
         .set('menu', action.payload.menu)
         .set('moduleLoading', action.payload.moduleLoading)
-        .set('newJobModules',action.payload.newJobModules)
+        .set('newJobModules', action.payload.newJobModules)
 
     case SET_ERP_PULL_ACTIVATED: {
       return state.set('customErpPullActivated', action.payload.customErpPullActivated)
@@ -79,6 +80,9 @@ export default function homeReducer(state = initialState, action) {
 
     case SET_BACKUP_FILES_LIST:
       return state.set('unsyncBackupFilesList', action.payload)
+
+    case SET_NEWJOB_DRAFT_INFO:
+      return state.set('draftNewJobInfo', action.payload)
   }
 
   return state

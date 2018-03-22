@@ -29,6 +29,7 @@ import {
   BACKUP_UPLOAD_FAIL_COUNT,
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
+  SET_NEWJOB_DRAFT_INFO
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -73,7 +74,8 @@ import { autoLogoutAfterUpload } from '../backup/backupActions'
 import {
   Toast
 } from 'native-base'
-import { redirectToContainer } from '../newJob/newJobActions';
+import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
+import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
 /**
  * This action enables modules for particular user
  */
@@ -420,7 +422,7 @@ export function navigateToPage(pageObject) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_NEW_JOB:
-          dispatch(redirectToContainer(pageObject.jobMasterIds[0], pageObject.name))
+          dispatch(redirectToContainer(pageObject))
           break
         default:
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support")
@@ -428,6 +430,21 @@ export function navigateToPage(pageObject) {
     } catch (error) {
       console.log(error)
       Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'Lets Code', type: 'danger', duration: 50000 })
+    }
+  }
+}
+
+export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
+  return async function (dispatch) {
+    try {
+      if (restoreDraft) {
+        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft))
+      } else {
+        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId))
+      }
+      dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
+    } catch (error) {
+      console.log(error)
     }
   }
 }

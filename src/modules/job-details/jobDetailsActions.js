@@ -79,7 +79,7 @@ export function getJobDetails(jobTransactionId) {
             const jobExpiryData = (!errorMessage && details.jobDataObject.dataMap[JOB_EXPIRY_TIME]) ? (Object.values(details.jobDataObject.dataMap[JOB_EXPIRY_TIME])[0]) : null
             const jobExpiryTime = jobExpiryData && jobExpiryData.data ? jobExpiryData.data.value : null
             const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
-            const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
+            const draftStatusInfo = draftService.getDraftForState(details.jobTransactionDisplay, null)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             let isEtaTimerShow = (statusCategory == 1)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime))

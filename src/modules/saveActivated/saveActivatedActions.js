@@ -17,8 +17,11 @@ import {
     IS_COMPANY_CODE_DHL,
     EMAILID_VIEW_ARRAY,
     SHOULD_RELOAD_START,
+    SET_SAVE_ACTIVATED_DRAFT
 } from '../../lib/constants'
 import _ from 'lodash'
+import { draftService } from '../../services/classes/DraftService'
+import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
 
 export function addTransactionAndPopulateView(formLayoutState, recurringData, commonData, statusName, navigationParams, navigationFormLayoutStates) {
     return async function (dispatch) {
@@ -117,6 +120,10 @@ export function clearStateAndStore(jobMasterId) {
             let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
             delete saveActivatedData.value[jobMasterId]
             await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, saveActivatedData.value)
+            await draftService.deleteDraftFromDb({
+                id: -1,
+                jobId: -1
+            }, jobMasterId)
             dispatch(setState(SAVE_ACTIVATED_INITIAL_STATE, {}))
             dispatch(navigateToScene(HomeTabNavigatorScreen, {}))
         } catch (error) {
@@ -146,3 +153,26 @@ export function deleteItem(itemId, recurringData, commonData, navigationParams, 
     }
 }
 
+export function checkIfDraftExists(jobMasterId) {
+    return async function (dispatch) {
+        try {
+            const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
+            dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, draftStatusInfo))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+export function restoreDraft(draft, contactData, jobTransaction) {
+    return async function (dispatch) {
+        try {
+            let cloneJobTransaction = _.cloneDeep(jobTransaction)
+            cloneJobTransaction.id--
+            cloneJobTransaction.jobId--
+            dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft))
+            dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, {}))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
