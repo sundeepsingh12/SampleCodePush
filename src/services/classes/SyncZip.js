@@ -47,6 +47,7 @@ import { jobMasterService } from './JobMaster'
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
+import { userExceptionLogsService } from './UserException'
 
 export async function createZip(transactionIdToBeSynced) {
 
@@ -70,7 +71,7 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
     SYNC_RESULTS.userCommunicationLog = [];
     SYNC_RESULTS.userEventsLog = await userEventLogService.getUserEventLog(lastSyncTime)
-    SYNC_RESULTS.userExceptionLog = [];
+    SYNC_RESULTS.userExceptionLog = await userExceptionLogsService.getUserExceptionLogs(lastSyncTime)
 
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}

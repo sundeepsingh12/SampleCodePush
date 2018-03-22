@@ -15,6 +15,7 @@ import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } fro
 import {
     OBJECT_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
+import { showToastAndAddUserExceptionLog } from '../global/globalActions'
 
 export function setFieldDataList(fieldDataList) {
     return {
@@ -32,8 +33,12 @@ export function _setIsRemarksValidation(isRemarksValidation) {
 
 export function saveSignature(result, fieldAttributeMasterId, formElement, isSaveDisabled, latestPositionId, jobTransaction) {
     return async function (dispatch) {
-        const value = await signatureService.saveFile(result, moment())
-        dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }, jobTransaction))
+        try {
+            const value = await signatureService.saveFile(result, moment())
+            dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }, jobTransaction))
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(2101, error.message, 'danger', 1))
+        }
     }
 }
 
@@ -43,25 +48,33 @@ export function getRemarksList(fieldDataList) {
             const remarksList = signatureService.filterRemarksList(fieldDataList)
             dispatch(setFieldDataList(remarksList))
         } catch (error) {
-            console.log(error) // TODo handle UI
+            dispatch(showToastAndAddUserExceptionLog(2102, error.message, 'danger', 1))
         }
     }
 }
 
 export function setIsRemarksValidation(validation) {
     return async function (dispatch) {
-        let isRemarksValidation = signatureService.getRemarksValidation(validation)
-        if (isRemarksValidation) {
-            dispatch(_setIsRemarksValidation(true))
+        try {
+            let isRemarksValidation = signatureService.getRemarksValidation(validation)
+            if (isRemarksValidation) {
+                dispatch(_setIsRemarksValidation(true))
+            }
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(2103, error.message, 'danger', 1))
         }
     }
 }
 
 export function saveSignatureAndRating(result, rating, currentElement, formElement, isSaveDisabled, jobTransaction, latestPositionId, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
-        const signatureValue = await signatureService.saveFile(result, moment())
-        const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-        const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransaction.id, latestPositionId)
-        dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap))
+        try {
+            const signatureValue = await signatureService.saveFile(result, moment())
+            const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+            const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransaction.id, latestPositionId)
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap))
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(2104, error.message, 'danger', 1))
+        }
     }
 }

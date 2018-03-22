@@ -15,8 +15,7 @@ import { Toast } from 'native-base'
 import {
     PASSWORD_RESET_SUCCESSFULLY,
 } from '../../lib/ContainerConstants'
-import { setState } from '../global/globalActions'
-
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { profileService } from '../../services/classes/ProfileService'
 
 
@@ -39,7 +38,7 @@ export function fetchUserList() {
             }
             dispatch(setState(FETCH_USER_DETAILS, userDetails))
         } catch (error) {
-            console.log(error.message)
+            dispatch(showToastAndAddUserExceptionLog(1901, error.message, 'danger', 1))
         }
     }
 }
@@ -67,14 +66,15 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
                     newPassword: '',
                     confirmNewPassword: ''
                 }
-                Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: 'OK' })
+                Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', type: 'success', buttonText: 'OK' })
                 dispatch(setState(CLEAR_PASSWORD_TEXTINPUT, allPasswords))
                 dispatch(setState(TOGGLE_SAVE_RESET_BUTTON, true))
                 onPressGoBack.goBack(null)
             }
-            dispatch(setState(IS_PROFILE_LOADING, false))            
+            dispatch(setState(IS_PROFILE_LOADING, false))
         } catch (error) {
-            console.log(error.message)
+            dispatch(setState(IS_PROFILE_LOADING, false))
+            dispatch(showToastAndAddUserExceptionLog(1902, error.message, 'danger', 1))
         }
     }
 }
