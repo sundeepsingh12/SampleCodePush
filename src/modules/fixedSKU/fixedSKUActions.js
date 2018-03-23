@@ -22,13 +22,12 @@ export function onSave(parentObject, formElement, fixedSKUList, isSaveDisabled, 
         try {
             fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
             let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(fixedSKUList, jobTransaction.id, parentObject.positionId, latestPositionId)
-            let cloneFormElement = _.cloneDeep(formElement)
-            cloneFormElement.get(parentObject.fieldAttributeMasterId).editable = false
+            formElement.get(parentObject.fieldAttributeMasterId).editable = false
             dispatch(setState(SET_FIXED_SKU, {
                 fixedSKUList,
                 isLoaderRunning: false
             }))
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
         } catch (error) {
             console.log(error)
         }
