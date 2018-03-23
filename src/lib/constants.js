@@ -136,6 +136,10 @@ module.exports = keyMirror({
     //Pay By Link Payment Actions
     SET_PAY_BY_LINK_PARAMETERS: null,
 
+    //Bluetooth Actions
+    BLUETOOTH_SCANNING_START:null,
+    BLUETOOTH_SCANNING_STOP:null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
@@ -293,6 +297,7 @@ module.exports = keyMirror({
     Payment: null,
     SequenceRunsheetList: null,
     UnsyncBackupUpload: null,
+    BluetoothListing:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,

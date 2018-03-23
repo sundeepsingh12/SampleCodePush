@@ -25,24 +25,18 @@ function mapStateToProps(state) {
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators({ ...preloaderActions }, dispatch)
-    }
-}
-
 class Preloader extends PureComponent {
 
     componentDidMount() {
-        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
+        this.props.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
  
     startLoginScreenWithoutLogout = () => {
-        this.props.actions.startLoginScreenWithoutLogout()
+        this.props.startLoginScreenWithoutLogout()
     }
 
       invalidateSession = () => {
-        this.props.actions.invalidateUserSession()
+        this.props.invalidateUserSession()
     }
 
     render() {
@@ -78,4 +72,4 @@ var styles = StyleSheet.create({
     }
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Preloader)
+export default connect(mapStateToProps, preloaderActions)(Preloader)
