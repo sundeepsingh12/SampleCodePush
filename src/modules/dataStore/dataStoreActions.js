@@ -96,7 +96,6 @@ export function checkForFiltersAndValidation(currentElement, formElement, jobTra
 export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStoreMasterAttributeId, externalDataStoreUrl, attributeKey) {
     return async function (dispatch) {
         try {
-            dispatch(setState(SHOW_LOADER_DS, true))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             let dataStoreResponse
             if (externalDataStoreUrl) {
