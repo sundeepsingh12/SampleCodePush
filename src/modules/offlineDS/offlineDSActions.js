@@ -2,7 +2,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
-import { setState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR,
     LAST_DATASTORE_SYNC_TIME,
@@ -28,6 +28,7 @@ export function getLastSyncTime() {
                 dispatch(setState(SET_LAST_SYNC_TIME, NEVER_SYNCED))
             }
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(1501, error.message, 'danger', 1))            
         }
     }
 }
@@ -50,14 +51,13 @@ export function syncDataStore() {
                     (fetchResults.totalElements) ?
                         await dispatch(setState(UPDATE_PROGRESS_BAR, parseInt((elements / fetchResults.totalElements) * 100))) :
                         await dispatch(setState(UPDATE_PROGRESS_BAR, 100))
-
-
                 }
                 while (elements < fetchResults.totalElements)
             }
             await keyValueDBService.validateAndSaveData(LAST_DATASTORE_SYNC_TIME, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
             dispatch(setState(SET_DOWNLOADING_STATUS, { downLoadingStatus: 2, progressBarStatus: 0, }))
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(1502, error.message, 'danger', 1))                    
             dispatch(setState(SET_DOWNLOADING_STATUS, { downLoadingStatus: 3, progressBarStatus: 0, }))
         }
     }

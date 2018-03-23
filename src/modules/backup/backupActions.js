@@ -12,7 +12,7 @@ import {
 } from '../../lib/constants'
 import { } from '../../lib/AttributeConstants'
 import _ from 'lodash'
-import { setState, deleteSessionToken } from '../global/globalActions'
+import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { backupService } from '../../services/classes/BackupService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
@@ -37,6 +37,7 @@ export function createManualBackup(syncedBackupFiles) {
                 dispatch(setState(SET_SYNCED_FILES, backupFilesAndToastMessage))
             }
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(201, error.message, 'danger', 1))            
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -51,6 +52,7 @@ export function getBackupList() {
             let backupFiles = await backupService.getBackupFilesList(user.value)
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(202, error.message, 'danger', 1))            
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -77,7 +79,7 @@ export function uploadBackupFile(index, filesMap) {
                 dispatch(setState(SET_BACKUP_VIEW, 3))
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(203, error.message, 'danger', 1))            
             dispatch(setState(SET_BACKUP_VIEW, 3))
         }
     }
@@ -93,6 +95,7 @@ export function deleteBackupFile(index, filesMap) {
             let backupFiles = await backupService.getBackupFilesList(user.value)
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(204, error.message, 'danger', 1))            
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -115,7 +118,7 @@ export function autoLogoutAfterUpload(calledFromHome) {
             dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
             dispatch(deleteSessionToken())
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(205, error.message, 'danger', 1))            
             dispatch(setState(SET_BACKUP_VIEW, 0))
         }
     }

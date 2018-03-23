@@ -15,7 +15,7 @@ import {
     PASSWORD_RESET_SUCCESSFULLY,
     OK,
 } from '../../lib/ContainerConstants'
-import { setState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { profileService } from '../../services/classes/ProfileService'
 import { NavigationActions } from 'react-navigation'
 
@@ -38,7 +38,7 @@ export function fetchUserList() {
             }
             dispatch(setState(FETCH_USER_DETAILS, userDetails))
         } catch (error) {
-            console.log(error.message)
+            dispatch(showToastAndAddUserExceptionLog(1901, error.message, 'danger', 1))
         }
     }
 }
@@ -59,13 +59,11 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
             const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject) // this function validates all parameters and then hit api to change password and returns the response.
 
             await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword)) // new password gets saved after the response status is checked
-            let allPasswords = { currentPassword: '', newPassword: '', confirmNewPassword: '' } // resets data in all password fields
             Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: OK, duration: 6000 })
             dispatch(setState(CLEAR_PASSWORD_TEXTINPUT))
             dispatch(NavigationActions.back())  // automatically goes on the previous screen.
         } catch (error) {
-            Toast.show({ text: error.message, position: 'bottom', buttonText: OK, duration: 6000 })
-            console.log(error.message) // to do update later
+            dispatch(showToastAndAddUserExceptionLog(1902, error.message, 'danger', 1))            
         } finally {
             dispatch(setState(IS_PROFILE_LOADING, false))
         }

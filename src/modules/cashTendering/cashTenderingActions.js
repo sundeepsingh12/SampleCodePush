@@ -20,7 +20,7 @@ import {
 } from '../../lib/AttributeConstants'
 import { Toast } from 'native-base'
 
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     SKIP_CASH_TENDERING,
     OK,
@@ -29,6 +29,7 @@ import {
     TOTAL_AMOUNT_NOT_SET,
     FIELD_ATTRIBUTE_NOT_SET,
 } from '../../lib/ContainerConstants'
+
 export function onSave(parentObject, formElement, cashTenderingList, cashTenderingListReturn, isSaveDisabled, latestPositionId, jobTransaction, isReceive) {
     return async function (dispatch) {
         try {
@@ -42,7 +43,7 @@ export function onSave(parentObject, formElement, cashTenderingList, cashTenderi
             }
             dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(601, error.message, 'danger', 1))
         }
     }
 }
@@ -60,7 +61,8 @@ export function getCashTenderingListReturn(cashTenderingList) {
                 isCashTenderingLoaderRunning: false
             }))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(602, error.message, 'danger', 1))            
+            dispatch(setState(IS_CASH_TENDERING_LOADER_RUNNING, false))
         }
     }
 }
@@ -80,7 +82,7 @@ export function checkForCash(routeParams) {
                 { Toast.show({ text: SKIP_CASH_TENDERING, position: 'bottom', buttonText: OK, duration: 5000 }) }
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(603, error.message, 'danger', 1))
         }
     }
 }
@@ -101,7 +103,7 @@ export function onChangeQuantity(cashTenderingList, totalAmount, payload, isRece
                 dispatch(setState(CHANGE_AMOUNT_RETURN, payload1))
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(604, error.message, 'danger', 1))
         }
     }
 }
@@ -121,7 +123,8 @@ export function fetchCashTenderingList(fieldAttributeMasterId) {
                 isCashTenderingLoaderRunning: false
             }))
         } catch (error) {
-            console.log("errors", error)
+            dispatch(showToastAndAddUserExceptionLog(605, error.message, 'danger', 1))            
+            dispatch(setState(IS_CASH_TENDERING_LOADER_RUNNING, false))
         }
     }
 }

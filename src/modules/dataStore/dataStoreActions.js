@@ -2,7 +2,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
-import { setState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     SET_DATA_STORE_ATTR_MAP,
     SHOW_LOADER_DS,
@@ -33,10 +33,18 @@ import { getNextFocusableAndEditableElement } from '../array/arrayActions'
  */
 export function getFieldAttribute(fieldAttributeMasterId, value) {
     return async function (dispatch) {
-        dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
-        const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-        let fieldAttribute = dataStoreService.getFieldAttribute(fieldAttributes.value, fieldAttributeMasterId)
-        dispatch(getDataStoreAttrValueMap(value, fieldAttribute[0].dataStoreMasterId, fieldAttribute[0].dataStoreAttributeId, fieldAttribute[0].externalDataStoreMasterUrl, fieldAttribute[0].key))
+        try {
+            dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
+            const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+            let fieldAttribute = dataStoreService.getFieldAttribute(fieldAttributes.value, fieldAttributeMasterId)
+            dispatch(getDataStoreAttrValueMap(value, fieldAttribute[0].dataStoreMasterId, fieldAttribute[0].dataStoreAttributeId, fieldAttribute[0].externalDataStoreMasterUrl, fieldAttribute[0].key))
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(701, error.message, 'danger', 0))            
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
+        }
     }
 }
 
@@ -48,10 +56,18 @@ export function getFieldAttribute(fieldAttributeMasterId, value) {
  */
 export function getJobAttribute(jobAttributeMasterId, value) {
     return async function (dispatch) {
-        dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
-        const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-        let jobAttribute = dataStoreService.getJobAttribute(jobAttributes.value, jobAttributeMasterId)
-        dispatch(getDataStoreAttrValueMap(value, jobAttribute[0].dataStoreMasterId, jobAttribute[0].dataStoreAttributeId, null, null))
+        try {
+            dispatch(setState(CLEAR_ATTR_MAP_AND_SET_LOADER, {}))
+            const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+            let jobAttribute = dataStoreService.getJobAttribute(jobAttributes.value, jobAttributeMasterId)
+            dispatch(getDataStoreAttrValueMap(value, jobAttribute[0].dataStoreMasterId, jobAttribute[0].dataStoreAttributeId, null, null))
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(702, error.message, 'danger', 0))            
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
+        }
     }
 }
 
@@ -79,6 +95,7 @@ export function checkForFiltersAndValidation(currentElement, formElement, jobTra
                 errorMessage: error.message,
                 dataStoreAttrValueMap: {},
             }))
+            dispatch(showToastAndAddUserExceptionLog(703, error.message, 'danger', 0))
         }
     }
 }
@@ -143,6 +160,7 @@ export function getDataStoreAttrValueMap(searchText, dataStoreMasterId, dataStor
                 }))
             }
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(704, error.message, 'danger', 0))            
             dispatch(setState(SHOW_ERROR_MESSAGE, {
                 errorMessage: error.message,
                 dataStoreAttrValueMap: {},
@@ -168,7 +186,7 @@ export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dat
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId, null, NEXT_FOCUS, 1, null, fieldAttributeMasterParentIdMap))
             }
         } catch (error) {
-
+            dispatch(showToastAndAddUserExceptionLog(705, error.message, 'danger', 1))
         }
     }
 }
@@ -196,6 +214,7 @@ export function uniqueValidationCheck(dataStorevalue, fieldAttributeMasterId, it
                 errorMessage: error.message,
                 dataStoreAttrValueMap: {},
             }))
+            dispatch(showToastAndAddUserExceptionLog(706, error.message, 'danger', 0))
         }
     }
 }
@@ -225,6 +244,7 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
                 errorMessage: error.message,
                 dataStoreAttrValueMap: {},
             }))
+            dispatch(showToastAndAddUserExceptionLog(707, error.message, 'danger', 0))
         }
     }
 }
@@ -261,6 +281,7 @@ export function checkOfflineDS(searchText, dataStoreMasterId, dataStoreMasterAtt
                 dispatch(getDataStoreAttrValueMap(searchText, null, null, externalDataStoreUrl, attributeKey))
             }
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(708, error.message, 'danger', 0))            
             dispatch(setState(SHOW_ERROR_MESSAGE, { errorMessage: error.message, dataStoreAttrValueMap: {} }))
         }
     }
@@ -288,6 +309,7 @@ export function searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueM
                 errorMessage: error.message,
                 dataStoreAttrValueMap: {},
             }))
+            dispatch(showToastAndAddUserExceptionLog(709, error.message, 'danger', 0))
         }
     }
 }

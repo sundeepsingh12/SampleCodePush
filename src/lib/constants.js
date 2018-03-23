@@ -16,7 +16,6 @@ module.exports = keyMirror({
     SET_LOADER_IN_AUTOLOGOUT: null,
 
     //Auth Actions
-    LOGIN: null,
     LOGOUT: null,
     LOGIN_START: null,
     LOGIN_SUCCESS: null,
@@ -46,10 +45,6 @@ module.exports = keyMirror({
     OTP_VALIDATION_START: null,
     OTP_VALIDATION_SUCCESS: null,
     OTP_VALIDATION_FAILURE: null,
-
-    SESSION_TOKEN_REQUEST: null,
-    SESSION_TOKEN_SUCCESS: null,
-    SESSION_TOKEN_FAILURE: null,
 
     DELETE_TOKEN_REQUEST: null,
     DELETE_TOKEN_SUCCESS: null,
@@ -513,6 +508,9 @@ module.exports = keyMirror({
     SET_UPLOADING_FILE: null,
     SET_SYNCED_FILES: null,
     SET_BACKUP_TOAST: null,
+
+    //userExceptionLogs
+    USER_EXCEPTION_LOGS: null,
 })
 
 
