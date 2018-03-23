@@ -237,7 +237,7 @@ module.exports = {
     SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
 
     //Cash Tendering
-    NOT_REQUIRED: 'NOT REQUIRED',
+    SKIP_CASH_TENDERING: 'Skipping Cash Tendering',
     MORE_MONEY_TO_PAY: 'More Money to Pay.',
     LESS_MONEY_TO_PAY: 'Less Money to Pay.',
     AMOUNT_TO_COLLECT: 'Amount to Collect: ',

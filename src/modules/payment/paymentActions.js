@@ -39,6 +39,8 @@ import {
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import { Toast } from 'native-base'
+import { CashTenderingService } from '../../services/classes/CashTenderingServices'
+
 
 /**
  * This action sets initial payment parameters
@@ -132,6 +134,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
                 jobTransactionIdAmountMap.moneyTransactionType = COLLECTION_SOD
             }
             formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
+            formElement = CashTenderingService.checkForCashTenderingAndResetValue(formElement, currentElement)
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd

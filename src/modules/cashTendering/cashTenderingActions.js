@@ -2,7 +2,7 @@
 
 import { CashTenderingService } from '../../services/classes/CashTenderingServices'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import { updateFieldDataWithChildData, getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import {
     FIELD_ATTRIBUTE_VALUE,
@@ -13,6 +13,7 @@ import {
     IS_RECEIVE_TOGGLE,
     FETCH_CASH_TENDERING_LIST_RETURN,
     CHANGE_AMOUNT_RETURN,
+    NEXT_FOCUS
 } from '../../lib/constants'
 import {
     ARRAY_SAROJ_FAREYE,
@@ -21,7 +22,7 @@ import { Toast } from 'native-base'
 
 import { setState, navigateToScene } from '../global/globalActions'
 import {
-    NOT_REQUIRED,
+    SKIP_CASH_TENDERING,
     OK,
     CASHTENDERINGLIST_NOT_SAVE_PROPERLY,
     FORMELEMENT_OR_CURRENTELEMENT_NOT_FOUND,
@@ -75,7 +76,8 @@ export function checkForCash(routeParams) {
                 routeParams.cash = cash
                 dispatch(navigateToScene('CashTendering', routeParams))
             } else {
-                { Toast.show({ text: NOT_REQUIRED, position: 'bottom', buttonText: OK }) }
+                dispatch(getNextFocusableAndEditableElements(routeParams.currentElement.fieldAttributeMasterId, routeParams.formElements, routeParams.isSaveDisabled, 'N.A.', NEXT_FOCUS, routeParams.jobTransaction, routeParams.fieldAttributeMasterParentIdMap))
+                { Toast.show({ text: SKIP_CASH_TENDERING, position: 'bottom', buttonText: OK, duration: 5000 }) }
             }
         } catch (error) {
             console.log(error)
