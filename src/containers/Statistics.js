@@ -38,44 +38,57 @@ class Statistics extends PureComponent {
     componentDidMount() {
         this.props.getDataForStatisticsList()
     }
+
+    showHeaderView(){
+      return (
+        <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+          <Body>
+            <View
+              style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
+              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
+              <Text
+                style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{STATISTICS}  {moment(new Date()).format('DD-MM-YYYY')}</Text>
+              <View />
+            </View>
+          </Body>
+        </Header>
+      )
+    }
+
+    showStatisticsList(){
+      return (
+        <FlatList
+          data={(Object.values(this.props.statisticsListItems))}
+          renderItem={({ item }) => {
+            return (
+              <TouchableHighlight underlayColor={'#eee'}>
+                <View style={style.seqCard}>
+                  <View style={style.seqCardDetail}>
+                    <View>
+                      <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+                        {item.label}
+                      </Text>
+                      <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+                        {item.value}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </TouchableHighlight>
+            )
+          }}
+          keyExtractor={item => String(item.id)}
+      />
+      )
+    }
+
     render() {
-        const listData = this.props.statisticsListItems
             return (
                 <StyleProvider style={getTheme(platform)}>
                 <Container>
-                  <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                    <Body>
-                      <View
-                        style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }}/>
-                        <Text
-                          style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{STATISTICS}  {moment(new Date()).format('DD-MM-YYYY')}</Text>
-                        <View/>
-                      </View>
-                    </Body>
-                  </Header>
-               <FlatList
-              data={(Object.values(listData))}
-              renderItem={({ item }) => {
-                return (
-                  <TouchableHighlight underlayColor={'#eee'}>
-                    <View style={style.seqCard}>
-                      <View style={style.seqCardDetail}>
-                        <View>
-                        <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                            {item.label}
-                        </Text>
-                        <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                            {item.value}
-                        </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableHighlight>
-                )
-              }}
-              keyExtractor={item => String(item.id)}
-            />
+                  {this.showHeaderView()}
+                  {this.showStatisticsList()}
+                 
             </Container>
         </StyleProvider>
             )

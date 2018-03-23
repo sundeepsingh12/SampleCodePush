@@ -119,3 +119,13 @@ export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, i
     }
   }
 }
+//Use to reset navigation state
+export function resetNavigationState(index, actions) {
+  return async function (dispatch) {
+    dispatch(NavigationActions.reset({
+      index: 0,
+      actions
+    }))
+  }
+}
+

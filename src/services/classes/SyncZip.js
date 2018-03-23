@@ -129,7 +129,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
         serverSmsLogs = [],
         transactionLogs = []
     if (!transactionIdsObject || !transactionIdsObject.value) {
-           serverSmsLogs = _getDataFromRealm([], null, TABLE_SERVER_SMS_LOG)
+        serverSmsLogs = _getDataFromRealm([], null, TABLE_SERVER_SMS_LOG)
         return {
             fieldDataList,
             transactionList,
@@ -209,7 +209,11 @@ export async function moveImageFilesToSync(fieldDataList, path) {
     for (let imageName of imageFileNamesArray) {
         let name = imageName.split('/')
         let fileExits = await RNFS.exists(PATH + '/CustomerImages/' + name[name.length - 1])
-        if (fileExits)
-            await RNFS.copyFile(PATH + '/CustomerImages/' + name[name.length - 1], path + '/' + name[name.length - 1])
+        if (fileExits) {
+            let fileAlreadyExists = await RNFS.exists(path + '/' + name[name.length - 1])
+            if (!fileAlreadyExists) {
+                await RNFS.copyFile(PATH + '/CustomerImages/' + name[name.length - 1], path + '/' + name[name.length - 1])
+            }
+        }
     }
 }

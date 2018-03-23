@@ -15,7 +15,7 @@ const initialState = new InitialState()
 
 export default function cashTenderingReducer(state = initialState, action) {
     switch (action.type) {
-        
+
         case IS_CASH_TENDERING_LOADER_RUNNING:
             return state.set('isCashTenderingLoaderRunning', action.payload)
 
@@ -30,6 +30,9 @@ export default function cashTenderingReducer(state = initialState, action) {
         case SET_CASH_TENDERING:
             return state.set('cashTenderingList', action.payload.cashTenderingList)
                 .set('isCashTenderingLoaderRunning', action.payload.isCashTenderingLoaderRunning)
+                .set('totalAmount', 0)
+                .set('totalAmountReturn', 0)
+                .set('isReceive', true)
 
         case IS_RECEIVE_TOGGLE:
             return state.set('isReceive', action.payload)
@@ -37,9 +40,9 @@ export default function cashTenderingReducer(state = initialState, action) {
         case FETCH_CASH_TENDERING_LIST_RETURN:
             return state.set('cashTenderingListReturn', action.payload.cashTenderingListReturn)
                 .set('isCashTenderingLoaderRunning', action.payload.isCashTenderingLoaderRunning)
-        
+
         case RESET_STATE:
-            return initialState        
+            return initialState
 
     }
     return state

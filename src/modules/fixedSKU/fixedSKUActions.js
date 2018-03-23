@@ -22,6 +22,7 @@ export function onSave(parentObject, formElement, fixedSKUList, isSaveDisabled, 
         try {
             fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
             let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(fixedSKUList, jobTransaction.id, parentObject.positionId, latestPositionId)
+            formElement.get(parentObject.fieldAttributeMasterId).editable = false
             dispatch(setState(SET_FIXED_SKU, {
                 fixedSKUList,
                 isLoaderRunning: false

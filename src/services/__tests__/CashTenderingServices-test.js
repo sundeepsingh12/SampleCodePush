@@ -635,3 +635,236 @@ describe('test cases for prepareCashTenderingList', () => {
         expect(CashTenderingService.prepareCashTenderingList(fieldAttributeMasterList, fieldAttributeValueDataArray, fieldAttributeMasterId, 0)).toEqual(result)
     })
 })
+
+describe('test cases for checkForCashTenderingAndResetValue', () => {
+    it('should return form element with value of cash tendering null', () => {
+        let currentElement = {
+            attributeTypeId: 18,
+            dataStoreAttributeId: null,
+            dataStoreMasterId: null,
+            editable: true,
+            externalDataStoreMasterUrl: null,
+            fieldAttributeMasterId: 44339,
+            focus: false,
+            helpText: '',
+            hidden: false,
+            key: "money collect",
+            label: "money collect",
+            parentId: 0,
+            positionId: 6,
+            required: false,
+            sequenceMasterId: null,
+            showHelpText: false,
+            subLabel: "cashtender",
+            validation: null
+        }
+        const formElement = new Map();
+        formElement.set(44548, {
+
+            attributeTypeId: 38,
+            dataStoreAttributeId: null,
+            dataStoreMasterId: null,
+            editable: true,
+            externalDataStoreMasterUrl: null,
+            fieldAttributeMasterId: 44339,
+            focus: false,
+            helpText: "cashtender",
+            hidden: false,
+            key: "cashtender",
+            label: "cashtender",
+            parentId: 0,
+            positionId: 7,
+            required: false,
+            sequenceMasterId: null,
+            showHelpText: false,
+            subLabel: "cashtender",
+            validation: null,
+            value: 'value',
+            displayValue: 'value',
+            childDataList:
+                [{
+                    attributeTypeId: 26,
+                    id: 2,
+                    jobMasterId: 1,
+                    key: 'actualamount',
+                    label: 'actualamount',
+                    parentId: 1,
+                    childDataList: null,
+                },
+                {
+                    attributeTypeId: 25,
+                    id: 3,
+                    jobMasterId: 1,
+                    key: 'originalamount',
+                    label: 'originalamount',
+                    parentId: 1,
+                    jobAttributeMasterId: 20,
+                    fieldAttributeMasterId: null,
+                    childDataList: null,
+                },
+                {
+                    attributeTypeId: 12,
+                    id: 4,
+                    jobMasterId: 1,
+                    key: 'detailsarray',
+                    label: 'detailsarray',
+                    parentId: 1,
+                    childDataList: [
+                        {
+                            attributeTypeId: 11,
+                            id: 5,
+                            jobMasterId: 1,
+                            key: 'detailsobject',
+                            label: 'detailsobject',
+                            parentId: 4,
+                            childDataList: [
+                                {
+                                    attributeTypeId: 13,
+                                    id: 6,
+                                    jobMasterId: 1,
+                                    key: 'amount',
+                                    label: 'amount',
+                                    parentId: 5,
+                                    value: 120,
+                                    childDataList: null,
+                                },
+                                {
+                                    attributeTypeId: 1,
+                                    id: 7,
+                                    jobMasterId: 1,
+                                    key: 'mode_type',
+                                    label: 'mode_type',
+                                    parentId: 5,
+                                    value: 'CS',
+                                    childDataList: null,
+                                },
+                                {
+                                    attributeTypeId: 1,
+                                    id: 8,
+                                    jobMasterId: 1,
+                                    key: 'receipt',
+                                    label: 'receipt',
+                                    parentId: 5,
+                                    childDataList: null,
+                                },
+                                {
+                                    attributeTypeId: 2,
+                                    id: 9,
+                                    jobMasterId: 1,
+                                    key: 'remarks',
+                                    label: 'remarks',
+                                    parentId: 5,
+                                    childDataList: null,
+                                },
+                                {
+                                    attributeTypeId: 1,
+                                    id: 10,
+                                    jobMasterId: 1,
+                                    key: 'transaction_number',
+                                    label: 'transaction_number',
+                                    parentId: 5,
+                                    childDataList: null,
+                                }
+                            ]
+                        }]
+                }
+                ],
+        })
+        const resultFormElement = new Map();
+        resultFormElement.set(44548, {
+            attributeTypeId: 38,
+            dataStoreAttributeId: null,
+            dataStoreMasterId: null,
+            editable: true,
+            externalDataStoreMasterUrl: null,
+            fieldAttributeMasterId: 44339,
+            focus: false,
+            helpText: "cashtender",
+            hidden: false,
+            key: "cashtender",
+            label: "cashtender",
+            parentId: 0,
+            positionId: 7,
+            required: false,
+            sequenceMasterId: null,
+            showHelpText: false,
+            subLabel: "cashtender",
+            validation: null,
+            value: null,
+            displayValue: null,
+            childDataList: null,
+        })
+        expect(CashTenderingService.checkForCashTenderingAndResetValue(formElement, currentElement)).toEqual(resultFormElement)
+    })
+
+    it('should return form element same when value of cash tendering is null', () => {
+        let currentElement = {
+            attributeTypeId: 18,
+            dataStoreAttributeId: null,
+            dataStoreMasterId: null,
+            editable: true,
+            externalDataStoreMasterUrl: null,
+            fieldAttributeMasterId: 44339,
+            focus: false,
+            helpText: '',
+            hidden: false,
+            key: "money collect",
+            label: "money collect",
+            parentId: 0,
+            positionId: 6,
+            required: false,
+            sequenceMasterId: null,
+            showHelpText: false,
+            subLabel: "cashtender",
+            validation: null
+        }
+        const formElement = new Map();
+        formElement.set(44548, {
+
+            attributeTypeId: 38,
+            dataStoreAttributeId: null,
+            dataStoreMasterId: null,
+            editable: true,
+            externalDataStoreMasterUrl: null,
+            fieldAttributeMasterId: 44339,
+            focus: false,
+            helpText: "cashtender",
+            hidden: false,
+            key: "cashtender",
+            label: "cashtender",
+            parentId: 0,
+            positionId: 7,
+            required: false,
+            sequenceMasterId: null,
+            showHelpText: false,
+            subLabel: "cashtender",
+            validation: null,
+            value: null,
+            displayValue: null,
+        })
+        const resultFormElement = new Map();
+        resultFormElement.set(44548, {
+            attributeTypeId: 38,
+            dataStoreAttributeId: null,
+            dataStoreMasterId: null,
+            editable: true,
+            externalDataStoreMasterUrl: null,
+            fieldAttributeMasterId: 44339,
+            focus: false,
+            helpText: "cashtender",
+            hidden: false,
+            key: "cashtender",
+            label: "cashtender",
+            parentId: 0,
+            positionId: 7,
+            required: false,
+            sequenceMasterId: null,
+            showHelpText: false,
+            subLabel: "cashtender",
+            validation: null,
+            value: null,
+            displayValue: null,
+        })
+        expect(CashTenderingService.checkForCashTenderingAndResetValue(formElement, currentElement)).toEqual(resultFormElement)
+    })
+})

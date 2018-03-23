@@ -14,6 +14,11 @@ buildscript {
 
 allprojects {
     repositories {
+        configurations.all {
+            resolutionStrategy {
+                force "com.google.android.gms:play-services-gcm:11.6.0"
+            }
+        }
         mavenLocal()
         jcenter()
         maven {
@@ -23,5 +28,11 @@ allprojects {
         maven {
             url 'https://maven.google.com'
         }
+         maven {
+          url "$rootDir/../node_modules/react-native-background-geolocation/android/libs"
+       }
+       maven {
+           url "$rootDir/../node_modules/react-native-background-fetch/android/libs"
+       }
     }
 }
