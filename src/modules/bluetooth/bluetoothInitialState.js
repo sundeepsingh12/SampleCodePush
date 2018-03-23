@@ -3,7 +3,9 @@
 import { Record } from 'immutable'
 
 var InitialState = Record({
-    isLoaderRunning: false,
+    isScanRunning: false,
+    unpairedDevices:[],
+    pairedDevices:[]
     
 })
 
