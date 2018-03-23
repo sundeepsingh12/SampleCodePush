@@ -59,6 +59,7 @@ module.exports = {
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
+    UNIQUE_VALIDATION_FAILED_FORMLAYOUT: 'This value is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
     OPTIONAL: '(optional)',
@@ -238,7 +239,7 @@ module.exports = {
     SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
 
     //Cash Tendering
-    NOT_REQUIRED: 'NOT REQUIRED',
+    SKIP_CASH_TENDERING: 'Skipping Cash Tendering',
     MORE_MONEY_TO_PAY: 'More Money to Pay.',
     LESS_MONEY_TO_PAY: 'Less Money to Pay.',
     AMOUNT_TO_COLLECT: 'Amount to Collect: ',
@@ -290,6 +291,15 @@ module.exports = {
     CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
     PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
     UNSAVED_PASSWORD: 'Password not saved before',
+    RESET_PASSWORD: 'Reset Password',
+    CONTACT_NUMBER: 'Contact Number',
+    EMAIL: 'Email',
+    PROFILE: 'Profile',
+    MINIMUM_REQUIREMENT_FOR_PASSWORD: 'Min. 8 characters required, including capital letter, symbol and number.',
+    CURRENT_PASSWORD: 'Current Password',
+    NEW_PASSWORD: 'New Password',
+    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
+    USERNAME_IS_MISSING: 'Username is missing',
 
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',

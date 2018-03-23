@@ -170,18 +170,21 @@ class LiveJobListing extends PureComponent {
                 return (
                     <StyleProvider style={getTheme(platform)}>
                         <Container>
-                            <Header style={StyleSheet.flatten([styles.bgPrimary])}>
-                                <Left>
-                                    <Button transparent onPress={() => {
-                                        this.props.navigation.goBack(null)
-                                    }}>
-                                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
-                                    </Button>
-                                </Left>
+                            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
                                 <Body>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{headerView}</Text>
+                                <View
+                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                    <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                    </TouchableOpacity>
+                                    <View style={[styles.headerBody, styles.paddingTop15]}>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
+                                    </View>
+                                    <View style={[styles.headerRight]}>
+                                    </View>
+                                    <View />
+                                </View>
                                 </Body>
-                                <Right />
                             </Header>
                             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
                                 <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
@@ -194,7 +197,7 @@ class LiveJobListing extends PureComponent {
                     <StyleProvider style={getTheme(platform)}>
                         <Container>
                             {renderIf(!this.props.selectedItems || this.props.selectedItems.length <= 0,
-                                <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                                <Header searchBar style={[styles.bgPrimary, style.header]}>
                                     <Body>
                                         <View
                                             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>

@@ -47,9 +47,7 @@ function mapDispatchToProps(dispatch) {
 class CashTendering extends PureComponent {
 
     componentDidMount() {
-        if (this.props.isReceive) {
-            this.props.actions.fetchCashTenderingList(this.props.navigation.state.params['currentElement'].fieldAttributeMasterId)
-        }
+        this.props.actions.fetchCashTenderingList(this.props.navigation.state.params['currentElement'].fieldAttributeMasterId)
     }
 
     renderData = (item) => {
@@ -67,7 +65,6 @@ class CashTendering extends PureComponent {
             this.props.actions.setState(IS_RECEIVE_TOGGLE, true)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
             this.props.actions.setState(CHANGE_AMOUNT_RETURN, { cashTenderingList: {}, totalAmount: 0 })
-            this.props.navigation.goBack('FormLayout')
         } else if (cashToReturn > this.props.totalAmountReturn) { Toast.show({ text: MORE_MONEY_TO_PAY, position: 'bottom', buttonText: OK, duration: 3000 }) }
         else { Toast.show({ text: LESS_MONEY_TO_PAY, position: 'bottom', buttonText: OK, duration: 3000 }) }
     }
@@ -130,8 +127,8 @@ class CashTendering extends PureComponent {
         return totalAmountInCashTendering
     }
 
-    showHeaderView(){
-        return(
+    showHeaderView() {
+        return (
             <Header searchBar style={[styles.bgPrimary, style.header]}>
                 <Body>
                     <View
@@ -151,7 +148,7 @@ class CashTendering extends PureComponent {
         )
     }
 
-    showFlatList(){
+    showFlatList() {
         return (
             <Content style={[styles.flex1, styles.bgWhite, styles.marginTop5]}>
                 <FlatList
@@ -173,11 +170,11 @@ class CashTendering extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
-                {this.showHeaderView()}
-                  
+                    {this.showHeaderView()}
+
                     {this._checkIfCashCollectOrReturn()}
                     {this.showFlatList()}
-                   
+
                     <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
                         {totalAmountInCashTendering}
                         <Button success full onPress={() => (this.props.isReceive) ? this._onSavePress() : this._onSavePressReturn()}>

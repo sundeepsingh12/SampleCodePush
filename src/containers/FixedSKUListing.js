@@ -80,9 +80,7 @@ class FixedSKUListing extends PureComponent {
   }
 
   componentWillMount() {
-    if (this.parentObject.value != ARRAY_SAROJ_FAREYE) {
-      this.props.actions.fetchFixedSKU(this.parentObject.fieldAttributeMasterId)
-    }
+    this.props.actions.fetchFixedSKU(this.parentObject.fieldAttributeMasterId)
   }
 
   componentDidUpdate() {
@@ -110,12 +108,15 @@ class FixedSKUListing extends PureComponent {
     }
   }
 
-  goBack() {
+  componentWillUnmount() {
     this.props.actions.setState(RESET_STATE_FIXED_SKU)
+  }
+
+  goBack() {
     this.props.navigation.goBack()
   }
 
-  showHeaderView(){
+  showHeaderView() {
     return (
       <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
         <Body>
@@ -136,7 +137,7 @@ class FixedSKUListing extends PureComponent {
     )
   }
 
-  showFooterView(){
+  showFooterView() {
     return (
       <Footer
         style={[style.footer, styles.bgWhite, styles.column]}>
@@ -168,7 +169,7 @@ class FixedSKUListing extends PureComponent {
     return (
       <Container>
         <View style={style.container}>
-         {this.showHeaderView()}
+          {this.showHeaderView()}
 
           <FlatList
             data={Object.values(this.props.fixedSKUList)}
@@ -178,7 +179,7 @@ class FixedSKUListing extends PureComponent {
 
           {this.showFooterView()}
 
-         
+
         </View>
       </Container >
     )

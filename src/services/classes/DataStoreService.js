@@ -195,14 +195,11 @@ class DataStoreService {
       * boolean
       */
     checkForUniqueValidation(fieldAttributeValue, fieldAttribute) {
-        if (!fieldAttributeValue) {
-            throw new Error('fieldAttributeValue missing in currentElement')
-        }
-        if (!fieldAttribute.fieldAttributeMasterId) {
-            throw new Error('fieldAttributeMasterId missing in currentElement')
+        if (!fieldAttributeValue || !fieldAttribute.fieldAttributeMasterId) {
+            return false
         }
         if (this.checkIfUniqueConditionExists(fieldAttribute)) {
-            let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttribute.fieldAttributeMasterId} AND value = '${fieldAttribute.displayValue}'`
+            let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttribute.fieldAttributeMasterId} AND value = '${realm._encryptData(fieldAttribute.displayValue)}'`
             let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
             return (fieldDataList && fieldDataList.length >= 1)
         }

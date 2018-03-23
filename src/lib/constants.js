@@ -136,6 +136,10 @@ module.exports = keyMirror({
     //Pay By Link Payment Actions
     SET_PAY_BY_LINK_PARAMETERS: null,
 
+    //Bluetooth Actions
+    BLUETOOTH_SCANNING_START:null,
+    BLUETOOTH_SCANNING_STOP:null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
@@ -250,6 +254,7 @@ module.exports = keyMirror({
     SET_FORM_TO_INVALID: null,
     SET_DSF_REVERSE_MAP: null,
     SET_MODAL_FIELD_ATTRIBUTE: null,
+    SET_FORM_INVALID_AND_FORM_ELEMENT: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -292,6 +297,7 @@ module.exports = keyMirror({
     Payment: null,
     SequenceRunsheetList: null,
     UnsyncBackupUpload: null,
+    BluetoothListing:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
