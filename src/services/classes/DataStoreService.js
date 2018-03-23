@@ -643,9 +643,6 @@ class DataStoreService {
      * This method search values from data store attr map and return filtered map along with cloned origonal map
      */
     searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap) {
-        if (!searchText) {
-            throw new Error(SEARCH_TEXT_MISSING)
-        }
         if (!dataStoreAttrValueMap) {
             throw new Error(DATA_STORE_MAP_MISSING)
         }

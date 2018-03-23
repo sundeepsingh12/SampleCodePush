@@ -13,6 +13,7 @@ import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
 import QRIcon from '../svg_components/icons/QRIcon'
 import _ from 'lodash'
+import { SEARCH } from '../lib/ContainerConstants'
 export default class SearchBar extends PureComponent {
 
     _startScanner() {
@@ -55,19 +56,18 @@ export default class SearchBar extends PureComponent {
                                 onChangeText={(searchText) => {
                                     this.callDataStoreSearchMethods(searchText)
                                 }}
-                                returnKeyType={"search"}
                                 keyboardAppearance={"dark"}
                                 value={this.props.searchText}
                                 style={[style.headerSearch, styles.bgGray]} />
                             {scanner}
                         </View>
-                        {(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent) ?
+                        {(_.size(this.props.searchText) > 2 && !this.props.isFiltersPresent) &&
                             <View style={{ alignItems: 'center', justifyContent: 'center', paddingLeft: 10, paddingRight: 10 }}>
                                 <Text style={[styles.fontDefault, styles.fontWhite, styles.paddingTop10, styles.paddingBottom10]}
                                     onPress={() => {
                                         this.props.fetchDataStoreAttrValueMap(this.props.searchText, true)
-                                    }}>Search</Text>
-                            </View> : null}
+                                    }}>{SEARCH}</Text>
+                            </View>}
                     </View>
                 </Body>
             </Header>

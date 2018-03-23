@@ -134,7 +134,7 @@ module.exports = {
     FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
     FORM_ELEMENT_IS_MISSING: 'formElement is missing',
     INVALID_BULK_JOB_CONFIG: 'Invalid job data in bulk data store filter, cannot proceed further.',
-    CONFIGURATION_ERROR_DS_MASTER_ID_MISSING:'Configuration error data store mapping is missing',
+    CONFIGURATION_ERROR_DS_MASTER_ID_MISSING: 'Configuration error data store mapping is missing',
     //Summary
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
@@ -311,4 +311,7 @@ module.exports = {
     OTP_CODE_SENT: 'OTP code hasbeen sent to',
     ENTER_MOBILE: 'Enter your mobile',
     SEND_OTP: 'Send OTP',
+
+    //Data Store
+    SEARCH: 'Search',
 }
