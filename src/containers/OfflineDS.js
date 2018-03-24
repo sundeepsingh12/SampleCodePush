@@ -82,7 +82,7 @@ class OfflineDS extends Component {
             return <View style={[styles.flexBasis100, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
-                        style={[style.imageSync]}
+                        style={[styles.imageSync]}
                         source={require('../../images/fareye-default-iconset/sync-cloud.png')}
                     />
                 </View>
@@ -129,7 +129,7 @@ class OfflineDS extends Component {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
-                        style={[style.imageSync]}
+                        style={[styles.imageSync]}
                         source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
@@ -154,7 +154,7 @@ class OfflineDS extends Component {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
-                        style={[style.imageSync]}
+                        style={[styles.imageSync]}
                         source={require('../../images/fareye-default-iconset/error.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
@@ -223,11 +223,6 @@ const style = StyleSheet.create({
         width: '15%',
         padding: 15
     },
-    imageSync: {
-        width: 116,
-        height: 116,
-        resizeMode: 'contain'
-    }
 });
 
 /**

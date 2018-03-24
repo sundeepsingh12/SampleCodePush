@@ -67,7 +67,7 @@ class UnsyncBackupUpload extends Component {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
-                        style={[style.imageSync]}
+                        style={[styles.imageSync]}
                         source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
@@ -84,7 +84,7 @@ class UnsyncBackupUpload extends Component {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
-                        style={[style.imageSync]}
+                        style={[styles.imageSync]}
                         source={require('../../images/fareye-default-iconset/error.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
@@ -171,37 +171,6 @@ class UnsyncBackupUpload extends Component {
     }
 }
 
-const style = StyleSheet.create({
-    header: {
-        borderBottomWidth: 0,
-        height: 'auto',
-        padding: 0,
-        paddingRight: 0,
-        paddingLeft: 0
-    },
-    headerLeft: {
-        width: '15%',
-        padding: 15
-    },
-    headerBody: {
-        width: '70%',
-        paddingTop: 15,
-        paddingBottom: 15,
-        paddingLeft: 10,
-        paddingRight: 10
-    },
-    headerRight: {
-        width: '15%',
-        padding: 15
-    },
-    imageSync: {
-        width: 116,
-        height: 116,
-        resizeMode: 'contain'
-    }
-});
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(UnsyncBackupUpload)

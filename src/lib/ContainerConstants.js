@@ -177,8 +177,8 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
-    LOGOUT_UNSYNCED_TRANSACTIONS: 'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
-
+    LOGOUT_UNSYNCED_TRANSACTIONS_TITLE: 'Confirm Log Out',
+    LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE: 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
     //Tracking constants
     ENTER: 'ENTER',
     EXIT: 'EXIT',

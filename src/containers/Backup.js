@@ -269,7 +269,7 @@ class Backup extends Component {
                                 </Button>
                                 <Button full transparent style={{ height: 60 }} onPress={() => this.setState({ indexOfModal: 0 })}>
                                     <Text style={[styles.fontDarkGray, styles.fontXl]}>
-                                       {CANCEL}
+                                        {CANCEL}
                                     </Text>
                                 </Button>
                             </View>
@@ -291,7 +291,7 @@ class Backup extends Component {
                             <View style={[styles.bgWhite, styles.justifyEnd]}>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.unSyncedFiles)}>
                                     <Text style={[styles.fontPrimary, styles.fontXl]}>
-                                    {UPLOAD}
+                                        {UPLOAD}
                                     </Text>
                                 </Button>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={
@@ -306,7 +306,7 @@ class Backup extends Component {
                                 </Button>
                                 <Button full transparent style={{ height: 60 }} onPress={() => this.setState({ indexOfModal: 0 })}>
                                     <Text style={[styles.fontDarkGray, styles.fontXl]}>
-                                       {CANCEL}
+                                        {CANCEL}
                                     </Text>
                                 </Button>
                             </View>
@@ -317,40 +317,28 @@ class Backup extends Component {
         return modal
     }
 
-    getUnsyncedFilesHeader() {
+
+    getUnsyncedFilesHeader(headerText) {
         let view
         if (this.props.backupView != 0) return
         if (!this.props.isLoading) {
             view = <View style={[styles.padding10, { borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
                 <Text style={[styles.fontLg, styles.fontBlack]}>
-                    {UNSYNCED_FILES}
+                    {headerText}
                 </Text>
             </View>
         }
         return view
     }
-
-    getSyncedFilesHeader() {
-        let view
-        if (this.props.backupView != 0) return
-        if (!this.props.isLoading) {
-            view = <View style={[styles.padding10, { borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
-                <Text style={[styles.fontLg, styles.fontBlack]}>
-                    {SYNCED_FILES}
-                </Text>
-            </View>
-        }
-        return view
-    }
-
+    
     uploadingView() {
         if (this.props.backupView == 1) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.justifyCenter, styles.flexBasis100, styles.padding10]}>
                     <View style={[styles.padding5, styles.row, styles.justifySpaceBetween,]}>
                         <Text style={[styles.fontBlack, styles.fontXl]}>
-                           {UPLOADING}
-                    </Text>
+                            {UPLOADING}
+                        </Text>
                     </View>
                     < View style={[styles.padding5, styles.row]} >
                         <View style={{ width: '40%' }}>
@@ -418,7 +406,7 @@ class Backup extends Component {
                         source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
-                       {UPLOAD_SUCCESSFUL}
+                        {UPLOAD_SUCCESSFUL}
                     </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
@@ -436,7 +424,7 @@ class Backup extends Component {
                         source={require('../../images/fareye-default-iconset/error.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
-                       {UPLOAD_FAILED}
+                        {UPLOAD_FAILED}
                     </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
@@ -472,38 +460,25 @@ class Backup extends Component {
     }
 
     render() {
-        let headerView = this.headerView()
-        let loader = this.getLoader()
-        let backupButton = this.createBackupButton()
-        let unSyncedFilesView = this.getUnSyncedFilesView()
-        let syncedFilesView = this.getSyncedFilesView()
-        let modalView = this.getModalView()
-        let unsyncedFilesHeader = this.getUnsyncedFilesHeader()
-        let syncedFilesHeader = this.getSyncedFilesHeader()
-        let uploadView = this.uploadingView()
-        let uploadSuccessView = this.uploadSuccessView()
-        let uploadFailureView = this.failureView()
-        let logoutView = this.getLogoutView()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    {headerView}
-
-                    {uploadView}
-                    {uploadSuccessView}
-                    {uploadFailureView}
-                    {logoutView}
+                    {this.headerView()}
+                    {this.uploadingView()}
+                    {this.uploadSuccessView()}
+                    {this.failureView()}
+                    {this.getLogoutView()}
                     {renderIf(this.props.backupView == 0, <Content style={[styles.bgLightGray]}>
-                        {backupButton}
-                        {modalView}
-                        {loader}
+                        {this.createBackupButton()}
+                        {this.getModalView()}
+                        {this.getLoader()}
                         <View style={[styles.marginBottom10, styles.bgWhite]}>
-                            {unsyncedFilesHeader}
-                            {unSyncedFilesView}
+                            {this.getUnsyncedFilesHeader(UNSYNCED_FILES)}
+                            {this.getUnSyncedFilesView()}
                         </View>
                         <View style={[styles.marginBottom10, styles.bgWhite]}>
-                            {syncedFilesHeader}
-                            {syncedFilesView}
+                            {this.getUnsyncedFilesHeader(SYNCED_FILES)}
+                            {this.getSyncedFilesView()}
                         </View>
                     </Content>)}
                 </Container>

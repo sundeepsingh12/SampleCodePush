@@ -241,7 +241,7 @@ export default {
         marginRight: 'auto'
     },
 
-    
+
 
     // Margin Verticle
     marginVerticle0: {
@@ -392,7 +392,7 @@ export default {
     paddingRight25: {
         paddingRight: 25
     },
-    
+
     paddingRight30: {
         paddingRight: 30
     },
@@ -552,7 +552,7 @@ export default {
     },
     shadow: {
         elevation: 2,
-        shadowOffset:{  width: 3,  height: 4,  },
+        shadowOffset: { width: 3, height: 4, },
         shadowColor: '#d3d3d3',
         shadowOpacity: .5,
     },
@@ -669,5 +669,10 @@ export default {
     inputType: {
         height: 50,
         fontSize: 14
+    },
+    imageSync: {
+        width: 116,
+        height: 116,
+        resizeMode: 'contain'
     }
 }
