@@ -15,7 +15,11 @@ import renderIf from '../lib/renderIf'
 import OtpScreen from './OtpScreen'
 import MobileNoScreen from './MobileNoScreen'
 import InitialSetup from './InitialSetup'
-
+import {
+    ERROR_400_403_LOGOUT_FAILURE,
+  } from '../lib/constants'
+import * as globalActions from '../modules/global/globalActions'
+  
 function mapStateToProps(state) {
     return {
         showMobileNumberScreen: state.preloader.showMobileNumberScreen,
@@ -25,18 +29,24 @@ function mapStateToProps(state) {
     }
 }
 
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({ ...preloaderActions, ...globalActions }, dispatch)
+    }
+}
+
 class Preloader extends PureComponent {
 
     componentDidMount() {
-        this.props.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
+        this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
  
     startLoginScreenWithoutLogout = () => {
-        this.props.startLoginScreenWithoutLogout()
+            this.props.actions.startLoginScreenWithoutLogout()
     }
 
       invalidateSession = () => {
-        this.props.invalidateUserSession()
+        this.props.actions.invalidateUserSession()
     }
 
     render() {
@@ -44,14 +54,13 @@ class Preloader extends PureComponent {
             <Container>
                 {renderIf(!this.props.showMobileNumberScreen,
                     <InitialSetup />
-                    )}
-                {renderIf(this.props.isErrorType_403_400_Logout, 
+                )}
+                {(this.props.isErrorType_403_400_Logout &&
                     <CustomAlert
-                        title = "Unauthorised Device" 
-                        message = {this.props.errorMessage_403_400_Logout} 
-                        onCancelPressed = {this.startLoginScreenWithoutLogout} />
-
-                )}                    
+                        title="Unauthorised Device"
+                        message={this.props.errorMessage_403_400_Logout.message}
+                        onCancelPressed={this.startLoginScreenWithoutLogout} />
+                )}                   
                 {renderIf(this.props.showMobileNumberScreen,
                     <MobileNoScreen invalidateUserSession = {this.invalidateSession} />
                   )}
@@ -72,4 +81,4 @@ var styles = StyleSheet.create({
     }
 })
 
-export default connect(mapStateToProps, preloaderActions)(Preloader)
+export default connect(mapStateToProps, mapDispatchToProps)(Preloader)

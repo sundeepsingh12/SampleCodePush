@@ -372,7 +372,6 @@ export function uploadUnsyncFiles(backupFilesList) {
       }
       for (let backupFile of backupFilesList) {
         try {
-          //let responseBody = 'Fail'
           let responseBody = await RestAPIFactory(token.value).uploadZipFile(backupFile.path, backupFile.name)
           if (responseBody && responseBody.split(",")[0] == 'success') {
             await backupService.deleteBackupFile(null, null, backupFile.path)

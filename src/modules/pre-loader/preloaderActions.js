@@ -89,9 +89,12 @@ import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
 import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
-import BackgroundTimer from 'react-native-background-timer';
+import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
+import {LOGOUT_UNSUCCESSFUL, OK } from '../../lib/ContainerConstants'
+import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
+
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -271,7 +274,7 @@ export function downloadJobMaster() {
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error.message))
+        dispatch(error_400_403_Logout(error))
       } else {
         dispatch(jobMasterDownloadFailure(error.message))
       }
@@ -280,7 +283,6 @@ export function downloadJobMaster() {
 }
 
 /**This method logs out the user and deletes session token from store in case of AutoLogout
- *  It also handles when user don't have network connection
  * 
  * @function invalidateUserSessionForAutoLogout()
  * 
@@ -311,10 +313,10 @@ export function invalidateUserSessionForAutoLogout() {
 }
 
 /**This method logs out the user and deletes session token from store
- *
+ * @param {*} createBackup if it is called from backup class 
  * @return {Function}
  */
-export function invalidateUserSession() {
+export function invalidateUserSession(createBackup) {
   return async function (dispatch) {
     try {
       dispatch(preLogoutRequest())
@@ -322,21 +324,24 @@ export function invalidateUserSession() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       // TODO uncomment this code when run sync in logout
       // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")  
-      await backupService.createBackupOnLogout()
-      await authenticationService.logout(token)
+      if (createBackup) {
+        await backupService.createBackupOnLogout()
+      }
+      let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
-      dispatch(setState(TOGGLE_LOGOUT, false))
+      dispatch(deleteSessionToken())
       // below 2 lines are used to delete geofence on logout 
       // <---- DON'T REMOVE THESE LINES --->
       // let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
       // await trackingService.inValidateStoreVariables(fenceIdentifier)
-      dispatch(deleteSessionToken())
 
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1))      
+      dispatch(showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1))
       dispatch(error_400_403_Logout(error.message))
+    }
+    finally {
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
@@ -372,11 +377,13 @@ export function autoLogout(userData) {
 export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
     try {
+      console.logs('startLoginScreenWithoutLogout called')
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
+      console.logs('error2',error)
       dispatch(showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1))
     }
 
@@ -538,7 +545,7 @@ export function checkIfSimValidOnServer() {
       if (error.code == 403 || error.code == 400) {
         // clear user session without Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error.message))
+        dispatch(error_400_403_Logout(error))
       } else {
         dispatch(checkAssetFailure(error.message))
       }
@@ -608,14 +615,17 @@ export function validateOtp(otpNumber) {
 export function checkForUnsyncTransactionAndLogout() {
   return async function (dispatch) {
     try {
+      console.logs('checkForUnsyncTransactionAndLogout called')
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
+      console.logs('isUnsyncTransactionsPresent',isUnsyncTransactionsPresent)
       if (isUnsyncTransactionsPresent) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {
-        dispatch(invalidateUserSession())
+        dispatch(invalidateUserSession(true))
       }
     } catch (error) {
+      console.logs('error',error)
       dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))      
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
