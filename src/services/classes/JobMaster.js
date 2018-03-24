@@ -33,6 +33,7 @@ import {
   TRANSACTION_TIME_SPENT,
   HUB,
   LAST_SYNC_WITH_SERVER,
+  HUB_LAT_LONG
 } from '../../lib/constants'
 
 import {
@@ -154,6 +155,9 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(HUB, json.hub)
     await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment().format('YYYY-MM-DD HH:mm:ss'))
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
+    if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {
+      await keyValueDBService.validateAndSaveData(HUB_LAT_LONG, json.hubLatLng)
+    }
   }
 
   /**

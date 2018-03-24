@@ -74,14 +74,15 @@ import {
   OTP_SUCCESS,
   PENDING_SYNC_TRANSACTION_IDS,
   SET_UNSYNC_TRANSACTION_PRESENT,
-  UnsyncBackupUpload
+  UnsyncBackupUpload,
+  GEO_FENCING
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog,resetNavigationState } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -90,6 +91,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer';
 import moment from 'moment'
+import { trackingService } from '../../services/classes/Tracking'
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -265,6 +267,7 @@ export function downloadJobMaster() {
       dispatch(validateAndSaveJobMaster(json))
       dispatch(autoLogout(userObject))
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1801, error.message, 'danger', 0))      
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
@@ -296,8 +299,11 @@ export function invalidateUserSessionForAutoLogout() {
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(setState(TOGGLE_LOGOUT, false))
+      let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1802, error.message, 'danger', 1))            
       dispatch(startLoginScreenWithoutLogout())
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
@@ -322,9 +328,14 @@ export function invalidateUserSession() {
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
       dispatch(setState(TOGGLE_LOGOUT, false))
+      // below 2 lines are used to delete geofence on logout 
+      // <---- DON'T REMOVE THESE LINES --->
+      // let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      // await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
 
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1))      
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
@@ -351,7 +362,7 @@ export function autoLogout(userData) {
         }, timeLimit * 1000)
       }
     } catch (error) {
-      console.log(error)
+      dispatch(showToastAndAddUserExceptionLog(1804, error.message, 'danger', 1))      
     }
   }
 }
@@ -360,10 +371,15 @@ export function autoLogout(userData) {
  */
 export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
-    await logoutService.deleteDataBase()
-    dispatch(preLogoutSuccess())
-    dispatch(deleteSessionToken())
-    dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+    try {
+      await logoutService.deleteDataBase()
+      dispatch(preLogoutSuccess())
+      dispatch(deleteSessionToken())
+      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+    } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1))
+    }
+
   }
 }
 
@@ -375,20 +391,24 @@ export function startLoginScreenWithoutLogout() {
  */
 export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService) {
   return async function (dispatch) {
-    const otpScreen = await keyValueDBService.getValueFromStore(IS_SHOW_OTP_SCREEN)
-    const mobileScreen = await keyValueDBService.getValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
-    if (otpScreen && otpScreen.value) {
-      dispatch(showOtp())
-      return
-    }
-    if (mobileScreen && mobileScreen.value) {
-      dispatch(showMobileNumber())
-      return
-    }
-    if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
-      dispatch(checkAsset())
-    } else {
-      dispatch(downloadJobMaster())
+    try {
+      const otpScreen = await keyValueDBService.getValueFromStore(IS_SHOW_OTP_SCREEN)
+      const mobileScreen = await keyValueDBService.getValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
+      if (otpScreen && otpScreen.value) {
+        dispatch(showOtp())
+        return
+      }
+      if (mobileScreen && mobileScreen.value) {
+        dispatch(showMobileNumber())
+        return
+      }
+      if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
+        dispatch(checkAsset())
+      } else {
+        dispatch(downloadJobMaster())
+      }
+    } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1806, error.message, 'danger', 1))
     }
   }
 }
@@ -411,6 +431,7 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0))      
       const keys = [
         JOB_MASTER,
         JOB_ATTRIBUTE,
@@ -462,13 +483,14 @@ export function checkAsset() {
         if (unsyncBackupFilesList.length > 0) {
           dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         } else {
-          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer());
       }
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1808, error.message, 'danger', 0))      
       dispatch(checkAssetFailure(error.message))
     }
   }
@@ -505,13 +527,14 @@ export function checkIfSimValidOnServer() {
         if (unsyncBackupFilesList.length > 0) {
           dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         } else {
-          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
         dispatch(showMobileNumber())
       }
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0))      
       if (error.code == 403 || error.code == 400) {
         // clear user session without Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
@@ -542,6 +565,7 @@ export function generateOtp(mobileNumber) {
       await keyValueDBService.validateAndSaveData(IS_SHOW_OTP_SCREEN, true)
       dispatch(showOtp())
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1810, error.message, 'danger', 0))      
       dispatch(otpGenerationFailure(error.message))
     }
   }
@@ -571,9 +595,10 @@ export function validateOtp(otpNumber) {
       if (unsyncBackupFilesList.length > 0) {
         dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
       } else {
-        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
       }
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1811, error.message, 'danger', 0))      
       dispatch(otpValidationFailure(error.message))
     }
   }
@@ -591,7 +616,7 @@ export function checkForUnsyncTransactionAndLogout() {
         dispatch(invalidateUserSession())
       }
     } catch (error) {
-      console.log(error)
+      dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))      
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }

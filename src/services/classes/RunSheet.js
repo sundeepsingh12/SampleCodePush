@@ -63,7 +63,7 @@ class RunSheet {
     const status = ['pendingCount','failCount','successCount']
     runsheetArray.forEach(runsheetObject => {
       const runsheetCLone = { ...runsheetObject } 
-      runsheetCLone.pendingCount = 0 ; runsheetCLone.failCount = 0 ; runsheetCLone.successCount = 0 ;
+      runsheetCLone.pendingCount = runsheetCLone.failCount = runsheetCLone.successCount = 0 
       runsheetList[runsheetObject.id] = { ...runsheetCLone }
     }) // map of runSheetId and runSheet 
     for (let index in jobTransactionArray) {
@@ -95,6 +95,15 @@ class RunSheet {
     }
     return runsheetNumberList
 }
+  getOpenRunsheets() {
+    let runSheetQuery = `isClosed = false`
+    const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET, runSheetQuery)
+    let runsheetNumberList = []
+    runsheetArray.forEach(runsheetObject => {
+      runsheetNumberList.push({ ...runsheetObject })
+    })
+    return runsheetNumberList
+  }
 
 }
 

@@ -20,7 +20,9 @@ import {
     USER_SUMMARY
 } from '../../lib/constants'
 import { keyValueDBService } from './KeyValueDBService'
+import { geoFencingService } from './GeoFencingService'
 import _ from 'lodash'
+import { draftService } from './DraftService'
 
 
 class JobDetails {
@@ -121,7 +123,7 @@ class JobDetails {
     }
 
     /**@function getParentStatusList(statusList,currentStatus,jobTransactionId)
-     * ## It will get all parent status list of current jobTransaction.
+     * ## It will get all parent status list of current jobTransaction.It will not add status of UNSEEN and SEEN code
      * 
      * @param {object} statusList - It contains data for all status
      * @param {object} currentStatus - It contains current status
@@ -132,8 +134,8 @@ class JobDetails {
 
     async getParentStatusList(statusList, currentStatus, jobTransactionId) {
         let parentStatusList = []
-        for (let status of statusList) {
-            if (status.code === UNSEEN) // check for status code for UNSEEN
+        for(let status of statusList){
+            if(status.code === UNSEEN || _.isEqual(_.toLower(status.code), 'seen' )) 
                 continue
             for (let nextStatus of status.nextStatusList) {
                 if (currentStatus.id === nextStatus.id) { // check for currentStatus Id in  nextStatusList
@@ -197,19 +199,7 @@ class JobDetails {
         const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)
         return !(unseenTransactions && unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
     }
-
-    /**@function toRadians(angle)
-     * ## convert degree to radians
-     * 
-     * @param {string} angle - It contains data for form layout
-     *
-     *@returns {string} radians value
-     */
-
-    toRadians(angle) {
-        return angle * (Math.PI / 180);
-    }
-
+    
     /**@function updateTransactionOnRevert(jobTransactionData,previousStatus)
      * ## It will update transactionData on revert status 
      * 
@@ -236,24 +226,6 @@ class JobDetails {
         }
     }
 
-    /**@function distance(jobLat,jobLong,userLat,userLong)
-     * ## find aerial distance between user location and job location
-     * 
-     * @param {string} jobLat - job location latitude
-     * @param {string} jobLat - job location longitude
-     * @param {string} userLat - user location latitud
-     * @param {string} userLong - user location longitude
-     * 
-     * @returns {string} - distance between user and job locations
-     */
-
-    distance(jobLat, jobLong, userLat, userLong) {
-        const theta = jobLong - userLong
-        let dist = Math.sin(this.toRadians(jobLat)) * Math.sin(this.toRadians(userLat)) + Math.cos(this.toRadians(jobLat)) * Math.cos(this.toRadians(userLat)) * Math.cos(this.toRadians(theta));
-        dist = (Math.acos(dist) * (180 / Math.PI)) * 60 * 1.1515 * 1.609344;
-        return dist;
-    }
-
     /**@function setAllDataForRevertStatus(statusList,jobTransaction,previousStatus)
      * ## It will set all data for revert status and update realm database
      * 
@@ -265,7 +237,6 @@ class JobDetails {
      */
 
     async setAllDataForRevertStatus(statusList, jobTransaction, previousStatus) {
-        let updatedJobTransaction
         let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
         let lastTrackLog = { // update track location of user
             latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
@@ -278,9 +249,10 @@ class JobDetails {
         await formLayoutEventsInterface._updateUserSummary(jobTransaction.jobStatusId, previousStatus[3], [jobTransaction], userSummary.value, previousStatus[0])
         let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction], previousStatus[0], jobTransaction.jobStatusId, jobTransaction.jobMasterId, user, lastTrackLog) // update transaction log on revert
         let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, previousStatus[3], [jobTransaction]) // update runSheet Summary on revert
-        updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction, previousStatus) // update jobTransaction on revert
+        let updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction, previousStatus) // update jobTransaction on revert
         await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value) // add jobTransaction to sync list
         realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog) // update jobTransaction, job, runSheet, transactionLog Db in batch
+        await draftService.deleteDraftFromDb(jobTransaction.id)
     }
 
     /**@function checkLatLong(jobId,userLat,userLong)
@@ -296,7 +268,7 @@ class JobDetails {
         let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0]; // get jobtransaction on jobId
         if (!jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong)
             return false
-        const dist = this.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong) //  calculate aerial distance between user location and user summary
+        const dist = geoFencingService.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
         return (dist * 1000 >= 100)
     }
 }

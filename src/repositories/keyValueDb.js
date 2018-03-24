@@ -82,6 +82,9 @@ export class keyValueDb {
       case 'USER_EVENT_LOG':
         schemaInstance = require('../repositories/schema/userEventLog');
         break;
+      case 'USER_EXCEPTION_LOGS':
+        schemaInstance = require('../repositories/schema/userExceptionLogs');
+        break;
       case 'HUB': 
       schemaInstance = require('../repositories/schema/hub');
       default:
