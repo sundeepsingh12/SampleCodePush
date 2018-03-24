@@ -63,7 +63,7 @@ class SkuListItem extends PureComponent {
                     mode="dropdown"
                     selectedValue={rowItem.value}
                     onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
-                  {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={987654321} /> */}
+                  {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={-987654321} /> */}
                     {this._populateSkuItems(this.props.reasonsList)}
                 </Picker>
             </View>)
