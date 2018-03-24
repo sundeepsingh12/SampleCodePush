@@ -60,7 +60,7 @@ class JobDetails {
     prepareDataObject(id, positionId, realmDBDataList, attributeMasterMap, attributeMap, isJob, autoIncrementId, isObject) {
         let dataMap = {}
         let dataList = isObject ? {} : []
-        let filteredDataList = isJob ? realmDBDataList.filter(arrayItem =>(arrayItem.parentId == positionId && arrayItem.jobId == id)) : realmDBDataList.filter(arrayItem =>(arrayItem.parentId == positionId && arrayItem.jobTransactionId == id))
+        let filteredDataList = isJob ? realmDBDataList.filter(arrayItem => (arrayItem.parentId == positionId && arrayItem.jobId == id)) : realmDBDataList.filter(arrayItem => (arrayItem.parentId == positionId && arrayItem.jobTransactionId == id))
         for (let index in filteredDataList) {
             let data = filteredDataList[index]
             let attributeMaster = isJob ? attributeMasterMap[data.jobAttributeMasterId] : attributeMasterMap[data.fieldAttributeMasterId]
@@ -92,7 +92,7 @@ class JobDetails {
             autoIncrementId
         }
     }
-    
+
     /**@function checkForEnablingStatus(enableOutForDelivery,enableResequenceRestriction,jobTime,jobMasterList,tabId,seqSelected,statusList,jobTransactionId)
      * ## It will get all parent status list of current jobTransaction.
      * 
@@ -108,20 +108,20 @@ class JobDetails {
      *@returns {string,Boolean} It returns boolean if enableOutForDelivery,enableResequenceRestriction and jobTime cases fail
      */
 
-   async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId, actionOnStatus){
-       let enableFlag = false
-        if(enableOutForDelivery){
-            enableFlag =  await this.checkOutForDelivery(jobMasterList)
+    async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId, actionOnStatus) {
+        let enableFlag = false
+        if (enableOutForDelivery) { // check for out for delivery
+            enableFlag = await this.checkOutForDelivery(jobMasterList) 
         }
-        if(!enableFlag && enableResequenceRestriction && actionOnStatus != 1){
-            enableFlag =  this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
+        if (!enableFlag && enableResequenceRestriction && actionOnStatus != 1) { // check for enable resequence restriction and job closed
+            enableFlag = this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
         }
-        if(!enableFlag && jobTime){
-            enableFlag =  this.checkJobExpire(jobTime)
+        if (!enableFlag && jobTime) { // check for jobTime expiry
+            enableFlag = this.checkJobExpire(jobTime)
         }
         return enableFlag
     }
-    
+
     /**@function getParentStatusList(statusList,currentStatus,jobTransactionId)
      * ## It will get all parent status list of current jobTransaction.It will not add status of UNSEEN and SEEN code
      * 
@@ -132,18 +132,18 @@ class JobDetails {
      *@returns {Array} parentStatusList
      */
 
-    async getParentStatusList(statusList,currentStatus,jobTransactionId){
+    async getParentStatusList(statusList, currentStatus, jobTransactionId) {
         let parentStatusList = []
         for(let status of statusList){
             if(status.code === UNSEEN || _.isEqual(_.toLower(status.code), 'seen' )) 
                 continue
-            for(let nextStatus of status.nextStatusList){
-                if(currentStatus.id === nextStatus.id){
-                   parentStatusList.push([status.id, status.name, status.code, status.statusCategory])
+            for (let nextStatus of status.nextStatusList) {
+                if (currentStatus.id === nextStatus.id) { // check for currentStatus Id in  nextStatusList
+                    parentStatusList.push([status.id, status.name, status.code, status.statusCategory])
                 }
             }
         }
-        if((parentStatusList.length > 0 && await jobTransactionService.checkIdToBeSync(jobTransactionId))){
+        if ((parentStatusList.length > 0 && await jobTransactionService.checkIdToBeSync(jobTransactionId))) { // check for parentStatusList length and jobTransaction sync with server 
             parentStatusList = []
             parentStatusList.push(1)
         }
@@ -159,8 +159,8 @@ class JobDetails {
      */
 
     checkJobExpire(jobDataList) {
-        const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]]
-        return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : false
+        const jobAttributeTime = jobDataList[Object.keys(jobDataList)[0]] // get jobExpiry time from jobData list
+        return ((jobAttributeTime != null && jobAttributeTime != undefined) && moment(moment(new Date()).format('YYYY-MM-DD HH:mm:ss')).isAfter(jobAttributeTime.data.value)) ? 'Job Expired!' : false // check for jobExpiry time with current time of job completion
     }
 
     /**@function checkEnableResequence(jobMasterList,tabId,seqSelected,statusList,jobTransactionId)
@@ -191,8 +191,8 @@ class JobDetails {
      */
 
     async checkOutForDelivery(jobMasterList) {
-        const jobListWithDelivery = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id)
-        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobListWithDelivery, UNSEEN)
+        const jobMasterIdListWithDelivery = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) // jobMaster Id list with out for delivery
+        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdListWithDelivery, UNSEEN)
         let statusIds = Object.keys(mapOfUnseenStatusWithJobMaster).map(function (key) {
             return mapOfUnseenStatusWithJobMaster[key];
         });
@@ -211,7 +211,7 @@ class JobDetails {
        }
      */
 
-    updateTransactionOnRevert(jobTransactionData,previousStatus){
+    updateTransactionOnRevert(jobTransactionData, previousStatus) {
         let jobTransactionArray = [];
         let jobTransaction = Object.assign({}, jobTransactionData) // no need to have null checks as it is called from a private method        
         jobTransaction.jobStatusId = previousStatus[0]
@@ -236,24 +236,23 @@ class JobDetails {
      * @description --> update userSummaryDb,jobSummaryDb,runsheetDb,transactionLogDb,jobTransactionDb,jobDb for status revert action
      */
 
-    async setAllDataForRevertStatus(statusList,jobTransaction,previousStatus){
-     let updatedJobTransaction
-     let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)     
-     let lastTrackLog = {
-        latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
-        longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
-     }
-     let user = await keyValueDBService.getValueFromStore(USER)                
-     let statusData = statusList.value.filter(list => list.id == jobTransaction.jobStatusId)
-     let updatedJobDb = formLayoutEventsInterface._setJobDbValues(statusData,jobTransaction.jobId)
-     await formLayoutEventsInterface._updateJobSummary(jobTransaction,previousStatus[0],[])
-     await formLayoutEventsInterface._updateUserSummary(jobTransaction,previousStatus[3],[],userSummary,null,previousStatus[0])
-     let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction],previousStatus[0],jobTransaction.jobStatusId,jobTransaction.jobMasterId,user, lastTrackLog)
-     let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction,previousStatus[3],[]) 
-     updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction,previousStatus)  
-     await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value)       
-     realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog)  
-     await draftService.deleteDraftFromDb(jobTransaction.id)
+    async setAllDataForRevertStatus(statusList, jobTransaction, previousStatus) {
+        let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+        let lastTrackLog = { // update track location of user
+            latitude: (userSummary.value.lastLat) ? userSummary.value.lastLat : 0,
+            longitude: (userSummary.value.lastLng) ? userSummary.value.lastLng : 0
+        }
+        let user = await keyValueDBService.getValueFromStore(USER)
+        let statusData = statusList.value.filter(list => list.id == jobTransaction.jobStatusId)
+        let updatedJobDb = formLayoutEventsInterface._setJobDbValues(statusData, jobTransaction.jobId) // update JobDb on revert
+        await formLayoutEventsInterface._updateJobSummary(jobTransaction, previousStatus[0], []) // update user Summary on revert
+        await formLayoutEventsInterface._updateUserSummary(jobTransaction.jobStatusId, previousStatus[3], [jobTransaction], userSummary.value, previousStatus[0])
+        let transactionLog = await formLayoutEventsInterface._updateTransactionLogs([jobTransaction], previousStatus[0], jobTransaction.jobStatusId, jobTransaction.jobMasterId, user, lastTrackLog) // update transaction log on revert
+        let runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, previousStatus[3], [jobTransaction]) // update runSheet Summary on revert
+        let updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction, previousStatus) // update jobTransaction on revert
+        await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value) // add jobTransaction to sync list
+        realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog) // update jobTransaction, job, runSheet, transactionLog Db in batch
+        await draftService.deleteDraftFromDb(jobTransaction.id)
     }
 
     /**@function checkLatLong(jobId,userLat,userLong)
@@ -266,7 +265,7 @@ class JobDetails {
      * @returns {boolean} - true if distance is greater than 100m else false
      */
     checkLatLong(jobId, userLat, userLong) {
-        let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0];
+        let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0]; // get jobtransaction on jobId
         if (!jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong)
             return false
         const dist = geoFencingService.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
