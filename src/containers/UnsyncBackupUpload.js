@@ -78,6 +78,7 @@ class UnsyncBackupUpload extends Component {
             </View>
         }
     }
+    
     failureView() {
         if (this.props.failedUploadCount > 0) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
@@ -112,8 +113,8 @@ class UnsyncBackupUpload extends Component {
                 </View>
             </View>
         }
-
     }
+
     getLogoutView() {
         if (this.props.backupUploadView == 3) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
@@ -127,6 +128,7 @@ class UnsyncBackupUpload extends Component {
         }
 
     }
+
     getUploadingView() {
         if (this.props.backupUploadView == 0 && this.props.failedUploadCount == 0) {
             return <View style={[styles.flex1, styles.justifyCenter, styles.column]}>
@@ -153,6 +155,7 @@ class UnsyncBackupUpload extends Component {
             </View>
         }
     }
+    
     render() {
         let uploadingView = this.getUploadingView()
         let failureView = this.failureView()

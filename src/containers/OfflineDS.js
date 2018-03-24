@@ -11,7 +11,7 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import {
     SET_OFFLINEDS_INITIAL_STATE,
-    } from '../lib/constants'
+} from '../lib/constants'
 import {
     Container,
     Header,
@@ -20,7 +20,7 @@ import {
     Right,
     Icon,
     StyleProvider,
-    } from 'native-base'
+} from 'native-base'
 import {
     DOWNLOADING_OFFLINE_DS,
     DOWNLOAD_SUCCESSFUL,
@@ -176,24 +176,25 @@ class OfflineDS extends Component {
     }
 
     goBack = () => {
-        this.props.actions.setState(SET_OFFLINEDS_INITIAL_STATE)
+        if (this.props.downLoadingStatus != 1) {
+            this.props.actions.setState(SET_OFFLINEDS_INITIAL_STATE)
+        }
         this.props.navigation.goBack()
     }
 
+    componentWillUnmount() {
+        this.goBack()
+    }
+
     render() {
-        let headerView = this.headerView()
-        let initialScreen = this.initialScreen()
-        let DownloadingView = this.downLoadingView()
-        let successView = this.successView()
-        let failureView = this.failureView()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    {headerView}
-                    {initialScreen}
-                    {DownloadingView}
-                    {successView}
-                    {failureView}
+                    {this.headerView()}
+                    {this.initialScreen()}
+                    {this.downLoadingView()}
+                    {this.successView()}
+                    {this.failureView()}
                 </Container>
             </StyleProvider>)
     }

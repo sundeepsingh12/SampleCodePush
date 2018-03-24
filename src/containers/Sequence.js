@@ -363,7 +363,7 @@ class Sequence extends PureComponent {
   showToast() {
     Toast.show({
       text: `${this.props.responseMessage}`,
-      duration: 5000,
+      duration: Number.MAX_SAFE_INTEGER,
       position: 'bottom',
       buttonText: OK,
     })

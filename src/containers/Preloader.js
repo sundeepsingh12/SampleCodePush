@@ -42,11 +42,7 @@ class Preloader extends PureComponent {
     }
  
     startLoginScreenWithoutLogout = () => {
-        if (this.props.errorMessage_403_400_Logout && (this.props.errorMessage_403_400_Logout.code == 400 || this.props.errorMessage_403_400_Logout.code == 403)) {
             this.props.actions.startLoginScreenWithoutLogout()
-        } else {
-            this.props.actions.setState(ERROR_400_403_LOGOUT_FAILURE, '')
-        }
     }
 
       invalidateSession = () => {

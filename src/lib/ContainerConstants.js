@@ -11,7 +11,7 @@ module.exports = {
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
-    VERIFY:'Verify',
+    VERIFY: 'Verify',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -59,6 +59,7 @@ module.exports = {
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
+    UNIQUE_VALIDATION_FAILED_FORMLAYOUT: 'This value is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
     OPTIONAL: '(optional)',
@@ -70,6 +71,7 @@ module.exports = {
     CONFIRM_REVERT: 'Confirm Revert',
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
+    REVERT_STATUS: 'Revert Status',
 
     //Payment Container
     YES: 'Yes',
@@ -125,13 +127,15 @@ module.exports = {
     //Data Store service
     DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
     CURRENT_ELEMENT_MISSING: 'currentElement Missing',
-    CONFIRM:'Confirm',
+    CONFIRM: 'Confirm',
 
     //Data Store Filter
     JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
     DSF_LIST_MISSING: 'DSFList is missing',
     FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
     FORM_ELEMENT_IS_MISSING: 'formElement is missing',
+    INVALID_BULK_JOB_CONFIG: 'Invalid job data in bulk data store filter, cannot proceed further.',
+    CONFIGURATION_ERROR_DS_MASTER_ID_MISSING: 'Configuration error data store mapping is missing',
     //Summary
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
@@ -192,6 +196,16 @@ module.exports = {
     MB: 'MB',
     TRY_AFTER_CLEARING_YOUR_STORAGE_DATA: 'Please Try again after clearing your storage data.',
 
+    //Tracking constants
+    ENTER: 'ENTER',
+    EXIT: 'EXIT',
+    INSIDE_BOUNDARY: 'inside boundary',
+    OUTSIDE_BOUNDARY: 'out of boundary',
+
+    //GeoFencing Service
+    HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
+    FENCE_LAT_LONG_MISSING: 'fenceLatLongObject not present',
+
     //DataStore
     SUGGESTIONS: 'Suggestions',
 
@@ -212,7 +226,7 @@ module.exports = {
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
-    REMOVE:'Remove',
+    REMOVE: 'Remove',
 
     //Expandable Details View
     TAP_TO_HIDE: 'Tap to hide',
@@ -221,6 +235,8 @@ module.exports = {
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+    YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
+    MORE: 'More',
 
     //Save Activated
     EDIT: 'Edit',
@@ -234,10 +250,10 @@ module.exports = {
     SELECT_NUMBER_FOR_CALL: 'Select number for call',
     CALL_CONFIRM: 'Do you want to proceed with the call?',
     CONFIRMATION: 'Confirmation: ',
-    SELECT_ADDRESS_NAVIGATION:'Select address for navigation',
+    SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
 
     //Cash Tendering
-    NOT_REQUIRED: 'NOT REQUIRED',
+    SKIP_CASH_TENDERING: 'Skipping Cash Tendering',
     MORE_MONEY_TO_PAY: 'More Money to Pay.',
     LESS_MONEY_TO_PAY: 'Less Money to Pay.',
     AMOUNT_TO_COLLECT: 'Amount to Collect: ',
@@ -272,7 +288,7 @@ module.exports = {
     NEXT_POSSIBLE_STATUS: 'Next possible status',
 
     //Sorting
-    SORTING : 'Sorting',
+    SORTING: 'Sorting',
     REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
@@ -287,19 +303,28 @@ module.exports = {
     MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
     VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
     CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
-    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..", 
+    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
     UNSAVED_PASSWORD: 'Password not saved before',
+    RESET_PASSWORD: 'Reset Password',
+    CONTACT_NUMBER: 'Contact Number',
+    EMAIL: 'Email',
+    PROFILE: 'Profile',
+    MINIMUM_REQUIREMENT_FOR_PASSWORD: 'Min. 8 characters required, including capital letter, symbol and number.',
+    CURRENT_PASSWORD: 'Current Password',
+    NEW_PASSWORD: 'New Password',
+    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
+    USERNAME_IS_MISSING: 'Username is missing',
 
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
 
     //Signature
-    IMPROPER_SIGNATURE:'Improper signature. Please make your full signature.',
+    IMPROPER_SIGNATURE: 'Improper signature. Please make your full signature.',
 
     //Login
-    CONFIRM_RESET:'Confirm Reset',
-    RESET_ACCOUNT_SETTINGS:'Click OK to reset your account settings.',
-    REMEMBER_ME:'Remember Me',
+    CONFIRM_RESET: 'Confirm Reset',
+    RESET_ACCOUNT_SETTINGS: 'Click OK to reset your account settings.',
+    REMEMBER_ME: 'Remember Me',
 
     //Preloader
     SETTING_UP:'Setting you up...',
@@ -314,4 +339,7 @@ module.exports = {
     // Job Summary
     UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
     VALUE_OF_JOBSUMMARY_IS_MISSING: 'Value of JobSummary is missing',
+
+     //Data Store
+     SEARCH: 'Search',
 }

@@ -1,6 +1,6 @@
 'use strict'
 
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -60,7 +60,7 @@ export function fetchJobMasterList(displayName) {
                 dispatch(navigateToScene(JobMasterListScreen,{displayName}))
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1701, error.message, 'danger', 1))
             dispatch(setState(SET_JOB_MASTER_LIST, {
                 jobMasterList: undefined,
                 loading: false
@@ -87,7 +87,7 @@ export function fetchUnseenJobs(jobMaster) {
                 loading: false
             }))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1702, error.message, 'danger', 1))
             dispatch(setState(SET_POST_ASSIGNMENT_TRANSACTION_LIST, {
                 jobTransactionMap: null,
                 loading: false
@@ -138,7 +138,7 @@ export function checkScannedJob(referenceNumber, jobTransactionMap, jobMaster, i
                 }, 3000);
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1703, error.message, 'danger', 0))
             dispatch(setState(SET_POST_ASSIGNMENT_ERROR, {
                 error: error.message
             }))

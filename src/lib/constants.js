@@ -16,7 +16,6 @@ module.exports = keyMirror({
     SET_LOADER_IN_AUTOLOGOUT: null,
 
     //Auth Actions
-    LOGIN: null,
     LOGOUT: null,
     LOGIN_START: null,
     LOGIN_SUCCESS: null,
@@ -46,10 +45,6 @@ module.exports = keyMirror({
     OTP_VALIDATION_START: null,
     OTP_VALIDATION_SUCCESS: null,
     OTP_VALIDATION_FAILURE: null,
-
-    SESSION_TOKEN_REQUEST: null,
-    SESSION_TOKEN_SUCCESS: null,
-    SESSION_TOKEN_FAILURE: null,
 
     DELETE_TOKEN_REQUEST: null,
     DELETE_TOKEN_SUCCESS: null,
@@ -93,6 +88,7 @@ module.exports = keyMirror({
     SET_UPLOAD_FILE_COUNT: null,
     SET_FAIL_UPLOAD_COUNT: null,
     SET_BACKUP_FILES_LIST: null,
+    SET_TRANSACTION_SERVICE_STARTED: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
 
@@ -116,6 +112,7 @@ module.exports = keyMirror({
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
+    SET_DRAFT_JOB_DETAILS_INFO: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -134,6 +131,10 @@ module.exports = keyMirror({
 
     //Pay By Link Payment Actions
     SET_PAY_BY_LINK_PARAMETERS: null,
+
+    //Bluetooth Actions
+    BLUETOOTH_SCANNING_START:null,
+    BLUETOOTH_SCANNING_STOP:null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,
@@ -195,6 +196,10 @@ module.exports = keyMirror({
     IS_COMPANY_CODE_DHL: null,
     BACKUP_ALREADY_EXIST: null,
     BACKUP_UPLOAD_FAIL_COUNT: null,
+    HUB_LAT_LONG: null,
+    GEO_FENCING: null,
+    GEO_FENCE_STATUS: null,
+    LAT_LONG_GEO_FENCE: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -245,6 +250,7 @@ module.exports = keyMirror({
     SET_FORM_TO_INVALID: null,
     SET_DSF_REVERSE_MAP: null,
     SET_MODAL_FIELD_ATTRIBUTE: null,
+    SET_FORM_INVALID_AND_FORM_ELEMENT: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -287,6 +293,7 @@ module.exports = keyMirror({
     Payment: null,
     SequenceRunsheetList: null,
     UnsyncBackupUpload: null,
+    BluetoothListing:null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -502,6 +509,9 @@ module.exports = keyMirror({
     SET_UPLOADING_FILE: null,
     SET_SYNCED_FILES: null,
     SET_BACKUP_TOAST: null,
+
+    //userExceptionLogs
+    USER_EXCEPTION_LOGS: null,
 })
 
 

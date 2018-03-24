@@ -142,7 +142,7 @@ class ArrayFieldAttribute {
         }
         let isValuePresentInAnotherRow = false
         if (dataStoreService.checkIfUniqueConditionExists(currentElement)) {
-            let fieldDataQuery = `fieldAttributeMasterId =  ${currentElement.fieldAttributeMasterId} AND value = '${currentElement.displayValue}'`
+            let fieldDataQuery = `fieldAttributeMasterId =  ${currentElement.fieldAttributeMasterId} AND value = '${realm._encryptData(currentElement.displayValue)}'`
             let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
             if (fieldDataList && fieldDataList.length >= 1) return true
             for (let rowId in arrayElements) {

@@ -35,7 +35,8 @@ import {
   NEW_JOB_STATUS,
   NEW_JOB_MASTER,
   POPULATE_DATA,
-  NewJob
+  NewJob,
+  SET_TRANSACTION_SERVICE_STARTED,
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -145,9 +146,8 @@ export function pieChartCount() {
   return async (dispatch) => {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
-      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
-      dispatch(setState(CHART_LOADING, { loading: false, count }))
+      const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount()
+      dispatch(setState(CHART_LOADING, { loading: false, count : countForPieChart }))
     } catch (error) {
       //Update UI here
       console.log(error)
@@ -317,9 +317,12 @@ export function startMqttService(pieChart) {
   }
 }
 
-export function startTracking() {
+export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
-    trackingService.init()
+    if (!trackingServiceStarted) {
+      trackingService.init()
+      dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+    }
   }
 }
 

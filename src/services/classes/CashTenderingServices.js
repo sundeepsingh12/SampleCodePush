@@ -12,7 +12,8 @@ import {
     CASH,
     STRING,
     TOTAL_AMOUNT,
-    OBJECT_SAROJ_FAREYE
+    OBJECT_SAROJ_FAREYE,
+    CASH_TENDERING
 } from '../../lib/AttributeConstants'
 
 class CashTenderingServices {
@@ -114,6 +115,15 @@ class CashTenderingServices {
         return cashTenderinglist
     }
 
+    checkForCashTenderingAndResetValue(formElement, currentElement) {
+        for (let [key, fieldDataObject] of formElement.entries()) {
+            if (fieldDataObject.attributeTypeId == CASH_TENDERING && fieldDataObject.childDataList && fieldDataObject.value && currentElement.positionId < fieldDataObject.positionId) {
+                fieldDataObject.value = fieldDataObject.displayValue = null
+                fieldDataObject.childDataList = null
+            }
+        }
+        return formElement
+    }
 }
 
 export let CashTenderingService = new CashTenderingServices()

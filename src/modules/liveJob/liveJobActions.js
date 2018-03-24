@@ -2,7 +2,7 @@
 
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { NavigationActions } from 'react-navigation'
-import { setState, navigateToScene } from '..//global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '..//global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { liveJobService } from '../../services/classes/LiveJobService'
 import * as realm from '../../repositories/realmdb'
@@ -42,7 +42,8 @@ export function getJobDetails(jobTransactionId) {
             const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value, 'LiveJob')
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.currentStatus, details.jobTransactionDisplay))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1201, error.message, 'danger', 1))            
+            dispatch(setState(SET_LIVE_JOB_LOADER, false))            
         }
     }
 }
@@ -90,7 +91,7 @@ export function acceptOrRejectJob(status, job, liveJobList) {
             }
 
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1202, error.message, 'danger', 1))
         }
     }
 }
@@ -101,7 +102,8 @@ export function fetchAllLiveJobsList() {
             let liveJobList = await liveJobService.getLiveJobList()
             dispatch(setState(SET_LIVE_JOB_LIST, liveJobList))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1203, error.message, 'danger', 1))            
+            dispatch(setState(START_FETCHING_LIVE_JOB, false))            
         }
     }
 }
@@ -117,7 +119,7 @@ export function toggleLiveJobSelection(jobId, allJobs) {
                 jobTransactions
             }))
         } catch (error) {
-            console.log(error.message)
+            dispatch(showToastAndAddUserExceptionLog(1204, error.message, 'danger', 1))
         }
     }
 }
@@ -153,7 +155,7 @@ export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
                 }))
             }
         } catch (error) {
-            console.log(error.message)
+            dispatch(showToastAndAddUserExceptionLog(1205, error.message, 'danger', 1)) 
         }
     }
 }
@@ -163,7 +165,7 @@ export function deleteExpiredJob(jobId, liveJobList) {
             let newLiveJobList = await liveJobService.deleteJob([jobId], liveJobList)
             dispatch(setState(SET_LIVE_JOB_LIST, newLiveJobList))
         } catch (error) {
-            console.log(error.message)
+            dispatch(showToastAndAddUserExceptionLog(1206, error.message, 'danger', 1)) 
         }
     }
 }
@@ -177,7 +179,7 @@ export function selectNone(liveJobList) {
                 jobTransactions: allJobs
             }))
         } catch (error) {
-            console.log(error.message)
+            dispatch(showToastAndAddUserExceptionLog(1207, error.message, 'danger', 1))
         }
     }
 }
@@ -192,7 +194,7 @@ export function selectAll(liveJobList) {
                 jobTransactions: allJobs
             }))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1208, error.message, 'danger', 1))
         }
     }
 }

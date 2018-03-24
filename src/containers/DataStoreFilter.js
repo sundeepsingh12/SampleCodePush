@@ -128,13 +128,13 @@ class DataStoreFilter extends PureComponent {
                                     <View searchBar style={[styles.padding5]}>
                                         <Item rounded style={{ height: 30, backgroundColor: '#ffffff' }}>
                                             <Input placeholder={SEARCH}
-                                                style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 10 }]}
+                                                style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 15 }]}
                                                 onChangeText={(searchText) => {
                                                     this.onSearch(searchText)
                                                 }}
                                                 value={this.props.DSFSearchText}
                                             />
-                                            <Icon style={[styles.fontSm]} name="md-close"
+                                            <Icon style={[styles.fontSm, styles.padding5]} name="md-close"
                                                 onPress={() => {
                                                     this.onSearch('')
                                                 }}

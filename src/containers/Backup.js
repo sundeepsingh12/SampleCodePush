@@ -82,6 +82,7 @@ class Backup extends Component {
                 text: this.props.toastMessage,
                 position: 'bottom',
                 buttonText: OK,
+                type: 'success',
                 duration: 5000
             })
             this.props.actions.setState(SET_BACKUP_TOAST, '')

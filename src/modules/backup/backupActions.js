@@ -12,7 +12,7 @@ import {
     SET_BACKUP_TOAST,
 } from '../../lib/constants'
 import _ from 'lodash'
-import { setState, deleteSessionToken } from '../global/globalActions'
+import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { backupService } from '../../services/classes/BackupService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
@@ -31,7 +31,7 @@ import {
 import { Toast } from 'native-base'
 import moment from 'moment'
 
-/** This methodd creates backup manually when button is pressed.
+/** This method creates backup manually when button is pressed.
  * 
  * @param {*} syncedBackupFiles // list of synced files.
  */
@@ -47,7 +47,8 @@ export function createManualBackup(syncedBackupFiles) {
                 dispatch(setState(SET_SYNCED_FILES, backupFilesAndToastMessage))
             }
         } catch (error) {
-            dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))    // to do add exception logs
+            dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))    
+            dispatch(showToastAndAddUserExceptionLog(201, error.message, 'danger', 1))            
         }
     }
 }
@@ -64,7 +65,8 @@ export function getBackupList() {
             let backupFiles = await backupService.getBackupFilesList(user.value) // this method gets backup files list from service
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
-            dispatch(setState(SET_LOADER_BACKUP, false))// to do add exception logs
+            dispatch(showToastAndAddUserExceptionLog(202, error.message, 'danger', 1))            
+            dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
 }
@@ -95,8 +97,8 @@ export function uploadBackupFile(index, filesMap) {
                 dispatch(setState(SET_BACKUP_VIEW, 3))
             }
         } catch (error) {
-            console.log(error)
-            dispatch(setState(SET_BACKUP_VIEW, 3))// to do add exception logs
+            dispatch(showToastAndAddUserExceptionLog(203, error.message, 'danger', 1))            
+            dispatch(setState(SET_BACKUP_VIEW, 3))
         }
     }
 }
@@ -116,7 +118,8 @@ export function deleteBackupFile(index, filesMap) {
             let backupFiles = await backupService.getBackupFilesList(user.value) // this method
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
-            dispatch(setState(SET_LOADER_BACKUP, false)) // to do add exception logs
+            dispatch(showToastAndAddUserExceptionLog(204, error.message, 'danger', 1))            
+            dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
 }
@@ -136,18 +139,12 @@ export function autoLogoutAfterUpload(calledFromHome) {
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             await backupService.createBackupOnLogout() // creates backup on logout
             let response = await authenticationService.logout(token) // hit logout api
-            const userData = await keyValueDBService.getValueFromStore(USER)
-            if ((response && response.status == 200) || (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD')))) {
-                await logoutService.deleteDataBase() //delete database.
-                dispatch(preLogoutSuccess())
-                dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
-                dispatch(deleteSessionToken())
-            } else {
-                Toast.show({ text: LOGOUT_UNSUCCESSFUL, position: 'bottom', buttonText: OK, duration: 5000 })
-            }
+            await logoutService.deleteDataBase() //delete database.
+            dispatch(preLogoutSuccess())
+            dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+            dispatch(deleteSessionToken())
         } catch (error) {
-            console.log(error)// to do add exception logs
-            Toast.show({ text: LOGOUT_UNSUCCESSFUL, position: 'bottom', buttonText: OK, duration: 5000 })
+            dispatch(showToastAndAddUserExceptionLog(205, error.message, 'danger', 1))
             dispatch(setState(SET_BACKUP_VIEW, 0))
         }
     }

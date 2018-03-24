@@ -21,7 +21,8 @@ import {
     SET_UPDATE_DRAFT,
     SET_FORM_TO_INVALID,
     SET_DSF_REVERSE_MAP,
-    SET_MODAL_FIELD_ATTRIBUTE
+    SET_MODAL_FIELD_ATTRIBUTE,
+    SET_FORM_INVALID_AND_FORM_ELEMENT
 } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -147,6 +148,11 @@ export default function formLayoutReducer(state = initialState, action) {
 
         case SET_MODAL_FIELD_ATTRIBUTE: {
             return state.set('modalFieldAttributeMasterId', action.payload)
+        }
+        case SET_FORM_INVALID_AND_FORM_ELEMENT: {
+            return state.set('isLoading', action.payload.isLoading)
+                .set('isFormValid', action.payload.isFormValid)
+                .set('formElement', action.payload.formElement)
         }
     }
     return state;
