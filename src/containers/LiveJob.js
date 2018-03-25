@@ -168,7 +168,7 @@ class LiveJob extends PureComponent {
         }
     }
 
-    showHeaderView(){
+    showHeaderView() {
         return (
             <Header searchBar style={[styles.bgPrimary, style.header]}>
                 <Body>
@@ -189,8 +189,8 @@ class LiveJob extends PureComponent {
         )
     }
 
-    showLineLine2Details(){
-        return(
+    showLineLine2Details() {
+        return (
             <View style={style.seqCardDetail}>
                 <View>
                     <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
@@ -208,7 +208,7 @@ class LiveJob extends PureComponent {
         )
     }
 
-    showJobDataList(){
+    showJobDataList() {
         return (
             <Content>
                 {renderIf(!this.props.isLoading,
@@ -222,7 +222,7 @@ class LiveJob extends PureComponent {
         )
     }
 
-    showJobMasterIdentifierAndLine1(){
+    showJobMasterIdentifierAndLine1() {
         return (
             <View style={style.seqCard}>
                 <View style={style.seqCircle}>
@@ -235,32 +235,40 @@ class LiveJob extends PureComponent {
             </View>
         )
     }
+    
+    onButtonPress = (status) => {
+        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)
+    }
 
+    showAccepRejectButtons() {
+        if (!this.state.counterNegative && !this.props.isLoading) {
+            return <View style={[styles.row, styles.bgWhite]}>
+                <View style={[styles.padding10, styles.paddingRight5, styles.flexBasis50]}>
+                    <Button full style={[styles.bgDanger]} onPress={() => this.onButtonPress(2)}>
+                        <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
+                    </Button>
+                </View>
+                <View style={[styles.padding10, styles.paddingLeft5, styles.flexBasis50]}>
+                    <Button full style={[styles.bgSuccess]} onPress={() => this.onButtonPress(1)}>
+                        <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
+                    </Button>
+                </View>
+            </View>
+        }
+    }
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
-                {this.showHeaderView()}
+                    {this.showHeaderView()}
                     <View style={{ flexDirection: 'column' }}>
-                    {this.showJobMasterIdentifierAndLine1()}
-                        { this.getLoader()}
+                        {this.showJobMasterIdentifierAndLine1()}
+                        {this.getLoader()}
                         {this.renderTime()}
-                        {renderIf(!this.state.counterNegative && !this.props.isLoading,
-                            <View style={[styles.row, styles.bgWhite]}>
-                                <View style={[styles.padding10, styles.paddingRight5, styles.flexBasis50]}>
-                                    <Button full style={[styles.bgDanger]} onPress={() => this.props.actions.acceptOrRejectJob(2, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)}>
-                                        <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
-                                    </Button>
-                                </View>
-                                <View style={[styles.padding10, styles.paddingLeft5, styles.flexBasis50]}>
-                                    <Button full style={[styles.bgSuccess]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)}>
-                                        <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
-                                    </Button>
-                                </View>
-                            </View>)}
+                        {this.showAccepRejectButtons()}
                     </View>
                     {this.showJobDataList()}
-                    <Footer style={[style.footer]}/>
+                    <Footer style={[style.footer]} />
                 </Container >
             </StyleProvider >
         )

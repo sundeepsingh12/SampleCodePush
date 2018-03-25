@@ -160,95 +160,105 @@ class LiveJobListing extends PureComponent {
         }
     }
 
+    emptyListView() {
+        return (
+            <StyleProvider style={getTheme(platform)}>
+                <Container>
+                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+                        <Body>
+                            <View
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                                <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                                </TouchableOpacity>
+                                <View style={[styles.headerBody, styles.paddingTop15]}>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : LIVE_TASKS}</Text>
+                                </View>
+                                <View style={[styles.headerRight]}>
+                                </View>
+                                <View />
+                            </View>
+                        </Body>
+                    </Header>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+                        <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
+                    </View>
+                </Container>
+            </StyleProvider>
+        )
+    }
+
+    setSearchText() {
+        this.props.actions.setState(SET_SEARCH, this.props.searchText)
+        this.setState({ isScannerUsed: true })
+    }
+    showListWithSearchBar() {
+        let view
+        if (!this.props.selectedItems || this.props.selectedItems.length == 0) {
+            view = <Header searchBar style={[styles.bgPrimary, style.header]}>
+                <Body>
+                    <View
+                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                        <TouchableOpacity style={[style.headerLeft]} onPress={() => {
+                            this.props.navigation.goBack(null)
+                        }}>
+                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                        </TouchableOpacity>
+                        <View style={[style.headerBody]}>
+                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{LIVE_TASKS}</Text>
+                        </View>
+                        <View style={[style.headerRight]}>
+                        </View>
+                        <View />
+                    </View>
+                    <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation}
+                        returnValue={(searchText) => this.setSearchText()} searchText={this.props.searchText} onPress={() => this.setSearchText()} />
+                </Body>
+            </Header>
+        }
+        return view
+    }
+
+    showMultipleSelectList() {
+        let view
+        if (this.props.selectedItems && this.props.selectedItems.length > 0) {
+            view = <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                <Body>
+                    <View style={[styles.column, { alignSelf: 'stretch' }]}>
+                        <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
+                            <View style={[styles.row, styles.justifySpaceAround, styles.alignCenter]}>
+                                <TouchableOpacity
+                                    style={[styles.margin5, styles.padding10, styles.paddingLeft0]}
+                                    onPress={() => this.props.actions.selectNone(this.props.liveJobList)}>
+                                    <Icon name="md-close" style={[styles.fontWhite, styles.fontXl]} />
+                                </TouchableOpacity>
+                                <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
+                            </View>
+                            <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
+                        </View>
+                        <View style={[styles.row]}>
+                            <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(1)}> {ACCEPT} </Text>
+                            <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(2)}> {REJECT} </Text>
+                        </View>
+                    </View>
+                </Body>
+            </Header>
+        }
+        return view
+    }
     render() {
-        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : LIVE_TASKS
         if (this.props.loaderRunning) {
             return <Loader />
         }
         else {
             if (_.isEmpty(this.props.liveJobList)) {
-                return (
-                    <StyleProvider style={getTheme(platform)}>
-                        <Container>
-                            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
-                                <Body>
-                                <View
-                                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                    <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                    </TouchableOpacity>
-                                    <View style={[styles.headerBody, styles.paddingTop15]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
-                                    </View>
-                                    <View style={[styles.headerRight]}>
-                                    </View>
-                                    <View />
-                                </View>
-                                </Body>
-                            </Header>
-                            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{NO_JOBS_PRESENT}</Text>
-                            </View>
-                        </Container>
-                    </StyleProvider>
-                )
+                return this.emptyListView()
             } else {
                 return (
                     <StyleProvider style={getTheme(platform)}>
                         <Container>
-                            {renderIf(!this.props.selectedItems || this.props.selectedItems.length <= 0,
-                                <Header searchBar style={[styles.bgPrimary, style.header]}>
-                                    <Body>
-                                        <View
-                                            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                            <TouchableOpacity style={[style.headerLeft]} onPress={() => {
-                                                this.props.navigation.goBack(null)
-                                            }}>
-                                                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                            </TouchableOpacity>
-                                            <View style={[style.headerBody]}>
-                                                <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{LIVE_TASKS}</Text>
-                                            </View>
-                                            <View style={[style.headerRight]}>
-                                            </View>
-                                            <View />
-                                        </View>
-                                        <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation}
-                                            returnValue={(searchText) => {
-                                                this.props.actions.setState(SET_SEARCH, searchText)
-                                                this.setState({ isScannerUsed: true })
-                                            }} searchText={this.props.searchText} onPress={() => {
-                                                this.props.actions.setState(SET_SEARCH, this.props.searchText)
-                                                this.setState({ isScannerUsed: true })
-                                            }} />
-                                    </Body>
-                                </Header>
-                            )}
-                            {renderIf(this.props.selectedItems && this.props.selectedItems.length > 0,
-                                <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                                    <Body>
-                                        <View style={[styles.column, { alignSelf: 'stretch' }]}>
-                                            <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>
-                                                <View style={[styles.row, styles.justifySpaceAround, styles.alignCenter]}>
-                                                    <TouchableOpacity
-                                                        style={[styles.margin5, styles.padding10, styles.paddingLeft0]}
-                                                        onPress={() => {
-                                                            this.props.actions.selectNone(this.props.liveJobList)
-                                                        }}>
-                                                        <Icon name="md-close" style={[styles.fontWhite, styles.fontXl]} />
-                                                    </TouchableOpacity>
-                                                    <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>
-                                                </View>
-                                                <Text style={[styles.fontWhite]} onPress={() => this.props.actions.selectAll(this.props.liveJobList)}> {SELECT_ALL} </Text>
-                                            </View>
-                                            <View style={[styles.row]}>
-                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(1)}> {ACCEPT} </Text>
-                                                <Text style={[styles.fontWhite, styles.padding10]} onPress={() => this.acceptOrRejectMultiple(2)}> {REJECT} </Text>
-                                            </View>
-                                        </View>
-                                    </Body>
-                                </Header>
-                            )}
+                            {this.showListWithSearchBar()}
+                            {this.showMultipleSelectList()}
                             <FlatList
                                 data={this.renderList()}
                                 renderItem={({ item }) => this.renderData(item)}
