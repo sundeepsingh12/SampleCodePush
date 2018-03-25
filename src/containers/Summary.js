@@ -99,11 +99,31 @@ class SummaryListing extends PureComponent {
             );
         });
     }
+
+    renderDataForCollection(data){
+        let collectionMode = ['cashCollected', 'cashCollectedByCard', 'cashPayment']
+        return collectionMode.map(function (collectionMode, i) {
+            return(
+            (data[collectionMode] > 0 ) ? 
+            <View style={[styles.padding10, { borderBottomColor: '#d3d3d3', borderBottomWidth: 1 }]} key={String(i)}>
+            <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter]}>
+                <Text style={[styles.fontLg, styles.fontWeight500]}>
+                    {collectionMode}
+                </Text>
+                <Text style={[styles.fontDefault, styles.fontWeight500]}>
+                    {data[collectionMode]}
+                </Text>
+            </View>
+            </View> : null
+            )
+        })
+    }
     
         render() {
             return (
             <View>
                 {this.renderData(this.props.status,this.props.data)}
+                {this.renderDataForCollection(this.props.data)}
             </View>
             )
         }

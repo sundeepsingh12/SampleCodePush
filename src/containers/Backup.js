@@ -17,14 +17,8 @@ import {
     Header,
     Button,
     Body,
-    Right,
     Icon,
-    List,
-    ListItem,
     StyleProvider,
-    Footer,
-    FooterTab,
-    Card,
     Toast
 } from 'native-base'
 import {
@@ -44,7 +38,12 @@ import {
     UPLOAD_FAILED,
     CLOSE,
     LOGGING_OUT,
-    OK
+    OK,
+    THERE_ARE_NO_UNSYNCED_FILES,
+    DELETE,
+    THERE_ARE_NO_SYNCED_FILES,
+    KB,
+    MB,
 } from '../lib/ContainerConstants'
 import {
     SET_BACKUP_VIEW,
@@ -125,10 +124,17 @@ class Backup extends Component {
         }
         return loader
     }
+    _getViewOfSize(size) {
+        if (size >= 1024) {
+            return <Text>{+(Math.round(size / 1024 + "e+2") + "e-2")} {MB}</Text>
+        } else {
+            return <Text>{size} {KB}</Text>
+        }
+    }
     renderSyncedData = (item) => {
         return (
             <View style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
-                < View style={[styles.padding10, styles.row]} >
+                <View style={[styles.padding10, styles.row]} >
                     <View style={{ width: '40%' }}>
                         <Text>
                             {FILE_CREATED}
@@ -142,7 +148,7 @@ class Backup extends Component {
                     <View style={{ width: '10%' }}>
                         <Icon onPress={() => this.setState({ indexOfModal: item.id })} size={10} style={{ height: 20, alignSelf: 'flex-end' }} name="ios-more" />
                     </View>
-                </View >
+                </View>
                 <View style={[styles.padding10, styles.row]}>
                     <View style={{ width: '40%' }}>
                         <Text>
@@ -165,9 +171,7 @@ class Backup extends Component {
                         </Text>
                     </View>
                     <View style={{ width: '50%' }}>
-                        <Text>
-                            {item.size} kb
-                        </Text>
+                        {this._getViewOfSize(item.size)}
                     </View>
                     <View style={{ width: '10%' }}>
                         {renderIf(item.isNew, <View style={[styles.alignCenter, { backgroundColor: '#F6DF80', borderRadius: 3, padding: 3 }]}>
@@ -195,19 +199,18 @@ class Backup extends Component {
         } else if (_.isEmpty(this.props.unSyncedFiles)) {
             emptyListView =
                 <View style={[styles.alignCenter, styles.padding20]}>
-                    <Text style={styles.fontDarkGray}> There are no Unsynced Files </Text>
+                    <Text style={styles.fontDarkGray}> {THERE_ARE_NO_UNSYNCED_FILES} </Text>
                 </View>
             return emptyListView
         }
-
     }
+
     renderList() {
         let syncedFiles = Object.values(this.props.syncedFiles)
-        const list = syncedFiles.sort((transaction1, transaction2) =>
-            transaction2.id - transaction1.id
-        )
+        const list = syncedFiles.sort((transaction1, transaction2) => transaction2.id - transaction1.id)
         return list
     }
+
     getSyncedFilesView() {
         let flatListView
         let emptyListView
@@ -223,12 +226,13 @@ class Backup extends Component {
         } else if (_.isEmpty(this.props.syncedFiles)) {
             emptyListView =
                 <View style={[styles.alignCenter, styles.padding20]}>
-                    <Text style={styles.fontDarkGray}> There are no Synced Files </Text>
+                    <Text style={styles.fontDarkGray}> {THERE_ARE_NO_SYNCED_FILES} </Text>
                 </View>
             return emptyListView
         }
 
     }
+
     headerView() {
         return <Header style={[styles.bgPrimary, style.header]}>
             <Body>
@@ -245,8 +249,8 @@ class Backup extends Component {
                 </View>
             </Body>
         </Header>
-
     }
+
     getModalView() {
         if (this.props.backupView != 0 || this.state.indexOfModal == 0) return
         let modal
@@ -301,7 +305,7 @@ class Backup extends Component {
                                     }
                                 }>
                                     <Text style={[styles.fontDanger, styles.fontXl]}>
-                                        Delete
+                                        {DELETE}
                                     </Text>
                                 </Button>
                                 <Button full transparent style={{ height: 60 }} onPress={() => this.setState({ indexOfModal: 0 })}>
@@ -312,7 +316,7 @@ class Backup extends Component {
                             </View>
                         </TouchableHighlight>
                     </Modal>
-                </View >
+                </View>
         }
         return modal
     }
@@ -330,7 +334,7 @@ class Backup extends Component {
         }
         return view
     }
-    
+
     uploadingView() {
         if (this.props.backupView == 1) {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
@@ -340,7 +344,7 @@ class Backup extends Component {
                             {UPLOADING}
                         </Text>
                     </View>
-                    < View style={[styles.padding5, styles.row]} >
+                    <View style={[styles.padding5, styles.row]} >
                         <View style={{ width: '40%' }}>
                             <Text>
                                 {FILE_CREATED}
@@ -351,7 +355,7 @@ class Backup extends Component {
                                 {this.props.fileUploading.creationDate}
                             </Text>
                         </View>
-                    </View >
+                    </View>
                     <View style={[styles.padding5, styles.row]}>
                         <View style={{ width: '40%' }}>
                             <Text>
@@ -374,9 +378,7 @@ class Backup extends Component {
                             </Text>
                         </View>
                         <View style={{ width: '50%' }}>
-                            <Text>
-                                {this.props.fileUploading.size} kb
-                        </Text>
+                            {this._getViewOfSize(this.props.fileUploading.size)}
                         </View>
                     </View>
                 </View>
@@ -421,14 +423,12 @@ class Backup extends Component {
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
                         style={[style.imageSync]}
-                        source={require('../../images/fareye-default-iconset/error.png')}
-                    />
+                        source={require('../../images/fareye-default-iconset/error.png')} />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
                         {UPLOAD_FAILED}
                     </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
-
                     <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
                             onPress={() => {
@@ -441,7 +441,6 @@ class Backup extends Component {
                 </View>
             </View>
         }
-
     }
 
     getLogoutView() {
@@ -456,7 +455,6 @@ class Backup extends Component {
 
             </View>
         }
-
     }
 
     render() {
@@ -482,7 +480,7 @@ class Backup extends Component {
                         </View>
                     </Content>)}
                 </Container>
-            </StyleProvider >)
+            </StyleProvider>)
     }
 }
 

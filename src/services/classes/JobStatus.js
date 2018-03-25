@@ -166,50 +166,59 @@ class JobStatus {
     return filteredJobStatusIds
   }
 
-  /** Returns statusIds based on particular status category  and status_code  and also check that 
-   *  job_status_tab is not hidden
-   * 
-   * Sample Return value
-   * [1,2,3]
-   */
+   /**@function getStatusIdsForAllStatusCategory()
+    * 
+    * function return map of allStatusIds (pending, fail, success) with its status category and 
+    * also map of status whose nextStatusList is empty
+    * It also check for hidden tab
+    *
+    *@return  {allStatusMap :  {  123 : 1 , 124 : 2 , 125 : 3 }, noNextStatusMap : { 126 : true , 130 : true } }
+    *
+    */
 
   async getStatusIdsForAllStatusCategory() {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    let allStatusMap = {}, noNextStatusMap = {}
+    let tabIdMap = await this.checkForHiddenTab()
+    if (!jobStatusArray || !jobStatusArray.value) {//check for jobStatus in store
+      throw new Error('Job status missing in store')
+    }
+    const jobStatusList = jobStatusArray.value
+    for (let id in jobStatusList) {
+      if (!tabIdMap[jobStatusList[id].tabId]) {// check for hidden tab 
+        continue
+      }
+      if (jobStatusList[id].nextStatusList.length == 0 && jobStatusList[id].statusCategory != 1) {//check for status having no next status list 
+        noNextStatusMap[jobStatusList[id].id] = true
+      }
+      if (jobStatusList[id].code != UNSEEN) { // check for all status whose code is not UNSEEN
+        allStatusMap[jobStatusList[id].id] = jobStatusList[id].statusCategory
+      }
+    }
+    return { allStatusMap, noNextStatusMap }
+  }
+
+/**@function checkForHiddenTab()
+    * 
+    * function return tabLisId map with boolean whose tabName is not equal to hidden
+    * 
+    *@return {tabListMap : {1 : true, 2 : true}} 
+    *
+    */
+   
+  async checkForHiddenTab() {
     const tabs = await keyValueDBService.getValueFromStore(TAB)
     if (!tabs || !tabs.value) {
       throw new Error('tab missing in store')
     }
-    const tabList = {}
+    const tabListMap = {}
     tabs.value.forEach(key => {
-      if (key.name.toLocaleLowerCase() !== 'hidden') {
-        tabList[key.id] = key
+      if (key.name.toLocaleLowerCase() !== 'hidden') { // check for hidden tab
+        tabListMap[key.id] = true
       }
     })
-    if (!jobStatusArray || !jobStatusArray.value) {
-      throw new Error('Job status missing in store')
-    }
-    const jobStatusList = jobStatusArray.value
-    let pendingStatusIds = [], failStatusIds = [], successStatusIds = [], noNextStatusIds = [];
-    for (id in jobStatusList) {
-      if (jobStatusList[id].nextStatusList.length == 0) {
-        noNextStatusIds.push(jobStatusList[id].id)
-      }
-      if (jobStatusList[id].statusCategory == 1 && jobStatusList[id].code != UNSEEN) {
-        pendingStatusIds.push(jobStatusList[id].id)
-        continue
-      }
-      if (jobStatusList[id].statusCategory == 3) {
-        successStatusIds.push(jobStatusList[id].id)
-        continue
-      }
-      if (jobStatusList[id].statusCategory == 2) {
-        failStatusIds.push(jobStatusList[id].id)
-      }
-    }
-    return { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds }
+    return tabListMap
   }
-
-
 
   getTabIdOnStatusId(statusList, statusId) {
     let tabId

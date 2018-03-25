@@ -25,7 +25,7 @@ import {
   LIVE_JOB,
   USER_EVENT_LOG,
   PENDING_SYNC_TRANSACTION_IDS,
-  SHOULD_CREATE_BACKUP,
+  BACKUP_ALREADY_EXIST,
   USER_EXCEPTION_LOGS
 } from '../../lib/constants'
 
@@ -95,7 +95,7 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
       await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)
       await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
-      await keyValueDBService.deleteValueFromStore(SHOULD_CREATE_BACKUP)
+      await keyValueDBService.deleteValueFromStore(BACKUP_ALREADY_EXIST)
       await keyValueDBService.deleteValueFromStore(USER_EXCEPTION_LOGS)
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
@@ -111,10 +111,11 @@ export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, i
   return async function (dispatch) {
     try {
       if (isToastShow == 1) {
-        Toast.show({ text: "ErrorCode: " + errorCode + "\nErrorMessage: " + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
+        Toast.show({ text: "ErrorCode: " + errorCode + "\n " + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
       }
       await userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
     } catch (error) {
+      console.logs('error1',error)
       await userExceptionLogsService.addUserExceptionLogs(error.message, 123121)
     }
   }

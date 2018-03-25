@@ -161,7 +161,6 @@ class LiveJobListing extends PureComponent {
     }
 
     emptyListView() {
-        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : LIVE_TASKS
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
@@ -173,7 +172,7 @@ class LiveJobListing extends PureComponent {
                                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[styles.headerBody, styles.paddingTop15]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : LIVE_TASKS}</Text>
                                 </View>
                                 <View style={[styles.headerRight]}>
                                 </View>
@@ -189,6 +188,10 @@ class LiveJobListing extends PureComponent {
         )
     }
 
+    setSearchText() {
+        this.props.actions.setState(SET_SEARCH, this.props.searchText)
+        this.setState({ isScannerUsed: true })
+    }
     showListWithSearchBar() {
         let view
         if (!this.props.selectedItems || this.props.selectedItems.length == 0) {
@@ -209,13 +212,7 @@ class LiveJobListing extends PureComponent {
                         <View />
                     </View>
                     <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={(searchText) => this.props.actions.setState(SET_SEARCH, searchText)} navigation={this.props.navigation}
-                        returnValue={(searchText) => {
-                            this.props.actions.setState(SET_SEARCH, searchText)
-                            this.setState({ isScannerUsed: true })
-                        }} searchText={this.props.searchText} onPress={() => {
-                            this.props.actions.setState(SET_SEARCH, this.props.searchText)
-                            this.setState({ isScannerUsed: true })
-                        }} />
+                        returnValue={(searchText) => this.setSearchText()} searchText={this.props.searchText} onPress={() => this.setSearchText()} />
                 </Body>
             </Header>
         }
@@ -232,9 +229,7 @@ class LiveJobListing extends PureComponent {
                             <View style={[styles.row, styles.justifySpaceAround, styles.alignCenter]}>
                                 <TouchableOpacity
                                     style={[styles.margin5, styles.padding10, styles.paddingLeft0]}
-                                    onPress={() => {
-                                        this.props.actions.selectNone(this.props.liveJobList)
-                                    }}>
+                                    onPress={() => this.props.actions.selectNone(this.props.liveJobList)}>
                                     <Icon name="md-close" style={[styles.fontWhite, styles.fontXl]} />
                                 </TouchableOpacity>
                                 <Text style={[styles.fontWhite]}> {this.props.selectedItems.length + SELECTED} </Text>

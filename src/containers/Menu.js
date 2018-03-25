@@ -51,6 +51,7 @@ import {
   OfflineDS,
   Backup,
   SET_UNSYNC_TRANSACTION_PRESENT,
+  ERROR_400_403_LOGOUT_FAILURE,
   BluetoothListing
 } from '../lib/constants'
 
@@ -58,7 +59,8 @@ import {
   OK,
   CANCEL,
   LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
-  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE
+  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
+  CONFIRM_LOGOUT,
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -143,12 +145,6 @@ class Menu extends PureComponent {
         this.props.actions.navigateToScene(BluetoothListing, { displayName: this.props.menu.BACKUP.displayName })
         break
       }
-      // default:
-      //   Toast.show({
-      //     text: `Under development!Coming Soon`,
-      //     position: 'bottom',
-      //     buttonText: 'OK'
-      //   })
     }
   }
 
@@ -184,7 +180,7 @@ class Menu extends PureComponent {
         {
           text: OK, onPress: () => {
             this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
-            this.props.actions.invalidateUserSession()
+            this.props.actions.invalidateUserSession(true)
           }
         },],
         { cancelable: false })
@@ -208,15 +204,14 @@ class Menu extends PureComponent {
   }
 
   render() {
-    let paymentView = this.renderModuleView([this.props.menu[EZETAP], this.props.menu[MSWIPE]], 2)
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
           {this.renderMenuHeader()}
-          {renderIf(this.props.isErrorType_403_400_Logout,
+          {(this.props.isErrorType_403_400_Logout &&
             <CustomAlert
               title="Unauthorised Device"
-              message={this.props.errorMessage_403_400_Logout}
+              message={this.props.errorMessage_403_400_Logout.message}
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
 
@@ -271,9 +266,7 @@ class Menu extends PureComponent {
 
   logoutButtonPressed = () => {
     this.props.actions.checkForUnsyncTransactionAndLogout()
-    // this.props.actions.invalidateUserSession()
   }
-
 }
 
 const style = StyleSheet.create({
