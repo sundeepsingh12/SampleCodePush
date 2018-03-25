@@ -133,9 +133,9 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
             }
             formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
-            // dispatch(setState(UPDATE_PAYMENT_AT_END, {
-            //     paymentAtEnd
-            // }))
+            dispatch(setState(UPDATE_PAYMENT_AT_END, {
+                paymentAtEnd
+            }))
         } catch (error) {
             console.log(error)
         }

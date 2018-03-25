@@ -11,7 +11,7 @@ module.exports = {
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
-    VERIFY:'Verify',
+    VERIFY: 'Verify',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -70,7 +70,7 @@ module.exports = {
     CONFIRM_REVERT: 'Confirm Revert',
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
-    REVERT_STATUS:'Revert Status',
+    REVERT_STATUS: 'Revert Status',
 
     //Payment Container
     YES: 'Yes',
@@ -126,7 +126,7 @@ module.exports = {
     //Data Store service
     DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
     CURRENT_ELEMENT_MISSING: 'currentElement Missing',
-    CONFIRM:'Confirm',
+    CONFIRM: 'Confirm',
 
     //Data Store Filter
     JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
@@ -174,7 +174,7 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
-    LOGOUT_UNSYNCED_TRANSACTIONS:'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    LOGOUT_UNSYNCED_TRANSACTIONS: 'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
 
     //Tracking constants
     ENTER: 'ENTER',
@@ -208,7 +208,7 @@ module.exports = {
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
     ADD_TOAST: 'Please fill required fields first',
     INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
-    REMOVE:'Remove',
+    REMOVE: 'Remove',
 
     //Expandable Details View
     TAP_TO_HIDE: 'Tap to hide',
@@ -218,8 +218,8 @@ module.exports = {
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
     YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
-    MORE:'More',
-    
+    MORE: 'More',
+
 
     //Save Activated
     EDIT: 'Edit',
@@ -233,7 +233,7 @@ module.exports = {
     SELECT_NUMBER_FOR_CALL: 'Select number for call',
     CALL_CONFIRM: 'Do you want to proceed with the call?',
     CONFIRMATION: 'Confirmation: ',
-    SELECT_ADDRESS_NAVIGATION:'Select address for navigation',
+    SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
 
     //Cash Tendering
     NOT_REQUIRED: 'NOT REQUIRED',
@@ -271,7 +271,7 @@ module.exports = {
     NEXT_POSSIBLE_STATUS: 'Next possible status',
 
     //Sorting
-    SORTING : 'Sorting',
+    SORTING: 'Sorting',
     REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
@@ -286,27 +286,50 @@ module.exports = {
     MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
     VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
     CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
-    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..", 
+    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
     UNSAVED_PASSWORD: 'Password not saved before',
 
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
 
     //Signature
-    IMPROPER_SIGNATURE:'Improper signature. Please make your full signature.',
+    IMPROPER_SIGNATURE: 'Improper signature. Please make your full signature.',
 
     //Login
-    CONFIRM_RESET:'Confirm Reset',
-    RESET_ACCOUNT_SETTINGS:'Click OK to reset your account settings.',
-    REMEMBER_ME:'Remember Me',
+    CONFIRM_RESET: 'Confirm Reset',
+    RESET_ACCOUNT_SETTINGS: 'Click OK to reset your account settings.',
+    REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP:'Setting you up...',
-    DOWNLOAD_SETTINGS:'Downloading settings',
-    APPLYING_SETTINGS:'Applying settings',
-    VERIFY_HANDSET:'Verifying handset',
-    VERIFY_MOBILE:'Verify your mobile',
-    OTP_CODE_SENT:'OTP code hasbeen sent to',
-    ENTER_MOBILE:'Enter your mobile',
-    SEND_OTP:'Send OTP',
+    SETTING_UP: 'Setting you up...',
+    DOWNLOAD_SETTINGS: 'Downloading settings',
+    APPLYING_SETTINGS: 'Applying settings',
+    VERIFY_HANDSET: 'Verifying handset',
+    VERIFY_MOBILE: 'Verify your mobile',
+    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    ENTER_MOBILE: 'Enter your mobile',
+    SEND_OTP: 'Send OTP',
+
+    //Mosambee Wallet
+    OTP_NUMBER_CAN_NOT_BE_BLANK: 'Otp Number can not be left Blank',
+    MOBILE_NO_CAN_NOT_BE_BLANK: 'Mobile Number can not be left Blank',
+    FAILED: 'Failed',
+    RESEND: 'reSend',
+    TRANSACTION_SUCCESSFUL: 'Transaction Successfull',
+    FINISH: 'Finish',
+    RETRY_PAYMENT: 'Retry Payment',
+    SEND_OTP: 'Send OTP',
+    SUBMIT: 'Submit',
+    PAYMENT_SUCCESSFUL: 'Payment Successful',
+    PAYMENT_FAILED: 'Payment Failed',
+    MOSAMBEE_WALLET: 'Mosambee Wallet',
+    PAYMENT: 'Payment',
+    SELECT_PREFERRED_METHOD: 'Select Preffered method',
+    ENTER_OTP_SENT_TO_MOBILE_NO:'Enter One Time Password (OTP) Sent to Mobile Number ',
+    CHANGE_MOBILE_NO:'Change Mobile Number',
+    ENTER_OTP_SENT_TO_CUSTOMER:'Enter OTP Sent to Customer',
+    RESEND_OTP:'Resend OTP',
+    ENTER_OTP:'Enter OTP',
+    ENTER_REGISTERED:'Enter Registered ',
+    TOTAL_AMOUNT_FOR_WALLET:'Total Amount',
 }

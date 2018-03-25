@@ -27,13 +27,15 @@ import {
   NET_BANKING_CARD_LINK,
   NET_BANKING_UPI_LINK,
   UPI,
+  MOSAMBEE_WALLET
 } from '../lib/AttributeConstants'
 
 import {
   SET_DRAFT,
   SET_UPDATE_DRAFT,
   ERROR_MESSAGE,
-  SET_FORM_TO_INVALID
+  SET_FORM_TO_INVALID,
+  RESET_STATE_FOR_WALLET
 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import {
@@ -85,6 +87,9 @@ class FormLayout extends PureComponent {
       })
       this.props.actions.setState(ERROR_MESSAGE, '')
     }
+  }
+  componentWillUnmount(){
+    this.props.actions.setState(RESET_STATE_FOR_WALLET)
   }
 
   saveDraft = () => {
@@ -151,6 +156,7 @@ class FormLayout extends PureComponent {
       case NET_BANKING_CARD_LINK.id:
       case NET_BANKING_UPI_LINK.id: return 'PayByLink'
       case UPI.id: return 'UPIPayment'
+      case MOSAMBEE_WALLET.id: return 'MosamBeeWalletPayment'
     }
 
     return null

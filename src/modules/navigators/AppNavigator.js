@@ -86,6 +86,7 @@ import AutoLogout from '../../containers/AutoLogout'
 import Backup from '../../containers/Backup'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
 import HomeTabNavigator from '../../containers/HomeTabNavigator'
+import MosambeeWalletPayment from '../../containers/MosambeeWalletPayment'
 import {
   ApplicationScreen,
   HardwareBackPress,
@@ -259,6 +260,12 @@ export const AppNavigator = StackNavigator({
   },
   UPIPayment: {
     screen: UPIPayment
+  },
+  MosamBeeWalletPayment:{
+    screen: MosambeeWalletPayment,
+    navigationOptions: {
+      header: null
+    }
   },
   PayByLink: {
     screen: PayByLink

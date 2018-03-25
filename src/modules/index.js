@@ -48,6 +48,7 @@ import cameraReducer from './camera/cameraReducer'
 import autoLogout from './autoLogout/autoLogoutReducer'
 import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 import backup from './backup/backupReducer'
+import mosambeeWalletPayment from './cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletReducer'
 // import profile from './profile/profileReducer'
 
 
@@ -97,6 +98,7 @@ const rootReducer = combineReducers({
   dataStoreFilterReducer,
   backup,
   multipleOptionsAttribute,
+  mosambeeWalletPayment
 })
 
 // const rootReducer = (state, action) => {

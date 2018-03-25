@@ -527,6 +527,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   showRevertView (){
+    return(
     <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={this.selectStatusToRevert}>
     <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
       <View style={[styles.row, styles.alignCenter]}>
@@ -540,12 +541,14 @@ class JobDetailsV2 extends PureComponent {
       </View>
     </View>
   </TouchableOpacity>
+    )
   }
 
   showContentView() {
     const statusView = this.props.currentStatus && !this.props.errorMessage ? this.renderStatusList(this.props.currentStatus.nextStatusList) : null
     const etaTimer = this.etaUpdateTimer()
-    return (<Content>
+    return (
+    <Content>
       {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
         this.showRevertView(): null}
 
