@@ -4,7 +4,6 @@ import {
   HomeTabNavigatorScreen,
   IS_PRELOADER_COMPLETE,
   LoginScreen,
-  LOGIN,
   LOGIN_FAILURE,
   LOGIN_START,
   LOGIN_SUCCESS,
@@ -20,9 +19,6 @@ import {
   REMEMBER_ME,
   REMEMBER_ME_SET_TRUE,
   SET_CREDENTIALS,
-  SESSION_TOKEN_REQUEST,
-  SESSION_TOKEN_SUCCESS,
-  SESSION_TOKEN_FAILURE,
   TOGGLE_CHECKBOX,
   USERNAME,
   AutoLogoutScreen,
@@ -53,25 +49,7 @@ import {
   NavigationActions
 } from 'react-navigation'
 
-import { setState, resetNavigationState } from '../global/globalActions'
-
-/**
- * ## State actions
- * controls which form is displayed to the user
- * as in login, register, logout or reset password
- */
-
-export function logoutState() {
-  return {
-    type: LOGOUT
-  }
-}
-
-export function loginState() {
-  return {
-    type: LOGIN
-  }
-}
+import { setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 
 /**
  * ## Login actions
@@ -98,20 +76,6 @@ export function loginFailure(error) {
 function forgetPassword() {
   return {
     type: FORGET_PASSWORD
-  }
-}
-
-export function sessionTokenRequestSuccess(token) {
-  return {
-    type: SESSION_TOKEN_SUCCESS,
-    payload: token
-  }
-}
-
-export function sessionTokenRequestFailure(error) {
-  return {
-    type: SESSION_TOKEN_FAILURE,
-    payload: error === undefined ? null : error
   }
 }
 
@@ -184,6 +148,7 @@ export function authenticateUser(username, password, rememberMe) {
         routeName: PreloaderScreen
       }))
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0))
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
     }
   }
@@ -206,8 +171,8 @@ export function onLongPressResetSettings() {
       dispatch(setState(RESET_STATE))
       dispatch(onLongPressIcon(false))
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1302, error.message, 'danger', 1))
       dispatch(onLongPressIcon(false))
-      console.log(erroe)
     }
   }
 }
@@ -224,6 +189,7 @@ export function forgetPasswordRequest(username) {
       const response = await RestAPIFactory().serviceCall(data, CONFIG.API.FORGET_PASSWORD, 'LOGIN')
       dispatch(loginFailure(response.json.message.replace(/<\/?[^>]+(>|$)/g, "")))
     } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1303, error.message, 'danger', 0))
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
     }
   }
@@ -241,7 +207,7 @@ export function checkRememberMe() {
         dispatch(rememberMeSetTrue())
       }
     } catch (error) {
-
+      dispatch(showToastAndAddUserExceptionLog(1304, error.message, 'danger', 1))
     }
   }
 }
@@ -282,8 +248,7 @@ export function getSessionToken() {
         }
       }
     } catch (error) {
-      dispatch(sessionTokenRequestFailure(error.message))
-      dispatch(loginState())
+      dispatch(showToastAndAddUserExceptionLog(1305, error.message, 'danger', 1))
       dispatch(NavigationActions.navigate({
         routeName: LoginScreen
       }))

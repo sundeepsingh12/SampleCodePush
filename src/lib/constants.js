@@ -16,7 +16,6 @@ module.exports = keyMirror({
     SET_LOADER_IN_AUTOLOGOUT: null,
 
     //Auth Actions
-    LOGIN: null,
     LOGOUT: null,
     LOGIN_START: null,
     LOGIN_SUCCESS: null,
@@ -47,10 +46,6 @@ module.exports = keyMirror({
     OTP_VALIDATION_SUCCESS: null,
     OTP_VALIDATION_FAILURE: null,
 
-    SESSION_TOKEN_REQUEST: null,
-    SESSION_TOKEN_SUCCESS: null,
-    SESSION_TOKEN_FAILURE: null,
-
     DELETE_TOKEN_REQUEST: null,
     DELETE_TOKEN_SUCCESS: null,
 
@@ -66,6 +61,7 @@ module.exports = keyMirror({
     ON_MOBILE_NO_CHANGE: null,
     ON_OTP_CHANGE: null,
     ERROR_400_403_LOGOUT: null,
+    ERROR_400_403_LOGOUT_FAILURE: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
@@ -136,6 +132,10 @@ module.exports = keyMirror({
     //Pay By Link Payment Actions
     SET_PAY_BY_LINK_PARAMETERS: null,
 
+    //Bluetooth Actions
+    BLUETOOTH_SCANNING_START: null,
+    BLUETOOTH_SCANNING_STOP: null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
@@ -194,7 +194,7 @@ module.exports = keyMirror({
     SET_SAVE_ACTIVATED_TOAST_MESSAGE: null,
     EMAILID_VIEW_ARRAY: null,
     IS_COMPANY_CODE_DHL: null,
-    SHOULD_CREATE_BACKUP: null,
+    BACKUP_ALREADY_EXIST: null,
     BACKUP_UPLOAD_FAIL_COUNT: null,
     HUB_LAT_LONG: null,
     GEO_FENCING: null,
@@ -293,6 +293,7 @@ module.exports = keyMirror({
     Payment: null,
     SequenceRunsheetList: null,
     UnsyncBackupUpload: null,
+    BluetoothListing: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -474,6 +475,7 @@ module.exports = keyMirror({
     VIEW_IMAGE_DATA: null,
     SET_SHOW_VIEW_IMAGE: null,
     UPDATE_SKU_LIST_ITEMS: null,
+    SET_SHOW_IMAGE_AND_DATA: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
@@ -508,6 +510,9 @@ module.exports = keyMirror({
     SET_UPLOADING_FILE: null,
     SET_SYNCED_FILES: null,
     SET_BACKUP_TOAST: null,
+
+    //userExceptionLogs
+    USER_EXCEPTION_LOGS: null,
 })
 
 

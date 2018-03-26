@@ -19,7 +19,7 @@ export default function skuListingReducer(state = initialState, action) {
 
     switch (action.type) {
         case SKU_LIST_FETCHING_START :
-            return state.set('skuListingLoading',true)
+            return state.set('skuListingLoading',action.payload)
 
         case SKU_LIST_FETCHING_STOP :
             return state.set('skuListItems',action.payload.skuListItems)
