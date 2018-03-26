@@ -168,7 +168,10 @@ class SkuListing {
                     fieldAttributeMasterId: -43210,
                     sequence: -1
                 }
-                reasonsList.splice(0,0,selectAnyReason)
+                reasonsList.push(selectAnyReason)
+                reasonsList.sort(function (reason1, reason2) {
+                    return reason1.sequence - reason2.sequence
+                })
             }
             attributeTypeIdValueMap[TOTAL_ORIGINAL_QUANTITY] = totalOriginalQuantityValue
             attributeTypeIdValueMap[TOTAL_ACTUAL_QUANTITY] = totalActualQuantityValue
