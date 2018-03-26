@@ -21,7 +21,7 @@ import * as realm from '../../repositories/realmdb'
 
 class ArrayFieldAttribute {
 
-    getSortedArrayChildElements(arrayDTO, jobTransaction) {
+    getSortedArrayChildElements(arrayDTO, jobTransaction, arrayReverseDataStoreFilterMap, fieldAttributeMasterId) {
         let errorMessage;
         let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
         if (requiredFields.length <= 0) {
@@ -31,7 +31,10 @@ class ArrayFieldAttribute {
             let arrayMainObject = arrayDTO.arrayMainObject
             let arrayTemplate = _.omit(arrayDTO, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
             let arrayRowDTO = this.addArrayRow(0, arrayTemplate, {}, jobTransaction)
-            return { arrayRowDTO, childElementsTemplate: arrayTemplate, errorMessage, arrayMainObject }
+            // Below two lines create a map which is used in case of DSF or DataStore which have mapping with other DSF attribute 
+            let cloneArrayReverseDataStoreFilterMap = _.clone(arrayReverseDataStoreFilterMap)
+            cloneArrayReverseDataStoreFilterMap[fieldAttributeMasterId] = {} // create map with fieldAttributeMasterId of array as key
+            return { arrayRowDTO, childElementsTemplate: arrayTemplate, errorMessage, arrayMainObject, arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap }
         }
     }
 

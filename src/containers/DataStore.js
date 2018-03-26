@@ -34,7 +34,7 @@ import {
     EXTERNAL_DATA_STORE,
 } from '../lib/AttributeConstants'
 import _ from 'lodash'
-import { SUGGESTIONS,OK } from '../lib/ContainerConstants'
+import { SUGGESTIONS, OK } from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         isSearchEnabled: state.dataStore.isSearchEnabled,
@@ -48,7 +48,8 @@ function mapStateToProps(state) {
         detailsVisibleFor: state.dataStore.detailsVisibleFor,
         dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
         isFiltersPresent: state.dataStore.isFiltersPresent,
-        cloneDataStoreAttrValueMap: state.dataStore.cloneDataStoreAttrValueMap
+        cloneDataStoreAttrValueMap: state.dataStore.cloneDataStoreAttrValueMap,
+        arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
     }
 };
 
@@ -65,11 +66,23 @@ class DataStore extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.checkForFiltersAndValidation(
-            this.props.navigation.state.params.currentElement,
-            this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.jobTransaction,
-            this.props.dataStoreFilterReverseMap)
+        //case if Data store is in Array
+        if (this.props.navigation.state.params.calledFromArray) {
+            this.props.actions.checkForFiltersAndValidationForArray(
+                this.props.navigation.state.params.currentElement,
+                this.props.navigation.state.params.formElements,
+                this.props.navigation.state.params.jobTransaction,
+                this.props.arrayReverseDataStoreFilterMap,
+                this.props.navigation.state.params.arrayFieldAttributeMasterId,
+                this.props.navigation.state.params.rowId,
+            )
+        } else {
+            this.props.actions.checkForFiltersAndValidation(
+                this.props.navigation.state.params.currentElement,
+                this.props.navigation.state.params.formElements,
+                this.props.navigation.state.params.jobTransaction,
+                this.props.dataStoreFilterReverseMap)
+        }
     }
 
     componentDidUpdate() {
@@ -186,7 +199,6 @@ class DataStore extends PureComponent {
             this.props.navigation.state.params.jobTransaction,
             this.props.navigation.state.params.fieldAttributeMasterParentIdMap
         )
-        this._goBack()
     }
 
     _searchDataStore = (value) => {

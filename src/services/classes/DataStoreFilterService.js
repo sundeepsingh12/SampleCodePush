@@ -117,7 +117,7 @@ class DataStoreFilterService {
                     if (currentObject.value) {
                         dataStoreAttributeIdtoValueMap[currentObject.dataStoreAttributeId] = currentObject.value
                     }
-                    if (dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId]) {
+                    if (dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId] && !_.includes(dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId], fieldAttributeMasterId)) { // check if variable is initialized with empty array and if present then check if it contains an entry of fieldAttributeMasterId or not to avoid duplicate entry in map
                         dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId].push(fieldAttributeMasterId)
                     } else {
                         dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId] = []
@@ -198,6 +198,28 @@ class DataStoreFilterService {
             }
         }
         return formElement
+    }
+
+    /**
+     * This method works in case of Array having DSF
+     * @param {*} token 
+     * @param {*} currentElement  // Data store filter element
+     * @param {*} formElement // Contains formElement of all rows
+     * @param {*} jobTransaction 
+     * @param {*} arrayReverseDataStoreFilterMap // Object having mapped id's so we can back track and remove value property from formElement if any dsf is edited by the user
+     * @param {*} rowId // Current rowId
+     * @param {*} arrayFieldAttributeMasterId // fieldAttributeMasterId of array
+     */
+    async fetchDataForFilterInArray(token, currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, rowId, arrayFieldAttributeMasterId) {
+        let rowFormElement = formElement[rowId].formLayoutObject //get current formElement 
+        let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
+        let returnParams = await this.fetchDataForFilter(token, currentElement, false, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //get Data for DSF
+        let cloneArrayReverseDataStoreFilterMap = _.cloneDeep(arrayReverseDataStoreFilterMap)
+        cloneArrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] = returnParams.dataStoreFilterReverseMap //change reverse DSF map which contains all mapping related to DSF and Data store
+        return {
+            dataStoreFilterResponse: returnParams.dataStoreFilterResponse,
+            arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap
+        }
     }
 }
 

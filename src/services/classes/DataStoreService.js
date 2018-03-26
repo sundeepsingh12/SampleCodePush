@@ -657,6 +657,29 @@ class DataStoreService {
             cloneDataStoreAttrValueMap
         }
     }
+
+    /**
+     * This method is called in case of array and data store having mapping with any DSF
+     * @param {*} currentElement // Data store element
+     * @param {*} formElement // Contains formElement of all rows
+     * @param {*} jobTransaction 
+     * @param {*} arrayReverseDataStoreFilterMap // Object having mapped id's so we can back track and remove value property from formElement if any dsf is edited by the user
+     * @param {*} arrayFieldAttributeMasterId // fieldAttributeMasterId of array
+     * @param {*} rowId // Current rowId
+     */
+    async checkForFiltersAndValidationsForArray(currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId, rowId) {
+        let rowFormElement = formElement[rowId].formLayoutObject //get current formElement
+        let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
+        let returnParams = await this.checkForFiltersAndValidations(currentElement, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //check for filters and if not present than check for validations
+        let cloneArrayReverseDataStoreFilterMap = _.cloneDeep(arrayReverseDataStoreFilterMap)
+        cloneArrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] = returnParams.dataStoreFilterReverseMap //change reverse DSF map which contains all mapping related to DSF and Data store
+        return {
+            dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
+            isFiltersPresent: returnParams.isFiltersPresent,
+            validation: returnParams.validation,
+            arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap
+        }
+    }
 }
 
 export let dataStoreService = new DataStoreService()
