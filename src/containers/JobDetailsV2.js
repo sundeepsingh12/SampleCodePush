@@ -80,6 +80,7 @@ import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { jobStatusService } from '../services/classes/JobStatus'
+import Line1Line2View from '../components/Line1Line2View'
 
 
 function mapStateToProps(state) {
@@ -511,9 +512,7 @@ class JobDetailsV2 extends PureComponent {
       <Header style={[style.header]}>
         <View style={style.seqCard}>
           {this.showJobMasterIdentifier()}
-          <View style={style.seqCardDetail}>
-            {this.showTransactionView()}
-          </View>
+          <Line1Line2View data = {this.props.navigation.state.params.jobTransaction}/>
           {this.showCloseIcon()}
         </View>
       </Header>

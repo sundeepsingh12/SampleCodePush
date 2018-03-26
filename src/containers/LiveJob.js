@@ -42,6 +42,7 @@ import { NavigationActions } from 'react-navigation'
 import {
     OK
 } from '../lib/ContainerConstants'
+import Line1Line2View from '../components/Line1Line2View'
 
 
 function mapStateToProps(state) {
@@ -189,25 +190,6 @@ class LiveJob extends PureComponent {
         )
     }
 
-    showLineLine2Details(){
-        return(
-            <View style={style.seqCardDetail}>
-                <View>
-                    <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                        {this.props.navigation.state.params.job.line1}
-                    </Text>
-                    <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                        {this.props.navigation.state.params.job.line2}
-                    </Text>
-                    <Text
-                        style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-                        {this.props.navigation.state.params.job.circleLine1}
-                    </Text>
-                </View>
-            </View>
-        )
-    }
-
     showJobDataList(){
         return (
             <Content>
@@ -230,8 +212,7 @@ class LiveJob extends PureComponent {
                         {this.props.navigation.state.params.job.jobMasterIdentifier}
                     </Text>
                 </View>
-                {this.showLineLine2Details()}
-
+                <Line1Line2View data = {this.props.navigation.state.params.job}/>
             </View>
         )
     }
