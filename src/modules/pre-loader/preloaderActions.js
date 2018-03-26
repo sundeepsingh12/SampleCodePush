@@ -82,7 +82,7 @@ import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog,resetNavigationState } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -91,7 +91,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
-import {LOGOUT_UNSUCCESSFUL, OK } from '../../lib/ContainerConstants'
+import { LOGOUT_UNSUCCESSFUL, OK } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
 
@@ -270,7 +270,7 @@ export function downloadJobMaster() {
       dispatch(validateAndSaveJobMaster(json))
       dispatch(autoLogout(userObject))
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1801, error.message, 'danger', 0))      
+      dispatch(showToastAndAddUserExceptionLog(1801, error.message, 'danger', 0))
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
@@ -305,7 +305,7 @@ export function invalidateUserSessionForAutoLogout() {
       await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1802, error.message, 'danger', 1))            
+      dispatch(showToastAndAddUserExceptionLog(1802, error.message, 'danger', 1))
       dispatch(startLoginScreenWithoutLogout())
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
@@ -367,7 +367,7 @@ export function autoLogout(userData) {
         }, timeLimit * 1000)
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1804, error.message, 'danger', 1))      
+      dispatch(showToastAndAddUserExceptionLog(1804, error.message, 'danger', 1))
     }
   }
 }
@@ -377,13 +377,11 @@ export function autoLogout(userData) {
 export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
     try {
-      console.logs('startLoginScreenWithoutLogout called')
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
-      console.logs('error2',error)
       dispatch(showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1))
     }
 
@@ -438,7 +436,7 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0))      
+      dispatch(showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0))
       const keys = [
         JOB_MASTER,
         JOB_ATTRIBUTE,
@@ -497,7 +495,7 @@ export function checkAsset() {
         dispatch(checkIfSimValidOnServer());
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1808, error.message, 'danger', 0))      
+      dispatch(showToastAndAddUserExceptionLog(1808, error.message, 'danger', 0))
       dispatch(checkAssetFailure(error.message))
     }
   }
@@ -541,7 +539,7 @@ export function checkIfSimValidOnServer() {
         dispatch(showMobileNumber())
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0))      
+      dispatch(showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0))
       if (error.code == 403 || error.code == 400) {
         // clear user session without Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
@@ -572,7 +570,7 @@ export function generateOtp(mobileNumber) {
       await keyValueDBService.validateAndSaveData(IS_SHOW_OTP_SCREEN, true)
       dispatch(showOtp())
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1810, error.message, 'danger', 0))      
+      dispatch(showToastAndAddUserExceptionLog(1810, error.message, 'danger', 0))
       dispatch(otpGenerationFailure(error.message))
     }
   }
@@ -605,7 +603,7 @@ export function validateOtp(otpNumber) {
         dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1811, error.message, 'danger', 0))      
+      dispatch(showToastAndAddUserExceptionLog(1811, error.message, 'danger', 0))
       dispatch(otpValidationFailure(error.message))
     }
   }
@@ -615,18 +613,15 @@ export function validateOtp(otpNumber) {
 export function checkForUnsyncTransactionAndLogout() {
   return async function (dispatch) {
     try {
-      console.logs('checkForUnsyncTransactionAndLogout called')
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
-      console.logs('isUnsyncTransactionsPresent',isUnsyncTransactionsPresent)
       if (isUnsyncTransactionsPresent) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {
         dispatch(invalidateUserSession(true))
       }
     } catch (error) {
-      console.logs('error',error)
-      dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))      
+      dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }

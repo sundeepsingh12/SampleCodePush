@@ -20,7 +20,7 @@ import {
     StyleProvider
 } from 'native-base';
 
-import {RNCamera} from 'react-native-camera'
+import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'

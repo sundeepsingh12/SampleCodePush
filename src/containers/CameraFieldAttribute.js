@@ -24,14 +24,15 @@ import {
 } from 'native-base';
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
 
-import {RNCamera} from 'react-native-camera'
+import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import * as cameraActions from '../modules/camera/cameraActions'
 import {
     SET_IMAGE_DATA,
-    SET_SHOW_IMAGE
+    SET_SHOW_IMAGE,
+    SET_SHOW_IMAGE_AND_DATA
 } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import platform from '../../native-base-theme/variables/platform'
@@ -74,8 +75,10 @@ class CameraFieldAttribute extends PureComponent {
         return { header: null }
     }
     componentWillUnmount() {
-        this.props.actions.setState(SET_SHOW_IMAGE, false)
-        this.props.actions.setState(SET_IMAGE_DATA, '')
+        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+            data: '',
+            showImage: false
+        })
     }
     componentDidMount() {
         switch (this.props.navigation.state.params.currentElement.attributeTypeId) {
@@ -134,10 +137,8 @@ class CameraFieldAttribute extends PureComponent {
                         }}
                         captureQuality={this.state.quality}
                         style={style.preview}
-                        captureTarget={RNCamera.Constants.CaptureTarget.memory}
                         flashMode={this.state.torchOff}
-                        type={this.state.cameraType}
-                        orientation={RNCamera.constants.Orientation.portrait}>
+                        type={this.state.cameraType}>
                         <View style={[styles.absolute, styles.padding10, { top: 0, left: 0 }]}>
                             <Icon
                                 name="md-close"
@@ -190,8 +191,10 @@ class CameraFieldAttribute extends PureComponent {
                                 name="md-close"
                                 style={[styles.fontXxxl, styles.fontWhite]}
                                 onPress={() => {
-                                    this.props.actions.setState(SET_SHOW_IMAGE, false)
-                                    this.props.actions.setState(SET_IMAGE_DATA, '')
+                                    this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                                        data: '',
+                                        showImage: false
+                                    })
                                 }} />
                         </View>
                     </View>
@@ -220,15 +223,16 @@ class CameraFieldAttribute extends PureComponent {
         }
     }
 
-    takePicture() {
-        const options = {};
-        this.camera.capture()
-            .then((data) => {
-                this.props.actions.setState(SET_SHOW_IMAGE, true)
-                this.props.actions.setState(SET_IMAGE_DATA, data.data)
+    takePicture = async function () {
+        if (this.camera) {
+            const options = { quality: 0.5, base64: true };
+            const data = await this.camera.takePictureAsync(options)
+            this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                data: data.base64,
+                showImage: true
             })
-            .catch(err => console.error(err));
-    }
+        }
+    };
 }
 
 const style = StyleSheet.create({

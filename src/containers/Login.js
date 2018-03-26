@@ -11,7 +11,7 @@ import {
   TouchableOpacity
 }
   from 'react-native'
-import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner ,Icon as Iconimg} from 'native-base'
+import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner, Icon as Iconimg } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -101,7 +101,7 @@ class Login extends PureComponent {
     const password = value.split("/")[1]
     this.onChangeUsername(username)
     this.onChangePassword(password)
-    this.props.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
+    this.props.authenticateUser(username, password, this.props.auth.form.rememberMe)
   }
 
   _onScaningCancelled = () => {
@@ -128,17 +128,17 @@ class Login extends PureComponent {
     }
     if (!this.props.auth.form.authenticationService) {
       return (
-        <TouchableOpacity onLongPress = {this.onLongPress}>
-        <Image
-          style={styles.logoStyle}
-          source={require('../../images/fareye-logo.png')}
-        />
+        <TouchableOpacity onLongPress={this.onLongPress}>
+          <Image
+            style={styles.logoStyle}
+            source={require('../../images/fareye-logo.png')}
+          />
         </TouchableOpacity >
       )
     }
   }
 
-  onLongPress = () =>{
+  onLongPress = () => {
     Alert.alert(
       CONFIRM_RESET,
       RESET_ACCOUNT_SETTINGS,
@@ -157,7 +157,7 @@ class Login extends PureComponent {
     this.props.navigation.navigate(QrCodeScanner, { returnData: this._onBarCodeRead.bind(this) })
   }
 
-  showUsernameView(){
+  showUsernameView() {
     return (
       <Item rounded style={[styles.marginBottom10]}>
         <Input
@@ -172,7 +172,7 @@ class Login extends PureComponent {
     )
   }
 
-  showPasswordView(){
+  showPasswordView() {
     return (
       <Item rounded>
         <Input
@@ -184,12 +184,12 @@ class Login extends PureComponent {
           disabled={this.props.auth.form.isEditTextDisabled}
           style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, { height: 40 }]}
         />
-       {this.showForgetPasswordView()}
+        {this.showForgetPasswordView()}
       </Item>
     )
   }
 
-  showForgetPasswordView(){
+  showForgetPasswordView() {
     return (
       <Iconimg
         name='ios-help-circle-outline'
@@ -201,7 +201,7 @@ class Login extends PureComponent {
     )
   }
 
-  showLoginButton(){
+  showLoginButton() {
     return (
       <Button
         full rounded success
@@ -214,7 +214,7 @@ class Login extends PureComponent {
     )
   }
 
-  showRememberMe(){
+  showRememberMe() {
     return (
       <View style={[styles.row, styles.flex1, styles.justifyStart, styles.marginTop15]}>
         <CheckBox checked={this.props.auth.form.rememberMe}
@@ -224,8 +224,8 @@ class Login extends PureComponent {
     )
   }
 
-  showDisplayMessageAndScanner(){
-    return(
+  showDisplayMessageAndScanner() {
+    return (
       <View style={[styles.marginTop30]}>
         <Text style={[styles.fontCenter, styles.fontDanger, styles.marginBottom10]}>
           {this.props.auth.form.displayMessage}
@@ -241,26 +241,26 @@ class Login extends PureComponent {
   render() {
     const imageView = this.getImageView()
     return (
-          <StyleProvider style={getTheme(platform)}>
-            <Container>
-              <Content>
-                <View style={style.container}>
-                  <View style={style.logoContainer}>
-                    {imageView}
-                  </View>
-                  <View style={[style.width70, styles.marginTop30]}>
-                  {this.showUsernameView()}
-                  {this.showPasswordView()}
-                  {this.showLoginButton()}
-                  {this.showRememberMe()}
-                  {this.showDisplayMessageAndScanner()}
-                    
-                  </View>
-                </View>
-              </Content>
-            </Container>
-            
-          </StyleProvider>
+      <StyleProvider style={getTheme(platform)}>
+        <Container>
+          <Content>
+            <View style={style.container}>
+              <View style={style.logoContainer}>
+                {imageView}
+              </View>
+              <View style={[style.width70, styles.marginTop30]}>
+                {this.showUsernameView()}
+                {this.showPasswordView()}
+                {this.showLoginButton()}
+                {this.showRememberMe()}
+                {this.showDisplayMessageAndScanner()}
+
+              </View>
+            </View>
+          </Content>
+        </Container>
+
+      </StyleProvider>
     )
   }
 };

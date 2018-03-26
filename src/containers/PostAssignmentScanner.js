@@ -14,7 +14,7 @@ import {
     Animated,
     Alert
 } from 'react-native'
-import {RNCamera} from 'react-native-camera'
+import { RNCamera } from 'react-native-camera'
 import {
     Input,
     Container,
@@ -266,7 +266,7 @@ class PostAssignmentScanner extends PureComponent {
                     <View style={[styles.relative, styles.flex1]}>
                         <RNCamera
                             ref="cam"
-                            torchMode={this.state.torchStatus ? RNCamera.Constants.FlashMode.on : RNCamera.Constants.FlashMode.off}
+                            flashMode={this.state.torchStatus ? RNCamera.Constants.FlashMode.torch : RNCamera.Constants.FlashMode.off}
                             onBarCodeRead={this._onBarcodeRead.bind(this)}
                             style={style.preview}>
 

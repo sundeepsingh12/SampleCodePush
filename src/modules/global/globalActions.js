@@ -115,7 +115,6 @@ export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, i
       }
       await userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
     } catch (error) {
-      console.logs('error1',error)
       await userExceptionLogsService.addUserExceptionLogs(error.message, 123121)
     }
   }
