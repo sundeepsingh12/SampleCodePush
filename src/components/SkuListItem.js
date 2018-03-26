@@ -25,6 +25,7 @@ import {
     SELECT_ANY_REASON,
     OPEN_CAMERA,
 } from '../lib/ContainerConstants'
+import { Platform } from 'react-native'
 const Item = Picker.Item;
 
 class SkuListItem extends PureComponent {
@@ -57,14 +58,19 @@ class SkuListItem extends PureComponent {
 
     _displaySkuItems(rowItem, originalQuantityValue) {
         if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
+            let reasonList = _.cloneDeep(this.props.reasonsList)
+            if (Platform.OS === 'ios') {
+                reasonList.splice(0, 1)
+            }
             return (
-            <View style={[{flexBasis: '60%', height: 40, width: 50}]}>
+            <View style={[{flexBasis: '60%', height: 40}]}>
                 <Picker 
-                    mode="dropdown"
-                    selectedValue={rowItem.value}
-                    onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
+                        mode="dropdown"
+                        placeholder={SELECT_ANY_REASON}
+                        selectedValue={rowItem.value}
+                        onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
                   {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={-987654321} /> */}
-                    {this._populateSkuItems(this.props.reasonsList)}
+                    {this._populateSkuItems(reasonList)}
                 </Picker>
             </View>)
         } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
