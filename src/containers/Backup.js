@@ -321,26 +321,14 @@ class Backup extends Component {
         return modal
     }
 
-    getUnsyncedFilesHeader() {
-        let view
-        if (this.props.backupView != 0) return
-        if (!this.props.isLoading) {
-            view = <View style={[styles.padding10, { borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
-                <Text style={[styles.fontLg, styles.fontBlack]}>
-                    {UNSYNCED_FILES}
-                </Text>
-            </View>
-        }
-        return view
-    }
 
-    getSyncedFilesHeader() {
+    getUnsyncedFilesHeader(headerText) {
         let view
         if (this.props.backupView != 0) return
         if (!this.props.isLoading) {
             view = <View style={[styles.padding10, { borderBottomColor: '#f4f4f4', borderBottomWidth: 1 }]}>
                 <Text style={[styles.fontLg, styles.fontBlack]}>
-                    {SYNCED_FILES}
+                    {headerText}
                 </Text>
             </View>
         }
@@ -435,14 +423,12 @@ class Backup extends Component {
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
                         style={[style.imageSync]}
-                        source={require('../../images/fareye-default-iconset/error.png')}
-                    />
+                        source={require('../../images/fareye-default-iconset/error.png')} />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
                         {UPLOAD_FAILED}
                     </Text>
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
-
                     <View style={[styles.marginTop30, styles.alignCenter]}>
                         <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
                             onPress={() => {
@@ -455,7 +441,6 @@ class Backup extends Component {
                 </View>
             </View>
         }
-
     }
 
     getLogoutView() {
@@ -473,37 +458,25 @@ class Backup extends Component {
     }
 
     render() {
-        let headerView = this.headerView()
-        let loader = this.getLoader()
-        let backupButton = this.createBackupButton()
-        let unSyncedFilesView = this.getUnSyncedFilesView()
-        let syncedFilesView = this.getSyncedFilesView()
-        let modalView = this.getModalView()
-        let unsyncedFilesHeader = this.getUnsyncedFilesHeader()
-        let syncedFilesHeader = this.getSyncedFilesHeader()
-        let uploadView = this.uploadingView()
-        let uploadSuccessView = this.uploadSuccessView()
-        let uploadFailureView = this.failureView()
-        let logoutView = this.getLogoutView()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    {headerView}
-                    {uploadView}
-                    {uploadSuccessView}
-                    {uploadFailureView}
-                    {logoutView}
+                    {this.headerView()}
+                    {this.uploadingView()}
+                    {this.uploadSuccessView()}
+                    {this.failureView()}
+                    {this.getLogoutView()}
                     {renderIf(this.props.backupView == 0, <Content style={[styles.bgLightGray]}>
-                        {backupButton}
-                        {modalView}
-                        {loader}
+                        {this.createBackupButton()}
+                        {this.getModalView()}
+                        {this.getLoader()}
                         <View style={[styles.marginBottom10, styles.bgWhite]}>
-                            {unsyncedFilesHeader}
-                            {unSyncedFilesView}
+                            {this.getUnsyncedFilesHeader(UNSYNCED_FILES)}
+                            {this.getUnSyncedFilesView()}
                         </View>
                         <View style={[styles.marginBottom10, styles.bgWhite]}>
-                            {syncedFilesHeader}
-                            {syncedFilesView}
+                            {this.getUnsyncedFilesHeader(SYNCED_FILES)}
+                            {this.getSyncedFilesView()}
                         </View>
                     </Content>)}
                 </Container>

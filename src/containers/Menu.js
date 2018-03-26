@@ -58,7 +58,8 @@ import {
 import {
   OK,
   CANCEL,
-  LOGOUT_UNSYNCED_TRANSACTIONS,
+  LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
+  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
   CONFIRM_LOGOUT,
 } from '../lib/ContainerConstants'
 
@@ -168,12 +169,13 @@ class Menu extends PureComponent {
   }
 
   startLoginScreenWithoutLogout = () => {
-      this.props.actions.startLoginScreenWithoutLogout()
+    this.props.actions.startLoginScreenWithoutLogout()
   }
-  
+
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
-      return Alert.alert(CONFIRM_LOGOUT, LOGOUT_UNSYNCED_TRANSACTIONS,
+      return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
+        LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
         [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
         {
           text: OK, onPress: () => {
@@ -185,7 +187,7 @@ class Menu extends PureComponent {
     }
   }
 
-  renderMenuHeader(){
+  renderMenuHeader() {
     return (
       <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
         <Body>
@@ -202,13 +204,11 @@ class Menu extends PureComponent {
   }
 
   render() {
-    console.logs('this.props.isErrorType_403_400_Logout ',this.props.isErrorType_403_400_Logout )
-
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
           {this.renderMenuHeader()}
-          {(this.props.isErrorType_403_400_Logout && 
+          {(this.props.isErrorType_403_400_Logout &&
             <CustomAlert
               title="Unauthorised Device"
               message={this.props.errorMessage_403_400_Logout.message}
@@ -228,7 +228,7 @@ class Menu extends PureComponent {
               {this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3)}
             </View>
 
-           {this.renderLogoutView()}
+            {this.renderLogoutView()}
           </Content>)}
         </Container>
       </StyleProvider>
@@ -236,7 +236,7 @@ class Menu extends PureComponent {
     )
   }
 
-  renderLogoutView(){
+  renderLogoutView() {
     return (
       <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={this.showLogoutAlert}>
         <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
