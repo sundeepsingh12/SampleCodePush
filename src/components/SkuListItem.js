@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
-    Text
+    Text,
 } from 'react-native'
 import styles from '../themes/FeStyle'
 import {
@@ -11,7 +11,6 @@ import {
     SKU_ACTUAL_QUANTITY,
     SKU_REASON,
     SKU_PHOTO,
-    OPEN_CAMERA,
     REASON,
     NA    
 } from '../lib/AttributeConstants'
@@ -24,6 +23,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import {
     SELECT_ANY_REASON,
+    OPEN_CAMERA,
 } from '../lib/ContainerConstants'
 const Item = Picker.Item;
 
@@ -63,7 +63,7 @@ class SkuListItem extends PureComponent {
                     mode="dropdown"
                     selectedValue={rowItem.value}
                     onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
-                    <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={987654321} />
+                  {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={987654321} /> */}
                     {this._populateSkuItems(this.props.reasonsList)}
                 </Picker>
             </View>)

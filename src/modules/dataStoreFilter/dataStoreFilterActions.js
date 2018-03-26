@@ -2,7 +2,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { dataStoreFilterService } from '../../services/classes/DataStoreFilterService'
-import { setState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     SHOW_LOADER_DSF,
     DATA_STORE_FILTER_LIST,
@@ -31,7 +31,8 @@ export function getDSFListContent(currentElement, formElement, jobTransaction, d
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
-
+            dispatch(showToastAndAddUserExceptionLog(801, error.message, 'danger', 1))            
+            dispatch(setState(SHOW_LOADER_DSF, false))
         }
     }
 }
@@ -53,7 +54,8 @@ export function getFilteredResults(dataStoreFilterList, cloneDataStoreFilterList
                 cloneDataStoreFilterList: searchResult.cloneDataStoreFilterList
             }))
         } catch (error) {
-
+            dispatch(showToastAndAddUserExceptionLog(802, error.message, 'danger', 1))            
+            dispatch(setState(SHOW_LOADER_DSF, false))
         }
     }
 }
@@ -65,7 +67,7 @@ export function onSave(fieldAttributeMasterId, formElement, isSaveDisabled, data
             formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formElement))
             dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap, true))
         } catch (error) {
-
+            dispatch(showToastAndAddUserExceptionLog(803, error.message, 'danger', 1))
         }
     }
 }

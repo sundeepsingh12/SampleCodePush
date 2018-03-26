@@ -5,9 +5,7 @@ import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
-
 import Loader from '../components/Loader'
-
 import {
   Container,
   Content,
@@ -36,7 +34,8 @@ import {
   PROFILE_ID,
   STATISTIC_ID,
   OFFLINEDATASTORE_ID,
-  BACKUP_ID
+  BACKUP_ID,
+  BLUETOOTH_ID
 } from '../lib/AttributeConstants'
 
 import {
@@ -51,8 +50,18 @@ import {
   BLUETOOTH,
   OfflineDS,
   Backup,
-  SET_UNSYNC_TRANSACTION_PRESENT
+  SET_UNSYNC_TRANSACTION_PRESENT,
+  ERROR_400_403_LOGOUT_FAILURE,
+  BluetoothListing
 } from '../lib/constants'
+
+import {
+  OK,
+  CANCEL,
+  LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
+  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
+  CONFIRM_LOGOUT,
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -111,7 +120,6 @@ class Menu extends PureComponent {
   }
 
   navigateToScene = (appModule) => {
-    console.log('modulename', appModule)
     switch (appModule.appModuleId) {
       case PROFILE_ID: {
         this.props.actions.navigateToScene(ProfileView)
@@ -132,12 +140,11 @@ class Menu extends PureComponent {
         this.props.actions.navigateToScene(Backup, { displayName: this.props.menu.BACKUP.displayName })
         break
       }
-      // default:
-      //   Toast.show({
-      //     text: `Under development!Coming Soon`,
-      //     position: 'bottom',
-      //     buttonText: 'OK'
-      //   })
+
+      case BLUETOOTH_ID: {
+        this.props.actions.navigateToScene(BluetoothListing, { displayName: this.props.menu.BACKUP.displayName })
+        break
+      }
     }
   }
 
@@ -164,139 +171,85 @@ class Menu extends PureComponent {
   startLoginScreenWithoutLogout = () => {
     this.props.actions.startLoginScreenWithoutLogout()
   }
+
   getUnsyncTransactionPresentAlert() {
     if (this.props.isUnsyncTransactionOnLogout) {
-      return Alert.alert('Confirm Log Out', 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
-        [{ text: 'CANCEL', onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
+      return Alert.alert(LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
+        LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
+        [{ text: CANCEL, onPress: () => this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false), style: 'cancel' },
         {
-          text: 'OK', onPress: () => {
+          text: OK, onPress: () => {
             this.props.actions.setState(SET_UNSYNC_TRANSACTION_PRESENT, false)
-            this.props.actions.invalidateUserSession()
+            this.props.actions.invalidateUserSession(true)
           }
         },],
         { cancelable: false })
     }
   }
 
+  renderMenuHeader() {
+    return (
+      <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+        <Body>
+          <View
+            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+            <View style={[style.headerBody]}>
+              <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Menu</Text>
+            </View>
+            <View />
+          </View>
+        </Body>
+      </Header>
+    )
+  }
+
   render() {
-    let profileView = this.renderModuleView([this.props.menu[PROFILE], this.props.menu[STATISTIC]], 1)
-    let paymentView = this.renderModuleView([this.props.menu[EZETAP], this.props.menu[MSWIPE]], 2)
-    let deviceView = this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3)
-    let unsyncTransactionPresentAlert = this.getUnsyncTransactionPresentAlert()
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
-            <Body>
-              <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter, styles.fontWeight500]}>Menu</Text>
-                </View>
-                <View />
-              </View>
-            </Body>
-          </Header>
-          {renderIf(this.props.isErrorType_403_400_Logout,
+          {this.renderMenuHeader()}
+          {(this.props.isErrorType_403_400_Logout &&
             <CustomAlert
               title="Unauthorised Device"
-              message={this.props.errorMessage_403_400_Logout}
+              message={this.props.errorMessage_403_400_Logout.message}
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
 
           {renderIf(this.props.isLoggingOut, <Loader />)}
 
-          {unsyncTransactionPresentAlert}
+          {this.getUnsyncTransactionPresentAlert()}
 
           {renderIf(!this.props.isLoggingOut, <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
-            {/*card 1*/}
             <View style={[styles.bgWhite, styles.marginBottom10]}>
-              {profileView}
+              {this.renderModuleView([this.props.menu[PROFILE], this.props.menu[STATISTIC]], 1)}
             </View>
 
-            {/*Card 2*/}
-            {/* <View style={[styles.bgWhite, paymentView.length ? styles.marginBottom10 : null]}>
-              {paymentView}
-            </View> */}
-
-            {/*Card 3*/}
             <View style={[styles.bgWhite, styles.marginBottom10]}>
-              {deviceView}
+              {this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3)}
             </View>
 
-            {/*Card 4*/}
-            {/* <View style={[styles.bgWhite, styles.marginBottom10]}>
-              <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-                <View style={[styles.justifySpaceBetween, styles.flex1]}>
-                  <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }]}>
-                    <Text style={[styles.fontDefault]}>
-                      Contact Support
-                    </Text>
-                    <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-                  </View>
-                </View>
-              </View>
-
-               <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-                <View style={[styles.justifySpaceBetween, styles.flex1]}>
-                  <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
-                    <Text style={[styles.fontDefault]}>
-                      Help &amp; Documentation
-                    </Text>
-                    <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-                  </View>
-                </View>
-              </View> 
-            </View> */}
-
-            {/* only for UI Components */}
-            {/* <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={() => { this.props.actions.navigateToScene('UIViews') }}>
-              <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-                <View style={[styles.justifySpaceBetween, styles.flex1]}>
-                  <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
-                    <Text style={[styles.fontDefault]}>
-                      UI
-                    </Text>
-                    <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity> */}
-
-            {/*Card 5*/}
-            <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={this.showLogoutAlert}>
-              <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-                <View style={[styles.justifySpaceBetween, styles.flex1]}>
-                  <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
-                    <Text style={[styles.fontDefault]}>
-                      Logout
-                    </Text>
-                    <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
+            {this.renderLogoutView()}
           </Content>)}
-
-          {/* <Footer style={[style.footer]}>
-            <FooterTab>
-              <Button onPress={() => { this.props.actions.navigateToScene('JobDetailsV2') }}>
-                <Icon name="ios-home" />
-                <Text>Home</Text>
-              </Button>
-              <Button>
-                <Icon name="ios-sync" />
-                <Text>Sync</Text>
-              </Button>
-              <Button active>
-                <Icon name="ios-menu" />
-                <Text>Menu</Text>
-              </Button>
-            </FooterTab>
-          </Footer> */}
         </Container>
       </StyleProvider>
 
+    )
+  }
+
+  renderLogoutView() {
+    return (
+      <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={this.showLogoutAlert}>
+        <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+          <View style={[styles.justifySpaceBetween, styles.flex1]}>
+            <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
+              <Text style={[styles.fontDefault]}>
+                Logout
+            </Text>
+              <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
     )
   }
 
@@ -305,17 +258,15 @@ class Menu extends PureComponent {
       "Logout",
       `Are you sure you want to Logout?`,
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'OK', onPress: this.logoutButtonPressed },
+        { text: CANCEL, style: 'cancel' },
+        { text: OK, onPress: this.logoutButtonPressed },
       ],
     )
   }
 
   logoutButtonPressed = () => {
     this.props.actions.checkForUnsyncTransactionAndLogout()
-    // this.props.actions.invalidateUserSession()
   }
-
 }
 
 const style = StyleSheet.create({

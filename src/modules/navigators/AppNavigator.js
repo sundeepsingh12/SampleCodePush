@@ -20,11 +20,8 @@ import {
 import Login from '../../containers/Login'
 import Preloader from '../../containers/Preloader'
 import Application from '../../containers/Application'
-import Message from '../../containers/Message'
-import Utilties from '../../containers/Utilities'
 import Home from '../../containers/Home'
 import Sequence from '../../containers/Sequence'
-import SkuDetails from '../../containers/SkuDetails'
 import Menu from '../../containers/Menu'
 import ProfileView from '../../containers/ProfileView'
 import ResetPassword from '../../containers/ResetPassword'
@@ -36,7 +33,6 @@ import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
 import BulkConfiguration from '../../containers/BulkConfiguration'
-import UIViews from '../../containers/UIViews'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import LiveJobListing from '../../containers/LiveJobListing'
 import LiveJob from '../../containers/LiveJob'
@@ -70,24 +66,20 @@ import FixedSKUListing from '../../containers/FixedSKUListing'
 import Signature from '../../containers/Signature'
 import FormLayout from '../../containers/FormLayout'
 import SkuListing from '../../containers/SkuListing'
-import OverlayAttributes from '../../containers/OverlayAttributes'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import ArrayFieldAttribute from '../../containers/ArrayFieldAttribute'
 import DataStoreItemDetails from '../../components/DataStoreItemDetails'
 import SignatureAndNps from '../../containers/SignatureAndNps'
-import SelectFromList from '../../containers/SelectFromList';
-import SaveActivated from '../../containers/SaveActivated';
-import Transient from '../../containers/Transient';
+import SaveActivated from '../../containers/SaveActivated'
+import Transient from '../../containers/Transient'
 import CheckoutDetails from '../../containers/CheckoutDetails'
 import CashTendering from '../../containers/CashTendering'
-import HomeFooter from '../../containers/HomeFooter'
 import Statistics from '../../containers/Statistics'
 import Sorting from '../../containers/Sorting'
 import DataStoreDetails from '../../containers/DataStoreDetails'
 import OfflineDS from '../../containers/OfflineDS'
 import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
-import Scanner from '../../components/Scanner'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
 import JobMaster from '../../containers/JobMaster'
 import AutoLogout from '../../containers/AutoLogout'
@@ -101,12 +93,17 @@ import {
   HomeTabNavigatorScreen,
   LoginScreen,
   PreloaderScreen,
+  SHOW_DISCARD_ALERT,
+  RETURN_TO_HOME,
+  SET_TRANSIENT_BACK_PRESSED
 } from '../../lib/constants'
 import SplitPayment from '../../containers/SplitPayment'
 import {
   createReduxBoundAddListener,
   createReactNavigationReduxMiddleware,
-} from 'react-navigation-redux-helpers';
+} from 'react-navigation-redux-helpers'
+import { setState } from '../global/globalActions'
+import BluetoothListing from '../../containers/BluetoothListing'
 
 
 class AppWithNavigationState extends React.PureComponent {
@@ -122,15 +119,24 @@ class AppWithNavigationState extends React.PureComponent {
       return false
     }
     switch (route.routeName) {
+      case 'SaveActivated': {
+        dispatch(setState(SHOW_DISCARD_ALERT, true))
+        return true
+      }
+      case 'CheckoutDetails': {
+        dispatch(setState(RETURN_TO_HOME, true))
+        return true
+      }
+      case 'Transient': {
+        dispatch(setState(SET_TRANSIENT_BACK_PRESSED, true))
+        return true
+      }
       case ApplicationScreen:
       case LoginScreen:
       case 'UnsyncBackupUpload':
-      case PreloaderScreen: return false
-      case HomeTabNavigatorScreen: {
-        if (route.routes[route.index].routeName == HomeScreen) {
-          return false
-        }
-      }
+      case PreloaderScreen:
+      case HomeTabNavigatorScreen:
+        return false
     }
     dispatch(NavigationActions.back());
     return true
@@ -177,24 +183,12 @@ export const AppNavigator = StackNavigator({
       gesturesEnabled: false
     }
   },
-  Message: {
-    screen: Message
-  },
-  Utilties: {
-    screen: Utilties,
-  },
   Payment: {
     screen: Payment
-  },
-  UIViews: {
-    screen: UIViews
   },
   JobDetailsV2: {
     screen: JobDetailsV2,
     header: null
-  },
-  SelectFromList: {
-    screen: SelectFromList,
   },
   AutoLogoutScreen: {
     screen: AutoLogout,
@@ -223,7 +217,10 @@ export const AppNavigator = StackNavigator({
     }
   },
   HomeTabNavigatorScreen: {
-    screen: HomeTabNavigator
+    screen: HomeTabNavigator,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
   },
   Sequence: {
     screen: Sequence,
@@ -248,9 +245,6 @@ export const AppNavigator = StackNavigator({
   },
   ResetPassword: {
     screen: ResetPassword
-  },
-  SkuDetails: {
-    screen: SkuDetails
   },
   NewJob: {
     screen: NewJob
@@ -290,9 +284,6 @@ export const AppNavigator = StackNavigator({
     navigationOptions: {
       header: null
     }
-  },
-  OverlayAttributes: {
-    screen: OverlayAttributes,
   },
   ArrayFieldAttribute: {
     screen: ArrayFieldAttribute
@@ -346,9 +337,6 @@ export const AppNavigator = StackNavigator({
   LiveJob: {
     screen: LiveJob
   },
-  Scanner: {
-    screen: Scanner
-  },
   PostAssignmentScanner: {
     screen: PostAssignmentScanner
   },
@@ -382,6 +370,10 @@ export const AppNavigator = StackNavigator({
       header: null,
       gesturesEnabled: false
     }
+  },
+  
+  BluetoothListing:{
+    screen:BluetoothListing
   }
 },
   {

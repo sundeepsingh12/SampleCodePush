@@ -57,6 +57,7 @@ import PushNotification from 'react-native-push-notification'
 import {
   JOBS_DELETED
 } from '../../lib/ContainerConstants'
+import { geoFencingService } from './GeoFencingService'
 
 class Sync {
 
@@ -568,17 +569,17 @@ class Sync {
    */
   async getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap) {
     let transactionIdDtos = []
-    const jobSummaries = []
+    let jobSummaries = []
     for (let jobMasterId in jobMasterIdJobStatusIdTransactionIdDtoMap) {
       for (let unseenStatusId in jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
-        let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].transactionId.split(":").length
-        let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].pendingStatusId
-        let unseenJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, unseenStatusId)
-        unseenJobSummaryData.count = 0
-        jobSummaries.push(unseenJobSummaryData)
-        let pendingJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, pendingID)
-        pendingJobSummaryData.count += count
-        jobSummaries.push(pendingJobSummaryData)
+        //let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].transactionId.split(":").length
+        //let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].pendingStatusId
+        //let unseenJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, unseenStatusId)
+        //unseenJobSummaryData.count = 0
+        //jobSummaries.push(unseenJobSummaryData)
+        //let pendingJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, pendingID)
+        //pendingJobSummaryData.count += count
+        //jobSummaries.push(pendingJobSummaryData)
         transactionIdDtos.push(jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId])
       }
     }
@@ -641,12 +642,13 @@ class Sync {
             this.showNotification(jobMasterTitleList)
             await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
           }
-          await jobSummaryService.updateJobSummary(dataList.jobSummaries)
+          //await jobSummaryService.updateJobSummary(dataList.jobSummaries)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
           if (erpPull) {
             user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')
             await keyValueDBService.validateAndSaveData(USER, user)
           }
+          await geoFencingService.addGeoFence(true)
         }
       } else {
         isLastPageReached = true
@@ -661,7 +663,7 @@ class Sync {
       }
     }
     if (isJobsPresent) {
-      await runSheetService.updateRunSheetAndUserSummary()
+      await runSheetService.updateRunSheetUserAndJobSummary()
     }
     return isJobsPresent
 

@@ -30,7 +30,6 @@ import {
 } from '../lib/AttributeConstants'
 
 import {
-  SET_FORM_LAYOUT_STATE,
   SET_DRAFT,
   SET_UPDATE_DRAFT,
   ERROR_MESSAGE,
@@ -39,7 +38,8 @@ import {
 import CustomAlert from "../components/CustomAlert"
 import {
   ALERT,
-  INVALID_FORM_ALERT
+  INVALID_FORM_ALERT,
+  OK
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -79,7 +79,7 @@ class FormLayout extends PureComponent {
       Toast.show({
         text: this.props.errorMessage,
         position: "bottom" | "center",
-        buttonText: 'Okay',
+        buttonText: OK,
         type: 'danger',
         duration: 10000
       })
@@ -171,6 +171,7 @@ class FormLayout extends PureComponent {
       isLoading: this.props.isLoading,
       errorMessage: this.props.errorMessage,
       currentElement: this.props.currentElement,
+      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
     }
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),

@@ -27,6 +27,10 @@ import NPSFeedback from '../components/NPSFeedback'
 import * as signatureActions from '../modules/signature/signatureActions'
 import SignatureCapture from 'react-native-signature-capture';
 import renderIf from '../lib/renderIf'
+import {
+    IMPROPER_SIGNATURE,
+    OK
+} from '../lib/ContainerConstants'
 function mapStateToProps(state) {
     return {
         isRemarksValidation: state.signature.isRemarksValidation,
@@ -78,9 +82,9 @@ class SignatureAndNps extends PureComponent {
     saveSign = () => {
         if (this.state.isSaveDisabled) {
             Toast.show({
-                text: 'Improper signature. Please make your full signature.',
+                text: IMPROPER_SIGNATURE,
                 position: "bottom" | "center",
-                buttonText: 'Okay',
+                buttonText: OK,
                 duration: 5000
             })
         } else {
@@ -104,27 +108,37 @@ class SignatureAndNps extends PureComponent {
         this.setState({ isLandscape: 'portrait' })
         this.props.navigation.goBack(null)
     }
+
+    headerView() {
+        return <Header searchBar style={[styles.bgWhite, style.header]}>
+            <Body>
+                <View
+                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                    <TouchableOpacity style={[style.headerLeft]} onPress={this.goBack}>
+                        <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
+                    </TouchableOpacity>
+                    <View style={[style.headerBody]}>
+                        <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
+                    </View>
+                    <TouchableOpacity style={[style.headerRight]}
+                        onPress={this.resetSign} >
+                        <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
+                    </TouchableOpacity>
+                </View>
+            </Body>
+        </Header>
+    }
+    saveSignButton() {
+        return <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
+            onPress={this.saveSign} >
+            <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
+        </TouchableOpacity>
+    }
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={[styles.bgWhite, style.header]}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={this.goBack}>
-                                    <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
-                                </View>
-                                <TouchableOpacity style={[style.headerRight]}
-                                    onPress={this.resetSign} >
-                                    <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </Body>
-                    </Header>
+                    {this.headerView()}
                     <View style={[styles.flex1, styles.row]}>
                         {renderIf(this.props.isRemarksValidation && this.props.fieldDataList.length > 0,
                             <View style={{ borderWidth: 1 }}>
@@ -147,10 +161,7 @@ class SignatureAndNps extends PureComponent {
                                 <NPSFeedback onStarPress={this.onStarRatingPress} showSave={true} />
                             </View>
                         </View>
-                        <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
-                            onPress={this.saveSign} >
-                            <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
-                        </TouchableOpacity>
+                        {this.saveSignButton()}
                     </View>
                 </Container>
             </StyleProvider >

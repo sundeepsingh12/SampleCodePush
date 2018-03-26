@@ -1,7 +1,10 @@
 'use strict'
 
 import { paymentService } from '../payment/Payment'
+import { fieldAttributeMasterService } from '../classes/FieldAttributeMaster'
+import { fieldValidationService } from '../classes/FieldValidation'
 import * as realm from '../../repositories/realmdb'
+import { moduleCustomizationService } from '../classes/ModuleCustomization'
 import {
     SPLIT_AMOUNT_ERROR
 } from '../../lib/ContainerConstants'
@@ -224,6 +227,818 @@ describe('test cases for getModeTypeFromModeTypeId', () => {
         expect(paymentService.getModeTypeFromModeTypeId(PAYTM.id)).toEqual(PAYTM.modeType)
     })
 })
+
+describe('test cases for setFieldDataKeysAndValues', () => {
+    it('should set field data keys and values', () => {
+        expect(paymentService.setFieldDataKeysAndValues(1, 1, 1, 1)).toEqual(
+            {
+                attributeTypeId: 1,
+                fieldAttributeMasterId: 1,
+                value: 1,
+                key: 1
+            }
+        )
+    })
+})
+
+describe('test cases for getActualAmount', () => {
+    let formElement = {
+        childDataList: [
+            {
+                attributeTypeId: 1,
+                value: 'test1'
+            },
+            {
+                attributeTypeId: 2,
+                value: 'test2'
+            },
+            {
+                attributeTypeId: 3,
+                value: 'test3'
+            }
+        ]
+    }
+    let formElementWithNoChildList = {}
+    it('should return actual amount from data list', () => {
+        expect(paymentService.getActualAmount(formElement, 2)).toEqual('test2')
+    })
+    it('should return default actual amount', () => {
+        expect(paymentService.getActualAmount(formElementWithNoChildList, 2)).toEqual(0)
+    })
+    it('should return default actual amount', () => {
+        expect(paymentService.getActualAmount(formElement, 5)).toEqual(0)
+    })
+})
+
+describe('test cases for actualAmountEditable', () => {
+    let moneyCollectMaster = {
+        attributeTypeId: 18,
+        childObject: {
+            1: {
+                attributeTypeId: 25,
+                id: 1
+            },
+            2: {
+                attributeTypeId: 26,
+                id: 2
+            },
+            3: {
+                attributeTypeId: 12,
+                id: 3
+            },
+        }
+    }
+    let validationMap = {
+        1: [
+            {
+                fieldAttributeMasterId: 1,
+                leftKey: 1,
+                rightKey: 1,
+                condition: '==',
+                timeOfExecution: 'after'
+            }
+        ],
+        2: [
+            {
+                id: 3924,
+                timeOfExecution: "Before",
+                leftKey: "+,10||+,100",
+                condition: "1",
+                rightKey: "1,2,3",
+                fieldAttributeMasterId: 2,
+                jobMasterId: 446
+            }
+        ]
+    }
+
+    it('should return min and max amount', () => {
+        expect(paymentService.actualAmountEditable(moneyCollectMaster, validationMap, 2)).toEqual(
+            {
+                minValue: 10,
+                maxValue: 100
+            }
+        )
+    })
+    it('should return null for no validation', () => {
+        expect(paymentService.actualAmountEditable(moneyCollectMaster, {}, 2)).toEqual(null)
+    })
+})
+
+describe('test cases for getTotalActualAmount', () => {
+    beforeEach(() => {
+        paymentService.getActualAmount = jest.fn()
+        paymentService.getActualAmount.mockReturnValueOnce(10)
+            .mockReturnValueOnce(20)
+            .mockReturnValue(40)
+    })
+    let moneyCollectMaster = {
+        attributeTypeId: 18,
+        childObject: {
+            1: {
+                attributeTypeId: 25,
+                id: 1
+            },
+            2: {
+                attributeTypeId: 26,
+                id: 2
+            },
+            3: {
+                attributeTypeId: 12,
+                id: 3
+            },
+        },
+        id: 3
+    }
+    let formData = new Map()
+    formData.set(1, {
+        attributeTypeId: 17,
+        positionId: 1
+    })
+    formData.set(2, {
+        attributeTypeId: 50,
+        positionId: 2
+    })
+    formData.set(3, {
+        attributeTypeId: 18,
+        positionId: 3
+    })
+    let formDataSku = new Map()
+    formDataSku.set(1, {
+        attributeTypeId: 17,
+        positionId: 4
+    })
+    formDataSku.set(2, {
+        attributeTypeId: 50,
+        positionId: 2
+    })
+    formDataSku.set(3, {
+        attributeTypeId: 18,
+        positionId: 3
+    })
+    it('should return sum of sku and fixed sku amount', () => {
+        expect(paymentService.getTotalActualAmount(moneyCollectMaster, formData)).toEqual(30)
+        expect(paymentService.getActualAmount).toHaveBeenCalledTimes(2)
+    })
+    it('should return fixed sku amount', () => {
+        expect(paymentService.getTotalActualAmount(moneyCollectMaster, formDataSku)).toEqual(10)
+        expect(paymentService.getActualAmount).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('test cases for prepareMoneyCollectChildFieldDataListDTO', () => {
+    const actualAmount = 10
+    const fieldAttributeMaster = {
+        childObject: {
+            1: {
+                attributeTypeId: 25,
+                id: 1,
+                key: 'original amount'
+            },
+            2: {
+                attributeTypeId: 26,
+                id: 2,
+                key: 'actual amount'
+            },
+            3: {
+                attributeTypeId: 12,
+                id: 3,
+                key: 'details',
+                childObject: {
+                    4: {
+                        attributeTypeId: 11,
+                        id: 4,
+                        key: 'details_object',
+                        childObject: {
+                            5: {
+                                attributeTypeId: 1,
+                                id: 5,
+                                key: 'mode_type',
+                            },
+                            6: {
+                                attributeTypeId: 1,
+                                id: 6,
+                                key: 'transaction_number',
+                            },
+                            7: {
+                                attributeTypeId: 13,
+                                id: 7,
+                                key: 'amount',
+                            },
+                            8: {
+                                attributeTypeId: 1,
+                                id: 8,
+                                key: 'receipt',
+                            },
+                            9: {
+                                attributeTypeId: 1,
+                                id: 9,
+                                key: 'remarks',
+                            },
+                        }
+                    }
+                }
+            },
+        }
+    }
+    const originalAmount = 20
+    const selectedPaymentMode = 1
+    const transactionNumber = null
+    const remarks = null
+    const receipt = null
+    const moneyCollectFieldDataResult = [
+        {
+            attributeTypeId: 25,
+            fieldAttributeMasterId: 1,
+            key: 'original amount',
+            value: 20
+        },
+        {
+            attributeTypeId: 26,
+            fieldAttributeMasterId: 2,
+            key: 'actual amount',
+            value: 10
+        },
+        {
+            attributeTypeId: 12,
+            childDataList: [
+                {
+                    attributeTypeId: 11,
+                    childDataList: [
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 5,
+                            key: 'mode_type',
+                            value: 'CS'
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 6,
+                            key: 'transaction_number',
+                            value: 'NA'
+                        },
+                        {
+                            attributeTypeId: 13,
+                            fieldAttributeMasterId: 7,
+                            key: 'amount',
+                            value: 10
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 8,
+                            key: 'receipt',
+                            value: 'NA'
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 9,
+                            key: 'remarks',
+                            value: 'NA'
+                        }
+                    ],
+                    fieldAttributeMasterId: 4,
+                    key: 'details_object',
+                    value: 'ObjectSarojFareye'
+                }
+            ],
+            fieldAttributeMasterId: 3,
+            key: 'details',
+            value: 'ArraySarojFareye'
+        }
+    ]
+    it('should prepare money collect field data for given parameters', () => {
+        expect(paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, fieldAttributeMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt)).toEqual(moneyCollectFieldDataResult)
+    })
+})
+
+describe('test cases for prepareMoneyCollectChildFieldDataListDTOForSplit', () => {
+    const actualAmount = 50
+    const fieldAttributeMaster = {
+        childObject: {
+            1: {
+                attributeTypeId: 25,
+                id: 1,
+                key: 'original amount'
+            },
+            2: {
+                attributeTypeId: 26,
+                id: 2,
+                key: 'actual amount'
+            },
+            3: {
+                attributeTypeId: 12,
+                id: 3,
+                key: 'details',
+                childObject: {
+                    4: {
+                        attributeTypeId: 11,
+                        id: 4,
+                        key: 'details_object',
+                        childObject: {
+                            5: {
+                                attributeTypeId: 1,
+                                id: 5,
+                                key: 'mode_type',
+                            },
+                            6: {
+                                attributeTypeId: 1,
+                                id: 6,
+                                key: 'transaction_number',
+                            },
+                            7: {
+                                attributeTypeId: 13,
+                                id: 7,
+                                key: 'amount',
+                            },
+                            8: {
+                                attributeTypeId: 1,
+                                id: 8,
+                                key: 'receipt',
+                            },
+                            9: {
+                                attributeTypeId: 1,
+                                id: 9,
+                                key: 'remarks',
+                            },
+                        }
+                    }
+                }
+            },
+        }
+    }
+    const originalAmount = 20
+    const splitPaymentModeMap = {
+        1: {
+            modeTypeId: 1,
+            amount: 10
+        },
+        4: {
+            list: [
+                {
+                    modeTypeId: 4,
+                    amount: 14
+                },
+                {
+                    modeTypeId: 4,
+                    amount: 16
+                },
+            ],
+            amount: 30
+        },
+        15: {
+            modeTypeId: 15,
+            amount: 10
+        }
+    }
+    const moneyCollectSplitFieldDataResult = [
+        {
+            attributeTypeId: 25,
+            fieldAttributeMasterId: 1,
+            key: 'original amount',
+            value: 20
+        },
+        {
+            attributeTypeId: 26,
+            fieldAttributeMasterId: 2,
+            key: 'actual amount',
+            value: 50
+        },
+        {
+            attributeTypeId: 12,
+            childDataList: [
+                {
+                    attributeTypeId: 11,
+                    childDataList: [
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 5,
+                            key: 'mode_type',
+                            value: 'CS'
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 6,
+                            key: 'transaction_number',
+                            value: 'NA'
+                        },
+                        {
+                            attributeTypeId: 13,
+                            fieldAttributeMasterId: 7,
+                            key: 'amount',
+                            value: 10
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 8,
+                            key: 'receipt',
+                            value: 'NA'
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 9,
+                            key: 'remarks',
+                            value: 'NA'
+                        }
+                    ],
+                    fieldAttributeMasterId: 4,
+                    key: 'details_object',
+                    value: 'ObjectSarojFareye'
+                },
+                {
+                    attributeTypeId: 11,
+                    childDataList: [
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 5,
+                            key: 'mode_type',
+                            value: 'Cheque'
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 6,
+                            key: 'transaction_number',
+                            value: 'NA'
+                        },
+                        {
+                            attributeTypeId: 13,
+                            fieldAttributeMasterId: 7,
+                            key: 'amount',
+                            value: 14
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 8,
+                            key: 'receipt',
+                            value: 'NA'
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 9,
+                            key: 'remarks',
+                            value: 'NA'
+                        }
+                    ],
+                    fieldAttributeMasterId: 4,
+                    key: 'details_object',
+                    value: 'ObjectSarojFareye'
+                },
+                {
+                    attributeTypeId: 11,
+                    childDataList: [
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 5,
+                            key: 'mode_type',
+                            value: 'Cheque'
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 6,
+                            key: 'transaction_number',
+                            value: 'NA'
+                        },
+                        {
+                            attributeTypeId: 13,
+                            fieldAttributeMasterId: 7,
+                            key: 'amount',
+                            value: 16
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 8,
+                            key: 'receipt',
+                            value: 'NA'
+                        },
+                        {
+                            attributeTypeId: 1,
+                            fieldAttributeMasterId: 9,
+                            key: 'remarks',
+                            value: 'NA'
+                        }
+                    ],
+                    fieldAttributeMasterId: 4,
+                    key: 'details_object',
+                    value: 'ObjectSarojFareye'
+                }
+            ],
+            fieldAttributeMasterId: 3,
+            value: 'ArraySarojFareye'
+        }
+    ]
+    it('should prepare money collect field data for given parameters', () => {
+        expect(paymentService.prepareMoneyCollectChildFieldDataListDTOForSplit(actualAmount, fieldAttributeMaster, originalAmount, splitPaymentModeMap)).toEqual(moneyCollectSplitFieldDataResult)
+    })
+})
+
+describe('test cases for getOriginalAmount', () => {
+    const jobDataListFromDB = [
+        {
+            value: 10
+        },
+        {
+            value: 20
+        }
+    ]
+    beforeEach(() => {
+        realm.getRecordListOnQuery = jest.fn()
+    })
+    const moneyCollectMasterField = {
+        childObject: {
+            1: {
+                attributeTypeId: 25,
+                id: 1,
+                key: 'original amount',
+                fieldAttributeMasterId: 2
+            },
+            2: {
+                attributeTypeId: 26,
+                id: 2,
+                key: 'actual amount'
+            },
+            3: {
+                attributeTypeId: 12,
+                id: 3,
+                key: 'details',
+            },
+        }
+    }
+    const moneyCollectMasterJob = {
+        childObject: {
+            1: {
+                attributeTypeId: 25,
+                id: 1,
+                key: 'original amount',
+                jobAttributeMasterId: 1,
+            },
+            2: {
+                attributeTypeId: 26,
+                id: 2,
+                key: 'actual amount'
+            },
+            3: {
+                attributeTypeId: 12,
+                id: 3,
+                key: 'details',
+            },
+        }
+    }
+
+    const singleJobTransaction = {
+        jobId: 20
+    }
+
+    const multipleJobTransaction = [
+        {
+            jobId: 20,
+            jobTransactionId: 30
+        },
+        {
+            jobId: 22,
+            jobTransactionId: 31
+        }
+    ]
+
+    const formData = new Map()
+    formData.set(2, {
+        value: 14
+    })
+
+    const fieldMapResult = {
+        originalAmount: 14,
+        jobTransactionIdAmountMap: null
+    }
+
+    const singleJobMapResult = {
+        originalAmount: '50',
+        jobTransactionIdAmountMap: null
+    }
+
+    const multipleJobMapResult = {
+        jobTransactionIdAmountMap: {
+            30: {
+                actualAmount: 50,
+                originalAmount: 50
+            },
+            31: {
+                actualAmount: 30,
+                originalAmount: 30
+            }
+        },
+        originalAmount: '80'
+    }
+
+    it('original amount mapped with field attribute master', () => {
+        expect(paymentService.getOriginalAmount(moneyCollectMasterField, formData, singleJobTransaction)).toEqual(fieldMapResult)
+    })
+
+    it('original amount mapped with job attribute master', () => {
+        realm.getRecordListOnQuery.mockReturnValue([{
+            value: 50
+        }])
+        expect(paymentService.getOriginalAmount(moneyCollectMasterJob, formData, singleJobTransaction)).toEqual(singleJobMapResult)
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+    })
+
+    it('original amount mapped with job attribute master', () => {
+        realm.getRecordListOnQuery.mockReturnValue([
+            {
+                value: 50,
+                jobId: 20
+            },
+            {
+                value: 30,
+                jobId: 22
+            }
+        ])
+        expect(paymentService.getOriginalAmount(moneyCollectMasterJob, formData, multipleJobTransaction)).toEqual(multipleJobMapResult)
+        expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('test cases for getPaymentModeList', () => {
+    const jobMasterMoneyTransactionModesList = [
+        {
+            id: 1,
+            moneyTransactionModeId: 1,
+            jobMasterId: 1
+        },
+        {
+            id: 2,
+            moneyTransactionModeId: 2,
+            jobMasterId: 1
+        },
+        {
+            id: 3,
+            moneyTransactionModeId: 20,
+            jobMasterId: 1
+        },
+        {
+            id: 4,
+            moneyTransactionModeId: 7,
+            jobMasterId: 1
+        },
+        {
+            id: 5,
+            moneyTransactionModeId: 15,
+            jobMasterId: 1
+        },
+        {
+            id: 6,
+            moneyTransactionModeId: 1,
+            jobMasterId: 2
+        },
+        {
+            id: 7,
+            moneyTransactionModeId: 2,
+            jobMasterId: 2
+        },
+        {
+            id: 8,
+            moneyTransactionModeId: 3,
+            jobMasterId: 2
+        },
+        {
+            id: 9,
+            moneyTransactionModeId: 4,
+            jobMasterId: 3
+        },
+        {
+            id: 10,
+            moneyTransactionModeId: 1,
+            jobMasterId: 3
+        }
+    ]
+
+    const jobMasterId = 1
+
+    const paymentModeObject = {
+        paymentModeList: {
+            endPaymentModeList: [
+                {
+                    id: 2,
+                    jobMasterId: 1,
+                    moneyTransactionModeId: 2
+                },
+                {
+                    id: 3,
+                    jobMasterId: 1,
+                    moneyTransactionModeId: 20
+                },
+                {
+                    id: 5,
+                    jobMasterId: 1,
+                    moneyTransactionModeId: 15
+                }
+            ],
+            otherPaymentModeList: [
+                {
+                    id: 1,
+                    jobMasterId: 1,
+                    moneyTransactionModeId: 1
+                }
+            ]
+        },
+        splitPaymentMode: true
+    }
+
+    it('payment mode according to job master', () => {
+        expect(paymentService.getPaymentModeList(jobMasterMoneyTransactionModesList, jobMasterId)).toEqual(paymentModeObject)
+    })
+})
+
+describe('test cases for getPaymentParameters', () => {
+    beforeEach(() => {
+        fieldAttributeMasterService.getFieldAttributeMasterMapWithParentId = jest.fn()
+        fieldValidationService.getFieldValidationMap = jest.fn()
+        moduleCustomizationService.getModuleCustomizationMapForAppModuleId = jest.fn()
+        paymentService.setDisplayNameForPaymentModules = jest.fn()
+        fieldAttributeMasterService.setChildFieldAttributeMaster = jest.fn()
+        paymentService.getOriginalAmount = jest.fn()
+        paymentService.getTotalActualAmount = jest.fn()
+        paymentService.actualAmountEditable = jest.fn()
+    })
+
+    const jobTransaction = {
+        jobMasterId: 1
+    }
+
+    const fieldAttributeMasterId = 3
+
+    it('render payment parameters with actual and original amount same', () => {
+        const paymentResult = {
+            actualAmount: 30,
+            amountEditableObject: undefined,
+            jobTransactionIdAmountMap: null,
+            moneyCollectMaster: {
+                attributeTypeId: 18,
+                childObject: undefined,
+                id: 3
+            },
+            originalAmount: 30,
+            paymentModeList: {
+                endPaymentModeList: [],
+                otherPaymentModeList: []
+            },
+            splitPaymentMode: false
+        }
+        fieldAttributeMasterService.getFieldAttributeMasterMapWithParentId.mockReturnValue(
+            {
+                1: {
+                    'root': {
+                        3: {
+                            attributeTypeId: 18,
+                            id: 3
+                        }
+                    }
+                }
+            }
+        )
+        paymentService.getOriginalAmount.mockReturnValue({
+            originalAmount: 30,
+            jobTransactionIdAmountMap: null
+        })
+        expect(paymentService.getPaymentParameters(jobTransaction, fieldAttributeMasterId)).toEqual(paymentResult)
+    })
+
+    it('render payment parameters with actual and original amount different', () => {
+        const paymentResult = {
+            actualAmount: 40,
+            amountEditableObject: undefined,
+            jobTransactionIdAmountMap: null,
+            moneyCollectMaster: {
+                attributeTypeId: 18,
+                childObject: undefined,
+                id: 3
+            },
+            originalAmount: 30,
+            paymentModeList: {
+                endPaymentModeList: [],
+                otherPaymentModeList: []
+            },
+            splitPaymentMode: false
+        }
+        fieldAttributeMasterService.getFieldAttributeMasterMapWithParentId.mockReturnValue(
+            {
+                1: {
+                    'root': {
+                        3: {
+                            attributeTypeId: 18,
+                            id: 3
+                        }
+                    }
+                }
+            }
+        )
+        paymentService.getOriginalAmount.mockReturnValue({
+            originalAmount: 30,
+            jobTransactionIdAmountMap: null
+        })
+        paymentService.getTotalActualAmount.mockReturnValue(40)
+        paymentService.getOriginalAmount
+        expect(paymentService.getPaymentParameters(jobTransaction, fieldAttributeMasterId)).toEqual(paymentResult)
+    })
+})
+
+
 
 // describe('test cases for getPaymentParameters', () => {
 //     beforeEach(() => {

@@ -6,20 +6,18 @@ import {
     USER,
     PASSWORD,
     CLEAR_PASSWORD_TEXTINPUT,
-    TOGGLE_SAVE_RESET_BUTTON,
     IS_PROFILE_LOADING,
 } from '../../lib/constants'
 import sha256 from 'sha256'
 import CONFIG from '../../lib/config'
 import { Toast } from 'native-base'
 import {
-    UNSAVED_PASSWORD,
     PASSWORD_RESET_SUCCESSFULLY,
-} from '../../lib/AttributeConstants'
-import { setState } from '../global/globalActions'
-
+    OK,
+} from '../../lib/ContainerConstants'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { profileService } from '../../services/classes/ProfileService'
-
+import { NavigationActions } from 'react-navigation'
 
 /**This action is used to fetch details of user like contact name and email.
  * 
@@ -40,42 +38,34 @@ export function fetchUserList() {
             }
             dispatch(setState(FETCH_USER_DETAILS, userDetails))
         } catch (error) {
-            console.log(error.message)
+            dispatch(showToastAndAddUserExceptionLog(1901, error.message, 'danger', 1))
         }
     }
 }
 
-/**This action is used to check and reset profile password.
+/**
  * 
- * @param {*} currentPassword, 
- * @param {*} newPassword,
- * @param {*} confirmNewPassword
- *  
+ * @param {*} currentPassword // sets confirm currentPassword
+ * @param {*} newPassword // sets new password
+ * @param {*} confirmNewPassword // sets confirm new password
  */
-export function checkAndResetPassword(currentPassword, newPassword, confirmNewPassword, onPressGoBack) {
+export function checkAndResetPassword(currentPassword, newPassword, confirmNewPassword) {
     return async function (dispatch) {
         try {
             dispatch(setState(IS_PROFILE_LOADING, true))
-            const userPassword = await keyValueDBService.getValueFromStore(PASSWORD)
-            const userObject = await keyValueDBService.getValueFromStore(USER)
-            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject)
+            const userPassword = await keyValueDBService.getValueFromStore(PASSWORD) // gets the user password
+            const userObject = await keyValueDBService.getValueFromStore(USER) // gets the user details
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY) // gets the user session token key
+            const response = await profileService.getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject) // this function validates all parameters and then hit api to change password and returns the response.
 
-            if (response != null && response.status == 200) {
-                await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword))
-                let allPasswords = {
-                    currentPassword: '',
-                    newPassword: '',
-                    confirmNewPassword: ''
-                }
-                Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: 'OK' })
-                dispatch(setState(CLEAR_PASSWORD_TEXTINPUT, allPasswords))
-                dispatch(setState(TOGGLE_SAVE_RESET_BUTTON, true))
-                onPressGoBack.goBack(null)
-            }
-            dispatch(setState(IS_PROFILE_LOADING, false))            
+            await keyValueDBService.validateAndSaveData(PASSWORD, sha256(newPassword)) // new password gets saved after the response status is checked
+            Toast.show({ text: PASSWORD_RESET_SUCCESSFULLY, position: 'bottom', buttonText: OK, duration: 6000 })
+            dispatch(setState(CLEAR_PASSWORD_TEXTINPUT))
+            dispatch(NavigationActions.back())  // automatically goes on the previous screen.
         } catch (error) {
-            console.log(error.message)
+            dispatch(showToastAndAddUserExceptionLog(1902, error.message, 'danger', 1))            
+        } finally {
+            dispatch(setState(IS_PROFILE_LOADING, false))
         }
     }
 }

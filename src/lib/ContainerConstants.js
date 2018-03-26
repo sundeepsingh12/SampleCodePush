@@ -11,6 +11,7 @@ module.exports = {
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
+    VERIFY: 'Verify',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -49,7 +50,7 @@ module.exports = {
 
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
-    NEW_TASK : 'New Task',
+    NEW_TASK: 'New Task',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -58,6 +59,7 @@ module.exports = {
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
+    UNIQUE_VALIDATION_FAILED_FORMLAYOUT: 'This value is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
     OPTIONAL: '(optional)',
@@ -69,6 +71,7 @@ module.exports = {
     CONFIRM_REVERT: 'Confirm Revert',
     PRESS_OK_TO_CONFIRM_REVERT_TO: 'Press OK to confirm revert to ',
     REVERT_NOT_ALLOWED_AFTER_COLLECTING_AMOUNT: 'Revert is not allowed after collecting amount.',
+    REVERT_STATUS: 'Revert Status',
 
     //Payment Container
     YES: 'Yes',
@@ -85,6 +88,8 @@ module.exports = {
     SPLIT_AMOUNT_ERROR: 'Total split amount should be equal to actual amount',
     INVALID_CONFIGURATION: 'Invalid Configuration',
     VALID_AMOUNT_ERROR: 'Please enter valid amount',
+    VALIDATION_AMOUNT_ERROR_LEFT: 'Amount should be greater than or equal to',
+    VALIDATION_AMOUNT_ERROR_RIGHT: 'and less than or equal to',
 
     //Sequence
     SELECT_RUNSHEET_NUMBER: 'Select runsheet number',
@@ -106,6 +111,7 @@ module.exports = {
     BLANK_NEW_SEQUENCE: `Sequence can't be left blank`,
     CURRENT_SEQUENCE_ROW_MISSING: `currentSequenceListItemIndex missing`,
     SEQUENCE_NOT_AN_INT: `Sequence can't be `,
+    NOT_A_NUMBER: 'Please enter a number',
     RUNSHEET_MISSING: 'No runsheet found',
     RUNSHEET_NUMBER_MISSING: 'Runsheet number not present',
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
@@ -121,12 +127,15 @@ module.exports = {
     //Data Store service
     DATA_STORE_MAP_MISSING: 'dataStoreAttrValueMap is missing',
     CURRENT_ELEMENT_MISSING: 'currentElement Missing',
+    CONFIRM: 'Confirm',
 
     //Data Store Filter
     JOBATTRIBUTES_MISSING: 'jobAttributes is missing',
     DSF_LIST_MISSING: 'DSFList is missing',
     FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
     FORM_ELEMENT_IS_MISSING: 'formElement is missing',
+    INVALID_BULK_JOB_CONFIG: 'Invalid job data in bulk data store filter, cannot proceed further.',
+    CONFIGURATION_ERROR_DS_MASTER_ID_MISSING: 'Configuration error data store mapping is missing',
     //Summary
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
@@ -168,18 +177,46 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
+    LOGOUT_UNSYNCED_TRANSACTIONS_TITLE: 'Confirm Log Out',
+    LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE: 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    THERE_ARE_NO_UNSYNCED_FILES: 'There are no Unsynced Files.',
+    DELETE: 'Delete',
+    THERE_ARE_NO_SYNCED_FILES: 'There are no Synced Files',
+    KB: 'KB',
+    UNABLE_TO_UPLOAD: 'Unable to upload',
+    BACKUP_FILE: 'backup file',
+    TRY_AGAIN: 'Try Again',
+    CONTINUE: 'Continue',
+    UNSYNCED_BACKUP_FILES_FOUND: 'Unsynced Backup Files Found',
+    UPLOADED: 'Uploaded',
+    UNSYNCED_BACKUP_FILES: 'Unsynced Backup Files',
+    TRANSACTIONLIST_IS_MISSING: 'Transaction List is missing',
+    SOME_PROCESS_ARE_STILL_WORKING_PLEASE_RE_TRY_AFTER_FEW_MINUTES: 'Some processes are still working. Please re-try after few minutes.',
+    LOGOUT_UNSUCCESSFUL: 'Logout Unsuccessful',
+    MB: 'MB',
+    TRY_AFTER_CLEARING_YOUR_STORAGE_DATA: 'Please Try again after clearing your storage data.',
+
+    //Tracking constants
+    ENTER: 'ENTER',
+    EXIT: 'EXIT',
+    INSIDE_BOUNDARY: 'inside boundary',
+    OUTSIDE_BOUNDARY: 'out of boundary',
+
+    //GeoFencing Service
+    HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
+    FENCE_LAT_LONG_MISSING: 'fenceLatLongObject not present',
 
     //DataStore
     SUGGESTIONS: 'Suggestions',
 
     //SKU
     SELECT_ANY_REASON: 'Select any Reason',
-     TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
-     QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
-     TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
-     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
-     REASON: 'Reason',
-     OPEN_CAMERA: 'Open Camera',
+    TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be less than max quantity.Cannot proceed.',
+    QTY_NOT_ZERO: `Quantity can't be 0.Cannot proceed.`,
+    TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY: 'Quantity should be equal to max quantity.Cannot proceed.',
+    QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
+    REASON: 'Reason',
+    OPEN_CAMERA: 'Open Camera',
 
     //Array
     TOTAL_COUNT: 'Total Count : ',
@@ -187,6 +224,9 @@ module.exports = {
     ADD_ROW_ERROR: 'Row could not be added',
     DELETE_ROW_ERROR: 'Row could not be deleted',
     SAVE_ARRAY_ERROR: 'Array Could not be saved',
+    ADD_TOAST: 'Please fill required fields first',
+    INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
+    REMOVE: 'Remove',
 
     //Expandable Details View
     TAP_TO_HIDE: 'Tap to hide',
@@ -195,14 +235,25 @@ module.exports = {
 
     //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
+    YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
+    MORE: 'More',
+
+    //Save Activated
+    EDIT: 'Edit',
     JOB_EXPIRED: 'Job Expired!',
     DETAILS: "Details",
-
-    //Job_DetailsV2
     UPDATE_GROUP: 'Update Group',
 
+    //JOb List
+    SELECT_NUMBER: 'Select number for message',
+    SELECT_TEMPLATE: 'Select template for message',
+    SELECT_NUMBER_FOR_CALL: 'Select number for call',
+    CALL_CONFIRM: 'Do you want to proceed with the call?',
+    CONFIRMATION: 'Confirmation: ',
+    SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
+
     //Cash Tendering
-    NOT_REQUIRED: 'NOT REQUIRED',
+    SKIP_CASH_TENDERING: 'Skipping Cash Tendering',
     MORE_MONEY_TO_PAY: 'More Money to Pay.',
     LESS_MONEY_TO_PAY: 'Less Money to Pay.',
     AMOUNT_TO_COLLECT: 'Amount to Collect: ',
@@ -233,7 +284,62 @@ module.exports = {
 
     //Bulk Listing 
     BULK_UPDATE: 'Bulk Update',
+    SELECT_STATUS_FOR_BULK: 'Select Status you would like to Bulk Update',
+    NEXT_POSSIBLE_STATUS: 'Next possible status',
 
     //Sorting
-    SORTING : 'Sorting',
+    SORTING: 'Sorting',
+    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
+    FAILURE_SORTING: 'Searching failed, Please try again !',
+    SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
+
+    //Save Activated
+    Do_you_want_to_checkout: 'Do you want to checkout?',
+    Discard_these_jobs: 'Discard these jobs?',
+
+    //Profile
+    CHECK_IF_PASSWORD_ENTERED: "Please Enter Password",
+    CHECK_CURRENT_PASSWORD: "Current Password is wrong Please try again",
+    MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
+    VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
+    CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
+    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
+    UNSAVED_PASSWORD: 'Password not saved before',
+    RESET_PASSWORD: 'Reset Password',
+    CONTACT_NUMBER: 'Contact Number',
+    EMAIL: 'Email',
+    PROFILE: 'Profile',
+    MINIMUM_REQUIREMENT_FOR_PASSWORD: 'Min. 8 characters required, including capital letter, symbol and number.',
+    CURRENT_PASSWORD: 'Current Password',
+    NEW_PASSWORD: 'New Password',
+    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
+    USERNAME_IS_MISSING: 'Username is missing',
+
+    //Error Message for NonExpandableDetailsView
+    IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+
+    //Signature
+    IMPROPER_SIGNATURE: 'Improper signature. Please make your full signature.',
+
+    //Login
+    CONFIRM_RESET: 'Confirm Reset',
+    RESET_ACCOUNT_SETTINGS: 'Click OK to reset your account settings.',
+    REMEMBER_ME: 'Remember Me',
+
+    //Preloader
+    SETTING_UP:'Setting you up...',
+    DOWNLOAD_SETTINGS:'Downloading settings',
+    APPLYING_SETTINGS:'Applying settings',
+    VERIFY_HANDSET:'Verifying handset',
+    VERIFY_MOBILE:'Verify your mobile',
+    OTP_CODE_SENT:'OTP code hasbeen sent to',
+    ENTER_MOBILE:'Enter your mobile',
+    SEND_OTP:'Send OTP',
+
+    // Job Summary
+    UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
+    VALUE_OF_JOBSUMMARY_IS_MISSING: 'Value of JobSummary is missing',
+
+     //Data Store
+     SEARCH: 'Search',
 }

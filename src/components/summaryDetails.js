@@ -36,16 +36,18 @@ export default class SummaryDetails extends PureComponent {
     }
 
     renderParcelItem = (item) => {
-        return (
-            <View style={[styles.row, styles.paddingRight5, styles.paddingLeft5]}>
-                <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault]}>{item.label}</Text>
+        if (item.value) {
+            return (
+                <View style={[styles.row, styles.paddingRight5, styles.paddingLeft5]}>
+                    <View style={[styles.flexBasis40, styles.paddingTop10, styles.paddingBottom10]}>
+                        <Text style={[styles.fontDefault]}>{item.label}</Text>
+                    </View>
+                    <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
+                        <Text style={[styles.fontDefault, styles.fontBlack]}>{item.value}</Text>
+                    </View>
                 </View>
-                <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
-                    <Text style={[styles.fontDefault, styles.fontBlack]}>{item.value}</Text>
-                </View>
-            </View>
-        )
+            )
+        }
     }
 
     _keyExtractor = (item, index) => String(item.id);

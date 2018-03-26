@@ -80,9 +80,7 @@ class FixedSKUListing extends PureComponent {
   }
 
   componentWillMount() {
-    if (this.parentObject.value != ARRAY_SAROJ_FAREYE) {
-      this.props.actions.fetchFixedSKU(this.parentObject.fieldAttributeMasterId)
-    }
+    this.props.actions.fetchFixedSKU(this.parentObject.fieldAttributeMasterId)
   }
 
   componentDidUpdate() {
@@ -110,9 +108,56 @@ class FixedSKUListing extends PureComponent {
     }
   }
 
-  goBack() {
+  componentWillUnmount() {
     this.props.actions.setState(RESET_STATE_FIXED_SKU)
+  }
+
+  goBack() {
     this.props.navigation.goBack()
+  }
+
+  showHeaderView() {
+    return (
+      <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+        <Body>
+          <View
+            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+            <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.goBack() }}>
+              <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+            </TouchableOpacity>
+            <View style={[style.headerBody]}>
+              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.currentElement.label}</Text>
+            </View>
+            <View style={[style.headerRight]}>
+            </View>
+            <View />
+          </View>
+        </Body>
+      </Header>
+    )
+  }
+
+  showFooterView() {
+    return (
+      <Footer
+        style={[style.footer, styles.bgWhite, styles.column]}>
+        <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
+          <Text>
+            {TOTAL_QUANTITY} {parseInt(this.props.totalQuantity)}
+          </Text>
+        </View>
+        <View style={[styles.bgPrimary]}>
+          <Button success full style={[styles.bgPrimary]}
+            onPress={() => {
+              this.props.actions.onSave(this.parentObject, this.formElement, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction)
+            }}>
+            <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
+              {SAVE}
+            </Text>
+          </Button>
+        </View>
+      </Footer>
+    )
   }
 
   render() {
@@ -124,22 +169,7 @@ class FixedSKUListing extends PureComponent {
     return (
       <Container>
         <View style={style.container}>
-          <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-            <Body>
-              <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.goBack() }}>
-                  <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                </TouchableOpacity>
-                <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.currentElement.label}</Text>
-                </View>
-                <View style={[style.headerRight]}>
-                </View>
-                <View />
-              </View>
-            </Body>
-          </Header>
+          {this.showHeaderView()}
 
           <FlatList
             data={Object.values(this.props.fixedSKUList)}
@@ -147,24 +177,9 @@ class FixedSKUListing extends PureComponent {
             keyExtractor={item => String(item.id)}
           />
 
-          <Footer
-            style={[style.footer, styles.bgWhite, styles.column]}>
-            <View style={[styles.justifySpaceBetween, styles.row, styles.alignCenter, styles.paddingBottom10]}>
-              <Text>
-                {TOTAL_QUANTITY} {parseInt(this.props.totalQuantity)}
-              </Text>
-            </View>
-            <View style={[styles.bgPrimary]}>
-              <Button success full style={[styles.bgPrimary]}
-                onPress={() => {
-                  this.props.actions.onSave(this.parentObject, this.formElement, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction)
-                }}>
-                <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
-                  {SAVE}
-                </Text>
-              </Button>
-            </View>
-          </Footer>
+          {this.showFooterView()}
+
+
         </View>
       </Container >
     )

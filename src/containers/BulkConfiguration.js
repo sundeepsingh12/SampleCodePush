@@ -27,11 +27,11 @@ import {
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import { StyleSheet, View, TouchableHighlight, FlatList } from 'react-native'
+import { StyleSheet, View, TouchableHighlight, FlatList, TouchableOpacity } from 'react-native'
 import Loader from '../components/Loader'
 import * as globalActions from '../modules/global/globalActions'
 import { BulkListing } from '../lib/constants'
-import {BULK_UPDATE} from '../lib/ContainerConstants'
+import {BULK_UPDATE,SELECT_STATUS_FOR_BULK} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -84,20 +84,24 @@ class BulkConfiguration extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <Header style={StyleSheet.flatten([styles.bgPrimary])}>
-            <Left>
-              <Button transparent onPress={() =>
-                this.props.navigation.goBack(null)}>
-                <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} />
-              </Button>
-            </Left>
-            <Body>
-              <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{headerView}</Text>
-            </Body>
-            <Right />
+          <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+              <Body>
+                <View
+                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                    <TouchableOpacity style={[styles.profileHeaderLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                    </TouchableOpacity>
+                    <View style={[styles.headerBody, styles.paddingTop15]}>
+                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{headerView}</Text>
+                    </View>
+                    <View style={[styles.headerRight]}>
+                    </View>
+                    <View />
+                </View>
+              </Body>
           </Header>
           <Content>
-            <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>Select Status you would like to Bulk Update</Text>
+            <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>{SELECT_STATUS_FOR_BULK}</Text>
             <List>
               <FlatList
                 data={this.props.bulkConfigList}

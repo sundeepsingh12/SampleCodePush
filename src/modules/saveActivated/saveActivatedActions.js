@@ -2,7 +2,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { transientStatusService } from '../../services/classes/TransientStatusService'
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     LOADER_ACTIVE,
     POPULATE_DATA,
@@ -42,7 +42,8 @@ export function addTransactionAndPopulateView(formLayoutState, recurringData, co
                 isSignOffVisible: (_.size(navigationParams.currentStatus.nextStatusList) == 1) ? true : false,
             }))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(2001, error.message, 'danger', 1))
+            dispatch(setState(LOADER_ACTIVE, false))
         }
     }
 }
@@ -65,7 +66,8 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
                 contactNumberInFieldData
             }))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(2002, error.message, 'danger', 1))
+            dispatch(setState(LOADER_ACTIVE, false))
         }
     }
 }
@@ -76,7 +78,7 @@ export function sendSmsOrEmails(totalAmount, emailTableElement, jobMasterId, ema
             let responseMessage = await transientStatusService.sendEmailOrSms(totalAmount, emailTableElement, emailOrSmsList, isEmail, emailGeneratedFromComplete, jobMasterId)
             dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(2003, error.message, 'danger', 1))
         }
     }
 }
@@ -90,7 +92,7 @@ export function fetchUserData(email, inputTextEmail) {
                 dispatch(setState(IS_COMPANY_CODE_DHL, true))
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(2004, error.message, 'danger', 1))
         }
     }
 }
@@ -102,13 +104,13 @@ export function storeState(saveActivatedState, screenName, jobMasterId, navigati
             let storeObject = await transientStatusService.createObjectForStore(saveActivatedState, screenName, jobMasterId, navigationParams, navigationFormLayoutStates)
             await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, storeObject)
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(2005, error.message, 'danger', 1))
         }
     }
 }
 
 
-export function clearStateAndStore(goToHome, jobMasterId) {
+export function clearStateAndStore(jobMasterId) {
     return async function (dispatch) {
         try {
             dispatch(setState(LOADER_ACTIVE, true))
@@ -116,11 +118,10 @@ export function clearStateAndStore(goToHome, jobMasterId) {
             delete saveActivatedData.value[jobMasterId]
             await keyValueDBService.validateAndSaveData(SAVE_ACTIVATED, saveActivatedData.value)
             dispatch(setState(SAVE_ACTIVATED_INITIAL_STATE, {}))
-            if (goToHome) {
-                dispatch(navigateToScene(HomeTabNavigatorScreen, {}))
-            }
+            dispatch(navigateToScene(HomeTabNavigatorScreen, {}))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(2006, error.message, 'danger', 1))
+            dispatch(setState(LOADER_ACTIVE, false))
         }
     }
 }
@@ -129,6 +130,7 @@ export function clearStateAndStore(goToHome, jobMasterId) {
 export function deleteItem(itemId, recurringData, commonData, navigationParams, statusName) {
     return async function (dispatch) {
         try {
+            dispatch(setState(LOADER_ACTIVE, true))
             recurringData = await transientStatusService.deleteRecurringItem(itemId, recurringData)
             await dispatch(storeState({
                 commonData,
@@ -140,7 +142,8 @@ export function deleteItem(itemId, recurringData, commonData, navigationParams, 
                 navigationParams))
             dispatch(setState(DELETE_ITEM_SAVE_ACTIVATED, recurringData))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(2007, error.message, 'danger', 1))
+            dispatch(setState(LOADER_ACTIVE, false))
         }
     }
 }

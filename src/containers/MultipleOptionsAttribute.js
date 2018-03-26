@@ -33,7 +33,6 @@ import {
     DROPDOWN,
     OPTION_RADIO_FOR_MASTER,
     SEARCH,
-    OK,
     ADVANCE_DROPDOWN
 } from '../lib/AttributeConstants'
 import {

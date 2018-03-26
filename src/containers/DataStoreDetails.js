@@ -31,9 +31,6 @@ function mapStateToProps(state) {
     }
 };
 
-/*
- * Bind all the actions
- */
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...dataStoreActions, ...globalActions }, dispatch)
@@ -118,10 +115,7 @@ class DataStoreDetails extends PureComponent {
     }
 
     render() {
-        let loaderView = this.loader()
         let flatListView = this.flatList()
-        let errorView = this.error()
-        console.log('render',this.props.errorMessage)
         return (
             <Modal
                 animationType="slide"
@@ -144,9 +138,9 @@ class DataStoreDetails extends PureComponent {
                         </Header >
 
                         <Content style={[styles.flex1, styles.bgWhite]}>
-                            {loaderView}
+                            {this.loader()}
                             {flatListView}
-                            {errorView}
+                            {this.error()}
                         </Content >
 
                     </Container >

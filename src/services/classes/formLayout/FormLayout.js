@@ -3,7 +3,12 @@ import { transientStatusService } from '../TransientStatusService.js'
 import {
     AFTER,
     BEFORE,
-    OBJECT
+    OBJECT,
+    STRING,
+    TEXT,
+    DECIMAL,
+    SCAN_OR_TEXT,
+    QR_SCAN
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import {
@@ -13,16 +18,19 @@ import {
     CheckoutDetails,
     TabScreen,
     SHOULD_RELOAD_START,
+    GEO_FENCING,
     FIELD_ATTRIBUTE,
     FIELD_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_VALIDATION,
     FIELD_ATTRIBUTE_VALIDATION_CONDITION,
-    SHOULD_CREATE_BACKUP
+    BACKUP_ALREADY_EXIST
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
-import { fieldValidationService } from '../FieldValidation';
-
+import { fieldValidationService } from '../FieldValidation'
+import { dataStoreService } from '../DataStoreService.js'
+import { geoFencingService } from '../GeoFencingService.js'
+import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../../lib/ContainerConstants'
 class FormLayout {
 
     /**
@@ -300,7 +308,8 @@ class FormLayout {
                 await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
-            await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))
+            await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(false))
+            await geoFencingService.addNewGeoFenceAndDeletePreviousFence()
         }
         return {
             routeName,
@@ -308,22 +317,39 @@ class FormLayout {
         }
     }
 
-    isFormValid(formElement, jobTransaction) {
+    isFormValid(formElement, jobTransaction, fieldAttributeMasterParentIdMap) {
         if (!formElement) {
             throw new Error('formElement is missing')
         }
         for (let [id, currentObject] of formElement.entries()) {
-            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction)
-            currentObject.value = afterValidationResult && !currentObject.alertMessage ? currentObject.displayValue : null
+            let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
+            let uniqueValidationResult = this.checkUniqueValidation(currentObject)
+            if (uniqueValidationResult) {
+                currentObject.alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
+            }
+            currentObject.value = afterValidationResult && !uniqueValidationResult ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
-                return false
+                return { isFormValid: false, formElement }
             } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 6 && !Number.isInteger(Number(currentObject.value))) {
-                return false
+                return { isFormValid: false, formElement }
             } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
-                return false
+                return { isFormValid: false, formElement }
             }
         }
-        return true
+        return { isFormValid: true, formElement }
+    }
+
+    checkUniqueValidation(currentObject) {
+        switch (currentObject.attributeTypeId) {
+            case STRING:
+            case TEXT:
+            case DECIMAL:
+            case SCAN_OR_TEXT:
+            case QR_SCAN:
+                return dataStoreService.checkForUniqueValidation(currentObject.displayValue, currentObject)
+            default:
+                false
+        }
     }
 }
 

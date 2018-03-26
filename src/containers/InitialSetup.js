@@ -5,7 +5,7 @@ import {
     Text,
     Image
 } from 'react-native'
-import { StyleProvider, Container, Content, Button, List, ListItem, Body, Left, Right, Input } from 'native-base';
+import { StyleProvider, Container, Content, Button, List, ListItem, Body, Left, Right, Input } from 'native-base'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import feStyle from '../themes/FeStyle'
@@ -14,6 +14,14 @@ import platform from '../../native-base-theme/variables/platform'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
+import {
+    SETTING_UP,
+    DOWNLOAD_SETTINGS,
+    APPLYING_SETTINGS,
+    VERIFY_HANDSET,
+    CANCEL,
+    RETRY
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
@@ -41,53 +49,79 @@ class InitialSetup extends PureComponent{
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
 
+    showSettingUpHeader(){
+        return (
+            <View style={[feStyle.column, feStyle.flexBasis40, feStyle.alignCenter, feStyle.flex1, feStyle.width100, feStyle.marginTop30, feStyle.marginBottom30]}>
+                <View style={{ flexBasis: '70%' }}>
+                    <Image
+                        style={styles.logoStyle}
+                        source={require('../../images/preloader.png')}
+                    />
+                </View>
+                <View style={[{ flexBasis: '30%' }, feStyle.width100, feStyle.alignCenter]}>
+                    <Text style={[feStyle.fontBlack, feStyle.fontXxl, feStyle.fontWeight200]}>
+                        {SETTING_UP}
+                    </Text>
+                </View>
+            </View>
+        )
+    }
+
+    showDownloadSettings(){
+        return (
+            <ListItem style={{ height: 50 }}>
+                <Left style={{ flex: 1 }}>
+                    <Ionicons name="ios-cloud-download-outline" style={styles.listIcons} />
+                    <Text style={[feStyle.fontDarkGray]}>{DOWNLOAD_SETTINGS}</Text>
+                </Left>
+                <Right style={{ flex: 0.5 }}>
+                    <ServiceStatusIcon status={this.props.configDownloadService} />
+                </Right>
+            </ListItem>
+        )
+    }
+
+    showApplyingSettings(){
+        return (
+            <ListItem style={{ height: 50 }}>
+                <Left style={{ flex: 1 }}>
+                    <Ionicons name="ios-construct-outline" style={styles.listIcons} />
+                    <Text style={[feStyle.fontDarkGray]}>{APPLYING_SETTINGS}</Text>
+                </Left>
+                <Right style={{ flex: 0.5 }}>
+                    <ServiceStatusIcon status={this.props.configSaveService} />
+                </Right>
+            </ListItem>
+        )
+    }
+
+    showVerifyHandset(){
+        return (
+            <ListItem style={{ height: 50 }}>
+                <Left style={{ flex: 1 }}>
+                    <Ionicons name="ios-color-wand-outline" style={styles.listIcons} />
+                    <Text style={[feStyle.fontDarkGray]}>{VERIFY_HANDSET}</Text>
+                </Left>
+                <Right style={{ flex: 0.5 }}>
+                    <ServiceStatusIcon status={this.props.deviceVerificationService} />
+                </Right>
+            </ListItem>
+        )
+    }
+
     render(){
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content style={[feStyle.paddingTop30]}>
-                        <View style={[feStyle.column, feStyle.flexBasis40, feStyle.alignCenter, feStyle.flex1, feStyle.width100, feStyle.marginTop30, feStyle.marginBottom30]}>
-                            <View style={{ flexBasis: '70%' }}>
-                                <Image
-                                    style={styles.logoStyle}
-                                    source={require('../../images/preloader.png')}
-                                />
-                            </View>
-                            <View style={[{ flexBasis: '30%' }, feStyle.width100, feStyle.alignCenter]}>
-                                <Text style={[feStyle.fontBlack, feStyle.fontXxl, feStyle.fontWeight200]}>
-                                    Setting you up...
-                                </Text>
-                            </View>
-                        </View>
+                    {this.showSettingUpHeader()}
+                      
                         <View style={[feStyle.column, feStyle.flexBasis30, feStyle.marginTop30, feStyle.flex1, feStyle.justifyCenter]}>
                             <List>
-                                <ListItem style={{ height: 50 }}>
-                                    <Left style={{ flex: 1 }}>
-                                        <Ionicons name="ios-cloud-download-outline" style={styles.listIcons} />
-                                        <Text style={[feStyle.fontDarkGray]}>Downloading settings</Text>
-                                    </Left>
-                                    <Right style={{ flex: 0.5 }}>
-                                        <ServiceStatusIcon status={this.props.configDownloadService} />
-                                    </Right>
-                                </ListItem>
-                                <ListItem style={{ height: 50 }}>
-                                    <Left style={{ flex: 1 }}>
-                                        <Ionicons name="ios-construct-outline" style={styles.listIcons} />
-                                        <Text style={[feStyle.fontDarkGray]}>Applying settings</Text>
-                                    </Left>
-                                    <Right style={{ flex: 0.5 }}>
-                                        <ServiceStatusIcon status={this.props.configSaveService} />
-                                    </Right>
-                                </ListItem>
-                                <ListItem style={{ height: 50 }}>
-                                    <Left style={{ flex: 1 }}>
-                                        <Ionicons name="ios-color-wand-outline" style={styles.listIcons} />
-                                        <Text style={[feStyle.fontDarkGray]}>Verifying handset</Text>
-                                    </Left>
-                                    <Right style={{ flex: 0.5 }}>
-                                        <ServiceStatusIcon status={this.props.deviceVerificationService} />
-                                    </Right>
-                                </ListItem>
+                                {this.showDownloadSettings()}
+                                {this.showApplyingSettings()}
+                                {this.showVerifyHandset()}
+                               
                             </List>
                         </View>
                         <View style={[feStyle.flexBasis25, feStyle.marginTop15, feStyle.flex1, feStyle.column, feStyle.alignCenter, feStyle.justifyCenter, feStyle.marginTop30]}>
@@ -115,10 +149,10 @@ class InitialSetup extends PureComponent{
             return (
                 <View style={[feStyle.row, feStyle.marginTop30]}>
                     <Button onPress={this.invalidateSession} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
-                        <Text style={{ color: '#ffffff' }}>Cancel</Text>
+                        <Text style={{ color: '#ffffff' }}>{CANCEL}</Text>
                     </Button>
                     <Button onPress={this.retry} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
-                        <Text style={{ color: '#ffffff' }}>Retry</Text>
+                        <Text style={{ color: '#ffffff' }}>{RETRY}</Text>
                     </Button>
                 </View>
             )

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, FlatList } from 'react-native'
+import { StyleSheet, View, FlatList, Modal } from 'react-native'
 import {
     Container,
     Content,
@@ -10,11 +10,14 @@ import {
     Icon,
     Footer,
     FooterTab,
-} from 'native-base';
+} from 'native-base'
 import {
     _id,
 } from '../lib/constants'
-import platform from '../../native-base-theme/variables/platform';
+import {
+    SAVE,
+    CONFIRM
+} from '../lib/ContainerConstants'
 import styles from '../themes/FeStyle'
 export default class DataStoreItemDetails extends PureComponent {
 
@@ -30,9 +33,9 @@ export default class DataStoreItemDetails extends PureComponent {
 
     createDetails(dataStoreAttributeValueMap) {
         let attributeArray = []
-        let id = 0;
+        let id = 0
         for (let attribute in dataStoreAttributeValueMap) {
-            if (attribute != _id) {
+            if (attribute != _id && dataStoreAttributeValueMap[attribute]) {
                 let attributeObject = {
                     id: id++,
                     key: attribute,
@@ -46,41 +49,45 @@ export default class DataStoreItemDetails extends PureComponent {
 
     render() {
         return (
-            <Container>
-                <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                    <Body>
-                        <View
-                            style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
-                            <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.paddingRight5, styles.paddingLeft5]} onPress={() => { this.props.goBack(-1, null, true) }} />
-                            <Text
-                                style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Confirm</Text>
-                            <View />
-                        </View>
-                        <View style={[styles.row,]}>
+            <Modal
+                animationType="slide"
+                onRequestClose={() => { this.props.goBack(-1, null, true) }}>
+                <Container>
+                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                        <Body>
                             <View
-                                style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
+                                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
+                                <Icon name="md-close" style={[styles.fontWhite, styles.fontXl, styles.paddingRight5, styles.paddingLeft5]} onPress={() => { this.props.goBack(-1, null, true) }} />
+                                <Text
+                                    style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{CONFIRM}</Text>
+                                <View />
                             </View>
-                        </View>
-                    </Body>
-                </Header>
-                <Content style={[styles.margin5]}>
-                    < FlatList
-                        data={this.createDetails(this.props.selectedElement.dataStoreAttributeValueMap)}
-                        renderItem={({ item }) => this.renderData(item)}
-                        keyExtractor={item => String(item.id)}
-                    />
-                </Content>
-                <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
-                    <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
-                        <Button success full style={styles.bgPrimary}
-                            onPress={() => {
-                                this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])
-                            }}>
-                            <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>
-                        </Button>
-                    </FooterTab>
-                </Footer>
-            </Container>
+                            <View style={[styles.row,]}>
+                                <View
+                                    style={[styles.row, styles.flex1, styles.justifySpaceBetween, styles.relative]}>
+                                </View>
+                            </View>
+                        </Body>
+                    </Header>
+                    <Content style={[styles.margin5]}>
+                        < FlatList
+                            data={this.createDetails(this.props.selectedElement.dataStoreAttributeValueMap)}
+                            renderItem={({ item }) => this.renderData(item)}
+                            keyExtractor={item => String(item.id)}
+                        />
+                    </Content>
+                    <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
+                        <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
+                            <Button success full style={styles.bgPrimary}
+                                onPress={() => {
+                                    this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])
+                                }}>
+                                <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
+                            </Button>
+                        </FooterTab>
+                    </Footer>
+                </Container>
+            </Modal>
         )
     }
 }

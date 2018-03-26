@@ -7,7 +7,7 @@ import {
     Text,
     View,
     Image
-} from 'react-native';
+} from 'react-native'
 import {
     Container,
     Content,
@@ -25,18 +25,15 @@ import * as cameraActions from '../modules/camera/cameraActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import platform from '../../native-base-theme/variables/platform'
-import getTheme from '../../native-base-theme/components';
+import getTheme from '../../native-base-theme/components'
 import styles from '../themes/FeStyle'
 
 function mapStateToProps(state) {
     return {
         viewData: state.cameraReducer.viewData,
     }
-};
+}
 
-/*
- * Bind all the actions
- */
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...cameraActions }, dispatch)

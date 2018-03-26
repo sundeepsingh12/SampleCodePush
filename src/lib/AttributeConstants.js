@@ -1,10 +1,5 @@
 import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
-import BulkIcon from '../../src/svg_components/icons/BulkIcon'
-import LiveIcon from '../../src/svg_components/icons/LiveIcon'
-import SequenceIcon from '../../src/svg_components/icons/SequenceIcon'
-import TaskIcon from '../../src/svg_components/icons/TaskIcon'
-import React, { PureComponent } from 'react'
 module.exports = {
 
     /**
@@ -258,8 +253,6 @@ module.exports = {
     View_Parcel_Summary: 'View Parcel Summary',
     Sign_Off_Summary: 'Sign Off Summary',
     Parcel_Summary: 'Parcel Summary',
-    Discard_these_jobs: 'Discard these jobs?',
-    Do_you_want_to_checkout: 'Do you want to checkout?',
     Yes_Checkout: 'Yes,Checkout',
     Total: 'Total :',
     Select_Next_Status: 'Select Next Status',
@@ -272,20 +265,7 @@ module.exports = {
     //Exceptions and Error
     //Profile Service
     REGEX_TO_VALIDATE_PASSWORD: /(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[@#$%^&+=!])(?=\S+$).{8,}/,
-    CHECK_IF_PASSWORD_ENTERED: "Please Enter Password",
-    CHECK_CURRENT_PASSWORD: "Current Password is wrong Please try again",
-    MATCH_NEW_AND_CONFIRM_PASSWORD: "Confirm new password does not match with new password.",
-    CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
-    VALIDATE_PASSWORD: "Password should be minimum 8 characters long and should contain at least one number, one special character, one uppercase and one lowercase alphabet.",
-    //Profile Actions
-    UNSAVED_PASSWORD: 'Password not saved before',
-    PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
-    TRY_AGAIN: "Please try again...",
-    //ProfileReset Container
-    CONFIRM_CURRENT_PASSWORD: 'Confirm Current Password',
-    NEW_PASSWORD: 'New Password',
-    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
-
+   
     // App Modules Constants
     BACKUP_ID: 17,
     BLUETOOTH_ID: 16,
@@ -320,11 +300,7 @@ module.exports = {
 
     //Sorting module constants
     REFERENCE_NO: 'referenceNo=',
-    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
-    FAILURE_SORTING: 'Searching failed, Please try again !',
     NA: 'N.A',
-    SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
-    SORTING_PLACEHOLDER: 'Enter Reference Number To Scan Package',
 
     //Sequence Attribute
     SEQUENCE_ID: 'sequenceMasterId=',
@@ -334,26 +310,8 @@ module.exports = {
     //Sequence Container
     ROUTE_OPTIMIZATION: 'Route optimisation',
 
-    //Bulk Listing Container
-    NEXT_POSSIBLE_STATUS: 'Next possible status',
-
-    // Array attribute constants
-    ADD_TOAST: 'Please fill required fields first',
-    INVALID_CONFIG_ERROR: 'Invalid Configuration,please contact manager',
-
-    //job details constants
-    SELECT_NUMBER: 'Select number for message',
-    SELECT_TEMPLATE: 'Select template for message',
-    SELECT_NUMBER_FOR_CALL: 'Select number for call',
-    CONFIRMATION: 'Confirmation: ',
-    OK: 'Ok',
-    CALL_CONFIRM: 'Do you want to proceed with the call?',
-
     //enableSequence
     SEQ_SELECTED: 'seqSelected',
-
-    //Start Search PlaceHolder
-    SEARCH_PLACEHOLDER: 'Filter Reference Numbers',
 
     //NonExpandableDetailsView
     VIEW_TEXT_LABEL: 'View',
@@ -361,8 +319,7 @@ module.exports = {
     //Error Messages
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
-    //Error Message for NonExpandableDetailsView
-    IMAGE_LOADING_ERROR: 'An error occurred while loading image',
+    
 
     //Custom App
     WEBVIEW_REF: 'webview',
@@ -373,7 +330,6 @@ module.exports = {
 
     //SelectFromList
     SEARCH: 'Search',
-    OK: 'Ok',
 
     //Notification 
     FAREYE_UPDATES: 'FarEye Updates',

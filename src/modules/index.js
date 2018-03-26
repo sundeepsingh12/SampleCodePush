@@ -13,7 +13,6 @@ import nav from './navigators/navigatorReducer'
 import home from './home/homeReducer'
 import listing from './listing/listingReducer'
 import jobDetails from './job-details/jobDetailsReducer'
-import selectFromList from './selectFromList/selectFromListReducer'
 import multipleOptionsAttribute from './multipleOptionsAttribute/multipleOptionsAttributeReducer'
 import skuListing from './skulisting/skuListingReducer'
 import payment from './payment/paymentReducer'
@@ -49,7 +48,7 @@ import cameraReducer from './camera/cameraReducer'
 import autoLogout from './autoLogout/autoLogoutReducer'
 import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 import backup from './backup/backupReducer'
-// import profile from './profile/profileReducer'
+import bluetooth from './bluetooth/bluetoothReducer'
 
 
 /**
@@ -65,7 +64,6 @@ const rootReducer = combineReducers({
   home,
   jobDetails,
   skuListing,
-  selectFromList,
   listing,
   payment,
   preloader,
@@ -99,6 +97,7 @@ const rootReducer = combineReducers({
   dataStoreFilterReducer,
   backup,
   multipleOptionsAttribute,
+  bluetooth
 })
 
 // const rootReducer = (state, action) => {

@@ -7,7 +7,7 @@ import {
     SORTING_LOADER
 } from '../../lib/constants'
 import { sortingService } from '../../services/classes/Sorting'
-import { setState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import CONFIG from '.././../lib/config'
 import {TOKEN_MISSING} from '../../lib/AttributeConstants'
@@ -31,7 +31,7 @@ export function getDataForSortingAndPrinting(referenceNumber) {
             dispatch(setState(SORTING_ITEM_DETAILS, setSortingValues))
         } catch (error) {
             dispatch(setState(ERROR_MESSAGE, error.message))
-            dispatch(setState(ERROR_MESSAGE, ''))
+            dispatch(showToastAndAddUserExceptionLog(2301, error.message, 'danger', 0))
         }
     }
 }

@@ -22,7 +22,14 @@ export default function bulkReducer(state = initialState, action) {
 
     switch (action.type) {
 
-        case START_FETCHING_BULK_TRANSACTIONS:
+        case START_FETCHING_BULK_TRANSACTIONS: {
+            return state.set('isLoaderRunning', true)
+                .set('isSelectAllVisible', false)
+                .set('bulkTransactionList', [])
+                .set('selectedItems', [])
+                .set('searchText', null)
+                .set('selectAllNone', 'Select All')
+        }
         case START_FETCHING_BULK_CONFIG:
             return state.set('isLoaderRunning', true)
 
