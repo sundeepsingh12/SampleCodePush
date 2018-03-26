@@ -58,7 +58,7 @@ class SkuListItem extends PureComponent {
     _displaySkuItems(rowItem, originalQuantityValue) {
         if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
             return (
-            <View style={[{flexBasis: '60%', height: 40}]}>
+            <View style={[{flexBasis: '60%', height: 40, width: 50}]}>
                 <Picker 
                     mode="dropdown"
                     selectedValue={rowItem.value}
