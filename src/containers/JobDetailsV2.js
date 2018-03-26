@@ -152,6 +152,37 @@ class JobDetailsV2 extends PureComponent {
       )
     }
   }
+  renderStatusForGroup() {
+    return (
+      <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={() => this.updateTransactionForGroupId(groupId)} key={groupId}>
+        <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+          <View style={[styles.row, styles.alignCenter]}>
+            <View style={[styles.marginTop12]}>
+              <GroupIcon />
+            </View>
+            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
+            <Right>
+              <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+            </Right>
+          </View>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+  renderDropDownStatus(length, minIndexDropDown) {
+    return (
+      <ListItem
+        key={1}
+        style={[style.jobListItem, styles.justifySpaceBetween]}
+        onPress={() => { this.props.actions.setState(SHOW_DROPDOWN, !this.props.isShowDropdown) }}
+      >
+        <View style={[styles.row, styles.alignCenter]}>
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{length - minIndexDropDown} {MORE}</Text>
+          <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
+        </View>
+      </ListItem>
+    )
+  }
 
   renderStatusList(statusList) {
     let statusView = []
@@ -161,19 +192,7 @@ class JobDetailsV2 extends PureComponent {
     let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
     if (groupId && statusList.length > 0) {
       statusView.push(
-        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={() => this.updateTransactionForGroupId(groupId)} key={groupId}>
-          <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
-            <View style={[styles.row, styles.alignCenter]}>
-              <View style={[styles.marginTop12]}>
-                <GroupIcon />
-              </View>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
-              <Right>
-                <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-              </Right>
-            </View>
-          </View>
-        </TouchableOpacity>
+        this.renderStatusForGroup(groupId)
       )
       return statusView
     }
@@ -184,16 +203,8 @@ class JobDetailsV2 extends PureComponent {
       )
       if (index == minIndexDropDown - 1 && statusList.length > minIndexDropDown) {
         statusView.push(
-          <ListItem
-            key={1}
-            style={[style.jobListItem, styles.justifySpaceBetween]}
-            onPress={() => { this.props.actions.setState(SHOW_DROPDOWN, !this.props.isShowDropdown) }}
-          >
-            <View style={[styles.row, styles.alignCenter]}>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{statusList.length - minIndexDropDown} {MORE}</Text>
-              <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
-            </View>
-          </ListItem>)
+          this.renderDropDownStatus(statusList.length, minIndexDropDown)
+        )
       }
     }
     return statusView
@@ -478,30 +489,32 @@ class JobDetailsV2 extends PureComponent {
       </View>
     )
   }
-
+  showTransactionView() {
+    return (
+      <View>
+        <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+          {this.props.navigation.state.params.jobTransaction.line1}
+        </Text>
+        <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+          {this.props.navigation.state.params.jobTransaction.line2}
+        </Text>
+        <Text
+          style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
+          {this.props.navigation.state.params.jobTransaction.circleLine1}
+        </Text>
+      </View>
+    )
+  }
 
   showHeaderView() {
     return (
       <Header style={[style.header]}>
         <View style={style.seqCard}>
           {this.showJobMasterIdentifier()}
-
           <View style={style.seqCardDetail}>
-            <View>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                {this.props.navigation.state.params.jobTransaction.line1}
-              </Text>
-              <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                {this.props.navigation.state.params.jobTransaction.line2}
-              </Text>
-              <Text
-                style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-                {this.props.navigation.state.params.jobTransaction.circleLine1}
-              </Text>
-            </View>
+            {this.showTransactionView()}
           </View>
           {this.showCloseIcon()}
-
         </View>
       </Header>
     )

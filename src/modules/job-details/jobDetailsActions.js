@@ -66,12 +66,7 @@ export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails())
-            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-            const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-            const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-            const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
-            const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
+            const { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList} = await jobDetailsService.getJobDetailsParameters()
             const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             if(details.checkForSeenStatus) dispatch(performSyncService())
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
@@ -90,6 +85,7 @@ export function getJobDetails(jobTransactionId) {
         }
     }
 }
+
 export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, jobData, fieldData) {
     return async function (dispatch) {
         try {
