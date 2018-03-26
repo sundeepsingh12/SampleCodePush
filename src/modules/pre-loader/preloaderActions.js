@@ -621,7 +621,7 @@ export function checkForUnsyncTransactionAndLogout() {
         dispatch(invalidateUserSession(true))
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))
+      dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))      
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
