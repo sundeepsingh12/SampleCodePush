@@ -377,13 +377,11 @@ export function autoLogout(userData) {
 export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
     try {
-      console.logs('startLoginScreenWithoutLogout called')
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(deleteSessionToken())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
-      console.logs('error2',error)
       dispatch(showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1))
     }
 
@@ -615,17 +613,14 @@ export function validateOtp(otpNumber) {
 export function checkForUnsyncTransactionAndLogout() {
   return async function (dispatch) {
     try {
-      console.logs('checkForUnsyncTransactionAndLogout called')
       let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
       let isUnsyncTransactionsPresent = logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
-      console.logs('isUnsyncTransactionsPresent',isUnsyncTransactionsPresent)
       if (isUnsyncTransactionsPresent) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {
         dispatch(invalidateUserSession(true))
       }
     } catch (error) {
-      console.logs('error',error)
       dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))      
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
