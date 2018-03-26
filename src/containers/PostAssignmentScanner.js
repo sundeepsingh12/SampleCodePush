@@ -14,7 +14,7 @@ import {
     Animated,
     Alert
 } from 'react-native'
-import Camera from 'react-native-camera'
+import { RNCamera } from 'react-native-camera'
 import {
     Input,
     Container,
@@ -264,13 +264,11 @@ class PostAssignmentScanner extends PureComponent {
                     </Header>
 
                     <View style={[styles.relative, styles.flex1]}>
-                        <Camera
+                        <RNCamera
                             ref="cam"
-                            torchMode={this.state.torchStatus ? Camera.constants.FlashMode.on : Camera.constants.FlashMode.off}
-                            playSoundOnCapture={true}
+                            flashMode={this.state.torchStatus ? RNCamera.Constants.FlashMode.torch : RNCamera.Constants.FlashMode.off}
                             onBarCodeRead={this._onBarcodeRead.bind(this)}
-                            style={style.preview}
-                            aspect={Camera.constants.Aspect.fill}>
+                            style={style.preview}>
 
                             <View style={{ width: 200, height: 200, justifyContent: 'space-between' }}>
                                 <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
@@ -290,7 +288,7 @@ class PostAssignmentScanner extends PureComponent {
                                     />
                                 </View> : null
                             }
-                        </Camera>
+                        </RNCamera>
                         <TouchableHighlight onPress={() => { this.setState({ torchStatus: !this.state.torchStatus }) }} style={[styles.alignCenter, styles.justifyCenter, { position: 'absolute', borderRadius: 5, top: 10, left: 10, backgroundColor: 'rgba(158, 158, 158,.6)', padding: 5 }]}>
                             <View>
                                 {this.state.torchStatus ? <TorchOnIcon width={32} height={32} /> : <TorchOffIcon width={32} height={32} />}
