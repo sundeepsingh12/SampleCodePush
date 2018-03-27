@@ -219,7 +219,6 @@ class Tracking {
         }, (error) => {
             //TODO
             console.log('- addGeofence error: ', error)
-            // console.logs('- addGeofence error: ', error)
         })
     }
 

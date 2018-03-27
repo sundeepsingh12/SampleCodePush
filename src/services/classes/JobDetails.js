@@ -17,7 +17,13 @@ import {
     TABLE_JOB,
     USER,
     TABLE_JOB_TRANSACTION,
-    USER_SUMMARY
+    USER_SUMMARY,
+    JOB_STATUS,
+    JOB_MASTER,
+    JOB_ATTRIBUTE,
+    FIELD_ATTRIBUTE,
+    JOB_ATTRIBUTE_STATUS,
+    FIELD_ATTRIBUTE_STATUS
 } from '../../lib/constants'
 import { keyValueDBService } from './KeyValueDBService'
 import { geoFencingService } from './GeoFencingService'
@@ -270,6 +276,16 @@ class JobDetails {
             return false
         const dist = geoFencingService.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)
         return (dist * 1000 >= 100)
+    }
+
+    async getJobDetailsParameters() {
+        const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
+        const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+        const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+        const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
+        const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
+        const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
+        return { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList}
     }
 }
 

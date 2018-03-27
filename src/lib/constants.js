@@ -133,8 +133,8 @@ module.exports = keyMirror({
     SET_PAY_BY_LINK_PARAMETERS: null,
 
     //Bluetooth Actions
-    BLUETOOTH_SCANNING_START:null,
-    BLUETOOTH_SCANNING_STOP:null,
+    BLUETOOTH_SCANNING_START: null,
+    BLUETOOTH_SCANNING_STOP: null,
 
     //Long running service's possible status
     SERVICE_PENDING: null,
@@ -294,7 +294,7 @@ module.exports = keyMirror({
     Payment: null,
     SequenceRunsheetList: null,
     UnsyncBackupUpload: null,
-    BluetoothListing:null,
+    BluetoothListing: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -476,6 +476,7 @@ module.exports = keyMirror({
     VIEW_IMAGE_DATA: null,
     SET_SHOW_VIEW_IMAGE: null,
     UPDATE_SKU_LIST_ITEMS: null,
+    SET_SHOW_IMAGE_AND_DATA: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
