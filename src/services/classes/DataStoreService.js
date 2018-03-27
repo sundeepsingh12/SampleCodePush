@@ -154,6 +154,7 @@ class DataStoreService {
             if (dataStoreAttributeValueMap[currentObject.key]) {
                 currentObject.value = dataStoreAttributeValueMap[currentObject.key]
                 currentObject.displayValue = dataStoreAttributeValueMap[currentObject.key]
+                currentObject.editable = true // set editable to true so that view of single entity of mapped key fieldAttribute will change in formLayout
             }
         }
         return formElements
@@ -380,7 +381,7 @@ class DataStoreService {
         if (!dataStoreJsonResponse) {
             return
         }
-        let dataStoreId = realm.getAll(DataStore_DB).length
+        let dataStoreId = realm.getRecordListOnQuery(DataStore_DB).length
         let dataStoreList = []
         for (let dataStore of dataStoreJsonResponse.content) {
             for (let attribute in dataStore.dataStoreAttributeValueMap) {
@@ -639,9 +640,6 @@ class DataStoreService {
      * This method search values from data store attr map and return filtered map along with cloned origonal map
      */
     searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap) {
-        if (!searchText) {
-            throw new Error(SEARCH_TEXT_MISSING)
-        }
         if (!dataStoreAttrValueMap) {
             throw new Error(DATA_STORE_MAP_MISSING)
         }
@@ -650,11 +648,16 @@ class DataStoreService {
         } else {
             dataStoreAttrValueMap = _.cloneDeep(cloneDataStoreAttrValueMap)
         }
-        let filteredData = _.values(dataStoreAttrValueMap).filter(DSObject => (DSObject.id.toUpperCase()).indexOf(searchText.toUpperCase()) == 0)
-        dataStoreAttrValueMap = _.mapKeys(filteredData, 'id')
+        let searchedDataStoreAttrValueObject = {} //contains filtered object
+        // This loop check if searched value is present in dataStoreAttrValueMap and if present then add this to searchedDataStoreAttrValueObject
+        for (let dataStoreAttrValueObjectIndex in dataStoreAttrValueMap) {
+            if ((dataStoreAttrValueMap[dataStoreAttrValueObjectIndex].id.toLowerCase()).indexOf(searchText.toLowerCase()) == 0) {
+                searchedDataStoreAttrValueObject[dataStoreAttrValueMap[dataStoreAttrValueObjectIndex].id] = dataStoreAttrValueMap[dataStoreAttrValueObjectIndex]
+            }
+        }
         return {
-            dataStoreAttrValueMap,
-            cloneDataStoreAttrValueMap
+            dataStoreAttrValueMap: searchedDataStoreAttrValueObject,
+            cloneDataStoreAttrValueMap // original copy of dataStoreAttrValueMap without any filteration
         }
     }
 

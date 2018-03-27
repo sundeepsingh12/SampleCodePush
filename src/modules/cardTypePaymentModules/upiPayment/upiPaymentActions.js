@@ -1,6 +1,6 @@
 'use strict'
 
-import { setState } from '../../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../../global/globalActions'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { moduleCustomizationService } from '../../../services/classes/ModuleCustomization'
 import { upiPaymentService } from '../../../services/payment/UPIPayment'
@@ -32,7 +32,7 @@ export function getUPIPaymentParameters(jobMasterId, jobId) {
                 upiConfigJSON
             }))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(501, error.message, 'danger', 1))
         }
     }
 }
@@ -56,7 +56,7 @@ export function approveTransactionAPIRequest(amount, customerName, customerConta
                 ))
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(502, error.message, 'danger', 1))
         }
     }
 }
@@ -74,7 +74,7 @@ export function queryTransactionAPIRequest(transactionId) {
                 //TODO : update and save fielddatalist in form layout state
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(503, error.message, 'danger', 1))
         }
     }
 }
@@ -86,7 +86,7 @@ export function testSave(actualAmount, currentElement, formElement, jobMasterId,
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransactionId, currentElement.positionId, latestPositionId)
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
         } catch (error) {
-
+            dispatch(showToastAndAddUserExceptionLog(504, error.message, 'danger', 1))
         }
     }
 }

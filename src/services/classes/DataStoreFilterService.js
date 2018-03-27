@@ -20,7 +20,9 @@ import {
     JOBATTRIBUTES_MISSING,
     DSF_LIST_MISSING,
     FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING,
-    FORM_ELEMENT_IS_MISSING
+    FORM_ELEMENT_IS_MISSING,
+    INVALID_BULK_JOB_CONFIG,
+    CONFIGURATION_ERROR_DS_MASTER_ID_MISSING
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 class DataStoreFilterService {
@@ -31,6 +33,9 @@ class DataStoreFilterService {
         }
         if (!token) {
             throw new Error(TOKEN_MISSING)
+        }
+        if (!currentElement.dataStoreMasterId) {
+            throw new Error(CONFIGURATION_ERROR_DS_MASTER_ID_MISSING)
         }
         const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
         let returnParams = await this.prepareDataStoreFilterMap(currentElement, formElement, jobTransaction, jobAttributes, dataStoreFilterReverseMap)
@@ -128,8 +133,13 @@ class DataStoreFilterService {
         } else if (key[0] == 'J') {
             let jobAttributeKey = fieldValidationService.splitKey(key, true)
             let filteredJobAttribute = jobAttributes.value.filter(jobAttribute => _.isEqual(jobAttribute.key, jobAttributeKey))
-            let jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${filteredJobAttribute[0].id} AND parentId = 0`
-            const jobData = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
+            let jobData
+            if (jobTransaction && jobTransaction.length) {// In case of bulk check if all jobs contain same jobData value or not
+                jobData = this.checkForSameJobDataValue(jobTransaction, filteredJobAttribute)
+            } else {
+                let jobDataQuery = `jobId = ${jobTransaction.jobId} AND jobAttributeMasterId = ${filteredJobAttribute[0].id} AND parentId = 0`
+                jobData = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
+            }
             if (jobData[0]) {
                 dataStoreAttributeIdtoValueMap[filteredJobAttribute[0].dataStoreAttributeId] = jobData[0].value
             }
@@ -220,6 +230,29 @@ class DataStoreFilterService {
             dataStoreFilterResponse: returnParams.dataStoreFilterResponse,
             arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap
         }
+    }
+
+    /** In case of bulk job check value of jobAttribute which is mapped with DSF contains same or not if same value is there then return that value else throw an error
+    * @param {*} jobTransaction
+    * @param {*} filteredJobAttribute
+    */
+    checkForSameJobDataValue(jobTransaction, filteredJobAttribute) {
+        let uniqueValueObject = {}, jobData
+        //loop through all jobTransactions and get jobData for particular jobAttribute i.e. filteredJobAttribute
+        for (let jobTransactionObjectIndex in jobTransaction) {
+            let jobDataQuery = `jobId = ${jobTransaction[jobTransactionObjectIndex].jobId} AND jobAttributeMasterId = ${filteredJobAttribute[0].id} AND parentId = 0` //get jobData with filteredJobAttribute and it should be parent only
+            jobData = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobDataQuery)
+            if (jobData[0]) { //if jobData is present put its value as key and value
+                uniqueValueObject[jobData[0].value] = jobData[0].value
+            } else { //if not present than put a dummy value as key and value
+                uniqueValueObject['empty_ds_value'] = 'empty_ds_value'
+            }
+        }
+        //if uniqueValueObject is not empty and don't have single entry then throw an error
+        if (!_.isEmpty(uniqueValueObject) && _.size(uniqueValueObject) != 1) {
+            throw new Error(INVALID_BULK_JOB_CONFIG)
+        }
+        return jobData //if unique value exist in job data of all jobs
     }
 }
 

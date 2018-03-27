@@ -8,11 +8,11 @@ import {
     SET_UPLOADING_FILE,
     SET_SYNCED_FILES,
     LoginScreen,
-    SET_BACKUP_UPLOAD_VIEW
+    SET_BACKUP_UPLOAD_VIEW,
+    SET_BACKUP_TOAST,
 } from '../../lib/constants'
-import { } from '../../lib/AttributeConstants'
 import _ from 'lodash'
-import { setState, deleteSessionToken } from '../global/globalActions'
+import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { backupService } from '../../services/classes/BackupService'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
@@ -24,7 +24,17 @@ import {
     USER_MISSING,
     TOKEN_MISSING,
     FILE_MISSING,
+    LOGOUT_UNSUCCESSFUL,
+    OK,
+    TRY_AFTER_CLEARING_YOUR_STORAGE_DATA,
 } from '../../lib/ContainerConstants'
+import { Toast } from 'native-base'
+import moment from 'moment'
+
+/** This method creates backup manually when button is pressed.
+ * 
+ * @param {*} syncedBackupFiles // list of synced files.
+ */
 export function createManualBackup(syncedBackupFiles) {
     return async function (dispatch) {
         try {
@@ -32,72 +42,91 @@ export function createManualBackup(syncedBackupFiles) {
             const user = await keyValueDBService.getValueFromStore(USER)
             if (!user || !user.value) throw new Error(USER_MISSING)
             let backupFiles = JSON.parse(JSON.stringify(syncedBackupFiles))
-            let backupFilesAndToastMessage = await backupService.createManualBackup(user, backupFiles)
+            let backupFilesAndToastMessage = await backupService.createManualBackup(user, backupFiles) // This service will create backup manually.
             if (backupFilesAndToastMessage) {
                 dispatch(setState(SET_SYNCED_FILES, backupFilesAndToastMessage))
             }
         } catch (error) {
-            dispatch(setState(SET_LOADER_BACKUP, false))
+            dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))    
+            dispatch(showToastAndAddUserExceptionLog(201, error.message, 'danger', 1))            
         }
     }
 }
 
+/**
+ * this method fetches list of backup.
+ */
 export function getBackupList() {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_BACKUP, true))
             const user = await keyValueDBService.getValueFromStore(USER)
             if (!user || !user.value) throw new Error(USER_MISSING)
-            let backupFiles = await backupService.getBackupFilesList(user.value)
+            let backupFiles = await backupService.getBackupFilesList(user.value) // this method gets backup files list from service
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(202, error.message, 'danger', 1))            
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
 }
+/** this method will upload backup file
+ * 
+ * @param {*} index index of file to be uploaded.
+ * @param {*} filesMap Object of backup files
+ */
 export function uploadBackupFile(index, filesMap) {
     return async function (dispatch) {
         try {
-            if (!filesMap[index]) throw new Error(FILE_MISSING)
+            if (!filesMap || !filesMap[index]) throw new Error(FILE_MISSING)
             dispatch(setState(SET_UPLOADING_FILE, filesMap[index]))
-            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+            const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY) // get session token for authentication while hitting api
             if (!token) {
                 throw new Error(TOKEN_MISSING)
             }
-            let responseBody = await RestAPIFactory(token.value).uploadZipFile(filesMap[index].path, filesMap[index].name)
+            let responseBody = await RestAPIFactory(token.value).uploadZipFile(filesMap[index].path, filesMap[index].name) // Method to upload zip file.
             if (responseBody && responseBody.split(",")[0] == 'success') {
                 dispatch(setState(SET_BACKUP_VIEW, 2))
                 if (index < 0) {
-                    dispatch(deleteBackupFile(index, filesMap))
+                    dispatch(deleteBackupFile(index, filesMap)) // negative index means unsynced backup file so it will be deleted after uploading
                 }
                 setTimeout(() => {
-                    dispatch(autoLogoutAfterUpload())
+                    dispatch(autoLogoutAfterUpload()) // after uploading successfully the user will automatically logged out.
                 }, 1000)
             } else {
                 dispatch(setState(SET_BACKUP_VIEW, 3))
             }
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(203, error.message, 'danger', 1))            
             dispatch(setState(SET_BACKUP_VIEW, 3))
         }
     }
 }
+/** this method will delete backup file.
+ * 
+ * @param {*} index index of file to be uploaded.
+ * @param {*} filesMap Object of backup files
+ */
 export function deleteBackupFile(index, filesMap) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_LOADER_BACKUP, true))
-            if (!filesMap[index]) throw new Error(FILE_MISSING)
+            if (!filesMap || !filesMap[index]) throw new Error(FILE_MISSING)
             const user = await keyValueDBService.getValueFromStore(USER)
             if (!user || !user.value) throw new Error(USER_MISSING)
-            await backupService.deleteBackupFile(index, filesMap)
-            let backupFiles = await backupService.getBackupFilesList(user.value)
+            await backupService.deleteBackupFile(index, filesMap) // this method in service will delete backup file.
+            let backupFiles = await backupService.getBackupFilesList(user.value) // this method
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(204, error.message, 'danger', 1))            
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
 }
-
+/** this method is for logging out after backup is successfully uploaded.
+ * 
+ * @param {*} calledFromHome // this boolean parameter checks if the method is called from Home class or any orher class.
+ */
 export function autoLogoutAfterUpload(calledFromHome) {
     return async function (dispatch) {
         try {
@@ -108,14 +137,14 @@ export function autoLogoutAfterUpload(calledFromHome) {
             }
             dispatch(preLogoutRequest())
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            await backupService.createBackupOnLogout()
-            await authenticationService.logout(token)
-            await logoutService.deleteDataBase()
+            await backupService.createBackupOnLogout() // creates backup on logout
+            let response = await authenticationService.logout(token) // hit logout api
+            await logoutService.deleteDataBase() //delete database.
             dispatch(preLogoutSuccess())
             dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
             dispatch(deleteSessionToken())
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(205, error.message, 'danger', 1))
             dispatch(setState(SET_BACKUP_VIEW, 0))
         }
     }

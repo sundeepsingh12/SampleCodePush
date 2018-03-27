@@ -146,9 +146,8 @@ export function pieChartCount() {
   return async (dispatch) => {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
-      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
-      dispatch(setState(CHART_LOADING, { loading: false, count }))
+      const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount()
+      dispatch(setState(CHART_LOADING, { loading: false, count : countForPieChart }))
     } catch (error) {
       //Update UI here
       console.log(error)
@@ -373,7 +372,6 @@ export function uploadUnsyncFiles(backupFilesList) {
       }
       for (let backupFile of backupFilesList) {
         try {
-          //let responseBody = 'Fail'
           let responseBody = await RestAPIFactory(token.value).uploadZipFile(backupFile.path, backupFile.name)
           if (responseBody && responseBody.split(",")[0] == 'success') {
             await backupService.deleteBackupFile(null, null, backupFile.path)

@@ -5,7 +5,7 @@ import { addServerSmsService } from '../../services/classes/AddServerSms'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { jobDetailsService } from '../../services/classes/JobDetails'
-import { setState, navigateToScene } from '..//global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '..//global/globalActions'
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { NavigationActions } from 'react-navigation'
@@ -85,6 +85,7 @@ export function getJobDetails(jobTransactionId) {
             let isEtaTimerShow = (statusCategory == 1)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime))
         } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(1101, error.message, 'danger', 0))                    
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
@@ -97,7 +98,7 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
             let user = await keyValueDBService.getValueFromStore(USER);
             await addServerSmsService.sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user)
         } catch (error) {
-
+            dispatch(showToastAndAddUserExceptionLog(1102, error.message, 'danger', 1))        
         }
     }
 }
@@ -136,7 +137,7 @@ export function setAllDataOnRevert(jobTransaction, statusTo, navigation) {
             } else { dispatch(navigation.goBack()) }
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1103, error.message, 'danger', 0))                    
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
@@ -163,9 +164,7 @@ export function checkForLocationMismatch(data, currentStatusCategory) {
                 return dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
             dispatch(navigateToScene('FormLayout', FormLayoutData))
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(1104, error.message, 'danger', 1))        
         }
     }
 }

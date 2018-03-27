@@ -29,8 +29,8 @@ export default function backupReducer(state = initialState, action) {
                 .set('toastMessage', action.payload.toastMessage)
                 .set('isLoading', false)
         case SET_BACKUP_TOAST:
-            return state.set('toastMessage', action.payload.toastMessage)
-
+            return state.set('toastMessage', action.payload)
+                .set('isLoading', false)
     }
     return state
 }
