@@ -18,7 +18,7 @@
     "moment": "^2.21.0",
     "native-base": "^2.3.10",
     "react": "^16.2.0",
-    "react-native": "^0.53.3",
+    "react-native": "^0.54.3",
     "react-native-background-fetch": "^2.4.0",
     "react-native-background-geolocation": "^2.11.0",
     "react-native-background-timer": "^2.0.1",
