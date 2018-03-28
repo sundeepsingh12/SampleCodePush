@@ -1,10 +1,9 @@
 'use strict'
 
 import { paymentService } from '../../services/payment/Payment'
-import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog, navigateToScene } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { fieldDataService } from '../../services/classes/FieldData'
-import { navigateToScene } from '../../modules/global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { NavigationActions } from 'react-navigation'
 import {
