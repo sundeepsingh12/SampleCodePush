@@ -47,7 +47,9 @@ function mapStateToProps(state) {
         detailsVisibleFor: state.dataStore.detailsVisibleFor,
         dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
         isFiltersPresent: state.dataStore.isFiltersPresent,
-        cloneDataStoreAttrValueMap: state.dataStore.cloneDataStoreAttrValueMap
+        cloneDataStoreAttrValueMap: state.dataStore.cloneDataStoreAttrValueMap,
+        arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
+        isAllowFromFieldInExternalDS: state.dataStore.isAllowFromFieldInExternalDS
     }
 };
 
@@ -64,11 +66,23 @@ class DataStore extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.checkForFiltersAndValidation(
-            this.props.navigation.state.params.currentElement,
-            this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.jobTransaction,
-            this.props.dataStoreFilterReverseMap)
+        //case if Data store is in Array
+        if (this.props.navigation.state.params.calledFromArray) {
+            this.props.actions.checkForFiltersAndValidationForArray({
+                currentElement: this.props.navigation.state.params.currentElement,
+                formElement: this.props.navigation.state.params.formElements,
+                jobTransaction: this.props.navigation.state.params.jobTransaction,
+                arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
+                arrayFieldAttributeMasterId: this.props.navigation.state.params.arrayFieldAttributeMasterId,
+                rowId: this.props.navigation.state.params.rowId
+            })
+        } else {
+            this.props.actions.checkForFiltersAndValidation(
+                this.props.navigation.state.params.currentElement,
+                this.props.navigation.state.params.formElements,
+                this.props.navigation.state.params.jobTransaction,
+                this.props.dataStoreFilterReverseMap)
+        }
     }
 
     componentDidUpdate() {
@@ -186,7 +200,6 @@ class DataStore extends PureComponent {
             this.props.navigation.state.params.jobTransaction,
             this.props.navigation.state.params.fieldAttributeMasterParentIdMap
         )
-        this._goBack()
     }
 
     _searchDataStore = (value) => {
@@ -243,8 +256,7 @@ class DataStore extends PureComponent {
                         {this.getSuggestionsText()}
                         {this.flatListView()}
                     </Content>
-                    {(this.props.isMinMaxValidation && _.size(this.props.searchText) > 2 &&
-                        this.props.navigation.state.params.currentElement.attributeTypeId != 63) &&
+                    {((this.props.isMinMaxValidation || this.props.isAllowFromFieldInExternalDS) && _.size(this.props.searchText) > 2) &&
                         <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                             <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
                                 <Button success full style={styles.bgPrimary}

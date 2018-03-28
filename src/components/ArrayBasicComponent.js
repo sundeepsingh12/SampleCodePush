@@ -46,7 +46,8 @@ import {
     OPTION_RADIO_VALUE,
     AFTER,
     BEFORE,
-    ADVANCE_DROPDOWN
+    ADVANCE_DROPDOWN,
+    DATA_STORE_FILTER,
 } from '../lib/AttributeConstants'
 import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
@@ -63,6 +64,8 @@ import {
     SELECTED,
     REMOVE
 } from '../lib/ContainerConstants'
+import DataStoreFilter from '../containers/DataStoreFilter'
+
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...arrayActions, ...globalActions }, dispatch)
@@ -170,6 +173,25 @@ class ArrayBasicComponent extends PureComponent {
         if (attributeTypeId == TIME || attributeTypeId == DATE || attributeTypeId == RE_ATTEMPT_DATE) {
             return (
                 <TimePicker onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item} />
+            )
+        }
+
+        if (attributeTypeId == DATA_STORE_FILTER) {
+            return (
+                <View>
+                    <DataStoreFilter
+                        currentElement={item}
+                        formElement={this.props.arrayElements}
+                        isSaveDisabled={this.props.isSaveDisabled}
+                        jobTransaction={this.props.jobTransaction}
+                        latestPositionId={this.props.latestPositionId}
+                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
+                        onClose={this.onCloseModal}
+                        calledFromArray={true}
+                        rowId={this.props.arrayRow.rowId}
+                        arrayFieldAttributeMasterId={this.props.arrayFieldAttributeMasterId}
+                    />
+                </View>
             )
         }
         return null
@@ -325,11 +347,20 @@ class ArrayBasicComponent extends PureComponent {
                                         isSaveDisabled: this.props.isSaveDisabled,
                                         calledFromArray: true,
                                         rowId: this.props.arrayRow.rowId,
-                                        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                                        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
+                                        arrayFieldAttributeMasterId: this.props.arrayFieldAttributeMasterId
                                     })
                             }} />
                     </View>
                 )
+            case DATA_STORE_FILTER:
+                return (
+                    <View>
+                        {modalView}
+                        <FormLayoutActivityComponent item={item} press={() => this.onPressModal(item.fieldAttributeMasterId)} />
+                    </View>
+                )
+                
             case QR_SCAN:
                 return (
                     <View>
