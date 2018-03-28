@@ -34,7 +34,7 @@ export function getDSFListContent(currentElement, formElement, jobTransaction, d
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(801, error.message, 'danger', 1))            
+            dispatch(showToastAndAddUserExceptionLog(801, error.message, 'danger', 1))
             dispatch(setState(SHOW_LOADER_DSF, false))
         }
     }
@@ -57,7 +57,7 @@ export function getFilteredResults(dataStoreFilterList, cloneDataStoreFilterList
                 cloneDataStoreFilterList: searchResult.cloneDataStoreFilterList
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(802, error.message, 'danger', 1))            
+            dispatch(showToastAndAddUserExceptionLog(802, error.message, 'danger', 1))
             dispatch(setState(SHOW_LOADER_DSF, false))
         }
     }
@@ -84,21 +84,23 @@ export function onSave(fieldAttributeMasterId, formElement, isSaveDisabled, data
     }
 }
 
-/**
- * In case of dsf in array this action is called and set dsf data which is fetched by hitting an API
- * @param {*} currentElement 
- * @param {*} formElement 
- * @param {*} jobTransaction 
- * @param {*} arrayReverseDataStoreFilterMap 
- * @param {*} rowId 
- * @param {*} arrayFieldAttributeMasterId 
- */
-export function getDSFListContentForArray(currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, rowId, arrayFieldAttributeMasterId) {
+ /**
+  * In case of dsf in array this action is called and set dsf data which is fetched by hitting an API
+  * @param {Object} functionParamsFromDSF {
+                                currentElement 
+                                formElement 
+                                jobTransaction 
+                                arrayReverseDataStoreFilterMap 
+                                rowId 
+                                arrayFieldAttributeMasterId        
+                             }
+  */
+export function getDSFListContentForArray(functionParamsFromDSF) {
     return async function (dispatch) {
         try {
             dispatch(setState(SHOW_LOADER_DSF, true))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            const returnParams = await dataStoreFilterService.fetchDataForFilterInArray(token, currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, rowId, arrayFieldAttributeMasterId) // get data for DSF and map of fieldAttributeId's
+            const returnParams = await dataStoreFilterService.fetchDataForFilterInArray(token, functionParamsFromDSF) // get data for DSF and map of fieldAttributeId's
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, returnParams.arrayReverseDataStoreFilterMap)) // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
         } catch (error) {

@@ -46,14 +46,14 @@ class DataStoreFilter extends PureComponent {
     componentDidMount() {
         //case if DSF is in Array
         if (this.props.calledFromArray) {
-            this.props.actions.getDSFListContentForArray(
-                this.props.currentElement,
-                this.props.formElement,
-                this.props.jobTransaction,
-                this.props.arrayReverseDataStoreFilterMap,
-                this.props.rowId,
-                this.props.arrayFieldAttributeMasterId
-            )
+            this.props.actions.getDSFListContentForArray({
+                currentElement: this.props.currentElement,
+                formElement: this.props.formElement,
+                jobTransaction: this.props.jobTransaction,
+                arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
+                rowId: this.props.rowId,
+                arrayFieldAttributeMasterId: this.props.arrayFieldAttributeMasterId
+            })
         } else {
             this.props.actions.getDSFListContent(
                 this.props.currentElement,
@@ -86,6 +86,7 @@ class DataStoreFilter extends PureComponent {
                     this.props.arrayReverseDataStoreFilterMap,
                     this.props.arrayFieldAttributeMasterId,
                 )
+                this.props.actions.setState(SET_DSF_INITIAL_STATE)
             }}>
             <View style={[styles.row, styles.alignCenter]}>
                 <Text style={[styles.fontDefault, styles.fontWeight300]}>{item}</Text>
@@ -153,7 +154,7 @@ class DataStoreFilter extends PureComponent {
                                                 }}
                                                 value={this.props.DSFSearchText}
                                             />
-                                            <Icon style={[styles.fontSm, styles.padding5]} name="md-close"
+                                            <Icon style={[styles.fontLg, styles.padding5]} name="md-close"
                                                 onPress={() => {
                                                     this.onSearch('')
                                                 }}

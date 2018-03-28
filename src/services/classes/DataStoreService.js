@@ -50,7 +50,7 @@ class DataStoreService {
     * }
     */
     getValidations(validationArray) {
-        let validationObject = {}
+        let validationObject = {}, specialValidationCount = 0 // It is use to count number of special validations present
         for (let validation of validationArray) {
             if (validation.timeOfExecution) {
                 switch (validation.timeOfExecution) {
@@ -63,7 +63,12 @@ class DataStoreService {
                         }
                         break
                     case SPECIAL:
-                        validationObject.isSearchEnabled = (validation.condition == 'true')
+                        if (specialValidationCount == 1) { // In external DS allow from field is true
+                            validationObject.isAllowFromFieldInExternalDS = (validation.condition == 'true')
+                        } else {
+                            specialValidationCount++
+                            validationObject.isSearchEnabled = (validation.condition == 'true')
+                        }
                         break
                     case MINMAX:
                         validationObject.isMinMaxValidation = (validation.condition == 'true')
@@ -574,7 +579,8 @@ class DataStoreService {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         if (!currentElement.dataStoreFilterMapping || _.isEqual(currentElement.dataStoreFilterMapping, '[]') || currentElement.attributeTypeId == EXTERNAL_DATA_STORE) {
             validation = (currentElement.validation) ?
@@ -663,14 +669,18 @@ class DataStoreService {
 
     /**
      * This method is called in case of array and data store having mapping with any DSF
-     * @param {*} currentElement // Data store element
-     * @param {*} formElement // Contains formElement of all rows
-     * @param {*} jobTransaction 
-     * @param {*} arrayReverseDataStoreFilterMap // Object having mapped id's so we can back track and remove value property from formElement if any dsf is edited by the user
-     * @param {*} arrayFieldAttributeMasterId // fieldAttributeMasterId of array
-     * @param {*} rowId // Current rowId
+     * @param {Object} functionParamsFromDS //
+                              {
+                                   currentElement // Data store element
+                                   formElement // Contains formElement of all rows
+                                   jobTransaction 
+                                   arrayReverseDataStoreFilterMap // Object having mapped id's so we can back track and remove value property from formElement if any dsf is edited by the user
+                                   arrayFieldAttributeMasterId // fieldAttributeMasterId of array
+                                   rowId // Current rowId
+                               }
      */
-    async checkForFiltersAndValidationsForArray(currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId, rowId) {
+    async checkForFiltersAndValidationsForArray(functionParamsFromDS) {
+        let { currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId, rowId } = functionParamsFromDS
         let rowFormElement = formElement[rowId].formLayoutObject //get current formElement
         let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
         let returnParams = await this.checkForFiltersAndValidations(currentElement, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //check for filters and if not present than check for validations

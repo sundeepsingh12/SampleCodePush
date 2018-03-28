@@ -213,14 +213,17 @@ class DataStoreFilterService {
     /**
      * This method works in case of Array having DSF
      * @param {*} token 
-     * @param {*} currentElement  // Data store filter element
-     * @param {*} formElement // Contains formElement of all rows
-     * @param {*} jobTransaction 
-     * @param {*} arrayReverseDataStoreFilterMap // Object having mapped id's so we can back track and remove value property from formElement if any dsf is edited by the user
-     * @param {*} rowId // Current rowId
-     * @param {*} arrayFieldAttributeMasterId // fieldAttributeMasterId of array
-     */
-    async fetchDataForFilterInArray(token, currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, rowId, arrayFieldAttributeMasterId) {
+     * @param {Object} functionParamsFromDSF {
+                                currentElement  // Data store filter element
+                                formElement // Contains formElement of all rows
+                                jobTransaction 
+                                arrayReverseDataStoreFilterMap // Object having mapped id's so we can back track and remove value property from formElement if any dsf is edited by the user
+                                rowId // Current rowId
+                                arrayFieldAttributeMasterId // fieldAttributeMasterId of array
+                            }
+     * */
+    async fetchDataForFilterInArray(token, functionParamsFromDSF) {
+        let { currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, rowId, arrayFieldAttributeMasterId } = functionParamsFromDSF
         let rowFormElement = formElement[rowId].formLayoutObject //get current formElement 
         let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
         let returnParams = await this.fetchDataForFilter(token, currentElement, false, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //get Data for DSF
