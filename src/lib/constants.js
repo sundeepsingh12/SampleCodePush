@@ -503,6 +503,7 @@ module.exports = keyMirror({
     SET_OPTION_ATTRIBUTE_ERROR: null,
     SET_OPTION_SEARCH_INPUT: null,
     SET_ADV_DROPDOWN_MESSAGE_OBJECT: null,
+    SET_ERROR_AND_ADV_DROPDOWN_MESSAGE_NULL: null,
     // backup actions
     SET_LOADER_BACKUP: null,
     SET_BACKUP_FILES: null,

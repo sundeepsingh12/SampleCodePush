@@ -314,7 +314,7 @@ class BasicFormElement extends PureComponent {
         }
 
         if (this.props.item.value != ARRAY_SAROJ_FAREYE && this.props.item.value != OBJECT_SAROJ_FAREYE) {
-            return this.props.item.containerValue
+            return this.props.item.containerValue ? this.props.item.containerValue : this.props.item.value
         }
         return null
     }

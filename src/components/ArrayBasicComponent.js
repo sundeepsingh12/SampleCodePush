@@ -140,7 +140,7 @@ class ArrayBasicComponent extends PureComponent {
                         latestPositionId={this.props.latestPositionId}
                         calledFromArray={true}
                         rowId={this.props.arrayRow.rowId}
-                        onCloseModal={this.onCloseModal}
+                        onCloseModal={() => this.onCloseModal(item)}
                         fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
                     />
                 </View>
@@ -192,7 +192,7 @@ class ArrayBasicComponent extends PureComponent {
         }
 
         if (item.value != ARRAY_SAROJ_FAREYE && item.value != OBJECT_SAROJ_FAREYE) {
-            return item.containerValue
+            return item.containerValue ? item.containerValue : item.value
         }
         return null
     }

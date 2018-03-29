@@ -106,6 +106,7 @@ export default class FormLayoutEventImpl {
                         isSaveDisabled = true
                         break
                     } else {
+                        isSaveDisabled = false
                         continue
                     }
                 }
@@ -115,6 +116,9 @@ export default class FormLayoutEventImpl {
                 } else {
                     value.focus = false
                 }
+            }
+            if (isSaveDisabled) {
+                break
             }
         }
         if (!isSaveDisabled) {
@@ -324,18 +328,18 @@ export default class FormLayoutEventImpl {
      * 
      */
 
-    async _updateUserSummary(prevStatusId, statusCategory, jobTransactionList, userSummary, nextStatusId ) {
-        if(!jobTransactionList || !userSummary){ // check for jobTransactionList and userSummary
+    async _updateUserSummary(prevStatusId, statusCategory, jobTransactionList, userSummary, nextStatusId) {
+        if (!jobTransactionList || !userSummary) { // check for jobTransactionList and userSummary
             return
         }
         const status = ['pendingCount', 'failCount', 'successCount']
-        const moneyTypeCollectionTypeMap = { 'Collection-Cash' : 'cashCollected', 'Collection-SOD' : 'cashCollectedByCard', 'Refund' : 'cashPayment'   }
+        const moneyTypeCollectionTypeMap = { 'Collection-Cash': 'cashCollected', 'Collection-SOD': 'cashCollectedByCard', 'Refund': 'cashPayment' }
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId) // get previous Status Category
         const count = jobTransactionList.length
-        if(prevStatusCategory && userSummary[status[prevStatusCategory - 1]] - count >= 0 && prevStatusId != nextStatusId){ // check for previous status category and negative userSummary count 
+        if (prevStatusCategory && userSummary[status[prevStatusCategory - 1]] - count >= 0 && prevStatusId != nextStatusId) { // check for previous status category and negative userSummary count 
             userSummary[status[prevStatusCategory - 1]] -= count
         }
-        if(jobTransactionList[0].moneyTransactionType && jobTransactionList[0].actualAmount > 0){ //check for moneyTransactionType and actualAmount of jobTransaction
+        if (jobTransactionList[0].moneyTransactionType && jobTransactionList[0].actualAmount > 0) { //check for moneyTransactionType and actualAmount of jobTransaction
             userSummary[moneyTypeCollectionTypeMap[jobTransactionList[0].moneyTransactionType]] += jobTransactionList[0].actualAmount * count
         }
         userSummary[status[statusCategory - 1]] += count // update next status count
@@ -384,7 +388,7 @@ export default class FormLayoutEventImpl {
     async _updateRunsheetSummary(prevStatusId, statusCategory, jobTransactionList) {
         let runSheetList = []
         const status = ['pendingCount', 'failCount', 'successCount']
-        const moneyTypeCollectionTypeMap = { 'Collection-Cash' : 'cashCollected', 'Collection-SOD' : 'cashCollectedByCard', 'Refund' : 'cashPayment'   }
+        const moneyTypeCollectionTypeMap = { 'Collection-Cash': 'cashCollected', 'Collection-SOD': 'cashCollectedByCard', 'Refund': 'cashPayment' }
         const prevStatusCategory = await jobStatusService.getStatusCategoryOnStatusId(prevStatusId) // get previous status category
         const runSheetData = realm.getRecordListOnQuery(TABLE_RUNSHEET, null)
         let runsheetMap = runSheetData.reduce(function (total, current) {
@@ -392,11 +396,11 @@ export default class FormLayoutEventImpl {
             return total;
         }, {}); // build map of runsheetId and runsheet
         for (let id in jobTransactionList) {
-            if(prevStatusCategory && runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] > 0){ // check for previousStatus category undefined and runSheetMap conut is greater than 0 
+            if (prevStatusCategory && runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] > 0) { // check for previousStatus category undefined and runSheetMap conut is greater than 0 
                 runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] -= 1
             }
             runsheetMap[jobTransactionList[id].runsheetId][status[statusCategory - 1]] += 1;
-            if(jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0 ){ // check for moneyTransactionType and  actualAmount 
+            if (jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0) { // check for moneyTransactionType and  actualAmount 
                 runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount
             }
             runSheetList.push(runsheetMap[jobTransactionList[id].runsheetId])
