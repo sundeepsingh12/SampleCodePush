@@ -37,6 +37,7 @@ import {
   POPULATE_DATA,
   NewJob,
   SET_TRANSACTION_SERVICE_STARTED,
+  SYNC_RUNNING,
 } from '../../lib/constants'
 import {
   SERVICE_ALREADY_SCHEDULED,
@@ -147,7 +148,7 @@ export function pieChartCount() {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
       const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount()
-      dispatch(setState(CHART_LOADING, { loading: false, count : countForPieChart }))
+      dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
     } catch (error) {
       //Update UI here
       console.log(error)
@@ -160,6 +161,12 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
   return async function (dispatch) {
     let transactionIdToBeSynced
     try {
+      let syncRunning = await keyValueDBService.getValueFromStore(SYNC_RUNNING);
+      if (syncRunning && syncRunning.value) {
+        return
+      } else {
+        await keyValueDBService.validateAndSaveData(SYNC_RUNNING, true);
+      }
       const userData = await keyValueDBService.getValueFromStore(USER)
       if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
         dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
@@ -176,7 +183,6 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         }
         //Download jobs only if sync count returned from server > 0 or if sync was started from home or Push Notification
         if (isCalledFromHome || syncCount > 0) {
-          console.log(isCalledFromHome, syncCount)
           dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
             unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
             syncStatus: 'Downloading'
@@ -250,6 +256,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
       if (!erpPull) {
         const difference = await sync.calculateDifference()
         dispatch(setState(LAST_SYNC_TIME, difference))
+        await keyValueDBService.deleteValueFromStore(SYNC_RUNNING)
       }
     }
   }
@@ -424,7 +431,7 @@ export function resetFailCountInStore() {
   }
 }
 
-export function navigateToNewJob(jobMasterIds,displayName) {
+export function navigateToNewJob(jobMasterIds, displayName) {
   return async function (dispatch) {
     try {
       const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
@@ -444,7 +451,7 @@ export function navigateToNewJob(jobMasterIds,displayName) {
           if (returnParams.stateParam) {
             await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
           }
-          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, {displayName}))
+          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, { displayName }))
         }
       } else if (_.size(mastersWithNewJob) == 0) {
         Toast.show({
@@ -457,7 +464,7 @@ export function navigateToNewJob(jobMasterIds,displayName) {
         // dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
       } else {
         dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
-        dispatch(navigateToScene(NewJob,{displayName}))
+        dispatch(navigateToScene(NewJob, { displayName }))
       }
     } catch (error) {
       console.log(error)
