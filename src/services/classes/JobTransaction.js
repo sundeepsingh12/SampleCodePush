@@ -252,6 +252,7 @@ class JobTransaction {
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         if (callingActivity == 'Bulk') {
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
+            jobTransactionQuery = callingActivityData.jobIdGroupIdMap && !_.isEmpty(callingActivityData.jobIdGroupIdMap) ?`${jobTransactionQuery} AND ${Object.keys(callingActivityData.jobIdGroupIdMap).map(data => 'jobId != ' + data).join(' AND ')}` : jobTransactionQuery
             if(callingActivityData.groupId){
                 let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
                 let jobList = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
@@ -343,8 +344,9 @@ class JobTransaction {
     */
 
     getEnableMultiPartJobMaster(jobMasterList){
-        let jobMasterListWithEnableMultiPart =  jobMasterList.filter(jobMaster => jobMaster.enableMultipartAssignment == true)
-        return jobMasterListWithEnableMultiPart
+        let jobMasterIdListWithEnableMultiPart = []
+         jobMasterList.forEach(jobMaster => {if(jobMaster.enableMultipartAssignment == true) jobMasterIdListWithEnableMultiPart.push(jobMaster.id)})
+        return jobMasterIdListWithEnableMultiPart
     }
 
    /** @function getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)
@@ -355,8 +357,8 @@ class JobTransaction {
     *@return {Object} {jobIdGroupIdMap}
     */
 
-    getJobIdGroupIdMap(jobMasterListWithEnableMultiPart) {
-        let jobMasterQuery = jobMasterListWithEnableMultiPart.map(jobMaster => 'jobMasterId = ' + jobMaster.id).join(' OR ')
+    getJobIdGroupIdMap(jobMasterIdListWithEnableMultiPart){
+        let jobMasterQuery = jobMasterIdListWithEnableMultiPart.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
         let jobQuery = `groupId != null AND (${jobMasterQuery})`
         let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
         let jobIdGroupIdMap = {}
@@ -443,7 +445,7 @@ class JobTransaction {
             }
             jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
             jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
-            if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
+            if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap) && statusIdsTabIdsMap[jobTransactionCustomization.statusId]) {
                 let groupId = jobIdGroupIdMap[jobTransactionCustomization.jobId] ? jobIdGroupIdMap[jobTransactionCustomization.jobId] : null
                 let groupIdTabKey = groupId ? groupId + '&' + statusIdsTabIdsMap[jobTransactionCustomization.statusId] : null
                 if (!groupId) {

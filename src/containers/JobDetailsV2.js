@@ -153,7 +153,7 @@ class JobDetailsV2 extends PureComponent {
       )
     }
   }
-  renderStatusForGroup() {
+  renderStatusForGroup(groupId) {
     return (
       <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={() => this.updateTransactionForGroupId(groupId)} key={groupId}>
         <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
