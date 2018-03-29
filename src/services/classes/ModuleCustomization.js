@@ -39,6 +39,7 @@ import {
     SORTING,
     CUSTOMAPP,
     JOB_ASSIGNMENT,
+    MAIN_MENU
 } from '../../lib/constants'
 import _ from 'lodash'
 import NewJobIcon from '../../../src/svg_components/icons/NewJobIcon'
@@ -181,7 +182,7 @@ class ModuleCustomization {
             }
         }
         return {
-            newJobModules : cloneNewJobModules,
+            newJobModules: cloneNewJobModules,
             modules: cloneModules,
             pieChart: clonePieChart,
             menu: cloneMenu
@@ -284,6 +285,54 @@ class ModuleCustomization {
             }
         }
         return false
+    }
+
+
+    getPagesMainMenuAndSubMenuObject(pageList, user) {
+        let mainMenuObject = {}, subMenuObject = {};
+        for (let page in pageList) {
+            if (pageList[page].userType != user.userType.id) {
+                continue
+            }
+            if (pageList[page].menuLocation == MAIN_MENU) {
+                mainMenuObject[pageList[page].groupName] = mainMenuObject[pageList[page].groupName] ? mainMenuObject[pageList[page].groupName] : {};
+                mainMenuObject[pageList[page].groupName].pageList = mainMenuObject[pageList[page].groupName].pageList ? mainMenuObject[pageList[page].groupName].pageList : [];
+                mainMenuObject[pageList[page].groupName].pageList.push(pageList[page]);
+                mainMenuObject[pageList[page].groupName].sequence = mainMenuObject[pageList[page].groupName].sequence ? mainMenuObject[pageList[page].groupName].sequence < pageList[page].sequenceNumber ? mainMenuObject[pageList[page].groupName].sequence : pageList[page].sequenceNumber : pageList[page].sequenceNumber;
+                mainMenuObject[pageList[page].groupName].groupName = pageList[page].groupName;
+            } else {
+                subMenuObject[pageList[page].groupName] = subMenuObject[pageList[page].groupName] ? subMenuObject[pageList[page].groupName] : {};
+                subMenuObject[pageList[page].groupName].pageList = subMenuObject[pageList[page].groupName].pageList ? subMenuObject[pageList[page].groupName].pageList : []
+                subMenuObject[pageList[page].groupName].pageList.push(pageList[page])
+                subMenuObject[pageList[page].groupName].sequence = subMenuObject[pageList[page].groupName].sequence ? subMenuObject[pageList[page].groupName].sequence < pageList[page].sequenceNumber ? subMenuObject[pageList[page].groupName].sequence : pageList[page].sequenceNumber : pageList[page].sequenceNumber
+                subMenuObject[pageList[page].groupName].groupName = pageList[page].groupName;
+            }
+        }
+        return {
+            mainMenuObject,
+            subMenuObject
+        }
+    }
+
+    sortMenuAndSubMenuGroupList(mainMenuObject, subMenuObject) {
+        mainMenuObject = _.sortBy(mainMenuObject, function (option) { return option.sequence });
+        subMenuObject = _.sortBy(subMenuObject, function (option) { return option.sequence });
+        let mainMenuSectionList = this.createSectionListDataAndSortPages(mainMenuObject);
+        let subMenuSectionList = this.createSectionListDataAndSortPages(subMenuObject);
+        return {
+            mainMenuSectionList,
+            subMenuSectionList
+        }
+    }
+
+    createSectionListDataAndSortPages(menuObject) {
+        let menuList = []
+        for (let group in menuObject) {
+            let data = _.sortBy(menuObject[group].pageList, function (option) { return option.sequenceNumber })
+            let title = menuObject[group].groupName
+            menuList.push({ data, title });
+        }
+        return menuList
     }
 
 

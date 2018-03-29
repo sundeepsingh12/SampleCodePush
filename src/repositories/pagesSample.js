@@ -11,12 +11,7 @@ const pagesSample = [{
     "menuLocation": "MAIN",
     "screenTypeId": 3,
     "sequenceNumber": 1,
-    "additionalParams": {
-        "temp": "xyz",
-        "statusId": 2010,
-        "selectAll": true,
-        "searchSelectionOnLine1Line2": true
-    }
+    "additionalParams": '{"temp": "xyz","statusId": 2010,"selectAll": true,"searchSelectionOnLine1Line2": true}',
 }, {
     "id": 2,
     "name": "Print Dispatch lables",
@@ -28,9 +23,7 @@ const pagesSample = [{
     "menuLocation": "MAIN",
     "screenTypeId": 1,
     "sequenceNumber": 2,
-    "additionalParams": {
-        "temp": "xyz"
-    }
+    "additionalParams": '{"temp": "xyz"}'
 }, {
     "id": 3,
     "name": "Start tour",
@@ -42,9 +35,7 @@ const pagesSample = [{
     "menuLocation": "MAIN",
     "screenTypeId": 1,
     "sequenceNumber": 3,
-    "additionalParams": {
-        "temp": "xyz"
-    }
+    "additionalParams": '{"temp": "xyz"}'
 }];
 
 module.exports = pagesSample;

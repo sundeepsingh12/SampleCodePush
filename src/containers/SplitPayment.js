@@ -88,7 +88,7 @@ class SplitPayment extends Component {
     }
 
     renderPaymentModeView(modeTypeId, paymentView, amount) {
-        let titleText = this.renderPaymentModeId(modeTypeId)
+        let titleText = this.props.navigation.state.params.renderPaymentModeId(modeTypeId)
         return (
             <View key={modeTypeId} style={[styles.bgWhite, styles.padding10, styles.marginBottom15]}>
                 <View style={paymentView ? [styles.marginBottom10] : null}>
@@ -122,7 +122,7 @@ class SplitPayment extends Component {
     }
 
     renderChequeOrDDView(modeTypeId, id, amount, transactionNumber) {
-        let titleText = this.renderPaymentModeId(modeTypeId)
+        let titleText = this.props.navigation.state.params.renderPaymentModeId(modeTypeId)
         return (
             <View key={`${id}${modeTypeId}`} style={[styles.row, styles.justifySpaceBetween, styles.marginTop10]}>
                 <View style={[styles.justifySpaceBetween, { width: '50%' }]}>
@@ -179,39 +179,9 @@ class SplitPayment extends Component {
         return paymentModeListView
     }
 
-    renderPaymentModeId(modeId, type) {
-        switch (modeId) {
-            case CASH.id: return CASH.displayName
-            case CHEQUE.id: return CHEQUE.displayName
-            case DEMAND_DRAFT.id: return DEMAND_DRAFT.displayName
-            case DISCOUNT.id: return DISCOUNT.displayName
-            case EZE_TAP.id: return EZE_TAP.displayName
-            case MOSAMBEE.id: return MOSAMBEE.displayName
-            case MOSAMBEE_WALLET.id: return MOSAMBEE_WALLET.displayName
-            case MPAY.id: return MPAY.displayName
-            case M_SWIPE.id: return M_SWIPE.displayName
-            case NET_BANKING.id: {
-                switch (type) {
-                    case NET_BANKING_LINK.id: return NET_BANKING_LINK.displayName
-                    case NET_BANKING_CARD_LINK.id: return NET_BANKING_CARD_LINK.displayName
-                    case NET_BANKING_UPI_LINK.id: return NET_BANKING_UPI_LINK.displayName
-                }
-            }
-            case NOT_PAID.id: return NOT_PAID.displayName
-            case PAYNEAR.id: return PAYNEAR.displayName
-            case PAYO.id: return PAYO.displayName
-            case PAYTM.id: return PAYTM.displayName
-            case POS.id: return POS.displayName
-            case RAZOR_PAY.id: return RAZOR_PAY.displayName
-            case SODEXO.id: return SODEXO.displayName
-            case SPLIT.id: return SPLIT.displayName
-            case TICKET_RESTAURANT.id: return TICKET_RESTAURANT.displayName
-            case UPI.id: return UPI.displayName
-        }
-    }
-
     render() {
         let paymentModeListView = this.renderPaymentModeListView(this.props.splitPaymentModeMap)
+        console.log('split paymeny', this.props)
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>

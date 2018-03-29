@@ -34,14 +34,8 @@ export default function homeReducer(state = initialState, action) {
     }
 
     case SET_PAGES_UTILITY_N_PIESUMMARY: {
-      //Creating a temp Utility variable as it is nested object inside State
-      const utilitiesTemp = {
-        ...state['utilities'],
-        'pieChartEnabled': action.payload.pieChartEnabled,
-        'messagingEnabled': action.payload.messagingEnabled
-      };
-      return state.set('pages', action.payload.pageList.value)
-        .set('utilities', utilitiesTemp)
+      return state.set('pages', action.payload.sortedMainMenuAndSubMenuList.mainMenuSectionList)
+        .set('utilities', action.payload.utilities)
         .set('pieChartSummaryCount', action.payload.pieChartSummaryCount)
         .set('pagesLoading', false);
     }

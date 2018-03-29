@@ -17,7 +17,7 @@ import Draft from './schema/Draft'
 import DeviceInfo from 'react-native-device-info'
 import AesCtr from '../services/classes/AesCtr'
 
-const schemaVersion = 42;
+const schemaVersion = 44;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft];
 
 let realm = new Realm({

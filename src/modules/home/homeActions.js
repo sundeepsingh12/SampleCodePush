@@ -96,6 +96,7 @@ import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
 import { utilitiesService } from '../../services/classes/Utilities'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization';
+import { moduleCustomizationService } from '../../services/classes/ModuleCustomization';
 
 /** 
  * Function which updates STATE when component is mounted
@@ -107,18 +108,18 @@ export function fetchPagesAndPiechart() {
   return async function (dispatch) {
     try {
       dispatch(setState(PAGES_LOADING, { pagesLoading: true }));
+      const user = await keyValueDBService.getValueFromStore(USER);
       //Fetching list of Pages
       const pageList = await keyValueDBService.getValueFromStore(PAGES);
-      //TODO : Reduce the list to only show MAIN_MENU items, Group by "Group name" and Sort by sequence
-
+      let mainMenuAndSubMenuObject = moduleCustomizationService.getPagesMainMenuAndSubMenuObject(pageList ? pageList.value : null, user ? user.value : null);
+      let sortedMainMenuAndSubMenuList = moduleCustomizationService.sortMenuAndSubMenuGroupList(mainMenuAndSubMenuObject.mainMenuObject, mainMenuAndSubMenuObject.subMenuObject);
       //Fetching list of Home screen Utilities 
       const utilityList = await keyValueDBService.getValueFromStore(PAGES_ADDITIONAL_UTILITY);
       //Looping over Utility list to check if Piechart and Messaging are enabled
-      let pieChartEnabled = false;
-      let messagingEnabled = false;
+      let utilities = {}
       _.each(utilityList.value, function (utility) {
-        (utility.utilityID == PAGE_SUMMARY_PIECHART) ? pieChartEnabled = utility.enabled : null;
-        (utility.utilityID == PAGE_MESSAGING) ? messagingEnabled = utility.enabled : null;
+        (utility.utilityID == PAGE_SUMMARY_PIECHART) ? utilities.pieChartEnabled = utility.enabled : null;
+        (utility.utilityID == PAGE_MESSAGING) ? utilities.messagingEnabled = utility.enabled : null;
       })
 
       //Fetching Summary count for Pie-chart
@@ -126,7 +127,7 @@ export function fetchPagesAndPiechart() {
       const pieChartSummaryCount = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
 
       //Finally updating state
-      dispatch(setState(SET_PAGES_UTILITY_N_PIESUMMARY, { pageList, pieChartEnabled, messagingEnabled, pieChartSummaryCount }));
+      dispatch(setState(SET_PAGES_UTILITY_N_PIESUMMARY, { sortedMainMenuAndSubMenuList, utilities, pieChartSummaryCount }));
     } catch (error) {
       //TODO : show proper error code message ERROR CODE 600
       //Save the error in exception logs

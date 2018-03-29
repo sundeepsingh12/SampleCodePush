@@ -95,11 +95,13 @@ module.exports = keyMirror({
     SET_TRANSACTION_SERVICE_STARTED: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
+
     //Pages
     PAGES_LOADING: null,
     SET_PAGES_UTILITY_N_PIESUMMARY: null,
     PAGES: null,
     PAGES_ADDITIONAL_UTILITY: null,
+    MAIN_MENU: null,
 
     //Home Container
     PIECHART: null,

@@ -82,15 +82,9 @@ class SyncZip {
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-        // await unzip(targetPath, PATH)
-        // var content = await RNFS.readFile(PATH + '/logs.json', 'base64')
-        // console.log('==image', content)
-        // Size of ZIP file created
-        // var stat = await RNFS.stat(PATH + '/sync.zip');
-        // console.log('=====zip '+stat.size);
+
         //Deleting TEMP folder location
         await RNFS.unlink(PATH_TEMP);
-        // console.log(PATH_TEMP+' removed');
     }
 
     updateUserSummaryNextJobTransactionId(statusList, jobMasterList, userSummary) {
@@ -176,15 +170,7 @@ class SyncZip {
         let transactionList = [], fieldDataList = [], jobList = [], serverSmsLogs = [], transactionLogs = [];
         if (!transactionIdList) {
             serverSmsLogs = this.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
-            return {
-                fieldDataList,
-                transactionList,
-                jobList,
-                serverSmsLogs,
-                runSheetSummary,
-                transactionLogs,
-                trackLogs
-            };
+            return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs };
         }
         let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery
         for (let index in transactionIdList) {
@@ -205,15 +191,7 @@ class SyncZip {
         jobList = this.getDataFromRealmDB(jobQuery, TABLE_JOB);
         serverSmsLogs = this.getDataFromRealmDB(fieldDataQuery, TABLE_SERVER_SMS_LOG);
         transactionLogs = this.getDataFromRealmDB(transactionLogQuery, TABLE_TRANSACTION_LOGS);
-        return {
-            fieldDataList,
-            transactionList,
-            jobList,
-            serverSmsLogs,
-            runSheetSummary,
-            transactionLogs,
-            trackLogs
-        }
+        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs }
     }
 
     /**

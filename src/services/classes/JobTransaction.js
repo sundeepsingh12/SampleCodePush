@@ -65,15 +65,7 @@ class JobTransaction {
      * @param {*} unseenTransactions 
      */
     getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap) {
-        let updatedJobStatusIdJobStatusMap = {}, updatedTransactonsList = []
-        if (_.isNull(unseenTransactions) || _.isEmpty(unseenTransactions)) {
-            return {
-                transactionIdDtos: [],
-                jobSummaries: [],
-                updatedTransactonsList
-            }
-        }
-        let jobMasterIdTransactionDtoMap = {} // Map<JobMasterId, TransactionIdDTO>
+        let updatedJobStatusIdJobStatusMap = {}, updatedTransactonsList = [], jobMasterIdTransactionDtoMap = {};
         for (let transaction in unseenTransactions) {
             let unseenTransactionObject = { ...unseenTransactions[transaction] };
             let transactionIdDtoObject = {
@@ -248,8 +240,8 @@ class JobTransaction {
         }
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         if (callingActivity == 'Bulk') {
-            console.log('bulk', callingActivityData)
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND jobStatusId = ${callingActivityData.pageObject.additionalParams.statusId}`
+            console.log('jobTransactionQuery', jobTransactionQuery)
             if (callingActivityData.groupId) {
                 let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
                 let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)

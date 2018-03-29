@@ -3,32 +3,13 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated, SectionList } from 'react-native'
 import Loader from '../components/Loader'
 import PieChart from '../components/PieChart'
 import renderIf from '../lib/renderIf'
 import * as globalActions from '../modules/global/globalActions'
 import * as homeActions from '../modules/home/homeActions'
-import {
-  Container,
-  Content,
-  Header,
-  Button,
-  Text,
-  List,
-  ListItem,
-  Separator,
-  Left,
-  Body,
-  Right,
-  Icon,
-  Title,
-  Footer,
-  FooterTab,
-  StyleProvider,
-  Toast,
-  ActionSheet,
-} from 'native-base'
+import { Container, Content, Header, Button, Text, List, ListItem, Separator, Left, Body, Right, Icon, Title, Footer, FooterTab, StyleProvider, Toast, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -52,6 +33,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 class Home extends PureComponent {
+
   componentDidMount() {
     if (Platform.OS === 'ios') {
       PushNotification.configure({
@@ -69,27 +51,40 @@ class Home extends PureComponent {
     this.props.actions.fetchPagesAndPiechart();
   }
 
+  getPageView(page) {
+    return (
+      <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
+        <Icon name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon]} />
+        <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
+        <Right><Icon name="ios-arrow-forward" /></Right>
+      </ListItem>
+    )
+  }
+
+  renderGroupHeader = ({ section }) => {
+    return (
+      <Separator bordered>
+        <Text>{section.title}</Text>
+      </Separator>
+    );
+  }
+
   getPageListItemsView() {
-    const pageList = this.props.pages;
-    let pageListView = []
-    _.each(pageList, (page => {
-      pageListView.push(
-        <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
-          <Icon name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon]} />
-          <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
-          <Right><Icon name="ios-arrow-forward" /></Right>
-        </ListItem>
-      )
-    }));
-    return pageListView
+    return (
+      <SectionList
+        sections={this.props.pages}
+        renderItem={({ item }) => this.getPageView(item)}
+        renderSectionHeader={this.renderGroupHeader}
+        keyExtractor={item => item.id}
+      />
+    )
   }
 
   render() {
-    console.log('pages', this.props)
-    const pageListItemsView = this.getPageListItemsView();
     if (this.props.pagesLoading) {
       return (<Loader />)
     }
+    const pageListItemsView = this.getPageListItemsView();
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={StyleSheet.flatten([styles.bgWhite])}>

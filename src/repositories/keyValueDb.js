@@ -94,14 +94,19 @@ export class keyValueDb {
       default:
         checkCondition = true;
     }
-    if (value && (checkCondition || validate(value, schemaInstance).valid)) {
-      return store.save(schemaName, {
-        value
-      }).then(() => {
-        return true;
-      }).catch(error => {
-        return error;
-      })
+    console.log(validate(value, schemaInstance))
+    if (value) {
+      if (checkCondition || validate(value, schemaInstance).valid) {
+        return store.save(schemaName, {
+          value
+        }).then(() => {
+          return true;
+        }).catch(error => {
+          return error;
+        })
+      } else {
+        throw new Error(schemaName + ' validation failed')
+      }
     } else {
       const schemaCheck = await this.getValueFromStore(schemaName)
       if (!schemaCheck) {

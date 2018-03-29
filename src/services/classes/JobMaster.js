@@ -131,6 +131,7 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    console.log('job master json',json)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : [])
     await keyValueDBService.validateAndSaveData(USER, json.user)
@@ -157,10 +158,10 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(HUB, json.hub)
     await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment().format('YYYY-MM-DD HH:mm:ss'))
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
-    let samplePageJson = require('../../repositories/pagesSample');
-    let sampleAdditionalUtilitySample = require('../../repositories/pagesAddtionalUtilitiesSample');
-    await keyValueDBService.validateAndSaveData(PAGES, samplePageJson);
-    await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, sampleAdditionalUtilitySample);
+    // let samplePageJson = require('../../repositories/pagesSample');
+    // let sampleAdditionalUtilitySample = require('../../repositories/pagesAddtionalUtilitiesSample');
+    await keyValueDBService.validateAndSaveData(PAGES, json.pages);
+    await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, json.additionalUtilities);
     if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {
       await keyValueDBService.validateAndSaveData(HUB_LAT_LONG, json.hubLatLng)
     }
