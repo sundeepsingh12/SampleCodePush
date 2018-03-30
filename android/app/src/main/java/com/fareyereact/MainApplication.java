@@ -66,6 +66,11 @@ public class MainApplication extends Application implements ReactApplication {
             new RNIMEIPackage()
       );
     }
+
+    @Override
+    protected String getJSMainModuleName() {
+      return "index.android";
+    }
   };
 
   @Override

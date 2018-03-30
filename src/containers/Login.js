@@ -112,15 +112,15 @@ class Login extends PureComponent {
     this.props.toggleCheckbox()
   }
 
-  // codepushSync = () => {
-  //   codePush.sync({
-  //     updateDialog: true,
-  //     installMode: codePush.InstallMode.IMMEDIATE
-  //   }, (status) => {
-  //     console.log("====Code push update=====");
-  //     console.log(status);
-  //   });
-  // }
+  codepushSync = () => {
+    codePush.sync({
+      updateDialog: true,
+      installMode: codePush.InstallMode.IMMEDIATE
+    }, (status) => {
+      console.log("====Code push update=====");
+      console.log(status);
+    });
+  }
 
   getImageView() {
     if (this.props.auth.form.authenticationService || this.props.auth.form.isLongPress) {
@@ -209,7 +209,19 @@ class Login extends PureComponent {
         onPress={this.loginButtonPress}
         style={[styles.marginTop15]}
       >
-        <Text style={[styles.fontWhite]}>Log In</Text>
+        <Text style={[styles.fontWhite]}>Log In2</Text>
+      </Button>
+    )
+  }
+
+  showCodePush(){
+    return (
+      <Button
+        full rounded success
+        onPress={this.codepushSync}
+        style={[styles.marginTop15]}
+      >
+        <Text style={[styles.fontWhite]}>Code Push</Text>
       </Button>
     )
   }
@@ -252,6 +264,7 @@ class Login extends PureComponent {
                 {this.showUsernameView()}
                 {this.showPasswordView()}
                 {this.showLoginButton()}
+                {this.showCodePush()}
                 {this.showRememberMe()}
                 {this.showDisplayMessageAndScanner()}
 
