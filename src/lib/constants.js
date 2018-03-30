@@ -200,6 +200,7 @@ module.exports = keyMirror({
     GEO_FENCING: null,
     GEO_FENCE_STATUS: null,
     LAT_LONG_GEO_FENCE: null,
+    SYNC_RUNNING: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
