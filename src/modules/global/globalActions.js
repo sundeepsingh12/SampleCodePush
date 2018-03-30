@@ -62,25 +62,6 @@ export function navigateToScene(routeName, params) {
   }
 }
 
-export async function getJobListingParameters() {
-  const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-  const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
-  const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-  const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
-  const customerCareList = await keyValueDBService.getValueFromStore(CUSTOMER_CARE)
-  const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
-  const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-  return {
-    customerCareList: customerCareList.value,
-    jobAttributeMasterList: jobAttributeMasterList.value,
-    jobAttributeStatusList: jobAttributeStatusList.value,
-    jobMasterList: jobMasterList.value,
-    jobMasterIdCustomizationMap: jobMasterIdCustomizationMap.value,
-    smsTemplateList: smsTemplateList.value,
-    statusList: statusList.value
-  }
-}
-
 //Deletes values from store
 export function deleteSessionToken() {
   return async function (dispatch) {
@@ -107,16 +88,19 @@ export function deleteSessionToken() {
   }
 }
 
+/**
+ * 
+ * @param {Number} errorCode error code of particular class and action.
+ * @param {String} errorMessage error message to display
+ * @param {String} type type of Toast for example danger, warning, success
+ * @param {Integer} isToastShow integer whether to show toast or not.
+ */
 export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
   return async function (dispatch) {
-    try {
       if (isToastShow == 1) {
-        Toast.show({ text: "ErrorCode: " + errorCode + "\n " + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
+        Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
       }
       await userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
-    } catch (error) {
-      await userExceptionLogsService.addUserExceptionLogs(error.message, 123121)
-    }
   }
 }
 //Use to reset navigation state

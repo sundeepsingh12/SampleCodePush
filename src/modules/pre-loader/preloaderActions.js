@@ -338,7 +338,7 @@ export function invalidateUserSession(createBackup) {
       // await trackingService.inValidateStoreVariables(fenceIdentifier)
 
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1))
+      dispatch(showToastAndAddUserExceptionLog(1803, error.message, 'danger', 0))
       dispatch(error_400_403_Logout(error.message))
     }
     finally {
@@ -618,11 +618,41 @@ export function checkForUnsyncTransactionAndLogout() {
       if (isUnsyncTransactionsPresent) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {
-        dispatch(invalidateUserSession(true))
+        dispatch(invalidateUserSessionWhenLogoutPressed(true))
       }
     } catch (error) {
       dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))      
       dispatch(error_400_403_Logout(error.message))
+      dispatch(setState(TOGGLE_LOGOUT, false))
+    }
+  }
+}
+
+export function invalidateUserSessionWhenLogoutPressed(createBackup) {
+  return async function (dispatch) {
+    try {
+      dispatch(preLogoutRequest())
+      dispatch(setState(TOGGLE_LOGOUT, true))
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      // TODO uncomment this code when run sync in logout
+      // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")  
+      if (createBackup) {
+        await backupService.createBackupOnLogout()
+      }
+      let response = await authenticationService.logout(token) // hit logout api
+      await logoutService.deleteDataBase()
+      dispatch(preLogoutSuccess())
+      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(deleteSessionToken())
+      // below 2 lines are used to delete geofence on logout 
+      // <---- DON'T REMOVE THESE LINES --->
+      // let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      // await trackingService.inValidateStoreVariables(fenceIdentifier)
+
+    } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1813, error.message, 'danger', 1))
+    }
+    finally {
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
