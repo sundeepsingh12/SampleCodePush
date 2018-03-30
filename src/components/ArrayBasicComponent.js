@@ -157,12 +157,17 @@ class ArrayBasicComponent extends PureComponent {
                         transparent={true}
                         onRequestClose={() => this.onCloseModal(item)}>
                         <TouchableHighlight
-                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
-                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]} onPress={() => this.onCloseModal(item)}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .2 }}>
                                 <View>
-                                    <NPSFeedback
-                                        onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item}
-                                    />
+                                    <Text style={[styles.alignStart, styles.fontLg, styles.padding10]}>
+                                        Rating
+                                    </Text>
+                                    <View style={[styles.padding20, styles.justifyCenter]}>
+                                        <NPSFeedback
+                                            onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item}
+                                        />
+                                    </View>
                                 </View>
                             </TouchableHighlight>
                         </TouchableHighlight>
@@ -360,7 +365,7 @@ class ArrayBasicComponent extends PureComponent {
                         <FormLayoutActivityComponent item={item} press={() => this.onPressModal(item.fieldAttributeMasterId)} />
                     </View>
                 )
-                
+
             case QR_SCAN:
                 return (
                     <View>

@@ -247,12 +247,18 @@ class BasicFormElement extends PureComponent {
                         transparent={true}
                         onRequestClose={this.onCloseModal}>
                         <TouchableHighlight
-                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
-                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}
+                            onPress={() => this.onCloseModal()}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .2 }}>
                                 <View>
-                                    <NPSFeedback
-                                        onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item}
-                                    />
+                                    <Text style={[styles.alignStart, styles.fontLg, styles.padding10]}>
+                                        Rating
+                                    </Text>
+                                    <View style={[styles.padding20,styles.justifyCenter]}>
+                                        <NPSFeedback
+                                            onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item}
+                                        />
+                                    </View>
                                 </View>
                             </TouchableHighlight>
                         </TouchableHighlight>
