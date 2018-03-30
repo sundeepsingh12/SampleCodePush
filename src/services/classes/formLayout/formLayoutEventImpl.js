@@ -565,7 +565,8 @@ export default class FormLayoutEventImpl {
             jobTransactionId,
             positionId: formLayoutObject.positionId,
             parentId: formLayoutObject.parentId,
-            fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId
+            fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId,
+            attributeTypeId: formLayoutObject.attributeTypeId
         }
     }
 
