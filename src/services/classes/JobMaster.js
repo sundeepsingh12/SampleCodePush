@@ -131,35 +131,33 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
-    console.log('job master json',json)
+    // console.log('job master json', json)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
-    await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : [])
-    await keyValueDBService.validateAndSaveData(USER, json.user)
-    await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster)
-    await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_VALUE, json.jobAttributeValueMaster)
-    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE, json.fieldAttributeMaster)
-    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster)
-    await keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus)
-    await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization)
-    let jobMasterIdCustomizationMap = this.prepareCustomizationListMap(json.jobListCustomization)
-    await keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP, jobMasterIdCustomizationMap)
-    await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_STATUS, json.jobAttributeMasterStatuses)
-    let tabs = await this.validateAndSortTabList(json.appJobStatusTabs)
-    await keyValueDBService.validateAndSaveData(TAB, tabs)
-    await keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes)
-    await keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList)
-    await keyValueDBService.validateAndSaveData(SMS_TEMPLATE, json.smsTemplatesList)
-    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_STATUS, json.fieldAttributeMasterStatuses)
-    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION, json.fieldAttributeMasterValidations)
-    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION_CONDITION, json.fieldAttributeMasterValidationConditions)
-    await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses)
-    await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary)
-    await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary)
-    await keyValueDBService.validateAndSaveData(HUB, json.hub)
-    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment().format('YYYY-MM-DD HH:mm:ss'))
-    await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'))
-    // let samplePageJson = require('../../repositories/pagesSample');
-    // let sampleAdditionalUtilitySample = require('../../repositories/pagesAddtionalUtilitiesSample');
+    await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
+    await keyValueDBService.validateAndSaveData(USER, json.user);
+    await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE, json.jobAttributeMaster);
+    await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_VALUE, json.jobAttributeValueMaster);
+    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE, json.fieldAttributeMaster);
+    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALUE, json.fieldAttributeValueMaster);
+    await keyValueDBService.validateAndSaveData(JOB_STATUS, json.jobStatus);
+    await keyValueDBService.validateAndSaveData(CUSTOMIZATION_APP_MODULE, json.modulesCustomization);
+    let jobMasterIdCustomizationMap = this.prepareCustomizationListMap(json.jobListCustomization);
+    await keyValueDBService.validateAndSaveData(CUSTOMIZATION_LIST_MAP, jobMasterIdCustomizationMap);
+    await keyValueDBService.validateAndSaveData(JOB_ATTRIBUTE_STATUS, json.jobAttributeMasterStatuses);
+    let tabs = await this.validateAndSortTabList(json.appJobStatusTabs);
+    await keyValueDBService.validateAndSaveData(TAB, tabs);
+    await keyValueDBService.validateAndSaveData(JOB_MASTER_MONEY_TRANSACTION_MODE, json.jobMasterMoneyTransactionModes);
+    await keyValueDBService.validateAndSaveData(CUSTOMER_CARE, json.customerCareList);
+    await keyValueDBService.validateAndSaveData(SMS_TEMPLATE, json.smsTemplatesList);
+    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_STATUS, json.fieldAttributeMasterStatuses);
+    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION, json.fieldAttributeMasterValidations);
+    await keyValueDBService.validateAndSaveData(FIELD_ATTRIBUTE_VALIDATION_CONDITION, json.fieldAttributeMasterValidationConditions);
+    await keyValueDBService.validateAndSaveData(SMS_JOB_STATUS, json.smsJobStatuses);
+    await keyValueDBService.validateAndSaveData(USER_SUMMARY, json.userSummary);
+    await keyValueDBService.validateAndSaveData(JOB_SUMMARY, json.jobSummary);
+    await keyValueDBService.validateAndSaveData(HUB, json.hub);
+    await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, moment().format('YYYY-MM-DD HH:mm:ss'));
+    await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'));
     await keyValueDBService.validateAndSaveData(PAGES, json.pages);
     await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, json.additionalUtilities);
     if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {

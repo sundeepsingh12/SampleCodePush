@@ -51,6 +51,7 @@ module.exports = {
     JOB_ASSIGNMENT_DISPLAY: 'Job Assignment',
     CUSTOM_APP_DISPLAY: 'Web URL',
     SORTING_DISPLAY: 'Sort Parcels',
+    UNTITLED: 'UNTITLED',
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
@@ -333,19 +334,23 @@ module.exports = {
     REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP:'Setting you up...',
-    DOWNLOAD_SETTINGS:'Downloading settings',
-    APPLYING_SETTINGS:'Applying settings',
-    VERIFY_HANDSET:'Verifying handset',
-    VERIFY_MOBILE:'Verify your mobile',
-    OTP_CODE_SENT:'OTP code hasbeen sent to',
-    ENTER_MOBILE:'Enter your mobile',
-    SEND_OTP:'Send OTP',
+    SETTING_UP: 'Setting you up...',
+    DOWNLOAD_SETTINGS: 'Downloading settings',
+    APPLYING_SETTINGS: 'Applying settings',
+    VERIFY_HANDSET: 'Verifying handset',
+    VERIFY_MOBILE: 'Verify your mobile',
+    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    ENTER_MOBILE: 'Enter your mobile',
+    SEND_OTP: 'Send OTP',
 
     // Job Summary
     UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
     VALUE_OF_JOBSUMMARY_IS_MISSING: 'Value of JobSummary is missing',
 
-     //Data Store
-     SEARCH: 'Search',
+    //Data Store
+    SEARCH: 'Search',
+
+    //Menu Container Constants
+    APP: 'App',
+    LOGOUT: 'Logout'
 }

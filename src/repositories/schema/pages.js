@@ -6,7 +6,7 @@ const pages = {
         "properties": {
             "id": { "type": "number", "required": true },
             "name": { "type": "string", "required": true },
-            "groupName": { "type": "string", "required": true },
+            "groupName": { "type": ["string", null] },
             "icon": { "type": "string", "required": true },
             "userType": { "type": "number", "required": true },
             "jobMasterIds": { "type": ["string", null], "required": true },

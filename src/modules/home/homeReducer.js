@@ -34,7 +34,8 @@ export default function homeReducer(state = initialState, action) {
     }
 
     case SET_PAGES_UTILITY_N_PIESUMMARY: {
-      return state.set('pages', action.payload.sortedMainMenuAndSubMenuList.mainMenuSectionList)
+      return state.set('mainMenuList', action.payload.sortedMainMenuAndSubMenuList.mainMenuSectionList)
+        .set('subMenuList', action.payload.sortedMainMenuAndSubMenuList.subMenuSectionList)
         .set('utilities', action.payload.utilities)
         .set('pieChartSummaryCount', action.payload.pieChartSummaryCount)
         .set('pagesLoading', false);

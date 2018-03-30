@@ -88,7 +88,7 @@ export function deleteSessionToken() {
   }
 }
 
-export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
+export async function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
   return async function (dispatch) {
     try {
       if (isToastShow == 1) {
@@ -96,7 +96,7 @@ export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, i
       }
       await userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
     } catch (error) {
-      await userExceptionLogsService.addUserExceptionLogs(error.message, 123121)
+      console.log(error)
     }
   }
 }

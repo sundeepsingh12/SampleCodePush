@@ -1,6 +1,7 @@
 import { Record } from 'immutable'
 var InitialState = Record({
-    pages: [],
+    mainMenuList: [],
+    subMenuList: [],
     utilities: {
         pieChartEnabled: false,
         messagingEnabled: false

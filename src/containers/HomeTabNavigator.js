@@ -43,7 +43,7 @@ class HomeTabNavigator extends PureComponent {
                     tabBarIcon: ({ tintColor }) => (
                         <Icon
                             name='ios-home'
-                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 15 : 0, color: tintColor }]}
+                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
                         />
                     ),
                 }
@@ -57,7 +57,7 @@ class HomeTabNavigator extends PureComponent {
                     tabBarIcon: ({ tintColor }) => (
                         <Icon
                             name='ios-sync'
-                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 15 : 0, color: tintColor }]}
+                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
                         />
                     ),
                 }
@@ -70,7 +70,7 @@ class HomeTabNavigator extends PureComponent {
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (
                         <View
-                            style={[styles.alignSelfCenter, styles.marginLeft5, { height: 30, marginTop: (Platform.OS == 'ios') ? 25 : 0 }]}>
+                            style={[styles.alignSelfCenter, styles.marginLeft5, { height: 30, marginTop: 15 }]}>
                             <ErpSyncTabIcon width={50} height={50} color={tintColor} />
                         </View>
                     ),
@@ -85,7 +85,7 @@ class HomeTabNavigator extends PureComponent {
                     tabBarIcon: ({ tintColor }) => (
                         <Icon
                             name='md-menu'
-                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 15 : 0, color: tintColor }]}
+                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
                         />
                     ),
                 }
@@ -113,7 +113,7 @@ class HomeTabNavigator extends PureComponent {
                     alignItems: 'center',
                     height: 50,
                     paddingTop: 10,
-                    paddingBottom: 10
+                    paddingBottom: 5
                 },
                 indicatorStyle: {
                     height: 0

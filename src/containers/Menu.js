@@ -4,24 +4,9 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Alert, SectionList } from 'react-native'
 import Loader from '../components/Loader'
-import {
-  Container,
-  Content,
-  Header,
-  Button,
-  Text,
-  Left,
-  Body,
-  Right,
-  Icon,
-  Footer,
-  FooterTab,
-  StyleProvider,
-  Toast
-} from 'native-base'
-
+import { Container, Content, Header, Button, Text, Left, Body, Right, Icon, Footer, FooterTab, StyleProvider, Toast, Separator } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -30,6 +15,7 @@ import * as globalActions from '../modules/global/globalActions'
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf'
 import CustomAlert from '../components/CustomAlert'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import {
   PROFILE_ID,
   STATISTIC_ID,
@@ -59,7 +45,10 @@ import {
   OK,
   CANCEL,
   LOGOUT_UNSYNCED_TRANSACTIONS_TITLE,
-  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE
+  LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE,
+  UNTITLED,
+  APP,
+  LOGOUT
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -69,103 +58,19 @@ function mapStateToProps(state) {
     isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
     menu: state.home.menu,
     isLoggingOut: state.home.isLoggingOut,
-    isUnsyncTransactionOnLogout: state.home.isUnsyncTransactionOnLogout
+    isUnsyncTransactionOnLogout: state.home.isUnsyncTransactionOnLogout,
+    subMenuList: state.home.subMenuList
   }
 };
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({
-      ...globalActions,
-      ...preloaderActions
-    }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...preloaderActions }, dispatch)
   }
 }
 
 
 class Menu extends PureComponent {
-
-  renderTextView(text, key, isLast, icon) {
-    return (
-      <View key={key} style={[styles.justifySpaceBetween, icon ? styles.marginLeft10 : null, styles.flex1]}>
-        <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomWidth: isLast ? 0 : 1, borderBottomColor: '#f3f3f3' }]}>
-          <Text style={[styles.fontDefault]}>
-            {text}
-          </Text>
-          <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-        </View>
-      </View>
-    )
-  }
-
-  renderIconView(icon, key) {
-    return (
-      <View key={key} style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
-        <Icon name={icon} style={[styles.fontPrimary, styles.fontLg]} />
-      </View>
-    )
-  }
-
-  renderCardView(view, key, moduleIndex) {
-    return (
-      <TouchableOpacity key={key} onPress={() => this.navigateToScene(moduleIndex)}>
-        <View style={[styles.bgWhite]}>
-          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-            {view}
-          </View>
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
-  navigateToScene = (appModule) => {
-    switch (appModule.appModuleId) {
-      case PROFILE_ID: {
-        this.props.actions.navigateToScene(ProfileView)
-        break
-      }
-
-      case STATISTIC_ID: {
-        this.props.actions.navigateToScene(Statistics)
-        break
-      }
-
-      case OFFLINEDATASTORE_ID: {
-        this.props.actions.navigateToScene(OfflineDS, { displayName: this.props.menu.OFFLINEDATASTORE.displayName })
-        break
-      }
-
-      case BACKUP_ID: {
-        this.props.actions.navigateToScene(Backup, { displayName: this.props.menu.BACKUP.displayName })
-        break
-      }
-
-      case BLUETOOTH_ID: {
-        this.props.actions.navigateToScene(BluetoothListing, { displayName: this.props.menu.BACKUP.displayName })
-        break
-      }
-    }
-  }
-
-  renderModuleView(moduleList, key) {
-    let moduleView, rowView = []
-    for (let index in moduleList) {
-      moduleView = []
-      if (!moduleList[index].enabled) {
-        continue
-      }
-      if (moduleList[index].icon) {
-        moduleView.push(
-          this.renderIconView(moduleList[index].icon, key * (index + 1) * 100)
-        )
-      }
-      moduleView.push(
-        this.renderTextView(moduleList[index].displayName, key * (index + 1) * 1000, (index == moduleList.length - 1), moduleList[index].icon)
-      )
-      rowView.push(this.renderCardView(moduleView, key * (index + 1) * 10000, moduleList[index]))
-    }
-    return rowView
-  }
 
   startLoginScreenWithoutLogout = () => {
     this.props.actions.startLoginScreenWithoutLogout()
@@ -201,6 +106,48 @@ class Menu extends PureComponent {
     )
   }
 
+  getPageView(page) {
+    return (
+      <TouchableOpacity key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
+        <View style={[styles.bgWhite, styles.borderBottomGray]}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
+              <MaterialIcons name={page.icon} style={[styles.fontPrimary, styles.fontLg]} />
+            </View>
+            <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
+              <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomColor: '#f3f3f3' }]}>
+                <Text style={[styles.fontDefault]}> {page.name} </Text>
+                <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontBlack]} />
+              </View>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  renderGroupHeader = ({ section }) => {
+    if (section.title == UNTITLED) {
+      return null
+    }
+    return (
+      <Separator style={[styles.bgLightGray]}>
+        <Text style={[styles.fontBlack]}>{section.title}</Text>
+      </Separator>
+    );
+  }
+
+  getPageListItemsView() {
+    return (
+      <SectionList
+        sections={this.props.subMenuList}
+        renderItem={({ item }) => this.getPageView(item)}
+        renderSectionHeader={this.renderGroupHeader}
+        keyExtractor={item => item.id}
+      />
+    )
+  }
+
   render() {
     return (
       <StyleProvider style={getTheme(platform)}>
@@ -212,22 +159,13 @@ class Menu extends PureComponent {
               message={this.props.errorMessage_403_400_Logout.message}
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
-
           {renderIf(this.props.isLoggingOut, <Loader />)}
-
           {this.getUnsyncTransactionPresentAlert()}
-
-          {renderIf(!this.props.isLoggingOut, <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
-            <View style={[styles.bgWhite, styles.marginBottom10]}>
-              {this.renderModuleView([this.props.menu[PROFILE], this.props.menu[STATISTIC]], 1)}
-            </View>
-
-            <View style={[styles.bgWhite, styles.marginBottom10]}>
-              {this.renderModuleView([this.props.menu[BACKUP], this.props.menu[OFFLINEDATASTORE], this.props.menu[BLUETOOTH]], 3)}
-            </View>
-
-            {this.renderLogoutView()}
-          </Content>)}
+          {renderIf(!this.props.isLoggingOut,
+            <Content style={[styles.flex1, styles.bgLightGray, styles.paddingTop10, styles.paddingBottom10]}>
+              {this.getPageListItemsView()}
+              {this.renderLogoutView()}
+            </Content>)}
         </Container>
       </StyleProvider>
 
@@ -236,18 +174,21 @@ class Menu extends PureComponent {
 
   renderLogoutView() {
     return (
-      <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={this.showLogoutAlert}>
-        <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-          <View style={[styles.justifySpaceBetween, styles.flex1]}>
-            <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
-              <Text style={[styles.fontDefault]}>
-                Logout
-            </Text>
-              <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
+      <View>
+        <Separator style={[styles.bgLightGray]}>
+          <Text style={[styles.fontBlack]}>{APP}</Text>
+        </Separator>
+        <TouchableOpacity style={[styles.bgWhite, styles.marginBottom10]} onPress={this.showLogoutAlert}>
+          <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
+            <View style={[styles.justifySpaceBetween, styles.flex1]}>
+              <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
+                <Text style={[styles.fontDefault]}> {LOGOUT} </Text>
+                <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
+              </View>
             </View>
           </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
     )
   }
 

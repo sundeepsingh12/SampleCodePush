@@ -16,10 +16,12 @@ import styles from '../themes/FeStyle'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import { Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { UNTITLED } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
   return {
-    pages: state.home.pages,
+    mainMenuList: state.home.mainMenuList,
     utilities: state.home.utilities,
     pagesLoading: state.home.pagesLoading,
     pieChartSummaryCount: state.home.pieChartSummaryCount,
@@ -54,7 +56,7 @@ class Home extends PureComponent {
   getPageView(page) {
     return (
       <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
-        <Icon name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon]} />
+        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon]} />
         <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
         <Right><Icon name="ios-arrow-forward" /></Right>
       </ListItem>
@@ -62,17 +64,20 @@ class Home extends PureComponent {
   }
 
   renderGroupHeader = ({ section }) => {
+    if (_.size(this.props.mainMenuList) == 1 && section.title == UNTITLED) {
+      return null
+    }
     return (
-      <Separator bordered>
-        <Text>{section.title}</Text>
-      </Separator>
+      <View style = {[styles.bgWhite, styles.padding10]}>
+        <Text style = {[styles.fontLg, styles.fontDarkGray, styles.paddingVertical10]}>{section.title}</Text>
+      </View>
     );
   }
 
   getPageListItemsView() {
     return (
       <SectionList
-        sections={this.props.pages}
+        sections={this.props.mainMenuList}
         renderItem={({ item }) => this.getPageView(item)}
         renderSectionHeader={this.renderGroupHeader}
         keyExtractor={item => item.id}
@@ -84,7 +89,6 @@ class Home extends PureComponent {
     if (this.props.pagesLoading) {
       return (<Loader />)
     }
-    const pageListItemsView = this.getPageListItemsView();
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={StyleSheet.flatten([styles.bgWhite])}>
@@ -99,7 +103,7 @@ class Home extends PureComponent {
             {renderIf(this.props.utilities.pieChartEnabled,
               <PieChart count={this.props.pieChartSummaryCount} />
             )}
-            <List>{pageListItemsView}</List>
+            <List>{this.getPageListItemsView()}</List>
           </Content>
         </Container>
       </StyleProvider>

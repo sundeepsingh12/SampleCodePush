@@ -43,6 +43,7 @@ import {
 } from '../../lib/constants'
 import _ from 'lodash'
 import NewJobIcon from '../../../src/svg_components/icons/NewJobIcon'
+import { UNTITLED } from '../../lib/ContainerConstants'
 class ModuleCustomization {
 
     /**
@@ -294,6 +295,7 @@ class ModuleCustomization {
             if (pageList[page].userType != user.userType.id) {
                 continue
             }
+            pageList[page].groupName = pageList[page].groupName ? pageList[page].groupName : UNTITLED
             if (pageList[page].menuLocation == MAIN_MENU) {
                 mainMenuObject[pageList[page].groupName] = mainMenuObject[pageList[page].groupName] ? mainMenuObject[pageList[page].groupName] : {};
                 mainMenuObject[pageList[page].groupName].pageList = mainMenuObject[pageList[page].groupName].pageList ? mainMenuObject[pageList[page].groupName].pageList : [];
