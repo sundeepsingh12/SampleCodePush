@@ -41,6 +41,7 @@ import { jobMasterService } from './JobMaster'
 var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
+import { userExceptionLogsService } from './UserException'
 
 class SyncZip {
 
@@ -67,6 +68,7 @@ class SyncZip {
         SYNC_RESULTS.userCommunicationLog = [];
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.userExceptionLog = [];
+        SYNC_RESULTS.userExceptionLog = await userExceptionLogsService.getUserExceptionLogs(lastSyncTime)
 
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.jobSummary = jobSummary || {}
@@ -255,7 +257,10 @@ class SyncZip {
             let name = imageName.split('/')
             let fileExits = await RNFS.exists(PATH + '/CustomerImages/' + name[name.length - 1])
             if (fileExits) {
-                await RNFS.copyFile(PATH + '/CustomerImages/' + name[name.length - 1], path + '/' + name[name.length - 1])
+                let fileAlreadyExists = await RNFS.exists(path + '/' + name[name.length - 1])
+                if (!fileAlreadyExists) {
+                    await RNFS.copyFile(PATH + '/CustomerImages/' + name[name.length - 1], path + '/' + name[name.length - 1])
+                }
             }
         }
     }

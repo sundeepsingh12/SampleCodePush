@@ -100,8 +100,9 @@ import SplitPayment from '../../containers/SplitPayment'
 import {
   createReduxBoundAddListener,
   createReactNavigationReduxMiddleware,
-} from 'react-navigation-redux-helpers';
+} from 'react-navigation-redux-helpers'
 import { setState } from '../global/globalActions'
+import BluetoothListing from '../../containers/BluetoothListing'
 
 
 class AppWithNavigationState extends React.PureComponent {
@@ -365,6 +366,10 @@ export const AppNavigator = StackNavigator({
       header: null,
       gesturesEnabled: false
     }
+  },
+  
+  BluetoothListing:{
+    screen:BluetoothListing
   }
 },
   {

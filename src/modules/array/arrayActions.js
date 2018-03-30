@@ -5,15 +5,16 @@ import {
     SET_ARRAY_CHILD_LIST,
     SET_NEW_ARRAY_ROW,
     SET_ARRAY_ELEMENTS,
-    SET_ERROR_MSG,
+    SET_ERROR_MSG,    
     CLEAR_ARRAY_STATE,
     NEXT_FOCUS,
     SET_ARRAY_ISLOADING,
-    SET_OPTION_ATTRIBUTE_ERROR
+    SET_OPTION_ATTRIBUTE_ERROR,
+    SET_ARRAY_DATA_STORE_FILTER_MAP,
 } from '../../lib/constants'
 import { ARRAY_SAROJ_FAREYE, AFTER, TEXT, STRING, SCAN_OR_TEXT, QR_SCAN } from '../../lib/AttributeConstants'
 import _ from 'lodash'
-import { setState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { NavigationActions } from 'react-navigation'
@@ -27,7 +28,7 @@ export function showOrDropModal(fieldAttributeMasterId, arrayElements, rowId, id
             newArray[rowId].modalFieldAttributeMasterId = idToSet
             dispatch(setState(SET_ARRAY_ELEMENTS, { newArrayElements: newArray, isSaveDisabled }))
         } catch (error) {
-            dispatch(setState(SET_ERROR_MSG, error.message))
+            dispatch(showToastAndAddUserExceptionLog(101, error.message, 'danger', 1))
         }
     }
 }
@@ -38,7 +39,7 @@ export function addRowInArray(lastrowId, childElementsTemplate, arrayElements, j
             if (!newArrayRow) throw new Error(ADD_ROW_ERROR)
             dispatch(setState(SET_NEW_ARRAY_ROW, newArrayRow))
         } catch (error) {
-            dispatch(setState(SET_ERROR_MSG, error.message))
+            dispatch(showToastAndAddUserExceptionLog(102, error.message, 'danger', 1))
         }
     }
 }
@@ -53,7 +54,7 @@ export function deleteArrayRow(arrayElements, rowId, lastrowId) {
                 isSaveDisabled
             }))
         } catch (error) {
-            dispatch(setState(SET_ERROR_MSG, error.message))
+            dispatch(showToastAndAddUserExceptionLog(103, error.message, 'danger', 1))
         }
     }
 }
@@ -69,7 +70,6 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
             arrayRow.formLayoutObject.get(attributeMasterId).containerValue = (validationsResult) ? containerValue : null
             arrayRow.modalFieldAttributeMasterId = (validationsResult) ? null : (backPressOrModalPresent == 2) ? attributeMasterId : null
             let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult && backPressOrModalPresent) ? value : null, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
-            if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
             if (validationsResult && backPressOrModalPresent == 1) {
                 dispatch(NavigationActions.back())
@@ -82,18 +82,20 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
                 }
             }
         } catch (error) {
-            console.log(error)
-            dispatch(setState(SET_ERROR_MSG, error.message))
+            dispatch(showToastAndAddUserExceptionLog(104, error.message, 'danger', 1))
         }
     }
 }
 export function getNextFocusableForArrayWithoutChildDatalist(attributeMasterId, isSaveDisabled, value, arrayElements, rowId, event, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
-        let cloneArrayElements = _.cloneDeep(arrayElements)
-        let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, null, event, fieldAttributeMasterParentIdMap)
-        if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
-        dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
-
+        try {
+            let cloneArrayElements = _.cloneDeep(arrayElements)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, value, null, event, fieldAttributeMasterParentIdMap)
+            if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
+            dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(105, error.message, 'danger', 1))
+        }
     }
 }
 export function saveArray(arrayElements, arrayParentItem, jobTransaction, latestPositionId, formElement, isSaveDisabled, arrayMainObject, fieldAttributeMasterParentIdMap) {
@@ -114,14 +116,18 @@ export function saveArray(arrayElements, arrayParentItem, jobTransaction, latest
                 dispatch(setState(CLEAR_ARRAY_STATE))
             }
         } catch (error) {
-            dispatch(setState(SET_ERROR_MSG, error.message))
+            dispatch(showToastAndAddUserExceptionLog(106, error.message, 'danger', 1))
         }
     }
 }
 
 export function clearArrayState() {
     return async function (dispatch) {
-        dispatch(setState(CLEAR_ARRAY_STATE))
+        try {
+            dispatch(setState(CLEAR_ARRAY_STATE))
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(107, error.message, 'danger', 1))
+        }
     }
 }
 
@@ -142,29 +148,31 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
             }
             dispatch(getNextFocusableForArrayWithoutChildDatalist(currentElement.fieldAttributeMasterId, isSaveDisabled, (!scanValue) ? currentElement.displayValue : scanValue, newArray, rowId, NEXT_FOCUS, null))
         } catch (error) {
-            console.log(error)
+            dispatch(showToastAndAddUserExceptionLog(108, error.message, 'danger', 1))
         }
     }
 }
-export function setInitialArray(currentElement, formElement, jobStatusId, jobTransaction) {
+export function setInitialArray(currentElement, formElement, jobStatusId, jobTransaction, arrayReverseDataStoreFilterMap, fieldAttributeMasterId) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_ARRAY_ISLOADING, true))
             const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, currentElement.fieldAttributeMasterId, jobTransaction)
             if (!formElement.get(currentElement.fieldAttributeMasterId).value || formElement.get(currentElement.fieldAttributeMasterId).value == '') {
-                const arrayDTO = await arrayService.getSortedArrayChildElements(sequenceWiseRootFieldAttributes, jobTransaction)
+                const arrayDTO = await arrayService.getSortedArrayChildElements(sequenceWiseRootFieldAttributes, jobTransaction, arrayReverseDataStoreFilterMap, fieldAttributeMasterId)
                 if (!arrayDTO) return
                 if (arrayDTO.errorMessage) {
-                    throw new Error(arrayDTO.errorMessage)
+                    dispatch(setState(SET_ERROR_MSG, arrayDTO.errorMessage))
                 } else {
                     dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
+                    dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, arrayDTO.arrayReverseDataStoreFilterMap))  // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
                 }
             } else {
                 let arrayState = arrayService.setInitialArray(currentElement, formElement, sequenceWiseRootFieldAttributes)
                 dispatch(setState(SET_ARRAY_CHILD_LIST, arrayState))
             }
         } catch (error) {
-            dispatch(setState(SET_ERROR_MSG, error.message))
+            dispatch(showToastAndAddUserExceptionLog(109, error.message, 'danger', 1))            
+            dispatch(setState(SET_ARRAY_ISLOADING, false))
         }
     }
 }

@@ -401,9 +401,8 @@ export function pieChartCount() {
   return async (dispatch) => {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
-      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const count = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
-      dispatch(setState(CHART_LOADING, { loading: false, count }))
+      const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount()
+      dispatch(setState(CHART_LOADING, { loading: false, count : countForPieChart }))
     } catch (error) {
       //Update UI here
       console.log(error)
@@ -445,6 +444,110 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
           await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 2)
         }
       }
+    }
+  }
+}
+
+export function uploadUnsyncFiles(backupFilesList) {
+  return async function (dispatch) {
+    try {
+      const failCount = 0, successCount = 0
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      if (!token) {
+        throw new Error('Token Missing')
+      }
+      for (let backupFile of backupFilesList) {
+        try {
+          let responseBody = await RestAPIFactory(token.value).uploadZipFile(backupFile.path, backupFile.name)
+          if (responseBody && responseBody.split(",")[0] == 'success') {
+            await backupService.deleteBackupFile(null, null, backupFile.path)
+            successCount++
+            dispatch(setState(SET_UPLOAD_FILE_COUNT, successCount))
+          } else {
+            failCount++
+          }
+        } catch (error) {
+          failCount++
+        }
+      }
+      if (failCount > 0) {
+        dispatch(setState(SET_FAIL_UPLOAD_COUNT, failCount))
+        await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, failCount)
+      } else {
+        dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 2))
+        setTimeout(() => {
+          dispatch(autoLogoutAfterUpload(true))
+        }, 1000)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+export function readAndUploadFiles() {
+  return async function (dispatch) {
+    try {
+      dispatch(setState(SET_BACKUP_UPLOAD_VIEW, 0))
+      dispatch(setState(SET_FAIL_UPLOAD_COUNT, 0))
+      const user = await keyValueDBService.getValueFromStore(USER)
+      let backupFilesList = await backupService.checkForUnsyncBackup(user)
+      dispatch(setState(SET_BACKUP_FILES_LIST, backupFilesList))
+      if (backupFilesList.length > 0) {
+        dispatch(uploadUnsyncFiles(backupFilesList))
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+export function resetFailCountInStore() {
+  return async function (dispatch) {
+    try {
+      await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+export function navigateToNewJob(jobMasterIds,displayName) {
+  return async function (dispatch) {
+    try {
+      const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
+      let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
+      if (_.size(mastersWithNewJob) == 1) {
+        let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
+        let returnParams = await newJob.checkForNextContainer(mastersWithNewJob[0], saveActivatedData)
+        if (returnParams.screenName == NewJobStatus) {
+          let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(mastersWithNewJob[0].id);
+          if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
+            dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, mastersWithNewJob[0].id))
+          } else {
+            dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
+            dispatch(navigateToScene(NewJobStatus, returnParams.navigationParams))
+          }
+        } else {
+          if (returnParams.stateParam) {
+            await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
+          }
+          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, {displayName}))
+        }
+      } else if (_.size(mastersWithNewJob) == 0) {
+        Toast.show({
+          text: NEW_JOB_CONFIGURATION_ERROR,
+          position: "bottom" | "center",
+          buttonText: OK,
+          type: 'danger',
+          duration: 10000
+        })
+        // dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
+      } else {
+        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
+        dispatch(navigateToScene(NewJob,{displayName}))
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 }

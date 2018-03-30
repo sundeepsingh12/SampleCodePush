@@ -22,7 +22,8 @@ import {
     SET_FORM_TO_INVALID,
     SET_DSF_REVERSE_MAP,
     SET_MODAL_FIELD_ATTRIBUTE,
-    SET_FORM_INVALID_AND_FORM_ELEMENT
+    SET_FORM_INVALID_AND_FORM_ELEMENT,
+    SET_ARRAY_DATA_STORE_FILTER_MAP,
 } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -153,6 +154,10 @@ export default function formLayoutReducer(state = initialState, action) {
             return state.set('isLoading', action.payload.isLoading)
                 .set('isFormValid', action.payload.isFormValid)
                 .set('formElement', action.payload.formElement)
+        }
+
+        case SET_ARRAY_DATA_STORE_FILTER_MAP: {
+            return state.set('arrayReverseDataStoreFilterMap', action.payload)
         }
     }
     return state;

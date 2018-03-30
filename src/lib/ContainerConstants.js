@@ -140,6 +140,8 @@ module.exports = {
     DSF_LIST_MISSING: 'DSFList is missing',
     FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
     FORM_ELEMENT_IS_MISSING: 'formElement is missing',
+    INVALID_BULK_JOB_CONFIG: 'Invalid job data in bulk data store filter, cannot proceed further.',
+    CONFIGURATION_ERROR_DS_MASTER_ID_MISSING: 'Configuration error data store mapping is missing',
     //Summary
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
@@ -183,14 +185,28 @@ module.exports = {
     LOGGING_OUT: 'Logging out',
     LOGOUT_UNSYNCED_TRANSACTIONS_TITLE: 'Confirm Log Out',
     LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE: 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    THERE_ARE_NO_UNSYNCED_FILES: 'There are no Unsynced Files.',
+    DELETE: 'Delete',
+    THERE_ARE_NO_SYNCED_FILES: 'There are no Synced Files',
+    KB: 'KB',
+    UNABLE_TO_UPLOAD: 'Unable to upload',
+    BACKUP_FILE: 'backup file',
+    TRY_AGAIN: 'Try Again',
+    CONTINUE: 'Continue',
+    UNSYNCED_BACKUP_FILES_FOUND: 'Unsynced Backup Files Found',
+    UPLOADED: 'Uploaded',
+    UNSYNCED_BACKUP_FILES: 'Unsynced Backup Files',
+    TRANSACTIONLIST_IS_MISSING: 'Transaction List is missing',
+    SOME_PROCESS_ARE_STILL_WORKING_PLEASE_RE_TRY_AFTER_FEW_MINUTES: 'Some processes are still working. Please re-try after few minutes.',
+    LOGOUT_UNSUCCESSFUL: 'Logout Unsuccessful',
+    MB: 'MB',
+    TRY_AFTER_CLEARING_YOUR_STORAGE_DATA: 'Please Try again after clearing your storage data.',
 
     //Tracking constants
     ENTER: 'ENTER',
     EXIT: 'EXIT',
     INSIDE_BOUNDARY: 'inside boundary',
     OUTSIDE_BOUNDARY: 'out of boundary',
-
-
 
     //GeoFencing Service
     HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
@@ -227,7 +243,6 @@ module.exports = {
     YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
     MORE: 'More',
 
-
     //Save Activated
     EDIT: 'Edit',
     JOB_EXPIRED: 'Job Expired!',
@@ -243,7 +258,7 @@ module.exports = {
     SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
 
     //Cash Tendering
-    NOT_REQUIRED: 'NOT REQUIRED',
+    SKIP_CASH_TENDERING: 'Skipping Cash Tendering',
     MORE_MONEY_TO_PAY: 'More Money to Pay.',
     LESS_MONEY_TO_PAY: 'Less Money to Pay.',
     AMOUNT_TO_COLLECT: 'Amount to Collect: ',
@@ -318,12 +333,19 @@ module.exports = {
     REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP: 'Setting you up...',
-    DOWNLOAD_SETTINGS: 'Downloading settings',
-    APPLYING_SETTINGS: 'Applying settings',
-    VERIFY_HANDSET: 'Verifying handset',
-    VERIFY_MOBILE: 'Verify your mobile',
-    OTP_CODE_SENT: 'OTP code hasbeen sent to',
-    ENTER_MOBILE: 'Enter your mobile',
-    SEND_OTP: 'Send OTP',
+    SETTING_UP:'Setting you up...',
+    DOWNLOAD_SETTINGS:'Downloading settings',
+    APPLYING_SETTINGS:'Applying settings',
+    VERIFY_HANDSET:'Verifying handset',
+    VERIFY_MOBILE:'Verify your mobile',
+    OTP_CODE_SENT:'OTP code hasbeen sent to',
+    ENTER_MOBILE:'Enter your mobile',
+    SEND_OTP:'Send OTP',
+
+    // Job Summary
+    UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
+    VALUE_OF_JOBSUMMARY_IS_MISSING: 'Value of JobSummary is missing',
+
+     //Data Store
+     SEARCH: 'Search',
 }

@@ -541,17 +541,17 @@ class Sync {
    */
   async getSummaryAndTransactionIdDTO(jobMasterIdJobStatusIdTransactionIdDtoMap) {
     let transactionIdDtos = []
-    const jobSummaries = []
+    let jobSummaries = []
     for (let jobMasterId in jobMasterIdJobStatusIdTransactionIdDtoMap) {
       for (let unseenStatusId in jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
-        let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].transactionId.split(":").length
-        let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].pendingStatusId
-        let unseenJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, unseenStatusId)
-        unseenJobSummaryData.count = 0
-        jobSummaries.push(unseenJobSummaryData)
-        let pendingJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, pendingID)
-        pendingJobSummaryData.count += count
-        jobSummaries.push(pendingJobSummaryData)
+        //let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].transactionId.split(":").length
+        //let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].pendingStatusId
+        //let unseenJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, unseenStatusId)
+        //unseenJobSummaryData.count = 0
+        //jobSummaries.push(unseenJobSummaryData)
+        //let pendingJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, pendingID)
+        //pendingJobSummaryData.count += count
+        //jobSummaries.push(pendingJobSummaryData)
         transactionIdDtos.push(jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId])
       }
     }
@@ -635,7 +635,7 @@ class Sync {
       await keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
     }
     if (isJobsPresent) {
-      await runSheetService.updateRunSheetAndUserSummary()
+      await runSheetService.updateRunSheetUserAndJobSummary()
     }
     return isJobsPresent
   }

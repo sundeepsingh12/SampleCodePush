@@ -91,6 +91,8 @@ export class keyValueDb {
       case 'PAGES_ADDITIONAL_UTILITY':
         schemaInstance = require('../repositories/schema/pagesAdditionalUtilities');
         break;
+      case 'USER_EXCEPTION_LOGS':
+        schemaInstance = require('../repositories/schema/userExceptionLogs');
       default:
         checkCondition = true;
     }

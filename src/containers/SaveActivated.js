@@ -44,13 +44,11 @@ import {
     Yes_Checkout,
     Total,
 } from '../lib/AttributeConstants'
-import {
-    EDIT
-} from './../lib/ContainerConstants'
 
 import {
     Discard_these_jobs,
-    Do_you_want_to_checkout
+    Do_you_want_to_checkout,
+    EDIT
 } from '../lib/ContainerConstants'
 
 import _ from 'lodash'

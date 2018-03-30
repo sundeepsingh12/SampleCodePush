@@ -18,12 +18,12 @@ import {
     CheckoutDetails,
     TabScreen,
     SHOULD_RELOAD_START,
-    SHOULD_CREATE_BACKUP,
     GEO_FENCING,
     FIELD_ATTRIBUTE,
     FIELD_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_VALIDATION,
     FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+    BACKUP_ALREADY_EXIST
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -308,7 +308,7 @@ class FormLayout {
                 await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
-            await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))
+            await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(false))
             await geoFencingService.addNewGeoFenceAndDeletePreviousFence()
         }
         return {
