@@ -256,8 +256,8 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
       if (!erpPull) {
         const difference = await sync.calculateDifference()
         dispatch(setState(LAST_SYNC_TIME, difference))
-        await keyValueDBService.deleteValueFromStore(SYNC_RUNNING)
       }
+      await keyValueDBService.deleteValueFromStore(SYNC_RUNNING)
     }
   }
 }
