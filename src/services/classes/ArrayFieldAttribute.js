@@ -21,7 +21,7 @@ import * as realm from '../../repositories/realmdb'
 
 class ArrayFieldAttribute {
 
-    getSortedArrayChildElements(arrayDTO, jobTransaction) {
+    getSortedArrayChildElements(arrayDTO, jobTransaction, arrayReverseDataStoreFilterMap, fieldAttributeMasterId) {
         let errorMessage;
         let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
         if (requiredFields.length <= 0) {
@@ -31,7 +31,10 @@ class ArrayFieldAttribute {
             let arrayMainObject = arrayDTO.arrayMainObject
             let arrayTemplate = _.omit(arrayDTO, ['latestPositionId', 'isSaveDisabled', 'arrayMainObject'])
             let arrayRowDTO = this.addArrayRow(0, arrayTemplate, {}, jobTransaction, arrayDTO.isSaveDisabled)
-            return { arrayRowDTO, childElementsTemplate: arrayTemplate, errorMessage, arrayMainObject }
+            // Below two lines create a map which is used in case of DSF or DataStore which have mapping with other DSF attribute 
+            let cloneArrayReverseDataStoreFilterMap = _.clone(arrayReverseDataStoreFilterMap)
+            cloneArrayReverseDataStoreFilterMap[fieldAttributeMasterId] = {} // create map with fieldAttributeMasterId of array as key
+            return { arrayRowDTO, childElementsTemplate: arrayTemplate, errorMessage, arrayMainObject, arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap }
         }
     }
 
@@ -61,13 +64,13 @@ class ArrayFieldAttribute {
             let arrayObject = {}
             let childDataList = []
             for (let [key, arrayRowElement] of arrayElements[rowId].formLayoutObject) {
-                if (arrayRowElement.value == ARRAY_SAROJ_FAREYE || arrayRowElement.value == OBJECT_SAROJ_FAREYE) {
-                    let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayRowElement.childDataList, jobTransaction.id, arrayRowElement.positionId, latestPositionId)
-                    arrayRowElement.childDataList = fieldDataListWithLatestPositionId.fieldDataList
-                    latestPositionId = fieldDataListWithLatestPositionId.latestPositionId
-                }
+                // if (arrayRowElement.value == ARRAY_SAROJ_FAREYE || arrayRowElement.value == OBJECT_SAROJ_FAREYE) {
+                //     let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayRowElement.childDataList, jobTransaction.id, arrayRowElement.positionId, latestPositionId)
+                //     arrayRowElement.childDataList = fieldDataListWithLatestPositionId.fieldDataList
+                //     latestPositionId = fieldDataListWithLatestPositionId.latestPositionId
+                // }
                 let afterValidationResult = fieldValidationService.fieldValidations(arrayRowElement, arrayElements[rowId].formLayoutObject, AFTER, jobTransaction)
-                arrayRowElement.value = afterValidationResult && !arrayRowElement.alertMessage ? arrayRowElement.displayValue : null
+                arrayRowElement.value = afterValidationResult ? arrayRowElement.displayValue : null
                 if (arrayRowElement.required && (!arrayRowElement.value || arrayRowElement.value == '')) {
                     isSaveDisabled = true
                     break
@@ -139,7 +142,7 @@ class ArrayFieldAttribute {
         }
         return { childElementsTemplate, arrayRowDTO, arrayMainObject }
     }
-    
+
     checkforUniqueValidation(currentElement, arrayElements, currentRowId) {
         if (!currentElement) {
             throw new Error('fieldAttributeValue missing in currentElement')

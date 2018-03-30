@@ -195,3 +195,8 @@ export function deleteSingleRecord(tableName, value, property) {
         realm.delete(filteredRecords)
     });
 }
+
+export function getMaxValueOfProperty(tableName, query, property) {
+    let filteredRecords = realm.objects(tableName).filtered(query).max(property)
+    return filteredRecords
+}

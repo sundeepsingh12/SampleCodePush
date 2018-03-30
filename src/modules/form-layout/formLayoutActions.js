@@ -69,11 +69,11 @@ export function _setErrorMessage(message) {
     }
 }
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
+export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, positionId) {
     return async function (dispatch) {
         try {
             dispatch(setState(IS_LOADING, true))
-            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
+            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction, positionId)
             let latestPositionId = sortedFormAttributesDto.latestPositionId
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
@@ -125,7 +125,7 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSa
                 dispatch(_setFormList(sortedFormAttributeDto))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0))            
+            dispatch(showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0))
             formElement.get(attributeMasterId).isLoading = false
             dispatch(_setErrorMessage(error.message))
             dispatch(setState(UPDATE_FIELD_DATA, formElement))
@@ -229,7 +229,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 }
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1))            
+            dispatch(showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1))
             dispatch(setState(IS_LOADING, false))
         }
     }
@@ -279,7 +279,7 @@ export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
     }
 }
 
-export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
+export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, latestPositionId) {
     return async function (dispatch) {
         try {
             if (isDraftRestore) {
@@ -289,7 +289,7 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
                     dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
                 }
                 else {
-                    dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
+                    dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, latestPositionId))
                 }
             }
         } catch (error) {

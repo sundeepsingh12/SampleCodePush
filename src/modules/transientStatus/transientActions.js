@@ -32,11 +32,12 @@ export function setStateFromNavigationParams(formLayout, transientFormLayoutMap,
                         statusName: currentStatus.nextStatusList[0].name,
                         jobMasterId: jobMasterId,
                         navigationFormLayoutStates: cloneTransientFormLayoutMap,
+                        latestPositionId: formLayout.latestPositionId
                     }))
                 }
             }
         } catch (error) {
-            dispatch(setState(LOADER_IS_RUNNING, false))            
+            dispatch(setState(LOADER_IS_RUNNING, false))
             dispatch(showToastAndAddUserExceptionLog(2501, error.message, 'danger', 1))
         }
     }

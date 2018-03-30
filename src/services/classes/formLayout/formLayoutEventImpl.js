@@ -417,56 +417,53 @@ export default class FormLayoutEventImpl {
      * @param {*jobTransactionId} jobTransactionId 
      */
     _saveFieldData(formLayoutObject, jobTransactionId, isBulk) {
-        try {
-            let currentFieldDataObject = {} // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
-            currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length
-            let fieldDataArray = []
-            let npsFeedbackValue = null
-            let reAttemptDate = null
-            let moneyCollectObject = null
-            let amountMap = {
-                originalAmount: null,
-                actualAmount: null,
-                moneyTransactionType: null
-            }
-            for (var [key, value] of formLayoutObject) {
-                if (value.attributeTypeId == 61) {
+        let currentFieldDataObject = {} // used object to set currentFieldDataId as call-by-reference whereas if we take integer then it is by call-by-value and hence value of id is not updated in that scenario.
+        currentFieldDataObject.currentFieldDataId = realm.getRecordListOnQuery(TABLE_FIELD_DATA, null, true, 'id').length
+        let fieldDataArray = []
+        let npsFeedbackValue = null
+        let reAttemptDate = null
+        let moneyCollectObject = null
+        let amountMap = {
+            originalAmount: null,
+            actualAmount: null,
+            moneyTransactionType: null
+        }
+        for (var [key, value] of formLayoutObject) {
+            if (value.attributeTypeId == 61) {
+                continue
+            } else if (value.attributeTypeId == NPS_FEEDBACK) {
+                npsFeedbackValue = value.value
+            } else if (value.attributeTypeId == SIGNATURE_AND_FEEDBACK) {
+                let npsFeedback = _.values(value.childDataList).filter(item => item.attributeTypeId == NPS_FEEDBACK)
+                npsFeedbackValue = _.isEmpty(npsFeedback) ? null : npsFeedback[0].value
+            } else if (value.attributeTypeId == RE_ATTEMPT_DATE) {
+                reAttemptDate = value.value
+            } else if (value.attributeTypeId == MONEY_COLLECT && value.jobTransactionIdAmountMap && value.childDataList) {
+                if (isBulk) {
+                    moneyCollectObject = value
                     continue
-                } else if (value.attributeTypeId == NPS_FEEDBACK) {
-                    npsFeedbackValue = value.value
-                } else if (value.attributeTypeId == SIGNATURE_AND_FEEDBACK) {
-                    let npsFeedback = _.values(value.childDataList).filter(item => item.attributeTypeId == NPS_FEEDBACK)
-                    npsFeedbackValue = _.isEmpty(npsFeedback) ? null : npsFeedback[0].value
-                } else if (value.attributeTypeId == RE_ATTEMPT_DATE) {
-                    reAttemptDate = value.value
-                } else if (value.attributeTypeId == MONEY_COLLECT && value.jobTransactionIdAmountMap && value.childDataList) {
-                    if (isBulk) {
-                        moneyCollectObject = value
-                        continue
-                    } else {
-                        amountMap.actualAmount = value.jobTransactionIdAmountMap.actualAmount
-                        amountMap.originalAmount = value.jobTransactionIdAmountMap.originalAmount
-                        amountMap.moneyTransactionType = value.jobTransactionIdAmountMap.moneyTransactionType
-                    }
-                }
-                let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
-                fieldDataArray.push(fieldDataObject)
-                if (value.childDataList && value.childDataList.length > 0) {
-                    currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(value.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId);
+                } else {
+                    amountMap.actualAmount = value.jobTransactionIdAmountMap.actualAmount
+                    amountMap.originalAmount = value.jobTransactionIdAmountMap.originalAmount
+                    amountMap.moneyTransactionType = value.jobTransactionIdAmountMap.moneyTransactionType
                 }
             }
-            return {
-                tableName: TABLE_FIELD_DATA,
-                value: fieldDataArray,
-                npsFeedbackValue,
-                reAttemptDate,
-                moneyCollectObject,
-                amountMap
+            let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId)
+            fieldDataArray.push(fieldDataObject)
+            if (value.childDataList && value.childDataList.length > 0) {
+                currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(value.childDataList, fieldDataArray, currentFieldDataObject, jobTransactionId);
             }
-        } catch (error) {
-            console.log(error)
+        }
+        return {
+            tableName: TABLE_FIELD_DATA,
+            value: fieldDataArray,
+            npsFeedbackValue,
+            reAttemptDate,
+            moneyCollectObject,
+            amountMap
         }
     }
+
 
     _saveFieldDataForBulk(formLayoutObject, jobTransactionList) {
         let fieldDataArray = []
@@ -569,7 +566,8 @@ export default class FormLayoutEventImpl {
             jobTransactionId,
             positionId: formLayoutObject.positionId,
             parentId: formLayoutObject.parentId,
-            fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId
+            fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId,
+            dateTime: moment().format('YYYY-MM-DD HH:mm:ss') + ''
         }
     }
 

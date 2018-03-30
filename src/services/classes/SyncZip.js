@@ -48,6 +48,7 @@ var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
 import { userExceptionLogsService } from './UserException'
+import { fieldDataService } from './FieldData'
 
 export async function createZip(transactionIdToBeSynced) {
 
@@ -59,7 +60,7 @@ export async function createZip(transactionIdToBeSynced) {
     var SYNC_RESULTS = {};
     let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
     let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
-    SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
+    SYNC_RESULTS.fieldData = fieldDataService.getFieldDataAfterLastSyncTime(realmDbData.fieldDataList, lastSyncTime)
     SYNC_RESULTS.job = realmDbData.jobList;
     SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
     SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
@@ -78,10 +79,9 @@ export async function createZip(transactionIdToBeSynced) {
 
     const userSummary = await updateUserSummaryNextJobTransactionId()
     SYNC_RESULTS.userSummary = (userSummary && userSummary.value) ? userSummary.value : {}
-    await moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP)
+    await moveImageFilesToSync(SYNC_RESULTS.fieldData, PATH_TEMP)
     //Writing Object to File at TEMP location
     await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');
-
     //Creating ZIP file
     const targetPath = PATH + '/sync.zip'
     const sourcePath = PATH_TEMP

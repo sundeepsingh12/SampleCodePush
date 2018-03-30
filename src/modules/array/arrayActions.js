@@ -9,7 +9,8 @@ import {
     CLEAR_ARRAY_STATE,
     NEXT_FOCUS,
     SET_ARRAY_ISLOADING,
-    SET_OPTION_ATTRIBUTE_ERROR
+    SET_OPTION_ATTRIBUTE_ERROR,
+    SET_ARRAY_DATA_STORE_FILTER_MAP,
 } from '../../lib/constants'
 import { ARRAY_SAROJ_FAREYE, AFTER, TEXT, STRING, SCAN_OR_TEXT, QR_SCAN } from '../../lib/AttributeConstants'
 import _ from 'lodash'
@@ -151,18 +152,19 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
         }
     }
 }
-export function setInitialArray(currentElement, formElement, jobStatusId, jobTransaction) {
+export function setInitialArray(currentElement, formElement, jobStatusId, jobTransaction, arrayReverseDataStoreFilterMap, fieldAttributeMasterId) {
     return async function (dispatch) {
         try {
             dispatch(setState(SET_ARRAY_ISLOADING, true))
             const sequenceWiseRootFieldAttributes = await formLayoutService.getSequenceWiseRootFieldAttributes(jobStatusId, currentElement.fieldAttributeMasterId, jobTransaction)
             if (!formElement.get(currentElement.fieldAttributeMasterId).value || formElement.get(currentElement.fieldAttributeMasterId).value == '') {
-                const arrayDTO = await arrayService.getSortedArrayChildElements(sequenceWiseRootFieldAttributes, jobTransaction)
+                const arrayDTO = await arrayService.getSortedArrayChildElements(sequenceWiseRootFieldAttributes, jobTransaction, arrayReverseDataStoreFilterMap, fieldAttributeMasterId)
                 if (!arrayDTO) return
                 if (arrayDTO.errorMessage) {
                     dispatch(setState(SET_ERROR_MSG, arrayDTO.errorMessage))
                 } else {
                     dispatch(setState(SET_ARRAY_CHILD_LIST, arrayDTO))
+                    dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, arrayDTO.arrayReverseDataStoreFilterMap))  // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
                 }
             } else {
                 let arrayState = arrayService.setInitialArray(currentElement, formElement, sequenceWiseRootFieldAttributes)
