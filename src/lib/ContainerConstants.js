@@ -297,4 +297,7 @@ module.exports = {
     OTP_CODE_SENT: 'OTP code hasbeen sent to',
     ENTER_MOBILE: 'Enter your mobile',
     SEND_OTP: 'Send OTP',
+
+    //Draft Modal
+    DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for '
 }

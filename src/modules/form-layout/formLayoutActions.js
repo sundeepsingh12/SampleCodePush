@@ -236,7 +236,12 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
 
 export function saveDraftInDb(formLayoutState, jobMasterId, jobTransaction) {
     return async function (dispatch) {
-        draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
+        try {
+            draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
+            dispatch(setState(SET_UPDATE_DRAFT, false))
+        } catch (error) {
+            console.log(error) //todo
+        }
     }
 }
 

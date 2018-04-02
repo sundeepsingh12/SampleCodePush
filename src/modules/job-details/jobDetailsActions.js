@@ -158,12 +158,14 @@ export function checkForLocationMismatch(data, currentStatusCategory) {
             const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId }
             const nextStatusCategory = data.statusList.statusCategory
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId)
-            if (!(jobMaster[0].enableLocationMismatch) || currentStatusCategory != 1 || !nextStatusCategory || !(nextStatusCategory == 2 || nextStatusCategory == 3))
-                return dispatch(navigateToScene('FormLayout', FormLayoutData))
+            if (!(jobMaster[0].enableLocationMismatch) || currentStatusCategory != 1 || !nextStatusCategory || !(nextStatusCategory == 2 || nextStatusCategory == 3)) {
+                dispatch(navigateToScene('FormLayout', FormLayoutData))
+            }
             const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-            if (data.jobTransaction.jobId != null && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng))
-                return dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
-            dispatch(navigateToScene('FormLayout', FormLayoutData))
+            if (data.jobTransaction.jobId != null && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng)) {
+                dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
+            }
+            //dispatch(navigateToScene('FormLayout', FormLayoutData))
         } catch (error) {
             // To do
             // Handle exceptions and change state accordingly

@@ -163,12 +163,13 @@ export function checkIfDraftExists(jobMasterId) {
         }
     }
 }
-export function restoreDraft(draft, contactData, jobTransaction) {
+export function restoreDraft(draft, contactData, recurringData, jobMasterId) {
     return async function (dispatch) {
         try {
-            let cloneJobTransaction = _.cloneDeep(jobTransaction)
-            cloneJobTransaction.id--
-            cloneJobTransaction.jobId--
+            let cloneJobTransaction = {}
+            let lastIndex = parseInt(_.findLastKey(recurringData))
+            cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
+            cloneJobTransaction.jobMasterId = jobMasterId
             dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft))
             dispatch(setState(SET_SAVE_ACTIVATED_DRAFT, {}))
         } catch (error) {

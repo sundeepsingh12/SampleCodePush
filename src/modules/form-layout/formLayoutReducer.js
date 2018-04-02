@@ -20,7 +20,8 @@ import {
     SET_UPDATE_DRAFT,
     SET_FORM_TO_INVALID,
     SET_DSF_REVERSE_MAP,
-    SET_MODAL_FIELD_ATTRIBUTE
+    SET_MODAL_FIELD_ATTRIBUTE,
+    SET_NO_FIELD_ATTRIBUTE_MAPPED
 } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -148,6 +149,9 @@ export default function formLayoutReducer(state = initialState, action) {
 
         case SET_MODAL_FIELD_ATTRIBUTE: {
             return state.set('modalFieldAttributeMasterId', action.payload)
+        }
+        case SET_NO_FIELD_ATTRIBUTE_MAPPED: {
+            return state.set('noFieldAttributeMappedWithStatus', action.payload)
         }
     }
     return state;

@@ -32,7 +32,8 @@ import {
 import {
   SET_UPDATE_DRAFT,
   ERROR_MESSAGE,
-  SET_FORM_TO_INVALID
+  SET_FORM_TO_INVALID,
+  SET_NO_FIELD_ATTRIBUTE_MAPPED
 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import {
@@ -70,9 +71,8 @@ function mapDispatchToProps(dispatch) {
 
 class FormLayout extends PureComponent {
   componentDidUpdate() {
-    if (this.props.updateDraft && !this.props.navigation.state.params.jobTransaction.length) { //Draft should not be saved for bulk
+    if (this.props.updateDraft && !this.props.navigation.state.params.jobTransaction.length && !this.props.navigation.state.params.editableFormLayoutState && !this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
       this.saveDraft()
-      this.props.actions.setState(SET_UPDATE_DRAFT, false)
     }
     if (this.props.errorMessage && this.props.errorMessage != '') {
       Toast.show({
@@ -86,6 +86,11 @@ class FormLayout extends PureComponent {
     }
   }
 
+  componentWillUnmount() {
+    if (this.props.noFieldAttributeMappedWithStatus) {
+      this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
+    }
+  }
   saveDraft = () => {
     if (this.props.jobTransactionId != 0) {
       let formLayoutState = {

@@ -12,6 +12,7 @@ import styles from '../themes/FeStyle'
 import {
     Button
 } from 'native-base';
+import { DRAFT_RESTORE_MESSAGE, OK, CANCEL } from '../lib/ContainerConstants'
 export default class DraftModal extends PureComponent {
 
     render() {
@@ -26,19 +27,19 @@ export default class DraftModal extends PureComponent {
                     </View>
                     <View style={[styles.bgWhite, styles.shadow, styles.borderRadius3, { width: '90%' }, styles.padding5]}>
                         <View style={[styles.padding10, styles.marginBottom10, styles.marginTop10]}>
-                            <Text style={[styles.fontCenter, styles.marginBottom10, styles.fontBlack, styles.fontLg]}>{'Do you want to restore draft for ' + this.props.draftStatusInfo.statusName + '?'}</Text>
+                            <Text style={[styles.fontCenter, styles.marginBottom10, styles.fontBlack, styles.fontLg]}>{DRAFT_RESTORE_MESSAGE + this.props.draftStatusInfo.statusName + '?'}</Text>
                         </View>
                         <View style={[styles.row, { borderTopColor: '#d3d3d3', borderTopWidth: 1 }]}>
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
                                     onPress={() => this.props.onOkPress()} >
-                                    <Text style={[styles.fontPrimary, styles.fontDefault]}>Ok</Text>
+                                    <Text style={[styles.fontPrimary, styles.fontDefault]}>{OK}</Text>
                                 </Button>
                             </View>
                             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
                                 <Button transparent full
                                     onPress={() => this.props.onCancelPress()}>
-                                    <Text style={[styles.fontPrimary, styles.fontDefault]}>Cancel</Text>
+                                    <Text style={[styles.fontPrimary, styles.fontDefault]}>{CANCEL}</Text>
                                 </Button>
                             </View>
                         </View>
