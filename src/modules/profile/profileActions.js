@@ -38,7 +38,7 @@ export function fetchUserList() {
             }
             dispatch(setState(FETCH_USER_DETAILS, userDetails))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1901, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1901, error.message, 'danger', 1)
         }
     }
 }
