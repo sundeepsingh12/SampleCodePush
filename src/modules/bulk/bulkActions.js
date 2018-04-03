@@ -32,6 +32,7 @@ import {
     moduleCustomizationService
 } from '../../services/classes/ModuleCustomization'
 import _ from 'lodash'
+import { jobTransactionService } from '../../services/classes/JobTransaction';
 
 
 export function getJobMasterVsStatusNameList(displayName) {
@@ -73,6 +74,12 @@ export function getBulkJobTransactions(bulkParams) {
     return async function (dispatch) {
         try {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS))
+            if (!bulkParams.groupId) {
+                const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+                const enableMultiPartJobMasterList = jobTransactionService.getEnableMultiPartJobMaster(jobMasterList.value)
+                const jobIdGroupIdMap = _.includes(enableMultiPartJobMasterList, bulkParams.jobMasterId) ? await jobTransactionService.getJobIdGroupIdMap([bulkParams.jobMasterId]) : null
+                if (!_.isEmpty(jobIdGroupIdMap)) bulkParams.jobIdGroupIdMap = jobIdGroupIdMap
+            }
             const bulkTransactions = await bulkService.getJobListingForBulk(bulkParams)
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             const bulkModule = await moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomizationList.value, BULK_ID)

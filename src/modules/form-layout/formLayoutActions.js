@@ -219,7 +219,6 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     }
                     dispatch(performSyncService(pieChart))
                     dispatch(setState(CLEAR_FORM_LAYOUT))
-                    dispatch(setState(CLEAR_BULK_STATE))
                 } else {
                     dispatch(setState(SET_FORM_INVALID_AND_FORM_ELEMENT, {
                         isLoading: false,
