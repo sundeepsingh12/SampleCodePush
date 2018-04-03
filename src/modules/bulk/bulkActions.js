@@ -78,7 +78,7 @@ export function getBulkJobTransactions(bulkParams) {
                 const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
                 const enableMultiPartJobMasterList = jobTransactionService.getEnableMultiPartJobMaster(jobMasterList.value)
                 const jobIdGroupIdMap = _.includes(enableMultiPartJobMasterList, bulkParams.jobMasterId) ? await jobTransactionService.getJobIdGroupIdMap([bulkParams.jobMasterId]) : null
-                if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) bulkParams.jobIdGroupIdMap = jobIdGroupIdMap
+                if (!_.isEmpty(jobIdGroupIdMap)) bulkParams.jobIdGroupIdMap = jobIdGroupIdMap
             }
             const bulkTransactions = await bulkService.getJobListingForBulk(bulkParams)
             const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)

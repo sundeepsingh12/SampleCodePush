@@ -345,7 +345,7 @@ class JobTransaction {
 
     getEnableMultiPartJobMaster(jobMasterList){
         let jobMasterIdListWithEnableMultiPart = []
-         jobMasterList.forEach(jobMaster => {if(jobMaster.enableMultipartAssignment == true) jobMasterIdListWithEnableMultiPart.push(jobMaster.id)})
+         jobMasterList.forEach(jobMaster => {if(jobMaster.enableMultipartAssignment) jobMasterIdListWithEnableMultiPart.push(jobMaster.id)})
         return jobMasterIdListWithEnableMultiPart
     }
 
@@ -405,7 +405,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
-        if(jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)){
+        if(!_.isEmpty(jobIdGroupIdMap)){
             statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
             tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
             tabIdGroupTransactionsMap['isGrouping'] = true 
@@ -445,7 +445,7 @@ class JobTransaction {
             }
             jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
             jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
-            if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap) && statusIdsTabIdsMap[jobTransactionCustomization.statusId]) {
+            if (!_.isEmpty(jobIdGroupIdMap) && statusIdsTabIdsMap[jobTransactionCustomization.statusId]) {
                 let groupId = jobIdGroupIdMap[jobTransactionCustomization.jobId] ? jobIdGroupIdMap[jobTransactionCustomization.jobId] : null
                 let groupIdTabKey = groupId ? groupId + '&' + statusIdsTabIdsMap[jobTransactionCustomization.statusId] : null
                 if (!groupId) {

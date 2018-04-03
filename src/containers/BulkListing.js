@@ -265,7 +265,7 @@ class BulkListing extends PureComponent {
                     // BackHandler.removeEventListener(HardwareBackPress, this._goBack)
                   }}
                   success full
-                  disabled={_.isEmpty(this.props.selectedItems) ||(this.props.navigation.state.params.groupId && !_.isEqual(Object.values(this.props.bulkTransactionList).length,this.props.selectedItems.length))}
+                  disabled={_.isEmpty(this.props.selectedItems) ||(this.props.navigation.state.params.groupId && !_.isEqual(_.size(this.props.bulkTransactionList),this.props.selectedItems.length))}
                 >
                   <Text style={[styles.fontLg, styles.fontWhite]}>Update All Selected</Text>
                 </Button>
