@@ -34,7 +34,7 @@ export function getDSFListContent(currentElement, formElement, jobTransaction, d
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(801, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(801, error.message, 'danger', 1)
             dispatch(setState(SHOW_LOADER_DSF, false))
         }
     }
@@ -57,7 +57,7 @@ export function getFilteredResults(dataStoreFilterList, cloneDataStoreFilterList
                 cloneDataStoreFilterList: searchResult.cloneDataStoreFilterList
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(802, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(802, error.message, 'danger', 1)
             dispatch(setState(SHOW_LOADER_DSF, false))
         }
     }
@@ -104,7 +104,7 @@ export function getDSFListContentForArray(functionParamsFromDSF) {
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, returnParams.arrayReverseDataStoreFilterMap)) // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(803, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(803, error.message, 'danger', 1)
         }
     }
 }

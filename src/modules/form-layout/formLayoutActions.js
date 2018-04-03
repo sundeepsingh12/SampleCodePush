@@ -91,7 +91,7 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
             }))
             dispatch(setState(IS_LOADING, false))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1001, error.message, 'danger', 0))
+            showToastAndAddUserExceptionLog(1001, error.message, 'danger', 0)
             dispatch(setState(IS_LOADING, false))
             dispatch(_setErrorMessage(error))
         }
@@ -108,7 +108,7 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
                 dispatch(setState(SET_UPDATE_DRAFT, true))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1002, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1002, error.message, 'danger', 1)
         }
     }
 }
@@ -125,7 +125,7 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSa
                 dispatch(_setFormList(sortedFormAttributeDto))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0))            
+            showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0)            
             formElement.get(attributeMasterId).isLoading = false
             dispatch(_setErrorMessage(error.message))
             dispatch(setState(UPDATE_FIELD_DATA, formElement))
@@ -140,7 +140,7 @@ export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLay
             const saveDisabled = formLayoutEventsInterface.disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value)
             dispatch(setState(DISABLE_SAVE, saveDisabled))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1004, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1004, error.message, 'danger', 1)
         }
     }
 }
@@ -152,7 +152,7 @@ export function updateFieldData(attributeId, value, formElement) {
             const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement)
             dispatch(setState(UPDATE_FIELD_DATA, updatedFieldData))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1005, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1005, error.message, 'danger', 1)
         }
     }
 }
@@ -186,7 +186,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
                 }
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1006, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1006, error.message, 'danger', 1)
         }
     }
 }
@@ -229,7 +229,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 }
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1)            
             dispatch(setState(IS_LOADING, false))
         }
     }
@@ -251,7 +251,7 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
             dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS, jobTransaction))
         }
         catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1008, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1008, error.message, 'danger', 1)
         }
     }
 }
@@ -260,7 +260,7 @@ export function saveDraftInDb(formLayoutState, jobMasterId) {
         try {
             draftService.saveDraftInDb(formLayoutState, jobMasterId)
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1009, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1009, error.message, 'danger', 1)
         }
     }
 }
@@ -274,7 +274,7 @@ export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
                 statusName: formLayoutState.statusName
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1010, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1010, error.message, 'danger', 1)
         }
     }
 }
@@ -293,7 +293,7 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
                 }
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1)
         }
     }
 }
@@ -318,7 +318,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
             }
         }
         catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1012, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1012, error.message, 'danger', 1)
         }
     }
 }

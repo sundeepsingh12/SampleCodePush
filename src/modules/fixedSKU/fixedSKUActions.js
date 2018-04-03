@@ -29,7 +29,7 @@ export function onSave(parentObject, formElement, fixedSKUList, isSaveDisabled, 
             }))
             dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(901, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(901, error.message, 'danger', 1)
         }
     }
 }
@@ -40,7 +40,7 @@ export function onChangeQuantity(fixedSKUList, totalQuantity, payload) {
             let payload1 = await fixedSKUDetailsService.calculateQuantity(fixedSKUList, totalQuantity, payload)
             dispatch(setState(CHANGE_QUANTITY, payload1))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(902, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(902, error.message, 'danger', 1)
         }
     }
 }
@@ -57,7 +57,7 @@ export function fetchFixedSKU(fieldAttributeMasterId) {
                 isLoaderRunning: false
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(903, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(903, error.message, 'danger', 1)            
             dispatch(setState(IS_LOADER_RUNNING, false))
         }
     }

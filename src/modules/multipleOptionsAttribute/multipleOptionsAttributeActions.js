@@ -47,7 +47,7 @@ export function getOptionsList(fieldAttributeMasterId, formElement) {
                 optionsMap
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1401, error.message, 'danger', 0))                        
+            showToastAndAddUserExceptionLog(1401, error.message, 'danger', 0)                        
             dispatch(setState(ERROR_MESSAGE, error.message))
         }
     }
@@ -79,7 +79,7 @@ export function getOptionsListFromJobData(currentElement, jobTransaction) {
                 optionsMap
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1402, error.message, 'danger', 0))                        
+            showToastAndAddUserExceptionLog(1402, error.message, 'danger', 0)                        
             dispatch(setState(ERROR_MESSAGE, error.message))
         }
     }
@@ -94,7 +94,7 @@ export function toggleCheckStatus(optionsMap, id) {
                 optionsMap: optionsMapClone
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1403, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1403, error.message, 'danger', 1)
         }
     }
 }
@@ -128,7 +128,7 @@ export function saveOptionsFieldData(optionsMap, currentElement, latestPositionI
             }
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, fieldDataValue, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, true, containerValue))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1404, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1404, error.message, 'danger', 1)
         }
     }
 }
@@ -145,7 +145,7 @@ export function showAdvanceDropdownMessage(item) {
                 itemMessage
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1405, error.message, 'danger', 0))                        
+            showToastAndAddUserExceptionLog(1405, error.message, 'danger', 0)                        
             dispatch(setState(SET_OPTION_ATTRIBUTE_ERROR, error.message))
         }
     }
