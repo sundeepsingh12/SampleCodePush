@@ -3,27 +3,27 @@
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import _ from 'lodash'
 import CONFIG from '.././../lib/config'
-import { REFERENCE_NO, GET,  NA } from '../../lib/AttributeConstants'
-import {REF_UNAVAILABLE,FAILURE_SORTING,} from '../../lib/ContainerConstants'
+import { REFERENCE_NO, GET, NA } from '../../lib/AttributeConstants'
+import { REF_UNAVAILABLE, FAILURE_SORTING, } from '../../lib/ContainerConstants'
 
 class Sorting {
 
-/**This method first get data from server according to given reference no. 
- * 
- * @param {*} referenceNumber 
- * @param {*} token 
- * @Return type
- *       object
- * 
- * Returns data = {
- *       firstName : '',
- *       lastName : '',
- *       jobsInRunsheet : '',
- *       jobTransaction : {},
- *       empHubCode : '',
- *       addressData : ''
- * }
- */
+  /**This method first get data from server according to given reference no. 
+   * 
+   * @param {*} referenceNumber 
+   * @param {*} token 
+   * @Return type
+   *       object
+   * 
+   * Returns data = {
+   *       firstName : '',
+   *       lastName : '',
+   *       jobsInRunsheet : '',
+   *       jobTransaction : {},
+   *       empHubCode : '',
+   *       addressData : ''
+   * }
+   */
 
   async getSortingData(referenceNumber, token) {
     if (_.isNull(referenceNumber) || _.isUndefined(referenceNumber) || _.isEmpty(referenceNumber))
