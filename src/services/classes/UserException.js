@@ -6,17 +6,18 @@ import {
     keyValueDBService
 } from './KeyValueDBService'
 import moment from 'moment'
-var package_json = require('../../../package.json')
+import package_json from '../../../package.json'
 import * as realm from '../../repositories/realmdb'
+import { Platform } from 'react-native'
 
 class UserException {
 
 
-/**
- * 
- * @param {String} errorMessage // errormessage to add in userExceptionLogs DB. 
- * @param {Number} errorCode // code which represents action of a particular class in which error has occured.
- */
+    /**
+     * 
+     * @param {String} errorMessage // errormessage to add in userExceptionLogs DB. 
+     * @param {Number} errorCode // code which represents action of a particular class in which error has occured.
+     */
     async addUserExceptionLogs(errorMessage, errorCode) {
         const userDetails = await keyValueDBService.getValueFromStore(USER)
         let userId = (userDetails && userDetails.value && userDetails.value.id) ? userDetails.value.id : 0
@@ -25,14 +26,14 @@ class UserException {
         let companyId = (userDetails && userDetails.value && userDetails.value.company && userDetails.value.company.id) ? userDetails.value.company.id : 0
         let userExceptionLogObject = {
             'id': 0,
-            'userId': userId,
+            userId,
             'dateTime': moment().format('YYYY-MM-DD HH:mm:ss'),
             'stacktrace': errorMessage,
             'packageVersion': package_json.version,
-            'packageName': 'N.A',
-            'hubId': hubId,
-            'cityId': cityId,
-            'companyId': companyId,
+            'packageName': (Platform.OS === 'ios') ? 'ios' : 'android',
+            hubId,
+            cityId,
+            companyId,
         }
         realm.save(USER_EXCEPTION_LOGS, userExceptionLogObject)
     }
