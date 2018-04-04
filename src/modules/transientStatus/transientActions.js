@@ -37,7 +37,7 @@ export function setStateFromNavigationParams(formLayout, transientFormLayoutMap,
             }
         } catch (error) {
             dispatch(setState(LOADER_IS_RUNNING, false))            
-            dispatch(showToastAndAddUserExceptionLog(2501, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2501, error.message, 'danger', 1)
         }
     }
 }

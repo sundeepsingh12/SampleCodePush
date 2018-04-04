@@ -23,7 +23,7 @@ export function getDataForSortingAndPrinting(referenceNumber) {
         try {
             dispatch(setState(SORTING_LOADER, true))
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-            if (!token && token.value != null && token.value != undefined) {
+            if (!token) {
                 throw new Error(TOKEN_MISSING)
             }
             const sortingJson = await sortingService.getSortingData(referenceNumber, token.value)
@@ -31,7 +31,7 @@ export function getDataForSortingAndPrinting(referenceNumber) {
             dispatch(setState(SORTING_ITEM_DETAILS, setSortingValues))
         } catch (error) {
             dispatch(setState(DEFAULT_ERROR_MESSAGE_IN_SORTING, error.message))
-            dispatch(showToastAndAddUserExceptionLog(2301, error.message, 'danger', 0))
+            showToastAndAddUserExceptionLog(2301, error.message, 'danger', 0)
         }
     }
 }

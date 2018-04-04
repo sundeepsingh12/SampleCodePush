@@ -26,13 +26,13 @@ class Sorting {
    */
 
   async getSortingData(referenceNumber, token) {
-    if (_.isNull(referenceNumber) || _.isUndefined(referenceNumber) || _.isEmpty(referenceNumber))
+    if ( _.isEmpty(referenceNumber))
       throw new Error(REF_UNAVAILABLE)
     let referenceData = REFERENCE_NO + referenceNumber;
     const url = (referenceData == null) ? CONFIG.API.SCAN_AND_SEARCH_SORTING : CONFIG.API.SCAN_AND_SEARCH_SORTING + "?" + referenceData
     let getSortingData = await RestAPIFactory(token).serviceCall(null, url, GET)
     let json = await getSortingData.json
-    let data = (!_.isNull(json) && !_.isUndefined(json) && !_.isEmpty(json)) ? json : null
+    let data = (!_.isEmpty(json)) ? json : null
     return data
   }
 
@@ -55,7 +55,7 @@ class Sorting {
 
   setSortingData(jsonData, referenceNumber) {
     let sortingList = {}, id = 0;
-    if (jsonData.jobTransaction != null && jsonData.jobTransaction != undefined) {
+    if (jsonData.jobTransaction) {
       label = ['', 'Name', 'Employee Code', 'Sequence Number', 'Address']
       sortingList[id] = (jsonData.jobTransaction.referenceNumber) ? { id, value: jsonData.jobTransaction.referenceNumber, label: label[id++] } : { id: id++, value: NA }
       sortingList[id] = (jsonData.firstName != null && jsonData.lastName != null) ? { id, value: jsonData.firstName.toUpperCase() + ' ' + jsonData.lastName.toUpperCase(), label: label[id++] } : { id: id++, value: NA };
