@@ -63,7 +63,7 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
                 dispatch(setState(SHOW_SEARCH_BAR))
         } catch (error) {
             dispatch(setState(SKU_LIST_FETCHING_START, false))    // false to stop sku loader        
-            dispatch(showToastAndAddUserExceptionLog(2201, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2201, error.message, 'danger', 1)
         }
     }
 }
@@ -103,7 +103,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                 }))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2202, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2202, error.message, 'danger', 1)
         }
     }
 
@@ -141,7 +141,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                 })
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2203, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2203, error.message, 'danger', 1)
         }
 
     }
