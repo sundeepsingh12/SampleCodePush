@@ -57,8 +57,8 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = opts.url
-    if(!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK)){
-    url = this.API_BASE_URL + url
+    if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK)) {
+      url = this.API_BASE_URL + url
     }
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
@@ -187,7 +187,7 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile(path, fileName) {
+  async uploadZipFile(path, fileName, currenDate) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
     // console.log('jid',jid)
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
@@ -206,8 +206,10 @@ class RestAPI {
           const syncCount = responseBody.split(",")[1]
           if (message == 'success') {
             //do something
-            const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
-            await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
+            console.logs('currentdate', currenDate)
+            if (currenDate) {
+              await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
+            }
             await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
             // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
           }

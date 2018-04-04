@@ -25,7 +25,8 @@ import {
     USER,
     AutoLogoutScreen,
     SET_OPTION_ATTRIBUTE_ERROR,
-    SET_FORM_INVALID_AND_FORM_ELEMENT
+    SET_FORM_INVALID_AND_FORM_ELEMENT,
+    SYNC_RUNNING_AND_TRANSACTION_SAVING
 } from '../../lib/constants'
 
 import {
@@ -194,6 +195,11 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
 export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, fieldAttributeMasterParentIdMap) {
     return async function (dispatch) {
         try {
+            let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
+            if (syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value) {
+                syncRunningAndTransactionSaving.value.transactionSaving = true
+            }
+            await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, syncRunningAndTransactionSaving.value)
             let cloneFormLayoutState = _.cloneDeep(formLayoutState)
             const userData = await keyValueDBService.getValueFromStore(USER)
             if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
@@ -217,9 +223,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     } else {
                         dispatch(navigateToScene(routeName, routeParam))
                     }
-                    dispatch(performSyncService(pieChart))
                     dispatch(setState(CLEAR_FORM_LAYOUT))
-                    dispatch(setState(CLEAR_BULK_STATE))
                 } else {
                     dispatch(setState(SET_FORM_INVALID_AND_FORM_ELEMENT, {
                         isLoading: false,
@@ -231,6 +235,13 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
         } catch (error) {
             dispatch(showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1))
             dispatch(setState(IS_LOADING, false))
+        } finally {
+            let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
+            if (syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value) {
+                syncRunningAndTransactionSaving.value.transactionSaving = false
+            }
+            await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, syncRunningAndTransactionSaving.value)
+            dispatch(performSyncService(pieChart))
         }
     }
 }

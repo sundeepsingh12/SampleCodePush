@@ -61,13 +61,13 @@ import { geoFencingService } from './GeoFencingService'
 
 class Sync {
 
-  async createAndUploadZip(transactionIdToBeSynced) {
+  async createAndUploadZip(transactionIdToBeSynced, currentDate) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     if (!token) {
       throw new Error('Token Missing')
     }
     await createZip(transactionIdToBeSynced)
-    const responseBody = await RestAPIFactory(token.value).uploadZipFile()
+    const responseBody = await RestAPIFactory(token.value).uploadZipFile(null, null, currentDate)
     return responseBody
   }
 
@@ -283,35 +283,35 @@ class Sync {
    * @param {*} query 
    */
   async saveDataFromServerInDB(contentQuery, isLiveJob) {
-    const jobTransactions = {
-      tableName: TABLE_JOB_TRANSACTION,
-      value: contentQuery.jobTransactions
-    }
-    const jobs = {
-      tableName: TABLE_JOB,
-      value: contentQuery.job
-    }
+      const jobTransactions = {
+        tableName: TABLE_JOB_TRANSACTION,
+        value: contentQuery.jobTransactions
+      }
+      const jobs = {
+        tableName: TABLE_JOB,
+        value: contentQuery.job
+      }
 
-    const jobDatas = {
-      tableName: TABLE_JOB_DATA,
-      value: contentQuery.jobData
-    }
+      const jobDatas = {
+        tableName: TABLE_JOB_DATA,
+        value: contentQuery.jobData
+      }
 
-    const fieldDatas = {
-      tableName: TABLE_FIELD_DATA,
-      value: contentQuery.fieldData
-    }
+      const fieldDatas = {
+        tableName: TABLE_FIELD_DATA,
+        value: contentQuery.fieldData
+      }
 
-    const runsheets = {
-      tableName: TABLE_RUNSHEET,
-      value: contentQuery.runSheet
-    }
-    if (isLiveJob) {
-      await this.saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
-    }
-    await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
-    const jobMasterIds = this.getJobMasterIds(contentQuery.job)
-    return jobMasterIds
+      const runsheets = {
+        tableName: TABLE_RUNSHEET,
+        value: contentQuery.runSheet
+      }
+      if (isLiveJob) {
+        await this.saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+      }
+      await realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
+      const jobMasterIds = this.getJobMasterIds(contentQuery.job)
+      return jobMasterIds
   }
   async saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets) {
     let jobIds = jobs.value;

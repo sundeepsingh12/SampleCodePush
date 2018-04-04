@@ -102,7 +102,7 @@ describe('test fillKeysInFormElement', () => {
             positionId: 0,
             parentId: 0,
             showHelpText: false,
-            editable: false,
+            editable: true,
             focus: false,
             validation: [],
             value: 'xyz',
@@ -120,7 +120,7 @@ describe('test fillKeysInFormElement', () => {
             positionId: 0,
             parentId: 0,
             showHelpText: true,
-            editable: false,
+            editable: true,
             focus: false,
             validation: [],
             value: '123456',
@@ -314,15 +314,6 @@ describe('test checkForUniqueValidation', () => {
         }
     })
 
-    it('should throw FieldAttributeMasterId missing error', () => {
-        const message = 'fieldAttributeMasterId missing in currentElement'
-        try {
-            dataStoreService.checkForUniqueValidation('abhi', null)
-        } catch (error) {
-            expect(error.message).toEqual(message)
-        }
-    })
-
     it('should return true as fieldAttributeValue is present is FieldData Table', () => {
         realm.getRecordListOnQuery = jest.fn();
         realm.getRecordListOnQuery.mockReturnValue([{
@@ -333,7 +324,9 @@ describe('test checkForUniqueValidation', () => {
             positionId: 0,
             value: 'abhi'
         }]);
-        expect(dataStoreService.checkForUniqueValidation('abhi', 123)).toEqual(true)
+        dataStoreService.checkIfUniqueConditionExists = jest.fn()
+        dataStoreService.checkIfUniqueConditionExists.mockReturnValue(true)
+        expect(dataStoreService.checkForUniqueValidation('abhi', { fieldAttributeMasterId: 123 })).toEqual(true)
     })
 
     it('should return false as fieldAttributeValue is not present is FieldData Table', () => {
@@ -346,7 +339,9 @@ describe('test checkForUniqueValidation', () => {
             positionId: 0,
             value: 'abhi'
         }]);
-        expect(dataStoreService.checkForUniqueValidation('xyz', 989)).toEqual(false)
+        dataStoreService.checkIfUniqueConditionExists = jest.fn()
+        dataStoreService.checkIfUniqueConditionExists.mockReturnValue(false)
+        expect(dataStoreService.checkForUniqueValidation('xyz', { fieldAttributeMasterId: 12345 })).toEqual(false)
     })
 })
 
@@ -952,13 +947,6 @@ describe('test checkForOfflineDsResponse', () => {
 })
 
 describe('test searchDataStoreAttributeValueMap', () => {
-    it('should throw searchText missing error', () => {
-        try {
-            dataStoreService.searchDataStoreAttributeValueMap(null)
-        } catch (error) {
-            expect(error.message).toEqual(SEARCH_TEXT_MISSING)
-        }
-    })
 
     it('should throw data store map missing error', () => {
         try {
@@ -1093,7 +1081,8 @@ describe('test checkForFiltersAndValidations', () => {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
             .then((result) => {
@@ -1114,7 +1103,8 @@ describe('test checkForFiltersAndValidations', () => {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
             .then((result) => {
@@ -1135,7 +1125,8 @@ describe('test checkForFiltersAndValidations', () => {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
             .then((result) => {
@@ -1184,7 +1175,8 @@ describe('test checkForFiltersAndValidations', () => {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         keyValueDBService.getValueFromStore.mockReturnValue({})
         dataStoreFilterService.fetchDataForFilter.mockReturnValue({
