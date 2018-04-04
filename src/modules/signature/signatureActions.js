@@ -37,7 +37,7 @@ export function saveSignature(result, fieldAttributeMasterId, formElement, isSav
             const value = await signatureService.saveFile(result, moment())
             dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }, jobTransaction))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2101, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2101, error.message, 'danger', 1)
         }
     }
 }
@@ -48,7 +48,7 @@ export function getRemarksList(fieldDataList) {
             const remarksList = signatureService.filterRemarksList(fieldDataList)
             dispatch(setFieldDataList(remarksList))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2102, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2102, error.message, 'danger', 1)
         }
     }
 }
@@ -61,7 +61,7 @@ export function setIsRemarksValidation(validation) {
                 dispatch(_setIsRemarksValidation(true))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2103, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2103, error.message, 'danger', 1)
         }
     }
 }
@@ -74,7 +74,7 @@ export function saveSignatureAndRating(result, rating, currentElement, formEleme
             const fieldDataListObject = signatureService.prepareSignAndNpsFieldData(signatureValue, rating, currentElement, fieldAttributeMasterList, jobTransaction.id, latestPositionId)
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2104, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2104, error.message, 'danger', 1)
         }
     }
 }
