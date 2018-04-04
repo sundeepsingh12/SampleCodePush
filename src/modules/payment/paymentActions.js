@@ -77,7 +77,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
                 }
             ))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1601, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1601, error.message, 'danger', 1)
         }
     }
 }
@@ -138,7 +138,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
             //     paymentAtEnd
             // }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1602, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1602, error.message, 'danger', 1)
         }
     }
 }
@@ -175,7 +175,7 @@ export function saveMoneyCollectSplitObject(actualAmount, currentElement, formEl
             dispatch(setState(CLEAR_PAYMENT_STATE))
             dispatch(NavigationActions.back())
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1603, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1603, error.message, 'danger', 1)
         }
     }
 }
@@ -226,7 +226,7 @@ export function paymentModeSelect(selectedPaymentMode, splitPaymentMode, modeTyp
             dispatch(setState(SET_SELECTED_PAYMENT_MODE, { selectedPaymentMode: tempSelectedPaymentMode, isSaveButtonDisabled }))
 
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1604, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1604, error.message, 'danger', 1)
         }
     }
 }
@@ -242,7 +242,7 @@ export function getSplitPaymentModeList(selectedPaymentMode) {
             let splitPaymentModeMap = paymentService.prepareSplitPaymentModeList(selectedPaymentMode)
             dispatch(setState(SET_SPLIT_PAYMENT_MODE_LIST, { splitPaymentModeMap }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1605, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1605, error.message, 'danger', 1)
         }
     }
 }
@@ -273,7 +273,7 @@ export function changeChequeOrDDPaymentModeList(modeTypeId, splitPaymentModeMap,
             }
             dispatch(setState(SET_SPLIT_PAYMENT_MODE_LIST, { splitPaymentModeMap: splitPaymentModeMapClone }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1606, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1606, error.message, 'danger', 1)
         }
     }
 }
@@ -292,7 +292,7 @@ export function setPaymentAmount(modeTypeId, amount, splitPaymentModeMap) {
             paymentModeObject.amount = amount
             dispatch(setState(SET_SPLIT_PAYMENT_MODE_LIST, { splitPaymentModeMap: splitPaymentModeMapClone }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1607, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1607, error.message, 'danger', 1)
         }
     }
 }
@@ -321,7 +321,7 @@ export function setPaymentParameterForChequeOrDD(modeTypeId, arrayIndex, splitPa
             paymentModeArray[arrayIndex].transactionNumber = transactionNumber || transactionNumber === '' ? transactionNumber : paymentModeArray[arrayIndex].transactionNumber
             dispatch(setState(SET_SPLIT_PAYMENT_MODE_LIST, { splitPaymentModeMap: splitPaymentModeMapClone }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1608, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1608, error.message, 'danger', 1)
         }
     }
 }

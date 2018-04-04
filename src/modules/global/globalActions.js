@@ -96,12 +96,10 @@ export function deleteSessionToken() {
  * @param {Integer} isToastShow integer whether to show toast or not.
  */
 export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
-  return async function (dispatch) {
       if (isToastShow == 1) {
         Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
       }
-      await userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
-  }
+      userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
 }
 //Use to reset navigation state
 export function resetNavigationState(index, actions) {

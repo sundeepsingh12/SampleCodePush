@@ -31,7 +31,7 @@ export function getDataForSortingAndPrinting(referenceNumber) {
             dispatch(setState(SORTING_ITEM_DETAILS, setSortingValues))
         } catch (error) {
             dispatch(setState(ERROR_MESSAGE, error.message))
-            dispatch(showToastAndAddUserExceptionLog(2301, error.message, 'danger', 0))
+            showToastAndAddUserExceptionLog(2301, error.message, 'danger', 0)
         }
     }
 }

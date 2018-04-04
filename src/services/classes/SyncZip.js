@@ -27,8 +27,8 @@ import {
     FIELD_ATTRIBUTE,
     JOB_STATUS,
     JOB_MASTER,
-    UNSEEN
-
+    UNSEEN,
+    USER_EXCEPTION_LOGS
 } from '../../lib/constants'
 import moment from 'moment'
 import { trackingService } from './Tracking'
@@ -71,7 +71,7 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
     SYNC_RESULTS.userCommunicationLog = [];
     SYNC_RESULTS.userEventsLog = await userEventLogService.getUserEventLog(lastSyncTime)
-    SYNC_RESULTS.userExceptionLog = await userExceptionLogsService.getUserExceptionLogs(lastSyncTime)
+    SYNC_RESULTS.userExceptionLog = await userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog,lastSyncTime)
 
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
@@ -116,7 +116,7 @@ async function updateUserSummaryNextJobTransactionId() {
  * @param {*} transactionIds whose data is to be synced
  */
 function _getSyncDataFromDb(transactionIdsObject) {
-
+    let userExceptionLog = _getDataFromRealm([], null, USER_EXCEPTION_LOGS)
     let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
     // console.log('lastSyncTime',lastSyncTime.value)
     // const formattedTime = moment(lastSyncTime.value).format('YYYY-MM-DD HH:mm:ss')
@@ -137,7 +137,8 @@ function _getSyncDataFromDb(transactionIdsObject) {
             serverSmsLogs,
             runSheetSummary,
             transactionLogs,
-            trackLogs
+            trackLogs,
+            userExceptionLog
         };
     }
     let transactionIds = transactionIdsObject.value;
@@ -158,7 +159,8 @@ function _getSyncDataFromDb(transactionIdsObject) {
         serverSmsLogs,
         runSheetSummary,
         transactionLogs,
-        trackLogs
+        trackLogs,
+        userExceptionLog
     }
 }
 

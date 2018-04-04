@@ -12,7 +12,8 @@ import {
     CLEAR_ATTR_MAP_AND_SET_LOADER,
     SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
     SET_DSF_REVERSE_MAP,
-    SEARCH_DATA_STORE_RESULT
+    SEARCH_DATA_STORE_RESULT,
+    SET_ARRAY_DATA_STORE_FILTER_MAP,
 } from '../../../lib/constants'
 import {
     DATA_STORE,
@@ -168,9 +169,6 @@ describe('test for getDataStoreAttrValueMap', () => {
 
     const expectedActions = [
         {
-            type: SHOW_LOADER_DS,
-            payload: true
-        }, {
             type: SET_DATA_STORE_ATTR_MAP,
             payload: {
                 dataStoreAttrValueMap: attrValueMap,
@@ -223,8 +221,6 @@ describe('test for getDataStoreAttrValueMap', () => {
                 expect(dataStoreService.getDataStoreAttrValueMapFromJson).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
     })
 
@@ -234,17 +230,15 @@ describe('test for getDataStoreAttrValueMap', () => {
         dataStoreService.fetchJsonForDS = jest.fn()
         dataStoreService.fetchJsonForDS.mockReturnValue(dataStoreResponse)
         dataStoreService.getDataStoreAttrValueMapFromJson = jest.fn()
-        dataStoreService.getDataStoreAttrValueMapFromJson.mockReturnValue(expectedActions[2].payload.dataStoreAttrValueMap)
+        dataStoreService.getDataStoreAttrValueMapFromJson.mockReturnValue(expectedActions[1].payload.dataStoreAttrValueMap)
         const store = mockStore({})
         return store.dispatch(actions.getDataStoreAttrValueMap('abc', 123, 123))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(dataStoreService.fetchJsonForDS).toHaveBeenCalled()
                 expect(dataStoreService.getDataStoreAttrValueMapFromJson).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[2].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[2].payload)
+                expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
             })
     })
 
@@ -263,8 +257,6 @@ describe('test for getDataStoreAttrValueMap', () => {
                 expect(dataStoreService.getDataStoreAttrValueMapFromJson).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
     })
 
@@ -274,17 +266,15 @@ describe('test for getDataStoreAttrValueMap', () => {
         dataStoreService.fetchJsonForExternalDS = jest.fn()
         dataStoreService.fetchJsonForExternalDS.mockReturnValue(dataStoreResponse)
         dataStoreService.getDataStoreAttrValueMapFromJson = jest.fn()
-        dataStoreService.getDataStoreAttrValueMapFromJson.mockReturnValue(expectedActions[2].payload.dataStoreAttrValueMap)
+        dataStoreService.getDataStoreAttrValueMapFromJson.mockReturnValue(expectedActions[1].payload.dataStoreAttrValueMap)
         const store = mockStore({})
         return store.dispatch(actions.getDataStoreAttrValueMap('abc', null, null, 'http://abc.com', 'EXT_DS'))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(dataStoreService.fetchJsonForExternalDS).toHaveBeenCalled()
                 expect(dataStoreService.getDataStoreAttrValueMapFromJson).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[2].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[2].payload)
+                expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
             })
     })
 
@@ -315,10 +305,8 @@ describe('test for getDataStoreAttrValueMap', () => {
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(dataStoreService.fetchJsonForExternalDS).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[3].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[3].payload)
+                expect(store.getActions()[0].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[2].payload)
             })
     })
 
@@ -370,6 +358,12 @@ describe('test for getFieldAttribute', () => {
     const expectedActions = [{
         type: CLEAR_ATTR_MAP_AND_SET_LOADER,
         payload: {}
+    }, {
+        type: SHOW_ERROR_MESSAGE,
+        payload: {
+            dataStoreAttrValueMap: {},
+            errorMessage: 'error'
+        }
     }]
 
     it('should return dataStoreAttrValueMap', () => {
@@ -391,6 +385,20 @@ describe('test for getFieldAttribute', () => {
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
             })
     })
+
+    it('should throw an error', () => {
+        keyValueDBService.getValueFromStore = jest.fn(() => {
+            throw new Error('error')
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.getFieldAttribute())
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+            })
+    })
 })
 
 
@@ -400,6 +408,12 @@ describe('test for getJobAttribute', () => {
     const expectedActions = [{
         type: CLEAR_ATTR_MAP_AND_SET_LOADER,
         payload: {}
+    }, {
+        type: SHOW_ERROR_MESSAGE,
+        payload: {
+            dataStoreAttrValueMap: {},
+            errorMessage: 'error'
+        }
     }]
 
     it('should return dataStoreAttrValueMap', () => {
@@ -417,6 +431,20 @@ describe('test for getJobAttribute', () => {
                 expect(dataStoreService.getJobAttribute).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+
+    it('should throw an error', () => {
+        keyValueDBService.getValueFromStore = jest.fn(() => {
+            throw new Error('error')
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.getJobAttribute())
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
             })
     })
 })
@@ -617,7 +645,7 @@ describe('test for searchDataStoreAttributeValueMap', () => {
         const store = mockStore({})
         return store.dispatch(actions.searchDataStoreAttributeValueMap('abc', {}, null))
             .then(() => {
-                expect( dataStoreService.searchDataStoreAttributeValueMap).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.searchDataStoreAttributeValueMap).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
@@ -632,7 +660,73 @@ describe('test for searchDataStoreAttributeValueMap', () => {
         const store = mockStore({})
         return store.dispatch(actions.searchDataStoreAttributeValueMap('temp', 1234, null, null))
             .then(() => {
-                expect( dataStoreService.searchDataStoreAttributeValueMap).toHaveBeenCalledTimes(1)
+                expect(dataStoreService.searchDataStoreAttributeValueMap).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[2].payload)
+            })
+    })
+})
+
+
+
+describe('test for checkForFiltersAndValidationForArray', () => {
+
+    const expectedActions = [{
+        type: SHOW_LOADER_DS,
+        payload: true
+    }, {
+        type: SET_IS_FILTER_PRESENT_AND_DS_ATTR_VALUE_MAP,
+        payload: {
+            dataStoreAttrValueMap: {
+                id: 1
+            },
+            isFiltersPresent: false,
+            validation: {}
+        }
+    }, {
+        type: SHOW_ERROR_MESSAGE,
+        payload: {
+            dataStoreAttrValueMap: {},
+            errorMessage: 'error'
+        }
+    }, {
+        type: SET_ARRAY_DATA_STORE_FILTER_MAP,
+        payload: {}
+    }]
+
+    it('should set dataStoreAttrValueMap, isFiltersPresent, validation and arrayReverseDataStoreFilterMap', () => {
+        dataStoreService.checkForFiltersAndValidationsForArray = jest.fn()
+        dataStoreService.checkForFiltersAndValidationsForArray.mockReturnValue({
+            dataStoreAttrValueMap: {
+                id: 1
+            },
+            isFiltersPresent: false,
+            validation: {},
+            arrayReverseDataStoreFilterMap: {}
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.checkForFiltersAndValidationForArray('temp'))
+            .then(() => {
+                expect(dataStoreService.checkForFiltersAndValidationsForArray).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                expect(store.getActions()[2].type).toEqual(expectedActions[3].type)
+                expect(store.getActions()[2].payload).toEqual(expectedActions[3].payload)
+            })
+    })
+
+    it('should throw an error', () => {
+        dataStoreService.checkForFiltersAndValidationsForArray = jest.fn(() => {
+            throw new Error('error')
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.checkForFiltersAndValidationForArray('temp'))
+            .then(() => {
+                expect(dataStoreService.checkForFiltersAndValidations).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[2].type)

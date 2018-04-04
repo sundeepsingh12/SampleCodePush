@@ -23,7 +23,7 @@ export function getDataForStatisticsList() {
             const selectedStatisticsList =  statisticsListService.setStatisticsList(userSummaryList.value)
             dispatch(setState(SET_DATA_IN_STATISTICS_LIST, selectedStatisticsList))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2401, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2401, error.message, 'danger', 1)
         }
     }
 }

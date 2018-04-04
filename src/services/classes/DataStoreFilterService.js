@@ -122,7 +122,7 @@ class DataStoreFilterService {
                     if (currentObject.value) {
                         dataStoreAttributeIdtoValueMap[currentObject.dataStoreAttributeId] = currentObject.value
                     }
-                    if (dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId]) {
+                    if (dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId] && !_.includes(dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId], fieldAttributeMasterId)) { // check if variable is initialized with empty array and if present then check if it contains an entry of fieldAttributeMasterId or not to avoid duplicate entry in map
                         dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId].push(fieldAttributeMasterId)
                     } else {
                         dataStoreFilterReverseMap[currentObject.fieldAttributeMasterId] = []
@@ -211,10 +211,34 @@ class DataStoreFilterService {
     }
 
     /**
-     * In case of bulk job check value of jobAttribute which is mapped with DSF contains same or not if same value is there then return that value else throw an error
-     * @param {*} jobTransaction 
-     * @param {*} filteredJobAttribute 
-     */
+     * This method works in case of Array having DSF
+     * @param {*} token 
+     * @param {Object} functionParamsFromDSF {
+                                currentElement  // Data store filter element
+                                formElement // Contains formElement of all rows
+                                jobTransaction 
+                                arrayReverseDataStoreFilterMap // Object having mapped id's so we can back track and remove value property from formElement if any dsf is edited by the user
+                                rowId // Current rowId
+                                arrayFieldAttributeMasterId // fieldAttributeMasterId of array
+                            }
+     * */
+    async fetchDataForFilterInArray(token, functionParamsFromDSF) {
+        let { currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, rowId, arrayFieldAttributeMasterId } = functionParamsFromDSF
+        let rowFormElement = formElement[rowId].formLayoutObject //get current formElement 
+        let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
+        let returnParams = await this.fetchDataForFilter(token, currentElement, false, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //get Data for DSF
+        let cloneArrayReverseDataStoreFilterMap = _.cloneDeep(arrayReverseDataStoreFilterMap)
+        cloneArrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] = returnParams.dataStoreFilterReverseMap //change reverse DSF map which contains all mapping related to DSF and Data store
+        return {
+            dataStoreFilterResponse: returnParams.dataStoreFilterResponse,
+            arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap
+        }
+    }
+
+    /** In case of bulk job check value of jobAttribute which is mapped with DSF contains same or not if same value is there then return that value else throw an error
+    * @param {*} jobTransaction
+    * @param {*} filteredJobAttribute
+    */
     checkForSameJobDataValue(jobTransaction, filteredJobAttribute) {
         let uniqueValueObject = {}, jobData
         //loop through all jobTransactions and get jobData for particular jobAttribute i.e. filteredJobAttribute

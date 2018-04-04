@@ -38,7 +38,7 @@ export function fetchUserList() {
             }
             dispatch(setState(FETCH_USER_DETAILS, userDetails))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1901, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(1901, error.message, 'danger', 1)
         }
     }
 }
@@ -63,7 +63,7 @@ export function checkAndResetPassword(currentPassword, newPassword, confirmNewPa
             dispatch(setState(CLEAR_PASSWORD_TEXTINPUT))
             dispatch(NavigationActions.back())  // automatically goes on the previous screen.
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1902, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(1902, error.message, 'danger', 1)
         } finally {
             dispatch(setState(IS_PROFILE_LOADING, false))
         }
