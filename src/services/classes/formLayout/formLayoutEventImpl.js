@@ -115,6 +115,7 @@ export default class FormLayoutEventImpl {
                     break
                 } else {
                     value.focus = false
+                    isSaveDisabled = false
                 }
             }
             if (isSaveDisabled) {

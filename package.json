@@ -48,7 +48,7 @@
     "react-navigation": "1.5.8",
     "react-navigation-redux-helpers": "1.0.3",
     "react-redux": "5.0.7",
-    "realm": "2.2.1",
+    "realm": "2.2.15",
     "redux": "3.7.2",
     "redux-logger": "3.0.6",
     "redux-mock-store": "1.5.1",
