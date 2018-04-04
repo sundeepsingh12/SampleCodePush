@@ -420,6 +420,7 @@ module.exports = keyMirror({
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
     SORTING_LOADER: null,
+    DEFAULT_ERROR_MESSAGE_IN_SORTING: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,
