@@ -38,38 +38,37 @@ import {
 } from '../../lib/ContainerConstants'
 
 class SkuListing {
-      async getSkuListingDto(fieldAttributeMasterId) {
-          if(!fieldAttributeMasterId){
-              throw new Error('Field Attribute master id missing')
-          }
-
+    async getSkuListingDto(fieldAttributeMasterId) {
+        if(!fieldAttributeMasterId){
+            throw new Error('Field Attribute master id missing')
+        }
+        
         const fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-         if (!fieldAttributesList || !fieldAttributesList.value) {
+        if (!fieldAttributesList || !fieldAttributesList.value) {
             throw new Error('Field Attributes missing in store')
         }
-
         let idFieldAttributeMap = new Map(), isSkuCodePresent = false
-        const childFieldAttributeId = fieldAttributesList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == fieldAttributeMasterId &&
+        let fieldAttributesListValues = fieldAttributesList.value
+        const childFieldAttributeId = fieldAttributesListValues.filter(fieldAttributeObject => fieldAttributeObject.parentId == fieldAttributeMasterId &&
             fieldAttributeObject.attributeTypeId == OBJECT).map(object => object.id)
-
-        fieldAttributesList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == childFieldAttributeId[0])
-            .forEach(fieldAttribute => {
-                if(fieldAttribute.attributeTypeId==SKU_CODE){
+            
+        for (let index in fieldAttributesListValues) {
+            if (fieldAttributesListValues[index].parentId == childFieldAttributeId[0]) {
+                if (fieldAttributesListValues[index].attributeTypeId == SKU_CODE) {
                     isSkuCodePresent = true
                 }
-                const id = (fieldAttribute.jobAttributeMasterId == 0 || fieldAttribute.jobAttributeMasterId==null) ?fieldAttribute.attributeTypeId:fieldAttribute.jobAttributeMasterId
-                idFieldAttributeMap.set(id,fieldAttribute)
-            })
-
-            fieldAttributesList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == fieldAttributeMasterId && fieldAttributeObject.attributeTypeId!=OBJECT).forEach(fieldAttribute=>{
-                idFieldAttributeMap.set(fieldAttribute.attributeTypeId,fieldAttribute)
-            })
-
-            const skuListingDto = {
-                idFieldAttributeMap,
-                isSkuCodePresent,
-                childFieldAttributeId
+                const id = (fieldAttributesListValues[index].jobAttributeMasterId == 0 || fieldAttributesListValues[index].jobAttributeMasterId == null) ? fieldAttributesListValues[index].attributeTypeId : fieldAttributesListValues[index].jobAttributeMasterId
+                idFieldAttributeMap.set(id, fieldAttributesListValues[index])
             }
+            if (fieldAttributesListValues[index].parentId == fieldAttributeMasterId && fieldAttributesListValues[index].attributeTypeId != OBJECT) {
+                idFieldAttributeMap.set(fieldAttributesListValues[index].attributeTypeId, fieldAttributesListValues[index])
+            }
+        }
+        const skuListingDto = {
+            idFieldAttributeMap,
+            isSkuCodePresent,
+            childFieldAttributeId
+        }
         return skuListingDto
     }
 
