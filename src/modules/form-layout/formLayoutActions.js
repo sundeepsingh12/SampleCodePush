@@ -126,7 +126,7 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSa
                 dispatch(_setFormList(sortedFormAttributeDto))
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0)            
+            showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0)
             formElement.get(attributeMasterId).isLoading = false
             dispatch(_setErrorMessage(error.message))
             dispatch(setState(UPDATE_FIELD_DATA, formElement))
@@ -192,7 +192,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, fieldAttributeMasterParentIdMap) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart) {
     return async function (dispatch) {
         try {
             let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
@@ -206,7 +206,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
                 dispatch(setState(IS_LOADING, true))
-                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap)
+                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
                 if (isFormValidAndFormElement.isFormValid) {
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                     let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
@@ -233,7 +233,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 }
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1)            
+            showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1)
             dispatch(setState(IS_LOADING, false))
         } finally {
             let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
