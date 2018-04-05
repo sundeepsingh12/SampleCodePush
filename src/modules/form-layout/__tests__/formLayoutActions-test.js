@@ -402,7 +402,6 @@ describe('test form sequence field attribute', () => {
         const store = mockStore({})
         return store.dispatch(actions.setSequenceDataAndNextFocus('7831', formElements, nextEditables, isSaveDisabled, '4'))
             .then(() => {
-                console.log("dgss", store.getActions())
                 expect(formLayoutEventsInterface.findNextFocusableAndEditableElement).toHaveBeenCalledTimes(1)
                 expect(formLayoutEventsInterface.updateFieldData).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[2].type)
@@ -420,7 +419,6 @@ describe('test form sequence field attribute', () => {
         const store = mockStore({})
         return store.dispatch(actions.setSequenceDataAndNextFocus('4', formLayoutMap, nextEditable, isSaveDisabled, '4'))
             .then(() => {
-                console.log("dgss", store.getActions())
                 expect(formLayoutEventsInterface.findNextFocusableAndEditableElement).toHaveBeenCalledTimes(1)
                 expect(formLayoutEventsInterface.updateFieldData).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[1].type)

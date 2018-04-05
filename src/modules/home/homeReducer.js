@@ -5,6 +5,8 @@ import React from 'react'
 
 const initialState = new InitialState()
 import {
+  PAGES_LOADING,
+  SET_PAGES_UTILITY_N_PIESUMMARY,
   HOME_LOADING,
   SET_MODULES,
   SYNC_STATUS,
@@ -22,20 +24,22 @@ import {
   ERP_SYNC_STATUS
 } from '../../lib/constants'
 
-
 export default function homeReducer(state = initialState, action) {
-  if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
-
+  if (!(state instanceof InitialState)) {
+    return initialState.mergeDeep(state)
+  }
   switch (action.type) {
-    case HOME_LOADING:
-      return state.set('moduleLoading', action.payload.moduleLoading)
+    case PAGES_LOADING: {
+      return state.set('pagesLoading', action.payload.pagesLoading)
+    }
 
-    case SET_MODULES:
-      return state.set('modules', action.payload.modules)
-        .set('pieChart', action.payload.pieChart)
-        .set('menu', action.payload.menu)
-        .set('moduleLoading', action.payload.moduleLoading)
-        .set('newJobModules',action.payload.newJobModules)
+    case SET_PAGES_UTILITY_N_PIESUMMARY: {
+      return state.set('mainMenuList', action.payload.sortedMainMenuAndSubMenuList.mainMenuSectionList)
+        .set('subMenuList', action.payload.sortedMainMenuAndSubMenuList.subMenuSectionList)
+        .set('utilities', action.payload.utilities)
+        .set('pieChartSummaryCount', action.payload.pieChartSummaryCount)
+        .set('pagesLoading', false);
+    }
 
     case SET_ERP_PULL_ACTIVATED: {
       return state.set('customErpPullActivated', action.payload.customErpPullActivated)
@@ -84,6 +88,5 @@ export default function homeReducer(state = initialState, action) {
     case SET_TRANSACTION_SERVICE_STARTED:
       return state.set('trackingServiceStarted', action.payload)
   }
-
-  return state
+  return state;
 }

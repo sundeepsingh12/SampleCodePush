@@ -24,7 +24,9 @@ import {
 
 
 export default function paymentReducer(state = initialState, action) {
-  if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
+  if (!(state instanceof InitialState)) {
+    return initialState.mergeDeep(state)
+  }
 
   switch (action.type) {
     case SET_PAYMENT_INITIAL_PARAMETERS: {
@@ -40,8 +42,7 @@ export default function paymentReducer(state = initialState, action) {
     }
 
     case SET_PAYMENT_CHANGED_PARAMETERS: {
-      const actualAmount = action.payload.actualAmount
-      const transactionNumber = action.payload.transactionNumber
+      const { actualAmount, transactionNumber } = action.payload
       let minValue = state.minValue
       let maxValue = state.maxValue
       let isSaveButtonDisabled, paymentError

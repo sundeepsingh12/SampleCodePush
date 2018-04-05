@@ -136,8 +136,6 @@ export function rememberMeSetTrue() {
 export function authenticateUser(username, password, rememberMe) {
   return async function (dispatch) {
     try {
-      let j_sessionid = null,
-        xsrfToken = null
       dispatch(loginRequest())
       const authenticationResponse = await authenticationService.login(username, password)
       let cookie = authenticationResponse.headers.map['set-cookie'][0]

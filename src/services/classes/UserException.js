@@ -41,7 +41,7 @@ class UserException {
     /**
      * @param {*} lastSyncTime --Latest time when the sync is done.
      */
-    async getUserExceptionLog(userExceptionLogs, lastSyncTime) {
+    getUserExceptionLog(userExceptionLogs, lastSyncTime) {
         let userExceptionLogToBeSynced = []
         userExceptionLogs.forEach(userExceptionLog => {
             if (moment(userExceptionLog.dateTime).isAfter(lastSyncTime.value)) {

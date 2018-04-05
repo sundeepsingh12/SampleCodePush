@@ -26,7 +26,6 @@ export function getUPIPaymentParameters(jobMasterId, jobId) {
             const upiModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, UPIMODULE)[0]
             const upiConfigJSON = upiModule ? upiModule.remark ? JSON.parse(upiModule.remark) : null : null
             let customerName = upiPaymentService.getInitialUPIParameters(jobMasterId, jobId, upiConfigJSON)
-            console.log('username', customerName)
             dispatch(setState(SET_UPI_PAYMENT_PARAMETERS, {
                 customerName,
                 upiConfigJSON
@@ -42,7 +41,6 @@ export function approveTransactionAPIRequest(amount, customerName, customerConta
         try {
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-            console.log(customerName, customerContact, payerVPA, upiConfigJSON)
             if (!customerName || !customerContact || !payerVPA || !upiConfigJSON) {
                 throw new Exception('Invalid Parameters')
             }
