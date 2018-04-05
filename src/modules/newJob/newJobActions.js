@@ -46,13 +46,14 @@ export function redirectToFormLayout(status, negativeId, jobMasterId) {
 export function redirectToContainer(pageObject) {
     return async function (dispatch) {
         try {
+            let jobMasterId = JSON.parse(pageObject.jobMasterIds)[0]
             let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)//get saveActiavted data
-            let returnParams = await newJob.checkForNextContainer(pageObject, saveActivatedData)//from saveActivated data check which container to go to
+            let returnParams = await newJob.checkForNextContainer(jobMasterId, saveActivatedData)//from saveActivated data check which container to go to
             if (returnParams.screenName == NewJobStatus) {//if screenName is NewJobStatus check if draft exists
-                const draftStatusInfo = draftService.getDraftForState(null, pageObject.jobMasterIds[0])
-                const nextStatus = await newJob.getNextPendingStatusForJobMaster(pageObject.jobMasterIds[0], pageObject.additionalParams.statusId)
+                const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
+                const nextStatus = await newJob.getNextPendingStatusForJobMaster(jobMasterId, JSON.parse(pageObject.additionalParams).statusId)
                 if (_.isEmpty(draftStatusInfo)) {
-                    dispatch(redirectToFormLayout(nextStatus, -1, pageObject.jobMasterIds[0]))
+                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId))
                 } else {
                     dispatch(setState(SET_NEWJOB_DRAFT_INFO, { draft: draftStatusInfo, nextStatus }))
                 }

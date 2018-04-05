@@ -33,12 +33,11 @@ class NewJob {
      * @param {*} jobMasterId 
      * @param {*} saveActivatedData 
      */
-    checkForNextContainer(pageObject, saveActivatedData) {
-        if (!pageObject) {
+    checkForNextContainer(jobMasterId, saveActivatedData) {
+        if (!jobMasterId) {
             throw new Error(JOB_MASTER_MISSING)
         }
         let navigationParams, stateParam, screenName
-        let jobMasterId = pageObject.jobMasterIds[0]
         //if save activated data is not present or save activated data is present but not with that jobMaster which is been clicked than NewJobStatus is the next container
         if (!saveActivatedData || !saveActivatedData.value[jobMasterId]) {
             return {

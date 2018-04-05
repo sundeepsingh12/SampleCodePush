@@ -96,19 +96,14 @@ import { NetInfo } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
-import moment from 'moment'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { logoutService } from '../../services/classes/Logout'
 import { authenticationService } from '../../services/classes/Authentication'
-
 import { backupService } from '../../services/classes/BackupService';
 import { autoLogoutAfterUpload } from '../backup/backupActions'
 import { utilitiesService } from '../../services/classes/Utilities'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization';
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization';
-import {
-  Toast
-} from 'native-base'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
 

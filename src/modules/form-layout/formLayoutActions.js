@@ -41,7 +41,7 @@ import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
-import { transientStatusService } from '../../services/classes/TransientStatusService'
+//import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
 
@@ -262,7 +262,7 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
         }
     }
 }
-export function saveDraftInDb(formLayoutState, jobMasterId) {
+export function saveDraftInDb(formLayoutState, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
             draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
