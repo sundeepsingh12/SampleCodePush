@@ -124,16 +124,6 @@ class FieldData {
         }
     }
 
-    getFieldDataAfterLastSyncTime(fieldDataList, lastSyncTime) {
-        let fieldDataListToSync = []
-        if (!lastSyncTime.value) return fieldDataListToSync
-        fieldDataList.forEach(fieldData => {
-            if (moment(fieldData.dateTime).isAfter(lastSyncTime.value)) {
-                fieldDataListToSync.push(_.omit(fieldData, ['dateTime']))
-            }
-        })
-        return fieldDataListToSync
-    }
 }
 
 export let fieldDataService = new FieldData()

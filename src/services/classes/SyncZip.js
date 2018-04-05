@@ -48,7 +48,6 @@ var PATH = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER;
 //Location where zip contents are temporarily added and then removed
 var PATH_TEMP = RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER + '/TEMP';
 import { userExceptionLogsService } from './UserException'
-import { fieldDataService } from './FieldData'
 
 export async function createZip(transactionIdToBeSynced) {
 
@@ -59,8 +58,8 @@ export async function createZip(transactionIdToBeSynced) {
     //Prepare the SYNC_RESULTS
     var SYNC_RESULTS = {};
     let lastSyncTime = await keyValueDBService.getValueFromStore(LAST_SYNC_WITH_SERVER)
-    let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced);
-    SYNC_RESULTS.fieldData = fieldDataService.getFieldDataAfterLastSyncTime(realmDbData.fieldDataList, lastSyncTime)
+    let realmDbData = _getSyncDataFromDb(transactionIdToBeSynced, lastSyncTime);
+    SYNC_RESULTS.fieldData = realmDbData.fieldDataList
     SYNC_RESULTS.job = realmDbData.jobList;
     SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
     SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
@@ -72,7 +71,7 @@ export async function createZip(transactionIdToBeSynced) {
     SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
     SYNC_RESULTS.userCommunicationLog = [];
     SYNC_RESULTS.userEventsLog = await userEventLogService.getUserEventLog(lastSyncTime)
-    SYNC_RESULTS.userExceptionLog = await userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog,lastSyncTime)
+    SYNC_RESULTS.userExceptionLog = await userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
 
     let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(lastSyncTime)
     SYNC_RESULTS.jobSummary = jobSummary || {}
@@ -115,7 +114,7 @@ async function updateUserSummaryNextJobTransactionId() {
  * and returns the object containing data from realm
  * @param {*} transactionIds whose data is to be synced
  */
-function _getSyncDataFromDb(transactionIdsObject) {
+function _getSyncDataFromDb(transactionIdsObject, lastSyncTime) {
     let userExceptionLog = _getDataFromRealm([], null, USER_EXCEPTION_LOGS)
     let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
     // console.log('lastSyncTime',lastSyncTime.value)
@@ -143,7 +142,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
     }
     let transactionIds = transactionIdsObject.value;
     let fieldDataQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
-    fieldDataList = _getDataFromRealm([], fieldDataQuery, TABLE_FIELD_DATA);
+    fieldDataList = _getDataFromRealm([], fieldDataQuery, TABLE_FIELD_DATA, lastSyncTime);
     let transactionListQuery = fieldDataQuery.replace(/jobTransactionId/g, 'id'); // regex expression to replace all jobTransactionId with id
     transactionList = _getDataFromRealm([], transactionListQuery, TABLE_JOB_TRANSACTION);
     let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
@@ -172,7 +171,7 @@ function _getSyncDataFromDb(transactionIdsObject) {
  * @param {*} table table name from which data is to be fetched
  * 
  */
-export function _getDataFromRealm(dataType, query, table) {
+export function _getDataFromRealm(dataType, query, table, lastSyncTime) {
     if (!dataType || !table) {
         return dataType;
     }
@@ -184,9 +183,16 @@ export function _getDataFromRealm(dataType, query, table) {
         return Object.assign(dataType, data);
     }
     if (table == TABLE_FIELD_DATA) {
-        return data.map(x => Object.assign({}, x, {
-            id: 0
-        })) // send id as 0 in case of field data
+        let fieldDataList = []
+        if (!lastSyncTime) return fieldDataList
+        for (let index in data) {
+            let fieldData = { ...data[index] }
+            if (moment(fieldData.dateTime).isAfter(lastSyncTime.value)) {
+                fieldData.id = 0
+                fieldDataList.push(_.omit(fieldData, ['dateTime']))
+            }
+        }
+        return fieldDataList
     } else {
         return data.map(x => Object.assign({}, x))
     }

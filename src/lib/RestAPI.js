@@ -206,7 +206,6 @@ class RestAPI {
           const syncCount = responseBody.split(",")[1]
           if (message == 'success') {
             //do something
-            console.logs('currentdate', currenDate)
             if (currenDate) {
               await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
             }
