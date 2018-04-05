@@ -512,7 +512,7 @@ class JobDetailsV2 extends PureComponent {
       <Header style={[style.header]}>
         <View style={style.seqCard}>
           {this.showJobMasterIdentifier()}
-          <Line1Line2View data = {this.props.navigation.state.params.jobTransaction}/>
+          <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
           {this.showCloseIcon()}
         </View>
       </Header>

@@ -207,7 +207,7 @@ module.exports = keyMirror({
     GEO_FENCING: null,
     GEO_FENCE_STATUS: null,
     LAT_LONG_GEO_FENCE: null,
-    SYNC_RUNNING: null,
+    SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -511,6 +511,7 @@ module.exports = keyMirror({
     SET_OPTION_ATTRIBUTE_ERROR: null,
     SET_OPTION_SEARCH_INPUT: null,
     SET_ADV_DROPDOWN_MESSAGE_OBJECT: null,
+    SET_ERROR_AND_ADV_DROPDOWN_MESSAGE_NULL: null,
     // backup actions
     SET_LOADER_BACKUP: null,
     SET_BACKUP_FILES: null,

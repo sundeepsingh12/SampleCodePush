@@ -187,7 +187,9 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile(path, fileName) {
+  async uploadZipFile(path, fileName, currenDate) {
+    // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
+    // console.log('jid',jid)
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
     var filePath = (!path) ? PATH + '/sync.zip' : PATH
     let responseBody = "Fail"
@@ -201,8 +203,9 @@ class RestAPI {
         responseBody = resp.text()
         const message = responseBody.split(",")[0]
         if (!path && message == 'success') {
-          const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+          if (currenDate) {
           await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
+          }
           await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         }
         else if (message != 'success') {

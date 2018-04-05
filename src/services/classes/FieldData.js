@@ -6,7 +6,7 @@ import * as realm from '../../repositories/realmdb'
 import {
     TABLE_FIELD_DATA
 } from '../../lib/constants'
-
+import moment from 'moment';
 class FieldData {
 
     /**
@@ -74,7 +74,7 @@ class FieldData {
             fieldDataQuery += ' AND (' + fieldAttributeMapQuery + ')'
         }
         let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery)
-        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false, 0,true)
+        let fieldDataObject = jobDetailsService.prepareDataObject(jobTransactionId, 0, fieldDataList, fieldAttributeMasterMap, fieldAttributeMap, false, 0, true)
         return fieldDataObject
     }
 
@@ -123,6 +123,7 @@ class FieldData {
             latestPositionId
         }
     }
+
 }
 
 export let fieldDataService = new FieldData()

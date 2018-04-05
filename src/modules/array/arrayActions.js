@@ -5,7 +5,7 @@ import {
     SET_ARRAY_CHILD_LIST,
     SET_NEW_ARRAY_ROW,
     SET_ARRAY_ELEMENTS,
-    SET_ERROR_MSG,    
+    SET_ERROR_MSG,
     CLEAR_ARRAY_STATE,
     NEXT_FOCUS,
     SET_ARRAY_ISLOADING,
@@ -32,10 +32,10 @@ export function showOrDropModal(fieldAttributeMasterId, arrayElements, rowId, id
         }
     }
 }
-export function addRowInArray(lastrowId, childElementsTemplate, arrayElements, jobTransaction) {
+export function addRowInArray(lastrowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled) {
     return async function (dispatch) {
         try {
-            const newArrayRow = arrayService.addArrayRow(lastrowId, childElementsTemplate, arrayElements, jobTransaction)
+            const newArrayRow = arrayService.addArrayRow(lastrowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled)
             if (!newArrayRow) throw new Error(ADD_ROW_ERROR)
             dispatch(setState(SET_NEW_ARRAY_ROW, newArrayRow))
         } catch (error) {
@@ -66,10 +66,10 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
             arrayRow.formLayoutObject.get(attributeMasterId).displayValue = value
             arrayRow.formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
             let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject.get(attributeMasterId), arrayRow.formLayoutObject, AFTER, null)
-            arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult && backPressOrModalPresent) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
+            arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
             arrayRow.formLayoutObject.get(attributeMasterId).containerValue = (validationsResult) ? containerValue : null
             arrayRow.modalFieldAttributeMasterId = (validationsResult) ? null : (backPressOrModalPresent == 2) ? attributeMasterId : null
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult && backPressOrModalPresent) ? value : null, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult) ? value : null, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
             if (validationsResult && backPressOrModalPresent == 1) {
                 dispatch(NavigationActions.back())

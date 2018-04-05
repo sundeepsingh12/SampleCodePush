@@ -55,7 +55,7 @@ class SyncZip {
         //Prepare the SYNC_RESULTS
         var SYNC_RESULTS = {};
         let lastSyncTime = syncStoreDTO.lastSyncWithServer
-        let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced);
+        let realmDbData = this.getDataToBeSyncedFromDB(syncStoreDTO.transactionIdToBeSynced, lastSyncTime);
         SYNC_RESULTS.fieldData = realmDbData.fieldDataList;
         SYNC_RESULTS.job = realmDbData.jobList;
         SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
@@ -162,7 +162,7 @@ class SyncZip {
             trackLogs
      * }
      */
-    getDataToBeSyncedFromDB(transactionIdList) {
+    getDataToBeSyncedFromDB(transactionIdList, lastSyncTime) {
         let userExceptionLog = this.getDataFromRealmDB(null, USER_EXCEPTION_LOGS)
         let runSheetSummary = this.getDataFromRealmDB(null, TABLE_RUNSHEET);
         let trackLogs = this.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
@@ -185,7 +185,7 @@ class SyncZip {
                 transactionLogQuery += ` OR transactionId = ${transactionIdList[index].id}`;
             }
         }
-        fieldDataList = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
+        fieldDataList = this.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA, lastSyncTime);
         transactionList = this.getDataFromRealmDB(jobTransactionQuery, TABLE_JOB_TRANSACTION);
         jobList = this.getDataFromRealmDB(jobQuery, TABLE_JOB);
         serverSmsLogs = this.getDataFromRealmDB(fieldDataQuery, TABLE_SERVER_SMS_LOG);
@@ -221,10 +221,22 @@ class SyncZip {
         }
     }
 
-    getDataFromRealmDB(query, table) {
+    getDataFromRealmDB(query, table, lastSyncTime) {
         let data = realm.getRecordListOnQuery(table, query);
         // send id as 0 in case of field data
-        return (table == TABLE_FIELD_DATA ? data.map(x => Object.assign({}, x, { id: 0 })) : data.map(x => Object.assign({}, x)));
+        if (table == TABLE_FIELD_DATA) {
+            let fieldDataList = []
+            for (let index in data) {
+                let fieldData = { ...data[index] }
+                if (moment(fieldData.dateTime).isAfter(lastSyncTime)) {
+                    fieldData.id = 0
+                    fieldDataList.push(_.omit(fieldData, ['dateTime']))
+                }
+            }
+            return fieldDataList
+        } else {
+            return data.map(x => Object.assign({}, x));
+        }
     }
 
     async moveImageFilesToSync(fieldDataList, path, fieldAttributesList) {

@@ -32,6 +32,7 @@ export function setStateFromNavigationParams(formLayout, transientFormLayoutMap,
                         statusName: currentStatus.nextStatusList[0].name,
                         jobMasterId: jobMasterId,
                         navigationFormLayoutStates: cloneTransientFormLayoutMap,
+                        latestPositionId: formLayout.latestPositionId
                     }))
                 }
             }

@@ -25,7 +25,8 @@ import {
     USER,
     AutoLogoutScreen,
     SET_OPTION_ATTRIBUTE_ERROR,
-    SET_FORM_INVALID_AND_FORM_ELEMENT
+    SET_FORM_INVALID_AND_FORM_ELEMENT,
+    SYNC_RUNNING_AND_TRANSACTION_SAVING
 } from '../../lib/constants'
 
 import {
@@ -69,11 +70,11 @@ export function _setErrorMessage(message) {
     }
 }
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
+export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, positionId) {
     return async function (dispatch) {
         try {
             dispatch(setState(IS_LOADING, true))
-            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
+            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction, positionId)
             let latestPositionId = sortedFormAttributesDto.latestPositionId
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
@@ -125,7 +126,7 @@ export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSa
                 dispatch(_setFormList(sortedFormAttributeDto))
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0)            
+            showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0)
             formElement.get(attributeMasterId).isLoading = false
             dispatch(_setErrorMessage(error.message))
             dispatch(setState(UPDATE_FIELD_DATA, formElement))
@@ -166,7 +167,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
             let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
             cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
             cloneFormElement.get(attributeMasterId).containerValue = validationsResult ? containerValue : null
-            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction);
+            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
             dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
                 {
                     formElement: updatedFieldDataObject.formLayoutObject,
@@ -191,16 +192,21 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
     }
 }
 
-export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart, fieldAttributeMasterParentIdMap) {
+export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, pieChart) {
     return async function (dispatch) {
         try {
+            let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
+            if (syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value) {
+                syncRunningAndTransactionSaving.value.transactionSaving = true
+            }
+            await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, syncRunningAndTransactionSaving.value)
             let cloneFormLayoutState = _.cloneDeep(formLayoutState)
             const userData = await keyValueDBService.getValueFromStore(USER)
             if (userData && userData.value && userData.value.company && userData.value.company.autoLogoutFromDevice && !moment(moment(userData.value.lastLoginTime).format('YYYY-MM-DD')).isSame(moment().format('YYYY-MM-DD'))) {
                 dispatch(NavigationActions.navigate({ routeName: AutoLogoutScreen }))
             } else {
                 dispatch(setState(IS_LOADING, true))
-                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, fieldAttributeMasterParentIdMap)
+                let isFormValidAndFormElement = await formLayoutService.isFormValid(cloneFormLayoutState.formElement, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
                 if (isFormValidAndFormElement.isFormValid) {
                     const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
                     let { routeName, routeParam } = await formLayoutService.saveAndNavigate(cloneFormLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList)
@@ -217,7 +223,6 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     } else {
                         dispatch(navigateToScene(routeName, routeParam))
                     }
-                    dispatch(performSyncService(pieChart))
                     dispatch(setState(CLEAR_FORM_LAYOUT))
                 } else {
                     dispatch(setState(SET_FORM_INVALID_AND_FORM_ELEMENT, {
@@ -228,8 +233,15 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 }
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1)            
+            showToastAndAddUserExceptionLog(1007, error.message, 'danger', 1)
             dispatch(setState(IS_LOADING, false))
+        } finally {
+            let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
+            if (syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value) {
+                syncRunningAndTransactionSaving.value.transactionSaving = false
+            }
+            await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, syncRunningAndTransactionSaving.value)
+            dispatch(performSyncService(pieChart))
         }
     }
 }
@@ -278,7 +290,7 @@ export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
     }
 }
 
-export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
+export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, latestPositionId) {
     return async function (dispatch) {
         try {
             if (isDraftRestore) {
@@ -288,7 +300,7 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
                     dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
                 }
                 else {
-                    dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
+                    dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, latestPositionId))
                 }
             }
         } catch (error) {

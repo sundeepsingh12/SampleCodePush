@@ -306,7 +306,7 @@ class BulkListing extends PureComponent {
     this.props.actions.navigateToScene(FormLayout, {
       statusId,
       statusName,
-      jobMasterId: this.props.navigation.state.params.pageObject.jobMasterIds[0],
+      jobMasterId: JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0],
       jobTransaction: Object.values(this.props.selectedItems),
     }
     )

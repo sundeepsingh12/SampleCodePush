@@ -45,7 +45,7 @@ import {
   NewJob,
   BulkListing,
   SET_TRANSACTION_SERVICE_STARTED,
-  SYNC_RUNNING,
+  SYNC_RUNNING_AND_TRANSACTION_SAVING,
 } from '../../lib/constants'
 
 import {
@@ -295,11 +295,14 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
   return async function (dispatch) {
     let syncStoreDTO
     try {
-      let syncRunning = await keyValueDBService.getValueFromStore(SYNC_RUNNING);
-      if (syncRunning && syncRunning.value) {
+      const currenDate = moment().format('YYYY-MM-DD HH:mm:ss')
+      let syncRunningAndTransactionSaving = await keyValueDBService.getValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING);
+      if (syncRunningAndTransactionSaving && syncRunningAndTransactionSaving.value && (syncRunningAndTransactionSaving.value.syncRunning || syncRunningAndTransactionSaving.value.transactionSaving)) {
         return
       } else {
-        await keyValueDBService.validateAndSaveData(SYNC_RUNNING, true);
+        await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, {
+          syncRunning: true
+        })
       }
       syncStoreDTO = await transactionCustomizationService.getSyncParamaters()
       const userData = syncStoreDTO.user
@@ -315,7 +318,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
           unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
           syncStatus: 'Uploading'
         }))
-        const responseBody = await sync.createAndUploadZip(syncStoreDTO)
+        const responseBody = await sync.createAndUploadZip(syncStoreDTO, currenDate)
         syncCount = parseInt(responseBody.split(",")[1])
       }
 
@@ -379,7 +382,9 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         const difference = await sync.calculateDifference()
         dispatch(setState(LAST_SYNC_TIME, difference))
       }
-      await keyValueDBService.deleteValueFromStore(SYNC_RUNNING)
+      await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, {
+        syncRunning: false
+      })
     }
   }
 }

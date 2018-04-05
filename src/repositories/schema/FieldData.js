@@ -10,12 +10,13 @@ export default class FieldData extends Realm.Object { }
 FieldData.schema = {
   name: TABLE_FIELD_DATA,
   properties: {
-    fieldAttributeMasterId: 'int' ,
-    id:  'int' ,
-    jobTransactionId:  'int' ,
-    parentId:  'int' ,
-    positionId:  'int' ,
-    value:  'string?',
-    attributeTypeId: 'int?', 
+    fieldAttributeMasterId: 'int',
+    id: 'int',
+    jobTransactionId: 'int',
+    parentId: 'int',
+    positionId: 'int',
+    value: 'string?',
+    attributeTypeId: 'int?',
+    dateTime: 'string?',
   }
 }

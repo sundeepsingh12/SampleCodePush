@@ -44,7 +44,7 @@ class UserException {
     getUserExceptionLog(userExceptionLogs, lastSyncTime) {
         let userExceptionLogToBeSynced = []
         userExceptionLogs.forEach(userExceptionLog => {
-            if (moment(userExceptionLog.dateTime).isAfter(lastSyncTime.value)) {
+            if (moment(userExceptionLog.dateTime).isAfter(lastSyncTime)) {
                 userExceptionLogToBeSynced.push(userExceptionLog)
             }
         })
