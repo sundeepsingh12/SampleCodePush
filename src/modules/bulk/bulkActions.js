@@ -46,7 +46,6 @@ export function getBulkJobTransactions(bulkParams) {
             const bulkTransactions = await bulkService.getJobListingForBulk(cloneBulkParams);
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
             const currentStatus = jobStatusService.getJobStatusForJobStatusId(statusList ? statusList.value : null, cloneBulkParams.pageObject.additionalParams.statusId)
-            const modulesCustomizationList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
             let selectAll = cloneBulkParams.pageObject.additionalParams.selectAll ? true : false
             let isManualSelectionAllowed = cloneBulkParams.pageObject.manualSelection ? true : false
             let searchSelectionOnLine1Line2 = cloneBulkParams.pageObject.additionalParams.searchSelectionOnLine1Line2 ? true : false
