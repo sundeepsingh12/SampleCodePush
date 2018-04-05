@@ -46,6 +46,9 @@ import {
   BulkListing,
   SET_TRANSACTION_SERVICE_STARTED,
   SYNC_RUNNING_AND_TRANSACTION_SAVING,
+  CustomApp,
+  Sorting,
+  Statistics
 } from '../../lib/constants'
 
 import {
@@ -81,7 +84,7 @@ import {
   Piechart,
   SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
-import { Toast } from 'native-base'
+import { Toast, ActionSheet } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
@@ -127,14 +130,15 @@ export function fetchPagesAndPiechart() {
       //Looping over Utility list to check if Piechart and Messaging are enabled
       let utilities = {}
       _.each(utilityList.value, function (utility) {
-        (utility.utilityID == PAGE_SUMMARY_PIECHART) ? utilities.pieChartEnabled = utility.enabled : null;
+        if (utility.utilityID == PAGE_SUMMARY_PIECHART) {
+          Piechart.enabled = utilities.pieChartEnabled = utility.enabled
+          Piechart.params = JSON.parse(utility.additionalParams).jobMasterIds
+        };
         (utility.utilityID == PAGE_MESSAGING) ? utilities.messagingEnabled = utility.enabled : null;
       })
 
       //Fetching Summary count for Pie-chart
-      const { pendingStatusIds, failStatusIds, successStatusIds, noNextStatusIds } = await jobStatusService.getStatusIdsForAllStatusCategory()
-      const pieChartSummaryCount = await summaryAndPieChartService.getAllStatusIdsCount(pendingStatusIds, successStatusIds, failStatusIds, noNextStatusIds)
-
+      const pieChartSummaryCount = (Piechart.enabled) ? await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params) : null
       //Finally updating state
       dispatch(setState(SET_PAGES_UTILITY_N_PIESUMMARY, { sortedMainMenuAndSubMenuList, utilities, pieChartSummaryCount }));
     } catch (error) {
@@ -178,7 +182,9 @@ export function navigateToPage(pageObject) {
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
-          throw new Error("CODE it, if you want to use it !");
+          let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
+          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, {customUrl : (customRemarks.length) ? customRemarks[0].customUrl : null})) : dispatch(customAppSelection(customRemarks))
+          break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_INLINE_UPDATE:
@@ -210,9 +216,11 @@ export function navigateToPage(pageObject) {
           break;
         }
         case PAGE_SORTING_PRINTING:
-          throw new Error("CODE it, if you want to use it !");
+          dispatch(navigateToScene(Sorting, pageObject))
+          break;
         case PAGE_STATISTICS:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(Statistics, pageObject))
+        break;
         case PAGE_TABS:
           dispatch(navigateToScene(TabScreen, pageObject));
           break;
@@ -225,6 +233,24 @@ export function navigateToPage(pageObject) {
       console.log(error)
       Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'Lets Code', type: 'danger', duration: 50000 })
     }
+  }
+}
+
+export function customAppSelection(appModule) {
+  return async function (dispatch) {
+    let BUTTONS = appModule.map(id => !(id.title) ? 'URL' : id.title)
+    BUTTONS.push('Cancel')
+    ActionSheet.show(
+      {
+        options: BUTTONS,
+        title: '123',
+        cancelButtonIndex: BUTTONS.length - 1,
+        destructiveButtonIndex: BUTTONS.length - 1
+      },
+      buttonIndex => {
+        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl })) : null
+      }
+    )
   }
 }
 
@@ -424,7 +450,7 @@ export function pieChartCount() {
   return async (dispatch) => {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
-      const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount()
+      const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
       dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
     } catch (error) {
       //Update UI here

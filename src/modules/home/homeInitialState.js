@@ -18,7 +18,6 @@ var InitialState = Record({
     unsyncedTransactionList: [],
     moduleLoading: false,
     chartLoading: false,
-    count: null,
     lastSyncTime: null,
     isLoggingOut: false,
     isUnsyncTransactionOnLogout: false,

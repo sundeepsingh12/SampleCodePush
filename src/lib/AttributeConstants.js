@@ -286,7 +286,8 @@ module.exports = {
     JOB_ASSIGNMENT_ID: 20,
     PAGE_NEW_JOB: 2,
     Piechart: {
-        enabled: false
+        enabled: false,
+        params:[]
     },
     Start: {
         landingTab: false

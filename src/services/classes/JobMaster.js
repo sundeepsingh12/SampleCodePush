@@ -297,6 +297,11 @@ class JobMaster {
     return jobMasterTitleList
   }
 
+  async getJobMasterIdList(){
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    return jobMasterList.value.map((data) => data.id)
+  }
+
   async getJobMasterFromJobMasterList(jobMasterId) {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     const jobMaster = jobMasterList.value.filter((data) => data.id == jobMasterId)

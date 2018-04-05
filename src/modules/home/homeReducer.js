@@ -58,7 +58,7 @@ export default function homeReducer(state = initialState, action) {
 
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)
-        .set('count', action.payload.count)
+        .set('pieChartSummaryCount', action.payload.count)
 
 
     case LAST_SYNC_TIME:

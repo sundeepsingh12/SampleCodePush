@@ -65,7 +65,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...preloaderActions }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...preloaderActions, ...homeActions }, dispatch)
   }
 }
 
