@@ -256,10 +256,13 @@ class JobTransaction {
             jobTransactionQuery = `deleteFlag != 1`
             //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected
             jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
+        } else if (callingActivity == 'AllTasks') {
+            jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
+            jobTransactionQuery = jobTransactionQuery + ' AND ' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
             fieldDataList = [], fieldDataMap = {}
-
+        // In case of live job,fetch all transactions with status = 6
         if (callingActivity == 'LiveJob') {
             jobTransactionObject.jobQuery = 'status = 6'
         }
@@ -280,6 +283,7 @@ class JobTransaction {
             jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobTransactionObject.jobDataQuery, false)
         }
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
+        //Check to fetch field data only when calling activity is not Live Job
         if (callingActivity != 'LiveJob') {
             fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery, false)
             fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
@@ -334,13 +338,8 @@ class JobTransaction {
       */
 
     getEnableMultiPartJobMaster(jobMasterList) {
-        let jobMasterIdListWithEnableMultiPart = []
-        jobMasterList.forEach(jobMaster => {
-            if (jobMaster.enableMultipartAssignment) {
-                jobMasterIdListWithEnableMultiPart.push(jobMaster.id)
-            }
-        })
-        return jobMasterIdListWithEnableMultiPart
+        let jobMasterListWithEnableMultiPart = jobMasterList.filter(jobMaster => jobMaster.enableMultipartAssignment == true)
+        return jobMasterListWithEnableMultiPart
     }
 
     /** @function getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)
@@ -351,8 +350,10 @@ class JobTransaction {
      *@return {Object} {jobIdGroupIdMap}
      */
 
-    getJobIdGroupIdMap(jobMasterIdListWithEnableMultiPart) {
-        let jobMasterQuery = jobMasterIdListWithEnableMultiPart.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+    getJobIdGroupIdMap(jobMastersList) {
+        let jobMasterListWithEnableMultiPart = this.getEnableMultiPartJobMaster(jobMastersList)
+        if (!jobMasterListWithEnableMultiPart || jobMasterListWithEnableMultiPart.length == 0) return {}
+        let jobMasterQuery = jobMasterListWithEnableMultiPart.map(jobMaster => 'jobMasterId = ' + jobMaster.id).join(' OR ')
         let jobQuery = `groupId != null AND (${jobMasterQuery})`
         let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
         let jobIdGroupIdMap = {}
@@ -399,7 +400,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
-        if(!_.isEmpty(jobIdGroupIdMap)){
+        if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
             statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
             tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
             tabIdGroupTransactionsMap['isGrouping'] = true
@@ -439,7 +440,7 @@ class JobTransaction {
             }
             jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
             jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
-            if (!_.isEmpty(jobIdGroupIdMap) && statusIdsTabIdsMap[jobTransactionCustomization.statusId]) {
+            if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap) && statusIdsTabIdsMap[jobTransactionCustomization.statusId]) {
                 let groupId = jobIdGroupIdMap[jobTransactionCustomization.jobId] ? jobIdGroupIdMap[jobTransactionCustomization.jobId] : null
                 let groupIdTabKey = groupId ? groupId + '&' + statusIdsTabIdsMap[jobTransactionCustomization.statusId] : null
                 if (!groupId) {
@@ -652,16 +653,13 @@ class JobTransaction {
      * @param {*} jobAttributeMap 
      * @param {*} job 
      * @returns
-     * CombinedAddressList : [String(complete address ie combination of address line 1 , address line 2, landmark, pincode))]
+     * addressDataForJob 
      */
     setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job) {
         let addressDataForJob = {},
             combinedAddressList = []
         jobAttributeMap = jobAttributeMap ? jobAttributeMap : {}
         let tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id] ? jobDataDetailsForListing.addressMap[job.id] : []
-        if (job.latitude !== undefined && job.longitude !== undefined && job.latitude !== null && job.longitude !== null && (job.latitude != 0.0 || job.longitude != 0.0)) {
-            combinedAddressList.push(job.latitude + ',' + job.longitude)
-        }
         tempAddressDataForJob.forEach(address => {
             if (!jobAttributeMap[address.jobAttributeMasterId]) {
                 return
@@ -670,14 +668,6 @@ class JobTransaction {
             addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence][jobAttributeMasterMap[address.jobAttributeMasterId].attributeTypeId] = address.value
         })
         return addressDataForJob
-        // for (let index in addressDataForJob) {
-        //     let combinedAddress = ''
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_1], '', null, null)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_2], '', ',', combinedAddress)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][LANDMARK], '', ',', combinedAddress)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][PINCODE], '', ',', combinedAddress)
-        //     combinedAddressList.push(combinedAddress)
-        // }
     }
 
     /**
@@ -781,10 +771,9 @@ class JobTransaction {
         }
         let currentStatus = statusIdStatusMap[jobStatusId]
         jobDataObject.dataList = Object.values(jobDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
+
         if (callingActivity != 'LiveJob') {
             fieldDataObject.dataList = Object.values(fieldDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
-        }
-        if (callingActivity != 'LiveJob') {
             const jobTransactionDisplay = {
                 id: jobTransactionId,
                 jobId,
@@ -860,6 +849,23 @@ class JobTransaction {
         }
     }
 
+    /**
+       * This function checks for future runsheet enabled and returns selected date if multipart is not selected
+       * @param {*}  customNaming
+       * @param {*}  jobIdGroupIdMap
+       * @param {*}  date
+       * @returns
+       * {
+       *     enableFutureDateRunsheet: boolean,
+       *     selectedDate:date
+       * }
+       */
+    getFutureRunsheetEnabledAndSelectedDate(customNaming, jobIdGroupIdMap, date) {
+        let enableFutureDateRunsheet = customNaming && customNaming.value && customNaming.value.enableFutureDateRunsheet && _.isEmpty(jobIdGroupIdMap) ? customNaming.value.enableFutureDateRunsheet : false
+        let selectedDate = (!date && enableFutureDateRunsheet) ? moment().format('YYYY-MM-DD') : date
+        if (!_.isEmpty(jobIdGroupIdMap)) selectedDate = null
+        return { enableFutureDateRunsheet, selectedDate }
+    }
 }
 
 export let jobTransactionService = new JobTransaction()

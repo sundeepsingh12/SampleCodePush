@@ -343,9 +343,16 @@ module.exports = {
     APPLYING_SETTINGS: 'Applying settings',
     VERIFY_HANDSET: 'Verifying handset',
     VERIFY_MOBILE: 'Verify your mobile',
-    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    OTP_CODE_SENT: 'OTP code has been sent to',
     ENTER_MOBILE: 'Enter your mobile',
     SEND_OTP: 'Send OTP',
+
+    //TaskListCalender
+    ALL: 'All',
+    TODAY: 'Today',
+
+    //TaskListScreen
+    NO_NEXT_STATUS: 'No NextStatus Available',
 
     //Draft Modal
     DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
