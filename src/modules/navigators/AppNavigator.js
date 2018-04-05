@@ -31,7 +31,6 @@ import TaskListScreen from '../../containers/TaskListScreen'
 import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
-import BulkConfiguration from '../../containers/BulkConfiguration'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import LiveJobListing from '../../containers/LiveJobListing'
 import LiveJob from '../../containers/LiveJob'
@@ -100,8 +99,9 @@ import SplitPayment from '../../containers/SplitPayment'
 import {
   createReduxBoundAddListener,
   createReactNavigationReduxMiddleware,
-} from 'react-navigation-redux-helpers';
+} from 'react-navigation-redux-helpers'
 import { setState } from '../global/globalActions'
+import BluetoothListing from '../../containers/BluetoothListing'
 
 
 class AppWithNavigationState extends React.PureComponent {
@@ -311,9 +311,6 @@ export const AppNavigator = StackNavigator({
   SignatureAndNps: {
     screen: SignatureAndNps
   },
-  BulkConfiguration: {
-    screen: BulkConfiguration
-  },
   BulkListing: {
     screen: BulkListing
   },
@@ -365,6 +362,10 @@ export const AppNavigator = StackNavigator({
       header: null,
       gesturesEnabled: false
     }
+  },
+  
+  BluetoothListing:{
+    screen:BluetoothListing
   }
 },
   {

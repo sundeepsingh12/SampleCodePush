@@ -56,6 +56,24 @@ class UserEvent {
     })
     return userEventLogsToBeSynced
   }
+
+  /**
+   * This function return events log to be synced
+   * @param {*} userEventsLogsList 
+   * @param {*} lastSyncTime 
+   * @returns
+   * [userEventLogs]
+   */
+  getUserEventLogsList(userEventsLogsList, lastSyncTime) {
+    let userEventLogsToBeSynced = [];
+    for (let userEventsLog in userEventsLogsList) {
+      // If event log captured time is after last sync time with server then has to be sent to server
+      if (moment(userEventsLogsList[userEventsLog].dateTime).isAfter(lastSyncTime)) {
+        userEventLogsToBeSynced.push(userEventsLogsList[userEventsLog]);
+      }
+    }
+    return userEventLogsToBeSynced;
+  }
 }
 
 export let userEventLogService = new UserEvent()

@@ -20,8 +20,10 @@ export default function jobDetailsReducer(state = initialState, action) {
     switch (action.type) {
         case JOB_DETAILS_FETCHING_START:
             return state.set('jobDetailsLoading', true)
+
         case IS_MISMATCHING_LOCATION:
             return state.set('statusList', action.payload)
+
         case JOB_DETAILS_FETCHING_END:
             return state.set('fieldDataList', action.payload.fieldDataList)
                 .set('jobDataList', action.payload.jobDataList)
@@ -33,18 +35,21 @@ export default function jobDetailsReducer(state = initialState, action) {
                 .set('draftStatusInfo', action.payload.draftStatusInfo)
                 .set('isEtaTimerShow', action.payload.isEtaTimerShow)
                 .set('jobExpiryTime', action.payload.jobExpiryTime)
+
         case RESET_STATE:
             return initialState
+
         case RESET_STATE_FOR_JOBDETAIL:
             return state.set('errorMessage', false)
                 .set('statusRevertList', [])
                 .set('jobDetailsLoading', false)
                 .set('draftStatusInfo', {})
+
         case SHOW_DROPDOWN:
             return state.set('isShowDropdown', action.payload)
+
         case SET_JOBDETAILS_DRAFT_INFO:
             return state.set('draftStatusInfo', action.payload)
-
     }
     return state
 }

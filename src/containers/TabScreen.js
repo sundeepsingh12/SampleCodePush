@@ -241,7 +241,7 @@ class TabScreen extends PureComponent {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.modules[START].displayName}</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>TEST</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>

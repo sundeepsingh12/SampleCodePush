@@ -1,6 +1,6 @@
 'use strict'
 
-import { setState } from '../../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../../global/globalActions'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { moduleCustomizationService } from '../../../services/classes/ModuleCustomization'
 import { upiPaymentService } from '../../../services/payment/UPIPayment'
@@ -26,13 +26,12 @@ export function getUPIPaymentParameters(jobMasterId, jobId) {
             const upiModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(modulesCustomization.value, UPIMODULE)[0]
             const upiConfigJSON = upiModule ? upiModule.remark ? JSON.parse(upiModule.remark) : null : null
             let customerName = upiPaymentService.getInitialUPIParameters(jobMasterId, jobId, upiConfigJSON)
-            console.log('username', customerName)
             dispatch(setState(SET_UPI_PAYMENT_PARAMETERS, {
                 customerName,
                 upiConfigJSON
             }))
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(501, error.message, 'danger', 1)
         }
     }
 }
@@ -42,7 +41,6 @@ export function approveTransactionAPIRequest(amount, customerName, customerConta
         try {
             const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
             const deviceIMEI = await keyValueDBService.getValueFromStore(DEVICE_IMEI)
-            console.log(customerName, customerContact, payerVPA, upiConfigJSON)
             if (!customerName || !customerContact || !payerVPA || !upiConfigJSON) {
                 throw new Exception('Invalid Parameters')
             }
@@ -56,7 +54,7 @@ export function approveTransactionAPIRequest(amount, customerName, customerConta
                 ))
             }
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(502, error.message, 'danger', 1)
         }
     }
 }
@@ -74,7 +72,7 @@ export function queryTransactionAPIRequest(transactionId) {
                 //TODO : update and save fielddatalist in form layout state
             }
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(503, error.message, 'danger', 1)
         }
     }
 }
@@ -86,7 +84,7 @@ export function testSave(actualAmount, currentElement, formElement, jobMasterId,
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransactionId, currentElement.positionId, latestPositionId)
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject))
         } catch (error) {
-
+            showToastAndAddUserExceptionLog(504, error.message, 'danger', 1)
         }
     }
 }

@@ -8,10 +8,11 @@ import {
   Platform,
   TouchableHighlight,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
+  TextInput
 }
   from 'react-native'
-import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner ,Icon as Iconimg} from 'native-base'
+import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -101,7 +102,7 @@ class Login extends PureComponent {
     const password = value.split("/")[1]
     this.onChangeUsername(username)
     this.onChangePassword(password)
-    this.props.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
+    this.props.authenticateUser(username, password, this.props.auth.form.rememberMe)
   }
 
   _onScaningCancelled = () => {
@@ -128,17 +129,17 @@ class Login extends PureComponent {
     }
     if (!this.props.auth.form.authenticationService) {
       return (
-        <TouchableOpacity onLongPress = {this.onLongPress}>
-        <Image
-          style={styles.logoStyle}
-          source={require('../../images/fareye-logo.png')}
-        />
+        <TouchableOpacity onLongPress={this.onLongPress}>
+          <Image
+            style={styles.logoStyle}
+            source={require('../../images/fareye-logo.png')}
+          />
         </TouchableOpacity >
       )
     }
   }
 
-  onLongPress = () =>{
+  onLongPress = () => {
     Alert.alert(
       CONFIRM_RESET,
       RESET_ACCOUNT_SETTINGS,
@@ -157,82 +158,112 @@ class Login extends PureComponent {
     this.props.navigation.navigate(QrCodeScanner, { returnData: this._onBarCodeRead.bind(this) })
   }
 
+  showUsernameView() {
+    return (
+      <Item rounded style={[styles.marginBottom10]}>
+        <TextInput
+          value={this.props.auth.form.username}
+          autoCapitalize="none"
+          placeholder='Username'
+          underlineColorAndroid='transparent'
+          onChangeText={this.onChangeUsername}
+          disabled={this.props.auth.form.isEditTextDisabled}
+          style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
+        />
+      </Item>
+    )
+  }
+
+  showPasswordView() {
+    return (
+      <Item rounded style={[styles.marginBottom10]}>
+        <TextInput
+          value={this.props.auth.form.password}
+          placeholder='Password'
+          underlineColorAndroid='transparent'
+          secureTextEntry={true}
+          onChangeText={this.onChangePassword}
+          onSubmitEditing={this.loginButtonPress}
+          disabled={this.props.auth.form.isEditTextDisabled}
+          style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
+        />
+        {this.showForgetPasswordView()}
+      </Item>
+    )
+  }
+
+  showForgetPasswordView() {
+    return (
+      <Iconimg
+        name='ios-help-circle-outline'
+        onPress={() => {
+          this.props.forgetPasswordRequest(this.props.auth.form.username)
+        }
+        }
+        style={{ right: 5, position: 'absolute', color: 'black', backgroundColor: 'white' }} />
+    )
+  }
+
+  showLoginButton() {
+    return (
+      <Button
+        full rounded success
+        disabled={this.props.auth.form.isButtonDisabled}
+        onPress={this.loginButtonPress}
+        style={[styles.marginTop15]}
+      >
+        <Text style={[styles.fontWhite]}>Log In</Text>
+      </Button>
+    )
+  }
+
+  showRememberMe() {
+    return (
+      <View style={[styles.row, styles.flex1, styles.justifyStart, styles.marginTop15]}>
+        <CheckBox checked={this.props.auth.form.rememberMe}
+          onPress={this.rememberMe} />
+        <Text style={{ marginLeft: 20 }} onPress={this.rememberMe}>{REMEMBER_ME}</Text>
+      </View>
+    )
+  }
+
+  showDisplayMessageAndScanner() {
+    return (
+      <View style={[styles.marginTop30]}>
+        <Text style={[styles.fontCenter, styles.fontDanger, styles.marginBottom10]}>
+          {this.props.auth.form.displayMessage}
+        </Text>
+        <Button
+          onPress={this.startScanner} full rounded>
+          <Text style={[styles.fontWhite]}>Scanner</Text>
+        </Button>
+      </View>
+    )
+  }
+
   render() {
     const imageView = this.getImageView()
     return (
-          <StyleProvider style={getTheme(platform)}>
-            <Container>
-              <Content>
-                <View style={style.container}>
-                  <View style={style.logoContainer}>
-                    {imageView}
-                  </View>
-                  <View style={[style.width70, styles.marginTop30]}>
-                    <Item rounded style={[styles.marginBottom10]}>
-                      <Input
-                        value={this.props.auth.form.username}
-                        autoCapitalize="none"
-                        placeholder='Username'
-                        onChangeText={this.onChangeUsername}
-                        disabled={this.props.auth.form.isEditTextDisabled}
-                        style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
-                      />
-                    </Item>
-                    <Item rounded>
-                      <Input
-                        value={this.props.auth.form.password}
-                        placeholder='Password'
-                        secureTextEntry={true}
-                        onChangeText={this.onChangePassword}
-                        onSubmitEditing={this.loginButtonPress}
-                        disabled={this.props.auth.form.isEditTextDisabled}
-                        style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, {height: 40}]}
-                      />
-                      <Iconimg  
-                        name='ios-help-circle-outline' 
-                        onPress={()=> {
-                          this.props.forgetPasswordRequest(this.props.auth.form.username)
-                          }
-                        } 
-                        style={{right:5, position: 'absolute', color: 'black', backgroundColor: 'white'}} />
-                    </Item>
+      <StyleProvider style={getTheme(platform)}>
+        <Container>
+          <Content>
+            <View style={style.container}>
+              <View style={style.logoContainer}>
+                {imageView}
+              </View>
+              <View style={[style.width70, styles.marginTop30]}>
+                {this.showUsernameView()}
+                {this.showPasswordView()}
+                {this.showLoginButton()}
+                {this.showRememberMe()}
+                {this.showDisplayMessageAndScanner()}
 
-                    <Button
-                      full rounded success
-                      disabled={this.props.auth.form.isButtonDisabled}
-                      onPress={this.loginButtonPress}
-                      style={[styles.marginTop15]}
-                    >
-                      <Text style={[styles.fontWhite]}>Log In</Text>
-                    </Button>
+              </View>
+            </View>
+          </Content>
+        </Container>
 
-                    <View style={[styles.row, styles.flex1, styles.justifyStart, styles.marginTop15]}>
-                      <CheckBox checked={this.props.auth.form.rememberMe}
-                        onPress={this.rememberMe} />
-                      <Text style={{ marginLeft: 20 }} onPress={this.rememberMe}>{REMEMBER_ME}</Text>
-                    </View>
-
-                    <View style={[styles.marginTop30]}>
-                      <Text style={[styles.fontCenter, styles.fontDanger, styles.marginBottom10]}>
-                        {this.props.auth.form.displayMessage}
-                      </Text>
-                      <Button
-                        onPress={this.startScanner} full rounded>
-                        <Text style={[styles.fontWhite]}>Scanner</Text>
-                      </Button>
-                    </View>
-                    {/* <View style={{ marginTop: 15 }}>
-                      <Button
-                        onPress={this.codepushSync} rounded style={{ width: '100%', }}>
-                        <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>Code Push Sync</Text>
-                      </Button>
-                    </View> */}
-                  </View>
-                </View>
-              </Content>
-            </Container>
-            
-          </StyleProvider>
+      </StyleProvider>
     )
   }
 };

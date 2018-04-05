@@ -320,6 +320,7 @@ module.exports = {
     //Error Messages
     USER_NOT_FOUND: 'User Not Found',
     SERVICE_ALREADY_SCHEDULED: 'Service Already Scheduled',
+    UNKNOWN_PAGE_TYPE: 'Unknown page type. Contact support',
 
 
     //Custom App
@@ -358,4 +359,30 @@ module.exports = {
     //Offline DS Actiions
     LAST_SYNCED: 'Last synced   ',
     NEVER_SYNCED: 'Never Synced',
+
+    //PAGES Constants
+    PAGE_TABS: 1,
+    PAGE_NEW_JOB: 2,
+    PAGE_BULK_UPDATE: 3,
+    PAGE_INLINE_UPDATE: 4,
+    PAGE_LIVE_JOB: 5,
+    PAGE_JOB_ASSIGNMENT: 6,
+    PAGE_OUTSCAN: 7,
+    PAGE_SEQUENCING: 8,
+    PAGE_CUSTOM_WEB_PAGE: 9,
+    PAGE_SORTING_PRINTING: 10,
+    PAGE_PICKUP: 11,
+    PAGE_STATISTICS: 12,
+    PAGE_PROFILE: 13,
+    PAGE_OFFLINE_DATASTORE: 14,
+    PAGE_BACKUP: 15,
+    PAGE_BLUETOOTH_PAIRING: 16,
+    PAGE_MSWIPE_INITIALIZE: 17,
+    PAGE_EZETAP_INITIALIZE: 18,
+    PAGE_PAYNEAR_INITIALIZE: 19,
+    PAGE_MOSAMBEE_INITIALIZE: 20,
+
+    //PAGE UTILITY Constants
+    PAGE_SUMMARY_PIECHART: 1,
+    PAGE_MESSAGING: 2,
 }

@@ -1,6 +1,6 @@
 'use strict'
 
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     ADD_FORM_LAYOUT_STATE,
     LOADER_IS_RUNNING,
@@ -32,12 +32,14 @@ export function setStateFromNavigationParams(formLayout, transientFormLayoutMap,
                         statusName: currentStatus.nextStatusList[0].name,
                         jobMasterId: jobMasterId,
                         navigationFormLayoutStates: cloneTransientFormLayoutMap,
+                        latestPositionId: formLayout.latestPositionId
                     }))
                 }
                 draftService.saveDraftInDb(formLayout, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
             }
         } catch (error) {
-            console.log(error)
+            dispatch(setState(LOADER_IS_RUNNING, false))            
+            showToastAndAddUserExceptionLog(2501, error.message, 'danger', 1)
         }
     }
 }

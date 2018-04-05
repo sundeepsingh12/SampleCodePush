@@ -103,34 +103,44 @@ class Signature extends PureComponent {
     }
     onDragEvent = () => {
         this.setState({ isSaveDisabled: false })
-        console.log("dragged");
     }
 
+    headerView() {
+        let view
+        view = <Header searchBar style={[styles.bgWhite, style.header]}>
+            <Body>
+                <View
+                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                    <TouchableOpacity style={[style.headerLeft]} onPress={() => {
+                        this.setState({ isLandscape: 'portrait' })
+                        this.props.navigation.goBack(null)
+                    }}>
+                        <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
+                    </TouchableOpacity>
+                    <View style={[style.headerBody]}>
+                        <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
+                    </View>
+                    <TouchableOpacity style={[style.headerRight]}
+                        onPress={this.resetSign} >
+                        <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
+                    </TouchableOpacity>
+                    <View />
+                </View>
+            </Body>
+        </Header>
+        return view
+    }
+    saveSignButton() {
+        return <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
+            onPress={this.saveSign} >
+            <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
+        </TouchableOpacity>
+    }
     render() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={[styles.bgWhite, style.header]}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => {
-                                    this.setState({ isLandscape: 'portrait' })
-                                    this.props.navigation.goBack(null)
-                                }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontBlack, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontBlack, styles.fontLg, styles.alignCenter]}>Signature</Text>
-                                </View>
-                                <TouchableOpacity style={[style.headerRight]}
-                                    onPress={this.resetSign} >
-                                    <Text style={[styles.fontBlack, styles.fontLg, styles.fontRight]}>Clear</Text>
-                                </TouchableOpacity>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                    {this.headerView()}
                     <View style={[styles.flex1, styles.row]}>
                         <View style={{ borderWidth: 1 }}>
                             {renderIf(this.props.isRemarksValidation && this.props.fieldDataList.length > 0,
@@ -148,12 +158,7 @@ class Signature extends PureComponent {
                                 showTitleLabel={false}
                                 viewMode={this.state.isLandscape} />
                         </View>
-                        {/* {renderIf(this.props.navigation.state.params.currentElement.attributeTypeId == SIGNATURE, */}
-                        <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
-                            onPress={this.saveSign} >
-                            <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
-                        </TouchableOpacity>
-                        {/* )} */}
+                        {this.saveSignButton()}
                     </View>
                 </Container>
             </StyleProvider >

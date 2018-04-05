@@ -48,7 +48,7 @@ import cameraReducer from './camera/cameraReducer'
 import autoLogout from './autoLogout/autoLogoutReducer'
 import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 import backup from './backup/backupReducer'
-// import profile from './profile/profileReducer'
+import bluetooth from './bluetooth/bluetoothReducer'
 
 
 /**
@@ -97,6 +97,7 @@ const rootReducer = combineReducers({
   dataStoreFilterReducer,
   backup,
   multipleOptionsAttribute,
+  bluetooth
 })
 
 // const rootReducer = (state, action) => {

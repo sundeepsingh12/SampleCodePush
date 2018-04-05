@@ -42,6 +42,7 @@ import { NavigationActions } from 'react-navigation'
 import {
     OK
 } from '../lib/ContainerConstants'
+import Line1Line2View from '../components/Line1Line2View'
 
 
 function mapStateToProps(state) {
@@ -167,81 +168,88 @@ class LiveJob extends PureComponent {
                 </View>)
         }
     }
+
+    showHeaderView() {
+        return (
+            <Header searchBar style={[styles.bgPrimary, style.header]}>
+                <Body>
+                    <View
+                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                        <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                        </TouchableOpacity>
+                        <View style={[style.headerBody]}>
+                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Live Task</Text>
+                        </View>
+                        <View style={[style.headerRight]}>
+                        </View>
+                        <View />
+                    </View>
+                </Body>
+            </Header>
+        )
+    }
+
+    showJobDataList(){
+        return (
+            <Content>
+                {renderIf(!this.props.isLoading,
+                    <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+                        <ExpandableHeader
+                            title={'Basic Details'}
+                            dataList={this.props.jobDataList}
+                        />
+                    </View>)}
+            </Content>
+        )
+    }
+
+    showJobMasterIdentifierAndLine1() {
+        return (
+            <View style={style.seqCard}>
+                <View style={style.seqCircle}>
+                    <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
+                        {this.props.navigation.state.params.job.jobMasterIdentifier}
+                    </Text>
+                </View>
+                <Line1Line2View data = {this.props.navigation.state.params.job}/>
+            </View>
+        )
+    }
+    
+    onButtonPress = (status) => {
+        this.props.actions.acceptOrRejectJob(status, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)
+    }
+
+    showAccepRejectButtons() {
+        if (!this.state.counterNegative && !this.props.isLoading) {
+            return <View style={[styles.row, styles.bgWhite]}>
+                <View style={[styles.padding10, styles.paddingRight5, styles.flexBasis50]}>
+                    <Button full style={[styles.bgDanger]} onPress={() => this.onButtonPress(2)}>
+                        <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
+                    </Button>
+                </View>
+                <View style={[styles.padding10, styles.paddingLeft5, styles.flexBasis50]}>
+                    <Button full style={[styles.bgSuccess]} onPress={() => this.onButtonPress(1)}>
+                        <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
+                    </Button>
+                </View>
+            </View>
+        }
+    }
     render() {
-        let remainingTime = this.renderTime()
-        let loader = this.getLoader()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container style={[styles.bgLightGray]}>
-                    <Header searchBar style={[styles.bgPrimary, style.header]}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Live Task</Text>
-                                </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                    {this.showHeaderView()}
                     <View style={{ flexDirection: 'column' }}>
-                        <View style={style.seqCard}>
-                            <View style={style.seqCircle}>
-                                <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-                                    {this.props.navigation.state.params.job.jobMasterIdentifier}
-                                </Text>
-                            </View>
-                            <View style={style.seqCardDetail}>
-                                <View>
-                                    <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                                        {this.props.navigation.state.params.job.line1}
-                                    </Text>
-                                    <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                                        {this.props.navigation.state.params.job.line2}
-                                    </Text>
-                                    <Text
-                                        style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-                                        {this.props.navigation.state.params.job.circleLine1}
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-                        {loader}
-
-                        {remainingTime}
-
-                        {renderIf(!this.state.counterNegative && !this.props.isLoading,
-                            <View style={[styles.row, styles.bgWhite]}>
-                                <View style={[styles.padding10, styles.paddingRight5, styles.flexBasis50]}>
-                                    <Button full style={[styles.bgDanger]} onPress={() => this.props.actions.acceptOrRejectJob(2, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)}>
-                                        <Text style={[styles.fontWhite, styles.fontDefault]}>Reject</Text>
-                                    </Button>
-                                </View>
-                                <View style={[styles.padding10, styles.paddingLeft5, styles.flexBasis50]}>
-                                    <Button full style={[styles.bgSuccess]} onPress={() => this.props.actions.acceptOrRejectJob(1, this.props.jobTransaction, this.props.navigation.state.params.liveJobList)}>
-                                        <Text style={[styles.fontWhite, styles.fontDefault]}>Accept</Text>
-                                    </Button>
-                                </View>
-                            </View>)}
+                        {this.showJobMasterIdentifierAndLine1()}
+                        {this.getLoader()}
+                        {this.renderTime()}
+                        {this.showAccepRejectButtons()}
                     </View>
-                    <Content>
-                        {/*Basic Details*/}
-                        {renderIf(!this.props.isLoading,
-                            <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
-                                <ExpandableHeader
-                                    title={'Basic Details'}
-                                    dataList={this.props.jobDataList}
-                                />
-                            </View>)}
-                    </Content>
-                    <Footer style={[style.footer]}>
-
-                    </Footer>
+                    {this.showJobDataList()}
+                    <Footer style={[style.footer]} />
                 </Container >
             </StyleProvider >
         )
