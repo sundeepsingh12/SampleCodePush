@@ -12,7 +12,7 @@ import {
   TextInput
 }
   from 'react-native'
-import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner, Icon as Iconimg } from 'native-base'
+import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -165,6 +165,7 @@ class Login extends PureComponent {
           value={this.props.auth.form.username}
           autoCapitalize="none"
           placeholder='Username'
+          underlineColorAndroid='transparent'
           onChangeText={this.onChangeUsername}
           disabled={this.props.auth.form.isEditTextDisabled}
           style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
@@ -179,6 +180,7 @@ class Login extends PureComponent {
         <TextInput
           value={this.props.auth.form.password}
           placeholder='Password'
+          underlineColorAndroid='transparent'
           secureTextEntry={true}
           onChangeText={this.onChangePassword}
           onSubmitEditing={this.loginButtonPress}

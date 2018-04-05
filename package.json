@@ -45,7 +45,7 @@
     "react-native-swipe-gestures": "1.0.2",
     "react-native-vector-icons": "4.5.0",
     "react-native-zip-archive": "2.2.2",
-    "react-navigation": "1.5.8",
+    "react-navigation": "1.5.10",
     "react-navigation-redux-helpers": "1.0.3",
     "react-redux": "5.0.7",
     "realm": "2.2.15",

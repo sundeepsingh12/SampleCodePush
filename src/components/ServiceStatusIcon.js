@@ -29,7 +29,6 @@ import {
 class ServiceStatusIcon extends React.PureComponent {
 
   getIconBasedOnState(status) {
-    console.log(status);
     switch(status) {
       case SERVICE_PENDING:
         return <Ionicons name="ios-clock-outline" style={[feStyle.fontDarkGray, feStyle.fontXxl]} />

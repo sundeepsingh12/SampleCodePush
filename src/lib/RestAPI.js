@@ -200,28 +200,16 @@ class RestAPI {
         { name: 'file', filename: (!fileName) ? 'sync.zip' : fileName, data: RNFetchBlob.wrap(filePath) },
       ]).uploadProgress((written, total) => {
       }).then(async (resp) => {
-        if (!path) {
-          responseBody = resp.text()
-          const message = responseBody.split(",")[0]
-          const syncCount = responseBody.split(",")[1]
-          if (message == 'success') {
-            //do something
-            if (currenDate) {
-              await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
-            }
-            await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-            // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+        responseBody = resp.text()
+        const message = responseBody.split(",")[0]
+        if (!path && message == 'success') {
+          if (currenDate) {
+          await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
           }
-          else {
-            throw new Error(responseBody)
-          }
-        } else {
-          responseBody = resp.text()
-          console.log('responseBody', responseBody)
-          const message = responseBody.split(",")[0]
-          if (message != 'success') {
-            throw new Error(responseBody)
-          }
+          await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+        }
+        else if (message != 'success') {
+          throw new Error(responseBody)
         }
       }).catch(err => {
         throw {

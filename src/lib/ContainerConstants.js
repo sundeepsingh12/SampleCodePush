@@ -12,6 +12,13 @@ module.exports = {
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
     VERIFY: 'Verify',
+    SELECT_ALL: 'Select All',
+    INVALID_SCAN: 'Invalid Scan',
+    NO_JOBS_PRESENT: 'No jobs present',
+    TOTAL_COUNT: 'Total Count : ',
+
+    //Common Error Strings
+    JOB_STATUS_MISSING: 'Job status missing in store',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -44,6 +51,7 @@ module.exports = {
     JOB_ASSIGNMENT_DISPLAY: 'Job Assignment',
     CUSTOM_APP_DISPLAY: 'Web URL',
     SORTING_DISPLAY: 'Sort Parcels',
+    UNTITLED: 'UNTITLED',
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
@@ -118,7 +126,6 @@ module.exports = {
     SEARCH_TEXT_MISSING: 'searchText not present',
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
     TOKEN_MISSING: 'Token missing',
-    INVALID_SCAN: 'Invalid Scan',
     JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
 
     //Sync service
@@ -219,7 +226,6 @@ module.exports = {
     OPEN_CAMERA: 'Open Camera',
 
     //Array
-    TOTAL_COUNT: 'Total Count : ',
     ADD: 'Add',
     ADD_ROW_ERROR: 'Row could not be added',
     DELETE_ROW_ERROR: 'Row could not be deleted',
@@ -276,9 +282,7 @@ module.exports = {
 
     //Live job
     LIVE_TASKS: 'Live Tasks',
-    NO_JOBS_PRESENT: 'No jobs present',
     FILTER_REF_NO: 'Filter Reference Numbers',
-    SELECT_ALL: 'SELECT ALL',
     ACCEPT: 'ACCEPT',
     REJECT: 'REJECT',
 
@@ -286,10 +290,13 @@ module.exports = {
     BULK_UPDATE: 'Bulk Update',
     SELECT_STATUS_FOR_BULK: 'Select Status you would like to Bulk Update',
     NEXT_POSSIBLE_STATUS: 'Next possible status',
+    SELECT_NONE: 'Select None',
+    COULD_NOT_SEARCH: 'Could not search',
+    UPDATE_ALL_SELECTED: 'Update All Selected',
 
     //Sorting
     SORTING: 'Sorting',
-    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
+    REF_UNAVAILABLE: 'Reference Number Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
 
@@ -327,19 +334,23 @@ module.exports = {
     REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP:'Setting you up...',
-    DOWNLOAD_SETTINGS:'Downloading settings',
-    APPLYING_SETTINGS:'Applying settings',
-    VERIFY_HANDSET:'Verifying handset',
-    VERIFY_MOBILE:'Verify your mobile',
-    OTP_CODE_SENT:'OTP code hasbeen sent to',
-    ENTER_MOBILE:'Enter your mobile',
-    SEND_OTP:'Send OTP',
+    SETTING_UP: 'Setting you up...',
+    DOWNLOAD_SETTINGS: 'Downloading settings',
+    APPLYING_SETTINGS: 'Applying settings',
+    VERIFY_HANDSET: 'Verifying handset',
+    VERIFY_MOBILE: 'Verify your mobile',
+    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    ENTER_MOBILE: 'Enter your mobile',
+    SEND_OTP: 'Send OTP',
 
     // Job Summary
     UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
     VALUE_OF_JOBSUMMARY_IS_MISSING: 'Value of JobSummary is missing',
 
-     //Data Store
-     SEARCH: 'Search',
+    //Data Store
+    SEARCH: 'Search',
+
+    //Menu Container Constants
+    APP: 'App',
+    LOGOUT: 'Logout'
 }
