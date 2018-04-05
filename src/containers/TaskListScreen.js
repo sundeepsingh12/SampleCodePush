@@ -131,7 +131,6 @@ class TaskListScreen extends PureComponent {
         }
       }
       if(transactionList.length > 0){
-      value.total = transactionList.length
       value.jobTransactions = transactionList
       value.seqSelected = value.jobTransactions[0].seqSelected
       jobTransactionArray.push(value)
@@ -147,15 +146,6 @@ class TaskListScreen extends PureComponent {
       return transaction1.seqSelected - transaction2.seqSelected
     })
     return jobTransactionArray
-  }
-
-  renderItem = (row) => {
-    return (
-      <JobListItem
-        data={row.item}
-        onPressItem={() => { this.navigateToScene(row.item) }}
-      />
-    )
   }
 
   renderSectionHeader = (row) => {
@@ -208,7 +198,7 @@ class TaskListScreen extends PureComponent {
     })
     let groupId = null,lastId = null
     if(items.groupId && items.total > 1){
-      lastId = jobTransactions[items.total-1]['id']
+      lastId = jobTransactions[items.jobTransactions.length-1]['id']
       groupId = items.groupId
     }
     return (
@@ -249,8 +239,9 @@ class TaskListScreen extends PureComponent {
     return (
       <SectionList
         sections={this.renderListForAll()}
-        renderItem={this.renderItem}
+        renderItem={({ item }) => this.renderData(item)}
         renderSectionHeader={this.renderSectionHeader}
+        keyExtractor={item => String(item.id)}
       />
     )
   }

@@ -87,7 +87,8 @@ class SequenceRunsheetList extends Component {
         return (
             <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.navigateToScene(Sequence, {
                 runsheetNumber: item,
-                displayName: this.props.navigation.state.params.displayName
+                displayName: this.props.navigation.state.params.displayName,
+                jobMasterIds: this.props.navigation.state.params.jobMasterIds
             })}>
                 <Text style={[styles.fontDefault, styles.fontWeight500]}>{item}</Text>
                 <Right>

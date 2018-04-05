@@ -37,11 +37,11 @@ import _ from 'lodash'
 
 /**
  * @param {*} runsheetNumber 
- * 
- * This method prepare jobTransaction list for given runsheet 
+ * @param {*} jobMasterIds
+ * This method prepare jobTransaction list for given runsheet and jobMasterIds
  * and check if there is duplicate sequence number present or not
  */
-export function prepareListForSequenceModule(runsheetNumber) {
+export function prepareListForSequenceModule(runsheetNumber, jobMasterIds) {
     return async function (dispatch) {
         try {
             //Set loader
@@ -51,8 +51,8 @@ export function prepareListForSequenceModule(runsheetNumber) {
             //is enabled then we can change text for line1, line2, circle1, circle2
             const jobMasterSeperatorMap = sequenceService.createSeperatorMap(jobMasterIdCustomizationMap)
 
-            //get jobTransaction List with given runsheet number
-            const sequenceList = await sequenceService.getSequenceList(runsheetNumber)
+            //get jobTransaction List with given runsheet number and jobMasterIds
+            const sequenceList = await sequenceService.getSequenceList(runsheetNumber, JSON.parse(jobMasterIds))
             // case of Auto-Sequencing :- check for duplicate sequence if present then add those transactions whose sequence is changed to a temprorary map i.e. transactionsWithChangedSeqeunceMap
             const { isDuplicateSequenceFound, sequenceArray, transactionsWithChangedSeqeunceMap } = await sequenceService.checkForAutoSequencing(sequenceList, jobMasterSeperatorMap)
             dispatch(setState(SEQUENCE_LIST_FETCHING_STOP, {
@@ -107,24 +107,27 @@ export function resequenceJobsFromServer(sequenceList) {
 /**
  * This method get all runsheet available and if only one runsheet is present
  * then navigate to sequence container if no runsheet is present then show a toast
- * @param {*String} displayName //name visible on header 
+ * @param {*String} pageObject //pageobject from server 
  */
-export function getRunsheetsForSequence(displayName) {
+export function getRunsheetsForSequence(pageObject) {
     return async function (dispatch) {
         try {
             //set loader to true
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             //get all runsheet
+            //TODO get runsheets for selected jobMasters
             const runsheetNumberList = await runSheetService.getRunsheets()
             dispatch(setState(SET_RUNSHEET_NUMBER_LIST, runsheetNumberList))
             //In case of single runsheet navigate to sequence container
             if (_.size(runsheetNumberList) == 1) {
                 dispatch(navigateToScene(Sequence, {
-                    runsheetNumber: runsheetNumberList[0]
+                    runsheetNumber: runsheetNumberList[0],
+                    jobMasterIds: pageObject.jobMasterIds
                 }))
             } else if (_.size(runsheetNumberList) > 1) {//if more than 1 runsheet present then show list
                 dispatch(navigateToScene(SequenceRunsheetList, {
-                    displayName
+                    displayName: pageObject.name,
+                    jobMasterIds: pageObject.jobMasterIds
                 }))
             }
         } catch (error) {

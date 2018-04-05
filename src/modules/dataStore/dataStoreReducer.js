@@ -60,6 +60,7 @@ export default function dataStoreReducer(state = initialState, action) {
                 .set('isMinMaxValidation', action.payload.validation.isMinMaxValidation)
                 .set('isSearchEnabled', action.payload.validation.isSearchEnabled)
                 .set('loaderRunning', false)
+                .set('isAllowFromFieldInExternalDS', action.payload.validation.isAllowFromFieldInExternalDS)
 
         case SEARCH_DATA_STORE_RESULT:
             return state.set('dataStoreAttrValueMap', action.payload.dataStoreAttrValueMap)

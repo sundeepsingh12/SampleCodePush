@@ -294,9 +294,13 @@ class AddServerSms {
     * @param {String} transactionIdDtos 
     */
     async setServerSmsMapForPendingStatus(transactionIdDtosMap) {
-        if (_.isEmpty(transactionIdDtosMap)) return
+        if (_.isEmpty(transactionIdDtosMap)) {
+            return
+        }
         let serverSmsMap = await this.prepareServerSmsMap()
-        if (_.isEmpty(serverSmsMap)) return
+        if (_.isEmpty(serverSmsMap)) {
+            return
+        }
         let user = await keyValueDBService.getValueFromStore(USER);
         let serverSmsLogs = []
         for (let jobMasterId in transactionIdDtosMap) {
@@ -322,14 +326,14 @@ class AddServerSms {
         let serverSmsLogList
         if (serverSmsLogs && serverSmsLogs.length > 0) {
             serverSmsLogList = this.saveServerSmsLog(serverSmsLogs)
-            await realm.performBatchSave(serverSmsLogList)
+            realm.performBatchSave(serverSmsLogList)
         }
     }
+
     getServerSmsLogs(serverSmsLogs, lastSyncTime) {
         let serverSmsLogsToBySynced = []
-
         serverSmsLogs.forEach(serverSmsLog => {
-            if (moment(serverSmsLog.dateTime).isAfter(lastSyncTime.value)) {
+            if (moment(serverSmsLog.dateTime).isAfter(lastSyncTime)) {
                 serverSmsLogsToBySynced.push(serverSmsLog)
             }
         })

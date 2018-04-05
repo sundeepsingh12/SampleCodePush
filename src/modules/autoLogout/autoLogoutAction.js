@@ -16,6 +16,7 @@ export function setAutoLogout() {
         //     }            
         } catch (error) {
             console.log(error)
+        //         dispatch(setState(SET_LOADER_IN_AUTOLOGOUT,false))                
         }
     }
 }

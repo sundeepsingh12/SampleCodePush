@@ -48,8 +48,8 @@ export function fetchJobs(date) {
       const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
       dispatch(setState(JOB_LISTING_START))
       const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-      let jobMasterListWithMultipart = jobTransactionService.getEnableMultiPartJobMaster(jobTransactionCustomizationListParametersDTO.jobMasterList)
-      let jobIdGroupIdMap = jobMasterListWithMultipart && jobMasterListWithMultipart.length > 0 ?  jobTransactionService.getJobIdGroupIdMap(jobMasterListWithMultipart) : {}
+      let jobMasterIdListWithMultipart = jobTransactionService.getEnableMultiPartJobMaster(jobTransactionCustomizationListParametersDTO.jobMasterList)
+      let jobIdGroupIdMap = jobMasterIdListWithMultipart && jobMasterIdListWithMultipart.length > 0 ?  jobTransactionService.getJobIdGroupIdMap(jobMasterIdListWithMultipart) : {}
       let enableFutureDateRunsheet = customNaming && customNaming.value && customNaming.value.enableFutureDateRunsheet && _.isEmpty(jobIdGroupIdMap) ? customNaming.value.enableFutureDateRunsheet : false
       dispatch(setState(FUTURE_RUNSHEET_ENABLED, enableFutureDateRunsheet))
       if(_.isUndefined(date) && customNaming.value.enableFutureDateRunsheet) date = moment().format('YYYY-MM-DD')

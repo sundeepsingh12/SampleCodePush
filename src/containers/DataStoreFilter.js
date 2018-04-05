@@ -31,6 +31,7 @@ function mapStateToProps(state) {
         DSFSearchText: state.dataStoreFilterReducer.DSFSearchText,
         cloneDataStoreFilterList: state.dataStoreFilterReducer.cloneDataStoreFilterList,
         dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
+        arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
     }
 }
 
@@ -43,15 +44,29 @@ function mapDispatchToProps(dispatch) {
 class DataStoreFilter extends PureComponent {
 
     componentDidMount() {
-        this.props.actions.getDSFListContent(this.props.currentElement,
-            this.props.formElement,
-            this.props.jobTransaction,
-            this.props.dataStoreFilterReverseMap)
+        //case if DSF is in Array
+        if (this.props.calledFromArray) {
+            this.props.actions.getDSFListContentForArray({
+                currentElement: this.props.currentElement,
+                formElement: this.props.formElement,
+                jobTransaction: this.props.jobTransaction,
+                arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
+                rowId: this.props.rowId,
+                arrayFieldAttributeMasterId: this.props.arrayFieldAttributeMasterId
+            })
+        } else {
+            this.props.actions.getDSFListContent(
+                this.props.currentElement,
+                this.props.formElement,
+                this.props.jobTransaction,
+                this.props.dataStoreFilterReverseMap
+            )
+        }
     }
 
     _dropModal() {
         this.props.actions.setState(SET_DSF_INITIAL_STATE)
-        this.props.onClose()
+        this.props.onClose(this.props.currentElement) // when modal is closed it will call either FormLayout method or ArrayFieldAtrribute method depending upon from where it is called
     }
 
     dataStoreFilterItemDetails(item) {
@@ -65,8 +80,13 @@ class DataStoreFilter extends PureComponent {
                     this.props.latestPositionId,
                     this.props.jobTransaction,
                     this.props.dataStoreFilterReverseMap,
-                    this.props.fieldAttributeMasterParentIdMap)
-                this._dropModal()
+                    this.props.fieldAttributeMasterParentIdMap,
+                    this.props.calledFromArray,
+                    this.props.rowId,
+                    this.props.arrayReverseDataStoreFilterMap,
+                    this.props.arrayFieldAttributeMasterId,
+                )
+                this.props.actions.setState(SET_DSF_INITIAL_STATE)
             }}>
             <View style={[styles.row, styles.alignCenter]}>
                 <Text style={[styles.fontDefault, styles.fontWeight300]}>{item}</Text>
@@ -128,13 +148,13 @@ class DataStoreFilter extends PureComponent {
                                     <View searchBar style={[styles.padding5]}>
                                         <Item rounded style={{ height: 30, backgroundColor: '#ffffff' }}>
                                             <Input placeholder={SEARCH}
-                                                style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 10 }]}
+                                                style={[styles.fontSm, styles.justifyCenter, { marginTop: 0, lineHeight: 15 }]}
                                                 onChangeText={(searchText) => {
                                                     this.onSearch(searchText)
                                                 }}
                                                 value={this.props.DSFSearchText}
                                             />
-                                            <Icon style={[styles.fontSm]} name="md-close"
+                                            <Icon style={[styles.fontLg, styles.padding5]} name="md-close"
                                                 onPress={() => {
                                                     this.onSearch('')
                                                 }}

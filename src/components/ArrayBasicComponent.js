@@ -46,7 +46,8 @@ import {
     OPTION_RADIO_VALUE,
     AFTER,
     BEFORE,
-    ADVANCE_DROPDOWN
+    ADVANCE_DROPDOWN,
+    DATA_STORE_FILTER,
 } from '../lib/AttributeConstants'
 import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
@@ -63,6 +64,8 @@ import {
     SELECTED,
     REMOVE
 } from '../lib/ContainerConstants'
+import DataStoreFilter from '../containers/DataStoreFilter'
+
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...arrayActions, ...globalActions }, dispatch)
@@ -140,7 +143,7 @@ class ArrayBasicComponent extends PureComponent {
                         latestPositionId={this.props.latestPositionId}
                         calledFromArray={true}
                         rowId={this.props.arrayRow.rowId}
-                        onCloseModal={this.onCloseModal}
+                        onCloseModal={() => this.onCloseModal(item)}
                         fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
                     />
                 </View>
@@ -154,12 +157,17 @@ class ArrayBasicComponent extends PureComponent {
                         transparent={true}
                         onRequestClose={() => this.onCloseModal(item)}>
                         <TouchableHighlight
-                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
-                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]} onPress={() => this.onCloseModal(item)}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .2 }}>
                                 <View>
-                                    <NPSFeedback
-                                        onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item}
-                                    />
+                                    <Text style={[styles.alignStart, styles.fontLg, styles.padding10]}>
+                                        Rating
+                                    </Text>
+                                    <View style={[styles.padding20, styles.justifyCenter]}>
+                                        <NPSFeedback
+                                            onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item}
+                                        />
+                                    </View>
                                 </View>
                             </TouchableHighlight>
                         </TouchableHighlight>
@@ -170,6 +178,25 @@ class ArrayBasicComponent extends PureComponent {
         if (attributeTypeId == TIME || attributeTypeId == DATE || attributeTypeId == RE_ATTEMPT_DATE) {
             return (
                 <TimePicker onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item} />
+            )
+        }
+
+        if (attributeTypeId == DATA_STORE_FILTER) {
+            return (
+                <View>
+                    <DataStoreFilter
+                        currentElement={item}
+                        formElement={this.props.arrayElements}
+                        isSaveDisabled={this.props.isSaveDisabled}
+                        jobTransaction={this.props.jobTransaction}
+                        latestPositionId={this.props.latestPositionId}
+                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
+                        onClose={this.onCloseModal}
+                        calledFromArray={true}
+                        rowId={this.props.arrayRow.rowId}
+                        arrayFieldAttributeMasterId={this.props.arrayFieldAttributeMasterId}
+                    />
+                </View>
             )
         }
         return null
@@ -192,7 +219,7 @@ class ArrayBasicComponent extends PureComponent {
         }
 
         if (item.value != ARRAY_SAROJ_FAREYE && item.value != OBJECT_SAROJ_FAREYE) {
-            return item.containerValue
+            return item.containerValue ? item.containerValue : item.value
         }
         return null
     }
@@ -325,11 +352,20 @@ class ArrayBasicComponent extends PureComponent {
                                         isSaveDisabled: this.props.isSaveDisabled,
                                         calledFromArray: true,
                                         rowId: this.props.arrayRow.rowId,
-                                        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                                        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
+                                        arrayFieldAttributeMasterId: this.props.arrayFieldAttributeMasterId
                                     })
                             }} />
                     </View>
                 )
+            case DATA_STORE_FILTER:
+                return (
+                    <View>
+                        {modalView}
+                        <FormLayoutActivityComponent item={item} press={() => this.onPressModal(item.fieldAttributeMasterId)} />
+                    </View>
+                )
+
             case QR_SCAN:
                 return (
                     <View>

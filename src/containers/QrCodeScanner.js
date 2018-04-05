@@ -20,14 +20,14 @@ import {
     StyleProvider
 } from 'native-base';
 
-import Camera from 'react-native-camera';
+import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as globalActions from '../modules/global/globalActions'
 import { SCANNING } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import platform from '../../native-base-theme/variables/platform'
-import getTheme from '../../native-base-theme/components';
+import getTheme from '../../native-base-theme/components'
 
 
 function mapStateToProps(state) {
@@ -78,14 +78,13 @@ class QrCodeScanner extends PureComponent {
                             </Body>
                         </Header>
                         <View style={style.rectangleContainer}>
-                            <Camera style={style.camera}
-                                type={Camera.constants.Type.back}
-                                playSoundOnCapture={true}
+                            <RNCamera style={style.camera}
+                                type={RNCamera.Constants.Type.back}
                                 onBarCodeRead={this._handleQrCodeRead.bind(this)}>
                                 <View style={style.rectangleContainer}>
                                     <View style={style.rectangle} />
                                 </View>
-                            </Camera>
+                            </RNCamera>
                         </View>
                     </Container>
                 </StyleProvider>

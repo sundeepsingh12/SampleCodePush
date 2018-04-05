@@ -4,8 +4,6 @@ const InitialState = require('./bulkInitialState').default
 
 const initialState = new InitialState()
 import {
-    START_FETCHING_BULK_CONFIG,
-    STOP_FETCHING_BULK_CONFIG,
     START_FETCHING_BULK_TRANSACTIONS,
     STOP_FETCHING_BULK_TRANSACTIONS,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM,
@@ -13,8 +11,13 @@ import {
     RESET_STATE,
     CLEAR_BULK_STATE,
     SET_BULK_SEARCH_TEXT,
-    SET_BULK_ERROR_MESSAGE
+    SET_BULK_ERROR_MESSAGE,
+    SET_BULK_TRANSACTION_PARAMETERS
 } from '../../lib/constants'
+
+import {
+    SELECT_ALL
+} from '../../lib/ContainerConstants'
 
 
 export default function bulkReducer(state = initialState, action) {
@@ -22,13 +25,14 @@ export default function bulkReducer(state = initialState, action) {
 
     switch (action.type) {
 
-        case START_FETCHING_BULK_TRANSACTIONS:
-        case START_FETCHING_BULK_CONFIG:
+        case START_FETCHING_BULK_TRANSACTIONS: {
             return state.set('isLoaderRunning', true)
-
-        case STOP_FETCHING_BULK_CONFIG:
-            return state.set('isLoaderRunning', false)
-                .set('bulkConfigList', action.payload)
+                .set('isSelectAllVisible', false)
+                .set('bulkTransactionList', {})
+                .set('selectedItems', {})
+                .set('searchText', null)
+                .set('selectAllNone', SELECT_ALL)
+        }
 
         case STOP_FETCHING_BULK_TRANSACTIONS:
             return state.set('isLoaderRunning', false)
@@ -37,6 +41,7 @@ export default function bulkReducer(state = initialState, action) {
                 .set('isManualSelectionAllowed', action.payload.isManualSelectionAllowed)
                 .set('searchSelectionOnLine1Line2', action.payload.searchSelectionOnLine1Line2)
                 .set('idToSeparatorMap', action.payload.idToSeparatorMap)
+                .set('nextStatusList', action.payload.nextStatusList)
 
         case TOGGLE_JOB_TRANSACTION_LIST_ITEM:
             return state.set('selectedItems', action.payload.selectedItems)
@@ -48,7 +53,7 @@ export default function bulkReducer(state = initialState, action) {
                 .set('selectAllNone', action.payload.displayText)
 
         case CLEAR_BULK_STATE:
-            return state.set('selectedItems', [])
+            return state.set('selectedItems', {})
                 .set('bulkTransactionList', {})
                 .set('selectAllNone', 'Select All')
                 .set('searchText', null)
@@ -61,6 +66,12 @@ export default function bulkReducer(state = initialState, action) {
         case SET_BULK_ERROR_MESSAGE:
             return state.set('errorToastMessage', action.payload)
                 .set('searchText', '')
+        case SET_BULK_TRANSACTION_PARAMETERS: {
+            return state.set('selectedItems', action.payload.selectedItems)
+                .set('bulkTransactionList', action.payload.bulkTransactions)
+                .set('selectAllNone', action.payload.displayText)
+                .set('searchText', action.payload.searchText)
+        }
     }
     return state
 }

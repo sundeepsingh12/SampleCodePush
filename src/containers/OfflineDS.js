@@ -11,7 +11,7 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import {
     SET_OFFLINEDS_INITIAL_STATE,
-    } from '../lib/constants'
+} from '../lib/constants'
 import {
     Container,
     Header,
@@ -20,7 +20,7 @@ import {
     Right,
     Icon,
     StyleProvider,
-    } from 'native-base'
+} from 'native-base'
 import {
     DOWNLOADING_OFFLINE_DS,
     DOWNLOAD_SUCCESSFUL,
@@ -82,7 +82,7 @@ class OfflineDS extends Component {
             return <View style={[styles.flexBasis100, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
-                        style={[style.imageSync]}
+                        style={[styles.imageSync]}
                         source={require('../../images/fareye-default-iconset/sync-cloud.png')}
                     />
                 </View>
@@ -129,7 +129,7 @@ class OfflineDS extends Component {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
-                        style={[style.imageSync]}
+                        style={[styles.imageSync]}
                         source={require('../../images/fareye-default-iconset/syncscreen/All_Done.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
@@ -154,7 +154,7 @@ class OfflineDS extends Component {
             return <View style={[styles.flex1, styles.justifySpaceBetween]}>
                 <View style={[styles.alignCenter, styles.justifyCenter, styles.flexBasis50]}>
                     <Image
-                        style={[style.imageSync]}
+                        style={[styles.imageSync]}
                         source={require('../../images/fareye-default-iconset/error.png')}
                     />
                     <Text style={[styles.fontBlack, styles.marginTop30]}>
@@ -176,24 +176,25 @@ class OfflineDS extends Component {
     }
 
     goBack = () => {
-        this.props.actions.setState(SET_OFFLINEDS_INITIAL_STATE)
+        if (this.props.downLoadingStatus != 1) {
+            this.props.actions.setState(SET_OFFLINEDS_INITIAL_STATE)
+        }
         this.props.navigation.goBack()
     }
 
+    componentWillUnmount() {
+        this.goBack()
+    }
+
     render() {
-        let headerView = this.headerView()
-        let initialScreen = this.initialScreen()
-        let DownloadingView = this.downLoadingView()
-        let successView = this.successView()
-        let failureView = this.failureView()
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    {headerView}
-                    {initialScreen}
-                    {DownloadingView}
-                    {successView}
-                    {failureView}
+                    {this.headerView()}
+                    {this.initialScreen()}
+                    {this.downLoadingView()}
+                    {this.successView()}
+                    {this.failureView()}
                 </Container>
             </StyleProvider>)
     }
@@ -222,11 +223,6 @@ const style = StyleSheet.create({
         width: '15%',
         padding: 15
     },
-    imageSync: {
-        width: 116,
-        height: 116,
-        resizeMode: 'contain'
-    }
 });
 
 /**

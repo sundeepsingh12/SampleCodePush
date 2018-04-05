@@ -40,11 +40,12 @@ import CONFIG from '../../lib/config'
 class Sequence {
 
     /**
-     * get jobTransaction List according to runsheet Number
-     * @param {*} runsheetNumber 
+     * get jobTransaction List according to runsheet Number and jobMasterIds
+     * @param {*} runsheetNumber
+     * @param {*} jobMasterIds // job master ids whose jobs are visible in this module 
      * @returns jobTransactionCustomizationList // jobTransacion List
      */
-    async getSequenceList(runsheetNumber) {
+    async getSequenceList(runsheetNumber, jobMasterIds) {
         if (!runsheetNumber) {
             throw new Error(RUNSHEET_NUMBER_MISSING)
         }
@@ -54,7 +55,8 @@ class Sequence {
         //get all jobTransaction List whose status is pending, runsheet number is as given in argument and delete flag != 1
         const { jobTransactionCustomizationList } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Sequence', {
             statusIds,
-            runsheetNumber
+            runsheetNumber,
+            jobMasterIds
         })
         return jobTransactionCustomizationList
     }

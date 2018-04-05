@@ -35,7 +35,8 @@ import { NavigationActions } from 'react-navigation'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import {
-    setState
+    setState,
+    showToastAndAddUserExceptionLog
 } from '../global/globalActions'
 import {
     Toast
@@ -44,7 +45,7 @@ import {
 export function prepareSkuList(fieldAttributeMasterId, jobId) {
     return async function (dispatch) {
         try {
-            dispatch(setState(SKU_LIST_FETCHING_START))
+            dispatch(setState(SKU_LIST_FETCHING_START, true))
             const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMasterId)
             const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId[0])
             const skuValidationForImageAndReason = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(fieldAttributeMasterId)
@@ -61,15 +62,15 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
             if (skuListingDto.isSkuCodePresent)
                 dispatch(setState(SHOW_SEARCH_BAR))
         } catch (error) {
-            console.log(error)
-            dispatch(setState(SKU_LIST_FETCHING_STOP))
+            dispatch(setState(SKU_LIST_FETCHING_START, false))    // false to stop sku loader        
+            showToastAndAddUserExceptionLog(2201, error.message, 'danger', 1)
         }
     }
 }
 
 export function scanSkuItem(skuListItems, skuCode) {
     return async function (dispatch) {
-
+//use try catch and dispatch showToastAndAddUserExceptionLog in catch
     }
 }
 
@@ -102,7 +103,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                 }))
             }
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(2202, error.message, 'danger', 1)
         }
     }
 
@@ -140,8 +141,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                 })
             }
         } catch (error) {
-            console.log(error)
-            //UI needs updating here
+            showToastAndAddUserExceptionLog(2203, error.message, 'danger', 1)
         }
 
     }

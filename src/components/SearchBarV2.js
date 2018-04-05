@@ -10,6 +10,7 @@ import styles from '../themes/FeStyle'
 import { QrCodeScanner } from '../lib/constants'
 import QRIcon from '../svg_components/icons/QRIcon'
 import _ from 'lodash'
+
 export default class SearchBarV2 extends PureComponent {
     _setQrValue = (value) => {
         this.props.returnValue(_.trim(value))

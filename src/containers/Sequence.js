@@ -90,7 +90,7 @@ class Sequence extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber)
+    this.props.actions.prepareListForSequenceModule(this.props.navigation.state.params.runsheetNumber, this.props.navigation.state.params.jobMasterIds)
   }
 
   /** 
@@ -391,7 +391,7 @@ class Sequence extends PureComponent {
   showToast() {
     Toast.show({
       text: `${this.props.responseMessage}`,
-      duration: 5000,
+      duration: Number.MAX_SAFE_INTEGER,
       position: 'bottom',
       buttonText: OK,
     })

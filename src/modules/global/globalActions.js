@@ -25,7 +25,9 @@ import {
   LIVE_JOB,
   USER_EVENT_LOG,
   PENDING_SYNC_TRANSACTION_IDS,
-  SHOULD_CREATE_BACKUP
+  BACKUP_ALREADY_EXIST,
+  USER_EXCEPTION_LOGS,
+  SYNC_RUNNING_AND_TRANSACTION_SAVING
 } from '../../lib/constants'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -42,7 +44,9 @@ import { onResyncPress } from '../home/homeActions'
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
 import { trackingService } from '../../services/classes/Tracking'
-
+import { Toast } from 'native-base'
+import { userExceptionLogsService } from '../../services/classes/UserException'
+import { OK } from '../../lib/ContainerConstants'
 
 export function setState(type, payload) {
   return {
@@ -71,9 +75,11 @@ export function deleteSessionToken() {
       await keyValueDBService.deleteValueFromStore(SAVE_ACTIVATED)
       await keyValueDBService.deleteValueFromStore(LIVE_JOB)
       await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS)
-      await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)            
+      await keyValueDBService.deleteValueFromStore(USER_EVENT_LOG)
       await keyValueDBService.deleteValueFromStore(JOB_SUMMARY)
-      await keyValueDBService.deleteValueFromStore(SHOULD_CREATE_BACKUP)
+      await keyValueDBService.deleteValueFromStore(BACKUP_ALREADY_EXIST)
+      await keyValueDBService.deleteValueFromStore(USER_EXCEPTION_LOGS)
+      await keyValueDBService.deleteValueFromStore(SYNC_RUNNING_AND_TRANSACTION_SAVING)
       await trackingService.destroy()
       BackgroundTimer.clearInterval(CONFIG.intervalId);
       CONFIG.intervalId = 0
@@ -81,6 +87,22 @@ export function deleteSessionToken() {
     } catch (error) {
       throw error
     }
+  }
+}
+
+export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
+      if (isToastShow == 1) {
+        Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
+      }
+      userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
+}
+//Use to reset navigation state
+export function resetNavigationState(index, actions) {
+  return async function (dispatch) {
+    dispatch(NavigationActions.reset({
+      index: 0,
+      actions
+    }))
   }
 }
 

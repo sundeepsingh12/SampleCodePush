@@ -24,12 +24,13 @@ class MultipleOptionsAttribute {
     }
 
     prepareOptionFieldData(optionMap, currentElement) {
-        let optionFieldDataList = []
+      let optionFieldDataList = []
         for (let index in optionMap) {
             if (!optionMap[index].selected) {
                 continue
             }
             optionFieldDataList.push({
+                attributeTypeId: 1,
                 fieldAttributeMasterId: optionMap[index].fieldAttributeMasterId,
                 value: optionMap[index].code
             })
