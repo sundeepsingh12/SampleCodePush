@@ -8,13 +8,14 @@ import {
     SEQUENCE_LIST_FETCHING_START,
     RESET_STATE,
     PREPARE_UPDATE_LIST,
-    CLEAR_SEQUENCE_STATE,
     SET_RUNSHEET_NUMBER_LIST,
     SET_RESPONSE_MESSAGE,
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP,
     SEQUENCE_LIST_ITEM_DRAGGED,
     SET_REFERENCE_NO,
-    SET_SEQUENCE_LIST_ITEM
+    SET_SEQUENCE_LIST_ITEM,
+    SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST,
+    SET_SEQUENCE_BACK_ENABLED,
 } from '../../lib/constants'
 
 
@@ -39,7 +40,6 @@ export default function sequenceReducer(state = initialState, action) {
                 .set('responseMessage', action.payload.responseMessage)
 
         case RESET_STATE:
-        case CLEAR_SEQUENCE_STATE:
             return initialState
 
         case SET_RUNSHEET_NUMBER_LIST:
@@ -65,6 +65,20 @@ export default function sequenceReducer(state = initialState, action) {
 
         case SET_SEQUENCE_LIST_ITEM:
             return state.set('currentSequenceListItemSeleceted', action.payload)
+                .set('searchText', '')
+
+        case SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST:
+            return state.set('sequenceList', [])
+                .set('isSequenceScreenLoading', false)
+                .set('isResequencingDisabled', false)
+                .set('responseMessage', '')
+                .set('searchText', '')
+                .set('currentSequenceListItemSeleceted', {})
+                .set('jobMasterSeperatorMap', {})
+                .set('transactionsWithChangedSeqeunceMap', {})
+
+        case SET_SEQUENCE_BACK_ENABLED:
+            return state.set('backEnabledFromAppNavigator', action.payload)
     }
     return state
 }

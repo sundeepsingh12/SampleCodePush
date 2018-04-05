@@ -251,10 +251,11 @@ class JobTransaction {
         }
         else if (callingActivity == 'Sequence') {
             let statusQueryWithRunsheetNo = '('
-            statusQueryWithRunsheetNo += callingActivityData.statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+            statusQueryWithRunsheetNo += callingActivityData.jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+            statusQueryWithRunsheetNo += `) AND (` + callingActivityData.statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
             statusQueryWithRunsheetNo += `) AND runsheetNo = "${callingActivityData.runsheetNumber}"`
             jobTransactionQuery = `deleteFlag != 1`
-            //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected
+            //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected and jobMasterIds
             jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
         } else if (callingActivity == 'AllTasks') {
             jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
@@ -400,7 +401,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
-        if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
+        if (!_.isEmpty(jobIdGroupIdMap)) {
             statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
             tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
             tabIdGroupTransactionsMap['isGrouping'] = true

@@ -103,6 +103,7 @@ import { autoLogoutAfterUpload } from '../backup/backupActions'
 import { utilitiesService } from '../../services/classes/Utilities'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization';
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization';
+import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
 
@@ -204,8 +205,10 @@ export function navigateToPage(pageObject) {
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
           throw new Error("CODE it, if you want to use it !");
-        case PAGE_SEQUENCING:
-          throw new Error("CODE it, if you want to use it !");
+        case PAGE_SEQUENCING: {
+          dispatch(getRunsheetsForSequence(pageObject));
+          break;
+        }
         case PAGE_SORTING_PRINTING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_STATISTICS:
