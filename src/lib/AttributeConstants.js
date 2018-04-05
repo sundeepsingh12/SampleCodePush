@@ -284,6 +284,7 @@ module.exports = {
     EZE_TAP_ID: 10,
     M_SWIPE_ID: 9,
     JOB_ASSIGNMENT_ID: 20,
+    PAGE_NEW_JOB: 2,
     Piechart: {
         enabled: false
     },

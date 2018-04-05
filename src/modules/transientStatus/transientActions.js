@@ -6,7 +6,7 @@ import {
     LOADER_IS_RUNNING,
     FormLayout
 } from '../../lib/constants'
-
+import { draftService } from '../../services/classes/DraftService'
 
 /**This action is called from componentDidMount 
  * 
@@ -35,6 +35,7 @@ export function setStateFromNavigationParams(formLayout, transientFormLayoutMap,
                         latestPositionId: formLayout.latestPositionId
                     }))
                 }
+                draftService.saveDraftInDb(formLayout, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
             }
         } catch (error) {
             dispatch(setState(LOADER_IS_RUNNING, false))            

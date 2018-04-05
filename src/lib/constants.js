@@ -91,6 +91,7 @@ module.exports = keyMirror({
     SET_TRANSACTION_SERVICE_STARTED: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
+    SET_NEWJOB_DRAFT_INFO: null,
 
     //Pages
     PAGES_LOADING: null,
@@ -119,7 +120,7 @@ module.exports = keyMirror({
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
-    SET_DRAFT_JOB_DETAILS_INFO: null,
+    SET_JOBDETAILS_DRAFT_INFO: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -239,6 +240,7 @@ module.exports = keyMirror({
     UPDATE_FIELD_DATA: null,
     STATUS_NAME: null,
     BASIC_INFO: null,
+    SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT: null,
     ON_BLUR: null,
     TOOGLE_HELP_TEXT: null,
     IS_LOADING: null,
@@ -249,7 +251,6 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
     CLEAR_FORM_LAYOUT: null,
-    SET_DRAFT: null,
     SET_UPDATE_DRAFT: null,
     SET_ARRAY_DATA_STORE_FILTER_MAP: null,
 
@@ -259,6 +260,7 @@ module.exports = keyMirror({
     SET_FORM_TO_INVALID: null,
     SET_DSF_REVERSE_MAP: null,
     SET_MODAL_FIELD_ATTRIBUTE: null,
+    SET_NO_FIELD_ATTRIBUTE_MAPPED: null,
     SET_FORM_INVALID_AND_FORM_ELEMENT: null,
 
     //Route names (Used in React Navigation)
@@ -279,8 +281,6 @@ module.exports = keyMirror({
     SaveActivated: null,
     Transient: null,
     CheckoutDetails: null,
-    NewJob: null,
-    NewJobStatus: null,
     BulkListing: null,
     Sorting: null,
     ProfileView: null,
@@ -373,9 +373,7 @@ module.exports = keyMirror({
     SET_SEQUENCE_BACK_ENABLED: null,
 
     //New Job
-    NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
-    SET_ERROR_MSG_FOR_NEW_JOB: null,
 
     //Transient
     ADD_FORM_LAYOUT_STATE: null,
@@ -400,6 +398,7 @@ module.exports = keyMirror({
     Checkout: null,
     SHOW_DISCARD_ALERT: null,
     RETURN_TO_HOME: null,
+    SET_SAVE_ACTIVATED_DRAFT: null,
 
     //Bulk Module
     START_FETCHING_BULK_TRANSACTIONS: null,

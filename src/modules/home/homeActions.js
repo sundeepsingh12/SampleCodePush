@@ -36,9 +36,9 @@ import {
   BACKUP_UPLOAD_FAIL_COUNT,
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
+  SET_NEWJOB_DRAFT_INFO,
   JOB_MASTER,
   SAVE_ACTIVATED,
-  NewJobStatus,
   NEW_JOB_STATUS,
   NEW_JOB_MASTER,
   POPULATE_DATA,
@@ -95,11 +95,19 @@ import { NetInfo } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
+import RestAPIFactory from '../../lib/RestAPIFactory'
+import { logoutService } from '../../services/classes/Logout'
+import { authenticationService } from '../../services/classes/Authentication'
+import { backupService } from '../../services/classes/BackupService';
+import { autoLogoutAfterUpload } from '../backup/backupActions'
 import { utilitiesService } from '../../services/classes/Utilities'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization';
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization';
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
-/** 
+import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
+import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
+
+/**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
  * - List of additional utilities for activating on Home Page (Piechart and Messaging)
@@ -183,8 +191,10 @@ export function navigateToPage(pageObject) {
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
-        case PAGE_NEW_JOB:
-          throw new Error("CODE it, if you want to use it !");
+        case PAGE_NEW_JOB: {
+          dispatch(redirectToContainer(pageObject))
+          break;
+        }
         case PAGE_OFFLINE_DATASTORE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_OUTSCAN:
@@ -524,41 +534,16 @@ export function resetFailCountInStore() {
   }
 }
 
-export function navigateToNewJob(jobMasterIds, displayName) {
+
+export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
   return async function (dispatch) {
     try {
-      const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
-      let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
-      if (_.size(mastersWithNewJob) == 1) {
-        let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
-        let returnParams = await newJob.checkForNextContainer(mastersWithNewJob[0], saveActivatedData)
-        if (returnParams.screenName == NewJobStatus) {
-          let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(mastersWithNewJob[0].id);
-          if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
-            dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, mastersWithNewJob[0].id))
-          } else {
-            dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
-            dispatch(navigateToScene(NewJobStatus, returnParams.navigationParams))
-          }
-        } else {
-          if (returnParams.stateParam) {
-            await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
-          }
-          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, { displayName }))
-        }
-      } else if (_.size(mastersWithNewJob) == 0) {
-        Toast.show({
-          text: NEW_JOB_CONFIGURATION_ERROR,
-          position: "bottom" | "center",
-          buttonText: OK,
-          type: 'danger',
-          duration: 10000
-        })
-        // dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
+      if (restoreDraft) {
+        dispatch(restoreDraftAndNavigateToFormLayout(null, null, draftStatusInfo.draft))
       } else {
-        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
-        dispatch(navigateToScene(NewJob, { displayName }))
+        dispatch(redirectToFormLayout(draftStatusInfo.nextStatus, -1, draftStatusInfo.draft.jobMasterId))
       }
+      dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {
       console.log(error)
     }

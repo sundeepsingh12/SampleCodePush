@@ -18,9 +18,18 @@ import { Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED } from '../lib/ContainerConstants'
+import DraftModal from '../components/DraftModal'
 
 function mapStateToProps(state) {
   return {
+    newJobModules: state.home.newJobModules,
+    modules: state.home.modules,
+    pieChart: state.home.pieChart,
+    menu: state.home.menu,
+    moduleLoading: state.home.moduleLoading,
+    chartLoading: state.home.chartLoading,
+    count: state.home.count,
+    draftNewJobInfo: state.home.draftNewJobInfo,
     mainMenuList: state.home.mainMenuList,
     utilities: state.home.utilities,
     pagesLoading: state.home.pagesLoading,
@@ -87,6 +96,13 @@ class Home extends PureComponent {
       />
     )
   }
+  
+  getNewJobDraftModal() {
+    if (!_.isEmpty(this.props.draftNewJobInfo)) {
+      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
+    }
+    return null
+  }
 
   render() {
     if (this.props.pagesLoading) {
@@ -106,6 +122,7 @@ class Home extends PureComponent {
             {renderIf(this.props.utilities.pieChartEnabled,
               <PieChart count={this.props.pieChartSummaryCount} />
             )}
+            {this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>
           </Content>
         </Container>

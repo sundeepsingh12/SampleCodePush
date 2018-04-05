@@ -53,9 +53,9 @@ describe('test setFormLayoutObjectForSaving', () => {
 
 describe('test checkIfDraftExistsAndGetStatusId', () => {
     it('should return undefined for no drafts in db', () => {
-        draftService.getDraftFromDb = jest.fn()
-        draftService.getDraftFromDb.mockReturnValue(null)
-        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, false, null)).toEqual(undefined)
+        draftService.getDraftForState = jest.fn()
+        draftService.getDraftForState.mockReturnValue(null)
+        expect(draftService.getDraftForState(1, 1, 1, false, null)).toEqual(undefined)
     })
     it('should return status id', () => {
         let draftDb = [{
@@ -63,9 +63,9 @@ describe('test checkIfDraftExistsAndGetStatusId', () => {
             statusId: 1,
             formElement: {}
         }]
-        draftService.getDraftFromDb = jest.fn()
-        draftService.getDraftFromDb.mockReturnValue(draftDb)
-        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, false, null)).toEqual(1)
+        draftService.getDraftForState = jest.fn()
+        draftService.getDraftForState.mockReturnValue(draftDb)
+        expect(draftService.getDraftForState(1, 1, 1, false, null)).toEqual(1)
     })
     it('should return undefined for null status list', () => {
         let draftDb = [{
@@ -73,9 +73,9 @@ describe('test checkIfDraftExistsAndGetStatusId', () => {
             statusId: 1,
             formElement: {}
         }]
-        draftService.getDraftFromDb = jest.fn()
-        draftService.getDraftFromDb.mockReturnValue(draftDb)
-        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, true, null)).toEqual(undefined)
+        draftService.getDraftForState = jest.fn()
+        draftService.getDraftForState.mockReturnValue(draftDb)
+        expect(draftService.getDraftForState(1, 1, 1, true, null)).toEqual(undefined)
     })
     it('should return undefined for empty status list', () => {
         let draftDb = [{
@@ -83,9 +83,9 @@ describe('test checkIfDraftExistsAndGetStatusId', () => {
             statusId: 1,
             formElement: {}
         }]
-        draftService.getDraftFromDb = jest.fn()
-        draftService.getDraftFromDb.mockReturnValue(draftDb)
-        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, true, [])).toEqual(undefined)
+        draftService.getDraftForState = jest.fn()
+        draftService.getDraftForState.mockReturnValue(draftDb)
+        expect(draftService.getDraftForState(1, 1, 1, true, [])).toEqual(undefined)
     })
     it('should return undefined for empty status list', () => {
         const statusList = { value: [] }
@@ -94,9 +94,9 @@ describe('test checkIfDraftExistsAndGetStatusId', () => {
             statusId: 1,
             formElement: {}
         }]
-        draftService.getDraftFromDb = jest.fn()
-        draftService.getDraftFromDb.mockReturnValue(draftDb)
-        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, true, statusList)).toEqual(undefined)
+        draftService.getDraftForState = jest.fn()
+        draftService.getDraftForState.mockReturnValue(draftDb)
+        expect(draftService.getDraftForState(1, 1, 1, true, statusList)).toEqual(undefined)
     })
     it('should return status id and name', () => {
         const statusList = {
@@ -112,9 +112,9 @@ describe('test checkIfDraftExistsAndGetStatusId', () => {
             statusId: 1,
             formElement: {}
         }]
-        draftService.getDraftFromDb = jest.fn()
-        draftService.getDraftFromDb.mockReturnValue(draftDb)
-        expect(draftService.checkIfDraftExistsAndGetStatusId(1, 1, 1, true, statusList)).toEqual({
+        draftService.getDraftForState = jest.fn()
+        draftService.getDraftForState.mockReturnValue(draftDb)
+        expect(draftService.getDraftForState(1, 1, 1, true, statusList)).toEqual({
 
             name: 'delivered',
             id: 1
@@ -125,8 +125,8 @@ describe('test checkIfDraftExistsAndGetStatusId', () => {
 
 describe('test restoreDraftFromDb', () => {
     it('should return undefined for no drafts in db', () => {
-        draftService.getDraftFromDb = jest.fn()
-        draftService.getDraftFromDb.mockReturnValue(null)
+        draftService.getDraftForState = jest.fn()
+        draftService.getDraftForState.mockReturnValue(null)
         expect(draftService.restoreDraftFromDb(1, 1, 1)).toEqual(undefined)
     })
     it('should return draft object', () => {
@@ -153,8 +153,8 @@ describe('test restoreDraftFromDb', () => {
         let draftDb = [
             draftObject
         ]
-        draftService.getDraftFromDb = jest.fn()
-        draftService.getDraftFromDb.mockReturnValue(draftDb)
+        draftService.getDraftForState = jest.fn()
+        draftService.getDraftForState.mockReturnValue(draftDb)
         expect(draftService.restoreDraftFromDb(1, 1, 1)).toEqual(formLayoutState)
     })
 })

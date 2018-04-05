@@ -59,6 +59,9 @@ module.exports = {
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
     NEW_TASK: 'New Task',
+    SELECT_TYPE_FOR: 'Select Type for ',
+    CONFIGURATION_ISSUES_WITH_PENDING_STATUS: 'Configuration issues with PENDING status',
+    JOB_MASTER_MISSING: 'jobMaster not present',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -226,6 +229,7 @@ module.exports = {
     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
     REASON: 'Reason',
     OPEN_CAMERA: 'Open Camera',
+    SKIP_SKU_MESSAGE: 'Skipping this attribute, not allowed in new job',
 
     //Array
     ADD: 'Add',
@@ -344,6 +348,9 @@ module.exports = {
     OTP_CODE_SENT: 'OTP code hasbeen sent to',
     ENTER_MOBILE: 'Enter your mobile',
     SEND_OTP: 'Send OTP',
+
+    //Draft Modal
+    DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
 
     // Job Summary
     UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
