@@ -24,7 +24,8 @@ import {
     SET_FORM_TO_INVALID,
     USER,
     AutoLogoutScreen,
-    SET_OPTION_ATTRIBUTE_ERROR
+    SET_OPTION_ATTRIBUTE_ERROR,
+    ADD_FORM_LAYOUT_STATE
 } from '../../lib/constants'
 
 import {
@@ -101,9 +102,6 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
         const cloneFormElement = _.cloneDeep(formElement)
         const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, null, event, jobTransaction, fieldAttributeMasterParentIdMap);
         dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributeDto))
-        if (value) {
-            dispatch(setState(SET_UPDATE_DRAFT, true))
-        }
     }
 }
 export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSaveDisabled, sequenceId, jobTransaction, fieldAttributeMasterParentIdMap) {
@@ -269,7 +267,6 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
                     formLayoutObject: cloneFormElement,
                     isSaveDisabled: true
                 }))
-                dispatch(setState(SET_UPDATE_DRAFT, true))
             } else {
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = ''
                 dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, value, latestPositionId, jobTransaction, null, true))
@@ -295,6 +292,9 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                     jobMasterId: draft.jobMasterId,
                     jobId: draftRestored.formLayoutState.jobTransactionId,
                 }
+            }
+            if (restoreDraftAndNavigateToFormLayout) {
+                dispatch(setState(ADD_FORM_LAYOUT_STATE, draftRestored.navigationFormLayoutStatesForRestore))
             }
             dispatch(navigateToScene('FormLayout', {
                 contactData,

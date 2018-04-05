@@ -109,6 +109,7 @@ export default class FormLayoutEventImpl {
                         isSaveDisabled = true
                         break
                     } else {
+                        isSaveDisabled = false
                         continue
                     }
                 }
@@ -116,6 +117,7 @@ export default class FormLayoutEventImpl {
                 if (!afterValidationResult && value.required) {
                     break
                 } else {
+                    isSaveDisabled = false
                     value.focus = false
                 }
             }
