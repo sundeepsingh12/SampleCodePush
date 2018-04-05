@@ -18,6 +18,7 @@ import { Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED } from '../lib/ContainerConstants'
+import { Summary }from '../lib/constants'
 import DraftModal from '../components/DraftModal'
 
 function mapStateToProps(state) {
@@ -28,7 +29,6 @@ function mapStateToProps(state) {
     menu: state.home.menu,
     moduleLoading: state.home.moduleLoading,
     chartLoading: state.home.chartLoading,
-    count: state.home.count,
     draftNewJobInfo: state.home.draftNewJobInfo,
     mainMenuList: state.home.mainMenuList,
     utilities: state.home.utilities,
@@ -96,6 +96,26 @@ class Home extends PureComponent {
       />
     )
   }
+  pieChartView() {
+    if (!this.props.utilities.pieChartEnabled) {
+      return null
+    }
+
+    if (this.props.chartLoading) {
+      return (
+        <ActivityIndicator animating={this.props.chartLoading}
+          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
+      )
+    }
+
+    if (this.props.pieChartSummaryCount) {
+      return (<PieChart count={this.props.pieChartSummaryCount} press={this._onPieChartPress} />)
+    }
+    return null
+  }
+  _onPieChartPress = () => {
+      this.props.actions.navigateToScene(Summary)
+  }
   
   getNewJobDraftModal() {
     if (!_.isEmpty(this.props.draftNewJobInfo)) {
@@ -104,7 +124,10 @@ class Home extends PureComponent {
     return null
   }
 
+  
+
   render() {
+    const pieChartView = this.pieChartView()
     if (this.props.pagesLoading) {
       return (<Loader />)
     }
@@ -119,9 +142,7 @@ class Home extends PureComponent {
             </Body>
           </Header>
           <Content>
-            {renderIf(this.props.utilities.pieChartEnabled,
-              <PieChart count={this.props.pieChartSummaryCount} />
-            )}
+            {pieChartView}
             {this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>
           </Content>
