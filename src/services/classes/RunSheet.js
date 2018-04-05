@@ -1,7 +1,8 @@
 import {
   TABLE_RUNSHEET,
   TABLE_JOB_TRANSACTION,
-  USER_SUMMARY
+  USER_SUMMARY,
+  JOB_MASTER
 } from '../../lib/constants'
 
 import * as realm from '../../repositories/realmdb'
@@ -12,56 +13,75 @@ import {
   RUNSHEET_MISSING
 } from '../../lib/ContainerConstants'
 import {keyValueDBService} from './KeyValueDBService'
+import { userSummaryService } from './UserSummary';
+import { jobSummaryService } from './JobSummary'
 
 class RunSheet {
 
-  /**
-   * 
-   * @param {*} jobSummaries 
-   */
-  async updateRunSheetAndUserSummary() {
-    let query = "deleteFlag != 1";
-    const status = ['pendingCount','failCount','successCount']
-    const jobTransactionArray = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, query)
-    const allStatusIds = await jobStatusService.getStatusIdsForAllStatusCategory()
-    const pendingStatusMap = this.idDtoMap(allStatusIds.pendingStatusIds, 1)
-    const failStatusMap = this.idDtoMap(allStatusIds.failStatusIds, 2)
-    const successStatusMap = this.idDtoMap(allStatusIds.successStatusIds, 3)
-    let allStatusMap =  { ...pendingStatusMap, ...failStatusMap, ...successStatusMap};
-    const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET)
-    let runsheetList = {}
-    let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY) 
-    runsheetArray.forEach(runsheetObject => {
-      const runsheetCLone = { ...runsheetObject } 
-      runsheetCLone.pendingCount = 0 ; runsheetCLone.failCount = 0 ; runsheetCLone.successCount = 0 ;
-      runsheetList[runsheetObject.id] = { ...runsheetCLone }
-    })
-    let pendingCount = 0,failCount = 0,successCount = 0,allCount = [0,0,0]
-    for (let index in jobTransactionArray) {
-      allCount[allStatusMap[jobTransactionArray[index].jobStatusId]-1]  += 1
-      if (allStatusMap[jobTransactionArray[index].jobStatusId] && (runsheetList[jobTransactionArray[index].runsheetId])) {
-        runsheetList[jobTransactionArray[index].runsheetId][status[allStatusMap[jobTransactionArray[index].jobStatusId] -1 ]] += 1
-      }
-    }
-    if(userSummary && userSummary.value){
-        userSummary["value"][status[0]] = allCount[0], userSummary["value"][status[1]] = allCount[1], userSummary["value"][status[2]] = allCount[2]
-    }
-    await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)    
+  /**@function updateRunSheetAndUserSummary()
+    * 
+    * function update RunSheet and UserSummary db count
+    * 
+    *@description => first calculate jobTransactionList on selected jobMaster and runsheetList
+    *                create map of all status List
+    *                then, calculate for runsheet count on jobTransaction and status map
+    *                finally save the updated runSheetData in Db
+    */
+
+  async updateRunSheetUserAndJobSummary() {
+    let jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    let runsheetQuery = 'isClosed = true'// check for closed runsheet
+    const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
+    let runSheetIdListQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ') // runSheet query for closed runsheet
+    let jobMasterQuery = (jobMasterList && jobMasterList.value) ? jobMasterList.value.map(jobMasterId => 'jobMasterId = ' + jobMasterId.id).join(' OR ') : '' // query for selected jobMaster
+    jobMasterQuery = jobMasterQuery && jobMasterQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobMasterQuery})` : "deleteFlag != 1"
+    jobMasterQuery = runSheetIdListQuery && runSheetIdListQuery.trim() !== '' ? `(${jobMasterQuery}) AND (${runSheetIdListQuery})` : jobMasterQuery
+    const jobTransactionArray = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobMasterQuery) // all jobTransaction List
+    const { allStatusMap } = await jobStatusService.getStatusIdsForAllStatusCategory() //all status (pending, fail, success) map
+    const runsheetListData = await this.buildRunSheetListAndUpdateJobAndUserSummary(jobTransactionArray, allStatusMap) // runSheet List Data for insertion in Db   
     const runsheets = {
       tableName: TABLE_RUNSHEET,
-      value: Object.values(runsheetList)
+      value: runsheetListData
     }
     realm.performBatchSave(runsheets)
   }
 
-  idDtoMap(dtoList, value) {
-    const listMap = dtoList.reduce(function (total, current) {
-      total[current] = value
-      return total;
-    }, {});
-    return listMap
+  /**@function buildRunSheetListAndUpdateUserSummary(jobTransactionArray,allStatusMap)
+    * 
+    * function return updated runSheetList count and update userSummary count
+    * 
+    *@param {Array} jobTransactionArray // all jobTransactions
+    *@param {Object} allStatusMap // map of all status id and status category
+    *
+    *@return {runsheetList} // array of runSheet List 
+    *
+    */
 
+  async buildRunSheetListAndUpdateJobAndUserSummary(jobTransactionArray, allStatusMap){
+    let runsheetList = {}, allCount = [0,0,0], statusCountMap = {}
+    const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET) // all runSheet List 
+    const status = ['pendingCount','failCount','successCount']
+    runsheetArray.forEach(runsheetObject => {
+      const runsheetCLone = { ...runsheetObject } 
+      runsheetCLone.pendingCount = runsheetCLone.failCount = runsheetCLone.successCount = 0 
+      runsheetList[runsheetObject.id] = { ...runsheetCLone }
+    }) // map of runSheetId and runSheet 
+    for (let index in jobTransactionArray) {
+      allCount[allStatusMap[jobTransactionArray[index].jobStatusId]-1]  += 1  //  array of pending fail and success count
+      if ((runsheetList[jobTransactionArray[index].runsheetId] && allStatusMap[jobTransactionArray[index].jobStatusId] )) { // check for runSheetId in runSheetList and jobStatus in allStatusMapList
+        runsheetList[jobTransactionArray[index].runsheetId][status[allStatusMap[jobTransactionArray[index].jobStatusId] -1 ]] += 1
+      }
+      if(statusCountMap[jobTransactionArray[index].jobStatusId]) { // check stausId count map for jobSummary
+        statusCountMap[jobTransactionArray[index].jobStatusId] += 1 
+      }else{ 
+        statusCountMap[jobTransactionArray[index].jobStatusId] = 1
+      }
+    }
+    await jobSummaryService.updateJobSummary(statusCountMap) // update jobSummary count 
+    await userSummaryService.updateUserSummaryCount(allCount) // update userSummary count for pending,fail and success
+    return Object.values(runsheetList)
   }
+
 
   getRunsheets() {
     const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET)
@@ -75,6 +95,15 @@ class RunSheet {
     }
     return runsheetNumberList
 }
+  getOpenRunsheets() {
+    let runSheetQuery = `isClosed = false`
+    const runsheetArray = realm.getRecordListOnQuery(TABLE_RUNSHEET, runSheetQuery)
+    let runsheetNumberList = []
+    runsheetArray.forEach(runsheetObject => {
+      runsheetNumberList.push({ ...runsheetObject })
+    })
+    return runsheetNumberList
+  }
 
 }
 

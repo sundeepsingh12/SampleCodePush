@@ -8,7 +8,7 @@ import {
     DISABLE_SAVE,
     UPDATE_FIELD_DATA,
     TOOGLE_HELP_TEXT,
-    BASIC_INFO,
+    SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
     RESET_STATE,
     ERROR_MESSAGE,
@@ -17,11 +17,13 @@ import {
     UPDATE_FIELD_DATA_VALIDATION,
     SET_FORM_LAYOUT_STATE,
     CLEAR_FORM_LAYOUT,
-    SET_DRAFT,
     SET_UPDATE_DRAFT,
     SET_FORM_TO_INVALID,
     SET_DSF_REVERSE_MAP,
-    SET_MODAL_FIELD_ATTRIBUTE
+    SET_MODAL_FIELD_ATTRIBUTE,
+    SET_NO_FIELD_ATTRIBUTE_MAPPED,
+    SET_FORM_INVALID_AND_FORM_ELEMENT,
+    SET_ARRAY_DATA_STORE_FILTER_MAP,
 } from '../../lib/constants'
 
 const initialState = new InitialState();
@@ -36,6 +38,7 @@ export default function formLayoutReducer(state = initialState, action) {
         case GET_SORTED_ROOT_FIELD_ATTRIBUTES: {
             return state.set('formElement', action.payload.formLayoutObject)
                 .set('isSaveDisabled', action.payload.isSaveDisabled) // applied ternary condition to set null, undefined to false
+                .set('updateDraft', true)
         }
 
         /**
@@ -67,15 +70,18 @@ export default function formLayoutReducer(state = initialState, action) {
         }
 
         /**
-         * set basic info like statusId, statusName, jobTransactionId, latestPositionId
+         * set basic info like statusId, statusName, jobTransactionId, latestPositionId etc
          */
-        case BASIC_INFO: {
+        case SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT: {
             return state.set('statusId', action.payload.statusId)
                 .set('statusName', action.payload.statusName)
                 .set('jobTransactionId', action.payload.jobTransactionId)
                 .set('latestPositionId', action.payload.latestPositionId)
-                .set('draftStatusId', action.payload.draftStatusId)
                 .set('fieldAttributeMasterParentIdMap', action.payload.fieldAttributeMasterParentIdMap)
+                .set('noFieldAttributeMappedWithStatus', action.payload.noFieldAttributeMappedWithStatus)
+                .set('formElement', action.payload.formLayoutObject)
+                .set('isSaveDisabled', action.payload.isSaveDisabled)
+                .set('isLoading', action.payload.isLoading)
         }
 
         /**
@@ -101,10 +107,11 @@ export default function formLayoutReducer(state = initialState, action) {
         }
 
         /**
-         * sets error message
+         * sets error message and isLoading to false
          */
         case ERROR_MESSAGE: {
             return state.set('errorMessage', action.payload)
+                .set('isLoading', false)
         }
 
         case UPDATE_FIELD_DATA_VALIDATION: {
@@ -130,9 +137,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('paymentAtEnd', action.payload.editableFormLayoutState.paymentAtEnd)
                 .set('dataStoreFilterReverseMap', action.payload.editableFormLayoutState.dataStoreFilterReverseMap)
         }
-        case SET_DRAFT: {
-            return state.set('draftStatusId', action.payload)
-        }
+
         case SET_UPDATE_DRAFT: {
             return state.set('updateDraft', action.payload)
         }
@@ -147,6 +152,18 @@ export default function formLayoutReducer(state = initialState, action) {
 
         case SET_MODAL_FIELD_ATTRIBUTE: {
             return state.set('modalFieldAttributeMasterId', action.payload)
+        }
+        case SET_NO_FIELD_ATTRIBUTE_MAPPED: {
+            return state.set('noFieldAttributeMappedWithStatus', action.payload)
+        }
+        case SET_FORM_INVALID_AND_FORM_ELEMENT: {
+            return state.set('isLoading', action.payload.isLoading)
+                .set('isFormValid', action.payload.isFormValid)
+                .set('formElement', action.payload.formElement)
+        }
+
+        case SET_ARRAY_DATA_STORE_FILTER_MAP: {
+            return state.set('arrayReverseDataStoreFilterMap', action.payload)
         }
     }
     return state;

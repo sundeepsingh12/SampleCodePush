@@ -3,75 +3,22 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import React, { PureComponent } from 'react'
-import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated } from 'react-native'
+import { StyleSheet, View, Image, TouchableHighlight, ActivityIndicator, PushNotificationIOS, Animated, SectionList } from 'react-native'
 import Loader from '../components/Loader'
-import {
-  Container,
-  Content,
-  Header,
-  Button,
-  Text,
-  List,
-  ListItem,
-  Left,
-  Body,
-  Right,
-  Icon,
-  Title,
-  Footer,
-  FooterTab,
-  StyleProvider,
-  Toast,
-  ActionSheet,
-
-} from 'native-base'
+import PieChart from '../components/PieChart'
+import renderIf from '../lib/renderIf'
+import * as globalActions from '../modules/global/globalActions'
+import * as homeActions from '../modules/home/homeActions'
+import { Container, Content, Header, Button, Text, List, ListItem, Separator, Left, Body, Right, Icon, Title, Footer, FooterTab, StyleProvider, Toast, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import * as homeActions from '../modules/home/homeActions'
-import * as globalActions from '../modules/global/globalActions'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
-import CircularProgress from '../svg_components/components/CircularProgress'
-import PieChart from '../components/PieChart'
-import {
-  BULK_ID,
-  LIVE_ID,
-  START_ID,
-  SEQUENCEMODULE_ID,
-  SORTING_ID,
-  CUSTOMAPP_ID,
-  CHOOSE_WEB_URL,
-  NEWJOB_ID,
-  JOB_ASSIGNMENT_ID,
-  FAREYE_UPDATES
-} from '../lib/AttributeConstants'
-
-import {
-  TabScreen,
-  SequenceRunsheetList,
-  BulkConfiguration,
-  Sorting,
-  LiveJobs,
-  Summary,
-  CustomApp,
-  NewJob,
-  START,
-  BULK,
-  LIVE,
-  SEQUENCEMODULE,
-  SORTING,
-  CUSTOMAPP,
-  JOB_ASSIGNMENT,
-  PIECHART,
-  SUMMARY,
-  JobMasterListScreen,
-} from '../lib/constants'
-import _ from 'lodash'
-import PushNotification from 'react-native-push-notification'
 import { Platform } from 'react-native'
-import { getJobMasterVsStatusNameList } from '../modules/bulk/bulkActions'
-import { getRunsheets } from '../modules/sequence/sequenceActions'
-import { fetchJobMasterList } from '../modules/postAssignment/postAssignmentActions'
+import PushNotification from 'react-native-push-notification'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { UNTITLED } from '../lib/ContainerConstants'
+import DraftModal from '../components/DraftModal'
 
 function mapStateToProps(state) {
   return {
@@ -82,285 +29,118 @@ function mapStateToProps(state) {
     moduleLoading: state.home.moduleLoading,
     chartLoading: state.home.chartLoading,
     count: state.home.count,
+    draftNewJobInfo: state.home.draftNewJobInfo,
+    mainMenuList: state.home.mainMenuList,
+    utilities: state.home.utilities,
+    pagesLoading: state.home.pagesLoading,
+    pieChartSummaryCount: state.home.pieChartSummaryCount,
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...homeActions, ...globalActions, getJobMasterVsStatusNameList, getRunsheets, fetchJobMasterList }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...homeActions }, dispatch)
   }
 }
 
 class Home extends PureComponent {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      showTransactionList: false,
-      torchStatus: false,
-      bounceValue: new Animated.Value(240),
-      searchText: ''
-    };
-    this.animatedValue = new Animated.Value(120)
-  }
 
   componentDidMount() {
     if (Platform.OS === 'ios') {
       PushNotification.configure({
         onNotification: function (notification) {
           console.log('NOTIFICATION:', notification);
-          // process the notification
           Toast.show({
             text: `${notification.message}`,
             position: 'top',
             buttonText: 'OK'
           })
-          // required on iOS only (see fetchCompletionHandler docs: https://facebook.github.io/react-native/docs/pushnotificationios.html)
           notification.finish(PushNotificationIOS.FetchResult.NoData);
         }
       })
     }
-    this.props.actions.fetchModulesList(this.props.modules, this.props.pieChart, this.props.menu, this.props.newJobModules)
+    this.props.actions.fetchPagesAndPiechart();
+    this.props.actions.startMqttService(this.props.pieChart);
+    this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated');
+    this.props.actions.startTracking(this.props.trackingServiceStarted);
   }
 
-  navigateToScene = (appModule) => {
-    switch (appModule.appModuleId) {
-      case BULK_ID: {
-        this.props.actions.getJobMasterVsStatusNameList(this.props.modules.BULK.displayName)
-        break
-      }
-      case LIVE_ID: {
-        this.props.actions.navigateToScene(LiveJobs,{displayName : this.props.modules.LIVE.displayName})
-        break
-      }
-      case SEQUENCEMODULE_ID: {
-        this.props.actions.getRunsheets(this.props.modules.SEQUENCEMODULE.displayName)
-        break
-      }
-      case START_ID: {
-        this.props.actions.navigateToScene(TabScreen, { remark: appModule.remark })
-        break
-      }
-
-      case SORTING_ID: {
-        this.props.actions.navigateToScene(Sorting,{displayName : this.props.modules.SORTING.displayName})
-        break
-      }
-
-      case CUSTOMAPP_ID: {
-        ((appModule.remark) && appModule.remark.length > 1) ? this.customAppSelection(appModule) : ((appModule.remark) && appModule.remark.length == 1)
-          ? this.props.actions.navigateToScene(CustomApp, {
-            customUrl: appModule.remark[0].customUrl
-          }) :
-          this.props.actions.navigateToScene(CustomApp, {
-            appModule
-          });
-        break
-      }
-
-      case JOB_ASSIGNMENT_ID: {
-        this.props.actions.fetchJobMasterList(this.props.modules.JOB_ASSIGNMENT.displayName)
-        //this.props.actions.navigateToScene(JobMasterListScreen)
-      }
-
-      default:
-        (appModule.appModuleId == NEWJOB_ID) ? this.props.actions.navigateToNewJob(appModule.jobMasterIdList,appModule.displayName) : null
-
-    }
-  }
-  customAppSelection(appModule) {
-    let BUTTONS = appModule.remark.map(id => !(id.title) ? URL : id.title)
-    BUTTONS.push('Cancel')
-    ActionSheet.show(
-      {
-        options: BUTTONS,
-        title: CHOOSE_WEB_URL,
-        cancelButtonIndex: BUTTONS.length - 1,
-        destructiveButtonIndex: BUTTONS.length - 1
-      },
-      buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? this.props.actions.navigateToScene(CustomApp, { customUrl: appModule.remark[buttonIndex].customUrl }) : null
-      }
-    )
-  }
-
-
-  headerView() {
+  getPageView(page) {
     return (
-      <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
-        <Body>
-          <View
-            style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-            <View style={[style.headerBody]}>
-              <View style={{
-                width: 90
-              }}>
-                <Image
-                  style={StyleSheet.flatten([
-                    styles.width100, {
-                      resizeMode: 'contain'
-                    }
-                  ])}
-                  source={FareyeLogo} />
-              </View>
-            </View>
-            <View />
-          </View>
-        </Body>
-      </Header>
-
+      <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
+        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon]} />
+        <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
+        <Right><Icon name="ios-arrow-forward" /></Right>
+      </ListItem>
     )
   }
 
-  moduleView(modulesList) {
-    let moduleView = []
-    for (let index in modulesList) {
-      if (!modulesList[index].enabled) {
-        continue
-      }
-      moduleView.push(
-        <ListItem button onPress={() => this.navigateToScene(modulesList[index])}
-          style={[style.moduleList]}
-          key={modulesList[index].serialNumber}
-        >
-          {modulesList[index].icon}
-          <Body>
-            <Text
-              style={[styles.fontWeight500, styles.fontLg]}>{modulesList[index].displayName}</Text>
-          </Body>
-          <Right>
-            <Icon name="ios-arrow-forward" />
-          </Right>
-        </ListItem>
-      )
-    }
-    return moduleView
-  }
-
-  _onPieChartPress = () => {
-    if (this.props.pieChart[SUMMARY].enabled) {
-      this.props.actions.navigateToScene(Summary)
-    }
-  }
-
-  pieChartView() {
-    if (!this.props.pieChart[PIECHART].enabled) {
+  renderGroupHeader = ({ section }) => {
+    if (_.size(this.props.mainMenuList) == 1 && section.title == UNTITLED) {
       return null
     }
+    return (
+      <View style={[styles.bgWhite, styles.padding10]}>
+        <Text style={[styles.fontLg, styles.fontDarkGray, styles.paddingVertical10]}>{section.title}</Text>
+      </View>
+    );
+  }
 
-    if (this.props.chartLoading) {
-      return (
-        <ActivityIndicator animating={this.props.chartLoading}
-          style={StyleSheet.flatten([{ marginTop: 10 }])} size="small" color="green" />
-      )
+  getPageListItemsView() {
+    return (
+      <SectionList
+        sections={this.props.mainMenuList}
+        renderItem={({ item }) => this.getPageView(item)}
+        renderSectionHeader={this.renderGroupHeader}
+        keyExtractor={item => item.id}
+      />
+    )
+  }
+  
+  getNewJobDraftModal() {
+    if (!_.isEmpty(this.props.draftNewJobInfo)) {
+      return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
     }
-
-    if (this.props.count) {
-      return (<PieChart count={this.props.count} press={this._onPieChartPress} />)
-    }
-
     return null
   }
 
   render() {
-    const headerView = this.headerView()
-    let list = []
-    list = list.concat(this.props.modules[START],
-      this.props.modules[LIVE],
-      this.props.modules[BULK],
-      this.props.modules[SEQUENCEMODULE],
-      _.values(this.props.newJobModules),
-      this.props.modules[SORTING],
-      this.props.modules[JOB_ASSIGNMENT],
-      this.props.modules[CUSTOMAPP])
-    const moduleView = this.moduleView(list)
-    const pieChartView = this.pieChartView()
-
-    if (this.props.moduleLoading) {
+    if (this.props.pagesLoading) {
       return (<Loader />)
     }
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container style={StyleSheet.flatten([styles.bgWhite])}>
-          {headerView}
+          <Header searchBar style={StyleSheet.flatten([styles.bgWhite, style.header])}>
+            <Body>
+              <View style={[styles.row, styles.width100, styles.justifySpaceBetween]}><View style={[style.headerBody]}><View style={{ width: 90 }}>
+                <Image style={StyleSheet.flatten([styles.width100, { resizeMode: 'contain' }])} source={FareyeLogo} />
+              </View></View></View>
+            </Body>
+          </Header>
           <Content>
-            {pieChartView}
-            <List>
-            {moduleView}
-            </List>
+            {renderIf(this.props.utilities.pieChartEnabled,
+              <PieChart count={this.props.pieChartSummaryCount} />
+            )}
+            {this.getNewJobDraftModal()}
+            <List>{this.getPageListItemsView()}</List>
           </Content>
         </Container>
       </StyleProvider>
-
     )
   }
-
 }
 
 const style = StyleSheet.create({
-  header: {
-    height: 'auto',
-    padding: 0,
-    paddingRight: 0,
-    paddingLeft: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f3f3'
-  },
-  headerBody: {
-    width: '100%',
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 10,
-    paddingRight: 10
-  },
-  chartCenterData: {
-    backgroundColor: 'transparent',
-    textAlign: 'center',
-
-  },
-  headerIcon: {
-    fontSize: 18,
-    color: '#ffffff'
-  },
-  pieData: {
-    position: 'absolute',
-    width: 140,
-    height: 140,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  pieNumber: {
-    fontSize: 40,
-    fontWeight: "bold"
-  },
-  pieText: {
-    fontSize: 16
-  },
-  chartContainer: {
-    height: 190,
-    paddingTop: 25,
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  chartBlock: {
-    margin: 10,
-    height: 240,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 2
-  },
   moduleList: {
-    height: 90,
-    borderBottomColor: '#F2F2F2'
+    height: 70
   },
   moduleListIcon: {
-    width: 30,
-    height: 30,
-    marginRight: 15
+    color: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#d6d7da',
+    padding: 5,
+    backgroundColor: styles.primaryColor
   }
 });
 

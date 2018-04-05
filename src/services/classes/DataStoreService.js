@@ -50,7 +50,7 @@ class DataStoreService {
     * }
     */
     getValidations(validationArray) {
-        let validationObject = {}
+        let validationObject = {}, specialValidationCount = 0 // It is use to count number of special validations present
         for (let validation of validationArray) {
             if (validation.timeOfExecution) {
                 switch (validation.timeOfExecution) {
@@ -63,7 +63,12 @@ class DataStoreService {
                         }
                         break
                     case SPECIAL:
-                        validationObject.isSearchEnabled = (validation.condition == 'true')
+                        if (specialValidationCount == 1) { // In external DS allow from field is true
+                            validationObject.isAllowFromFieldInExternalDS = (validation.condition == 'true')
+                        } else {
+                            specialValidationCount++
+                            validationObject.isSearchEnabled = (validation.condition == 'true')
+                        }
                         break
                     case MINMAX:
                         validationObject.isMinMaxValidation = (validation.condition == 'true')
@@ -154,6 +159,7 @@ class DataStoreService {
             if (dataStoreAttributeValueMap[currentObject.key]) {
                 currentObject.value = dataStoreAttributeValueMap[currentObject.key]
                 currentObject.displayValue = dataStoreAttributeValueMap[currentObject.key]
+                currentObject.editable = true // set editable to true so that view of single entity of mapped key fieldAttribute will change in formLayout
             }
         }
         return formElements
@@ -194,14 +200,11 @@ class DataStoreService {
       * boolean
       */
     checkForUniqueValidation(fieldAttributeValue, fieldAttribute) {
-        if (!fieldAttributeValue) {
-            throw new Error('fieldAttributeValue missing in currentElement')
-        }
-        if (!fieldAttribute.fieldAttributeMasterId) {
-            throw new Error('fieldAttributeMasterId missing in currentElement')
+        if (!fieldAttributeValue || !fieldAttribute.fieldAttributeMasterId) {
+            return false
         }
         if (this.checkIfUniqueConditionExists(fieldAttribute)) {
-            let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttribute.fieldAttributeMasterId} AND value = '${fieldAttribute.displayValue}'`
+            let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttribute.fieldAttributeMasterId} AND value = '${realm._encryptData(fieldAttribute.displayValue)}'`
             let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
             return (fieldDataList && fieldDataList.length >= 1)
         }
@@ -383,7 +386,7 @@ class DataStoreService {
         if (!dataStoreJsonResponse) {
             return
         }
-        let dataStoreId = realm.getAll(DataStore_DB).length
+        let dataStoreId = realm.getRecordListOnQuery(DataStore_DB).length
         let dataStoreList = []
         for (let dataStore of dataStoreJsonResponse.content) {
             for (let attribute in dataStore.dataStoreAttributeValueMap) {
@@ -576,7 +579,8 @@ class DataStoreService {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         if (!currentElement.dataStoreFilterMapping || _.isEqual(currentElement.dataStoreFilterMapping, '[]') || currentElement.attributeTypeId == EXTERNAL_DATA_STORE) {
             validation = (currentElement.validation) ?
@@ -642,9 +646,6 @@ class DataStoreService {
      * This method search values from data store attr map and return filtered map along with cloned origonal map
      */
     searchDataStoreAttributeValueMap(searchText, dataStoreAttrValueMap, cloneDataStoreAttrValueMap) {
-        if (!searchText) {
-            throw new Error(SEARCH_TEXT_MISSING)
-        }
         if (!dataStoreAttrValueMap) {
             throw new Error(DATA_STORE_MAP_MISSING)
         }
@@ -653,11 +654,43 @@ class DataStoreService {
         } else {
             dataStoreAttrValueMap = _.cloneDeep(cloneDataStoreAttrValueMap)
         }
-        let filteredData = _.values(dataStoreAttrValueMap).filter(DSObject => (DSObject.id.toUpperCase()).indexOf(searchText.toUpperCase()) == 0)
-        dataStoreAttrValueMap = _.mapKeys(filteredData, 'id')
+        let searchedDataStoreAttrValueObject = {} //contains filtered object
+        // This loop check if searched value is present in dataStoreAttrValueMap and if present then add this to searchedDataStoreAttrValueObject
+        for (let dataStoreAttrValueObjectIndex in dataStoreAttrValueMap) {
+            if ((dataStoreAttrValueMap[dataStoreAttrValueObjectIndex].id.toLowerCase()).indexOf(searchText.toLowerCase()) == 0) {
+                searchedDataStoreAttrValueObject[dataStoreAttrValueMap[dataStoreAttrValueObjectIndex].id] = dataStoreAttrValueMap[dataStoreAttrValueObjectIndex]
+            }
+        }
         return {
-            dataStoreAttrValueMap,
-            cloneDataStoreAttrValueMap
+            dataStoreAttrValueMap: searchedDataStoreAttrValueObject,
+            cloneDataStoreAttrValueMap // original copy of dataStoreAttrValueMap without any filteration
+        }
+    }
+
+    /**
+     * This method is called in case of array and data store having mapping with any DSF
+     * @param {Object} functionParamsFromDS //
+                              {
+                                   currentElement // Data store element
+                                   formElement // Contains formElement of all rows
+                                   jobTransaction 
+                                   arrayReverseDataStoreFilterMap // Object having mapped id's so we can back track and remove value property from formElement if any dsf is edited by the user
+                                   arrayFieldAttributeMasterId // fieldAttributeMasterId of array
+                                   rowId // Current rowId
+                               }
+     */
+    async checkForFiltersAndValidationsForArray(functionParamsFromDS) {
+        let { currentElement, formElement, jobTransaction, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId, rowId } = functionParamsFromDS
+        let rowFormElement = formElement[rowId].formLayoutObject //get current formElement
+        let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] //get map for current array this may contain map of multiple arrays
+        let returnParams = await this.checkForFiltersAndValidations(currentElement, rowFormElement, jobTransaction, dataStoreFilterReverseMap) //check for filters and if not present than check for validations
+        let cloneArrayReverseDataStoreFilterMap = _.cloneDeep(arrayReverseDataStoreFilterMap)
+        cloneArrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] = returnParams.dataStoreFilterReverseMap //change reverse DSF map which contains all mapping related to DSF and Data store
+        return {
+            dataStoreAttrValueMap: returnParams.dataStoreAttrValueMap,
+            isFiltersPresent: returnParams.isFiltersPresent,
+            validation: returnParams.validation,
+            arrayReverseDataStoreFilterMap: cloneArrayReverseDataStoreFilterMap
         }
     }
 }

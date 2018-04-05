@@ -41,7 +41,7 @@ export function fetchTabs() {
 /**
  * This function fetches jobTransaction from db and set jobTransactionCustomizationListDTO in state
  */
-export function fetchJobs(date) {
+export function fetchJobs(date, pageObject) {
   return async function (dispatch) {
     try {
       dispatch(setState(JOB_LISTING_START))
@@ -52,7 +52,7 @@ export function fetchJobs(date) {
       // Fetch future enable runsheet and selected Date for calender
       let { enableFutureDateRunsheet, selectedDate } = jobTransactionService.getFutureRunsheetEnabledAndSelectedDate(customNaming, jobIdGroupIdMap, date)
       dispatch(setState(SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE, { enableFutureDateRunsheet, selectedDate }))
-      let { jobTransactionCustomizationList, statusNextStatusListMap } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'AllTasks', null, selectedDate, jobIdGroupIdMap)
+      let { jobTransactionCustomizationList, statusNextStatusListMap } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'AllTasks', pageObject, selectedDate, jobIdGroupIdMap)
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList, statusNextStatusListMap }))
     } catch (error) {
       //TODO handle UI
@@ -67,12 +67,12 @@ export function fetchJobs(date) {
  * @param {*} jobTransactionCustomizationList 
  *  This action will fetch jobs if SHOULD_RELOAD_START is true in store or if jobTransactionCustomizationList is empty
  */
-export function shouldFetchJobsOrNot(jobTransactionCustomizationList) {
+export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject) {
   return async function (dispatch) {
     try {
       let shouldFetchJobs = await keyValueDBService.getValueFromStore(SHOULD_RELOAD_START)
       if ((shouldFetchJobs && shouldFetchJobs.value) || _.isEmpty(jobTransactionCustomizationList)) {
-        dispatch(fetchJobs(moment().format('YYYY-MM-DD')))
+        dispatch(fetchJobs(moment().format('YYYY-MM-DD'), pageObject))
       }
       // Sets SHOULD_RELOAD_START to false so jobs are not fetched unnecessesarily 
       await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(false))

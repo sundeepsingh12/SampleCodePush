@@ -5,7 +5,7 @@ import { addServerSmsService } from '../../services/classes/AddServerSms'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { jobDetailsService } from '../../services/classes/JobDetails'
-import { setState, navigateToScene } from '..//global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '..//global/globalActions'
 import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { NavigationActions } from 'react-navigation'
@@ -66,30 +66,25 @@ export function getJobDetails(jobTransactionId) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails())
-            const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-            const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-            const jobAttributeMasterList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
-            const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-            const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
-            const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
+            const { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList} = await jobDetailsService.getJobDetailsParameters()
             const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
+            if(details.checkForSeenStatus) dispatch(performSyncService())
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
             const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId, details.currentStatus.actionOnStatus) : false
             const jobExpiryData = (!errorMessage && details.jobDataObject.dataMap[JOB_EXPIRY_TIME]) ? (Object.values(details.jobDataObject.dataMap[JOB_EXPIRY_TIME])[0]) : null
             const jobExpiryTime = jobExpiryData && jobExpiryData.data ? jobExpiryData.data.value : null
-            const parentStatusList = (jobMaster[0].isStatusRevert) ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
-            const draftStatusInfo = draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, null, null, true, statusList)
+            const parentStatusList = (jobMaster[0].isStatusRevert) && !_.isEqual(_.toLower(details.currentStatus.code), 'seen')  ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
+            const draftStatusInfo = draftService.getDraftForState(details.jobTransactionDisplay, null)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
             dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime))
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
-            console.log(error)
+            showToastAndAddUserExceptionLog(1101, error.message, 'danger', 0)                    
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
 }
+
 export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, jobData, fieldData) {
     return async function (dispatch) {
         try {
@@ -98,9 +93,7 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
             let user = await keyValueDBService.getValueFromStore(USER);
             await addServerSmsService.sendFieldMessage(contact, smsTemplate, jobTransaction, jobData, fieldData, jobAttributesList, fieldAttributesList, user)
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
-            console.log(error)
+            showToastAndAddUserExceptionLog(1102, error.message, 'danger', 1)        
         }
     }
 }
@@ -139,7 +132,7 @@ export function setAllDataOnRevert(jobTransaction, statusTo, navigation) {
             } else { dispatch(navigation.goBack()) }
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(1103, error.message, 'danger', 0)                    
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
         }
     }
@@ -159,16 +152,16 @@ export function checkForLocationMismatch(data, currentStatusCategory) {
             const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId }
             const nextStatusCategory = data.statusList.statusCategory
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId)
-            if (!(jobMaster[0].enableLocationMismatch) || currentStatusCategory != 1 || !nextStatusCategory || !(nextStatusCategory == 2 || nextStatusCategory == 3))
-                return dispatch(navigateToScene('FormLayout', FormLayoutData))
+            if (!(jobMaster[0].enableLocationMismatch) || currentStatusCategory != 1 || !nextStatusCategory || !(nextStatusCategory == 2 || nextStatusCategory == 3)) {
+                dispatch(navigateToScene('FormLayout', FormLayoutData))
+            }
             const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-            if (data.jobTransaction.jobId != null && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng))
-                return dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
-            dispatch(navigateToScene('FormLayout', FormLayoutData))
+            if (data.jobTransaction.jobId != null && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng)) {
+                dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
+            }
+            //dispatch(navigateToScene('FormLayout', FormLayoutData))
         } catch (error) {
-            // To do
-            // Handle exceptions and change state accordingly
-            console.log(error)
+            showToastAndAddUserExceptionLog(1104, error.message, 'danger', 1)        
         }
     }
 }

@@ -3,7 +3,7 @@
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { statisticsListService } from '../../services/classes/Statistics'
-import { setState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import {
     SET_DATA_IN_STATISTICS_LIST,USER_SUMMARY
 } from '../../lib/constants'
@@ -23,7 +23,7 @@ export function getDataForStatisticsList() {
             const selectedStatisticsList =  statisticsListService.setStatisticsList(userSummaryList.value)
             dispatch(setState(SET_DATA_IN_STATISTICS_LIST, selectedStatisticsList))
         } catch (error) {
-           console.log("ErrorMessage",error)
+            showToastAndAddUserExceptionLog(2401, error.message, 'danger', 1)
         }
     }
 }

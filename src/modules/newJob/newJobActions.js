@@ -1,66 +1,23 @@
 'use strict'
 import {
-    NEW_JOB_MASTER,
     NEW_JOB_STATUS,
     SAVE_ACTIVATED,
-    SaveActivated,
-    CheckoutDetails,
     POPULATE_DATA,
-    JOB_MASTER,
     FormLayout,
-    SET_ERROR_MSG_FOR_NEW_JOB,
-    NewJobStatus
+    SET_NEWJOB_DRAFT_INFO,
 } from '../../lib/constants'
-import {
-    NEW_JOB_CONFIGURATION_ERROR
-} from '../../lib/ContainerConstants'
 import { newJob } from '../../services/classes/NewJob'
 import { setState, navigateToScene } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { transientStatusService } from '../../services/classes/TransientStatusService'
 import _ from 'lodash'
+import { draftService } from '../../services/classes/DraftService'
 
-
-export function getMastersWithNewJob() {
-    return async function (dispatch) {
-        let mastersWithNewJob = await newJob.getMastersWithNewJob();
-        if (_.size(mastersWithNewJob) == 1) {
-            dispatch(redirectToContainer(mastersWithNewJob[0]))
-        } else if (_.size(mastersWithNewJob) == 0) {
-            dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
-        }
-        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob));
-    }
-}
-
-export function getMastersFromMasterIds(jobMasterIds) {
-    return async function (dispatch) {
-        const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
-        let mastersWithNewJob = await newJob.getMastersFromMasterIds(jobMasters, jobMasterIds)
-        if (_.size(mastersWithNewJob) == 1) {
-            dispatch(redirectToContainer(mastersWithNewJob[0]))
-        } else if (_.size(mastersWithNewJob) == 0) {
-            dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
-        }
-        dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
-    }
-}
-
-export function getStatusAndIdForJobMaster(jobMasterId) {
-    return async function (dispatch) {
-        if (!jobMasterId) {
-            // fire error action for missing jobMasterId
-        }
-        //initially reset the statusList
-        dispatch(setState(NEW_JOB_STATUS, []));
-        let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMasterId);
-        if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
-            dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, jobMasterId))
-        }
-        dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
-    }
-}
-
+/**
+ * It will navigate to FormLayout container
+ * @param {*} status 
+ * @param {*} negativeId 
+ * @param {*} jobMasterId 
+ */
 export function redirectToFormLayout(status, negativeId, jobMasterId) {
     return async function (dispatch) {
         try {
@@ -68,39 +25,45 @@ export function redirectToFormLayout(status, negativeId, jobMasterId) {
                 statusId: status.id,
                 statusName: status.name,
                 jobTransactionId: negativeId,
-                jobMasterId: jobMasterId,
+                jobMasterId,
                 jobTransaction: {
                     id: negativeId,
-                    jobMasterId: jobMasterId,
+                    jobMasterId,
                     jobId: negativeId,
                 }
             }))
         } catch (error) {
-
+            //TODO
+            console.log(error)
         }
     }
 }
 
-export function redirectToContainer(jobMaster) {
+/**
+ * This method is called from home container and is use to check which container to navigate to
+ */
+export function redirectToContainer(pageObject) {
     return async function (dispatch) {
         try {
-            let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)
-            let returnParams = await newJob.checkForNextContainer(jobMaster, saveActivatedData)
-            if (returnParams.screenName == NewJobStatus) {
-                let nextPendingStatusWithId = await newJob.getNextPendingStatusForJobMaster(jobMaster.id);
-                if (_.size(nextPendingStatusWithId.nextPendingStatus) == 1) {
-                    dispatch(redirectToFormLayout(nextPendingStatusWithId.nextPendingStatus[0], nextPendingStatusWithId.negativeId, jobMaster.id))
+            let jobMasterId = JSON.parse(pageObject.jobMasterIds)[0]
+            let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)//get saveActiavted data
+            let returnParams = await newJob.checkForNextContainer(jobMasterId, saveActivatedData)//from saveActivated data check which container to go to
+            if (returnParams.screenName == FormLayout) {//if screenName is FormLayout check if draft exists
+                const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
+                const nextStatus = await newJob.getNextPendingStatusForJobMaster(jobMasterId, JSON.parse(pageObject.additionalParams).statusId)
+                if (_.isEmpty(draftStatusInfo)) {
+                    dispatch(redirectToFormLayout(nextStatus, -1, jobMasterId))
                 } else {
-                    dispatch(setState(NEW_JOB_STATUS, nextPendingStatusWithId));
-                    dispatch(navigateToScene(NewJobStatus, returnParams.navigationParams))
+                    dispatch(setState(SET_NEWJOB_DRAFT_INFO, { draft: draftStatusInfo, nextStatus }))
                 }
-            } else {
-                if (returnParams.stateParam) {
+            } else { //this is the case of saveActivated data which is present so navigate to saveActivated container or CheckoutDetails container depending upon screeName
+                if (returnParams.stateParam) { //if state params is present then populate state of saveActivated
                     await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
                 }
                 dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams))
             }
         } catch (error) {
+            //TODO
             console.log(error)
         }
     }

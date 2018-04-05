@@ -14,11 +14,12 @@ import DatastoreSchema from './schema/DatastoreSchema'
 import TransactionLogs from './schema/transactionLogs'
 import _ from 'lodash'
 import Draft from './schema/Draft'
-import crypto from 'crypto-js'
 import DeviceInfo from 'react-native-device-info'
+import AesCtr from '../services/classes/AesCtr'
+import userExceptionLogs from './schema/userExceptionLogsDB'
 
-const schemaVersion = 42;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft];
+const schemaVersion = 44;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs];
 
 let realm = new Realm({
     schemaVersion,
@@ -40,6 +41,7 @@ import {
     Datastore_Master_DB,
     TABLE_DRAFT,
     DEVICE_IMEI,
+    USER_EXCEPTION_LOGS,
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -64,13 +66,15 @@ export function saveList(tableName, array) {
  */
 export function performBatchSave(...tableNamesVsDataList) {
     return realm.write(() => {
-    let imeiNumber = DeviceInfo.getUniqueID()
+        let imeiNumber = DeviceInfo.getUniqueID()
         tableNamesVsDataList.forEach(record => {
             try {
                 if (!_.isEmpty(record.value) && !_.isUndefined(record.value)) {
                     if (record.tableName == TABLE_JOB_DATA || record.tableName == TABLE_FIELD_DATA) {
+                        // Create counter block from imei number used for encryption
+                        let counterBlock = Array.from(imeiNumber).slice(0, 8)
                         for (let data in record.value) {
-                            record.value[data].value = _encryptData(record.value[data].value, imeiNumber)
+                            record.value[data].value = _encryptData(record.value[data].value, imeiNumber, counterBlock)
                             realm.create(record.tableName, record.value[data], true)
                         }
                     } else {
@@ -83,11 +87,23 @@ export function performBatchSave(...tableNamesVsDataList) {
         })
     })
 }
-
-export function _encryptData(dataToEncrypt, encryptionKey) {
-    return (crypto.AES.encrypt(JSON.stringify(dataToEncrypt), encryptionKey)).toString()
+/**
+ * 
+ * @param {*} dataToEncrypt value to be decrypted
+ * @param {*} encryptionKey key used to encrypt
+ * @param {Array} counterBlock counter block used by aes to encrypt(recommended parameter in case of encryption in loop)
+ *  counterBlock: [1,2,3,4,5,6,7,8] array of 8 characters
+ */
+export function _encryptData(dataToEncrypt, encryptionKey, counterBlock) {
+    if (!dataToEncrypt) return
+    if (!encryptionKey) encryptionKey = DeviceInfo.getUniqueID()
+    if (!counterBlock) counterBlock = Array.from(encryptionKey).slice(0, 8)
+    return AesCtr.encrypt(dataToEncrypt, encryptionKey, 256, counterBlock)
 }
 
+export function _decryptData(dataToDecrypt, decryptionKey) {
+    return AesCtr.decrypt(dataToDecrypt, decryptionKey, 256)
+}
 export function deleteRecords() {
     return realm.write(() => {
         realm.delete(realm.objects(TABLE_JOB_TRANSACTION))
@@ -99,6 +115,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_SERVER_SMS_LOG))
         realm.delete(realm.objects(TABLE_TRANSACTION_LOGS))
         realm.delete(realm.objects(TABLE_DRAFT))
+        realm.delete(realm.objects(USER_EXCEPTION_LOGS))
     });
 }
 
@@ -154,11 +171,6 @@ export function getRecordListOnQuery(tableName, query, isSorted, sortProperty) {
     return records
 }
 
-export function _decryptData(dataToDecrypt, decryptionKey) {
-    let recordDataInBytes = crypto.AES.decrypt(dataToDecrypt, decryptionKey)
-    return JSON.parse(recordDataInBytes.toString(crypto.enc.Utf8))
-}
-
 export function updateRealmDb(tableName, transactionIdSequenceMap) {
     const filteredRecords = realm.objects(tableName).filtered(Object.keys(transactionIdSequenceMap).map(value => 'id = "' + value + '"').join(' OR '))
     realm.write(() => {
@@ -185,4 +197,9 @@ export function deleteSingleRecord(tableName, value, property) {
     realm.write(() => {
         realm.delete(filteredRecords)
     });
+}
+
+export function getMaxValueOfProperty(tableName, query, property) {
+    let filteredRecords = realm.objects(tableName).filtered(query).max(property)
+    return filteredRecords
 }

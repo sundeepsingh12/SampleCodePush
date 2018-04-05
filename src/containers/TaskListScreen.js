@@ -57,7 +57,7 @@ function mapDispatchToProps(dispatch) {
 class TaskListScreen extends PureComponent {
 
   componentDidMount() {
-    this.props.actions.shouldFetchJobsOrNot(this.props.jobTransactionCustomizationList)
+    this.props.actions.shouldFetchJobsOrNot(this.props.jobTransactionCustomizationList, this.props.pageObject)
   }
 
   navigateToScene = (item, groupId) => {
@@ -110,8 +110,8 @@ class TaskListScreen extends PureComponent {
     // Navigate to job details page when single transaction is searched
     if (_.size(jobTransactionArray) == 1 && scanner && isEqualMatchFound) {
       this.navigateToScene(jobTransactionArray[0], groupId)
-    }else if(scanner){
-      this.props.actions.setState(LISTING_SEARCH_VALUE,{searchText, scanner : false})
+    } else if (scanner) {
+      this.props.actions.setState(LISTING_SEARCH_VALUE, { searchText, scanner: false })
     }
     return jobTransactionArray
   }
@@ -237,7 +237,7 @@ class TaskListScreen extends PureComponent {
     })
     let groupId = null, lastId = null
     if (items.groupId && items.total > 1) {
-      lastId = jobTransactions[items.total - 1]['id']
+      lastId = jobTransactions[items.jobTransactions.length - 1]['id']
       groupId = items.groupId
     }
     return (

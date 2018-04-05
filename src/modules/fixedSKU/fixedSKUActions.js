@@ -15,20 +15,21 @@ import {
     ARRAY_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
 
-import { setState } from '../global/globalActions'
+import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 
 export function onSave(parentObject, formElement, fixedSKUList, isSaveDisabled, latestPositionId, jobTransaction) {
     return async function (dispatch) {
         try {
             fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
             let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(fixedSKUList, jobTransaction.id, parentObject.positionId, latestPositionId)
+            formElement.get(parentObject.fieldAttributeMasterId).editable = false
             dispatch(setState(SET_FIXED_SKU, {
                 fixedSKUList,
                 isLoaderRunning: false
             }))
             dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(901, error.message, 'danger', 1)
         }
     }
 }
@@ -39,7 +40,7 @@ export function onChangeQuantity(fixedSKUList, totalQuantity, payload) {
             let payload1 = await fixedSKUDetailsService.calculateQuantity(fixedSKUList, totalQuantity, payload)
             dispatch(setState(CHANGE_QUANTITY, payload1))
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(902, error.message, 'danger', 1)
         }
     }
 }
@@ -56,7 +57,8 @@ export function fetchFixedSKU(fieldAttributeMasterId) {
                 isLoaderRunning: false
             }))
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(903, error.message, 'danger', 1)            
+            dispatch(setState(IS_LOADER_RUNNING, false))
         }
     }
 }

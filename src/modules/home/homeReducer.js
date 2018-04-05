@@ -5,6 +5,8 @@ import React from 'react'
 
 const initialState = new InitialState()
 import {
+  PAGES_LOADING,
+  SET_PAGES_UTILITY_N_PIESUMMARY,
   HOME_LOADING,
   SET_MODULES,
   SYNC_STATUS,
@@ -17,24 +19,28 @@ import {
   SET_UPLOAD_FILE_COUNT,
   SET_FAIL_UPLOAD_COUNT,
   SET_BACKUP_FILES_LIST,
+  SET_TRANSACTION_SERVICE_STARTED,
   SET_ERP_PULL_ACTIVATED,
-  ERP_SYNC_STATUS
+  ERP_SYNC_STATUS,
+  SET_NEWJOB_DRAFT_INFO
 } from '../../lib/constants'
 
-
 export default function homeReducer(state = initialState, action) {
-  if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
-
+  if (!(state instanceof InitialState)) {
+    return initialState.mergeDeep(state)
+  }
   switch (action.type) {
-    case HOME_LOADING:
-      return state.set('moduleLoading', action.payload.moduleLoading)
+    case PAGES_LOADING: {
+      return state.set('pagesLoading', action.payload.pagesLoading)
+    }
 
-    case SET_MODULES:
-      return state.set('modules', action.payload.modules)
-        .set('pieChart', action.payload.pieChart)
-        .set('menu', action.payload.menu)
-        .set('moduleLoading', action.payload.moduleLoading)
-        .set('newJobModules',action.payload.newJobModules)
+    case SET_PAGES_UTILITY_N_PIESUMMARY: {
+      return state.set('mainMenuList', action.payload.sortedMainMenuAndSubMenuList.mainMenuSectionList)
+        .set('subMenuList', action.payload.sortedMainMenuAndSubMenuList.subMenuSectionList)
+        .set('utilities', action.payload.utilities)
+        .set('pieChartSummaryCount', action.payload.pieChartSummaryCount)
+        .set('pagesLoading', false);
+    }
 
     case SET_ERP_PULL_ACTIVATED: {
       return state.set('customErpPullActivated', action.payload.customErpPullActivated)
@@ -79,7 +85,12 @@ export default function homeReducer(state = initialState, action) {
 
     case SET_BACKUP_FILES_LIST:
       return state.set('unsyncBackupFilesList', action.payload)
-  }
 
-  return state
+    case SET_NEWJOB_DRAFT_INFO:
+      return state.set('draftNewJobInfo', action.payload)
+
+    case SET_TRANSACTION_SERVICE_STARTED:
+      return state.set('trackingServiceStarted', action.payload)
+  }
+  return state;
 }
