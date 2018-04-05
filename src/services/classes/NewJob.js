@@ -1,8 +1,8 @@
 import {
     JOB_STATUS,
     PENDING,
-    NewJobStatus,
-    SaveActivated
+    SaveActivated,
+    FormLayout
 } from '../../lib/constants'
 import { transientStatusAndSaveActivatedService } from './TransientStatusAndSaveActivatedService.js'
 import { keyValueDBService } from './KeyValueDBService.js'
@@ -38,10 +38,10 @@ class NewJob {
             throw new Error(JOB_MASTER_MISSING)
         }
         let navigationParams, stateParam, screenName
-        //if save activated data is not present or save activated data is present but not with that jobMaster which is been clicked than NewJobStatus is the next container
+        //if save activated data is not present or save activated data is present but not with that jobMaster which is been clicked than form layout is the next container
         if (!saveActivatedData || !saveActivatedData.value[jobMasterId]) {
             return {
-                screenName: NewJobStatus,
+                screenName: FormLayout,
             }
         }//if saveActivated data is present and it has screenName of SaveActivated then navigate to SaveActivated Container
         else if (saveActivatedData.value[jobMasterId].screenName == SaveActivated) {

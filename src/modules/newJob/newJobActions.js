@@ -4,8 +4,7 @@ import {
     SAVE_ACTIVATED,
     POPULATE_DATA,
     FormLayout,
-    NewJobStatus,
-    SET_NEWJOB_DRAFT_INFO
+    SET_NEWJOB_DRAFT_INFO,
 } from '../../lib/constants'
 import { newJob } from '../../services/classes/NewJob'
 import { setState, navigateToScene } from '../global/globalActions'
@@ -49,7 +48,7 @@ export function redirectToContainer(pageObject) {
             let jobMasterId = JSON.parse(pageObject.jobMasterIds)[0]
             let saveActivatedData = await keyValueDBService.getValueFromStore(SAVE_ACTIVATED)//get saveActiavted data
             let returnParams = await newJob.checkForNextContainer(jobMasterId, saveActivatedData)//from saveActivated data check which container to go to
-            if (returnParams.screenName == NewJobStatus) {//if screenName is NewJobStatus check if draft exists
+            if (returnParams.screenName == FormLayout) {//if screenName is FormLayout check if draft exists
                 const draftStatusInfo = draftService.getDraftForState(null, jobMasterId)
                 const nextStatus = await newJob.getNextPendingStatusForJobMaster(jobMasterId, JSON.parse(pageObject.additionalParams).statusId)
                 if (_.isEmpty(draftStatusInfo)) {

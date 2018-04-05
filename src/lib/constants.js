@@ -281,7 +281,6 @@ module.exports = keyMirror({
     SaveActivated: null,
     Transient: null,
     CheckoutDetails: null,
-    NewJobStatus: null,
     BulkListing: null,
     Sorting: null,
     ProfileView: null,
