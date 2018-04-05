@@ -93,6 +93,7 @@ class HomeTabNavigator extends PureComponent {
         }
         const tabStyle = {
             tabBarPosition: 'bottom',
+            initialRouteName: 'HomeScreen',
             animationEnabled: true,
             tabBarOptions: {
                 showIcon: true,
@@ -129,7 +130,7 @@ class HomeTabNavigator extends PureComponent {
                 ErpSyncScreen: Tabs.ErpSyncScreen,
                 MenuScreen: Tabs.MenuScreen
             },
-                tabStyle
+                tabStyle,
             );
         } else {
             HomeTabNavigatorOptions = TabNavigator({

@@ -146,7 +146,7 @@ export function authenticateUser(username, password, rememberMe) {
         routeName: PreloaderScreen
       }))
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0))
+      showToastAndAddUserExceptionLog(1301, error.message, 'danger', 0)
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
     }
   }
@@ -169,7 +169,7 @@ export function onLongPressResetSettings() {
       dispatch(setState(RESET_STATE))
       dispatch(onLongPressIcon(false))
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1302, error.message, 'danger', 1))
+      showToastAndAddUserExceptionLog(1302, error.message, 'danger', 1)
       dispatch(onLongPressIcon(false))
     }
   }
@@ -187,7 +187,7 @@ export function forgetPasswordRequest(username) {
       const response = await RestAPIFactory().serviceCall(data, CONFIG.API.FORGET_PASSWORD, 'LOGIN')
       dispatch(loginFailure(response.json.message.replace(/<\/?[^>]+(>|$)/g, "")))
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1303, error.message, 'danger', 0))
+      showToastAndAddUserExceptionLog(1303, error.message, 'danger', 0)
       dispatch(loginFailure(error.message.replace(/<\/?[^>]+(>|$)/g, "")))
     }
   }
@@ -205,7 +205,7 @@ export function checkRememberMe() {
         dispatch(rememberMeSetTrue())
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1304, error.message, 'danger', 1))
+      showToastAndAddUserExceptionLog(1304, error.message, 'danger', 1)
     }
   }
 }
@@ -246,7 +246,7 @@ export function getSessionToken() {
         }
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1305, error.message, 'danger', 1))
+      showToastAndAddUserExceptionLog(1305, error.message, 'danger', 1)
       dispatch(NavigationActions.navigate({
         routeName: LoginScreen
       }))

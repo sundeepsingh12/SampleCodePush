@@ -88,17 +88,11 @@ export function deleteSessionToken() {
   }
 }
 
-export async function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
-  return async function (dispatch) {
-    try {
+export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
       if (isToastShow == 1) {
-        Toast.show({ text: "ErrorCode: " + errorCode + "\n " + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
+        Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
       }
-      await userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+      userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
 }
 //Use to reset navigation state
 export function resetNavigationState(index, actions) {

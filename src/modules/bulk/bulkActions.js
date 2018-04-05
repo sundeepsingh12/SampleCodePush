@@ -30,6 +30,7 @@ import { jobStatusService } from '../../services/classes/JobStatus';
 import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { bulkService } from '../../services/classes/Bulk'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
+import { jobTransactionService } from '../../services/classes/JobTransaction';
 
 /**
  * This action sets job transaction,manual selection,selectAll and search on line1 or lin2 parameters
@@ -148,7 +149,6 @@ export function toggleMultipleTransactions(jobTransactionList, allTransactions, 
                 bulkTransactions[jobTransaction.id].isChecked ? cloneSelectedItems[jobTransaction.id] = bulkService.getSelectedTransactionObject(bulkTransactions[jobTransaction.id]) : delete cloneSelectedItems[jobTransaction.id]
             }
             let displayText = _.size(cloneSelectedItems) == _.size(bulkTransactions) ? SELECT_NONE : SELECT_ALL
-            console.log('displayText', displayText)
             dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
                 selectedItems: cloneSelectedItems,
                 bulkTransactions,

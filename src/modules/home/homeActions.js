@@ -45,6 +45,7 @@ import {
   NewJob,
   BulkListing,
   SET_TRANSACTION_SERVICE_STARTED,
+  SYNC_RUNNING,
 } from '../../lib/constants'
 
 import {
@@ -231,7 +232,7 @@ export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
     if (!trackingServiceStarted) {
       trackingService.init()
-      dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+      // dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
     }
   }
 }
@@ -281,7 +282,6 @@ export function startMqttService(pieChart) {
           return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
         })
         .catch(responseObject => {
-          console.log('catch', responseObject)
           if (responseObject.errorCode !== 0) {
             console.log('onConnectionLost:' + responseObject.errorMessage);
             // dispatch(startMqttService())
@@ -295,6 +295,12 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
   return async function (dispatch) {
     let syncStoreDTO
     try {
+      let syncRunning = await keyValueDBService.getValueFromStore(SYNC_RUNNING);
+      if (syncRunning && syncRunning.value) {
+        return
+      } else {
+        await keyValueDBService.validateAndSaveData(SYNC_RUNNING, true);
+      }
       syncStoreDTO = await transactionCustomizationService.getSyncParamaters()
       const userData = syncStoreDTO.user
       const autoLogoutEnabled = userData ? userData.company ? userData.company.autoLogoutFromDevice : null : null
@@ -357,7 +363,6 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
       else {
         let connectionInfo = await utilitiesService.checkInternetConnection()
         syncStatus = (connectionInfo) ? 'ERROR' : 'NOINTERNET'
-
       }
       //Update Javadoc
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
@@ -374,6 +379,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         const difference = await sync.calculateDifference()
         dispatch(setState(LAST_SYNC_TIME, difference))
       }
+      await keyValueDBService.deleteValueFromStore(SYNC_RUNNING)
     }
   }
 }
@@ -402,7 +408,7 @@ export function pieChartCount() {
     try {
       dispatch(setState(CHART_LOADING, { loading: true }))
       const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount()
-      dispatch(setState(CHART_LOADING, { loading: false, count : countForPieChart }))
+      dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
     } catch (error) {
       //Update UI here
       console.log(error)
@@ -511,7 +517,7 @@ export function resetFailCountInStore() {
   }
 }
 
-export function navigateToNewJob(jobMasterIds,displayName) {
+export function navigateToNewJob(jobMasterIds, displayName) {
   return async function (dispatch) {
     try {
       const jobMasters = await keyValueDBService.getValueFromStore(JOB_MASTER)
@@ -531,7 +537,7 @@ export function navigateToNewJob(jobMasterIds,displayName) {
           if (returnParams.stateParam) {
             await dispatch(setState(POPULATE_DATA, returnParams.stateParam))
           }
-          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, {displayName}))
+          dispatch(navigateToScene(returnParams.screenName, returnParams.navigationParams, { displayName }))
         }
       } else if (_.size(mastersWithNewJob) == 0) {
         Toast.show({
@@ -544,7 +550,7 @@ export function navigateToNewJob(jobMasterIds,displayName) {
         // dispatch(setState(SET_ERROR_MSG_FOR_NEW_JOB, NEW_JOB_CONFIGURATION_ERROR))
       } else {
         dispatch(setState(NEW_JOB_MASTER, mastersWithNewJob))
-        dispatch(navigateToScene(NewJob,{displayName}))
+        dispatch(navigateToScene(NewJob, { displayName }))
       }
     } catch (error) {
       console.log(error)

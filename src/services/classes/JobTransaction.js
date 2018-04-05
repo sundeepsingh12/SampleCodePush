@@ -241,7 +241,7 @@ class JobTransaction {
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         if (callingActivity == 'Bulk') {
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND jobStatusId = ${callingActivityData.pageObject.additionalParams.statusId}`
-            console.log('jobTransactionQuery', jobTransactionQuery)
+            jobTransactionQuery = callingActivityData.jobIdGroupIdMap && !_.isEmpty(callingActivityData.jobIdGroupIdMap) ? `${jobTransactionQuery} AND ${Object.keys(callingActivityData.jobIdGroupIdMap).map(data => 'jobId != ' + data).join(' AND ')}` : jobTransactionQuery
             if (callingActivityData.groupId) {
                 let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
                 let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
@@ -313,7 +313,7 @@ class JobTransaction {
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         jobTransactionQuery = `(${jobTransactionQuery}) AND (${jobMasterQuery}) AND (${jobStatusQuery})`
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, SEQ_SELECTED)
-        return jobTransactionList && jobTransactionList.length > 0 ? jobTransactionList[0] : {}
+        return jobTransactionList && jobTransactionList.length > 0 ? jobTransactionList[0] : null
     }
 
     updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
@@ -334,8 +334,13 @@ class JobTransaction {
       */
 
     getEnableMultiPartJobMaster(jobMasterList) {
-        let jobMasterListWithEnableMultiPart = jobMasterList.filter(jobMaster => jobMaster.enableMultipartAssignment == true)
-        return jobMasterListWithEnableMultiPart
+        let jobMasterIdListWithEnableMultiPart = []
+        jobMasterList.forEach(jobMaster => {
+            if (jobMaster.enableMultipartAssignment) {
+                jobMasterIdListWithEnableMultiPart.push(jobMaster.id)
+            }
+        })
+        return jobMasterIdListWithEnableMultiPart
     }
 
     /** @function getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)
@@ -346,8 +351,8 @@ class JobTransaction {
      *@return {Object} {jobIdGroupIdMap}
      */
 
-    getJobIdGroupIdMap(jobMasterListWithEnableMultiPart) {
-        let jobMasterQuery = jobMasterListWithEnableMultiPart.map(jobMaster => 'jobMasterId = ' + jobMaster.id).join(' OR ')
+    getJobIdGroupIdMap(jobMasterIdListWithEnableMultiPart) {
+        let jobMasterQuery = jobMasterIdListWithEnableMultiPart.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
         let jobQuery = `groupId != null AND (${jobMasterQuery})`
         let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
         let jobIdGroupIdMap = {}
@@ -394,7 +399,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
-        if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
+        if(!_.isEmpty(jobIdGroupIdMap)){
             statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
             tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
             tabIdGroupTransactionsMap['isGrouping'] = true
@@ -434,7 +439,7 @@ class JobTransaction {
             }
             jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
             jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
-            if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
+            if (!_.isEmpty(jobIdGroupIdMap) && statusIdsTabIdsMap[jobTransactionCustomization.statusId]) {
                 let groupId = jobIdGroupIdMap[jobTransactionCustomization.jobId] ? jobIdGroupIdMap[jobTransactionCustomization.jobId] : null
                 let groupIdTabKey = groupId ? groupId + '&' + statusIdsTabIdsMap[jobTransactionCustomization.statusId] : null
                 if (!groupId) {

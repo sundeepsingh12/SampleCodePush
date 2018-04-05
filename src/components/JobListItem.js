@@ -166,7 +166,7 @@ export default class JobListItem extends PureComponent {
         onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
         <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : { backgroundColor: '#ffffff' }]}>
-        {this.props.lastId != null ? <View style={{position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: (this.props.lastId != this.props.data.id) ? '100%' : '50%',top:0, left: 36, zIndex: 1}}></View> : null}
+        {this.props.lastId != null ? <View style={{position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: (this.props.lastId != this.props.data.id) ? '100%' : '30%',top:0, left: 36, zIndex: 1}}></View> : null}
          {this.showJobMasterIdentifierAndCheckMark()}
           <View style={style.seqCardDetail}>
             {this.renderJobListItemDetails()}

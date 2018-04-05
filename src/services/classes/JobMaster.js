@@ -131,7 +131,6 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
-    // console.log('job master json', json)
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
     await keyValueDBService.validateAndSaveData(USER, json.user);

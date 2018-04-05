@@ -296,7 +296,7 @@ module.exports = {
 
     //Sorting
     SORTING: 'Sorting',
-    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
+    REF_UNAVAILABLE: 'Reference Number Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
 

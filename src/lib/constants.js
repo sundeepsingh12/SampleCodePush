@@ -207,6 +207,7 @@ module.exports = keyMirror({
     GEO_FENCING: null,
     GEO_FENCE_STATUS: null,
     LAT_LONG_GEO_FENCE: null,
+    SYNC_RUNNING: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -424,6 +425,7 @@ module.exports = keyMirror({
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
     SORTING_LOADER: null,
+    DEFAULT_ERROR_MESSAGE_IN_SORTING: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,

@@ -268,7 +268,7 @@ export function downloadJobMaster() {
       const json = await jobMasters.json
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
-      dispatch(autoLogout(userObject))
+      // dispatch(autoLogout(userObject))
     } catch (error) {
       dispatch(showToastAndAddUserExceptionLog(1801, error.message, 'danger', 0))
       if (error.code == 403 || error.code == 400) {

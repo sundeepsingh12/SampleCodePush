@@ -176,7 +176,7 @@ class Login extends PureComponent {
 
   showPasswordView() {
     return (
-      <Item rounded>
+      <Item rounded style={[styles.marginBottom10]}>
         <TextInput
           value={this.props.auth.form.password}
           placeholder='Password'

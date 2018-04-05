@@ -51,6 +51,9 @@ class Home extends PureComponent {
       })
     }
     this.props.actions.fetchPagesAndPiechart();
+    this.props.actions.startMqttService(this.props.pieChart);
+    this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated');
+    this.props.actions.startTracking(this.props.trackingServiceStarted);
   }
 
   getPageView(page) {
@@ -68,8 +71,8 @@ class Home extends PureComponent {
       return null
     }
     return (
-      <View style = {[styles.bgWhite, styles.padding10]}>
-        <Text style = {[styles.fontLg, styles.fontDarkGray, styles.paddingVertical10]}>{section.title}</Text>
+      <View style={[styles.bgWhite, styles.padding10]}>
+        <Text style={[styles.fontLg, styles.fontDarkGray, styles.paddingVertical10]}>{section.title}</Text>
       </View>
     );
   }

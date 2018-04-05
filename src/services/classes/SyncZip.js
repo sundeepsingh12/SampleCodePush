@@ -22,7 +22,8 @@ import {
     FIELD_ATTRIBUTE,
     JOB_STATUS,
     JOB_MASTER,
-    UNSEEN
+    UNSEEN,
+    USER_EXCEPTION_LOGS
 } from '../../lib/constants'
 import moment from 'moment'
 import { trackingService } from './Tracking'
@@ -59,34 +60,27 @@ class SyncZip {
         SYNC_RESULTS.job = realmDbData.jobList;
         SYNC_RESULTS.jobTransaction = realmDbData.transactionList;
         SYNC_RESULTS.runSheetSummary = realmDbData.runSheetSummary;
-
         SYNC_RESULTS.scannedReferenceNumberLog = [];
         SYNC_RESULTS.serverSmsLog = addServerSmsService.getServerSmsLogs(realmDbData.serverSmsLogs, syncStoreDTO.lastSyncWithServer);
-
         SYNC_RESULTS.trackLog = trackingService.getTrackLogs(realmDbData.trackLogs, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.transactionLog = realmDbData.transactionLogs;
         SYNC_RESULTS.userCommunicationLog = [];
         SYNC_RESULTS.userEventsLog = userEventLogService.getUserEventLogsList(syncStoreDTO.userEventsLogsList, syncStoreDTO.lastSyncWithServer)
-        SYNC_RESULTS.userExceptionLog = [];
-        SYNC_RESULTS.userExceptionLog = await userExceptionLogsService.getUserExceptionLogs(lastSyncTime)
-
+        SYNC_RESULTS.userExceptionLog = userExceptionLogsService.getUserExceptionLog(realmDbData.userExceptionLog, lastSyncTime)
         let jobSummary = jobSummaryService.getJobSummaryListForSync(syncStoreDTO.jobSummaryList, syncStoreDTO.lastSyncWithServer)
         SYNC_RESULTS.jobSummary = jobSummary || {}
-
         const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');
-
         //Creating ZIP file
         const targetPath = PATH + '/sync.zip'
         const sourcePath = PATH_TEMP
         await zip(sourcePath, targetPath);
-
         //Deleting TEMP folder location
-        await RNFS.unlink(PATH_TEMP);
+        RNFS.unlink(PATH_TEMP).then(() => { }).catch((error) => { })
     }
 
     updateUserSummaryNextJobTransactionId(statusList, jobMasterList, userSummary) {
@@ -106,7 +100,7 @@ class SyncZip {
     * @param {*} transactionIds whose data is to be synced
     */
     _getSyncDataFromDb(transactionIdsObject) {
-
+        let userExceptionLog = _getDataFromRealm([], null, USER_EXCEPTION_LOGS)
         let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
         // console.log('lastSyncTime',lastSyncTime.value)
         // const formattedTime = moment(lastSyncTime.value).format('YYYY-MM-DD HH:mm:ss')
@@ -127,20 +121,21 @@ class SyncZip {
                 serverSmsLogs,
                 runSheetSummary,
                 transactionLogs,
-                trackLogs
+                trackLogs,
+                userExceptionLog
             };
         }
         let transactionIds = transactionIdsObject.value;
         let fieldDataQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
-        fieldDataList = _getDataFromRealm([], fieldDataQuery, TABLE_FIELD_DATA);
+        fieldDataList = this._getDataFromRealm([], fieldDataQuery, TABLE_FIELD_DATA);
         let transactionListQuery = fieldDataQuery.replace(/jobTransactionId/g, 'id'); // regex expression to replace all jobTransactionId with id
-        transactionList = _getDataFromRealm([], transactionListQuery, TABLE_JOB_TRANSACTION);
+        transactionList = this._getDataFromRealm([], transactionListQuery, TABLE_JOB_TRANSACTION);
         let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
-        jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB)
+        jobList = this._getDataFromRealm([], jobIdQuery, TABLE_JOB)
         let smsLogsQuery = transactionIds.map(transactionId => 'jobTransactionId = ' + transactionId.id).join(' OR ')
-        serverSmsLogs = _getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
+        serverSmsLogs = this._getDataFromRealm([], smsLogsQuery, TABLE_SERVER_SMS_LOG);
         let transactionLogQuery = transactionIds.map(transactionId => 'transactionId = ' + transactionId.id).join(' OR ')
-        transactionLogs = _getDataFromRealm([], transactionLogQuery, TABLE_TRANSACTION_LOGS);
+        transactionLogs = this._getDataFromRealm([], transactionLogQuery, TABLE_TRANSACTION_LOGS);
         return {
             fieldDataList,
             transactionList,
@@ -148,7 +143,8 @@ class SyncZip {
             serverSmsLogs,
             runSheetSummary,
             transactionLogs,
-            trackLogs
+            trackLogs,
+            userExceptionLog
         }
     }
 
@@ -167,12 +163,13 @@ class SyncZip {
      * }
      */
     getDataToBeSyncedFromDB(transactionIdList) {
+        let userExceptionLog = this.getDataFromRealmDB(null, USER_EXCEPTION_LOGS)
         let runSheetSummary = this.getDataFromRealmDB(null, TABLE_RUNSHEET);
         let trackLogs = this.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
         let transactionList = [], fieldDataList = [], jobList = [], serverSmsLogs = [], transactionLogs = [];
         if (!transactionIdList) {
             serverSmsLogs = this.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
-            return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs };
+            return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog };
         }
         let fieldDataQuery, jobTransactionQuery, jobQuery, transactionLogQuery
         for (let index in transactionIdList) {
@@ -193,7 +190,7 @@ class SyncZip {
         jobList = this.getDataFromRealmDB(jobQuery, TABLE_JOB);
         serverSmsLogs = this.getDataFromRealmDB(fieldDataQuery, TABLE_SERVER_SMS_LOG);
         transactionLogs = this.getDataFromRealmDB(transactionLogQuery, TABLE_TRANSACTION_LOGS);
-        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs }
+        return { fieldDataList, transactionList, jobList, serverSmsLogs, runSheetSummary, transactionLogs, trackLogs, userExceptionLog }
     }
 
     /**

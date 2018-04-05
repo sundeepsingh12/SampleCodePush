@@ -181,7 +181,6 @@ class SplitPayment extends Component {
 
     render() {
         let paymentModeListView = this.renderPaymentModeListView(this.props.splitPaymentModeMap)
-        console.log('split paymeny', this.props)
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
