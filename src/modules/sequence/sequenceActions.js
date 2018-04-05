@@ -30,7 +30,7 @@ import {
     JOB_NOT_PRESENT
 } from '../../lib/ContainerConstants'
 import {
-    setState, navigateToScene
+    setState, navigateToScene, showToastAndAddUserExceptionLog
 } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
@@ -62,7 +62,7 @@ export function prepareListForSequenceModule(runsheetNumber, jobMasterIds) {
                 jobMasterSeperatorMap
             }))
         } catch (error) {
-            // TODO
+            showToastAndAddUserExceptionLog(2601, error.message, null, 0)
             //set toast if an error occured
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
@@ -95,7 +95,7 @@ export function resequenceJobsFromServer(sequenceList) {
                 responseMessage: (unallocatedTransactionCount) ? unallocatedTransactionCount + UNTRACKED_JOBS_MESSAGE : ''//if unallocatedTransactionCount present than show its couont in a toast 
             }))
         } catch (error) {
-            // TODO
+            showToastAndAddUserExceptionLog(2602, error.message, null, 0)
             dispatch(setState(PREPARE_UPDATE_LIST, {
                 updatedSequenceList: sequenceList,
                 responseMessage: error.message,
@@ -131,7 +131,7 @@ export function getRunsheetsForSequence(pageObject) {
                 }))
             }
         } catch (error) {
-            // TODO
+            showToastAndAddUserExceptionLog(2603, error.message, null, 0)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
@@ -155,7 +155,7 @@ export function rowMoved(rowParam, sequenceList, transactionsWithChangedSeqeunce
                 transactionsWithChangedSeqeunceMap: newTransactionsWithChangedSeqeunceMap,
             }))
         } catch (error) {
-            //TODO
+            showToastAndAddUserExceptionLog(2604, error.message, null, 0)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
@@ -174,7 +174,7 @@ export function saveSequencedJobTransactions(transactionsWithChangedSeqeunceMap)
             await sequenceService.updateJobTrasaction(transactionsWithChangedSeqeunceMap)
             dispatch(setState(CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP, SAVE_SUCCESSFUL))//clear transactionsWithChangedSeqeunceMap to empty
         } catch (error) {
-            // TODO
+            showToastAndAddUserExceptionLog(2605, error.message, null, 0)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
@@ -197,7 +197,7 @@ export function searchReferenceNumber(searchText, sequenceList) {
             //set jobTransaction whose reference number is matched and open modal so user can change its sequence number
             dispatch(setState(SET_SEQUENCE_LIST_ITEM, searchObject))
         } catch (error) {
-            //TODO
+            showToastAndAddUserExceptionLog(2606, error.message, null, 0)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
@@ -222,7 +222,7 @@ export function jumpSequence(currentSequenceListItemIndex, newSequence, sequence
                 transactionsWithChangedSeqeunceMap: newTransactionsWithChangedSeqeunceMap,
             }))
         } catch (error) {
-            //TODO
+            showToastAndAddUserExceptionLog(2607, error.message, null, 0)
             dispatch(setState(SET_RESPONSE_MESSAGE, error.message))
         }
     }
