@@ -1,5 +1,5 @@
 import { keyValueDBService } from '../KeyValueDBService.js'
-import { transientStatusService } from '../TransientStatusService.js'
+import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
 import {
     AFTER,
     BEFORE,
@@ -171,7 +171,7 @@ class FormLayout {
     getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction, latestPositionId) {
         let formLayoutObject = new Map()
         if (!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0) {
-            return { formLayoutObject, isSaveDisabled: false }
+            return { formLayoutObject, isSaveDisabled: false, noFieldAttributeMappedWithStatus: true } //no field attribute mapped to this status
         }
 
         let isRequiredAttributeFound = false
@@ -201,7 +201,7 @@ class FormLayout {
         //     // formLayoutObject.set(tempFieldAttributeList[0].id, this.getFieldAttributeObject(tempFieldAttributeList[0], formLayoutObject.get(tempFieldAttributeList[0].id).validation, formLayoutObject.get(tempFieldAttributeList[0].id).positionId))
         // }
         let positionId = sequenceWiseSortedFieldAttributesForStatus.length + latestPositionId
-        return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId: positionId }
+        return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId: positionId, noFieldAttributeMappedWithStatus: false }
     }
 
     /**
@@ -263,17 +263,19 @@ class FormLayout {
     }
 
     concatFormElementForTransientStatus(navigationFormLayoutStates, formElement) {
-        let combineMap = new Map(formElement);
+        let combineMap = new Map(formElement)
         for (let formLayoutCounter in navigationFormLayoutStates) {
             let formElementForPreviousStatus = navigationFormLayoutStates[formLayoutCounter].formElement
-            combineMap = new Map([...combineMap, ...formElementForPreviousStatus])
+            let formElement1 = JSON.parse(JSON.stringify([...combineMap]))//deep cloning ES6 Map
+            let formElement2 = JSON.parse(JSON.stringify([...formElementForPreviousStatus]))// concatinating fieldAttributes i.e. formElement map of multiple status in case if transient status is present
+            combineMap = new Map(formElement1.concat(formElement2))
         }
         return combineMap
     }
 
     async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList) {
         let routeName, routeParam
-        const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
+        const currentStatus = await transientStatusAndSaveActivatedService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
             routeName = SaveActivated
             routeParam = {
@@ -281,19 +283,19 @@ class FormLayout {
                 contactData, currentStatus, jobTransaction, jobMasterId,
                 navigationFormLayoutStates
             }
-            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+            await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
 
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
-            let { elementsArray, amount } = await transientStatusService.getDataFromFormElement(formLayoutState.formElement)
-            let totalAmount = await transientStatusService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
+            let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
+            let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
             routeName = CheckoutDetails
             routeParam = { commonData: previousStatusSaveActivated.commonData.commonData, recurringData: previousStatusSaveActivated.recurringData, totalAmount, signOfData: elementsArray, jobMasterId }
             let formLayoutObject = formLayoutState.formElement
             if (navigationFormLayoutStates) {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
-            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+            await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
+            await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
 
         }
         else if (currentStatus.transient) {
@@ -310,7 +312,7 @@ class FormLayout {
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
             if (!jobTransaction.length) { //Delete draft only if not bulk
-                await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+                await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
             }
             await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(false))

@@ -141,7 +141,7 @@ class Transient extends PureComponent {
                             </FlatList>
                         </List>
                     </View>
-                </Content>
+                </Content>        
             </Container>
         )
     }
@@ -178,9 +178,9 @@ const style = StyleSheet.create({
         padding: 15
     },
     statusCircle: {
-        width: 6,
-        height: 6,
-        borderRadius: 3
+        width: 10,
+        height: 10,
+        borderRadius: 5
     }
 });
 /**

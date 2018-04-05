@@ -21,7 +21,8 @@ import {
   SET_BACKUP_FILES_LIST,
   SET_TRANSACTION_SERVICE_STARTED,
   SET_ERP_PULL_ACTIVATED,
-  ERP_SYNC_STATUS
+  ERP_SYNC_STATUS,
+  SET_NEWJOB_DRAFT_INFO
 } from '../../lib/constants'
 
 export default function homeReducer(state = initialState, action) {
@@ -84,6 +85,9 @@ export default function homeReducer(state = initialState, action) {
 
     case SET_BACKUP_FILES_LIST:
       return state.set('unsyncBackupFilesList', action.payload)
+
+    case SET_NEWJOB_DRAFT_INFO:
+      return state.set('draftNewJobInfo', action.payload)
 
     case SET_TRANSACTION_SERVICE_STARTED:
       return state.set('trackingServiceStarted', action.payload)

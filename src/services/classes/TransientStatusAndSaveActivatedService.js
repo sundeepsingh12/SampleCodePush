@@ -50,7 +50,7 @@ import {
     SMS_SENT_SUCCESSFULLY,
     EMAIL_SENT_SUCCESSFULLY,
 } from '../../lib/ContainerConstants'
-class TransientStatusService {
+class TransientStatusAndSaveActivatedService {
 
     /**
        * This function returns current status
@@ -220,7 +220,9 @@ class TransientStatusService {
             if (!isCalledFromFormLayout) {
                 formLayoutObject = await formLayoutService.concatFormElementForTransientStatus(previousFormLayoutState, dataForSingleTransaction.formLayoutState.formElement)
             } else {
-                formLayoutObject = new Map([...previousFormLayoutState, ...dataForSingleTransaction.formLayoutState.formElement])
+                let formElement1 = JSON.parse(JSON.stringify([...previousFormLayoutState]))//deep cloning ES6 Map
+                let formElement2 = JSON.parse(JSON.stringify([...dataForSingleTransaction.formLayoutState.formElement]))
+                formLayoutObject = new Map(formElement1.concat(formElement2))// concatinating fieldAttributes i.e. formElement map of multiple status in case if saveActivated status have next status
             }
             let returnParams = (formLayoutObject) ? this.prepareDTOOfFromLayoutObject(formLayoutObject, emailIdInFieldData, contactNumberInFieldData) : {}
             emailIdInFieldData = returnParams.emailIdInFieldData
@@ -391,4 +393,4 @@ class TransientStatusService {
     }
 }
 
-export let transientStatusService = new TransientStatusService()
+export let transientStatusAndSaveActivatedService = new TransientStatusAndSaveActivatedService()

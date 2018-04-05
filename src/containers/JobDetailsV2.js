@@ -60,7 +60,7 @@ import {
   RESET_STATE_FOR_JOBDETAIL,
   BulkListing,
   SHOW_DROPDOWN,
-  SET_DRAFT_JOB_DETAILS_INFO
+  SET_JOBDETAILS_DRAFT_INFO
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -80,6 +80,8 @@ import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { jobStatusService } from '../services/classes/JobStatus'
+import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/formLayoutActions'
+import DraftModal from '../components/DraftModal'
 import Line1Line2View from '../components/Line1Line2View'
 
 
@@ -107,7 +109,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions, restoreDraftAndNavigateToFormLayout }, dispatch)
   }
 }
 
@@ -170,6 +172,7 @@ class JobDetailsV2 extends PureComponent {
       </TouchableOpacity>
     )
   }
+  
   renderDropDownStatus(length, minIndexDropDown) {
     return (
       <ListItem
@@ -187,7 +190,7 @@ class JobDetailsV2 extends PureComponent {
 
   renderStatusList(statusList) {
     let statusView = []
-    if (this.props.jobTransaction.id < 0 && this.props.jobDataList.length < 1) {
+    if (this.props.jobTransaction.id < 0 && this.props.jobTransaction.jobId < 0 && this.props.jobDataList.length < 1) {//In case of new job which is not synced with server do not show status button
       return statusView
     }
     let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
@@ -224,10 +227,6 @@ class JobDetailsV2 extends PureComponent {
   }
   _onCancel = () => {
     this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
-  }
-
-  _onCancelForDraft = () => {
-    this.props.actions.setState(SET_DRAFT_JOB_DETAILS_INFO, {})
   }
 
   _onCheckLocationMismatch = (statusList, jobTransaction) => {
@@ -406,7 +405,7 @@ class JobDetailsV2 extends PureComponent {
       }
     }
   }
-
+  
   alertForStatusRevert(statusData) {
     Alert.alert(
       CONFIRM_REVERT,
@@ -426,7 +425,7 @@ class JobDetailsV2 extends PureComponent {
       groupId
     })
   }
-
+  
   selectStatusToRevert = () => {
     if (this.props.statusRevertList[0] == 1) {
       { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
@@ -459,16 +458,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   showDraftAlert() {
-    // let draftStatus = this.props.currentStatus.nextStatusList.filter(nextStatus => nextStatus.id == this.props.draftStatusId)
-    // let draftMessage = (draftStatus.length > 0) ? 'Do you want to restore draft for ' + draftStatus[0].name + '?' : 'Do you want to restore draft?'
-    let draftMessage = 'Do you want to restore draft for ' + this.props.draftStatusInfo.name + '?'
-    let view =
-      <CustomAlert
-        title="Draft"
-        message={draftMessage}
-        onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={this._onCancelForDraft} />
-    return view
+    return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={() => this._goToFormLayoutWithDraft()} onCancelPress={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} onRequestClose={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} />
   }
 
   showLocationMisMatchAlert() {
@@ -651,18 +641,14 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _goToFormLayoutWithDraft = () => {
-    this.props.actions.navigateToScene('FormLayout', {
-      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
-      jobTransactionId: this.props.jobTransaction.id,
-      jobTransaction: this.props.jobTransaction,
-      statusId: this.props.draftStatusInfo.id,
-      statusName: this.props.draftStatusInfo.name,
-      jobMasterId: this.props.jobTransaction.jobMasterId,
-      isDraftRestore: true
-    })
-    this.props.actions.setState(SET_DRAFT_JOB_DETAILS_INFO, {})
-
+    this.props.actions.restoreDraftAndNavigateToFormLayout(
+      this.props.navigation.state.params.jobSwipableDetails.contactData,
+      this.props.jobTransaction,
+      this.props.draftStatusInfo,
+    )
+    this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }
+
   render() {
     if (this.props.jobDetailsLoading) {
       return (

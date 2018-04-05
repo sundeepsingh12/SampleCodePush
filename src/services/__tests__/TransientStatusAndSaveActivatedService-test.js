@@ -1,5 +1,5 @@
 
-import { transientStatusService } from '../classes/TransientStatusService'
+import { transientStatusAndSaveActivatedService } from '../classes/TransientStatusAndSaveActivatedService'
 import {
     DATA_STORE_ATTR_MASTER_ID,
     DATA_STORE_MASTER_ID,
@@ -46,34 +46,6 @@ describe('test getCurrentStatus', () => {
             id: 1,
             jobMasterId: 123
         }
-        expect(transientStatusService.getCurrentStatus(statusList, statusId, jobMasterId)).toEqual(result)
+        expect(transientStatusAndSaveActivatedService.getCurrentStatus(statusList, statusId, jobMasterId)).toEqual(result)
     })
 })
-
-
-
-// describe('test getRecurringData', () => {
-//     it('should return recurringData', () => {
-//         let formLayoutState = {
-//             id: 123
-//         }
-//         let recurringData = {}
-//         let jobTransaction = {
-//             id: -1,
-//             jobId: -1
-//         }
-//         let statusId = 123
-
-//         let differentData = {
-//             '-1': {
-//                 id: -1,
-//                 jobId: -1,
-//                 textToShow: 1,
-//                 fieldDataArray: elementsArray,
-//                 formLayoutState,
-//                 amount: 0
-//             }
-//         }
-//         expect(transientStatusService.setSavedJobDetails(formLayoutState, recurringData, jobTransaction, statusId)).toEqual(result)
-//     })
-// })

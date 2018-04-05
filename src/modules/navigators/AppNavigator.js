@@ -28,8 +28,6 @@ import ResetPassword from '../../containers/ResetPassword'
 import SyncScreen from '../../containers/SyncScreen'
 import TabScreen from '../../containers/TabScreen'
 import TaskListScreen from '../../containers/TaskListScreen'
-import NewJob from '../../containers/NewJob'
-import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
@@ -244,12 +242,6 @@ export const AppNavigator = StackNavigator({
   },
   ResetPassword: {
     screen: ResetPassword
-  },
-  NewJob: {
-    screen: NewJob
-  },
-  NewJobStatus: {
-    screen: NewJobStatus
   },
   SkuListing: {
     screen: SkuListing,

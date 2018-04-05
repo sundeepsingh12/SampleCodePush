@@ -8,7 +8,7 @@ import {
     STATUS_NAME,
     ON_BLUR,
     TOOGLE_HELP_TEXT,
-    BASIC_INFO,
+    SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
@@ -25,6 +25,7 @@ import {
     USER,
     AutoLogoutScreen,
     SET_OPTION_ATTRIBUTE_ERROR,
+    ADD_FORM_LAYOUT_STATE,
     SET_FORM_INVALID_AND_FORM_ELEMENT,
     SYNC_RUNNING_AND_TRANSACTION_SAVING
 } from '../../lib/constants'
@@ -40,7 +41,7 @@ import { NavigationActions } from 'react-navigation'
 import InitialState from './formLayoutInitialState.js'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
-import { transientStatusService } from '../../services/classes/TransientStatusService'
+//import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
 
@@ -74,23 +75,21 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
     return async function (dispatch) {
         try {
             dispatch(setState(IS_LOADING, true))
-            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction, positionId)
-            let latestPositionId = sortedFormAttributesDto.latestPositionId
+            const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
+            let { latestPositionId, noFieldAttributeMappedWithStatus } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
-            const draftStatusId = (jobTransactionId < 0) ? draftService.checkIfDraftExistsAndGetStatusId(jobTransactionId, jobMasterId, statusId) : null
-            if (!draftStatusId) {
-                sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
-            }
-            dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributesDto))
-            dispatch(setState(BASIC_INFO, {
+            sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
+            dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
                 statusId,
                 statusName,
                 jobTransactionId,
                 latestPositionId,
-                draftStatusId,
-                fieldAttributeMasterParentIdMap
+                fieldAttributeMasterParentIdMap,
+                noFieldAttributeMappedWithStatus: (noFieldAttributeMappedWithStatus || sortedFormAttributesDto.isAllAttributeHidden),
+                formLayoutObject: sortedFormAttributesDto.formLayoutObject,
+                isSaveDisabled: sortedFormAttributesDto.isSaveDisabled,
+                isLoading: false
             }))
-            dispatch(setState(IS_LOADING, false))
         } catch (error) {
             showToastAndAddUserExceptionLog(1001, error.message, 'danger', 0)
             dispatch(setState(IS_LOADING, false))
@@ -105,9 +104,6 @@ export function getNextFocusableAndEditableElements(attributeMasterId, formEleme
             const cloneFormElement = _.cloneDeep(formElement)
             const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, null, event, jobTransaction, fieldAttributeMasterParentIdMap);
             dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributeDto))
-            if (value) {
-                dispatch(setState(SET_UPDATE_DRAFT, true))
-            }
         } catch (error) {
             showToastAndAddUserExceptionLog(1002, error.message, 'danger', 1)
         }
@@ -266,10 +262,11 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
         }
     }
 }
-export function saveDraftInDb(formLayoutState, jobMasterId) {
+export function saveDraftInDb(formLayoutState, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
-            draftService.saveDraftInDb(formLayoutState, jobMasterId)
+            draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
+            dispatch(setState(SET_UPDATE_DRAFT, false))
         } catch (error) {
             showToastAndAddUserExceptionLog(1009, error.message, 'danger', 1)
         }
@@ -293,15 +290,11 @@ export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
 export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDraftRestore, statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, latestPositionId) {
     return async function (dispatch) {
         try {
-            if (isDraftRestore) {
-                dispatch(restoreDraft(jobTransactionId, statusId))
-            } else {
-                if (editableFormLayoutState) {
-                    dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
-                }
-                else {
-                    dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, latestPositionId))
-                }
+            if (editableFormLayoutState) {
+                dispatch(setState(SET_FORM_LAYOUT_STATE, { editableFormLayoutState, statusName }))
+            }
+            else {
+                dispatch(getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1011, error.message, 'danger', 1)
@@ -322,7 +315,6 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
                     formLayoutObject: cloneFormElement,
                     isSaveDisabled: true
                 }))
-                dispatch(setState(SET_UPDATE_DRAFT, true))
             } else {
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = ''
                 dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, value, latestPositionId, jobTransaction, null, true))
@@ -330,6 +322,40 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
         }
         catch (error) {
             showToastAndAddUserExceptionLog(1012, error.message, 'danger', 1)
+        }
+    }
+}
+
+export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft) {
+    return async function (dispatch) {
+        try {
+            let draftRestored = draftService.getFormLayoutStateFromDraft(draft)
+            dispatch(setState(SET_FORM_LAYOUT_STATE, {
+                editableFormLayoutState: draftRestored.formLayoutState,
+                statusName: draftRestored.formLayoutState.statusName
+            }))
+            if (!jobTransaction) {
+                jobTransaction = {
+                    id: draftRestored.formLayoutState.jobTransactionId,
+                    jobMasterId: draft.jobMasterId,
+                    jobId: draftRestored.formLayoutState.jobTransactionId,
+                }
+            }
+            if (restoreDraftAndNavigateToFormLayout) {
+                dispatch(setState(ADD_FORM_LAYOUT_STATE, draftRestored.navigationFormLayoutStatesForRestore))
+            }
+            dispatch(navigateToScene('FormLayout', {
+                contactData,
+                jobTransactionId: jobTransaction.id,
+                jobTransaction: jobTransaction,
+                statusId: draftRestored.formLayoutState.statusId,
+                statusName: draftRestored.formLayoutState.statusName,
+                jobMasterId: draft.jobMasterId,
+                navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : null,
+                isDraftRestore: true
+            }))
+        } catch (error) {
+            console.log(error)
         }
     }
 }

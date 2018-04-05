@@ -75,7 +75,9 @@ import {
   PENDING_SYNC_TRANSACTION_IDS,
   SET_UNSYNC_TRANSACTION_PRESENT,
   UnsyncBackupUpload,
-  GEO_FENCING
+  GEO_FENCING,
+  PAGES,
+  PAGES_ADDITIONAL_UTILITY
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -270,7 +272,7 @@ export function downloadJobMaster() {
       dispatch(validateAndSaveJobMaster(json))
       // dispatch(autoLogout(userObject))
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1801, error.message, 'danger', 0))
+      showToastAndAddUserExceptionLog(1801, error.message, 'danger', 0)
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
@@ -305,7 +307,7 @@ export function invalidateUserSessionForAutoLogout() {
       await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1802, error.message, 'danger', 1))
+      showToastAndAddUserExceptionLog(1802, error.message, 'danger', 1)
       dispatch(startLoginScreenWithoutLogout())
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
@@ -338,7 +340,7 @@ export function invalidateUserSession(createBackup) {
       // await trackingService.inValidateStoreVariables(fenceIdentifier)
 
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1))
+      showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1)
       dispatch(error_400_403_Logout(error.message))
     }
     finally {
@@ -367,7 +369,7 @@ export function autoLogout(userData) {
         }, timeLimit * 1000)
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1804, error.message, 'danger', 1))
+      showToastAndAddUserExceptionLog(1804, error.message, 'danger', 1)
     }
   }
 }
@@ -382,7 +384,7 @@ export function startLoginScreenWithoutLogout() {
       dispatch(deleteSessionToken())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1))
+      showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1)
     }
 
   }
@@ -413,7 +415,7 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
         dispatch(downloadJobMaster())
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1806, error.message, 'danger', 1))
+      showToastAndAddUserExceptionLog(1806, error.message, 'danger', 1)
     }
   }
 }
@@ -436,7 +438,7 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0))
+      showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0)
       const keys = [
         JOB_MASTER,
         JOB_ATTRIBUTE,
@@ -460,6 +462,8 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
         CUSTOMIZATION_LIST_MAP,
         TABIDMAP,
         JOB_ATTRIBUTE_STATUS,
+        PAGES,
+        PAGES_ADDITIONAL_UTILITY
       ]
       await keyValueDBService.deleteValueFromStore(keys)
       dispatch(jobMasterSavingFailure(error.message))
@@ -495,7 +499,7 @@ export function checkAsset() {
         dispatch(checkIfSimValidOnServer());
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1808, error.message, 'danger', 0))
+      showToastAndAddUserExceptionLog(1808, error.message, 'danger', 0)
       dispatch(checkAssetFailure(error.message))
     }
   }
@@ -539,7 +543,7 @@ export function checkIfSimValidOnServer() {
         dispatch(showMobileNumber())
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0))
+      showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0)
       if (error.code == 403 || error.code == 400) {
         // clear user session without Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
@@ -570,7 +574,7 @@ export function generateOtp(mobileNumber) {
       await keyValueDBService.validateAndSaveData(IS_SHOW_OTP_SCREEN, true)
       dispatch(showOtp())
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1810, error.message, 'danger', 0))
+      showToastAndAddUserExceptionLog(1810, error.message, 'danger', 0)
       dispatch(otpGenerationFailure(error.message))
     }
   }
@@ -603,7 +607,7 @@ export function validateOtp(otpNumber) {
         dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1811, error.message, 'danger', 0))
+      showToastAndAddUserExceptionLog(1811, error.message, 'danger', 0)
       dispatch(otpValidationFailure(error.message))
     }
   }
@@ -621,7 +625,7 @@ export function checkForUnsyncTransactionAndLogout() {
         dispatch(invalidateUserSession(true))
       }
     } catch (error) {
-      dispatch(showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0))      
+      showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0)
       dispatch(error_400_403_Logout(error.message))
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
