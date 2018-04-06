@@ -20,6 +20,7 @@ import {
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
   CALL_CONFIRM,
+  DRAFT_RESTORE_MESSAGE,
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
   SELECT_ADDRESS_NAVIGATION,
   REVERT_STATUS,
@@ -84,7 +85,6 @@ import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/form
 import DraftModal from '../components/DraftModal'
 import Line1Line2View from '../components/Line1Line2View'
 
-
 function mapStateToProps(state) {
   return {
     addressList: state.jobDetails.addressList,
@@ -126,7 +126,10 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
-    this.props.actions.setState(SHOW_DROPDOWN, null)
+    // reset dropdown state only when required
+    if (this.props.isShowDropdown) {
+      this.props.actions.setState(SHOW_DROPDOWN, null)
+    }
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
@@ -456,7 +459,9 @@ class JobDetailsV2 extends PureComponent {
       }
     )
   }
-
+  _onCancelDraft = () => {
+    this.props.actions.setState(SET_DRAFT_INFO_JOBDETAILS, {})
+  }
   showDraftAlert() {
     return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={() => this._goToFormLayoutWithDraft()} onCancelPress={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} onRequestClose={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} />
   }

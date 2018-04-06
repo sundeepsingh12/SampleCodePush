@@ -91,7 +91,8 @@ import {
   PreloaderScreen,
   SHOW_DISCARD_ALERT,
   RETURN_TO_HOME,
-  SET_TRANSIENT_BACK_PRESSED
+  SET_TRANSIENT_BACK_PRESSED,
+  SET_SEQUENCE_BACK_ENABLED
 } from '../../lib/constants'
 import SplitPayment from '../../containers/SplitPayment'
 import {
@@ -125,6 +126,10 @@ class AppWithNavigationState extends React.PureComponent {
       }
       case 'Transient': {
         dispatch(setState(SET_TRANSIENT_BACK_PRESSED, true))
+        return true
+      }
+      case 'Sequence': {
+        dispatch(setState(SET_SEQUENCE_BACK_ENABLED, true))
         return true
       }
       case ApplicationScreen:

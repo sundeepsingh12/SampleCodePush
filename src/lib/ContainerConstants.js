@@ -121,8 +121,7 @@ module.exports = {
     SEQUENCELIST_MISSING: `sequenceList not present`,
     BLANK_NEW_SEQUENCE: `Sequence can't be left blank`,
     CURRENT_SEQUENCE_ROW_MISSING: `currentSequenceListItemIndex missing`,
-    SEQUENCE_NOT_AN_INT: `Sequence can't be `,
-    NOT_A_NUMBER: 'Please enter a number',
+    NOT_A_NUMBER: 'Please enter a valid positive number',
     RUNSHEET_MISSING: 'No runsheet found',
     RUNSHEET_NUMBER_MISSING: 'Runsheet number not present',
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
@@ -130,6 +129,8 @@ module.exports = {
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
     TOKEN_MISSING: 'Token missing',
     JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
+    AUTO_ROUTING_MESSAGE: 'This will run route optimization for ',
+    AUTO_ROUTING_EXTRA_MESSAGE: ' job transactions',
 
     //Sync service
     JOBS_DELETED: 'Jobs deleted',
@@ -187,6 +188,7 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
+    LOGOUT_UNSYNCED_TRANSACTIONS: 'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
     LOGOUT_UNSYNCED_TRANSACTIONS_TITLE: 'Confirm Log Out',
     LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE: 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
     THERE_ARE_NO_UNSYNCED_FILES: 'There are no Unsynced Files.',
@@ -343,9 +345,16 @@ module.exports = {
     APPLYING_SETTINGS: 'Applying settings',
     VERIFY_HANDSET: 'Verifying handset',
     VERIFY_MOBILE: 'Verify your mobile',
-    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    OTP_CODE_SENT: 'OTP code has been sent to',
     ENTER_MOBILE: 'Enter your mobile',
     SEND_OTP: 'Send OTP',
+
+    //TaskListCalender
+    ALL: 'All',
+    TODAY: 'Today',
+
+    //TaskListScreen
+    NO_NEXT_STATUS: 'No NextStatus Available',
 
     //Draft Modal
     DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',

@@ -91,6 +91,7 @@ module.exports = keyMirror({
     SET_TRANSACTION_SERVICE_STARTED: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
+    SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
 
     //Pages
@@ -102,8 +103,6 @@ module.exports = keyMirror({
 
     //Home Container
     PIECHART: null,
-    FUTURE_RUNSHEET_ENABLED: null,
-    SET_SELECTED_DATE: null,
     IS_CALENDAR_VISIBLE: null,
     SYNC_ERROR: null,
     SYNC_STATUS: null,
@@ -363,13 +362,14 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
     PREPARE_UPDATE_LIST: null,
-    CLEAR_SEQUENCE_STATE: null,
     SET_RUNSHEET_NUMBER_LIST: null,
     SET_RESPONSE_MESSAGE: null,
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: null,
     SEQUENCE_LIST_ITEM_DRAGGED: null,
     SET_REFERENCE_NO: null,
     SET_SEQUENCE_LIST_ITEM: null,
+    SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST: null,
+    SET_SEQUENCE_BACK_ENABLED: null,
 
     //New Job
     NEW_JOB_STATUS: null,
