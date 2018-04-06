@@ -78,7 +78,6 @@ import OfflineDS from '../../containers/OfflineDS'
 import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
-import JobMaster from '../../containers/JobMaster'
 import AutoLogout from '../../containers/AutoLogout'
 import Backup from '../../containers/Backup'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
@@ -332,9 +331,6 @@ export const AppNavigator = StackNavigator({
   },
   PostAssignmentScanner: {
     screen: PostAssignmentScanner
-  },
-  JobMasterListScreen: {
-    screen: JobMaster
   },
   DataStoreDetails: {
     screen: DataStoreDetails

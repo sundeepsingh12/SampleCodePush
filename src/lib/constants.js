@@ -454,7 +454,6 @@ module.exports = keyMirror({
     SET_POST_ASSIGNMENT_TRANSACTION_LIST: null,
     SET_POST_ASSIGNMENT_ERROR: null,
     SET_POST_SCAN_SUCCESS: null,
-    SET_POST_ASSIGNMENT_PARAMETERS: null,
     //QrCodeGenerator
     SCANNING: null,
 

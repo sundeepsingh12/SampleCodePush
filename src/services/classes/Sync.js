@@ -30,14 +30,15 @@ import {
   CUSTOMIZATION_APP_MODULE,
   POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
   LAST_SYNC_WITH_SERVER,
+  PAGES
 } from '../../lib/constants'
 
 import {
   FAREYE_UPDATES,
-  JOB_ASSIGNMENT_ID,
+  PAGE_OUTSCAN
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
-import { moduleCustomizationService } from './ModuleCustomization'
+import { pages } from './Pages'
 import PushNotification from 'react-native-push-notification'
 import {
   JOBS_DELETED
@@ -544,14 +545,6 @@ class Sync {
     let jobSummaries = []
     for (let jobMasterId in jobMasterIdJobStatusIdTransactionIdDtoMap) {
       for (let unseenStatusId in jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId]) {
-        //let count = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].transactionId.split(":").length
-        //let pendingID = jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId].pendingStatusId
-        //let unseenJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, unseenStatusId)
-        //unseenJobSummaryData.count = 0
-        //jobSummaries.push(unseenJobSummaryData)
-        //let pendingJobSummaryData = await jobSummaryService.getJobSummaryData(jobMasterId, pendingID)
-        //pendingJobSummaryData.count += count
-        //jobSummaries.push(pendingJobSummaryData)
         transactionIdDtos.push(jobMasterIdJobStatusIdTransactionIdDtoMap[jobMasterId][unseenStatusId])
       }
     }
@@ -574,10 +567,9 @@ class Sync {
     let pageNumber = 0, currentPage, jobMasterMapWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap
     let pageSize = isLiveJob ? 200 : 3
     let isLastPageReached = false, json, isJobsPresent = false, jobMasterIds
-    const appModulesList = await keyValueDBService.getValueFromStore(CUSTOMIZATION_APP_MODULE)
-    let jobAssignmentModule = moduleCustomizationService.getModuleCustomizationForAppModuleId(appModulesList.value, JOB_ASSIGNMENT_ID)
-    let postAssignmentList = _.size(jobAssignmentModule) == 0 ? null : jobAssignmentModule[0].remark ? JSON.parse(jobAssignmentModule[0].remark).postAssignmentList : null
-    const unseenStatusIds = postAssignmentList && _.size(postAssignmentList) > 0 ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, postAssignmentList, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
+    const pagesList = await keyValueDBService.getValueFromStore(PAGES)
+    let outScanModuleJobMasterIds = pages.getJobMasterIdListForScreenTypeId(pagesList.value, PAGE_OUTSCAN)
+    const unseenStatusIds =  !_.isEmpty(outScanModuleJobMasterIds) ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, outScanModuleJobMasterIds, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
     let jobMasterTitleList = []
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull)
@@ -600,6 +592,7 @@ class Sync {
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
+        
           const unseenTransactions = postOrderList ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap)
           const messageIdDTOs = []
