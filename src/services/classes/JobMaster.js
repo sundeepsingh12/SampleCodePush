@@ -309,33 +309,6 @@ class JobMaster {
     return jobMasterIdWithEnableResequence
   }
 
-  /**
-   * This function prepares job master list on the basis of pre and post assignment list
-   * @param {*} postAssignmentList 
-   * @param {*} preAssignmentList 
-   * @param {*} jobMasterList 
-   * @returns
-   * [JobMaster]
-   */
-  getJobMasterListFromPostAndPreAssignmentList(postAssignmentList, preAssignmentList, jobMasterList) {
-    let orderJobMasterList = []
-    postAssignmentList = postAssignmentList ? postAssignmentList : []
-    preAssignmentList = preAssignmentList ? preAssignmentList : []
-    for (let index in jobMasterList) {
-      let jobMaster = jobMasterList[index]
-      if (postAssignmentList.includes(jobMaster.id)) {
-        jobMaster.postAssignment = true
-      }
-      if (preAssignmentList.includes(jobMaster.id)) {
-        jobMaster.preAssignment = true
-      }
-      // if (jobMaster.postAssignment || jobMaster.preAssignment) {
-      if (jobMaster.postAssignment) {
-        orderJobMasterList.push(jobMaster)
-      }
-    }
-    return orderJobMasterList
-  }
 
   //This loop gets jobMaster map for job master of which assignOrderToHub is enabled
   getJobMasterMapWithAssignOrderToHub(jobMasterList) {
@@ -349,6 +322,5 @@ class JobMaster {
   }
 
 }
-
 
 export let jobMasterService = new JobMaster()

@@ -5,7 +5,6 @@ import {
     SET_POST_ASSIGNMENT_TRANSACTION_LIST,
     SET_POST_ASSIGNMENT_ERROR,
     SET_POST_SCAN_SUCCESS,
-    SET_POST_ASSIGNMENT_PARAMETERS
 } from '../../../lib/constants'
 
 import InitialState from '../postAssignmentInitialState'
@@ -69,20 +68,6 @@ describe('test cases for case SET_POST_SCAN_SUCCESS', () => {
     })
 })
 
-describe('test cases for case SET_POST_ASSIGNMENT_PARAMETERS', () => {
-    it('should set post assignment parameters', () => {
-        const action = {
-            type: SET_POST_ASSIGNMENT_PARAMETERS,
-            payload: {
-                isForceAssignmentAllowed: false,
-                isManualSelectionAllowed: true
-            }
-        }
-        let nextState = postAssignmentReducer(undefined, action)
-        expect(nextState.isForceAssignmentAllowed).toEqual(false)
-        expect(nextState.isManualSelectionAllowed).toEqual(true)
-    })
-})
 
 describe('test cases for undefined action', () => {
     it('should return initial state', () => {

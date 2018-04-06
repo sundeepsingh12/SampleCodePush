@@ -46,6 +46,7 @@ import {
   BulkListing,
   SET_TRANSACTION_SERVICE_STARTED,
   SYNC_RUNNING_AND_TRANSACTION_SAVING,
+  PostAssignmentScanner
 } from '../../lib/constants'
 
 import {
@@ -197,7 +198,8 @@ export function navigateToPage(pageObject) {
         case PAGE_OFFLINE_DATASTORE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_OUTSCAN:
-          throw new Error("CODE it, if you want to use it !");
+            dispatch(navigateToScene(PostAssignmentScanner,{pageObject}))
+            break
         case PAGE_PAYNEAR_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PICKUP:

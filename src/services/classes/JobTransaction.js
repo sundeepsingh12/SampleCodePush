@@ -842,12 +842,12 @@ class JobTransaction {
      *      pendingCount : integer
      * }
      */
-    async getUnseenJobTransaction(jobMaster) {
-        let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMaster.id, UNSEEN)
+    async getUnseenJobTransaction(jobMasterId) {
+        let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMasterId, UNSEEN)
         let runsheetQuery = 'isClosed = true'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
-        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1  AND (${jobTransactionQuery})` : `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1`
+        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `jobMasterId = ${jobMasterId} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1  AND (${jobTransactionQuery})` : `jobMasterId = ${jobMasterId} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1`
         let unseenJobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         let jobTransactionMap = {}
         for (let index in unseenJobTransactionList) {

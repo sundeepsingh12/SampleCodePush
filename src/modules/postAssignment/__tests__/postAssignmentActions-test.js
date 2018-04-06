@@ -11,7 +11,6 @@ const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 import {
     SET_JOB_MASTER_LIST,
-    SET_POST_ASSIGNMENT_PARAMETERS,
     SET_POST_ASSIGNMENT_TRANSACTION_LIST,
     SET_POST_SCAN_SUCCESS,
     SET_POST_ASSIGNMENT_ERROR,
@@ -39,7 +38,6 @@ describe('test cases for fetchJobMasterList action', () => {
                 expect(store.getActions()[0].payload).toEqual({ jobMasterList: undefined, loading: true })
                 expect(store.getActions()[1].type).toEqual(SET_JOB_MASTER_LIST)
                 expect(store.getActions()[1].payload).toEqual({ jobMasterList: undefined, loading: false })
-                expect(store.getActions()[2].type).toEqual(SET_POST_ASSIGNMENT_PARAMETERS)
                 expect(store.getActions()[2].payload).toEqual({ isManualSelectionAllowed: null, isForceAssignmentAllowed: null })
             })
     })
@@ -67,7 +65,6 @@ describe('test cases for fetchJobMasterList action', () => {
                 expect(store.getActions()[0].payload).toEqual({ jobMasterList: undefined, loading: true })
                 expect(store.getActions()[1].type).toEqual(SET_JOB_MASTER_LIST)
                 expect(store.getActions()[1].payload).toEqual({ jobMasterList, loading: false })
-                expect(store.getActions()[2].type).toEqual(SET_POST_ASSIGNMENT_PARAMETERS)
                 expect(store.getActions()[2].payload).toEqual({ isManualSelectionAllowed: null, isForceAssignmentAllowed: null })
             })
     })

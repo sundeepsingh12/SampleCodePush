@@ -8,9 +8,8 @@ var InitialState = Record({
     pendingCount: 0,
     error: null,
     scanSuccess: false,
-    isManualSelectionAllowed: false,
-    isForceAssignmentAllowed: false,
-    scanError: null
+    scanError: null,
+    jobMaster:null
 })
 
 export default InitialState
