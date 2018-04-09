@@ -64,45 +64,34 @@ class JobTransaction {
      * 
      * @param {*} unseenTransactions 
      */
-    async getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions) {
-        if (_.isNull(unseenTransactions) || _.isEmpty(unseenTransactions)) {
-            return {}
-        }
-        let jobMasterIdTransactionDtoMap = {}, // Map<JobMasterId, TransactionIdDTO>
-            jobMasterIdJobStatusIdTransactionIdDtoMap = {}, // Map<JobMasterId, Map<JobStausId, TransactionIdDTO>>
-            jobMasterIdStatusIdTransactionIdMap = {}
-        const jobMasterIdList = await this.getUnseenTransactionsJobMasterIds(unseenTransactions)
-        const jobMasterIdStatusIdMap = await jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdList, PENDING)
-        unseenTransactions.forEach(unseenTransactionObject => {
-            let transactionIdDtoObject = {}, transactionIdDTO = {}
-            if (!jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId]) {
-                transactionIdDtoObject = {
-                    "jobMasterId": unseenTransactionObject.jobMasterId,
-                    "pendingStatusId": jobMasterIdStatusIdMap[unseenTransactionObject.jobMasterId],
-                    "transactionId": '',
-                    "unSeenStatusId": unseenTransactionObject.jobStatusId
-                }
-            } else {
-                transactionIdDtoObject = jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId]
-            }
-            if (transactionIdDtoObject.transactionId != "")
-                transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId + ":"
-            transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId + unseenTransactionObject.id
-            jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId] = transactionIdDtoObject
-            if (!jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId] || !jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId][unseenTransactionObject.jobStatusId]) {
-                let jobStatusIdTransactionIdDtoMap = {}
-                jobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobStatusId] = transactionIdDtoObject
-                jobMasterIdJobStatusIdTransactionIdDtoMap[unseenTransactionObject.jobMasterId] = jobStatusIdTransactionIdDtoMap
-            }
-            transactionIdDTO = {
+    getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap) {
+        let updatedJobStatusIdJobStatusMap = {}, updatedTransactonsList = [], jobMasterIdTransactionDtoMap = {};
+        for (let transaction in unseenTransactions) {
+            let unseenTransactionObject = { ...unseenTransactions[transaction] };
+            let transactionIdDtoObject = {
                 "jobMasterId": unseenTransactionObject.jobMasterId,
-                "pendingStatusId": jobMasterIdStatusIdMap[unseenTransactionObject.jobMasterId],
-                "transactionId": unseenTransactionObject.id,
+                "pendingStatusId": jobMasterIdJobStatusIdOfPendingCodeMap[unseenTransactionObject.jobMasterId],
+                "transactionId": '',
                 "unSeenStatusId": unseenTransactionObject.jobStatusId
-            }
-            jobMasterIdStatusIdTransactionIdMap[unseenTransactionObject.jobStatusId] = transactionIdDTO
-        })
-        return { jobMasterIdJobStatusIdTransactionIdDtoMap, jobMasterIdStatusIdTransactionIdMap }
+            };
+            transactionIdDtoObject = jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId] ? jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId] : transactionIdDtoObject;
+            transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId != '' ? transactionIdDtoObject.transactionId + ":" : transactionIdDtoObject.transactionId;
+            transactionIdDtoObject.transactionId = transactionIdDtoObject.transactionId + unseenTransactionObject.id;
+            jobMasterIdTransactionDtoMap[unseenTransactionObject.jobMasterId] = transactionIdDtoObject;
+            unseenTransactionObject.jobStatusId = jobMasterIdJobStatusIdOfPendingCodeMap[unseenTransactionObject.jobMasterId];
+            updatedTransactonsList.push(unseenTransactionObject);
+            let updatedPendingJobSummary = updatedJobStatusIdJobStatusMap[transactionIdDtoObject.pendingStatusId] ? updatedJobStatusIdJobStatusMap[transactionIdDtoObject.pendingStatusId] : jobStatusIdJobSummaryMap[transactionIdDtoObject.pendingStatusId];
+            let updatedUnseenJobSummary = jobStatusIdJobSummaryMap[transactionIdDtoObject.unSeenStatusId];
+            updatedPendingJobSummary.count += 1;
+            updatedUnseenJobSummary.count = 0;
+            updatedJobStatusIdJobStatusMap[transactionIdDtoObject.pendingStatusId] = updatedPendingJobSummary;
+            updatedJobStatusIdJobStatusMap[transactionIdDtoObject.unSeenStatusId] = updatedUnseenJobSummary;
+        }
+        return {
+            transactionIdDtos: Object.values(jobMasterIdTransactionDtoMap),
+            jobSummaries: Object.values(updatedJobStatusIdJobStatusMap),
+            updatedTransactonsList
+        }
     }
 
     /**
@@ -221,16 +210,16 @@ class JobTransaction {
      *                                      }
      *                                  ]
      */
-    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData, selectedDate,jobIdGroupIdMap) {
+    getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, callingActivity, callingActivityData, selectedDate, jobIdGroupIdMap) {
         let jobAttributeMasterMap = jobAttributeMasterService.getJobAttributeMasterMap(jobTransactionCustomizationListParametersDTO.jobAttributeMasterList)
         let jobAttributeStatusMap = jobAttributeMasterService.getJobAttributeStatusMap(jobTransactionCustomizationListParametersDTO.jobAttributeStatusList)
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(jobTransactionCustomizationListParametersDTO.statusList, jobAttributeStatusMap)
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         let customerCareMap = customerCareService.getCustomerCareMap(jobTransactionCustomizationListParametersDTO.customerCareList)
         let smsTemplateMap = smsTemplateService.getSMSTemplateMap(jobTransactionCustomizationListParametersDTO.smsTemplateList)
-        let statusIdNextStatusListMap = {},jobIdGroupIdStatusObject = {}
-        if(jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)){
-            jobTransactionCustomizationListParametersDTO.statusList.forEach((jobStatus) => {statusIdNextStatusListMap[jobStatus.id] = jobStatus.nextStatusList}) 
+        let statusIdNextStatusListMap = {}, jobIdGroupIdStatusObject = {}
+        if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
+            jobTransactionCustomizationListParametersDTO.statusList.forEach((jobStatus) => { statusIdNextStatusListMap[jobStatus.id] = jobStatus.nextStatusList })
         }
         let runsheetQuery
         if (selectedDate && selectedDate != "All") {
@@ -250,26 +239,33 @@ class JobTransaction {
             return []
         }
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
-        if (callingActivity == 'Bulk') {
-            jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.jobMasterId} AND jobStatusId = ${callingActivityData.statusId}`
-            if(callingActivityData.groupId){
-                let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
-                let jobList = realm.getRecordListOnQuery(TABLE_JOB,jobQuery)
-                let query = jobList.map((job) => `jobId = ${job.id}`).join(' OR ')
-                jobTransactionQuery = query && query.trim() !== '' ? `(${jobTransactionQuery}) AND (${query})` : `(${jobTransactionQuery})`
+        if (callingActivityData) {
+            if (callingActivity == 'Bulk') {
+                jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND jobStatusId = ${callingActivityData.pageObject.additionalParams.statusId}`
+                jobTransactionQuery = callingActivityData.jobIdGroupIdMap && !_.isEmpty(callingActivityData.jobIdGroupIdMap) ? `${jobTransactionQuery} AND ${Object.keys(callingActivityData.jobIdGroupIdMap).map(data => 'jobId != ' + data).join(' AND ')}` : jobTransactionQuery
+                if (callingActivityData.groupId) {
+                    let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
+                    let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
+                    let query = jobList.map((job) => `jobId = ${job.id}`).join(' OR ')
+                    jobTransactionQuery = query && query.trim() !== '' ? `(${jobTransactionQuery}) AND (${query})` : `(${jobTransactionQuery})`
+                }
             }
-        }
-        else if (callingActivity == 'Sequence') {
-            let statusQueryWithRunsheetNo = '('
-            statusQueryWithRunsheetNo += callingActivityData.statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-            statusQueryWithRunsheetNo += `) AND runsheetNo = "${callingActivityData.runsheetNumber}"`
-            jobTransactionQuery = `deleteFlag != 1`
-            //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected
-            jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
+            else if (callingActivity == 'Sequence') {
+                let statusQueryWithRunsheetNo = '('
+                statusQueryWithRunsheetNo += callingActivityData.jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+                statusQueryWithRunsheetNo += `) AND (` + callingActivityData.statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+                statusQueryWithRunsheetNo += `) AND runsheetNo = "${callingActivityData.runsheetNumber}"`
+                jobTransactionQuery = `deleteFlag != 1`
+                //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected and jobMasterIds
+                jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
+            } else if (callingActivity == 'AllTasks') {
+                jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
+                jobTransactionQuery = jobTransactionQuery + ' AND ' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+            }
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
             fieldDataList = [], fieldDataMap = {}
-
+        // In case of live job,fetch all transactions with status = 6
         if (callingActivity == 'LiveJob') {
             jobTransactionObject.jobQuery = 'status = 6'
         }
@@ -290,14 +286,15 @@ class JobTransaction {
             jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobTransactionObject.jobDataQuery, false)
         }
         let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap)
+        //Check to fetch field data only when calling activity is not Live Job
         if (callingActivity != 'LiveJob') {
             fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, jobTransactionObject.fieldDataQuery, false)
             fieldDataMap = fieldDataService.getFieldDataMap(fieldDataList)
         }
         let idJobMasterMap = _.mapKeys(jobTransactionCustomizationListParametersDTO.jobMasterList, 'id')
-        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap, 
-            jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap, jobIdGroupIdMap,jobTransactionCustomizationListParametersDTO.statusList,jobTransactionCustomizationListParametersDTO.tabList)
-        return {jobTransactionCustomizationList, statusNextStatusListMap : statusIdNextStatusListMap}
+        let jobTransactionCustomizationList = this.prepareJobCustomizationList(jobTransactionMap, jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobAttributeMasterMap,
+            jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap, jobIdGroupIdMap, jobTransactionCustomizationListParametersDTO.statusList, jobTransactionCustomizationListParametersDTO.tabList)
+        return { jobTransactionCustomizationList, statusNextStatusListMap: statusIdNextStatusListMap }
 
     }
 
@@ -311,22 +308,23 @@ class JobTransaction {
     *@return {Object} {jobTransactionList[0]}
     */
 
-    getFirstTransactionWithEnableSequence(jobMasterIdList, statusMap) {
+    getFirstTransactionWithEnableSequence(jobMasterListWithEnableResequence, statusList) {
         let runsheetQuery = 'isClosed = false'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
-        if (_.isEmpty(jobMasterIdList) || _.isEmpty(runsheetList)) {
+        if (_.isEmpty(jobMasterListWithEnableResequence) || _.isEmpty(runsheetList)) {
             return null
         }
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId = ${runsheet.id}`).join(' OR ')
-        let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
-        let jobStatusQuery = statusMap.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+        let jobMasterQuery = jobMasterListWithEnableResequence.map(jobMaster => 'jobMasterId = ' + jobMaster.id).join(' OR ')
+        let jobStatusQuery = statusList.map(status => 'jobStatusId = ' + status.id).join(' OR ')
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
         jobTransactionQuery = `(${jobTransactionQuery}) AND (${jobMasterQuery}) AND (${jobStatusQuery})`
         let jobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery, true, SEQ_SELECTED)
-        return jobTransactionList && jobTransactionList.length > 0 ? jobTransactionList[0] : {}
+        return jobTransactionList && jobTransactionList.length > 0 ? jobTransactionList[0] : null
     }
 
     updateJobTransactionStatusId(jobMasterIdTransactionDtoMap) {
+        // db hit avoid
         for (let jobMasterIdTransactionObject in jobMasterIdTransactionDtoMap) {
             const transactionIdList = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].transactionId.split(":")
             let pendingStatusId = jobMasterIdTransactionDtoMap[jobMasterIdTransactionObject].pendingStatusId
@@ -334,28 +332,30 @@ class JobTransaction {
         }
     }
 
-  /** @function getEnableMultiPartJobMaster(jobMasterList)
-    * function return List of all jobMaster With enable multipart assignment 
-    *
-    *@param {Array} jobMasterList //all jobMasterList 
-    * 
-    *@return {Array} jobMasterListWithEnableMultiPart
-    */
+    /** @function getEnableMultiPartJobMaster(jobMasterList)
+      * function return List of all jobMaster With enable multipart assignment 
+      *
+      *@param {Array} jobMasterList //all jobMasterList 
+      * 
+      *@return {Array} jobMasterListWithEnableMultiPart
+      */
 
-    getEnableMultiPartJobMaster(jobMasterList){
-        let jobMasterListWithEnableMultiPart =  jobMasterList.filter(jobMaster => jobMaster.enableMultipartAssignment == true)
+    getEnableMultiPartJobMaster(jobMasterList) {
+        let jobMasterListWithEnableMultiPart = jobMasterList.filter(jobMaster => jobMaster.enableMultipartAssignment == true)
         return jobMasterListWithEnableMultiPart
     }
 
-   /** @function getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)
-    * function return map of jobId verses groupId whose groupid is not null
-    *
-    * @param {Array} jobMasterListWithEnableMultiPart //jobMasterList with enable multipart assignment
-    * 
-    *@return {Object} {jobIdGroupIdMap}
-    */
+    /** @function getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)
+     * function return map of jobId verses groupId whose groupid is not null
+     *
+     * @param {Array} jobMasterListWithEnableMultiPart //jobMasterList with enable multipart assignment
+     * 
+     *@return {Object} {jobIdGroupIdMap}
+     */
 
-    getJobIdGroupIdMap(jobMasterListWithEnableMultiPart) {
+    getJobIdGroupIdMap(jobMastersList) {
+        let jobMasterListWithEnableMultiPart = this.getEnableMultiPartJobMaster(jobMastersList)
+        if (!jobMasterListWithEnableMultiPart || jobMasterListWithEnableMultiPart.length == 0) return {}
         let jobMasterQuery = jobMasterListWithEnableMultiPart.map(jobMaster => 'jobMasterId = ' + jobMaster.id).join(' OR ')
         let jobQuery = `groupId != null AND (${jobMasterQuery})`
         let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
@@ -399,14 +399,14 @@ class JobTransaction {
      */
     prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobMasterIdJobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, callingActivity, runsheetIdToStartDateMap, jobIdGroupIdMap, statusList, tabList) {
         let jobTransactionCustomizationList = []
-        let jobTransactionDateTOJobTransactionsMap = {},tabIdGroupTransactionsMap = {}, groupIdTransactionIdMap = {}, statusIdsTabIdsMap = {}
+        let jobTransactionDateTOJobTransactionsMap = {}, tabIdGroupTransactionsMap = {}, groupIdTransactionIdMap = {}, statusIdsTabIdsMap = {}
         if (callingActivity == 'LiveJob') {
             jobTransactionMap = jobMap
         }
-        if(jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)){
+        if (!_.isEmpty(jobIdGroupIdMap)) {
             statusIdsTabIdsMap = jobMasterService.prepareStatusTabIdMap(statusList)
             tabList.forEach((tab) => tabIdGroupTransactionsMap[tab.id] = {})
-            tabIdGroupTransactionsMap['isGrouping'] = true 
+            tabIdGroupTransactionsMap['isGrouping'] = true
         }
         for (var index in jobTransactionMap) {
             let jobTransaction = jobTransactionMap[index]
@@ -443,7 +443,7 @@ class JobTransaction {
             }
             jobTransactionCustomization.runsheetNo = jobTransaction.runsheetNo
             jobTransactionCustomization.referenceNumber = jobTransaction.referenceNumber
-            if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) {
+            if (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap) && statusIdsTabIdsMap[jobTransactionCustomization.statusId]) {
                 let groupId = jobIdGroupIdMap[jobTransactionCustomization.jobId] ? jobIdGroupIdMap[jobTransactionCustomization.jobId] : null
                 let groupIdTabKey = groupId ? groupId + '&' + statusIdsTabIdsMap[jobTransactionCustomization.statusId] : null
                 if (!groupId) {
@@ -453,7 +453,7 @@ class JobTransaction {
                     groupIdTransactionIdMap[groupIdTabKey] = jobTransactionCustomization.id
                 } else {
                     tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected'] = tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected'] > jobTransactionCustomization.seqSelected ?
-                    jobTransactionCustomization.seqSelected : tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected']
+                        jobTransactionCustomization.seqSelected : tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['seqSelected']
                     tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['total'] += 1
                     tabIdGroupTransactionsMap[statusIdsTabIdsMap[jobTransactionCustomization.statusId]][groupIdTransactionIdMap[groupIdTabKey]]['jobTransactions'].push(jobTransactionCustomization)
                 }
@@ -469,7 +469,7 @@ class JobTransaction {
         if (callingActivity == 'LiveJob') {
             return jobTransactionMap
         } else {
-            return !_.isEmpty(runsheetIdToStartDateMap) ? jobTransactionDateTOJobTransactionsMap : (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) ? tabIdGroupTransactionsMap :  jobTransactionCustomizationList
+            return !_.isEmpty(runsheetIdToStartDateMap) ? jobTransactionDateTOJobTransactionsMap : (jobIdGroupIdMap && !_.isEmpty(jobIdGroupIdMap)) ? tabIdGroupTransactionsMap : jobTransactionCustomizationList
         }
     }
 
@@ -656,16 +656,13 @@ class JobTransaction {
      * @param {*} jobAttributeMap 
      * @param {*} job 
      * @returns
-     * CombinedAddressList : [String(complete address ie combination of address line 1 , address line 2, landmark, pincode))]
+     * addressDataForJob 
      */
     setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job) {
         let addressDataForJob = {},
             combinedAddressList = []
         jobAttributeMap = jobAttributeMap ? jobAttributeMap : {}
         let tempAddressDataForJob = jobDataDetailsForListing.addressMap[job.id] ? jobDataDetailsForListing.addressMap[job.id] : []
-        if (job.latitude !== undefined && job.longitude !== undefined && job.latitude !== null && job.longitude !== null && (job.latitude != 0.0 || job.longitude != 0.0)) {
-            combinedAddressList.push(job.latitude + ',' + job.longitude)
-        }
         tempAddressDataForJob.forEach(address => {
             if (!jobAttributeMap[address.jobAttributeMasterId]) {
                 return
@@ -674,14 +671,6 @@ class JobTransaction {
             addressDataForJob[jobAttributeMap[address.jobAttributeMasterId].sequence][jobAttributeMasterMap[address.jobAttributeMasterId].attributeTypeId] = address.value
         })
         return addressDataForJob
-        // for (let index in addressDataForJob) {
-        //     let combinedAddress = ''
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_1], '', null, null)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][ADDRESS_LINE_2], '', ',', combinedAddress)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][LANDMARK], '', ',', combinedAddress)
-        //     combinedAddress += this.appendText(true, addressDataForJob[index][PINCODE], '', ',', combinedAddress)
-        //     combinedAddressList.push(combinedAddress)
-        // }
     }
 
     /**
@@ -743,7 +732,7 @@ class JobTransaction {
      *                              }
      * } 
      */
-   async prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
+    async prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList, jobAttributeStatusList, fieldAttributeMasterList, fieldAttributeStatusList, customerCareList, smsTemplateList, statusList, callingActivity) {
         let jobTransactionQuery = 'id = ' + jobTransactionId
         const jobTransaction = (callingActivity != 'LiveJob') ? realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery) : realm.getRecordListOnQuery(TABLE_JOB, jobTransactionQuery)
         let { jobStatusId, jobId, jobMasterId, referenceNumber, seqSelected, attemptCount, runsheetNo, jobCreatedAt, lastUpdatedAtServer, jobEtaTime, runsheetId, hubId, cityId, companyId, actualAmount, moneyTransactionType, startTime, endTime } = (callingActivity != 'LiveJob') ? jobTransaction[0] : {}
@@ -753,11 +742,11 @@ class JobTransaction {
         const jobStatusObject = jobStatusService.getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap)
         const jobMasterIdJobAttributeStatusMap = jobStatusObject.jobMasterIdJobAttributeStatusMap
         const statusIdStatusMap = jobStatusObject.statusIdStatusMap
-        const checkForSeenStatus = (callingActivity != 'LiveJob') ? jobStatusService.isSeenStatusCode(jobStatusId,statusIdStatusMap) : false
-        if(checkForSeenStatus) {
-            jobStatusId = checkForSeenStatus,
+        const checkForSeenStatus = (callingActivity != 'LiveJob') ? jobStatusService.isSeenStatusCode(jobStatusId, statusIdStatusMap) : false
+        if (checkForSeenStatus) {
+            jobStatusId = checkForSeenStatus
             lastUpdatedAtServer = moment().format('YYYY-MM-DD HH:mm:ss')
-            let jobTransactionList =  await formLayoutEventsInterface.saveData([], jobTransactionId, checkForSeenStatus, jobMasterId)
+            let jobTransactionList = await formLayoutEventsInterface.saveData([], jobTransactionId, checkForSeenStatus, jobMasterId)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
         }
         if (callingActivity == 'LiveJob') {
@@ -765,7 +754,7 @@ class JobTransaction {
             jobStatusId = jobTransaction[0].status
             jobId = jobTransaction[0].id
             referenceNumber = jobTransaction[0].referenceNo
-        } 
+        }
         const fieldAttributeMasterMap = fieldAttributeMasterService.getFieldAttributeMasterMap(fieldAttributeMasterList)
         const fieldAttributeStatusMap = fieldAttributeMasterService.getFieldAttributeStatusMap(fieldAttributeStatusList)
         let jobAttributeMap = jobMasterIdJobAttributeStatusMap[jobMasterId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] ? jobMasterIdJobAttributeStatusMap[jobMasterId][jobStatusId] : {} : jobAttributeMasterMap
@@ -785,10 +774,9 @@ class JobTransaction {
         }
         let currentStatus = statusIdStatusMap[jobStatusId]
         jobDataObject.dataList = Object.values(jobDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
+
         if (callingActivity != 'LiveJob') {
             fieldDataObject.dataList = Object.values(fieldDataObject.dataList).sort((x, y) => x.sequence - y.sequence)
-        }
-        if (callingActivity != 'LiveJob') {
             const jobTransactionDisplay = {
                 id: jobTransactionId,
                 jobId,
@@ -846,12 +834,12 @@ class JobTransaction {
      *      pendingCount : integer
      * }
      */
-    async getUnseenJobTransaction(jobMaster) {
-        let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMaster.id, UNSEEN)
+    async getUnseenJobTransaction(jobMasterId) {
+        let unseenStatusId = await jobStatusService.getStatusIdForJobMasterIdAndCode(jobMasterId, UNSEEN)
         let runsheetQuery = 'isClosed = true'
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let jobTransactionQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ')
-        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1  AND (${jobTransactionQuery})` : `jobMasterId = ${jobMaster.id} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1`
+        jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `jobMasterId = ${jobMasterId} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1  AND (${jobTransactionQuery})` : `jobMasterId = ${jobMasterId} AND jobStatusId = ${unseenStatusId} AND deleteFlag != 1`
         let unseenJobTransactionList = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION, jobTransactionQuery)
         let jobTransactionMap = {}
         for (let index in unseenJobTransactionList) {
@@ -864,6 +852,23 @@ class JobTransaction {
         }
     }
 
+    /**
+       * This function checks for future runsheet enabled and returns selected date if multipart is not selected
+       * @param {*}  customNaming
+       * @param {*}  jobIdGroupIdMap
+       * @param {*}  date
+       * @returns
+       * {
+       *     enableFutureDateRunsheet: boolean,
+       *     selectedDate:date
+       * }
+       */
+    getFutureRunsheetEnabledAndSelectedDate(customNaming, jobIdGroupIdMap, date) {
+        let enableFutureDateRunsheet = customNaming && customNaming.value && customNaming.value.enableFutureDateRunsheet && _.isEmpty(jobIdGroupIdMap) ? customNaming.value.enableFutureDateRunsheet : false
+        let selectedDate = (!date && enableFutureDateRunsheet) ? moment().format('YYYY-MM-DD') : date
+        if (!_.isEmpty(jobIdGroupIdMap)) selectedDate = null
+        return { enableFutureDateRunsheet, selectedDate }
+    }
 }
 
 export let jobTransactionService = new JobTransaction()

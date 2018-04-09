@@ -6,9 +6,12 @@ import {
     keyValueDBService
 } from './KeyValueDBService'
 import moment from 'moment'
-var package_json = require('../../../package.json')
+import package_json from '../../../package.json'
+import * as realm from '../../repositories/realmdb'
+import { Platform } from 'react-native'
 
 class UserException {
+
 
     /**
      * 
@@ -16,44 +19,36 @@ class UserException {
      * @param {Number} errorCode // code which represents action of a particular class in which error has occured.
      */
     async addUserExceptionLogs(errorMessage, errorCode) {
-        if (errorMessage && errorCode) {
-            errorMessage = "errorCode: " + errorCode + ", error: " + errorMessage
-        }
         const userDetails = await keyValueDBService.getValueFromStore(USER)
-        if (!userDetails) {
-            throw new Error("userDetails are missing")
-        }
+        let userId = (userDetails && userDetails.value && userDetails.value.id) ? userDetails.value.id : 0
+        let hubId = (userDetails && userDetails.value && userDetails.value.hubId) ? userDetails.value.hubId : 0
+        let cityId = (userDetails && userDetails.value && userDetails.value.cityId) ? userDetails.value.cityId : 0
+        let companyId = (userDetails && userDetails.value && userDetails.value.company && userDetails.value.company.id) ? userDetails.value.company.id : 0
         let userExceptionLogObject = {
-            id: 0,
-            userId: userDetails.value.id,
-            dateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-            stacktrace: errorMessage,
-            packageVersion: package_json.version,
-            packageName: 'N.A',
-            hubId: userDetails.value.hubId,
-            cityId: userDetails.value.cityId,
-            companyId: userDetails.value.company.id,
+            'id': 0,
+            userId,
+            'dateTime': moment().format('YYYY-MM-DD HH:mm:ss'),
+            'stacktrace': errorMessage,
+            'packageVersion': package_json.version,
+            'packageName': (Platform.OS === 'ios') ? 'ios' : 'android',
+            hubId,
+            cityId,
+            companyId,
         }
-        let oldUserExceptionLogArray = await keyValueDBService.getValueFromStore(USER_EXCEPTION_LOGS)
-        let userExceptionLogArray = oldUserExceptionLogArray ? oldUserExceptionLogArray.value : []
-        userExceptionLogArray.push(userExceptionLogObject)          // Adding new exceptionLog in existing DB.
-        await keyValueDBService.validateAndSaveData(USER_EXCEPTION_LOGS, userExceptionLogArray)
-        let a = await keyValueDBService.getValueFromStore(USER_EXCEPTION_LOGS)
+        realm.save(USER_EXCEPTION_LOGS, userExceptionLogObject)
     }
 
     /**
      * @param {*} lastSyncTime --Latest time when the sync is done.
      */
-    async getUserExceptionLogs(lastSyncTime) {
-        const userExceptionLogs = await keyValueDBService.getValueFromStore(USER_EXCEPTION_LOGS);
-        const userExceptionLogsValues = userExceptionLogs ? userExceptionLogs.value : []
-        let userExceptionLogsToBeSynced = []
-        userExceptionLogsValues.forEach(exceptionLog => { // fetching only those exceptionLogs which are saved after lastSyncTime.
-            if (moment(exceptionLog.dateTime).isAfter(lastSyncTime.value)) {
-                userExceptionLogsToBeSynced.push(exceptionLog)
+    getUserExceptionLog(userExceptionLogs, lastSyncTime) {
+        let userExceptionLogToBeSynced = []
+        userExceptionLogs.forEach(userExceptionLog => {
+            if (moment(userExceptionLog.dateTime).isAfter(lastSyncTime)) {
+                userExceptionLogToBeSynced.push(userExceptionLog)
             }
         })
-        return userExceptionLogsToBeSynced
+        return userExceptionLogToBeSynced
     }
 }
 

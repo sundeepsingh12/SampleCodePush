@@ -48,7 +48,7 @@ export function createManualBackup(syncedBackupFiles) {
             }
         } catch (error) {
             dispatch(setState(SET_BACKUP_TOAST, TRY_AFTER_CLEARING_YOUR_STORAGE_DATA))    
-            dispatch(showToastAndAddUserExceptionLog(201, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(201, error.message, 'danger', 1)            
         }
     }
 }
@@ -65,7 +65,7 @@ export function getBackupList() {
             let backupFiles = await backupService.getBackupFilesList(user.value) // this method gets backup files list from service
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(202, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(202, error.message, 'danger', 1)            
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -97,7 +97,7 @@ export function uploadBackupFile(index, filesMap) {
                 dispatch(setState(SET_BACKUP_VIEW, 3))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(203, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(203, error.message, 'danger', 1)            
             dispatch(setState(SET_BACKUP_VIEW, 3))
         }
     }
@@ -118,7 +118,7 @@ export function deleteBackupFile(index, filesMap) {
             let backupFiles = await backupService.getBackupFilesList(user.value) // this method
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(204, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(204, error.message, 'danger', 1)            
             dispatch(setState(SET_LOADER_BACKUP, false))
         }
     }
@@ -144,7 +144,7 @@ export function autoLogoutAfterUpload(calledFromHome) {
             dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
             dispatch(deleteSessionToken())
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(205, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(205, error.message, 'danger', 1)
             dispatch(setState(SET_BACKUP_VIEW, 0))
         }
     }

@@ -49,7 +49,6 @@ class PayByLink extends PureComponent {
     }
 
     render() {
-        console.log('PayByLink props', this.props)
         return (
             <Container>
                 <Content style={StyleSheet.flatten([styles.padding10])}>

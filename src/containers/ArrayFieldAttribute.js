@@ -99,7 +99,8 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.actions.addRowInArray(this.props.lastRowId,
                 this.props.childElementsTemplate,
                 this.props.arrayElements,
-                this.props.navigation.state.params.jobTransaction)
+                this.props.navigation.state.params.jobTransaction,
+                this.props.isSaveDisabled)
         }
     }
     savePressed = () => {

@@ -39,41 +39,42 @@ import {
 
 class SkuListing {
     async getSkuListingDto(fieldAttributeMasterId) {
-        if (!fieldAttributeMasterId) {
+        if(!fieldAttributeMasterId){
             throw new Error('Field Attribute master id missing')
         }
-
+        
         const fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
         if (!fieldAttributesList || !fieldAttributesList.value) {
             throw new Error('Field Attributes missing in store')
         }
 
         let idFieldAttributeMap = new Map(), isSkuCodePresent = false, childFieldAttributeId, childFieldAttributeKey
-        fieldAttributesList.value.map(fieldAttributeObject => {
+        let fieldAttributesListValues = fieldAttributesList.value
+        fieldAttributesListValues.map(fieldAttributeObject => {
             if (fieldAttributeObject.parentId == fieldAttributeMasterId && fieldAttributeObject.attributeTypeId == OBJECT) {
                 childFieldAttributeId = fieldAttributeObject.id
                 childFieldAttributeKey = fieldAttributeObject.key
             }
         })
-        fieldAttributesList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == childFieldAttributeId)
-            .forEach(fieldAttribute => {
-                if (fieldAttribute.attributeTypeId == SKU_CODE) {
+        for (let index in fieldAttributesListValues) {
+            if (fieldAttributesListValues[index].parentId == childFieldAttributeId) {
+                if (fieldAttributesListValues[index].attributeTypeId == SKU_CODE) {
                     isSkuCodePresent = true
                 }
-                const id = (fieldAttribute.jobAttributeMasterId == 0 || fieldAttribute.jobAttributeMasterId == null) ? fieldAttribute.attributeTypeId : fieldAttribute.jobAttributeMasterId
-                idFieldAttributeMap.set(id, fieldAttribute)
-            })
-
-        fieldAttributesList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == fieldAttributeMasterId && fieldAttributeObject.attributeTypeId != OBJECT).forEach(fieldAttribute => {
-            idFieldAttributeMap.set(fieldAttribute.attributeTypeId, fieldAttribute)
-        })
-
+                const id = (fieldAttributesListValues[index].jobAttributeMasterId == 0 || fieldAttributesListValues[index].jobAttributeMasterId == null) ? fieldAttributesListValues[index].attributeTypeId : fieldAttributesListValues[index].jobAttributeMasterId
+                idFieldAttributeMap.set(id, fieldAttributesListValues[index])
+            }
+            if (fieldAttributesListValues[index].parentId == fieldAttributeMasterId && fieldAttributesListValues[index].attributeTypeId != OBJECT) {
+                idFieldAttributeMap.set(fieldAttributesListValues[index].attributeTypeId, fieldAttributesListValues[index])
+            }
+        }
         const skuListingDto = {
             idFieldAttributeMap,
             isSkuCodePresent,
             childFieldAttributeId,
             childFieldAttributeKey
         }
+
         return skuListingDto
     }
 
@@ -284,15 +285,17 @@ class SkuListing {
         }
         let childElementsArray = []
         for (let index in skuListItems) {
-            const childDataList = []
+            let childDataList = [],imageAtMaxQty,imageAt0Qty,imageAtAnyQty,reasonAtMaxQty,reasonAt0Qty,reasonAtAnyQty
             const originalQuantityValue = parseInt(skuListItems[index].filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)[0])
             const actualQuantityValue = parseInt(skuListItems[index].filter(object => object.attributeTypeId == SKU_ACTUAL_QUANTITY).map(item => item.value)[0])
-            const imageAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')
-            const imageAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')
-            const imageAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')
-            const reasonAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')
-            const reasonAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')
-            const reasonAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')
+            if (skuValidationForImageAndReason) {
+                imageAtMaxQty = (actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty'))
+                imageAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')
+                imageAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')
+                reasonAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')
+                reasonAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')
+                reasonAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')
+            }
             skuListItems[index].forEach(skuItem => {
                 if (skuValidationForImageAndReason && ((skuItem.attributeTypeId == SKU_PHOTO && skuItem.value == OPEN_CAMERA && (imageAtMaxQty || imageAt0Qty || imageAtAnyQty)) || (skuItem.attributeTypeId == SKU_REASON && (skuItem.value == REASON || skuItem.value < 0) && (reasonAtMaxQty || reasonAt0Qty || reasonAtAnyQty)))) {
                     ShouldProceedOrNot = false

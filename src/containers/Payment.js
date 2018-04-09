@@ -330,7 +330,8 @@ class Payment extends PureComponent {
                 moneyCollectMaster: this.props.moneyCollectMaster,
                 isSaveDisabled: this.props.navigation.state.params.isSaveDisabled,
                 latestPositionId: this.props.navigation.state.params.latestPositionId,
-                paymentContainerKey: this.props.navigation.state.key
+                paymentContainerKey: this.props.navigation.state.key,
+                renderPaymentModeId: this.renderPaymentModeId,
             })
         } else {
             this.props.actions.saveMoneyCollectObject(

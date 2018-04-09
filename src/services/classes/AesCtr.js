@@ -93,9 +93,9 @@ class AesCtr extends Aes {
             ciphertext += cipherChar.join('');
 
             // if within web worker, announce progress every 1000 blocks (roughly every 50ms)
-            if (typeof WorkerGlobalScope != 'undefined' && self instanceof WorkerGlobalScope) {
-                if (b % 1000 == 0) self.postMessage({ progress: b / blockCount });
-            }
+            // if (typeof WorkerGlobalScope != 'undefined' && self instanceof WorkerGlobalScope) {
+            //     if (b % 1000 == 0) self.postMessage({ progress: b / blockCount });
+            // }
         }
 
         ciphertext = AesCtr.base64Encode(ctrTxt + ciphertext);
@@ -163,9 +163,9 @@ class AesCtr extends Aes {
             plaintext += plaintxtByte.join('');
 
             // if within web worker, announce progress every 1000 blocks (roughly every 50ms)
-            if (typeof WorkerGlobalScope != 'undefined' && self instanceof WorkerGlobalScope) {
-                if (b % 1000 == 0) self.postMessage({ progress: b / nBlocks });
-            }
+            // if (typeof WorkerGlobalScope != 'undefined' && self instanceof WorkerGlobalScope) {
+            //     if (b % 1000 == 0) self.postMessage({ progress: b / nBlocks });
+            // }
         }
 
         plaintext = AesCtr.utf8Decode(plaintext);  // decode from UTF8 back to Unicode multi-byte chars

@@ -30,10 +30,10 @@ import {
 } from '../lib/AttributeConstants'
 
 import {
-  SET_DRAFT,
   SET_UPDATE_DRAFT,
   ERROR_MESSAGE,
-  SET_FORM_TO_INVALID
+  SET_FORM_TO_INVALID,
+  SET_NO_FIELD_ATTRIBUTE_MAPPED
 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import {
@@ -55,11 +55,11 @@ function mapStateToProps(state) {
     errorMessage: state.formLayout.errorMessage,
     currentElement: state.formLayout.currentElement,
     pieChart: state.home.pieChart,
-    draftStatusId: state.formLayout.draftStatusId,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
     dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
+    noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
   }
 }
 
@@ -71,9 +71,8 @@ function mapDispatchToProps(dispatch) {
 
 class FormLayout extends PureComponent {
   componentDidUpdate() {
-    if (this.props.updateDraft && !this.props.navigation.state.params.jobTransaction.length) { //Draft should not be saved for bulk
+    if (this.props.updateDraft && !this.props.navigation.state.params.jobTransaction.length && !this.props.navigation.state.params.editableFormLayoutState && !this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
       this.saveDraft()
-      this.props.actions.setState(SET_UPDATE_DRAFT, false)
     }
     if (this.props.errorMessage && this.props.errorMessage != '') {
       Toast.show({
@@ -87,6 +86,11 @@ class FormLayout extends PureComponent {
     }
   }
 
+  componentWillUnmount() {
+    if (this.props.noFieldAttributeMappedWithStatus) {
+      this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
+    }
+  }
   saveDraft = () => {
     if (this.props.jobTransactionId != 0) {
       let formLayoutState = {
@@ -103,28 +107,14 @@ class FormLayout extends PureComponent {
         dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
         fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
       }
-      this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId)
+      this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction)
     }
   }
-  showDraftAlert() {
-    let draftMessage = 'Do you want to restore draft for ' + this.props.statusName + '?'
-    let view =
-      <CustomAlert
-        title="Draft"
-        message={draftMessage}
-        onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={() => this._onCancel()} />
-    return view
-  }
-  _onCancel = () => {
-    this.props.actions.setState(SET_DRAFT, null)
-  }
-  _goToFormLayoutWithDraft = () => {
-    this.props.actions.setState(SET_DRAFT, null)
-    this.props.actions.restoreDraft(this.props.jobTransactionId, this.props.statusId, this.props.navigation.state.params.jobMasterId)
-  }
+
   componentDidMount() {
-    this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction)
+    if (!this.props.navigation.state.params.isDraftRestore) {
+      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId)
+    }
   }
 
   renderData = (item) => {
@@ -245,9 +235,20 @@ class FormLayout extends PureComponent {
     )
   }
 
+  /**
+   * When a status doesn't have any visible attribute mapped then show this view
+   */
+  emptyFieldAttributeForStatusView() {
+    if (this.props.noFieldAttributeMappedWithStatus) {
+      return <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+        <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}> No visible attribute mapped</Text>
+      </View>
+    }
+  }
+
   render() {
-    const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
+    let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -265,10 +266,9 @@ class FormLayout extends PureComponent {
     const footerView = this.getFooterView()
     if (Platform.OS == 'ios') {
       formView = <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-        {draftAlert}
         {invalidFormAlert}
         {headerView}
-
+        {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList
@@ -283,10 +283,9 @@ class FormLayout extends PureComponent {
       </KeyboardAvoidingView >
     } else {
       formView = <Container>
-        {draftAlert}
         {invalidFormAlert}
         {headerView}
-
+        {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList

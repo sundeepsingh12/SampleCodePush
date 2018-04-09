@@ -32,15 +32,21 @@ import {
   TABLE_JOB_TRANSACTION,
   SEARCH_TAP,
   LISTING_SEARCH_VALUE,
-  BulkListing
+  BulkListing,
+  JobDetailsV2
 } from '../lib/constants'
 import JobListItem from '../components/JobListItem'
+import {
+  NO_NEXT_STATUS,
+  OK
+} from '../lib/ContainerConstants'
+import moment from 'moment'
 
 function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
     isRefreshing: state.listing.isRefreshing,
-    statusNextStatusListMap : state.listing.statusNextStatusListMap
+    statusNextStatusListMap: state.listing.statusNextStatusListMap
   }
 }
 
@@ -53,11 +59,11 @@ function mapDispatchToProps(dispatch) {
 class TaskListScreen extends PureComponent {
 
   componentDidMount() {
-    this.props.actions.shouldFetchJobsOrNot(this.props.jobTransactionCustomizationList)
+    this.props.actions.fetchJobs(moment().format('YYYY-MM-DD'), this.props.pageObject)
   }
 
-  navigateToScene = (item,groupId) => {
-    this.props.actions.navigateToScene('JobDetailsV2',
+  navigateToScene = (item, groupId) => {
+    this.props.actions.navigateToScene(JobDetailsV2,
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
@@ -65,90 +71,119 @@ class TaskListScreen extends PureComponent {
       }
     )
   }
-
-  renderData = (item,lastId,groupId) => {
+  /**It renders each job transaction item
+    * 
+    * @param {*} item 
+    * @param {*} lastId 
+    * @param {*} groupId 
+    */
+  renderData = (item, lastId, groupId) => {
     return (
       <JobListItem
         data={item}
-        showIconsInJobListing = {true}
-        onPressItem={() => { this.navigateToScene(item,groupId) }}
-        lastId = {lastId}
+        showIconsInJobListing={true}
+        onPressItem={() => { this.navigateToScene(item, groupId) }}
+        lastId={lastId}
       />
     )
   }
 
-  renderListForAll() {
-    let sectionList = []
-    let listObject = _.clone(this.props.jobTransactionCustomizationList)  
-    let statusIdlistObject = {}  
-    for(let selectedDateObject in listObject){
-      let statusIdFilteredArray = []
-      statusIdFilteredArray = listObject[selectedDateObject].filter(arrayItem => this.props.statusIdList.includes(arrayItem.statusId))
-      if(!_.isEmpty(statusIdFilteredArray)){
-        statusIdlistObject[selectedDateObject] = statusIdFilteredArray
+  /**It performs filter and search on a list of job transactions
+   * and returns filtered array. It also navigates to a job if only one
+   * transaction is searched.
+   * 
+   * @param {*} listArray 
+   * @param {*} searchText text to be searched
+   * @param {*} scanner boolean variable that distinguishes between search and filter
+   * @param {*} groupId groupId in case of multipart assignment
+   */
+  performFilteringAndSearch(listArray, searchText, scanner, groupId) {
+    let trimmedSearchText = _.trim(searchText)
+    let jobTransactionArray = [], isEqualMatchFound
+    for (let value of listArray) {
+      let values = [value.referenceNumber, value.runsheetNo, value.line1, value.line2, value.circleLine1, value.circleLine2]
+      if (_.isEqual(_.toLower(value.referenceNumber), trimmedSearchText) || _.isEqual(_.toLower(value.runsheetNo), trimmedSearchText)) {
+        jobTransactionArray.push(value)
+        isEqualMatchFound = true
+      } else if (_.some(values, (data) => _.includes(_.toLower(data), trimmedSearchText))) {
+        jobTransactionArray.push(value)
+      }
     }
+    // Navigate to job details page when single transaction is searched
+    if (_.size(jobTransactionArray) == 1 && scanner && isEqualMatchFound) {
+      this.navigateToScene(jobTransactionArray[0], groupId)
+    } else if (scanner) {
+      this.props.actions.setState(LISTING_SEARCH_VALUE, { searchText, scanner: false })
+    }
+    return jobTransactionArray
   }
-      if (!_.isEmpty(statusIdlistObject)) {
-      for (let key in statusIdlistObject) {
-        let sectionListObject = {
-          data: statusIdlistObject[key],
-          key: key,
-        }
-        sectionList.push(sectionListObject)
+
+  /**It returns section list according to dates for calender selection.
+   */
+  renderListForCalender() {
+    let scanner = (this.props.searchText.scanner) ? true : false
+    let searchText = _.toLower(this.props.searchText.searchText)
+    let sectionList = []
+    let listObject = this.props.jobTransactionCustomizationList
+    for (let selectedDateObject in listObject) {
+      let statusIdFilteredArray = listObject[selectedDateObject].filter(arrayItem => this.props.statusIdList.includes(arrayItem.statusId))
+      let jobTransactionArray = this.performFilteringAndSearch(statusIdFilteredArray, searchText, scanner)
+      if (!_.isEmpty(jobTransactionArray)) {
+        sectionList.push({
+          data: jobTransactionArray,
+          key: selectedDateObject,
+        })
       }
     }
     return sectionList
   }
 
-  renderSearchList(searchTextValue, listArray) {
-    let scanner = (searchTextValue.scanner) ? true : false
-    let searchText = _.toLower(searchTextValue.searchText)
-    let jobTransactionArray = []
-    for(let value of listArray) {
-      let values = [value.referenceNumber, value.runsheetNo, value.line1, value.line2, value.circleLine1, value.circleLine2]
-      if (_.isEqual(_.toLower(value.referenceNumber), searchText) || _.isEqual(_.toLower(value.runsheetNo), searchText)){
-        jobTransactionArray = []
+  /**Function to render transactions based on group id.
+   * 
+   * @param {*} groupTransactionsArray 
+   */
+  renderSearchListForGroupId(groupTransactionsArray) {
+    let scanner = (this.props.searchText.scanner) ? true : false
+    let searchText = _.toLower(this.props.searchText.searchText)
+    let jobTransactionArray = [], transactionList = []
+    for (let value of groupTransactionsArray) {
+      let transactionList = this.performFilteringAndSearch(value.jobTransactions, searchText, scanner, value.groupId);
+      if (transactionList && transactionList.length > 0) {
+        value.total = transactionList.length
+        value.jobTransactions = transactionList
+        value.seqSelected = value.jobTransactions[0].seqSelected
         jobTransactionArray.push(value)
-        break
-      }
-      if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
-        jobTransactionArray.push(value)
-      }
-    }
-    (jobTransactionArray.length == 1) ? 
-      this.props.actions.setState(SEARCH_TAP,{jobTransaction : jobTransactionArray[0],scanner}) : this.props.actions.setState(SEARCH_TAP,null) 
-    return jobTransactionArray;
-  }
-  renderSearchListForGroupId(searchTextValue, groupTransactionsArray) {
-    let searchText = _.toLower(searchTextValue.searchText)
-    let jobTransactionArray = [],transactionList = []
-    for(let value of groupTransactionsArray) {
-      transactionList = []
-      for(let transaction of value.jobTransactions){
-        let values = [transaction.referenceNumber, transaction.runsheetNo, transaction.line1, transaction.line2, transaction.circleLine1, transaction.circleLine2]
-        if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
-          transactionList.push(transaction)
-        }
-      }
-      if(transactionList.length > 0){
-      value.total = transactionList.length
-      value.jobTransactions = transactionList
-      value.seqSelected = value.jobTransactions[0].seqSelected
-      jobTransactionArray.push(value)
       }
     }
     return jobTransactionArray;
   }
-
+  /**Function to render transactions without group id and calender date
+    * 
+    * @param {*} groupTransactionsArray 
+    */
   renderList() {
     let list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
-    let jobTransactionArray = (_.trim(this.props.searchText)) ? this.renderSearchList(this.props.searchText, list) : list
+    let scanner = (this.props.searchText.scanner) ? true : false
+    let searchText = _.toLower(this.props.searchText.searchText)
+    let jobTransactionArray = this.performFilteringAndSearch(list, searchText, scanner);
+
+    // Sort transaction list by order of sequence selected
     jobTransactionArray.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
     return jobTransactionArray
   }
 
+  renderItem = (row) => {
+    return (
+      <JobListItem
+        data={row.item}
+        onPressItem={() => { this.navigateToScene(row.item) }}
+      />
+    )
+  }
+
+  // Function to render headers in calender section list
   renderSectionHeader = (row) => {
     return (
       <Separator bordered>
@@ -156,7 +191,9 @@ class TaskListScreen extends PureComponent {
       </Separator>
     );
   }
-
+  /**Renders flatlist for list of job transactions
+    *  
+    */
   flatlist() {
     return (
       <FlatList
@@ -166,81 +203,91 @@ class TaskListScreen extends PureComponent {
       />
     )
   }
-
+  /**Renders flatlist for list of job transactions with group id
+    *  
+    */
   flatlistForGroupTransactions() {
     return (
       <FlatList
-        data={this.getGroupWiseTransactions(this.props.jobTransactionCustomizationList,this.props.tabId)}
+        data={this.getGroupWiseTransactions(this.props.jobTransactionCustomizationList, this.props.tabId)}
         renderItem={({ item }) => {
-          return(
+          return (
             <View>
-              {(item.groupId && item.jobTransactions.length > 1) ? <TouchableOpacity style={[styles.row, styles.padding10, styles.justifyStart, styles.alignCenter, {height: 70}]}   onPress={() => this.updateTransactionForGroupId(item)}>
-                <View style={{position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: 40,top:40, left: 36}}></View>
-                  <View style={[styles.borderRadius50,{backgroundColor : item.color,width: 16, height: 16, marginLeft: 20}]}>
-                  </View>
-                  <View style={{marginLeft: 34,marginTop: 12}}>
-                    <Text style={[styles.fontLg, styles.fontWeight500, styles.fontBlack]}> {item.groupId}</Text>
-                    <Text style={[styles.fontSm, styles.fontDarkGray]}>Total : {item.total} </Text>
-                  </View>
-                  <Icon name="ios-arrow-forward" style={{marginLeft: 'auto',color: '#a3a3a3'}}/>
+              {(item.groupId && item.jobTransactions.length > 1) ? <TouchableOpacity style={[styles.row, styles.padding10, styles.justifyStart, styles.alignCenter, { height: 70 }]} onPress={() => this.updateTransactionForGroupId(item)}>
+                <View style={{ position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: 40, top: 40, left: 36 }}></View>
+                <View style={[styles.borderRadius50, { backgroundColor: item.color, width: 16, height: 16, marginLeft: 20 }]}>
+                </View>
+                <View style={{ marginLeft: 34, marginTop: 12 }}>
+                  <Text style={[styles.fontLg, styles.fontWeight500, styles.fontBlack]}> {item.groupId}</Text>
+                  <Text style={[styles.fontSm, styles.fontDarkGray]}>Total : {item.total} </Text>
+                </View>
+                <Icon name="ios-arrow-forward" style={{ marginLeft: 'auto', color: '#a3a3a3' }} />
 
               </TouchableOpacity> : null}
               {this.renderGroupTransactions(item)}
-              </View>
+            </View>
           )
         }}
         keyExtractor={item => String(item.key)}
       />
     )
   }
-  renderGroupTransactions(items){
+
+  renderGroupTransactions(items) {
     let jobTransactions = items.jobTransactions.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
-    let groupId = null,lastId = null
-    if(items.groupId && items.total > 1){
-      lastId = jobTransactions[items.total-1]['id']
+    let groupId = null, lastId = null
+    if (items.groupId && items.total > 1) {
+      lastId = jobTransactions[items.jobTransactions.length - 1]['id']
       groupId = items.groupId
     }
     return (
       <FlatList
         data={jobTransactions}
-        renderItem={({ item }) => this.renderData(item,lastId,groupId)}
-        legacyImplementation = {true}
+        renderItem={({ item }) => this.renderData(item, lastId, groupId)}
+        legacyImplementation={true}
         keyExtractor={item => String(item.id)}
       />
-    )  
-  } 
+    )
+  }
 
-  updateTransactionForGroupId (item){
+  /**Navigate to bulk update when selecting a group of transactions
+    *  
+    */
+  updateTransactionForGroupId(item) {
     let jobTransaction = item.jobTransactions[0]
-    if(this.props.statusNextStatusListMap[jobTransaction.statusId].length > 0){
-    this.props.actions.navigateToScene(BulkListing, {
-      jobMasterId: jobTransaction.jobMasterId,      
-      statusId: jobTransaction.statusId,
-      nextStatusList : this.props.statusNextStatusListMap[jobTransaction.statusId],
-      groupId: item.groupId
-    }) }else{
+    if (this.props.statusNextStatusListMap[jobTransaction.statusId].length > 0) {
+      this.props.actions.navigateToScene(BulkListing, {
+        jobMasterId: jobTransaction.jobMasterId,
+        statusId: jobTransaction.statusId,
+        nextStatusList: this.props.statusNextStatusListMap[jobTransaction.statusId],
+        groupId: item.groupId
+      })
+    } else {
       Toast.show({
-        text: 'No NextStatus Available',  position: 'bottom', buttonText: 'Ok'
+        text: NO_NEXT_STATUS, position: 'bottom', buttonText: OK
       })
     }
-
   }
-  getGroupWiseTransactions(jobTransactionCustomizationList,tabId) {
+
+  getGroupWiseTransactions(jobTransactionCustomizationList, tabId) {
     let list = Object.values(jobTransactionCustomizationList[tabId])
-    let groupTransactionsArray = (_.trim(this.props.searchText)) ? this.renderSearchListForGroupId(this.props.searchText, _.cloneDeep(list)) : list
+    let groupTransactionsArray = (_.trim(this.props.searchText)) ? this.renderSearchListForGroupId(_.cloneDeep(list)) : list
     groupTransactionsArray.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
     return groupTransactionsArray
   }
 
+  /**Renders section list for transactions divided date wise
+    *  
+    */
   sectionlist() {
     return (
       <SectionList
-        sections={this.renderListForAll()}
-        renderItem={({ item }) => this.renderData(item)}
+        sections={this.renderListForCalender()}
+        renderItem={this.renderItem}
         renderSectionHeader={this.renderSectionHeader}
         keyExtractor={item => String(item.id)}
       />
@@ -251,8 +298,8 @@ class TaskListScreen extends PureComponent {
     if (this.props.isRefreshing) {
       return <Loader />
     } else {
-      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList) && this.props.jobTransactionCustomizationList) ? this.props.jobTransactionCustomizationList['isGrouping'] ? 
-                   this.flatlistForGroupTransactions() : this.sectionlist()  : this.flatlist()
+      let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList) && this.props.jobTransactionCustomizationList) ? this.props.jobTransactionCustomizationList['isGrouping'] ?
+        this.flatlistForGroupTransactions() : this.sectionlist() : this.flatlist()
       return (
         <Container>
           <Content>
@@ -264,8 +311,6 @@ class TaskListScreen extends PureComponent {
       )
     }
   }
-
-
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TaskListScreen)

@@ -117,7 +117,7 @@ class JobDetails {
     async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId, actionOnStatus) {
         let enableFlag = false
         if (enableOutForDelivery) { // check for out for delivery
-            enableFlag = await this.checkOutForDelivery(jobMasterList) 
+            enableFlag = await this.checkOutForDelivery(jobMasterList,statusList) 
         }
         if (!enableFlag && enableResequenceRestriction && actionOnStatus != 1) { // check for enable resequence restriction and job closed
             enableFlag = this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
@@ -182,8 +182,8 @@ class JobDetails {
      */
 
     checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId) {
-        const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true).map(obj => obj.id)
-        const statusMap = statusList.value.filter((status) => status.tabId == tabId && status.code !== UNSEEN).map(obj => obj.id)
+        const jobMasterIdWithEnableResequence = jobMasterList.value.filter((obj) => obj.enableResequenceRestriction == true)
+        const statusMap = statusList.value.filter((status) => status.tabId == tabId && status.code !== UNSEEN)
         const firstEnableSequenceTransaction = jobTransactionService.getFirstTransactionWithEnableSequence(jobMasterIdWithEnableResequence, statusMap)
         return !(!_.isEmpty(firstEnableSequenceTransaction) && firstEnableSequenceTransaction.id != jobTransactionId && seqSelected >= firstEnableSequenceTransaction.seqSelected) ? false : "Please finish previous items first"
     }
@@ -196,13 +196,10 @@ class JobDetails {
      *@returns {string,Boolean} if unseentransaction present then return string else boolean
      */
 
-    async checkOutForDelivery(jobMasterList) {
+    async checkOutForDelivery(jobMasterList, statusList) {
         const jobMasterIdListWithDelivery = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) // jobMaster Id list with out for delivery
-        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdListWithDelivery, UNSEEN)
-        let statusIds = Object.keys(mapOfUnseenStatusWithJobMaster).map(function (key) {
-            return mapOfUnseenStatusWithJobMaster[key];
-        });
-        const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(statusIds)
+        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdListWithDelivery, UNSEEN, statusList)
+        const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(Object.values(mapOfUnseenStatusWithJobMaster))
         return !(unseenTransactions && unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
     }
     
@@ -258,7 +255,7 @@ class JobDetails {
         let updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction, previousStatus) // update jobTransaction on revert
         await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value) // add jobTransaction to sync list
         realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog) // update jobTransaction, job, runSheet, transactionLog Db in batch
-        await draftService.deleteDraftFromDb(jobTransaction.id)
+        await draftService.deleteDraftFromDb(jobTransaction)
     }
 
     /**@function checkLatLong(jobId,userLat,userLong)
