@@ -34,11 +34,6 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 
 import CONFIG from '../../lib/config'
 
-import {
-  onChangePassword,
-  onChangeUsername
-} from '../login/loginActions'
-
 import { onResyncPress } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer'
@@ -90,6 +85,13 @@ export function deleteSessionToken() {
   }
 }
 
+/**
+ * 
+ * @param {Number} errorCode error code of particular class and action.
+ * @param {String} errorMessage error message to display
+ * @param {String} type type of Toast for example danger, warning, success
+ * @param {Integer} isToastShow integer whether to show toast or not.
+ */
 export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
       if (isToastShow == 1) {
         Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })

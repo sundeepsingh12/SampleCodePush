@@ -59,7 +59,7 @@ export function checkout(previousFormLayoutState, recurringData, jobMasterId, co
             let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(commonData.amount, recurringData)
             let { emailTableElement, emailIdInFieldData, contactNumberInFieldData } = await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(previousFormLayoutState, recurringData, jobMasterId, statusId, false)
             let responseMessage = await transientStatusAndSaveActivatedService.sendEmailOrSms(totalAmount, emailTableElement, emailIdInFieldData, true, true, jobMasterId)
-            await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))//after completing jobs set start module to reload itself so that new job which is created here will be visible
+            //await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))//after completing jobs set start module to reload itself so that new job which is created here will be visible
             dispatch(setState(SET_SAVE_ACTIVATED_TOAST_MESSAGE, responseMessage))
             dispatch(navigateToScene(CheckoutDetails, {
                 commonData: commonData.commonData,
