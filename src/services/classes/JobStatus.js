@@ -67,14 +67,15 @@ class JobStatus {
    *  {930: 4813}
    * 
    */
-  async getjobMasterIdStatusIdMap(jobMasterIdList, jobStatusCode) {
+   getjobMasterIdStatusIdMap(jobMasterIdList, jobStatusCode, jobStatusArray) {
     let jobMasterIdStatusIdMap = {}
-    const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS) 
-    if (!jobStatusArray || !jobStatusArray.value) {
+    console.log("jobStatusArray",jobStatusArray)
+    // const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS) 
+    if (!jobStatusArray) {
       throw new Error(JOB_STATUS_MISSING)
     }
     //optimize using for loop
-    const filteredJobStatusArray = await jobStatusArray.value.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobMasterIdList.includes(jobStatusObject.jobMasterId)))
+    const filteredJobStatusArray = jobStatusArray.filter(jobStatusObject => (jobStatusObject.code == jobStatusCode && jobMasterIdList.includes(jobStatusObject.jobMasterId)))
     if (_.isUndefined(filteredJobStatusArray) || _.isNull(filteredJobStatusArray)) {
       throw new Error('Invalid Job Master or Job Status Code')
     }

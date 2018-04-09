@@ -36,6 +36,43 @@ describe('test cases for check out for delivery', () => { //checkOutForDelivery(
             }
         ]
     }
+    const statusList = {
+        value: [
+            {
+                code: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+                name: "Success",
+                saveActivated: null,
+                sequence: 3,
+                statusCategory: 3,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+                name: "Unseen",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+                name: "Pending12",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            }
+        ]
+    }
     let jobTransactionId = 123
     let unseenTransactionList = [
         {
@@ -58,31 +95,13 @@ describe('test cases for check out for delivery', () => { //checkOutForDelivery(
     it('should check for out for delivery and return message', () => {
         jobStatusService.getjobMasterIdStatusIdMap.mockReturnValueOnce(jobMasterIdStatusIdMap)
         jobTransactionService.getJobTransactionsForStatusIds.mockReturnValueOnce(unseenTransactionList)
-        return jobDetailsService.checkOutForDelivery(jobMasterList)
-            .then((statusList) => {
-                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
-                expect(jobTransactionService.getJobTransactionsForStatusIds).toHaveBeenCalledTimes(1)
-                expect(statusList).toEqual(message)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
-            })
+        expect(jobDetailsService.checkOutForDelivery(jobMasterList,statusList)).toEqual(message)
     })
     it('should check for out for delivery and return false', () => {
         unseenTransactionList = []
         jobStatusService.getjobMasterIdStatusIdMap.mockReturnValueOnce(jobMasterIdStatusIdMap)
         jobTransactionService.getJobTransactionsForStatusIds.mockReturnValueOnce(unseenTransactionList)
-        return jobDetailsService.checkOutForDelivery(jobMasterList)
-            .then((statusList) => {
-                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
-                expect(jobTransactionService.getJobTransactionsForStatusIds).toHaveBeenCalledTimes(1)
-                expect(statusList).toEqual(false)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
-            })
+        expect(jobDetailsService.checkOutForDelivery(jobMasterList,statusList)).toEqual(false)
     })
 })
 
@@ -262,38 +281,18 @@ describe('test cases for check for enabling status', () => {   // checkForEnabli
     it('should return message for outForDelivery enabled', () => {
         let message = "Please Scan all Parcels First"
         jobDetailsService.checkOutForDelivery.mockReturnValueOnce(message)
-        return jobDetailsService.checkForEnablingStatus()
-            .then(() => {
-                expect(jobDetailsService.checkOutForDelivery).toHaveBeenCalledTimes(1)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobDetailsService.checkOutForDelivery).not.toHaveBeenCalled()
-            })
+        expect(jobDetailsService.checkForEnablingStatus(true)).toEqual(message)
     })
     it('should return message for enableResequence enabled', () => {
         let message = "Please finish previous items first"
         jobDetailsService.checkEnableResequence.mockReturnValueOnce(message)
-        return jobDetailsService.checkForEnablingStatus()
-            .then(() => {
-                expect(jobDetailsService.checkEnableResequence).toHaveBeenCalledTimes(1)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobDetailsService.checkEnableResequence).not.toHaveBeenCalled()
-            })
+        expect(jobDetailsService.checkForEnablingStatus(false,true)).toEqual(message)
     })
     it('should return message for jobExpired', () => {
         let message = "Job Expired!"
         jobDetailsService.checkJobExpire.mockReturnValueOnce(message)
-        return jobDetailsService.checkForEnablingStatus()
-            .then(() => {
-                expect(jobDetailsService.checkJobExpire).toHaveBeenCalledTimes(1)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobDetailsService.checkJobExpire).not.toHaveBeenCalled()
-            })
+        expect(jobDetailsService.checkForEnablingStatus(false,false,true)).toEqual(message)
+
     })
 })
 
@@ -303,116 +302,130 @@ describe('test cases for prepareDataObject', () => {
             id: 0,
             jobAttributeMasterId: 1,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 0,
             positionId: 1,
             value: 'xyz',
         },
         {
-            id: 0,
+            id: 1,
             jobAttributeMasterId: 2,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 0,
             positionId: 2,
             value: 91727217123,
         },
         {
-            id: 0,
+            id: 2,
             jobAttributeMasterId: 3,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 0,
             positionId: 3,
             value: 62,
         },
         {
-            id: 0,
+            id: 3,
             jobAttributeMasterId: 4,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 0,
             positionId: 4,
             value: 'address line 1',
         },
         {
-            id: 0,
+            id: 4,
             jobAttributeMasterId: 5,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 0,
             positionId: 5,
             value: 'abc',
         },
         {
-            id: 0,
+            id: 5,
             jobAttributeMasterId: 6,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 0,
             positionId: 6,
             value: 'ArraySarojFareye',
         },
         {
-            id: 0,
+            id: 6,
             jobAttributeMasterId: 7,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 6,
             positionId: 7,
             value: 'ObjectSarojFareye',
         },
         {
-            id: 0,
+            id: 7,
             jobAttributeMasterId: 8,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 7,
             positionId: 8,
             value: 'test11',
         },
         {
-            id: 0,
+            id: 8,
             jobAttributeMasterId: 9,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 7,
             positionId: 9,
             value: 'test12',
         },
         {
-            id: 0,
+            id: 9,
             jobAttributeMasterId: 10,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 7,
             positionId: 10,
             value: 'test13',
         },
         {
-            id: 0,
+            id: 10,
             jobAttributeMasterId: 7,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 6,
             positionId: 11,
             value: 'ObjectSarojFareye',
         },
         {
-            id: 0,
+            id: 11,
             jobAttributeMasterId: 8,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 11,
             positionId: 12,
             value: 'test21',
         },
         {
-            id: 0,
+            id: 12,
             jobAttributeMasterId: 9,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 11,
             positionId: 13,
             value: 'test22',
         },
         {
-            id: 0,
+            id: 13,
             jobAttributeMasterId: 10,
             jobId: 1,
+            jobTransactionId: 1,
             parentId: 11,
             positionId: 14,
             value: 'test23',
         },
     ]
-    let attributeTypeId = 2
+    let id = 1
     const attributeMasterMap = {
         1: {
             attributeTypeId: 1,
@@ -421,63 +434,245 @@ describe('test cases for prepareDataObject', () => {
             label: 'name',
         },
         2: {
-            attributeTypeId,
+            attributeTypeId: 2,
             hidden: false,
             id: 2,
             label: 'number',
         },
         3: {
-            attributeTypeId,
+            attributeTypeId: 3,
             hidden: true,
             id: 3,
             label: 'num',
         },
         4: {
-            attributeTypeId,
+            attributeTypeId: 4,
             hidden: false,
             id: 4,
             label: 'address',
         },
         5: {
-            attributeTypeId,
+            attributeTypeId: 5,
             hidden: true,
             id: 5,
             label: 'text',
         },
         6: {
-            attributeTypeId,
+            attributeTypeId: 6,
             hidden: false,
             id: 6,
             label: 'array',
         },
         7: {
-            attributeTypeId,
+            attributeTypeId: 7,
             hidden: false,
             id: 7,
             label: 'object',
         },
         8: {
-            attributeTypeId,
+            attributeTypeId: 8,
             hidden: false,
             id: 8,
             label: 'text1',
         },
         9: {
-            attributeTypeId,
+            attributeTypeId: 9,
             hidden: true,
             id: 9,
             label: 'text2',
         },
         10: {
-            attributeTypeId,
+            attributeTypeId: 10,
             hidden: false,
             id: 10,
             label: 'text3',
         }
     }
-    // it('should return empty data list fo rempty data', () => {
 
-    // })
+    const attributeMap = {
+        1: {
+            jobAttributeId: 1,
+            id: 1,
+            sequence: 1,
+        },
+        2: {
+            jobAttributeId: 2,
+            id: 2,
+            sequence: 2,
+        },
+        3: {
+            jobAttributeId: 3,
+            id: 3,
+            sequence: 3,
+        },
+        4: {
+            jobAttributeId: 4,
+            id: 4,
+            sequence: 4,
+        },
+        5: {
+            jobAttributeId: 5,
+            id: 5,
+            sequence: 5,
+        },
+        6: {
+            jobAttributeId: 6,
+            id: 6,
+            sequence: 6,
+        },
+        7: {
+            jobAttributeId: 7,
+            id: 7,
+            sequence: 7,
+        },
+        8: {
+            jobAttributeId: 8,
+            id: 8,
+            sequence: 8,
+        },
+        9: {
+            jobAttributeId: 9,
+            id: 9,
+            sequence: 9,
+        },
+        10: {
+            jobAttributeId: 10,
+            id: 10,
+            sequence: 10,
+        }
+    }
+
+    it('should prepare Data object for jobId and contains object as a type', () => {
+        const jobDataListForObject = {
+            "autoIncrementId": 2,
+            "dataList":
+                {
+                    "10":
+                        {
+                            "attributeTypeId": 10,
+                            "data":
+                                {
+                                    "id": 13,
+                                    "jobAttributeMasterId": 10,
+                                    "jobId": 1,
+                                    "jobTransactionId": 1,
+                                    "parentId": 11,
+                                    "positionId": 14,
+                                    "value": "test23"
+                                }, "id": 2,
+                            "label": "text3",
+                            "sequence": 10
+                        }, "8":
+                        {
+                            "attributeTypeId": 8,
+                            "data":
+                                {
+                                    "id": 11,
+                                    "jobAttributeMasterId": 8,
+                                    "jobId": 1,
+                                    "jobTransactionId": 1,
+                                    "parentId": 11,
+                                    "positionId": 12,
+                                    "value": "test21"
+                                },
+                            "id": 1,
+                            "label":
+                                "text1",
+                            "sequence": 8
+                        }
+                }, "dataMap":
+                {
+                    "10":
+                        {
+                            "10":
+                                {
+                                    "data":
+                                        {
+                                            "id": 13,
+                                            "jobAttributeMasterId": 10,
+                                            "jobId": 1,
+                                            "jobTransactionId": 1,
+                                            "parentId": 11,
+                                            "positionId": 14,
+                                            "value": "test23"
+                                        }, "label": "text3",
+                                    "sequence": 10
+                                }
+                        },
+                    "8": {
+                        "8":
+                            {
+                                "data":
+                                    {
+                                        "id": 11,
+                                        "jobAttributeMasterId": 8,
+                                        "jobId": 1,
+                                        "jobTransactionId": 1,
+                                        "parentId": 11,
+                                        "positionId": 12,
+                                        "value": "test21"
+                                    }, "label": "text1",
+                                "sequence": 8
+                            }
+                    }
+                }
+        }
+        expect(jobDetailsService.prepareDataObject(id, 11, realmDBDataList, attributeMasterMap, attributeMap, true, 0, true)).toEqual(jobDataListForObject)
+    })
+    it('should prepare Data object for jobId and contains array as a type', () => {
+        const jobDataListForArray = {
+            "autoIncrementId": 2,
+            "dataList": [{
+                "attributeTypeId": 8, "data":
+                    {
+                        "id": 11, "jobAttributeMasterId": 8, "jobId": 1,
+                        "jobTransactionId": 1, "parentId": 11, "positionId": 12, "value": "test21"
+                    },
+                "id": 1, "label": "text1", "sequence": 8
+            }, {
+                "attributeTypeId": 10,
+                "data": {
+                    "id": 13, "jobAttributeMasterId": 10, "jobId": 1, "jobTransactionId": 1,
+                    "parentId": 11, "positionId": 14, "value": "test23"
+                },
+                "id": 2, "label": "text3", "sequence": 10
+            }],
+            "dataMap": {
+                "10": {
+                    "10": {
+                        "data": {
+                            "id": 13,
+                            "jobAttributeMasterId": 10, "jobId": 1, "jobTransactionId": 1,
+                            "parentId": 11, "positionId": 14, "value": "test23"
+                        }, "label":
+                            "text3", "sequence": 10
+                    }
+                },
+                "8": {
+                    "8": {
+                        "data": {
+                            "id": 11, "jobAttributeMasterId": 8,
+                            "jobId": 1, "jobTransactionId": 1, "parentId": 11,
+                            "positionId": 12, "value": "test21"
+                        }, "label": "text1",
+                        "sequence": 8
+                    }
+                }
+            }
+        }
+
+        expect(jobDetailsService.prepareDataObject(id, 11, realmDBDataList, attributeMasterMap, attributeMap, true, 0, false)).toEqual(jobDataListForArray)
+    })
+    it('should prepare Data object for jobTransaction and contains object as a type', () => {
+        const jobTransactionDataListForObject =  {"autoIncrementId": 0, "dataList": {}, "dataMap": {}}
+        expect(jobDetailsService.prepareDataObject(id, 11, realmDBDataList, attributeMasterMap, attributeMap, false, 0, true)).toEqual(jobTransactionDataListForObject)
+    
+    })
+    it('should prepare Data object for jobTransaction and contains array as a type', () => {
+        const jobTransactionDataListForArray =  {"autoIncrementId": 0, "dataList": [], "dataMap": {}}
+        expect(jobDetailsService.prepareDataObject(id, 11, realmDBDataList, attributeMasterMap, attributeMap, false, 0, false)).toEqual(jobTransactionDataListForArray)
+    
+    })
 })
 
 describe('test cases for check Latitude and longitude', () => { //checkLocationMismatch
@@ -731,9 +926,9 @@ describe('test cases for set All data for revert status', () => {   // setAllDat
                 expect(formLayoutEventsInterface._updateJobSummary).toHaveBeenCalledTimes(1)
                 expect(formLayoutEventsInterface.addTransactionsToSyncList).toHaveBeenCalledTimes(1)
             })
-        .catch((error) => {
-            expect(error).toEqual(error)
-        })
+            .catch((error) => {
+                expect(error).toEqual(error)
+            })
     })
 })
 
@@ -805,13 +1000,13 @@ describe('test cases for get all jobDetails parameters', () => {   // setAllData
                 key: "Success123",
                 id: 2416,
                 jobMasterId: 441,
-                fieldAttributeMasterId:1
+                fieldAttributeMasterId: 1
             },
             {
                 key: "UNSEEN",
                 id: 1999,
                 jobMasterId: 441,
-                fieldAttributeMasterId:2
+                fieldAttributeMasterId: 2
             },
             {
                 key: "PENDING",
@@ -826,12 +1021,12 @@ describe('test cases for get all jobDetails parameters', () => {   // setAllData
             {
                 id: 2416,
                 statusId: 441,
-                jobAttributeId:1
+                jobAttributeId: 1
             },
             {
                 id: 1999,
                 statusId: 441,
-                jobAttributeId:2
+                jobAttributeId: 2
             },
             {
                 id: 1998,
@@ -846,12 +1041,12 @@ describe('test cases for get all jobDetails parameters', () => {   // setAllData
             {
                 id: 2416,
                 statusId: 441,
-                fieldAttributeId:1
+                fieldAttributeId: 1
             },
             {
                 id: 1999,
                 statusId: 441,
-                fieldAttributeId:2
+                fieldAttributeId: 2
             },
             {
                 id: 1998,
@@ -883,18 +1078,18 @@ describe('test cases for get all jobDetails parameters', () => {   // setAllData
     }
     it('should get parameters for jobDetails', () => {
         keyValueDBService.getValueFromStore.mockReturnValueOnce(statusList)
-                                           .mockReturnValueOnce(jobMasterList)
-                                           .mockReturnValueOnce(jobAttributeMasterList)
-                                           .mockReturnValueOnce(fieldAttributeMasterList)
-                                           .mockReturnValueOnce(jobAttributeStatusList)
-                                           .mockReturnValueOnce(fieldAttributeStatusList)
+            .mockReturnValueOnce(jobMasterList)
+            .mockReturnValueOnce(jobAttributeMasterList)
+            .mockReturnValueOnce(fieldAttributeMasterList)
+            .mockReturnValueOnce(jobAttributeStatusList)
+            .mockReturnValueOnce(fieldAttributeStatusList)
         return jobDetailsService.getJobDetailsParameters()
             .then((data) => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(6)
-                expect(data).toEqual({statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, jobAttributeStatusList, fieldAttributeStatusList})
+                expect(data).toEqual({ statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, jobAttributeStatusList, fieldAttributeStatusList })
             })
-        .catch((error) => {
-            expect(error).toEqual(error)
-        })
+            .catch((error) => {
+                expect(error).toEqual(error)
+            })
     })
 })
