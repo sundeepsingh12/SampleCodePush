@@ -314,7 +314,7 @@ class FormLayout {
             if (!jobTransaction.length) { //Delete draft only if not bulk
                 await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
             }
-            await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
+            //await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
             await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(false))
             await geoFencingService.addNewGeoFenceAndDeletePreviousFence()
         }

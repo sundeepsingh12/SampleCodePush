@@ -239,27 +239,29 @@ class JobTransaction {
             return []
         }
         jobTransactionQuery = jobTransactionQuery && jobTransactionQuery.trim() !== '' ? `deleteFlag != 1 AND (${jobTransactionQuery})` : 'deleteFlag != 1'
-        if (callingActivity == 'Bulk') {
-            jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND jobStatusId = ${callingActivityData.pageObject.additionalParams.statusId}`
-            jobTransactionQuery = callingActivityData.jobIdGroupIdMap && !_.isEmpty(callingActivityData.jobIdGroupIdMap) ? `${jobTransactionQuery} AND ${Object.keys(callingActivityData.jobIdGroupIdMap).map(data => 'jobId != ' + data).join(' AND ')}` : jobTransactionQuery
-            if (callingActivityData.groupId) {
-                let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
-                let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
-                let query = jobList.map((job) => `jobId = ${job.id}`).join(' OR ')
-                jobTransactionQuery = query && query.trim() !== '' ? `(${jobTransactionQuery}) AND (${query})` : `(${jobTransactionQuery})`
+        if (callingActivityData) {
+            if (callingActivity == 'Bulk') {
+                jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND jobStatusId = ${callingActivityData.pageObject.additionalParams.statusId}`
+                jobTransactionQuery = callingActivityData.jobIdGroupIdMap && !_.isEmpty(callingActivityData.jobIdGroupIdMap) ? `${jobTransactionQuery} AND ${Object.keys(callingActivityData.jobIdGroupIdMap).map(data => 'jobId != ' + data).join(' AND ')}` : jobTransactionQuery
+                if (callingActivityData.groupId) {
+                    let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
+                    let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
+                    let query = jobList.map((job) => `jobId = ${job.id}`).join(' OR ')
+                    jobTransactionQuery = query && query.trim() !== '' ? `(${jobTransactionQuery}) AND (${query})` : `(${jobTransactionQuery})`
+                }
             }
-        }
-        else if (callingActivity == 'Sequence') {
-            let statusQueryWithRunsheetNo = '('
-            statusQueryWithRunsheetNo += callingActivityData.jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
-            statusQueryWithRunsheetNo += `) AND (` + callingActivityData.statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-            statusQueryWithRunsheetNo += `) AND runsheetNo = "${callingActivityData.runsheetNumber}"`
-            jobTransactionQuery = `deleteFlag != 1`
-            //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected and jobMasterIds
-            jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
-        } else if (callingActivity == 'AllTasks') {
-            jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
-            jobTransactionQuery = jobTransactionQuery + ' AND ' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+            else if (callingActivity == 'Sequence') {
+                let statusQueryWithRunsheetNo = '('
+                statusQueryWithRunsheetNo += callingActivityData.jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+                statusQueryWithRunsheetNo += `) AND (` + callingActivityData.statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
+                statusQueryWithRunsheetNo += `) AND runsheetNo = "${callingActivityData.runsheetNumber}"`
+                jobTransactionQuery = `deleteFlag != 1`
+                //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected and jobMasterIds
+                jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
+            } else if (callingActivity == 'AllTasks') {
+                jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
+                jobTransactionQuery = jobTransactionQuery + ' AND ' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+            }
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
             fieldDataList = [], fieldDataMap = {}

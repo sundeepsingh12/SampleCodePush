@@ -118,18 +118,18 @@ export function setAllDataOnRevert(jobTransaction, statusTo, navigation) {
             await jobDetailsService.setAllDataForRevertStatus(statusList, jobTransaction, statusTo)
             dispatch(performSyncService())
             dispatch(pieChartCount())
-            dispatch(fetchJobs())
-            let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : false
-            if (landingId) {
-                await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
+            //dispatch(fetchJobs())
+            //let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : false
+            //if (landingId) {
+            //    await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
                 dispatch(NavigationActions.reset({
-                    index: 1,
+                    index: 0,
                     actions: [
                         NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                        NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
+                       // NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
                     ]
                 }))
-            } else { dispatch(navigation.goBack()) }
+            //} else { dispatch(navigation.goBack()) }
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
             showToastAndAddUserExceptionLog(1103, error.message, 'danger', 0)                    

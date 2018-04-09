@@ -222,7 +222,7 @@ class Sequence {
         //save jobTransaction to DB
         await realm.saveList(TABLE_JOB_TRANSACTION, _.values(transactionsWithChangedSeqeunceMap))
         //this is use to enable reload of start module
-        await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
+        //await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
     }
 
     /**
