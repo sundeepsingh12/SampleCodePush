@@ -139,7 +139,7 @@ class SkuListing extends PureComponent {
         this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
         this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
         this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-        this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason)
+        this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason, this.props.skuObjectAttributeKey)
   }
 }
 
@@ -152,6 +152,7 @@ function mapStateToProps(state) {
     skuObjectValidation: state.skuListing.skuObjectValidation,
     skuChildItems: state.skuListing.skuChildItems,
     skuObjectAttributeId: state.skuListing.skuObjectAttributeId,
+    skuObjectAttributeKey: state.skuListing.skuObjectAttributeKey,
     skuValidationForImageAndReason: state.skuListing.skuValidationForImageAndReason,
     reasonsList: state.skuListing.reasonsList,
   }

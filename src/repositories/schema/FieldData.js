@@ -16,6 +16,7 @@ FieldData.schema = {
     parentId:  'int' ,
     positionId:  'int' ,
     value:  'string?',
-    attributeTypeId: 'int?', 
+    attributeTypeId: 'int?',
+    key: 'string?' 
   }
 }
