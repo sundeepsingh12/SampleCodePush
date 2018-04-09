@@ -10,6 +10,8 @@ import * as realm from '../../../repositories/realmdb'
 import { jobTransactionService } from '../../../services/classes/JobTransaction'
 import { performSyncService, pieChartCount } from '../../home/homeActions'
 import { fetchJobs } from '../../taskList/taskListActions'
+import { jobStatusService } from '../../../services/classes/JobStatus'
+import { draftService } from '../../../services/classes/DraftService'
 import {
     JOB_ATTRIBUTE,
     FIELD_ATTRIBUTE,
@@ -36,6 +38,16 @@ const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
 describe('jobDetail actions', () => {
+
+    beforeEach(() => {
+        jobDetailsService.getJobDetailsParameters = jest.fn()
+        jobTransactionService.prepareParticularStatusTransactionDetails = jest.fn()
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+        jobDetailsService.checkForEnablingStatus = jest.fn()
+        jobDetailsService.getParentStatusList = jest.fn()
+        draftService.getDraftForState = jest.fn()
+        jobStatusService.getStatusCategoryOnStatusId = jest.fn()
+      })
     const statusList = {
         value: [
             {
@@ -216,15 +228,8 @@ describe('jobDetail actions', () => {
             }
         ]
     }
-    const jobMaster = [
-        {
-            id: 441,
-            enableLocationMismatch: false,
-            enableManualBroadcast: false,
-            enableMultipartAssignment: false,
-            enableOutForDelivery: false,
-            enableResequenceRestriction: true
-        }
+    const parentList = [
+        [1,'ab','PENDING',1], [2,'an','SUCCESS',3]
     ]
 
 
@@ -236,7 +241,7 @@ describe('jobDetail actions', () => {
                 enableManualBroadcast: false,
                 enableMultipartAssignment: false,
                 enableOutForDelivery: false,
-                enableResequenceRestriction: true
+                enableResequenceRestriction: false
             },
             {
                 id: 442,
@@ -280,9 +285,17 @@ describe('jobDetail actions', () => {
             referenceNumber: "ZOMATO-1511121784686",
         },
         seqSelected: 2,
-        jobTime: new Date()
+        jobTime: null,
+        checkForSeenStatus: false
     }
-
+    const jobMaster = [{
+        id: 441,
+        enableLocationMismatch: false,
+        enableManualBroadcast: false,
+        enableMultipartAssignment: false,
+        enableOutForDelivery: false,
+        enableResequenceRestriction: false
+    }]
     const jobDataList = []
     const fieldDataList = []
     const currentStatus = {
@@ -307,8 +320,10 @@ describe('jobDetail actions', () => {
     }
     let parentStatusList = []
     const jobDetailsLoading = false
-    let draftStatusInfo = undefined
-    let errorMessage = undefined
+    let draftStatusInfo = {}
+    let errorMessage = false
+    let isEtaTimerShow = true
+    let jobExpiryTime = null
     it('should start fetching jobDetails', () => {
         expect(actions.startFetchingJobDetails()).toEqual({
             type: JOB_DETAILS_FETCHING_START,
@@ -327,27 +342,20 @@ describe('jobDetail actions', () => {
                     jobTransaction,
                     currentStatus,
                     errorMessage,
+                    isEtaTimerShow,
+                    jobExpiryTime,
                     draftStatusInfo,
                     parentStatusList,
                 }
             }
         ]
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValueOnce(statusList)
-            .mockReturnValueOnce(jobAttributeMasterList)
-            .mockReturnValueOnce(fieldAttributeMasterList)
-            .mockReturnValueOnce(jobAttributeStatusList)
-            .mockReturnValueOnce(fieldAttributeStatusList)
-            .mockReturnValueOnce(jobMasterList)
-
-        jobTransactionService.prepareParticularStatusTransactionDetails = jest.fn()
+        jobDetailsService.getJobDetailsParameters.mockReturnValueOnce({statusList,jobMasterList, jobAttributeMasterList, fieldAttributeMasterList,jobAttributeStatusList, fieldAttributeStatusList })
         jobTransactionService.prepareParticularStatusTransactionDetails.mockReturnValueOnce(details)
-
-        jobDetailsService.checkForEnablingStatus = jest.fn()
-        jobDetailsService.checkForEnablingStatus(false);
-
-        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
         jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce(jobMaster)
+        jobDetailsService.checkForEnablingStatus.mockReturnValueOnce(false);
+        jobDetailsService.getParentStatusList.mockReturnValueOnce(parentList)
+        jobStatusService.getStatusCategoryOnStatusId.mockReturnValueOnce(1)
+        draftService.getDraftForState.mockReturnValueOnce({})
         const store = mockStore({})
         return store.dispatch(actions.getJobDetails(1234))
             .then(() => {

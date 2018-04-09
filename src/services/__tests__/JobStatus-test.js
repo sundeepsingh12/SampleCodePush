@@ -250,7 +250,6 @@ describe('test cases for getJobMasterIdStatusIdMap', () => {
   })
 
 })
-
 describe('test cases for getNonUnseenStatusIdsForStatusCategory', () => {
 
   it('should throw error job status missing', () => {
@@ -287,6 +286,55 @@ describe('test cases for getNonUnseenStatusIdsForStatusCategory', () => {
     })
   })
 
+})
+
+describe('test cases for get statusIds map for all status category', () => {
+  beforeEach(() => {
+    keyValueDBService.getValueFromStore = jest.fn()
+    jobStatusService.checkForHiddenTab = jest.fn()
+
+  })
+
+ const jobStatusList = {
+   value: [
+  {
+    id: 123,
+    jobMasterId: 1,
+    code: 'FAIL',
+    tabId : 11
+  },
+  {
+    id: 124,
+    jobMasterId: 1,
+    code: 'DEL',
+    tabId : 12,
+  },
+  {
+    id: 125,
+    jobMasterId: 1,
+    code: 'PENDING',
+    tabId : 11
+  }
+]}
+  it('should get statusIds map for all status category', () => {
+    const message = 'Job status missing in store'
+    try{
+    keyValueDBService.getValueFromStore.mockReturnValueOnce(jobStatusList)
+    jobStatusService.checkForHiddenTab.mockReturnValueOnce({
+      11 : true,
+      12 : true,
+      14 : true
+    })
+    const statusCtegory = 1
+    keyValueDBService.getValueFromStore = jest.fn()
+    keyValueDBService.getValueFromStore.mockReturnValue(null)
+    jobStatusService.getStatusIdsForAllStatusCategory().then(data => {
+      expect(data).toEqual({})
+    })
+  }catch(error){
+    expect(error.message).toEqual(message)
+  }
+  })
 })
 
 describe('test cases for getStatusForJobMasterIdAndCode', () => {

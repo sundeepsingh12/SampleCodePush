@@ -48,6 +48,7 @@ function mapStateToProps(state) {
         errorMessage: state.array.errorMessage,
         arrayMainObject: state.array.arrayMainObject,
         isLoading: state.array.isLoading,
+        arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -63,7 +64,9 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.navigation.state.params.currentElement,
             this.props.navigation.state.params.formElements,
             this.props.navigation.state.params.jobStatusId,
-            this.props.navigation.state.params.jobTransaction
+            this.props.navigation.state.params.jobTransaction,
+            this.props.arrayReverseDataStoreFilterMap,
+            this.props.navigation.state.params.currentElement.fieldAttributeMasterId
         )
     }
     componentWillUnmount() {
@@ -80,6 +83,7 @@ class ArrayFieldAttribute extends PureComponent {
                 jobStatusId={this.props.jobStatusId}
                 latestPositionId={this.props.navigation.state.params.latestPositionId}
                 fieldAttributeMasterParentIdMap={this.props.navigation.state.params.fieldAttributeMasterParentIdMap}
+                arrayFieldAttributeMasterId={this.props.navigation.state.params.currentElement.fieldAttributeMasterId}
             />
         )
     }
@@ -95,7 +99,8 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.actions.addRowInArray(this.props.lastRowId,
                 this.props.childElementsTemplate,
                 this.props.arrayElements,
-                this.props.navigation.state.params.jobTransaction)
+                this.props.navigation.state.params.jobTransaction,
+                this.props.isSaveDisabled)
         }
     }
     savePressed = () => {

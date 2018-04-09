@@ -10,6 +10,7 @@ var InitialState = Record({
    skuObjectValidation:{},
    skuChildItems:{},
    skuObjectAttributeId:'',
+   skuObjectAttributeKey:'',
    skuValidationForImageAndReason:{},
    reasonsList: [],
 })

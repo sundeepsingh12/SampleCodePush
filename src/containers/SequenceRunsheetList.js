@@ -38,7 +38,7 @@ import {
 } from './../lib/ContainerConstants'
 import {
     Sequence,
-    CLEAR_SEQUENCE_STATE,
+    SET_RUNSHEET_NUMBER_LIST,
     SET_RESPONSE_MESSAGE
 } from './../lib/constants'
 
@@ -79,7 +79,7 @@ class SequenceRunsheetList extends Component {
     }
 
     goBack = () => {
-        this.props.actions.setState(CLEAR_SEQUENCE_STATE)
+        this.props.actions.setState(SET_RUNSHEET_NUMBER_LIST, [])
         this.props.navigation.goBack(null)
     }
 
@@ -87,7 +87,8 @@ class SequenceRunsheetList extends Component {
         return (
             <ListItem style={[style.jobListItem]} onPress={() => this.props.actions.navigateToScene(Sequence, {
                 runsheetNumber: item,
-                displayName: this.props.navigation.state.params.displayName
+                displayName: this.props.navigation.state.params.displayName,
+                jobMasterIds: this.props.navigation.state.params.jobMasterIds
             })}>
                 <Text style={[styles.fontDefault, styles.fontWeight500]}>{item}</Text>
                 <Right>

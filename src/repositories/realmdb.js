@@ -16,9 +16,10 @@ import _ from 'lodash'
 import Draft from './schema/Draft'
 import DeviceInfo from 'react-native-device-info'
 import AesCtr from '../services/classes/AesCtr'
+import userExceptionLogs from './schema/userExceptionLogsDB'
 
-const schemaVersion = 42;
-const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft];
+const schemaVersion = 44;
+const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs];
 
 let realm = new Realm({
     schemaVersion,
@@ -40,6 +41,7 @@ import {
     Datastore_Master_DB,
     TABLE_DRAFT,
     DEVICE_IMEI,
+    USER_EXCEPTION_LOGS,
 } from '../lib/constants'
 
 export function save(tableName, object) {
@@ -113,6 +115,7 @@ export function deleteRecords() {
         realm.delete(realm.objects(TABLE_SERVER_SMS_LOG))
         realm.delete(realm.objects(TABLE_TRANSACTION_LOGS))
         realm.delete(realm.objects(TABLE_DRAFT))
+        realm.delete(realm.objects(USER_EXCEPTION_LOGS))
     });
 }
 
@@ -194,4 +197,9 @@ export function deleteSingleRecord(tableName, value, property) {
     realm.write(() => {
         realm.delete(filteredRecords)
     });
+}
+
+export function getMaxValueOfProperty(tableName, query, property) {
+    let filteredRecords = realm.objects(tableName).filtered(query).max(property)
+    return filteredRecords
 }
