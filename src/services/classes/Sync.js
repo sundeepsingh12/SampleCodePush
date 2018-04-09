@@ -602,7 +602,7 @@ class Sync {
           }
           realm.saveList(TABLE_JOB_TRANSACTION, jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
           jobMasterTitleList = jobMasterTitleList.concat(jobMasterService.getJobMasterTitleListFromIds(jobMasterIds, syncStoreDTO.jobMasterList))
-          await jobSummaryService.updateJobSummaryForSync(jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries, jobStatusIdJobSummaryMap)
+          // await jobSummaryService.updateJobSummaryForSync(jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries, jobStatusIdJobSummaryMap)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
           if (erpPull) {
             user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')

@@ -220,7 +220,7 @@ class BulkListing extends PureComponent {
     })
     nextStatusNames.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
     const nextStatusIds = this.props.nextStatusList.map(nextStatus => nextStatus.id)
-
+    
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -274,7 +274,7 @@ class BulkListing extends PureComponent {
                 ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
               }}
               success full
-              disabled={_.isEmpty(this.props.selectedItems)}
+              disabled={_.isEmpty(this.props.selectedItems) || (this.props.navigation.state.params.pageObject.groupId && !_.isEqual(_.size(this.props.bulkTransactionList),_.size(this.props.selectedItems)))}
             >
               <Text style={[styles.fontLg, styles.fontWhite]}>{UPDATE_ALL_SELECTED}</Text>
             </Button>

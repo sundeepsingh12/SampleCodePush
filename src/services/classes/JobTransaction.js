@@ -242,8 +242,8 @@ class JobTransaction {
         if (callingActivity == 'Bulk') {
             jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND jobStatusId = ${callingActivityData.pageObject.additionalParams.statusId}`
             jobTransactionQuery = callingActivityData.jobIdGroupIdMap && !_.isEmpty(callingActivityData.jobIdGroupIdMap) ? `${jobTransactionQuery} AND ${Object.keys(callingActivityData.jobIdGroupIdMap).map(data => 'jobId != ' + data).join(' AND ')}` : jobTransactionQuery
-            if (callingActivityData.groupId) {
-                let jobQuery = `jobMasterId = ${callingActivityData.jobMasterId} AND groupId = '${callingActivityData.groupId}'`
+            if (callingActivityData.pageObject.groupId) {
+                let jobQuery = `jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND groupId = '${callingActivityData.pageObject.groupId}'`
                 let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
                 let query = jobList.map((job) => `jobId = ${job.id}`).join(' OR ')
                 jobTransactionQuery = query && query.trim() !== '' ? `(${jobTransactionQuery}) AND (${query})` : `(${jobTransactionQuery})`

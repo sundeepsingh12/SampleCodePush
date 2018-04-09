@@ -256,12 +256,11 @@ class TaskListScreen extends PureComponent {
   updateTransactionForGroupId(item) {
     let jobTransaction = item.jobTransactions[0]
     if (this.props.statusNextStatusListMap[jobTransaction.statusId].length > 0) {
-      this.props.actions.navigateToScene(BulkListing, {
-        jobMasterId: jobTransaction.jobMasterId,
-        statusId: jobTransaction.statusId,
-        nextStatusList: this.props.statusNextStatusListMap[jobTransaction.statusId],
+      this.props.actions.navigateToScene(BulkListing, {pageObject : {
+        jobMasterIds: [jobTransaction.jobMasterId],
+        additionalParams: {statusId : jobTransaction.statusId},
         groupId: item.groupId
-      })
+      }})
     } else {
       Toast.show({
         text: NO_NEXT_STATUS, position: 'bottom', buttonText: OK

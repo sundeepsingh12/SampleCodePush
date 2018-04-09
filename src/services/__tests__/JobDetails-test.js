@@ -10,6 +10,293 @@ import moment from 'moment'
 import { keyValueDBService } from '../classes/KeyValueDBService'
 import { geoFencingService } from '../classes/GeoFencingService'
 
+
+describe('test cases for check out for delivery', () => { //checkOutForDelivery(jobMasterList)
+    beforeEach(() => {
+        jobStatusService.getjobMasterIdStatusIdMap = jest.fn()
+        jobTransactionService.getJobTransactionsForStatusIds = jest.fn()
+    })
+    const jobMasterList = {
+        value: [
+            {
+                id: 441,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: true,
+                enableResequenceRestriction: true
+            },
+            {
+                id: 442,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: false,
+                enableResequenceRestriction: false
+            }
+        ]
+    }
+    let jobTransactionId = 123
+    let unseenTransactionList = [
+        {
+            code: "Success123",
+            id: 2416,
+            jobMasterId: 441,
+        },
+        {
+            code: "Success121",
+            id: 2417,
+            jobMasterId: 441,
+        },
+    ]
+    let jobMasterIdStatusIdMap = {
+        '441': '1999',
+        '442': '2000'
+    }
+    let message = "Please Scan all Parcels First"
+    let parentStatusList = []
+    it('should check for out for delivery and return message', () => {
+        jobStatusService.getjobMasterIdStatusIdMap.mockReturnValueOnce(jobMasterIdStatusIdMap)
+        jobTransactionService.getJobTransactionsForStatusIds.mockReturnValueOnce(unseenTransactionList)
+        return jobDetailsService.checkOutForDelivery(jobMasterList)
+            .then((statusList) => {
+                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
+                expect(jobTransactionService.getJobTransactionsForStatusIds).toHaveBeenCalledTimes(1)
+                expect(statusList).toEqual(message)
+            })
+            .catch((error) => {
+                expect(error).toEqual(error)
+                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
+            })
+    })
+    it('should check for out for delivery and return false', () => {
+        unseenTransactionList = []
+        jobStatusService.getjobMasterIdStatusIdMap.mockReturnValueOnce(jobMasterIdStatusIdMap)
+        jobTransactionService.getJobTransactionsForStatusIds.mockReturnValueOnce(unseenTransactionList)
+        return jobDetailsService.checkOutForDelivery(jobMasterList)
+            .then((statusList) => {
+                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
+                expect(jobTransactionService.getJobTransactionsForStatusIds).toHaveBeenCalledTimes(1)
+                expect(statusList).toEqual(false)
+            })
+            .catch((error) => {
+                expect(error).toEqual(error)
+                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
+            })
+    })
+})
+
+describe('test cases for checkEnableRestriction', () => {
+    const jobMasterList = {
+        value: [
+            {
+                id: 441,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: false,
+                enableResequenceRestriction: true
+            },
+            {
+                id: 442,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: false,
+                enableResequenceRestriction: false
+            }
+        ]
+    }
+
+    const tabId = 251
+    const seqSelected = 2
+    const statusList = {
+        value: [
+            {
+                code: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+                name: "Success",
+                saveActivated: null,
+                sequence: 3,
+                statusCategory: 3,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+                name: "Unseen",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+                name: "Pending12",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            }
+        ]
+    }
+    let firstEnableSequenceTransaction = {
+        id: 3447,
+        seqSelected: 1
+    }
+    let jobTransactionId = 3446
+    let message = "Please finish previous items first"
+    it('should check enable resequence if sequence is before', () => {
+        jobTransactionService.getFirstTransactionWithEnableSequence = jest.fn()
+        jobTransactionService.getFirstTransactionWithEnableSequence.mockReturnValue(firstEnableSequenceTransaction)
+        expect(jobDetailsService.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)).toEqual(message)
+    })
+
+    it('should check enable resequence if sequence is after', () => {
+        firstEnableSequenceTransaction.seqSelected = 3
+        jobTransactionService.getFirstTransactionWithEnableSequence = jest.fn()
+        jobTransactionService.getFirstTransactionWithEnableSequence.mockReturnValue(firstEnableSequenceTransaction)
+        expect(jobDetailsService.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)).toEqual(false)
+    })
+})
+
+describe('test cases for checkJobExpiryTime', () => {
+    const result = "Job Expired!"
+    const dataList = {
+        '4748': {
+            'data': {
+                id: 4477616,
+                jobAttributeMasterId: 4748,
+                jobId: 134814,
+                parentId: 0,
+                positionId: 2,
+                value: "2017-11-22 00:51:00",
+            },
+            label: "jobTime",
+            sequence: 3
+        }
+
+    }
+    it('should check whether jobExpire or not', () => {
+        expect(jobDetailsService.checkJobExpire(dataList)).toEqual(result)
+    })
+
+})
+
+describe('test cases for check for enabling status', () => {   // checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
+    beforeEach(() => {
+        jobDetailsService.checkOutForDelivery = jest.fn()
+        jobDetailsService.checkEnableResequence = jest.fn()
+        jobDetailsService.checkJobExpire = jest.fn()
+    })
+    let enableOutForDelivery = true
+    let enableResequenceRestriction = true
+    let jobTime = "2018-11-22 00:51:00"
+    const jobMasterList = {
+        value: [
+            {
+                id: 441,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: true,
+                enableResequenceRestriction: true
+            },
+            {
+                id: 442,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: true,
+                enableResequenceRestriction: false
+            }
+        ]
+    }
+    let tabId = 123
+    let seqSelected = 3
+    const statusList = {
+        value: [
+            {
+                code: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+                name: "Success",
+                saveActivated: null,
+                sequence: 3,
+                statusCategory: 3,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+                name: "Unseen",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+                name: "Pending12",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            }
+        ]
+    }
+    let jobTransactionId = 123
+    it('should return message for outForDelivery enabled', () => {
+        let message = "Please Scan all Parcels First"
+        jobDetailsService.checkOutForDelivery.mockReturnValueOnce(message)
+        return jobDetailsService.checkForEnablingStatus()
+            .then(() => {
+                expect(jobDetailsService.checkOutForDelivery).toHaveBeenCalledTimes(1)
+            })
+            .catch((error) => {
+                expect(error).toEqual(error)
+                expect(jobDetailsService.checkOutForDelivery).not.toHaveBeenCalled()
+            })
+    })
+    it('should return message for enableResequence enabled', () => {
+        let message = "Please finish previous items first"
+        jobDetailsService.checkEnableResequence.mockReturnValueOnce(message)
+        return jobDetailsService.checkForEnablingStatus()
+            .then(() => {
+                expect(jobDetailsService.checkEnableResequence).toHaveBeenCalledTimes(1)
+            })
+            .catch((error) => {
+                expect(error).toEqual(error)
+                expect(jobDetailsService.checkEnableResequence).not.toHaveBeenCalled()
+            })
+    })
+    it('should return message for jobExpired', () => {
+        let message = "Job Expired!"
+        jobDetailsService.checkJobExpire.mockReturnValueOnce(message)
+        return jobDetailsService.checkForEnablingStatus()
+            .then(() => {
+                expect(jobDetailsService.checkJobExpire).toHaveBeenCalledTimes(1)
+            })
+            .catch((error) => {
+                expect(error).toEqual(error)
+                expect(jobDetailsService.checkJobExpire).not.toHaveBeenCalled()
+            })
+    })
+})
+
 describe('test cases for prepareDataObject', () => {
     const realmDBDataList = [
         {
@@ -193,111 +480,6 @@ describe('test cases for prepareDataObject', () => {
     // })
 })
 
-describe('test cases for checkJobExpiryTime', () => {
-    const result = "Job Expired!"
-    const dataList = {
-        '4748': {
-            'data': {
-                id: 4477616,
-                jobAttributeMasterId: 4748,
-                jobId: 134814,
-                parentId: 0,
-                positionId: 2,
-                value: "2017-11-22 00:51:00",
-            },
-            label: "jobTime",
-            sequence: 3
-        }
-
-    }
-    it('should check whether jobExpire or not', () => {
-        expect(jobDetailsService.checkJobExpire(dataList)).toEqual(result)
-    })
-
-})
-
-
-describe('test cases for checkEnableRestriction', () => {
-    const jobMasterList = {
-        value: [
-            {
-                id: 441,
-                enableLocationMismatch: false,
-                enableManualBroadcast: false,
-                enableMultipartAssignment: false,
-                enableOutForDelivery: false,
-                enableResequenceRestriction: true
-            },
-            {
-                id: 442,
-                enableLocationMismatch: false,
-                enableManualBroadcast: false,
-                enableMultipartAssignment: false,
-                enableOutForDelivery: false,
-                enableResequenceRestriction: false
-            }
-        ]
-    }
-
-    const tabId = 251
-    const seqSelected = 2
-    const statusList = {
-        value: [
-            {
-                code: "Success123",
-                id: 2416,
-                jobMasterId: 441,
-                name: "Success",
-                saveActivated: null,
-                sequence: 3,
-                statusCategory: 3,
-                tabId: 251,
-                transient: false,
-            },
-            {
-                code: "UNSEEN",
-                id: 1999,
-                jobMasterId: 441,
-                name: "Unseen",
-                saveActivated: null,
-                sequence: 23,
-                statusCategory: 1,
-                tabId: 251,
-                transient: false,
-            },
-            {
-                code: "PENDING",
-                id: 1998,
-                jobMasterId: 441,
-                name: "Pending12",
-                saveActivated: null,
-                sequence: 23,
-                statusCategory: 1,
-                tabId: 251,
-                transient: false,
-            }
-        ]
-    }
-    let firstEnableSequenceTransaction = {
-        id: 3447,
-        seqSelected: 1
-    }
-    let jobTransactionId = 3446
-    let message = "Please finish previous items first"
-    it('should check enable resequence if sequence is before', () => {
-        jobTransactionService.getFirstTransactionWithEnableSequence = jest.fn()
-        jobTransactionService.getFirstTransactionWithEnableSequence.mockReturnValue(firstEnableSequenceTransaction)
-        expect(jobDetailsService.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)).toEqual(message)
-    })
-
-    it('should check enable resequence if sequence is after', () => {
-        firstEnableSequenceTransaction.seqSelected = 3
-        jobTransactionService.getFirstTransactionWithEnableSequence = jest.fn()
-        jobTransactionService.getFirstTransactionWithEnableSequence.mockReturnValue(firstEnableSequenceTransaction)
-        expect(jobDetailsService.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)).toEqual(false)
-    })
-})
-
 describe('test cases for check Latitude and longitude', () => { //checkLocationMismatch
     const angle = "28.2554334", radianValue = 0.493150344407976
     let jobTransaction = {
@@ -311,9 +493,6 @@ describe('test cases for check Latitude and longitude', () => { //checkLocationM
         longitude: 77.267463
     }]
     let jobId = 3447, userLat = "28.5551", userLong = "77.26751"
-    it('should convert angle to radians', () => {
-        expect(jobDetailsService.toRadians(angle)).toEqual(radianValue)
-    })
     it('should find aerial distance between user and job location', () => {
         const dist = 0.03587552758583335
         expect(geoFencingService.distance(jobTransaction.latitude, jobTransaction.longitude, userLat, userLong)).toEqual(dist)
@@ -332,6 +511,9 @@ describe('test cases for check Latitude and longitude', () => { //checkLocationM
             latitude: 58.5551,
             longitude: 77.26751
         }])
+        const dist = 0.53587552758583335
+        geoFencingService.distance = jest.fn()
+        geoFencingService.distance.mockReturnValueOnce(dist)
         expect(jobDetailsService.checkLatLong(jobId, userLat, userLong)).toEqual(true)
     })
 })
@@ -416,188 +598,6 @@ describe('test cases for get parentStatusList on status Revert', () => { //getPa
             .catch((error) => {
                 expect(error).toEqual(error)
                 expect(jobTransactionService.checkIdToBeSync).toHaveBeenCalledTimes(0)
-            })
-    })
-})
-
-describe('test cases for check out for delivery', () => { //checkOutForDelivery(jobMasterList)
-    beforeEach(() => {
-        jobStatusService.getjobMasterIdStatusIdMap = jest.fn()
-        jobTransactionService.getJobTransactionsForStatusIds = jest.fn()
-    })
-    const jobMasterList = {
-        value: [
-            {
-                id: 441,
-                enableLocationMismatch: false,
-                enableManualBroadcast: false,
-                enableMultipartAssignment: false,
-                enableOutForDelivery: true,
-                enableResequenceRestriction: true
-            },
-            {
-                id: 442,
-                enableLocationMismatch: false,
-                enableManualBroadcast: false,
-                enableMultipartAssignment: false,
-                enableOutForDelivery: false,
-                enableResequenceRestriction: false
-            }
-        ]
-    }
-    let jobTransactionId = 123
-    let unseenTransactionList = [
-        {
-            code: "Success123",
-            id: 2416,
-            jobMasterId: 441,
-        },
-        {
-            code: "Success121",
-            id: 2417,
-            jobMasterId: 441,
-        },
-    ]
-    let jobMasterIdStatusIdMap = {
-        '441': '1999',
-        '442': '2000'
-    }
-    let message = "Please Scan all Parcels First"
-    let parentStatusList = []
-    it('should check for out for delivery and return message', () => {
-        jobStatusService.getjobMasterIdStatusIdMap.mockReturnValueOnce(jobMasterIdStatusIdMap)
-        jobTransactionService.getJobTransactionsForStatusIds.mockReturnValueOnce(unseenTransactionList)
-        return jobDetailsService.checkOutForDelivery(jobMasterList)
-            .then((statusList) => {
-                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
-                expect(jobTransactionService.getJobTransactionsForStatusIds).toHaveBeenCalledTimes(1)
-                expect(statusList).toEqual(message)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
-            })
-    })
-    it('should check for out for delivery and return false', () => {
-        unseenTransactionList = []
-        jobStatusService.getjobMasterIdStatusIdMap.mockReturnValueOnce(jobMasterIdStatusIdMap)
-        jobTransactionService.getJobTransactionsForStatusIds.mockReturnValueOnce(unseenTransactionList)
-        return jobDetailsService.checkOutForDelivery(jobMasterList)
-            .then((statusList) => {
-                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
-                expect(jobTransactionService.getJobTransactionsForStatusIds).toHaveBeenCalledTimes(1)
-                expect(statusList).toEqual(false)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobStatusService.getjobMasterIdStatusIdMap).toHaveBeenCalledTimes(1)
-            })
-    })
-})
-
-describe('test cases for check for enabling status', () => {   // checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
-    beforeEach(() => {
-        jobDetailsService.checkOutForDelivery = jest.fn()
-        jobDetailsService.checkEnableResequence = jest.fn()
-        jobDetailsService.checkJobExpire = jest.fn()
-    })
-    let enableOutForDelivery = true
-    let enableResequenceRestriction = true
-    let jobTime = "2018-11-22 00:51:00"
-    const jobMasterList = {
-        value: [
-            {
-                id: 441,
-                enableLocationMismatch: false,
-                enableManualBroadcast: false,
-                enableMultipartAssignment: false,
-                enableOutForDelivery: true,
-                enableResequenceRestriction: true
-            },
-            {
-                id: 442,
-                enableLocationMismatch: false,
-                enableManualBroadcast: false,
-                enableMultipartAssignment: false,
-                enableOutForDelivery: true,
-                enableResequenceRestriction: false
-            }
-        ]
-    }
-    let tabId = 123
-    let seqSelected = 3
-    const statusList = {
-        value: [
-            {
-                code: "Success123",
-                id: 2416,
-                jobMasterId: 441,
-                name: "Success",
-                saveActivated: null,
-                sequence: 3,
-                statusCategory: 3,
-                tabId: 251,
-                transient: false,
-            },
-            {
-                code: "UNSEEN",
-                id: 1999,
-                jobMasterId: 441,
-                name: "Unseen",
-                saveActivated: null,
-                sequence: 23,
-                statusCategory: 1,
-                tabId: 251,
-                transient: false,
-            },
-            {
-                code: "PENDING",
-                id: 1998,
-                jobMasterId: 441,
-                name: "Pending12",
-                saveActivated: null,
-                sequence: 23,
-                statusCategory: 1,
-                tabId: 251,
-                transient: false,
-            }
-        ]
-    }
-    let jobTransactionId = 123
-    it('should return message for outForDelivery enabled', () => {
-        let message = "Please Scan all Parcels First"
-        jobDetailsService.checkOutForDelivery.mockReturnValueOnce(message)
-        return jobDetailsService.checkForEnablingStatus()
-            .then(() => {
-                expect(jobDetailsService.checkOutForDelivery).toHaveBeenCalledTimes(1)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobDetailsService.checkOutForDelivery).not.toHaveBeenCalled()
-            })
-    })
-    it('should return message for enableResequence enabled', () => {
-        let message = "Please finish previous items first"
-        jobDetailsService.checkEnableResequence.mockReturnValueOnce(message)
-        return jobDetailsService.checkForEnablingStatus()
-            .then(() => {
-                expect(jobDetailsService.checkEnableResequence).toHaveBeenCalledTimes(1)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobDetailsService.checkEnableResequence).not.toHaveBeenCalled()
-            })
-    })
-    it('should return message for jobExpired', () => {
-        let message = "Job Expired!"
-        jobDetailsService.checkJobExpire.mockReturnValueOnce(message)
-        return jobDetailsService.checkForEnablingStatus()
-            .then(() => {
-                expect(jobDetailsService.checkJobExpire).toHaveBeenCalledTimes(1)
-            })
-            .catch((error) => {
-                expect(error).toEqual(error)
-                expect(jobDetailsService.checkJobExpire).not.toHaveBeenCalled()
             })
     })
 })
@@ -731,10 +731,170 @@ describe('test cases for set All data for revert status', () => {   // setAllDat
                 expect(formLayoutEventsInterface._updateJobSummary).toHaveBeenCalledTimes(1)
                 expect(formLayoutEventsInterface.addTransactionsToSyncList).toHaveBeenCalledTimes(1)
             })
-        // .catch((error) => {
-        //     expect(error).toEqual(error)
-        //     // expect(jobDetailsService.checkOutForDelivery).not.toHaveBeenCalled()
-        // })
+        .catch((error) => {
+            expect(error).toEqual(error)
+        })
     })
 })
 
+describe('test cases for get all jobDetails parameters', () => {   // setAllDataForRevertStatus(statusList,jobTransaction,previousStatus)
+    beforeEach(() => {
+        keyValueDBService.getValueFromStore = jest.fn()
+    })
+    let tabId = 123
+    let seqSelected = 3
+    const statusList = {
+        value: [
+            {
+                code: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+                name: "Success",
+                saveActivated: null,
+                sequence: 3,
+                statusCategory: 3,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+                name: "Unseen",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            },
+            {
+                code: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+                name: "Pending12",
+                saveActivated: null,
+                sequence: 23,
+                statusCategory: 1,
+                tabId: 251,
+                transient: false,
+            }
+        ]
+    }
+    const jobAttributeMasterList = {
+        value: [
+            {
+                key: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+            },
+            {
+                key: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+            },
+            {
+                key: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+            }
+        ]
+    }
+    const fieldAttributeMasterList = {
+        value: [
+            {
+                key: "Success123",
+                id: 2416,
+                jobMasterId: 441,
+                fieldAttributeMasterId:1
+            },
+            {
+                key: "UNSEEN",
+                id: 1999,
+                jobMasterId: 441,
+                fieldAttributeMasterId:2
+            },
+            {
+                key: "PENDING",
+                id: 1998,
+                jobMasterId: 441,
+                fieldAttributeMasterId: 3
+            }
+        ]
+    }
+    const jobAttributeStatusList = {
+        value: [
+            {
+                id: 2416,
+                statusId: 441,
+                jobAttributeId:1
+            },
+            {
+                id: 1999,
+                statusId: 441,
+                jobAttributeId:2
+            },
+            {
+                id: 1998,
+                statusId: 441,
+                jobAttributeId: 3
+            }
+        ]
+    }
+
+    const fieldAttributeStatusList = {
+        value: [
+            {
+                id: 2416,
+                statusId: 441,
+                fieldAttributeId:1
+            },
+            {
+                id: 1999,
+                statusId: 441,
+                fieldAttributeId:2
+            },
+            {
+                id: 1998,
+                statusId: 441,
+                fieldAttributeId: 3
+            }
+        ]
+    }
+
+    const jobMasterList = {
+        value: [
+            {
+                id: 441,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: true,
+                enableResequenceRestriction: true
+            },
+            {
+                id: 442,
+                enableLocationMismatch: false,
+                enableManualBroadcast: false,
+                enableMultipartAssignment: false,
+                enableOutForDelivery: false,
+                enableResequenceRestriction: false
+            }
+        ]
+    }
+    it('should get parameters for jobDetails', () => {
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(statusList)
+                                           .mockReturnValueOnce(jobMasterList)
+                                           .mockReturnValueOnce(jobAttributeMasterList)
+                                           .mockReturnValueOnce(fieldAttributeMasterList)
+                                           .mockReturnValueOnce(jobAttributeStatusList)
+                                           .mockReturnValueOnce(fieldAttributeStatusList)
+        return jobDetailsService.getJobDetailsParameters()
+            .then((data) => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(6)
+                expect(data).toEqual({statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, jobAttributeStatusList, fieldAttributeStatusList})
+            })
+        .catch((error) => {
+            expect(error).toEqual(error)
+        })
+    })
+})

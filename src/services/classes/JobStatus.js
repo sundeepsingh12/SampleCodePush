@@ -231,6 +231,9 @@ class JobStatus {
 
   async getStatusCategoryOnStatusId(jobStatusId) {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
+    if (!jobStatusArray || !jobStatusArray.value) {
+      throw new Error(JOB_STATUS_MISSING)
+    }
     const category = jobStatusArray.value.filter(jobStatus => jobStatus.id == jobStatusId && jobStatus.code != UNSEEN).map(id => id.statusCategory)
     return category[0];
   }

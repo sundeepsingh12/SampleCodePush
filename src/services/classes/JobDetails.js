@@ -255,7 +255,7 @@ class JobDetails {
         let updatedJobTransaction = this.updateTransactionOnRevert(jobTransaction, previousStatus) // update jobTransaction on revert
         await formLayoutEventsInterface.addTransactionsToSyncList(updatedJobTransaction.value) // add jobTransaction to sync list
         realm.performBatchSave(updatedJobTransaction, updatedJobDb, runSheet, transactionLog) // update jobTransaction, job, runSheet, transactionLog Db in batch
-        await draftService.deleteDraftFromDb(jobTransaction.id)
+        await draftService.deleteDraftFromDb(jobTransaction)
     }
 
     /**@function checkLatLong(jobId,userLat,userLong)
