@@ -132,7 +132,7 @@ class SkuListItem extends PureComponent {
     render() {
         const originalQuantityValue = this.props.item.filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)
         return (
-            <Content style={[styles.flex1,styles.bgLightGray]}>
+            <Content style={[styles.bgLightGray]}>
                 <View style={[style.card]} >
                     {this.props.item.map(object => this.renderListRow(object, originalQuantityValue))}
                 </View>
@@ -175,7 +175,7 @@ const style = StyleSheet.create({
             height: 2
         },
         shadowOpacity: 0.5,
-        shadowRadius: 2
+        shadowRadius: 2,
     },
     cardLeftTopRow: {
         flexDirection: 'row',
