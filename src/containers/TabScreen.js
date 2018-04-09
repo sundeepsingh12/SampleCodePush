@@ -97,17 +97,17 @@ class TabScreen extends PureComponent {
   _onConfirm = (date) => {
     this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
     const formattedDate = moment(date).format('YYYY-MM-DD')
-    this.props.actions.fetchJobs(formattedDate)
+    this.props.actions.fetchJobs(formattedDate, this.props.navigation.state.params.pageObject)
   }
 
   _transactionsForTodayDate = () => {
     // fetch all jobs for today's date
-    this.props.actions.fetchJobs(moment(new Date()).format('YYYY-MM-DD'))
+    this.props.actions.fetchJobs(moment(new Date()).format('YYYY-MM-DD'), this.props.navigation.state.params.pageObject)
   }
 
   _showAllJobTransactions = () => {
     //fetch all jobs for all dates when user selects ALL option in calender
-    this.props.actions.fetchJobs("All")
+    this.props.actions.fetchJobs("All", this.props.navigation.state.params.pageObject)
   }
 
   renderTabs() {
@@ -127,8 +127,8 @@ class TabScreen extends PureComponent {
               tabId={tabs[index].id}
               statusIdList={this.props.tabIdStatusIdMap[tabs[index].id]}
               searchText={this.props.searchText}
-              pageObject={this.props.navigation.state.params}
-            />
+              pageObject={this.props.navigation.state.params.pageObject}
+          />
           </Tab>
         )
       }

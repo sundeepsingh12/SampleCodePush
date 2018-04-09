@@ -257,7 +257,7 @@ class JobTransaction {
             jobTransactionQuery = `deleteFlag != 1`
             //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected and jobMasterIds
             jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
-        } else if (callingActivity == 'AllTasks') {
+        } else if (callingActivity == 'AllTasks' && callingActivityData) {
             jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
             jobTransactionQuery = jobTransactionQuery + ' AND ' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
         }
