@@ -34,11 +34,6 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 
 import CONFIG from '../../lib/config'
 
-import {
-  onChangePassword,
-  onChangeUsername
-} from '../login/loginActions'
-
 import { onResyncPress } from '../home/homeActions'
 
 import BackgroundTimer from 'react-native-background-timer'

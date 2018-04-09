@@ -186,7 +186,7 @@ export function navigateToPage(pageObject) {
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, {customUrl : (customRemarks.length) ? customRemarks[0].customUrl : null})) : dispatch(customAppSelection(customRemarks))
+          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (customRemarks.length) ? customRemarks[0].customUrl : null })) : dispatch(customAppSelection(customRemarks))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -207,8 +207,8 @@ export function navigateToPage(pageObject) {
         case PAGE_OFFLINE_DATASTORE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_OUTSCAN:
-            dispatch(navigateToScene(PostAssignmentScanner,{pageObject}))
-            break
+          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }))
+          break
         case PAGE_PAYNEAR_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PICKUP:
@@ -223,10 +223,10 @@ export function navigateToPage(pageObject) {
           dispatch(navigateToScene(Sorting, pageObject))
           break;
         case PAGE_STATISTICS:
-        dispatch(navigateToScene(Statistics, pageObject))
-        break;
+          dispatch(navigateToScene(Statistics, pageObject))
+          break;
         case PAGE_TABS:
-          dispatch(navigateToScene(TabScreen, pageObject));
+          dispatch(navigateToScene(TabScreen, { pageObject }));
           break;
         default:
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
@@ -378,7 +378,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
           if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
-          dispatch(fetchJobs())
+          //dispatch(fetchJobs())
         }
         if (isLiveJob) {
           dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
