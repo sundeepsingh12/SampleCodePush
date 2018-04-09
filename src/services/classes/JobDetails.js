@@ -114,10 +114,10 @@ class JobDetails {
      *@returns {string,Boolean} It returns boolean if enableOutForDelivery,enableResequenceRestriction and jobTime cases fail
      */
 
-    async checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId, actionOnStatus) {
+    checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId, actionOnStatus) {
         let enableFlag = false
         if (enableOutForDelivery) { // check for out for delivery
-            enableFlag = await this.checkOutForDelivery(jobMasterList,statusList) 
+            enableFlag = this.checkOutForDelivery(jobMasterList, statusList)
         }
         if (!enableFlag && enableResequenceRestriction && actionOnStatus != 1) { // check for enable resequence restriction and job closed
             enableFlag = this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
@@ -140,8 +140,8 @@ class JobDetails {
 
     async getParentStatusList(statusList, currentStatus, jobTransactionId) {
         let parentStatusList = []
-        for(let status of statusList){
-            if(status.code === UNSEEN || _.isEqual(_.toLower(status.code), 'seen' )) 
+        for (let status of statusList) {
+            if (status.code === UNSEEN || _.isEqual(_.toLower(status.code), 'seen'))
                 continue
             for (let nextStatus of status.nextStatusList) {
                 if (currentStatus.id === nextStatus.id) { // check for currentStatus Id in  nextStatusList
@@ -196,13 +196,13 @@ class JobDetails {
      *@returns {string,Boolean} if unseentransaction present then return string else boolean
      */
 
-    async checkOutForDelivery(jobMasterList, statusList) {
+    checkOutForDelivery(jobMasterList, statusList) {
         const jobMasterIdListWithDelivery = jobMasterList.value.filter((obj) => obj.enableOutForDelivery == true).map(obj => obj.id) // jobMaster Id list with out for delivery
-        const mapOfUnseenStatusWithJobMaster = await jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdListWithDelivery, UNSEEN, statusList)
-        const unseenTransactions = await jobTransactionService.getJobTransactionsForStatusIds(Object.values(mapOfUnseenStatusWithJobMaster))
+        const mapOfUnseenStatusWithJobMaster = jobStatusService.getjobMasterIdStatusIdMap(jobMasterIdListWithDelivery, UNSEEN, statusList.value)
+        const unseenTransactions = jobTransactionService.getJobTransactionsForStatusIds(Object.values(mapOfUnseenStatusWithJobMaster))
         return !(unseenTransactions && unseenTransactions.length > 0) ? false : "Please Scan all Parcels First"
     }
-    
+
     /**@function updateTransactionOnRevert(jobTransactionData,previousStatus)
      * ## It will update transactionData on revert status 
      * 
@@ -282,7 +282,7 @@ class JobDetails {
         const fieldAttributeMasterList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
         const jobAttributeStatusList = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE_STATUS)
         const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS)
-        return { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList}
+        return { statusList, jobMasterList, jobAttributeMasterList, fieldAttributeMasterList, fieldAttributeStatusList, jobAttributeStatusList }
     }
 }
 

@@ -41,14 +41,14 @@ export function getBulkJobTransactions(bulkParams) {
         try {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS));
             let cloneBulkParams = _.cloneDeep(bulkParams);
-            cloneBulkParams.pageObject.additionalParams = JSON.parse(cloneBulkParams.pageObject.additionalParams);
-            cloneBulkParams.pageObject.jobMasterIds = JSON.parse(cloneBulkParams.pageObject.jobMasterIds);
+            cloneBulkParams.pageObject.additionalParams =(!cloneBulkParams.pageObject.groupId)  ? JSON.parse(cloneBulkParams.pageObject.additionalParams) : { statusId : cloneBulkParams.pageObject.additionalParams.statusId }
+            cloneBulkParams.pageObject.jobMasterIds = (!cloneBulkParams.pageObject.groupId) ? JSON.parse(cloneBulkParams.pageObject.jobMasterIds) : cloneBulkParams.pageObject.jobMasterIds
             const bulkTransactions = await bulkService.getJobListingForBulk(cloneBulkParams);
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
             const currentStatus = jobStatusService.getJobStatusForJobStatusId(statusList ? statusList.value : null, cloneBulkParams.pageObject.additionalParams.statusId)
             let selectAll = cloneBulkParams.pageObject.additionalParams.selectAll ? true : false
-            let isManualSelectionAllowed = cloneBulkParams.pageObject.manualSelection ? true : false
-            let searchSelectionOnLine1Line2 = cloneBulkParams.pageObject.additionalParams.searchSelectionOnLine1Line2 ? true : false
+            let isManualSelectionAllowed = cloneBulkParams.pageObject.manualSelection || cloneBulkParams.pageObject.groupId ? true : false
+            let searchSelectionOnLine1Line2 = cloneBulkParams.pageObject.additionalParams.searchSelectionOnLine1Line2 || cloneBulkParams.pageObject.groupId ? true : false
             let idToSeparatorMap
             if (searchSelectionOnLine1Line2) { // If search selection on line1line2 is allowed
                 const jobMasterIdCustomizationMap = await keyValueDBService.getValueFromStore(CUSTOMIZATION_LIST_MAP)
