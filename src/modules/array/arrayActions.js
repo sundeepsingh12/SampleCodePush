@@ -5,7 +5,7 @@ import {
     SET_ARRAY_CHILD_LIST,
     SET_NEW_ARRAY_ROW,
     SET_ARRAY_ELEMENTS,
-    SET_ERROR_MSG,    
+    SET_ERROR_MSG,
     CLEAR_ARRAY_STATE,
     NEXT_FOCUS,
     SET_ARRAY_ISLOADING,
@@ -28,18 +28,18 @@ export function showOrDropModal(fieldAttributeMasterId, arrayElements, rowId, id
             newArray[rowId].modalFieldAttributeMasterId = idToSet
             dispatch(setState(SET_ARRAY_ELEMENTS, { newArrayElements: newArray, isSaveDisabled }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(101, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(101, error.message, 'danger', 1)
         }
     }
 }
-export function addRowInArray(lastrowId, childElementsTemplate, arrayElements, jobTransaction) {
+export function addRowInArray(lastrowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled) {
     return async function (dispatch) {
         try {
-            const newArrayRow = arrayService.addArrayRow(lastrowId, childElementsTemplate, arrayElements, jobTransaction)
+            const newArrayRow = arrayService.addArrayRow(lastrowId, childElementsTemplate, arrayElements, jobTransaction, isSaveDisabled)
             if (!newArrayRow) throw new Error(ADD_ROW_ERROR)
             dispatch(setState(SET_NEW_ARRAY_ROW, newArrayRow))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(102, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(102, error.message, 'danger', 1)
         }
     }
 }
@@ -54,7 +54,7 @@ export function deleteArrayRow(arrayElements, rowId, lastrowId) {
                 isSaveDisabled
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(103, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(103, error.message, 'danger', 1)
         }
     }
 }
@@ -66,10 +66,10 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
             arrayRow.formLayoutObject.get(attributeMasterId).displayValue = value
             arrayRow.formLayoutObject.get(attributeMasterId).childDataList = fieldDataList
             let validationsResult = fieldValidationService.fieldValidations(arrayRow.formLayoutObject.get(attributeMasterId), arrayRow.formLayoutObject, AFTER, null)
-            arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult && backPressOrModalPresent) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
+            arrayRow.formLayoutObject.get(attributeMasterId).value = (validationsResult) ? arrayRow.formLayoutObject.get(attributeMasterId).displayValue : null
             arrayRow.formLayoutObject.get(attributeMasterId).containerValue = (validationsResult) ? containerValue : null
             arrayRow.modalFieldAttributeMasterId = (validationsResult) ? null : (backPressOrModalPresent == 2) ? attributeMasterId : null
-            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult && backPressOrModalPresent) ? value : null, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
+            let newArrayElements = arrayService.findNextEditableAndSetSaveDisabled(attributeMasterId, cloneArrayElements, isSaveDisabled, rowId, (validationsResult) ? value : null, (validationsResult) ? fieldDataList : null, event, fieldAttributeMasterParentIdMap)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
             if (validationsResult && backPressOrModalPresent == 1) {
                 dispatch(NavigationActions.back())
@@ -82,7 +82,7 @@ export function getNextFocusableAndEditableElement(attributeMasterId, isSaveDisa
                 }
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(104, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(104, error.message, 'danger', 1)
         }
     }
 }
@@ -94,7 +94,7 @@ export function getNextFocusableForArrayWithoutChildDatalist(attributeMasterId, 
             if (!newArrayElements) throw new Error(DELETE_ROW_ERROR)
             dispatch(setState(SET_ARRAY_ELEMENTS, newArrayElements))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(105, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(105, error.message, 'danger', 1)
         }
     }
 }
@@ -116,7 +116,7 @@ export function saveArray(arrayElements, arrayParentItem, jobTransaction, latest
                 dispatch(setState(CLEAR_ARRAY_STATE))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(106, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(106, error.message, 'danger', 1)
         }
     }
 }
@@ -126,7 +126,7 @@ export function clearArrayState() {
         try {
             dispatch(setState(CLEAR_ARRAY_STATE))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(107, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(107, error.message, 'danger', 1)
         }
     }
 }
@@ -148,7 +148,7 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
             }
             dispatch(getNextFocusableForArrayWithoutChildDatalist(currentElement.fieldAttributeMasterId, isSaveDisabled, (!scanValue) ? currentElement.displayValue : scanValue, newArray, rowId, NEXT_FOCUS, null))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(108, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(108, error.message, 'danger', 1)
         }
     }
 }
@@ -171,7 +171,7 @@ export function setInitialArray(currentElement, formElement, jobStatusId, jobTra
                 dispatch(setState(SET_ARRAY_CHILD_LIST, arrayState))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(109, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(109, error.message, 'danger', 1)            
             dispatch(setState(SET_ARRAY_ISLOADING, false))
         }
     }

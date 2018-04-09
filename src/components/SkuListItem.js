@@ -12,7 +12,7 @@ import {
     SKU_REASON,
     SKU_PHOTO,
     REASON,
-    NA    
+    NA
 } from '../lib/AttributeConstants'
 import { CheckBox, Picker, Content, Icon } from 'native-base'
 import _ from 'lodash'
@@ -52,7 +52,17 @@ class SkuListItem extends PureComponent {
         })
     }
 
-    _getIconForImageAlreadyCaptured(rowItem){
+    _getViewOfHeader(rowItem) {
+        if (rowItem.attributeTypeId == SKU_PHOTO) {
+            return <Icon name="ios-camera" style={[styles.flexBasis40, styles.fontDefault, styles.fontXxl, styles.paddingTop10]} />
+        } else {
+            return <Text style={[styles.flexBasis40, styles.fontSm, styles.justifyCenter, styles.paddingTop10]} >
+                {rowItem.label}
+            </Text>
+        }
+    }
+
+    _getIconForImageAlreadyCaptured(rowItem) {
         return (rowItem.value != OPEN_CAMERA) ? <Icon name="ios-checkmark-circle" style={[styles.fontXl, styles.fontSuccess, styles.fontXxl, styles.paddingTop10]} /> : null
     }
 
@@ -63,37 +73,36 @@ class SkuListItem extends PureComponent {
                 reasonList.splice(0, 1)
             }
             return (
-            <View style={[{flexBasis: '60%', height: 40}]}>
-                <Picker 
+                <View style={[{ flexBasis: '60%', height: 40 }]}>
+                    <Picker
                         mode="dropdown"
                         placeholder={SELECT_ANY_REASON}
                         selectedValue={rowItem.value}
                         onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
-                  {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={-987654321} /> */}
-                    {this._populateSkuItems(reasonList)}
-                </Picker>
-            </View>)
+                        {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={-987654321} /> */}
+                        {this._populateSkuItems(reasonList)}
+                    </Picker>
+                </View>)
         } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
-        let isImageAlreadyCaptured = this._getIconForImageAlreadyCaptured(rowItem)
-                return (
-                    <View style={[styles.row, styles.justifyCenter]}>
-                        <Text style={[styles.flexBasis30, styles.fontDefault, styles.padding10]}
-                            onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
-                            {OPEN_CAMERA}
-                        </Text>
-                        {isImageAlreadyCaptured}
-                    </View>)
-            
-        } else if(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY){
+            return (
+                <View style={[styles.row, styles.justifyCenter]}>
+                    <Text style={[styles.flexBasis30, styles.fontDefault, styles.padding10]}
+                        onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
+                        {OPEN_CAMERA}
+                    </Text>
+                    {this._getIconForImageAlreadyCaptured(rowItem)}
+                </View>)
+
+        } else if (rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
             let quantitySelector
             if (originalQuantityValue <= 1) {
-                quantitySelector = 
-                <View>
-                <CheckBox style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
-                </View>
+                quantitySelector =
+                    <View>
+                        <CheckBox style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
+                    </View>
             }
             else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
-    
+
                 quantitySelector = <Picker
                     mode="dropdown"
                     selectedValue={rowItem.value}
@@ -102,14 +111,14 @@ class SkuListItem extends PureComponent {
                 </Picker>
             }
             return (
-                <View style={[{flexBasis: '60%', height: 40}]}>
+                <View style={[{ flexBasis: '60%', height: 40 }]}>
                     {quantitySelector}
                 </View>
             )
-        }else {
+        } else {
             return (
                 <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10]}>
-                    {(rowItem.attributeTypeId == SKU_REASON || rowItem.attributeTypeId == SKU_PHOTO) ? NA :rowItem.value}
+                    {(rowItem.attributeTypeId == SKU_REASON || rowItem.attributeTypeId == SKU_PHOTO) ? NA : rowItem.value}
                 </Text>
             )
         }
@@ -118,13 +127,11 @@ class SkuListItem extends PureComponent {
     renderListRow(rowItem, originalQuantityValue) {
         if (rowItem.attributeTypeId != SKU_ORIGINAL_QUANTITY) {
             return (
-                <View key={rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal5, {height: 50}]}>
-                        <View style={[styles.row]}>
-                            <Text style={[styles.flexBasis40, styles.fontSm, styles.justifyCenter, styles.paddingTop10]} >
-                                {rowItem.label}
-                            </Text>
-                            {this._displaySkuItems(rowItem, originalQuantityValue)}
-                        </View> 
+                <View key={rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal5, { height: 50 }]}>
+                    <View style={[styles.row]}>
+                        {this._getViewOfHeader(rowItem)}
+                        {this._displaySkuItems(rowItem, originalQuantityValue)}
+                    </View>
                 </View>
             )
         }

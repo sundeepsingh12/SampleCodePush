@@ -9,7 +9,6 @@ import {
     SET_RESPONSE_MESSAGE,
     SET_RUNSHEET_NUMBER_LIST,
     PREPARE_UPDATE_LIST,
-    CLEAR_SEQUENCE_STATE,
     RESET_STATE
 } from '../../../lib/constants'
 
@@ -129,14 +128,6 @@ describe('sequenceReducer', () => {
     it('default case', () => {
         const action = {
             type: 'DEFAULT',
-        }
-        let nextState = sequenceReducer(undefined, action)
-        expect(nextState).toEqual(resultState)
-    })
-
-    it('should set initialState', () => {
-        const action = {
-            type: CLEAR_SEQUENCE_STATE,
         }
         let nextState = sequenceReducer(undefined, action)
         expect(nextState).toEqual(resultState)

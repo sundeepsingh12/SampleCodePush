@@ -13,7 +13,7 @@ import styles from '../themes/FeStyle'
 import ExpandableDetailsList from './ExpandableDetailsList'
 import renderIf from '../lib/renderIf'
 import _ from 'lodash'
-import { N_A, TAP_TO_HIDE, TAP_TO_SHOW} from '../lib/ContainerConstants'
+import { N_A, TAP_TO_HIDE, TAP_TO_SHOW } from '../lib/ContainerConstants'
 
 class ExpandableDetailsView extends PureComponent {
     constructor(props) {
@@ -23,10 +23,10 @@ class ExpandableDetailsView extends PureComponent {
         }
     }
     checkForChildData(childDataList) {
-            for(let data in childDataList){
-                if (!_.isEmpty(childDataList[data].childDataList)) {
-                    return true
-                }  
+        for (let data in childDataList) {
+            if (!_.isEmpty(childDataList[data].childDataList) || childDataList[data].attributeTypeId == 8) {
+                return true
+            }
         }
         return false
     }
@@ -43,7 +43,7 @@ class ExpandableDetailsView extends PureComponent {
                     </View>
                     <View style={[styles.flexBasis60, styles.paddingTop10, styles.paddingBottom10]}>
                         <Text style={[styles.fontDefault, styles.fontPrimary]}>
-                        {(!isChildData) ? N_A : this.state.showDropdown ? TAP_TO_HIDE : TAP_TO_SHOW}
+                            {(!isChildData) ? N_A : this.state.showDropdown ? TAP_TO_HIDE : TAP_TO_SHOW}
                         </Text>
                     </View>
                 </View>

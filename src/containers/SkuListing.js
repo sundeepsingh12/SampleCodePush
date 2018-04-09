@@ -40,7 +40,10 @@ class SkuListing extends PureComponent {
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+  
+    if (_.isEmpty(this.props.skuListItems)) { // Fetch data only once,after it has been loaded in state,no need to fetch it again
+      this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+    }
   }
 
   renderData(item) {
@@ -85,7 +88,7 @@ class SkuListing extends PureComponent {
 
             <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
               <FlatList
-              initialNumToRender={_.size(this.props.skuListItems)}
+                initialNumToRender={_.size(this.props.skuListItems)}
                 data={_.values(this.props.skuListItems)}
                 renderItem={({ item }) => this.renderData(item)}
                 keyExtractor={item => String(_.values(this.props.skuListItems).indexOf(item))}

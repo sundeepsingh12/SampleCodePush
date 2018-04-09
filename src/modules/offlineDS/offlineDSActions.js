@@ -28,7 +28,7 @@ export function getLastSyncTime() {
                 dispatch(setState(SET_LAST_SYNC_TIME, NEVER_SYNCED))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1501, error.message, 'danger', 1))            
+            showToastAndAddUserExceptionLog(1501, error.message, 'danger', 1)            
         }
     }
 }
@@ -57,7 +57,7 @@ export function syncDataStore() {
             await keyValueDBService.validateAndSaveData(LAST_DATASTORE_SYNC_TIME, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'))
             dispatch(setState(SET_DOWNLOADING_STATUS, { downLoadingStatus: 2, progressBarStatus: 0, }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(1502, error.message, 'danger', 1))                    
+            showToastAndAddUserExceptionLog(1502, error.message, 'danger', 1)                    
             dispatch(setState(SET_DOWNLOADING_STATUS, { downLoadingStatus: 3, progressBarStatus: 0, }))
         }
     }

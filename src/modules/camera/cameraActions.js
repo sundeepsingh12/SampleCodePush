@@ -28,7 +28,7 @@ export function saveImage(result, fieldAttributeMasterId, formElement, isSaveDis
                 viewData: ''
             }))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(301, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(301, error.message, 'danger', 1)
         }
     }
 }
@@ -38,7 +38,7 @@ export function getImageData(value) {
             const result = await signatureService.getImageData(value)
             dispatch(setState(VIEW_IMAGE_DATA, result))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(302, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(302, error.message, 'danger', 1)
         }
     }
 }
@@ -47,7 +47,7 @@ export function setInitialState() {
         try {
             dispatch(setState(VIEW_IMAGE_DATA, ''))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(303, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(303, error.message, 'danger', 1)
         }
     }
 }
@@ -62,7 +62,7 @@ export function setExistingImage(item) {
                 }
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(304, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(304, error.message, 'danger', 1)
         }
     }
 }

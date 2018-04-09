@@ -163,7 +163,7 @@ describe('test case for getRunsheets', () => {
         runSheetService.getRunsheets = jest.fn()
         runSheetService.getRunsheets.mockReturnValue(runsheetNumberList)
         const store = mockStore({})
-        return store.dispatch(actions.getRunsheets())
+        return store.dispatch(actions.getRunsheetsForSequence())
             .then(() => {
                 expect(runSheetService.getRunsheets).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
@@ -178,7 +178,7 @@ describe('test case for getRunsheets', () => {
             throw new Error(RUNSHEET_MISSING)
         })
         const store = mockStore({})
-        return store.dispatch(actions.getRunsheets())
+        return store.dispatch(actions.getRunsheetsForSequence())
             .then(() => {
                 expect(runSheetService.getRunsheets).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)

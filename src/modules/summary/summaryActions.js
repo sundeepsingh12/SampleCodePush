@@ -13,6 +13,8 @@ import {
     JOB_SUMMARY,
 } from '../../lib/constants'
 
+import  { Piechart } from '../../lib/AttributeConstants'
+
 /**@function getDataForJobMasterSummaryAndRunSheetSummary()
     * 
     * this action is for set all jobMaster Summary and runSheet Summary, action is called on pieChart press
@@ -32,7 +34,8 @@ export function getDataForJobMasterSummaryAndRunSheetSummary() {
                 throw new Error('store not available')
             }
             const allPendingSuccessFailIds = Object.keys(allStatusMap)
-            const jobMasterSummaryList =  summaryAndPieChartService.setAllJobMasterSummary(jobMasterList.value,jobStatusList.value,jobSummaryList.value,allPendingSuccessFailIds,noNextStatusMap) // set all jobMasterSummary list
+            const jobMasterListValue = (_.size(Piechart.params)) ? jobMasterList.value.filter((jobMaster) => _.includes(Piechart.params, jobMaster.id)) : jobMasterList.value
+            const jobMasterSummaryList =  summaryAndPieChartService.setAllJobMasterSummary(jobMasterListValue,jobStatusList.value,jobSummaryList.value,allPendingSuccessFailIds,noNextStatusMap) // set all jobMasterSummary list
             const runsheetSummaryList =   summaryAndPieChartService.getAllRunSheetSummary() // set all runSheetList summary
             dispatch(setState(SET_SUMMARY_FOR_JOBMASTER, jobMasterSummaryList))
             dispatch(setState(SET_SUMMARY_FOR_RUNSHEET,runsheetSummaryList))
