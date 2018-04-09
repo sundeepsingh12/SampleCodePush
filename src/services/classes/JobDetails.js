@@ -116,17 +116,13 @@ class JobDetails {
 
     checkForEnablingStatus(enableOutForDelivery, enableResequenceRestriction, jobTime, jobMasterList, tabId, seqSelected, statusList, jobTransactionId, actionOnStatus) {
         let enableFlag = false
-        console.log("0")
         if (enableOutForDelivery) { // check for out for delivery
-           console.log("1")
             enableFlag = this.checkOutForDelivery(jobMasterList, statusList)
         }
         if (!enableFlag && enableResequenceRestriction && actionOnStatus != 1) { // check for enable resequence restriction and job closed
-            console.log("2")
             enableFlag = this.checkEnableResequence(jobMasterList, tabId, seqSelected, statusList, jobTransactionId)
         }
         if (!enableFlag && jobTime) { // check for jobTime expiry
-            console.log("3")
             enableFlag = this.checkJobExpire(jobTime)
         }
         return enableFlag

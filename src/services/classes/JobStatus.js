@@ -69,7 +69,6 @@ class JobStatus {
    */
    getjobMasterIdStatusIdMap(jobMasterIdList, jobStatusCode, jobStatusArray) {
     let jobMasterIdStatusIdMap = {}
-    console.log("jobStatusArray",jobStatusArray)
     // const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS) 
     if (!jobStatusArray) {
       throw new Error(JOB_STATUS_MISSING)
