@@ -81,6 +81,7 @@ class ArrayFieldAttribute {
                 fieldAttributeMasterId: arrayMainObject.id,
                 attributeTypeId: arrayMainObject.attributeTypeId,
                 value: OBJECT_SAROJ_FAREYE,
+                key: arrayMainObject.key,
                 childDataList
             }
             arrayChildDataList.push(arrayObject)

@@ -18,5 +18,6 @@ FieldData.schema = {
     value: 'string?',
     attributeTypeId: 'int?',
     dateTime: 'string?',
+    key: 'string?'
   }
 }

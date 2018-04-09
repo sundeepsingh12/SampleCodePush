@@ -132,8 +132,8 @@ class SignatureRemarks {
         let childDataList = []
         for (let fieldAttribute of fieldAttributeList) {
             fieldAttribute.value = (fieldAttribute.attributeTypeId == SIGNATURE) ? signatureValue : npsValue + ''
-            let { id, attributeTypeId, value } = fieldAttribute
-            childDataList.push({ fieldAttributeMasterId: id, attributeTypeId, value })
+            let { id, attributeTypeId, value, key } = fieldAttribute
+            childDataList.push({ fieldAttributeMasterId: id, attributeTypeId, value, key })
         }
         let fieldDataObject = fieldDataService.prepareFieldDataForTransactionSavingInState(childDataList, jobTransactionId, currentElement.positionId, latestPositionId)
         return fieldDataObject

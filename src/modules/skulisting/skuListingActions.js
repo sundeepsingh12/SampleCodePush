@@ -51,7 +51,7 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
         try {
             dispatch(setState(SKU_LIST_FETCHING_START, true))
             const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMasterId)
-            const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId[0])
+            const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId)
             const skuValidationForImageAndReason = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(fieldAttributeMasterId)
             const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation, skuValidationForImageAndReason)
             const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap, skuData.attributeTypeIdValueMap)
@@ -59,7 +59,8 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
                 skuListItems: skuData.skuObjectListDto,
                 skuObjectValidation,
                 skuArrayChildAttributes,
-                skuObjectAttributeId: skuListingDto.childFieldAttributeId[0],
+                skuObjectAttributeId: skuListingDto.childFieldAttributeId,
+                skuObjectAttributeKey: skuListingDto.childFieldAttributeKey,
                 skuValidationForImageAndReason,
                 reasonsList: skuData.reasonsList,
             }))
@@ -120,12 +121,12 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, latestPositionId, parentObject, formElement, isSaveDisabled, navigation, skuValidationForImageAndReason) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, latestPositionId, parentObject, formElement, isSaveDisabled, navigation, skuValidationForImageAndReason, skuObjectAttributeKey) {
     return async function (dispatch) {
         try {
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
             if (!message) {
-                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId, skuValidationForImageAndReason)
+                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId, skuValidationForImageAndReason, skuObjectAttributeKey)
                 if (_.isNull(skuChildElements)) {
                     Toast.show({
                         text: `Please Fill all the Required Details`,
