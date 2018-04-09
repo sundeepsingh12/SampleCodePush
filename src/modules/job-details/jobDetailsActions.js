@@ -121,7 +121,7 @@ export function setAllDataOnRevert(jobTransaction, statusTo, navigation) {
             //dispatch(fetchJobs())
             //let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : false
             //if (landingId) {
-                await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
+            //    await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
                 dispatch(NavigationActions.reset({
                     index: 0,
                     actions: [
