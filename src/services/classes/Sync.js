@@ -666,9 +666,8 @@ class Sync {
   getJobTransactionAndNewJobTransactionIds(jobTransactionList) {
     let jobTransactionsIds = [], newJobTransactionsIds = []
     for (let jobTransaction in jobTransactionList) {
-      if (!jobTransactionList[jobTransaction].negativeJobTransactionId) {
-        jobTransactionsIds.push(jobTransactionList[jobTransaction].id)
-      } else if (jobTransactionList[jobTransaction].negativeJobTransactionId < 0) {
+      jobTransactionsIds.push(jobTransactionList[jobTransaction].id)
+      if (jobTransactionList[jobTransaction].negativeJobTransactionId < 0) {
         newJobTransactionsIds.push(jobTransactionList[jobTransaction].negativeJobTransactionId)
       }
     }
