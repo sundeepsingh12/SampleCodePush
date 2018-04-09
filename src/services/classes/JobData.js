@@ -172,9 +172,10 @@ class JobData {
     getParentIdJobDataListMap(jobDatas) {
         let parentIdJobDataListMap = {}
         jobDatas.forEach(jobData => {
-            let jobDataList = (parentIdJobDataListMap[jobData.parentId]) ? parentIdJobDataListMap[jobData.parentId] : []
-            jobDataList.push(jobData)
-            parentIdJobDataListMap[jobData.parentId] = jobDataList
+            const jobDataObject = {...jobData}
+            let jobDataList = (parentIdJobDataListMap[jobDataObject.parentId]) ? parentIdJobDataListMap[jobDataObject.parentId] : []
+            jobDataList.push(jobDataObject)
+            parentIdJobDataListMap[jobDataObject.parentId] = jobDataList
         })
         return parentIdJobDataListMap
     }
