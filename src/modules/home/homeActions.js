@@ -49,7 +49,8 @@ import {
   PostAssignmentScanner,
   CustomApp,
   Sorting,
-  Statistics
+  Statistics,
+  Backup
 } from '../../lib/constants'
 
 import {
@@ -175,7 +176,8 @@ export function navigateToPage(pageObject) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(Backup, { pageObject }));
+        break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
