@@ -70,7 +70,7 @@ class ProfileView extends PureComponent {
             <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
           </TouchableOpacity>
           <View style={[styles.headerBody, styles.paddingTop15]}>
-            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{PROFILE}</Text>
+            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
           </View>
           <View style={[styles.headerRight]}>
           </View>
