@@ -260,7 +260,8 @@ class JobTransaction {
                 jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
             } else if (callingActivity == 'AllTasks') {
                 jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
-                jobTransactionQuery = jobTransactionQuery + ' AND ' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+                jobTransactionQuery = jobTransactionQuery + ' AND (' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+                jobTransactionQuery = jobTransactionQuery + ')'
             }
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
