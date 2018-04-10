@@ -115,7 +115,7 @@ class Login extends PureComponent {
 
   codepushSync = () => {
     codePush.sync({
-      updateDialog: true,
+      updateDialog: (Platform.OS === 'ios')?false:true,
       installMode: codePush.InstallMode.IMMEDIATE
     }, (status) => {
       console.log("====Code push update=====");
