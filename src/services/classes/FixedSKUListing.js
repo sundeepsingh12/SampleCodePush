@@ -24,7 +24,8 @@ class FixedSKUListing {
             let objectWithFieldData = {
                 fieldAttributeMasterId: id,
                 label,
-                attributeTypeId
+                attributeTypeId,
+                key
             }
             return objectWithFieldData
         } else {

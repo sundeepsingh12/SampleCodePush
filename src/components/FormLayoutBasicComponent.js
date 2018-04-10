@@ -79,6 +79,7 @@ import {
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
 import TimePicker from '../components/TimePicker'
+import { checkForNewJob } from '../modules/skulisting/skuListingActions'
 
 function mapStateToProps(state) {
     return {
@@ -89,7 +90,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions, checkForNewJob }, dispatch)
     }
 }
 class BasicFormElement extends PureComponent {
@@ -125,7 +126,16 @@ class BasicFormElement extends PureComponent {
                 break
             }
             case SKU_ARRAY: {
-                screenName = 'SkuListing'
+                this.props.actions.checkForNewJob({
+                    currentElement: item,
+                    formElements: this.props.formElement,
+                    jobStatusId: this.props.jobStatusId,
+                    jobTransaction: this.props.jobTransaction,
+                    latestPositionId: this.props.latestPositionId,
+                    isSaveDisabled: this.props.isSaveDisabled,
+                    returnData: this._searchForReferenceValue.bind(this),
+                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                })
                 break
             }
             case EXTERNAL_DATA_STORE:
@@ -156,18 +166,20 @@ class BasicFormElement extends PureComponent {
             }
         }
 
-        this.props.actions.navigateToScene(screenName,
-            {
-                currentElement: item,
-                formElements: this.props.formElement,
-                jobStatusId: this.props.jobStatusId,
-                jobTransaction: this.props.jobTransaction,
-                latestPositionId: this.props.latestPositionId,
-                isSaveDisabled: this.props.isSaveDisabled,
-                returnData: this._searchForReferenceValue.bind(this),
-                fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
-            }
-        )
+        if (screenName) {
+            this.props.actions.navigateToScene(screenName,
+                {
+                    currentElement: item,
+                    formElements: this.props.formElement,
+                    jobStatusId: this.props.jobStatusId,
+                    jobTransaction: this.props.jobTransaction,
+                    latestPositionId: this.props.latestPositionId,
+                    isSaveDisabled: this.props.isSaveDisabled,
+                    returnData: this._searchForReferenceValue.bind(this),
+                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                }
+            )
+        }
     }
 
     _searchForReferenceValue = (value) => {
@@ -247,12 +259,18 @@ class BasicFormElement extends PureComponent {
                         transparent={true}
                         onRequestClose={this.onCloseModal}>
                         <TouchableHighlight
-                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
-                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}
+                            onPress={() => this.onCloseModal()}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .2 }}>
                                 <View>
-                                    <NPSFeedback
-                                        onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item}
-                                    />
+                                    <Text style={[styles.alignStart, styles.fontLg, styles.padding10]}>
+                                        Rating
+                                    </Text>
+                                    <View style={[styles.padding20,styles.justifyCenter]}>
+                                        <NPSFeedback
+                                            onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item}
+                                        />
+                                    </View>
                                 </View>
                             </TouchableHighlight>
                         </TouchableHighlight>
@@ -314,7 +332,7 @@ class BasicFormElement extends PureComponent {
         }
 
         if (this.props.item.value != ARRAY_SAROJ_FAREYE && this.props.item.value != OBJECT_SAROJ_FAREYE) {
-            return this.props.item.containerValue
+            return this.props.item.containerValue ? this.props.item.containerValue : this.props.item.value
         }
         return null
     }

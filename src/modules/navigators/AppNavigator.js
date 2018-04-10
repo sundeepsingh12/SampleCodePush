@@ -28,11 +28,8 @@ import ResetPassword from '../../containers/ResetPassword'
 import SyncScreen from '../../containers/SyncScreen'
 import TabScreen from '../../containers/TabScreen'
 import TaskListScreen from '../../containers/TaskListScreen'
-import NewJob from '../../containers/NewJob'
-import NewJobStatus from '../../containers/NewJobStatus'
 import DataStore from '../../containers/DataStore'
 import BulkListing from '../../containers/BulkListing'
-import BulkConfiguration from '../../containers/BulkConfiguration'
 import JobDetailsV2 from '../../containers/JobDetailsV2'
 import LiveJobListing from '../../containers/LiveJobListing'
 import LiveJob from '../../containers/LiveJob'
@@ -80,7 +77,6 @@ import OfflineDS from '../../containers/OfflineDS'
 import ImageDetailsView from '../../containers/ImageDetailsView'
 import { NavigationActions } from 'react-navigation'
 import PostAssignmentScanner from '../../containers/PostAssignmentScanner'
-import JobMaster from '../../containers/JobMaster'
 import AutoLogout from '../../containers/AutoLogout'
 import Backup from '../../containers/Backup'
 import UnsyncBackupUpload from '../../containers/UnsyncBackupUpload'
@@ -94,7 +90,8 @@ import {
   PreloaderScreen,
   SHOW_DISCARD_ALERT,
   RETURN_TO_HOME,
-  SET_TRANSIENT_BACK_PRESSED
+  SET_TRANSIENT_BACK_PRESSED,
+  SET_SEQUENCE_BACK_ENABLED
 } from '../../lib/constants'
 import SplitPayment from '../../containers/SplitPayment'
 import {
@@ -128,6 +125,10 @@ class AppWithNavigationState extends React.PureComponent {
       }
       case 'Transient': {
         dispatch(setState(SET_TRANSIENT_BACK_PRESSED, true))
+        return true
+      }
+      case 'Sequence': {
+        dispatch(setState(SET_SEQUENCE_BACK_ENABLED, true))
         return true
       }
       case ApplicationScreen:
@@ -245,12 +246,6 @@ export const AppNavigator = StackNavigator({
   ResetPassword: {
     screen: ResetPassword
   },
-  NewJob: {
-    screen: NewJob
-  },
-  NewJobStatus: {
-    screen: NewJobStatus
-  },
   SkuListing: {
     screen: SkuListing,
     navigationOptions: {
@@ -315,9 +310,6 @@ export const AppNavigator = StackNavigator({
   SignatureAndNps: {
     screen: SignatureAndNps
   },
-  BulkConfiguration: {
-    screen: BulkConfiguration
-  },
   BulkListing: {
     screen: BulkListing
   },
@@ -338,9 +330,6 @@ export const AppNavigator = StackNavigator({
   },
   PostAssignmentScanner: {
     screen: PostAssignmentScanner
-  },
-  JobMasterListScreen: {
-    screen: JobMaster
   },
   DataStoreDetails: {
     screen: DataStoreDetails

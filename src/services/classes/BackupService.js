@@ -27,7 +27,7 @@ import {
     unzip
 } from 'react-native-zip-archive'
 import _ from 'lodash'
-import { moveImageFilesToSync, _getDataFromRealm } from './SyncZip'
+import { syncZipService } from './SyncZip'
 import {
     USER_MISSING,
     BACKUP_CREATED_SUCCESS_TOAST,
@@ -129,7 +129,7 @@ class Backup {
         let statusIdForDeliveredCode = await jobStatusService.getNonDeliveredStatusIds() // get all job status for code DELIVERED.
         if (!statusIdForDeliveredCode) return
         let transactionQuery = statusIdForDeliveredCode.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')
-        let transactionList = _getDataFromRealm([], transactionQuery, TABLE_JOB_TRANSACTION);
+        let transactionList = syncZipService.getDataFromRealmDB(transactionQuery, TABLE_JOB_TRANSACTION);
         let json = await this._getSyncDataFromDb(transactionList, dateTime)
         return json
     }
@@ -147,14 +147,14 @@ class Backup {
             transactionLogs = [],
             trackLogs = []
         let fieldDataQuery = transactionList.map(transaction => 'jobTransactionId = ' + transaction.id).join(' OR ')
-        fieldDataList = _getDataFromRealm([], fieldDataQuery, TABLE_FIELD_DATA);
+        fieldDataList = syncZipService.getDataFromRealmDB(fieldDataQuery, TABLE_FIELD_DATA);
         let jobIdQuery = transactionList.map(jobTransaction => jobTransaction.jobId).map(jobId => 'id = ' + jobId).join(' OR '); // first find jobIds using map and then make a query for job table
-        jobList = _getDataFromRealm([], jobIdQuery, TABLE_JOB);
-        serverSmsLogs = _getDataFromRealm([], null, TABLE_SERVER_SMS_LOG);
+        jobList = syncZipService.getDataFromRealmDB(jobIdQuery, TABLE_JOB);
+        serverSmsLogs = syncZipService.getDataFromRealmDB(null, TABLE_SERVER_SMS_LOG);
         let transactionLogsQuery = transactionList.map(jobTransaction => 'transactionId = ' + jobTransaction.id).join(' OR ')
-        transactionLogs = _getDataFromRealm([], transactionLogsQuery, TABLE_TRANSACTION_LOGS);
-        trackLogs = _getDataFromRealm([], null, TABLE_TRACK_LOGS);
-        await moveImageFilesToSync(fieldDataList, PATH_BACKUP_TEMP) // This method will move image files to get synced
+        transactionLogs = syncZipService.getDataFromRealmDB(transactionLogsQuery, TABLE_TRANSACTION_LOGS);
+        trackLogs = syncZipService.getDataFromRealmDB(null, TABLE_TRACK_LOGS);
+        await syncZipService.moveImageFilesToSync(fieldDataList, PATH_BACKUP_TEMP)
         BACKUP_JSON.fieldData = fieldDataList
         BACKUP_JSON.job = jobList
         BACKUP_JSON.jobTransaction = transactionList

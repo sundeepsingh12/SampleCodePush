@@ -82,22 +82,30 @@ export class keyValueDb {
       case 'USER_EVENT_LOG':
         schemaInstance = require('../repositories/schema/userEventLog');
         break;
-      case 'USER_EXCEPTION_LOGS':
-        schemaInstance = require('../repositories/schema/userExceptionLogs');
+      case 'HUB':
+        schemaInstance = require('../repositories/schema/hub');
         break;
-      case 'HUB': 
-      schemaInstance = require('../repositories/schema/hub');
+      case 'PAGES':
+        schemaInstance = require('../repositories/schema/pages');
+        break;
+      case 'PAGES_ADDITIONAL_UTILITY':
+        schemaInstance = require('../repositories/schema/pagesAdditionalUtilities');
+        break;
       default:
         checkCondition = true;
     }
-    if (value && (checkCondition || validate(value, schemaInstance).valid)) {
-      return store.save(schemaName, {
-        value
-      }).then(() => {
-        return true;
-      }).catch(error => {
-        return error;
-      })
+    if (value) {
+      if (checkCondition || validate(value, schemaInstance).valid) {
+        return store.save(schemaName, {
+          value
+        }).then(() => {
+          return true;
+        }).catch(error => {
+          return error;
+        })
+      } else {
+        throw new Error(schemaName + ' validation failed')
+      }
     } else {
       const schemaCheck = await this.getValueFromStore(schemaName)
       if (!schemaCheck) {
@@ -121,7 +129,7 @@ export class keyValueDb {
       })
   }
 
-  getAllKeysFromStore(){
+  getAllKeysFromStore() {
     return store.keys()
   }
 
@@ -133,7 +141,7 @@ export class keyValueDb {
         break;
       case 'JOB_STATUS':
         schemaInstance = require('../repositories/schema/jobStatus');
-        break; 
+        break;
       case 'USER_SUMMARY':
         schemaInstance = require('../repositories/schema/userSummary');
         break;

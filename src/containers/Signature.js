@@ -103,7 +103,6 @@ class Signature extends PureComponent {
     }
     onDragEvent = () => {
         this.setState({ isSaveDisabled: false })
-        console.log("dragged");
     }
 
     headerView() {

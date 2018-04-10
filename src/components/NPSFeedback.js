@@ -12,6 +12,7 @@ import {
     SAVE,
     CANCEL
 } from '../lib/ContainerConstants'
+import styles from '../themes/FeStyle'
 
 class NPSFeedback extends PureComponent {
 
@@ -28,6 +29,8 @@ class NPSFeedback extends PureComponent {
         });
         if (this.props.showSave) {
             this.props.onStarPress(rating)
+        } else {
+            this.props.onSave(rating, this.props.item)
         }
     }
 
@@ -37,31 +40,18 @@ class NPSFeedback extends PureComponent {
                 <StarRating
                     disabled={false}
                     maxStars={5}
-                    rating={this.state.starCount}
+                    rating={(this.props.item && this.props.item.value) ? parseInt(this.props.item.value) : this.state.starCount}
                     selectedStar={(rating) => this.onStarRatingPress(rating)}
+                    fullStarColor={'#f6db7b'}
+                    emptyStar={'ios-star-outline'}
+                    iconSet={'Ionicons'}
+                    fullStar={'ios-star'}
+                    emptyStarColor={'#a3a3a3'}
                 />
-                {renderIf(!this.props.showSave,
-                    <View style={{ flexDirection: "row" }}>
-                        <TouchableHighlight style={styles.buttonStyle}
-                            onPress={() => { this.props.onSave(this.state.starCount, this.props.item) }} >
-                            <Text>{SAVE}</Text>
-                        </TouchableHighlight>
-
-                        <TouchableHighlight style={styles.buttonStyle}
-                            onPress={() => { this.props.onCancel() }} >
-                            <Text>{CANCEL}</Text>
-                        </TouchableHighlight>
-                    </View>)}
             </View>
 
         );
     }
 }
-const styles = StyleSheet.create({
-    buttonStyle: {
-        flex: 2, justifyContent: "center", alignItems: "center", height: 50,
-        backgroundColor: "#eeeeee",
-        margin: 10
-    }
-});
+
 export default NPSFeedback

@@ -67,12 +67,6 @@ function mapDispatchToProps(dispatch) {
 
 class SyncScreen extends PureComponent {
 
-  componentDidMount() {
-    this.props.actions.startMqttService(this.props.pieChart)
-    this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated')
-    this.props.actions.startTracking(this.props.trackingServiceStarted)
-  }
-
   getTransactionView() {
     let transactionList = this.props.unsyncedTransactionList
     let transactionView = []

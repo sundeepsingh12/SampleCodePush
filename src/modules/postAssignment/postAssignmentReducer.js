@@ -7,7 +7,6 @@ import {
     SET_POST_ASSIGNMENT_TRANSACTION_LIST,
     SET_POST_ASSIGNMENT_ERROR,
     SET_POST_SCAN_SUCCESS,
-    SET_POST_ASSIGNMENT_PARAMETERS
 } from '../../lib/constants'
 
 
@@ -22,6 +21,7 @@ export default function postAssignmentReducer(state = initialState, action) {
                 .set('scanSuccess', false)
                 .set('error', null)
                 .set('scanError', action.payload.scanError)
+                .set('jobMaster',action.payload.jobMaster)
 
         case SET_POST_ASSIGNMENT_ERROR:
             return state.set('error', action.payload.error)
@@ -34,9 +34,6 @@ export default function postAssignmentReducer(state = initialState, action) {
                 .set('error', null)
                 .set('scanError',action.payload.scanError)
 
-        case SET_POST_ASSIGNMENT_PARAMETERS:
-            return state.set('isForceAssignmentAllowed', action.payload.isForceAssignmentAllowed)
-                .set('isManualSelectionAllowed', action.payload.isManualSelectionAllowed)
     }
 
     return state

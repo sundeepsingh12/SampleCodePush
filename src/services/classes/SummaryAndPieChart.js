@@ -20,6 +20,9 @@ import {
     UNSEEN,
 } from '../../lib/AttributeConstants'
 
+import {jobMasterService} from '../classes/JobMaster'
+import _ from 'lodash'
+
 class SummaryAndPieChart {
 
     /**@function getAllStatusIdsCount()
@@ -29,11 +32,11 @@ class SummaryAndPieChart {
     *@return {pendingCounts : a, successCounts : b, failCounts : c}
     *
     */
-    async getAllStatusIdsCount() {
+    async getAllStatusIdsCount(jobMasterList) {
         const { allStatusMap, noNextStatusMap } = await jobStatusService.getStatusIdsForAllStatusCategory() // get all status list
         const allPendingSuccessFailIds = Object.keys(allStatusMap)
-        let jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-        const transactionList = this.getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, jobMasterList.value) // get all transactions for selected jobMAster list
+        let jobMasterIdList = (_.isEmpty(jobMasterList)) ? await jobMasterService.getJobMasterIdList() : jobMasterList
+        const transactionList = this.getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, jobMasterIdList) // get all transactions for selected jobMAster list
         const allTransactionOnTodaysDate = (transactionList.length) ? this.isTodaysDateTransactions(transactionList, noNextStatusMap) : [] // get transactions on today's date
         return this.setAllCounts(allTransactionOnTodaysDate, allStatusMap)
     }
@@ -64,7 +67,7 @@ class SummaryAndPieChart {
         jobMasterList.forEach(id => {
             jobMasterSummaryList[id.id] = { id: id.id, code: id.identifier, cashCollected : 0, cashCollectedByCard : 0, cashPayment : 0,  identifierColor: id.identifierColor, title: id.title, count: 0, 1: { count: 0, list: [] }, 2: { count: 0, list: [] }, 3: { count: 0, list: [] } }
         }) // map of jobMasterId and jobMaster Summary details Dto
-        const jobTransactions = this.getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, jobMasterList) // get transactions for summary
+        const jobTransactions = this.getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, Object.keys(jobMasterSummaryList)) // get transactions for summary
         const jobStatusIdCountMap = this.createJobStatusCountMap(jobTransactions, noNextStatusMap, jobSummaryList, jobMasterSummaryList) // get jobStatus and count map
         return this.buildJobMasterSummaryList(jobStatusList, jobMasterSummaryList, jobStatusIdCountMap)
     }
@@ -80,12 +83,12 @@ class SummaryAndPieChart {
     *
     */
 
-    getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, jobMasterList) {
+    getTransactionsForPieChartAndSummary(allPendingSuccessFailIds, jobMasterIdList) {
         let runsheetQuery = 'isClosed = true'// check for closed runsheet
         const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery)
         let runSheetIdListQuery = runsheetList.map((runsheet) => `runsheetId != ${runsheet.id}`).join(' AND ') // query for all runsheetList    
         let statusQuery = allPendingSuccessFailIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')// query for all status
-        let jobMasterQuery = jobMasterList.map(jobMasterId => 'jobMasterId = ' + jobMasterId.id).join(' OR ') // query for selected jobMaster
+        let jobMasterQuery = jobMasterIdList.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ') // query for selected jobMaster
         statusQuery = statusQuery && statusQuery.trim() !== '' ? `deleteFlag != 1 AND (${statusQuery})` : 'deleteFlag != 1'
         statusQuery = runSheetIdListQuery && runSheetIdListQuery.trim() !== '' ? `(${statusQuery}) AND (${runSheetIdListQuery})` : statusQuery
         statusQuery = jobMasterQuery && jobMasterQuery.trim() !== '' ? `(${statusQuery}) AND (${jobMasterQuery})` : statusQuery

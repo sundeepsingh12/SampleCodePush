@@ -9,7 +9,7 @@ import renderIf from '../lib/renderIf'
 import QRCode from 'react-native-qrcode-svg'
 import QRIcon from '../svg_components/icons/QRIcon'
 import _ from 'lodash'
-import { NA} from '../lib/AttributeConstants'
+import { NA } from '../lib/AttributeConstants'
 import * as sortingActions from '../modules/sorting/sortingActions'
 import * as globalActions from '../modules/global/globalActions'
 import React, { PureComponent } from 'react'
@@ -32,8 +32,8 @@ import {
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
-import {SORTING_SEARCH_VALUE,QrCodeScanner} from '../lib/constants'
-import { SORTING,SEARCH_INFO,POST_SEARCH_PLACEHOLDER,OK } from '../lib/ContainerConstants'
+import { SORTING_SEARCH_VALUE, QrCodeScanner, DEFAULT_ERROR_MESSAGE_IN_SORTING, SORTING_ITEM_DETAILS } from '../lib/constants'
+import { SORTING, SEARCH_INFO, POST_SEARCH_PLACEHOLDER, OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -45,7 +45,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...sortingActions,...globalActions}, dispatch)
+        actions: bindActionCreators({ ...sortingActions, ...globalActions }, dispatch)
     }
 }
 class SortingListing extends PureComponent {
@@ -68,7 +68,7 @@ class SortingListing extends PureComponent {
         )
     }
 
-    showSearchResultTitle(){
+    showSearchResultTitle() {
         return (
             <View style={[style.card, styles.row, styles.paddingTop15, styles.paddingBottom10]}>
                 <Text>
@@ -78,7 +78,7 @@ class SortingListing extends PureComponent {
         )
     }
 
-    showQrCodeLogo(){
+    showQrCodeLogo() {
         return (
             <View style={style.qrBox}>
                 <QRCode
@@ -93,11 +93,11 @@ class SortingListing extends PureComponent {
     render() {
         return (
             <View style={[styles.bgWhite]}>
-            {this.showSearchResultTitle()}
-               
+                {this.showSearchResultTitle()}
+
                 <View style={style.resultCard}>
-                {this.showQrCodeLogo()}
-                   
+                    {this.showQrCodeLogo()}
+
                     <View style={style.resultCardDetail}>
                         <View style={{ borderBottomWidth: 1, borderBottomColor: '#f3f3f3', marginBottom: 10, paddingBottom: 10 }}>
                             <Text style={[styles.fontDefault]}>
@@ -119,44 +119,56 @@ class SortingListing extends PureComponent {
 }
 
 class Sorting extends PureComponent {
-    componentDidmount(){
-        if(!_.isUndefined(this.props.navigation.state.params)){
+
+    componentDidmount() {
+        if (!_.isUndefined(this.props.navigation.state.params)) {
             this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))
-         }
+        }
     }
-    componentDidUpdate(){
-        if ((!_.isNull(this.props.errorMessage) && !_.isUndefined(this.props.errorMessage)  && this.props.errorMessage.length > 0)) {
+
+    componentDidUpdate() {
+        if (_.size(this.props.errorMessage)) {
             Toast.show({
                 text: this.props.errorMessage,
-                position: 'bottom' | "center", 
+                position: 'bottom' | "center",
                 buttonText: OK,
                 type: 'danger',
-                duration: 5000
+                duration: 5000,
+                onClose: this._setDefaultErrorMessage
             })
         }
     }
+
+    componentWillUnmount() {
+        this.props.actions.setState(SORTING_ITEM_DETAILS, {})
+    }
+
+    _setDefaultErrorMessage = () => {
+        this.props.actions.setState(DEFAULT_ERROR_MESSAGE_IN_SORTING, '')
+    }
+
     _onChangeReferenceValue = (value) => {
-        this.props.actions.setState(SORTING_SEARCH_VALUE, {value})
+        this.props.actions.setState(SORTING_SEARCH_VALUE, { value })
     }
 
     _searchForReferenceValue = (value) => {
         this.props.actions.getDataForSortingAndPrinting(value)
     }
 
-    _renderContent(){
-        if(this.props.loaderRunning){
-            return <Loader/>
+    _renderContent() {
+        if (this.props.loaderRunning) {
+            return <Loader />
         }
-        if(((this.props.searchRefereneceValue === '') && !(_.isEmpty(this.props.sortingDetails)) && this.props.sortingDetails[0].value !== NA)){
+        if (((this.props.searchRefereneceValue === '') && !(_.isEmpty(this.props.sortingDetails)) && this.props.sortingDetails[0].value !== NA)) {
             return <SortingListing sortingDetails={this.props.sortingDetails} />
-        }else{
+        } else {
             return <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                       <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{SEARCH_INFO}</Text>
-                  </View>
+                <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}>{SEARCH_INFO}</Text>
+            </View>
         }
     }
 
-    showReferenceNoInputView(){
+    showReferenceNoInputView() {
         return (
             <View style={[styles.relative, { width: '85%', height: 33 }]}>
                 <Input
@@ -165,8 +177,12 @@ class Sorting extends PureComponent {
                     placeholder={POST_SEARCH_PLACEHOLDER}
                     returnKeyType={"search"}
                     keyboardAppearance={"dark"}
-                    placeholderTextColor={'rgba(255,255,255,.4)'}
-                    style={[style.headerSearch]} />
+                    placeholderTextColor={'rgba(255,255,255,.6)'}
+                    selectionColor={'rgba(224, 224, 224,.5)'}
+                    underlineColorAndroid= {'transparent'}
+                    style={[style.headerSearch]}
+                    onSubmitEditing={() => this._searchForReferenceValue(this.props.searchRefereneceValue.value)}
+                />
                 <Button small transparent style={[style.inputInnerBtn]} onPress={() => this._searchForReferenceValue(this.props.searchRefereneceValue.value)}>
                     <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
                 </Button>
@@ -174,12 +190,12 @@ class Sorting extends PureComponent {
         )
     }
 
-    showTitleAndBackArrow(){
-        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : SORTING 
+    showTitleAndBackArrow() {
+        let headerView = this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : SORTING
         return (
             <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack(this._onChangeReferenceValue('')) }}>
+                <TouchableOpacity style={[style.headerLeft]} onPress={() => { this.props.navigation.goBack() }}>
                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
@@ -201,17 +217,17 @@ class Sorting extends PureComponent {
                             {this.showTitleAndBackArrow()}
 
                             <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10, styles.paddingBottom10]}>
-                               {this.showReferenceNoInputView()}
-                               
-                                <TouchableOpacity style={[{ width: '15%' },styles.marginLeft15]} onPress = {() =>   this.props.navigation.navigate(QrCodeScanner, {returnData: this._searchForReferenceValue.bind(this)})} >
-                                     <QRIcon width={30} height={30} color = {styles.fontWhite} />  
+                                {this.showReferenceNoInputView()}
+
+                                <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this._searchForReferenceValue.bind(this) })} >
+                                    <QRIcon width={30} height={30} color={styles.fontWhite} />
                                 </TouchableOpacity>
                             </View>
                         </Body>
                     </Header>
                     <Content style={[styles.flex1, styles.bgLightGray]}>
                         {renderView}
-                    </Content> 
+                    </Content>
                 </Container>
             </StyleProvider>
         )
