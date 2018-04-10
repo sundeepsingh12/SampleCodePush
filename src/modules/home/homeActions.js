@@ -20,7 +20,6 @@ import {
   SYNC_ERROR,
   SYNC_STATUS,
   PENDING,
-  LiveJobs,
   PIECHART,
   LAST_SYNC_WITH_SERVER,
   LAST_SYNC_TIME,
@@ -50,7 +49,10 @@ import {
   CustomApp,
   Sorting,
   Statistics,
-  Backup
+  Backup,
+  LiveJobs,
+  OfflineDS,
+  ProfileView
 } from '../../lib/constants'
 
 import {
@@ -176,7 +178,7 @@ export function navigateToPage(pageObject) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-        dispatch(navigateToScene(Backup, { pageObject }));
+        dispatch(navigateToScene(Backup,  { displayName: (pageObject.name) ? pageObject.name : 'BackUp'}));
         break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
@@ -195,7 +197,8 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob'}));
+        break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
@@ -205,7 +208,8 @@ export function navigateToPage(pageObject) {
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore'}))
+        break;
         case PAGE_OUTSCAN:
           dispatch(navigateToScene(PostAssignmentScanner, { pageObject }))
           break
@@ -214,16 +218,17 @@ export function navigateToPage(pageObject) {
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile'}))
+        break;
         case PAGE_SEQUENCING: {
           dispatch(getRunsheetsForSequence(pageObject));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, pageObject))
+          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting'}))
           break;
         case PAGE_STATISTICS:
-          dispatch(navigateToScene(Statistics, pageObject))
+          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics'}))
           break;
         case PAGE_TABS:
           dispatch(navigateToScene(TabScreen, { pageObject }));
