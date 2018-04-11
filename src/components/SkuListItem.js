@@ -4,6 +4,7 @@ import {
     StyleSheet,
     View,
     Text,
+    Slider,
 } from 'react-native'
 import styles from '../themes/FeStyle'
 import {
@@ -12,9 +13,9 @@ import {
     SKU_REASON,
     SKU_PHOTO,
     REASON,
-    NA    
+    NA
 } from '../lib/AttributeConstants'
-import { CheckBox, Picker, Content, Icon } from 'native-base'
+import { CheckBox, Picker, Content, Icon, Input } from 'native-base'
 import _ from 'lodash'
 import {
     CameraAttribute,
@@ -63,43 +64,66 @@ class SkuListItem extends PureComponent {
                 reasonList.splice(0, 1)
             }
             return (
-            <View style={[{flexBasis: '60%', height: 40}]}>
-                <Picker 
+                <View style={[styles.flexBasis50, { height: 40 }]}>
+                    <Picker
                         mode="dropdown"
                         placeholder={SELECT_ANY_REASON}
                         selectedValue={rowItem.value}
                         onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
-                  {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={-987654321} /> */}
-                    {this._populateSkuItems(reasonList)}
-                </Picker>
-            </View>)
+                        {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={-987654321} /> */}
+                        {this._populateSkuItems(reasonList)}
+                    </Picker>
+                </View>)
         } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
-        let isImageAlreadyCaptured = this._getIconForImageAlreadyCaptured(rowItem)
-                return (
-                    <View style={[styles.row, styles.justifyCenter]}>
-                        <Text style={[styles.flexBasis30, styles.fontDefault, styles.padding10]}
-                            onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
-                            {OPEN_CAMERA}
-                        </Text>
-                        {isImageAlreadyCaptured}
-                    </View>)
-            
+            let isImageAlreadyCaptured = this._getIconForImageAlreadyCaptured(rowItem)
+            return (
+                <View style={[styles.row, styles.justifyCenter]}>
+                    <Text style={[styles.flexBasis30, styles.fontDefault, styles.padding10]}
+                        onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
+                        {OPEN_CAMERA}
+                    </Text>
+                    {isImageAlreadyCaptured}
+                </View>)
+
         } else if(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY){
             let quantitySelector
             if (originalQuantityValue <= 1) {
-                quantitySelector = 
-                <View>
-                <CheckBox style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
-                </View>
+                quantitySelector =
+                    <View>
+                    <CheckBox style={[style.cardCheckbox, styles.bgPrimary, styles.marginTop20]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
+                    </View>
             }
             else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
-    
-                quantitySelector = <Picker
-                    mode="dropdown"
-                    selectedValue={rowItem.value}
-                    onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)} >
-                    {this._populateItems(originalQuantityValue)}
-                </Picker>
+
+                //quantitySelector =   <Picker
+                //     mode="dropdown"
+                //     selectedValue={rowItem.value}
+                //     onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)} >
+                //     {this._populateItems(originalQuantityValue)}
+                // </Picker>
+
+                quantitySelector = <View style={[styles.flex1, styles.row]}>
+                    <View style={[styles.flexBasis80, styles.paddingRight5]}>
+                        <Slider
+                            thumbTintColor='#00796B'
+                            maximumTrackTintColor='#00796B'
+                            minimumTrackTintColor='#00796B'
+                            value={parseInt(rowItem.value)}
+                            maximumValue={parseInt(originalQuantityValue[0])}
+                            minimumValue={0}
+                            onSlidingComplete={(value) => this.changeSkuActualQuantity(value, rowItem)}
+                        />
+                    </View>
+                    <Input
+                        style={[styles.flexBasis20, { borderColor: '#00796B', borderWidth: 1, height: 33 }]}
+                        editable={true}
+                        maxLength={4}
+                        keyboardType={'numeric'}
+                        returnKeyType='done'
+                        value={parseInt(rowItem.value).toString()}
+                        onChangeText={(value) => this.changeSkuActualQuantity(value, rowItem)}
+                    />
+                </View>
             }
             return (
                 <View style={[{flexBasis: '60%', height: 40}]}>
@@ -108,9 +132,11 @@ class SkuListItem extends PureComponent {
             )
         }else {
             return (
-                <Text style={[styles.flexBasis60, styles.fontDefault, styles.padding10]}>
-                    {(rowItem.attributeTypeId == SKU_REASON || rowItem.attributeTypeId == SKU_PHOTO) ? NA :rowItem.value}
-                </Text>
+                <View style={[styles.column, styles.justifyCenter, styles.flex1]}>
+                    <Text style={[styles.fontDefault]}>
+                        {(rowItem.attributeTypeId == SKU_REASON || rowItem.attributeTypeId == SKU_PHOTO) ? NA : rowItem.value}
+                    </Text>
+                </View>
             )
         }
     }
@@ -118,13 +144,18 @@ class SkuListItem extends PureComponent {
     renderListRow(rowItem, originalQuantityValue) {
         if (rowItem.attributeTypeId != SKU_ORIGINAL_QUANTITY) {
             return (
-                <View key={rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal5, {height: 50}]}>
-                        <View style={[styles.row]}>
-                            <Text style={[styles.flexBasis40, styles.fontSm, styles.justifyCenter, styles.paddingTop10]} >
-                                {rowItem.label}
-                            </Text>
+                <View key={rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal10, { height: 'auto' }]}>
+                    <View style={[styles.row]}>
+
+                        {!(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY && originalQuantityValue > 1 && originalQuantityValue <= 1000) && <View style={[styles.flexBasis50, styles.column, styles.justifyCenter, { height: 60 }]}><Text style={[styles.fontSm]}>
+                            {rowItem.label}
+                        </Text></View>}
+
+
+                        <View style={[styles.width100, { height: 60 }]}>
                             {this._displaySkuItems(rowItem, originalQuantityValue)}
-                        </View> 
+                        </View>
+                    </View>
                 </View>
             )
         }
@@ -141,30 +172,6 @@ class SkuListItem extends PureComponent {
     }
 }
 const style = StyleSheet.create({
-    header: {
-        borderBottomWidth: 0,
-        height: 'auto',
-        paddingTop: 10,
-        paddingBottom: 10
-    },
-    headerIcon: {
-        width: 24
-    },
-    headerSearch: {
-        paddingLeft: 10,
-        paddingRight: 30,
-        backgroundColor: '#1260be',
-        borderRadius: 2,
-        height: 30,
-        color: '#fff',
-        fontSize: 10
-    },
-    headerQRButton: {
-        position: 'absolute',
-        right: 5,
-        paddingLeft: 0,
-        paddingRight: 0
-    },
     card: {
         marginBottom: 10,
         backgroundColor: '#ffffff',
@@ -177,19 +184,7 @@ const style = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 2
     },
-    cardLeftTopRow: {
-        flexDirection: 'row',
-        borderBottomColor: '#f3f3f3',
-        borderBottomWidth: 1
-    },
-    cardRight: {
-        width: 40,
-        position: 'relative',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
     cardCheckbox: {
-        backgroundColor: 'green',
         borderRadius: 0,
     }
 

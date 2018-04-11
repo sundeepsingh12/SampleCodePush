@@ -34,7 +34,9 @@ import _ from 'lodash'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import * as globalActions from '../modules/global/globalActions'
-
+import SearchBarV2 from '../components/SearchBarV2'
+import { SEARCH_PLACE_HOLDER } from '../lib/ContainerConstants'
+import { SET_SKU_CODE } from '../lib/constants'
 class SkuListing extends PureComponent {
 
   componentDidMount() {
@@ -45,7 +47,7 @@ class SkuListing extends PureComponent {
 
   renderData(item) {
     return (
-      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList = {this.props.reasonsList} navigateToScene = {this.props.actions.navigateToScene.bind(this)}/>
+      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} />
     )
   }
 
@@ -61,7 +63,27 @@ class SkuListing extends PureComponent {
     return { header: null }
   }
 
+  setSearchText = (searchText) => {
+    console.logs('setSearchText', this.props.searchText)
+    this.props.actions.setState(SET_SKU_CODE, searchText)
+  }
+
+  returnValue = (searchText) => {
+    console.logs('returnValue', this.props.searchText, this.props.skuObjectValidation)
+    this.setSearchText(searchText)
+    this.props.actions.scanSkuItem(this.props.skuListItems, searchText, this.props.skuObjectValidation)
+  }
+
+  searchIconPressed = () => {
+    console.logs('searchIconPressed', this.props.searchText)
+    console.logs('skuListItems before-->', this.props.skuListItems)
+    if (this.props.searchText) {
+      this.props.actions.scanSkuItem(this.props.skuListItems, this.props.searchText, this.props.skuObjectValidation)
+    }
+  }
+
   render() {
+    console.logs('render inn sku', this.props.skuListItems)
     if (this.props.skuListingLoading) {
       return <Loader />
     }
@@ -78,16 +100,7 @@ class SkuListing extends PureComponent {
                     style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
                   <View />
                 </View>
-                {/* <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.relative]}>
-                <Input
-                  placeholder="Filter Reference Numbers"
-                  placeholderTextColor={'rgba(255,255,255,.4)'}
-                  style={[style.headerSearch]}/>
-                <Button small transparent style={[style.headerQRButton]}>
-                  <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXl]}/>
-                </Button>
-              </View> */}
+                <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />
               </Body>
 
             </Header>
@@ -133,13 +146,13 @@ class SkuListing extends PureComponent {
       this.props.actions.scanSkuItem(this.props.skuListItems, searchTerm)
     }
   }
-  
+
   saveSkuList = () => {
-      this.props.actions.saveSkuListItems(
-        this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
-        this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
-        this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-        this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason)
+    this.props.actions.saveSkuListItems(
+      this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
+      this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
+      this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
+      this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason)
   }
 }
 
@@ -154,6 +167,7 @@ function mapStateToProps(state) {
     skuObjectAttributeId: state.skuListing.skuObjectAttributeId,
     skuValidationForImageAndReason: state.skuListing.skuValidationForImageAndReason,
     reasonsList: state.skuListing.reasonsList,
+    searchText: state.skuListing.searchText,
   }
 }
 

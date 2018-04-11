@@ -68,9 +68,23 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
     }
 }
 
-export function scanSkuItem(skuListItems, skuCode) {
+export function scanSkuItem(skuListItems, skuCode, skuObjectValidation) {
     return async function (dispatch) {
-//use try catch and dispatch showToastAndAddUserExceptionLog in catch
+        try {
+            let { errorMessage, cloneSKUListItems } = await skuListing.scanSKUCode(skuListItems, skuCode, skuObjectValidation)
+            if (errorMessage) {
+                Toast.show({
+                    text: errorMessage,
+                    position: 'bottom',
+                    buttonText: 'OK'
+                })
+            } else {
+                dispatch(setState(UPDATE_SKU_LIST_ITEMS, cloneSKUListItems))
+            }
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(2204, error.message, 'danger', 1))
+        }
+        //use try catch and dispatch showToastAndAddUserExceptionLog in catch
     }
 }
 
@@ -90,7 +104,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                 if (rowItem.attributeTypeId == SKU_PHOTO) {
                     value = await signatureService.saveFile(value, moment(), true)
                     dispatch(NavigationActions.back())
-                    dispatch(setState(SET_SHOW_VIEW_IMAGE, {imageData: '', showImage: false, viewData: '' }))
+                    dispatch(setState(SET_SHOW_VIEW_IMAGE, { imageData: '', showImage: false, viewData: '' }))
                 }
                 let copyOfskuListItems = _.cloneDeep(skuListItems)
                 copyOfskuListItems[rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
@@ -127,7 +141,7 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                         text: `Please Fill all the Required Details`,
                         position: 'bottom',
                         buttonText: 'OK'
-                    }) 
+                    })
                 } else {
                     let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, latestPositionId)
                     dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))

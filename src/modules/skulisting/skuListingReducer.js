@@ -11,6 +11,7 @@ import {
     UPDATE_SKU_ACTUAL_QUANTITY,
     RESET_STATE,
     UPDATE_SKU_LIST_ITEMS,
+    SET_SKU_CODE,
 } from '../../lib/constants'
 
 
@@ -18,33 +19,36 @@ export default function skuListingReducer(state = initialState, action) {
     if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
 
     switch (action.type) {
-        case SKU_LIST_FETCHING_START :
-            return state.set('skuListingLoading',action.payload)
+        case SKU_LIST_FETCHING_START:
+            return state.set('skuListingLoading', action.payload)
 
-        case SKU_LIST_FETCHING_STOP :
-            return state.set('skuListItems',action.payload.skuListItems)
-                        .set('skuListingLoading',false)
-                        .set('skuObjectValidation',action.payload.skuObjectValidation)
-                        .set('skuChildItems',action.payload.skuArrayChildAttributes)
-                        .set('skuObjectAttributeId',action.payload.skuObjectAttributeId)
-                        .set('skuValidationForImageAndReason',action.payload.skuValidationForImageAndReason)
-                        .set('reasonsList', action.payload.reasonsList)
-        case  SHOW_SEARCH_BAR :
-            return state.set('isSearchBarVisible',true)     
-        
+        case SKU_LIST_FETCHING_STOP:
+            return state.set('skuListItems', action.payload.skuListItems)
+                .set('skuListingLoading', false)
+                .set('skuObjectValidation', action.payload.skuObjectValidation)
+                .set('skuChildItems', action.payload.skuArrayChildAttributes)
+                .set('skuObjectAttributeId', action.payload.skuObjectAttributeId)
+                .set('skuValidationForImageAndReason', action.payload.skuValidationForImageAndReason)
+                .set('reasonsList', action.payload.reasonsList)
+        case SHOW_SEARCH_BAR:
+            return state.set('isSearchBarVisible', true)
+
         case SKU_CODE_CHANGE:
-         return state.set('skuSearchTerm',action.payload)
+            return state.set('skuSearchTerm', action.payload)
 
         case UPDATE_SKU_ACTUAL_QUANTITY:
-          return state.set('skuListItems',action.payload.skuListItems)
-                      .set('skuChildItems',action.payload.skuRootChildElements) 
+            return state.set('skuListItems', action.payload.skuListItems)
+                .set('skuChildItems', action.payload.skuRootChildElements)
 
         case UPDATE_SKU_LIST_ITEMS:
             return state.set('skuListItems', action.payload)
 
         case RESET_STATE:
-            return initialState              
-    
+            return initialState
+
+        case SET_SKU_CODE:
+            return state.set('searchText', action.payload)
+
     }
     return state
 }

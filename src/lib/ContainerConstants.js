@@ -217,6 +217,11 @@ module.exports = {
     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
     REASON: 'Reason',
     OPEN_CAMERA: 'Open Camera',
+    SEARCH_PLACE_HOLDER: 'Search SKU Code',
+    ORIGNAL_QUANTITY: 'ORIGONAL QUANTITY',
+    ACTUAL_QUANTITY: 'ACTUAL QUANTITY',
+    SKU_CODE_MAX_LIMIT_REACHED: 'Maximum value reached',
+    SKU_CODE_MIN_LIMIT_REACHED: 'Minimum value reached',
 
     //Array
     TOTAL_COUNT: 'Total Count : ',
@@ -327,19 +332,19 @@ module.exports = {
     REMEMBER_ME: 'Remember Me',
 
     //Preloader
-    SETTING_UP:'Setting you up...',
-    DOWNLOAD_SETTINGS:'Downloading settings',
-    APPLYING_SETTINGS:'Applying settings',
-    VERIFY_HANDSET:'Verifying handset',
-    VERIFY_MOBILE:'Verify your mobile',
-    OTP_CODE_SENT:'OTP code hasbeen sent to',
-    ENTER_MOBILE:'Enter your mobile',
-    SEND_OTP:'Send OTP',
+    SETTING_UP: 'Setting you up...',
+    DOWNLOAD_SETTINGS: 'Downloading settings',
+    APPLYING_SETTINGS: 'Applying settings',
+    VERIFY_HANDSET: 'Verifying handset',
+    VERIFY_MOBILE: 'Verify your mobile',
+    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    ENTER_MOBILE: 'Enter your mobile',
+    SEND_OTP: 'Send OTP',
 
     // Job Summary
     UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
     VALUE_OF_JOBSUMMARY_IS_MISSING: 'Value of JobSummary is missing',
 
-     //Data Store
-     SEARCH: 'Search',
+    //Data Store
+    SEARCH: 'Search',
 }
