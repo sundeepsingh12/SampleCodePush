@@ -187,7 +187,11 @@ export function onSave(fieldAttributeMasterId, formElements, isSaveDisabled, dat
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStorevalue, formElements, rowId, null, NEXT_FOCUS, 1, null, fieldAttributeMasterParentIdMap))
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(705, error.message, 'danger', 1)
+            showToastAndAddUserExceptionLog(705, error.message, 'danger', 0)
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
         }
     }
 }

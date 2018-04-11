@@ -389,7 +389,10 @@ describe('test getSequenceList', () => {
 
     it('gives jobTransaction List', () => {
         let runsheetNumber = 123
-        return sequenceService.getSequenceList(123).then(() => {
+        jobTransactionService.getAllJobTransactionsCustomizationList.mockReturnValue({
+            jobTransactionCustomizationList: {}
+        })
+        return sequenceService.getSequenceList(123, [123, 234]).then(() => {
             expect(jobStatusService.getNonUnseenStatusIdsForStatusCategory).toHaveBeenCalledTimes(1)
             expect(transactionCustomizationService.getJobListingParameters).toHaveBeenCalledTimes(1)
             expect(jobTransactionService.getAllJobTransactionsCustomizationList).toHaveBeenCalledTimes(1)
