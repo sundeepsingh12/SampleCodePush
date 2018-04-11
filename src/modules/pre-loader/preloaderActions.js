@@ -77,7 +77,7 @@ import {
   UnsyncBackupUpload,
   GEO_FENCING,
   PAGES,
-  PAGES_ADDITIONAL_UTILITY
+  PAGES_ADDITIONAL_UTILITY,
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -93,9 +93,15 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
-import { LOGOUT_UNSUCCESSFUL, OK } from '../../lib/ContainerConstants'
+import { LOGOUT_UNSUCCESSFUL, OK,DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
+import codePush from "react-native-code-push"
+import {
+  Platform,
+}
+  from 'react-native'
+
 
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
@@ -390,6 +396,7 @@ export function startLoginScreenWithoutLogout() {
   }
 }
 
+
 /**Called when preloader container is mounted or when user clicks on Retry button
  * 
  * @param {*} configDownloadService 
@@ -438,35 +445,48 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
-      showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0)
-      const keys = [
-        JOB_MASTER,
-        JOB_ATTRIBUTE,
-        JOB_ATTRIBUTE_VALUE,
-        FIELD_ATTRIBUTE,
-        FIELD_ATTRIBUTE_VALUE,
-        JOB_STATUS,
-        TAB,
-        CUSTOMER_CARE,
-        SMS_TEMPLATE,
-        USER_SUMMARY,
-        JOB_SUMMARY,
-        SMS_JOB_STATUS,
-        JOB_MASTER_MONEY_TRANSACTION_MODE,
-        FIELD_ATTRIBUTE_STATUS,
-        FIELD_ATTRIBUTE_VALIDATION,
-        FIELD_ATTRIBUTE_VALIDATION_CONDITION,
-        JOB_LIST_CUSTOMIZATION,
-        CUSTOMIZATION_APP_MODULE,
-        USER,
-        CUSTOMIZATION_LIST_MAP,
-        TABIDMAP,
-        JOB_ATTRIBUTE_STATUS,
-        PAGES,
-        PAGES_ADDITIONAL_UTILITY
-      ]
-      await keyValueDBService.deleteValueFromStore(keys)
-      dispatch(jobMasterSavingFailure(error.message))
+      if (error.message == DOWNLOAD_LATEST_APP_VERSION) {
+        dispatch(setState(DOWNLOAD_LATEST_APP,{displayMessage:error.message,downloadUrl:error.downloadUrl}))
+      } 
+      else if (error.message == 'App outdated') {
+        codePush.sync({
+          updateDialog: (Platform.OS === 'ios') ? false : true,
+          installMode: codePush.InstallMode.IMMEDIATE
+        }, (status) => {
+
+        });
+      }
+      else {
+        showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0)
+        const keys = [
+          JOB_MASTER,
+          JOB_ATTRIBUTE,
+          JOB_ATTRIBUTE_VALUE,
+          FIELD_ATTRIBUTE,
+          FIELD_ATTRIBUTE_VALUE,
+          JOB_STATUS,
+          TAB,
+          CUSTOMER_CARE,
+          SMS_TEMPLATE,
+          USER_SUMMARY,
+          JOB_SUMMARY,
+          SMS_JOB_STATUS,
+          JOB_MASTER_MONEY_TRANSACTION_MODE,
+          FIELD_ATTRIBUTE_STATUS,
+          FIELD_ATTRIBUTE_VALIDATION,
+          FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+          JOB_LIST_CUSTOMIZATION,
+          CUSTOMIZATION_APP_MODULE,
+          USER,
+          CUSTOMIZATION_LIST_MAP,
+          TABIDMAP,
+          JOB_ATTRIBUTE_STATUS,
+          PAGES,
+          PAGES_ADDITIONAL_UTILITY
+        ]
+        await keyValueDBService.deleteValueFromStore(keys)
+        dispatch(jobMasterSavingFailure(error.message))
+      }
     }
   }
 }
@@ -661,3 +681,6 @@ export function invalidateUserSessionWhenLogoutPressed(createBackup) {
     }
   }
 }
+
+
+

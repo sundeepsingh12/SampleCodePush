@@ -69,6 +69,7 @@ module.exports = keyMirror({
     TOGGLE_CHECKBOX: null,
     REMEMBER_ME_SET_TRUE: null,
     OTP_SUCCESS: null,
+    DOWNLOAD_LATEST_APP:null,
 
     //Home Actions
     HOME_LOADING: null,

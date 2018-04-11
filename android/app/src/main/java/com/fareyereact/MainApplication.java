@@ -3,6 +3,7 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.cnull.apkinstaller.ApkInstallerPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.airbnb.android.react.lottie.LottiePackage;
@@ -46,6 +47,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ApkInstallerPackage(),
             new RNCameraPackage(),
             new RNBackgroundFetchPackage(),
             new LottiePackage(),

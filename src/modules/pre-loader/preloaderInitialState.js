@@ -1,7 +1,5 @@
 'use strict'
-/**
- * ## Import
- */
+
 const {Record} = require('immutable')
 
 import {
@@ -10,7 +8,6 @@ import {
   SERVICE_SUCCESS,
   SERVICE_FAILED
 } from '../../lib/constants'
-
 
 var InitialState = Record({
   configDownloadService: SERVICE_PENDING, //Possible values => Constants.SERVICE_PENDING/ RUNNING/ SUCCESS/ FAILED
@@ -30,7 +27,9 @@ var InitialState = Record({
   isOtpScreenLogoutDisabled:false, //logout button which is displayed in enter opt screen
   isMobileScreenLogoutDisabled:false, //logout button which is displayed in enter mobile no screen
   mobileDisplayMessage:'', //message which will be displayed in mobile no screen
-  otpDisplayMessage:'' //message which will be displayed in otp screen
+  otpDisplayMessage:'', //message which will be displayed in otp screen,
+  downloadLatestAppMessage:null,
+  downloadUrl:null
 })
 
 export default InitialState

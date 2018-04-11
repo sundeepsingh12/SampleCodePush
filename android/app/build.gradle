@@ -141,6 +141,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':react-native-apk-installer')
     compile project(':react-native-background-fetch')
     compile project(':lottie-react-native')
     compile project(':react-native-bluetooth-serial')

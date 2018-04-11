@@ -21,7 +21,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf'
-import codePush from "react-native-code-push"
 import { QrCodeScanner } from '../lib/constants'
 import Icon from '../../native-base-theme/components/Icon'
 import {
@@ -113,15 +112,6 @@ class Login extends PureComponent {
     this.props.toggleCheckbox()
   }
 
-  codepushSync = () => {
-    codePush.sync({
-      updateDialog: (Platform.OS === 'ios')?false:true,
-      installMode: codePush.InstallMode.IMMEDIATE
-    }, (status) => {
-      console.log("====Code push update=====");
-      console.log(status);
-    });
-  }
 
   getImageView() {
     if (this.props.auth.form.authenticationService || this.props.auth.form.isLongPress) {

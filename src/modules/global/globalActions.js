@@ -27,7 +27,8 @@ import {
   PENDING_SYNC_TRANSACTION_IDS,
   BACKUP_ALREADY_EXIST,
   USER_EXCEPTION_LOGS,
-  SYNC_RUNNING_AND_TRANSACTION_SAVING
+  SYNC_RUNNING_AND_TRANSACTION_SAVING,
+  DOWNLOAD_LATEST_APP
 } from '../../lib/constants'
 
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -49,7 +50,6 @@ export function setState(type, payload) {
     payload
   }
 }
-
 
 //Use to navigate to other scene
 export function navigateToScene(routeName, params) {
@@ -105,6 +105,20 @@ export function resetNavigationState(index, actions) {
       index: 0,
       actions
     }))
+  }
+}
+
+
+export function resetApp() {
+  return async function (dispatch) {
+    try {
+      await logoutService.deleteDataBase()
+      const allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
+      await keyValueDBService.deleteValueFromStore(allSchemaInstance)
+      dispatch(setState(DOWNLOAD_LATEST_APP, {displayMessage:null}))
+    } catch (error) {
+      console.log('error1', error)
+    }
   }
 }
 

@@ -368,5 +368,8 @@ module.exports = {
 
     //Menu Container Constants
     APP: 'App',
-    LOGOUT: 'Logout'
+    LOGOUT: 'Logout',
+
+    //CodePush Constants
+    DOWNLOAD_LATEST_APP_VERSION:'You must download latest version to proceed'
 }

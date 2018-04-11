@@ -41,7 +41,12 @@ import {
 import {
   UNSEEN,
 } from '../../lib/AttributeConstants'
+import {
+  DOWNLOAD_LATEST_APP_VERSION
+} from '../../lib/ContainerConstants'
 import _ from 'lodash'
+import package_json from '../../../package.json'
+
 
 class JobMaster {
   /**
@@ -131,6 +136,22 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    //Server side changes needed
+    //Node names : downloadUrl,applicationVersion,minorPatchVersion
+    const packageJsonVersion = package_json.version.split('.')[0]
+    const downloadUrl = json.downloadUrl
+    if(json.applicationVersion > packageJsonVersion){
+      throw ({message:DOWNLOAD_LATEST_APP_VERSION,downloadUrl})
+    }
+    const minorPatchVersion = json.minorPatchVersion
+    const minorVersionFromServer = minorPatchVersion.split('.')[0]
+    const patchVersionFromServer = minorPatchVersion.split('.')[1]
+    const appMinorVersion =  package_json.version.split('.')[1]
+    const appPatchVersion = package_json.version.split('.')[2]
+    if((minorVersionFromServer > appMinorVersion) ||((minorVersionFromServer ==  appMinorVersion) && (patchVersionFromServer > appPatchVersion))){
+      throw new Error('App outdated')
+    }
+
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
     await keyValueDBService.validateAndSaveData(USER, json.user);

@@ -48,6 +48,7 @@ import {
   PRELOADER_SUCCESS,
   OTP_SUCCESS,
   ERROR_400_403_LOGOUT_FAILURE,
+  DOWNLOAD_LATEST_APP
 } from '../../lib/constants'
 
 /**
@@ -182,6 +183,10 @@ export default function preloaderReducer(state = initialState, action) {
 
     case OTP_SUCCESS: 
       return state.set('showOtpScreen',false)
+
+    case DOWNLOAD_LATEST_APP:
+      return state.set('downloadLatestAppMessage',action.payload.displayMessage)
+                  .set('downloadUrl',action.payload.downloadUrl)
   }
   return state
 }
