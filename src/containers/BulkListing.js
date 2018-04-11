@@ -194,7 +194,7 @@ class BulkListing extends PureComponent {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{BULK_UPDATE}</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>
@@ -220,7 +220,7 @@ class BulkListing extends PureComponent {
     })
     nextStatusNames.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
     const nextStatusIds = this.props.nextStatusList.map(nextStatus => nextStatus.id)
-
+    
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
@@ -234,7 +234,7 @@ class BulkListing extends PureComponent {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{(this.props.navigation.state.params.groupId) ? this.props.navigation.state.params.groupId : BULK_UPDATE}</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg]}>{(this.props.navigation.state.params.pageObject.groupId) ? this.props.navigation.state.params.pageObject.groupId : this.props.navigation.state.params.pageObject.name}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                   {this.props.isSelectAllVisible ?
@@ -274,7 +274,7 @@ class BulkListing extends PureComponent {
                 ) : this.goToFormLayout(nextStatusIds[0], nextStatusNames[0].text)
               }}
               success full
-              disabled={_.isEmpty(this.props.selectedItems)}
+              disabled={_.isEmpty(this.props.selectedItems) || (this.props.navigation.state.params.pageObject.groupId && !_.isEqual(_.size(this.props.bulkTransactionList),_.size(this.props.selectedItems)))}
             >
               <Text style={[styles.fontLg, styles.fontWhite]}>{UPDATE_ALL_SELECTED}</Text>
             </Button>

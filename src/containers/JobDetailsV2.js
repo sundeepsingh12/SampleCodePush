@@ -421,12 +421,11 @@ class JobDetailsV2 extends PureComponent {
   }
 
   updateTransactionForGroupId(groupId) {
-    this.props.actions.navigateToScene(BulkListing, {
-      jobMasterId: this.props.jobTransaction.jobMasterId,
-      statusId: this.props.currentStatus.id,
-      nextStatusList: this.props.currentStatus.nextStatusList,
-      groupId
-    })
+    this.props.actions.navigateToScene(BulkListing, {pageObject : {
+      jobMasterIds: [this.props.jobTransaction.jobMasterId],
+      additionalParams: {statusId : this.props.currentStatus.id},
+      groupId: groupId
+    }})
   }
   
   selectStatusToRevert = () => {

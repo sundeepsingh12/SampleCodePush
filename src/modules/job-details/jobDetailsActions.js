@@ -70,7 +70,7 @@ export function getJobDetails(jobTransactionId) {
             const details = await jobTransactionService.prepareParticularStatusTransactionDetails(jobTransactionId, jobAttributeMasterList.value, jobAttributeStatusList.value, fieldAttributeMasterList.value, fieldAttributeStatusList.value, null, null, statusList.value)
             if(details.checkForSeenStatus) dispatch(performSyncService())
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(details.jobTransactionDisplay.jobMasterId)
-            const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? await jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
+            const errorMessage = (jobMaster[0].enableOutForDelivery) || (jobMaster[0].enableResequenceRestriction || (details.jobTime != null && details.jobTime != undefined)) ? jobDetailsService.checkForEnablingStatus(jobMaster[0].enableOutForDelivery,
                 jobMaster[0].enableResequenceRestriction, details.jobTime, jobMasterList, details.currentStatus.tabId, details.seqSelected, statusList, jobTransactionId, details.currentStatus.actionOnStatus) : false
             const jobExpiryData = (!errorMessage && details.jobDataObject.dataMap[JOB_EXPIRY_TIME]) ? (Object.values(details.jobDataObject.dataMap[JOB_EXPIRY_TIME])[0]) : null
             const jobExpiryTime = jobExpiryData && jobExpiryData.data ? jobExpiryData.data.value : null
@@ -118,18 +118,18 @@ export function setAllDataOnRevert(jobTransaction, statusTo, navigation) {
             await jobDetailsService.setAllDataForRevertStatus(statusList, jobTransaction, statusTo)
             dispatch(performSyncService())
             dispatch(pieChartCount())
-            dispatch(fetchJobs())
-            let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : false
-            if (landingId) {
-                await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
+            //dispatch(fetchJobs())
+            //let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : false
+            //if (landingId) {
+            //    await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
                 dispatch(NavigationActions.reset({
-                    index: 1,
+                    index: 0,
                     actions: [
                         NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                        NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
+                       // NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
                     ]
                 }))
-            } else { dispatch(navigation.goBack()) }
+            //} else { dispatch(navigation.goBack()) }
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
             showToastAndAddUserExceptionLog(1103, error.message, 'danger', 0)                    

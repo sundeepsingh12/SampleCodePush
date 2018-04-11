@@ -53,7 +53,7 @@ class JobSummary {
     }
 
     if (!jobStatusIdJobSummaryMap) {
-      throw new Error('Unable to update Job Summary')
+      throw new Error(UNABLE_TO_UPDATE_JOB_SUMMARY)
     }
     let jobSummaryIdJobSummaryObjectMap = {}
     let currentDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')

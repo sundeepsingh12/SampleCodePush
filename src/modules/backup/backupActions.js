@@ -97,7 +97,7 @@ export function uploadBackupFile(index, filesMap) {
                 dispatch(setState(SET_BACKUP_VIEW, 3))
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(203, error.message, 'danger', 1)            
+            showToastAndAddUserExceptionLog(203, error.message, 'danger', 0)          
             dispatch(setState(SET_BACKUP_VIEW, 3))
         }
     }

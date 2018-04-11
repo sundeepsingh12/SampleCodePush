@@ -21,6 +21,7 @@ import {
 } from '../../lib/AttributeConstants'
 
 import {jobMasterService} from '../classes/JobMaster'
+import _ from 'lodash'
 
 class SummaryAndPieChart {
 

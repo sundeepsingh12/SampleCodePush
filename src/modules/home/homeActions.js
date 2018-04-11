@@ -20,7 +20,6 @@ import {
   SYNC_ERROR,
   SYNC_STATUS,
   PENDING,
-  LiveJobs,
   PIECHART,
   LAST_SYNC_WITH_SERVER,
   LAST_SYNC_TIME,
@@ -49,7 +48,11 @@ import {
   PostAssignmentScanner,
   CustomApp,
   Sorting,
-  Statistics
+  Statistics,
+  Backup,
+  LiveJobs,
+  OfflineDS,
+  ProfileView
 } from '../../lib/constants'
 
 import {
@@ -175,7 +178,8 @@ export function navigateToPage(pageObject) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(Backup,  { displayName: (pageObject.name) ? pageObject.name : 'BackUp'}));
+        break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
@@ -184,7 +188,7 @@ export function navigateToPage(pageObject) {
         }
         case PAGE_CUSTOM_WEB_PAGE:
           let customRemarks = JSON.parse(pageObject.additionalParams).CustomAppArr
-          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, {customUrl : (customRemarks.length) ? customRemarks[0].customUrl : null})) : dispatch(customAppSelection(customRemarks))
+          !_.size(customRemarks) || customRemarks.length == 1 ? dispatch(navigateToScene(CustomApp, { customUrl: (customRemarks.length) ? customRemarks[0].customUrl : null })) : dispatch(customAppSelection(customRemarks))
           break
         case PAGE_EZETAP_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -193,7 +197,8 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob'}));
+        break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
@@ -203,28 +208,30 @@ export function navigateToPage(pageObject) {
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore'}))
+        break;
         case PAGE_OUTSCAN:
-            dispatch(navigateToScene(PostAssignmentScanner,{pageObject}))
-            break
+          dispatch(navigateToScene(PostAssignmentScanner, { pageObject }))
+          break
         case PAGE_PAYNEAR_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-          throw new Error("CODE it, if you want to use it !");
+        dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile'}))
+        break;
         case PAGE_SEQUENCING: {
           dispatch(getRunsheetsForSequence(pageObject));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, pageObject))
+          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting'}))
           break;
         case PAGE_STATISTICS:
-        dispatch(navigateToScene(Statistics, pageObject))
-        break;
+          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics'}))
+          break;
         case PAGE_TABS:
-          dispatch(navigateToScene(TabScreen, pageObject));
+          dispatch(navigateToScene(TabScreen, { pageObject }));
           break;
         default:
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
@@ -376,7 +383,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
           if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
-          dispatch(fetchJobs())
+          //dispatch(fetchJobs())
         }
         if (isLiveJob) {
           dispatch(navigateToScene(LiveJobs, { callAlarm: true }))

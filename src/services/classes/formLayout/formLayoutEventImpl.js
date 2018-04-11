@@ -573,8 +573,9 @@ export default class FormLayoutEventImpl {
             positionId: formLayoutObject.positionId,
             parentId: formLayoutObject.parentId,
             fieldAttributeMasterId: formLayoutObject.fieldAttributeMasterId,
+            attributeTypeId: formLayoutObject.attributeTypeId,
+            key: formLayoutObject.key,
             dateTime: currentTime + '',
-            attributeTypeId: formLayoutObject.attributeTypeId
         }
     }
 

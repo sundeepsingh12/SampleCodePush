@@ -262,24 +262,24 @@ class Sync {
    * @param {*} query 
    */
   async saveDataFromServerInDB(contentQuery, isLiveJob) {
-      const jobTransactions = {
-        tableName: TABLE_JOB_TRANSACTION,
-        value: contentQuery.jobTransactions
-      }
-      const jobs = {
-        tableName: TABLE_JOB,
-        value: contentQuery.job
-      }
+    const jobTransactions = {
+      tableName: TABLE_JOB_TRANSACTION,
+      value: contentQuery.jobTransactions
+    }
+    const jobs = {
+      tableName: TABLE_JOB,
+      value: contentQuery.job
+    }
 
-      const jobDatas = {
-        tableName: TABLE_JOB_DATA,
-        value: contentQuery.jobData
-      }
+    const jobDatas = {
+      tableName: TABLE_JOB_DATA,
+      value: contentQuery.jobData
+    }
 
-      const fieldDatas = {
-        tableName: TABLE_FIELD_DATA,
-        value: contentQuery.fieldData
-      }
+    const fieldDatas = {
+      tableName: TABLE_FIELD_DATA,
+      value: contentQuery.fieldData
+    }
 
     const runsheets = {
       tableName: TABLE_RUNSHEET,
@@ -569,7 +569,7 @@ class Sync {
     let isLastPageReached = false, json, isJobsPresent = false, jobMasterIds
     const pagesList = await keyValueDBService.getValueFromStore(PAGES)
     let outScanModuleJobMasterIds = pages.getJobMasterIdListForScreenTypeId(pagesList.value, PAGE_OUTSCAN)
-    const unseenStatusIds =  !_.isEmpty(outScanModuleJobMasterIds) ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, outScanModuleJobMasterIds, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
+    const unseenStatusIds = !_.isEmpty(outScanModuleJobMasterIds) ? jobStatusService.getStatusIdListForStatusCodeAndJobMasterList(syncStoreDTO.statusList, outScanModuleJobMasterIds, UNSEEN) : jobStatusService.getAllIdsForCode(syncStoreDTO.statusList, UNSEEN)
     let jobMasterTitleList = []
     while (!isLastPageReached) {
       const tdcResponse = await this.downloadDataFromServer(pageNumber, pageSize, isLiveJob, erpPull)
@@ -592,7 +592,7 @@ class Sync {
         if (!_.isNull(successSyncIds) && !_.isUndefined(successSyncIds) && !_.isEmpty(successSyncIds)) {
           isJobsPresent = true
           const postOrderList = await keyValueDBService.getValueFromStore(POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS)
-        
+
           const unseenTransactions = postOrderList ? jobTransactionService.getJobTransactionsForDeleteSync(unseenStatusIds, postOrderList.value) : jobTransactionService.getJobTransactionsForStatusIds(unseenStatusIds)
           const jobMasterIdJobStatusIdTransactionIdDtoObject = jobTransactionService.getJobMasterIdJobStatusIdTransactionIdDtoMap(unseenTransactions, jobMasterIdJobStatusIdOfPendingCodeMap, jobStatusIdJobSummaryMap)
           const messageIdDTOs = []
@@ -602,7 +602,7 @@ class Sync {
           }
           realm.saveList(TABLE_JOB_TRANSACTION, jobMasterIdJobStatusIdTransactionIdDtoObject.updatedTransactonsList)
           jobMasterTitleList = jobMasterTitleList.concat(jobMasterService.getJobMasterTitleListFromIds(jobMasterIds, syncStoreDTO.jobMasterList))
-          await jobSummaryService.updateJobSummaryForSync(jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries, jobStatusIdJobSummaryMap)
+          // await jobSummaryService.updateJobSummaryForSync(jobMasterIdJobStatusIdTransactionIdDtoObject.jobSummaries, jobStatusIdJobSummaryMap)
           await addServerSmsService.setServerSmsMapForPendingStatus(jobMasterIdJobStatusIdTransactionIdDtoObject.jobMasterIdJobStatusIdTransactionIdDtoMap)
           if (erpPull) {
             user.lastERPSyncWithServer = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -666,9 +666,8 @@ class Sync {
   getJobTransactionAndNewJobTransactionIds(jobTransactionList) {
     let jobTransactionsIds = [], newJobTransactionsIds = []
     for (let jobTransaction in jobTransactionList) {
-      if (!jobTransactionList[jobTransaction].negativeJobTransactionId) {
-        jobTransactionsIds.push(jobTransactionList[jobTransaction].id)
-      } else if (jobTransactionList[jobTransaction].negativeJobTransactionId < 0) {
+      jobTransactionsIds.push(jobTransactionList[jobTransaction].id)
+      if (jobTransactionList[jobTransaction].negativeJobTransactionId < 0) {
         newJobTransactionsIds.push(jobTransactionList[jobTransaction].negativeJobTransactionId)
       }
     }
