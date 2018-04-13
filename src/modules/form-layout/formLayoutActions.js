@@ -324,7 +324,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formLayoutState, v
             } else {
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = ''
                 formLayoutState.formElement = cloneFormElement
-                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, formLayoutState, value, null, jobTransaction, true))
+                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, true))
             }
         }
         catch (error) {

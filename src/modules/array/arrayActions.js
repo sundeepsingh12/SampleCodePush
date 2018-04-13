@@ -12,7 +12,7 @@ import {
     SET_OPTION_ATTRIBUTE_ERROR,
     SET_ARRAY_DATA_STORE_FILTER_MAP,
 } from '../../lib/constants'
-import { ARRAY_SAROJ_FAREYE, AFTER, TEXT, STRING, SCAN_OR_TEXT, QR_SCAN } from '../../lib/AttributeConstants'
+import { ARRAY_SAROJ_FAREYE, AFTER, TEXT, STRING, SCAN_OR_TEXT, QR_SCAN, NUMBER } from '../../lib/AttributeConstants'
 import _ from 'lodash'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
@@ -142,8 +142,10 @@ export function fieldValidationsArray(currentElement, arrayElements, timeOfExecu
             let isValuePresentInAnotherTransaction = false
             let validationsResult = fieldValidationService.fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction)
             if (timeOfExecution == AFTER) {
-                isValuePresentInAnotherTransaction = (currentElement.attributeTypeId == TEXT || currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == STRING || currentElement.attributeTypeId == QR_SCAN) ? arrayService.checkforUniqueValidation(currentElement, newArray, rowId) : false
-                if (scanValue) formElement.get(currentElement.fieldAttributeMasterId).displayValue = scanValue
+                if (scanValue) {
+                    formElement.get(currentElement.fieldAttributeMasterId).displayValue = currentElement.displayValue = scanValue
+                }
+                isValuePresentInAnotherTransaction = (currentElement.attributeTypeId == TEXT || currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == STRING || currentElement.attributeTypeId == QR_SCAN || currentElement.attributeTypeId == NUMBER) ? arrayService.checkforUniqueValidation(currentElement, newArray, rowId) : false
                 formElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? formElement.get(currentElement.fieldAttributeMasterId).displayValue : null
             }
             if (isValuePresentInAnotherTransaction) {

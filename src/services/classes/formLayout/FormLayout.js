@@ -8,7 +8,8 @@ import {
     TEXT,
     DECIMAL,
     SCAN_OR_TEXT,
-    QR_SCAN
+    QR_SCAN,
+    NUMBER
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import {
@@ -352,6 +353,7 @@ class FormLayout {
             case DECIMAL:
             case SCAN_OR_TEXT:
             case QR_SCAN:
+            case NUMBER:
                 return dataStoreService.checkForUniqueValidation(currentObject.displayValue, currentObject)
             default:
                 false
