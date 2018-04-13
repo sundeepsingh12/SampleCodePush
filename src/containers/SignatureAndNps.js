@@ -54,7 +54,7 @@ class SignatureAndNps extends PureComponent {
         };
     }
     componentDidMount() {
-        this.props.actions.getRemarksList(this.props.navigation.state.params.formElements)
+        this.props.actions.getRemarksList(this.props.navigation.state.params.formLayoutState.formElement)
         this.props.actions.setIsRemarksValidation(this.props.navigation.state.params.currentElement.validation)
     }
 
@@ -68,11 +68,8 @@ class SignatureAndNps extends PureComponent {
         this.props.actions.saveSignatureAndRating(result,
             this.state.starCount,
             this.props.navigation.state.params.currentElement,
-            this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.isSaveDisabled,
+            this.props.navigation.state.params.formLayoutState,
             this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.state.params.latestPositionId,
-            this.props.navigation.state.params.fieldAttributeMasterParentIdMap
         )
     }
 

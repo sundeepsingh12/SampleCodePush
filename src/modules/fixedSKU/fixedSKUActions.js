@@ -17,17 +17,17 @@ import {
 
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions'
 
-export function onSave(parentObject, formElement, fixedSKUList, isSaveDisabled, latestPositionId, jobTransaction) {
+export function onSave(parentObject, formLayoutState, fixedSKUList, jobTransaction) {
     return async function (dispatch) {
         try {
             fixedSKUList = await fixedSKUDetailsService.calculateTotalAmount(fixedSKUList)
-            let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(fixedSKUList, jobTransaction.id, parentObject.positionId, latestPositionId)
-            formElement.get(parentObject.fieldAttributeMasterId).editable = false
+            let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(fixedSKUList, jobTransaction.id, parentObject.positionId, formLayoutState.latestPositionId)
+            formLayoutState.formElement.get(parentObject.fieldAttributeMasterId).editable = false
             dispatch(setState(SET_FIXED_SKU, {
                 fixedSKUList,
                 isLoaderRunning: false
             }))
-            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
+            dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
         } catch (error) {
             showToastAndAddUserExceptionLog(901, error.message, 'danger', 1)
         }
@@ -57,7 +57,7 @@ export function fetchFixedSKU(fieldAttributeMasterId) {
                 isLoaderRunning: false
             }))
         } catch (error) {
-            showToastAndAddUserExceptionLog(903, error.message, 'danger', 1)            
+            showToastAndAddUserExceptionLog(903, error.message, 'danger', 1)
             dispatch(setState(IS_LOADER_RUNNING, false))
         }
     }

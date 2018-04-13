@@ -72,7 +72,7 @@ class MultipleOptionsAttribute extends PureComponent {
     }
 
     componentDidMount() {
-        let formElement = this.props.calledFromArray ? this.props.formElements[this.props.rowId].formLayoutObject : this.props.formElements
+        let formElement = this.props.calledFromArray ? this.props.formLayoutState.formElement[this.props.rowId].formLayoutObject : this.props.formLayoutState.formElement
         if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
             this.props.actions.getOptionsListFromJobData(this.props.currentElement, this.props.jobTransaction)
         } else {
@@ -105,13 +105,10 @@ class MultipleOptionsAttribute extends PureComponent {
                             this.props.actions.saveOptionsFieldData(
                                 this.props.optionsMap,
                                 this.props.currentElement,
-                                this.props.latestPositionId,
-                                this.props.formElements,
-                                this.props.isSaveDisabled,
+                                this.props.formLayoutState,
                                 this.props.jobTransaction,
                                 this.props.calledFromArray,
                                 this.props.rowId,
-                                this.props.fieldAttributeMasterParentIdMap,
                                 item
                             ))
 
@@ -221,13 +218,10 @@ class MultipleOptionsAttribute extends PureComponent {
                                     this.props.actions.saveOptionsFieldData(
                                         this.props.optionsMap,
                                         this.props.currentElement,
-                                        this.props.latestPositionId,
-                                        this.props.formElements,
-                                        this.props.isSaveDisabled,
+                                        this.props.formLayoutState,
                                         this.props.jobTransaction,
                                         this.props.calledFromArray,
                                         this.props.rowId,
-                                        this.props.fieldAttributeMasterParentIdMap,
                                         this.props.advanceDropdownMessageObject
                                     )
                                 }}>
@@ -304,13 +298,10 @@ class MultipleOptionsAttribute extends PureComponent {
                                                 this.props.actions.saveOptionsFieldData(
                                                     this.props.optionsMap,
                                                     this.props.currentElement,
-                                                    this.props.latestPositionId,
-                                                    this.props.formElements,
-                                                    this.props.isSaveDisabled,
+                                                    this.props.formLayoutState,
                                                     this.props.jobTransaction,
                                                     this.props.calledFromArray,
                                                     this.props.rowId,
-                                                    this.props.fieldAttributeMasterParentIdMap,
                                                 )
                                             }}>
                                             <Text style={[styles.fontPrimary, styles.padding10]}> {DONE} </Text>

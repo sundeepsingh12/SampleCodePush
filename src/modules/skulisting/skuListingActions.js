@@ -178,7 +178,7 @@ export function checkForNewJob(routeParams) {
                     position: 'bottom',
                     buttonText: OK, duration: 5000
                 })
-                dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, formElements, isSaveDisabled, NA, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap))// save NA as value
+                dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, routeParams.formLayoutState, NA, NEXT_FOCUS, jobTransaction))// save NA as value
             } else {
                 dispatch(navigateToScene(SkuListing, routeParams))//navigate to SkuListing
             }

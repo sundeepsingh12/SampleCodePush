@@ -283,7 +283,7 @@ class FormLayout {
                 contactData, currentStatus, jobTransaction, jobMasterId,
                 navigationFormLayoutStates
             }
-            await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
+            //await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
 
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
@@ -296,7 +296,6 @@ class FormLayout {
             }
             await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
             await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-
         }
         else if (currentStatus.transient) {
             routeName = Transient

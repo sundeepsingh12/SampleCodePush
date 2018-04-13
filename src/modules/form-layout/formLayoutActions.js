@@ -56,14 +56,6 @@ import platform from '../../../native-base-theme/variables/platform';
 import styles from '../../themes/FeStyle'
 import { Toast } from 'native-base'
 
-export function _setFormList(sortedFormAttributesDto) {
-    return {
-        type: GET_SORTED_ROOT_FIELD_ATTRIBUTES,
-        payload: sortedFormAttributesDto
-
-    }
-}
-
 export function _setErrorMessage(message) {
     return {
         type: ERROR_MESSAGE,
@@ -98,35 +90,38 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
     }
 }
 
-export function getNextFocusableAndEditableElements(attributeMasterId, formElement, isSaveDisabled, value, event, jobTransaction, fieldAttributeMasterParentIdMap) {
+export function getNextFocusableAndEditableElements(attributeMasterId, formLayoutState, value, event, jobTransaction) {
     return async function (dispatch) {
         try {
-            const cloneFormElement = _.cloneDeep(formElement)
-            const sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, null, event, jobTransaction, fieldAttributeMasterParentIdMap);
-            dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, sortedFormAttributeDto))
+            const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
+            const { formLayoutObject, isSaveDisabled } = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, null, event, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap);
+            dispatch(setState(GET_SORTED_ROOT_FIELD_ATTRIBUTES, { formLayoutObject, isSaveDisabled }))
+            if (formLayoutState.updateDraft) {
+                formLayoutState.formElement = formLayoutObject
+                formLayoutState.isSaveDisabled = isSaveDisabled
+                draftService.saveDraftInDb(formLayoutState, formLayoutState.jobMasterId, null, jobTransaction)
+            }
         } catch (error) {
             showToastAndAddUserExceptionLog(1002, error.message, 'danger', 1)
         }
     }
 }
-export function setSequenceDataAndNextFocus(attributeMasterId, formElement, isSaveDisabled, sequenceId, jobTransaction, fieldAttributeMasterParentIdMap) {
+export function setSequenceDataAndNextFocus(currentElement, formLayoutState, sequenceId, jobTransaction) {
     return async function (dispatch) {
         try {
-            formElement.get(attributeMasterId).isLoading = true
-            dispatch(setState(UPDATE_FIELD_DATA, formElement))
+            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).isLoading = true
+            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).editable = false
+            dispatch(setState(UPDATE_FIELD_DATA, formLayoutState.formElement))
             const sequenceData = await formLayoutEventsInterface.getSequenceData(sequenceId)
             if (sequenceData) {
-                const cloneFormElement = _.cloneDeep(formElement)
-                let sortedFormAttributeDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, sequenceData, null, null, jobTransaction, fieldAttributeMasterParentIdMap);
-                sortedFormAttributeDto.formLayoutObject.get(attributeMasterId).isLoading = false;
-                dispatch(_setFormList(sortedFormAttributeDto))
+                formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).displayValue = sequenceData
+                formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).isLoading = false
+                dispatch(fieldValidations(currentElement, formLayoutState, AFTER, jobTransaction))
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(1003, error.message, 'danger', 0)
-            formElement.get(attributeMasterId).isLoading = false
-            dispatch(_setErrorMessage(error.message))
-            dispatch(setState(UPDATE_FIELD_DATA, formElement))
-            dispatch(_setErrorMessage(''))
+            showToastAndAddUserExceptionLog(1003, error.message, 'danger', 1)
+            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).isLoading = false
+            dispatch(setState(UPDATE_FIELD_DATA, formLayoutState.formElement))
         }
     }
 }
@@ -142,28 +137,32 @@ export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLay
     }
 }
 
-export function updateFieldData(attributeId, value, formElement) {
+export function updateFieldData(attributeId, value, formLayoutState, jobTransaction) {
     return async function (dispatch) {
         try {
-            const cloneFormElement = _.cloneDeep(formElement)
+            const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
             const updatedFieldData = formLayoutEventsInterface.updateFieldData(attributeId, value, cloneFormElement)
             dispatch(setState(UPDATE_FIELD_DATA, updatedFieldData))
+            if (formLayoutState.updateDraft) {
+                formLayoutState.formElement = updatedFieldData
+                draftService.saveDraftInDb(formLayoutState, formLayoutState.jobMasterId, null, jobTransaction)
+            }
         } catch (error) {
             showToastAndAddUserExceptionLog(1005, error.message, 'danger', 1)
         }
     }
 }
 
-export function updateFieldDataWithChildData(attributeMasterId, formElement, isSaveDisabled, value, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, modalPresent, containerValue) {
+export function updateFieldDataWithChildData(attributeMasterId, formLayoutState, value, fieldDataListObject, jobTransaction, modalPresent, containerValue) {
     return function (dispatch) {
         try {
-            const cloneFormElement = _.cloneDeep(formElement)
+            const cloneFormElement = _.cloneDeep(formLayoutState.formElement)
             cloneFormElement.get(attributeMasterId).displayValue = value
             cloneFormElement.get(attributeMasterId).childDataList = fieldDataListObject.fieldDataList
-            let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
+            let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
             cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
             cloneFormElement.get(attributeMasterId).containerValue = validationsResult ? containerValue : null
-            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
+            const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap);
             dispatch(setState(UPDATE_FIELD_DATA_WITH_CHILD_DATA,
                 {
                     formElement: updatedFieldDataObject.formLayoutObject,
@@ -181,6 +180,12 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
                 } else {
                     Toast.show({ text: cloneFormElement.get(attributeMasterId).alertMessage, position: 'bottom', buttonText: 'OK', duration: 5000 })
                 }
+            }
+            if (formLayoutState.updateDraft) {
+                formLayoutState.formElement = updatedFieldDataObject.formLayoutObject
+                formLayoutState.isSaveDisabled = updatedFieldDataObject.isSaveDisabled
+                formLayoutState.latestPositionId = fieldDataListObject.latestPositionId
+                draftService.saveDraftInDb(formLayoutState, formLayoutState.jobMasterId, null, jobTransaction)
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(1006, error.message, 'danger', 1)
@@ -242,12 +247,12 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
     }
 }
 
-export function fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, isSaveDisabled, fieldAttributeMasterParentIdMap) {
+export function fieldValidations(currentElement, formLayoutState, timeOfExecution, jobTransaction) {
     return async function (dispatch) {
         try {
-            let cloneFormElement = _.cloneDeep(formElement)
+            let cloneFormElement = _.cloneDeep(formLayoutState.formElement)
             let isValuePresentInAnotherTransaction = false
-            let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, fieldAttributeMasterParentIdMap)
+            let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
             if (timeOfExecution == AFTER) {
                 isValuePresentInAnotherTransaction = formLayoutService.checkUniqueValidation(currentElement)
                 cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null
@@ -255,7 +260,8 @@ export function fieldValidations(currentElement, formElement, timeOfExecution, j
             if (isValuePresentInAnotherTransaction) {
                 cloneFormElement.get(currentElement.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
             }
-            dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS, jobTransaction))
+            formLayoutState.formElement = cloneFormElement
+            dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, formLayoutState, cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue, NEXT_FOCUS, jobTransaction))
         }
         catch (error) {
             showToastAndAddUserExceptionLog(1008, error.message, 'danger', 1)
@@ -302,11 +308,11 @@ export function restoreDraftOrRedirectToFormLayout(editableFormLayoutState, isDr
     }
 }
 
-export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSaveDisabled, value, latestPositionId, jobTransaction) {
+export function checkUniqueValidationThenSave(fieldAtrribute, formLayoutState, value, jobTransaction) {
     return async function (dispatch) {
         try {
             let isValuePresentInAnotherTransaction = await dataStoreService.checkForUniqueValidation(value, fieldAtrribute)
-            let cloneFormElement = _.cloneDeep(formElement)
+            let cloneFormElement = _.cloneDeep(formLayoutState.formElement)
             if (isValuePresentInAnotherTransaction) {
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).displayValue = value
@@ -317,7 +323,8 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
                 }))
             } else {
                 cloneFormElement.get(fieldAtrribute.fieldAttributeMasterId).alertMessage = ''
-                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, cloneFormElement, isSaveDisabled, value, latestPositionId, jobTransaction, null, true))
+                formLayoutState.formElement = cloneFormElement
+                dispatch(updateFieldDataWithChildData(fieldAtrribute.fieldAttributeMasterId, formLayoutState, value, null, jobTransaction, true))
             }
         }
         catch (error) {
@@ -326,7 +333,7 @@ export function checkUniqueValidationThenSave(fieldAtrribute, formElement, isSav
     }
 }
 
-export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft) {
+export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction, draft, navgiationStateForSaveActivated) {
     return async function (dispatch) {
         try {
             let draftRestored = draftService.getFormLayoutStateFromDraft(draft)
@@ -351,7 +358,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 statusId: draftRestored.formLayoutState.statusId,
                 statusName: draftRestored.formLayoutState.statusName,
                 jobMasterId: draft.jobMasterId,
-                navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : null,
+                navigationFormLayoutStates: !_.isEmpty(draftRestored.navigationFormLayoutStatesForRestore) ? draftRestored.navigationFormLayoutStatesForRestore : (navgiationStateForSaveActivated ? navgiationStateForSaveActivated : null),
                 isDraftRestore: true
             }))
         } catch (error) {

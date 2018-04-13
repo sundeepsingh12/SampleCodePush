@@ -38,7 +38,6 @@ export default function formLayoutReducer(state = initialState, action) {
         case GET_SORTED_ROOT_FIELD_ATTRIBUTES: {
             return state.set('formElement', action.payload.formLayoutObject)
                 .set('isSaveDisabled', action.payload.isSaveDisabled) // applied ternary condition to set null, undefined to false
-                .set('updateDraft', true)
         }
 
         /**
@@ -53,7 +52,6 @@ export default function formLayoutReducer(state = initialState, action) {
          */
         case UPDATE_FIELD_DATA: {
             return state.set('formElement', action.payload)
-                .set('updateDraft', true)
         }
 
 
@@ -61,7 +59,6 @@ export default function formLayoutReducer(state = initialState, action) {
             return state.set('formElement', action.payload.formElement)
                 .set('latestPositionId', action.payload.latestPositionId)
                 .set('isSaveDisabled', action.payload.isSaveDisabled ? true : false)
-                .set('updateDraft', true)
                 .set('modalFieldAttributeMasterId', action.payload.modalFieldAttributeMasterId)
         }
 

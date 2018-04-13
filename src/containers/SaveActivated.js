@@ -273,7 +273,7 @@ class SaveActivated extends PureComponent {
         })
     }
     draftOkPress = () => {
-        this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.recurringData, this.props.navigation.state.params.jobMasterId)
+        this.props.actions.restoreDraft(this.props.draftStatusInfo, this.props.navigation.state.params.contactData, this.props.recurringData, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.navigationFormLayoutStates)
     }
     draftModal() {
         if (!_.isEmpty(this.props.draftStatusInfo)) {
