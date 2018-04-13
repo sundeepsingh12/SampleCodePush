@@ -23,7 +23,7 @@ import {
     SKU_PHOTO,
     SKU_REASON,
     NA,
-    UNIT_PRICE
+    UNIT_PRICE,
 } from '../../lib/AttributeConstants'
 import {
     fieldAttributeStatusService
@@ -45,6 +45,7 @@ import {
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 class SkuListing {
+
     async getSkuListingDto(fieldAttributeMasterId) {
         if (!fieldAttributeMasterId) {
             throw new Error('Field Attribute master id missing')
@@ -150,7 +151,7 @@ class SkuListing {
                 let skuReason = {
                     label: idFieldAttributeMap.get(SKU_REASON).label,
                     attributeTypeId: idFieldAttributeMap.get(SKU_REASON).attributeTypeId,
-                    value: (skuObjectValidation && (valueMaxAndReasonAtMaxQuantity || value0AndReasonAtZeroQuantity)) ? REASON : null,
+                    value: (valueMaxAndReasonAtMaxQuantity || value0AndReasonAtZeroQuantity) ? REASON : null,
                     id: idFieldAttributeMap.get(SKU_REASON).id,
                     key: idFieldAttributeMap.get(SKU_REASON).key,
                     parentId,
@@ -160,14 +161,14 @@ class SkuListing {
             }
             if (idFieldAttributeMap.get(SKU_PHOTO)) {
                 let value0AndImageAtZeroQuantity, valueMaxAndImageAtMaxQuantity
-                if (skuValidationForImageAndReason && skuValidationForImageAndReason.leftKey) {
+                if (skuValidationForImageAndReason && skuObjectValidation && skuObjectValidation.leftKey) {
                     value0AndImageAtZeroQuantity = skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty') && skuObjectValidation.leftKey == 0
                     valueMaxAndImageAtMaxQuantity = skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty') && skuObjectValidation.leftKey != 0
                 }
                 let skuPhoto = {
                     label: idFieldAttributeMap.get(SKU_PHOTO).label,
                     attributeTypeId: idFieldAttributeMap.get(SKU_PHOTO).attributeTypeId,
-                    value: (skuObjectValidation && (valueMaxAndImageAtMaxQuantity || value0AndImageAtZeroQuantity)) ? OPEN_CAMERA : null,
+                    value: (valueMaxAndImageAtMaxQuantity || value0AndImageAtZeroQuantity) ? OPEN_CAMERA : null,
                     id: idFieldAttributeMap.get(SKU_PHOTO).id,
                     key: idFieldAttributeMap.get(SKU_PHOTO).key,
                     parentId,
@@ -336,6 +337,8 @@ class SkuListing {
     }
 
     prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason) {
+       //TODO
+       //Change this logic because for changing one row's actual quantity we are calculating values for whole sku array objects which is taking O(NM) which can be done in O(M)
         const updatedObject = JSON.parse(JSON.stringify(skuListItems))
         const updatedChildElements = JSON.parse(JSON.stringify(skuChildElements))
         let totalActualQuantity = 0, skuActualAmount = 0

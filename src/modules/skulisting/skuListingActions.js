@@ -196,8 +196,7 @@ export function checkForNewJob(routeParams) {
                 dispatch(navigateToScene(SkuListing, routeParams))//navigate to SkuListing
             }
         } catch (error) {
-            //TODO
-            console.log(error)
+            showToastAndAddUserExceptionLog(2205, error.message, 'danger', 1)
         }
     }
 }

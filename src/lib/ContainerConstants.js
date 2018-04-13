@@ -238,6 +238,7 @@ module.exports = {
     SKU_CODE_MIN_LIMIT_REACHED: 'Minimum value reached',
     SKIP_SKU_MESSAGE: 'Skipping this attribute, not allowed in new job',
     RESULT_NOT_FOUND: 'No result found for your search',
+    ACTUAL_QUANTITY_INPUT_ERROR: 'Please enter valid quantity',
 
     //Array
     ADD: 'Add',

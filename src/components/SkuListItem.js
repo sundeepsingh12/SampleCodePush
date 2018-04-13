@@ -26,7 +26,8 @@ import { bindActionCreators } from 'redux'
 import {
     SELECT_ANY_REASON,
     OPEN_CAMERA,
-    OK
+    OK,
+    ACTUAL_QUANTITY_INPUT_ERROR,
 } from '../lib/ContainerConstants'
 import { Platform } from 'react-native'
 const Item = Picker.Item;
@@ -73,7 +74,7 @@ class SkuListItem extends PureComponent {
     checkForProperActualQuantityInput(value, rowItem, originalQuantityValue) {
         if (isNaN(value) || value.includes('.') || parseInt(value) < 0 || parseInt(originalQuantityValue[0]) < parseInt(value)) {
             Toast.show({
-                text: `Please enter valid quantity`,
+                text: ACTUAL_QUANTITY_INPUT_ERROR,
                 position: 'bottom',
                 buttonText: OK,
                 type: 'danger',
