@@ -40,7 +40,8 @@ import getTheme from '../../native-base-theme/components'
 import CameraIcon from '../svg_components/icons/CameraIcon'
 import TorchOffIcon from '../svg_components/icons/TorchOffIcon'
 import TorchOnIcon from '../svg_components/icons/TorchOnIcon'
-
+import ImagePicker from 'react-native-image-picker'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import {
     CAMERA,
     CAMERA_HIGH,
@@ -77,11 +78,12 @@ class CameraFieldAttribute extends PureComponent {
     componentWillUnmount() {
         this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
             data: '',
-            showImage: false
+            showImage: true
         })
     }
     componentDidMount() {
-        switch (this.props.navigation.state.params.currentElement.attributeTypeId) {
+        let item = this.props.navigation.state.params.currentElement
+        switch (item.attributeTypeId) {
             case CAMERA: this.setState({ quality: 'low' })
                 break
             case CAMERA_MEDIUM: this.setState({ quality: 'medium' })
@@ -95,7 +97,9 @@ class CameraFieldAttribute extends PureComponent {
             }
         }
         this.setState({ torchOff: RNCamera.Constants.FlashMode.off })
-        this.props.actions.setExistingImage(this.props.navigation.state.params.currentElement)
+        if (item.value && item.value != '') {
+            this.props.actions.setExistingImage(item)
+        }
     }
     _setTorchOn = () => {
         this.setState({ torchOff: RNCamera.Constants.FlashMode.on })
@@ -112,6 +116,32 @@ class CameraFieldAttribute extends PureComponent {
             }
             else {
                 return { cameraType: 'back' }
+            }
+        })
+    }
+    getImageGallery = () => {
+            const options = {
+              title: 'Photo Picker',
+              takePhotoButtonTitle: 'Take Photo...',
+              chooseFromLibraryButtonTitle: 'Choose from Library...',
+              quality: 0.8,
+              maxWidth: 300,
+              maxHeight: 300,
+              allowsEditing: true,
+              storageOptions: {
+                skipBackup: true,
+                waitUntilSaved : true
+              }
+            }
+        ImagePicker.launchImageLibrary(options, (response) => {
+            if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            }
+            else if (response.data) {
+                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                    data: response.data,
+                    showImage: true
+                })
             }
         })
     }
@@ -139,24 +169,26 @@ class CameraFieldAttribute extends PureComponent {
                         style={style.preview}
                         flashMode={this.state.torchOff}
                         type={this.state.cameraType}>
-                        <View style={[styles.absolute, styles.padding10, { top: 0, left: 0 }]}>
-                            <Icon
-                                name="md-close"
-                                style={[styles.fontXxxl, styles.fontWhite]}
-                                onPress={() => {
-                                    this.props.navigation.goBack()
-                                }} />
+                        <View style={[styles.absolute, styles.padding15, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
+                            <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
+                                <Icon
+                                    name="md-close"
+                                    style={[styles.fontXxxl, styles.fontWhite]}
+                                    onPress={() => {
+                                        this.props.navigation.goBack()
+                                    }} />
+                                <Right>
+                                    {torchView}
+                                </Right>
+                            </View>
                         </View>
                     </RNCamera>
                 </View>
                 <View style={[style.cameraFooter]}>
                     <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                            <TouchableOpacity style={[styles.flexBasis33_3, styles.alignCenter]}>
-                                {torchView}
-                            </TouchableOpacity>
+                            <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} />
                         </View>
-
                         <View style={[styles.flexBasis33_3, styles.alignCenter]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
                                 <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#ffffff' }}>
@@ -165,7 +197,7 @@ class CameraFieldAttribute extends PureComponent {
                             </View>
                         </View>
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                            <Icon name="ios-reverse-camera" style={[styles.fontWhite, styles.fontXxxl]} onPress={() => this.toggleCameraType()} />
+                            <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} />
                         </View>
                     </View>
                 </View>
@@ -174,19 +206,19 @@ class CameraFieldAttribute extends PureComponent {
     }
 
     showImageView() {
-        let view
-        view =
+        return(
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <View style={{ flex: 1 }}>
                         <Image
+                            resizeMethod = {'resize'}
                             source={{
                                 isStatic: true,
                                 uri: 'data:image/jpeg;base64,' + this.props.imageData,
                             }}
                             style={[styles.flex1]}
                         />
-                        <View style={[styles.absolute, styles.padding10, { top: 0, left: 0 }]}>
+                        <View style={[styles.absolute, styles.padding10, { top: 0, left: 0, height: 50, backgroundColor: 'rgba(0,0,0,.4)', width: '100%' }]}>
                             <Icon
                                 name="md-close"
                                 style={[styles.fontXxxl, styles.fontWhite]}
@@ -213,24 +245,29 @@ class CameraFieldAttribute extends PureComponent {
                     </View>
                 </Container>
             </StyleProvider>
-        return view
+        )
     }
     render() {
-        if (!this.props.showImage) {
-            return this.imageCaptureView()
-        } else {
+        let item = this.props.navigation.state.params.currentElement
+        if (((item.value && item.value != '') || this.props.imageData ) && this.props.showImage) {
             return this.showImageView()
+        } else {
+            return this.imageCaptureView()
         }
     }
 
     takePicture = async function () {
         if (this.camera) {
             const options = { quality: 0.5, base64: true };
+         try{
             const data = await this.camera.takePictureAsync(options)
             this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
                 data: data.base64,
                 showImage: true
             })
+            }catch(error){
+             console.log(error.message)
+            }
         }
     };
 }

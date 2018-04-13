@@ -3,7 +3,7 @@
 import { Record } from 'immutable'
 
 var InitialState = Record({
-    showImage: false,
+    showImage: true,
     imageData: '',
     viewData: ''
 })
