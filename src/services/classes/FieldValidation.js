@@ -209,7 +209,7 @@ class FieldValidation {
                 return (leftKey === rightKey)
             }
             case CONTAINS: {
-                return leftKey.includes(rightKey)
+                return _.includes(leftKey, rightKey)
             }
             case GREATER_THAN:
             case GREATER_THAN_OR_EQUAL_TO:

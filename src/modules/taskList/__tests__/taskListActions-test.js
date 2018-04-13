@@ -10,7 +10,8 @@ import { transactionCustomizationService } from '../../../services/classes/Trans
 import {
     JOB_LISTING_START,
     JOB_LISTING_END,
-    SET_TABS_LIST
+    SET_TABS_LIST,
+    SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE
 } from '../../../lib/constants'
 
 const middlewares = [thunk]
@@ -65,6 +66,7 @@ describe('test cases for action fetchJobs', () => {
         transactionCustomizationService.getJobListingParameters = jest.fn()
         jobTransactionService.getEnableMultiPartJobMaster = jest.fn()
         jobTransactionService.getJobIdGroupIdMap = jest.fn()
+        jobTransactionService.getFutureRunsheetEnabledAndSelectedDate = jest.fn()
     })
 
     let jobMasterWithEnableMultiPart = [{
@@ -75,8 +77,8 @@ describe('test cases for action fetchJobs', () => {
     }]
 
     let jobIdGroupIdMap = {
-        "1" : "xyz",
-        "2" : "abc"
+        "1": "xyz",
+        "2": "abc"
     }
     it('should fetch jobs', () => {
         const jobTransactionCustomizationList = []
@@ -87,6 +89,10 @@ describe('test cases for action fetchJobs', () => {
                 type: JOB_LISTING_START,
             },
             {
+                type: SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE,
+                payload: { enableFutureDateRunsheet: false, selectedDate: null }
+            },
+            {
                 type: JOB_LISTING_END,
                 payload: {
                     jobTransactionCustomizationList,
@@ -94,18 +100,86 @@ describe('test cases for action fetchJobs', () => {
                 }
             }
         ]
-        jobTransactionService.getEnableMultiPartJobMaster.mockReturnValue(jobMasterWithEnableMultiPart)
         jobTransactionService.getJobIdGroupIdMap.mockReturnValue(jobIdGroupIdMap)
         transactionCustomizationService.getJobListingParameters.mockReturnValue({})
-        jobTransactionService.getAllJobTransactionsCustomizationList.mockReturnValueOnce({jobTransactionCustomizationList, statusNextStatusListMap })
+        jobTransactionService.getAllJobTransactionsCustomizationList.mockReturnValueOnce({ jobTransactionCustomizationList, statusNextStatusListMap })
+        jobTransactionService.getFutureRunsheetEnabledAndSelectedDate.mockReturnValue({ enableFutureDateRunsheet: false, selectedDate: null })
         const store = mockStore({})
         return store.dispatch(actions.fetchJobs())
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
-                expect(jobTransactionService.getAllJobTransactionsCustomizationList).toHaveBeenCalledTimes(0)
+                expect(jobTransactionService.getAllJobTransactionsCustomizationList).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[2].payload).toEqual(expectedActions[2].payload)
+            })
+    })
+})
+
+describe('test cases for action shouldFetchJobsOrNot', () => {
+    beforeEach(() => {
+        keyValueDBService.getValueFromStore = jest.fn()
+    })
+    it('should fetch jobs when jobTransactionCustomizationList is empty', () => {
+        const statusNextStatusListMap = {}
+        let jobIdGroupIdMap = {
+            "1": "xyz",
+            "2": "abc"
+        }
+        const expectedActions = [
+            {
+                type: JOB_LISTING_START,
+            },
+            {
+                type: SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE,
+                payload: { enableFutureDateRunsheet: false, selectedDate: null }
+            },
+            {
+                type: JOB_LISTING_END,
+                payload: {
+                    jobTransactionCustomizationList,
+                    statusNextStatusListMap
+                }
+            }
+        ]
+        jobTransactionService.getJobIdGroupIdMap.mockReturnValue(jobIdGroupIdMap)
+        transactionCustomizationService.getJobListingParameters.mockReturnValue({})
+        jobTransactionService.getAllJobTransactionsCustomizationList.mockReturnValueOnce({ jobTransactionCustomizationList, statusNextStatusListMap })
+        jobTransactionService.getFutureRunsheetEnabledAndSelectedDate.mockReturnValue({ enableFutureDateRunsheet: false, selectedDate: null })
+        const jobTransactionCustomizationList = []
+        const shouldFetchJobs = {
+            value: true
+        }
+        keyValueDBService.getValueFromStore.mockReturnValue(shouldFetchJobs)
+        const store = mockStore({})
+        return store.dispatch(actions.shouldFetchJobsOrNot(jobTransactionCustomizationList))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
+                expect(jobTransactionService.getAllJobTransactionsCustomizationList).toHaveBeenCalledTimes(2)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+                expect(store.getActions()[2].type).toEqual(expectedActions[2].type)
+                expect(store.getActions()[2].payload).toEqual(expectedActions[2].payload)
+            })
+    })
+
+    it('should not fetch jobs when should reload jobs is false', () => {
+        const jobTransactionCustomizationList = [{
+            x: 1
+        }]
+        const shouldFetchJobs = {
+            value: false
+        }
+        keyValueDBService.validateAndSaveData = jest.fn()
+        keyValueDBService.getValueFromStore.mockReturnValue(shouldFetchJobs)
+        const store = mockStore({})
+        return store.dispatch(actions.shouldFetchJobsOrNot(jobTransactionCustomizationList))
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(1)
             })
     })
 })

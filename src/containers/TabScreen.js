@@ -49,6 +49,7 @@ import {
   SEARCH_TAP,
   JobDetailsV2
 } from '../lib/constants'
+import TaskListCalender from '../components/TaskListCalender'
 
 function mapStateToProps(state) {
   return {
@@ -60,7 +61,6 @@ function mapStateToProps(state) {
     isCalendarVisible: state.taskList.isCalendarVisible,
     searchText: state.taskList.searchText,
     modules: state.home.modules,
-    searchTap: state.taskList.searchTap,
   }
 };
 
@@ -81,40 +81,33 @@ class TabScreen extends PureComponent {
   }
 
   componentDidMount() {
+    // fetch all tabs
     this.props.actions.fetchTabs()
   }
-  componentWillUnmount(){
-    this.props.actions.setState(LISTING_SEARCH_VALUE,"")    
-    this.props.actions.setState(SEARCH_TAP,null)    
-    
+  componentWillUnmount() {
+    this.props.actions.setState(LISTING_SEARCH_VALUE, "")
   }
+
+  // On cancel press of calender,hide calender
   _onCancel = () => {
     this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
   }
 
-  componentDidUpdate(){
-    if(this.props.searchTap && this.props.searchTap.scanner){
-      this.props.actions.navigateToScene(JobDetailsV2,
-      {
-        jobSwipableDetails: this.props.searchTap.jobTransaction.jobSwipableDetails,
-        jobTransaction: this.props.searchTap.jobTransaction,
-      }
-    )
-    }
-  }
-
+  // set selected date in calender
   _onConfirm = (date) => {
     this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
     const formattedDate = moment(date).format('YYYY-MM-DD')
-    this.props.actions.fetchJobs(formattedDate)
+    this.props.actions.fetchJobs(formattedDate, this.props.navigation.state.params.pageObject)
   }
 
   _transactionsForTodayDate = () => {
-    this.props.actions.fetchJobs(moment(new Date()).format('YYYY-MM-DD'))
+    // fetch all jobs for today's date
+    this.props.actions.fetchJobs(moment(new Date()).format('YYYY-MM-DD'), this.props.navigation.state.params.pageObject)
   }
 
   _showAllJobTransactions = () => {
-    this.props.actions.fetchJobs("All")
+    //fetch all jobs for all dates when user selects ALL option in calender
+    this.props.actions.fetchJobs("All", this.props.navigation.state.params.pageObject)
   }
 
   renderTabs() {
@@ -134,94 +127,56 @@ class TabScreen extends PureComponent {
               tabId={tabs[index].id}
               statusIdList={this.props.tabIdStatusIdMap[tabs[index].id]}
               searchText={this.props.searchText}
-            />
+              pageObject={this.props.navigation.state.params.pageObject}
+          />
           </Tab>
         )
       }
     }
     return renderTabList
   }
-  _landingIndex(tabId){
+  _landingIndex(tabId) {
+    //get index for landing tab id
     const tabs = this.props.tabsList
     let index
-    for(let id in tabs){
-         if(tabs[id].id == tabId){
-           index = id
-           break
-         }
+    for (let id in tabs) {
+      if (tabs[id].id == tabId) {
+        index = id
+        break
+      }
     }
     return Number(index)
   }
+
+  // call back method to set search text for filtering
   fetchDataForListing = (searchText) => {
-    this.props.actions.setState(LISTING_SEARCH_VALUE,{searchText})
+    this.props.actions.setState(LISTING_SEARCH_VALUE, { searchText })
   }
 
+  //method to set search text and scanner for navigating if match found
   fetchDataForScanner = (searchText) => {
-    this.props.actions.setState(LISTING_SEARCH_VALUE, {searchText,scanner:true})    
+    this.props.actions.setState(LISTING_SEARCH_VALUE, {
+      searchText: (!searchText) ? this.props.searchText.searchText : searchText, scanner: true
+    })
   }
 
+  //Renders calender component TaskListCalender
   _renderCalendar = () => {
+    //Return no calender view if future runsheet is not enabled
     if (!this.props.isFutureRunsheetEnabled) {
       return null
     }
     return (
-      <Footer style={[styles.bgWhite, { borderTopWidth: 1, borderTopColor: '#f3f3f3' }]}>
-        <FooterTab style={[styles.flexBasis25]}>
-          <Button transparent
-            onPress={this._transactionsForTodayDate}
-            style={[styles.alignStart]}>
-            <Text style={[styles.fontPrimary, styles.fontSm]}>Today</Text>
-          </Button>
-        </FooterTab>
-        <FooterTab style={[styles.flexBasis50]}>
-          <DateTimePicker
-            isVisible={this.props.isCalendarVisible}
-            onConfirm={this._onConfirm}
-            onCancel={this._onCancel}
-            mode='date'
-            datePickerModeAndroid='spinner'
-          />
-          <Button transparent
-            onPress={() => { this.props.actions.setState(IS_CALENDAR_VISIBLE, true) }}
-            style={[styles.row]}>
-            <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{this._renderCalendarButtonText()}</Text>
-            <Icon name='ios-arrow-down' style={[styles.fontBlack, styles.fontSm]} />
-          </Button>
-        </FooterTab>
-        <FooterTab style={[styles.flexBasis25]}>
-          <Button transparent
-            onPress={this._showAllJobTransactions}
-            style={[styles.alignEnd]}>
-            <Text style={[styles.fontPrimary, styles.fontSm]}>All</Text>
-          </Button>
-        </FooterTab>
-
-      </Footer>
+      <TaskListCalender isFutureRunsheetEnabled={this.props.isFutureRunsheetEnabled} isCalendarVisible={this.props.isCalendarVisible} setState={this.props.actions.setState} _showAllJobTransactions={this._showAllJobTransactions} selectedDate={this.props.selectedDate} _transactionsForTodayDate={this._transactionsForTodayDate}
+        _onConfirm={this._onConfirm} _onCancel={this._onCancel} />
     )
-  }
-
-  _renderCalendarButtonText() {
-    if ((this.props.selectedDate == "All")) {
-      return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>All</Text>
-    } else {
-      return <Text style={[styles.fontBlack, styles.fontWeight500, styles.fontSm]}>{moment(this.props.selectedDate).format('ddd, DD MMM, YYYY')}</Text>
-    }
-  }
-  onPress = () => { //implement for search
-     if(this.props.searchTap){
-      this.props.actions.navigateToScene(JobDetailsV2,
-      {
-        jobSwipableDetails: this.props.searchTap.jobTransaction.jobSwipableDetails,
-        jobTransaction: this.props.searchTap.jobTransaction,
-      }
-    )
-     }
   }
 
   render() {
-    let landingValue = (this.props.navigation.state.params.landingTab) ?this._landingIndex(this.props.navigation.state.params.landingTab) : 0
+    let landingValue = (this.props.navigation.state.params.landingTab) ? this._landingIndex(this.props.navigation.state.params.landingTab) : 0
     const viewTabList = this.renderTabs()
     const calendarView = this._renderCalendar()
+    const pageName = this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : 'All Tasks'
     const searchTextValue = (this.props.searchText) ? this.props.searchText.searchText : ''
     if (viewTabList.length == 0) {
       return (
@@ -241,17 +196,17 @@ class TabScreen extends PureComponent {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.modules[START].displayName}</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{pageName}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>
               </View>
-              <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.onPress} />
+              <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.fetchDataForScanner.bind(this)} />
             </Body>
           </Header>
           <Tabs
             tabBarBackgroundColor={styles.bgPrimary.backgroundColor}
-            initialPage = {landingValue}
+            initialPage={landingValue}
             tabBarUnderlineStyle={[styles.bgWhite]}
             renderTabBar={() => <ScrollableTab />}>
             {viewTabList}
@@ -261,7 +216,6 @@ class TabScreen extends PureComponent {
       </StyleProvider>
     )
   }
-
 };
 
 const style = StyleSheet.create({
@@ -293,51 +247,6 @@ const style = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10
   },
-  headerIcon: {
-    width: 24
-  },
-  headerSearch: {
-    paddingLeft: 10,
-    paddingRight: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.20)',
-    borderRadius: 2,
-    height: 55,
-    color: '#fff',
-    fontSize: 11
-  },
-  inputInnerBtn: {
-    position: 'absolute',
-    top: 0,
-    right: 5,
-    paddingLeft: 0,
-    paddingRight: 0
-  },
-  seqCard: {
-    minHeight: 70,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingLeft: 10
-  },
-  seqCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#ffcc00',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  seqCardDetail: {
-    flex: 1,
-    minHeight: 70,
-    paddingTop: 10,
-    paddingBottom: 10,
-    marginLeft: 15,
-    borderBottomColor: '#e4e4e4',
-    borderBottomWidth: 1,
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }
 });
 
 

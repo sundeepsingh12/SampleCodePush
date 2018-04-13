@@ -12,6 +12,13 @@ module.exports = {
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
     VERIFY: 'Verify',
+    SELECT_ALL: 'Select All',
+    INVALID_SCAN: 'Invalid Scan',
+    NO_JOBS_PRESENT: 'No jobs present',
+    TOTAL_COUNT: 'Total Count : ',
+
+    //Common Error Strings
+    JOB_STATUS_MISSING: 'Job status missing in store',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -44,6 +51,7 @@ module.exports = {
     JOB_ASSIGNMENT_DISPLAY: 'Job Assignment',
     CUSTOM_APP_DISPLAY: 'Web URL',
     SORTING_DISPLAY: 'Sort Parcels',
+    UNTITLED: 'UNTITLED',
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
@@ -51,6 +59,9 @@ module.exports = {
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
     NEW_TASK: 'New Task',
+    SELECT_TYPE_FOR: 'Select Type for ',
+    CONFIGURATION_ISSUES_WITH_PENDING_STATUS: 'Configuration issues with PENDING status',
+    JOB_MASTER_MISSING: 'jobMaster not present',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -110,16 +121,16 @@ module.exports = {
     SEQUENCELIST_MISSING: `sequenceList not present`,
     BLANK_NEW_SEQUENCE: `Sequence can't be left blank`,
     CURRENT_SEQUENCE_ROW_MISSING: `currentSequenceListItemIndex missing`,
-    SEQUENCE_NOT_AN_INT: `Sequence can't be `,
-    NOT_A_NUMBER: 'Please enter a number',
+    NOT_A_NUMBER: 'Please enter a valid positive number',
     RUNSHEET_MISSING: 'No runsheet found',
     RUNSHEET_NUMBER_MISSING: 'Runsheet number not present',
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
     SEARCH_TEXT_MISSING: 'searchText not present',
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
     TOKEN_MISSING: 'Token missing',
-    INVALID_SCAN: 'Invalid Scan',
     JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
+    AUTO_ROUTING_MESSAGE: 'This will run route optimization for ',
+    AUTO_ROUTING_EXTRA_MESSAGE: ' job transactions',
 
     //Sync service
     JOBS_DELETED: 'Jobs deleted',
@@ -177,6 +188,7 @@ module.exports = {
     UPLOAD_SUCCESSFUL: ' Upload Successful',
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
+    LOGOUT_UNSYNCED_TRANSACTIONS: 'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
     LOGOUT_UNSYNCED_TRANSACTIONS_TITLE: 'Confirm Log Out',
     LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE: 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
     THERE_ARE_NO_UNSYNCED_FILES: 'There are no Unsynced Files.',
@@ -218,13 +230,16 @@ module.exports = {
     REASON: 'Reason',
     OPEN_CAMERA: 'Open Camera',
     SEARCH_PLACE_HOLDER: 'Search SKU Code',
-    ORIGNAL_QUANTITY: 'ORIGONAL QUANTITY',
+    ORIGNAL_QUANTITY: 'ORIGINAL QUANTITY',
+    PHOTO: 'PHOTO',
     ACTUAL_QUANTITY: 'ACTUAL QUANTITY',
+    UNIT_PRICE: 'UNIT_PRICE',
     SKU_CODE_MAX_LIMIT_REACHED: 'Maximum value reached',
     SKU_CODE_MIN_LIMIT_REACHED: 'Minimum value reached',
+    SKIP_SKU_MESSAGE: 'Skipping this attribute, not allowed in new job',
+    RESULT_NOT_FOUND: 'No result found for your search',
 
     //Array
-    TOTAL_COUNT: 'Total Count : ',
     ADD: 'Add',
     ADD_ROW_ERROR: 'Row could not be added',
     DELETE_ROW_ERROR: 'Row could not be deleted',
@@ -281,9 +296,7 @@ module.exports = {
 
     //Live job
     LIVE_TASKS: 'Live Tasks',
-    NO_JOBS_PRESENT: 'No jobs present',
     FILTER_REF_NO: 'Filter Reference Numbers',
-    SELECT_ALL: 'SELECT ALL',
     ACCEPT: 'ACCEPT',
     REJECT: 'REJECT',
 
@@ -291,10 +304,13 @@ module.exports = {
     BULK_UPDATE: 'Bulk Update',
     SELECT_STATUS_FOR_BULK: 'Select Status you would like to Bulk Update',
     NEXT_POSSIBLE_STATUS: 'Next possible status',
+    SELECT_NONE: 'Select None',
+    COULD_NOT_SEARCH: 'Could not search',
+    UPDATE_ALL_SELECTED: 'Update All Selected',
 
     //Sorting
     SORTING: 'Sorting',
-    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
+    REF_UNAVAILABLE: 'Reference Number Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
 
@@ -337,9 +353,19 @@ module.exports = {
     APPLYING_SETTINGS: 'Applying settings',
     VERIFY_HANDSET: 'Verifying handset',
     VERIFY_MOBILE: 'Verify your mobile',
-    OTP_CODE_SENT: 'OTP code hasbeen sent to',
+    OTP_CODE_SENT: 'OTP code has been sent to',
     ENTER_MOBILE: 'Enter your mobile',
     SEND_OTP: 'Send OTP',
+
+    //TaskListCalender
+    ALL: 'All',
+    TODAY: 'Today',
+
+    //TaskListScreen
+    NO_NEXT_STATUS: 'No NextStatus Available',
+
+    //Draft Modal
+    DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
 
     // Job Summary
     UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
@@ -347,4 +373,8 @@ module.exports = {
 
     //Data Store
     SEARCH: 'Search',
+
+    //Menu Container Constants
+    APP: 'App',
+    LOGOUT: 'Logout'
 }

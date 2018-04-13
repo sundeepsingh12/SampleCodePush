@@ -66,7 +66,8 @@ class CashTenderingServices {
         let objectWithFieldData = {
             fieldAttributeMasterId: fieldAttributeData.id,
             label: fieldAttributeData.label,
-            attributeTypeId: fieldAttributeData.attributeTypeId
+            attributeTypeId: fieldAttributeData.attributeTypeId,
+            key: fieldAttributeData.key
         }
         return objectWithFieldData
     }

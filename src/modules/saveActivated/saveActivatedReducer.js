@@ -15,6 +15,7 @@ import {
     IS_COMPANY_CODE_DHL,
     SHOW_DISCARD_ALERT,
     RETURN_TO_HOME,
+    SET_SAVE_ACTIVATED_DRAFT
 } from '../../lib/constants'
 
 export default function saveActivatedReducer(state = initialState, action) {
@@ -57,6 +58,9 @@ export default function saveActivatedReducer(state = initialState, action) {
 
         case RETURN_TO_HOME:
             return state.set('isReturnToHome', action.payload)
+
+        case SET_SAVE_ACTIVATED_DRAFT:
+            return state.set('draftStatusInfo', action.payload)
 
     }
 

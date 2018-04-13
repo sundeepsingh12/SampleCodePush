@@ -179,7 +179,7 @@ class LiveJob extends PureComponent {
                             <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                         </TouchableOpacity>
                         <View style={[style.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>Live Task</Text>
+                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}</Text>
                         </View>
                         <View style={[style.headerRight]}>
                         </View>

@@ -7,7 +7,9 @@ import {
     SKU_CODE_CHANGE,
     UPDATE_SKU_ACTUAL_QUANTITY,
     SET_SHOW_VIEW_IMAGE,
-    UPDATE_SKU_LIST_ITEMS
+    UPDATE_SKU_LIST_ITEMS,
+    SkuListing,
+    NEXT_FOCUS,
 } from '../../lib/constants'
 
 import {
@@ -29,25 +31,27 @@ import {
     ARRAY_SAROJ_FAREYE,
     SKU_PHOTO,
     SKU_REASON,
+    NA,
 } from '../../lib/AttributeConstants'
 import { NavigationActions } from 'react-navigation'
 
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { fieldDataService } from '../../services/classes/FieldData'
 import {
-    setState,
-    showToastAndAddUserExceptionLog
+    setState, navigateToScene, showToastAndAddUserExceptionLog
 } from '../global/globalActions'
 import {
     Toast
 } from 'native-base'
+import { getNextFocusableAndEditableElements } from '../form-layout/formLayoutActions'
+import { SKIP_SKU_MESSAGE, OK } from '../../lib/ContainerConstants'
 
 export function prepareSkuList(fieldAttributeMasterId, jobId) {
     return async function (dispatch) {
         try {
             dispatch(setState(SKU_LIST_FETCHING_START, true))
             const skuListingDto = await skuListing.getSkuListingDto(fieldAttributeMasterId)
-            const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId[0])
+            const skuObjectValidation = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(skuListingDto.childFieldAttributeId)
             const skuValidationForImageAndReason = await fieldAttributeValidation.getFieldAttributeValidationFromFieldAttributeId(fieldAttributeMasterId)
             const skuData = await skuListing.prepareSkuListingData(skuListingDto.idFieldAttributeMap, jobId, skuObjectValidation, skuValidationForImageAndReason)
             const skuArrayChildAttributes = await skuListing.getSkuChildAttributes(skuListingDto.idFieldAttributeMap, skuData.attributeTypeIdValueMap)
@@ -55,7 +59,8 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
                 skuListItems: skuData.skuObjectListDto,
                 skuObjectValidation,
                 skuArrayChildAttributes,
-                skuObjectAttributeId: skuListingDto.childFieldAttributeId[0],
+                skuObjectAttributeId: skuListingDto.childFieldAttributeId,
+                skuObjectAttributeKey: skuListingDto.childFieldAttributeKey,
                 skuValidationForImageAndReason,
                 reasonsList: skuData.reasonsList,
             }))
@@ -63,15 +68,15 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
                 dispatch(setState(SHOW_SEARCH_BAR))
         } catch (error) {
             dispatch(setState(SKU_LIST_FETCHING_START, false))    // false to stop sku loader        
-            dispatch(showToastAndAddUserExceptionLog(2201, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2201, error.message, 'danger', 1)
         }
     }
 }
 
-export function scanSkuItem(skuListItems, skuCode, skuObjectValidation) {
+export function scanSkuItem(functionParams) {
     return async function (dispatch) {
         try {
-            let { errorMessage, cloneSKUListItems } = await skuListing.scanSKUCode(skuListItems, skuCode, skuObjectValidation)
+            let { errorMessage, cloneSKUListItems, cloneSkuChildItems } = await skuListing.scanSKUCode(functionParams)
             if (errorMessage) {
                 Toast.show({
                     text: errorMessage,
@@ -79,12 +84,11 @@ export function scanSkuItem(skuListItems, skuCode, skuObjectValidation) {
                     buttonText: 'OK'
                 })
             } else {
-                dispatch(setState(UPDATE_SKU_LIST_ITEMS, cloneSKUListItems))
+                dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, { skuListItems: cloneSKUListItems, skuRootChildElements: cloneSkuChildItems }))
             }
         } catch (error) {
             dispatch(showToastAndAddUserExceptionLog(2204, error.message, 'danger', 1))
         }
-        //use try catch and dispatch showToastAndAddUserExceptionLog in catch
     }
 }
 
@@ -117,7 +121,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                 }))
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2202, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2202, error.message, 'danger', 1)
         }
     }
 
@@ -130,17 +134,17 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, latestPositionId, parentObject, formElement, isSaveDisabled, navigation, skuValidationForImageAndReason) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, latestPositionId, parentObject, formElement, isSaveDisabled, navigation, skuValidationForImageAndReason, skuObjectAttributeKey) {
     return async function (dispatch) {
         try {
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
             if (!message) {
-                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId, skuValidationForImageAndReason)
+                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId, skuValidationForImageAndReason, skuObjectAttributeKey)
                 if (_.isNull(skuChildElements)) {
                     Toast.show({
                         text: `Please Fill all the Required Details`,
                         position: 'bottom',
-                        buttonText: 'OK'
+                        buttonText: OK
                     })
                 } else {
                     let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, latestPositionId)
@@ -151,11 +155,11 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                 Toast.show({
                     text: `${message}`,
                     position: 'bottom',
-                    buttonText: 'OK'
+                    buttonText: OK
                 })
             }
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(2203, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(2203, error.message, 'danger', 1)
         }
 
     }
@@ -166,6 +170,34 @@ export function changeSkuCode(skuCode) {
         type: SKU_CODE_CHANGE,
         payload: {
             skuCode
+        }
+    }
+}
+
+/**
+ * This method checks if SKU is in new job or normal job
+ * if in new job then show toast message and skip SKU by saving NA in it
+ * else open SkuListing
+ * @param {*} routeParams 
+ */
+export function checkForNewJob(routeParams) {
+    return async function (dispatch) {
+        try {
+            let { currentElement, formElements, jobTransaction, latestPositionId, isSaveDisabled, fieldAttributeMasterParentIdMap } = routeParams
+            //case of new job
+            if (jobTransaction.id < 0 && jobTransaction.jobId < 0) {
+                Toast.show({
+                    text: SKIP_SKU_MESSAGE,
+                    position: 'bottom',
+                    buttonText: OK, duration: 5000
+                })
+                dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, formElements, isSaveDisabled, NA, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap))// save NA as value
+            } else {
+                dispatch(navigateToScene(SkuListing, routeParams))//navigate to SkuListing
+            }
+        } catch (error) {
+            //TODO
+            console.log(error)
         }
     }
 }

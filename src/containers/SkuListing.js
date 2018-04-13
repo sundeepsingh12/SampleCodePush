@@ -42,7 +42,10 @@ class SkuListing extends PureComponent {
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+
+    if (_.isEmpty(this.props.skuListItems)) { // Fetch data only once,after it has been loaded in state,no need to fetch it again
+      this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+    }
   }
 
   renderData(item) {
@@ -64,26 +67,33 @@ class SkuListing extends PureComponent {
   }
 
   setSearchText = (searchText) => {
-    console.logs('setSearchText', this.props.searchText)
     this.props.actions.setState(SET_SKU_CODE, searchText)
   }
 
   returnValue = (searchText) => {
-    console.logs('returnValue', this.props.searchText, this.props.skuObjectValidation)
     this.setSearchText(searchText)
-    this.props.actions.scanSkuItem(this.props.skuListItems, searchText, this.props.skuObjectValidation)
+    this.props.actions.scanSkuItem({
+      skuListItems: this.props.skuListItems,
+      searchText,
+      skuObjectValidation: this.props.skuObjectValidation,
+      skuValidationForImageAndReason: this.props.skuValidationForImageAndReason,
+      skuChildItems: this.props.skuChildItems
+    })
   }
 
   searchIconPressed = () => {
-    console.logs('searchIconPressed', this.props.searchText)
-    console.logs('skuListItems before-->', this.props.skuListItems)
     if (this.props.searchText) {
-      this.props.actions.scanSkuItem(this.props.skuListItems, this.props.searchText, this.props.skuObjectValidation)
+      this.props.actions.scanSkuItem({
+        skuListItems: this.props.skuListItems,
+        searchText: this.props.searchText,
+        skuObjectValidation: this.props.skuObjectValidation,
+        skuValidationForImageAndReason: this.props.skuValidationForImageAndReason,
+        skuChildItems: this.props.skuChildItems
+      })
     }
   }
 
   render() {
-    console.logs('render inn sku', this.props.skuListItems)
     if (this.props.skuListingLoading) {
       return <Loader />
     }
@@ -94,7 +104,7 @@ class SkuListing extends PureComponent {
             <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
               <Body>
                 <View
-                  style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom5, styles.marginTop15]}>
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
                   <Text
                     style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
@@ -102,31 +112,16 @@ class SkuListing extends PureComponent {
                 </View>
                 <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />
               </Body>
-
             </Header>
 
             <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
               <FlatList
+                initialNumToRender={_.size(this.props.skuListItems)}
                 data={_.values(this.props.skuListItems)}
                 renderItem={({ item }) => this.renderData(item)}
                 keyExtractor={item => String(_.values(this.props.skuListItems).indexOf(item))}
               />
             </Content>
-
-            {/* {renderIf(this.props.isSearchBarVisible,
-            <View style={{ flex: 2, flexDirection: 'row' }}>
-              <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
-                <Input value={this.props.skuSearchTerm}
-                  onChangeText={value => this.onChangeSkuCode(value)}
-                  bordered='true'
-                  rounded
-                  style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
-                  placeholder="Scan Sku Code" />
-              </View>
-              <View onPress={() => this.scanSkuItem()} style={{ backgroundColor: '#d7d7d7', flexGrow: .10, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name='ios-barcode-outline' style={{ fontSize: 34 }} />
-              </View>
-            </View>)} */}
 
             <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
               <Button primary full onPress={this.saveSkuList}>
@@ -139,20 +134,12 @@ class SkuListing extends PureComponent {
     }
   }
 
-  scanSkuItem() {
-    //Code incomplete
-    const searchTerm = this.props.skuSearchTerm;
-    if (skuSearchTerm) {
-      this.props.actions.scanSkuItem(this.props.skuListItems, searchTerm)
-    }
-  }
-
   saveSkuList = () => {
     this.props.actions.saveSkuListItems(
       this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
       this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
       this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-      this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason)
+      this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason, this.props.skuObjectAttributeKey)
   }
 }
 
@@ -165,6 +152,7 @@ function mapStateToProps(state) {
     skuObjectValidation: state.skuListing.skuObjectValidation,
     skuChildItems: state.skuListing.skuChildItems,
     skuObjectAttributeId: state.skuListing.skuObjectAttributeId,
+    skuObjectAttributeKey: state.skuListing.skuObjectAttributeKey,
     skuValidationForImageAndReason: state.skuListing.skuValidationForImageAndReason,
     reasonsList: state.skuListing.reasonsList,
     searchText: state.skuListing.searchText,
@@ -184,62 +172,6 @@ const style = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10
   },
-  headerIcon: {
-    width: 24
-  },
-  headerSearch: {
-    paddingLeft: 10,
-    paddingRight: 30,
-    backgroundColor: '#1260be',
-    borderRadius: 2,
-    height: 30,
-    color: '#fff',
-    fontSize: 10
-  },
-  headerQRButton: {
-    position: 'absolute',
-    right: 5,
-    paddingLeft: 0,
-    paddingRight: 0
-  },
-  card: {
-    paddingLeft: 10,
-    marginBottom: 10,
-    backgroundColor: '#ffffff',
-    elevation: 1,
-    shadowColor: '#d3d3d3',
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 2
-  },
-  cardLeft: {
-    flex: 0.85,
-    borderRightColor: '#f3f3f3',
-    borderRightWidth: 1
-  },
-  cardLeftTopRow: {
-    flexDirection: 'row',
-    borderBottomColor: '#f3f3f3',
-    borderBottomWidth: 1
-  },
-  cardRight: {
-    width: 40,
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  cardCheckbox: {
-    alignSelf: 'center',
-    backgroundColor: 'green',
-    position: 'absolute',
-    marginLeft: 10,
-    borderRadius: 0,
-    left: 0
-  }
-
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SkuListing)

@@ -28,6 +28,7 @@ export default function skuListingReducer(state = initialState, action) {
                 .set('skuObjectValidation', action.payload.skuObjectValidation)
                 .set('skuChildItems', action.payload.skuArrayChildAttributes)
                 .set('skuObjectAttributeId', action.payload.skuObjectAttributeId)
+                .set('skuObjectAttributeKey', action.payload.skuObjectAttributeKey)
                 .set('skuValidationForImageAndReason', action.payload.skuValidationForImageAndReason)
                 .set('reasonsList', action.payload.reasonsList)
         case SHOW_SEARCH_BAR:

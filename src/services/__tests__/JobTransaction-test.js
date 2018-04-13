@@ -9,7 +9,7 @@ import { fieldDataService } from '../classes/FieldData'
 import { customerCareService } from '../classes/CustomerCare'
 import { smsTemplateService } from '../classes/SMSTemplate'
 import { SEQ_SELECTED } from '../../lib/AttributeConstants'
-
+import moment from 'moment'
 import * as realm from '../../repositories/realmdb'
 
 describe('test cases for getJobTransactionMapAndQuery', () => {
@@ -494,12 +494,6 @@ describe('test cases for setContactDetails', () => {
 
 describe('test cases for setAddressDetails', () => {
 
-  beforeEach(() => {
-    jobTransactionService.appendText = jest.fn()
-    jobTransactionService.appendText.mockReturnValueOnce('xyz')
-    jobTransactionService.appendText.mockReturnValue('')
-  })
-
   const jobAttributeMasterMap = {
     10: {
       id: 10,
@@ -561,8 +555,7 @@ describe('test cases for setAddressDetails', () => {
     const jobAttributeMap = {}
     const job = {}
     const jobAttributeMasterMap = {}
-    expect(jobTransactionService.setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job)).toEqual([])
-    expect(jobTransactionService.appendText).not.toHaveBeenCalled()
+    expect(jobTransactionService.setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job)).toEqual({})
   })
 
   it('should return address data without lat lng', () => {
@@ -571,7 +564,8 @@ describe('test cases for setAddressDetails', () => {
         1: [
           {
             jobAttributeMasterId: 10,
-            value: 'addressline1'
+            value: 'addressline1',
+            sequence: 1
           },
           {
             jobAttributeMasterId: 11,
@@ -591,8 +585,7 @@ describe('test cases for setAddressDetails', () => {
     const job = {
       id: 1
     }
-    expect(jobTransactionService.setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job)).toEqual(['xyz'])
-    expect(jobTransactionService.appendText).toHaveBeenCalledTimes(4)
+    expect(jobTransactionService.setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job)).toEqual({ 1: ['xyz'] })
   })
 
   it('should return address data without lat lng', () => {
@@ -624,7 +617,6 @@ describe('test cases for setAddressDetails', () => {
       longitude: 1
     }
     expect(jobTransactionService.setAddressDetails(jobDataDetailsForListing, jobAttributeMasterMap, jobAttributeMap, job)).toEqual(['1,1', 'xyz'])
-    expect(jobTransactionService.appendText).toHaveBeenCalledTimes(4)
   })
 })
 
@@ -742,13 +734,13 @@ describe('test cases for prepareJobCustomizationList', () => {
   }
 
   const idJobMasterMap = {
-    "3" : {
-      identifier : "123",
-      identifierColor : "#000000"
+    "3": {
+      identifier: "123",
+      identifierColor: "#000000"
     },
-    "4" : {
-      identifier : "124",
-      identifierColor : "#000000"
+    "4": {
+      identifier: "124",
+      identifierColor: "#000000"
     }
   }
 
@@ -870,35 +862,35 @@ describe('test cases for prepareJobCustomizationList', () => {
       "jobSwipableDetails": "test1",
       "line1": "xyz",
       "line2": "abc",
-      "referenceNumber": "refno", 
-      "runsheetId": undefined, 
-      "runsheetNo": undefined, 
-      "seqActual": undefined, 
-      "seqAssigned": undefined, 
-      "seqSelected": 10, 
+      "referenceNumber": "refno",
+      "runsheetId": undefined,
+      "runsheetNo": undefined,
+      "seqActual": undefined,
+      "seqAssigned": undefined,
+      "seqSelected": 10,
       "statusId": 11
     }, {
-        "circleLine1": "test",
-        "circleLine2": "test", 
-        "id": 2, 
-        "identifierColor": "#000000", 
-        "jobId": 3, 
-        "jobLatitude": undefined, 
-        "jobLongitude": undefined, 
-        "jobMasterId": 3, 
-        "jobMasterIdentifier": "123", 
-        "jobSwipableDetails": "test2", 
-        "line1": "test", 
-        "line2": "test", 
-        "referenceNumber": "refno", 
-        "runsheetId": undefined, 
-        "runsheetNo": undefined, 
-        "seqActual": undefined, 
-        "seqAssigned": undefined, 
-        "seqSelected": 12, 
-        "statusId": 11
-      }]
-    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap,idJobMasterMap)).toEqual(result)
+      "circleLine1": "test",
+      "circleLine2": "test",
+      "id": 2,
+      "identifierColor": "#000000",
+      "jobId": 3,
+      "jobLatitude": undefined,
+      "jobLongitude": undefined,
+      "jobMasterId": 3,
+      "jobMasterIdentifier": "123",
+      "jobSwipableDetails": "test2",
+      "line1": "test",
+      "line2": "test",
+      "referenceNumber": "refno",
+      "runsheetId": undefined,
+      "runsheetNo": undefined,
+      "seqActual": undefined,
+      "seqAssigned": undefined,
+      "seqSelected": 12,
+      "statusId": 11
+    }]
+    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap)).toEqual(result)
     expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(8)
     expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
   })
@@ -924,67 +916,67 @@ describe('test cases for prepareJobCustomizationList', () => {
     }
 
     const jobIdGroupIdMap = {
-      "1" : "abc",
-      "2" : "xyz",
+      "1": "abc",
+      "2": "xyz",
     }
 
     const tabList = [
       {
-        id : 123,
-        name : "pending"
+        id: 123,
+        name: "pending"
       },
       {
-        id : 124,
-        name : "success"
+        id: 124,
+        name: "success"
       },
       {
-        id : 125,
-        name : "fail"
+        id: 125,
+        name: "fail"
       }
     ]
 
     const statusList = {
       value: [
-          {
-              code: "Success123",
-              id: 11,
-              jobMasterId: 3,
-              name: "Success",
-              saveActivated: null,
-              sequence: 3,
-              statusCategory: 3,
-              tabId: 124,
-              transient: false,
-          },
-          {
-              code: "FAIL",
-              id: 12,
-              jobMasterId: 441,
-              name: "fail",
-              saveActivated: null,
-              sequence: 23,
-              statusCategory: 3,
-              tabId: 125,
-              transient: false,
-          },
-          {
-              code: "PENDING",
-              id: 14,
-              jobMasterId: 441,
-              name: "Pending12",
-              saveActivated: null,
-              sequence: 23,
-              statusCategory: 1,
-              tabId: 123,
-              transient: false,
-          }
+        {
+          code: "Success123",
+          id: 11,
+          jobMasterId: 3,
+          name: "Success",
+          saveActivated: null,
+          sequence: 3,
+          statusCategory: 3,
+          tabId: 124,
+          transient: false,
+        },
+        {
+          code: "FAIL",
+          id: 12,
+          jobMasterId: 441,
+          name: "fail",
+          saveActivated: null,
+          sequence: 23,
+          statusCategory: 3,
+          tabId: 125,
+          transient: false,
+        },
+        {
+          code: "PENDING",
+          id: 14,
+          jobMasterId: 441,
+          name: "Pending12",
+          saveActivated: null,
+          sequence: 23,
+          statusCategory: 1,
+          tabId: 123,
+          transient: false,
+        }
       ]
-  }
-  const statusIdsTabIdsMap = {
-    11 : 124,
-    12 : 125,
-    14 : 123
-  }
+    }
+    const statusIdsTabIdsMap = {
+      11: 124,
+      12: 125,
+      14: 123
+    }
 
     const result = {
       "123":
@@ -1052,9 +1044,9 @@ describe('test cases for prepareJobCustomizationList', () => {
       "isGrouping": true
     }
 
-      
+
     jobMasterService.prepareStatusTabIdMap.mockReturnValue(statusIdsTabIdsMap)
-    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap,idJobMasterMap,null, null, jobIdGroupIdMap, statusList, tabList)).toEqual(result)
+    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, null, null, jobIdGroupIdMap, statusList, tabList)).toEqual(result)
     expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(8)
     expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
   })
@@ -1092,35 +1084,35 @@ describe('test cases for prepareJobCustomizationList', () => {
       "jobSwipableDetails": "test1",
       "line1": "xyz",
       "line2": "abc",
-      "referenceNumber": "refno", 
-      "runsheetId": undefined, 
-      "runsheetNo": undefined, 
-      "seqActual": undefined, 
-      "seqAssigned": undefined, 
-      "seqSelected": 10, 
+      "referenceNumber": "refno",
+      "runsheetId": undefined,
+      "runsheetNo": undefined,
+      "seqActual": undefined,
+      "seqAssigned": undefined,
+      "seqSelected": 10,
       "statusId": 11
     }, {
-        "circleLine1": "test",
-        "circleLine2": "test", 
-        "id": 2, 
-        "identifierColor": "#000000", 
-        "jobId": 3, 
-        "jobLatitude": undefined, 
-        "jobLongitude": undefined, 
-        "jobMasterId": 3, 
-        "jobMasterIdentifier": "123", 
-        "jobSwipableDetails": "test2", 
-        "line1": "test", 
-        "line2": "test", 
-        "referenceNumber": "refno", 
-        "runsheetId": undefined, 
-        "runsheetNo": undefined, 
-        "seqActual": undefined, 
-        "seqAssigned": undefined, 
-        "seqSelected": 12, 
-        "statusId": 11
-      }]
-    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap,idJobMasterMap, null, null, jobIdGroupIdMap )).toEqual(result)
+      "circleLine1": "test",
+      "circleLine2": "test",
+      "id": 2,
+      "identifierColor": "#000000",
+      "jobId": 3,
+      "jobLatitude": undefined,
+      "jobLongitude": undefined,
+      "jobMasterId": 3,
+      "jobMasterIdentifier": "123",
+      "jobSwipableDetails": "test2",
+      "line1": "test",
+      "line2": "test",
+      "referenceNumber": "refno",
+      "runsheetId": undefined,
+      "runsheetNo": undefined,
+      "seqActual": undefined,
+      "seqAssigned": undefined,
+      "seqSelected": 12,
+      "statusId": 11
+    }]
+    expect(jobTransactionService.prepareJobCustomizationList(jobTransactionMap, jobMap, jobDataDetailsForListing, fieldDataMap, jobMasterIdCustomizationMap, jobAttributeMasterMap, jobAttributeStatusMap, customerCareMap, smsTemplateMap, idJobMasterMap, null, null, jobIdGroupIdMap)).toEqual(result)
     expect(jobTransactionService.setTransactionDisplayDetails).toHaveBeenCalledTimes(8)
     expect(jobTransactionService.setJobSwipableDetails).toHaveBeenCalledTimes(2)
   })
@@ -1392,7 +1384,7 @@ describe('test for get EnableMultiPart JobMaster List', () => {
     {
       id: '1',
       enableMultipartAssignment: true,
-      
+
     },
     {
       id: '2',
@@ -1407,7 +1399,7 @@ describe('test for get EnableMultiPart JobMaster List', () => {
     {
       id: '1',
       enableMultipartAssignment: true,
-      
+
     },
     {
       id: '2',
@@ -1423,12 +1415,19 @@ describe('test for get jobIdGroupIdMap', () => {
   beforeEach(() => {
     realm.getRecordListOnQuery = jest.fn()
   })
-  let jobMasterListWithEnableMultiPart = [441, 442, 443]
+  let jobMasterList = [
+    {
+      id: 441,
+      enableMultipartAssignment: true
+    }, {
+      id: 442,
+      enableMultipartAssignment: false
+    }]
   let jobList = [
     {
       id: '1',
       groupId: '1',
-      
+
     },
     {
       id: '2',
@@ -1440,23 +1439,29 @@ describe('test for get jobIdGroupIdMap', () => {
     }
   ]
   let resultData = {
-    "1" : "1",
-    "2" : "2",
-    "3" : "4"
+    "1": "1",
+    "2": "2",
+    "3": "4"
   }
   it('should get jobIdGroupIdMap for all groupId', () => {
     realm.getRecordListOnQuery.mockReturnValue(jobList)
-    expect(jobTransactionService.getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)).toEqual(resultData)
+    expect(jobTransactionService.getJobIdGroupIdMap(jobMasterList)).toEqual(resultData)
     expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
   })
-  
-  jobMasterListWithEnableMultiPart = []
-  jobList = []
-  resultData = {} 
+
   it('should get empty jobIdGroupIdMap if multipart is disabled', () => {
+    jobMasterList = [
+      {
+        id: 441,
+        enableMultipartAssignment: false
+      }, {
+        id: 442,
+        enableMultipartAssignment: false
+      }]
+    jobList = []
+    resultData = {}
     realm.getRecordListOnQuery.mockReturnValue(jobList)
-    expect(jobTransactionService.getJobIdGroupIdMap(jobMasterListWithEnableMultiPart)).toEqual(resultData)
-    expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1)
+    expect(jobTransactionService.getJobIdGroupIdMap(jobMasterList)).toEqual(resultData)
   })
 })
 
@@ -1571,4 +1576,35 @@ describe('test cases for getUnseenJobTransaction', () => {
       })
   })
 
+})
+
+describe('test for getFutureRunsheetEnabledAndSelectedDate', () => {
+  it('should get enableFutureDateRunsheet when jobIdGroupIdMap is empty', () => {
+    const customNaming = {
+      value: {
+        enableFutureDateRunsheet: true
+      }
+    }
+    const jobIdGroupIdMap = {}
+    const date = null
+    const result = {
+      enableFutureDateRunsheet: true,
+      selectedDate: moment().format('YYYY-MM-DD')
+    }
+    expect(jobTransactionService.getFutureRunsheetEnabledAndSelectedDate(customNaming, jobIdGroupIdMap, date)).toEqual(result)
+  })
+  it('should get enableFutureDateRunsheet false when jobIdGroupIdMap is not empty', () => {
+    const customNaming = {
+      value: {
+        enableFutureDateRunsheet: true
+      }
+    }
+    const jobIdGroupIdMap = { x: {} }
+    const date = null
+    const result = {
+      enableFutureDateRunsheet: false,
+      selectedDate: null
+    }
+    expect(jobTransactionService.getFutureRunsheetEnabledAndSelectedDate(customNaming, jobIdGroupIdMap, date)).toEqual(result)
+  })
 })

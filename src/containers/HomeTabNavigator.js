@@ -1,22 +1,12 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    Platform,
-    BackHandler,
-    View
-    
-} from 'react-native'
-import {
-    Icon
-} from 'native-base'
+import { Platform, BackHandler, View } from 'react-native'
+import { Icon } from 'native-base'
 import { connect } from 'react-redux'
-import {
-    TabNavigator
-} from 'react-navigation'
+import { TabNavigator } from 'react-navigation'
 import SyncScreen from './SyncScreen'
 import ErpSyncScreen from './ErpSyncScreen'
-
 import Home from './Home'
 import Menu from './Menu'
 import styles from '../themes/FeStyle'
@@ -53,7 +43,7 @@ class HomeTabNavigator extends PureComponent {
                     tabBarIcon: ({ tintColor }) => (
                         <Icon
                             name='ios-home'
-                            style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
+                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
                         />
                     ),
                 }
@@ -67,7 +57,7 @@ class HomeTabNavigator extends PureComponent {
                     tabBarIcon: ({ tintColor }) => (
                         <Icon
                             name='ios-sync'
-                            style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
+                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
                         />
                     ),
                 }
@@ -79,9 +69,9 @@ class HomeTabNavigator extends PureComponent {
                     title: 'ERP',
                     gesturesEnabled: false,
                     tabBarIcon: ({ tintColor }) => (
-                        <View 
-                        style={[ styles.alignSelfCenter, styles.marginLeft5, { height: 30, paddingTop: (Platform.OS == 'ios') ? 0 : 10, marginBottom: (Platform.OS == 'ios') ? 0 : 0}]}>
-                            <ErpSyncTabIcon width = {50} height = {50} color={tintColor} />
+                        <View
+                            style={[styles.alignSelfCenter, styles.marginLeft5, { height: 30, marginTop: 15 }]}>
+                            <ErpSyncTabIcon width={50} height={50} color={tintColor} />
                         </View>
                     ),
                 }
@@ -95,7 +85,7 @@ class HomeTabNavigator extends PureComponent {
                     tabBarIcon: ({ tintColor }) => (
                         <Icon
                             name='md-menu'
-                            style={[{ fontSize: 18, marginBottom: (Platform.OS == 'ios') ? 15 : 0, marginTop: (Platform.OS == 'ios') ? 0 : 5, color: tintColor }]}
+                            style={[{ fontSize: 18, marginTop: (Platform.OS == 'ios') ? 5 : 0, color: tintColor }]}
                         />
                     ),
                 }
@@ -103,6 +93,7 @@ class HomeTabNavigator extends PureComponent {
         }
         const tabStyle = {
             tabBarPosition: 'bottom',
+            initialRouteName: 'HomeScreen',
             animationEnabled: true,
             tabBarOptions: {
                 showIcon: true,
@@ -123,7 +114,7 @@ class HomeTabNavigator extends PureComponent {
                     alignItems: 'center',
                     height: 50,
                     paddingTop: 10,
-                    paddingBottom: 10
+                    paddingBottom: 5
                 },
                 indicatorStyle: {
                     height: 0
@@ -139,13 +130,13 @@ class HomeTabNavigator extends PureComponent {
                 ErpSyncScreen: Tabs.ErpSyncScreen,
                 MenuScreen: Tabs.MenuScreen
             },
-                tabStyle
+                tabStyle,
             );
         } else {
             HomeTabNavigatorOptions = TabNavigator({
                 HomeScreen: Tabs.HomeScreen,
                 SyncScreen: Tabs.SyncScreen,
-                MenuScreen: Tabs.MenuScreen
+                MenuScreen: Tabs.MenuScreen,
             },
                 tabStyle
             );

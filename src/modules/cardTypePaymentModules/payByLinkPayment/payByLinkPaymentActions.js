@@ -26,7 +26,7 @@ export function getPayByLinkPaymentParameters(contactDataList) {
                 }
             ))
         } catch (error) {
-            dispatch(showToastAndAddUserExceptionLog(401, error.message, 'danger', 1))
+            showToastAndAddUserExceptionLog(401, error.message, 'danger', 1)
         }
     }
 }

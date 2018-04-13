@@ -80,7 +80,8 @@ class PostAssignment {
         let jobTransaction = { ...transaction }
         let transactionDTO = {
             id: jobTransaction.id,
-            referenceNumber: jobTransaction.referenceNumber
+            referenceNumber: jobTransaction.referenceNumber,
+            jobId:jobTransaction.jobId
         }
         const runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, pendingStatus.statusCategory, [jobTransaction])
         await formLayoutEventsInterface._updateJobSummary(jobTransaction, pendingStatus.id)

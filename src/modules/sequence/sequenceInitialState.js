@@ -12,6 +12,7 @@ var InitialState = Record({
     currentSequenceListItemSeleceted: {},
     jobMasterSeperatorMap: {},
     transactionsWithChangedSeqeunceMap: {},// map having those transaction whose sequence is changed,
+    backEnabledFromAppNavigator: false,
 })
 
 export default InitialState
