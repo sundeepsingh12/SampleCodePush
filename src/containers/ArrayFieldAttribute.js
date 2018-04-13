@@ -112,7 +112,8 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.navigation.state.params.currentElement,
             this.props.navigation.state.params.jobTransaction,
             this.props.navigation.state.params.formLayoutState,
-            this.props.arrayMainObject)
+            this.props.arrayMainObject,
+            this.props.arrayReverseDataStoreFilterMap)
     }
     static navigationOptions = ({ navigation }) => {
         return { header: null }

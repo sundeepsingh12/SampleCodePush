@@ -99,7 +99,7 @@ export function getNextFocusableForArrayWithoutChildDatalist(attributeMasterId, 
         }
     }
 }
-export function saveArray(arrayElements, arrayParentItem, jobTransaction, formLayoutState, arrayMainObject) {
+export function saveArray(arrayElements, arrayParentItem, jobTransaction, formLayoutState, arrayMainObject, arrayReverseDataStoreFilterMap) {
     return async function (dispatch) {
         try {
             if (!_.isEmpty(arrayElements)) {
@@ -109,10 +109,12 @@ export function saveArray(arrayElements, arrayParentItem, jobTransaction, formLa
                     dispatch(setState(SET_ARRAY_ELEMENTS, { newArrayElements: arrayElements, isSaveDisabled: fieldDataListSaveDisabled.isSaveDisabled }))
                     Toast.show({ text: ADD_TOAST, position: 'bottom', buttonText: 'OK', duration: 5000 })
                 } else {
+                    formLayoutState.arrayReverseDataStoreFilterMap = arrayReverseDataStoreFilterMap
                     dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListSaveDisabled.fieldDataListWithLatestPositionId, jobTransaction))
                     dispatch(setState(CLEAR_ARRAY_STATE))
                 }
             } else {
+                formLayoutState.arrayReverseDataStoreFilterMap = arrayReverseDataStoreFilterMap
                 dispatch(updateFieldDataWithChildData(arrayParentItem.fieldAttributeMasterId, formLayoutState, '', { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
                 dispatch(setState(CLEAR_ARRAY_STATE))
             }

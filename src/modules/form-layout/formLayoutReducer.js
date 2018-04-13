@@ -133,6 +133,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('errorMessage', action.payload.editableFormLayoutState.errorMessage)
                 .set('paymentAtEnd', action.payload.editableFormLayoutState.paymentAtEnd)
                 .set('dataStoreFilterReverseMap', action.payload.editableFormLayoutState.dataStoreFilterReverseMap)
+                .set('arrayReverseDataStoreFilterMap', action.payload.editableFormLayoutState.arrayReverseDataStoreFilterMap)
         }
 
         case SET_UPDATE_DRAFT: {

@@ -77,7 +77,7 @@ class DataStoreFilter extends PureComponent {
                     this.props.formLayoutState,
                     item,
                     this.props.jobTransaction,
-                    this.props.dataStoreFilterReverseMap,
+                    this.props.formLayoutState.dataStoreFilterReverseMap,
                     this.props.calledFromArray,
                     this.props.rowId,
                     this.props.arrayReverseDataStoreFilterMap,

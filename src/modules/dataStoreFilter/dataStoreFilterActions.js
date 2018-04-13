@@ -77,6 +77,7 @@ export function onSave(fieldAttributeMasterId, formLayoutState, dataStoreFilterv
             } else {
                 let formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formLayoutState.formElement))
                 formLayoutState.formElement = formElement
+                formLayoutState.dataStoreFilterReverseMap = dataStoreFilterReverseMap
                 dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStoreFiltervalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, true))
             }
         } catch (error) {
