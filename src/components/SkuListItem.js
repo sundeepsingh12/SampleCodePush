@@ -87,46 +87,26 @@ class SkuListItem extends PureComponent {
         this.changeSkuActualQuantity(value, rowItem)
     }
 
-    _displaySkuItems(rowItem, originalQuantityValue) {
-        if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
-            let reasonList = _.cloneDeep(this.props.reasonsList)
-            if (Platform.OS === 'ios') {
-                reasonList.splice(0, 1)
-            }
-            return (
-                <View style={[styles.flexBasis50, { height: 40 }]}>
-                    <Picker
-                        textStyle={[styles.fontSm]}
-                        mode="dropdown"
-                        placeholder={SELECT_ANY_REASON}
-                        selectedValue={rowItem.value}
-                        onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
-                        {/* <Item label={SELECT_ANY_REASON} value={SELECT_ANY_REASON} key={-987654321} /> */}
-                        {this._populateSkuItems(reasonList)}
-                    </Picker>
-                </View>)
-        } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
-            return (
-                <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>
-                    <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, styles.fontPrimary]}
-                        onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
-                        {OPEN_CAMERA}
-                    </Text>
-                    {this._getIconForImageAlreadyCaptured(rowItem)}
-                </View>)
+    renderPickerForReasons(rowItem,reasonList){
+        return (
+            <View style={[styles.flexBasis50, { height: 40 }]}>
+                <Picker
+                    textStyle={[styles.fontSm]}
+                    mode="dropdown"
+                    placeholder={SELECT_ANY_REASON}
+                    selectedValue={rowItem.value}
+                    onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
+                    {this._populateSkuItems(reasonList)}
+                </Picker>
+            </View>)
+    }
 
-        } else if (rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-            let quantitySelector
-            if (originalQuantityValue <= 1) {
-                quantitySelector =
-                    <View style={[styles.paddingTop20]}>
-                        <CheckBox color={styles.bgPrimary.backgroundColor} style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
-                    </View>
-            }
-            else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
-                quantitySelector = <View style={[styles.flex1, styles.row, styles.paddingTop10]}>
+    renderQuantitySelectorForLargeQuantity(rowItem,originalQuantityValue){
+        return (
+            <View style={[styles.flex1, styles.row, styles.paddingTop10]}>
                     <View style={[styles.flexBasis80, styles.paddingTop10]}>
                         <Slider
+                            step = {1}
                             thumbTintColor='#00796B'
                             maximumTrackTintColor='#00796B'
                             minimumTrackTintColor='#00796B'
@@ -147,6 +127,36 @@ class SkuListItem extends PureComponent {
                         onChangeText={(value) => this.checkForProperActualQuantityInput(value, rowItem, originalQuantityValue)}
                     />
                 </View>
+        )
+    }
+
+    _displaySkuItems(rowItem, originalQuantityValue) {
+        if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
+            let reasonList = _.cloneDeep(this.props.reasonsList)
+            if (Platform.OS === 'ios') {
+                reasonList.splice(0, 1)
+            }
+            { this.renderPickerForReasons(rowItem,reasonList) }
+        } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
+            return (
+                <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>
+                    <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, styles.fontPrimary]}
+                        onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
+                        {OPEN_CAMERA}
+                    </Text>
+                    {this._getIconForImageAlreadyCaptured(rowItem)}
+                </View>)
+
+        } else if (rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+            let quantitySelector
+            if (originalQuantityValue <= 1) {
+                quantitySelector =
+                    <View style={[styles.paddingTop20]}>
+                        <CheckBox color={styles.bgPrimary.backgroundColor} style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
+                    </View>
+            }
+            else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
+                quantitySelector = this.renderQuantitySelectorForLargeQuantity(rowItem,originalQuantityValue)
             }
             return (
                 <View style={[{ flexBasis: '60%', height: 40 }]}>

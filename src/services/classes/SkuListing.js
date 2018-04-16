@@ -23,7 +23,6 @@ import {
     SKU_PHOTO,
     SKU_REASON,
     NA,
-    UNIT_PRICE,
 } from '../../lib/AttributeConstants'
 import {
     fieldAttributeStatusService
@@ -42,6 +41,8 @@ import {
     SKU_CODE_MIN_LIMIT_REACHED,
     PHOTO,
     RESULT_NOT_FOUND,
+    UNIT_PRICE,
+    
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 class SkuListing {
@@ -337,36 +338,29 @@ class SkuListing {
     }
 
     prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason) {
-       //TODO
-       //Change this logic because for changing one row's actual quantity we are calculating values for whole sku array objects which is taking O(NM) which can be done in O(M)
         const updatedObject = JSON.parse(JSON.stringify(skuListItems))
         const updatedChildElements = JSON.parse(JSON.stringify(skuChildElements))
-        let totalActualQuantity = 0, skuActualAmount = 0
-        for (let index in updatedObject) {
-            let unitPrice = 0, actualQuantity = 0, isUnitPricePresent = false
-            const originalQuantityValue = parseInt(updatedObject[index].filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)[0])
-            updatedObject[index].forEach(item => {
-                if (item.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                    if (rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                        item.value = value
-                    }
-                    actualQuantity = parseInt(item.value)
-                    totalActualQuantity += parseInt(item.value)
-                } else if (item.attributeTypeId == SKU_UNIT_PRICE) {
-                    unitPrice = item.value
-                } else if (item.attributeTypeId == SKU_REASON && rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                    item.value = this.changeSKUReasonStatus(parseInt(value), skuValidationForImageAndReason, originalQuantityValue)
-                } else if (item.attributeTypeId == SKU_PHOTO && rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                    item.value = this.changeSKUPhotoStatus(parseInt(value), skuValidationForImageAndReason, originalQuantityValue)
-                }
-                if (!isUnitPricePresent && unitPrice > 0 && actualQuantity > 0) {
-                    skuActualAmount += (unitPrice * actualQuantity)
-                    isUnitPricePresent = true
-                }
-            })
+        let actualQuantity = 0, oldActualQty = 0,originalQuantityValue = 0,unitPriceValue=0
+        for (let index in updatedObject[rowItem.parentId]) {
+            if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_ORIGINAL_QUANTITY) {
+                originalQuantityValue = parseInt(updatedObject[rowItem.parentId][index].value)
+            }
+            else if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_UNIT_PRICE) {
+                unitPriceValue = parseInt(updatedObject[rowItem.parentId][index].value)
+            }
+            if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_ACTUAL_QUANTITY && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                oldActualQty = rowItem.value
+                updatedObject[rowItem.parentId][index].value = value
+                actualQuantity = parseInt(value)
+            }
+            else if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_REASON && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                updatedObject[rowItem.parentId][index].value = this.changeSKUReasonStatus(parseInt(value), skuValidationForImageAndReason, originalQuantityValue)
+            } else if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_PHOTO && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                updatedObject[rowItem.parentId][index].value = this.changeSKUPhotoStatus(parseInt(value), skuValidationForImageAndReason, originalQuantityValue)
+            }
         }
-        updatedChildElements[TOTAL_ACTUAL_QUANTITY].value = totalActualQuantity
-        updatedChildElements[SKU_ACTUAL_AMOUNT].value = skuActualAmount
+        updatedChildElements[TOTAL_ACTUAL_QUANTITY].value = updatedChildElements[TOTAL_ACTUAL_QUANTITY].value - oldActualQty + actualQuantity
+        updatedChildElements[SKU_ACTUAL_AMOUNT].value = updatedChildElements[SKU_ACTUAL_AMOUNT].value - (unitPriceValue*oldActualQty)+(unitPriceValue*actualQuantity);
         return {
             updatedObject,
             updatedChildElements
@@ -433,24 +427,32 @@ class SkuListing {
             }
         }
         if (!errorMessage) {
-            orignalQuantityAndActualQuantity[PHOTO].value = this.changeSKUPhotoStatus(orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value, skuValidationForImageAndReason, orignalQuantityAndActualQuantity[ORIGNAL_QUANTITY].value)
-            orignalQuantityAndActualQuantity[REASON].value = this.changeSKUReasonStatus(orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value, skuValidationForImageAndReason, orignalQuantityAndActualQuantity[ORIGNAL_QUANTITY].value)
+            if (orignalQuantityAndActualQuantity[PHOTO]) {
+                orignalQuantityAndActualQuantity[PHOTO].value = this.changeSKUPhotoStatus(orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value, skuValidationForImageAndReason, orignalQuantityAndActualQuantity[ORIGNAL_QUANTITY].value)
+            }
+            if (orignalQuantityAndActualQuantity[REASON]) {
+                orignalQuantityAndActualQuantity[REASON].value = this.changeSKUReasonStatus(orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value, skuValidationForImageAndReason, orignalQuantityAndActualQuantity[ORIGNAL_QUANTITY].value)
+            }
         }
         return { errorMessage, cloneSkuChildItems }
     }
 
     changeSKUPhotoStatus(actualQuantityValue, skuValidationForImageAndReason, originalQuantityValue) {
-        const imageAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')
-        const imageAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')
-        const imageAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')
-        return (skuValidationForImageAndReason && (imageAtMaxQty || imageAt0Qty || imageAtAnyQty)) ? OPEN_CAMERA : null
+        if (skuValidationForImageAndReason) {
+            const imageAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')
+            const imageAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')
+            const imageAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')
+            return (skuValidationForImageAndReason && (imageAtMaxQty || imageAt0Qty || imageAtAnyQty)) ? OPEN_CAMERA : null
+        }
     }
 
     changeSKUReasonStatus(actualQuantityValue, skuValidationForImageAndReason, originalQuantityValue) {
-        const reasonAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')
-        const reasonAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')
-        const reasonAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')
-        return (skuValidationForImageAndReason && (reasonAtMaxQty || reasonAt0Qty || reasonAtAnyQty)) ? REASON : null
+        if (skuValidationForImageAndReason) {
+            const reasonAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')
+            const reasonAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')
+            const reasonAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')
+            return (skuValidationForImageAndReason && (reasonAtMaxQty || reasonAt0Qty || reasonAtAnyQty)) ? REASON : null
+        }
     }
 }
 

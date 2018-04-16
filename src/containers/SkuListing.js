@@ -36,7 +36,7 @@ import platform from '../../native-base-theme/variables/platform'
 import * as globalActions from '../modules/global/globalActions'
 import SearchBarV2 from '../components/SearchBarV2'
 import { SEARCH_PLACE_HOLDER } from '../lib/ContainerConstants'
-import { SET_SKU_CODE } from '../lib/constants'
+import { SET_SKU_CODE,SKU_CODE_CHANGE } from '../lib/constants'
 class SkuListing extends PureComponent {
 
   componentDidMount() {
@@ -59,7 +59,7 @@ class SkuListing extends PureComponent {
   }
 
   onChangeSkuCode(skuCode) {
-    this.props.actions.changeSkuCode(skuCode)
+    this.props.actions.setState(SKU_CODE_CHANGE, skuCode)
   }
 
   static navigationOptions = ({ navigation }) => {
