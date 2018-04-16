@@ -10,8 +10,7 @@ import CONFIG from './config'
 import {restAPI} from './RestAPI'
 
 export default function RestAPIFactory (token = null) {
-  if (CONFIG.backend.fareyeProduction || CONFIG.backend.fareyeStaging || CONFIG.backend.fareyeDev) {
+  // if (CONFIG.backend.url) {
     restAPI.initialize(token)
     return restAPI
-  }
 }

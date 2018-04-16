@@ -18,7 +18,8 @@ import RNFetchBlob from 'react-native-fetch-blob'
 import { keyValueDBService } from '../services/classes/KeyValueDBService.js'
 import {
   PENDING_SYNC_TRANSACTION_IDS,
-  LAST_SYNC_WITH_SERVER
+  LAST_SYNC_WITH_SERVER,
+  DOMAIN_URL
 } from './constants'
 import moment from 'moment'
 const fetch = require('react-native-cancelable-fetch');
@@ -35,9 +36,9 @@ class RestAPI {
     }
     this._sessionToken = _.isNull(token) ? null : token
 
-    this.API_BASE_URL = CONFIG.backend.fareyeProduction ?
-      CONFIG.FAREYE.production.url :
-      CONFIG.FAREYE.staging.url
+    // this.API_BASE_URL = CONFIG.backend.fareyeProduction ?
+    //   CONFIG.FAREYE.production.url :
+    //   CONFIG.FAREYE.staging.url
   }
 
   /**
@@ -58,7 +59,8 @@ class RestAPI {
   async _fetch(opts, fetchRequestId) {
     let url = opts.url
     if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK)) {
-      url = this.API_BASE_URL + url
+      let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+      url = data.value + url
     }
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
@@ -193,7 +195,8 @@ class RestAPI {
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
     var filePath = (!path) ? PATH + '/sync.zip' : PATH
     let responseBody = "Fail"
-    await RNFetchBlob.fetch('POST', this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API, {
+    let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+    await RNFetchBlob.fetch('POST', data.value + CONFIG.API.UPLOAD_DATA_API, {
       'cookie': this._sessionToken,
       'Content-Type': 'multipart/form-data',
     }, [
