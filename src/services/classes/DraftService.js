@@ -8,9 +8,6 @@ import * as realm from '../../repositories/realmdb'
 class DraftService {
 
     saveDraftInDb(formLayoutState, jobMasterId, navigationFormLayoutStates, jobTransaction) {
-        // if (formLayoutState.jobTransactionId < 0) {
-        //     await realm.deleteSingleRecord(TABLE_DRAFT, jobMasterId, 'jobMasterId')
-        // }
         let draftObject = this.setFormLayoutObjectForSaving(formLayoutState, jobMasterId, navigationFormLayoutStates, jobTransaction)
         if (draftObject && draftObject.jobTransactionId) {
             realm.save(TABLE_DRAFT, draftObject)

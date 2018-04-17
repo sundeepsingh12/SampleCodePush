@@ -36,16 +36,13 @@ import platform from '../../native-base-theme/variables/platform'
 import * as globalActions from '../modules/global/globalActions'
 import SearchBarV2 from '../components/SearchBarV2'
 import { SEARCH_PLACE_HOLDER } from '../lib/ContainerConstants'
-import { SET_SKU_CODE,SKU_CODE_CHANGE } from '../lib/constants'
+import { SET_SKU_CODE, SKU_CODE_CHANGE } from '../lib/constants'
 class SkuListing extends PureComponent {
 
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-
-    if (_.isEmpty(this.props.skuListItems)) { // Fetch data only once,after it has been loaded in state,no need to fetch it again
-      this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
-    }
+    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
   }
 
   renderData(item) {
@@ -110,7 +107,7 @@ class SkuListing extends PureComponent {
                     style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
                   <View />
                 </View>
-                {this.props.isSearchBarVisible? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />:null}
+                {this.props.isSearchBarVisible ? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
               </Body>
             </Header>
 
@@ -136,10 +133,15 @@ class SkuListing extends PureComponent {
 
   saveSkuList = () => {
     this.props.actions.saveSkuListItems(
-      this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
-      this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
-      this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-      this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason, this.props.skuObjectAttributeKey)
+      this.props.skuListItems,
+      this.props.skuObjectValidation,
+      this.props.skuChildItems,
+      this.props.skuObjectAttributeId,
+      this.props.navigation.state.params.jobTransaction,
+      this.props.navigation.state.params.currentElement,
+      this.props.navigation.state.params.formLayoutState,
+      this.props.skuValidationForImageAndReason,
+      this.props.skuObjectAttributeKey)
   }
 }
 

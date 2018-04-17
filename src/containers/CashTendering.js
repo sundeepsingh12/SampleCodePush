@@ -61,7 +61,7 @@ class CashTendering extends PureComponent {
     _onSavePressReturn() {
         let cashToReturn = this.props.totalAmount - this.props.navigation.state.params['cash']
         if (cashToReturn == this.props.totalAmountReturn) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, this.props.cashTenderingListReturn, this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
             this.props.actions.setState(IS_RECEIVE_TOGGLE, true)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
             this.props.actions.setState(CHANGE_AMOUNT_RETURN, { cashTenderingList: {}, totalAmount: 0 })
@@ -71,7 +71,7 @@ class CashTendering extends PureComponent {
 
     _onSavePress() {
         if (this.props.navigation.state.params['cash'] > 0 && this.props.navigation.state.params['cash'] == this.props.totalAmount) {
-            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params['formElements'], this.props.cashTenderingList, null, this.props.navigation.state.params['isSaveDisabled'], this.props.navigation.state.params['latestPositionId'], this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
+            this.props.actions.onSave(this.props.navigation.state.params['currentElement'], this.props.navigation.state.params.formLayoutState, this.props.cashTenderingList, null, this.props.navigation.state.params['jobTransaction'], this.props.isReceive)
             this.props.actions.setState(CHANGE_AMOUNT, { cashTenderingList: {}, totalAmount: 0 })
         } else if (this.props.navigation.state.params['cash'] > this.props.totalAmount) {
             Toast.show({ text: MORE_MONEY_TO_PAY, position: 'bottom', buttonText: OK, duration: 3000 })
@@ -81,11 +81,8 @@ class CashTendering extends PureComponent {
             this.props.actions.navigateToScene('CashTendering',
                 {
                     currentElement: this.props.navigation.state.params['currentElement'],
-                    formElements: this.props.navigation.state.params['formElements'],
-                    jobStatusId: this.jobStatusId,
+                    formElements: this.props.navigation.state.params.formLayoutState,
                     jobTransaction: this.props.navigation.state.params['jobTransaction'],
-                    latestPositionId: this.props.navigation.state.params['latestPositionId'],
-                    isSaveDisabled: this.props.navigation.state.params['isSaveDisabled'],
                     cash: this.props.navigation.state.params['cash']
                 }
             )

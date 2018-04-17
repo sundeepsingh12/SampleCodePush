@@ -134,7 +134,7 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, latestPositionId, parentObject, formElement, isSaveDisabled, navigation, skuValidationForImageAndReason, skuObjectAttributeKey) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey) {
     return async function (dispatch) {
         try {
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
@@ -147,8 +147,8 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
                         buttonText: OK
                     })
                 } else {
-                    let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, latestPositionId)
-                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formElement, isSaveDisabled, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
+                    let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, formLayoutState.latestPositionId)
+                    dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
                 }
             }
             else {
@@ -182,7 +182,7 @@ export function changeSkuCode(skuCode) {
 export function checkForNewJob(routeParams) {
     return async function (dispatch) {
         try {
-            let { currentElement, formElements, jobTransaction, latestPositionId, isSaveDisabled, fieldAttributeMasterParentIdMap } = routeParams
+            let { currentElement, jobTransaction } = routeParams
             //case of new job
             if (jobTransaction.id < 0 && jobTransaction.jobId < 0) {
                 Toast.show({
@@ -190,7 +190,7 @@ export function checkForNewJob(routeParams) {
                     position: 'bottom',
                     buttonText: OK, duration: 5000
                 })
-                dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, formElements, isSaveDisabled, NA, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap))// save NA as value
+                dispatch(getNextFocusableAndEditableElements(currentElement.fieldAttributeMasterId, routeParams.formLayoutState, NA, NEXT_FOCUS, jobTransaction))// save NA as value
             } else {
                 dispatch(navigateToScene(SkuListing, routeParams))//navigate to SkuListing
             }
