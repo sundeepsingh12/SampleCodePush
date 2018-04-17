@@ -3,7 +3,12 @@ import _ from 'lodash'
 import {
     ARRAY_SAROJ_FAREYE,
     OBJECT_SAROJ_FAREYE,
-    AFTER
+    AFTER,
+    TEXT,
+    SCAN_OR_TEXT,
+    QR_SCAN,
+    NUMBER,
+    STRING
 } from '../../lib/AttributeConstants'
 import {
     INVALID_CONFIG_ERROR,
@@ -70,7 +75,8 @@ class ArrayFieldAttribute {
                 //     latestPositionId = fieldDataListWithLatestPositionId.latestPositionId
                 // }
                 let afterValidationResult = fieldValidationService.fieldValidations(arrayRowElement, arrayElements[rowId].formLayoutObject, AFTER, jobTransaction)
-                arrayRowElement.value = afterValidationResult ? arrayRowElement.displayValue : null
+                let isValuePresentInAnotherTransaction = (arrayRowElement.attributeTypeId == TEXT || arrayRowElement.attributeTypeId == SCAN_OR_TEXT || arrayRowElement.attributeTypeId == STRING || arrayRowElement.attributeTypeId == QR_SCAN || arrayRowElement.attributeTypeId == NUMBER) ? this.checkforUniqueValidation(arrayRowElement, arrayElements, rowId) : false
+                arrayRowElement.value = afterValidationResult && !isValuePresentInAnotherTransaction ? arrayRowElement.displayValue : null
                 if (arrayRowElement.required && (!arrayRowElement.value || arrayRowElement.value == '')) {
                     isSaveDisabled = true
                     break

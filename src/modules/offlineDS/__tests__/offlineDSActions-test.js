@@ -19,6 +19,7 @@ import thunk from 'redux-thunk'
 import configureStore from 'redux-mock-store'
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
+import { Toast } from 'native-base'
 
 describe('test for getLastSyncTime', () => {
 
@@ -61,6 +62,20 @@ describe('test for getLastSyncTime', () => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[1].payload)
+            })
+    })
+
+    it('error in getLastSyncTime', () => {
+        keyValueDBService.getValueFromStore = jest.fn(() => {
+            throw new Error('error')
+        })
+        Toast.show = jest.fn()
+        Toast.show.mockReturnValue({})
+        const store = mockStore({})
+        return store.dispatch(actions.getLastSyncTime())
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
+                expect(Toast.show).toHaveBeenCalledTimes(1)
             })
     })
 })
@@ -113,14 +128,14 @@ describe('test for syncDataStore', () => {
             })
     })
 
-    it('should set last sync time and no data store master are present', () => {
+    it('error in syncDataStore', () => {
         keyValueDBService.getValueFromStore = jest.fn(() => {
             throw new Error('error')
         })
         const store = mockStore({})
         return store.dispatch(actions.syncDataStore())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[2].type)
@@ -131,7 +146,7 @@ describe('test for syncDataStore', () => {
     it('should set last sync time and data store master is present', () => {
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue({
-            value:123
+            value: 123
         })
         dataStoreService.getDataStoreMasters = jest.fn()
         dataStoreService.getDataStoreMasters.mockReturnValue({
@@ -165,7 +180,7 @@ describe('test for syncDataStore', () => {
     it('should set last sync time and data store master is present but totalElements is 0', () => {
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue({
-            value:123
+            value: 123
         })
         dataStoreService.getDataStoreMasters = jest.fn()
         dataStoreService.getDataStoreMasters.mockReturnValue({

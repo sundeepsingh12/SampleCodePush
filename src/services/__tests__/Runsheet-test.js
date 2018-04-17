@@ -3,6 +3,7 @@ import { jobSummaryService } from '../classes/JobSummary'
 import { keyValueDBService } from '../classes/KeyValueDBService'
 import { userSummaryService } from '../classes/UserSummary';
 import * as realm from '../../repositories/realmdb'
+import { RUNSHEET_MISSING } from '../../lib/ContainerConstants'
 import { runSheetService } from '../classes/RunSheet'
 
 
@@ -67,7 +68,7 @@ describe('test for build runsheetList and update user and job summary', () => {
   {
     id: 2521229,
     jobMasterId: 3,
-    jobStatusId: 14,
+    jobStatusId: 12,
     runsheetId: 1,
   },
   {
@@ -75,9 +76,8 @@ describe('test for build runsheetList and update user and job summary', () => {
     jobMasterId: 3,
     jobStatusId: 15,
     runsheetId: 2,
-  },
+  },]
 
-  ]
   it('should get runSheetList', () => {
     const jobMasterId = 930,
       statusId = 4814
@@ -183,7 +183,6 @@ describe('test case for update runsheet db', () => {  // getAllStatusIdsCount(pe
     jobStatusId: 13,
     runsheetId: 4,
   },
-
   ]
 
   it('should update runsheet db', () => {
@@ -197,5 +196,34 @@ describe('test case for update runsheet db', () => {  // getAllStatusIdsCount(pe
         expect(jobStatusService.getStatusIdsForAllStatusCategory).toHaveBeenCalledTimes(1)
         expect(runSheetService.buildRunSheetListAndUpdateJobAndUserSummary).toHaveBeenCalledTimes(1)
       })
+  })
+})
+
+describe('test cases for getRunsheets', () => {
+  it('should return list of runsheet', () => {
+    realm.getRecordListOnQuery = jest.fn()
+    realm.getRecordListOnQuery.mockReturnValue([{ runsheetNumber: 123 }])
+    expect(runSheetService.getRunsheets()).toEqual([123])
+  })
+
+  it('should throw runsheet missing error', () => {
+    const message = RUNSHEET_MISSING
+    try {
+      realm.getRecordListOnQuery = jest.fn()
+      realm.getRecordListOnQuery.mockReturnValue([])
+      runSheetService.getRunsheets()
+    } catch (error) {
+      expect(error.message).toEqual(message)
+    }
+  })
+})
+
+
+
+describe('test cases for getOpenRunsheets', () => {
+  it('should return list of open runsheet', () => {
+    realm.getRecordListOnQuery = jest.fn()
+    realm.getRecordListOnQuery.mockReturnValue([{ runsheetNumber: 123 }])
+    expect(runSheetService.getOpenRunsheets()).toEqual([{ runsheetNumber: 123 }])
   })
 })

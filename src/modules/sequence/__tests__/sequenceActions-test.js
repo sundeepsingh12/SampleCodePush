@@ -82,7 +82,7 @@ describe('test case for prepareListForSequenceModule', () => {
             transactionsWithChangedSeqeunceMap
         });
         const store = mockStore({})
-        return store.dispatch(actions.prepareListForSequenceModule(runsheetNumber))
+        return store.dispatch(actions.prepareListForSequenceModule(runsheetNumber, '[123, 1234]'))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(sequenceService.createSeperatorMap).toHaveBeenCalledTimes(1)
@@ -109,7 +109,7 @@ describe('test case for prepareListForSequenceModule', () => {
             transactionsWithChangedSeqeunceMap: transactionsWithChangedSeqeunceMapForDuplicateSequence
         });
         const store = mockStore({})
-        return store.dispatch(actions.prepareListForSequenceModule(runsheetNumber))
+        return store.dispatch(actions.prepareListForSequenceModule(runsheetNumber, '[123, 1234]'))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(sequenceService.createSeperatorMap).toHaveBeenCalledTimes(1)
@@ -123,19 +123,13 @@ describe('test case for prepareListForSequenceModule', () => {
     })
 
     it('should not prepare jobTransaction list for given runsheet and throw an error', () => {
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue({})
-        sequenceService.createSeperatorMap = jest.fn()
-        sequenceService.createSeperatorMap.mockReturnValue({})
-        sequenceService.getSequenceList = jest.fn(() => {
+        keyValueDBService.getValueFromStore = jest.fn(() => {
             throw new Error(RUNSHEET_NUMBER_MISSING)
         })
         const store = mockStore({})
-        return store.dispatch(actions.prepareListForSequenceModule())
+        return store.dispatch(actions.prepareListForSequenceModule(null, '[123, 1234]'))
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
-                expect(sequenceService.createSeperatorMap).toHaveBeenCalledTimes(1)
-                expect(sequenceService.getSequenceList).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[3].type)
@@ -157,6 +151,9 @@ describe('test case for getRunsheets', () => {
     }, {
         type: SET_RESPONSE_MESSAGE,
         payload: RUNSHEET_MISSING
+    }, {
+        type: SET_RUNSHEET_NUMBER_LIST,
+        payload: [{ id: 234 }]
     }]
 
     it('should set runsheet number list', () => {
@@ -170,6 +167,20 @@ describe('test case for getRunsheets', () => {
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+            })
+    })
+
+    it('should set runsheet number list and only one runsheet is present', () => {
+        runSheetService.getRunsheets = jest.fn()
+        runSheetService.getRunsheets.mockReturnValue([{ id: 234 }])
+        const store = mockStore({})
+        return store.dispatch(actions.getRunsheetsForSequence())
+            .then(() => {
+                expect(runSheetService.getRunsheets).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[3].type)
+                expect(store.getActions()[1].payload).toEqual(expectedActions[3].payload)
             })
     })
 
@@ -494,7 +505,7 @@ describe('test case for resequenceJobsFromServer', () => {
         return store.dispatch(actions.resequenceJobsFromServer(sequenceList))
             .then(() => {
                 expect(sequenceService.prepareRequestBody).toHaveBeenCalledTimes(1)
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(sequenceService.fetchResequencedJobsFromServer).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)

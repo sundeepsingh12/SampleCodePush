@@ -534,13 +534,13 @@ describe('test for onSave', () => {
 
     it('should call updateFieldDataWithChildData when it is called from DS', () => {
         const store = mockStore({})
-        return store.dispatch(actions.onSave(null, null, null, null, false, EXTERNAL_DATA_STORE))
+        return store.dispatch(actions.onSave(null, null, null, null, false, 1, 1, {}, {}))
             .then(() => {
 
             })
     })
 
-    it('should call updateFieldDataWithChildData when it is called from DS', () => {
+    it('should call updateFieldDataWithChildData when it is called from Array', () => {
         const store = mockStore({})
         return store.dispatch(actions.onSave(null, null, null, null, true, EXTERNAL_DATA_STORE))
             .then(() => {

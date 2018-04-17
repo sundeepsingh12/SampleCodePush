@@ -69,18 +69,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FixedSKUListing extends PureComponent {
-  constructor(props) {
-    super(props)
-    let navigationState = this.props.navigation.state.params
-    this.parentObject = navigationState['currentElement']
-    this.jobTransaction = navigationState['jobTransaction']
-    this.latestPositionId = navigationState['latestPositionId']
-    this.formElement = navigationState['formElements']
-    this.isSaveDisabled = navigationState['isSaveDisabled']
-  }
 
   componentWillMount() {
-    this.props.actions.fetchFixedSKU(this.parentObject.fieldAttributeMasterId)
+    this.props.actions.fetchFixedSKU(this.props.navigation.state.params.currentElement.fieldAttributeMasterId)
   }
 
   componentDidUpdate() {
@@ -149,7 +140,7 @@ class FixedSKUListing extends PureComponent {
         <View style={[styles.bgPrimary]}>
           <Button success full style={[styles.bgPrimary]}
             onPress={() => {
-              this.props.actions.onSave(this.parentObject, this.formElement, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction)
+              this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction)
             }}>
             <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
               {SAVE}

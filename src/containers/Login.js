@@ -12,7 +12,7 @@ import {
   TextInput
 }
   from 'react-native'
-import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg } from 'native-base'
+import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -24,6 +24,7 @@ import renderIf from '../lib/renderIf'
 import codePush from "react-native-code-push"
 import { QrCodeScanner } from '../lib/constants'
 import Icon from '../../native-base-theme/components/Icon'
+import CONFIG from '../lib/config'
 import {
   OK,
   CANCEL,
@@ -31,6 +32,7 @@ import {
   RESET_ACCOUNT_SETTINGS,
   REMEMBER_ME
 } from '../lib/ContainerConstants'
+import { keyValueDBService } from '../services/classes/KeyValueDBService';
 
 
 var style = StyleSheet.create({
@@ -95,6 +97,26 @@ class Login extends PureComponent {
       this.props.authenticateUser(this.props.auth.form.username, sha256(this.props.auth.form.password), this.props.auth.form.rememberMe)
     }
 
+  }
+
+  scaneerLongPressToChooseEnvironment = () => {
+    let domainList = CONFIG.FAREYE.domain.map((domain) => domain.name)
+    domainList.push(CANCEL)
+    ActionSheet.show(
+      {
+        options: domainList,
+        cancelButtonIndex: domainList.length - 1,
+        title: 'SELECT DOMAIN'
+      },
+      buttonIndex => {
+        if (buttonIndex != domainList.length - 1 && buttonIndex >= 0) {
+          this.onScannerLongPress(CONFIG.FAREYE.domain[buttonIndex].url)
+        }
+      }
+    )
+  }
+  onScannerLongPress = (url ) => {
+    this.props.onLongPressResetSettings(url)
   }
 
   _onBarCodeRead = (value) => {
@@ -234,7 +256,9 @@ class Login extends PureComponent {
           {this.props.auth.form.displayMessage}
         </Text>
         <Button
-          onPress={this.startScanner} full rounded>
+          onPress={this.startScanner} full rounded 
+          onLongPress = {this.scaneerLongPressToChooseEnvironment}
+          >
           <Text style={[styles.fontWhite]}>Scanner</Text>
         </Button>
       </View>

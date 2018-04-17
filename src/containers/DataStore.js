@@ -70,7 +70,7 @@ class DataStore extends PureComponent {
         if (this.props.navigation.state.params.calledFromArray) {
             this.props.actions.checkForFiltersAndValidationForArray({
                 currentElement: this.props.navigation.state.params.currentElement,
-                formElement: this.props.navigation.state.params.formElements,
+                formElement: this.props.navigation.state.params.formLayoutState.formElement,
                 jobTransaction: this.props.navigation.state.params.jobTransaction,
                 arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
                 arrayFieldAttributeMasterId: this.props.navigation.state.params.arrayFieldAttributeMasterId,
@@ -79,7 +79,7 @@ class DataStore extends PureComponent {
         } else {
             this.props.actions.checkForFiltersAndValidation(
                 this.props.navigation.state.params.currentElement,
-                this.props.navigation.state.params.formElements,
+                this.props.navigation.state.params.formLayoutState.formElement,
                 this.props.navigation.state.params.jobTransaction,
                 this.props.dataStoreFilterReverseMap)
         }
@@ -191,14 +191,11 @@ class DataStore extends PureComponent {
     onSave = (dataStoreAttributeValueMap, dataStoreValue) => {
         this.props.actions.fillKeysAndSave(dataStoreAttributeValueMap,
             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
-            this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.isSaveDisabled,
+            this.props.navigation.state.params.formLayoutState,
             dataStoreValue,
             this.props.navigation.state.params.calledFromArray,
             this.props.navigation.state.params.rowId,
-            this.props.navigation.state.params.latestPositionId,
             this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.state.params.fieldAttributeMasterParentIdMap
         )
     }
 
@@ -263,13 +260,11 @@ class DataStore extends PureComponent {
                                     onPress={() => {
                                         this.props.actions.onSave(
                                             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
-                                            this.props.navigation.state.params.formElements,
-                                            this.props.navigation.state.params.isSaveDisabled,
+                                            this.props.navigation.state.params.formLayoutState,
                                             this.props.searchText,
                                             this.props.navigation.state.params.calledFromArray,
                                             this.props.navigation.state.params.rowId,
                                             this.props.navigation.state.params.jobTransaction,
-                                            this.props.navigation.state.params.fieldAttributeMasterParentIdMap
                                         )
                                     }}>
                                     <Text style={[styles.fontLg, styles.fontWhite]}>Save</Text>

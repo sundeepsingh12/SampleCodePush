@@ -100,7 +100,7 @@ export function getPaymentParameters(jobTransaction, fieldAttributeMasterId, for
  * @param {*} receipt 
  * @param {*} jobTransactionIdAmountMap 
  */
-export function saveMoneyCollectObject(actualAmount, currentElement, formElement, jobMasterId, jobId, jobTransaction, latestPositionId, moneyCollectMaster, isSaveDisabled, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap) {
+export function saveMoneyCollectObject(actualAmount, currentElement, jobTransaction, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt, jobTransactionIdAmountMap, formLayoutState) {
     return async function (dispatch) {
         try {
             //While saving actual amount should be a number
@@ -109,7 +109,7 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
                 return
             }
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt)
-            const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransaction.id, currentElement.positionId, latestPositionId)
+            const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransaction.id, currentElement.positionId, formLayoutState.latestPositionId)
             const isCardPayment = paymentService.checkCardPayment(selectedPaymentMode)
             let paymentAtEnd = {
                 currentElement,
@@ -131,9 +131,9 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
             } else {
                 jobTransactionIdAmountMap.moneyTransactionType = COLLECTION_SOD
             }
-            formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
-            formElement = CashTenderingService.checkForCashTenderingAndResetValue(formElement, currentElement)
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
+            formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
+            formLayoutState.formElement = CashTenderingService.checkForCashTenderingAndResetValue(formLayoutState.formElement, currentElement)
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))
@@ -156,19 +156,19 @@ export function saveMoneyCollectObject(actualAmount, currentElement, formElement
  * @param {*} splitPaymentModeMap 
  * @param {*} paymentContainerKey 
  */
-export function saveMoneyCollectSplitObject(actualAmount, currentElement, formElement, jobTransaction, latestPositionId, moneyCollectMaster, isSaveDisabled, originalAmount, splitPaymentModeMap, paymentContainerKey) {
+export function saveMoneyCollectSplitObject(actualAmount, currentElement, formLayoutState, jobTransaction, moneyCollectMaster, originalAmount, splitPaymentModeMap, paymentContainerKey) {
     return async function (dispatch) {
         try {
             paymentService.checkSplitAmount(actualAmount, splitPaymentModeMap)
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTOForSplit(actualAmount, moneyCollectMaster, originalAmount, splitPaymentModeMap)
-            const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransaction.id, currentElement.positionId, latestPositionId)
+            const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransaction.id, currentElement.positionId, formLayoutState.latestPositionId)
             // const isCardPayment = paymentService.checkCardPayment(selectedPaymentMode)
             // let paymentAtEnd = {
             //     currentElement,
             //     modeTypeId: selectedPaymentMode,
             //     isCardPayment
             // }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
             // dispatch(setState(UPDATE_PAYMENT_AT_END, {
             //     paymentAtEnd
             // }))
