@@ -184,7 +184,7 @@ class BasicFormElement extends PureComponent {
 
     _onBlurEvent(currentElement) {
         if (currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == QR_SCAN) {
-            this.props.actions.checkUniqueValidationThenSave(currentElement, this.props.formLayoutState.formElement, this.props.formLayoutState.isSaveDisabled, currentElement.displayValue, { latestPositionId: this.props.formLayoutState.latestPositionId }, this.props.jobTransaction)
+            this.props.actions.checkUniqueValidationThenSave(currentElement, this.props.formLayoutState, currentElement.displayValue, this.props.jobTransaction)
         }
         this.props.actions.fieldValidations(currentElement, this.props.formLayoutState, AFTER, this.props.jobTransaction)
     }

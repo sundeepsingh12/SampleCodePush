@@ -129,7 +129,7 @@ class AddServerSms {
             let keyForJob = key.slice(1, key.length - 1)
             let jobAttributeWithSameKey = keyToJobAttributeMap[keyForJob]
             if (!jobAttributeWithSameKey) {
-                return messageBody
+                continue
             }
             if (jobDataMap && jobDataMap[jobAttributeWithSameKey.id]) {
                 jobDataValueToReplace = jobDataMap[jobAttributeWithSameKey.id].value
@@ -160,12 +160,12 @@ class AddServerSms {
     setSMSBodyFieldData(messageBody, fieldDataList, jobTransaction, keyToFieldAttributeMap, formElement, setNA) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
-        if (!keys || !fieldDataList || fieldDataList.length == 0) return messageBody
+        if (!keys) return messageBody
         for (let key of keys) {
             let valueFound = false, fieldDataValueToReplace
             let keyForJob = key.slice(1, key.length - 1)
             let fieldAttributesWithSameKey = keyToFieldAttributeMap[keyForJob]
-            if (!fieldAttributesWithSameKey) break
+            if (!fieldAttributesWithSameKey) continue
             if (fieldDataList) {
                 let fieldData = fieldDataList.filter(data => data.fieldAttributeMasterId == fieldAttributesWithSameKey.id && data.jobTransactionId == jobTransaction.id)
                 fieldDataValueToReplace = (fieldData[0] && fieldData[0].value) ? fieldData[0].value : null
@@ -267,21 +267,21 @@ class AddServerSms {
     * @returns
     * messageBody: string
     */
-    checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, fieldAndJobAttrMap, user) {
+    checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, fieldAndJobAttrMap, user, formElement) {
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
-        if (!keys || keys.length <= 0 || !fieldData)
+        if (!keys || keys.length == 0)
             return messageBody
-        if (!previousMessage == messageBody) {
+        if (previousMessage != messageBody) {
             messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
-            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap)
+            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, formElement)
             messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
             previousMessage = messageBody
-            messageBody = this.checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, fieldAndJobAttrMap)
+            messageBody = this.checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, fieldAndJobAttrMap, user, formElement)
         }
         else {
             messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap, null, true)
-            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, null, true)
+            messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, formElement, true)
             messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user, true)
         }
         return messageBody
@@ -370,7 +370,7 @@ class AddServerSms {
         })
         return serverSmsLogsToBySynced
     }
-    
+
     async prepareServerSmsMap() {
         const smsJobStatuses = await keyValueDBService.getValueFromStore(SMS_JOB_STATUS);
         let serverSmsMap = {}
