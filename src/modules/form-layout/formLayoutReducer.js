@@ -82,6 +82,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('formElement', action.payload.formLayoutObject)
                 .set('isSaveDisabled', action.payload.isSaveDisabled)
                 .set('isLoading', action.payload.isLoading)
+                .set('jobAndFieldAttributesList', action.payload.jobAndFieldAttributesList)
         }
 
         /**

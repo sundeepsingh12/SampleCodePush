@@ -76,7 +76,7 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
         try {
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
-            let { latestPositionId, noFieldAttributeMappedWithStatus } = sortedFormAttributesDto
+            let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
             dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
@@ -88,7 +88,8 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
                 noFieldAttributeMappedWithStatus: (noFieldAttributeMappedWithStatus || sortedFormAttributesDto.isAllAttributeHidden),
                 formLayoutObject: sortedFormAttributesDto.formLayoutObject,
                 isSaveDisabled: sortedFormAttributesDto.isSaveDisabled,
-                isLoading: false
+                isLoading: false,
+                jobAndFieldAttributesList
             }))
         } catch (error) {
             showToastAndAddUserExceptionLog(1001, error.message, 'danger', 0)

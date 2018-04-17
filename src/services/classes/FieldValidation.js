@@ -5,7 +5,8 @@ import {
 } from '../../lib/constants'
 import moment from 'moment'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
-
+import { jobDataService } from './JobData'
+import { addServerSmsService } from './AddServerSms'
 import {
     AFTER,
     ALERT_MESSAGE,
@@ -251,7 +252,8 @@ class FieldValidation {
         for (let index in validationActionList) {
             switch (validationActionList[index].type) {
                 case ALERT_MESSAGE: {
-                    formElement.get(currentFieldAttributeMasterId).alertMessage = validationActionList[index].assignValue
+                    let alertMessage = this.setAlertMessage(validationActionList[index].assignValue, jobTransaction, formElement)
+                    formElement.get(currentFieldAttributeMasterId).alertMessage = alertMessage
                     break
                 }
                 case ASSIGN: {
@@ -516,6 +518,40 @@ class FieldValidation {
             min,
             max
         }
+    }
+
+    setAlertMessage(alertMessage, jobTransaction, formElement, jobAndFieldAttributesList) {
+        if (!alertMessage || alertMessage.trim() == '') {
+            return alertMessage
+        }
+        let singleJobTransactionArray = []
+        if (jobTransaction.length) {
+            singleJobTransactionArray.push(jobTransaction[0])
+        } else {
+            singleJobTransactionArray.push(jobTransaction)
+        }
+        let jobDataMap = jobDataService.getJobData(singleJobTransactionArray)[singleJobTransactionArray[0].jobId]
+        let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAndFieldAttributesList, singleJobTransactionArray[0].jobMasterId)
+        alertMessage = addServerSmsService.setSmsBodyJobData(alertMessage, jobDataMap, singleJobTransactionArray[0], fieldAndJobAttrMap.keyToJobAttributeMap)
+        alertMessage = addServerSmsService.setSmsBodyFixedAttribute(alertMessage, singleJobTransactionArray[0], user)
+        alertMessage = addServerSmsService.setSMSBodyFieldData(alertMessage, null, singleJobTransactionArray[0], fieldAndJobAttrMap.keyToFieldAttributeMap, formElement)
+        alertMessage = addServerSmsService.checkForRecursiveData(alertMessage, '', jobData, fieldData.value, jobTransaction, fieldAndJobAttrMap, user)
+        return alertMessage
+    }
+
+    getKeyToAttributeMap(jobAndFieldAttributesList, jobMasterId) {
+        let keyToJobAttributeMap = {}, keyToFieldAttributeMap = {}
+        for (let jobAttribute of jobAndFieldAttributesList.jobAttributes) {
+            if (jobAttribute.jobMasterId == jobMasterId) {
+                keyToJobAttributeMap[jobAttribute.key] = jobAttribute
+            }
+        }
+        for (let fieldAttribute of jobAndFieldAttributesList.fieldAttributes) {
+            if (fieldAttribute.jobMasterId == jobMasterId) {
+                keyToFieldAttributeMap[fieldAttribute.key] = fieldAttribute
+            }
+        }
+        return { keyToJobAttributeMap, keyToFieldAttributeMap }
     }
 
 }

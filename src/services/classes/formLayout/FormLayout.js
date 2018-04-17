@@ -24,7 +24,9 @@ import {
     FIELD_ATTRIBUTE_VALIDATION,
     FIELD_ATTRIBUTE_VALIDATION_CONDITION,
     BACKUP_ALREADY_EXIST,
-    TABLE_FIELD_DATA
+    TABLE_FIELD_DATA,
+    JOB_ATTRIBUTE,
+    USER
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -49,6 +51,8 @@ class FormLayout {
             throw new Error('Missing statusId');
         }
         const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+        const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+        const user = await keyValueDBService.getValueFromStore(USER)
         const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS);
         const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION);
         const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION_CONDITION);
@@ -110,6 +114,11 @@ class FormLayout {
         }
         else {
             sequenceWiseFormLayout.fieldAttributeMasterParentIdMap = fieldAttributeMasterParentIdMap
+            sequenceWiseFormLayout.jobAndFieldAttributesList = {
+                jobAttributes: jobAttributes.value,
+                fieldAttributes: fieldAttributes.value,
+                user: user.value
+            }
             return sequenceWiseFormLayout
         }
 
