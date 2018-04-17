@@ -87,20 +87,6 @@ class SkuListItem extends PureComponent {
         this.changeSkuActualQuantity(value, rowItem)
     }
 
-    renderPickerForReasons(rowItem,reasonList){
-        return (
-            <View style={[styles.flexBasis50, { height: 40 }]}>
-                <Picker
-                    textStyle={[styles.fontSm]}
-                    mode="dropdown"
-                    placeholder={SELECT_ANY_REASON}
-                    selectedValue={rowItem.value}
-                    onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
-                    {this._populateSkuItems(reasonList)}
-                </Picker>
-            </View>)
-    }
-
     renderQuantitySelectorForLargeQuantity(rowItem,originalQuantityValue){
         return (
             <View style={[styles.flex1, styles.row, styles.paddingTop10]}>
@@ -136,7 +122,16 @@ class SkuListItem extends PureComponent {
             if (Platform.OS === 'ios') {
                 reasonList.splice(0, 1)
             }
-            { this.renderPickerForReasons(rowItem,reasonList) }
+            return (
+                <View style={[{ flexBasis: '60%', height: 40 }]}>
+                    <Picker
+                        mode="dropdown"
+                        placeholder={SELECT_ANY_REASON}
+                        selectedValue={rowItem.value}
+                        onValueChange={(value) => this.changeSkuActualQuantity(value, rowItem)}>
+                        {this._populateSkuItems(reasonList)}
+                    </Picker>
+                </View>)
         } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
             return (
                 <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>

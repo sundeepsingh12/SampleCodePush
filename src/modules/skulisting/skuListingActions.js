@@ -161,7 +161,6 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
         } catch (error) {
             showToastAndAddUserExceptionLog(2203, error.message, 'danger', 1)
         }
-
     }
 }
 

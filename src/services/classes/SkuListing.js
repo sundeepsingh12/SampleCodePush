@@ -251,9 +251,6 @@ class SkuListing {
 
     getFinalCheckForValidation(skuObjectValidation, skuRootChildElements) {
 
-        if (!skuObjectValidation) {
-            throw new Error('Sku Object validation missing')
-        }
         if (!skuRootChildElements) {
             throw new Error('Sku child elements missing')
         }
