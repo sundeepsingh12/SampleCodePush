@@ -160,6 +160,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formElement, isS
             const cloneFormElement = _.cloneDeep(formElement)
             cloneFormElement.get(attributeMasterId).displayValue = value
             cloneFormElement.get(attributeMasterId).childDataList = fieldDataListObject.fieldDataList
+            cloneFormElement.get(attributeMasterId).alertMessage  = null
             let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
             cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
             cloneFormElement.get(attributeMasterId).containerValue = validationsResult ? containerValue : null

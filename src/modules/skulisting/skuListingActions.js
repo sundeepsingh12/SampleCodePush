@@ -73,9 +73,22 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
     }
 }
 
-export function scanSkuItem(skuListItems, skuCode) {
+export function scanSkuItem(functionParams) {
     return async function (dispatch) {
-        //use try catch and dispatch showToastAndAddUserExceptionLog in catch
+        try {
+            let { errorMessage, cloneSKUListItems, cloneSkuChildItems } = await skuListing.scanSKUCode(functionParams)
+            if (errorMessage) {
+                Toast.show({
+                    text: errorMessage,
+                    position: 'bottom',
+                    buttonText: 'OK'
+                })
+            } else {
+                dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, { skuListItems: cloneSKUListItems, skuRootChildElements: cloneSkuChildItems }))
+            }
+        } catch (error) {
+            dispatch(showToastAndAddUserExceptionLog(2204, error.message, 'danger', 1))
+        }
     }
 }
 
@@ -148,7 +161,6 @@ export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChild
         } catch (error) {
             showToastAndAddUserExceptionLog(2203, error.message, 'danger', 1)
         }
-
     }
 }
 
@@ -183,8 +195,7 @@ export function checkForNewJob(routeParams) {
                 dispatch(navigateToScene(SkuListing, routeParams))//navigate to SkuListing
             }
         } catch (error) {
-            //TODO
-            console.log(error)
+            showToastAndAddUserExceptionLog(2205, error.message, 'danger', 1)
         }
     }
 }

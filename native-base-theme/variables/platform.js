@@ -31,7 +31,7 @@ export default {
   CheckboxBorderWidth: platform === "ios" ? 1 : 2,
   CheckboxPaddingLeft: platform === "ios" ? 4 : 2,
   CheckboxPaddingBottom: platform === "ios" ? 0 : 5,
-  CheckboxIconSize: platform === "ios" ? 21 : 14,
+  CheckboxIconSize: platform === "ios" ? 21 : 17,
   CheckboxIconMarginTop: platform === "ios" ? undefined : 1,
   CheckboxFontSize: platform === "ios" ? 23 / 0.9 : 18,
   DefaultFontSize: 17,
