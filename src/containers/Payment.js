@@ -94,7 +94,7 @@ class Payment extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.jobStatusId)
+        this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState.formElement, this.props.navigation.state.params.formLayoutState.statusId)
     }
 
     renderPaymentModeId(modeId, type) {
@@ -325,11 +325,9 @@ class Payment extends PureComponent {
                 actualAmount: this.props.actualAmount,
                 originalAmount: this.props.originalAmount,
                 currentElement: this.props.navigation.state.params.currentElement,
-                formElements: this.props.navigation.state.params.formElements,
+                formLayoutState: this.props.navigation.state.params.formLayoutState,
                 jobTransaction: this.props.navigation.state.params.jobTransaction,
                 moneyCollectMaster: this.props.moneyCollectMaster,
-                isSaveDisabled: this.props.navigation.state.params.isSaveDisabled,
-                latestPositionId: this.props.navigation.state.params.latestPositionId,
                 paymentContainerKey: this.props.navigation.state.key,
                 renderPaymentModeId: this.renderPaymentModeId,
             })
@@ -337,19 +335,15 @@ class Payment extends PureComponent {
             this.props.actions.saveMoneyCollectObject(
                 this.props.actualAmount,
                 this.props.navigation.state.params.currentElement,
-                this.props.navigation.state.params.formElements,
-                this.props.navigation.state.params.jobTransaction.jobMasterId,
-                this.props.navigation.state.params.jobTransaction.jobId,
                 this.props.navigation.state.params.jobTransaction,
-                this.props.navigation.state.params.latestPositionId,
                 this.props.moneyCollectMaster,
-                this.props.navigation.state.params.isSaveDisabled,
                 this.props.originalAmount,
                 this.props.selectedPaymentMode,
                 this.props.transactionNumber,
                 null,
                 null,
-                this.props.jobTransactionIdAmountMap
+                this.props.jobTransactionIdAmountMap,
+                this.props.navigation.state.params.formLayoutState
             )
         }
     }

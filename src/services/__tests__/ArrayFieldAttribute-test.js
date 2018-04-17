@@ -7,7 +7,7 @@ import {
 } from '../../lib/AttributeConstants'
 import {
     INVALID_CONFIG_ERROR
-} from '../../lib/ContaierConstants'
+} from '../../lib/ContainerConstants'
 import { backupService } from '../classes/BackupService';
 describe('test cases for getSortedArrayChildElements', () => {
     it('should return null arrayElements when arrayelements is not empty', () => {

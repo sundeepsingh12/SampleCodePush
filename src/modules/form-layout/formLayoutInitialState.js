@@ -36,7 +36,7 @@ var InitialState = Record({
         isLoading: false,
         errorMessage: '',
         paymentAtEnd: {},
-        updateDraft: false,
+        updateDraft: true,
         isFormValid: true,
         dataStoreFilterReverseMap: {},
         fieldAttributeMasterParentIdMap: {},

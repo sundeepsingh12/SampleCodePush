@@ -204,7 +204,7 @@ class DataStoreService {
             return false
         }
         if (this.checkIfUniqueConditionExists(fieldAttribute)) {
-            let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttribute.fieldAttributeMasterId} AND value = '${realm._encryptData(fieldAttribute.displayValue)}'`
+            let fieldDataQuery = `fieldAttributeMasterId =  ${fieldAttribute.fieldAttributeMasterId} AND value = '${realm._encryptData(fieldAttributeValue)}'`
             let fieldDataList = realm.getRecordListOnQuery(TABLE_FIELD_DATA, fieldDataQuery, null, null)
             return (fieldDataList && fieldDataList.length >= 1)
         }

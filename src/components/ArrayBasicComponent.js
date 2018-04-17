@@ -117,7 +117,7 @@ class ArrayBasicComponent extends PureComponent {
         this.props.actions.navigateToScene('QrCodeScanner',
             {
                 currentElement: item,
-                formElements: this.props.arrayElements,
+                formLayoutState: this.props.formLayoutState,
                 jobStatusId: this.props.jobStatusId,
                 jobTransaction: this.props.jobTransaction,
                 latestPositionId: this.props.latestPositionId,
@@ -136,15 +136,12 @@ class ArrayBasicComponent extends PureComponent {
                 <View>
                     <MultipleOptionsAttribute
                         currentElement={item}
-                        formElements={this.props.arrayElements}
-                        isSaveDisabled={this.props.isSaveDisabled}
+                        formLayoutState={this.props.formLayoutState}
                         jobTransaction={this.props.jobTransaction}
                         jobStatusId={this.props.jobStatusId}
-                        latestPositionId={this.props.latestPositionId}
                         calledFromArray={true}
                         rowId={this.props.arrayRow.rowId}
                         onCloseModal={() => this.onCloseModal(item)}
-                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
                     />
                 </View>
             )
@@ -186,7 +183,7 @@ class ArrayBasicComponent extends PureComponent {
                 <View>
                     <DataStoreFilter
                         currentElement={item}
-                        formElement={this.props.arrayElements}
+                        formLayoutState={this.props.formLayoutState}
                         isSaveDisabled={this.props.isSaveDisabled}
                         jobTransaction={this.props.jobTransaction}
                         latestPositionId={this.props.latestPositionId}
@@ -345,7 +342,7 @@ class ArrayBasicComponent extends PureComponent {
                                 this.props.actions.navigateToScene('DataStore',
                                     {
                                         currentElement: item,
-                                        formElements: this.props.arrayElements,
+                                        formLayoutState: this.props.formLayoutState,
                                         jobStatusId: this.props.jobStatusId,
                                         jobTransaction: this.props.jobTransaction,
                                         latestPositionId: this.props.latestPositionId,
@@ -386,7 +383,7 @@ class ArrayBasicComponent extends PureComponent {
                             this.props.actions.navigateToScene(CameraAttribute,
                                 {
                                     currentElement: item,
-                                    formElements: this.props.arrayElements,
+                                    formLayoutState: this.props.formLayoutState,
                                     jobStatusId: this.props.jobStatusId,
                                     jobTransaction: this.props.jobTransaction,
                                     latestPositionId: this.props.latestPositionId,

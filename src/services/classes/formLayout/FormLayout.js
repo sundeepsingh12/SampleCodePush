@@ -8,7 +8,8 @@ import {
     TEXT,
     DECIMAL,
     SCAN_OR_TEXT,
-    QR_SCAN
+    QR_SCAN,
+    NUMBER
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import {
@@ -288,12 +289,10 @@ class FormLayout {
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
             routeName = SaveActivated
             routeParam = {
-                formLayoutState,
-                contactData, currentStatus, jobTransaction, jobMasterId,
-                navigationFormLayoutStates
+                formLayoutState, contactData, currentStatus, jobTransaction, jobMasterId, navigationFormLayoutStates
             }
             await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-
+        
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
             let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
@@ -305,7 +304,6 @@ class FormLayout {
             }
             await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
             await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-
         }
         else if (currentStatus.transient) {
             routeName = Transient
@@ -362,6 +360,7 @@ class FormLayout {
             case DECIMAL:
             case SCAN_OR_TEXT:
             case QR_SCAN:
+            case NUMBER:
                 return dataStoreService.checkForUniqueValidation(currentObject.displayValue, currentObject)
             default:
                 false
