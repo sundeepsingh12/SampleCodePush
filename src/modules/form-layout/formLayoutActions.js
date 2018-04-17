@@ -364,7 +364,7 @@ export function restoreDraftAndNavigateToFormLayout(contactData, jobTransaction,
                 isDraftRestore: true
             }))
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(1013, error.message, 'danger', 1)
         }
     }
 }

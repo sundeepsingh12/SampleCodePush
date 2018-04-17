@@ -124,13 +124,8 @@ class BasicFormElement extends PureComponent {
             case SKU_ARRAY: {
                 this.props.actions.checkForNewJob({
                     currentElement: item,
-                    formElements: this.props.formElement,
-                    jobStatusId: this.props.jobStatusId,
                     jobTransaction: this.props.jobTransaction,
-                    latestPositionId: this.props.latestPositionId,
-                    isSaveDisabled: this.props.isSaveDisabled,
                     returnData: this._searchForReferenceValue.bind(this),
-                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
                     formLayoutState: this.props.formLayoutState
                 })
                 break
@@ -182,7 +177,6 @@ class BasicFormElement extends PureComponent {
     onFocusEvent(currentElement) {
         this.props.actions.fieldValidations(currentElement, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
         if (currentElement && !currentElement.displayValue && currentElement.attributeTypeId == 62) {
-            //currentElement.editable = false
             Keyboard.dismiss();
             this.props.actions.setSequenceDataAndNextFocus(currentElement, this.props.formLayoutState, currentElement.sequenceMasterId, this.props.jobTransaction)
         }
@@ -432,11 +426,6 @@ class BasicFormElement extends PureComponent {
             case CAMERA_HIGH:
             case CAMERA_MEDIUM:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-            case NPS_FEEDBACK:
-                return <View>
-                    {modalView}
-                    <FormLayoutActivityComponent item={this.props.item} press={this.onPressModal} />
-                </View>
             case CHECKBOX:
             case RADIOBUTTON:
             case DROPDOWN:
@@ -450,13 +439,8 @@ class BasicFormElement extends PureComponent {
             case DATE:
             case RE_ATTEMPT_DATE:
             case TIME:
-                return (
-                    <View>
-                        {modalView}
-                        <FormLayoutActivityComponent item={this.props.item} press={this.onPressModal} />
-                    </View>
-                )
             case DATA_STORE_FILTER:
+            case NPS_FEEDBACK:
                 return (
                     <View>
                         {modalView}
