@@ -10,6 +10,7 @@ import {
     LoginScreen,
     SET_BACKUP_UPLOAD_VIEW,
     SET_BACKUP_TOAST,
+    DOMAIN_URL
 } from '../../lib/constants'
 import _ from 'lodash'
 import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '../global/globalActions'
@@ -61,8 +62,9 @@ export function getBackupList() {
         try {
             dispatch(setState(SET_LOADER_BACKUP, true))
             const user = await keyValueDBService.getValueFromStore(USER)
-            if (!user || !user.value) throw new Error(USER_MISSING)
-            let backupFiles = await backupService.getBackupFilesList(user.value) // this method gets backup files list from service
+            let domainUrl =await keyValueDBService.getValueFromStore(DOMAIN_URL)
+            if (!user || !user.value || !domainUrl || !domainUrl.value) throw new Error(USER_MISSING)
+            let backupFiles = await backupService.getBackupFilesList(user.value, domainUrl.value) // this method gets backup files list from service
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
             showToastAndAddUserExceptionLog(202, error.message, 'danger', 1)            
@@ -113,9 +115,10 @@ export function deleteBackupFile(index, filesMap) {
             dispatch(setState(SET_LOADER_BACKUP, true))
             if (!filesMap || !filesMap[index]) throw new Error(FILE_MISSING)
             const user = await keyValueDBService.getValueFromStore(USER)
-            if (!user || !user.value) throw new Error(USER_MISSING)
+            let domainUrl = keyValueDBService.getValueFromStore(DOMAIN_URL)
+            if (!user || !user.value || !domainUrl && !domainUrl.value) throw new Error(USER_MISSING)
             await backupService.deleteBackupFile(index, filesMap) // this method in service will delete backup file.
-            let backupFiles = await backupService.getBackupFilesList(user.value) // this method
+            let backupFiles = await backupService.getBackupFilesList(user.value, domainUrl.value) // this method
             dispatch(setState(SET_BACKUP_FILES, backupFiles))
         } catch (error) {
             showToastAndAddUserExceptionLog(204, error.message, 'danger', 1)            

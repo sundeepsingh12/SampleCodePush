@@ -154,6 +154,7 @@ module.exports = keyMirror({
     USERNAME: null,
     PASSWORD: null,
     REMEMBER_ME: null,
+    DOMAIN_URL: null,
 
     //Preloader Credentials
     IS_SHOW_OTP_SCREEN: null,

@@ -14,7 +14,8 @@ import {
     FIELD_ATTRIBUTE,
     USER,
     PENDING_SYNC_TRANSACTION_IDS,
-    BACKUP_ALREADY_EXIST
+    BACKUP_ALREADY_EXIST,
+    DOMAIN_URL
 } from '../../lib/constants'
 import { userEventLogService } from './UserEvent'
 import { jobSummaryService } from './JobSummary'
@@ -45,17 +46,18 @@ class Backup {
      */
     async createBackupOnLogout() {
         let user = await keyValueDBService.getValueFromStore(USER)
-        if (!user || !user.value) throw new Error(USER_MISSING)
-        await this.createSyncedBackup(user) // it creates backup of synced files.
-        await this.createUnsyncBackupIfNeeded(user) // it creates backup of unsynced files if required.
+        let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+        if (!user || !user.value || !domainUrl || !domainUrl.value) throw new Error(USER_MISSING)
+        await this.createSyncedBackup(user, domainUrl.value) // it creates backup of synced files.
+        await this.createUnsyncBackupIfNeeded(user, domainUrl.value) // it creates backup of unsynced files if required.
         await this.deleteOldBackup() // it will delete backup older than 15 days.
         await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(true))
     }
-    async createUnsyncBackupIfNeeded(user) {
+    async createUnsyncBackupIfNeeded(user, url) {
         let pendingSyncTransactionIds = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
         let isUnsyncTransactionPresent = await logoutService.checkForUnsyncTransactions(pendingSyncTransactionIds)
         if (isUnsyncTransactionPresent) {
-            let backupFileName = this.getBackupFileName(user.value, true)
+            let backupFileName = this.getBackupFileName(user.value, true, url)
             let syncFilePath = PATH + '/sync.zip'
             RNFS.mkdir(PATH);
             RNFS.mkdir(PATH_BACKUP);
@@ -71,7 +73,7 @@ class Backup {
      * 
      * @param {*} user 
      */
-    async createSyncedBackup(user) {
+    async createSyncedBackup(user, url) {
         RNFS.mkdir(PATH);
         RNFS.mkdir(PATH_BACKUP);
         RNFS.mkdir(PATH_BACKUP_TEMP);
@@ -79,7 +81,7 @@ class Backup {
         if (!json) return
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_BACKUP_TEMP + '/logs.json', json, 'utf8');
-        const backupFileName = this.getBackupFileName(user.value) // this will get the backup file name.
+        const backupFileName = this.getBackupFileName(user.value,false,url ) // this will get the backup file name.
         //Creating ZIP file
         const targetPath = PATH_BACKUP + '/' + backupFileName
         const sourcePath = PATH_BACKUP_TEMP
@@ -97,7 +99,8 @@ class Backup {
         if (shouldCreateBackup && shouldCreateBackup.value) {
             return { syncedBackupFiles, toastMessage: BACKUP_ALREADY_EXISTS }
         }
-        let backupFileName = await this.createSyncedBackup(user) // will create backup of synced files.
+        let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL) 
+        let backupFileName = await this.createSyncedBackup(user, domainUrl.value) // will create backup of synced files.
         if (syncedBackupFiles) {
             var stat = await RNFS.stat(PATH_BACKUP + '/' + backupFileName);
             let fileNameArray = backupFileName.split('_')
@@ -114,8 +117,8 @@ class Backup {
      * @param {*} user 
      * @param {*} isUnsyncBackup 
      */
-    getBackupFileName(user, isUnsyncBackup) {
-        const domain = CONFIG.FAREYE.staging.url.split('//')[1].split('.')[0]
+    getBackupFileName(user, isUnsyncBackup, url) {
+        const domain = url.split('//')[1].split('.')[0]
         const dateTimeForBackup = moment().format('YYYY-MM-DD HH-mm-ss')
         let backupFileName = (!isUnsyncBackup) ? domain + '-backup_' + dateTimeForBackup + '_' + user.employeeCode + '.zip' : domain + '-UnSyncbackup_' + dateTimeForBackup + '_' + user.employeeCode + '.zip' // Backup file particular format
         return backupFileName
@@ -174,7 +177,7 @@ class Backup {
      * 
      * @param {*} user 
      */
-    async getBackupFilesList(user) {
+    async getBackupFilesList(user, url) {
         let syncedBackupFiles = {}
         let unsyncedBackupFiles = {}
         let syncedIndex = 1, unSyncedIndex = -1
@@ -182,7 +185,7 @@ class Backup {
         let backUpFilesInfo = await RNFS.readDir(PATH_BACKUP)
         for (let backUpFile in backUpFilesInfo) {
             let fileName = backUpFilesInfo[backUpFile].name
-            const domain = CONFIG.FAREYE.staging.url.split('//')[1].split('.')[0]
+            const domain = url.split('//')[1].split('.')[0]
             let fileNameArray = fileName.split('_')
             let fileDomainInfo = fileNameArray[0]
             let employeeCode = fileName.substring(fileName.indexOf(fileNameArray[2]), _.size(fileName) - 4)
@@ -257,12 +260,13 @@ class Backup {
      */
     async checkForUnsyncBackup(user) {
         let unsyncBackupFilesList = []
-        if (!user || !user.value) return unsyncBackupFilesList
+        let domainUrl = keyValueDBService.getValueFromStore(DOMAIN_URL)
+        if (!user || !user.value || !domainUrl || !domainUrl.value) return unsyncBackupFilesList
         RNFS.mkdir(PATH_BACKUP);
         let backUpFilesInfo = await RNFS.readDir(PATH_BACKUP)
         for (let backUpFile in backUpFilesInfo) {
             let fileName = backUpFilesInfo[backUpFile].name
-            const domain = CONFIG.FAREYE.staging.url.split('//')[1].split('.')[0]
+            const domain = domainUrl.value.split('//')[1].split('.')[0]
             let fileNameArray = fileName.split('_')
             let fileDomainInfo = fileNameArray[0]
             let employeeCode = fileName.substring(fileName.indexOf(fileNameArray[2]), _.size(fileName) - 4)
