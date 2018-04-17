@@ -42,10 +42,7 @@ class SkuListing extends PureComponent {
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-
-    if (_.isEmpty(this.props.skuListItems)) { // Fetch data only once,after it has been loaded in state,no need to fetch it again
-      this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
-    }
+    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
   }
 
   renderData(item) {
