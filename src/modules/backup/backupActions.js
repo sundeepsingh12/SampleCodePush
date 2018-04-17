@@ -116,7 +116,7 @@ export function deleteBackupFile(index, filesMap) {
             if (!filesMap || !filesMap[index]) throw new Error(FILE_MISSING)
             const user = await keyValueDBService.getValueFromStore(USER)
             let domainUrl = keyValueDBService.getValueFromStore(DOMAIN_URL)
-            if (!user || !user.value) throw new Error(USER_MISSING)
+            if (!user || !user.value || !domainUrl && !domainUrl.value) throw new Error(USER_MISSING)
             await backupService.deleteBackupFile(index, filesMap) // this method in service will delete backup file.
             let backupFiles = await backupService.getBackupFilesList(user.value, domainUrl.value) // this method
             dispatch(setState(SET_BACKUP_FILES, backupFiles))

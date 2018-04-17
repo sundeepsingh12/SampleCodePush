@@ -163,13 +163,17 @@ export function authenticateUser(username, password, rememberMe) {
 export function onLongPressResetSettings(url) {
   return async function (dispatch) {
     try {
+      if(!url) {
+        const domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+        url = domainUrl.value
+      }
       dispatch(onLongPressIcon(true))
       await logoutService.deleteDataBase()
       let allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
       await keyValueDBService.deleteValueFromStore(allSchemaInstance)
       dispatch(setState(RESET_STATE))
       dispatch(onLongPressIcon(false))
-      if(url) await keyValueDBService.validateAndSaveData(DOMAIN_URL, url)
+      await keyValueDBService.validateAndSaveData(DOMAIN_URL, url)
     } catch (error) {
       showToastAndAddUserExceptionLog(1302, error.message, 'danger', 1)
       dispatch(onLongPressIcon(false))
@@ -208,6 +212,9 @@ export function checkRememberMe() {
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(1304, error.message, 'danger', 1)
+    } finally {
+      const url = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+      if(!url || !url.value) await keyValueDBService.validateAndSaveData(DOMAIN_URL, CONFIG.FAREYE.domain[0].url)
     }
   }
 }

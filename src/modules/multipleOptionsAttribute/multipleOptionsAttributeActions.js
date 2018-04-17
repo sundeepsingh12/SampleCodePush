@@ -47,7 +47,7 @@ export function getOptionsList(fieldAttributeMasterId, formElement) {
                 optionsMap
             }))
         } catch (error) {
-            showToastAndAddUserExceptionLog(1401, error.message, 'danger', 0)                        
+            showToastAndAddUserExceptionLog(1401, error.message, 'danger', 0)
             dispatch(setState(ERROR_MESSAGE, error.message))
         }
     }
@@ -79,7 +79,7 @@ export function getOptionsListFromJobData(currentElement, jobTransaction) {
                 optionsMap
             }))
         } catch (error) {
-            showToastAndAddUserExceptionLog(1402, error.message, 'danger', 0)                        
+            showToastAndAddUserExceptionLog(1402, error.message, 'danger', 0)
             dispatch(setState(ERROR_MESSAGE, error.message))
         }
     }
@@ -99,11 +99,11 @@ export function toggleCheckStatus(optionsMap, id) {
     }
 }
 
-export function saveOptionsFieldData(optionsMap, currentElement, latestPositionId, formElement, isSaveDisabled, jobTransaction, calledFromArray, rowId, fieldAttributeMasterParentIdMap, item) {
+export function saveOptionsFieldData(optionsMap, currentElement, formLayoutState, jobTransaction, calledFromArray, rowId, item) {
     return async function (dispatch) {
         try {
             let optionFieldDataList, fieldDataListObject = {
-                latestPositionId
+                latestPositionId: formLayoutState.latestPositionId
             }
             let fieldDataValue, containerValue
             if (currentElement.attributeTypeId == CHECKBOX) {
@@ -120,13 +120,13 @@ export function saveOptionsFieldData(optionsMap, currentElement, latestPositionI
             }
             if (fieldDataValue == ARRAY_SAROJ_FAREYE || fieldDataValue == OBJECT_SAROJ_FAREYE) {
                 optionFieldDataList = currentElement.attributeTypeId == CHECKBOX ? multipleOptionsAttributeService.prepareOptionFieldData(optionsMap, currentElement) : multipleOptionsAttributeService.prepareOptionFieldDataFromJobData(item)
-                fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(optionFieldDataList, jobTransaction.id, currentElement.positionId, latestPositionId)
+                fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(optionFieldDataList, jobTransaction.id, currentElement.positionId, formLayoutState.latestPositionId)
             }
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, isSaveDisabled, fieldDataValue, formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS, 2, containerValue, fieldAttributeMasterParentIdMap))
+                dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, formLayoutState.isSaveDisabled, fieldDataValue, formLayoutState.formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS, 2, containerValue, formLayoutState.fieldAttributeMasterParentIdMap))
                 return
             }
-            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formElement, isSaveDisabled, fieldDataValue, fieldDataListObject, jobTransaction, fieldAttributeMasterParentIdMap, true, containerValue))
+            dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, fieldDataValue, fieldDataListObject, jobTransaction, true, containerValue))
         } catch (error) {
             showToastAndAddUserExceptionLog(1404, error.message, 'danger', 1)
         }
@@ -145,7 +145,7 @@ export function showAdvanceDropdownMessage(item) {
                 itemMessage
             }))
         } catch (error) {
-            showToastAndAddUserExceptionLog(1405, error.message, 'danger', 0)                        
+            showToastAndAddUserExceptionLog(1405, error.message, 'danger', 0)
             dispatch(setState(SET_OPTION_ATTRIBUTE_ERROR, error.message))
         }
     }

@@ -64,19 +64,21 @@ export function getFilteredResults(dataStoreFilterList, cloneDataStoreFilterList
 }
 
 
-export function onSave(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, latestPositionId, jobTransaction, dataStoreFilterReverseMap, fieldAttributeMasterParentIdMap, calledFromArray, rowId, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId) {
+export function onSave(fieldAttributeMasterId, formLayoutState, dataStoreFiltervalue, jobTransaction, dataStoreFilterReverseMap, calledFromArray, rowId, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId) {
     return async function (dispatch) {
         try {
             // In case DSF is present in Array field attribute
             if (calledFromArray) {
-                let rowFormElement = formElement[rowId].formLayoutObject // get current formElement from rowId
+                let rowFormElement = formLayoutState.formElement[rowId].formLayoutObject // get current formElement from rowId
                 let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] // get DSF reverse Map in case of array used for back tracking, if it is edited
                 let singleFormElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(rowFormElement))
-                formElement[rowId].formLayoutObject = singleFormElement
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStoreFiltervalue, formElement, rowId, null, NEXT_FOCUS, 2, null, fieldAttributeMasterParentIdMap)) // call save method of array actions and pass NEXT_FOCUS as event
+                formLayoutState.formElement[rowId].formLayoutObject = singleFormElement
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStoreFiltervalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 2, null, formLayoutState.fieldAttributeMasterParentIdMap)) // call save method of array actions and pass NEXT_FOCUS as event
             } else {
-                formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formElement))
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap, true))
+                let formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formLayoutState.formElement))
+                formLayoutState.formElement = formElement
+                formLayoutState.dataStoreFilterReverseMap = dataStoreFilterReverseMap
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStoreFiltervalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, true))
             }
         } catch (error) {
             dispatch(setState(SHOW_LOADER_DSF, false))
@@ -85,17 +87,17 @@ export function onSave(fieldAttributeMasterId, formElement, isSaveDisabled, data
     }
 }
 
- /**
-  * In case of dsf in array this action is called and set dsf data which is fetched by hitting an API
-  * @param {Object} functionParamsFromDSF {
-                                currentElement 
-                                formElement 
-                                jobTransaction 
-                                arrayReverseDataStoreFilterMap 
-                                rowId 
-                                arrayFieldAttributeMasterId        
-                             }
-  */
+/**
+ * In case of dsf in array this action is called and set dsf data which is fetched by hitting an API
+ * @param {Object} functionParamsFromDSF {
+                               currentElement 
+                               formElement 
+                               jobTransaction 
+                               arrayReverseDataStoreFilterMap 
+                               rowId 
+                               arrayFieldAttributeMasterId        
+                            }
+ */
 export function getDSFListContentForArray(functionParamsFromDSF) {
     return async function (dispatch) {
         try {

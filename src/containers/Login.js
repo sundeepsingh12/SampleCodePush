@@ -22,7 +22,7 @@ import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf'
 import codePush from "react-native-code-push"
-import { QrCodeScanner, DOMAIN_URL } from '../lib/constants'
+import { QrCodeScanner } from '../lib/constants'
 import Icon from '../../native-base-theme/components/Icon'
 import CONFIG from '../lib/config'
 import {

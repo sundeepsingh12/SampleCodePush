@@ -262,6 +262,12 @@ class Sync {
    * @param {*} query 
    */
   async saveDataFromServerInDB(contentQuery, isLiveJob) {
+    const jobIds = contentQuery.job.map(jobObject => jobObject.id)
+    const existingJobDatas = {
+      tableName: TABLE_JOB_DATA,
+      valueList: jobIds,
+      propertyName: 'jobId'
+    }
     const jobTransactions = {
       tableName: TABLE_JOB_TRANSACTION,
       value: contentQuery.jobTransactions
@@ -288,6 +294,9 @@ class Sync {
     if (isLiveJob) {
       await this.saveLiveJobData(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     }
+    //Job data is deleted in insert query also,to handle multiple login case 
+    //Ideally Id should be added server side in jobdata table
+    realm.deleteRecordsInBatch(existingJobDatas)
     realm.performBatchSave(jobs, jobTransactions, jobDatas, fieldDatas, runsheets)
     const jobMasterIds = this.getJobMasterIds(contentQuery.job)
     return jobMasterIds
