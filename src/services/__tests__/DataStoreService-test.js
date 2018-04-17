@@ -13,6 +13,22 @@ import { dataStoreFilterService } from '../classes/DataStoreFilterService'
 import { EXTERNAL_DATA_STORE, DATA_STORE } from '../../lib/AttributeConstants'
 import { SEARCH_TEXT_MISSING, DATA_STORE_MAP_MISSING, CURRENT_ELEMENT_MISSING } from '../../lib/ContainerConstants'
 
+describe('test checkIfUniqueConditionExists', () => {
+    it('should return false', () => {
+        expect(dataStoreService.checkIfUniqueConditionExists({
+        })).toEqual(undefined)
+    })
+
+    it('should return true', () => {
+        expect(dataStoreService.checkIfUniqueConditionExists({
+            validation: [{
+                timeOfExecution: MINMAX,
+                condition: 'true'
+            }]
+        })).toEqual(true)
+    })
+})
+
 describe('test getValidations', () => {
     it('should return validation array having all validations', () => {
         const validationArray = [{
@@ -30,13 +46,18 @@ describe('test getValidations', () => {
         {
             timeOfExecution: SPECIAL,
             condition: 'true'
+        },
+        {
+            timeOfExecution: SPECIAL,
+            condition: 'true'
         }]
 
         const validationsResult = {
             isScannerEnabled: true,
             isAutoStartScannerEnabled: false,
             isSearchEnabled: true,
-            isMinMaxValidation: true
+            isMinMaxValidation: true,
+            isAllowFromFieldInExternalDS: true
         }
         expect(dataStoreService.getValidations(validationArray)).toEqual(validationsResult)
     })
@@ -631,6 +652,12 @@ describe('test getDataStoreMasters', () => {
 
 
 describe('test fetchDatastoreAndSaveInDB', () => {
+
+    beforeEach(() => {
+        dataStoreService.fetchDataStore = jest.fn()
+        dataStoreService.saveDataStoreToDB = jest.fn()
+    })
+
     it('should throw Token missing error', () => {
         const message = 'Token Missing'
         try {
@@ -647,12 +674,6 @@ describe('test fetchDatastoreAndSaveInDB', () => {
         } catch (error) {
             expect(error.message).toEqual(message)
         }
-    })
-
-
-    beforeEach(() => {
-        dataStoreService.fetchDataStore = jest.fn()
-        dataStoreService.saveDataStoreToDB = jest.fn()
     })
 
     it('should return totalElements && numberOfElements', () => {
@@ -1201,6 +1222,45 @@ describe('test checkForFiltersAndValidations', () => {
     })
 })
 
+
+describe('test checkForFiltersAndValidationsForArray', () => {
+    beforeEach(() => {
+        dataStoreService.checkForFiltersAndValidations = jest.fn()
+    })
+
+    let functionParamsFromDS = {
+        currentElement: {},
+        formElement: {
+            1: {}
+        },
+        jobTransaction: {},
+        arrayReverseDataStoreFilterMap: {
+            123: {}
+        },
+        arrayFieldAttributeMasterId: 123,
+        rowId: 1
+    }
+
+    it('should return isFiltersPresent to true and check for validations', () => {
+        dataStoreService.checkForFiltersAndValidations.mockReturnValue({
+            dataStoreFilterReverseMap: {},
+            dataStoreAttrValueMap: {},
+            isFiltersPresent: true,
+            validation: {}
+        })
+        return dataStoreService.checkForFiltersAndValidationsForArray(functionParamsFromDS)
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        arrayReverseDataStoreFilterMap: { 123: {} },
+                        isFiltersPresent: true,
+                        validation: {}
+                    }
+                )
+            })
+    })
+})
 
 function getMapFromObject(obj) {
     let strMap = new Map();

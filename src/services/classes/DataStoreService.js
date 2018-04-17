@@ -211,13 +211,19 @@ class DataStoreService {
         return false
     }
 
+    /**
+     * find min max validation from validation array
+     * @param {*} fieldAttribute 
+     */
     checkIfUniqueConditionExists(fieldAttribute) {
-        if (!fieldAttribute.validation || fieldAttribute.validation.length <= 0) {
+        if (!fieldAttribute.validation || fieldAttribute.validation.length == 0) {
             return
         }
+
         let minMaxValidation = fieldAttribute.validation.filter(validation => validation.timeOfExecution == MINMAX)
         return (minMaxValidation.length > 0 && minMaxValidation[0].condition == 'true')
     }
+
     /**
      * This function return fieldAttribute with matching fieldAttributeMasterId
      * @param {*} fieldAttributes

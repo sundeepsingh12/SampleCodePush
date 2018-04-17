@@ -121,11 +121,11 @@ class SortingListing extends PureComponent {
 
 class Sorting extends PureComponent {
 
-    componentDidmount() {
-        if (!_.isUndefined(this.props.navigation.state.params)) {
-            this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))
-        }
-    }
+    // componentDidmount() {
+    //     if (!_.isUndefined(this.props.navigation.state.params)) {
+    //         this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))
+    //     }
+    // }
 
     componentDidUpdate() {
         if (_.size(this.props.errorMessage)) {

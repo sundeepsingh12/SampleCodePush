@@ -9,7 +9,9 @@ import {
     SET_RESPONSE_MESSAGE,
     SET_RUNSHEET_NUMBER_LIST,
     PREPARE_UPDATE_LIST,
-    RESET_STATE
+    RESET_STATE,
+    SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST,
+    SET_SEQUENCE_BACK_ENABLED,
 } from '../../../lib/constants'
 
 import sequenceReducer from '../sequenceReducer'
@@ -139,5 +141,29 @@ describe('sequenceReducer', () => {
         }
         let nextState = sequenceReducer(undefined, action)
         expect(nextState).toEqual(resultState)
+    })
+
+    it('should set state to initial state except runsheetList', () => {
+        const action = {
+            type: SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST,
+        }
+        let nextState = sequenceReducer(undefined, action)
+        expect(nextState.sequenceList).toEqual([])
+        expect(nextState.isSequenceScreenLoading).toBe(false)
+        expect(nextState.isResequencingDisabled).toBe(false)
+        expect(nextState.responseMessage).toBe('')
+        expect(nextState.searchText).toBe('')
+        expect(nextState.currentSequenceListItemSeleceted).toEqual({})
+        expect(nextState.jobMasterSeperatorMap).toEqual({})
+        expect(nextState.transactionsWithChangedSeqeunceMap).toEqual({})
+    })
+
+    it('should set backEnabledFromAppNavigator', () => {
+        const action = {
+            type: SET_SEQUENCE_BACK_ENABLED,
+            payload: true
+        }
+        let nextState = sequenceReducer(undefined, action)
+        expect(nextState.backEnabledFromAppNavigator).toEqual(action.payload)
     })
 })

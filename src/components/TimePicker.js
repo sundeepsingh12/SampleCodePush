@@ -76,6 +76,8 @@ class TimePicker extends PureComponent {
                 date={new Date()}
                 minimumDate={minimum}
                 maximumDate={maximum}
+                titleIOS = {mode}
+
             />
         )
     }

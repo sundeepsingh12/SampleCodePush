@@ -256,16 +256,17 @@ class FieldValidation {
                 }
                 case ASSIGN: {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
-                    if (formElement.get(parseInt(fieldAttributeMasterId))) {
-                        let valueToBeAssigned = null
-                        if (validationActionList[index].actionOnAssignFrom) {
-                            valueToBeAssigned = this.actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationActionList[index], fieldAttributeMasterParentIdMap)
-                        } else {
+                    if(!formElement.get(parseInt(fieldAttributeMasterId))){
+                        break
+                    }
+                    let valueToBeAssigned = null
+                    if (validationActionList[index].actionOnAssignFrom) {
+                        valueToBeAssigned = this.actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationActionList[index], fieldAttributeMasterParentIdMap)
+                    } else {
                             valueToBeAssigned = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction, fieldAttributeMasterParentIdMap)
-                        }
+                    }
                         formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = valueToBeAssigned || valueToBeAssigned === 0 ? valueToBeAssigned + '' : null
                         formElement.get(parseInt(fieldAttributeMasterId)).editable = true
-                    }
                     break
                 }
                 case ASSIGN_BY_MATHEMATICAL_FORMULA: {

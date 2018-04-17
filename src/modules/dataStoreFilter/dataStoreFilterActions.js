@@ -34,8 +34,8 @@ export function getDSFListContent(currentElement, formElement, jobTransaction, d
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
-            showToastAndAddUserExceptionLog(801, error.message, 'danger', 1)
             dispatch(setState(SHOW_LOADER_DSF, false))
+            showToastAndAddUserExceptionLog(801, error.message, 'danger', 1)   
         }
     }
 }
@@ -57,8 +57,8 @@ export function getFilteredResults(dataStoreFilterList, cloneDataStoreFilterList
                 cloneDataStoreFilterList: searchResult.cloneDataStoreFilterList
             }))
         } catch (error) {
-            showToastAndAddUserExceptionLog(802, error.message, 'danger', 1)
             dispatch(setState(SHOW_LOADER_DSF, false))
+            showToastAndAddUserExceptionLog(802, error.message, 'danger', 1)
         }
     }
 }
@@ -81,7 +81,8 @@ export function onSave(fieldAttributeMasterId, formLayoutState, dataStoreFilterv
                 dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStoreFiltervalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, true))
             }
         } catch (error) {
-
+            dispatch(setState(SHOW_LOADER_DSF, false))
+            showToastAndAddUserExceptionLog(803, error.message, 'danger', 1)
         }
     }
 }
@@ -106,7 +107,8 @@ export function getDSFListContentForArray(functionParamsFromDSF) {
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, returnParams.arrayReverseDataStoreFilterMap)) // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
         } catch (error) {
-            showToastAndAddUserExceptionLog(803, error.message, 'danger', 1)
+            dispatch(setState(SHOW_LOADER_DSF, false))
+            showToastAndAddUserExceptionLog(804, error.message, 'danger', 1)
         }
     }
 }

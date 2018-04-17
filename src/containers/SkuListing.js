@@ -34,13 +34,15 @@ import _ from 'lodash'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import * as globalActions from '../modules/global/globalActions'
-
+import SearchBarV2 from '../components/SearchBarV2'
+import { SEARCH_PLACE_HOLDER } from '../lib/ContainerConstants'
+import { SET_SKU_CODE,SKU_CODE_CHANGE } from '../lib/constants'
 class SkuListing extends PureComponent {
 
   componentDidMount() {
     const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
     const jobId = this.props.navigation.state.params.jobTransaction.jobId
-  
+
     if (_.isEmpty(this.props.skuListItems)) { // Fetch data only once,after it has been loaded in state,no need to fetch it again
       this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
     }
@@ -48,7 +50,7 @@ class SkuListing extends PureComponent {
 
   renderData(item) {
     return (
-      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList = {this.props.reasonsList} navigateToScene = {this.props.actions.navigateToScene.bind(this)}/>
+      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} />
     )
   }
 
@@ -57,11 +59,38 @@ class SkuListing extends PureComponent {
   }
 
   onChangeSkuCode(skuCode) {
-    this.props.actions.changeSkuCode(skuCode)
+    this.props.actions.setState(SKU_CODE_CHANGE, skuCode)
   }
 
   static navigationOptions = ({ navigation }) => {
     return { header: null }
+  }
+
+  setSearchText = (searchText) => {
+    this.props.actions.setState(SET_SKU_CODE, searchText)
+  }
+
+  returnValue = (searchText) => {
+    this.setSearchText(searchText)
+    this.props.actions.scanSkuItem({
+      skuListItems: this.props.skuListItems,
+      searchText,
+      skuObjectValidation: this.props.skuObjectValidation,
+      skuValidationForImageAndReason: this.props.skuValidationForImageAndReason,
+      skuChildItems: this.props.skuChildItems
+    })
+  }
+
+  searchIconPressed = () => {
+    if (this.props.searchText) {
+      this.props.actions.scanSkuItem({
+        skuListItems: this.props.skuListItems,
+        searchText: this.props.searchText,
+        skuObjectValidation: this.props.skuObjectValidation,
+        skuValidationForImageAndReason: this.props.skuValidationForImageAndReason,
+        skuChildItems: this.props.skuChildItems
+      })
+    }
   }
 
   render() {
@@ -75,15 +104,14 @@ class SkuListing extends PureComponent {
             <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
               <Body>
                 <View
-                  style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom5, styles.marginTop15]}>
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
                   <Text
                     style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
                   <View />
                 </View>
-               
+                {this.props.isSearchBarVisible? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} />:null}
               </Body>
-
             </Header>
 
             <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
@@ -106,20 +134,12 @@ class SkuListing extends PureComponent {
     }
   }
 
-  scanSkuItem() {
-    //Code incomplete
-    const searchTerm = this.props.skuSearchTerm;
-    if (skuSearchTerm) {
-      this.props.actions.scanSkuItem(this.props.skuListItems, searchTerm)
-    }
-  }
-  
   saveSkuList = () => {
-      this.props.actions.saveSkuListItems(
-        this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
-        this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
-        this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-        this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason, this.props.skuObjectAttributeKey)
+    this.props.actions.saveSkuListItems(
+      this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
+      this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
+      this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
+      this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason, this.props.skuObjectAttributeKey)
   }
 }
 
@@ -135,6 +155,7 @@ function mapStateToProps(state) {
     skuObjectAttributeKey: state.skuListing.skuObjectAttributeKey,
     skuValidationForImageAndReason: state.skuListing.skuValidationForImageAndReason,
     reasonsList: state.skuListing.reasonsList,
+    searchText: state.skuListing.searchText,
   }
 }
 
@@ -151,24 +172,6 @@ const style = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10
   },
-  headerIcon: {
-    width: 24
-  },
-  headerSearch: {
-    paddingLeft: 10,
-    paddingRight: 30,
-    backgroundColor: '#1260be',
-    borderRadius: 2,
-    height: 30,
-    color: '#fff',
-    fontSize: 10
-  },
-  headerQRButton: {
-    position: 'absolute',
-    right: 5,
-    paddingLeft: 0,
-    paddingRight: 0
-  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SkuListing)

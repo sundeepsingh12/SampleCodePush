@@ -187,7 +187,11 @@ export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, 
                 dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState.fieldAttributeMasterParentIdMap))
             }
         } catch (error) {
-            showToastAndAddUserExceptionLog(705, error.message, 'danger', 1)
+            showToastAndAddUserExceptionLog(705, error.message, 'danger', 0)
+            dispatch(setState(SHOW_ERROR_MESSAGE, {
+                errorMessage: error.message,
+                dataStoreAttrValueMap: {},
+            }))
         }
     }
 }

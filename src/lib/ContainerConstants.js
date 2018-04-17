@@ -229,7 +229,16 @@ module.exports = {
     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
     REASON: 'Reason',
     OPEN_CAMERA: 'Open Camera',
+    SEARCH_PLACE_HOLDER: 'Search SKU Code',
+    ORIGNAL_QUANTITY: 'ORIGINAL QUANTITY',
+    PHOTO: 'PHOTO',
+    ACTUAL_QUANTITY: 'ACTUAL QUANTITY',
+    UNIT_PRICE: 'UNIT_PRICE',
+    SKU_CODE_MAX_LIMIT_REACHED: 'Maximum value reached',
+    SKU_CODE_MIN_LIMIT_REACHED: 'Minimum value reached',
     SKIP_SKU_MESSAGE: 'Skipping this attribute, not allowed in new job',
+    RESULT_NOT_FOUND: 'No result found for your search',
+    ACTUAL_QUANTITY_INPUT_ERROR: 'Please enter valid quantity',
 
     //Array
     ADD: 'Add',
