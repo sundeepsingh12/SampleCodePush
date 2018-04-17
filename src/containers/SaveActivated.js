@@ -133,6 +133,9 @@ class SaveActivated extends PureComponent {
     navigateToFormLayout = (statusId, statusName) => {
         let cloneJobTransaction = _.cloneDeep(this.props.navigation.state.params.jobTransaction)
         let lastIndex = parseInt(_.findLastKey(this.props.recurringData))
+        if (!lastIndex) {
+            lastIndex = 0
+        }
         cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
         this.props.actions.navigateToScene(FormLayout, {
             contactData: this.props.navigation.state.params.contactData,

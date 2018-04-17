@@ -177,6 +177,9 @@ export function restoreDraft(draft, contactData, recurringData, jobMasterId, nav
         try {
             let cloneJobTransaction = {}
             let lastIndex = parseInt(_.findLastKey(recurringData))
+            if (!lastIndex) {
+                lastIndex = 0
+            }
             cloneJobTransaction.jobId = cloneJobTransaction.id = --lastIndex
             cloneJobTransaction.jobMasterId = jobMasterId
             dispatch(restoreDraftAndNavigateToFormLayout(contactData, cloneJobTransaction, draft, navigationFormLayoutStates))

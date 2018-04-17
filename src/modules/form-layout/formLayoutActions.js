@@ -171,6 +171,12 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
                     modalFieldAttributeMasterId: validationsResult ? null : modalPresent ? attributeMasterId : null
                 }
             ))
+            if (formLayoutState.updateDraft) {
+                formLayoutState.formElement = updatedFieldDataObject.formLayoutObject
+                formLayoutState.isSaveDisabled = updatedFieldDataObject.isSaveDisabled
+                formLayoutState.latestPositionId = fieldDataListObject.latestPositionId
+                draftService.saveDraftInDb(formLayoutState, formLayoutState.jobMasterId, null, jobTransaction)
+            }
             if (validationsResult && !modalPresent) {
                 dispatch(NavigationActions.back())
             }
@@ -181,12 +187,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
                     Toast.show({ text: cloneFormElement.get(attributeMasterId).alertMessage, position: 'bottom', buttonText: 'OK', duration: 5000 })
                 }
             }
-            if (formLayoutState.updateDraft) {
-                formLayoutState.formElement = updatedFieldDataObject.formLayoutObject
-                formLayoutState.isSaveDisabled = updatedFieldDataObject.isSaveDisabled
-                formLayoutState.latestPositionId = fieldDataListObject.latestPositionId
-                draftService.saveDraftInDb(formLayoutState, formLayoutState.jobMasterId, null, jobTransaction)
-            }
+
         } catch (error) {
             showToastAndAddUserExceptionLog(1006, error.message, 'danger', 1)
         }

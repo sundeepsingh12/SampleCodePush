@@ -280,12 +280,10 @@ class FormLayout {
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
             routeName = SaveActivated
             routeParam = {
-                formLayoutState,
-                contactData, currentStatus, jobTransaction, jobMasterId,
-                navigationFormLayoutStates
+                formLayoutState, contactData, currentStatus, jobTransaction, jobMasterId, navigationFormLayoutStates
             }
-            //await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-
+            await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
+        
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
             let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
