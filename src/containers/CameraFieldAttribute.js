@@ -52,7 +52,8 @@ import {
 function mapStateToProps(state) {
     return {
         imageData: state.cameraReducer.imageData,
-        showImage: state.cameraReducer.showImage
+        showImage: state.cameraReducer.showImage,
+        validation: state.cameraReducer.validation
     }
 }
 
@@ -83,6 +84,7 @@ class CameraFieldAttribute extends PureComponent {
     }
     componentDidMount() {
         let item = this.props.navigation.state.params.currentElement
+        this.props.actions.getValidation(item.validation)
         switch (item.attributeTypeId) {
             case CAMERA: this.setState({ quality: 'low' })
                 break
@@ -124,9 +126,7 @@ class CameraFieldAttribute extends PureComponent {
               title: 'Photo Picker',
               takePhotoButtonTitle: 'Take Photo...',
               chooseFromLibraryButtonTitle: 'Choose from Library...',
-              quality: 0.8,
-              maxWidth: 300,
-              maxHeight: 300,
+              quality: 0.5,
               allowsEditing: true,
               storageOptions: {
                 skipBackup: true,
@@ -156,7 +156,7 @@ class CameraFieldAttribute extends PureComponent {
         }
         return view
     }
-    imageCaptureView() {
+    imageCaptureView(getValidationObject) {
         let torchView = this.renderTorch()
         return <StyleProvider style={getTheme(platform)}>
             <Container>
@@ -187,7 +187,7 @@ class CameraFieldAttribute extends PureComponent {
                 <View style={[style.cameraFooter]}>
                     <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.flex1]}>
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                            <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} />
+                        {( getValidationObject && getValidationObject.imageUploadFromDevice) ?  <MaterialIcons name={'photo'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.getImageGallery()} /> : null }
                         </View>
                         <View style={[styles.flexBasis33_3, styles.alignCenter]}>
                             <View style={[styles.justifyCenter, styles.alignCenter, { width: 68, height: 68, borderRadius: 34, borderColor: '#ffffff', borderWidth: 1 }]}>
@@ -197,8 +197,8 @@ class CameraFieldAttribute extends PureComponent {
                             </View>
                         </View>
                         <View style={[styles.flexBasis33_3, styles.alignCenter, styles.justifyCenter]}>
-                            <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} />
-                        </View>
+                        {( getValidationObject && getValidationObject.isFrontCameraEnabled) ? <MaterialIcons name={'switch-camera'} style={[styles.fontXxxl, styles.fontWeight500, { color: '#ffffff' }]} onPress={() => this.toggleCameraType()} /> : null }
+                        </View> 
                     </View>
                 </View>
             </Container>
@@ -252,7 +252,7 @@ class CameraFieldAttribute extends PureComponent {
         if (((item.value && item.value != '') || this.props.imageData ) && this.props.showImage) {
             return this.showImageView()
         } else {
-            return this.imageCaptureView()
+            return this.imageCaptureView(this.props.validation)
         }
     }
 
