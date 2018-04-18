@@ -60,6 +60,7 @@ function mapStateToProps(state) {
     dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
     noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
+    arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
   }
 }
 
@@ -70,10 +71,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FormLayout extends PureComponent {
+
   componentDidUpdate() {
-    if (this.props.updateDraft && !this.props.navigation.state.params.jobTransaction.length && !this.props.navigation.state.params.editableFormLayoutState && !this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
-      this.saveDraft()
-    }
     if (this.props.errorMessage && this.props.errorMessage != '') {
       Toast.show({
         text: this.props.errorMessage,
@@ -91,42 +90,40 @@ class FormLayout extends PureComponent {
       this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
     }
   }
-  saveDraft = () => {
-    if (this.props.jobTransactionId != 0) {
-      let formLayoutState = {
-        formElement: this.props.formElement,
-        isSaveDisabled: this.props.isSaveDisabled,
-        statusName: this.props.statusName,
-        jobTransactionId: this.props.jobTransactionId,
-        statusId: this.props.statusId,
-        latestPositionId: this.props.latestPositionId,
-        paymentAtEnd: this.props.paymentAtEnd,
-        isLoading: this.props.isLoading,
-        errorMessage: this.props.errorMessage,
-        currentElement: this.props.currentElement,
-        dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
-        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
-      }
-      this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction)
-    }
-  }
 
   componentDidMount() {
     if (!this.props.navigation.state.params.isDraftRestore) {
       this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId)
+      if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
+        this.props.actions.setState(SET_UPDATE_DRAFT, false)
+      }
     }
   }
 
   renderData = (item) => {
+    let formLayoutState = {
+      formElement: this.props.formElement,
+      isSaveDisabled: this.props.isSaveDisabled,
+      statusName: this.props.statusName,
+      jobTransactionId: this.props.jobTransactionId,
+      statusId: this.props.statusId,
+      latestPositionId: this.props.latestPositionId,
+      paymentAtEnd: this.props.paymentAtEnd,
+      isLoading: this.props.isLoading,
+      errorMessage: this.props.errorMessage,
+      currentElement: this.props.currentElement,
+      dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
+      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
+      updateDraft: this.props.updateDraft,
+      arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
+      jobMasterId: this.props.navigation.state.params.jobMasterId
+    }
     return (
       <BasicFormElement
         item={item}
-        formElement={this.props.formElement}
-        isSaveDisabled={this.props.isSaveDisabled}
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
-        latestPositionId={this.props.latestPositionId}
-        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
+        formLayoutState={formLayoutState}
       />
     )
   }

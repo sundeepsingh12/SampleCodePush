@@ -154,6 +154,7 @@ module.exports = keyMirror({
     USERNAME: null,
     PASSWORD: null,
     REMEMBER_ME: null,
+    DOMAIN_URL: null,
 
     //Preloader Credentials
     IS_SHOW_OTP_SCREEN: null,
@@ -308,6 +309,7 @@ module.exports = keyMirror({
     SHOW_SEARCH_BAR: null,
     SKU_CODE_CHANGE: null,
     UPDATE_SKU_ACTUAL_QUANTITY: null,
+    SET_SKU_CODE: null,
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,

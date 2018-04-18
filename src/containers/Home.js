@@ -53,7 +53,8 @@ class Home extends PureComponent {
           Toast.show({
             text: `${notification.message}`,
             position: 'top',
-            buttonText: 'OK'
+            buttonText: 'OK',
+            duration: 10000
           })
           notification.finish(PushNotificationIOS.FetchResult.NoData);
         }
