@@ -50,7 +50,7 @@ export function getValidation(value) {
             const result = await signatureService.getValidations(value)
             dispatch(setState(SET_VALIDATION_FOR_CAMERA, result))
         } catch (error) {
-            showToastAndAddUserExceptionLog(-302, error.message, 'danger', 1)
+            showToastAndAddUserExceptionLog(305, error.message, 'danger', 1)
         }
     }
 }
