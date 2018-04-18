@@ -11,7 +11,7 @@ import {
 import styles from '../themes/FeStyle'
 import getTheme from '../../native-base-theme/components';
 import platform from '../../native-base-theme/variables/platform';
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import { SEARCH } from '../lib/ContainerConstants'
 export default class SearchBar extends PureComponent {
@@ -22,7 +22,7 @@ export default class SearchBar extends PureComponent {
                 style={[style.headerQRButton]}
                 onPress={() => this.props.scanner()}
                 autoFocus={this.props.isAutoStartScannerEnabled} >
-                <QRIcon width={30} height={30} color={styles.fontBlack} />
+                <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={styles.fontBlack.color} />
             </Button>
         }
     }

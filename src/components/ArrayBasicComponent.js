@@ -53,7 +53,7 @@ import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
 import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
 import * as globalActions from '../modules/global/globalActions'
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
     ON_BLUR,
     NEXT_FOCUS,
@@ -298,8 +298,7 @@ class ArrayBasicComponent extends PureComponent {
                                     style={[styles.absolute, { bottom: 50, right: 10 }]}
                                     onPress={() => this.goToQRCode(item)} >
                                     <View>
-                                        <QRIcon width={30} height={30} color={this.getComponentLabelStyle(item.focus, item.editable)} />
-                                    </View>
+                                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(item.focus, item.editable).color} />                                    </View>
                                 </TouchableHighlight> : null}
                             {item.alertMessage ?
                                 <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{item.alertMessage}</Label>

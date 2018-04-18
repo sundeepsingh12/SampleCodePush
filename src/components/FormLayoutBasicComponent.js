@@ -22,7 +22,7 @@ import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import DataStoreFilter from '../containers/DataStoreFilter'
 import {
     MONEY_COLLECT,
@@ -400,7 +400,7 @@ class BasicFormElement extends PureComponent {
                                         onPress={this.goToQRCode}
                                     >
                                         <View>
-                                            <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)} />
+                                            <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable).color} />
                                         </View>
                                     </TouchableHighlight> : null}
                             </View>

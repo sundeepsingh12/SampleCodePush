@@ -120,7 +120,7 @@ class AddServerSms {
      * @returns
      * messageBody: string
      */
-    setSmsBodyJobData(messageBody, jobDataMap, jobTransaction, keyToJobAttributeMap, jobDataList, setNA) {
+    setSmsBodyJobData(messageBody, jobDataMap, jobTransaction, keyToJobAttributeMap, jobDataList, setNA) { //TODO combine setSmsBodyJobData and setSmsBodyFieldData
         let reqEx = /\{.*?\}/g
         let keys = messageBody.match(reqEx)
         if (!keys) return messageBody
@@ -273,10 +273,10 @@ class AddServerSms {
         if (!keys || keys.length == 0)
             return messageBody
         if (previousMessage != messageBody) {
+            previousMessage = messageBody
             messageBody = this.setSmsBodyJobData(messageBody, jobData, jobTransaction, fieldAndJobAttrMap.keyToJobAttributeMap)
             messageBody = this.setSMSBodyFieldData(messageBody, fieldData, jobTransaction, fieldAndJobAttrMap.keyToFieldAttributeMap, formElement)
             messageBody = this.setSmsBodyFixedAttribute(messageBody, jobTransaction, user)
-            previousMessage = messageBody
             messageBody = this.checkForRecursiveData(messageBody, previousMessage, jobData, fieldData, jobTransaction, fieldAndJobAttrMap, user, formElement)
         }
         else {
