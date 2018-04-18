@@ -84,7 +84,7 @@ class CameraFieldAttribute extends PureComponent {
     }
     componentDidMount() {
         let item = this.props.navigation.state.params.currentElement
-        this.props.actions.getValidation(item.validation)
+        if(!_.isEmpty(item.validation)) this.props.actions.getValidation(item.validation)
         switch (item.attributeTypeId) {
             case CAMERA: this.setState({ quality: 'low' })
                 break
