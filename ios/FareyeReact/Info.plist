@@ -39,6 +39,8 @@
 	<string>Fareye needs access to your camera</string>
 	<key>NSPhotoLibraryUsageDescription</key>
     <string>Fareye would like access to your photo gallery</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Fareye needs access to your bluetooth</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>CHANGEME: Location Always And When In Use Usage Description</string>
 	<key>NSLocationAlwaysUsageDescription</key>
