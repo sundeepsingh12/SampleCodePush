@@ -61,6 +61,7 @@ function mapStateToProps(state) {
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
     noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
     arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
+    jobAndFieldAttributesList: state.formLayout.jobAndFieldAttributesList
   }
 }
 
@@ -116,7 +117,8 @@ class FormLayout extends PureComponent {
       fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
       updateDraft: this.props.updateDraft,
       arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
-      jobMasterId: this.props.navigation.state.params.jobMasterId
+      jobMasterId: this.props.navigation.state.params.jobMasterId,
+      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList
     }
     return (
       <BasicFormElement

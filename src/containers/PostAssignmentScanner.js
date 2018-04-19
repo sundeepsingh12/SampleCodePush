@@ -30,8 +30,6 @@ import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures';
-import TorchOnIcon from '../svg_components/icons/TorchOnIcon'
-import TorchOffIcon from '../svg_components/icons/TorchOffIcon'
 import * as postAssignmentActions from '../modules/postAssignment/postAssignmentActions'
 import * as globalActions from '../modules/global/globalActions'
 import Loader from '../components/Loader'
@@ -51,6 +49,7 @@ import {
 
 import * as homeActions from '../modules/home/homeActions'
 import * as taskListActions from '../modules/taskList/taskListActions'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 function mapStateToProps(state) {
     return {
@@ -60,7 +59,7 @@ function mapStateToProps(state) {
         error: state.postAssignment.error,
         scanSuccess: state.postAssignment.scanSuccess,
         scanError: state.postAssignment.scanError,
-        jobMaster:state.postAssignment.jobMaster
+        jobMaster: state.postAssignment.jobMaster
     }
 }
 
@@ -136,8 +135,9 @@ class PostAssignmentScanner extends PureComponent {
     }
 
     _onBarcodeRead(barcodeResult) {
-        if(!this.props.error){
-        this.props.actions.checkScannedJob(barcodeResult.data, this.props.jobTransactionMap, this.props.jobMaster,  JSON.parse(this.props.navigation.state.params.pageObject.additionalParams).isForceAssignmentAllowed, this.props.pendingCount, true)}
+        if (!this.props.error) {
+            this.props.actions.checkScannedJob(barcodeResult.data, this.props.jobTransactionMap, this.props.jobMaster, JSON.parse(this.props.navigation.state.params.pageObject.additionalParams).isForceAssignmentAllowed, this.props.pendingCount, true)
+        }
     }
 
     getTransactionIconView(jobTransaction) {
@@ -220,48 +220,48 @@ class PostAssignmentScanner extends PureComponent {
         this.props.actions.fetchJobs()
     }
 
-    getSearchPlaceHolder(){
+    getSearchPlaceHolder() {
         return (
             <View style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingLeft10, styles.paddingRight10]}>
-            <View style={[styles.relative, { width: '100%', height: 30 }]}>
-                <TextInput
-                    placeholder={POST_SEARCH_PLACEHOLDER}
-                    placeholderTextColor={'rgba(255,255,255,.6)'}
-                    underlineColorAndroid='transparent'
-                    style={[styles.headerSearch]}
-                    onChangeText={value => this.setState({ searchText: value })}
-                    onSubmitEditing={event => this.checkJobTransaction(this.state.searchText, true)}
-                    value={this.state.searchText} />
-                <Button onPress={() => { this.checkJobTransaction(this.state.searchText, true) }} small transparent style={[styles.inputInnerBtn]}>
-                    <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
-                </Button>
+                <View style={[styles.relative, { width: '100%', height: 30 }]}>
+                    <TextInput
+                        placeholder={POST_SEARCH_PLACEHOLDER}
+                        placeholderTextColor={'rgba(255,255,255,.6)'}
+                        underlineColorAndroid='transparent'
+                        style={[styles.headerSearch]}
+                        onChangeText={value => this.setState({ searchText: value })}
+                        onSubmitEditing={event => this.checkJobTransaction(this.state.searchText, true)}
+                        value={this.state.searchText} />
+                    <Button onPress={() => { this.checkJobTransaction(this.state.searchText, true) }} small transparent style={[styles.inputInnerBtn]}>
+                        <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
+                    </Button>
+                </View>
             </View>
-        </View>
         )
     }
 
-    getHeader(){
+    getHeader() {
         return (
             <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])} hasTabs>
-            <Body>
-                <View
-                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                    <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
-                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                    </TouchableOpacity>
-                    <View style={[styles.headerBody]}>
-                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name}</Text>
+                <Body>
+                    <View
+                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                        <TouchableOpacity style={[styles.headerLeft]} onPress={() => { this.props.navigation.goBack(null) }}>
+                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                        </TouchableOpacity>
+                        <View style={[styles.headerBody]}>
+                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name}</Text>
+                        </View>
+                        <View style={[styles.headerRight]}>
+                        </View>
                     </View>
-                    <View style={[styles.headerRight]}>
-                    </View>
-                </View>
-              {this.getSearchPlaceHolder()}
-            </Body>
-        </Header>
+                    {this.getSearchPlaceHolder()}
+                </Body>
+            </Header>
         )
     }
 
-    getCameraView(){
+    getCameraView() {
         return (
             <RNCamera
                 ref="cam"
@@ -291,22 +291,22 @@ class PostAssignmentScanner extends PureComponent {
         )
     }
 
-    getCameraAndGestureRecognizer(){
+    getCameraAndGestureRecognizer() {
         return (
             <View style={[styles.relative, styles.flex1]}>
-            {this.getCameraView()}
-            <TouchableHighlight onPress={() => { this.setState({ torchStatus: !this.state.torchStatus }) }} style={[styles.alignCenter, styles.justifyCenter, { position: 'absolute', borderRadius: 5, top: 10, left: 10, backgroundColor: 'rgba(158, 158, 158,.6)', padding: 5 }]}>
-                <View>
-                    {this.state.torchStatus ? <TorchOnIcon width={32} height={32} /> : <TorchOffIcon width={32} height={32} />}
-                </View>
-            </TouchableHighlight>
-            {this.state.showTransactionList ?
-                <GestureRecognizer
-                    onSwipeDown={(state) => this.onSwipeDown(state)}
-                    style={[styles.flex1, { position: 'absolute', backgroundColor: 'rgba(0,0,0,.8)', top: 0, bottom: 0, left: 0, right: 0 }]}>
-                </GestureRecognizer> : null
-            }
-        </View>
+                {this.getCameraView()}
+                <TouchableHighlight onPress={() => { this.setState({ torchStatus: !this.state.torchStatus }) }} style={[styles.alignCenter, styles.justifyCenter, { position: 'absolute', borderRadius: 5, top: 10, left: 10, backgroundColor: 'rgba(158, 158, 158,.6)', padding: 5 }]}>
+                    <View>
+                        {this.state.torchStatus ? <MaterialCommunityIcons name='flashlight' style={[styles.fontXxl, styles.padding5]} color={styles.fontBlack.color} /> : <MaterialCommunityIcons name='flashlight-off' style={[styles.fontXxl, styles.padding5]} color={styles.fontBlack.color} />}
+                    </View>
+                </TouchableHighlight>
+                {this.state.showTransactionList ?
+                    <GestureRecognizer
+                        onSwipeDown={(state) => this.onSwipeDown(state)}
+                        style={[styles.flex1, { position: 'absolute', backgroundColor: 'rgba(0,0,0,.8)', top: 0, bottom: 0, left: 0, right: 0 }]}>
+                    </GestureRecognizer> : null
+                }
+            </View>
         )
     }
 
@@ -323,9 +323,9 @@ class PostAssignmentScanner extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                  {this.getHeader()}
+                    {this.getHeader()}
 
-                   {this.getCameraAndGestureRecognizer()}
+                    {this.getCameraAndGestureRecognizer()}
 
                     <Animated.View
                         style={[style.subView,
@@ -349,7 +349,7 @@ class PostAssignmentScanner extends PureComponent {
                                 }}
                                 style={[styles.justifyCenter, styles.width100, styles.alignCenter, styles.padding10, { backgroundColor: 'transparent' }]}>
                                 <Text style={[styles.fontBlack]}>
-                                    <Icon onPress = {() => this.state.showTransactionList?this.onSwipeDown(this.state):this.onSwipeUp(this.state)} name={this.state.showTransactionList ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontXxxl, styles.fontWhite]} />
+                                    <Icon onPress={() => this.state.showTransactionList ? this.onSwipeDown(this.state) : this.onSwipeUp(this.state)} name={this.state.showTransactionList ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontXxxl, styles.fontWhite]} />
                                 </Text>
                             </GestureRecognizer>
                             <View style={{ width: '95%', flex: 1, backgroundColor: '#ffffff', borderTopLeftRadius: 5, borderTopRightRadius: 5, borderBottomColor: '#f3f3f3', borderBottomWidth: 3 }}>

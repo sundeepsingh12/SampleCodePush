@@ -123,7 +123,7 @@ export function saveOptionsFieldData(optionsMap, currentElement, formLayoutState
                 fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(optionFieldDataList, jobTransaction.id, currentElement.positionId, formLayoutState.latestPositionId)
             }
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, formLayoutState.isSaveDisabled, fieldDataValue, formLayoutState.formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS, 2, containerValue, formLayoutState.fieldAttributeMasterParentIdMap))
+                dispatch(getNextFocusableAndEditableElement(currentElement.fieldAttributeMasterId, formLayoutState.isSaveDisabled, fieldDataValue, formLayoutState.formElement, rowId, fieldDataListObject.fieldDataList, NEXT_FOCUS, 2, containerValue, formLayoutState))
                 return
             }
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, fieldDataValue, fieldDataListObject, jobTransaction, true, containerValue))

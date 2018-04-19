@@ -8,7 +8,7 @@ import {
 } from 'native-base';
 import styles from '../themes/FeStyle'
 import { QrCodeScanner } from '../lib/constants'
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 
 export default class SearchBarV2 extends PureComponent {
@@ -40,7 +40,7 @@ export default class SearchBarV2 extends PureComponent {
                     </Button>
                 </View>
                 <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this._setQrValue.bind(this) })} >
-                    <QRIcon width={30} height={30} color={styles.fontWhite} />
+                    <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl]} color={styles.fontWhite.color} />
                 </TouchableOpacity>
             </View>
         )

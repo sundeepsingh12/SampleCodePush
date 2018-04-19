@@ -37,9 +37,6 @@ import {
 import styles from '../themes/FeStyle'
 import platform from '../../native-base-theme/variables/platform'
 import getTheme from '../../native-base-theme/components'
-import CameraIcon from '../svg_components/icons/CameraIcon'
-import TorchOffIcon from '../svg_components/icons/TorchOffIcon'
-import TorchOnIcon from '../svg_components/icons/TorchOnIcon'
 import ImagePicker from 'react-native-image-picker'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import {
