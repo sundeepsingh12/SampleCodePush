@@ -154,6 +154,7 @@ module.exports = keyMirror({
     USERNAME: null,
     PASSWORD: null,
     REMEMBER_ME: null,
+    DOMAIN_URL: null,
 
     //Preloader Credentials
     IS_SHOW_OTP_SCREEN: null,
@@ -483,6 +484,7 @@ module.exports = keyMirror({
     SET_SHOW_VIEW_IMAGE: null,
     UPDATE_SKU_LIST_ITEMS: null,
     SET_SHOW_IMAGE_AND_DATA: null,
+    SET_VALIDATION_FOR_CAMERA: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
