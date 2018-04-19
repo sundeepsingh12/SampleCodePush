@@ -91,6 +91,9 @@ export class keyValueDb {
       case 'PAGES_ADDITIONAL_UTILITY':
         schemaInstance = require('../repositories/schema/pagesAdditionalUtilities');
         break;
+      case 'MDM_POLICIES':
+        schemaInstance = require('../repositories/schema/mdmPolicies');
+        break;
       default:
         checkCondition = true;
     }
