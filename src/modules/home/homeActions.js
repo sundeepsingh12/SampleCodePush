@@ -447,7 +447,7 @@ export function syncService(pieChart) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
       const mdmPolicies = await keyValueDBService.getValueFromStore(MDM_POLICIES)
-      const timeInterval = (mdmPolicies && mdmPolicies.value  && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : 5
+      const timeInterval = (mdmPolicies && mdmPolicies.value  && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
         dispatch(performSyncService(pieChart))
       }, timeInterval*1000)
