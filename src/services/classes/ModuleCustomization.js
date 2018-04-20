@@ -42,7 +42,6 @@ import {
     MAIN_MENU
 } from '../../lib/constants'
 import _ from 'lodash'
-import NewJobIcon from '../../../src/svg_components/icons/NewJobIcon'
 import { UNTITLED } from '../../lib/ContainerConstants'
 class ModuleCustomization {
 

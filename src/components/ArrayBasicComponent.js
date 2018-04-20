@@ -53,7 +53,7 @@ import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
 import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
 import * as globalActions from '../modules/global/globalActions'
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
     ON_BLUR,
     NEXT_FOCUS,
@@ -75,18 +75,18 @@ function mapDispatchToProps(dispatch) {
 class ArrayBasicComponent extends PureComponent {
 
     _searchForReferenceValue = (value, item) => {
-        this.props.actions.fieldValidationsArray(item, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, value)
+        this.props.actions.fieldValidationsArray(item, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, value, this.props.formLayoutState)
     }
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
     }
 
     _onBlurEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId) {
-        this.props.actions.getNextFocusableForArrayWithoutChildDatalist(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, this.props.fieldAttributeMasterParentIdMap);
+        this.props.actions.getNextFocusableForArrayWithoutChildDatalist(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, this.props.formLayoutState);
     }
 
     _styleNextFocusable(isFocusable) {
@@ -96,7 +96,7 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     onSaveDateTime = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState);
     }
     onPressModal = (fieldAttributeMasterId) => {
         this.props.actions.showOrDropModal(fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
@@ -298,8 +298,7 @@ class ArrayBasicComponent extends PureComponent {
                                     style={[styles.absolute, { bottom: 50, right: 10 }]}
                                     onPress={() => this.goToQRCode(item)} >
                                     <View>
-                                        <QRIcon width={30} height={30} color={this.getComponentLabelStyle(item.focus, item.editable)} />
-                                    </View>
+                                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(item.focus, item.editable).color} />                                    </View>
                                 </TouchableHighlight> : null}
                             {item.alertMessage ?
                                 <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{item.alertMessage}</Label>
@@ -338,7 +337,7 @@ class ArrayBasicComponent extends PureComponent {
                     <View>
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
                                 this.props.actions.navigateToScene('DataStore',
                                     {
                                         currentElement: item,
@@ -368,7 +367,7 @@ class ArrayBasicComponent extends PureComponent {
                     <View>
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled, null, this.props.formLayoutState)
                                 this.goToQRCode(item)
                             }} />
                     </View>
@@ -379,7 +378,7 @@ class ArrayBasicComponent extends PureComponent {
                 return (<View>
                     <FormLayoutActivityComponent item={item} press={
                         () => {
-                            this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+                            this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
                             this.props.actions.navigateToScene(CameraAttribute,
                                 {
                                     currentElement: item,

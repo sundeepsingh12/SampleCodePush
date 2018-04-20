@@ -22,7 +22,6 @@ import {
 } from 'native-base'
 import moment from 'moment'
 import renderIf from '../lib/renderIf'
-import CallIcon from '../svg_components/icons/CallIcon'
 import {
   SELECT_NUMBER_FOR_CALL,
   SELECT_NUMBER,
@@ -36,6 +35,7 @@ import {
 import Communications from 'react-native-communications'
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 
 export default class JobListItem extends PureComponent {
 
@@ -276,7 +276,7 @@ export default class JobListItem extends PureComponent {
 
           {renderIf(this.props.data.jobSwipableDetails.customerCareData && this.props.data.jobSwipableDetails.customerCareData.length > 0 && this.props.showIconsInJobListing,
             <Button transparent onPress={this.customerCareButtonPressed}>
-              <CallIcon />
+              <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
             </Button>)}
         </View>
     )

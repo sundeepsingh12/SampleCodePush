@@ -184,7 +184,7 @@ export function onSave(fieldAttributeMasterId, formLayoutState, dataStorevalue, 
             if (!calledFromArray) {
                 dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStorevalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
             } else {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState.fieldAttributeMasterParentIdMap))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(705, error.message, 'danger', 0)
@@ -243,7 +243,7 @@ export function fillKeysAndSave(dataStoreAttributeValueMap, fieldAttributeMaster
             } else {
                 let formElementResult = await dataStoreService.fillKeysInFormElement(dataStoreAttributeValueMap, formLayoutState.formElement[rowId].formLayoutObject)
                 formLayoutState.formElement[rowId].formLayoutObject = formElementResult
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState.fieldAttributeMasterParentIdMap))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStorevalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 1, null, formLayoutState))
             }
         } catch (error) {
             dispatch(setState(SHOW_ERROR_MESSAGE, {

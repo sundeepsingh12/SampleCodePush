@@ -73,21 +73,17 @@ import {
   ADDRESS_LINE_2
 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications'
-import CallIcon from '../svg_components/icons/CallIcon'
-import RevertIcon from '../svg_components/icons/RevertIcon'
-import GroupIcon from '../svg_components/icons/GroupIcon'
-
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
-import { jobStatusService } from '../services/classes/JobStatus'
 import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/formLayoutActions'
-import { checkForDraftANdStartSyncAndNavigateToJobDetail } from '../modules/taskList/taskListActions' 
+import { checkForDraftANdStartSyncAndNavigateToJobDetail } from '../modules/taskList/taskListActions'
 import DraftModal from '../components/DraftModal'
 import Line1Line2View from '../components/Line1Line2View'
 import SyncLoader from '../components/SyncLoader'
-
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 function mapStateToProps(state) {
   return {
@@ -169,7 +165,7 @@ class JobDetailsV2 extends PureComponent {
         <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
           <View style={[styles.row, styles.alignCenter]}>
             <View style={[styles.marginTop12]}>
-              <GroupIcon />
+              <MaterialIcons name='playlist-play' style={[styles.fontXxl]} color={styles.fontBlack.color} />
             </View>
             <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
             <Right>
@@ -180,7 +176,7 @@ class JobDetailsV2 extends PureComponent {
       </TouchableOpacity>
     )
   }
-  
+
   renderDropDownStatus(length, minIndexDropDown) {
     return (
       <ListItem
@@ -413,7 +409,7 @@ class JobDetailsV2 extends PureComponent {
       }
     }
   }
-  
+
   alertForStatusRevert(statusData) {
     Alert.alert(
       CONFIRM_REVERT,
@@ -426,13 +422,15 @@ class JobDetailsV2 extends PureComponent {
   }
 
   updateTransactionForGroupId(groupId) {
-    this.props.actions.checkForDraftANdStartSyncAndNavigateToJobDetail(BulkListing, {pageObject : {
-      jobMasterIds: [this.props.jobTransaction.jobMasterId],
-      additionalParams: {statusId : this.props.currentStatus.id},
-      groupId: groupId
-    }}, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
+    this.props.actions.checkForDraftANdStartSyncAndNavigateToJobDetail(BulkListing, {
+      pageObject: {
+        jobMasterIds: [this.props.jobTransaction.jobMasterId],
+        additionalParams: { statusId: this.props.currentStatus.id },
+        groupId: groupId
+      }
+    }, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
   }
-  
+
   selectStatusToRevert = () => {
     if (this.props.statusRevertList[0] == 1) {
       { Toast.show({ text: REVERT_NOT_ALLOWED_INCASE_OF_SYNCING, position: 'bottom' | "center", buttonText: OK, type: 'danger', duration: 5000 }) }
@@ -543,7 +541,7 @@ class JobDetailsV2 extends PureComponent {
         <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
           <View style={[styles.row, styles.alignCenter]}>
             <View>
-              <RevertIcon color={styles.fontPrimary} />
+              <MaterialIcons name='rotate-left' style={[styles.fontXxl]} color={styles.fontBlack.color} />
             </View>
             <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{REVERT_STATUS}</Text>
             <Right>
@@ -631,7 +629,7 @@ class JobDetailsV2 extends PureComponent {
         {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
           <FooterTab>
             <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
-              <CallIcon />
+              <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
             </Button>
           </FooterTab>)}
       </Footer>
@@ -670,7 +668,7 @@ class JobDetailsV2 extends PureComponent {
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
-          {(this.props.syncLoading) ? <SyncLoader moduleLoading = {this.props.syncLoading} /> : null }
+            {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
             {draftAlert}
             {mismatchAlert}
             {this.showHeaderView()}

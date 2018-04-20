@@ -75,7 +75,8 @@ class ArrayFieldAttribute extends PureComponent {
             formElement: this.props.arrayElements,
             isSaveDisabled: this.props.isSaveDisabled,
             latestPositionId: this.props.navigation.state.params.formLayoutState.latestPositionId,
-            fieldAttributeMasterParentIdMap: this.props.navigation.state.params.formLayoutState.fieldAttributeMasterParentIdMap
+            fieldAttributeMasterParentIdMap: this.props.navigation.state.params.formLayoutState.fieldAttributeMasterParentIdMap,
+            jobAndFieldAttributesList: this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList
 
         }
         return (

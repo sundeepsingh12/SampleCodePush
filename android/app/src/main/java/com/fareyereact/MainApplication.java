@@ -3,6 +3,7 @@ package com.fareyereact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.imagepicker.ImagePickerPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
@@ -45,6 +46,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+          new ImagePickerPackage(),
             new RNCameraPackage(),
             new RNBackgroundFetchPackage(),
             new RCTBluetoothSerialPackage(),

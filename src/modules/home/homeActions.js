@@ -95,7 +95,7 @@ import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieC
 import { trackingService } from '../../services/classes/Tracking'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
-import { setState, navigateToScene } from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { Client } from 'react-native-paho-mqtt'
 import { sync } from '../../services/classes/Sync'
@@ -150,7 +150,7 @@ export function fetchPagesAndPiechart() {
     } catch (error) {
       //TODO : show proper error code message ERROR CODE 600
       //Save the error in exception logs
-      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
+      showToastAndAddUserExceptionLog(2701, error.message, 'danger', 1)
     }
   }
 }
@@ -199,7 +199,7 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }))
+          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }));
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -242,26 +242,30 @@ export function navigateToPage(pageObject) {
       //TODO : show proper error code message ERROR CODE 600
       //Save the error in exception logs
       console.log(error)
-      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'Lets Code', type: 'danger', duration: 50000 })
+      showToastAndAddUserExceptionLog(2702, error.message, 'danger', 1)
     }
   }
 }
 
 export function customAppSelection(appModule) {
   return async function (dispatch) {
-    let BUTTONS = appModule.map(id => !(id.title) ? 'URL' : id.title)
-    BUTTONS.push('Cancel')
-    ActionSheet.show(
-      {
-        options: BUTTONS,
-        title: '123',
-        cancelButtonIndex: BUTTONS.length - 1,
-        destructiveButtonIndex: BUTTONS.length - 1
-      },
-      buttonIndex => {
-        (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl })) : null
-      }
-    )
+    try {
+      let BUTTONS = appModule.map(id => !(id.title) ? 'URL' : id.title)
+      BUTTONS.push('Cancel')
+      ActionSheet.show(
+        {
+          options: BUTTONS,
+          title: '123',
+          cancelButtonIndex: BUTTONS.length - 1,
+          destructiveButtonIndex: BUTTONS.length - 1
+        },
+        buttonIndex => {
+          (buttonIndex > -1 && buttonIndex < (BUTTONS.length - 1)) ? dispatch(navigateToScene(CustomApp, { customUrl: appModule[buttonIndex].customUrl })) : null
+        }
+      )
+    } catch (error) {
+      showToastAndAddUserExceptionLog(2703, error.message, 'danger', 1)
+    }
   }
 }
 
@@ -272,7 +276,7 @@ export function checkCustomErpPullActivated() {
       const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
-      console.log(error)
+      showToastAndAddUserExceptionLog(2704, error.message, 'danger', 1)
     }
   }
 }
@@ -316,9 +320,13 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk) {
 
 export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
-    if (!trackingServiceStarted) {
-      trackingService.init()
-      // dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+    try {
+      if (!trackingServiceStarted) {
+        trackingService.init()
+        // dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(2705, error.message, 'danger', 1)
     }
   }
 }
@@ -443,6 +451,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
       }
     } catch (error) {
       console.log(error)
+      showToastAndAddUserExceptionLog(2706, error.message, 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
         syncStatus = 'INTERNALSERVERERROR'
@@ -503,6 +512,7 @@ export function pieChartCount() {
     } catch (error) {
       //Update UI here
       console.log(error)
+      showToastAndAddUserExceptionLog(2707, error.message, 'danger', 1)
       dispatch(setState(CHART_LOADING, { loading: false, count: null }))
     }
   }
@@ -522,6 +532,7 @@ export function reAuthenticateUser(transactionIdToBeSynced) {
       await keyValueDBService.validateAndSaveData(CONFIG.SESSION_TOKEN_KEY, cookie)
       dispatch(performSyncService())
     } catch (error) {
+      showToastAndAddUserExceptionLog(2708, error.message, 'danger', 1)
       if (error.code == 401) {
         dispatch(setState(SYNC_STATUS, {
           unsyncedTransactionList: transactionIdToBeSynced ? transactionIdToBeSynced.value : [],
@@ -577,6 +588,7 @@ export function uploadUnsyncFiles(backupFilesList) {
         }, 1000)
       }
     } catch (error) {
+      showToastAndAddUserExceptionLog(2709, error.message, 'danger', 1)
       console.log(error)
     }
   }
@@ -594,6 +606,7 @@ export function readAndUploadFiles() {
         dispatch(uploadUnsyncFiles(backupFilesList))
       }
     } catch (error) {
+      showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
       console.log(error)
     }
   }
@@ -603,6 +616,7 @@ export function resetFailCountInStore() {
     try {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
     } catch (error) {
+      showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
       console.log(error)
     }
   }
@@ -619,6 +633,7 @@ export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
       }
       dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {
+      showToastAndAddUserExceptionLog(2712, error.message, 'danger', 1)
       console.log(error)
     }
   }
