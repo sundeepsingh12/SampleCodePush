@@ -18,11 +18,6 @@ import {
 } from '../../lib/AttributeConstants'
 import React, { PureComponent } from 'react'
 
-import BulkIcon from '../../svg_components/icons/BulkIcon'
-import LiveIcon from '../../svg_components/icons/LiveIcon'
-import SequenceIcon from '../../svg_components/icons/SequenceIcon'
-import TaskIcon from '../../svg_components/icons/TaskIcon'
-
 describe('test cases for getModuleCustomizationMapForAppModuleId', () => {
     const moduleCustomizationList = [
         {
