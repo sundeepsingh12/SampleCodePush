@@ -52,7 +52,8 @@ import {
   Backup,
   LiveJobs,
   OfflineDS,
-  ProfileView
+  ProfileView,
+  MDM_POLICIES
 } from '../../lib/constants'
 
 import {
@@ -454,9 +455,11 @@ export function syncService(pieChart) {
       if (CONFIG.intervalId) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
+      const mdmPolicies = await keyValueDBService.getValueFromStore(MDM_POLICIES)
+      const timeInterval = (mdmPolicies && mdmPolicies.value  && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
         dispatch(performSyncService(pieChart))
-      }, CONFIG.SYNC_SERVICE_DELAY)
+      }, timeInterval*1000)
     } catch (error) {
       //Update UI here
       console.log(error)
