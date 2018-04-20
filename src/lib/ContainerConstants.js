@@ -263,7 +263,6 @@ module.exports = {
     EDIT: 'Edit',
     JOB_EXPIRED: 'Job Expired!',
     DETAILS: "Details",
-    UPDATE_GROUP: 'Update Group',
 
     //JOb List
     SELECT_NUMBER: 'Select number for message',

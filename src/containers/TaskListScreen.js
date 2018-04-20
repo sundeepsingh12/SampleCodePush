@@ -33,7 +33,8 @@ import {
   SEARCH_TAP,
   LISTING_SEARCH_VALUE,
   BulkListing,
-  JobDetailsV2
+  JobDetailsV2,
+  TASKLIST_LOADER_FOR_SYNC
 } from '../lib/constants'
 import JobListItem from '../components/JobListItem'
 import {
@@ -42,11 +43,12 @@ import {
 } from '../lib/ContainerConstants'
 import moment from 'moment'
 
+
 function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
     isRefreshing: state.listing.isRefreshing,
-    statusNextStatusListMap: state.listing.statusNextStatusListMap
+    statusNextStatusListMap: state.listing.statusNextStatusListMap,
   }
 }
 
@@ -63,12 +65,12 @@ class TaskListScreen extends PureComponent {
   }
 
   navigateToScene = (item, groupId) => {
-    this.props.actions.navigateToScene(JobDetailsV2,
+    this.props.actions.checkForDraftANdStartSyncAndNavigateToJobDetail(JobDetailsV2,
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
         groupId
-      }
+      }, TASKLIST_LOADER_FOR_SYNC
     )
   }
   /**It renders each job transaction item
@@ -258,11 +260,11 @@ class TaskListScreen extends PureComponent {
   updateTransactionForGroupId(item) {
     let jobTransaction = item.jobTransactions[0]
     if (this.props.statusNextStatusListMap[jobTransaction.statusId].length > 0) {
-      this.props.actions.navigateToScene(BulkListing, {pageObject : {
+      this.props.actions.checkForDraftANdStartSyncAndNavigateToJobDetail(BulkListing, {pageObject : {
         jobMasterIds: [jobTransaction.jobMasterId],
         additionalParams: {statusId : jobTransaction.statusId},
         groupId: item.groupId
-      }})
+      }}, TASKLIST_LOADER_FOR_SYNC)
     } else {
       Toast.show({
         text: NO_NEXT_STATUS, position: 'bottom', buttonText: OK

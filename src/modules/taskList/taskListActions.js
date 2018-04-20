@@ -3,7 +3,8 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
-import { setState } from '../global/globalActions'
+import { setState, navigateToScene } from '../global/globalActions'
+import { performSyncService } from '../../modules/home/homeActions'
 import {
   JOB_LISTING_START,
   JOB_LISTING_END,
@@ -12,10 +13,16 @@ import {
   CUSTOM_NAMING,
   TAB,
   SHOULD_RELOAD_START,
-  SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE
+  SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE,
+  TASKLIST_LOADER_FOR_SYNC,
+  JobDetailsV2,
+  BulkListing
 } from '../../lib/constants'
+import { Toast } from 'native-base'
+import { NetInfo } from 'react-native'
 import moment from 'moment'
 import _ from 'lodash'
+import { draftService } from '../../services/classes/DraftService'
 
 /**
  * This function fetches tabs list and set in state
@@ -80,6 +87,40 @@ export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject
       //TODO handle UI
       console.log(error)
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }))
+    }
+  }
+}
+
+export function checkForDraftANdStartSyncAndNavigateToJobDetail(screenName,jobDetailData, actionLoader) {
+  return async function (dispatch) {
+    try {
+      const jobMasterId = (screenName == BulkListing)  ? jobDetailData.pageObject.jobMasterIds[0] : jobDetailData.jobTransaction.jobMasterId
+      const jobMasterValue = await jobMasterService.getJobMasterFromJobMasterList(jobMasterId)
+      const checkForDraft = (screenName == JobDetailsV2) ? draftService.getDraftForState(jobDetailData.jobTransaction, null) : true
+      if (jobMasterValue[0].enableLiveJobMaster && checkForDraft) {
+          NetInfo.isConnected.fetch().then(isConnected => {
+              if (isConnected) {
+                  dispatch(setState(actionLoader, true))
+                  dispatch(performSyncService()).then(() => 
+                  { 
+                      dispatch(setState(actionLoader, false))
+                      dispatch(navigateToScene(screenName, jobDetailData)) 
+                  })
+              }
+              else {
+                alert('Please enable internet connection to update this job!!!')
+              }
+          }).catch(function (err) {
+              dispatch(setState(actionLoader, false))
+              Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
+
+          })
+      } else  {
+          dispatch(navigateToScene(screenName, jobDetailData))
+      }
+    } catch (error) {
+      dispatch(setState(actionLoader, false))
+      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
     }
   }
 }

@@ -235,6 +235,17 @@ class JobMaster {
     return tabIdStatusIdsMap
   }
 
+  async checkForEnableLiveJobMaster(jobMasterId){
+   const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+   const jobMasterListValue = jobMasterList.value
+   for (let id in jobMasterListValue){
+     if(jobMasterListValue[id].id == jobMasterId && jobMasterListValue[id].enableLiveJobMaster){
+       return true
+     }
+   }
+   return false
+  }
+
 
   prepareStatusTabIdMap(jobStatus) {
     if (!jobStatus) {

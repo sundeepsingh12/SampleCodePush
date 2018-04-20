@@ -10,7 +10,8 @@ import {
     RESET_STATE,
     RESET_STATE_FOR_JOBDETAIL,
     SHOW_DROPDOWN,
-    SET_JOBDETAILS_DRAFT_INFO
+    SET_JOBDETAILS_DRAFT_INFO,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL
 } from '../../lib/constants'
 
 
@@ -23,6 +24,8 @@ export default function jobDetailsReducer(state = initialState, action) {
 
         case IS_MISMATCHING_LOCATION:
             return state.set('statusList', action.payload)
+        case SET_LOADER_FOR_SYNC_IN_JOBDETAIL:
+            return state.set('syncLoading', action.payload)
 
         case JOB_DETAILS_FETCHING_END:
             return state.set('fieldDataList', action.payload.fieldDataList)

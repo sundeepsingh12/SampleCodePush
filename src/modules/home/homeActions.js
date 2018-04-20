@@ -52,7 +52,8 @@ import {
   Backup,
   LiveJobs,
   OfflineDS,
-  ProfileView
+  ProfileView,
+  LOADER_FOR_SYNCING
 } from '../../lib/constants'
 
 import {
@@ -88,7 +89,7 @@ import {
   Piechart,
   SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
-import { Toast, ActionSheet } from 'native-base'
+import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
@@ -98,7 +99,7 @@ import { setState, navigateToScene } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { Client } from 'react-native-paho-mqtt'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo } from 'react-native'
+import { NetInfo, Alert } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -113,6 +114,7 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
+import { jobMasterService } from '../../services/classes/JobMaster';
 
 /**
  * Function which updates STATE when component is mounted
@@ -178,12 +180,12 @@ export function navigateToPage(pageObject) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-        dispatch(navigateToScene(Backup,  { displayName: (pageObject.name) ? pageObject.name : 'BackUp'}));
-        break;
+          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }));
+          break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(navigateToScene(BulkListing, { pageObject }));
+          dispatch(startSyncAndNavigateToContainer(pageObject, true))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
@@ -197,19 +199,19 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-        dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob'}));
-        break;
+          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }))
+          break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(redirectToContainer(pageObject))
+          dispatch(startSyncAndNavigateToContainer(pageObject))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-        dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore'}))
-        break;
+          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }))
+          break;
         case PAGE_OUTSCAN:
           dispatch(navigateToScene(PostAssignmentScanner, { pageObject }))
           break
@@ -218,17 +220,17 @@ export function navigateToPage(pageObject) {
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-        dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile'}))
-        break;
+          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }))
+          break;
         case PAGE_SEQUENCING: {
           dispatch(getRunsheetsForSequence(pageObject));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting'}))
+          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }))
           break;
         case PAGE_STATISTICS:
-          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics'}))
+          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }))
           break;
         case PAGE_TABS:
           dispatch(navigateToScene(TabScreen, { pageObject }));
@@ -271,6 +273,43 @@ export function checkCustomErpPullActivated() {
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
       console.log(error)
+    }
+  }
+}
+
+export function startSyncAndNavigateToContainer(pageObject, isBulk) {
+  return async function (dispatch) {
+    try {
+      if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
+        NetInfo.isConnected.fetch().then(isConnected => {
+          if (isConnected) {
+            dispatch(setState(LOADER_FOR_SYNCING, true))
+            dispatch(performSyncService()).then(() => {
+              dispatch(setState(LOADER_FOR_SYNCING, false))
+              if (!isBulk) {
+                dispatch(redirectToContainer(pageObject))
+              } else {
+                dispatch(navigateToScene(BulkListing, { pageObject }))
+              }
+            }).catch(function (err) {
+              dispatch(setState(LOADER_FOR_SYNCING, false))
+              Toast.show({ text: err.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
+            })
+          }
+          else {
+            alert('Please enable internet connection to update this job!!!')
+          }
+        })
+      } else {
+        if (!isBulk) {
+          dispatch(redirectToContainer(pageObject))
+        } else {
+          dispatch(navigateToScene(BulkListing, { pageObject }))
+        }
+      }
+    } catch (error) {
+      dispatch(setState(LOADER_FOR_SYNCING, false))
+      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
     }
   }
 }
