@@ -160,7 +160,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'));
     await keyValueDBService.validateAndSaveData(PAGES, json.pages);
     await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, json.additionalUtilities);
-    await keyValueDBService.validateAndSaveData(MDM_POLICIES, json.companyMDM);
+    if(!_.isEmpty(json.companyMDM)) await keyValueDBService.validateAndSaveData(MDM_POLICIES, json.companyMDM);
     if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {
       await keyValueDBService.validateAndSaveData(HUB_LAT_LONG, json.hubLatLng)
     }
