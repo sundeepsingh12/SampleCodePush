@@ -31,4 +31,4 @@ fareye('android')
 //   }
 
 
-//   AppRegistry.registerComponent('FareyeReact', () => Fareye)
+//   AppRegistry.registerComponent('Fareye', () => Fareye)

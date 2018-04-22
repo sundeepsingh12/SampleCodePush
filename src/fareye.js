@@ -73,5 +73,5 @@ export default function native(platform) {
    * registerComponent to the AppRegistery and off we go....
    */
 
-  AppRegistry.registerComponent('FareyeReact', () => Fareye)
+  AppRegistry.registerComponent('Fareye', () => Fareye)
 }
