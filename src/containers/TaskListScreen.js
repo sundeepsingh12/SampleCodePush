@@ -59,7 +59,9 @@ function mapDispatchToProps(dispatch) {
 class TaskListScreen extends PureComponent {
 
   componentDidMount() {
-    this.props.actions.fetchJobs(moment().format('YYYY-MM-DD'), this.props.pageObject)
+    if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
+      this.props.actions.fetchJobs()
+    }
   }
 
   navigateToScene = (item, groupId) => {
@@ -67,7 +69,8 @@ class TaskListScreen extends PureComponent {
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
-        groupId
+        groupId,
+        pageObjectAdditionalParams: this.props.pageObject.additionalParams
       }
     )
   }
@@ -162,7 +165,14 @@ class TaskListScreen extends PureComponent {
     * @param {*} groupTransactionsArray 
     */
   renderList() {
-    let list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
+    let list = []
+    let jobMasterList = JSON.parse(this.props.pageObject.jobMasterIds)
+    for(let index in this.props.jobTransactionCustomizationList) {
+      if(jobMasterList && jobMasterList.includes(this.props.jobTransactionCustomizationList[index].jobMasterId) && this.props.statusIdList.includes(this.props.jobTransactionCustomizationList[index].statusId)) {
+        list.push(this.props.jobTransactionCustomizationList[index])
+      }
+    }
+    // let list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
     let scanner = (this.props.searchText.scanner) ? true : false
     let searchText = _.toLower(this.props.searchText.searchText)
     let jobTransactionArray = this.performFilteringAndSearch(list, searchText, scanner);
@@ -258,11 +268,13 @@ class TaskListScreen extends PureComponent {
   updateTransactionForGroupId(item) {
     let jobTransaction = item.jobTransactions[0]
     if (this.props.statusNextStatusListMap[jobTransaction.statusId].length > 0) {
-      this.props.actions.navigateToScene(BulkListing, {pageObject : {
-        jobMasterIds: [jobTransaction.jobMasterId],
-        additionalParams: {statusId : jobTransaction.statusId},
-        groupId: item.groupId
-      }})
+      this.props.actions.navigateToScene(BulkListing, {
+        pageObject: {
+          jobMasterIds: [jobTransaction.jobMasterId],
+          additionalParams: { statusId: jobTransaction.statusId },
+          groupId: item.groupId
+        }
+      })
     } else {
       Toast.show({
         text: NO_NEXT_STATUS, position: 'bottom', buttonText: OK

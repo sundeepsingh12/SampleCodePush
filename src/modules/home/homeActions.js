@@ -391,7 +391,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
           if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
-          //dispatch(fetchJobs())
+          dispatch(fetchJobs())
         }
         if (isLiveJob) {
           dispatch(navigateToScene(LiveJobs, { callAlarm: true }))

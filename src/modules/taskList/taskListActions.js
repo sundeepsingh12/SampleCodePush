@@ -41,7 +41,7 @@ export function fetchTabs() {
 /**
  * This function fetches jobTransaction from db and set jobTransactionCustomizationListDTO in state
  */
-export function fetchJobs(date, pageObject) {
+export function fetchJobs(date) {
   return async function (dispatch) {
     try {
       dispatch(setState(JOB_LISTING_START))
@@ -52,7 +52,7 @@ export function fetchJobs(date, pageObject) {
       // Fetch future enable runsheet and selected Date for calender
       let { enableFutureDateRunsheet, selectedDate } = jobTransactionService.getFutureRunsheetEnabledAndSelectedDate(customNaming, jobIdGroupIdMap, date)
       dispatch(setState(SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE, { enableFutureDateRunsheet, selectedDate }))
-      let { jobTransactionCustomizationList, statusNextStatusListMap } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'AllTasks', pageObject, selectedDate, jobIdGroupIdMap)
+      let { jobTransactionCustomizationList, statusNextStatusListMap } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'AllTasks', null, selectedDate, jobIdGroupIdMap)
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList, statusNextStatusListMap }))
     } catch (error) {
       //TODO handle UI

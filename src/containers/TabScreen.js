@@ -61,6 +61,7 @@ function mapStateToProps(state) {
     isCalendarVisible: state.taskList.isCalendarVisible,
     searchText: state.taskList.searchText,
     modules: state.home.modules,
+    landingTabId: state.home.landingTabId
   }
 };
 
@@ -97,17 +98,17 @@ class TabScreen extends PureComponent {
   _onConfirm = (date) => {
     this.props.actions.setState(IS_CALENDAR_VISIBLE, false)
     const formattedDate = moment(date).format('YYYY-MM-DD')
-    this.props.actions.fetchJobs(formattedDate, this.props.navigation.state.params.pageObject)
+    this.props.actions.fetchJobs(formattedDate)
   }
 
   _transactionsForTodayDate = () => {
     // fetch all jobs for today's date
-    this.props.actions.fetchJobs(moment(new Date()).format('YYYY-MM-DD'), this.props.navigation.state.params.pageObject)
+    this.props.actions.fetchJobs(moment().format('YYYY-MM-DD'))
   }
 
   _showAllJobTransactions = () => {
     //fetch all jobs for all dates when user selects ALL option in calender
-    this.props.actions.fetchJobs("All", this.props.navigation.state.params.pageObject)
+    this.props.actions.fetchJobs("All")
   }
 
   renderTabs() {
@@ -128,7 +129,7 @@ class TabScreen extends PureComponent {
               statusIdList={this.props.tabIdStatusIdMap[tabs[index].id]}
               searchText={this.props.searchText}
               pageObject={this.props.navigation.state.params.pageObject}
-          />
+            />
           </Tab>
         )
       }
@@ -173,7 +174,7 @@ class TabScreen extends PureComponent {
   }
 
   render() {
-    let landingValue = (this.props.navigation.state.params.landingTab) ? this._landingIndex(this.props.navigation.state.params.landingTab) : 0
+    let landingValue = this.props.landingTabId ? this.props.landingTabId : 0
     const viewTabList = this.renderTabs()
     const calendarView = this._renderCalendar()
     const pageName = this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : 'All Tasks'

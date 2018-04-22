@@ -10,6 +10,7 @@ var InitialState = Record({
     selectedDate: null,
     isCalendarVisible: false,
     searchText: {},
+    landingTabId: null
 })
 
 export default InitialState

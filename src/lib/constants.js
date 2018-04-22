@@ -93,6 +93,7 @@ module.exports = keyMirror({
     ERP_SYNC_STATUS: null,
     SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
+    SET_LANDING_TAB: null,
 
     //Pages
     PAGES_LOADING: null,

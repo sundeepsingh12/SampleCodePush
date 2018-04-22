@@ -221,7 +221,9 @@ class JobDetailsV2 extends PureComponent {
       jobTransaction: this.props.jobTransaction,
       statusId: this.props.statusList.id,
       statusName: this.props.statusList.name,
-      jobMasterId: this.props.jobTransaction.jobMasterId
+      jobMasterId: this.props.jobTransaction.jobMasterId,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+      jobDetailsScreenKey: this.props.navigation.state.key
     })
     this._onCancel()
   }
@@ -243,7 +245,9 @@ class JobDetailsV2 extends PureComponent {
       const FormLayoutObject = {
         contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
         jobTransaction,
-        statusList
+        statusList,
+        pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+        jobDetailsScreenKey: this.props.navigation.state.key
       }
       this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
     }
@@ -648,6 +652,9 @@ class JobDetailsV2 extends PureComponent {
       this.props.navigation.state.params.jobSwipableDetails.contactData,
       this.props.jobTransaction,
       this.props.draftStatusInfo,
+      null,
+      this.props.navigation.state.params.pageObjectAdditionalParams,
+      this.props.navigation.state.key
     )
     this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }

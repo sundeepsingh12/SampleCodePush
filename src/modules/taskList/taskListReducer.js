@@ -9,7 +9,8 @@ import {
   IS_CALENDAR_VISIBLE,
   LISTING_SEARCH_VALUE,
   RESET_STATE,
-  SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE
+  SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE,
+  SET_LANDING_TAB
 } from '../../lib/constants'
 
 
@@ -22,6 +23,7 @@ export default function taskList(state = initialState, action) {
     case SET_TABS_LIST:
       return state.set('tabsList', action.payload.tabsList)
         .set('tabIdStatusIdMap', action.payload.tabIdStatusIdMap)
+        .set('landingTabId', 0)
 
     case JOB_DOWNLOADING_STATUS:
       return state.set('downloadingJobs', action.payload.isDownloadingjobs)
@@ -35,6 +37,10 @@ export default function taskList(state = initialState, action) {
     case SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE:
       return state.set('selectedDate', action.payload.selectedDate)
         .set('isFutureRunsheetEnabled', action.payload.enableFutureDateRunsheet)
+
+    case SET_LANDING_TAB: {
+      return state.set('landingTabId', action.payload.landingTabId)
+    }
 
     case RESET_STATE:
       return initialState

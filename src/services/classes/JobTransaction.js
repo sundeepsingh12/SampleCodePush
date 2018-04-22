@@ -258,10 +258,6 @@ class JobTransaction {
                 jobTransactionQuery = `deleteFlag != 1`
                 //Fetch only pending status category assigned job transactions for sequence listing with runsheet selected and jobMasterIds
                 jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
-            } else if (callingActivity == 'AllTasks') {
-                jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
-                jobTransactionQuery = jobTransactionQuery + ' AND (' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
-                jobTransactionQuery = jobTransactionQuery + ')'
             }
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],
@@ -867,7 +863,9 @@ class JobTransaction {
     getFutureRunsheetEnabledAndSelectedDate(customNaming, jobIdGroupIdMap, date) {
         let enableFutureDateRunsheet = customNaming && customNaming.value && customNaming.value.enableFutureDateRunsheet && _.isEmpty(jobIdGroupIdMap) ? customNaming.value.enableFutureDateRunsheet : false
         let selectedDate = (!date && enableFutureDateRunsheet) ? moment().format('YYYY-MM-DD') : date
-        if (!_.isEmpty(jobIdGroupIdMap)) selectedDate = null
+        if (!_.isEmpty(jobIdGroupIdMap)) {
+            selectedDate = null
+        }
         return { enableFutureDateRunsheet, selectedDate }
     }
 }
