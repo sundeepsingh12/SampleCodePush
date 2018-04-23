@@ -5,22 +5,23 @@ import {
     VIEW_IMAGE_DATA,
     SET_SHOW_IMAGE,
     SET_SHOW_VIEW_IMAGE,
+    SET_VALIDATION_FOR_CAMERA
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
 import moment from 'moment'
-import { getNextFocusableAndEditableElements, updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
+import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions';
 
-export function saveImage(result, fieldAttributeMasterId, formElement, isSaveDisabled, calledFromArray, rowId, latestPositionId, jobTransaction) {
+export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
         try {
             const value = await signatureService.saveFile(result, moment(), true)
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, value, formElement, rowId, [], NEXT_FOCUS, 1, null))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
             } else {
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, value, { latestPositionId }, jobTransaction))
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
             }
             dispatch(setState(SET_SHOW_VIEW_IMAGE, {
                 imageData: '',
@@ -42,6 +43,18 @@ export function getImageData(value) {
         }
     }
 }
+
+export function getValidation(value) {
+    return async function (dispatch) {
+        try {
+            const result = await signatureService.getValidations(value)
+            dispatch(setState(SET_VALIDATION_FOR_CAMERA, result))
+        } catch (error) {
+            showToastAndAddUserExceptionLog(305, error.message, 'danger', 1)
+        }
+    }
+}
+
 export function setInitialState() {
     return async function (dispatch) {
         try {

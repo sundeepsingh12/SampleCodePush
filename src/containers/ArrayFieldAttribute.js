@@ -62,27 +62,32 @@ class ArrayFieldAttribute extends PureComponent {
     componentDidMount() {
         this.props.actions.setInitialArray(
             this.props.navigation.state.params.currentElement,
-            this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.jobStatusId,
+            this.props.navigation.state.params.formLayoutState,
             this.props.navigation.state.params.jobTransaction,
             this.props.arrayReverseDataStoreFilterMap,
-            this.props.navigation.state.params.currentElement.fieldAttributeMasterId
         )
     }
     componentWillUnmount() {
         this.props.actions.clearArrayState()
     }
     renderData = (arrayRow) => {
+        let formLayoutState = {
+            formElement: this.props.arrayElements,
+            isSaveDisabled: this.props.isSaveDisabled,
+            latestPositionId: this.props.navigation.state.params.formLayoutState.latestPositionId,
+            fieldAttributeMasterParentIdMap: this.props.navigation.state.params.formLayoutState.fieldAttributeMasterParentIdMap,
+            jobAndFieldAttributesList: this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList
+
+        }
         return (
             <ArrayBasicComponent
                 arrayRow={arrayRow.item}
+                formLayoutState={formLayoutState}
                 arrayElements={this.props.arrayElements}
                 isSaveDisabled={this.props.isSaveDisabled}
                 lastRowId={this.props.lastRowId}
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
                 jobStatusId={this.props.jobStatusId}
-                latestPositionId={this.props.navigation.state.params.latestPositionId}
-                fieldAttributeMasterParentIdMap={this.props.navigation.state.params.fieldAttributeMasterParentIdMap}
                 arrayFieldAttributeMasterId={this.props.navigation.state.params.currentElement.fieldAttributeMasterId}
             />
         )
@@ -107,11 +112,9 @@ class ArrayFieldAttribute extends PureComponent {
         this.props.actions.saveArray(this.props.arrayElements,
             this.props.navigation.state.params.currentElement,
             this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.state.params.latestPositionId,
-            this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.isSaveDisabled,
+            this.props.navigation.state.params.formLayoutState,
             this.props.arrayMainObject,
-            this.props.navigation.state.params.fieldAttributeMasterParentIdMap)
+            this.props.arrayReverseDataStoreFilterMap)
     }
     static navigationOptions = ({ navigation }) => {
         return { header: null }

@@ -174,6 +174,7 @@ class TabScreen extends PureComponent {
     let landingValue = (this.props.navigation.state.params.landingTab) ? this._landingIndex(this.props.navigation.state.params.landingTab) : 0
     const viewTabList = this.renderTabs()
     const calendarView = this._renderCalendar()
+    const pageName = this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : 'All Tasks'
     const searchTextValue = (this.props.searchText) ? this.props.searchText.searchText : ''
     if (viewTabList.length == 0) {
       return (
@@ -193,7 +194,7 @@ class TabScreen extends PureComponent {
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                 </TouchableOpacity>
                 <View style={[style.headerBody]}>
-                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>TEST</Text>
+                  <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{pageName}</Text>
                 </View>
                 <View style={[style.headerRight]}>
                 </View>

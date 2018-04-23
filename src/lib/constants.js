@@ -155,6 +155,7 @@ module.exports = keyMirror({
     USERNAME: null,
     PASSWORD: null,
     REMEMBER_ME: null,
+    DOMAIN_URL: null,
 
     //Preloader Credentials
     IS_SHOW_OTP_SCREEN: null,
@@ -209,6 +210,7 @@ module.exports = keyMirror({
     GEO_FENCE_STATUS: null,
     LAT_LONG_GEO_FENCE: null,
     SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
+    MDM_POLICIES: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -309,6 +311,7 @@ module.exports = keyMirror({
     SHOW_SEARCH_BAR: null,
     SKU_CODE_CHANGE: null,
     UPDATE_SKU_ACTUAL_QUANTITY: null,
+    SET_SKU_CODE: null,
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
@@ -483,6 +486,7 @@ module.exports = keyMirror({
     SET_SHOW_VIEW_IMAGE: null,
     UPDATE_SKU_LIST_ITEMS: null,
     SET_SHOW_IMAGE_AND_DATA: null,
+    SET_VALIDATION_FOR_CAMERA: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,

@@ -8,7 +8,8 @@ import {
     TEXT,
     DECIMAL,
     SCAN_OR_TEXT,
-    QR_SCAN
+    QR_SCAN,
+    NUMBER
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import {
@@ -24,7 +25,9 @@ import {
     FIELD_ATTRIBUTE_VALIDATION,
     FIELD_ATTRIBUTE_VALIDATION_CONDITION,
     BACKUP_ALREADY_EXIST,
-    TABLE_FIELD_DATA
+    TABLE_FIELD_DATA,
+    JOB_ATTRIBUTE,
+    USER
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
@@ -49,6 +52,8 @@ class FormLayout {
             throw new Error('Missing statusId');
         }
         const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+        const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+        const user = await keyValueDBService.getValueFromStore(USER)
         const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS);
         const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION);
         const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION_CONDITION);
@@ -110,6 +115,11 @@ class FormLayout {
         }
         else {
             sequenceWiseFormLayout.fieldAttributeMasterParentIdMap = fieldAttributeMasterParentIdMap
+            sequenceWiseFormLayout.jobAndFieldAttributesList = {
+                jobAttributes: jobAttributes.value,
+                fieldAttributes: fieldAttributes.value,
+                user: user.value
+            }
             return sequenceWiseFormLayout
         }
 
@@ -279,12 +289,10 @@ class FormLayout {
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
             routeName = SaveActivated
             routeParam = {
-                formLayoutState,
-                contactData, currentStatus, jobTransaction, jobMasterId,
-                navigationFormLayoutStates
+                formLayoutState, contactData, currentStatus, jobTransaction, jobMasterId, navigationFormLayoutStates
             }
             await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-
+        
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
             let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
             let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
@@ -296,7 +304,6 @@ class FormLayout {
             }
             await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
             await draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
-
         }
         else if (currentStatus.transient) {
             routeName = Transient
@@ -353,6 +360,7 @@ class FormLayout {
             case DECIMAL:
             case SCAN_OR_TEXT:
             case QR_SCAN:
+            case NUMBER:
                 return dataStoreService.checkForUniqueValidation(currentObject.displayValue, currentObject)
             default:
                 false

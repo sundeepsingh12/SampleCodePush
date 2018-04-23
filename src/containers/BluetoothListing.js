@@ -17,7 +17,6 @@ import {Toast,StyleProvider,Container,Content,Header,Left,Body,Right,Button,Icon
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import BluetoothSerial from 'react-native-bluetooth-serial'
-import Animation from 'lottie-react-native'
 import * as bluetoothActions from '../modules/bluetooth/bluetoothActions'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
@@ -171,14 +170,6 @@ renderBluetoothScanningView(){
         <Text style={[styles.fontLg, styles.fontBlack, styles.bold, styles.fontCenter]}>Searching for nearby Devices...</Text>
       </View>
       <View style={[styles.justifyCenter, styles.alignCenter]}>
-        <Animation
-          ref={animation => { this.animation = animation }}
-          style={{
-            width: 480,
-            height: 480
-          }}
-          loop={true}
-          source={anim} />
       </View>
     </Container>
   )

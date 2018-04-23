@@ -48,7 +48,7 @@ class DataStoreFilter extends PureComponent {
         if (this.props.calledFromArray) {
             this.props.actions.getDSFListContentForArray({
                 currentElement: this.props.currentElement,
-                formElement: this.props.formElement,
+                formElement: this.props.formLayoutState.formElement,
                 jobTransaction: this.props.jobTransaction,
                 arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
                 rowId: this.props.rowId,
@@ -57,7 +57,7 @@ class DataStoreFilter extends PureComponent {
         } else {
             this.props.actions.getDSFListContent(
                 this.props.currentElement,
-                this.props.formElement,
+                this.props.formLayoutState.formElement,
                 this.props.jobTransaction,
                 this.props.dataStoreFilterReverseMap
             )
@@ -74,13 +74,10 @@ class DataStoreFilter extends PureComponent {
             onPress={() => {
                 this.props.actions.onSave(
                     this.props.currentElement.fieldAttributeMasterId,
-                    this.props.formElement,
-                    this.props.isSaveDisabled,
+                    this.props.formLayoutState,
                     item,
-                    this.props.latestPositionId,
                     this.props.jobTransaction,
-                    this.props.dataStoreFilterReverseMap,
-                    this.props.fieldAttributeMasterParentIdMap,
+                    this.props.formLayoutState.dataStoreFilterReverseMap,
                     this.props.calledFromArray,
                     this.props.rowId,
                     this.props.arrayReverseDataStoreFilterMap,

@@ -243,7 +243,7 @@ class JobTransaction {
             if (callingActivity == 'Bulk') {
                 jobTransactionQuery = `${jobTransactionQuery} AND jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND jobStatusId = ${callingActivityData.pageObject.additionalParams.statusId}`
                 jobTransactionQuery = callingActivityData.jobIdGroupIdMap && !_.isEmpty(callingActivityData.jobIdGroupIdMap) ? `${jobTransactionQuery} AND ${Object.keys(callingActivityData.jobIdGroupIdMap).map(data => 'jobId != ' + data).join(' AND ')}` : jobTransactionQuery
-                if (callingActivityData.groupId) {
+                if (callingActivityData.pageObject.groupId) {
                     let jobQuery = `jobMasterId = ${callingActivityData.pageObject.jobMasterIds[0]} AND groupId = '${callingActivityData.pageObject.groupId}'`
                     let jobList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery)
                     let query = jobList.map((job) => `jobId = ${job.id}`).join(' OR ')
@@ -260,7 +260,8 @@ class JobTransaction {
                 jobTransactionQuery = statusQueryWithRunsheetNo && statusQueryWithRunsheetNo.trim() !== '' ? `${jobTransactionQuery} AND (${statusQueryWithRunsheetNo})` : null
             } else if (callingActivity == 'AllTasks') {
                 jobMasterIds = JSON.parse(callingActivityData.jobMasterIds)
-                jobTransactionQuery = jobTransactionQuery + ' AND ' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+                jobTransactionQuery = jobTransactionQuery + ' AND (' + jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')
+                jobTransactionQuery = jobTransactionQuery + ')'
             }
         }
         let jobTransactionList = [], jobTransactionMap = {}, jobTransactionObject = {}, jobDataList = [],

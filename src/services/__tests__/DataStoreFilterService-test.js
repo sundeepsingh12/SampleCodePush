@@ -19,9 +19,37 @@ import {
     JOBATTRIBUTES_MISSING,
     DSF_LIST_MISSING,
     FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING,
-    FORM_ELEMENT_IS_MISSING
+    FORM_ELEMENT_IS_MISSING,
+    INVALID_BULK_JOB_CONFIG,
 } from '../../lib/ContainerConstants'
 import _ from 'lodash'
+
+
+
+describe('test checkForSameJobDataValue', () => {
+    it('should return jobData', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue([{ value: 123 }])
+        expect(dataStoreFilterService.checkForSameJobDataValue({ jobId: 123 }, [{ id: 1 }])).toEqual([{ value: 123 }])
+    })
+
+    it('should return INVALID_BULK_JOB_CONFIG', () => {
+        try {
+            realm.getRecordListOnQuery = jest.fn()
+            realm.getRecordListOnQuery.mockReturnValueOnce([{ value: 123 }])
+                .mockReturnValueOnce([{ value: 12345 }])
+            dataStoreFilterService.checkForSameJobDataValue({ 0: { jobId: 123 }, 1: { jobId: 12 } }, [{ id: 1 }])
+        } catch (error) {
+            expect(error.message).toEqual(INVALID_BULK_JOB_CONFIG)
+        }
+    })
+
+    it('empty job Data', () => {
+        realm.getRecordListOnQuery = jest.fn()
+        realm.getRecordListOnQuery.mockReturnValue({})
+        expect(dataStoreFilterService.checkForSameJobDataValue({ jobId: 123 }, [{ id: 1 }])).toEqual({})
+    })
+})
 
 
 describe('test clearMappedDSFValue', () => {
@@ -346,9 +374,9 @@ describe('test fetchDataForFilter', () => {
 
     it('should throw token missing error', () => {
         try {
-            dataStoreFilterService.fetchDataForFilter(null)
+            dataStoreFilterService.fetchDataForFilter()
         } catch (error) {
-            expect(error.message).toEqual(TOKEN_MISSING)
+            expect(error.message).toEqual()
         }
     })
 
@@ -382,6 +410,37 @@ describe('test fetchDataForFilter', () => {
 })
 
 
+describe('test fetchDataForFilterInArray', () => {
+    beforeEach(() => {
+        dataStoreFilterService.fetchDataForFilter = jest.fn()
+    })
+
+    it('should return dataStoreFilterResponse and dataStoreFilterReverseMap', () => {
+        let currentElement = {
+            dataStoreAttributeId: 123,
+            dataStoreMasterId: 234
+        }
+        let functionParamsFromDSF = {
+            currentElement: {},
+            formElement: { 123: {} },
+            jobTransaction: {},
+            arrayReverseDataStoreFilterMap: { 121: {} },
+            rowId: 123, arrayFieldAttributeMasterId: 121
+        }
+        dataStoreFilterService.fetchDataForFilter.mockReturnValue({
+            dataStoreFilterResponse: {},
+            dataStoreFilterReverseMap: {}
+        })
+        dataStoreFilterService.fetchDSF.mockReturnValue({ json: { id: 1 } })
+        dataStoreFilterService.fetchDataForFilterInArray().then(() => {
+            expect(dataStoreFilterService.fetchDataForFilter).toHaveBeenCalledTimes(1)
+            expect(result).toEqual({
+                dataStoreFilterResponse: {},
+                dataStoreFilterReverseMap: {}
+            })
+        })
+    })
+})
 
 function getMapFromObject(obj) {
     let strMap = new Map();

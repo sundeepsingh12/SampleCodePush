@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import Loader from '../components/Loader'
 import renderIf from '../lib/renderIf'
 import QRCode from 'react-native-qrcode-svg'
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import { NA } from '../lib/AttributeConstants'
 import * as sortingActions from '../modules/sorting/sortingActions'
@@ -120,11 +120,11 @@ class SortingListing extends PureComponent {
 
 class Sorting extends PureComponent {
 
-    componentDidmount() {
-        if (!_.isUndefined(this.props.navigation.state.params)) {
-            this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))
-        }
-    }
+    // componentDidmount() {
+    //     if (!_.isUndefined(this.props.navigation.state.params)) {
+    //         this._searchForReferenceValue(_.trim(this.props.navigation.state.params.data))
+    //     }
+    // }
 
     componentDidUpdate() {
         if (_.size(this.props.errorMessage)) {
@@ -179,7 +179,7 @@ class Sorting extends PureComponent {
                     keyboardAppearance={"dark"}
                     placeholderTextColor={'rgba(255,255,255,.6)'}
                     selectionColor={'rgba(224, 224, 224,.5)'}
-                    underlineColorAndroid= {'transparent'}
+                    underlineColorAndroid={'transparent'}
                     style={[style.headerSearch]}
                     onSubmitEditing={() => this._searchForReferenceValue(this.props.searchRefereneceValue.value)}
                 />
@@ -220,7 +220,7 @@ class Sorting extends PureComponent {
                                 {this.showReferenceNoInputView()}
 
                                 <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this._searchForReferenceValue.bind(this) })} >
-                                    <QRIcon width={30} height={30} color={styles.fontWhite} />
+                                    <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={styles.fontWhite.color} />
                                 </TouchableOpacity>
                             </View>
                         </Body>

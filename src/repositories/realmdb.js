@@ -18,7 +18,7 @@ import DeviceInfo from 'react-native-device-info'
 import AesCtr from '../services/classes/AesCtr'
 import userExceptionLogs from './schema/userExceptionLogsDB'
 
-const schemaVersion = 44;
+const schemaVersion = 45;
 const schema = [JobTransaction, Job, JobData, FieldData, Runsheet, TrackLogs, ServerSmsLog, TransactionLogs, DatastoreMaster, DatastoreSchema, Draft, userExceptionLogs];
 
 let realm = new Realm({

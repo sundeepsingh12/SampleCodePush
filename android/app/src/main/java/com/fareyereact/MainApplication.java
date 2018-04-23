@@ -4,9 +4,9 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.cnull.apkinstaller.ApkInstallerPackage;
+import com.imagepicker.ImagePickerPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
-import com.airbnb.android.react.lottie.LottiePackage;
 import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
 import io.realm.react.RealmReactPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
@@ -46,11 +46,11 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
+            new MainReactPackage(),
             new ApkInstallerPackage(),
+            new ImagePickerPackage(),
             new RNCameraPackage(),
             new RNBackgroundFetchPackage(),
-            new LottiePackage(),
             new RCTBluetoothSerialPackage(),
             new RealmReactPackage(),
             new ReactNativePushNotificationPackage(),

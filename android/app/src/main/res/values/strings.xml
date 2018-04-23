@@ -1,5 +1,5 @@
 <resources>
     <string moduleConfig="true" name="reactNativeCodePush_androidDeploymentKey">EganwTZpUPDLT9PgWS_uyroX2mADHk1Mxbr5z</string>
 
-    <string name="app_name">FareyeReact</string>
+    <string name="app_name">Fareye</string>
 </resources>

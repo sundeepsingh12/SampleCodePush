@@ -34,8 +34,8 @@ export function getDSFListContent(currentElement, formElement, jobTransaction, d
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
-            showToastAndAddUserExceptionLog(801, error.message, 'danger', 1)
             dispatch(setState(SHOW_LOADER_DSF, false))
+            showToastAndAddUserExceptionLog(801, error.message, 'danger', 1)
         }
     }
 }
@@ -57,44 +57,47 @@ export function getFilteredResults(dataStoreFilterList, cloneDataStoreFilterList
                 cloneDataStoreFilterList: searchResult.cloneDataStoreFilterList
             }))
         } catch (error) {
-            showToastAndAddUserExceptionLog(802, error.message, 'danger', 1)
             dispatch(setState(SHOW_LOADER_DSF, false))
+            showToastAndAddUserExceptionLog(802, error.message, 'danger', 1)
         }
     }
 }
 
 
-export function onSave(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, latestPositionId, jobTransaction, dataStoreFilterReverseMap, fieldAttributeMasterParentIdMap, calledFromArray, rowId, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId) {
+export function onSave(fieldAttributeMasterId, formLayoutState, dataStoreFiltervalue, jobTransaction, dataStoreFilterReverseMap, calledFromArray, rowId, arrayReverseDataStoreFilterMap, arrayFieldAttributeMasterId) {
     return async function (dispatch) {
         try {
             // In case DSF is present in Array field attribute
             if (calledFromArray) {
-                let rowFormElement = formElement[rowId].formLayoutObject // get current formElement from rowId
+                let rowFormElement = formLayoutState.formElement[rowId].formLayoutObject // get current formElement from rowId
                 let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] // get DSF reverse Map in case of array used for back tracking, if it is edited
                 let singleFormElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(rowFormElement))
-                formElement[rowId].formLayoutObject = singleFormElement
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, isSaveDisabled, dataStoreFiltervalue, formElement, rowId, null, NEXT_FOCUS, 2, null, fieldAttributeMasterParentIdMap)) // call save method of array actions and pass NEXT_FOCUS as event
+                formLayoutState.formElement[rowId].formLayoutObject = singleFormElement
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStoreFiltervalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 2, null, formLayoutState)) // call save method of array actions and pass NEXT_FOCUS as event
             } else {
-                formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formElement))
-                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formElement, isSaveDisabled, dataStoreFiltervalue, { latestPositionId }, jobTransaction, fieldAttributeMasterParentIdMap, true))
+                let formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formLayoutState.formElement))
+                formLayoutState.formElement = formElement
+                formLayoutState.dataStoreFilterReverseMap = dataStoreFilterReverseMap
+                dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, dataStoreFiltervalue, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction, true))
             }
         } catch (error) {
-
+            dispatch(setState(SHOW_LOADER_DSF, false))
+            showToastAndAddUserExceptionLog(803, error.message, 'danger', 1)
         }
     }
 }
 
- /**
-  * In case of dsf in array this action is called and set dsf data which is fetched by hitting an API
-  * @param {Object} functionParamsFromDSF {
-                                currentElement 
-                                formElement 
-                                jobTransaction 
-                                arrayReverseDataStoreFilterMap 
-                                rowId 
-                                arrayFieldAttributeMasterId        
-                             }
-  */
+/**
+ * In case of dsf in array this action is called and set dsf data which is fetched by hitting an API
+ * @param {Object} functionParamsFromDSF {
+                               currentElement 
+                               formElement 
+                               jobTransaction 
+                               arrayReverseDataStoreFilterMap 
+                               rowId 
+                               arrayFieldAttributeMasterId        
+                            }
+ */
 export function getDSFListContentForArray(functionParamsFromDSF) {
     return async function (dispatch) {
         try {
@@ -104,7 +107,8 @@ export function getDSFListContentForArray(functionParamsFromDSF) {
             dispatch(setState(DATA_STORE_FILTER_LIST, returnParams.dataStoreFilterResponse))
             dispatch(setState(SET_ARRAY_DATA_STORE_FILTER_MAP, returnParams.arrayReverseDataStoreFilterMap)) // set formLayout state of arrayReverseDataStoreFilterMap which is avilable globally
         } catch (error) {
-            showToastAndAddUserExceptionLog(803, error.message, 'danger', 1)
+            dispatch(setState(SHOW_LOADER_DSF, false))
+            showToastAndAddUserExceptionLog(804, error.message, 'danger', 1)
         }
     }
 }
