@@ -78,6 +78,7 @@ import {
   GEO_FENCING,
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
+  DOWNLOAD_LATEST_APP
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -445,6 +446,7 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
+      console.log('error',error)
       if (error.message == DOWNLOAD_LATEST_APP_VERSION) {
         dispatch(setState(DOWNLOAD_LATEST_APP,{displayMessage:error.message,downloadUrl:error.downloadUrl}))
       } 

@@ -43,6 +43,7 @@ import { trackingService } from '../../services/classes/Tracking'
 import { Toast } from 'native-base'
 import { userExceptionLogsService } from '../../services/classes/UserException'
 import { OK } from '../../lib/ContainerConstants'
+import { logoutService } from '../../services/classes/Logout'
 
 export function setState(type, payload) {
   return {
