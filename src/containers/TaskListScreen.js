@@ -123,13 +123,13 @@ class TaskListScreen extends PureComponent {
 
   /**It returns section list according to dates for calender selection.
    */
-  renderListForCalender() {
+  renderListForCalender(jobMasterList) {
     let scanner = (this.props.searchText.scanner) ? true : false
     let searchText = _.toLower(this.props.searchText.searchText)
     let sectionList = []
     let listObject = this.props.jobTransactionCustomizationList
     for (let selectedDateObject in listObject) {
-      let statusIdFilteredArray = listObject[selectedDateObject].filter(arrayItem => this.props.statusIdList.includes(arrayItem.statusId))
+      let statusIdFilteredArray = this.filterJobTransactionsOnJobMasterIdsAndStatusIds(listObject[selectedDateObject], jobMasterList, this.props.statusIdList)
       let jobTransactionArray = this.performFilteringAndSearch(statusIdFilteredArray, searchText, scanner)
       if (!_.isEmpty(jobTransactionArray)) {
         sectionList.push({
@@ -145,12 +145,13 @@ class TaskListScreen extends PureComponent {
    * 
    * @param {*} groupTransactionsArray 
    */
-  renderSearchListForGroupId(groupTransactionsArray) {
+  renderSearchListForGroupId(groupTransactionsArray, jobMasterList) {
     let scanner = (this.props.searchText.scanner) ? true : false
-    let searchText = _.toLower(this.props.searchText.searchText)
+    let searchText = (this.props.searchText) ? _.toLower(this.props.searchText.searchText) : null
     let jobTransactionArray = [], transactionList = []
     for (let value of groupTransactionsArray) {
-      let transactionList = this.performFilteringAndSearch(value.jobTransactions, searchText, scanner, value.groupId);
+      let transactionList = value.jobTransactions.filter((jobTransaction) => jobMasterList.includes(jobTransaction.jobMasterId))
+      if (searchText) transactionList = this.performFilteringAndSearch(transactionList, searchText, scanner, value.groupId);
       if (transactionList && transactionList.length > 0) {
         value.total = transactionList.length
         value.jobTransactions = transactionList
@@ -164,15 +165,9 @@ class TaskListScreen extends PureComponent {
     * 
     * @param {*} groupTransactionsArray 
     */
-  renderList() {
-    let list = []
-    let jobMasterList = JSON.parse(this.props.pageObject.jobMasterIds)
-    for(let index in this.props.jobTransactionCustomizationList) {
-      if(jobMasterList && jobMasterList.includes(this.props.jobTransactionCustomizationList[index].jobMasterId) && this.props.statusIdList.includes(this.props.jobTransactionCustomizationList[index].statusId)) {
-        list.push(this.props.jobTransactionCustomizationList[index])
-      }
-    }
-    // let list = this.props.jobTransactionCustomizationList ? this.props.jobTransactionCustomizationList.filter(transactionCustomizationObject => this.props.statusIdList.includes(transactionCustomizationObject.statusId)) : []
+  renderList(jobMasterList) {
+    // let jobMasterList = JSON.parse(this.props.pageObject.jobMasterIds)
+    let list = this.filterJobTransactionsOnJobMasterIdsAndStatusIds(this.props.jobTransactionCustomizationList, jobMasterList, this.props.statusIdList)
     let scanner = (this.props.searchText.scanner) ? true : false
     let searchText = _.toLower(this.props.searchText.searchText)
     let jobTransactionArray = this.performFilteringAndSearch(list, searchText, scanner);
@@ -182,6 +177,16 @@ class TaskListScreen extends PureComponent {
       return transaction1.seqSelected - transaction2.seqSelected
     })
     return jobTransactionArray
+  }
+
+  filterJobTransactionsOnJobMasterIdsAndStatusIds(jobTransactionList, jobMasterList, statusIdList) {
+    let list = [];
+    for (let index in jobTransactionList) {
+      if (jobMasterList && jobMasterList.includes(jobTransactionList[index].jobMasterId) && this.props.statusIdList.includes(jobTransactionList[index].statusId)) {
+        list.push(jobTransactionList[index]);
+      }
+    }
+    return list;
   }
 
   renderItem = (row) => {
@@ -204,10 +209,10 @@ class TaskListScreen extends PureComponent {
   /**Renders flatlist for list of job transactions
     *  
     */
-  flatlist() {
+  flatlist(jobMasterList) {
     return (
       <FlatList
-        data={this.renderList()}
+        data={this.renderList(jobMasterList)}
         renderItem={({ item }) => this.renderData(item)}
         keyExtractor={item => String(item.id)}
       />
@@ -216,10 +221,10 @@ class TaskListScreen extends PureComponent {
   /**Renders flatlist for list of job transactions with group id
     *  
     */
-  flatlistForGroupTransactions() {
+  flatlistForGroupTransactions(jobMasterList) {
     return (
       <FlatList
-        data={this.getGroupWiseTransactions(this.props.jobTransactionCustomizationList, this.props.tabId)}
+        data={this.getGroupWiseTransactions(this.props.jobTransactionCustomizationList, this.props.tabId, jobMasterList)}
         renderItem={({ item }) => {
           return (
             <View>
@@ -270,8 +275,8 @@ class TaskListScreen extends PureComponent {
     if (this.props.statusNextStatusListMap[jobTransaction.statusId].length > 0) {
       this.props.actions.navigateToScene(BulkListing, {
         pageObject: {
-          jobMasterIds: [jobTransaction.jobMasterId],
-          additionalParams: { statusId: jobTransaction.statusId },
+          jobMasterIds: JSON.stringify([jobTransaction.jobMasterId]),
+          additionalParams: JSON.stringify({ statusId: jobTransaction.statusId }),
           groupId: item.groupId
         }
       })
@@ -282,9 +287,10 @@ class TaskListScreen extends PureComponent {
     }
   }
 
-  getGroupWiseTransactions(jobTransactionCustomizationList, tabId) {
+  getGroupWiseTransactions(jobTransactionCustomizationList, tabId, jobMasterList) {
+    console.log('jobTransactionCustomizationList', jobTransactionCustomizationList)
     let list = Object.values(jobTransactionCustomizationList[tabId])
-    let groupTransactionsArray = (_.trim(this.props.searchText)) ? this.renderSearchListForGroupId(_.cloneDeep(list)) : list
+    let groupTransactionsArray = this.renderSearchListForGroupId(_.cloneDeep(list), jobMasterList)
     groupTransactionsArray.sort(function (transaction1, transaction2) {
       return transaction1.seqSelected - transaction2.seqSelected
     })
@@ -294,10 +300,10 @@ class TaskListScreen extends PureComponent {
   /**Renders section list for transactions divided date wise
     *  
     */
-  sectionlist() {
+  sectionlist(jobMasterList) {
     return (
       <SectionList
-        sections={this.renderListForCalender()}
+        sections={this.renderListForCalender(jobMasterList)}
         renderItem={this.renderItem}
         renderSectionHeader={this.renderSectionHeader}
         keyExtractor={item => String(item.id)}
@@ -309,8 +315,9 @@ class TaskListScreen extends PureComponent {
     if (this.props.isRefreshing) {
       return <Loader />
     } else {
+      let jobMasterList = JSON.parse(this.props.pageObject.jobMasterIds)
       let joblist = (!Array.isArray(this.props.jobTransactionCustomizationList) && this.props.jobTransactionCustomizationList) ? this.props.jobTransactionCustomizationList['isGrouping'] ?
-        this.flatlistForGroupTransactions() : this.sectionlist() : this.flatlist()
+        this.flatlistForGroupTransactions(jobMasterList) : this.sectionlist(jobMasterList) : this.flatlist(jobMasterList)
       return (
         <Container>
           <Content>

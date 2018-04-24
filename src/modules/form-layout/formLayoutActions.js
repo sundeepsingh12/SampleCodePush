@@ -219,7 +219,6 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     if (routeName == TabScreen && taskListScreenDetails.jobDetailsScreenKey) {
                         let landingTabId = JSON.parse(taskListScreenDetails.pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, cloneFormLayoutState.statusId) : null
                         dispatch(setState(SET_LANDING_TAB, { landingTabId }))
-                        dispatch(fetchJobs())
                         dispatch(pieChartCount())
                         dispatch(NavigationActions.back({ key: taskListScreenDetails.jobDetailsScreenKey }))
                     } else if (routeName == TabScreen) {
@@ -233,6 +232,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                     } else {
                         dispatch(navigateToScene(routeName, routeParam))
                     }
+                    dispatch(fetchJobs())
                     dispatch(setState(CLEAR_FORM_LAYOUT))
                 } else {
                     dispatch(setState(SET_FORM_INVALID_AND_FORM_ELEMENT, {

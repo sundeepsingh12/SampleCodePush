@@ -23,7 +23,7 @@ export default function taskList(state = initialState, action) {
     case SET_TABS_LIST:
       return state.set('tabsList', action.payload.tabsList)
         .set('tabIdStatusIdMap', action.payload.tabIdStatusIdMap)
-        .set('landingTabId', 0)
+        .set('landingTabId', action.payload.landingTabId)
 
     case JOB_DOWNLOADING_STATUS:
       return state.set('downloadingJobs', action.payload.isDownloadingjobs)

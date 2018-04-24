@@ -47,7 +47,8 @@ import {
   IS_CALENDAR_VISIBLE,
   LISTING_SEARCH_VALUE,
   SEARCH_TAP,
-  JobDetailsV2
+  JobDetailsV2,
+  SET_LANDING_TAB
 } from '../lib/constants'
 import TaskListCalender from '../components/TaskListCalender'
 
@@ -61,16 +62,13 @@ function mapStateToProps(state) {
     isCalendarVisible: state.taskList.isCalendarVisible,
     searchText: state.taskList.searchText,
     modules: state.home.modules,
-    landingTabId: state.home.landingTabId
+    landingTabId: state.taskList.landingTabId
   }
 };
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({
-      ...taskListActions,
-      ...globalActions,
-    }, dispatch)
+    actions: bindActionCreators({ ...taskListActions, ...globalActions, }, dispatch)
   }
 }
 
@@ -136,6 +134,7 @@ class TabScreen extends PureComponent {
     }
     return renderTabList
   }
+
   _landingIndex(tabId) {
     //get index for landing tab id
     const tabs = this.props.tabsList
@@ -174,7 +173,7 @@ class TabScreen extends PureComponent {
   }
 
   render() {
-    let landingValue = this.props.landingTabId ? this.props.landingTabId : 0
+    let landingValue = this.props.landingTabId ? this._landingIndex(this.props.landingTabId) : 0
     const viewTabList = this.renderTabs()
     const calendarView = this._renderCalendar()
     const pageName = this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : 'All Tasks'
@@ -207,7 +206,12 @@ class TabScreen extends PureComponent {
           </Header>
           <Tabs
             tabBarBackgroundColor={styles.bgPrimary.backgroundColor}
-            initialPage={landingValue}
+            page={landingValue}
+            onChangeTab={(position) => {
+              console.log('position', position)
+              this.props.actions.setState(SET_LANDING_TAB, { landingTabId: this.props.tabsList[position.i].id })
+            }
+            }
             tabBarUnderlineStyle={[styles.bgWhite]}
             renderTabBar={() => <ScrollableTab />}>
             {viewTabList}

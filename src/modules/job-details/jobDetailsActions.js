@@ -34,7 +34,8 @@ import {
     TabScreen,
     HomeTabNavigatorScreen,
     RESET_STATE_FOR_JOBDETAIL,
-    SHOULD_RELOAD_START
+    SHOULD_RELOAD_START,
+    SET_LANDING_TAB
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
 
@@ -110,25 +111,22 @@ export function setSmsBodyAndSendMessage(contact, smsTemplate, jobTransaction, j
  *
  */
 
-export function setAllDataOnRevert(jobTransaction, statusTo, navigation) {
+export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditionalParams) {
     return async function (dispatch) {
         try {
             dispatch(startFetchingJobDetails());
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
             await jobDetailsService.setAllDataForRevertStatus(statusList, jobTransaction, statusTo)
-            dispatch(performSyncService())
-            dispatch(pieChartCount())
-            dispatch(fetchJobs())
+            let landingTabId = JSON.parse(pageObjectAdditionalParams).landingTabAfterJobCompletion ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : null
             //let landingId = (Start.landingTab) ? jobStatusService.getTabIdOnStatusId(statusList.value, statusTo[0]) : false
             //if (landingId) {
             //    await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
-            dispatch(NavigationActions.reset({
-                index: 0,
-                actions: [
-                    NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                    // NavigationActions.navigate({ routeName: TabScreen, params: { landingTab: landingId } })
-                ]
-            }))
+            dispatch(setState(SET_LANDING_TAB, { landingTabId }))
+            dispatch(performSyncService())
+            dispatch(pieChartCount())
+            dispatch(fetchJobs())
+            
+            dispatch(NavigationActions.back())
             //} else { dispatch(navigation.goBack()) }
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
         } catch (error) {
