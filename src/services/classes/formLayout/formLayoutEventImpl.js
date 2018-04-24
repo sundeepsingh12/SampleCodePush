@@ -400,13 +400,19 @@ export default class FormLayoutEventImpl {
             total[current.id] = Object.assign({}, current);
             return total;
         }, {}); // build map of runsheetId and runsheet
+        let prevJobTransactionValue = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION)
+        let prevJobTransactionMap = _.keyBy(prevJobTransactionValue, 'id')
         for (let id in jobTransactionList) {
             if (prevStatusCategory && runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] > 0) { // check for previousStatus category undefined and runSheetMap conut is greater than 0 
                 runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] -= 1
             }
             runsheetMap[jobTransactionList[id].runsheetId][status[statusCategory - 1]] += 1;
-            if (jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0) { // check for moneyTransactionType and  actualAmount 
-                runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount
+            if (jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0) { // check for moneyTransactionType and  actualAmount
+                if(prevJobTransactionMap[jobTransactionList[id].id].moneyTransactionType == jobTransactionList[id].moneyTransactionType && prevJobTransactionMap[jobTransactionList[id].id].actualAmount > 0){
+                    runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount - prevJobTransactionMap[jobTransactionList[id].id].actualAmount
+                }else{
+                   runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount
+                }
             }
             runSheetList.push(runsheetMap[jobTransactionList[id].runsheetId])
         }
