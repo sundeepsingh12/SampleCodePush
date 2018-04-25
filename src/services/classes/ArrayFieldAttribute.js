@@ -29,7 +29,7 @@ class ArrayFieldAttribute {
     getSortedArrayChildElements(arrayDTO, jobTransaction, arrayReverseDataStoreFilterMap, fieldAttributeMasterId) {
         let errorMessage;
         let requiredFields = Array.from(arrayDTO.formLayoutObject.values()).filter(arrayElement => (arrayElement.required && !arrayElement.hidden))
-        if (requiredFields.length <= 0) {
+        if (requiredFields.length == 0) {
             errorMessage = INVALID_CONFIG_ERROR
             return { arrayRowDTO: {}, childElementsTemplate: arrayDTO, errorMessage }
         } else {
@@ -69,11 +69,6 @@ class ArrayFieldAttribute {
             let arrayObject = {}
             let childDataList = []
             for (let [key, arrayRowElement] of arrayElements[rowId].formLayoutObject) {
-                // if (arrayRowElement.value == ARRAY_SAROJ_FAREYE || arrayRowElement.value == OBJECT_SAROJ_FAREYE) {
-                //     let fieldDataListWithLatestPositionId = fieldDataService.prepareFieldDataForTransactionSavingInState(arrayRowElement.childDataList, jobTransaction.id, arrayRowElement.positionId, latestPositionId)
-                //     arrayRowElement.childDataList = fieldDataListWithLatestPositionId.fieldDataList
-                //     latestPositionId = fieldDataListWithLatestPositionId.latestPositionId
-                // }
                 let afterValidationResult = fieldValidationService.fieldValidations(arrayRowElement, arrayElements[rowId].formLayoutObject, AFTER, jobTransaction)
                 let isValuePresentInAnotherTransaction = (arrayRowElement.attributeTypeId == TEXT || arrayRowElement.attributeTypeId == SCAN_OR_TEXT || arrayRowElement.attributeTypeId == STRING || arrayRowElement.attributeTypeId == QR_SCAN || arrayRowElement.attributeTypeId == NUMBER) ? this.checkforUniqueValidation(arrayRowElement, arrayElements, rowId) : false
                 arrayRowElement.value = afterValidationResult && !isValuePresentInAnotherTransaction ? arrayRowElement.displayValue : null

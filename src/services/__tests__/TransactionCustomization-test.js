@@ -31,12 +31,13 @@ describe('test cases for getModuleCustomizationMapForAppModuleId', () => {
             jobMasterIdCustomizationMap: { id: '123' },
             smsTemplateList: { id: '123' },
             statusList: { id: '123' },
+            tabList: { id: '123' },
         }
 
         return transactionCustomizationService.getJobListingParameters()
             .then((data) => {
                 expect(data).toEqual(jobTransactionCustomizationListParametersDTO)
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(7)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(8)
             })
     })
 })

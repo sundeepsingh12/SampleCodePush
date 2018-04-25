@@ -31,14 +31,6 @@ const mockStore = configureStore(middlewares)
 
 describe('global actions', () => {
 
-    it('should set store', () => {
-        const store = 'test token'
-        expect(actions.setStore(store)).toEqual({
-            type: SET_STORE,
-            payload: store
-        })
-    })
-
     it('should delete session token', () => {
         const expectedActions = [
             {

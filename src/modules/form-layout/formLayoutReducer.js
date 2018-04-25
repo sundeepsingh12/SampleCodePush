@@ -5,16 +5,13 @@ import _ from 'lodash'
 
 import {
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
-    DISABLE_SAVE,
     UPDATE_FIELD_DATA,
-    TOOGLE_HELP_TEXT,
     SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
     RESET_STATE,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     UPDATE_PAYMENT_AT_END,
-    UPDATE_FIELD_DATA_VALIDATION,
     SET_FORM_LAYOUT_STATE,
     CLEAR_FORM_LAYOUT,
     SET_UPDATE_DRAFT,
@@ -38,13 +35,6 @@ export default function formLayoutReducer(state = initialState, action) {
         case GET_SORTED_ROOT_FIELD_ATTRIBUTES: {
             return state.set('formElement', action.payload.formLayoutObject)
                 .set('isSaveDisabled', action.payload.isSaveDisabled) // applied ternary condition to set null, undefined to false
-        }
-
-        /**
-         * disabled save if all required elements are not filled
-         */
-        case DISABLE_SAVE: {
-            return state.set('isSaveDisabled', action.payload)
         }
 
         /**
@@ -82,13 +72,6 @@ export default function formLayoutReducer(state = initialState, action) {
         }
 
         /**
-         * toogle's help text, sets to true if previous was false and vice versa
-         */
-        case TOOGLE_HELP_TEXT: {
-            return state.set('formElement', action.payload)
-        }
-
-        /**
          * for showing loader
          */
         case IS_LOADING: {
@@ -109,12 +92,6 @@ export default function formLayoutReducer(state = initialState, action) {
         case ERROR_MESSAGE: {
             return state.set('errorMessage', action.payload)
                 .set('isLoading', false)
-        }
-
-        case UPDATE_FIELD_DATA_VALIDATION: {
-            return state.set('formElement', action.payload.formElement)
-                .set('errorMessage', action.payload.message)
-                .set('currentElement', action.payload.currentElement)
         }
 
         /**

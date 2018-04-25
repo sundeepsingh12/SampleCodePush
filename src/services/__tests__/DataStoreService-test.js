@@ -325,7 +325,7 @@ describe('test fetchJsonForExternalDS', () => {
 })
 
 describe('test checkForUniqueValidation', () => {
-
+    realm._encryptData = jest.fn()
     it('should throw fieldAttributeValue missing error', () => {
         const message = 'fieldAttributeValue missing in currentElement'
         try {
@@ -347,6 +347,7 @@ describe('test checkForUniqueValidation', () => {
         }]);
         dataStoreService.checkIfUniqueConditionExists = jest.fn()
         dataStoreService.checkIfUniqueConditionExists.mockReturnValue(true)
+        realm._encryptData.mockReturnValue('abhi')
         expect(dataStoreService.checkForUniqueValidation('abhi', { fieldAttributeMasterId: 123 })).toEqual(true)
     })
 
@@ -360,6 +361,7 @@ describe('test checkForUniqueValidation', () => {
             positionId: 0,
             value: 'abhi'
         }]);
+        realm._encryptData.mockReturnValue('abhi')
         dataStoreService.checkIfUniqueConditionExists = jest.fn()
         dataStoreService.checkIfUniqueConditionExists.mockReturnValue(false)
         expect(dataStoreService.checkForUniqueValidation('xyz', { fieldAttributeMasterId: 12345 })).toEqual(false)

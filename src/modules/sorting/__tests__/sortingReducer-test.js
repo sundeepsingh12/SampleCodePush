@@ -3,7 +3,7 @@ import {
     SORTING_SEARCH_VALUE,
     SORTING_ITEM_DETAILS,
     SORTING_LOADER,
-    ERROR_MESSAGE
+    DEFAULT_ERROR_MESSAGE_IN_SORTING
 } from '../../../lib/constants'
 
 import sortingReducer from '../sortingReducer'
@@ -44,7 +44,7 @@ describe('sortingReducer ', () => {
     it('it should show Error-Message', () => {
         const message = 'test'
         const action = {
-            type: ERROR_MESSAGE,
+            type: DEFAULT_ERROR_MESSAGE_IN_SORTING,
             payload: message
         }
         let nextState = sortingReducer(undefined, action)

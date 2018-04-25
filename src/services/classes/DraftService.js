@@ -43,6 +43,7 @@ class DraftService {
         }
         return draftObject
     }
+
     convertFormLayoutStateToString(formLayoutState) {
         let cloneFormLayoutState = JSON.parse(JSON.stringify(formLayoutState))
         let formElement = formLayoutState.formElement
@@ -50,6 +51,7 @@ class DraftService {
         cloneFormLayoutState.formElement = formElementAsArray
         return cloneFormLayoutState
     }
+
     getDraftForState(jobTransaction, jobMasterId) {
         let draftDbObject = this.getDraftFromDb(jobTransaction, jobMasterId)
         for (let index in draftDbObject) {
@@ -57,6 +59,7 @@ class DraftService {
             return draft
         }
     }
+    
     getDraftFromDb(jobTransaction, jobMasterId) {
         let draftQuery, draftDbObject
         let allData = realm.getRecordListOnQuery(TABLE_DRAFT)

@@ -35,7 +35,7 @@ export function getDSFListContent(currentElement, formElement, jobTransaction, d
             dispatch(setState(SET_DSF_REVERSE_MAP, returnParams.dataStoreFilterReverseMap))
         } catch (error) {
             dispatch(setState(SHOW_LOADER_DSF, false))
-            showToastAndAddUserExceptionLog(801, error.message, 'danger', 1)   
+            showToastAndAddUserExceptionLog(801, error.message, 'danger', 1)
         }
     }
 }

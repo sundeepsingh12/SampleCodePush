@@ -81,7 +81,7 @@ class Backup {
         if (!json) return
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_BACKUP_TEMP + '/logs.json', json, 'utf8');
-        const backupFileName = this.getBackupFileName(user.value,false,url ) // this will get the backup file name.
+        const backupFileName = this.getBackupFileName(user.value, false, url) // this will get the backup file name.
         //Creating ZIP file
         const targetPath = PATH_BACKUP + '/' + backupFileName
         const sourcePath = PATH_BACKUP_TEMP
@@ -99,7 +99,8 @@ class Backup {
         if (shouldCreateBackup && shouldCreateBackup.value) {
             return { syncedBackupFiles, toastMessage: BACKUP_ALREADY_EXISTS }
         }
-        let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL) 
+        let domainUrl = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+        if (!user || !user.value || !domainUrl || !domainUrl.value) throw new Error(USER_MISSING)
         let backupFileName = await this.createSyncedBackup(user, domainUrl.value) // will create backup of synced files.
         if (syncedBackupFiles) {
             var stat = await RNFS.stat(PATH_BACKUP + '/' + backupFileName);
@@ -142,7 +143,7 @@ class Backup {
      * @param {*} dateTime 
      */
     async  _getSyncDataFromDb(transactionList, dateTime) {
-        if(!transactionList) throw new Error(TRANSACTIONLIST_IS_MISSING)
+        if (!transactionList) throw new Error(TRANSACTIONLIST_IS_MISSING)
         var BACKUP_JSON = {};
         let fieldDataList = [],
             jobList = [],

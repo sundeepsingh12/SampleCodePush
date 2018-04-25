@@ -41,7 +41,7 @@ export function getBulkJobTransactions(bulkParams) {
         try {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS));
             let cloneBulkParams = _.cloneDeep(bulkParams);
-            cloneBulkParams.pageObject.additionalParams =(!cloneBulkParams.pageObject.groupId)  ? JSON.parse(cloneBulkParams.pageObject.additionalParams) : { statusId : cloneBulkParams.pageObject.additionalParams.statusId }
+            cloneBulkParams.pageObject.additionalParams = (!cloneBulkParams.pageObject.groupId) ? JSON.parse(cloneBulkParams.pageObject.additionalParams) : { statusId: cloneBulkParams.pageObject.additionalParams.statusId }
             cloneBulkParams.pageObject.jobMasterIds = (!cloneBulkParams.pageObject.groupId) ? JSON.parse(cloneBulkParams.pageObject.jobMasterIds) : cloneBulkParams.pageObject.jobMasterIds
             const bulkTransactions = await bulkService.getJobListingForBulk(cloneBulkParams);
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
@@ -78,7 +78,7 @@ export function getBulkJobTransactions(bulkParams) {
  * @param {*} selectedItems 
  */
 export function toggleAllItems(allTransactions, selectAllNone, selectedItems) {
-    return async function (dispatch) {
+    return function (dispatch) {
         try {
             const bulkTransactions = _.cloneDeep(allTransactions)
             const cloneSelectedItems = _.cloneDeep(selectedItems)

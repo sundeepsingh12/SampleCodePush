@@ -38,8 +38,6 @@ import {
   SET_NEWJOB_DRAFT_INFO,
   JOB_MASTER,
   SAVE_ACTIVATED,
-  NEW_JOB_STATUS,
-  NEW_JOB_MASTER,
   POPULATE_DATA,
   NewJob,
   BulkListing,
@@ -178,8 +176,8 @@ export function navigateToPage(pageObject) {
     try {
       switch (pageObject.screenTypeId) {
         case PAGE_BACKUP:
-        dispatch(navigateToScene(Backup,  { displayName: (pageObject.name) ? pageObject.name : 'BackUp'}));
-        break;
+          dispatch(navigateToScene(Backup, { displayName: (pageObject.name) ? pageObject.name : 'BackUp' }));
+          break;
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
@@ -197,8 +195,8 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-        dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob'}));
-        break;
+          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }));
+          break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
@@ -208,8 +206,8 @@ export function navigateToPage(pageObject) {
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
-        dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore'}))
-        break;
+          dispatch(navigateToScene(OfflineDS, { displayName: (pageObject.name) ? pageObject.name : 'OfflineDataStore' }))
+          break;
         case PAGE_OUTSCAN:
           dispatch(navigateToScene(PostAssignmentScanner, { pageObject }))
           break
@@ -218,17 +216,17 @@ export function navigateToPage(pageObject) {
         case PAGE_PICKUP:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_PROFILE:
-        dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile'}))
-        break;
+          dispatch(navigateToScene(ProfileView, { displayName: (pageObject.name) ? pageObject.name : 'Profile' }))
+          break;
         case PAGE_SEQUENCING: {
           dispatch(getRunsheetsForSequence(pageObject));
           break;
         }
         case PAGE_SORTING_PRINTING:
-          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting'}))
+          dispatch(navigateToScene(Sorting, { displayName: (pageObject.name) ? pageObject.name : 'Sorting' }))
           break;
         case PAGE_STATISTICS:
-          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics'}))
+          dispatch(navigateToScene(Statistics, { displayName: (pageObject.name) ? pageObject.name : 'Statistics' }))
           break;
         case PAGE_TABS:
           dispatch(navigateToScene(TabScreen, { pageObject }));
@@ -279,7 +277,7 @@ export function startTracking(trackingServiceStarted) {
   return async function (dispatch) {
     if (!trackingServiceStarted) {
       trackingService.init()
-      // dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+      dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
     }
   }
 }

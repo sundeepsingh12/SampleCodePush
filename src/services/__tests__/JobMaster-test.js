@@ -390,7 +390,7 @@ describe('job master services', () => {
     jobMasterService.validateAndSortTabList = jest.fn()
     return jobMasterService.saveJobMaster(json)
       .then(() => {
-        expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(24)
+        expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(26)
         expect(jobMasterService.prepareCustomizationListMap).toHaveBeenCalledTimes(1)
         expect(jobMasterService.validateAndSortTabList).toHaveBeenCalledTimes(1)
       })
