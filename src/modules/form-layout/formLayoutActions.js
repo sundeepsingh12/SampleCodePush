@@ -35,7 +35,6 @@ import { formLayoutEventsInterface } from '../../services/classes/formLayout/For
 import { NavigationActions } from 'react-navigation'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
-//import { transientStatusService } from '../../services/classes/TransientStatusService'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobStatusService } from '../../services/classes/JobStatus'
 
@@ -53,7 +52,7 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
         try {
             dispatch(setState(IS_LOADING, true))
             const sortedFormAttributesDto = await formLayoutService.getSequenceWiseRootFieldAttributes(statusId, null, jobTransaction)
-            let { latestPositionId, noFieldAttributeMappedWithStatus } = sortedFormAttributesDto
+            let { latestPositionId, noFieldAttributeMappedWithStatus, jobAndFieldAttributesList } = sortedFormAttributesDto
             let fieldAttributeMasterParentIdMap = sortedFormAttributesDto.fieldAttributeMasterParentIdMap
             sortedFormAttributesDto = formLayoutEventsInterface.findNextFocusableAndEditableElement(null, sortedFormAttributesDto.formLayoutObject, sortedFormAttributesDto.isSaveDisabled, null, null, NEXT_FOCUS, jobTransaction, fieldAttributeMasterParentIdMap);
             dispatch(setState(SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT, {
@@ -65,7 +64,8 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
                 noFieldAttributeMappedWithStatus: (noFieldAttributeMappedWithStatus || sortedFormAttributesDto.isAllAttributeHidden),
                 formLayoutObject: sortedFormAttributesDto.formLayoutObject,
                 isSaveDisabled: sortedFormAttributesDto.isSaveDisabled,
-                isLoading: false
+                isLoading: false,
+                jobAndFieldAttributesList
             }))
         } catch (error) {
             showToastAndAddUserExceptionLog(1001, error.message, 'danger', 0)
@@ -133,7 +133,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
             cloneFormElement.get(attributeMasterId).displayValue = value
             cloneFormElement.get(attributeMasterId).childDataList = fieldDataListObject.fieldDataList
             cloneFormElement.get(attributeMasterId).alertMessage = null
-            let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
+            let validationsResult = fieldValidationService.fieldValidations(cloneFormElement.get(attributeMasterId), cloneFormElement, AFTER, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
             cloneFormElement.get(attributeMasterId).value = validationsResult ? cloneFormElement.get(attributeMasterId).displayValue : null
             cloneFormElement.get(attributeMasterId).containerValue = validationsResult ? containerValue : null
             const updatedFieldDataObject = formLayoutEventsInterface.findNextFocusableAndEditableElement(attributeMasterId, cloneFormElement, formLayoutState.isSaveDisabled, value, validationsResult ? fieldDataListObject.fieldDataList : null, NEXT_FOCUS, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap);
@@ -228,7 +228,7 @@ export function fieldValidations(currentElement, formLayoutState, timeOfExecutio
         try {
             let cloneFormElement = _.cloneDeep(formLayoutState.formElement)
             let isValuePresentInAnotherTransaction = false
-            let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap)
+            let validationsResult = fieldValidationService.fieldValidations(currentElement, cloneFormElement, timeOfExecution, jobTransaction, formLayoutState.fieldAttributeMasterParentIdMap, formLayoutState.jobAndFieldAttributesList)
             if (timeOfExecution == AFTER) {
                 isValuePresentInAnotherTransaction = formLayoutService.checkUniqueValidation(currentElement)
                 cloneFormElement.get(currentElement.fieldAttributeMasterId).value = validationsResult && !isValuePresentInAnotherTransaction ? cloneFormElement.get(currentElement.fieldAttributeMasterId).displayValue : null

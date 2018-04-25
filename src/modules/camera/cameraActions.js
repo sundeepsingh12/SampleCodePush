@@ -5,6 +5,7 @@ import {
     VIEW_IMAGE_DATA,
     SET_SHOW_IMAGE,
     SET_SHOW_VIEW_IMAGE,
+    SET_VALIDATION_FOR_CAMERA
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
@@ -18,7 +19,7 @@ export function saveImage(result, fieldAttributeMasterId, formLayoutState, calle
         try {
             const value = await signatureService.saveFile(result, moment(), true)
             if (calledFromArray) {
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null))
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, value, formLayoutState.formElement, rowId, [], NEXT_FOCUS, 1, null, formLayoutState))
             } else {
                 dispatch(updateFieldDataWithChildData(fieldAttributeMasterId, formLayoutState, value, { latestPositionId: formLayoutState.latestPositionId }, jobTransaction))
             }
@@ -42,6 +43,18 @@ export function getImageData(value) {
         }
     }
 }
+
+export function getValidation(value) {
+    return async function (dispatch) {
+        try {
+            const result = await signatureService.getValidations(value)
+            dispatch(setState(SET_VALIDATION_FOR_CAMERA, result))
+        } catch (error) {
+            showToastAndAddUserExceptionLog(305, error.message, 'danger', 1)
+        }
+    }
+}
+
 export function setInitialState() {
     return async function (dispatch) {
         try {

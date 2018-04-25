@@ -73,7 +73,7 @@ export function onSave(fieldAttributeMasterId, formLayoutState, dataStoreFilterv
                 let dataStoreFilterReverseMap = arrayReverseDataStoreFilterMap[arrayFieldAttributeMasterId] // get DSF reverse Map in case of array used for back tracking, if it is edited
                 let singleFormElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(rowFormElement))
                 formLayoutState.formElement[rowId].formLayoutObject = singleFormElement
-                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStoreFiltervalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 2, null, formLayoutState.fieldAttributeMasterParentIdMap)) // call save method of array actions and pass NEXT_FOCUS as event
+                dispatch(getNextFocusableAndEditableElement(fieldAttributeMasterId, formLayoutState.isSaveDisabled, dataStoreFiltervalue, formLayoutState.formElement, rowId, null, NEXT_FOCUS, 2, null, formLayoutState)) // call save method of array actions and pass NEXT_FOCUS as event
             } else {
                 let formElement = await dataStoreFilterService.clearMappedDSFValue(fieldAttributeMasterId, dataStoreFilterReverseMap, _.cloneDeep(formLayoutState.formElement))
                 formLayoutState.formElement = formElement

@@ -69,6 +69,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('formElement', action.payload.formLayoutObject)
                 .set('isSaveDisabled', action.payload.isSaveDisabled)
                 .set('isLoading', action.payload.isLoading)
+                .set('jobAndFieldAttributesList', action.payload.jobAndFieldAttributesList)
         }
 
         /**
@@ -111,6 +112,7 @@ export default function formLayoutReducer(state = initialState, action) {
                 .set('paymentAtEnd', action.payload.editableFormLayoutState.paymentAtEnd)
                 .set('dataStoreFilterReverseMap', action.payload.editableFormLayoutState.dataStoreFilterReverseMap)
                 .set('arrayReverseDataStoreFilterMap', action.payload.editableFormLayoutState.arrayReverseDataStoreFilterMap)
+                .set('jobAndFieldAttributesList', action.payload.editableFormLayoutState.jobAndFieldAttributesList)
         }
 
         case SET_UPDATE_DRAFT: {
