@@ -45,7 +45,6 @@ import postAssignment from './postAssignment/postAssignmentReducer'
 import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 import offlineDS from './offlineDS/offlineDSReducer'
 import cameraReducer from './camera/cameraReducer'
-import autoLogout from './autoLogout/autoLogoutReducer'
 import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 import backup from './backup/backupReducer'
 import bluetooth from './bluetooth/bluetoothReducer'
@@ -93,7 +92,6 @@ const rootReducer = combineReducers({
   qrCodeReducer,
   offlineDS,
   cameraReducer,
-  autoLogout,
   dataStoreFilterReducer,
   backup,
   multipleOptionsAttribute,
