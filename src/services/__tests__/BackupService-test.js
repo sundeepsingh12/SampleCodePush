@@ -49,13 +49,13 @@ describe('test cases for _getSyncDataFromDb', () => {
             userSummary: {},
             serverSmsLog: []
         }
-        jobSummaryService.getJobSummaryDataOnLastSync = jest.fn()
-        jobSummaryService.getJobSummaryDataOnLastSync.mockReturnValue([])
+        jobSummaryService.getJobSummaryListForSync = jest.fn()
+        jobSummaryService.getJobSummaryListForSync.mockReturnValue([])
         backupService._getDataFromRealm = jest.fn()
         backupService._getDataFromRealm.mockReturnValue([])
         return backupService._getSyncDataFromDb(transactionList).then((result) => {
             expect(backupService._getDataFromRealm).toHaveBeenCalledTimes(5)
-            expect(jobSummaryService.getJobSummaryDataOnLastSync).toHaveBeenCalledTimes(1)
+            expect(jobSummaryService.getJobSummaryListForSync).toHaveBeenCalledTimes(1)
             expect(result).toEqual(JSON.stringify(json))
         })
     })

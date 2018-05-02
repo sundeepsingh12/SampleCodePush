@@ -12,6 +12,7 @@ import {
     JOB_STATUS,
     JOB_SUMMARY,
 } from '../../lib/constants'
+import _ from 'lodash'
 
 import  { Piechart } from '../../lib/AttributeConstants'
 

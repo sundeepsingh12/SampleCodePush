@@ -12,7 +12,9 @@ import {
 const initialState = new InitialState()
 
 export default function sortingReducer(state = initialState, action) {
-    if (!(state instanceof InitialState)) return initialState.mergeDeep(state)
+    if (!(state instanceof InitialState)) {
+        return initialState.mergeDeep(state)
+    }
     switch (action.type) {
         case SORTING_LOADER:
             return state.set('loaderRunning', action.payload)

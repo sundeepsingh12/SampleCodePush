@@ -3,10 +3,12 @@ import {
     SORTING_SEARCH_VALUE,
     SORTING_ITEM_DETAILS,
     SORTING_LOADER,
-    DEFAULT_ERROR_MESSAGE_IN_SORTING
+    DEFAULT_ERROR_MESSAGE_IN_SORTING,
+    RESET_STATE
 } from '../../../lib/constants'
 
 import sortingReducer from '../sortingReducer'
+import { Record } from 'immutable'
 
 describe('sortingReducer ', () => {
 
@@ -51,5 +53,32 @@ describe('sortingReducer ', () => {
         expect(nextState.errorMessage).toBe(message)
         expect(nextState.loaderRunning).toBe(false)
         expect(nextState.searchRefereneceValue).toBe('')
+    })
+    it('it should reset state to initial', () => {
+        const action = {
+            type: RESET_STATE,
+        }
+        let nextState = sortingReducer(undefined, action)
+        expect(nextState.sortingDetails).toEqual({})
+    })
+    it('it should not update state', () => {
+        const action = {
+            type: 'NO_STATE',
+        }
+        let nextState = sortingReducer(undefined, action)
+        expect(nextState.sortingDetails).toEqual({})
+    })
+    it('it should check for instance', () => {
+        let initialState = {
+            searchRefereneceValue: '',
+            sortingDetails: {},
+            errorMessage: '',
+            loaderRunning: false,
+        }
+        const action = {
+            type: 'NO_STATE',
+        }
+        let nextState = sortingReducer(initialState, action)
+        expect(nextState.sortingDetails).toEqual({})
     })
 })
