@@ -1,38 +1,17 @@
 'use strict'
 import {
-    keyValueDBService
-} from './KeyValueDBService'
-import {
-    jobStatusService
-} from './JobStatus'
-import {
-    jobMasterService
-} from './JobMaster'
-import {
     jobTransactionService
 } from './JobTransaction'
 import {
     transactionCustomizationService
 } from './TransactionCustomization'
-import {
-    UNSEEN,
-    JOB_STATUS,
-    CUSTOMIZATION_LIST_MAP,
-    JOB_ATTRIBUTE,
-    JOB_ATTRIBUTE_STATUS,
-    CUSTOMER_CARE,
-    SMS_TEMPLATE,
-    JOB_MASTER,
-    HUB,
-    TABLE_JOB_TRANSACTION
-} from '../../lib/constants'
+
 import _ from 'lodash'
-import { moduleCustomizationService } from './ModuleCustomization'
+
 import {
-    BULK_ID
-} from '../../lib/AttributeConstants'
-import {
-    INVALID_SCAN
+    INVALID_SCAN,
+    SELECT_ALL,
+    SELECT_NONE
 } from '../../lib/ContainerConstants'
 
 class Bulk {
@@ -80,29 +59,47 @@ class Bulk {
      *      errorMessage : string
      * }
      */
-    performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems) {
+    performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems, pageObject) {
         let searchText = _.toLower(searchValue)
         let isSearchFound = false
-        let errorMessage = ''
+        let errorMessage = '', numberOfEnabledItems
+        let clonePageObject = _.cloneDeep(pageObject)
+        let bulkJobSimilarityConfig = this.getBulkJobSimilarityConfig(clonePageObject)
+
         for (let key in bulkTransactions) {
             if (_.isEqual(_.toLower(bulkTransactions[key].referenceNumber), searchText) || _.isEqual(_.toLower(bulkTransactions[key].runsheetNo), searchText)) { // If search text is equal to reference number or runsheet number.Search on reference or runsheet can toggle multiple transactions
-                bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
-                bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
-                isSearchFound = true
+                if (bulkJobSimilarityConfig) {
+                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
+                }
+                if (bulkJobSimilarityConfig && isSearchFound) {
+                    errorMessage = INVALID_SCAN
+                    break
+                }
+                if (!bulkTransactions[bulkTransactions[key].id].disabled) {
+                    bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
+                    bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
+                    isSearchFound = true
+                }
             } else if (searchSelectionOnLine1Line2 && this.checkForPresenceInDisplayText(searchText, bulkTransactions[key], idToSeparatorMap)) { // If search on line1 and line2 is allowed and search text is present in line1 or line2
-                bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
-                bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
                 if (isSearchFound) { // Search on lin1 or line2 cannot toggle multiple transactions
                     errorMessage = INVALID_SCAN
                     break
                 }
-                isSearchFound = true
+                if (bulkJobSimilarityConfig) {
+                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
+                }
+                if (!bulkTransactions[bulkTransactions[key].id].disabled) {
+                    bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
+                    bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
+                    isSearchFound = true
+                }
             }
         }
+        let { displayText, selectAll } = this.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, selectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject)
         if (!isSearchFound) { // If transaction not found
             return { errorMessage: INVALID_SCAN }
         } else {
-            return { errorMessage }
+            return { errorMessage, displayText, selectAll }
         }
     }
 
@@ -177,6 +174,68 @@ class Bulk {
             jobId: jobTransaction.jobId,
             jobMasterId: jobTransaction.jobMasterId
         }
+    }
+
+    checkForSimilarityBulk(jobTransaction, previousJobTransaction, bulkJobSimilarityConfig) {
+        let differentDataPresent = false
+
+        if (bulkJobSimilarityConfig.lineOneEnabled && jobTransaction.line1 != previousJobTransaction.line1) {
+            differentDataPresent = true
+        } else if (bulkJobSimilarityConfig.lineTwoEnabled && jobTransaction.line2 != previousJobTransaction.line2) {
+            differentDataPresent = true
+        } else if (bulkJobSimilarityConfig.circleLineOneEnabled && jobTransaction.circleLine1 != previousJobTransaction.circleLine1) {
+            differentDataPresent = true
+        } else if (bulkJobSimilarityConfig.circleLineTwoEnabled && jobTransaction.circleLine2 != previousJobTransaction.circleLine2) {
+            differentDataPresent = true
+        }
+        return differentDataPresent
+    }
+
+    setEnabledTransactions(bulkTransactions, currentTransaction, bulkJobSimilarityConfig, selectedItems) {
+        let numberOfEnabledItems = 0
+        for (let index in bulkTransactions) {
+            if (_.size(selectedItems) == 0) {
+                let differentDataPresent = this.checkForSimilarityBulk(bulkTransactions[index], currentTransaction, bulkJobSimilarityConfig)
+                bulkTransactions[index].disabled = differentDataPresent
+            } else if (selectedItems[currentTransaction.id] && _.size(selectedItems) == 1) {
+                bulkTransactions[index].disabled = false
+            }
+            if (!bulkTransactions[index].disabled) {
+                numberOfEnabledItems++
+            }
+        }
+        return numberOfEnabledItems
+    }
+
+    getBulkJobSimilarityConfig(clonePageObject) {
+        clonePageObject.additionalParams = JSON.parse(clonePageObject.additionalParams)
+        let bulkJobSimilarityConfig = clonePageObject.additionalParams.bulkJobSimilarityConf
+        if (!bulkJobSimilarityConfig) {
+            return
+        } else if (!(bulkJobSimilarityConfig.lineOneEnabled || bulkJobSimilarityConfig.lineTwoEnabled || bulkJobSimilarityConfig.circleLineOneEnabled || bulkJobSimilarityConfig.circleLineTwoEnabled)) {
+            return
+        } else {
+            return bulkJobSimilarityConfig
+        }
+    }
+
+
+    getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject) {
+        let displayText, selectAll
+        if (bulkJobSimilarityConfig) {
+            displayText = _.size(cloneSelectedItems) == numberOfEnabledItems ? SELECT_NONE : SELECT_ALL
+        } else {
+            displayText = _.size(cloneSelectedItems) == _.size(bulkTransactions) ? SELECT_NONE : SELECT_ALL
+        }
+        //clonePageObject.additionalParams.selectAll = true // remove this
+        if (!clonePageObject.additionalParams.selectAll) {
+            selectAll = false
+        } else if (bulkJobSimilarityConfig) {
+            selectAll = (_.size(cloneSelectedItems) > 0) ? true : false
+        } else {
+            selectAll = clonePageObject.additionalParams.selectAll
+        }
+        return { displayText, selectAll }
     }
 }
 

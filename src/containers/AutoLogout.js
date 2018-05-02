@@ -14,7 +14,6 @@ import
     from 'react-native'
     function mapStateToProps(state) {
         return {
-        isLoaderRunning:state.autoLogout.isLoaderRunning,
         }
     }
     function mapDispatchToProps(dispatch) {

@@ -25,7 +25,7 @@ console.tron = Reactotron
 if(__DEV__){
 Reactotron //To be added dev under dev flag
     .configure({
-        host: '172.16.10.137',
+        host: '172.16.10.1',
         name: "Fareye App"
     }) // controls connection & communication settings
     //.useReactNative()

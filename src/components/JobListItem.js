@@ -42,7 +42,7 @@ export default class JobListItem extends PureComponent {
   callButtonPressed = () => {
     if (this.props.data.jobSwipableDetails.contactData.length > 1) {
       let contactData = this.props.data.jobSwipableDetails.contactData.map(contacts => ({ text: contacts, icon: "md-arrow-dropright", iconColor: "#000000" }))
-      contactData.push( { text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      contactData.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
       ActionSheet.show(
         {
           options: contactData,
@@ -70,7 +70,7 @@ export default class JobListItem extends PureComponent {
 
   customerCareButtonPressed = () => {
     let customerCareTitles = this.props.data.jobSwipableDetails.customerCareData.map(customerCare => ({ text: customerCare.name, icon: "md-arrow-dropright", iconColor: "#000000" }))
-    customerCareTitles.push( { text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
+    customerCareTitles.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
     ActionSheet.show(
       {
         options: customerCareTitles,
@@ -106,7 +106,7 @@ export default class JobListItem extends PureComponent {
       Object.values(addressDatas).forEach(object => {
         addressArray.push({ text: Object.values(object).join(), icon: "md-arrow-dropright", iconColor: "#000000" })
       })
-      addressArray.push( { text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
+      addressArray.push({ text: CANCEL, icon: "close", iconColor: styles.bgDanger.backgroundColor })
       if (_.size(addressArray) > 2) {
         ActionSheet.show(
           {
@@ -146,16 +146,16 @@ export default class JobListItem extends PureComponent {
     }
   }
 
-  showJobMasterIdentifierAndCheckMark(){
-    return(
-      <View style={[style.seqCircle, styles.relative, { backgroundColor: this.props.data.identifierColor, zIndex: 3 }]}>
-            <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-              {this.props.data.jobMasterIdentifier}
-            </Text>
-            {this.props.data.isChecked ? <View style={[styles.absolute, styles.bgSuccess, styles.justifyCenter, styles.alignCenter, style.selectedItemCircle]}>
-              <Icon name="ios-checkmark" style={[styles.bgTransparent, styles.fontWhite]} />
-            </View> : null}
-          </View>
+  showJobMasterIdentifierAndCheckMark() {
+    return (
+      <View style={[style.seqCircle, styles.relative, !this.props.data.disabled ? { backgroundColor: this.props.data.identifierColor, zIndex: 3 } : { backgroundColor:this.props.data.identifierColor + '98'  }]}>
+        <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
+          {this.props.data.jobMasterIdentifier}
+        </Text>
+        {this.props.data.isChecked ? <View style={[styles.absolute, styles.bgSuccess, styles.justifyCenter, styles.alignCenter, style.selectedItemCircle]}>
+          <Icon name="ios-checkmark" style={[styles.bgTransparent, styles.fontWhite]} />
+        </View> : null}
+      </View>
     )
   }
 
@@ -166,11 +166,11 @@ export default class JobListItem extends PureComponent {
         onLongPress={this.props.onLongPressItem}
         underlayColor={'#eee'} {...this.props.sortHandlers}>
         <View style={[style.seqCard, this.props.data.isChecked ? { backgroundColor: '#d3d3d3' } : { backgroundColor: '#ffffff' }]}>
-        {this.props.lastId != null ? <View style={{position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: (this.props.lastId != this.props.data.id) ? '100%' : '30%',top:0, left: 36, zIndex: 1}}></View> : null}
-         {this.showJobMasterIdentifierAndCheckMark()}
+          {this.props.lastId != null ? <View style={{ position: 'absolute', width: 3, backgroundColor: '#d9d9d9', height: (this.props.lastId != this.props.data.id) ? '100%' : '30%', top: 0, left: 36, zIndex: 1 }}></View> : null}
+          {this.showJobMasterIdentifierAndCheckMark()}
           <View style={style.seqCardDetail}>
             {this.renderJobListItemDetails()}
-            {this.props.callingActivity == 'Sequence' ? <SequenceVerticalBar/> : <View />}
+            {this.props.callingActivity == 'Sequence' ? <SequenceVerticalBar /> : <View />}
           </View>
         </View>
       </TouchableHighlight>
@@ -213,8 +213,8 @@ export default class JobListItem extends PureComponent {
   renderJobListItemDetails() {
     return (
       <View style={[styles.flexBasis90]}>
-      {this.showLine1Line2Details()}
-       
+        {this.showLine1Line2Details()}
+
         {this.props.jobEndTime ?
           <View style={[styles.marginTop10, styles.bgBlack, styles.bgWarning, styles.padding5, { borderRadius: 5 }]}>
             <Text style={[styles.fontWhite, styles.fontDefault, styles.fontCenter]}>
@@ -230,75 +230,75 @@ export default class JobListItem extends PureComponent {
     )
   }
 
-  showLine1Line2Details(){
+  showLine1Line2Details() {
     return (
-      <View>
-      {this.props.data.line1 ?
-        <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-          {this.props.data.line1}
-        </Text>
-        : null
-      }
-      {this.props.data.line2 ?
-        <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.data.line2}
-        </Text>
-        : null
-      }
-      {this.props.data.circleLine1 || this.props.data.circleLine2 ?
-        <Text
-          style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-          {this.props.data.circleLine1} . {this.props.data.circleLine2}
-        </Text>
-        : null
-      }
-      {this.previousAndCurrentSequenceView(this.props.data)}
-    </View>
+      <View style={[]}>
+        {this.props.data.line1 ?
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25, !this.props.data.disabled ? styles.fontBlack : styles.fontDarkGray]}>
+            {this.props.data.line1}
+          </Text>
+          : null
+        }
+        {this.props.data.line2 ?
+          <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20, !this.props.data.disabled ? styles.fontBlack : styles.fontDarkGray]}>
+            {this.props.data.line2}
+          </Text>
+          : null
+        }
+        {this.props.data.circleLine1 || this.props.data.circleLine2 ?
+          <Text
+            style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20, !this.props.data.disabled ? styles.fontBlack : styles.fontDarkGray]}>
+            {this.props.data.circleLine1} . {this.props.data.circleLine2}
+          </Text>
+          : null
+        }
+        {this.previousAndCurrentSequenceView(this.props.data)}
+      </View>
     )
   }
 
-  showActionButtonSection(){
+  showActionButtonSection() {
     return (
-      <View style={[styles.row, {marginLeft: -10}]}>
+      <View style={[styles.row, { marginLeft: -10 }]}>
 
-          {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.showIconsInJobListing,
-            <Button transparent onPress={this.callButtonPressed}>
-              <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-            </Button>
-          )}
+        {renderIf(this.props.data.jobSwipableDetails.contactData && this.props.data.jobSwipableDetails.contactData.length > 0 && this.props.showIconsInJobListing,
+          <Button transparent onPress={this.callButtonPressed}>
+            <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+          </Button>
+        )}
 
-          {renderIf((!_.isEmpty(this.props.data.jobSwipableDetails.addressData) ||
-            (this.props.data.jobLatitude && this.props.data.jobLongitude)) && this.props.showIconsInJobListing,
-            <Button transparent onPress={this.navigationButtonPressed}>
-              <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
-            </Button>)}
+        {renderIf((!_.isEmpty(this.props.data.jobSwipableDetails.addressData) ||
+          (this.props.data.jobLatitude && this.props.data.jobLongitude)) && this.props.showIconsInJobListing,
+          <Button transparent onPress={this.navigationButtonPressed}>
+            <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
+          </Button>)}
 
 
-          {renderIf(this.props.data.jobSwipableDetails.customerCareData && this.props.data.jobSwipableDetails.customerCareData.length > 0 && this.props.showIconsInJobListing,
-            <Button transparent onPress={this.customerCareButtonPressed}>
-              <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
-            </Button>)}
-        </View>
+        {renderIf(this.props.data.jobSwipableDetails.customerCareData && this.props.data.jobSwipableDetails.customerCareData.length > 0 && this.props.showIconsInJobListing,
+          <Button transparent onPress={this.customerCareButtonPressed}>
+            <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
+          </Button>)}
+      </View>
     )
   }
 }
 
-const SequenceVerticalBar = ()=>{
-  return(
-  <View
-    style={{
-      width: 30,
-      alignSelf: 'center',
-      flexBasis: '10%'
-    }} >
-    <Icon
-      name="ios-menu"
-      style={[
-        styles.fontXl, {
-          color: '#c9c9c9'
-        }
-      ]} />
-  </View>
+const SequenceVerticalBar = () => {
+  return (
+    <View
+      style={{
+        width: 30,
+        alignSelf: 'center',
+        flexBasis: '10%'
+      }} >
+      <Icon
+        name="ios-menu"
+        style={[
+          styles.fontXl, {
+            color: '#c9c9c9'
+          }
+        ]} />
+    </View>
   )
 }
 
