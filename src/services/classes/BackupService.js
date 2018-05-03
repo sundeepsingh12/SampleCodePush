@@ -15,7 +15,8 @@ import {
     USER,
     PENDING_SYNC_TRANSACTION_IDS,
     BACKUP_ALREADY_EXIST,
-    DOMAIN_URL
+    DOMAIN_URL,
+    JOB_SUMMARY
 } from '../../lib/constants'
 import { userEventLogService } from './UserEvent'
 import { jobSummaryService } from './JobSummary'
@@ -161,7 +162,9 @@ class Backup {
         BACKUP_JSON.fieldData = fieldDataList
         BACKUP_JSON.job = jobList
         BACKUP_JSON.jobTransaction = transactionList
-        let jobSummary = await jobSummaryService.getJobSummaryDataOnLastSync(dateTime)
+        const alljobSummaryList = await keyValueDBService.getValueFromStore(JOB_SUMMARY)
+        const jobSummaryListValue = alljobSummaryList ? alljobSummaryList.value : null
+        let jobSummary = jobSummaryService.getJobSummaryListForSync(jobSummaryListValue, dateTime)
         BACKUP_JSON.jobSummary = jobSummary || {}
         BACKUP_JSON.trackLog = trackLogs
         BACKUP_JSON.userCommunicationLog = [];
