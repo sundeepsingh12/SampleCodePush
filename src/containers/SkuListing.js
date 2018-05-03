@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   FlatList,
+  SectionList
 }
   from 'react-native'
 import { bindActionCreators } from 'redux'
@@ -25,7 +26,8 @@ import {
   Body,
   Right,
   Icon,
-  Toast
+  Toast,
+  Separator
 } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import styles from '../themes/FeStyle'
@@ -37,22 +39,22 @@ import * as globalActions from '../modules/global/globalActions'
 import SearchBarV2 from '../components/SearchBarV2'
 import { SEARCH_PLACE_HOLDER } from '../lib/ContainerConstants'
 import { SET_SKU_CODE, SKU_CODE_CHANGE } from '../lib/constants'
+import Title from '../../native-base-theme/components/Title';
 class SkuListing extends PureComponent {
 
   componentDidMount() {
-    const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
-    const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+    const jobTransactions = _.isArray(this.props.navigation.state.params.jobTransaction) ? this.props.navigation.state.params.jobTransaction :  [this.props.navigation.state.params.jobTransaction]
+    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, jobTransactions)
   }
 
-  renderData(item) {
+  renderData(item,title) {
     return (
-      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} />
+      <SkuListItem  item={item} title = {title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} />
     )
   }
 
-  updateSkuActualQty(value, rowItem) {
-    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason)
+  updateSkuActualQty(value, rowItem, title) {
+    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason, title)
   }
 
   onChangeSkuCode(skuCode) {
@@ -74,7 +76,8 @@ class SkuListing extends PureComponent {
       searchText,
       skuObjectValidation: this.props.skuObjectValidation,
       skuValidationForImageAndReason: this.props.skuValidationForImageAndReason,
-      skuChildItems: this.props.skuChildItems
+      skuChildItems: this.props.skuChildItems,
+      skuCodeMap: this.props.isSearchBarVisible
     })
   }
 
@@ -85,13 +88,15 @@ class SkuListing extends PureComponent {
         searchText: this.props.searchText,
         skuObjectValidation: this.props.skuObjectValidation,
         skuValidationForImageAndReason: this.props.skuValidationForImageAndReason,
-        skuChildItems: this.props.skuChildItems
+        skuChildItems: this.props.skuChildItems,
+        skuCodeMap: this.props.isSearchBarVisible
       })
     }
   }
 
   render() {
-    if (this.props.skuListingLoading) {
+    let jobIdTransactionMap = (_.isArray(this.props.navigation.state.params.jobTransaction)) ? _.keyBy(this.props.navigation.state.params.jobTransaction,'jobId') : null
+    if (this.props.skuListingLoading || !_.size(this.props.skuListItems)) {
       return <Loader />
     }
     else {
@@ -112,12 +117,12 @@ class SkuListing extends PureComponent {
             </Header>
 
             <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
-              <FlatList
-                initialNumToRender={_.size(this.props.skuListItems)}
-                data={_.values(this.props.skuListItems)}
-                renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => String(_.values(this.props.skuListItems).indexOf(item))}
-              />
+            <SectionList
+            sections={this.createSkuSectionList(this.props.skuListItems)}
+        renderItem={({ item, section }) => this.renderData(item,section.title)}
+        renderSectionHeader={({section}) => this.renderGroupHeader(jobIdTransactionMap,section.title)}
+        keyExtractor={items => items.title}
+        />
             </Content>
 
             <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
@@ -129,6 +134,24 @@ class SkuListing extends PureComponent {
         </StyleProvider>
       )
     }
+  }
+
+  renderGroupHeader(jobIdTransactionMap,title){
+    return (
+     (jobIdTransactionMap && jobIdTransactionMap[title]) ?  <Separator  key = {title} style={[style.sectionHeader]}>
+        <Text style={[{fontSize : 20}, styles.fontDarkGray]}>{'REF#'+jobIdTransactionMap[title].referenceNumber}</Text>
+      </Separator> : null
+    );
+  }
+
+  createSkuSectionList(skuObject){
+    let sectionList = []
+    for (let group in skuObject) {
+      let data = Object.values(skuObject[group])
+      let title = group
+      sectionList.push({ data, title });
+  }
+  return sectionList
   }
 
   saveSkuList = () => {
@@ -174,6 +197,12 @@ const style = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10
   },
+  sectionHeader: {
+    height: 50,
+    flex: 1,
+    justifyContent: 'center',
+    paddingLeft: 10
+},
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SkuListing)

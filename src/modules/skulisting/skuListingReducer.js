@@ -31,9 +31,7 @@ export default function skuListingReducer(state = initialState, action) {
                 .set('skuObjectAttributeKey', action.payload.skuObjectAttributeKey)
                 .set('skuValidationForImageAndReason', action.payload.skuValidationForImageAndReason)
                 .set('reasonsList', action.payload.reasonsList)
-        case SHOW_SEARCH_BAR:
-            return state.set('isSearchBarVisible', true)
-
+                .set('isSearchBarVisible', action.payload.skuCodeMap)
         case SKU_CODE_CHANGE:
             return state.set('skuSearchTerm', action.payload)
 

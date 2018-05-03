@@ -36,12 +36,12 @@ class SkuListItem extends PureComponent {
 
     changeSkuActualQuantity(selectedValue, rowItem) {
         //Call parent component using callback
-        this.props.updateSkuActualQuantity(selectedValue, rowItem)
+        this.props.updateSkuActualQuantity(selectedValue, rowItem, this.props.title)
     }
 
-    changeQuantityForCheckBox(rowItem, selectedValue) {
+    changeQuantityForCheckBox(rowItem, selectedValue, title) {
         const newValue = (selectedValue == 0) ? 1 : 0
-        this.props.updateSkuActualQuantity(newValue, rowItem)
+        this.props.updateSkuActualQuantity(newValue, rowItem, title)
     }
 
     _populateItems(value) {
@@ -147,7 +147,7 @@ class SkuListItem extends PureComponent {
             if (originalQuantityValue <= 1) {
                 quantitySelector =
                     <View style={[styles.paddingTop20]}>
-                        <CheckBox color={styles.bgPrimary.backgroundColor} style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
+                        <CheckBox color={styles.bgPrimary.backgroundColor} style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value, this.props.title)} />
                     </View>
             }
             else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {
@@ -172,7 +172,7 @@ class SkuListItem extends PureComponent {
     renderListRow(rowItem, originalQuantityValue) {
         if (rowItem.attributeTypeId != SKU_ORIGINAL_QUANTITY) {
             return (
-                <View key={rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal10, { height: 'auto' }]}>
+                <View key = {rowItem.autoIncrementId} style={[styles.row, styles.borderBottomLightGray, styles.paddingHorizontal10, { height: 'auto' }]}>
                     <View style={[styles.row]}>
                         {this._getViewOfHeader(rowItem, originalQuantityValue)}
                         <View style={[styles.width100, { height: 60 }]}>
@@ -187,11 +187,9 @@ class SkuListItem extends PureComponent {
     render() {
         const originalQuantityValue = this.props.item.filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)
         return (
-            <Content style={[styles.bgLightGray]}>
                 <View style={[style.card]} >
                     {this.props.item.map(object => this.renderListRow(object, originalQuantityValue))}
                 </View>
-            </Content>
         )
     }
 }

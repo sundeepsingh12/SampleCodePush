@@ -175,7 +175,8 @@ class Bulk {
         return {
             jobTransactionId: jobTransaction.id,
             jobId: jobTransaction.jobId,
-            jobMasterId: jobTransaction.jobMasterId
+            jobMasterId: jobTransaction.jobMasterId,
+            referenceNumber:jobTransaction.referenceNumber
         }
     }
 }
