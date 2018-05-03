@@ -50,7 +50,6 @@ export function getBulkJobTransactions(bulkParams) {
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
             const currentStatus = jobStatusService.getJobStatusForJobStatusId(statusList ? statusList.value : null, cloneBulkParams.pageObject.additionalParams.statusId)
             let selectAll = cloneBulkParams.pageObject.additionalParams.selectAll ? true : false
-            //selectAll = true // remove this
             if (cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf && (cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.lineOneEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.lineTwoEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.circleLineOneEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.circleLineTwoEnabled)) {
                 selectAll = false
             }
@@ -106,10 +105,7 @@ export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pa
             let { displayText, selectAll } = bulkService.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, enabledJobs, bulkTransactions, clonePageObject)
 
             dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
-                selectedItems: cloneSelectedItems,
-                bulkTransactions,
-                displayText,
-                selectAll
+                selectedItems: cloneSelectedItems, bulkTransactions, displayText, selectAll
             }))
         } catch (error) {
             showToastAndAddUserExceptionLog(2802, error.message, 'danger', 1)

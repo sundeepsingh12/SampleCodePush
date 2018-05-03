@@ -219,7 +219,6 @@ class Bulk {
         }
     }
 
-
     getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject) {
         let displayText, selectAll
         if (bulkJobSimilarityConfig) {
@@ -227,7 +226,6 @@ class Bulk {
         } else {
             displayText = _.size(cloneSelectedItems) == _.size(bulkTransactions) ? SELECT_NONE : SELECT_ALL
         }
-        //clonePageObject.additionalParams.selectAll = true // remove this
         if (!clonePageObject.additionalParams.selectAll) {
             selectAll = false
         } else if (bulkJobSimilarityConfig) {
