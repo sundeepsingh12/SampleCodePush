@@ -11,14 +11,12 @@ import {
 export function getIOSDownloadUrl() {
     return async function (dispatch) {
       try {
-        console.log('getIOSDownloadUrl action called >>>')
         const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
         if (!token) {
-            throw new Error('Token Missing')
+          throw new Error('Token Missing')
         }
         const appVersion = await keyValueDBService.getValueFromStore(APP_VERSION)
-        console.log('appVersion',appVersion)
-       appDownload.getDownloadLinkFromServer(token.value,appVersion.value)
+        appDownload.getDownloadLinkFromServer(token.value, appVersion.value)
       } catch (error) {
         console.log('error1', error)
       }

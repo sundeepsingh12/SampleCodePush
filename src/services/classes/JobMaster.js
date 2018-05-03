@@ -141,7 +141,7 @@ class JobMaster {
    */
   async saveJobMaster(json) {
 
-    await keyValueDBService.validateAndSaveData(APP_VERSION,json.applicationVersion)
+    await keyValueDBService.validateAndSaveData(APP_VERSION,json.applicationVersion+"")
     const packageJsonMajorVersion = parseInt(package_json.version.split('.')[0])
 
     //Check if appMajorVersion from server is greater than package json major version
