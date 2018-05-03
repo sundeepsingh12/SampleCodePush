@@ -525,6 +525,9 @@ module.exports = keyMirror({
 
     //userExceptionLogs
     USER_EXCEPTION_LOGS: null,
+
+    //ApplicationVersion
+    APP_VERSION:null
 })
 
 

@@ -386,4 +386,9 @@ module.exports = {
     //PAGE UTILITY Constants
     PAGE_SUMMARY_PIECHART: 1,
     PAGE_MESSAGING: 2,
+
+    //App Upgrade & Code Push Constants
+    LATEST_APK_PATH:'/fareye_latest1.apk',
+    MAJOR_VERSION_OUTDATED:'1',
+    MINOR_PATCH_OUTDATED:'2'
 }

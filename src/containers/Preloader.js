@@ -3,11 +3,14 @@ import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     Platform,
+    View,
+    Image,
+    Text
 }
     from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
-import { Container} from 'native-base'
+import { Container,Button} from 'native-base'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
@@ -25,6 +28,10 @@ import ApkInstaller from 'react-native-apk-installer'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import DownloadProgressBar from '../components/DownloadProgressBar'
+import ErrorScreen from '../components/ErrorScreen'
+import * as appDownloadActions from '../modules/appDownload/appDownloadActions'
+import AppOutdated from '../components/AppOutdated'
+import {LATEST_APK_PATH} from '../lib/AttributeConstants'
   
 function mapStateToProps(state) {
     return {
@@ -33,13 +40,13 @@ function mapStateToProps(state) {
         isErrorType_403_400_Logout:state.preloader.isErrorType_403_400_Logout,
         showOtpScreen:state.preloader.showOtpScreen,
         downloadLatestAppMessage:state.preloader.downloadLatestAppMessage,
-        downloadUrl:state.preloader.downloadUrl
+        androidDownloadUrl:state.preloader.androidDownloadUrl
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...preloaderActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...preloaderActions, ...globalActions,...appDownloadActions }, dispatch)
     }
 }
 
@@ -49,7 +56,8 @@ class Preloader extends PureComponent {
         super(props)
         this.state = {
             progressBarStatus: 0,
-            showDownloadProgressBar:false
+            showDownloadProgressBar:false,
+            errorInDownload:false
         }
     }
 
@@ -65,50 +73,44 @@ class Preloader extends PureComponent {
         this.props.actions.invalidateUserSession()
     }
 
-    downloadLatestApp = () => {
-        if (Platform.OS === 'ios') {
-            this.props.actions.startLoginScreenWithoutLogout()
-        } else {
-            this.setState({
-                showDownloadProgressBar: true
-            });
-            this.props.actions.resetApp()
-            this.downloadLatestApplicationForAndroid()
-        }
-    }
-
     //Downloading Latest App programatically in Android 
     //Code written in container and not action/service  because local state is changing
     downloadLatestApplicationForAndroid() {
         try {
-            const filePath = RNFS.CachesDirectoryPath + '/fareye_latest1.apk'
+            //Path where new Apk will be downloaded
+            const filePath = RNFS.CachesDirectoryPath + LATEST_APK_PATH
             const download = RNFS.downloadFile({
-                fromUrl:this.props.downloadUrl,
-                // fromUrl: 'https://staging.fareye.co/img/clear_session_and_download_apk/428/biker_gama/14f6d848-72e8-4f1f-a10a-61dba1b8fb2a',
+                fromUrl:this.props.androidDownloadUrl,
                 toFile: filePath,
                 progress: res => {
                     this.setState({
                         progressBarStatus: 100 * ((res.bytesWritten / res.contentLength).toFixed(2))
-                    });
+                    })
                 },
                 progressDivider: 1
             });
             download.promise.then(result => {
                 if (result.statusCode == 200) {
-                    ApkInstaller.install(filePath);
+                    ApkInstaller.install(filePath)
                 }else{
-                    this.setState({
-                        progressBarStatus: 0,
-                        showDownloadProgressBar:false
-                    });
+                    this.setState({error:true, showDownloadProgressBar:false})
                 }
-            });
+            })
         }
         catch (error) {
-            this.setState({
-                progressBarStatus: 0,
-                showDownloadProgressBar:false
-            });
+            this.setState({error:true, showDownloadProgressBar:false})
+        }
+    }
+
+    downloadLatestApk = () => {
+        //In ios open Web View
+        if (Platform.OS === 'ios') {
+            this.props.actions.startLoginScreenWithoutLogout()
+            this.props.actions.getIOSDownloadUrl()
+        } else {
+            this.props.actions.resetApp()
+            this.setState({showDownloadProgressBar: true})
+            this.downloadLatestApplicationForAndroid()
         }
     }
 
@@ -132,14 +134,15 @@ class Preloader extends PureComponent {
                     <OtpScreen invalidateUserSession = {this.invalidateSession}/>
                 )}
                 {renderIf(this.props.downloadLatestAppMessage, 
-                    <CustomAlert
-                    title="Outdated App"
-                    message={this.props.downloadLatestAppMessage}
-                    onOkPressed={this.downloadLatestApp} />
+                 <AppOutdated downloadLatestApk = {this.downloadLatestApk}/>
                 )}
 
                 {renderIf(this.state.showDownloadProgressBar,
                     <DownloadProgressBar progressBarStatus = {this.state.progressBarStatus} />
+                )}
+
+                {renderIf(this.state.errorInDownload,
+                <ErrorScreen downloadLatestApk = {this.downloadLatestApk} invalidateUserSession = {this.invalidateSession}/>
                 )}
                    
             </Container>

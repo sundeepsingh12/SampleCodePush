@@ -36,11 +36,14 @@ import {
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
   HUB_LAT_LONG,
-  MDM_POLICIES
+  MDM_POLICIES,
+  APP_VERSION
 } from '../../lib/constants'
 
 import {
   UNSEEN,
+  MAJOR_VERSION_OUTDATED,
+  MINOR_PATCH_OUTDATED
 } from '../../lib/AttributeConstants'
 import {
   DOWNLOAD_LATEST_APP_VERSION
@@ -137,22 +140,23 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
-    //Server side changes needed
-    //Node names : downloadUrl,applicationVersion,minorPatchVersion
-    const packageJsonVersion = package_json.version.split('.')[0]
-    const downloadUrl = json.downloadUrl
-    json.applicationVersion = 1
-    if(json.applicationVersion > packageJsonVersion){
-      throw ({message:DOWNLOAD_LATEST_APP_VERSION,downloadUrl})
+
+    await keyValueDBService.validateAndSaveData(APP_VERSION,json.applicationVersion)
+    const packageJsonMajorVersion = parseInt(package_json.version.split('.')[0])
+
+    //Check if appMajorVersion from server is greater than package json major version
+    if(json.applicationVersion && parseInt(json.applicationVersion) > packageJsonMajorVersion){
+      throw ({errorCode:MAJOR_VERSION_OUTDATED,androidDownloadUrl:json.androidDownloadUrl})
     }
-    // const minorPatchVersion = json.minorPatchVersion
-    // const minorVersionFromServer = minorPatchVersion.split('.')[0]
-    // const patchVersionFromServer = minorPatchVersion.split('.')[1]
-    // const appMinorVersion =  package_json.version.split('.')[1]
-    // const appPatchVersion = package_json.version.split('.')[2]
-    // if((minorVersionFromServer > appMinorVersion) ||((minorVersionFromServer ==  appMinorVersion) && (patchVersionFromServer > appPatchVersion))){
-    //   throw new Error('App outdated')
-    // }
+    const minorPatchVersion = json.minorPatchVersion
+    if (minorPatchVersion) {
+      const [minorVersionFromServer,patchVersionFromServer] = minorPatchVersion.split('.')
+      const [appMajorVersion,appMinorVersion,appPatchVersion] = package_json.version.split('.')
+      //Check if minor or patch version from server is greater than current minor/patch version installed in phone
+      if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
+        throw ({ errorCode: MINOR_PATCH_OUTDATED,androidDeploymentKey:json.androidDeployementKey,iosDeploymentKey:json.iosDeployementKey})
+      }
+    }
 
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);

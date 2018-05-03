@@ -186,7 +186,7 @@ export default function preloaderReducer(state = initialState, action) {
 
     case DOWNLOAD_LATEST_APP:
       return state.set('downloadLatestAppMessage',action.payload.displayMessage)
-                  .set('downloadUrl',action.payload.downloadUrl)
+                  .set('androidDownloadUrl',action.payload.androidDownloadUrl)
   }
   return state
 }

@@ -81,12 +81,12 @@ import {
   DOWNLOAD_LATEST_APP,
   MDM_POLICIES
 } from '../../lib/constants'
-import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
+import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL,MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED} from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState,resetApp } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -447,50 +447,81 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
-      console.log('error',error)
-      if (error.message == DOWNLOAD_LATEST_APP_VERSION) {
-        dispatch(setState(DOWNLOAD_LATEST_APP,{displayMessage:error.message,downloadUrl:error.downloadUrl}))
-      } 
-      else if (error.message == 'App outdated') {
-        codePush.sync({
-          updateDialog: (Platform.OS === 'ios') ? false : true,
-          installMode: codePush.InstallMode.IMMEDIATE
-        }, (status) => {
+      dispatch(checkIfAppIsOutdated(error))
+    }
+  }
+}
 
-        });
+export function patchUpdateViaCodePush(error){
+  return async function(dispatch){
+    codePush.sync({
+      updateDialog: (Platform.OS === 'ios') ? false : true,
+      installMode: codePush.InstallMode.IMMEDIATE,
+      deploymentKey: (Platform.OS === 'ios') ? error.iosDeploymentKey : error.androidDeploymentKey,
+    }, (status) => {
+      switch (status) {
+        case codePush.SyncStatus.CHECKING_FOR_UPDATE:
+          console.log("Checking for updates.");
+          break;
+        case codePush.SyncStatus.DOWNLOADING_PACKAGE:
+          console.log("Downloading package.");
+          break;
+        case codePush.SyncStatus.INSTALLING_UPDATE:
+          console.log("Installing update.");
+          break;
+        case codePush.SyncStatus.UP_TO_DATE:
+          console.log("Up-to-date.");
+          break;
+        case codePush.SyncStatus.UPDATE_INSTALLED:
+          console.log("Update installed.");
+          dispatch(resetApp())
+          break;
+        default:
+          dispatch(jobMasterSavingFailure(error.message))
       }
-      else {
-        showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0)
-        const keys = [
-          JOB_MASTER,
-          JOB_ATTRIBUTE,
-          JOB_ATTRIBUTE_VALUE,
-          FIELD_ATTRIBUTE,
-          FIELD_ATTRIBUTE_VALUE,
-          JOB_STATUS,
-          TAB,
-          CUSTOMER_CARE,
-          SMS_TEMPLATE,
-          USER_SUMMARY,
-          JOB_SUMMARY,
-          SMS_JOB_STATUS,
-          JOB_MASTER_MONEY_TRANSACTION_MODE,
-          FIELD_ATTRIBUTE_STATUS,
-          FIELD_ATTRIBUTE_VALIDATION,
-          FIELD_ATTRIBUTE_VALIDATION_CONDITION,
-          JOB_LIST_CUSTOMIZATION,
-          CUSTOMIZATION_APP_MODULE,
-          USER,
-          CUSTOMIZATION_LIST_MAP,
-          TABIDMAP,
-          JOB_ATTRIBUTE_STATUS,
-          PAGES,
-          PAGES_ADDITIONAL_UTILITY,
-          MDM_POLICIES
-        ]
-        await keyValueDBService.deleteValueFromStore(keys)
-        dispatch(jobMasterSavingFailure(error.message))
-      }
+    })
+  }
+}
+
+export function checkIfAppIsOutdated(error){
+  return async function (dispatch){
+    if (error.errorCode == MAJOR_VERSION_OUTDATED) {
+      dispatch(setState(DOWNLOAD_LATEST_APP,{displayMessage:error.errorCode,androidDownloadUrl:error.androidDownloadUrl}))
+    } 
+    else if (error.errorCode == MINOR_PATCH_OUTDATED) {
+      dispatch(patchUpdateViaCodePush(error))
+    }
+    else {
+      showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0)
+      const keys = [
+        JOB_MASTER,
+        JOB_ATTRIBUTE,
+        JOB_ATTRIBUTE_VALUE,
+        FIELD_ATTRIBUTE,
+        FIELD_ATTRIBUTE_VALUE,
+        JOB_STATUS,
+        TAB,
+        CUSTOMER_CARE,
+        SMS_TEMPLATE,
+        USER_SUMMARY,
+        JOB_SUMMARY,
+        SMS_JOB_STATUS,
+        JOB_MASTER_MONEY_TRANSACTION_MODE,
+        FIELD_ATTRIBUTE_STATUS,
+        FIELD_ATTRIBUTE_VALIDATION,
+        FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+        JOB_LIST_CUSTOMIZATION,
+        CUSTOMIZATION_APP_MODULE,
+        USER,
+        CUSTOMIZATION_LIST_MAP,
+        TABIDMAP,
+        JOB_ATTRIBUTE_STATUS,
+        PAGES,
+        PAGES_ADDITIONAL_UTILITY,
+        MDM_POLICIES
+      ]
+      await keyValueDBService.deleteValueFromStore(keys)
+      dispatch(jobMasterSavingFailure(error.message))
     }
   }
 }
@@ -685,6 +716,8 @@ export function invalidateUserSessionWhenLogoutPressed(createBackup) {
     }
   }
 }
+
+
 
 
 

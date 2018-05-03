@@ -116,7 +116,8 @@ export function resetApp() {
       await logoutService.deleteDataBase()
       const allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
       await keyValueDBService.deleteValueFromStore(allSchemaInstance)
-      dispatch(setState(DOWNLOAD_LATEST_APP, {displayMessage:null}))
+      dispatch(setState(RESET_STATE))
+      // dispatch(setState(DOWNLOAD_LATEST_APP, {displayMessage:null}))
     } catch (error) {
       console.log('error1', error)
     }

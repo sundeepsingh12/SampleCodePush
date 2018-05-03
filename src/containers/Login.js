@@ -261,7 +261,7 @@ class Login extends PureComponent {
           onPress={this.startScanner} full rounded 
           onLongPress = {this.scaneerLongPressToChooseEnvironment}
           >
-          <Text style={[styles.fontWhite]}>Scanner</Text>
+          <Text style={[styles.fontWhite]}>Scanner3</Text>
         </Button>
       </View>
     )
@@ -281,7 +281,6 @@ class Login extends PureComponent {
                 {this.showUsernameView()}
                 {this.showPasswordView()}
                 {this.showLoginButton()}
-                {/* {this.showCodePush()} */}
                 {this.showRememberMe()}
                 {this.showDisplayMessageAndScanner()}
 

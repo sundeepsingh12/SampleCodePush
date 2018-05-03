@@ -379,6 +379,11 @@ module.exports = {
     APP: 'App',
     LOGOUT: 'Logout',
 
-    //CodePush Constants
-    DOWNLOAD_LATEST_APP_VERSION:'You must download latest version to proceed'
+    //App Upgrade Constants
+    DOWNLOAD_LATEST_APP_VERSION:'You must download latest version to proceed',
+    NEW_VERSION_AVAILABLE:'New version available',
+    DOWNLOAD:'DOWNLOAD',
+    DOWNLOADING_LATEST_VERSION:'Downloading latest version. Please wait',
+    UPDATE_FAILED:'Update Failed',
+    NO_INTERNET_CONNECTIVITY:'Please check your internet and try again'
 }
