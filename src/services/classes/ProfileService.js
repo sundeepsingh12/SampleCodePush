@@ -18,19 +18,20 @@ import {
     VALIDATE_PASSWORD,
     CURRENT_AND_NEW_PASSWORD_CHECK,
     UNSAVED_PASSWORD,
-    OK
+    OK,
+    USERNAME_IS_MISSING
 } from '../../lib/ContainerConstants'
 
 class ProfileService {
-/**
- * 
- * @param {*} currentPassword 
- * @param {*} newPassword 
- * @param {*} confirmNewPassword 
- * @param {*} userPassword 
- * @param {*} token // session token of a user
- * @param {*} userObject // user details
- */
+    /**
+     * 
+     * @param {*} currentPassword 
+     * @param {*} newPassword 
+     * @param {*} confirmNewPassword 
+     * @param {*} userPassword 
+     * @param {*} token // session token of a user
+     * @param {*} userObject // user details
+     */
     getResponse(currentPassword, newPassword, confirmNewPassword, userPassword, token, userObject) {
         if (!userObject || !userObject.value || !userObject.value.username) { // validates user details
             throw new Error(USERNAME_IS_MISSING)

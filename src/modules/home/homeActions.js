@@ -38,8 +38,6 @@ import {
   SET_NEWJOB_DRAFT_INFO,
   JOB_MASTER,
   SAVE_ACTIVATED,
-  NEW_JOB_STATUS,
-  NEW_JOB_MASTER,
   POPULATE_DATA,
   NewJob,
   BulkListing,
@@ -285,7 +283,7 @@ export function startTracking(trackingServiceStarted) {
     try {
       if (!trackingServiceStarted) {
         trackingService.init()
-        // dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+        dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2705, error.message, 'danger', 1)
@@ -456,10 +454,10 @@ export function syncService(pieChart) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
       const mdmPolicies = await keyValueDBService.getValueFromStore(MDM_POLICIES)
-      const timeInterval = (mdmPolicies && mdmPolicies.value  && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
+      const timeInterval = (mdmPolicies && mdmPolicies.value && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
         dispatch(performSyncService(pieChart))
-      }, timeInterval*1000)
+      }, timeInterval * 1000)
     } catch (error) {
       //Update UI here
       console.log(error)

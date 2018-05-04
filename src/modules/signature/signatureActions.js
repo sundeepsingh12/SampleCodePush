@@ -15,21 +15,7 @@ import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import {
     OBJECT_SAROJ_FAREYE
 } from '../../lib/AttributeConstants'
-import { showToastAndAddUserExceptionLog } from '../global/globalActions'
-
-export function setFieldDataList(fieldDataList) {
-    return {
-        type: SET_FIELD_DATA_LIST,
-        payload: fieldDataList
-    }
-}
-
-export function _setIsRemarksValidation(isRemarksValidation) {
-    return {
-        type: SET_REMARKS_VALIDATION,
-        payload: isRemarksValidation
-    }
-}
+import { showToastAndAddUserExceptionLog, setState } from '../global/globalActions'
 
 export function saveSignature(result, fieldAttributeMasterId, formLayoutState, jobTransaction) {
     return async function (dispatch) {
@@ -42,26 +28,14 @@ export function saveSignature(result, fieldAttributeMasterId, formLayoutState, j
     }
 }
 
-export function getRemarksList(fieldDataList) {
+export function getRemarksList(currentElement, formElement) {
     return async function (dispatch) {
         try {
-            const remarksList = signatureService.filterRemarksList(fieldDataList)
-            dispatch(setFieldDataList(remarksList))
+            let isRemarksValidation = signatureService.getRemarksValidation(currentElement.validation)
+            const remarksList = (isRemarksValidation) ? signatureService.filterRemarksList(formElement) : []
+            dispatch(setState(SET_FIELD_DATA_LIST, remarksList))
         } catch (error) {
             showToastAndAddUserExceptionLog(2102, error.message, 'danger', 1)
-        }
-    }
-}
-
-export function setIsRemarksValidation(validation) {
-    return async function (dispatch) {
-        try {
-            let isRemarksValidation = signatureService.getRemarksValidation(validation)
-            if (isRemarksValidation) {
-                dispatch(_setIsRemarksValidation(true))
-            }
-        } catch (error) {
-            showToastAndAddUserExceptionLog(2103, error.message, 'danger', 1)
         }
     }
 }

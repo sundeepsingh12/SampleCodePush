@@ -15,9 +15,7 @@ class Job {
      */
     getJobMapAndJobDataQuery(jobsList) {
         let jobQuery = '',
-            jobTransactionQuery = '',
             jobDataQuery = '',
-            fieldDataQuery = '',
             jobMap = {}
         for (let index in jobsList) {
             const job = jobsList[index]

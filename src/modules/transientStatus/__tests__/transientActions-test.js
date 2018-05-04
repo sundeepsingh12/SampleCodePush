@@ -20,28 +20,44 @@ describe('test for setStateFromNavigationParams', () => {
     }
 
     const currentStatus = {
-        id: 1
+        id: 1,
+        nextStatusList: [{
+            id: 2,
+            name: 'success'
+        }]
     }
-    const expectedActions = [{
-        type: LOADER_IS_RUNNING,
-        payload: true
-    }, {
-        type: ADD_FORM_LAYOUT_STATE,
-        payload: {
-            '1': {
-                id: 123
+    const expectedActions = [
+        {
+            type: LOADER_IS_RUNNING,
+            payload: true
+        },
+        {
+            type: ADD_FORM_LAYOUT_STATE,
+            payload: {
+                '1': {
+                    id: 123
+                }
             }
-        }
-    }]
+        }]
 
     it('should set all formLayoutStates', () => {
         const store = mockStore({})
-        return store.dispatch(actions.setStateFromNavigationParams(formLayout, {}, expectedActions))
+        return store.dispatch(actions.setStateFromNavigationParams(formLayout.formElement, {}, currentStatus, null, { id: 9, jobId: 9 }))
             .then(() => {
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+            })
+    })
+    it('should throw error ', () => {
+        const store = mockStore({})
+        return store.dispatch(actions.setStateFromNavigationParams(formLayout.formElement, {}, null, null))
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+                expect(store.getActions()[1].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[1].payload).toEqual(false)
             })
     })
 })

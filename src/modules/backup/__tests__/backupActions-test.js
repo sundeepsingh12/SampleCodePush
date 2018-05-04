@@ -13,10 +13,17 @@ import {
     SET_BACKUP_FILES,
     SET_BACKUP_VIEW,
     SET_UPLOADING_FILE,
-    SET_SYNCED_FILES
+    SET_SYNCED_FILES,
+    SET_BACKUP_TOAST,
 } from '../../../lib/constants'
+import {
+    TRY_AFTER_CLEARING_YOUR_STORAGE_DATA
+} from '../../../lib/ContainerConstants'
 import { backupService } from '../../../services/classes/BackupService';
 import RestAPIFactory from '../../../lib/RestAPIFactory';
+import { setState, deleteSessionToken, showToastAndAddUserExceptionLog } from '../../global/globalActions'
+import { userExceptionLogsService } from '../../../services/classes/UserException'
+import { Toast } from 'native-base'
 
 describe('test cases for createManualBackup action', () => {
 
@@ -24,13 +31,15 @@ describe('test cases for createManualBackup action', () => {
         const store = mockStore({})
         keyValueDBService.getValueFromStore = jest.fn()
         keyValueDBService.getValueFromStore.mockReturnValue(null)
+        userExceptionLogsService.addUserExceptionLogs = jest.fn()
         return store.dispatch(actions.createManualBackup({}))
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(SET_LOADER_BACKUP)
                 expect(store.getActions()[0].payload).toEqual(true)
-                expect(store.getActions()[1].type).toEqual(SET_LOADER_BACKUP)
-                expect(store.getActions()[1].payload).toEqual(false)
+                expect(store.getActions()[1].type).toEqual(SET_BACKUP_TOAST)
+                expect(store.getActions()[1].payload).toEqual(TRY_AFTER_CLEARING_YOUR_STORAGE_DATA)
+                expect(userExceptionLogsService.addUserExceptionLogs).toHaveBeenCalledTimes(1)
             })
     })
     it('should set synced files', () => {
@@ -47,8 +56,6 @@ describe('test cases for createManualBackup action', () => {
                 expect(store.getActions()[0].payload).toEqual(true)
                 expect(store.getActions()[1].type).toEqual(SET_SYNCED_FILES)
                 expect(store.getActions()[1].payload).toEqual({})
-                expect(store.getActions()[2].type).toEqual(SET_LOADER_BACKUP)
-                expect(store.getActions()[2].payload).toEqual(false)
             })
     })
 })
@@ -61,7 +68,7 @@ describe('test cases for getBackupList action', () => {
         keyValueDBService.getValueFromStore.mockReturnValue(null)
         return store.dispatch(actions.getBackupList())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(store.getActions()[0].type).toEqual(SET_LOADER_BACKUP)
                 expect(store.getActions()[0].payload).toEqual(true)
                 expect(store.getActions()[1].type).toEqual(SET_LOADER_BACKUP)
@@ -77,7 +84,7 @@ describe('test cases for getBackupList action', () => {
         backupService.getBackupFilesList.mockReturnValue({})
         return store.dispatch(actions.getBackupList())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(store.getActions()[0].type).toEqual(SET_LOADER_BACKUP)
                 expect(store.getActions()[0].payload).toEqual(true)
                 expect(store.getActions()[1].type).toEqual(SET_BACKUP_FILES)
@@ -99,7 +106,7 @@ describe('test cases for uploadBackupFile action', () => {
                 expect(store.getActions()[0].type).toEqual(SET_UPLOADING_FILE)
                 expect(store.getActions()[0].payload).toEqual(filesMap[0])
                 expect(store.getActions()[1].type).toEqual(SET_BACKUP_VIEW)
-                expect(store.getActions()[1].payload).toEqual(0)
+                expect(store.getActions()[1].payload).toEqual(3)
             })
     })
     it('should throw error for undefined file', () => {
@@ -108,7 +115,7 @@ describe('test cases for uploadBackupFile action', () => {
         return store.dispatch(actions.uploadBackupFile(0, filesMap))
             .then(() => {
                 expect(store.getActions()[0].type).toEqual(SET_BACKUP_VIEW)
-                expect(store.getActions()[0].payload).toEqual(0)
+                expect(store.getActions()[0].payload).toEqual(3)
             })
     })
     it('should set backup view as 2', () => {
@@ -145,7 +152,7 @@ describe('test cases for uploadBackupFile action', () => {
                 expect(store.getActions()[1].payload).toEqual(3)
             })
     })
-    
+
 })
 
 describe('test cases for deleteBackupFile action', () => {
@@ -187,7 +194,7 @@ describe('test cases for deleteBackupFile action', () => {
             .then(() => {
                 expect(store.getActions()[0].type).toEqual(SET_LOADER_BACKUP)
                 expect(store.getActions()[0].payload).toEqual(true)
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
                 expect(backupService.deleteBackupFile).toHaveBeenCalledTimes(1)
                 expect(backupService.getBackupFilesList).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[1].type).toEqual(SET_BACKUP_FILES)

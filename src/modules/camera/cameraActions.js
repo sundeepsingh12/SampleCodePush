@@ -67,12 +67,13 @@ export function setInitialState() {
 export function setExistingImage(item) {
     return async function (dispatch) {
         try {
-            if (item.value && item.value != '') {
-                const result = await signatureService.getImageData(item.value)
+            if (!item || !item.value || item.value == '') {
+                throw new Error('No image found')
+            }
+            const result = await signatureService.getImageData(item.value)
+            if (result) {
                 dispatch(setState(SET_IMAGE_DATA, result))
-                if (result) {
-                    dispatch(setState(SET_SHOW_IMAGE, true))
-                }
+                dispatch(setState(SET_SHOW_IMAGE, true))
             }
         } catch (error) {
             showToastAndAddUserExceptionLog(304, error.message, 'danger', 1)

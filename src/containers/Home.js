@@ -18,7 +18,7 @@ import { Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED } from '../lib/ContainerConstants'
-import { Summary }from '../lib/constants'
+import { Summary } from '../lib/constants'
 import DraftModal from '../components/DraftModal'
 
 function mapStateToProps(state) {
@@ -34,6 +34,7 @@ function mapStateToProps(state) {
     utilities: state.home.utilities,
     pagesLoading: state.home.pagesLoading,
     pieChartSummaryCount: state.home.pieChartSummaryCount,
+    trackingServiceStarted: state.home.trackingServiceStarted
   }
 }
 
@@ -115,9 +116,9 @@ class Home extends PureComponent {
     return null
   }
   _onPieChartPress = () => {
-      this.props.actions.navigateToScene(Summary)
+    this.props.actions.navigateToScene(Summary)
   }
-  
+
   getNewJobDraftModal() {
     if (!_.isEmpty(this.props.draftNewJobInfo)) {
       return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
@@ -125,7 +126,7 @@ class Home extends PureComponent {
     return null
   }
 
-  
+
 
   render() {
     const pieChartView = this.pieChartView()

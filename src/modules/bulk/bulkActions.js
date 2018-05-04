@@ -15,7 +15,8 @@ import {
 } from '../../lib/constants'
 import {
     setState,
-    navigateToScene
+    navigateToScene,
+    showToastAndAddUserExceptionLog
 } from '../global/globalActions'
 import {
     BULK_ID
@@ -31,7 +32,9 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { bulkService } from '../../services/classes/Bulk'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobTransactionService } from '../../services/classes/JobTransaction';
-
+import {
+    Alert
+} from 'react-native'
 /**
  * This action sets job transaction,manual selection,selectAll and search on line1 or lin2 parameters
  * @param {*} bulkParams 
@@ -41,12 +44,15 @@ export function getBulkJobTransactions(bulkParams) {
         try {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS));
             let cloneBulkParams = _.cloneDeep(bulkParams);
-            cloneBulkParams.pageObject.additionalParams =(!cloneBulkParams.pageObject.groupId)  ? JSON.parse(cloneBulkParams.pageObject.additionalParams) : { statusId : cloneBulkParams.pageObject.additionalParams.statusId }
+            cloneBulkParams.pageObject.additionalParams = (!cloneBulkParams.pageObject.groupId) ? JSON.parse(cloneBulkParams.pageObject.additionalParams) : { statusId: cloneBulkParams.pageObject.additionalParams.statusId }
             cloneBulkParams.pageObject.jobMasterIds = (!cloneBulkParams.pageObject.groupId) ? JSON.parse(cloneBulkParams.pageObject.jobMasterIds) : cloneBulkParams.pageObject.jobMasterIds
             const bulkTransactions = await bulkService.getJobListingForBulk(cloneBulkParams);
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
             const currentStatus = jobStatusService.getJobStatusForJobStatusId(statusList ? statusList.value : null, cloneBulkParams.pageObject.additionalParams.statusId)
             let selectAll = cloneBulkParams.pageObject.additionalParams.selectAll ? true : false
+            if (cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf && (cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.lineOneEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.lineTwoEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.circleLineOneEnabled || cloneBulkParams.pageObject.additionalParams.bulkJobSimilarityConf.circleLineTwoEnabled)) {
+                selectAll = false
+            }
             let isManualSelectionAllowed = cloneBulkParams.pageObject.manualSelection || cloneBulkParams.pageObject.groupId ? true : false
             let searchSelectionOnLine1Line2 = cloneBulkParams.pageObject.additionalParams.searchSelectionOnLine1Line2 || cloneBulkParams.pageObject.groupId ? true : false
             let idToSeparatorMap
@@ -63,7 +69,7 @@ export function getBulkJobTransactions(bulkParams) {
                 nextStatusList: currentStatus.nextStatusList ? currentStatus.nextStatusList : []
             }))
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(2801, error.message, 'danger', 1)
             dispatch(setState(STOP_FETCHING_BULK_TRANSACTIONS, {
                 bulkTransactions: {}
             }))
@@ -77,24 +83,32 @@ export function getBulkJobTransactions(bulkParams) {
  * @param {*} selectAllNone 
  * @param {*} selectedItems 
  */
-export function toggleAllItems(allTransactions, selectAllNone, selectedItems) {
-    return async function (dispatch) {
+export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pageObject) {
+    return function (dispatch) {
         try {
             const bulkTransactions = _.cloneDeep(allTransactions)
             const cloneSelectedItems = _.cloneDeep(selectedItems)
-            let displayText = '';
+            let clonePageObject = _.cloneDeep(pageObject)
+            let enabledJobs = 0
+            let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
+
             for (let index in bulkTransactions) {
-                bulkTransactions[index].isChecked = selectAllNone == SELECT_ALL;
-                selectAllNone == SELECT_ALL ? cloneSelectedItems[bulkTransactions[index].id] = bulkService.getSelectedTransactionObject(bulkTransactions[index]) : delete cloneSelectedItems[bulkTransactions[index].id]
+                if (!bulkTransactions[index].disabled) {
+                    bulkTransactions[index].isChecked = selectAllNone == SELECT_ALL;
+                    selectAllNone == SELECT_ALL ? cloneSelectedItems[bulkTransactions[index].id] = bulkService.getSelectedTransactionObject(bulkTransactions[index]) : delete cloneSelectedItems[bulkTransactions[index].id]
+                    enabledJobs++
+                }
+                if (selectAllNone == SELECT_NONE) {
+                    bulkTransactions[index].disabled = false
+                }
             }
-            displayText = _.size(cloneSelectedItems) == _.size(allTransactions) ? SELECT_NONE : SELECT_ALL
+            let { displayText, selectAll } = bulkService.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, enabledJobs, bulkTransactions, clonePageObject)
+
             dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
-                selectedItems: cloneSelectedItems,
-                bulkTransactions,
-                displayText
+                selectedItems: cloneSelectedItems, bulkTransactions, displayText, selectAll
             }))
         } catch (error) {
-            //Update UI here 
+            showToastAndAddUserExceptionLog(2802, error.message, 'danger', 1)
         }
     }
 }
@@ -108,26 +122,25 @@ export function toggleAllItems(allTransactions, selectAllNone, selectedItems) {
  * @param {*} idToSeparatorMap 
  * @param {*} selectedItems 
  */
-export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems) {
+export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems, pageObject) {
     return function (dispatch) {
         try {
             let cloneBulkTransactions = _.cloneDeep(bulkTransactions)
             let cloneSelectedItems = _.cloneDeep(selectedItems)
-            let searchResultObject = bulkService.performSearch(searchValue, cloneBulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, cloneSelectedItems)
+            let searchResultObject = bulkService.performSearch(searchValue, cloneBulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, cloneSelectedItems, pageObject)
             if (!searchResultObject.errorMessage && searchResultObject.errorMessage == '') { // If after search there is any error
-                let displayText = (_.size(cloneSelectedItems) == _.size(cloneBulkTransactions)) ? SELECT_NONE : SELECT_ALL
                 dispatch(setState(SET_BULK_TRANSACTION_PARAMETERS, {
                     selectedItems: cloneSelectedItems,
                     bulkTransactions: cloneBulkTransactions,
-                    displayText,
-                    searchText: ''
+                    displayText: searchResultObject.displayText,
+                    searchText: '',
+                    selectAll: searchResultObject.selectAll
                 }))
             } else {
                 dispatch(setState(SET_BULK_ERROR_MESSAGE, searchResultObject.errorMessage))
             }
         } catch (error) {
-            console.log(error)
-            //Update UI here if needed
+            showToastAndAddUserExceptionLog(2803, error.message, 'danger', 1)
         }
     }
 }
@@ -138,23 +151,32 @@ export function setSearchedItem(searchValue, bulkTransactions, searchSelectionOn
  * @param {*} allTransactions 
  * @param {*} selectedItems 
  */
-export function toggleMultipleTransactions(jobTransactionList, allTransactions, selectedItems) {
+export function toggleMultipleTransactions(jobTransactionList, allTransactions, selectedItems, pageObject) {
     return function (dispatch) {
         try {
             let bulkTransactions = _.cloneDeep(allTransactions)
             let cloneSelectedItems = _.cloneDeep(selectedItems)
+            let clonePageObject = _.cloneDeep(pageObject)
+            let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
+            let numberOfEnabledItems = 0
             for (let jobTransaction of jobTransactionList) {
-                bulkTransactions[jobTransaction.id].isChecked = !bulkTransactions[jobTransaction.id].isChecked
-                bulkTransactions[jobTransaction.id].isChecked ? cloneSelectedItems[jobTransaction.id] = bulkService.getSelectedTransactionObject(bulkTransactions[jobTransaction.id]) : delete cloneSelectedItems[jobTransaction.id]
+                if (bulkJobSimilarityConfig) {
+                    numberOfEnabledItems = bulkService.setEnabledTransactions(bulkTransactions, jobTransaction, bulkJobSimilarityConfig, selectedItems)
+                }
+                if (!bulkTransactions[jobTransaction.id].disabled) {
+                    bulkTransactions[jobTransaction.id].isChecked = !bulkTransactions[jobTransaction.id].isChecked
+                    bulkTransactions[jobTransaction.id].isChecked ? cloneSelectedItems[jobTransaction.id] = bulkService.getSelectedTransactionObject(bulkTransactions[jobTransaction.id]) : delete cloneSelectedItems[jobTransaction.id]
+                }
             }
-            let displayText = _.size(cloneSelectedItems) == _.size(bulkTransactions) ? SELECT_NONE : SELECT_ALL
+            let { displayText, selectAll } = bulkService.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject)
             dispatch(setState(TOGGLE_ALL_JOB_TRANSACTIONS, {
                 selectedItems: cloneSelectedItems,
                 bulkTransactions,
-                displayText
+                displayText,
+                selectAll
             }))
         } catch (error) {
-            console.log(error)
+            showToastAndAddUserExceptionLog(2804, error.message, 'danger', 1)
         }
     }
 }

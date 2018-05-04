@@ -71,10 +71,10 @@ describe('sortingReducer ', () => {
     it('it should check for instance', () => {
         let initialState = {
             searchRefereneceValue: '',
-            sortingDetails:{},
+            sortingDetails: {},
             errorMessage: '',
             loaderRunning: false,
-         }
+        }
         const action = {
             type: 'NO_STATE',
         }
