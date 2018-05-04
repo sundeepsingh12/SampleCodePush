@@ -65,12 +65,12 @@ class TaskListScreen extends PureComponent {
   }
 
   navigateToScene = (item, groupId) => {
-    this.props.actions.checkForDraftANdStartSyncAndNavigateToJobDetail(JobDetailsV2,
+    this.props.actions.navigateToScene(JobDetailsV2,
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
         groupId
-      }, TASKLIST_LOADER_FOR_SYNC
+      }
     )
   }
   /**It renders each job transaction item

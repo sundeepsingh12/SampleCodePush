@@ -91,36 +91,36 @@ export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject
   }
 }
 
-export function checkForDraftANdStartSyncAndNavigateToJobDetail(screenName,jobDetailData, actionLoader) {
+export function checkForDraftANdStartSyncAndNavigateToJobDetail(screenName, bulkData, syncLoader) {
   return async function (dispatch) {
     try {
-      const jobMasterId = (screenName == BulkListing)  ? jobDetailData.pageObject.jobMasterIds[0] : jobDetailData.jobTransaction.jobMasterId
+      const jobMasterId = bulkData.pageObject.jobMasterIds[0]
       const jobMasterValue = await jobMasterService.getJobMasterFromJobMasterList(jobMasterId)
-      const checkForDraft = (screenName == JobDetailsV2) ? draftService.getDraftForState(jobDetailData.jobTransaction, null) : true
-      if (jobMasterValue[0].enableLiveJobMaster && checkForDraft) {
-          NetInfo.isConnected.fetch().then(isConnected => {
-              if (isConnected) {
-                  dispatch(setState(actionLoader, true))
-                  dispatch(performSyncService()).then(() => 
-                  { 
-                      dispatch(setState(actionLoader, false))
-                      dispatch(navigateToScene(screenName, jobDetailData)) 
-                  })
+      if (jobMasterValue[0].enableLiveJobMaster) {
+          NetInfo.isConnected.fetch().then(async isConnected => {
+            if(isConnected){
+            dispatch(setState(syncLoader, true))
+             let message = await dispatch(performSyncService())
+              if (message === true) {
+                dispatch(setState(syncLoader, false))
+                dispatch(navigateToScene(screenName, bulkData)) 
+              }else{
+                dispatch(setState(syncLoader, false))
+                alert(message)
               }
-              else {
-                alert('Please enable internet connection to update this job!!!')
+            }else {
+              alert('Please enable internet connection to update this job!!!')
               }
           }).catch(function (err) {
-              dispatch(setState(actionLoader, false))
-              Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
-
+              dispatch(setState(syncLoader, false))
+              Toast.show({ text: err.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 5000 })
           })
       } else  {
-          dispatch(navigateToScene(screenName, jobDetailData))
+          dispatch(navigateToScene(screenName, bulkData))
       }
     } catch (error) {
-      dispatch(setState(actionLoader, false))
-      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
+      dispatch(setState(TASKLIST_LOADER_FOR_SYNC, false))
+      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 5000 })
     }
   }
 }

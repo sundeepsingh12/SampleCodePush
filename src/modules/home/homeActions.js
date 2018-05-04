@@ -285,25 +285,28 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk) {
   return async function (dispatch) {
     try {
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
-        NetInfo.isConnected.fetch().then(isConnected => {
+        NetInfo.isConnected.fetch().then(async isConnected => {
           if (isConnected) {
             dispatch(setState(LOADER_FOR_SYNCING, true))
-            dispatch(performSyncService()).then(() => {
+            let message = await dispatch(performSyncService())
+            if(message === true){
               dispatch(setState(LOADER_FOR_SYNCING, false))
               if (!isBulk) {
                 dispatch(redirectToContainer(pageObject))
               } else {
                 dispatch(navigateToScene(BulkListing, { pageObject }))
               }
-            }).catch(function (err) {
+            }else{
               dispatch(setState(LOADER_FOR_SYNCING, false))
-              Toast.show({ text: err.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
-            })
-          }
-          else {
+              alert(message)
+            }
+          }else {
             alert('Please enable internet connection to update this job!!!')
           }
-        })
+        }).catch(function (err) {
+          dispatch(setState(LOADER_FOR_SYNCING, false))
+          Toast.show({ text: err.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 5000 })
+      })
       } else {
         if (!isBulk) {
           dispatch(redirectToContainer(pageObject))
@@ -313,7 +316,7 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk) {
       }
     } catch (error) {
       dispatch(setState(LOADER_FOR_SYNCING, false))
-      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 50000 })
+      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 5000 })
     }
   }
 }
@@ -449,8 +452,8 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
       }
+      return true;
     } catch (error) {
-      console.log(error)
       showToastAndAddUserExceptionLog(2706, error.message, 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
@@ -472,6 +475,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
         syncStatus
       }))
+      return error.message ; 
     } finally {
       if (!erpPull) {
         const difference = await sync.calculateDifference()

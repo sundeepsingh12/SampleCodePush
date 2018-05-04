@@ -123,6 +123,7 @@ module.exports = keyMirror({
     SHOW_DROPDOWN: null,
     SET_JOBDETAILS_DRAFT_INFO: null,
     SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
