@@ -68,18 +68,14 @@ class Bulk {
 
         for (let key in bulkTransactions) {
             if (_.isEqual(_.toLower(bulkTransactions[key].referenceNumber), searchText) || _.isEqual(_.toLower(bulkTransactions[key].runsheetNo), searchText)) { // If search text is equal to reference number or runsheet number.Search on reference or runsheet can toggle multiple transactions
-                if (bulkJobSimilarityConfig) {
-                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
-                }
                 if (bulkJobSimilarityConfig && isSearchFound) {
                     errorMessage = INVALID_SCAN
                     break
                 }
-                if (!bulkTransactions[bulkTransactions[key].id].disabled) {
-                    bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
-                    bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
-                    isSearchFound = true
+                if (bulkJobSimilarityConfig) {
+                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
                 }
+                isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems)
             } else if (searchSelectionOnLine1Line2 && this.checkForPresenceInDisplayText(searchText, bulkTransactions[key], idToSeparatorMap)) { // If search on line1 and line2 is allowed and search text is present in line1 or line2
                 if (isSearchFound) { // Search on lin1 or line2 cannot toggle multiple transactions
                     errorMessage = INVALID_SCAN
@@ -88,11 +84,7 @@ class Bulk {
                 if (bulkJobSimilarityConfig) {
                     numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
                 }
-                if (!bulkTransactions[bulkTransactions[key].id].disabled) {
-                    bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
-                    bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
-                    isSearchFound = true
-                }
+                isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems)
             }
         }
         let { displayText, selectAll } = this.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, selectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject)
@@ -101,6 +93,15 @@ class Bulk {
         } else {
             return { errorMessage, displayText, selectAll }
         }
+    }
+
+    toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems) {
+        if (!bulkTransactions[bulkTransactions[key].id].disabled) {
+            bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
+            bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
+            isSearchFound = true
+        }
+        return isSearchFound
     }
 
     /**
@@ -112,16 +113,20 @@ class Bulk {
      * boolean - whether search text is present in ine1, line2, circle line 1 or circle line 2
      */
     checkForPresenceInDisplayText(searchValue, bulkTransaction, idToSeparatorMap) {
+        let line1match = false
         if (bulkTransaction.line1 && _.toLower(bulkTransaction.line1).includes(searchValue)) { // If line1 includes search text
-            return this.checkLineContents(_.toLower(bulkTransaction.line1), idToSeparatorMap[1], searchValue)
-        } else if (bulkTransaction.line2 && _.toLower(bulkTransaction.line2).includes(searchValue)) { // If line2 includes search text
-            return this.checkLineContents(_.toLower(bulkTransaction.line2), idToSeparatorMap[2], searchValue)
-        } else if (bulkTransaction.circleLine1 && _.toLower(bulkTransaction.circleLine1).includes(searchValue)) { // If circleline1 includes search text
-            return this.checkLineContents(_.toLower(bulkTransaction.circleLine1), idToSeparatorMap[3], searchValue)
-        } else if (bulkTransaction.circleLine2 && _.toLower(bulkTransaction.circleLine2).includes(searchValue)) { // If circleline2 includes search text
-            return this.checkLineContents(_.toLower(bulkTransaction.circleLine2), idToSeparatorMap[4], searchValue)
+            line1match = this.checkLineContents(_.toLower(bulkTransaction.line1), idToSeparatorMap[1], searchValue)
         }
-        return false;
+        if (!line1match && bulkTransaction.line2 && _.toLower(bulkTransaction.line2).includes(searchValue)) { // If line2 includes search text
+            line1match = this.checkLineContents(_.toLower(bulkTransaction.line2), idToSeparatorMap[2], searchValue)
+        }
+        if (!line1match && bulkTransaction.circleLine1 && _.toLower(bulkTransaction.circleLine1).includes(searchValue)) { // If circleline1 includes search text
+            line1match = this.checkLineContents(_.toLower(bulkTransaction.circleLine1), idToSeparatorMap[3], searchValue)
+        }
+        if (!line1match && bulkTransaction.circleLine2 && _.toLower(bulkTransaction.circleLine2).includes(searchValue)) { // If circleline2 includes search text
+            line1match = this.checkLineContents(_.toLower(bulkTransaction.circleLine2), idToSeparatorMap[4], searchValue)
+        }
+        return line1match;
     }
 
     /**
@@ -210,9 +215,7 @@ class Bulk {
     getBulkJobSimilarityConfig(clonePageObject) {
         clonePageObject.additionalParams = JSON.parse(clonePageObject.additionalParams)
         let bulkJobSimilarityConfig = clonePageObject.additionalParams.bulkJobSimilarityConf
-        if (!bulkJobSimilarityConfig) {
-            return
-        } else if (!(bulkJobSimilarityConfig.lineOneEnabled || bulkJobSimilarityConfig.lineTwoEnabled || bulkJobSimilarityConfig.circleLineOneEnabled || bulkJobSimilarityConfig.circleLineTwoEnabled)) {
+        if (!bulkJobSimilarityConfig || !(bulkJobSimilarityConfig.lineOneEnabled || bulkJobSimilarityConfig.lineTwoEnabled || bulkJobSimilarityConfig.circleLineOneEnabled || bulkJobSimilarityConfig.circleLineTwoEnabled)) {
             return
         } else {
             return bulkJobSimilarityConfig
@@ -220,7 +223,7 @@ class Bulk {
     }
 
     getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject) {
-        let displayText, selectAll
+        let displayText, selectAll = clonePageObject.additionalParams.selectAll
         if (bulkJobSimilarityConfig) {
             displayText = _.size(cloneSelectedItems) == numberOfEnabledItems ? SELECT_NONE : SELECT_ALL
         } else {
@@ -230,8 +233,6 @@ class Bulk {
             selectAll = false
         } else if (bulkJobSimilarityConfig) {
             selectAll = (_.size(cloneSelectedItems) > 0) ? true : false
-        } else {
-            selectAll = clonePageObject.additionalParams.selectAll
         }
         return { displayText, selectAll }
     }

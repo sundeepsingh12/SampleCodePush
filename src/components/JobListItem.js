@@ -148,7 +148,7 @@ export default class JobListItem extends PureComponent {
 
   showJobMasterIdentifierAndCheckMark() {
     return (
-      <View style={[style.seqCircle, styles.relative, !this.props.data.disabled ? { backgroundColor: this.props.data.identifierColor, zIndex: 3 } : { backgroundColor:this.props.data.identifierColor + '98'  }]}>
+      <View style={[style.seqCircle, styles.relative, !this.props.data.disabled ? { backgroundColor: this.props.data.identifierColor, zIndex: 3 } : { backgroundColor: this.props.data.identifierColor + '98' }]}>
         <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
           {this.props.data.jobMasterIdentifier}
         </Text>
@@ -232,7 +232,7 @@ export default class JobListItem extends PureComponent {
 
   showLine1Line2Details() {
     return (
-      <View style={[]}>
+      <View>
         {this.props.data.line1 ?
           <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25, !this.props.data.disabled ? styles.fontBlack : styles.fontDarkGray]}>
             {this.props.data.line1}
