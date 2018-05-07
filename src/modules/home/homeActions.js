@@ -115,6 +115,7 @@ import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
 import { jobMasterService } from '../../services/classes/JobMaster';
+import { PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB, UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
 
 /**
  * Function which updates STATE when component is mounted
@@ -185,7 +186,7 @@ export function navigateToPage(pageObject) {
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(startSyncAndNavigateToContainer(pageObject, true))
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
@@ -206,7 +207,7 @@ export function navigateToPage(pageObject) {
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(startSyncAndNavigateToContainer(pageObject))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
@@ -281,31 +282,32 @@ export function checkCustomErpPullActivated() {
   }
 }
 
-export function startSyncAndNavigateToContainer(pageObject, isBulk) {
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
   return async function (dispatch) {
     try {
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
         NetInfo.isConnected.fetch().then(async isConnected => {
           if (isConnected) {
-            dispatch(setState(LOADER_FOR_SYNCING, true))
+            dispatch(setState(syncLoader, true))
             let message = await dispatch(performSyncService())
             if(message === true){
-              dispatch(setState(LOADER_FOR_SYNCING, false))
+              dispatch(setState(syncLoader, false))
               if (!isBulk) {
                 dispatch(redirectToContainer(pageObject))
               } else {
                 dispatch(navigateToScene(BulkListing, { pageObject }))
               }
             }else{
-              dispatch(setState(LOADER_FOR_SYNCING, false))
-              alert(message)
+              dispatch(setState(syncLoader, false))
+              alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
             }
           }else {
-            alert('Please enable internet connection to update this job!!!')
+            alert(PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB)
           }
         }).catch(function (err) {
-          dispatch(setState(LOADER_FOR_SYNCING, false))
-          Toast.show({ text: err.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 5000 })
+          dispatch(setState(syncLoader, false))
+          showToastAndAddUserExceptionLog(2713, err.message, 'danger', 1)
+
       })
       } else {
         if (!isBulk) {
@@ -315,8 +317,8 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk) {
         }
       }
     } catch (error) {
-      dispatch(setState(LOADER_FOR_SYNCING, false))
-      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 5000 })
+      dispatch(setState(syncLoader, false))
+      showToastAndAddUserExceptionLog(2714, error.message, 'danger', 1)
     }
   }
 }
@@ -475,7 +477,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
         syncStatus
       }))
-      return error.message ; 
+      return false ; 
     } finally {
       if (!erpPull) {
         const difference = await sync.calculateDifference()

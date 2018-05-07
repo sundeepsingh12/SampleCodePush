@@ -90,37 +90,3 @@ export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject
     }
   }
 }
-
-export function checkForDraftANdStartSyncAndNavigateToJobDetail(screenName, bulkData, syncLoader) {
-  return async function (dispatch) {
-    try {
-      const jobMasterId = bulkData.pageObject.jobMasterIds[0]
-      const jobMasterValue = await jobMasterService.getJobMasterFromJobMasterList(jobMasterId)
-      if (jobMasterValue[0].enableLiveJobMaster) {
-          NetInfo.isConnected.fetch().then(async isConnected => {
-            if(isConnected){
-            dispatch(setState(syncLoader, true))
-             let message = await dispatch(performSyncService())
-              if (message === true) {
-                dispatch(setState(syncLoader, false))
-                dispatch(navigateToScene(screenName, bulkData)) 
-              }else{
-                dispatch(setState(syncLoader, false))
-                alert(message)
-              }
-            }else {
-              alert('Please enable internet connection to update this job!!!')
-              }
-          }).catch(function (err) {
-              dispatch(setState(syncLoader, false))
-              Toast.show({ text: err.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 5000 })
-          })
-      } else  {
-          dispatch(navigateToScene(screenName, bulkData))
-      }
-    } catch (error) {
-      dispatch(setState(TASKLIST_LOADER_FOR_SYNC, false))
-      Toast.show({ text: error.message, position: "bottom" | "center", buttonText: 'OKAY', type: 'danger', duration: 5000 })
-    }
-  }
-}

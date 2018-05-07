@@ -13,6 +13,7 @@ import * as realm from '../../repositories/realmdb'
 import { NetInfo } from 'react-native'
 import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
+import { PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB, UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
 import {
     Start,
     PENDING,
@@ -184,10 +185,10 @@ export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutDa
                             if (!_.isEmpty(FormLayoutData)) dispatch(navigateToScene('FormLayout', FormLayoutData))
                         } else {
                             dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, false))
-                            alert(message)
+                            alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
                         }
                     } else {
-                        alert('Please enable internet connection to update this job!!!')
+                        alert(PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB)
                     }
                 }).catch(function (err) {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))

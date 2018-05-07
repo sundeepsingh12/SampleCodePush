@@ -16,6 +16,8 @@ module.exports = {
     INVALID_SCAN: 'Invalid Scan',
     NO_JOBS_PRESENT: 'No jobs present',
     TOTAL_COUNT: 'Total Count : ',
+    PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB: 'Please enable internet connection to update this job!!!',
+    UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET: 'unable to sync with server, Please check your internet connection',
 
     //Common Error Strings
     JOB_STATUS_MISSING: 'Job status missing in store',

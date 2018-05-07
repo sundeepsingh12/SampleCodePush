@@ -78,7 +78,7 @@ import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/formLayoutActions'
-import { checkForDraftANdStartSyncAndNavigateToJobDetail } from '../modules/taskList/taskListActions'
+import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 import DraftModal from '../components/DraftModal'
 import Line1Line2View from '../components/Line1Line2View'
 import SyncLoader from '../components/SyncLoader'
@@ -110,7 +110,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions, restoreDraftAndNavigateToFormLayout, checkForDraftANdStartSyncAndNavigateToJobDetail }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions, restoreDraftAndNavigateToFormLayout, startSyncAndNavigateToContainer }, dispatch)
   }
 }
 
@@ -422,13 +422,12 @@ class JobDetailsV2 extends PureComponent {
   }
 
   updateTransactionForGroupId(groupId) {
-    this.props.actions.checkForDraftANdStartSyncAndNavigateToJobDetail(BulkListing, {
-      pageObject: {
-        jobMasterIds: [this.props.jobTransaction.jobMasterId],
+    this.props.actions.startSyncAndNavigateToContainer({
+        jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
         additionalParams: { statusId: this.props.currentStatus.id },
         groupId: groupId
       }
-    }, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
+    , true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
   }
 
   selectStatusToRevert = () => {
