@@ -95,7 +95,7 @@ import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'
-import { Client } from 'react-native-paho-mqtt'
+// import { Client } from 'react-native-paho-mqtt'
 import { sync } from '../../services/classes/Sync'
 import { NetInfo } from 'react-native'
 import moment from 'moment'
@@ -310,37 +310,37 @@ export function startMqttService(pieChart) {
       };
 
       // Create a client instance 
-      const client = new Client({
-        uri,
-        clientId,
-        storage
-      })
+      // const client = new Client({
+      //   uri,
+      //   clientId,
+      //   storage
+      // })
 
       // set event handlers 
       //TODO connection re-establishment on connection lost
-      client.on('connectionLost', responseObject => {
-      })
-      client.on('messageReceived', message => {
-        if (message.payloadString == 'Live Job Notification') {
-          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-          dispatch(performSyncService(pieChart, true, true))
-        } else {
-          dispatch(performSyncService(pieChart, true))
-        }
-      })
+      // client.on('connectionLost', responseObject => {
+      // })
+      // client.on('messageReceived', message => {
+      //   if (message.payloadString == 'Live Job Notification') {
+      //     keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+      //     dispatch(performSyncService(pieChart, true, true))
+      //   } else {
+      //     dispatch(performSyncService(pieChart, true))
+      //   }
+      // })
 
       // connect the client 
-      client.connect()
-        .then(() => {
-          // Once a connection has been made, make a subscription 
-          return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
-        })
-        .catch(responseObject => {
-          if (responseObject.errorCode !== 0) {
-            console.log('onConnectionLost:' + responseObject.errorMessage);
-            // dispatch(startMqttService())
-          }
-        })
+      // client.connect()
+      //   .then(() => {
+      //     // Once a connection has been made, make a subscription 
+      //     return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
+      //   })
+      //   .catch(responseObject => {
+      //     if (responseObject.errorCode !== 0) {
+      //       console.log('onConnectionLost:' + responseObject.errorMessage);
+      //       // dispatch(startMqttService())
+      //     }
+      //   })
     }
   }
 }
