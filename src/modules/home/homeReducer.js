@@ -7,8 +7,6 @@ const initialState = new InitialState()
 import {
   PAGES_LOADING,
   SET_PAGES_UTILITY_N_PIESUMMARY,
-  HOME_LOADING,
-  SET_MODULES,
   SYNC_STATUS,
   CHART_LOADING,
   RESET_STATE,
@@ -64,7 +62,6 @@ export default function homeReducer(state = initialState, action) {
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)
         .set('pieChartSummaryCount', action.payload.count)
-
 
     case LAST_SYNC_TIME:
       return state.set('lastSyncTime', action.payload)

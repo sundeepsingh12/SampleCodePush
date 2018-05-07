@@ -120,10 +120,17 @@ describe('test for fillKeysAndSave', () => {
 
 
     it('should fill value of matched keys in formElement in case of called from array', () => {
+        let formLayoutState = {
+            formElement: formLayoutMap
+        }
+        let jobTransaction = {
+            id: 1,
+            jobId: 1
+        }
         dataStoreService.fillKeysInFormElement = jest.fn();
         dataStoreService.fillKeysInFormElement.mockReturnValue(formLayoutMapResult);
         const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, formLayoutObject, null, null, true, 1))
+        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, formLayoutState, 'abc', null, null, jobTransaction))
             .then(() => {
                 expect(dataStoreService.fillKeysInFormElement).toHaveBeenCalledTimes(1)
             })
@@ -133,7 +140,7 @@ describe('test for fillKeysAndSave', () => {
         dataStoreService.fillKeysInFormElement = jest.fn();
         dataStoreService.fillKeysInFormElement.mockReturnValue(formLayoutMapResult);
         const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, null, null, null, false))
+        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, {}, null, false))
             .then(() => {
                 expect(dataStoreService.fillKeysInFormElement).toHaveBeenCalledTimes(1)
             })
@@ -144,7 +151,7 @@ describe('test for fillKeysAndSave', () => {
             throw new Error('error')
         })
         const store = mockStore({})
-        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, null, null, null, false))
+        return store.dispatch(actions.fillKeysAndSave(dataStoreAttributeValueMap, 123, {}, null, null, false))
             .then(() => {
                 expect(dataStoreService.fillKeysInFormElement).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(expectedActions[0].type)

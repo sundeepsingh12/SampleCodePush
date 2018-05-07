@@ -3,8 +3,9 @@ import configureStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { keyValueDBService } from '../../../services/classes/KeyValueDBService'
 import { sortingService } from '../../../services/classes/Sorting'
-var actions = require('../sortingActions')
 import CONFIG from '../../../lib/config'
+import { getDataForSortingAndPrinting } from '../sortingActions'
+import { showToastAndAddUserExceptionLog } from '../../global/globalActions'
 
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
@@ -12,7 +13,7 @@ const mockStore = configureStore(middlewares)
 import {
     SORTING_SEARCH_VALUE,
     SORTING_ITEM_DETAILS,
-    ERROR_MESSAGE,
+    DEFAULT_ERROR_MESSAGE_IN_SORTING,
     SORTING_LOADER
 } from '../../../lib/constants'
 
@@ -46,11 +47,7 @@ describe('sorting actions', () => {
             type: SORTING_ITEM_DETAILS,
             payload: data
         }, {
-            type: ERROR_MESSAGE,
-            payload: {
-                errorMessage: 'No records found for search',
-                dataStoreAttrValueMap: {},
-            }
+            type: DEFAULT_ERROR_MESSAGE_IN_SORTING
         }
     ]
     
@@ -66,7 +63,7 @@ describe('sorting actions', () => {
         sortingService.setSortingData = jest.fn()
         sortingService.setSortingData.mockReturnValue(data,referenceValue)
         const store = mockStore({})
-        return store.dispatch(actions.getDataForSortingAndPrinting())
+        return store.dispatch(getDataForSortingAndPrinting())
             .then(() => {
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
                 expect(sortingService.getSortingData).toHaveBeenCalled()
@@ -78,24 +75,22 @@ describe('sorting actions', () => {
             })
     })
     it('should return error message', () => {
+        try{
         const referenceValue = 'NITESH-151025253305'
         const token = { value : null}
         keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue(CONFIG.SESSION_TOKEN_KEY)
-        sortingService.getSortingData = jest.fn()
-        sortingService.getSortingData.mockReturnValue(referenceValue,token.value)
-        sortingService.setSortingData = jest.fn()
-        sortingService.setSortingData.mockReturnValue(data,referenceValue)
+        keyValueDBService.getValueFromStore.mockReturnValue(null)
         const store = mockStore({})
-        return store.dispatch(actions.getDataForSortingAndPrinting())
+        return store.dispatch(getDataForSortingAndPrinting())
             .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalled()
-                expect(sortingService.getSortingData).toHaveBeenCalled()
-                expect(sortingService.setSortingData).toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
-                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
-                expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
-                expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload)
+
             })
+        }catch(error){
+            expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+            expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            expect(store.getActions()[1].type).toEqual(expectedActions[2].type)
+            expect(store.getActions()[1].payload).toEqual(error.message)
+            expect(showToastAndAddUserExceptionLog).toHaveBeenCalled()
+        }
     })       
 })

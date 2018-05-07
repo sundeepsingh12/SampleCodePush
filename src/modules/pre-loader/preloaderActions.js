@@ -77,7 +77,8 @@ import {
   UnsyncBackupUpload,
   GEO_FENCING,
   PAGES,
-  PAGES_ADDITIONAL_UTILITY
+  PAGES_ADDITIONAL_UTILITY,
+  MDM_POLICIES
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -463,7 +464,8 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
         TABIDMAP,
         JOB_ATTRIBUTE_STATUS,
         PAGES,
-        PAGES_ADDITIONAL_UTILITY
+        PAGES_ADDITIONAL_UTILITY,
+        MDM_POLICIES
       ]
       await keyValueDBService.deleteValueFromStore(keys)
       dispatch(jobMasterSavingFailure(error.message))

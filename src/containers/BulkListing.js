@@ -109,12 +109,12 @@ class BulkListing extends PureComponent {
 
   onClickRowItem(item) {
     if (this.props.isManualSelectionAllowed) {
-      this.props.actions.toggleMultipleTransactions([item], this.props.bulkTransactionList, this.props.selectedItems)
+      this.props.actions.toggleMultipleTransactions([item], this.props.bulkTransactionList, this.props.selectedItems, this.props.navigation.state.params.pageObject)
     }
   }
 
   selectAll = () => {
-    this.props.actions.toggleAllItems(this.props.bulkTransactionList, this.props.selectAllNone, this.props.selectedItems)
+    this.props.actions.toggleAllItems(this.props.bulkTransactionList, this.props.selectAllNone, this.props.selectedItems, this.props.navigation.state.params.pageObject)
   }
 
   componentDidMount() {
@@ -123,7 +123,7 @@ class BulkListing extends PureComponent {
 
   _setQrValue = (value) => {
     if (value && value != '')
-      this.props.actions.setSearchedItem(value, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems)
+      this.props.actions.setSearchedItem(value, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject)
   }
 
   searchBarView() {
@@ -143,12 +143,12 @@ class BulkListing extends PureComponent {
             }}
             onEndEditing={() => {
               if (this.props.searchText && this.props.searchText != '')
-                this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems)
+                this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject)
             }}
             value={this.props.searchText} />
           <Button small transparent style={[styles.inputInnerBtn]} onPress={() => {
             if (this.props.searchText && this.props.searchText != '')
-              this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems)
+              this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject)
           }}>
             <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
           </Button>
@@ -163,11 +163,11 @@ class BulkListing extends PureComponent {
   }
 
   renderList() {
+    let jobTransactionArray = []
     if (!this.props.searchText || this.props.searchText == '') {
-      return Object.values(this.props.bulkTransactionList)
+      jobTransactionArray = Object.values(this.props.bulkTransactionList)
     }
     else {
-      let jobTransactionArray = []
       let searchText = this.props.searchText
       // Function for filtering on basis of reference number, runsheet number, line1, line2, circleline1, circleline2
       _.forEach(this.props.bulkTransactionList, function (value) {
@@ -176,8 +176,13 @@ class BulkListing extends PureComponent {
           jobTransactionArray.push(value)
         }
       })
-      return jobTransactionArray;
+      //return jobTransactionArray;
     }
+    // jobTransactionArray.sort(function (transaction1, transaction2) {
+    //   return (transaction1.disabled && transaction2.disabled)
+    // })
+    jobTransactionArray = _.sortBy(jobTransactionArray, ['disabled'])
+    return jobTransactionArray
   }
 
   getBulkEmptyView() {

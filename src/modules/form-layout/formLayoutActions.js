@@ -3,17 +3,12 @@
 import {
     FIELD_ATTRIBUTE,
     GET_SORTED_ROOT_FIELD_ATTRIBUTES,
-    DISABLE_SAVE,
     UPDATE_FIELD_DATA,
-    STATUS_NAME,
-    ON_BLUR,
-    TOOGLE_HELP_TEXT,
     SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT,
     IS_LOADING,
     ERROR_MESSAGE,
     UPDATE_FIELD_DATA_WITH_CHILD_DATA,
     JOB_STATUS,
-    UPDATE_FIELD_DATA_VALIDATION,
     NEXT_FOCUS,
     TabScreen,
     HomeTabNavigatorScreen,
@@ -38,7 +33,6 @@ import {
 import { formLayoutService } from '../../services/classes/formLayout/FormLayout.js'
 import { formLayoutEventsInterface } from '../../services/classes/formLayout/FormLayoutEventInterface.js'
 import { NavigationActions } from 'react-navigation'
-import InitialState from './formLayoutInitialState.js'
 import { fieldValidationService } from '../../services/classes/FieldValidation'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
@@ -50,19 +44,10 @@ import { draftService } from '../../services/classes/DraftService'
 import { dataStoreService } from '../../services/classes/DataStoreService'
 import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../lib/ContainerConstants'
 import moment from 'moment'
-import getTheme from '../../../native-base-theme/components';
-import platform from '../../../native-base-theme/variables/platform';
-import styles from '../../themes/FeStyle'
 import { Toast } from 'native-base'
 
-export function _setErrorMessage(message) {
-    return {
-        type: ERROR_MESSAGE,
-        payload: message
-    }
-}
 
-export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction, positionId) {
+export function getSortedRootFieldAttributes(statusId, statusName, jobTransactionId, jobMasterId, jobTransaction) {
     return async function (dispatch) {
         try {
             dispatch(setState(IS_LOADING, true))
@@ -85,7 +70,6 @@ export function getSortedRootFieldAttributes(statusId, statusName, jobTransactio
         } catch (error) {
             showToastAndAddUserExceptionLog(1001, error.message, 'danger', 0)
             dispatch(setState(IS_LOADING, false))
-            dispatch(_setErrorMessage(error))
         }
     }
 }
@@ -122,17 +106,6 @@ export function setSequenceDataAndNextFocus(currentElement, formLayoutState, seq
             showToastAndAddUserExceptionLog(1003, error.message, 'danger', 1)
             formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).isLoading = false
             dispatch(setState(UPDATE_FIELD_DATA, formLayoutState.formElement))
-        }
-    }
-}
-
-export function disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value) {
-    return async function (dispatch) {
-        try {
-            const saveDisabled = formLayoutEventsInterface.disableSaveIfRequired(attributeMasterId, isSaveDisabled, formLayoutObject, value)
-            dispatch(setState(DISABLE_SAVE, saveDisabled))
-        } catch (error) {
-            showToastAndAddUserExceptionLog(1004, error.message, 'danger', 1)
         }
     }
 }
@@ -190,6 +163,7 @@ export function updateFieldDataWithChildData(attributeMasterId, formLayoutState,
             }
 
         } catch (error) {
+            //console.log(error)
             showToastAndAddUserExceptionLog(1006, error.message, 'danger', 1)
         }
     }
@@ -267,30 +241,6 @@ export function fieldValidations(currentElement, formLayoutState, timeOfExecutio
         }
         catch (error) {
             showToastAndAddUserExceptionLog(1008, error.message, 'danger', 1)
-        }
-    }
-}
-export function saveDraftInDb(formLayoutState, jobMasterId, jobTransaction) {
-    return async function (dispatch) {
-        try {
-            draftService.saveDraftInDb(formLayoutState, jobMasterId, null, jobTransaction)
-            dispatch(setState(SET_UPDATE_DRAFT, false))
-        } catch (error) {
-            showToastAndAddUserExceptionLog(1009, error.message, 'danger', 1)
-        }
-    }
-}
-
-export function restoreDraft(jobTransactionId, statusId, jobMasterId) {
-    return async function (dispatch) {
-        try {
-            let formLayoutState = draftService.restoreDraftFromDb(jobTransactionId, statusId, jobMasterId)
-            dispatch(setState(SET_FORM_LAYOUT_STATE, {
-                editableFormLayoutState: formLayoutState,
-                statusName: formLayoutState.statusName
-            }))
-        } catch (error) {
-            showToastAndAddUserExceptionLog(1010, error.message, 'danger', 1)
         }
     }
 }

@@ -41,5 +41,12 @@ describe('summary reducer', () => {
         let nextState = summaryReducer(undefined, action)
         expect(nextState.isLoaderRunning).toBe(false)
     })
+    it('it should not return any state', () => {        
+        const action = {
+            type: 'NO_STATE',
+        }
+        let nextState = summaryReducer(undefined, action)
+        expect(nextState.isLoaderRunning).toBe(false)
+    })
 
 })
