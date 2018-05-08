@@ -93,6 +93,7 @@ module.exports = keyMirror({
     ERP_SYNC_STATUS: null,
     SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
+    LOADER_FOR_SYNCING:null,
 
     //Pages
     PAGES_LOADING: null,
@@ -112,6 +113,7 @@ module.exports = keyMirror({
     //Listing Actions
     JOB_LISTING_START: null,
     JOB_LISTING_END: null,
+    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
@@ -120,6 +122,8 @@ module.exports = keyMirror({
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
     SET_JOBDETAILS_DRAFT_INFO: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,

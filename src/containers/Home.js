@@ -20,6 +20,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED } from '../lib/ContainerConstants'
 import { Summary } from '../lib/constants'
 import DraftModal from '../components/DraftModal'
+import SyncLoader from '../components/SyncLoader'
 
 function mapStateToProps(state) {
   return {
@@ -145,6 +146,7 @@ class Home extends PureComponent {
             </Body>
           </Header>
           <Content>
+          {(this.props.moduleLoading) ? <SyncLoader moduleLoading = {this.props.moduleLoading} /> : null }
             {pieChartView}
             {this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>

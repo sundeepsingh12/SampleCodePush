@@ -3,7 +3,8 @@ import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
-import { setState } from '../global/globalActions'
+import { setState, navigateToScene } from '../global/globalActions'
+import { performSyncService } from '../../modules/home/homeActions'
 import {
   JOB_LISTING_START,
   JOB_LISTING_END,
@@ -12,10 +13,16 @@ import {
   CUSTOM_NAMING,
   TAB,
   SHOULD_RELOAD_START,
-  SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE
+  SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE,
+  TASKLIST_LOADER_FOR_SYNC,
+  JobDetailsV2,
+  BulkListing
 } from '../../lib/constants'
+import { Toast } from 'native-base'
+import { NetInfo } from 'react-native'
 import moment from 'moment'
 import _ from 'lodash'
+import { draftService } from '../../services/classes/DraftService'
 
 /**
  * This function fetches tabs list and set in state

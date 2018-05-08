@@ -20,7 +20,8 @@ import {
   SET_TRANSACTION_SERVICE_STARTED,
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
-  SET_NEWJOB_DRAFT_INFO
+  SET_NEWJOB_DRAFT_INFO,
+  LOADER_FOR_SYNCING
 } from '../../lib/constants'
 
 export default function homeReducer(state = initialState, action) {
@@ -52,6 +53,10 @@ export default function homeReducer(state = initialState, action) {
       return state.set('erpSyncStatus', action.payload.syncStatus)
         .set('erpModalVisible', action.payload.erpModalVisible ? true : false)
         .set('lastErpSyncTime', action.payload.lastErpSyncTime)
+    }
+
+    case LOADER_FOR_SYNCING:{
+      return state.set('moduleLoading', action.payload)
     }
 
     case CHART_LOADING:

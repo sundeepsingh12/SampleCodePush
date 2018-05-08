@@ -22,6 +22,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as taskListActions from '../modules/taskList/taskListActions'
 import * as globalActions from '../modules/global/globalActions'
+import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 import _ from 'lodash'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
@@ -33,7 +34,8 @@ import {
   SEARCH_TAP,
   LISTING_SEARCH_VALUE,
   BulkListing,
-  JobDetailsV2
+  JobDetailsV2,
+  TASKLIST_LOADER_FOR_SYNC
 } from '../lib/constants'
 import JobListItem from '../components/JobListItem'
 import {
@@ -42,17 +44,18 @@ import {
 } from '../lib/ContainerConstants'
 import moment from 'moment'
 
+
 function mapStateToProps(state) {
   return {
     jobTransactionCustomizationList: state.listing.jobTransactionCustomizationList,
     isRefreshing: state.listing.isRefreshing,
-    statusNextStatusListMap: state.listing.statusNextStatusListMap
+    statusNextStatusListMap: state.listing.statusNextStatusListMap,
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...taskListActions, ...globalActions }, dispatch)
+    actions: bindActionCreators({ ...taskListActions, ...globalActions, startSyncAndNavigateToContainer }, dispatch)
   }
 }
 
@@ -258,11 +261,11 @@ class TaskListScreen extends PureComponent {
   updateTransactionForGroupId(item) {
     let jobTransaction = item.jobTransactions[0]
     if (this.props.statusNextStatusListMap[jobTransaction.statusId].length > 0) {
-      this.props.actions.navigateToScene(BulkListing, {pageObject : {
-        jobMasterIds: [jobTransaction.jobMasterId],
+      this.props.actions.startSyncAndNavigateToContainer({
+        jobMasterIds: JSON.stringify([jobTransaction.jobMasterId]),
         additionalParams: {statusId : jobTransaction.statusId},
         groupId: item.groupId
-      }})
+      }, true, TASKLIST_LOADER_FOR_SYNC)
     } else {
       Toast.show({
         text: NO_NEXT_STATUS, position: 'bottom', buttonText: OK
