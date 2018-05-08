@@ -268,6 +268,7 @@ class JobDetails {
      * @returns {boolean} - true if distance is greater than 100m else false
      */
     checkLatLong(jobId, userLat, userLong) {
+        if(!jobId) return false
         let jobTransaction = realm.getRecordListOnQuery(TABLE_JOB, 'id = ' + jobId, false)[0]; // get jobtransaction on jobId
         if (!jobTransaction.latitude || !jobTransaction.longitude || !userLat || !userLong)
             return false

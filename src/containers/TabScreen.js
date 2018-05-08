@@ -50,6 +50,7 @@ import {
   JobDetailsV2
 } from '../lib/constants'
 import TaskListCalender from '../components/TaskListCalender'
+import SyncLoader from '../components/SyncLoader'
 
 function mapStateToProps(state) {
   return {
@@ -61,6 +62,7 @@ function mapStateToProps(state) {
     isCalendarVisible: state.taskList.isCalendarVisible,
     searchText: state.taskList.searchText,
     modules: state.home.modules,
+    syncLoadingInTaskList: state.taskList.syncLoadingInTaskList
   }
 };
 
@@ -204,6 +206,7 @@ class TabScreen extends PureComponent {
               <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.fetchDataForScanner.bind(this)} />
             </Body>
           </Header>
+          {this.props.syncLoadingInTaskList ? <SyncLoader moduleLoading = {this.props.syncLoadingInTaskList}/> : null}
           <Tabs
             tabBarBackgroundColor={styles.bgPrimary.backgroundColor}
             initialPage={landingValue}

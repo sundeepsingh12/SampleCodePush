@@ -51,6 +51,7 @@ import {
   LiveJobs,
   OfflineDS,
   ProfileView,
+  LOADER_FOR_SYNCING,
   MDM_POLICIES
 } from '../../lib/constants'
 
@@ -87,7 +88,7 @@ import {
   Piechart,
   SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
-import { Toast, ActionSheet } from 'native-base'
+import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
@@ -97,7 +98,7 @@ import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../g
 import CONFIG from '../../lib/config'
 import { Client } from 'react-native-paho-mqtt'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo } from 'react-native'
+import { NetInfo, Alert } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -112,6 +113,8 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
+import { jobMasterService } from '../../services/classes/JobMaster';
+import { PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB, UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
 
 /**
  * Function which updates STATE when component is mounted
@@ -182,7 +185,7 @@ export function navigateToPage(pageObject) {
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(navigateToScene(BulkListing, { pageObject }));
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
@@ -203,7 +206,7 @@ export function navigateToPage(pageObject) {
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(redirectToContainer(pageObject))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
@@ -274,6 +277,38 @@ export function checkCustomErpPullActivated() {
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
       showToastAndAddUserExceptionLog(2704, error.message, 'danger', 1)
+    }
+  }
+}
+
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
+  return async function (dispatch) {
+    try {
+      if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
+        dispatch(setState(syncLoader, true))
+        let message = await dispatch(performSyncService())
+        if (message === true) {
+          dispatch(setState(syncLoader, false))
+          if (!isBulk) {
+            dispatch(redirectToContainer(pageObject))
+          } else {
+            dispatch(navigateToScene(BulkListing, { pageObject }))
+          }
+        } else {
+          dispatch(setState(syncLoader, false))
+          alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+        }
+      }
+      else {
+        if (!isBulk) {
+          dispatch(redirectToContainer(pageObject))
+        } else {
+          dispatch(navigateToScene(BulkListing, { pageObject }))
+        }
+      }
+    } catch (error) {
+      dispatch(setState(syncLoader, false))
+      showToastAndAddUserExceptionLog(2714, error.message, 'danger', 1)
     }
   }
 }
@@ -409,8 +444,8 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
       }
+      return true;
     } catch (error) {
-      console.log(error)
       showToastAndAddUserExceptionLog(2706, error.message, 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
@@ -432,6 +467,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
         syncStatus
       }))
+      return false;
     } finally {
       if (!erpPull) {
         const difference = await sync.calculateDifference()
