@@ -176,25 +176,17 @@ export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutDa
         try {
             const jobMasterValue = (!jobMaster) ? await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId) : jobMaster
             if (jobMasterValue[0].enableLiveJobMaster) {
-                NetInfo.isConnected.fetch().then(async isConnected => {
-                    if (isConnected) {
-                        dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, true))
-                        let message = await dispatch(performSyncService())
-                        if (message === true) {
-                            dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
-                            if (!_.isEmpty(FormLayoutData)) dispatch(navigateToScene('FormLayout', FormLayoutData))
-                        } else {
-                            dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, false))
-                            alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
-                        }
-                    } else {
-                        alert(PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB)
-                    }
-                }).catch(function (err) {
+                dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, true))
+                let message = await dispatch(performSyncService())
+                if (message === true) {
                     dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
-                    showToastAndAddUserExceptionLog(1105, err.message, 'danger', 1)
-                })
-            } else if (!_.isEmpty(FormLayoutData)) {
+                    if (!_.isEmpty(FormLayoutData)) dispatch(navigateToScene('FormLayout', FormLayoutData))
+                } else {
+                    dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, false))
+                    alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+                }
+            }
+            else if (!_.isEmpty(FormLayoutData)) {
                 dispatch(navigateToScene('FormLayout', FormLayoutData))
             }
         } catch (error) {

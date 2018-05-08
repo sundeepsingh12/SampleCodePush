@@ -285,30 +285,21 @@ export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) 
   return async function (dispatch) {
     try {
       if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
-        NetInfo.isConnected.fetch().then(async isConnected => {
-          if (isConnected) {
-            dispatch(setState(syncLoader, true))
-            let message = await dispatch(performSyncService())
-            if(message === true){
-              dispatch(setState(syncLoader, false))
-              if (!isBulk) {
-                dispatch(redirectToContainer(pageObject))
-              } else {
-                dispatch(navigateToScene(BulkListing, { pageObject }))
-              }
-            }else{
-              dispatch(setState(syncLoader, false))
-              alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
-            }
-          }else {
-            alert(PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB)
-          }
-        }).catch(function (err) {
+        dispatch(setState(syncLoader, true))
+        let message = await dispatch(performSyncService())
+        if (message === true) {
           dispatch(setState(syncLoader, false))
-          showToastAndAddUserExceptionLog(2713, err.message, 'danger', 1)
-
-      })
-      } else {
+          if (!isBulk) {
+            dispatch(redirectToContainer(pageObject))
+          } else {
+            dispatch(navigateToScene(BulkListing, { pageObject }))
+          }
+        } else {
+          dispatch(setState(syncLoader, false))
+          alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+        }
+      }
+      else {
         if (!isBulk) {
           dispatch(redirectToContainer(pageObject))
         } else {
@@ -476,7 +467,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
         syncStatus
       }))
-      return false ; 
+      return false;
     } finally {
       if (!erpPull) {
         const difference = await sync.calculateDifference()
