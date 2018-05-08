@@ -25,6 +25,7 @@ import {
     TABLE_JOB,
     USER_SUMMARY,
     IS_MISMATCHING_LOCATION,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL
 } from '../../../lib/constants'
 
 import configureStore from 'redux-mock-store'
@@ -770,3 +771,45 @@ describe('check location mismatch actions', () => {
     })
 })
 
+describe('test cases for action checkForInternetAndStartSyncAndNavigateToFormLayout', () => {
+    beforeEach (() =>{
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
+    })
+    let expectedActions = [
+        {
+            type: SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
+            payload: false
+        },
+    ]
+    let formLayoutObject = { data : [1,2,3], jobMasterId : 12}
+    const store = mockStore({})
+    it('should start syncing and navigate to formLayout', () => {
+        jobMasterService.getJobMasterFromJobMasterList.mockReturnValueOnce([{
+            enableLiveJobMaster : true
+        }])
+        return store.dispatch(actions.checkForInternetAndStartSyncAndNavigateToFormLayout(formLayoutObject,null))
+            .then(() => {
+                expect(jobMasterService.getJobMasterFromJobMasterList).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+
+    it('should throw error', () => {
+        expectedActions = [
+            {
+                type: SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
+                payload: false
+            },
+        ]
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn(() => {
+            throw new Error('error')
+        })
+        return store.dispatch(actions.checkForInternetAndStartSyncAndNavigateToFormLayout(formLayoutObject,null))
+            .then(() => {
+                expect(jobMasterService.getJobMasterFromJobMasterList).toHaveBeenCalledTimes(1)
+                expect(store.getActions()[0].type).toEqual(expectedActions[0].type)
+                expect(store.getActions()[0].payload).toEqual(expectedActions[0].payload)
+            })
+    })
+})

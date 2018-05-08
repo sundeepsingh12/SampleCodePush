@@ -61,7 +61,8 @@ import {
   RESET_STATE_FOR_JOBDETAIL,
   BulkListing,
   SHOW_DROPDOWN,
-  SET_JOBDETAILS_DRAFT_INFO
+  SET_JOBDETAILS_DRAFT_INFO,
+  SET_LOADER_FOR_SYNC_IN_JOBDETAIL
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -77,8 +78,10 @@ import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/formLayoutActions'
+import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 import DraftModal from '../components/DraftModal'
 import Line1Line2View from '../components/Line1Line2View'
+import SyncLoader from '../components/SyncLoader'
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
@@ -99,14 +102,15 @@ function mapStateToProps(state) {
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
     isShowDropdown: state.jobDetails.isShowDropdown,
-    jobExpiryTime: state.jobDetails.jobExpiryTime
+    jobExpiryTime: state.jobDetails.jobExpiryTime,
+    syncLoading: state.jobDetails.syncLoading
   }
 }
 
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions, restoreDraftAndNavigateToFormLayout }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions, restoreDraftAndNavigateToFormLayout, startSyncAndNavigateToContainer }, dispatch)
   }
 }
 
@@ -215,7 +219,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onGoToNextStatus = () => {
-    this.props.actions.navigateToScene('FormLayout', {
+    this.props.actions.checkForInternetAndStartSyncAndNavigateToFormLayout({
       contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
       jobTransaction: this.props.jobTransaction,
@@ -422,13 +426,11 @@ class JobDetailsV2 extends PureComponent {
   }
 
   updateTransactionForGroupId(groupId) {
-    this.props.actions.navigateToScene(BulkListing, {
-      pageObject: {
-        jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
-        additionalParams: JSON.stringify({ statusId: this.props.currentStatus.id }),
-        groupId: groupId
-      }
-    })
+    this.props.actions.startSyncAndNavigateToContainer({
+      jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
+      additionalParams: JSON.stringify({ statusId: this.props.currentStatus.id }),
+      groupId: groupId
+    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
   }
 
   selectStatusToRevert = () => {
@@ -666,11 +668,12 @@ class JobDetailsV2 extends PureComponent {
       )
     }
     else {
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
       const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
+            {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
             {draftAlert}
             {mismatchAlert}
             {this.showHeaderView()}

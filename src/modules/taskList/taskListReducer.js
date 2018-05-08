@@ -11,7 +11,8 @@ import {
   RESET_STATE,
   SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE,
   SET_LANDING_TAB,
-  SET_SELECTED_DATE
+  SET_SELECTED_DATE,
+  TASKLIST_LOADER_FOR_SYNC
 } from '../../lib/constants'
 
 
@@ -35,6 +36,9 @@ export default function taskList(state = initialState, action) {
 
     case IS_CALENDAR_VISIBLE:
       return state.set('isCalendarVisible', action.payload)
+
+    case TASKLIST_LOADER_FOR_SYNC:
+      return state.set('syncLoadingInTaskList', action.payload)
 
     case LISTING_SEARCH_VALUE:
       return state.set('searchText', action.payload)

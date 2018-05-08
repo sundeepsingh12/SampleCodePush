@@ -10,7 +10,10 @@ import { performSyncService, pieChartCount } from '../home/homeActions'
 import { jobStatusService } from '../../services/classes/JobStatus'
 import { NavigationActions } from 'react-navigation'
 import * as realm from '../../repositories/realmdb'
+import { NetInfo } from 'react-native'
+import _ from 'lodash'
 import { fetchJobs } from '../taskList/taskListActions'
+import { PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB, UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
 import {
     Start,
     PENDING,
@@ -35,7 +38,9 @@ import {
     HomeTabNavigatorScreen,
     RESET_STATE_FOR_JOBDETAIL,
     SHOULD_RELOAD_START,
-    SET_LANDING_TAB
+    SET_LANDING_TAB,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService';
 
@@ -46,7 +51,7 @@ export function startFetchingJobDetails() {
 }
 
 
-export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime) {
+export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus, jobTransaction, errorMessage, draftStatusInfo, parentStatusList, isEtaTimerShow, jobExpiryTime, isSyncLoading) {
     return {
         type: JOB_DETAILS_FETCHING_END,
         payload: {
@@ -58,7 +63,8 @@ export function endFetchingJobDetails(jobDataList, fieldDataList, currentStatus,
             parentStatusList,
             draftStatusInfo,
             isEtaTimerShow,
-            jobExpiryTime
+            jobExpiryTime,
+            isSyncLoading
         }
     }
 }
@@ -78,7 +84,8 @@ export function getJobDetails(jobTransactionId) {
             const parentStatusList = (jobMaster[0].isStatusRevert) && !_.isEqual(_.toLower(details.currentStatus.code), 'seen') ? await jobDetailsService.getParentStatusList(statusList.value, details.currentStatus, jobTransactionId) : []
             const draftStatusInfo = draftService.getDraftForState(details.jobTransactionDisplay, null)
             const statusCategory = await jobStatusService.getStatusCategoryOnStatusId(details.jobTransactionDisplay.jobStatusId)
-            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime))
+            dispatch(endFetchingJobDetails(details.jobDataObject.dataList, details.fieldDataObject.dataList, details.currentStatus, details.jobTransactionDisplay, errorMessage, draftStatusInfo, parentStatusList, (statusCategory == 1), jobExpiryTime, draftStatusInfo && jobMaster[0].enableLiveJobMaster))
+            if (draftStatusInfo && jobMaster[0].enableLiveJobMaster) dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(null, jobMaster))
         } catch (error) {
             showToastAndAddUserExceptionLog(1101, error.message, 'danger', 0)
             dispatch(endFetchingJobDetails(null, null, null, null, error.message, null, null, null, null))
@@ -125,7 +132,6 @@ export function setAllDataOnRevert(jobTransaction, statusTo, pageObjectAdditiona
             dispatch(performSyncService())
             dispatch(pieChartCount())
             dispatch(fetchJobs())
-            
             dispatch(NavigationActions.back())
             //} else { dispatch(navigation.goBack()) }
             dispatch(setState(RESET_STATE_FOR_JOBDETAIL))
@@ -150,16 +156,39 @@ export function checkForLocationMismatch(data, currentStatusCategory) {
             const FormLayoutData = { contactData: data.contactData, jobTransactionId: data.jobTransaction.id, jobTransaction: data.jobTransaction, statusId: data.statusList.id, statusName: data.statusList.name, jobMasterId: data.jobTransaction.jobMasterId, pageObjectAdditionalParams: data.pageObjectAdditionalParams, jobDetailsScreenKey: data.jobDetailsScreenKey }
             const nextStatusCategory = data.statusList.statusCategory
             const jobMaster = await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId)
-            if (!(jobMaster[0].enableLocationMismatch) || currentStatusCategory != 1 || !nextStatusCategory || !(nextStatusCategory == 2 || nextStatusCategory == 3)) {
-                dispatch(navigateToScene('FormLayout', FormLayoutData))
-            }
             const userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
-            if (data.jobTransaction.jobId != null && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng)) {
+            if ((jobMaster[0].enableLocationMismatch) && currentStatusCategory == 1 && (nextStatusCategory == 2 || nextStatusCategory == 3) && jobDetailsService.checkLatLong(data.jobTransaction.jobId, userSummary.value.lastLat, userSummary.value.lastLng)) {
                 dispatch(setState(IS_MISMATCHING_LOCATION, { id: data.statusList.id, name: data.statusList.name }))
+            } else {
+                dispatch(checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster))
             }
-            //dispatch(navigateToScene('FormLayout', FormLayoutData))
         } catch (error) {
             showToastAndAddUserExceptionLog(1104, error.message, 'danger', 1)
+        }
+    }
+}
+
+export function checkForInternetAndStartSyncAndNavigateToFormLayout(FormLayoutData, jobMaster) {
+    return async function (dispatch) {
+        try {
+            const jobMasterValue = (!jobMaster) ? await jobMasterService.getJobMasterFromJobMasterList(FormLayoutData.jobMasterId) : jobMaster
+            if (jobMasterValue[0].enableLiveJobMaster) {
+                dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, true))
+                let message = await dispatch(performSyncService())
+                if (message === true) {
+                    dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
+                    if (!_.isEmpty(FormLayoutData)) dispatch(navigateToScene('FormLayout', FormLayoutData))
+                } else {
+                    dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT, false))
+                    alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+                }
+            }
+            else if (!_.isEmpty(FormLayoutData)) {
+                dispatch(navigateToScene('FormLayout', FormLayoutData))
+            }
+        } catch (error) {
+            dispatch(setState(SET_LOADER_FOR_SYNC_IN_JOBDETAIL, false))
+            showToastAndAddUserExceptionLog(1106, error.message, 'danger', 1)
         }
     }
 }

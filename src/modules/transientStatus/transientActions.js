@@ -7,7 +7,7 @@ import {
     FormLayout
 } from '../../lib/constants'
 import { draftService } from '../../services/classes/DraftService'
-
+import _ from 'lodash'
 /**This action is called from componentDidMount 
  * 
  * Add form layout state of current status to transientFormLayoutMap
@@ -18,27 +18,26 @@ import { draftService } from '../../services/classes/DraftService'
 export function setStateFromNavigationParams(formLayout, transientFormLayoutMap, currentStatus, contactData, jobTransaction, jobMasterId) {
     return async function (dispatch) {
         try {
-            if (formLayout && currentStatus) {
-                dispatch(setState(LOADER_IS_RUNNING, true))
-                let cloneTransientFormLayoutMap = _.cloneDeep(transientFormLayoutMap)
-                cloneTransientFormLayoutMap[currentStatus.id] = _.cloneDeep(formLayout)
-                dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
-                if (_.size(currentStatus.nextStatusList) == 1) {
-                    dispatch(navigateToScene(FormLayout, {
-                        contactData,
-                        jobTransactionId: jobTransaction.id,
-                        jobTransaction: jobTransaction,
-                        statusId: currentStatus.nextStatusList[0].id,
-                        statusName: currentStatus.nextStatusList[0].name,
-                        jobMasterId: jobMasterId,
-                        navigationFormLayoutStates: cloneTransientFormLayoutMap,
-                        latestPositionId: formLayout.latestPositionId
-                    }))
-                }
-                draftService.saveDraftInDb(formLayout, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
+            dispatch(setState(LOADER_IS_RUNNING, true))
+            if (!currentStatus || !formLayout) throw new Error('current status missing')
+            let cloneTransientFormLayoutMap = _.cloneDeep(transientFormLayoutMap)
+            cloneTransientFormLayoutMap[currentStatus.id] = _.cloneDeep(formLayout)
+            dispatch(setState(ADD_FORM_LAYOUT_STATE, cloneTransientFormLayoutMap))
+            if (_.size(currentStatus.nextStatusList) == 1) {
+                dispatch(navigateToScene(FormLayout, {
+                    contactData,
+                    jobTransactionId: jobTransaction.id,
+                    jobTransaction: jobTransaction,
+                    statusId: currentStatus.nextStatusList[0].id,
+                    statusName: currentStatus.nextStatusList[0].name,
+                    jobMasterId: jobMasterId,
+                    navigationFormLayoutStates: cloneTransientFormLayoutMap,
+                    latestPositionId: formLayout.latestPositionId
+                }))
             }
+            draftService.saveDraftInDb(formLayout, jobMasterId, cloneTransientFormLayoutMap, jobTransaction)
         } catch (error) {
-            dispatch(setState(LOADER_IS_RUNNING, false))            
+            dispatch(setState(LOADER_IS_RUNNING, false))
             showToastAndAddUserExceptionLog(2501, error.message, 'danger', 1)
         }
     }

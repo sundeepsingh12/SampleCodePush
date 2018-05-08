@@ -12,6 +12,7 @@ var InitialState = Record({
     searchText: {},
     landingTabId: null,
     tabsLoading: false,
+    syncLoadingInTaskList: false,
 })
 
 export default InitialState

@@ -13,10 +13,16 @@ import {
 
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
-
+import  { Piechart } from '../../../lib/AttributeConstants'
+import _ from 'lodash'
 describe('test cases for get data for jobMaster and runSheet summary List ', () => {
 
-
+    beforeEach(() => {
+        keyValueDBService.getValueFromStore = jest.fn()
+        jobStatusService.getStatusIdsForAllStatusCategory = jest.fn()
+        summaryAndPieChartService.setAllJobMasterSummary = jest.fn()
+        summaryAndPieChartService.getAllRunSheetSummary = jest.fn()
+    })
     const jobMasterList = {
         value: [
             {
@@ -37,7 +43,7 @@ describe('test cases for get data for jobMaster and runSheet summary List ', () 
             }
         ]
     }
-    const jobStatusList = [{
+    const jobStatusList ={value :  [{
         id: 1,
         jobMasterId: 441,
         statusCategory : 1,
@@ -50,12 +56,12 @@ describe('test cases for get data for jobMaster and runSheet summary List ', () 
         code: 'PENDING',
         name: 'Pending',
       },
-    ]
-    const jobSummaryList = [
-        { jobStatusId: 1 },
-        { jobStatusId: 2 },
-        { jobStatusId: 3 },
-        { jobStatusId: 4 }]
+    ]}
+    const jobSummaryList ={ value :  [
+        { jobStatusId: 11 },
+        { jobStatusId: 12 },
+        { jobStatusId: 13 },
+        { jobStatusId: 14 }] }
 
     let jobMasterSummaryList = [{
         "1": { "count": 3, "list": [[2, "Unseen", 1], [1, "Pending", 2]] },
@@ -133,22 +139,15 @@ describe('test cases for get data for jobMaster and runSheet summary List ', () 
         ]
         
         
-
-        const pendingStatusIds = [12,13]
-        const failStatusIds = [14,15]
-        const successStatusIds = [16,17] 
-        const noNextStatusIds = [18,19]
+        const allStatusMap = {12 : 1, 13 : 1, 14 : 2, 15 : 2, 16 : 3, 17 : 3}
+        const noNextStatusMap = {18 : true, 19 : true}
         
-        keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue(jobMasterList)
-                                           .mockReturnValue(jobStatusList)
-                                           .mockReturnValue(jobSummaryList)
-        jobStatusService.getStatusIdsForAllStatusCategory = jest.fn()
-        jobStatusService.getStatusIdsForAllStatusCategory.mockReturnValue({pendingStatusIds,noNextStatusIds})
-        summaryAndPieChartService.setAllJobMasterSummary = jest.fn()
-        summaryAndPieChartService.setAllJobMasterSummary.mockReturnValue(jobList)
-        summaryAndPieChartService.getAllRunSheetSummary = jest.fn()
-        summaryAndPieChartService.getAllRunSheetSummary.mockReturnValue(data)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMasterList)
+                                           .mockReturnValueOnce(jobStatusList)
+                                           .mockReturnValueOnce(jobSummaryList)
+        jobStatusService.getStatusIdsForAllStatusCategory.mockReturnValue({allStatusMap,noNextStatusMap})
+        summaryAndPieChartService.setAllJobMasterSummary.mockReturnValueOnce(jobList)
+        summaryAndPieChartService.getAllRunSheetSummary.mockReturnValueOnce(data)
         const store = mockStore({})
         return store.dispatch(actions.getDataForJobMasterSummaryAndRunSheetSummary())
             .then(() => {
@@ -161,5 +160,24 @@ describe('test cases for get data for jobMaster and runSheet summary List ', () 
                 expect(store.getActions()[1].type).toEqual(expectedActions[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedActions[1].payload.data)
             })
+    })
+    it('should throw error', () => {
+        const message = 'store not available'
+        try{ 
+        const allStatusMap = {12 : 1, 13 : 1, 14 : 2, 15 : 2, 16 : 3, 17 : 3}
+        const noNextStatusMap = {18 : true, 19 : true}
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(jobMasterList)
+                                           .mockReturnValueOnce(jobStatusList)
+                                           .mockReturnValueOnce(null)
+        jobStatusService.getStatusIdsForAllStatusCategory.mockReturnValue({allStatusMap,noNextStatusMap})
+        const store = mockStore({})
+        return store.dispatch(actions.getDataForJobMasterSummaryAndRunSheetSummary())
+            .then(() => {
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(3)
+                expect(jobStatusService.getStatusIdsForAllStatusCategory).toHaveBeenCalledTimes(1)
+            })
+        }catch(error){
+            expect(message).toEqual(error.message)
+        }
     })
 })

@@ -6,14 +6,16 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as taskListActions from '../modules/taskList/taskListActions';
 import * as globalActions from '../modules/global/globalActions';
+import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 import _ from 'lodash';
 import renderIf from '../lib/renderIf';
 import Loader from '../components/Loader';
 import styles from '../themes/FeStyle';
-import { JobDetails, TABLE_RUNSHEET, TABLE_JOB_TRANSACTION, SEARCH_TAP, LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2 } from '../lib/constants';
+import { JobDetails, TABLE_RUNSHEET, TABLE_JOB_TRANSACTION, SEARCH_TAP, LISTING_SEARCH_VALUE, BulkListing, JobDetailsV2, TASKLIST_LOADER_FOR_SYNC } from '../lib/constants';
 import JobListItem from '../components/JobListItem';
 import { NO_NEXT_STATUS, OK, ALL } from '../lib/ContainerConstants';
 import moment from 'moment';
+
 
 function mapStateToProps(state) {
   return {
@@ -25,7 +27,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...taskListActions, ...globalActions }, dispatch)
+    actions: bindActionCreators({ ...taskListActions, ...globalActions, startSyncAndNavigateToContainer }, dispatch)
   }
 }
 

@@ -10,7 +10,9 @@ import {
     RESET_STATE,
     RESET_STATE_FOR_JOBDETAIL,
     SHOW_DROPDOWN,
-    SET_JOBDETAILS_DRAFT_INFO
+    SET_JOBDETAILS_DRAFT_INFO,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT
 } from '../../lib/constants'
 
 
@@ -23,6 +25,8 @@ export default function jobDetailsReducer(state = initialState, action) {
 
         case IS_MISMATCHING_LOCATION:
             return state.set('statusList', action.payload)
+        case SET_LOADER_FOR_SYNC_IN_JOBDETAIL:
+            return state.set('syncLoading', action.payload)
 
         case JOB_DETAILS_FETCHING_END:
             return state.set('fieldDataList', action.payload.fieldDataList)
@@ -35,7 +39,8 @@ export default function jobDetailsReducer(state = initialState, action) {
                 .set('draftStatusInfo', action.payload.draftStatusInfo)
                 .set('isEtaTimerShow', action.payload.isEtaTimerShow)
                 .set('jobExpiryTime', action.payload.jobExpiryTime)
-
+                .set('syncLoading',action.payload.isSyncLoading)
+                
         case RESET_STATE:
             return initialState
 
@@ -50,6 +55,11 @@ export default function jobDetailsReducer(state = initialState, action) {
 
         case SET_JOBDETAILS_DRAFT_INFO:
             return state.set('draftStatusInfo', action.payload)
+        
+        case SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT:
+            return state.set('draftStatusInfo', null)
+                        .set('syncLoading', action.payload)
+
     }
     return state
 }

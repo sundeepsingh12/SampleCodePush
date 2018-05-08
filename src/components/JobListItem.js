@@ -148,7 +148,7 @@ export default class JobListItem extends PureComponent {
 
   showJobMasterIdentifierAndCheckMark() {
     return (
-      <View style={[style.seqCircle, styles.relative, { backgroundColor: this.props.data.identifierColor, zIndex: 3 }]}>
+      <View style={[style.seqCircle, styles.relative, !this.props.data.disabled ? { backgroundColor: this.props.data.identifierColor, zIndex: 3 } : { backgroundColor: this.props.data.identifierColor + '98' }]}>
         <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
           {this.props.data.jobMasterIdentifier}
         </Text>
@@ -234,20 +234,20 @@ export default class JobListItem extends PureComponent {
     return (
       <View>
         {this.props.data.line1 ?
-          <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25, !this.props.data.disabled ? styles.fontBlack : styles.fontDarkGray]}>
             {this.props.data.line1}
           </Text>
           : null
         }
         {this.props.data.line2 ?
-          <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+          <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20, !this.props.data.disabled ? styles.fontBlack : styles.fontDarkGray]}>
             {this.props.data.line2}
           </Text>
           : null
         }
         {this.props.data.circleLine1 || this.props.data.circleLine2 ?
           <Text
-            style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
+            style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20, !this.props.data.disabled ? styles.fontBlack : styles.fontDarkGray]}>
             {this.props.data.circleLine1} . {this.props.data.circleLine2}
           </Text>
           : null

@@ -28,7 +28,7 @@ class UserException {
             'id': 0,
             userId,
             'dateTime': moment().format('YYYY-MM-DD HH:mm:ss'),
-            'stacktrace': errorMessage,
+            'stacktrace': 'errorCode: ' + errorCode + ', errorMessage: ' + errorMessage,
             'packageVersion': package_json.version,
             'packageName': (Platform.OS === 'ios') ? 'ios' : 'android',
             hubId,

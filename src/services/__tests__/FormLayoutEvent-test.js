@@ -59,9 +59,7 @@ formLayoutMap.set(1, {
     focus: false,
     validation: []
 });
-let nextEditable = {
-    1: ['required$$2']
-}
+
 
 describe('save events implementation', () => {
     it('should disable save if required with save disabled', () => {

@@ -21,6 +21,7 @@ import { FILTER_REF_NO, ALL_TASKS, NO_TAB_PRESENT } from '../lib/ContainerConsta
 import { START, IS_CALENDAR_VISIBLE, LISTING_SEARCH_VALUE, SEARCH_TAP, JobDetailsV2, SET_LANDING_TAB, SET_SELECTED_DATE } from '../lib/constants'
 import TaskListCalender from '../components/TaskListCalender'
 import TitleHeader from '../components/TitleHeader'
+import SyncLoader from '../components/SyncLoader'
 
 function mapStateToProps(state) {
   return {
@@ -29,7 +30,8 @@ function mapStateToProps(state) {
     tabIdStatusIdMap: state.taskList.tabIdStatusIdMap,
     isFutureRunsheetEnabled: state.taskList.isFutureRunsheetEnabled,
     searchText: state.taskList.searchText,
-    landingTabId: state.taskList.landingTabId
+    landingTabId: state.taskList.landingTabId,
+    syncLoadingInTaskList: state.taskList.syncLoadingInTaskList
   }
 };
 
@@ -149,6 +151,7 @@ class TabScreen extends PureComponent {
           <Container>
             <View style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
               <SearchBarV2 placeholder={FILTER_REF_NO} setSearchText={this.fetchDataForListing} searchText={searchTextValue} navigation={this.props.navigation} returnValue={this.fetchDataForScanner.bind(this)} onPress={this.fetchDataForScanner.bind(this)} />
+              {this.props.syncLoadingInTaskList ? <SyncLoader moduleLoading={this.props.syncLoadingInTaskList} /> : null}
             </View>
             <Tabs
               tabBarBackgroundColor={styles.bgPrimary.backgroundColor}
@@ -162,7 +165,7 @@ class TabScreen extends PureComponent {
             </Tabs>
             {this.props.isFutureRunsheetEnabled ? <TaskListCalender /> : null}
           </Container>
-        </StyleProvider>
+        </StyleProvider >
       )
     }
   }
