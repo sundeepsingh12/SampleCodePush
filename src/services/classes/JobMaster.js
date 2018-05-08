@@ -36,7 +36,8 @@ import {
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
   HUB_LAT_LONG,
-  MDM_POLICIES
+  MDM_POLICIES,
+  APP_THEME,
 } from '../../lib/constants'
 
 import {
@@ -132,6 +133,7 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    // json.appTheme = '#939BB4'
     await keyValueDBService.validateAndSaveData(JOB_MASTER, json.jobMaster);
     await keyValueDBService.validateAndSaveData(CUSTOM_NAMING, json.customNaming ? json.customNaming : []);
     await keyValueDBService.validateAndSaveData(USER, json.user);
@@ -160,11 +162,11 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'));
     await keyValueDBService.validateAndSaveData(PAGES, json.pages);
     await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, json.additionalUtilities);
-    if(!_.isEmpty(json.companyMDM)) await keyValueDBService.validateAndSaveData(MDM_POLICIES, json.companyMDM);
-    if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {
-      await keyValueDBService.validateAndSaveData(HUB_LAT_LONG, json.hubLatLng)
-    }
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.appTheme,APP_THEME)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.companyMDM, MDM_POLICIES)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.hubLatLng, HUB_LAT_LONG)
   }
+
 
   /**
    * 

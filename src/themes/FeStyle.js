@@ -1,6 +1,6 @@
 
 
-const themeColor = '#00796B';
+var themeColor = '#00796B';
 
 export default {
     primaryColor: themeColor,
