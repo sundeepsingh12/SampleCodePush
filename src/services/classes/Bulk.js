@@ -1,19 +1,9 @@
 'use strict'
-import {
-    keyValueDBService
-} from './KeyValueDBService'
-import {
-    jobStatusService
-} from './JobStatus'
-import {
-    jobMasterService
-} from './JobMaster'
-import {
-    jobTransactionService
-} from './JobTransaction'
-import {
-    transactionCustomizationService
-} from './TransactionCustomization'
+import { keyValueDBService } from './KeyValueDBService'
+import { jobStatusService } from './JobStatus'
+import { jobMasterService } from './JobMaster'
+import { jobTransactionService } from './JobTransaction'
+import { transactionCustomizationService } from './TransactionCustomization'
 import {
     UNSEEN,
     JOB_STATUS,
@@ -28,18 +18,14 @@ import {
 } from '../../lib/constants'
 import _ from 'lodash'
 import { moduleCustomizationService } from './ModuleCustomization'
-import {
-    BULK_ID
-} from '../../lib/AttributeConstants'
-import {
-    INVALID_SCAN
-} from '../../lib/ContainerConstants'
+import { BULK_ID } from '../../lib/AttributeConstants'
+import { INVALID_SCAN } from '../../lib/ContainerConstants'
 
 class Bulk {
 
     /**
      * This function returns job transaction map of job transaction corresponding to job master id and status id
-     * @param {*} bulkData 
+     * @param {*} bulkParamas 
      * @returns
      * {
      *      jobTransactionId : jobTransactionCustomization {
@@ -60,11 +46,14 @@ class Bulk {
      *                                      }
      * }
      */
-    async getJobListingForBulk(bulkData) {
-        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        let { jobTransactionCustomizationList } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Bulk', bulkData)
-        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id')
-        return idJobTransactionCustomizationListMap
+    async getJobListingForBulk(bulkParamas) {
+        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters();
+        let queryDTO = {};
+        queryDTO.jobTransactionQuery = `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND jobStatusId = ${bulkParamas.pageObject.additionalParams.statusId} AND jobId > 0`;
+        queryDTO.jobQuery = bulkParamas.pageObject.groupId ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = "${bulkParamas.pageObject.groupId}"` : `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = null`;
+        let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO)
+        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id');
+        return idJobTransactionCustomizationListMap;
     }
 
     /**

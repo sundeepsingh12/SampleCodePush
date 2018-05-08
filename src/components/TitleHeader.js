@@ -2,26 +2,28 @@ import React, { PureComponent } from 'react'
 import {
     StyleSheet,
     View,
-    Text
+    Text,
+    TouchableOpacity
 } from 'react-native'
-import {Button, Body, Header, Left, Right, Icon } from 'native-base'
+import { Body, Header, Icon } from 'native-base'
 import styles from '../themes/FeStyle'
-
 class TitleHeader extends PureComponent {
     render() {
         return (
-            <Header style={StyleSheet.flatten([styles.bgPrimary])}>
-                <Left style={StyleSheet.flatten([styles.flexBasis15])}>
-                    <Button transparent onPress={() => { }}>
-                        <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])} />
-                    </Button>
-                </Left>
-                <Body style={StyleSheet.flatten([styles.alignCenter, styles.flexBasis70])}>
-                    <Text style={StyleSheet.flatten([styles.fontSm, styles.fontWhite, styles.fontCenter])}>Ref12345676565</Text>
-                    <Text style={StyleSheet.flatten([styles.fontSm, styles.fontWhite, styles.bold, styles.fontYellow, styles.fontCenter])}>Pending</Text>
+            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])} hasTabs>
+                <Body>
+                    <View
+                        style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                        <TouchableOpacity style={[styles.headerLeft]} onPress={() => this.props.goBack(null)}>
+                            <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                        </TouchableOpacity>
+                        <View style={[styles.headerBody]}>
+                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.pageName}</Text>
+                        </View>
+                        <View style={[styles.headerRight]}>
+                        </View>
+                    </View>
                 </Body>
-                <Right style={StyleSheet.flatten([styles.flexBasis15])}>
-                </Right>
             </Header>
         )
     }

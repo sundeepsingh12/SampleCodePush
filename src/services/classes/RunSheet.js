@@ -111,6 +111,34 @@ class RunSheet {
     return runsheetNumberList
   }
 
+  /**
+   * This function prepares runsheet map and job transaction query according to runsheet
+   * @param {*} isFutureDateRunsheetEnabled 
+   * @returns 
+   * {
+   *    runsheetMap : {
+   *                      runsheetId : { startDate }
+   *                  }
+   *    jobTransactionQuery : string
+   * }
+   */
+  prepareJobTransactionQueryOnBasisOfRunsheet(isFutureDateRunsheetEnabled) {
+    let runsheetMap = {}, jobTransactionQuery = '';
+    /* If future date runsheet enabled then check for that runsheets opened else check for runsheets closed.
+       This is done as new job/assign order to hub doesn't have any runsheet id.
+       So new job/assign order to hub will not work with future date runsheet.
+    */
+    let runsheetQuery = isFutureDateRunsheetEnabled ? 'isClosed = false' : 'isClosed = true';
+    const runsheetList = realm.getRecordListOnQuery(TABLE_RUNSHEET, runsheetQuery);
+    for (let index in runsheetList) {
+      let id = runsheetList[index].id;
+      let startDate = runsheetList[index].startDate;
+      runsheetMap[id] = { startDate }
+      jobTransactionQuery += isFutureDateRunsheetEnabled ? index == 0 ? `runsheetId = ${runsheetList[index].id}` : ` OR runsheetId = ${runsheetList[index].id}` : index == 0 ? `runsheetId != ${runsheetList[index].id}` : ` AND runsheetId != ${runsheetList[index].id}`;
+    }
+    return { runsheetMap, jobTransactionQuery };
+  }
+
 }
 
 export let runSheetService = new RunSheet()

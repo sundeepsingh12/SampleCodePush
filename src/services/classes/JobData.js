@@ -44,42 +44,24 @@ class JobData {
      * }
      */
     getJobDataDetailsForListing(jobDataList, jobAttributeMasterMap) {
-        let jobDataDetailsForListing = {},
-            jobDataMap = {},
-            contactMap = {},
-            addressMap = {}
-        jobDataList.forEach(jobDataObj => {
-            const {
-                jobAttributeMasterId,
-                jobId,
-                parentId,
-                value
-            } = jobDataObj
-            let jobData = {
-                jobId,
-                jobAttributeMasterId,
-                value
-            }
-
+        let jobDataDetailsForListing = {}, jobDataMap = {}, contactMap = {}, addressMap = {}
+        for (let index in jobDataList) {
+            const { jobAttributeMasterId, jobId, parentId, value } = jobDataList[index];
+            let jobData = { jobId, jobAttributeMasterId, value };
             if (parentId !== 0) {
-                return
+                continue;
             }
-
-            jobDataMap[jobId] = jobDataMap[jobId] ? jobDataMap[jobId] : {}
-
-            jobDataMap[jobId][jobAttributeMasterId] = jobData
+            jobDataMap[jobId] = jobDataMap[jobId] ? jobDataMap[jobId] : {};
+            jobDataMap[jobId][jobAttributeMasterId] = jobData;
             if (this.checkContacNumber(jobAttributeMasterId, value, jobAttributeMasterMap)) {
-                contactMap[jobId] = contactMap[jobId] ? contactMap[jobId] : []
-                contactMap[jobId].push(jobData)
+                contactMap[jobId] = contactMap[jobId] ? contactMap[jobId] : [];
+                contactMap[jobId].push(jobData);
             } else if (this.checkAddressField(jobAttributeMasterId, value, jobAttributeMasterMap)) {
-                addressMap[jobId] = addressMap[jobId] ? addressMap[jobId] : []
-                addressMap[jobId].push(jobData)
+                addressMap[jobId] = addressMap[jobId] ? addressMap[jobId] : [];
+                addressMap[jobId].push(jobData);
             }
-        })
-        jobDataDetailsForListing.jobDataMap = jobDataMap
-        jobDataDetailsForListing.contactMap = contactMap
-        jobDataDetailsForListing.addressMap = addressMap
-        return jobDataDetailsForListing
+        }
+        return { jobDataMap, contactMap, addressMap };
     }
 
     /**

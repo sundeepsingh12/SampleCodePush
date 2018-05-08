@@ -30,25 +30,23 @@ import _ from 'lodash'
 export function getOptionsList(fieldAttributeMasterId, formElement) {
     return async function (dispatch) {
         try {
-            let optionList = []
-            const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
+            let optionList = [];
+            const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE);
             if (!fieldAttributeValueList || !fieldAttributeValueList.value) {
-                return
+                return;
             }
-            let childDataList = []
-            childDataList = formElement.get(fieldAttributeMasterId).childDataList ? formElement.get(fieldAttributeMasterId).childDataList : formElement.get(fieldAttributeMasterId).value ? childDataList.concat(formElement.get(fieldAttributeMasterId)) : []
-            let selectedOptionsMap = {}
+            let childDataList = [];
+            childDataList = formElement.get(fieldAttributeMasterId).childDataList ? formElement.get(fieldAttributeMasterId).childDataList : formElement.get(fieldAttributeMasterId).value ? childDataList.concat(formElement.get(fieldAttributeMasterId)) : [];
+            let selectedOptionsMap = {};
             for (let index in childDataList) {
-                selectedOptionsMap[childDataList[index].value] = true
+                selectedOptionsMap[childDataList[index].value] = true;
             }
-            optionList = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, fieldAttributeMasterId)
-            let optionsMap = multipleOptionsAttributeService.changeOptionStatus(optionList, selectedOptionsMap)
-            dispatch(setState(SET_OPTIONS_LIST, {
-                optionsMap
-            }))
+            optionList = fieldAttributeValueMasterService.filterFieldAttributeValueList(fieldAttributeValueList.value, fieldAttributeMasterId);
+            let optionsMap = multipleOptionsAttributeService.changeOptionStatus(optionList, selectedOptionsMap);
+            dispatch(setState(SET_OPTIONS_LIST, { optionsMap }));
         } catch (error) {
-            showToastAndAddUserExceptionLog(1401, error.message, 'danger', 0)
-            dispatch(setState(ERROR_MESSAGE, error.message))
+            showToastAndAddUserExceptionLog(1401, error.message, 'danger', 0);
+            dispatch(setState(ERROR_MESSAGE, error.message));
         }
     }
 }

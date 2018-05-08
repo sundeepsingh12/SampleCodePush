@@ -94,6 +94,8 @@ module.exports = keyMirror({
     SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
     SET_LANDING_TAB: null,
+    TABS_LOADING: null,
+    SET_SELECTED_DATE: null,
 
     //Pages
     PAGES_LOADING: null,

@@ -365,6 +365,9 @@ module.exports = {
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',
 
+    //TabScreen
+    NO_TAB_PRESENT: 'No Tab Present',
+
     //Draft Modal
     DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
 
@@ -377,5 +380,21 @@ module.exports = {
 
     //Menu Container Constants
     APP: 'App',
-    LOGOUT: 'Logout'
+    LOGOUT: 'Logout',
+
+    //Pages Default Name
+    ALL_TASKS: 'All Tasks',
+
+    //Mobile Job List Customization Fixed Attributes
+    ATTEMPT: 'Attempt: ',
+    SLOT: 'Slot: ',
+    START: 'Start: ',
+    END: 'End: ',
+    DISTANCE: 'Distance: ',
+    HALT_DURATION: 'Halt Duration: ',
+    CALL_COUNT: 'Call Count: ',
+    CALL_DURATION: 'Call Duration: ',
+    SMS: 'Sms: ',
+    TIME_SPENT: 'Time Spent: ',
+    SEQUENCE: 'Sequence: ',
 }

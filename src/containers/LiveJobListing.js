@@ -116,8 +116,8 @@ class LiveJobListing extends PureComponent {
         let time = this.getJobEtaTime(item.id)
         if (time != 'TimeUp') {
             return (
-                <JobListItem data={item.jobTransactionCustomization} jobEndTime={time}
-                    onPressItem={() => { this.navigateToScene(item.jobTransactionCustomization) }}
+                <JobListItem data={item} jobEndTime={time}
+                    onPressItem={() => { this.navigateToScene(item) }}
                     onLongPressItem={() => this.toggleLiveJobSelection(item.id)}
                 />
             )
@@ -147,7 +147,7 @@ class LiveJobListing extends PureComponent {
             let jobTransactionArray = []
             let searchText = this.props.searchText
             _.forEach(this.props.liveJobList, function (value) {
-                let values = [value.referenceNo]
+                let values = [value.referenceNumber]
                 if (_.some(values, (data) => _.includes(_.toLower(data), _.toLower(searchText)))) {
                     jobTransactionArray.push(value)
                 }
