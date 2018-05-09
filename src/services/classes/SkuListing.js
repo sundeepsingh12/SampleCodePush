@@ -98,7 +98,7 @@ class SkuListing {
         if (_.isEmpty(jobTransactionList)) {
             throw new Error('JobTransactions is missing')
         }
-        skuValidationForImageAndReason = (skuValidationForImageAndReason.timeOfExecution == 'SKUValidation') ? skuValidationForImageAndReason : null
+        skuValidationForImageAndReason = (skuValidationForImageAndReason && skuValidationForImageAndReason.timeOfExecution == 'SKUValidation') ? skuValidationForImageAndReason : null
         let reasonsList, skuActualQuantityObject, autoIncrementId = 0, skuCodeMap = {}
         let query = Array.from(idFieldAttributeMap.keys()).map(jobAttributeId => `jobAttributeMasterId = ${jobAttributeId}`).join(' OR ')
         query = `(${query}) AND (${jobTransactionList.map(jobTransaction => `jobId = ${jobTransaction.jobId}`).join(' OR ')})`

@@ -117,7 +117,7 @@ class SkuListItem extends PureComponent {
     }
 
     _displaySkuItems(rowItem, originalQuantityValue) {
-        if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
+        if (!_.isEmpty(this.props.skuValidationForImageAndReason) && !_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_REASON) {
             let reasonList = _.cloneDeep(this.props.reasonsList)
             if (Platform.OS === 'ios') {
                 reasonList.splice(0, 1)
@@ -132,7 +132,7 @@ class SkuListItem extends PureComponent {
                         {this._populateSkuItems(reasonList)}
                     </Picker>
                 </View>)
-        } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
+        } else if (!_.isEmpty(this.props.skuValidationForImageAndReason) && !_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
             return (
                 <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>
                     <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, styles.fontPrimary]}

@@ -49,7 +49,7 @@ class SkuListing extends PureComponent {
 
   renderData(item,title) {
     return (
-      <SkuListItem  item={item} title = {title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} />
+      <SkuListItem  item={item} title = {title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} skuValidationForImageAndReason = {this.props.skuValidationForImageAndReason} />
     )
   }
 
@@ -112,7 +112,7 @@ class SkuListing extends PureComponent {
                     style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
                   <View />
                 </View>
-                {this.props.isSearchBarVisible ? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
+                {!_.isEmpty(this.props.isSearchBarVisible) ? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
               </Body>
             </Header>
 
