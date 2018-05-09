@@ -17,10 +17,6 @@ module.exports = {
         name : 'Dev',
         url: 'https://dev.fareye.co'
       },
-      {
-        name:'Local',
-        url:'http://172.16.10.83:8080'
-      }
     ],
     port: 8083,
     PUSH_QOS: 2

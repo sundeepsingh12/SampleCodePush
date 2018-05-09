@@ -140,6 +140,7 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
+    json.applicationVersion = 1
 
     await keyValueDBService.validateAndSaveData(APP_VERSION,json.applicationVersion+"")
     const packageJsonMajorVersion = parseInt(package_json.version.split('.')[0])

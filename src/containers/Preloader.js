@@ -5,7 +5,7 @@ import {
     Platform,
     View,
     Image,
-    Text
+    Text,
 }
     from 'react-native'
 import CustomAlert from "../components/CustomAlert"
@@ -57,7 +57,7 @@ class Preloader extends PureComponent {
         this.state = {
             progressBarStatus: 0,
             showDownloadProgressBar:false,
-            errorInDownload:false
+            errorInDownload:false,
         }
     }
 
@@ -103,13 +103,13 @@ class Preloader extends PureComponent {
     }
 
     downloadLatestApk = () => {
+        this.props.actions.resetApp()
+        this.setState({showDownloadProgressBar: true})
         //In ios open Web View
         if (Platform.OS === 'ios') {
-            this.props.actions.startLoginScreenWithoutLogout()
+            // this.props.actions.startLoginScreenWithoutLogout()
             this.props.actions.getIOSDownloadUrl()
         } else {
-            this.props.actions.resetApp()
-            this.setState({showDownloadProgressBar: true})
             this.downloadLatestApplicationForAndroid()
         }
     }
