@@ -104,14 +104,23 @@ export class keyValueDb {
         }).then(() => {
           return true;
         }).catch(error => {
+          console.log('catch >>>>')
+          console.log('schemaInstance',schemaInstance)
+          console.log('value',value)
           return error;
         })
       } else {
+        console.log('else >>>>')
+        console.log('schemaInstance',schemaInstance)
+        console.log('value',value)
         throw new Error(schemaName + ' validation failed')
       }
     } else {
       const schemaCheck = await this.getValueFromStore(schemaName)
       if (!schemaCheck) {
+        console.log('schemaCheck >>>>')
+        console.log('schemaInstance',schemaInstance)
+        console.log('value',value)
         throw new Error(schemaName + ' validation failed')
       }
     }

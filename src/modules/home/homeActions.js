@@ -112,7 +112,7 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
-
+import FCM, {NotificationActionType,FCMEvent} from "react-native-fcm";
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -296,18 +296,67 @@ export function startMqttService(pieChart) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
     //Check if user session is alive
     if (token && token.value) {
-      const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
+      // const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
       const userObject = await keyValueDBService.getValueFromStore(USER)
-      const clientId = `FE_${userObject.value.id}`
-      const storage = {
-        setItem: (key, item) => {
-          storage[key] = item;
-        },
-        getItem: (key) => storage[key],
-        removeItem: (key) => {
-          delete storage[key]
-        },
-      };
+      const topic = `FE_${userObject.value.id}`
+
+      FCM.requestPermissions().then(
+        ()=>console.logs('granted'))
+        FCM.getFCMToken().then(fcmToken => {
+          console.logs('fcmToken',fcmToken)
+          sync.sendRegistrationTokenToServer(token,fcmToken,topic)
+        }, (error) => {
+          console.logs('The token could not be generated! , ', error)
+        }).catch(
+          ()=>console.logs('notification permission rejected'))
+  
+      
+      FCM.getInitialNotification().then(notif => {
+        console.logs('INITIAL NOTIFICATION', notif)
+      }, (err) => {
+        console.logs('Initial Notifications can not be displayed! ', err)
+      })
+
+      this.notificationListner = FCM.on(FCMEvent.Notification, notif => {
+        console.log('Notification', notif)
+        if (notif.local_notification) {
+          return
+        }
+        if (notif.opened_from_tray) {
+          return
+        }
+  
+        if (Platform.OS === 'ios') {
+                // optional
+                // iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see the above documentation link.
+                // This library handles it for you automatically with default behavior (for remote notification, finish with NoData; for WillPresent, finish depend on "show_in_foreground"). However if you want to return different result, follow the following code to override
+                // notif._notificationType is available for iOS platfrom
+          switch (notif._notificationType) {
+            case NotificationType.Remote:
+              notif.finish(RemoteNotificationResult.NewData) // other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+              break
+            case NotificationType.NotificationResponse:
+              notif.finish()
+              break
+            case NotificationType.WillPresent:
+              notif.finish(WillPresentNotificationResult.All) // other types available: WillPresentNotificationResult.None
+              break
+          }
+        }
+        // this.showLocalNotification(notif)
+      })
+
+      FCM.subscribeToTopic(topic)
+
+      // const storage = {
+      //   setItem: (key, item) => {
+      //     storage[key] = item;
+      //   },
+      //   getItem: (key) => storage[key],
+      //   removeItem: (key) => {
+      //     delete storage[key]
+      //   },
+      // };
 
       // Create a client instance 
       // const client = new Client({

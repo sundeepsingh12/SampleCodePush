@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -13,6 +14,7 @@
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
 		00E356F31AD99517003FC87E /* FareyeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* FareyeTests.m */; };
 		0238DAD8CCC64A3B84BDD049 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 308BB85010634F8A99984F9C /* SimpleLineIcons.ttf */; };
+		084FDFC73533812239FBBD12 /* libPods-FareyeTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3A0AE146701657F9F08FD6D /* libPods-FareyeTests.a */; };
 		116C4307662E4196B98B6A36 /* libRCTBluetoothSerial.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EAD6927C039A451C909EBD6C /* libRCTBluetoothSerial.a */; };
 		133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
 		139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139105C11AF99BAD00B5F7CC /* libRCTSettings.a */; };
@@ -40,7 +42,6 @@
 		2D02E4C71E0B4AEC006451C7 /* libRCTText-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E941DF850E9000B6D8A /* libRCTText-tvOS.a */; };
 		2D02E4C81E0B4AEC006451C7 /* libRCTWebSocket-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E991DF850E9000B6D8A /* libRCTWebSocket-tvOS.a */; };
 		2D02E4C91E0B4AEC006451C7 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
-		2DCD954D1E0B4F2C00145EB5 /* FareyeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* FareyeTests.m */; };
 		2DF4BDE843854DE488D89729 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 43AC8BA8802647FDAD361FF8 /* libRNFS.a */; };
 		2F05F48E1F1E274B00B7C50B /* TSLocationManager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F05F48D1F1E274B00B7C50B /* TSLocationManager.framework */; };
 		4C6BA6617B3D4049B6A69FD4 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BCEEE64B0F334CD39CDE6F32 /* Feather.ttf */; };
@@ -50,6 +51,7 @@
 		5A9036971F9DB70F0099D990 /* libART.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A9036941F9DB6740099D990 /* libART.a */; };
 		5BCCEBCEF5B547FD833CD376 /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3245982243754B2B942FD59F /* libRNCamera.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
+		62DB8359BA14B0A2369ACA02 /* libPods-Fareye-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C9E92AE60FF60C3DF084F0F6 /* libPods-Fareye-tvOS.a */; };
 		6CB7D6BA66294A3E8EF5AF61 /* TSBackgroundFetch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FABA5ABFE7F54A768EF29B9F /* TSBackgroundFetch.framework */; };
 		764A9E346E9F41259CE551DE /* libCodePush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4CFD850A4184BB2AB3B6665 /* libCodePush.a */; };
 		776ED8F0BD7341209DDE9C86 /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65789B672F2E48B4BAC1E824 /* libRNFetchBlob.a */; };
@@ -59,6 +61,8 @@
 		93512BB49AB04125BEDBCAF3 /* libCocoaLumberjack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C63CC90944DA4B22BE9B4713 /* libCocoaLumberjack.a */; };
 		959FA59ED213434FA2924C34 /* RNBackgroundFetch+AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C55F4E58B9E346AFBDF28A01 /* RNBackgroundFetch+AppDelegate.m */; };
 		A072217968BF41FD8C4E54FE /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9DCD390E81DC4B35BB71E893 /* EvilIcons.ttf */; };
+		A743F7A4242B4C70ABD56837 /* libRNFIRMessaging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 008982B26F1B499D8B5103E9 /* libRNFIRMessaging.a */; };
+		A8AC40675CFF796F61F00AE3 /* libPods-Fareye.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32AE764250CC849EE0DD9931 /* libPods-Fareye.a */; };
 		B5AAA419CF1D4E018B5FB885 /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 73E47FAA20B04A9DAD2FC3CC /* libRNDeviceInfo.a */; };
 		BCA07562E66C4769B9BDD979 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 08DB55D1A1BC4F93AA43ECD9 /* MaterialCommunityIcons.ttf */; };
 		D1BFFA29D5C44226996CFA99 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1233F94C669D4F40A3366E35 /* libsqlite3.tbd */; };
@@ -70,7 +74,6 @@
 		F8CB360D5B714A52AA3D6667 /* libRNZipArchive.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D81427C5F768493280BD7CEC /* libRNZipArchive.a */; };
 		FB303808CAEC4CB999F550B3 /* libRSSignatureCapture.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA1A1F66A6184FEABBBE1DC8 /* libRSSignatureCapture.a */; };
 		FB911C19F323472CA783743E /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 030A266DBF844984B193C455 /* FontAwesome.ttf */; };
-		A743F7A4242B4C70ABD56837 /* libRNFIRMessaging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 008982B26F1B499D8B5103E9 /* libRNFIRMessaging.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -221,12 +224,12 @@
 			remoteGlobalIDString = E72EC1401F7ABB5A0001BC90;
 			remoteInfo = "RNDeviceInfo-tvOS";
 		};
-		1C8974371F5B212C004418DD /* PBXContainerItemProxy */ = {
+		1C637E3520A1BC0F0079811A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2D02E47A1E0B4A5D006451C7;
-			remoteInfo = "Fareye-tvOS";
+			containerPortal = 0F6270E5FD594D53AB9D1F0E /* RCTBluetoothSerial.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 69CA06031CC43C2900AF6479;
+			remoteInfo = RCTBluetoothSerial;
 		};
 		1C89743A1F5B212C004418DD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -361,6 +364,13 @@
 			remoteGlobalIDString = 1CA3AF921F6697DD00057D5E;
 			remoteInfo = "RNSVG-tvOS";
 		};
+		1CB2E59320A1CB3A00FAE260 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A27965CEE8524DC886257AD9 /* RNFIRMessaging.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNFIRMessaging;
+		};
 		1CD971A1208772230098C6FD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D08F36E102DE42D48D2EC501 /* RNImagePicker.xcodeproj */;
@@ -444,13 +454,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 83FF5F851AFD0D2B0016A13E;
 			remoteInfo = RNBackgroundGeolocation;
-		};
-		2F05F4691F1E270800B7C50B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1F1DB001E6484715B5E8ECCC /* RNBackgroundGeolocation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 83FF5F901AFD0D2B0016A13E;
-			remoteInfo = RNBackgroundGeolocationTests;
 		};
 		2F05F4831F1E270800B7C50B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -622,6 +625,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		008982B26F1B499D8B5103E9 /* libRNFIRMessaging.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFIRMessaging.a; sourceTree = "<group>"; };
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTActionSheet.xcodeproj; path = "../node_modules/react-native/Libraries/ActionSheetIOS/RCTActionSheet.xcodeproj"; sourceTree = "<group>"; };
 		00C302B51ABCB90400DB3ED1 /* RCTGeolocation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTGeolocation.xcodeproj; path = "../node_modules/react-native/Libraries/Geolocation/RCTGeolocation.xcodeproj"; sourceTree = "<group>"; };
@@ -639,6 +643,7 @@
 		0CD786D383FF43BE853A9EEA /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/react-native-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		0DDE47429DAF4E20AAE3C7FC /* CodePush.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = CodePush.xcodeproj; path = "../node_modules/react-native-code-push/ios/CodePush.xcodeproj"; sourceTree = "<group>"; };
 		0F17875311ED49DB8EF29BC8 /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
+		0F6270E5FD594D53AB9D1F0E /* RCTBluetoothSerial.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTBluetoothSerial.xcodeproj; path = "../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial.xcodeproj"; sourceTree = "<group>"; };
 		1233F94C669D4F40A3366E35 /* libsqlite3.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
@@ -650,6 +655,8 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Fareye/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Fareye/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
+		1590F3F2BE421DA2EC7F0069 /* Pods-Fareye.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fareye.release.xcconfig"; path = "Pods/Target Support Files/Pods-Fareye/Pods-Fareye.release.xcconfig"; sourceTree = "<group>"; };
+		15FFFCD1E49F39554CFF5935 /* Pods-Fareye-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fareye-tvOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Fareye-tvOS/Pods-Fareye-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		1C1963B71FCEDBC8002AEF2D /* Fareye.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Fareye.entitlements; path = Fareye/Fareye.entitlements; sourceTree = "<group>"; };
 		1C1D77D41FF68FA3003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		1C1D77DD1FF68FDB003594E2 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
@@ -658,11 +665,11 @@
 		1F5BDB0DBAA64E9DA404CDA8 /* libBVLinearGradient.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libBVLinearGradient.a; sourceTree = "<group>"; };
 		1FEA8B5176BE440B922D3644 /* CodePush.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = CodePush.xcodeproj; path = "../node_modules/react-native-code-push/ios/CodePush.xcodeproj"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* Fareye-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Fareye-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2D02E4901E0B4A5D006451C7 /* Fareye-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Fareye-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D938CCB876F47648B28DA3B /* RSSignatureCapture.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RSSignatureCapture.xcodeproj; path = "../node_modules/react-native-signature-capture/ios/RSSignatureCapture.xcodeproj"; sourceTree = "<group>"; };
 		2F05F48D1F1E274B00B7C50B /* TSLocationManager.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TSLocationManager.framework; path = "../node_modules/react-native-background-geolocation/ios/RNBackgroundGeolocation/TSLocationManager.framework"; sourceTree = "<group>"; };
 		308BB85010634F8A99984F9C /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		3245982243754B2B942FD59F /* libRNCamera.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNCamera.a; sourceTree = "<group>"; };
+		32AE764250CC849EE0DD9931 /* libPods-Fareye.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Fareye.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BD54A6EC92B43B7AB5FCE59 /* libRealmReact.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRealmReact.a; sourceTree = "<group>"; };
 		406FE7A6212F4AD186E20533 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		43AC8BA8802647FDAD361FF8 /* libRNFS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFS.a; sourceTree = "<group>"; };
@@ -685,13 +692,17 @@
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		7BAFBD90623D46009E6F04FE /* OFL.txt */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = OFL.txt; path = "../node_modules/native-base/Fonts/OFL.txt"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		91EA5FA5FE59F236A3CD1FF4 /* Pods-FareyeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FareyeTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-FareyeTests/Pods-FareyeTests.release.xcconfig"; sourceTree = "<group>"; };
 		92A621AE82DE47B28ED098DD /* libRNSVG.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSVG.a; sourceTree = "<group>"; };
 		969C6078E5F540BBAB2D29B9 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
 		9720A66FFF99403EA2E2A2AD /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; };
 		97AD4A11346A4D58AFBA45BB /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		9AE2979B3374830E2DF52299 /* Pods-Fareye-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fareye-tvOS.release.xcconfig"; path = "Pods/Target Support Files/Pods-Fareye-tvOS/Pods-Fareye-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		9DCD390E81DC4B35BB71E893 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		A054425B035847E09D9B5A36 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		A18BE11F9E2448478C39CA80 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
+		A27965CEE8524DC886257AD9 /* RNFIRMessaging.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFIRMessaging.xcodeproj; path = "../node_modules/react-native-fcm/ios/RNFIRMessaging.xcodeproj"; sourceTree = "<group>"; };
+		A3A0AE146701657F9F08FD6D /* libPods-FareyeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-FareyeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD3A3261228A4D65B281D0FD /* RNZipArchive.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNZipArchive.xcodeproj; path = "../node_modules/react-native-zip-archive/ios/RNZipArchive.xcodeproj"; sourceTree = "<group>"; };
 		B4349F5749F44E62BC93FBC2 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		BCEEE64B0F334CD39CDE6F32 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
@@ -702,10 +713,12 @@
 		C7C28E651038445ABB281D8E /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		C826417CB4A84C6592D01603 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		C904F600A55C43829DD0D022 /* RNBackgroundTimer.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBackgroundTimer.xcodeproj; path = "../node_modules/react-native-background-timer/ios/RNBackgroundTimer.xcodeproj"; sourceTree = "<group>"; };
+		C9E92AE60FF60C3DF084F0F6 /* libPods-Fareye-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Fareye-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA79EDBD66184C2F9C86C100 /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/react-native-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		CC7EDD6E79384658AF67D2B9 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		D08F36E102DE42D48D2EC501 /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNImagePicker.xcodeproj; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; };
 		D3B9E9A5F194416A862AEDC8 /* libRNImagePicker.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNImagePicker.a; sourceTree = "<group>"; };
+		D55BAB1FF0149E9B5CC34BF9 /* Pods-FareyeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FareyeTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FareyeTests/Pods-FareyeTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D57C7032FE564278BCEAD80C /* BVLinearGradient.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = BVLinearGradient.xcodeproj; path = "../node_modules/react-native-linear-gradient/BVLinearGradient.xcodeproj"; sourceTree = "<group>"; };
 		D81427C5F768493280BD7CEC /* libRNZipArchive.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNZipArchive.a; sourceTree = "<group>"; };
 		DA1A1F66A6184FEABBBE1DC8 /* libRSSignatureCapture.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRSSignatureCapture.a; sourceTree = "<group>"; };
@@ -722,9 +735,7 @@
 		EE13725ADBF9427B9D77CE4E /* RNFS.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		FABA5ABFE7F54A768EF29B9F /* TSBackgroundFetch.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = TSBackgroundFetch.framework; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/TSBackgroundFetch.framework"; sourceTree = SDKROOT; };
 		FC3DF98F2C014B3285292D34 /* libc++.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
-		AC1BC47226A24B05BA9A3D79 /* RNFIRMessaging.xcodeproj */ = {isa = PBXFileReference; name = "RNFIRMessaging.xcodeproj"; path = "../node_modules/react-native-fcm/ios/RNFIRMessaging.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		008982B26F1B499D8B5103E9 /* libRNFIRMessaging.a */ = {isa = PBXFileReference; name = "libRNFIRMessaging.a"; path = "libRNFIRMessaging.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		B0AB3FF039B545F9A20A66ED /* RNFIRMessaging.xcodeproj */ = {isa = PBXFileReference; name = "RNFIRMessaging.xcodeproj"; path = "../node_modules/react-native-fcm/ios/RNFIRMessaging.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		FC5262FDC7C1E084B98D9F02 /* Pods-Fareye.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Fareye.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Fareye/Pods-Fareye.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -733,6 +744,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */,
+				084FDFC73533812239FBBD12 /* libPods-FareyeTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -776,6 +788,7 @@
 				1F3F5E4D033D48A886295E57 /* libRNImagePicker.a in Frameworks */,
 				DAA8410ED5E64676B5058E1B /* libRNVectorIcons.a in Frameworks */,
 				A743F7A4242B4C70ABD56837 /* libRNFIRMessaging.a in Frameworks */,
+				A8AC40675CFF796F61F00AE3 /* libPods-Fareye.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -791,13 +804,7 @@
 				2D02E4C61E0B4AEC006451C7 /* libRCTSettings-tvOS.a in Frameworks */,
 				2D02E4C71E0B4AEC006451C7 /* libRCTText-tvOS.a in Frameworks */,
 				2D02E4C81E0B4AEC006451C7 /* libRCTWebSocket-tvOS.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2D02E48D1E0B4A5D006451C7 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				62DB8359BA14B0A2369ACA02 /* libPods-Fareye-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -967,6 +974,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		1C637E2E20A1BC0F0079811A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1C637E3620A1BC0F0079811A /* libRCTBluetoothSerial.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		1C8973861F59F100004418DD /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -1037,6 +1052,7 @@
 				52ABDE7F721446AB84F0855B /* libRNDeviceInfo-tvOS.a */,
 				D3B9E9A5F194416A862AEDC8 /* libRNImagePicker.a */,
 				0F17875311ED49DB8EF29BC8 /* libRNVectorIcons.a */,
+				008982B26F1B499D8B5103E9 /* libRNFIRMessaging.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -1070,6 +1086,14 @@
 			children = (
 				1CA3AFDC1F6697DE00057D5E /* libRNSVG.a */,
 				1CA3AFDE1F6697DE00057D5E /* libRNSVG-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1CB2E55320A1CB3A00FAE260 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1CB2E59420A1CB3A00FAE260 /* libRNFIRMessaging.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1128,7 +1152,6 @@
 			isa = PBXGroup;
 			children = (
 				2F05F4681F1E270800B7C50B /* libRNBackgroundGeolocation.a */,
-				2F05F46A1F1E270800B7C50B /* RNBackgroundGeolocationTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1228,8 +1251,8 @@
 				4BD9C8810CA2437AB5B19D20 /* RNDeviceInfo.xcodeproj */,
 				D08F36E102DE42D48D2EC501 /* RNImagePicker.xcodeproj */,
 				B4349F5749F44E62BC93FBC2 /* RNVectorIcons.xcodeproj */,
-				AC1BC47226A24B05BA9A3D79 /* RNFIRMessaging.xcodeproj */,
-				B0AB3FF039B545F9A20A66ED /* RNFIRMessaging.xcodeproj */,
+				0F6270E5FD594D53AB9D1F0E /* RCTBluetoothSerial.xcodeproj */,
+				A27965CEE8524DC886257AD9 /* RNFIRMessaging.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1253,6 +1276,7 @@
 				FC41E0880B2647D389831B8D /* Frameworks */,
 				E1D5DEE5C2404F9B943B2F25 /* Resources */,
 				1C944AC11FB2E0660017FA5C /* Recovered References */,
+				F8526DA09E921E39BC52FE93 /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -1264,7 +1288,6 @@
 				13B07F961A680F5B00A75B9A /* Fareye.app */,
 				00E356EE1AD99517003FC87E /* FareyeTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* Fareye-tvOS.app */,
-				2D02E4901E0B4A5D006451C7 /* Fareye-tvOSTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1294,6 +1317,19 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		F8526DA09E921E39BC52FE93 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				FC5262FDC7C1E084B98D9F02 /* Pods-Fareye.debug.xcconfig */,
+				1590F3F2BE421DA2EC7F0069 /* Pods-Fareye.release.xcconfig */,
+				15FFFCD1E49F39554CFF5935 /* Pods-Fareye-tvOS.debug.xcconfig */,
+				9AE2979B3374830E2DF52299 /* Pods-Fareye-tvOS.release.xcconfig */,
+				D55BAB1FF0149E9B5CC34BF9 /* Pods-FareyeTests.debug.xcconfig */,
+				91EA5FA5FE59F236A3CD1FF4 /* Pods-FareyeTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		FC41E0880B2647D389831B8D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1302,6 +1338,9 @@
 				1233F94C669D4F40A3366E35 /* libsqlite3.tbd */,
 				FABA5ABFE7F54A768EF29B9F /* TSBackgroundFetch.framework */,
 				FC3DF98F2C014B3285292D34 /* libc++.tbd */,
+				32AE764250CC849EE0DD9931 /* libPods-Fareye.a */,
+				C9E92AE60FF60C3DF084F0F6 /* libPods-Fareye-tvOS.a */,
+				A3A0AE146701657F9F08FD6D /* libPods-FareyeTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1313,9 +1352,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "FareyeTests" */;
 			buildPhases = (
+				4EEB9E2FD20DFD6F75F3ABD1 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
+				CB96CD3D0A44F85D5E97AA2F /* [CP] Embed Pods Frameworks */,
+				A151A1C5B0EE65F118E87174 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1331,11 +1373,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Fareye" */;
 			buildPhases = (
+				14C6445F76A36F4968180731 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				1CED3D71206248950051F1A5 /* Embed Frameworks */,
+				103F02EDD65BD5845713AE1F /* [CP] Embed Pods Frameworks */,
+				3D9D53F54A1405A3F8F887BA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1350,10 +1395,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "Fareye-tvOS" */;
 			buildPhases = (
+				58AD7F7ED5687B5A6CFB5988 /* [CP] Check Pods Manifest.lock */,
 				2D02E4771E0B4A5D006451C7 /* Sources */,
 				2D02E4781E0B4A5D006451C7 /* Frameworks */,
 				2D02E4791E0B4A5D006451C7 /* Resources */,
 				2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */,
+				5CEA2D91521473B90C00CFD0 /* [CP] Embed Pods Frameworks */,
+				84EF852D0620CA93A98F99D3 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1363,24 +1411,6 @@
 			productName = "Fareye-tvOS";
 			productReference = 2D02E47B1E0B4A5D006451C7 /* Fareye-tvOS.app */;
 			productType = "com.apple.product-type.application";
-		};
-		2D02E48F1E0B4A5D006451C7 /* Fareye-tvOSTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "Fareye-tvOSTests" */;
-			buildPhases = (
-				2D02E48C1E0B4A5D006451C7 /* Sources */,
-				2D02E48D1E0B4A5D006451C7 /* Frameworks */,
-				2D02E48E1E0B4A5D006451C7 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2D02E4921E0B4A5D006451C7 /* PBXTargetDependency */,
-			);
-			name = "Fareye-tvOSTests";
-			productName = "Fareye-tvOSTests";
-			productReference = 2D02E4901E0B4A5D006451C7 /* Fareye-tvOSTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -1402,18 +1432,13 @@
 								enabled = true;
 							};
 							com.apple.Push = {
-								enabled = 0;
+								enabled = 1;
 							};
 						};
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
 						ProvisioningStyle = Automatic;
-					};
-					2D02E48F1E0B4A5D006451C7 = {
-						CreatedOnToolsVersion = 8.2.1;
-						ProvisioningStyle = Automatic;
-						TestTargetID = 2D02E47A1E0B4A5D006451C7;
 					};
 				};
 			};
@@ -1460,6 +1485,10 @@
 				{
 					ProductGroup = 1CED3D55206247B60051F1A5 /* Products */;
 					ProjectRef = 56A8F83B0E214EFFA2A1EFBB /* RCTBluetoothSerial.xcodeproj */;
+				},
+				{
+					ProductGroup = 1C637E2E20A1BC0F0079811A /* Products */;
+					ProjectRef = 0F6270E5FD594D53AB9D1F0E /* RCTBluetoothSerial.xcodeproj */;
 				},
 				{
 					ProductGroup = 00C302B61ABCB90400DB3ED1 /* Products */;
@@ -1542,6 +1571,10 @@
 					ProjectRef = 0CD786D383FF43BE853A9EEA /* RNFetchBlob.xcodeproj */;
 				},
 				{
+					ProductGroup = 1CB2E55320A1CB3A00FAE260 /* Products */;
+					ProjectRef = A27965CEE8524DC886257AD9 /* RNFIRMessaging.xcodeproj */;
+				},
+				{
 					ProductGroup = 2F9F835F1F275F62008C9252 /* Products */;
 					ProjectRef = EE13725ADBF9427B9D77CE4E /* RNFS.xcodeproj */;
 				},
@@ -1583,7 +1616,6 @@
 				13B07F861A680F5B00A75B9A /* Fareye */,
 				00E356ED1AD99517003FC87E /* FareyeTests */,
 				2D02E47A1E0B4A5D006451C7 /* Fareye-tvOS */,
-				2D02E48F1E0B4A5D006451C7 /* Fareye-tvOSTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1729,6 +1761,13 @@
 			remoteRef = 1C6278631FCE9E5D005E7F6E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		1C637E3620A1BC0F0079811A /* libRCTBluetoothSerial.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTBluetoothSerial.a;
+			remoteRef = 1C637E3520A1BC0F0079811A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		1C89743B1F5B212C004418DD /* libCodePush.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1862,6 +1901,13 @@
 			remoteRef = 1CA3AFDD1F6697DE00057D5E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		1CB2E59420A1CB3A00FAE260 /* libRNFIRMessaging.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFIRMessaging.a;
+			remoteRef = 1CB2E59320A1CB3A00FAE260 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		1CD971A2208772230098C6FD /* libRNImagePicker.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1944,13 +1990,6 @@
 			fileType = archive.ar;
 			path = libRNBackgroundGeolocation.a;
 			remoteRef = 2F05F4671F1E270800B7C50B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		2F05F46A1F1E270800B7C50B /* RNBackgroundGeolocationTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = RNBackgroundGeolocationTests.xctest;
-			remoteRef = 2F05F4691F1E270800B7C50B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		2F05F4841F1E270800B7C50B /* libCocoaLumberjack.a */ = {
@@ -2144,13 +2183,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2D02E48E1E0B4A5D006451C7 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -2168,6 +2200,39 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
+		103F02EDD65BD5845713AE1F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Fareye/Pods-Fareye-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		14C6445F76A36F4968180731 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Fareye-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2181,6 +2246,117 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/packager/react-native-xcode.sh";
+		};
+		3D9D53F54A1405A3F8F887BA /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Fareye/Pods-Fareye-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4EEB9E2FD20DFD6F75F3ABD1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-FareyeTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		58AD7F7ED5687B5A6CFB5988 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Fareye-tvOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5CEA2D91521473B90C00CFD0 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Fareye-tvOS/Pods-Fareye-tvOS-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		84EF852D0620CA93A98F99D3 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Fareye-tvOS/Pods-Fareye-tvOS-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A151A1C5B0EE65F118E87174 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FareyeTests/Pods-FareyeTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CB96CD3D0A44F85D5E97AA2F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FareyeTests/Pods-FareyeTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2212,14 +2388,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2D02E48C1E0B4A5D006451C7 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				2DCD954D1E0B4F2C00145EB5 /* FareyeTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2227,11 +2395,6 @@
 			isa = PBXTargetDependency;
 			target = 13B07F861A680F5B00A75B9A /* Fareye */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
-		};
-		2D02E4921E0B4A5D006451C7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2D02E47A1E0B4A5D006451C7 /* Fareye-tvOS */;
-			targetProxy = 1C8974371F5B212C004418DD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2250,6 +2413,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D55BAB1FF0149E9B5CC34BF9 /* Pods-FareyeTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2288,6 +2452,8 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
+					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 				);
 				INFOPLIST_FILE = FareyeTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2317,6 +2483,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 91EA5FA5FE59F236A3CD1FF4 /* Pods-FareyeTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -2352,6 +2519,8 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
+					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 				);
 				INFOPLIST_FILE = FareyeTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2381,15 +2550,19 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FC5262FDC7C1E084B98D9F02 /* Pods-Fareye.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Fareye/Fareye.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Gaurav Srivastava (V5RMU6PK5W)";
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = 484RJ94GY3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
 					"$(PROJECT_DIR)/../node_modules/react-native-background-geolocation/**",
 					"$(PROJECT_DIR)/../node_modules/react-native-background-geolocation/ios/**",
+					"$(inherited)/**",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2420,6 +2593,8 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
+					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 				);
 				INFOPLIST_FILE = Fareye/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2431,7 +2606,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.roboticwares.fareye;
 				PRODUCT_NAME = Fareye;
-				PROVISIONING_PROFILE = "bd5753ec-d85f-4f7e-8ed3-4245c562997e";
+				PROVISIONING_PROFILE = "7642be6c-5d10-4b24-b619-da1886886c36";
+				PROVISIONING_PROFILE_SPECIFIER = "Development Provisioning Profile";
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -2439,8 +2615,10 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1590F3F2BE421DA2EC7F0069 /* Pods-Fareye.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Fareye/Fareye.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: ROBOTIC WARES PRIVATE LIMITED (484RJ94GY3)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ROBOTIC WARES PRIVATE LIMITED (484RJ94GY3)";
 				CURRENT_PROJECT_VERSION = 1;
@@ -2449,6 +2627,7 @@
 					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
 					"$(PROJECT_DIR)/../node_modules/react-native-background-geolocation/**",
 					"$(PROJECT_DIR)/../node_modules/react-native-background-geolocation/ios/**",
+					"$(inherited)/**",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2479,6 +2658,8 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
+					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 				);
 				INFOPLIST_FILE = Fareye/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2490,8 +2671,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.roboticwares.fareye;
 				PRODUCT_NAME = Fareye;
-				PROVISIONING_PROFILE = "d3d1af47-0e47-4585-8f70-952bf40b27b5";
-				PROVISIONING_PROFILE_SPECIFIER = "VPP Provision Profile";
+				PROVISIONING_PROFILE = "a18516ec-3b69-4d17-84e4-3635b20e2e0e";
+				PROVISIONING_PROFILE_SPECIFIER = "Distribution Provision Profile";
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -2499,6 +2680,7 @@
 		};
 		2D02E4971E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 15FFFCD1E49F39554CFF5935 /* Pods-Fareye-tvOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -2540,6 +2722,8 @@
 					"$(SRCROOT)/../node_modules/react-native-image-picker/ios",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
+					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 				);
 				INFOPLIST_FILE = "Fareye-tvOS/Info.plist";
@@ -2571,6 +2755,7 @@
 		};
 		2D02E4981E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9AE2979B3374830E2DF52299 /* Pods-Fareye-tvOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -2613,6 +2798,8 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
+					"$(SRCROOT)/../node_modules/react-native-bluetooth-serial/ios/RCTBluetoothSerial",
+					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 				);
 				INFOPLIST_FILE = "Fareye-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2641,74 +2828,6 @@
 			};
 			name = Release;
 		};
-		2D02E4991E0B4A5E006451C7 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_TESTABILITY = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Fareye-tvOSTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.Fareye-tvOSTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = appletvos;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fareye-tvOS.app/Fareye-tvOS";
-				TVOS_DEPLOYMENT_TARGET = 10.1;
-			};
-			name = Debug;
-		};
-		2D02E49A1E0B4A5E006451C7 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Fareye-tvOSTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.Fareye-tvOSTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = appletvos;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fareye-tvOS.app/Fareye-tvOS";
-				TVOS_DEPLOYMENT_TARGET = 10.1;
-			};
-			name = Release;
-		};
 		83CBBA201A601CBA00E9B192 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2732,6 +2851,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -2778,6 +2898,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -2820,15 +2941,6 @@
 			buildConfigurations = (
 				2D02E4971E0B4A5E006451C7 /* Debug */,
 				2D02E4981E0B4A5E006451C7 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "Fareye-tvOSTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2D02E4991E0B4A5E006451C7 /* Debug */,
-				2D02E49A1E0B4A5E006451C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -684,6 +684,14 @@ class Sync {
       newJobTransactionsIds
     }
   }
+
+  sendRegistrationTokenToServer(token,fcmToken,topic){
+    let url = CONFIG.API.FCM_TOKEN_REGISTRATON +'?topic='+topic
+    console.logs('url',url)
+    const postData = {token}
+    let response = RestAPIFactory(token.value).serviceCall(postData, url, 'POST')
+    console.log('response',response)
+  }
 }
 
 export let sync = new Sync()

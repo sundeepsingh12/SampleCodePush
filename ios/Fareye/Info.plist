@@ -35,8 +35,6 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Fareye needs access to your bluetooth</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Fareye needs access to your camera</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
