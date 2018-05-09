@@ -6,7 +6,7 @@ var InitialState = Record({
     skuListingLoading: false,
     skuListItems: {},
     skuSearchTerm: '',
-    isSearchBarVisible: false,
+    isSearchBarVisible: null,
     skuObjectValidation: {},
     skuChildItems: {},
     skuObjectAttributeId: '',
