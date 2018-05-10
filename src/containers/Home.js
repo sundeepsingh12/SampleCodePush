@@ -69,7 +69,6 @@ class Home extends PureComponent {
   }
 
   getPageView(page) {
-    console.logs('getPageView color',styles.primaryColor)
     return (
       <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
         <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon,{backgroundColor: styles.primaryColor}]} />

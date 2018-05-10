@@ -20,7 +20,8 @@ import {
     CAMERA,
     CAMERA_HIGH,
     CAMERA_MEDIUM,
-    SIGNATURE_AND_FEEDBACK
+    SIGNATURE_AND_FEEDBACK,
+    SKU_PHOTO
 } from '../lib/AttributeConstants'
 import {
     IMAGE_LOADING_ERROR,
@@ -66,7 +67,7 @@ export default class NonExpandableDetailsView extends PureComponent {
                         </Text>)}
                     {renderIf(this.props.attributeTypeId == COUNT_DOWN_TIMER,
                         <CountDownTimer value={this.props.value} />)}
-                    {renderIf(this.props.attributeTypeId == CAMERA || this.props.attributeTypeId == CAMERA_HIGH || this.props.attributeTypeId == CAMERA_MEDIUM || this.props.attributeTypeId == SIGNATURE,
+                    {renderIf(this.props.attributeTypeId == CAMERA || this.props.attributeTypeId == CAMERA_HIGH || this.props.attributeTypeId == CAMERA_MEDIUM || this.props.attributeTypeId == SIGNATURE || this.props.attributeTypeId == SKU_PHOTO,
                         <Text style={[styles.fontDefault, {color : styles.fontPrimaryColor}, styles.textUnderline]}
                             onPress={() => this.props.navigateToCameraDetails({
                                 value: this.props.value,
@@ -74,7 +75,7 @@ export default class NonExpandableDetailsView extends PureComponent {
                             Tap to View
                         </Text>)}
                     {renderIf(this.props.attributeTypeId != IMAGE_URL && this.props.attributeTypeId != COUNT_DOWN_TIMER && this.props.attributeTypeId != DATA_STORE &&
-                        this.props.attributeTypeId != CAMERA && this.props.attributeTypeId != CAMERA_HIGH && this.props.attributeTypeId != CAMERA_MEDIUM && this.props.attributeTypeId != SIGNATURE,
+                        this.props.attributeTypeId != CAMERA && this.props.attributeTypeId != CAMERA_HIGH && this.props.attributeTypeId != CAMERA_MEDIUM && this.props.attributeTypeId != SIGNATURE && this.props.attributeTypeId != SKU_PHOTO,
                         <Text style={[styles.fontDefault, styles.fontBlack]}>
                             {this.props.value}
                         </Text>)}
