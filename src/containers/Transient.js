@@ -111,7 +111,7 @@ class Transient extends PureComponent {
         }
         return (
             <Container>
-                <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
                     <Body>
                         <View
                             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -131,7 +131,7 @@ class Transient extends PureComponent {
 
                 <Content style={[styles.bgWhite]}>
                     <View style={[styles.flexBasis25]}>
-                        <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>{Select_Next_Status}</Text>
+                        <Text style={[styles.fontSm, {color : styles.fontPrimaryColor}, styles.padding15]}>{Select_Next_Status}</Text>
                         <List style={[styles.flex1]}>
                             <FlatList
                                 data={this.props.navigation.state.params.currentStatus.nextStatusList}

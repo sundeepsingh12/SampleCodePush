@@ -14,7 +14,7 @@ class SignatureRemarks extends PureComponent {
     renderData = (item) => {
         return (
             <View style={{borderBottomColor: '#f3f3f3', borderBottomWidth: 1}}>
-                <Text style={[styles.fontPrimary]}>{item.label}</Text>
+                <Text style={{color : styles.fontPrimaryColor}}>{item.label}</Text>
                 <Text style={[styles.fontDefault, styles.fontBlack]}>{item.value}</Text>
             </View>
         )

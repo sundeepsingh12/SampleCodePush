@@ -112,7 +112,7 @@ class Menu extends PureComponent {
         <View style={[styles.bgWhite, styles.borderBottomGray]}>
           <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
             <View style={[style.listIcon, styles.marginTop15, styles.justifyCenter, styles.alignCenter]}>
-              <MaterialIcons name={page.icon} style={[styles.fontPrimary, styles.fontLg]} />
+              <MaterialIcons name={page.icon} style={[{color: styles.fontPrimaryColor}, styles.fontLg]} />
             </View>
             <View style={[styles.justifySpaceBetween, styles.marginLeft10, styles.flex1]}>
               <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter, { borderBottomColor: '#f3f3f3' }]}>
@@ -183,7 +183,7 @@ class Menu extends PureComponent {
             <View style={[styles.justifySpaceBetween, styles.flex1]}>
               <View style={[styles.row, styles.paddingRight10, styles.paddingTop15, styles.paddingBottom15, styles.justifySpaceBetween, styles.alignCenter]}>
                 <Text style={[styles.fontDefault]}> {LOGOUT} </Text>
-                <Icon name="ios-log-in" style={[styles.fontLg, styles.fontPrimary]} />
+                <Icon name="ios-log-in" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
               </View>
             </View>
           </View>

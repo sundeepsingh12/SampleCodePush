@@ -53,7 +53,7 @@ export default class DataStoreItemDetails extends PureComponent {
                 animationType="slide"
                 onRequestClose={() => { this.props.goBack(-1, null, true) }}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
@@ -78,7 +78,7 @@ export default class DataStoreItemDetails extends PureComponent {
                     </Content>
                     <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                         <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
-                            <Button success full style={styles.bgPrimary}
+                            <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
                                 onPress={() => {
                                     this.props.onSave(this.props.selectedElement.dataStoreAttributeValueMap, this.props.selectedElement.dataStoreAttributeValueMap[this.props.selectedElement.uniqueKey])
                                 }}>

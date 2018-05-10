@@ -120,8 +120,8 @@ class TabScreen extends PureComponent {
         renderTabList.push(
           <Tab
             key={tabs[index].id}
-            tabStyle={[styles.bgPrimary]}
-            activeTabStyle={[styles.bgPrimary]}
+            tabStyle={{backgroundColor : styles.bgPrimaryColor}}
+            activeTabStyle={{backgroundColor : styles.bgPrimaryColor}}
             textStyle={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14 }}
             activeTextStyle={[styles.fontWhite, styles.fontDefault]}
             heading={tabs[index].name}>
@@ -190,7 +190,7 @@ class TabScreen extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])} hasTabs>
+          <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])} hasTabs>
             <Body>
               <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -208,7 +208,7 @@ class TabScreen extends PureComponent {
           </Header>
           {this.props.syncLoadingInTaskList ? <SyncLoader moduleLoading = {this.props.syncLoadingInTaskList}/> : null}
           <Tabs
-            tabBarBackgroundColor={styles.bgPrimary.backgroundColor}
+            tabBarBackgroundColor={styles.bgPrimaryColor}
             initialPage={landingValue}
             tabBarUnderlineStyle={[styles.bgWhite]}
             renderTabBar={() => <ScrollableTab />}>

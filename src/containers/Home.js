@@ -71,7 +71,7 @@ class Home extends PureComponent {
   getPageView(page) {
     return (
       <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
-        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon]} />
+        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon,{backgroundColor: styles.primaryColor}]} />
         <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
         <Right><Icon name="ios-arrow-forward" /></Right>
       </ListItem>
@@ -165,7 +165,6 @@ const style = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d6d7da',
     padding: 5,
-    backgroundColor: styles.primaryColor
   }
 });
 

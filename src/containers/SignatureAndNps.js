@@ -125,7 +125,7 @@ class SignatureAndNps extends PureComponent {
         </Header>
     }
     saveSignButton() {
-        return <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
+        return <TouchableOpacity style={[style.fabButton, {backgroundColor : styles.bgPrimaryColor}]}
             onPress={this.saveSign} >
             <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
         </TouchableOpacity>
