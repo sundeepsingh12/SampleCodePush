@@ -1,5 +1,5 @@
 
-var themeColor = '#F7F8FA'
+var themeColor = '#00796B'
 export default {
     primaryColor: themeColor,
     bgPrimaryColor : themeColor,
