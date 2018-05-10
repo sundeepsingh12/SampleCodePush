@@ -10,7 +10,7 @@ import styles from '../themes/FeStyle'
 class TitleHeader extends PureComponent {
     render() {
         return (
-            <Header style={StyleSheet.flatten([styles.bgPrimary])}>
+            <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}])}>
                 <Left style={StyleSheet.flatten([styles.flexBasis15])}>
                     <Button transparent onPress={() => { }}>
                         <Icon name='arrow-back' style={StyleSheet.flatten([styles.fontXl, styles.fontWhite])} />

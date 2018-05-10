@@ -58,7 +58,7 @@ class SkuListItem extends PureComponent {
 
     _getViewOfHeader(rowItem, originalQuantityValue) {
         if (rowItem.attributeTypeId == SKU_PHOTO) {
-            return <Icon name="ios-camera" style={[styles.flexBasis50, styles.fontDefault, styles.fontXxl, styles.marginTop15, styles.fontPrimary]} />
+            return <Icon name="ios-camera" style={[styles.flexBasis50, styles.fontDefault, styles.fontXxl, styles.marginTop15, {color : styles.fontPrimaryColor}]} />
         } else if (!(rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY && originalQuantityValue > 1 && originalQuantityValue <= 1000)) {
             return <View style={[styles.flexBasis50, styles.column, styles.justifyCenter, { height: 60 }]}>
                 <Text style={[styles.fontSm]}>
@@ -135,7 +135,7 @@ class SkuListItem extends PureComponent {
         } else if (!_.isNull(rowItem.value) && rowItem.attributeTypeId == SKU_PHOTO) {
             return (
                 <View style={[styles.row, styles.flexBasis50, styles.alignCenter, styles.marginTop15]}>
-                    <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, styles.fontPrimary]}
+                    <Text style={[styles.fontDefault, styles.padding10, styles.paddingLeft0, {color : styles.fontPrimaryColor}]}
                         onPress={() => { this.props.navigateToScene('CameraAttribute', { currentElement: rowItem, changeSkuActualQuantity: this.changeSkuActualQuantity.bind(this) }) }}>
                         {OPEN_CAMERA}
                     </Text>
@@ -147,7 +147,7 @@ class SkuListItem extends PureComponent {
             if (originalQuantityValue <= 1) {
                 quantitySelector =
                     <View style={[styles.paddingTop20]}>
-                        <CheckBox color={styles.bgPrimary.backgroundColor} style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
+                        <CheckBox color={ styles.bgPrimaryColor } style={[style.cardCheckbox]} checked={rowItem.value != 0} onPress={() => this.changeQuantityForCheckBox(rowItem, rowItem.value)} />
                     </View>
             }
             else if (originalQuantityValue > 1 && originalQuantityValue <= 1000) {

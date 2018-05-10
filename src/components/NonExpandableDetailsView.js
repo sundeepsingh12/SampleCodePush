@@ -48,15 +48,15 @@ export default class NonExpandableDetailsView extends PureComponent {
                     {renderIf(this.props.attributeTypeId == IMAGE_URL,
                         <TouchableOpacity onPress={() => this._openURL(this.props.value)}>
                             <View style={[styles.row]}>
-                                <Icon name={'ios-image'} style={StyleSheet.flatten([styles.alignSelfEnd, styles.fontBlack, styles.fontXl, styles.fontPrimary])} />
-                                <Text style={StyleSheet.flatten([styles.fontSm, styles.paddingLeft5, styles.fontPrimary])}>
+                                <Icon name={'ios-image'} style={StyleSheet.flatten([styles.alignSelfEnd, styles.fontBlack, styles.fontXl, {color : styles.fontPrimaryColor}])} />
+                                <Text style={StyleSheet.flatten([styles.fontSm, styles.paddingLeft5, {color : styles.fontPrimaryColor}])}>
                                     {VIEW_TEXT_LABEL}
                                 </Text>
                             </View>
                         </TouchableOpacity>)}
 
                     {renderIf(this.props.attributeTypeId == DATA_STORE,
-                        <Text style={[styles.fontDefault, styles.fontPrimary, styles.textUnderline]}
+                        <Text style={[styles.fontDefault, {color : styles.fontPrimaryColor}, styles.textUnderline]}
                             onPress={() => this.props.navigateToDataStoreDetails({
                                 value: this.props.value,
                                 fieldAttributeMasterId: this.props.fieldAttributeMasterId,
@@ -67,7 +67,7 @@ export default class NonExpandableDetailsView extends PureComponent {
                     {renderIf(this.props.attributeTypeId == COUNT_DOWN_TIMER,
                         <CountDownTimer value={this.props.value} />)}
                     {renderIf(this.props.attributeTypeId == CAMERA || this.props.attributeTypeId == CAMERA_HIGH || this.props.attributeTypeId == CAMERA_MEDIUM || this.props.attributeTypeId == SIGNATURE,
-                        <Text style={[styles.fontDefault, styles.fontPrimary, styles.textUnderline]}
+                        <Text style={[styles.fontDefault, {color : styles.fontPrimaryColor}, styles.textUnderline]}
                             onPress={() => this.props.navigateToCameraDetails({
                                 value: this.props.value,
                             })}>

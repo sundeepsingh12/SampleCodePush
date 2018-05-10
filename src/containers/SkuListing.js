@@ -98,7 +98,7 @@ class SkuListing extends PureComponent {
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
               <Body>
                 <View
                   style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom5, styles.marginTop15]}>

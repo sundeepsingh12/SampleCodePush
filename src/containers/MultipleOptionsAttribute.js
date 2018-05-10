@@ -225,7 +225,7 @@ class MultipleOptionsAttribute extends PureComponent {
                                         this.props.advanceDropdownMessageObject
                                     )
                                 }}>
-                                <Text style={[styles.fontPrimary, styles.padding10]}> {DONE} </Text>
+                                <Text style={[{color : styles.fontPrimaryColor}, styles.padding10]}> {DONE} </Text>
                             </TouchableHighlight>
                         </View>
                     </View>
@@ -304,7 +304,7 @@ class MultipleOptionsAttribute extends PureComponent {
                                                     this.props.rowId,
                                                 )
                                             }}>
-                                            <Text style={[styles.fontPrimary, styles.padding10]}> {DONE} </Text>
+                                            <Text style={[{color : styles.fontPrimaryColor}, styles.padding10]}> {DONE} </Text>
                                         </TouchableHighlight> : null
                                     }
                                 </View>

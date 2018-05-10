@@ -40,7 +40,7 @@ export default class TaskListCalender extends PureComponent {
                     <Button transparent
                         onPress={this.props._transactionsForTodayDate}
                         style={[styles.alignStart]}>
-                        <Text style={[styles.fontPrimary, styles.fontSm]}>{TODAY}</Text>
+                        <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{TODAY}</Text>
                     </Button>
                 </FooterTab>
                 <FooterTab style={[styles.flexBasis50]}>
@@ -62,7 +62,7 @@ export default class TaskListCalender extends PureComponent {
                     <Button transparent
                         onPress={this.props._showAllJobTransactions}
                         style={[styles.alignEnd]}>
-                        <Text style={[styles.fontPrimary, styles.fontSm]}>{ALL}</Text>
+                        <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{ALL}</Text>
                     </Button>
                 </FooterTab>
             </Footer>

@@ -62,7 +62,7 @@ class ProfileView extends PureComponent {
   }
 
   _getHeaderView() {
-    return <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+    return <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
       <Body>
         <View
           style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -83,7 +83,7 @@ class ProfileView extends PureComponent {
   _getResetPasswordView() {
     return <View style={[styles.bgWhite, styles.padding20, { borderBottomWidth: 25, borderBottomColor: '#f3f3f3' }]}>
       <View style={[styles.alignStart, styles.justifyCenter, styles.row, styles.paddingLeft10]}>
-        <View style={[styles.alignCenter, styles.justifyCenter, styles.profilePic, styles.bgPrimary]}>
+        <View style={[styles.alignCenter, styles.justifyCenter, styles.profilePic,{backgroundColor : styles.bgPrimaryColor}]}>
           <Icon name="md-person" style={[styles.alignStart, styles.justifyCenter, styles.fontWhite, styles.fontXxxl, styles.fontLeft]} />
         </View>
       </View>
@@ -91,7 +91,7 @@ class ProfileView extends PureComponent {
         <Text style={[styles.fontLg, styles.fontBlack]}>
           {this.props.name}
         </Text>
-        <Text style={[styles.fontLg, styles.fontPrimary, styles.fontWeight500, styles.marginTop10]} onPress={this._onResetButtonPress}>
+        <Text style={[styles.fontLg, {color : styles.fontPrimaryColor}, styles.fontWeight500, styles.marginTop10]} onPress={this._onResetButtonPress}>
           {RESET_PASSWORD}
         </Text>
       </View>
