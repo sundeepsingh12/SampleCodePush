@@ -1,13 +1,7 @@
 
-import {
-    sequenceService
-} from '../../services/classes/Sequence'
-import {
-    runSheetService
-} from '../../services/classes/RunSheet'
-import {
-    keyValueDBService
-} from '../../services/classes/KeyValueDBService'
+import { sequenceService } from '../../services/classes/Sequence'
+import { runSheetService } from '../../services/classes/RunSheet'
+import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import {
     SEQUENCE_LIST_FETCHING_START,
     SEQUENCE_LIST_FETCHING_STOP,
@@ -29,11 +23,10 @@ import {
     INVALID_SCAN,
     JOB_NOT_PRESENT
 } from '../../lib/ContainerConstants'
-import {
-    setState, navigateToScene, showToastAndAddUserExceptionLog
-} from '../global/globalActions'
+import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import _ from 'lodash'
+import { fetchJobs } from '../taskList/taskListActions';
 
 /**
  * @param {*} runsheetNumber 
@@ -172,6 +165,7 @@ export function saveSequencedJobTransactions(transactionsWithChangedSeqeunceMap)
             dispatch(setState(SEQUENCE_LIST_FETCHING_START))
             //update jobTransaction in DB and set start module so as if it get open it will reload
             await sequenceService.updateJobTrasaction(transactionsWithChangedSeqeunceMap)
+            dispatch(fetchJobs())
             dispatch(setState(CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP, SAVE_SUCCESSFUL))//clear transactionsWithChangedSeqeunceMap to empty
         } catch (error) {
             showToastAndAddUserExceptionLog(2605, error.message, null, 0)

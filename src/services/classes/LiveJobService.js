@@ -1,28 +1,41 @@
 'use strict'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import {
-    TABLE_JOB,
-    TABLE_JOB_DATA
-} from '../../lib/constants'
+import { TABLE_JOB, TABLE_JOB_DATA } from '../../lib/constants'
 import { jobTransactionService } from './JobTransaction'
-import {
-    transactionCustomizationService
-} from './TransactionCustomization'
+import { transactionCustomizationService } from './TransactionCustomization'
 import * as realm from '../../repositories/realmdb'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import CONFIG from '../../lib/config'
 import moment from 'moment'
 import _ from 'lodash'
+import { jobService } from './Job';
+import { jobDataService } from './JobData';
 class LiveJobService {
+
     async getLiveJobList() {
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        const {jobTransactionCustomizationList} = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'LiveJob', null)
+        let jobTransactionCustomizationList = this.getLiveJobAndJobDataList(jobTransactionCustomizationListParametersDTO)
         const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id')
-        const liveJobsWithValidTime = await this.checkJobExpiry(idJobTransactionCustomizationListMap)
+        const liveJobsWithValidTime = this.checkJobExpiry(idJobTransactionCustomizationListMap)
         return liveJobsWithValidTime
     }
-    async checkJobExpiry(liveJobMap) {
-        if (!liveJobMap || _.isEmpty(liveJobMap)) return {}
+
+    getLiveJobAndJobDataList(jobTransactionCustomizationListParametersDTO) {
+        let jobTransactionCustomizationListParametersMaps = jobTransactionService.prepareMapsForTransactionCustomizationList(jobTransactionCustomizationListParametersDTO);
+        let jobQuery = 'status = 6';
+        let jobsList = realm.getRecordListOnQuery(TABLE_JOB, jobQuery);
+        let jobMapAndJobDataQuery = jobService.getJobMapAndJobDataQuery(jobsList);
+        let jobDataList = realm.getRecordListOnQuery(TABLE_JOB_DATA, jobMapAndJobDataQuery.jobDataQuery);
+        let jobDataDetailsForListing = jobDataService.getJobDataDetailsForListing(jobDataList, jobTransactionCustomizationListParametersMaps.jobAttributeMasterMap);
+        let jobTransactionDTO = { jobTransactionMap: jobMapAndJobDataQuery.jobMap, jobMap: jobMapAndJobDataQuery.jobMap, jobDataDetailsForListing, fieldDataMap: {} }
+        let jobTransactionCustomizationList = jobTransactionService.prepareJobCustomizationList(jobTransactionDTO, jobTransactionCustomizationListParametersDTO.jobMasterIdCustomizationMap, jobTransactionCustomizationListParametersMaps, {})
+        return jobTransactionCustomizationList
+    }
+
+    checkJobExpiry(liveJobMap) {
+        if (!liveJobMap || _.isEmpty(liveJobMap)) {
+            return {}
+        }
         let expiredJobIds = []
         let liveJobList = Object.values(liveJobMap)
         for (let job of liveJobList) {
@@ -33,11 +46,12 @@ class LiveJobService {
             }
         }
         if (expiredJobIds.length > 0) {
-            return await this.deleteJob(expiredJobIds, liveJobMap)
+            return this.deleteJob(expiredJobIds, liveJobMap)
         } else {
             return liveJobMap
         }
     }
+
     async requestServerForApproval(status, token, job, liveJobList) {
         let postJson = "{\"jobId\":\"" + job.id + "\",\"jobDate\":\"" + job.jobStartTime + "\",\"statusId\":\"" + status + "\"}"
         try {
@@ -46,7 +60,7 @@ class LiveJobService {
             if (serviceAlertResponse && serviceAlertResponse.status == 200) {
                 let jobIdList = []
                 jobIdList.push(job.id)
-                newLiveJobList = await this.deleteJob(jobIdList, liveJobList)
+                newLiveJobList = this.deleteJob(jobIdList, liveJobList)
                 let statusMessage = serviceAlertResponse._bodyText
                 if (statusMessage == 'success') {
                     toastMessage = 'Your request has been accepted'
@@ -64,10 +78,11 @@ class LiveJobService {
         }
     }
     getSelectedJobIds(jobs) {
-        const selectedTransactionIds = _.filter(jobs, job => job.jobTransactionCustomization.isChecked == true).map(job => job.id)
+        const selectedTransactionIds = _.filter(jobs, job => job.isChecked == true).map(job => job.id)
         return selectedTransactionIds
     }
-    async deleteJob(jobIdList, liveJobList) {
+
+    deleteJob(jobIdList, liveJobList) {
         const jobDatas = {
             tableName: TABLE_JOB_DATA,
             valueList: jobIdList,
@@ -78,8 +93,8 @@ class LiveJobService {
             valueList: jobIdList,
             propertyName: 'id'
         }
-        await realm.deleteRecordsInBatch(jobDatas, jobs)
-        let newLiveJobList = await JSON.parse(JSON.stringify(liveJobList))
+        realm.deleteRecordsInBatch(jobDatas, jobs)
+        let newLiveJobList = JSON.parse(JSON.stringify(liveJobList))
         for (let id of jobIdList) {
             delete newLiveJobList[id]
         }
@@ -105,7 +120,7 @@ class LiveJobService {
                 } else {
                     toastMessage = successCount + ' jobs were accepted and ' + failCount + ' jobs were rejected.'
                 }
-                newLiveJobList = await this.deleteJob(selectedItems, liveJobList)
+                newLiveJobList = this.deleteJob(selectedItems, liveJobList)
                 return { newLiveJobList, toastMessage }
             } else {
                 toastMessage = 'Something went wrong,try again'

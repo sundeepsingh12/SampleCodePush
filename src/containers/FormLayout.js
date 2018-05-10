@@ -171,6 +171,10 @@ class FormLayout extends PureComponent {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
+      let taskListScreenDetails = {
+        jobDetailsScreenKey : this.props.navigation.state.params.jobDetailsScreenKey,
+        pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
+      }
       this.props.actions.saveJobTransaction(
         formLayoutState,
         this.props.navigation.state.params.jobMasterId,
@@ -178,7 +182,8 @@ class FormLayout extends PureComponent {
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
-        this.props.pieChart
+        this.props.pieChart,
+        taskListScreenDetails
       )
     }
   }

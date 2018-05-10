@@ -10,7 +10,9 @@ var InitialState = Record({
     selectedDate: null,
     isCalendarVisible: false,
     searchText: {},
-    syncLoadingInTaskList: false
+    landingTabId: null,
+    tabsLoading: false,
+    syncLoadingInTaskList: false,
 })
 
 export default InitialState

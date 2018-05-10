@@ -127,8 +127,6 @@ class Home extends PureComponent {
     return null
   }
 
-
-
   render() {
     const pieChartView = this.pieChartView()
     if (this.props.pagesLoading) {
