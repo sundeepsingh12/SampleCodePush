@@ -38,8 +38,9 @@ class Bulk {
     async getJobListingForBulk(bulkParamas) {
         const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters();
         let queryDTO = {};
+        let jobMaster = jobTransactionCustomizationListParametersDTO.jobMasterList.filter(jobmaster => jobmaster.id == bulkParamas.pageObject.jobMasterIds[0])[0];
         queryDTO.jobTransactionQuery = `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND jobStatusId = ${bulkParamas.pageObject.additionalParams.statusId} AND jobId > 0`;
-        queryDTO.jobQuery = bulkParamas.pageObject.groupId ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = "${bulkParamas.pageObject.groupId}"` : `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = null`;
+        queryDTO.jobQuery = bulkParamas.pageObject.groupId ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = "${bulkParamas.pageObject.groupId}"` : jobMaster.enableMultipartAssignment ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = null` : `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]}`;
         let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO)
         const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id');
         return idJobTransactionCustomizationListMap;

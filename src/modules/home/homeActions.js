@@ -199,7 +199,7 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }));
+          dispatch(navigateToScene(LiveJobs, { pageObject }));
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -427,9 +427,9 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
           }
           dispatch(fetchJobs())
         }
-        if (isLiveJob) {
-          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
-        }
+        // if (isLiveJob) {
+        //   dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
+        // }
       }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],

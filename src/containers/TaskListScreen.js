@@ -37,14 +37,19 @@ class TaskListScreen extends PureComponent {
     if (_.isEmpty(this.props.jobTransactionCustomizationList)) {
       this.props.actions.fetchJobs()
     }
+  } 
+
+  componentWillUnmount(){
+    this.props.actions.setState(LISTING_SEARCH_VALUE,{})
   }
 
-  navigateToScene = (item, isGroup) => {
+  navigateToScene = (item) => {
+    let countOfGroup = this.props.jobTransactionCustomizationList.filter(jobTransaction => jobTransaction.groupId == item.groupId).length;
     this.props.actions.navigateToScene(JobDetailsV2,
       {
         jobSwipableDetails: item.jobSwipableDetails,
         jobTransaction: item,
-        groupId: isGroup ? item.groupId : null,
+        groupId: item.groupId == 'nullGroup' || countOfGroup < 2 ? null : item.groupId,
         pageObjectAdditionalParams: this.props.pageObject.additionalParams
       }
     )
@@ -63,7 +68,7 @@ class TaskListScreen extends PureComponent {
       <JobListItem
         data={item}
         showIconsInJobListing={true}
-        onPressItem={() => { this.navigateToScene(item, lastId) }}
+        onPressItem={() => { this.navigateToScene(item) }}
         lastId={lastId}
       />
     )
@@ -111,7 +116,7 @@ class TaskListScreen extends PureComponent {
   getTransactionView(jobMasterMap) {
     let tabJobTransactionList = {}, jobTransactionList = this.renderJobTransactionView(this.props.jobTransactionCustomizationList), searchEqualTransactionList = [];
     for (let index in jobTransactionList) {
-      if (!jobMasterMap[jobTransactionList[index].jobMasterId] || !this.props.statusIdList.includes(jobTransactionList[index].statusId) || !this.checkTransactionForSearchText(jobTransactionList[index], searchEqualTransactionList)) {
+      if (!jobMasterMap[jobTransactionList[index].jobMasterId] || !this.checkTransactionForSearchText(jobTransactionList[index], searchEqualTransactionList) || !this.props.statusIdList.includes(jobTransactionList[index].statusId)) {
         continue;
       } else if (!this.props.isFutureRunsheetEnabled) {
         this.prepareJobTrasactionListStructureForViewForNormalCase(tabJobTransactionList, jobTransactionList[index]);
@@ -227,7 +232,6 @@ class TaskListScreen extends PureComponent {
 
   render() {
     let jobMasterMap = _.mapKeys(JSON.parse(this.props.pageObject.jobMasterIds));
-    let jobMasterList = JSON.parse(this.props.pageObject.jobMasterIds); // to be removed
     let jobTransactionViewStructure = this.getTransactionView(jobMasterMap)
     let jobList = null;
     if (this.props.isRefreshing) {

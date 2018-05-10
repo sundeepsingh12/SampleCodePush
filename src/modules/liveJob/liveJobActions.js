@@ -65,29 +65,31 @@ export function acceptOrRejectJob(status, job, liveJobList) {
             if (serverResponse.toastMessage && serverResponse.toastMessage != '') {
                 dispatch(setState(SET_MESSAGE, serverResponse.toastMessage))
             }
-            if (status == 1) {
-                dispatch(NavigationActions.reset({
-                    index: 0,
-                    actions: [
-                        NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })
-                    ]
-                }))
-            } else if (status == 2 && _.isEmpty(serverResponse.newLiveJobList)) {
-                dispatch(NavigationActions.reset({
-                    index: 0,
-                    actions: [
-                        NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                    ]
-                }))
-            } else {
-                dispatch(NavigationActions.reset({
-                    index: 1,
-                    actions: [
-                        NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
-                        NavigationActions.navigate({ routeName: 'LiveJobs' })
-                    ]
-                }))
-            }
+            dispatch(fetchAllLiveJobsList())
+            dispatch(NavigationActions.back())
+            // if (status == 1) {
+            //     dispatch(NavigationActions.reset({
+            //         index: 0,
+            //         actions: [
+            //             NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })
+            //         ]
+            //     }))
+            // } else if (status == 2 && _.isEmpty(serverResponse.newLiveJobList)) {
+            //     dispatch(NavigationActions.reset({
+            //         index: 0,
+            //         actions: [
+            //             NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+            //         ]
+            //     }))
+            // } else {
+            //     dispatch(NavigationActions.reset({
+            //         index: 1,
+            //         actions: [
+            //             NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }),
+            //             NavigationActions.navigate({ routeName: 'LiveJobs' })
+            //         ]
+            //     }))
+            // }
 
         } catch (error) {
             showToastAndAddUserExceptionLog(1202, error.message, 'danger', 1)
@@ -131,29 +133,29 @@ export function acceptOrRejectMultiple(status, selectedItems, liveJobList) {
             let serverResponseForLive = await liveJobService.requestServerForApprovalForMultiple(status + '', selectedItems, liveJobList, token)
             dispatch(setState(SET_LIVE_JOB_LIST, serverResponseForLive.newLiveJobList))
             dispatch(setState(SET_LIVE_JOB_TOAST, serverResponseForLive.toastMessage))
-            if (status == 1) {
-                dispatch(NavigationActions.reset({
-                    index: 0,
-                    actions: [
-                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-                    ]
-                }))
-            } else if (status == 2 && _.isEmpty(serverResponseForLive.newLiveJobList)) {
-                dispatch(NavigationActions.reset({
-                    index: 0,
-                    actions: [
-                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-                    ]
-                }))
-            } else {
-                dispatch(NavigationActions.reset({
-                    index: 1,
-                    actions: [
-                        NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
-                        NavigationActions.navigate({ routeName: 'LiveJobs' })
-                    ]
-                }))
-            }
+            // if (status == 1) {
+            //     dispatch(NavigationActions.reset({
+            //         index: 0,
+            //         actions: [
+            //             NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+            //         ]
+            //     }))
+            // } else if (status == 2 && _.isEmpty(serverResponseForLive.newLiveJobList)) {
+            //     dispatch(NavigationActions.reset({
+            //         index: 0,
+            //         actions: [
+            //             NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+            //         ]
+            //     }))
+            // } else {
+            //     dispatch(NavigationActions.reset({
+            //         index: 1,
+            //         actions: [
+            //             NavigationActions.navigate({ routeName: 'HomeTabNavigatorScreen' }),
+            //             NavigationActions.navigate({ routeName: 'LiveJobs' })
+            //         ]
+            //     }))
+            // }
         } catch (error) {
             showToastAndAddUserExceptionLog(1205, error.message, 'danger', 1)
         }

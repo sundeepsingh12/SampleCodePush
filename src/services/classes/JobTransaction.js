@@ -335,7 +335,7 @@ class JobTransaction {
             jobTransactionCustomization.runsheetDate = runsheetMap[jobTransaction.runsheetId] ? runsheetMap[jobTransaction.runsheetId].startDate : null;
             jobTransactionCustomization.jobStartTime = job.jobStartTime;
             jobTransactionCustomization.jobEndTime = job.jobEndTime;
-            jobTransactionCustomization.isNextStatusPresent = jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0;
+            jobTransactionCustomization.isNextStatusPresent = jobTransaction.jobStatusId ? jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList && jobTransactionCustomizationListParametersMaps.jobStatusObject.statusIdStatusMap[jobTransaction.jobStatusId].nextStatusList.length > 0 : null; 
             jobTransactionCustomization.jobPriority = jobTransactionCustomizationListParametersMaps.jobMasterIdMap[jobMasterId].enableJobPriority ? job.jobPriority : 0;
             jobTransactionCustomizationList.push(jobTransactionCustomization);
         }
