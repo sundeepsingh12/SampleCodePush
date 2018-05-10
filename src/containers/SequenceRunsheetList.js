@@ -104,7 +104,7 @@ class SequenceRunsheetList extends Component {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                    <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -121,7 +121,7 @@ class SequenceRunsheetList extends Component {
                         </Body>
                     </Header>
                     <Content style={[styles.bgWhite]}>
-                        <Text style={[styles.fontSm, styles.fontPrimary, styles.padding15]}>{SELECT_RUNSHEET_NUMBER}</Text>
+                        <Text style={[styles.fontSm, {color : styles.fontPrimaryColor}, styles.padding15]}>{SELECT_RUNSHEET_NUMBER}</Text>
                         <List>
                             <FlatList
                                 data={(this.props.runsheetNumberList)}

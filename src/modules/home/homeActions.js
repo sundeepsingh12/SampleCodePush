@@ -52,7 +52,8 @@ import {
   OfflineDS,
   ProfileView,
   LOADER_FOR_SYNCING,
-  MDM_POLICIES
+  MDM_POLICIES,
+  APP_THEME
 } from '../../lib/constants'
 
 import {
@@ -113,9 +114,9 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
+import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster';
-import { PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB, UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
-
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -274,6 +275,14 @@ export function checkCustomErpPullActivated() {
     try {
       const user = await keyValueDBService.getValueFromStore(USER)
       const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
+      let appTheme = await keyValueDBService.getValueFromStore(APP_THEME);
+      if (appTheme && appTheme.value) {
+        feStyle.primaryColor = appTheme.value
+        feStyle.bgPrimaryColor = appTheme.value
+        feStyle.fontPrimaryColor = appTheme.value
+        feStyle.shadeColor = appTheme.value + '98'
+        feStyle.borderLeft4Color = appTheme.value
+      }
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
       showToastAndAddUserExceptionLog(2704, error.message, 'danger', 1)

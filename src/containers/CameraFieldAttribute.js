@@ -45,6 +45,9 @@ import {
     CAMERA_MEDIUM,
     SKU_PHOTO
 } from '../lib/AttributeConstants'
+import {
+    OPEN_CAMERA
+} from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -96,7 +99,7 @@ class CameraFieldAttribute extends PureComponent {
             }
         }
         this.setState({ torchOff: RNCamera.Constants.FlashMode.off })
-        if (item.value && item.value != '') {
+        if (item.value && item.value != '' && item.value != OPEN_CAMERA) {
             this.props.actions.setExistingImage(item)
         }
     }
@@ -246,7 +249,7 @@ class CameraFieldAttribute extends PureComponent {
     }
     render() {
         let item = this.props.navigation.state.params.currentElement
-        if (((item.value && item.value != '') || this.props.imageData ) && this.props.showImage) {
+        if (((item.value && item.value != '' && item.value != OPEN_CAMERA) || this.props.imageData ) && this.props.showImage) {
             return this.showImageView()
         } else {
             return this.imageCaptureView(this.props.validation)

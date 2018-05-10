@@ -107,7 +107,7 @@ class UnsyncBackupUpload extends Component {
                                 this.props.actions.navigateToScene('HomeTabNavigatorScreen')
                                 this.props.actions.resetFailCountInStore()
                             }}  >
-                            <Text style={[styles.fontPrimary, styles.fontXl]}>{CONTINUE}</Text>
+                            <Text style={[{color : styles.fontPrimaryColor}, styles.fontXl]}>{CONTINUE}</Text>
                         </Button>
                     </View>
                 </View>
@@ -147,7 +147,7 @@ class UnsyncBackupUpload extends Component {
                  </Text>
                     </View>
                     <View style={{ width: '100%', borderRadius: 8, height: 10, backgroundColor: styles.bgGray.backgroundColor }}>
-                        <View style={{ width: String(this.props.uploadingFileCount / this.props.unsyncBackupFilesList.length * 100 + "%"), borderRadius: 8, height: 10, backgroundColor: styles.bgPrimary.backgroundColor }}>
+                        <View style={{ width: String(this.props.uploadingFileCount / this.props.unsyncBackupFilesList.length * 100 + "%"), borderRadius: 8, height: 10, backgroundColor:  styles.bgPrimaryColor}}>
                         </View>
                     </View>
                 </View>

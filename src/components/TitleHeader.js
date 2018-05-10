@@ -10,7 +10,7 @@ import styles from '../themes/FeStyle'
 class TitleHeader extends PureComponent {
     render() {
         return (
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])} hasTabs>
+            <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])} hasTabs>
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween]}>

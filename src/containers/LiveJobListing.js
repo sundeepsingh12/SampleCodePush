@@ -169,7 +169,7 @@ class LiveJobListing extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -200,7 +200,7 @@ class LiveJobListing extends PureComponent {
     showListWithSearchBar() {
         let view
         if (!this.props.selectedItems || this.props.selectedItems.length == 0) {
-            view = <Header searchBar style={[styles.bgPrimary, style.header]}>
+            view = <Header searchBar style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -227,7 +227,7 @@ class LiveJobListing extends PureComponent {
     showMultipleSelectList() {
         let view
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
-            view = <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            view = <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
                 <Body>
                     <View style={[styles.column, { alignSelf: 'stretch' }]}>
                         <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>

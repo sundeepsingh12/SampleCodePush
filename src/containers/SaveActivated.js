@@ -304,7 +304,7 @@ class SaveActivated extends PureComponent {
             <StyleProvider style={getTheme(platform)}>
                 <Container>
 
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -344,8 +344,8 @@ class SaveActivated extends PureComponent {
 
                             <Button style={{ borderColor: '#338FFC', paddingLeft: 5, paddingRight: 5, height: 25 }} bordered small
                                 onPress={() => this.navigateToFormLayout(this.props.navigation.state.params.currentStatus.id, this.props.navigation.state.params.currentStatus.name)}>
-                                <Icon name="md-add" style={[styles.fontLg, styles.fontPrimary]} />
-                                <Text style={[styles.fontPrimary]}>Add</Text>
+                                <Icon name="md-add" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
+                                <Text style={{color : styles.fontPrimaryColor}}>Add</Text>
                             </Button>
                             <View>
                                 <Text style={[styles.fontCenter, styles.fontBlack, styles.fontDefault, styles.alignCenter]}>
@@ -370,7 +370,7 @@ class SaveActivated extends PureComponent {
                                     this.props.navigation.state.params.currentStatus.nextStatusList[0].id,
                                 )
                             }}>
-                                <Text style={[styles.fontPrimary, styles.fontDefault]}>Signature</Text>
+                                <Text style={[{color : styles.fontPrimaryColor}, styles.fontDefault]}>Signature</Text>
                             </Button>
                         </FooterTab>)}
                         <FooterTab style={[styles.paddingLeft5, styles.paddingRight10, styles.bgWhite]}>

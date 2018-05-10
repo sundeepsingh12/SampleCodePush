@@ -40,7 +40,7 @@ class TaskListCalender extends PureComponent {
                     <Button transparent vertical
                         onPress={() => this.props.actions.setState(SET_SELECTED_DATE, { selectedDate: moment().format('YYYY-MM-DD') })}
                         style={[styles.alignStart]}>
-                        <Text style={[styles.fontPrimary, styles.fontSm]}>{TODAY}</Text>
+                        <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{TODAY}</Text>
                     </Button>
                 </FooterTab>
                 <FooterTab style={[styles.flexBasis50]}>
@@ -62,7 +62,7 @@ class TaskListCalender extends PureComponent {
                     <Button transparent vertical
                         onPress={() => this.props.actions.setState(SET_SELECTED_DATE, { selectedDate: ALL })}
                         style={[styles.alignEnd]}>
-                        <Text style={[styles.fontPrimary, styles.fontSm]}>{ALL}</Text>
+                        <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{ALL}</Text>
                     </Button>
                 </FooterTab>
             </Footer>
