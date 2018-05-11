@@ -61,13 +61,13 @@ class Preloader extends PureComponent {
                         message={this.props.errorMessage_403_400_Logout.message}
                         onCancelPressed={this.startLoginScreenWithoutLogout} />
                 )}                   
-                {renderIf(this.props.showMobileNumberScreen,
-                    <MobileNoScreen invalidateUserSession = {this.invalidateSession} />
+                {renderIf(this.props.showMobileNumberScreen || this.props.showOtpScreen,
+                    <MobileNoScreen invalidateUserSession = {this.invalidateSession} isMobileScreen = {this.props.showMobileNumberScreen} />
                   )}
 
-                {renderIf(this.props.showOtpScreen,
+                {/* {renderIf(this.props.showOtpScreen,
                     <OtpScreen invalidateUserSession = {this.invalidateSession}/>
-                )}
+                )} */}
             </Container>
         )
     }

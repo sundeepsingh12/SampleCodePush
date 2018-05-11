@@ -81,13 +81,55 @@ class OtpScreen extends PureComponent{
 
     showCloseButton(){
         return (
-            <View>
-                <Button onPress={this.props.invalidateUserSession} full rounded danger
-                    disabled={this.props.isOtpScreenLogoutDisabled}
-                    style={[styles.bgDanger]}>
-                    <Text style={[styles.fontWhite]}>{CLOSE}</Text>
-                </Button>
+            <Content style={[ styles.paddingTop0, styles.paddingLeft10]}>
+            <View style={[ { top: 10, left: 0, height: 60, }]}>
+                    <Icon
+                        name="md-close"
+                        style={[styles.fontXxxl, styles.fontBlack]}
+                        onPress={this.props.isOtpScreenLogoutDisabled} />
+                </View>
+                <View style={[styles.bgWhite, styles.column, styles.justifyCenter, styles.alignCenter, styles.paddingTop30]}>
+                    <View style={[styles.alignCenter, styles.column, styles.justifyCenter, {width: 240}]}>
+                        <Text style={[feStyle.fontWeight500, feStyle.fontXxl, feStyle.fontBlack]}>{ENTER_OTP}</Text>
+                        <Text style={[feStyle.fontDefault, feStyle.fontDarkGray, feStyle.marginTop10]}>{OTP_CODE_SENT}</Text>
+                        <View style = {{flexDirection: 'row'}}>
+                        <Text style={[feStyle.fontDefault, feStyle.fontDarkGray]}>2134</Text>
+                        <Text style={[feStyle.fontDefault, styles.marginLeft5, feStyle.fontBlack]}>Edit</Text>
+                        </View>
+                    </View>
+                    
+                    {this.showOtpInputView()}
+                </View>
+            </Content>
+        )
+    }
+    showOtpInputView(){
+        return(
+        <View style={[styles.bgWhite, styles.alignCenter, styles.justifyCenter, styles.marginBottom30]}>
+            <View style={[styles.marginTop30, {width: 100}]}>
+                <Item floatingLabel>
+                    <Input
+                    placeholder='000000'
+                    value={this.props.otpNumber}
+                    keyboardType='numeric'
+                    returnKeyType='done'
+                    onChangeText={this.onChangeOtp}
+                    style={[styles.fontXxl]}
+                />
+                </Item>
+            </View>    
+            <Text style={[styles.fontCenter, styles.fontDanger, styles.marginTop5, styles.marginBottom5]}>
+                {this.props.otpDisplayMessage} 
+            </Text>
+            <View style={[styles.marginTop5, styles.marginBottom5, styles.justifyCenter, styles.alignCenter, {height: 40}]}>
+                <Spinner color={styles.bgBlack.backgroundColor} size={'small'} />
             </View>
+            <Button onPress={this.validateOtp}  full
+                    disabled={this.props.isOtpVerificationButtonDisabled}>
+                    <Text style={[styles.fontWhite]}>{VERIFY}</Text>
+                </Button>
+        </View>
+
         )
     }
 

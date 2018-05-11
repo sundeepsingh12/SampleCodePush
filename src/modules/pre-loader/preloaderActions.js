@@ -486,6 +486,7 @@ export function checkAsset() {
       const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
       const user = await keyValueDBService.getValueFromStore(USER)
       const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
+      isVerified = false
       if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
@@ -531,6 +532,7 @@ export function checkIfSimValidOnServer() {
       await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
       await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
       const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
+      responseIsVerified = false
       if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())

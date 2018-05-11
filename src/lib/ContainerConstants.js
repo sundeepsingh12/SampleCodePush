@@ -356,8 +356,9 @@ module.exports = {
     APPLYING_SETTINGS: 'Applying settings',
     VERIFY_HANDSET: 'Verifying handset',
     VERIFY_MOBILE: 'Verify your mobile',
-    OTP_CODE_SENT: 'OTP code has been sent to',
-    ENTER_MOBILE: 'Enter your mobile',
+    ENTER_OTP: 'Enter Otp',
+    OTP_CODE_SENT: 'We have sent a password via SMS on',
+    ENTER_MOBILE: 'Mobile Verification',
     SEND_OTP: 'Send OTP',
 
     //TaskListCalender
