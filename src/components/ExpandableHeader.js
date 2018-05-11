@@ -30,7 +30,7 @@ class ExpandableHeader extends PureComponent {
                             {this.props.title}
                         </Text>
                         <View>
-                            <Icon name={this.state.showDropDown ? 'ios-arrow-up-outline' : 'ios-arrow-down-outline'} style={StyleSheet.flatten([styles.fontXl, styles.fontPrimary, styles.justifyEnd])} />
+                            <Icon name={this.state.showDropDown ? 'ios-arrow-up-outline' : 'ios-arrow-down-outline'} style={StyleSheet.flatten([styles.fontXl, {color : styles.fontPrimaryColor}, styles.justifyEnd])} />
                         </View>
                     </View>
                 </TouchableHighlight>

@@ -15,16 +15,16 @@ import * as realm from '../../repositories/realmdb'
 class MultipleOptionsAttribute {
 
     changeOptionStatus(optionList, selectedOptionsMap) {
-        let optionMap = {}
+        let optionMap = {};
         for (let index in optionList) {
-            optionMap[optionList[index].id] = optionList[index]
-            optionMap[optionList[index].id].selected = selectedOptionsMap[optionList[index].code] ? true : false
+            optionMap[optionList[index].id] = optionList[index];
+            optionMap[optionList[index].id].selected = selectedOptionsMap[optionList[index].code] ? true : false;
         }
         return optionMap
     }
 
     prepareOptionFieldData(optionMap, currentElement) {
-      let optionFieldDataList = []
+        let optionFieldDataList = []
         for (let index in optionMap) {
             if (!optionMap[index].selected) {
                 continue

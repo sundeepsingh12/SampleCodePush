@@ -18,7 +18,8 @@ var InitialState = Record({
     draftStatusInfo: {},
     isEtaTimerShow: false,
     isShowDropdown: null,
-    jobExpiryTime : null
+    jobExpiryTime : null,
+    syncLoading: false
 })
 
 export default InitialState

@@ -57,8 +57,7 @@ class Signature extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.getRemarksList(this.props.navigation.state.params.formLayoutState.formElement)
-        this.props.actions.setIsRemarksValidation(this.props.navigation.state.params.currentElement.validation)
+        this.props.actions.getRemarksList(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState.formElement)
     }
 
     onSaveSign = async (result) => {
@@ -129,7 +128,7 @@ class Signature extends PureComponent {
         return view
     }
     saveSignButton() {
-        return <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
+        return <TouchableOpacity style={[style.fabButton, {backgroundColor : styles.bgPrimaryColor}]}
             onPress={this.saveSign} >
             <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
         </TouchableOpacity>
@@ -141,7 +140,7 @@ class Signature extends PureComponent {
                     {this.headerView()}
                     <View style={[styles.flex1, styles.row]}>
                         <View style={{ borderWidth: 1 }}>
-                            {renderIf(this.props.isRemarksValidation && this.props.fieldDataList.length > 0,
+                            {renderIf(this.props.fieldDataList.length > 0,
                                 <SignatureRemarks fieldDataList={this.props.fieldDataList} />
                             )}
                         </View>

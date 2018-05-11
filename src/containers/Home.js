@@ -18,8 +18,9 @@ import { Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED } from '../lib/ContainerConstants'
-import { Summary }from '../lib/constants'
+import { Summary } from '../lib/constants'
 import DraftModal from '../components/DraftModal'
+import SyncLoader from '../components/SyncLoader'
 
 function mapStateToProps(state) {
   return {
@@ -34,6 +35,7 @@ function mapStateToProps(state) {
     utilities: state.home.utilities,
     pagesLoading: state.home.pagesLoading,
     pieChartSummaryCount: state.home.pieChartSummaryCount,
+    trackingServiceStarted: state.home.trackingServiceStarted
   }
 }
 
@@ -69,7 +71,7 @@ class Home extends PureComponent {
   getPageView(page) {
     return (
       <ListItem button style={[style.moduleList]} key={page.id} onPress={() => this.props.actions.navigateToPage(page)}>
-        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon]} />
+        <MaterialIcons name={page.icon} style={[styles.fontLg, styles.fontWeight500, style.moduleListIcon,{backgroundColor: styles.primaryColor}]} />
         <Body><Text style={[styles.fontWeight500, styles.fontLg]}>{page.name}</Text></Body>
         <Right><Icon name="ios-arrow-forward" /></Right>
       </ListItem>
@@ -115,17 +117,15 @@ class Home extends PureComponent {
     return null
   }
   _onPieChartPress = () => {
-      this.props.actions.navigateToScene(Summary)
+    this.props.actions.navigateToScene(Summary)
   }
-  
+
   getNewJobDraftModal() {
     if (!_.isEmpty(this.props.draftNewJobInfo)) {
       return <DraftModal draftStatusInfo={this.props.draftNewJobInfo.draft} onOkPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, true)} onCancelPress={() => this.props.actions.restoreNewJobDraft(this.props.draftNewJobInfo, false)} onRequestClose={() => this.props.actions.setState(SET_NEWJOB_DRAFT_INFO, {})} />
     }
     return null
   }
-
-  
 
   render() {
     const pieChartView = this.pieChartView()
@@ -143,6 +143,7 @@ class Home extends PureComponent {
             </Body>
           </Header>
           <Content>
+          {(this.props.moduleLoading) ? <SyncLoader moduleLoading = {this.props.moduleLoading} /> : null }
             {pieChartView}
             {this.getNewJobDraftModal()}
             <List>{this.getPageListItemsView()}</List>
@@ -162,7 +163,6 @@ const style = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d6d7da',
     padding: 5,
-    backgroundColor: styles.primaryColor
   }
 });
 

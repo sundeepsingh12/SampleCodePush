@@ -54,8 +54,7 @@ class SignatureAndNps extends PureComponent {
         };
     }
     componentDidMount() {
-        this.props.actions.getRemarksList(this.props.navigation.state.params.formLayoutState.formElement)
-        this.props.actions.setIsRemarksValidation(this.props.navigation.state.params.currentElement.validation)
+        this.props.actions.getRemarksList(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState.formElement)
     }
 
     onStarRatingPress = (starCount) => {
@@ -126,7 +125,7 @@ class SignatureAndNps extends PureComponent {
         </Header>
     }
     saveSignButton() {
-        return <TouchableOpacity style={[style.fabButton, styles.bgPrimary]}
+        return <TouchableOpacity style={[style.fabButton, {backgroundColor : styles.bgPrimaryColor}]}
             onPress={this.saveSign} >
             <Icon name="md-checkmark" style={[styles.fontWhite, styles.fontXl]} />
         </TouchableOpacity>
@@ -137,7 +136,7 @@ class SignatureAndNps extends PureComponent {
                 <Container>
                     {this.headerView()}
                     <View style={[styles.flex1, styles.row]}>
-                        {renderIf(this.props.isRemarksValidation && this.props.fieldDataList.length > 0,
+                        {renderIf(this.props.fieldDataList.length > 0,
                             <View style={{ borderWidth: 1 }}>
                                 <SignatureRemarks fieldDataList={this.props.fieldDataList} />
                             </View>

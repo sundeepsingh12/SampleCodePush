@@ -70,7 +70,7 @@ export function getCashTenderingListReturn(cashTenderingList) {
 export function checkForCash(routeParams) {
     return async function (dispatch) {
         try {
-            if (!routeParams.formLayoutState.formElement || !routeParams.currentElement) {
+            if (!routeParams || !routeParams.formLayoutState.formElement || !routeParams.currentElement) {
                 throw new Error(FORMELEMENT_OR_CURRENTELEMENT_NOT_FOUND)
             }
             let cash = CashTenderingService.checkForCashInMoneyCollect(routeParams.formLayoutState.formElement, routeParams.currentElement)

@@ -38,8 +38,6 @@ import {
   SET_NEWJOB_DRAFT_INFO,
   JOB_MASTER,
   SAVE_ACTIVATED,
-  NEW_JOB_STATUS,
-  NEW_JOB_MASTER,
   POPULATE_DATA,
   NewJob,
   BulkListing,
@@ -53,7 +51,9 @@ import {
   LiveJobs,
   OfflineDS,
   ProfileView,
-  MDM_POLICIES
+  LOADER_FOR_SYNCING,
+  MDM_POLICIES,
+  APP_THEME
 } from '../../lib/constants'
 
 import {
@@ -89,7 +89,7 @@ import {
   Piechart,
   SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
-import { Toast, ActionSheet } from 'native-base'
+import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
@@ -99,7 +99,7 @@ import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../g
 import CONFIG from '../../lib/config'
 import { Client } from 'react-native-paho-mqtt'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo } from 'react-native'
+import { NetInfo, Alert } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -114,7 +114,9 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
-
+import feStyle from '../../themes/FeStyle'
+import { jobMasterService } from '../../services/classes/JobMaster';
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -184,7 +186,7 @@ export function navigateToPage(pageObject) {
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(navigateToScene(BulkListing, { pageObject }));
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
@@ -198,14 +200,14 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }));
+          dispatch(navigateToScene(LiveJobs, { pageObject }));
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(redirectToContainer(pageObject))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
@@ -273,9 +275,49 @@ export function checkCustomErpPullActivated() {
     try {
       const user = await keyValueDBService.getValueFromStore(USER)
       const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
+      let appTheme = await keyValueDBService.getValueFromStore(APP_THEME);
+      if (appTheme && appTheme.value) {
+        feStyle.primaryColor = appTheme.value
+        feStyle.bgPrimaryColor = appTheme.value
+        feStyle.fontPrimaryColor = appTheme.value
+        feStyle.shadeColor = appTheme.value + '98'
+        feStyle.borderLeft4Color = appTheme.value
+      }
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
       showToastAndAddUserExceptionLog(2704, error.message, 'danger', 1)
+    }
+  }
+}
+
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
+  return async function (dispatch) {
+    try {
+      if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
+        dispatch(setState(syncLoader, true))
+        let message = await dispatch(performSyncService())
+        if (message === true) {
+          dispatch(setState(syncLoader, false))
+          if (!isBulk) {
+            dispatch(redirectToContainer(pageObject))
+          } else {
+            dispatch(navigateToScene(BulkListing, { pageObject }))
+          }
+        } else {
+          dispatch(setState(syncLoader, false))
+          alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+        }
+      }
+      else {
+        if (!isBulk) {
+          dispatch(redirectToContainer(pageObject))
+        } else {
+          dispatch(navigateToScene(BulkListing, { pageObject }))
+        }
+      }
+    } catch (error) {
+      dispatch(setState(syncLoader, false))
+      showToastAndAddUserExceptionLog(2714, error.message, 'danger', 1)
     }
   }
 }
@@ -285,7 +327,7 @@ export function startTracking(trackingServiceStarted) {
     try {
       if (!trackingServiceStarted) {
         trackingService.init()
-        // dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
+        dispatch(setState(SET_TRANSACTION_SERVICE_STARTED, true))// set trackingServiceStarted to true and it will get false on logout or when state is cleared
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2705, error.message, 'danger', 1)
@@ -392,11 +434,11 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
           if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
-          //dispatch(fetchJobs())
+          dispatch(fetchJobs())
         }
-        if (isLiveJob) {
-          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
-        }
+        // if (isLiveJob) {
+        //   dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
+        // }
       }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
@@ -411,8 +453,8 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
       }
+      return true;
     } catch (error) {
-      console.log(error)
       showToastAndAddUserExceptionLog(2706, error.message, 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
@@ -434,6 +476,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
         syncStatus
       }))
+      return false;
     } finally {
       if (!erpPull) {
         const difference = await sync.calculateDifference()
@@ -456,10 +499,10 @@ export function syncService(pieChart) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
       const mdmPolicies = await keyValueDBService.getValueFromStore(MDM_POLICIES)
-      const timeInterval = (mdmPolicies && mdmPolicies.value  && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
+      const timeInterval = (mdmPolicies && mdmPolicies.value && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
         dispatch(performSyncService(pieChart))
-      }, timeInterval*1000)
+      }, timeInterval * 1000)
     } catch (error) {
       //Update UI here
       console.log(error)

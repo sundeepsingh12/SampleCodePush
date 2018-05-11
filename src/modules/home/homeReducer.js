@@ -7,8 +7,6 @@ const initialState = new InitialState()
 import {
   PAGES_LOADING,
   SET_PAGES_UTILITY_N_PIESUMMARY,
-  HOME_LOADING,
-  SET_MODULES,
   SYNC_STATUS,
   CHART_LOADING,
   RESET_STATE,
@@ -22,7 +20,8 @@ import {
   SET_TRANSACTION_SERVICE_STARTED,
   SET_ERP_PULL_ACTIVATED,
   ERP_SYNC_STATUS,
-  SET_NEWJOB_DRAFT_INFO
+  SET_NEWJOB_DRAFT_INFO,
+  LOADER_FOR_SYNCING
 } from '../../lib/constants'
 
 export default function homeReducer(state = initialState, action) {
@@ -56,10 +55,13 @@ export default function homeReducer(state = initialState, action) {
         .set('lastErpSyncTime', action.payload.lastErpSyncTime)
     }
 
+    case LOADER_FOR_SYNCING:{
+      return state.set('moduleLoading', action.payload)
+    }
+
     case CHART_LOADING:
       return state.set('chartLoading', action.payload.loading)
         .set('pieChartSummaryCount', action.payload.count)
-
 
     case LAST_SYNC_TIME:
       return state.set('lastSyncTime', action.payload)

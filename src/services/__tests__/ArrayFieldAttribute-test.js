@@ -10,10 +10,7 @@ import {
 } from '../../lib/ContainerConstants'
 import { backupService } from '../classes/BackupService';
 describe('test cases for getSortedArrayChildElements', () => {
-    it('should return null arrayElements when arrayelements is not empty', () => {
-        expect(arrayService.getSortedArrayChildElements(0, { test: 1 }, {})).toEqual(undefined)
 
-    })
     it('should return error message ', () => {
         const arrayElements = {}
         let formLayoutObject = new Map()
@@ -27,8 +24,7 @@ describe('test cases for getSortedArrayChildElements', () => {
         const newArrayElements = {
             allRequiredFieldsFilled: false,
         }
-        //     { "arrayRowDTO": { "arrayElements": { "0": { "allRequiredFieldsFilled": false, "rowId": 0, "test": 1 } }, "isSaveDisabled": true, "lastRowId": 1}, "childElementsTemplate": { "allRequiredFieldsFilled": false, "rowId": 0, "test": 1 }}
-        expect(arrayService.getSortedArrayChildElements(0, arrayElements, arrayRowDTO)).toEqual({
+        expect(arrayService.getSortedArrayChildElements(arrayRowDTO, {}, {})).toEqual({
             arrayRowDTO: {
             },
             childElementsTemplate: arrayRowDTO,
@@ -50,15 +46,16 @@ describe('test cases for getSortedArrayChildElements', () => {
             fieldAttributeMasterId: 1,
             parentId: 0
         })
+        const arrayMainObject = {}
         const arrayRowDTO = {
-            formLayoutObject
+            formLayoutObject,
+            arrayMainObject
         }
         const newArrayElements = {
             allRequiredFieldsFilled: false,
         }
         let errorMessage
-        //     { "arrayRowDTO": { "arrayElements": { "0": { "allRequiredFieldsFilled": false, "rowId": 0, "test": 1 } }, "isSaveDisabled": true, "lastRowId": 1}, "childElementsTemplate": { "allRequiredFieldsFilled": false, "rowId": 0, "test": 1 }}
-        expect(arrayService.getSortedArrayChildElements(0, arrayElements, arrayRowDTO)).toEqual({
+        expect(arrayService.getSortedArrayChildElements(arrayRowDTO, {}, {}, 1)).toEqual({
             arrayRowDTO: {
                 arrayElements: {
                     0: {
@@ -67,11 +64,18 @@ describe('test cases for getSortedArrayChildElements', () => {
                         formLayoutObject
                     }
                 },
-                isSaveDisabled: true,
-                lastRowId: 1
+                isSaveDisabled: false,
+                lastRowId: 1,
             },
-            childElementsTemplate: arrayRowDTO,
-            errorMessage
+            childElementsTemplate: {
+                rowId: 0,
+                formLayoutObject,
+                allRequiredFieldsFilled: false
+
+            },
+            errorMessage,
+            arrayReverseDataStoreFilterMap: { 1: {} },
+            arrayMainObject
         })
     })
 
@@ -90,10 +94,8 @@ describe('test cases for addArrayRow', () => {
         fieldAttributeMasterId: 1,
         parentId: 0
     })
-    const nextEditable = 'test'
     const childElementsTemplate = {
         formLayoutObject,
-        nextEditable
     }
     const arrayElements = {}
     const lastRowId = 0
@@ -102,16 +104,15 @@ describe('test cases for addArrayRow', () => {
             0: {
                 allRequiredFieldsFilled: false,
                 formLayoutObject,
-                nextEditable,
                 rowId: 0
             }
         },
         lastRowId: 1,
-        isSaveDisabled: true
+        isSaveDisabled: false
     }
 
     it('should return arrayElements with new row', () => {
-        expect(arrayService.addArrayRow(lastRowId, childElementsTemplate, arrayElements)).toEqual(arrayRowDTO)
+        expect(arrayService.addArrayRow(lastRowId, childElementsTemplate, arrayElements, {}, true)).toEqual(arrayRowDTO)
     })
 })
 
@@ -283,10 +284,10 @@ describe('test cases for prepareArrayForSaving', () => {
         helpText: null,
         key: '7',
         required: false,
-        value: 'hello',
         attributeTypeId: 2,
         fieldAttributeMasterId: 1,
-        parentId: 0
+        parentId: 0,
+        displayValue: 'abc'
     })
     const nextEditable = 'test'
     const childElementsTemplate = {
@@ -294,6 +295,11 @@ describe('test cases for prepareArrayForSaving', () => {
         nextEditable
     }
     const lastRowId = 0
+    let arrayMainObject = {
+        id: 1,
+        attributeTypeId: 3,
+        key: 1
+    }
     const arrayElements = {
         0: {
             formLayoutObject,
@@ -317,7 +323,8 @@ describe('test cases for prepareArrayForSaving', () => {
                         jobTransactionId: 0,
                         parentId: 1,
                         positionId: 2,
-                        value: "hello",
+                        key: '7',
+                        value: 'abc'
                     },
                 ],
                 fieldAttributeMasterId: 1,
@@ -325,11 +332,91 @@ describe('test cases for prepareArrayForSaving', () => {
                 parentId: 0,
                 positionId: 1,
                 value: "ObjectSarojFareye",
+                key: 1
             },
         ],
         latestPositionId: 2,
     }
     it('should return fieldDataListWithLatestPositionId', () => {
-        expect(arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, 0, 0)).toEqual(fieldDataListWithLatestPositionId)
+        expect(arrayService.prepareArrayForSaving(arrayElements, arrayParentItem, { id: 0 }, 0, arrayMainObject)).toEqual({ fieldDataListWithLatestPositionId, isSaveDisabled: false })
     })
 })
+
+describe('test cases for findNextEditableAndSetSaveDisabled', () => {
+
+    const formLayoutObject = new Map();
+    formLayoutObject.set(1, {
+        label: 'xyz',
+        subLabel: null,
+        helpText: null,
+        key: '7',
+        required: false,
+        attributeTypeId: 2,
+        fieldAttributeMasterId: 1,
+        parentId: 0,
+        displayValue: 'abc',
+        focus: true
+    })
+    formLayoutObject.set(2, {
+        label: 'xyz1',
+        subLabel: null,
+        helpText: null,
+        key: '70',
+        required: false,
+        attributeTypeId: 2,
+        fieldAttributeMasterId: 2,
+        parentId: 0,
+    })
+    const arrayElements = {
+        0: {
+            formLayoutObject,
+        }
+    }
+    let resultFormObject = new Map()
+    resultFormObject.set(1, {
+        label: 'xyz',
+        subLabel: null,
+        helpText: null,
+        key: '7',
+        required: false,
+        attributeTypeId: 2,
+        fieldAttributeMasterId: 1,
+        parentId: 0,
+        displayValue: 'abc',
+        focus: false
+    })
+    resultFormObject.set(2, {
+        label: 'xyz1',
+        subLabel: null,
+        helpText: null,
+        key: '70',
+        required: false,
+        attributeTypeId: 2,
+        fieldAttributeMasterId: 2,
+        parentId: 0,
+        focus: true,
+        childDataList: {},
+        displayValue: 'test'
+    })
+
+    let result = {
+        newArrayElements: {
+            0: {
+                formLayoutObject: resultFormObject,
+                allRequiredFieldsFilled: true
+            }
+        },
+        isSaveDisabled: false
+
+    }
+    it('should return array elements with next element on focus', () => {
+        expect(arrayService.findNextEditableAndSetSaveDisabled(2, arrayElements, true, 0, 'test', {}, 'NEXT_FOCUS', {})).toEqual(result)
+    })
+})
+function getMapFromObject(obj) {
+    let strMap = new Map();
+    for (let k of Object.keys(obj)) {
+        strMap.set(k, obj[k]);
+    }
+    return strMap;
+}

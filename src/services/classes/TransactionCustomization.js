@@ -1,27 +1,7 @@
 'use strict'
 
 import { keyValueDBService } from './KeyValueDBService'
-import {
-    CUSTOMER_CARE,
-    CUSTOMIZATION_LIST_MAP,
-    JOB_ATTRIBUTE,
-    JOB_ATTRIBUTE_STATUS,
-    JOB_MASTER,
-    JOB_STATUS,
-    SMS_TEMPLATE,
-    TAB,
-    USER,
-    LAST_SYNC_WITH_SERVER,
-    FIELD_ATTRIBUTE,
-    SMS_JOB_STATUS,
-    IS_SERVER_REACHABLE,
-    USER_SUMMARY,
-    JOB_SUMMARY,
-    HUB,
-    DEVICE_IMEI,
-    USER_EVENT_LOG,
-    PENDING_SYNC_TRANSACTION_IDS
-} from '../../lib/constants'
+import { CUSTOMER_CARE, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, JOB_MASTER, JOB_STATUS, SMS_TEMPLATE, TAB, USER, LAST_SYNC_WITH_SERVER, FIELD_ATTRIBUTE, SMS_JOB_STATUS, IS_SERVER_REACHABLE, USER_SUMMARY, JOB_SUMMARY, HUB, DEVICE_IMEI, USER_EVENT_LOG, PENDING_SYNC_TRANSACTION_IDS, CUSTOM_NAMING } from '../../lib/constants'
 
 class TransactionCustomization {
 
@@ -46,15 +26,17 @@ class TransactionCustomization {
         const smsTemplateList = await keyValueDBService.getValueFromStore(SMS_TEMPLATE)
         const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
         const tabList = await keyValueDBService.getValueFromStore(TAB)
+        const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
         return {
-            customerCareList: customerCareList.value,
-            jobAttributeMasterList: jobAttributeMasterList.value,
-            jobAttributeStatusList: jobAttributeStatusList.value,
-            jobMasterList: jobMasterList.value,
-            jobMasterIdCustomizationMap: jobMasterIdCustomizationMap.value,
-            smsTemplateList: smsTemplateList.value,
-            statusList: statusList.value,
-            tabList: tabList.value
+            customerCareList: customerCareList ? customerCareList.value : customerCareList,
+            jobAttributeMasterList: jobAttributeMasterList ? jobAttributeMasterList.value : jobAttributeMasterList,
+            jobAttributeStatusList: jobAttributeStatusList ? jobAttributeStatusList.value : jobAttributeStatusList,
+            jobMasterList: jobMasterList ? jobMasterList.value : jobMasterList,
+            jobMasterIdCustomizationMap: jobMasterIdCustomizationMap ? jobMasterIdCustomizationMap.value : jobMasterIdCustomizationMap,
+            smsTemplateList: smsTemplateList ? smsTemplateList.value : smsTemplateList,
+            statusList: statusList ? statusList.value : statusList,
+            tabList: tabList ? tabList.value : tabList,
+            customNaming: customNaming ? customNaming.value : customNaming
         }
     }
 

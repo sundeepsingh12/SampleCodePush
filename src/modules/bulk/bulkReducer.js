@@ -51,6 +51,7 @@ export default function bulkReducer(state = initialState, action) {
             return state.set('selectedItems', action.payload.selectedItems)
                 .set('bulkTransactionList', action.payload.bulkTransactions)
                 .set('selectAllNone', action.payload.displayText)
+                .set('isSelectAllVisible', action.payload.selectAll)
 
         case CLEAR_BULK_STATE:
             return state.set('selectedItems', {})
@@ -71,6 +72,7 @@ export default function bulkReducer(state = initialState, action) {
                 .set('bulkTransactionList', action.payload.bulkTransactions)
                 .set('selectAllNone', action.payload.displayText)
                 .set('searchText', action.payload.searchText)
+                .set('isSelectAllVisible', action.payload.selectAll)
         }
     }
     return state
