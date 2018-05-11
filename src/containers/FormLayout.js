@@ -31,11 +31,11 @@ import {
 } from '../lib/AttributeConstants'
 
 import {
-  SET_DRAFT,
   SET_UPDATE_DRAFT,
   ERROR_MESSAGE,
   SET_FORM_TO_INVALID,
-  RESET_STATE_FOR_WALLET
+  RESET_STATE_FOR_WALLET,
+  SET_NO_FIELD_ATTRIBUTE_MAPPED
 } from '../lib/constants'
 import CustomAlert from "../components/CustomAlert"
 import {
@@ -57,11 +57,13 @@ function mapStateToProps(state) {
     errorMessage: state.formLayout.errorMessage,
     currentElement: state.formLayout.currentElement,
     pieChart: state.home.pieChart,
-    draftStatusId: state.formLayout.draftStatusId,
     updateDraft: state.formLayout.updateDraft,
     isFormValid: state.formLayout.isFormValid,
     dataStoreFilterReverseMap: state.formLayout.dataStoreFilterReverseMap,
     fieldAttributeMasterParentIdMap: state.formLayout.fieldAttributeMasterParentIdMap,
+    noFieldAttributeMappedWithStatus: state.formLayout.noFieldAttributeMappedWithStatus,
+    arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
+    jobAndFieldAttributesList: state.formLayout.jobAndFieldAttributesList
   }
 }
 
@@ -72,11 +74,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FormLayout extends PureComponent {
+
   componentDidUpdate() {
-    if (this.props.updateDraft && !this.props.navigation.state.params.jobTransaction.length) { //Draft should not be saved for bulk
-      this.saveDraft()
-      this.props.actions.setState(SET_UPDATE_DRAFT, false)
-    }
     if (this.props.errorMessage && this.props.errorMessage != '') {
       Toast.show({
         text: this.props.errorMessage,
@@ -88,60 +87,50 @@ class FormLayout extends PureComponent {
       this.props.actions.setState(ERROR_MESSAGE, '')
     }
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     this.props.actions.setState(RESET_STATE_FOR_WALLET)
   }
 
-  saveDraft = () => {
-    if (this.props.jobTransactionId != 0) {
-      let formLayoutState = {
-        formElement: this.props.formElement,
-        isSaveDisabled: this.props.isSaveDisabled,
-        statusName: this.props.statusName,
-        jobTransactionId: this.props.jobTransactionId,
-        statusId: this.props.statusId,
-        latestPositionId: this.props.latestPositionId,
-        paymentAtEnd: this.props.paymentAtEnd,
-        isLoading: this.props.isLoading,
-        errorMessage: this.props.errorMessage,
-        currentElement: this.props.currentElement,
-        dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
-        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
-      }
-      this.props.actions.saveDraftInDb(formLayoutState, this.props.navigation.state.params.jobMasterId)
+  componentWillUnmount() {
+    if (this.props.noFieldAttributeMappedWithStatus) {
+      this.props.actions.setState(SET_NO_FIELD_ATTRIBUTE_MAPPED, false)
     }
   }
-  showDraftAlert() {
-    let draftMessage = 'Do you want to restore draft for ' + this.props.statusName + '?'
-    let view =
-      <CustomAlert
-        title="Draft"
-        message={draftMessage}
-        onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={() => this._onCancel()} />
-    return view
-  }
-  _onCancel = () => {
-    this.props.actions.setState(SET_DRAFT, null)
-  }
-  _goToFormLayoutWithDraft = () => {
-    this.props.actions.setState(SET_DRAFT, null)
-    this.props.actions.restoreDraft(this.props.jobTransactionId, this.props.statusId, this.props.navigation.state.params.jobMasterId)
-  }
+
   componentDidMount() {
-    this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction)
+    if (!this.props.navigation.state.params.isDraftRestore) {
+      this.props.actions.restoreDraftOrRedirectToFormLayout(this.props.navigation.state.params.editableFormLayoutState, this.props.navigation.state.params.isDraftRestore, this.props.navigation.state.params.statusId, this.props.navigation.state.params.statusName, this.props.navigation.state.params.jobTransactionId, this.props.navigation.state.params.jobMasterId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId)
+      if (this.props.navigation.state.params.jobTransaction.length || this.props.navigation.state.params.editableFormLayoutState || this.props.navigation.state.params.saveActivatedStatusData) { //Draft should not be saved for bulk and save activated edit and checkout state
+        this.props.actions.setState(SET_UPDATE_DRAFT, false)
+      }
+    }
   }
 
   renderData = (item) => {
+    let formLayoutState = {
+      formElement: this.props.formElement,
+      isSaveDisabled: this.props.isSaveDisabled,
+      statusName: this.props.statusName,
+      jobTransactionId: this.props.jobTransactionId,
+      statusId: this.props.statusId,
+      latestPositionId: this.props.latestPositionId,
+      paymentAtEnd: this.props.paymentAtEnd,
+      isLoading: this.props.isLoading,
+      errorMessage: this.props.errorMessage,
+      currentElement: this.props.currentElement,
+      dataStoreFilterReverseMap: this.props.dataStoreFilterReverseMap,
+      fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
+      updateDraft: this.props.updateDraft,
+      arrayReverseDataStoreFilterMap: this.props.arrayReverseDataStoreFilterMap,
+      jobMasterId: this.props.navigation.state.params.jobMasterId,
+      jobAndFieldAttributesList: this.props.jobAndFieldAttributesList
+    }
     return (
       <BasicFormElement
         item={item}
-        formElement={this.props.formElement}
-        isSaveDisabled={this.props.isSaveDisabled}
         jobTransaction={this.props.navigation.state.params.jobTransaction}
         jobStatusId={this.props.navigation.state.params.statusId}
-        latestPositionId={this.props.latestPositionId}
-        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
+        formLayoutState={formLayoutState}
       />
     )
   }
@@ -188,6 +177,10 @@ class FormLayout extends PureComponent {
           paymentAtEnd: this.props.paymentAtEnd,
         })
     } else {
+      let taskListScreenDetails = {
+        jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
+        pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
+      }
       this.props.actions.saveJobTransaction(
         formLayoutState,
         this.props.navigation.state.params.jobMasterId,
@@ -195,7 +188,8 @@ class FormLayout extends PureComponent {
         this.props.navigation.state.params.jobTransaction,
         this.props.navigation.state.params.navigationFormLayoutStates,
         this.props.navigation.state.params.saveActivatedStatusData,
-        this.props.pieChart
+        this.props.pieChart,
+        taskListScreenDetails
       )
     }
   }
@@ -218,7 +212,7 @@ class FormLayout extends PureComponent {
 
   getHeaderView() {
     return (
-      <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+      <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
         <Body>
           <View
             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -251,9 +245,20 @@ class FormLayout extends PureComponent {
     )
   }
 
+  /**
+   * When a status doesn't have any visible attribute mapped then show this view
+   */
+  emptyFieldAttributeForStatusView() {
+    if (this.props.noFieldAttributeMappedWithStatus) {
+      return <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
+        <Text style={[styles.margin30, styles.fontDefault, styles.fontDarkGray]}> No visible attribute mapped</Text>
+      </View>
+    }
+  }
+
   render() {
-    const draftAlert = (this.props.draftStatusId) ? this.showDraftAlert() : null
     const invalidFormAlert = (!this.props.isFormValid) ? this.showInvalidFormAlert() : null
+    let emptyFieldAttributeForStatusView = this.emptyFieldAttributeForStatusView()
     let formView = null
     if (this.props.isLoading) { return <Loader /> }
     if (this.props.formElement && this.props.formElement.length == 0) {
@@ -271,10 +276,9 @@ class FormLayout extends PureComponent {
     const footerView = this.getFooterView()
     if (Platform.OS == 'ios') {
       formView = <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-        {draftAlert}
         {invalidFormAlert}
         {headerView}
-
+        {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList
@@ -289,10 +293,9 @@ class FormLayout extends PureComponent {
       </KeyboardAvoidingView >
     } else {
       formView = <Container>
-        {draftAlert}
         {invalidFormAlert}
         {headerView}
-
+        {emptyFieldAttributeForStatusView}
         <View style={[styles.flex1, styles.bgWhite]}>
           <View style={[styles.paddingTop10, styles.paddingBottom10]}>
             <FlatList

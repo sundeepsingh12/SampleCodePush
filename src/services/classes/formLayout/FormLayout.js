@@ -1,9 +1,15 @@
 import { keyValueDBService } from '../KeyValueDBService.js'
-import { transientStatusService } from '../TransientStatusService.js'
+import { transientStatusAndSaveActivatedService } from '../TransientStatusAndSaveActivatedService.js'
 import {
     AFTER,
     BEFORE,
-    OBJECT
+    OBJECT,
+    STRING,
+    TEXT,
+    DECIMAL,
+    SCAN_OR_TEXT,
+    QR_SCAN,
+    NUMBER
 } from '../../../lib/AttributeConstants'
 import _ from 'lodash'
 import {
@@ -13,17 +19,23 @@ import {
     CheckoutDetails,
     TabScreen,
     SHOULD_RELOAD_START,
-    SHOULD_CREATE_BACKUP,
     GEO_FENCING,
     FIELD_ATTRIBUTE,
     FIELD_ATTRIBUTE_STATUS,
     FIELD_ATTRIBUTE_VALIDATION,
     FIELD_ATTRIBUTE_VALIDATION_CONDITION,
+    BACKUP_ALREADY_EXIST,
+    TABLE_FIELD_DATA,
+    JOB_ATTRIBUTE,
+    USER
 } from '../../../lib/constants'
 import { formLayoutEventsInterface } from './FormLayoutEventInterface'
 import { draftService } from '../DraftService.js'
-import { fieldValidationService } from '../FieldValidation';
-import { geoFencingService } from '../GeoFencingService.js';
+import { fieldValidationService } from '../FieldValidation'
+import { dataStoreService } from '../DataStoreService.js'
+import { geoFencingService } from '../GeoFencingService.js'
+import * as realm from '../../../repositories/realmdb'
+import { UNIQUE_VALIDATION_FAILED_FORMLAYOUT } from '../../../lib/ContainerConstants'
 class FormLayout {
 
     /**
@@ -35,11 +47,13 @@ class FormLayout {
      * 
      * @param {*} statusId id of status to be captured
      */
-    async getSequenceWiseRootFieldAttributes(statusId, fieldAttributeMasterIdFromArray, jobTransaction) {
+    async getSequenceWiseRootFieldAttributes(statusId, fieldAttributeMasterIdFromArray, jobTransaction, latestPositionId) {
         if (!statusId) {
             throw new Error('Missing statusId');
         }
         const fieldAttributes = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE);
+        const jobAttributes = await keyValueDBService.getValueFromStore(JOB_ATTRIBUTE)
+        const user = await keyValueDBService.getValueFromStore(USER)
         const fieldAttributeStatusList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_STATUS);
         const fieldAttributeMasterValidation = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION);
         const fieldAttributeValidationCondition = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALIDATION_CONDITION);
@@ -91,13 +105,21 @@ class FormLayout {
 
         const fieldAttributeMasterValidationMap = this.getFieldAttributeValidationMap(fieldAttributeMasterValidation.value);
         const fieldAttrMasterValidationConditionMap = this.getFieldAttributeValidationConditionMap(fieldAttributeValidationCondition.value, fieldAttributeMasterValidationMap)
-        const sequenceWiseFormLayout = this.getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction)
+        if (!latestPositionId) {
+            latestPositionId = this.getLatestPositionIdForJobTransaction(jobTransaction)
+        }
+        const sequenceWiseFormLayout = this.getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction, latestPositionId)
         if (fieldAttributeMasterIdFromArray) {
             sequenceWiseFormLayout.arrayMainObject = arrayMainObject[0]
             return sequenceWiseFormLayout
         }
         else {
             sequenceWiseFormLayout.fieldAttributeMasterParentIdMap = fieldAttributeMasterParentIdMap
+            sequenceWiseFormLayout.jobAndFieldAttributesList = {
+                jobAttributes: jobAttributes.value,
+                fieldAttributes: fieldAttributes.value,
+                user: user.value
+            }
             return sequenceWiseFormLayout
         }
 
@@ -156,10 +178,10 @@ class FormLayout {
      * @param {*} fieldAttributeMasterValidationMap fieldAttributeMaster validation map
      * @param {*} fieldAttrMasterValidationConditionMap validation condition map
      */
-    getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction) {
+    getFormLayoutSortedObject(sequenceWiseSortedFieldAttributesForStatus, fieldAttributeMasterValidationMap, fieldAttrMasterValidationConditionMap, jobTransaction, latestPositionId) {
         let formLayoutObject = new Map()
         if (!sequenceWiseSortedFieldAttributesForStatus || sequenceWiseSortedFieldAttributesForStatus.length == 0) {
-            return { formLayoutObject, isSaveDisabled: false }
+            return { formLayoutObject, isSaveDisabled: false, noFieldAttributeMappedWithStatus: true } //no field attribute mapped to this status
         }
 
         let isRequiredAttributeFound = false
@@ -175,7 +197,7 @@ class FormLayout {
                     validation.conditions = fieldAttrMasterValidationConditionMap[validation.id]
                 }
             }
-            formLayoutObject.set(fieldAttribute.id, this.getFieldAttributeObject(fieldAttribute, validationArr, i + 1))
+            formLayoutObject.set(fieldAttribute.id, this.getFieldAttributeObject(fieldAttribute, validationArr, i + latestPositionId + 1))
             if (!fieldAttribute.hidden) {
                 tempFieldAttributeList.push(formLayoutObject.get(fieldAttribute.id))
             }
@@ -188,8 +210,8 @@ class FormLayout {
         //     }
         //     // formLayoutObject.set(tempFieldAttributeList[0].id, this.getFieldAttributeObject(tempFieldAttributeList[0], formLayoutObject.get(tempFieldAttributeList[0].id).validation, formLayoutObject.get(tempFieldAttributeList[0].id).positionId))
         // }
-        let latestPositionId = sequenceWiseSortedFieldAttributesForStatus.length
-        return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId }
+        let positionId = sequenceWiseSortedFieldAttributesForStatus.length + latestPositionId
+        return { formLayoutObject, isSaveDisabled: isRequiredAttributeFound, latestPositionId: positionId, noFieldAttributeMappedWithStatus: false }
     }
 
     /**
@@ -251,38 +273,37 @@ class FormLayout {
     }
 
     concatFormElementForTransientStatus(navigationFormLayoutStates, formElement) {
-        let combineMap = new Map(formElement);
+        let combineMap = new Map(formElement)
         for (let formLayoutCounter in navigationFormLayoutStates) {
             let formElementForPreviousStatus = navigationFormLayoutStates[formLayoutCounter].formElement
-            combineMap = new Map([...combineMap, ...formElementForPreviousStatus])
+            let formElement1 = JSON.parse(JSON.stringify([...combineMap]))//deep cloning ES6 Map
+            let formElement2 = JSON.parse(JSON.stringify([...formElementForPreviousStatus]))// concatinating fieldAttributes i.e. formElement map of multiple status in case if transient status is present
+            combineMap = new Map(formElement1.concat(formElement2))
         }
         return combineMap
     }
 
     async saveAndNavigate(formLayoutState, jobMasterId, contactData, jobTransaction, navigationFormLayoutStates, previousStatusSaveActivated, statusList) {
         let routeName, routeParam
-        const currentStatus = await transientStatusService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
+        const currentStatus = await transientStatusAndSaveActivatedService.getCurrentStatus(statusList, formLayoutState.statusId, jobMasterId)
         if (formLayoutState.jobTransactionId < 0 && currentStatus.saveActivated) {
             routeName = SaveActivated
             routeParam = {
-                formLayoutState,
-                contactData, currentStatus, jobTransaction, jobMasterId,
-                navigationFormLayoutStates
+                formLayoutState, contactData, currentStatus, jobTransaction, jobMasterId, navigationFormLayoutStates
             }
-            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+            draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
 
         } else if (formLayoutState.jobTransactionId < 0 && !_.isEmpty(previousStatusSaveActivated)) {
-            let { elementsArray, amount } = await transientStatusService.getDataFromFormElement(formLayoutState.formElement)
-            let totalAmount = await transientStatusService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
+            let { elementsArray, amount } = await transientStatusAndSaveActivatedService.getDataFromFormElement(formLayoutState.formElement)
+            let totalAmount = await transientStatusAndSaveActivatedService.calculateTotalAmount(previousStatusSaveActivated.commonData.amount, previousStatusSaveActivated.recurringData, amount)
             routeName = CheckoutDetails
             routeParam = { commonData: previousStatusSaveActivated.commonData.commonData, recurringData: previousStatusSaveActivated.recurringData, totalAmount, signOfData: elementsArray, jobMasterId }
             let formLayoutObject = formLayoutState.formElement
             if (navigationFormLayoutStates) {
                 formLayoutObject = await this.concatFormElementForTransientStatus(navigationFormLayoutStates, formLayoutState.formElement)
             }
-            await transientStatusService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
-            await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
-
+            await transientStatusAndSaveActivatedService.saveDataInDbAndAddTransactionsToSyncList(formLayoutObject, previousStatusSaveActivated.recurringData, jobMasterId, formLayoutState.statusId, true)
+            draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
         }
         else if (currentStatus.transient) {
             routeName = Transient
@@ -298,10 +319,10 @@ class FormLayout {
             let jobTransactionList = await formLayoutEventsInterface.saveDataInDb(formLayoutObject, formLayoutState.jobTransactionId, formLayoutState.statusId, jobMasterId, jobTransaction)
             await formLayoutEventsInterface.addTransactionsToSyncList(jobTransactionList)
             if (!jobTransaction.length) { //Delete draft only if not bulk
-                await draftService.deleteDraftFromDb(formLayoutState.jobTransactionId, jobMasterId)
+                draftService.deleteDraftFromDb(jobTransaction, jobMasterId)
             }
-            await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
-            await keyValueDBService.validateAndSaveData(SHOULD_CREATE_BACKUP, new Boolean(false))
+            //await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(true))
+            await keyValueDBService.validateAndSaveData(BACKUP_ALREADY_EXIST, new Boolean(false))
             await geoFencingService.addNewGeoFenceAndDeletePreviousFence()
         }
         return {
@@ -316,16 +337,44 @@ class FormLayout {
         }
         for (let [id, currentObject] of formElement.entries()) {
             let afterValidationResult = fieldValidationService.fieldValidations(currentObject, formElement, AFTER, jobTransaction, fieldAttributeMasterParentIdMap)
-            currentObject.value = afterValidationResult && !currentObject.alertMessage ? currentObject.displayValue : null
+            let uniqueValidationResult = this.checkUniqueValidation(currentObject)
+            if (uniqueValidationResult) {
+                currentObject.alertMessage = UNIQUE_VALIDATION_FAILED_FORMLAYOUT
+            }
+            currentObject.value = afterValidationResult && !uniqueValidationResult ? currentObject.displayValue : null
             if (currentObject.required && (currentObject.value == undefined || currentObject.value == null || currentObject.value == '')) {
-                return false
-            } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 6 && !Number.isInteger(Number(currentObject.value))) {
-                return false
+                return { isFormValid: false, formElement }
+            } else if ((currentObject.value || currentObject.value == 0) && (currentObject.attributeTypeId == 6 || currentObject.attributeTypeId == 27) && !Number.isInteger(Number(currentObject.value))) {
+                return { isFormValid: false, formElement }
             } else if ((currentObject.value || currentObject.value == 0) && currentObject.attributeTypeId == 13 && !Number(currentObject.value)) {
-                return false
+                return { isFormValid: false, formElement }
             }
         }
-        return true
+        return { isFormValid: true, formElement }
+    }
+
+    checkUniqueValidation(currentObject) {
+        switch (currentObject.attributeTypeId) {
+            case STRING:
+            case TEXT:
+            case DECIMAL:
+            case SCAN_OR_TEXT:
+            case QR_SCAN:
+            case NUMBER:
+                return dataStoreService.checkForUniqueValidation(currentObject.displayValue, currentObject)
+            default:
+                false
+        }
+    }
+    getLatestPositionIdForJobTransaction(jobTransaction) {
+        let query = ''
+        if (jobTransaction.length) {
+            query = jobTransaction.map(job => 'jobTransactionId = ' + job.jobTransactionId).join(' OR ')
+        } else {
+            query = 'jobTransactionId = ' + jobTransaction.id
+        }
+        let maxPositionId = realm.getMaxValueOfProperty(TABLE_FIELD_DATA, query, 'positionId')
+        return (!maxPositionId) ? 0 : maxPositionId
     }
 }
 

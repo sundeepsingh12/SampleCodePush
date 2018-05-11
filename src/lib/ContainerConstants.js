@@ -12,6 +12,15 @@ module.exports = {
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
     VERIFY: 'Verify',
+    SELECT_ALL: 'Select All',
+    INVALID_SCAN: 'Invalid Scan',
+    NO_JOBS_PRESENT: 'No jobs present',
+    TOTAL_COUNT: 'Total Count : ',
+    PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB: 'Please enable internet connection to update this job!!!',
+    UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET: 'unable to sync with server, Please check your internet connection',
+
+    //Common Error Strings
+    JOB_STATUS_MISSING: 'Job status missing in store',
 
     // Sync Container 
     DOWNLOADING: 'Downloading ...',
@@ -44,6 +53,7 @@ module.exports = {
     JOB_ASSIGNMENT_DISPLAY: 'Job Assignment',
     CUSTOM_APP_DISPLAY: 'Web URL',
     SORTING_DISPLAY: 'Sort Parcels',
+    UNTITLED: 'UNTITLED',
 
     //Job Master
     JOB_MASTER_HEADER: 'Job Master List',
@@ -51,6 +61,9 @@ module.exports = {
     //New Job
     NEW_JOB_CONFIGURATION_ERROR: 'Configuration error no job master mapped!',
     NEW_TASK: 'New Task',
+    SELECT_TYPE_FOR: 'Select Type for ',
+    CONFIGURATION_ISSUES_WITH_PENDING_STATUS: 'Configuration issues with PENDING status',
+    JOB_MASTER_MISSING: 'jobMaster not present',
 
     //Offline DS
     DOWNLOADING_OFFLINE_DS: 'Downloading',
@@ -59,6 +72,7 @@ module.exports = {
 
     //Form Layout Container
     UNIQUE_VALIDATION_FAILED: 'This code is already in use',
+    UNIQUE_VALIDATION_FAILED_FORMLAYOUT: 'This value is already in use',
     INVALID_FORM_ALERT: 'Form is incorrectly filled please re-check the form',
     ALERT: 'Alert!',
     OPTIONAL: '(optional)',
@@ -109,16 +123,16 @@ module.exports = {
     SEQUENCELIST_MISSING: `sequenceList not present`,
     BLANK_NEW_SEQUENCE: `Sequence can't be left blank`,
     CURRENT_SEQUENCE_ROW_MISSING: `currentSequenceListItemIndex missing`,
-    SEQUENCE_NOT_AN_INT: `Sequence can't be `,
-    NOT_A_NUMBER: 'Please enter a number',
+    NOT_A_NUMBER: 'Please enter a valid positive number',
     RUNSHEET_MISSING: 'No runsheet found',
     RUNSHEET_NUMBER_MISSING: 'Runsheet number not present',
     TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: 'transactionsWithChangedSeqeunceMap not present',
     SEARCH_TEXT_MISSING: 'searchText not present',
     SEQUENCE_REQUEST_DTO: 'sequenceRequestDto missing',
     TOKEN_MISSING: 'Token missing',
-    INVALID_SCAN: 'Invalid Scan',
     JOB_MASTER_ID_CUSTOMIZATION_MAP_MISSING: 'jobMasterIdCustomizationMap is missing',
+    AUTO_ROUTING_MESSAGE: 'This will run route optimization for ',
+    AUTO_ROUTING_EXTRA_MESSAGE: ' job transactions',
 
     //Sync service
     JOBS_DELETED: 'Jobs deleted',
@@ -133,6 +147,8 @@ module.exports = {
     DSF_LIST_MISSING: 'DSFList is missing',
     FIELD_ATTRIBUTE_ATTR_MASTER_ID_MISSING: 'fieldAttributeMasterId is missing',
     FORM_ELEMENT_IS_MISSING: 'formElement is missing',
+    INVALID_BULK_JOB_CONFIG: 'Invalid job data in bulk data store filter, cannot proceed further.',
+    CONFIGURATION_ERROR_DS_MASTER_ID_MISSING: 'Configuration error data store mapping is missing',
     //Summary
     REFUND: 'Refund',
     COLLECTION_CASH: 'Collection-Cash',
@@ -175,14 +191,30 @@ module.exports = {
     UPLOAD_FAILED: 'Upload Failed',
     LOGGING_OUT: 'Logging out',
     LOGOUT_UNSYNCED_TRANSACTIONS: 'Confirm Log Out, You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    LOGOUT_UNSYNCED_TRANSACTIONS_TITLE: 'Confirm Log Out',
+    LOGOUT_UNSYNCED_TRANSACTIONS_MESSAGE: 'You have transactions to be synced with server. Click OK to confirm Log-out or Cancel to try-again',
+    THERE_ARE_NO_UNSYNCED_FILES: 'There are no Unsynced Files.',
+    DELETE: 'Delete',
+    THERE_ARE_NO_SYNCED_FILES: 'There are no Synced Files',
+    KB: 'KB',
+    UNABLE_TO_UPLOAD: 'Unable to upload',
+    BACKUP_FILE: 'backup file',
+    TRY_AGAIN: 'Try Again',
+    CONTINUE: 'Continue',
+    UNSYNCED_BACKUP_FILES_FOUND: 'Unsynced Backup Files Found',
+    UPLOADED: 'Uploaded',
+    UNSYNCED_BACKUP_FILES: 'Unsynced Backup Files',
+    TRANSACTIONLIST_IS_MISSING: 'Transaction List is missing',
+    SOME_PROCESS_ARE_STILL_WORKING_PLEASE_RE_TRY_AFTER_FEW_MINUTES: 'Some processes are still working. Please re-try after few minutes.',
+    LOGOUT_UNSUCCESSFUL: 'Logout Unsuccessful',
+    MB: 'MB',
+    TRY_AFTER_CLEARING_YOUR_STORAGE_DATA: 'Please Try again after clearing your storage data.',
 
     //Tracking constants
     ENTER: 'ENTER',
     EXIT: 'EXIT',
     INSIDE_BOUNDARY: 'inside boundary',
     OUTSIDE_BOUNDARY: 'out of boundary',
-
-
 
     //GeoFencing Service
     HUB_LAT_LONG_MISSING: 'Hub Lat Long missing',
@@ -199,9 +231,19 @@ module.exports = {
     QTY_ZERO: 'Quantity should be 0.Cannot proceed.',
     REASON: 'Reason',
     OPEN_CAMERA: 'Open Camera',
+    SEARCH_PLACE_HOLDER: 'Search SKU Code',
+    ORIGNAL_QUANTITY: 'ORIGINAL QUANTITY',
+    PHOTO: 'PHOTO',
+    ACTUAL_QUANTITY: 'ACTUAL QUANTITY',
+    ACTUAL_AMOUNT: 'ACTUAL AMOUNT',
+    UNIT_PRICE: 'UNIT_PRICE',
+    SKU_CODE_MAX_LIMIT_REACHED: 'Maximum value reached',
+    SKU_CODE_MIN_LIMIT_REACHED: 'Minimum value reached',
+    SKIP_SKU_MESSAGE: 'Skipping this attribute, not allowed in new job',
+    RESULT_NOT_FOUND: 'No result found for your search',
+    ACTUAL_QUANTITY_INPUT_ERROR: 'Please enter valid quantity',
 
     //Array
-    TOTAL_COUNT: 'Total Count : ',
     ADD: 'Add',
     ADD_ROW_ERROR: 'Row could not be added',
     DELETE_ROW_ERROR: 'Row could not be deleted',
@@ -220,12 +262,10 @@ module.exports = {
     YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE: 'You are not at location. Do you want to continue?',
     MORE: 'More',
 
-
     //Save Activated
     EDIT: 'Edit',
     JOB_EXPIRED: 'Job Expired!',
     DETAILS: "Details",
-    UPDATE_GROUP: 'Update Group',
 
     //JOb List
     SELECT_NUMBER: 'Select number for message',
@@ -236,7 +276,7 @@ module.exports = {
     SELECT_ADDRESS_NAVIGATION: 'Select address for navigation',
 
     //Cash Tendering
-    NOT_REQUIRED: 'NOT REQUIRED',
+    SKIP_CASH_TENDERING: 'Skipping Cash Tendering',
     MORE_MONEY_TO_PAY: 'More Money to Pay.',
     LESS_MONEY_TO_PAY: 'Less Money to Pay.',
     AMOUNT_TO_COLLECT: 'Amount to Collect: ',
@@ -259,9 +299,7 @@ module.exports = {
 
     //Live job
     LIVE_TASKS: 'Live Tasks',
-    NO_JOBS_PRESENT: 'No jobs present',
     FILTER_REF_NO: 'Filter Reference Numbers',
-    SELECT_ALL: 'SELECT ALL',
     ACCEPT: 'ACCEPT',
     REJECT: 'REJECT',
 
@@ -269,10 +307,13 @@ module.exports = {
     BULK_UPDATE: 'Bulk Update',
     SELECT_STATUS_FOR_BULK: 'Select Status you would like to Bulk Update',
     NEXT_POSSIBLE_STATUS: 'Next possible status',
+    SELECT_NONE: 'Select None',
+    COULD_NOT_SEARCH: 'Could not search',
+    UPDATE_ALL_SELECTED: 'Update All Selected',
 
     //Sorting
     SORTING: 'Sorting',
-    REF_UNAVAILABLE: 'ReferenceNumber Unavailable',
+    REF_UNAVAILABLE: 'Reference Number Unavailable',
     FAILURE_SORTING: 'Searching failed, Please try again !',
     SEARCH_INFO: 'Search/Scan QR code in the top bar to Start',
 
@@ -288,6 +329,15 @@ module.exports = {
     CURRENT_AND_NEW_PASSWORD_CHECK: "New password cannot be same as current password.",
     PASSWORD_RESET_SUCCESSFULLY: " Password reset successful. Use the new password next time you log-in..",
     UNSAVED_PASSWORD: 'Password not saved before',
+    RESET_PASSWORD: 'Reset Password',
+    CONTACT_NUMBER: 'Contact Number',
+    EMAIL: 'Email',
+    PROFILE: 'Profile',
+    MINIMUM_REQUIREMENT_FOR_PASSWORD: 'Min. 8 characters required, including capital letter, symbol and number.',
+    CURRENT_PASSWORD: 'Current Password',
+    NEW_PASSWORD: 'New Password',
+    CONFIRM_NEW_PASSWORD: 'Confirm New Password',
+    USERNAME_IS_MISSING: 'Username is missing',
 
     //Error Message for NonExpandableDetailsView
     IMAGE_LOADING_ERROR: 'An error occurred while loading image',
@@ -318,7 +368,6 @@ module.exports = {
     TRANSACTION_SUCCESSFUL: 'Transaction Successfull',
     FINISH: 'Finish',
     RETRY_PAYMENT: 'Retry Payment',
-    SEND_OTP: 'Send OTP',
     SUBMIT: 'Submit',
     PAYMENT_SUCCESSFUL: 'Payment Successful',
     PAYMENT_FAILED: 'Payment Failed',
@@ -332,4 +381,44 @@ module.exports = {
     ENTER_OTP:'Enter OTP',
     ENTER_REGISTERED:'Enter Registered ',
     TOTAL_AMOUNT_FOR_WALLET:'Total Amount',
+
+    //TaskListCalender
+    ALL: 'All',
+    TODAY: 'Today',
+
+    //TaskListScreen
+    NO_NEXT_STATUS: 'No NextStatus Available',
+
+    //TabScreen
+    NO_TAB_PRESENT: 'No Tab Present',
+
+    //Draft Modal
+    DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
+
+    // Job Summary
+    UNABLE_TO_UPDATE_JOB_SUMMARY: 'Unable to update Job Summary',
+    VALUE_OF_JOBSUMMARY_IS_MISSING: 'Value of JobSummary is missing',
+
+    //Data Store
+    SEARCH: 'Search',
+
+    //Menu Container Constants
+    APP: 'App',
+    LOGOUT: 'Logout',
+
+    //Pages Default Name
+    ALL_TASKS: 'All Tasks',
+
+    //Mobile Job List Customization Fixed Attributes
+    ATTEMPT: 'Attempt: ',
+    SLOT: 'Slot: ',
+    START: 'Start: ',
+    END: 'End: ',
+    DISTANCE: 'Distance: ',
+    HALT_DURATION: 'Halt Duration: ',
+    CALL_COUNT: 'Call Count: ',
+    CALL_DURATION: 'Call Duration: ',
+    SMS: 'Sms: ',
+    TIME_SPENT: 'Time Spent: ',
+    SEQUENCE: 'Sequence: ',
 }

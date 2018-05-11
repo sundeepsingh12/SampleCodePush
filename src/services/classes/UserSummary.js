@@ -33,6 +33,14 @@ class UserSummary {
             console.log("error_updateUserSummary", error.message) // todo remove this
         }
     }
+
+    async updateUserSummaryCount(allCount){
+        let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+        if(userSummary && userSummary.value){
+            userSummary.value.pendingCount = allCount[0], userSummary.value.failCount = allCount[1], userSummary.value.successCount = allCount[2]
+        }
+        await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary.value)  
+    }
 }
 
 export let userSummaryService = new UserSummary()

@@ -15,10 +15,10 @@ import * as realm from '../../repositories/realmdb'
 class MultipleOptionsAttribute {
 
     changeOptionStatus(optionList, selectedOptionsMap) {
-        let optionMap = {}
+        let optionMap = {};
         for (let index in optionList) {
-            optionMap[optionList[index].id] = optionList[index]
-            optionMap[optionList[index].id].selected = selectedOptionsMap[optionList[index].code] ? true : false
+            optionMap[optionList[index].id] = optionList[index];
+            optionMap[optionList[index].id].selected = selectedOptionsMap[optionList[index].code] ? true : false;
         }
         return optionMap
     }
@@ -30,8 +30,10 @@ class MultipleOptionsAttribute {
                 continue
             }
             optionFieldDataList.push({
+                attributeTypeId: 1,
                 fieldAttributeMasterId: optionMap[index].fieldAttributeMasterId,
-                value: optionMap[index].code
+                value: optionMap[index].code,
+                key: currentElement.key
             })
         }
         return optionFieldDataList
@@ -80,12 +82,14 @@ class MultipleOptionsAttribute {
         let optionKeyFieldData = {
             attributeTypeId: item.keyFieldAttributeMaster ? item.keyFieldAttributeMaster.attributeTypeId : null,
             fieldAttributeMasterId: item.keyFieldAttributeMaster.id,
-            value: item.code
+            value: item.code,
+            key: item.keyFieldAttributeMaster && item.keyFieldAttributeMaster.key ? item.keyFieldAttributeMaster.key : null
         }
         let optionValueFieldData = {
             attributeTypeId: item.valueFieldAttributeMaster ? item.valueFieldAttributeMaster.attributeTypeId : null,
             fieldAttributeMasterId: item.valueFieldAttributeMaster.id,
-            value: item.name
+            value: item.name,
+            key: item.valueFieldAttributeMaster && item.valueFieldAttributeMaster.key ? item.valueFieldAttributeMaster.key : null
         }
         optionFieldDataList.push(optionKeyFieldData, optionValueFieldData)
         return optionFieldDataList

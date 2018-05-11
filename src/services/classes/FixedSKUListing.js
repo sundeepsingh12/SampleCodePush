@@ -20,11 +20,12 @@ class FixedSKUListing {
 
     prepareObjectWithFieldAttributeData(fieldAttributeData) {
         if (fieldAttributeData != undefined) {
-            let { id, label, attributeTypeId } = fieldAttributeData
+            let { id, label, attributeTypeId, key } = fieldAttributeData
             let objectWithFieldData = {
                 fieldAttributeMasterId: id,
                 label,
-                attributeTypeId
+                attributeTypeId,
+                key
             }
             return objectWithFieldData
         } else {

@@ -32,6 +32,7 @@ export default function arrayReducer(state = initialState, action) {
                 .set('errorMessage', '')
         case SET_ERROR_MSG:
             return state.set('errorMessage', action.payload)
+                .set('isLoading', false)
         case SET_ARRAY_ISLOADING:
             return state.set('isLoading', action.payload)
         case CLEAR_ARRAY_STATE: {

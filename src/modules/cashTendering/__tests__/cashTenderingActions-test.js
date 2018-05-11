@@ -16,6 +16,7 @@ import {
     FETCH_CASH_TENDERING_LIST_RETURN,
     CHANGE_AMOUNT_RETURN,
 } from '../../../lib/constants'
+import { userExceptionLogsService } from '../../../services/classes/UserException';
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 
@@ -127,23 +128,32 @@ describe('cashtendering  getCashTenderingListReturn', () => {
 })
 
 describe('cashtendering  onChangeQuantity', () => {
+    userExceptionLogsService.addUserExceptionLogs = jest.fn()
+    const expectedAction = [{
+        type: CHANGE_AMOUNT,
+        payload: {
+            cashtenderingList: { id: 1 },
+            totalQuantity: 10
+        }
+    },
+    {
+        type: CHANGE_AMOUNT_RETURN,
+        payload: {
+            cashtenderingList: { id: 1 },
+            totalQuantity: 10
+        }
+    }]
+    let cashtenderingList = {
+        id: 1
+    }
+    let totalQuantity = 10
+    let payload = {
+        id: 1,
+        quantity: 1200
+    }
+    let isReceive = true
     it('should change quantity of individual item', () => {
-        const expectedAction = [{
-            type: CHANGE_AMOUNT,
-            payload: {
-                cashtenderingList: { id: 1 },
-                totalQuantity: 10
-            }
-        }]
-        let cashtenderingList = {
-            id: 1
-        }
-        let totalQuantity = 10
-        let payload = {
-            id: 1,
-            quantity: 1200
-        }
-        let isReceive = true
+
         CashTenderingService.calculateQuantity = jest.fn()
         CashTenderingService.calculateQuantity.mockReturnValue({
             cashtenderingList: cashtenderingList,
@@ -155,6 +165,37 @@ describe('cashtendering  onChangeQuantity', () => {
                 expect(CashTenderingService.calculateQuantity).toHaveBeenCalled()
                 expect(store.getActions()[0].type).toEqual(expectedAction[0].type)
                 expect(store.getActions()[0].payload).toEqual(expectedAction[0].payload)
+            })
+    })
+
+    it('should change quantity of individual item when isreceive false', () => {
+
+        CashTenderingService.calculateQuantity = jest.fn()
+        CashTenderingService.calculateQuantity.mockReturnValue({
+            cashtenderingList: cashtenderingList,
+            totalQuantity: totalQuantity
+        })
+        const store = mockStore({})
+        return store.dispatch(actions.onChangeQuantity(cashtenderingList, totalQuantity, payload, false))
+            .then(() => {
+                expect(CashTenderingService.calculateQuantity).toHaveBeenCalled()
+                expect(store.getActions()[0].type).toEqual(expectedAction[1].type)
+                expect(store.getActions()[0].payload).toEqual(expectedAction[1].payload)
+            })
+    })
+
+    it('throw error when cashtenderingList is null', () => {
+        const store = mockStore({})
+        return store.dispatch(actions.onChangeQuantity(null))
+            .then(() => {
+                expect(userExceptionLogsService.addUserExceptionLogs).toHaveBeenCalled()
+            })
+    })
+    it('throw error when total amount is null', () => {
+        const store = mockStore({})
+        return store.dispatch(actions.onChangeQuantity(cashtenderingList))
+            .then(() => {
+                expect(userExceptionLogsService.addUserExceptionLogs).toHaveBeenCalled()
             })
     })
 })
@@ -183,6 +224,18 @@ describe('cashtendering  fetchCashTenderingList', () => {
                 expect(store.getActions()[0].type).toEqual(expectedAction[0].type)
                 expect(store.getActions()[1].type).toEqual(expectedAction[1].type)
                 expect(store.getActions()[1].payload).toEqual(expectedAction[1].payload)
+            })
+    })
+    it('throw error', () => {
+        const expectedAction = [{
+            type: IS_CASH_TENDERING_LOADER_RUNNING,
+        },
+        ]
+        const store = mockStore({})
+        return store.dispatch(actions.fetchCashTenderingList())
+            .then(() => {
+                expect(store.getActions()[0].type).toEqual(expectedAction[0].type)
+                expect(store.getActions()[0].payload).toEqual(false)
             })
     })
 })
@@ -310,13 +363,26 @@ describe('cashtendering  checkForCash', () => {
                 }
                 ],
         })
+        let routeParams = {
+            formLayoutState: {
+                formElement,
+            },
+            currentElement
+        }
         let cash = 120
         CashTenderingService.checkForCashInMoneyCollect = jest.fn()
         CashTenderingService.checkForCashInMoneyCollect.mockReturnValue({})
         const store = mockStore({})
-        return store.dispatch(actions.checkForCash(formElement, currentElement))
+        return store.dispatch(actions.checkForCash(routeParams))
             .then(() => {
                 expect(CashTenderingService.checkForCashInMoneyCollect).toHaveBeenCalled()
+            })
+    })
+    it('throw error ', () => {
+        const store = mockStore({})
+        return store.dispatch(actions.checkForCash())
+            .then(() => {
+                expect(userExceptionLogsService.addUserExceptionLogs).toHaveBeenCalled()
             })
     })
 })

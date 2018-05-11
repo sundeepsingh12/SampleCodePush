@@ -88,14 +88,14 @@ class SplitPayment extends Component {
     }
 
     renderPaymentModeView(modeTypeId, paymentView, amount) {
-        let titleText = this.renderPaymentModeId(modeTypeId)
+        let titleText = this.props.navigation.state.params.renderPaymentModeId(modeTypeId)
         return (
             <View key={modeTypeId} style={[styles.bgWhite, styles.padding10, styles.marginBottom15]}>
                 <View style={paymentView ? [styles.marginBottom10] : null}>
                     <Text style={[styles.fontLg, styles.width100, styles.fontCenter, styles.marginBottom10, styles.paddingTop5]}>
                         {titleText} {PAYMENT}
                     </Text>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
                         {AMOUNT}
                     </Text>
                     <Item>
@@ -114,7 +114,7 @@ class SplitPayment extends Component {
                 </View>
                 {paymentView ? <View style={[styles.marginTop5, styles.marginBottom15]}>
                     <Button bordered small onPress={() => { this.props.actions.changeChequeOrDDPaymentModeList(modeTypeId, this.props.splitPaymentModeMap) }}>
-                        <Text style={[styles.fontPrimary]}>{ADD_PAYMENT_MODE}</Text>
+                        <Text style={{color : styles.fontPrimaryColor}}>{ADD_PAYMENT_MODE}</Text>
                     </Button>
                 </View> : null}
             </View>
@@ -122,11 +122,11 @@ class SplitPayment extends Component {
     }
 
     renderChequeOrDDView(modeTypeId, id, amount, transactionNumber) {
-        let titleText = this.renderPaymentModeId(modeTypeId)
+        let titleText = this.props.navigation.state.params.renderPaymentModeId(modeTypeId)
         return (
             <View key={`${id}${modeTypeId}`} style={[styles.row, styles.justifySpaceBetween, styles.marginTop10]}>
                 <View style={[styles.justifySpaceBetween, { width: '50%' }]}>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
                         {titleText} {NUMBER}
                     </Text>
                     <Item>
@@ -142,7 +142,7 @@ class SplitPayment extends Component {
                     </Item>
                 </View>
                 <View style={[styles.justifySpaceBetween, { width: '35%' }]}>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
                         {titleText} {AMOUNT}
                     </Text>
                     <Item>
@@ -179,43 +179,12 @@ class SplitPayment extends Component {
         return paymentModeListView
     }
 
-    renderPaymentModeId(modeId, type) {
-        switch (modeId) {
-            case CASH.id: return CASH.displayName
-            case CHEQUE.id: return CHEQUE.displayName
-            case DEMAND_DRAFT.id: return DEMAND_DRAFT.displayName
-            case DISCOUNT.id: return DISCOUNT.displayName
-            case EZE_TAP.id: return EZE_TAP.displayName
-            case MOSAMBEE.id: return MOSAMBEE.displayName
-            case MOSAMBEE_WALLET.id: return MOSAMBEE_WALLET.displayName
-            case MPAY.id: return MPAY.displayName
-            case M_SWIPE.id: return M_SWIPE.displayName
-            case NET_BANKING.id: {
-                switch (type) {
-                    case NET_BANKING_LINK.id: return NET_BANKING_LINK.displayName
-                    case NET_BANKING_CARD_LINK.id: return NET_BANKING_CARD_LINK.displayName
-                    case NET_BANKING_UPI_LINK.id: return NET_BANKING_UPI_LINK.displayName
-                }
-            }
-            case NOT_PAID.id: return NOT_PAID.displayName
-            case PAYNEAR.id: return PAYNEAR.displayName
-            case PAYO.id: return PAYO.displayName
-            case PAYTM.id: return PAYTM.displayName
-            case POS.id: return POS.displayName
-            case RAZOR_PAY.id: return RAZOR_PAY.displayName
-            case SODEXO.id: return SODEXO.displayName
-            case SPLIT.id: return SPLIT.displayName
-            case TICKET_RESTAURANT.id: return TICKET_RESTAURANT.displayName
-            case UPI.id: return UPI.displayName
-        }
-    }
-
     render() {
         let paymentModeListView = this.renderPaymentModeListView(this.props.splitPaymentModeMap)
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>
@@ -261,11 +230,9 @@ class SplitPayment extends Component {
                                     this.props.actions.saveMoneyCollectSplitObject(
                                         this.props.navigation.state.params.actualAmount,
                                         this.props.navigation.state.params.currentElement,
-                                        this.props.navigation.state.params.formElements,
+                                        this.props.navigation.state.params.formLayoutState,
                                         this.props.navigation.state.params.jobTransaction,
-                                        this.props.navigation.state.params.latestPositionId,
                                         this.props.navigation.state.params.moneyCollectMaster,
-                                        this.props.navigation.state.params.isSaveDisabled,
                                         this.props.navigation.state.params.originalAmount,
                                         this.props.splitPaymentModeMap,
                                         this.props.navigation.state.params.paymentContainerKey

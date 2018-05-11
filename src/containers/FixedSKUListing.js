@@ -69,20 +69,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class FixedSKUListing extends PureComponent {
-  constructor(props) {
-    super(props)
-    let navigationState = this.props.navigation.state.params
-    this.parentObject = navigationState['currentElement']
-    this.jobTransaction = navigationState['jobTransaction']
-    this.latestPositionId = navigationState['latestPositionId']
-    this.formElement = navigationState['formElements']
-    this.isSaveDisabled = navigationState['isSaveDisabled']
-  }
 
   componentWillMount() {
-    if (this.parentObject.value != ARRAY_SAROJ_FAREYE) {
-      this.props.actions.fetchFixedSKU(this.parentObject.fieldAttributeMasterId)
-    }
+    this.props.actions.fetchFixedSKU(this.props.navigation.state.params.currentElement.fieldAttributeMasterId)
   }
 
   componentDidUpdate() {
@@ -110,14 +99,17 @@ class FixedSKUListing extends PureComponent {
     }
   }
 
-  goBack() {
+  componentWillUnmount() {
     this.props.actions.setState(RESET_STATE_FIXED_SKU)
+  }
+
+  goBack() {
     this.props.navigation.goBack()
   }
 
-  showHeaderView(){
+  showHeaderView() {
     return (
-      <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+      <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
         <Body>
           <View
             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -136,7 +128,7 @@ class FixedSKUListing extends PureComponent {
     )
   }
 
-  showFooterView(){
+  showFooterView() {
     return (
       <Footer
         style={[style.footer, styles.bgWhite, styles.column]}>
@@ -145,10 +137,10 @@ class FixedSKUListing extends PureComponent {
             {TOTAL_QUANTITY} {parseInt(this.props.totalQuantity)}
           </Text>
         </View>
-        <View style={[styles.bgPrimary]}>
-          <Button success full style={[styles.bgPrimary]}
+        <View style={{backgroundColor : styles.bgPrimaryColor}}>
+          <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
             onPress={() => {
-              this.props.actions.onSave(this.parentObject, this.formElement, this.props.fixedSKUList, this.isSaveDisabled, this.latestPositionId, this.jobTransaction)
+              this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction)
             }}>
             <Text style={{ textAlign: 'center', width: '100%', color: 'white' }}>
               {SAVE}
@@ -168,7 +160,7 @@ class FixedSKUListing extends PureComponent {
     return (
       <Container>
         <View style={style.container}>
-         {this.showHeaderView()}
+          {this.showHeaderView()}
 
           <FlatList
             data={Object.values(this.props.fixedSKUList)}
@@ -178,7 +170,7 @@ class FixedSKUListing extends PureComponent {
 
           {this.showFooterView()}
 
-         
+
         </View>
       </Container >
     )

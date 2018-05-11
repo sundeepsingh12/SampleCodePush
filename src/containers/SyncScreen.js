@@ -67,12 +67,6 @@ function mapDispatchToProps(dispatch) {
 
 class SyncScreen extends PureComponent {
 
-  componentDidMount() {
-    this.props.actions.startMqttService(this.props.pieChart)
-    this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated')
-    this.props.actions.startTracking(this.props.trackingServiceStarted)
-  }
-
   getTransactionView() {
     let transactionList = this.props.unsyncedTransactionList
     let transactionView = []
@@ -133,7 +127,7 @@ class SyncScreen extends PureComponent {
             {SYNC_OK_TEXT}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
+            <Button style={{backgroundColor : styles.bgPrimaryColor}} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RE_SYNC} </Text>
             </Button>
           </View>
@@ -150,7 +144,7 @@ class SyncScreen extends PureComponent {
             {INTERNAL_SERVER_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
+            <Button style={{backgroundColor : styles.bgPrimaryColor}} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -168,7 +162,7 @@ class SyncScreen extends PureComponent {
             {NO_INTERNET}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
+            <Button style={{backgroundColor : styles.bgPrimaryColor}} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -195,7 +189,7 @@ class SyncScreen extends PureComponent {
             {INTERNAL_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={[styles.bgPrimary]} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
+            <Button style={{backgroundColor : styles.bgPrimaryColor}} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated') }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>

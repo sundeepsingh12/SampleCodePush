@@ -9,161 +9,6 @@ import {
 } from '../classes/JobMaster'
 
 
-describe('test cases for prepareJobMasterVsStatusList', () => {
-    // it('should prepare job master vs status', () => {
-    //     const jobStatusList = [{
-    //         id: 1,
-    //         jobMasterId: 1,
-    //         code: 'UNSEEN',
-    //         name: 'Unseen'
-    //     }, {
-    //         id: 2,
-    //         jobMasterId: 1,
-    //         code: 'PENDING',
-    //         name: 'Pending',
-    //         nextStatusList: [{
-    //             id: 3,
-    //             jobMasterId: 1,
-    //             code: 'Success',
-    //             name: 'Success'
-    //         }]
-    //     }]
-
-    //     const bulkConfigList = [{
-    //         jobMasterName: 'A',
-    //         id: 0,
-    //         statusName: 'Pending',
-    //         statusId: 2,
-    //         nextStatusList: [{
-    //             id: 3,
-    //             jobMasterId: 1,
-    //             code: 'Success',
-    //             name: 'Success'
-    //         }],
-    //         jobMasterId: 1
-    //     }]
-    //     const jobMasterList = [{
-    //         id: 1,
-    //         title: 'A'
-    //     }]
-
-    //     jobMasterService.getIdJobMasterMap = jest.fn()
-    //     jobMasterService.getIdJobMasterMap.mockReturnValue({
-    //         1: {
-    //             id: 1,
-    //             title: 'A'
-    //         }
-    //     })
-
-    //     bulkService._getJobMasterIdStatusNameList = jest.fn()
-    //     bulkService._getJobMasterIdStatusNameList.mockReturnValue(bulkConfigList)
-
-    //     expect(bulkService.prepareJobMasterVsStatusList(jobMasterList, jobStatusList)).toEqual(bulkConfigList)
-    // })
-})
-
-describe('test case for _getJobMasterIdStatusNameList', () => {
-    it('should return bulk config list', () => {
-        const jobStatusList = [{
-            id: 1,
-            jobMasterId: 1,
-            code: 'UNSEEN',
-            name: 'Unseen'
-        }, {
-            id: 2,
-            jobMasterId: 1,
-            code: 'PENDING',
-            name: 'Pending',
-            nextStatusList: [{
-                id: 3,
-                jobMasterId: 1,
-                code: 'Success',
-                name: 'Success'
-            }]
-        }]
-        const idJobMasterMap = {
-            1: {
-                id: 1,
-                title: 'A'
-            }
-        }
-        const bulkConfigList = [{
-            jobMasterName: 'A',
-            id: 0,
-            statusName: 'Pending',
-            statusId: 2,
-            nextStatusList: [{
-                id: 3,
-                jobMasterId: 1,
-                code: 'Success',
-                name: 'Success'
-            }],
-            jobMasterId: 1
-        }]
-        expect(bulkService._getJobMasterIdStatusNameList(jobStatusList, idJobMasterMap)).toEqual(bulkConfigList)
-    })
-})
-
-describe('test case for getSelectedTransactionIds', () => {
-    it('should return no transactions', () => {
-        const jobTransactions = [{
-            id: 1,
-            isChecked: false
-        },
-        {
-            id: 2,
-            isChecked: false
-        }]
-        expect(bulkService.getSelectedTransactionIds(jobTransactions)).toEqual([])
-    })
-    it('should return selected transactions', () => {
-        const jobTransactions = [{
-            id: 1,
-            isChecked: true
-        },
-        {
-            id: 2,
-            isChecked: false
-        }]
-        const selectedItems = [1]
-        expect(bulkService.getSelectedTransactionIds(jobTransactions)).toEqual(selectedItems)
-    })
-})
-
-describe('test case for _getStatusIdJobMasterIdBulkAllowedMap', () => {
-    it('should return null for empty bulkJobMasterStatusConfiguration', () => {
-        expect(bulkService._getStatusIdJobMasterIdBulkAllowedMap({})).toEqual(undefined)
-    })
-    it('should return  statusIdJobMasterIdBulkAllowedMap', () => {
-        const bulkJobMasterStatusConfiguration = [{
-            statusId: 123,
-            jobMasterId: 1,
-            bulkUpdateAllowed: true
-        }]
-        const statusIdJobMasterIdBulkAllowedMap = {
-            123: {
-                1: true
-            }
-        }
-        expect(bulkService._getStatusIdJobMasterIdBulkAllowedMap(bulkJobMasterStatusConfiguration)).toEqual(statusIdJobMasterIdBulkAllowedMap)
-    })
-})
-
-describe('test case for getManualSelection', () => {
-    it('should return true for empty jobMasterManualSelectionConfiguration', () => {
-        expect(bulkService.getManualSelection([])).toEqual(true, 1)
-    })
-    it('should return  manual selection config', () => {
-        const jobMasterId = 1
-        const jobMasterManualSelectionConfiguration = [
-            {
-                jobMasterId: 1,
-                manualSelectionAllowed: false
-            }
-        ]
-        expect(bulkService.getManualSelection(jobMasterManualSelectionConfiguration, jobMasterId)).toEqual(false)
-    })
-})
 describe('test case for performsearch', () => {
 
     it('should return empty jobTransaction array for no search found', () => {
@@ -171,131 +16,115 @@ describe('test case for performsearch', () => {
         const bulkTransactions = []
         const searchSelectionOnLine1Line2 = false, idToSeparatorMap = {}
         const searchObject = {
-            jobTransactionArray: [], errorMessage: 'Invalid Scan'
+            errorMessage: 'Invalid Scan'
         }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
+        const pageObject = {
+            additionalParams: JSON.stringify({})
+        }
+        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, {}, pageObject)).toEqual(searchObject)
     })
-    it('should return  jobTransaction array with matching reference number', () => {
+
+    it('should return  no error message with matching reference number', () => {
         const searchValue = 'test'
-        const bulkTransactions = [{
-            referenceNumber: 'test'
-        }]
+        const bulkTransactions = {
+            1: {
+                referenceNumber: 'test',
+                id: 1
+            }
+        }
         const searchSelectionOnLine1Line2 = false, idToSeparatorMap = {}
         const searchObject = {
-            jobTransactionArray: [{
-                referenceNumber: 'test'
-            }], errorMessage: ''
+            errorMessage: '',
+            displayText: 'Select None',
+            selectAll: false
         }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
+        const pageObject = {
+            additionalParams: JSON.stringify({})
+        }
+        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, {}, pageObject)).toEqual(searchObject)
     })
-    it('should return  jobTransaction array with matching reference number', () => {
+
+    it('should return error message for no match in runsheet no', () => {
         const searchValue = 'test'
-        const bulkTransactions = [{
-            runsheetNo: 'test'
-        }]
+        const bulkTransactions = {
+            1: {
+                referenceNumber: 'test2',
+                id: 1
+            }
+        }
         const searchSelectionOnLine1Line2 = false, idToSeparatorMap = {}
         const searchObject = {
-            jobTransactionArray: [{
-                runsheetNo: 'test'
-            }], errorMessage: ''
+            errorMessage: 'Invalid Scan'
         }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
-    })
-    it('should return empty jobTransaction array for no match in runsheet no', () => {
-        const searchValue = 'test'
-        const bulkTransactions = [{
-            runsheetNo: 'test2'
-        }]
-        const searchSelectionOnLine1Line2 = false, idToSeparatorMap = {}
-        const searchObject = {
-            jobTransactionArray: [], errorMessage: 'Invalid Scan'
+        const pageObject = {
+            additionalParams: JSON.stringify({})
         }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
+        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, {}, pageObject)).toEqual(searchObject)
     })
     it('should return empty jobTransaction array for no match in display value', () => {
         const searchValue = 'test'
-        const bulkTransactions = [{
-            runsheetNo: 'test2'
-        }]
+        const bulkTransactions = {
+            1: {
+                referenceNumber: 'test2',
+                id: 1
+            }
+        }
         const searchSelectionOnLine1Line2 = true, idToSeparatorMap = {}
         const searchObject = {
-            jobTransactionArray: [], errorMessage: 'Invalid Scan'
+            errorMessage: 'Invalid Scan'
         }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
+        const pageObject = {
+            additionalParams: JSON.stringify({})
+        }
+        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, {}, pageObject)).toEqual(searchObject)
     })
     it('should return match for line 1', () => {
         const searchValue = 'test'
-        const bulkTransactions = [{
-            runsheetNo: 'test2',
-            line1: 'test'
-        }]
+        const bulkTransactions = {
+            1: {
+                runsheetNo: 'test2',
+                line1: 'test',
+                id: 1
+            }
+        }
         const searchSelectionOnLine1Line2 = true, idToSeparatorMap = {
             1: '-'
         }
         const searchObject = {
-            jobTransactionArray: [{
-                runsheetNo: 'test2',
-                line1: 'test'
-            }], errorMessage: ''
+            errorMessage: '',
+            displayText: 'Select None',
+            selectAll: false
         }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
+        const pageObject = {
+            additionalParams: JSON.stringify({})
+        }
+        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, {}, pageObject)).toEqual(searchObject)
     })
     it('should return no job transactions for line1 same in 2 transaction', () => {
         const searchValue = 'test'
-        const bulkTransactions = [{
-            runsheetNo: 'test2',
-            line1: 'test',
-        },
-        {
-            runsheetNo: 'test2',
-            line1: 'test',
-        }]
+        const bulkTransactions = {
+            1: {
+                runsheetNo: 'test2',
+                line1: 'test', id: 1
+            },
+            2: {
+                runsheetNo: 'test2',
+                line1: 'test',
+                id: 2
+            }
+        }
         const searchSelectionOnLine1Line2 = true, idToSeparatorMap = {
             1: '-'
         }
         const searchObject = {
-            jobTransactionArray: [{
-                runsheetNo: 'test2',
-                line1: 'test',
-            },
-            {
-                runsheetNo: 'test2',
-                line1: 'test',
-            }], errorMessage: 'Invalid Scan'
+            errorMessage: 'Invalid Scan',
+            displayText: 'Select All',
+            selectAll: false
         }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
-    })
-    it('should return match for line 2', () => {
-        const searchValue = 'test'
-        const bulkTransactions = [{
-            runsheetNo: 'test2',
-            line2: 'test'
-        }]
-        const searchSelectionOnLine1Line2 = true, idToSeparatorMap = {
-            1: '-',
-            2: '-'
+        const pageObject = {
+            additionalParams: JSON.stringify({})
         }
-        const searchObject = {
-            jobTransactionArray: [{
-                runsheetNo: 'test2',
-                line2: 'test'
-            }], errorMessage: ''
-        }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
-    })
-    it('should return no match for no separator', () => {
-        const searchValue = 'test'
-        const bulkTransactions = [{
-            runsheetNo: 'test2',
-            line1: 'test-test2'
-        }]
-        const searchSelectionOnLine1Line2 = true, idToSeparatorMap = {
-
-        }
-        const searchObject = {
-            jobTransactionArray: [], errorMessage: 'Invalid Scan'
-        }
-        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap)).toEqual(searchObject)
+        expect(bulkService.performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, {}, pageObject)).toEqual(searchObject)
     })
 })
 
@@ -333,7 +162,7 @@ describe('test case for checkForPresenceInDisplayText', () => {
         }
         const idToSeparatorMap = {
             1: '-',
-        
+
         }
         expect(bulkService.checkForPresenceInDisplayText(searchValue, bulkTransactions, idToSeparatorMap)).toEqual(true)
     })
@@ -345,7 +174,7 @@ describe('test case for checkForPresenceInDisplayText', () => {
         }
         const idToSeparatorMap = {
             1: '-',
-       
+
         }
         expect(bulkService.checkForPresenceInDisplayText(searchValue, bulkTransactions, idToSeparatorMap)).toEqual(true)
     })
@@ -406,5 +235,147 @@ describe('test case for getIdSeparatorMap', () => {
             1: '-'
         }
         expect(bulkService.getIdSeparatorMap(jobMasterIdCustomizationMap, 400)).toEqual(idToSeparatorMap)
+    })
+
+})
+
+describe('test case for getSelectedTransactionObject', () => {
+
+    it('should return empty object for no jobMasterIdCustomizationMap', () => {
+        let jobTransaction = {
+            id: 1,
+            jobId: 1,
+            jobMasterId: 1
+        }
+        let jobTransactionObject = {
+            jobTransactionId: 1,
+            jobId: 1,
+            jobMasterId: 1
+        }
+        expect(bulkService.getSelectedTransactionObject(jobTransaction)).toEqual(jobTransactionObject)
+    })
+})
+describe('test case for checkForSimilarityBulk', () => {
+
+    it('should return false for null similarity config', () => {
+        expect(bulkService.checkForSimilarityBulk({}, {}, {})).toEqual(false)
+    })
+
+    it('should return false for same line 1', () => {
+        const jobTransaction = {
+            line1: 'abc'
+        }
+        const bulkConfig = {
+            lineOneEnabled: true
+        }
+        expect(bulkService.checkForSimilarityBulk(jobTransaction, jobTransaction, bulkConfig)).toEqual(false)
+    })
+    it('should return true for different line 1', () => {
+        const jobTransaction = {
+            line1: 'abc'
+        }
+        const jobTransaction2 = {
+            line1: 'abc1'
+        }
+        const bulkConfig = {
+            lineOneEnabled: true
+        }
+        expect(bulkService.checkForSimilarityBulk(jobTransaction, jobTransaction2, bulkConfig)).toEqual(true)
+    })
+})
+
+describe('test case for setEnabledTransactions', () => {
+
+    it('should return number of enabled transactions', () => {
+        let jobTransaction = {
+            1: {
+                id: 1,
+                jobId: 1,
+                jobMasterId: 1
+            }
+        }
+        expect(bulkService.setEnabledTransactions(jobTransaction, jobTransaction[1], {})).toEqual(1)
+    })
+
+    it('should return 2 enabled transactions', () => {
+        let jobTransaction = {
+            1: {
+                id: 1,
+                jobId: 1,
+                jobMasterId: 1,
+                line1: 'abc'
+            },
+            2: {
+                id: 2,
+                jobId: 2,
+                jobMasterId: 2,
+                line1: 'abc'
+            }
+        }
+        const bulkConfig = {
+            lineOneEnabled: true
+        }
+        expect(bulkService.setEnabledTransactions(jobTransaction, jobTransaction[1], bulkConfig, {})).toEqual(2)
+    })
+
+    it('should return 2 enabled transactions for selected item as current transaction', () => {
+        let jobTransaction = {
+            1: {
+                id: 1,
+                jobId: 1,
+                jobMasterId: 1,
+                line1: 'abc'
+            },
+            2: {
+                id: 2,
+                jobId: 2,
+                jobMasterId: 2,
+                line1: 'abc'
+            }
+        }
+        const selectedItem = {
+            1: {
+                id: 1,
+                jobId: 1,
+                jobMasterId: 1,
+            },
+        }
+        const bulkConfig = {
+            lineOneEnabled: true
+        }
+        expect(bulkService.setEnabledTransactions(jobTransaction, jobTransaction[1], bulkConfig, {})).toEqual(2)
+    })
+})
+
+
+describe('test case for getDisplayTextAndSelectAll', () => {
+
+    it('should return display text and select all in case of no similarity check ', () => {
+        const pageObject = {
+            additionalParams: {
+                selectAll: true
+            }
+        }
+        const result = {
+            displayText: 'Select None',
+            selectAll: true
+        }
+        expect(bulkService.getDisplayTextAndSelectAll(null, {}, null, {}, pageObject)).toEqual(result)
+    })
+
+    it('should return display text and select all in case of similarity check ', () => {
+        const pageObject = {
+            additionalParams: {
+                selectAll: true
+            }
+        }
+        const bulkConfig = {
+            lineOneEnabled: true
+        }
+        const result = {
+            displayText: 'Select None',
+            selectAll: false
+        }
+        expect(bulkService.getDisplayTextAndSelectAll(bulkConfig, {}, 0, {}, pageObject)).toEqual(result)
     })
 })

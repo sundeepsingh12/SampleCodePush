@@ -80,4 +80,4 @@ export default class Fareye extends PureComponent {
 }
 
 
-AppRegistry.registerComponent('FareyeReact', () => Fareye)*/
+AppRegistry.registerComponent('Fareye', () => Fareye)*/

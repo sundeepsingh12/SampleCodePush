@@ -1,18 +1,10 @@
 
-
-const themeColor = '#00796B';
-
+var themeColor = '#00796B'
 export default {
     primaryColor: themeColor,
-
-    bgPrimary: {
-        backgroundColor: themeColor
-    },
+    bgPrimaryColor : themeColor,
+    fontPrimaryColor : themeColor,
     shadeColor: themeColor + '98',
-    fontPrimary: {
-        color: themeColor
-    },
-
     mainBg: {
         backgroundColor: '#F7F8FA'
     },
@@ -241,7 +233,7 @@ export default {
         marginRight: 'auto'
     },
 
-    
+
 
     // Margin Verticle
     marginVerticle0: {
@@ -392,7 +384,7 @@ export default {
     paddingRight25: {
         paddingRight: 25
     },
-    
+
     paddingRight30: {
         paddingRight: 30
     },
@@ -552,14 +544,11 @@ export default {
     },
     shadow: {
         elevation: 2,
-        shadowOffset:{  width: 3,  height: 4,  },
+        shadowOffset: { width: 3, height: 4, },
         shadowColor: '#d3d3d3',
         shadowOpacity: .5,
     },
-    borderLeft4: {
-        borderLeftColor: themeColor,
-        borderLeftWidth: 4
-    },
+    borderLeft4Color : themeColor,
     header: {
         borderBottomWidth: 0,
         height: 'auto',
@@ -650,5 +639,29 @@ export default {
     borderBottomGray: {
         borderBottomWidth: 1,
         borderBottomColor: '#d4d4d4'
+    },
+    // Profile UI
+    profileHeaderLeft: {
+        width: '15%',
+        padding: 15
+    },
+    profilePic: {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+    },
+    footer: {
+        height: 'auto',
+        borderTopWidth: 1,
+        borderTopColor: '#f3f3f3'
+    },
+    inputType: {
+        height: 50,
+        fontSize: 14
+    },
+    imageSync: {
+        width: 116,
+        height: 116,
+        resizeMode: 'contain'
     }
 }

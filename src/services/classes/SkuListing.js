@@ -8,7 +8,7 @@ import {
 import {
     keyValueDBService
 } from './KeyValueDBService'
-import {jobDataService} from './JobData'
+import { jobDataService } from './JobData'
 import * as realm from '../../repositories/realmdb'
 import {
     SKU_ORIGINAL_QUANTITY,
@@ -22,7 +22,7 @@ import {
     OBJECT_SAROJ_FAREYE,
     SKU_PHOTO,
     SKU_REASON,
-    NA
+    NA,
 } from '../../lib/AttributeConstants'
 import {
     fieldAttributeStatusService
@@ -35,41 +35,55 @@ import {
     QTY_ZERO,
     REASON,
     OPEN_CAMERA,
+    ORIGNAL_QUANTITY,
+    ACTUAL_QUANTITY,
+    SKU_CODE_MAX_LIMIT_REACHED,
+    SKU_CODE_MIN_LIMIT_REACHED,
+    PHOTO,
+    RESULT_NOT_FOUND,
+    UNIT_PRICE,
+    ACTUAL_AMOUNT
 } from '../../lib/ContainerConstants'
+import _ from 'lodash'
 class SkuListing {
 
-      async getSkuListingDto(fieldAttributeMasterId) {
-          if(!fieldAttributeMasterId){
-              throw new Error('Field Attribute master id missing')
-          }
+    async getSkuListingDto(fieldAttributeMasterId) {
+        if (!fieldAttributeMasterId) {
+            throw new Error('Field Attribute master id missing')
+        }
 
         const fieldAttributesList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE)
-         if (!fieldAttributesList || !fieldAttributesList.value) {
+        if (!fieldAttributesList || !fieldAttributesList.value) {
             throw new Error('Field Attributes missing in store')
         }
 
-        let idFieldAttributeMap = new Map(), isSkuCodePresent = false
-        const childFieldAttributeId = fieldAttributesList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == fieldAttributeMasterId &&
-            fieldAttributeObject.attributeTypeId == OBJECT).map(object => object.id)
-
-        fieldAttributesList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == childFieldAttributeId[0])
-            .forEach(fieldAttribute => {
-                if(fieldAttribute.attributeTypeId==SKU_CODE){
+        let idFieldAttributeMap = new Map(), isSkuCodePresent = false, childFieldAttributeId, childFieldAttributeKey
+        let fieldAttributesListValues = fieldAttributesList.value
+        fieldAttributesListValues.map(fieldAttributeObject => {
+            if (fieldAttributeObject.parentId == fieldAttributeMasterId && fieldAttributeObject.attributeTypeId == OBJECT) {
+                childFieldAttributeId = fieldAttributeObject.id
+                childFieldAttributeKey = fieldAttributeObject.key
+            }
+        })
+        for (let index in fieldAttributesListValues) {
+            if (fieldAttributesListValues[index].parentId == childFieldAttributeId) {
+                if (fieldAttributesListValues[index].attributeTypeId == SKU_CODE) {
                     isSkuCodePresent = true
                 }
-                const id = (fieldAttribute.jobAttributeMasterId == 0 || fieldAttribute.jobAttributeMasterId==null) ?fieldAttribute.attributeTypeId:fieldAttribute.jobAttributeMasterId
-                idFieldAttributeMap.set(id,fieldAttribute)
-            })
-
-            fieldAttributesList.value.filter(fieldAttributeObject => fieldAttributeObject.parentId == fieldAttributeMasterId && fieldAttributeObject.attributeTypeId!=OBJECT).forEach(fieldAttribute=>{
-                idFieldAttributeMap.set(fieldAttribute.attributeTypeId,fieldAttribute)
-            })
-
-            const skuListingDto = {
-                idFieldAttributeMap,
-                isSkuCodePresent,
-                childFieldAttributeId
+                const id = (fieldAttributesListValues[index].jobAttributeMasterId == 0 || fieldAttributesListValues[index].jobAttributeMasterId == null) ? fieldAttributesListValues[index].attributeTypeId : fieldAttributesListValues[index].jobAttributeMasterId
+                idFieldAttributeMap.set(id, fieldAttributesListValues[index])
             }
+            if (fieldAttributesListValues[index].parentId == fieldAttributeMasterId && fieldAttributesListValues[index].attributeTypeId != OBJECT) {
+                idFieldAttributeMap.set(fieldAttributesListValues[index].attributeTypeId, fieldAttributesListValues[index])
+            }
+        }
+        const skuListingDto = {
+            idFieldAttributeMap,
+            isSkuCodePresent,
+            childFieldAttributeId,
+            childFieldAttributeKey
+        }
+
         return skuListingDto
     }
 
@@ -80,18 +94,24 @@ class SkuListing {
      * 
      * idFieldAttributeMap - fieldAttributeTypeId/JobAttributeId Vs FieldAttribute Map
      */
-        async prepareSkuListingData(idFieldAttributeMap, jobId,skuObjectValidation, skuValidationForImageAndReason) {
-            if(!jobId){
-                throw new Error('Job id missing')
-            }
-            let reasonsList, skuActualQuantityObject,originalQuantityValue=0
-            let query = Array.from(idFieldAttributeMap.keys()).map(jobAttributeId => `jobAttributeMasterId = ${jobAttributeId}`).join(' OR ')
-            query = `(${query}) AND jobId = ${jobId}`
-            const jobDatas = realm.getRecordListOnQuery(TABLE_JOB_DATA, query)
-            let autoIncrementId = 0, skuObjectListDto = {},attributeTypeIdValueMap={},totalActualQuantityValue=0,totalOriginalQuantityValue=0,skuActualAmount=0
-            const parentIdJobDataListMap = jobDataService.getParentIdJobDataListMap(jobDatas)
+    async prepareSkuListingData(idFieldAttributeMap, jobTransactionList, skuObjectValidation, skuValidationForImageAndReason) {
+        if (_.isEmpty(jobTransactionList)) {
+            throw new Error('JobTransactions is missing')
+        }
+        skuValidationForImageAndReason = (skuValidationForImageAndReason && skuValidationForImageAndReason.timeOfExecution == 'SKUValidation') ? skuValidationForImageAndReason : null
+        let reasonsList, skuActualQuantityObject, autoIncrementId = 0, skuCodeMap = {}
+        let query = Array.from(idFieldAttributeMap.keys()).map(jobAttributeId => `jobAttributeMasterId = ${jobAttributeId}`).join(' OR ')
+        query = `(${query}) AND (${jobTransactionList.map(jobTransaction => `jobId = ${jobTransaction.jobId}`).join(' OR ')})`
+        const jobDatas = realm.getRecordListOnQuery(TABLE_JOB_DATA, query)
+        let skuObjectListDto = {}, attributeTypeIdValueMap = {}, jobIdData
+        const parentIdJobDataListArray = jobDataService.getParentIdJobDataListMap(jobDatas, jobTransactionList)
+        for (let jobId in parentIdJobDataListArray) {
+            let totalActualQuantityValue = 0, totalOriginalQuantityValue = 0, skuActualAmount = 0
+            let parentIdJobDataListMap = parentIdJobDataListArray[jobId]
+            attributeTypeIdValueMap[jobId] = {}
+            skuObjectListDto[jobId] = {}
             for (let parentId in parentIdJobDataListMap) {
-                let innerArray = [],unitPrice=0,actualQuantityValue=0
+                let innerArray = [], unitPrice = 0, actualQuantityValue = 0, checkForActualAmount, originalQuantityValue = 0
                 parentIdJobDataListMap[parentId].forEach(jobData => {
                     let isUnitPricePresent = false
                     const fieldAttribute = idFieldAttributeMap.get(jobData.jobAttributeMasterId)
@@ -100,139 +120,169 @@ class SkuListing {
                         attributeTypeId: fieldAttribute.attributeTypeId,
                         value: jobData.value,
                         id: fieldAttribute.id,
+                        key: fieldAttribute.key,
                         parentId,
                         autoIncrementId
                     }
                     innerArray.push(innerObject)
                     autoIncrementId++
-                    if(innerObject.attributeTypeId==SKU_ORIGINAL_QUANTITY){
-                         originalQuantityValue = innerObject.value
-                         totalOriginalQuantityValue+=parseInt(originalQuantityValue)
-
+                    if (innerObject.attributeTypeId == SKU_CODE) {
+                        skuCodeMap[jobData.value.toLowerCase()] = (!skuCodeMap[jobData.value.toLowerCase()]) ? [parentId, jobId] : skuCodeMap[jobData.value.toLowerCase()]
                     }
-                    else if(innerObject.attributeTypeId==SKU_UNIT_PRICE){
+                    if (innerObject.attributeTypeId == SKU_ORIGINAL_QUANTITY) {
+                        originalQuantityValue = innerObject.value
+                        totalOriginalQuantityValue += parseInt(originalQuantityValue)
+                    } else if (innerObject.attributeTypeId == SKU_UNIT_PRICE) {
                         unitPrice = parseInt(innerObject.value)
                         isUnitPricePresent = true
-
                     }
-                    if(!isUnitPricePresent){
-                        skuActualAmount+=(unitPrice*actualQuantityValue)
+                    if (originalQuantityValue && unitPrice) {
+                        actualQuantityValue = (skuObjectValidation && skuObjectValidation.leftKey == 0) ? 0 : originalQuantityValue
+                        skuActualAmount += (unitPrice * actualQuantityValue)
+                        unitPrice = 0
                     }
                 })
                 skuActualQuantityObject = {
                     label: idFieldAttributeMap.get(SKU_ACTUAL_QUANTITY).label,
                     attributeTypeId: idFieldAttributeMap.get(SKU_ACTUAL_QUANTITY).attributeTypeId,
-                    value: (skuObjectValidation && skuObjectValidation.leftKey == 0) ? '0' : originalQuantityValue,
+                    value: actualQuantityValue,
                     id: idFieldAttributeMap.get(SKU_ACTUAL_QUANTITY).id,
+                    key: idFieldAttributeMap.get(SKU_ACTUAL_QUANTITY).key,
                     parentId,
                     autoIncrementId: autoIncrementId++
                 }
                 innerArray.push(skuActualQuantityObject)
-                    if (idFieldAttributeMap.get(SKU_REASON)) {
+                if (idFieldAttributeMap.get(SKU_REASON)) {
+                    let value0AndReasonAtZeroQuantity, valueMaxAndReasonAtMaxQuantity
+                    if (skuValidationForImageAndReason && skuObjectValidation && skuObjectValidation.leftKey) {
+                        value0AndReasonAtZeroQuantity = _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty') && skuObjectValidation.leftKey == 0
+                        valueMaxAndReasonAtMaxQuantity = _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty') && skuObjectValidation.leftKey != 0
+                    }
                     let skuReason = {
                         label: idFieldAttributeMap.get(SKU_REASON).label,
                         attributeTypeId: idFieldAttributeMap.get(SKU_REASON).attributeTypeId,
-                        value: ((originalQuantityValue != 0 && skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty') && skuObjectValidation && skuObjectValidation.leftKey != 0) || (originalQuantityValue == 0 && _.includes(this.props.skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty') && skuObjectValidation && skuObjectValidation.leftKey == 0)) ? REASON : null,
+                        value: (valueMaxAndReasonAtMaxQuantity || value0AndReasonAtZeroQuantity) ? REASON : null,
                         id: idFieldAttributeMap.get(SKU_REASON).id,
+                        key: idFieldAttributeMap.get(SKU_REASON).key,
                         parentId,
                         autoIncrementId: autoIncrementId++
                     }
                     innerArray.push(skuReason)
                 }
                 if (idFieldAttributeMap.get(SKU_PHOTO)) {
+                    let value0AndImageAtZeroQuantity, valueMaxAndImageAtMaxQuantity
+                    if (skuValidationForImageAndReason && skuObjectValidation && skuObjectValidation.leftKey) {
+                        value0AndImageAtZeroQuantity = skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty') && skuObjectValidation.leftKey == 0
+                        valueMaxAndImageAtMaxQuantity = skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty') && skuObjectValidation.leftKey != 0
+                    }
                     let skuPhoto = {
                         label: idFieldAttributeMap.get(SKU_PHOTO).label,
                         attributeTypeId: idFieldAttributeMap.get(SKU_PHOTO).attributeTypeId,
-                        value: ((originalQuantityValue != 0 && skuValidationForImageAndReason && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty') && skuObjectValidation && skuObjectValidation.leftKey != 0) || (originalQuantityValue == 0 && _.includes(this.props.skuValidationForImageAndReason.leftKey, 'imageAtZeroQty') && skuObjectValidation && skuObjectValidation.leftKey != 0)) ? OPEN_CAMERA : null,
+                        value: (valueMaxAndImageAtMaxQuantity || value0AndImageAtZeroQuantity) ? OPEN_CAMERA : null,
                         id: idFieldAttributeMap.get(SKU_PHOTO).id,
+                        key: idFieldAttributeMap.get(SKU_PHOTO).key,
                         parentId,
                         autoIncrementId: autoIncrementId
                     }
                     innerArray.push(skuPhoto)
                 }
-                      actualQuantityValue=parseInt(skuActualQuantityObject.value)
-                    totalActualQuantityValue+=actualQuantityValue
+                actualQuantityValue = parseInt(skuActualQuantityObject.value)
+                totalActualQuantityValue += actualQuantityValue
                 autoIncrementId++
-                skuObjectListDto[parentId] = innerArray
+                skuObjectListDto[jobId][parentId] = innerArray
             }
-            if(skuValidationForImageAndReason && (!_.isEmpty(skuValidationForImageAndReason.rightKey) || !_.isEmpty(skuValidationForImageAndReason.leftKey))){
-                const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
-                if (!fieldAttributeValueList || !fieldAttributeValueList.value) {
-                    throw new Error('Field attributes missing in store')
-                }
-                reasonsList = (fieldAttributeValueList.value.filter(item => item.fieldAttributeMasterId == idFieldAttributeMap.get(SKU_REASON).id))
+            attributeTypeIdValueMap[jobId][TOTAL_ORIGINAL_QUANTITY] = totalOriginalQuantityValue
+            attributeTypeIdValueMap[jobId][TOTAL_ACTUAL_QUANTITY] = totalActualQuantityValue
+            attributeTypeIdValueMap[jobId][SKU_ACTUAL_AMOUNT] = skuActualAmount
+        }
+        if (skuValidationForImageAndReason && (!_.isEmpty(skuValidationForImageAndReason.rightKey) || !_.isEmpty(skuValidationForImageAndReason.leftKey))) {
+            const fieldAttributeValueList = await keyValueDBService.getValueFromStore(FIELD_ATTRIBUTE_VALUE)
+            if (!fieldAttributeValueList || !fieldAttributeValueList.value) {
+                throw new Error('Field attributes missing in store')
             }
-            attributeTypeIdValueMap[TOTAL_ORIGINAL_QUANTITY] = totalOriginalQuantityValue
-            attributeTypeIdValueMap[TOTAL_ACTUAL_QUANTITY] = totalActualQuantityValue
-            attributeTypeIdValueMap[SKU_ACTUAL_AMOUNT] = skuActualAmount
-            return {
-                skuObjectListDto,
-                attributeTypeIdValueMap,
-                reasonsList,
+            reasonsList = fieldAttributeValueList.value.filter(item => item.fieldAttributeMasterId == idFieldAttributeMap.get(SKU_REASON).id)
+            let selectAnyReason = {
+                id: -999999,
+                name: SELECT_ANY_REASON,
+                code: -43210,
+                fieldAttributeMasterId: -43210,
+                sequence: -1
             }
+            reasonsList.push(selectAnyReason)
+            reasonsList.sort(function (reason1, reason2) {
+                return reason1.sequence - reason2.sequence
+            })
+        }
+        return {
+            skuObjectListDto,
+            attributeTypeIdValueMap,
+            reasonsList,
+            skuCodeMap
+        }
     }
 
-    getSkuChildAttributes(idFieldAttributeMap,attributeTypeIdValueMap){
+    getSkuChildAttributes(idFieldAttributeMap, attributeTypeIdValueMap) {
         const childAttributesList = {}
-        if(!idFieldAttributeMap.has(TOTAL_ACTUAL_QUANTITY)){
+        if (!idFieldAttributeMap.has(TOTAL_ACTUAL_QUANTITY)) {
             throw new Error('Total Actual Quantity missing')
         }
 
-        if(!idFieldAttributeMap.has(SKU_ACTUAL_AMOUNT)){
+        if (!idFieldAttributeMap.has(SKU_ACTUAL_AMOUNT)) {
             throw new Error('Sku Actual Amount missing')
         }
 
-        if(!idFieldAttributeMap.has(TOTAL_ORIGINAL_QUANTITY)){
+        if (!idFieldAttributeMap.has(TOTAL_ORIGINAL_QUANTITY)) {
             throw new Error('Total Original Quantity missing')
         }
+        childAttributesList[ACTUAL_QUANTITY] = childAttributesList[ORIGNAL_QUANTITY] = childAttributesList[ACTUAL_AMOUNT] = 0
+        for (let transactionId in attributeTypeIdValueMap) {
+            childAttributesList[transactionId] = {}
+            const totalActualQty = {
+                fieldAttributeMasterId: idFieldAttributeMap.get(TOTAL_ACTUAL_QUANTITY).id,
+                value: attributeTypeIdValueMap[transactionId][TOTAL_ACTUAL_QUANTITY],
+                attributeTypeId: TOTAL_ACTUAL_QUANTITY,
+                key: idFieldAttributeMap.get(TOTAL_ACTUAL_QUANTITY).key
+            }
+            childAttributesList[transactionId][TOTAL_ACTUAL_QUANTITY] = totalActualQty
+            const totalOriginalQty = {
+                fieldAttributeMasterId: idFieldAttributeMap.get(TOTAL_ORIGINAL_QUANTITY).id,
+                value: attributeTypeIdValueMap[transactionId][TOTAL_ORIGINAL_QUANTITY],
+                attributeTypeId: TOTAL_ORIGINAL_QUANTITY,
+                key: idFieldAttributeMap.get(TOTAL_ORIGINAL_QUANTITY).key
+            }
+            childAttributesList[transactionId][TOTAL_ORIGINAL_QUANTITY] = totalOriginalQty
 
-        const totalActualQty = {
-            fieldAttributeMasterId:idFieldAttributeMap.get(TOTAL_ACTUAL_QUANTITY).id,
-            value:attributeTypeIdValueMap[TOTAL_ACTUAL_QUANTITY],
-            attributeTypeId:TOTAL_ACTUAL_QUANTITY
+            const skuActualAmount = {
+                fieldAttributeMasterId: idFieldAttributeMap.get(SKU_ACTUAL_AMOUNT).id,
+                value: attributeTypeIdValueMap[transactionId][SKU_ACTUAL_AMOUNT],
+                attributeTypeId: SKU_ACTUAL_AMOUNT,
+                key: idFieldAttributeMap.get(SKU_ACTUAL_AMOUNT).key
+            }
+            childAttributesList[transactionId][SKU_ACTUAL_AMOUNT] = skuActualAmount
+            childAttributesList[ACTUAL_AMOUNT] += skuActualAmount.value
+            childAttributesList[ORIGNAL_QUANTITY] += totalOriginalQty.value
+            childAttributesList[ACTUAL_QUANTITY] += totalActualQty.value
         }
-        childAttributesList[TOTAL_ACTUAL_QUANTITY]=totalActualQty
-        const totalOriginalQty = {
-            fieldAttributeMasterId:idFieldAttributeMap.get(TOTAL_ORIGINAL_QUANTITY).id,
-            value:attributeTypeIdValueMap[TOTAL_ORIGINAL_QUANTITY],
-            attributeTypeId:TOTAL_ORIGINAL_QUANTITY
-        }
-        childAttributesList[TOTAL_ORIGINAL_QUANTITY]=totalOriginalQty
-
-          const skuActualAmount = {
-            fieldAttributeMasterId:idFieldAttributeMap.get(SKU_ACTUAL_AMOUNT).id,
-            value:attributeTypeIdValueMap[SKU_ACTUAL_AMOUNT],
-            attributeTypeId:SKU_ACTUAL_AMOUNT
-        }
-        childAttributesList[SKU_ACTUAL_AMOUNT]=skuActualAmount
         return childAttributesList
     }
 
-    getFinalCheckForValidation(skuObjectValidation,skuRootChildElements){
-        
-        if(!skuObjectValidation){
-            throw new Error('Sku Object validation missing')
-        }
-        if(!skuRootChildElements){
+    getFinalCheckForValidation(skuObjectValidation, skuRootChildElements) {
+        if (!skuRootChildElements) {
             throw new Error('Sku child elements missing')
         }
         const rightKey = (skuObjectValidation) ? skuObjectValidation.rightKey : null
         let message
-        if(!rightKey) return
-        if (rightKey!= null && rightKey.includes("1")) {
-                    if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ORIGINAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value==skuRootChildElements[TOTAL_ORIGINAL_QUANTITY].value)
-                        message = TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY
-                } else if (rightKey.includes("2")) {
-                    if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value==0)
-                        message = QTY_NOT_ZERO
-                } else if (rightKey.includes("3")) {
-                    if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ORIGINAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value!=skuRootChildElements[TOTAL_ORIGINAL_QUANTITY].value)
-                        message = TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY
-                } else if (rightKey.includes("4")) {
-                    if (skuRootChildElements[TOTAL_ACTUAL_QUANTITY] && skuRootChildElements[TOTAL_ACTUAL_QUANTITY].value!=0)
-                        message = QTY_ZERO
-                }
-                return message
+        if (!rightKey) return
+        if (rightKey != null && rightKey.includes("1") && skuRootChildElements[ACTUAL_QUANTITY] == skuRootChildElements[ORIGNAL_QUANTITY]) {
+                message = TOTAL_ORG_QTY_NOT_EQUAL_TOTAL_ACTUAL_QTY
+        } else if (rightKey.includes("2") && skuRootChildElements[ACTUAL_QUANTITY] == 0) {
+                message = QTY_NOT_ZERO
+        } else if (rightKey.includes("3") && skuRootChildElements[ORIGNAL_QUANTITY] && skuRootChildElements[ACTUAL_QUANTITY] != skuRootChildElements[ORIGNAL_QUANTITY]) {
+                message = TOTAL_ORG_QTY_EQUAL_TOTAL_ACTUAL_QTY
+        } else if (rightKey.includes("4") && skuRootChildElements[ACTUAL_QUANTITY] != 0) {
+                message = QTY_ZERO
+        }
+        return message
     }
 
     /**
@@ -247,82 +297,172 @@ class SkuListing {
      * childElementsArray : []
      */
 
-    prepareSkuListChildElementsForSaving(skuListItems,skuRootChildItems,skuObjectAttributeId, skuValidationForImageAndReason){
-    let ShouldProceedOrNot = true 
-        if(!skuObjectAttributeId){
+    prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId, skuValidationForImageAndReason, skuObjectAttributeKey) {
+        let ShouldProceedOrNot = true
+        if (!skuObjectAttributeId) {
             throw new Error('Sku Object AttributeId missing')
         }
 
-        if(!skuListItems){
+        if (!skuListItems) {
             throw new Error('Sku list items missing')
         }
-            let childElementsArray = []
-            for(let index in skuListItems){
-                const childDataList = []
-                const originalQuantityValue = parseInt(skuListItems[index].filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)[0])
-                const actualQuantityValue = parseInt(skuListItems[index].filter(object => object.attributeTypeId == SKU_ACTUAL_QUANTITY).map(item => item.value)[0])
-                skuListItems[index].forEach(skuItem=>{
-                    if ((skuValidationForImageAndReason && skuItem.attributeTypeId == SKU_PHOTO && skuItem.value == OPEN_CAMERA && ((actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')) || (actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')) || (actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')))) || (skuItem.attributeTypeId == SKU_REASON && skuValidationForImageAndReason && (skuItem.value == REASON || skuItem.value == SELECT_ANY_REASON) && (actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')) || (actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')) || (actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')))) {
-                        ShouldProceedOrNot = false
-                    }
-                    const skuObjectChild = {
-                    attributeTypeId:skuItem.attributeTypeId,
-                    value:skuItem.value,
-                    fieldAttributeMasterId:skuItem.id
-                    }
-                    childDataList.push(skuObjectChild)
-                })
-                const skuObject = {
-                    attributeTypeId:OBJECT,
-                    childDataList,
-                    value:OBJECT_SAROJ_FAREYE,
-                    fieldAttributeMasterId:skuObjectAttributeId
+        let childElementsArray = []
+        for (let index in skuListItems) {
+            let childDataList = [], imageAtMaxQty, imageAt0Qty, imageAtAnyQty, reasonAtMaxQty, reasonAt0Qty, reasonAtAnyQty
+            const originalQuantityValue = parseInt(skuListItems[index].filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)[0])
+            const actualQuantityValue = parseInt(skuListItems[index].filter(object => object.attributeTypeId == SKU_ACTUAL_QUANTITY).map(item => item.value)[0])
+            if (skuValidationForImageAndReason) {
+                imageAtMaxQty = (actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty'))
+                imageAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')
+                imageAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')
+                reasonAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')
+                reasonAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')
+                reasonAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')
+            }
+            skuListItems[index].forEach(skuItem => {
+                if (skuValidationForImageAndReason && ((skuItem.attributeTypeId == SKU_PHOTO && skuItem.value == OPEN_CAMERA && (imageAtMaxQty || imageAt0Qty || imageAtAnyQty)) || (skuItem.attributeTypeId == SKU_REASON && (skuItem.value == REASON || skuItem.value < 0) && (reasonAtMaxQty || reasonAt0Qty || reasonAtAnyQty)))) {
+                    ShouldProceedOrNot = false
                 }
-                childElementsArray.push(skuObject)
+                const skuObjectChild = {
+                    attributeTypeId: skuItem.attributeTypeId,
+                    value: skuItem.value,
+                    fieldAttributeMasterId: skuItem.id,
+                    key: skuItem.key
+                }
+                childDataList.push(skuObjectChild)
+            })
+            const skuObject = {
+                attributeTypeId: OBJECT,
+                childDataList,
+                value: OBJECT_SAROJ_FAREYE,
+                fieldAttributeMasterId: skuObjectAttributeId,
+                key: skuObjectAttributeKey
             }
-            for(let index in skuRootChildItems){
-                childElementsArray.push(skuRootChildItems[index])
-            }
-            return (ShouldProceedOrNot) ? childElementsArray : null
+            childElementsArray.push(skuObject)
+        }
+        for (let index in skuRootChildItems) {
+            childElementsArray.push(skuRootChildItems[index])
+        }
+        return (ShouldProceedOrNot) ? childElementsArray : null
     }
 
-    prepareUpdatedSkuArray(value,rowItem,skuListItems,skuChildElements, skuValidationForImageAndReason){
-        const updatedObject = JSON.parse(JSON.stringify(skuListItems))
-        const updatedChildElements = JSON.parse(JSON.stringify(skuChildElements))
-        let totalOriginalQuantityValue = 0, totalActualQuantity = 0,skuActualAmount=0
-        for (let index in updatedObject) {
-            let unitPrice=0,actualQuantity=0
-            const originalQuantityValue = parseInt(updatedObject[index].filter(object => object.attributeTypeId == SKU_ORIGINAL_QUANTITY).map(item => item.value)[0])
-            updatedObject[index].forEach(item => {
-                let isUnitPricePresent = false
-                if (item.attributeTypeId == SKU_ORIGINAL_QUANTITY) {
-                    totalOriginalQuantityValue += parseInt(item.value)
-                    isUnitPricePresent = true
-
-                } else if (item.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                    if (rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                        item.value = value
-                    }
-                    actualQuantity = item.value
-                    totalActualQuantity += parseInt(item.value)
-                } else if (item.attributeTypeId == SKU_UNIT_PRICE) {
-                    unitPrice = item.value
-                } else if (item.attributeTypeId == SKU_REASON && rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                    item.value = (skuValidationForImageAndReason && ((value == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')) || (value == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')) || (value != 0 && value != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')))) ? REASON : null
-                } else if (item.attributeTypeId == SKU_PHOTO && rowItem.parentId == item.parentId && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
-                    item.value = (skuValidationForImageAndReason && ((value == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')) || (value == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')) || (value != 0 && value != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')))) ? OPEN_CAMERA : null
-                }
-                if (!isUnitPricePresent) {
-                    skuActualAmount += (unitPrice * actualQuantity)
-                }
-            })
+    prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId) {
+        let updatedSkuList = _.cloneDeep(skuListItems)
+        let updatedObject = updatedSkuList[jobId]
+        let updatedSkuChildList = _.cloneDeep(skuChildElements)
+        let updatedChildElements = updatedSkuChildList[jobId]
+        let actualQuantity = 0, oldActualQty = 0, originalQuantityValue = 0, unitPriceValue = 0
+        for (let index in updatedObject[rowItem.parentId]) {
+            if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_ORIGINAL_QUANTITY) {
+                originalQuantityValue = parseInt(updatedObject[rowItem.parentId][index].value)
+            }
+            else if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_UNIT_PRICE) {
+                unitPriceValue = parseInt(updatedObject[rowItem.parentId][index].value)
+            }
+            if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_ACTUAL_QUANTITY && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                oldActualQty = rowItem.value
+                updatedObject[rowItem.parentId][index].value = value
+                actualQuantity = parseInt(value)
+            }
+            else if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_REASON && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                updatedObject[rowItem.parentId][index].value = this.changeSKUReasonStatus(parseInt(value), skuValidationForImageAndReason, originalQuantityValue)
+            } else if (updatedObject[rowItem.parentId][index].attributeTypeId == SKU_PHOTO && rowItem.attributeTypeId == SKU_ACTUAL_QUANTITY) {
+                updatedObject[rowItem.parentId][index].value = this.changeSKUPhotoStatus(parseInt(value), skuValidationForImageAndReason, originalQuantityValue)
+            }
         }
-        updatedChildElements[TOTAL_ORIGINAL_QUANTITY].value = totalOriginalQuantityValue
-        updatedChildElements[TOTAL_ACTUAL_QUANTITY].value = totalActualQuantity
-        updatedChildElements[SKU_ACTUAL_AMOUNT].value = skuActualAmount
+        updatedSkuChildList[ACTUAL_AMOUNT] += unitPriceValue * (actualQuantity - oldActualQty)
+        updatedSkuChildList[ACTUAL_QUANTITY] += actualQuantity - oldActualQty
+        updatedChildElements[TOTAL_ACTUAL_QUANTITY].value +=  actualQuantity - oldActualQty  
+        updatedChildElements[SKU_ACTUAL_AMOUNT].value += unitPriceValue * (actualQuantity - oldActualQty)
+        updatedSkuList[jobId] = updatedObject
+        updatedSkuChildList[jobId] = updatedChildElements
         return {
-            updatedObject,
-            updatedChildElements
+            updatedSkuList,
+            updatedSkuChildList
+        }
+    }
+
+
+    scanSKUCode(functionParams) {
+        let { skuListItems, searchText, skuObjectValidation, skuValidationForImageAndReason, skuChildItems, skuCodeMap } = functionParams
+        let cloneSKUListItems = _.cloneDeep(skuListItems), errorMessage, cloneSkuChildItems = _.cloneDeep(skuChildItems)
+        let codeMatches = skuCodeMap[searchText.toLowerCase()], orignalQuantityAndActualQuantity = {}
+        if (codeMatches) {
+            let skuListItemValue = cloneSKUListItems[codeMatches[1]][codeMatches[0]]
+            for (let skuComponentIndex in skuListItemValue) {
+                switch (skuListItemValue[skuComponentIndex].attributeTypeId) {
+                    case SKU_ACTUAL_QUANTITY:
+                        orignalQuantityAndActualQuantity[ACTUAL_QUANTITY] = skuListItemValue[skuComponentIndex]
+                        break
+                    case SKU_ORIGINAL_QUANTITY:
+                        orignalQuantityAndActualQuantity[ORIGNAL_QUANTITY] = skuListItemValue[skuComponentIndex]
+                        break
+                    case SKU_PHOTO:
+                        orignalQuantityAndActualQuantity[PHOTO] = skuListItemValue[skuComponentIndex]
+                        break
+                    case SKU_REASON:
+                        orignalQuantityAndActualQuantity[REASON] = skuListItemValue[skuComponentIndex]
+                        break
+                    case SKU_UNIT_PRICE:
+                        orignalQuantityAndActualQuantity[UNIT_PRICE] = skuListItemValue[skuComponentIndex]
+                        break
+                }
+            }
+                let returnParam = this.changeSKUObjectWhenCodeMatches(skuObjectValidation, orignalQuantityAndActualQuantity, skuValidationForImageAndReason, cloneSkuChildItems, codeMatches[1])
+                errorMessage = returnParam.errorMessage
+                cloneSkuChildItems = returnParam.cloneSkuChildItemsMap
+        } else {
+            errorMessage = RESULT_NOT_FOUND;
+        }
+        return { errorMessage, cloneSKUListItems, cloneSkuChildItems }
+    }
+
+    changeSKUObjectWhenCodeMatches(skuObjectValidation, orignalQuantityAndActualQuantity, skuValidationForImageAndReason, cloneSkuChildItemsMap, jobId) {
+        let errorMessage, cloneSkuChildItems = cloneSkuChildItemsMap[jobId]
+        if (!skuObjectValidation || skuObjectValidation.leftKey == 1) {
+            if (orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value == 0) {
+                errorMessage = SKU_CODE_MIN_LIMIT_REACHED
+            } else {
+                cloneSkuChildItems[TOTAL_ACTUAL_QUANTITY].value -= 1
+                orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value = parseInt(orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value) - 1
+                cloneSkuChildItems[SKU_ACTUAL_AMOUNT].value = parseInt(cloneSkuChildItems[SKU_ACTUAL_AMOUNT].value) - parseInt(orignalQuantityAndActualQuantity[UNIT_PRICE].value)
+            }
+        } else {
+            if (orignalQuantityAndActualQuantity[ORIGNAL_QUANTITY].value == orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value) {
+                errorMessage = SKU_CODE_MAX_LIMIT_REACHED
+            } else {
+                cloneSkuChildItems[TOTAL_ACTUAL_QUANTITY].value += 1
+                orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value = parseInt(orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value) + 1
+                cloneSkuChildItems[SKU_ACTUAL_AMOUNT].value = parseInt(cloneSkuChildItems[SKU_ACTUAL_AMOUNT].value) + parseInt(orignalQuantityAndActualQuantity[UNIT_PRICE].value)
+            }
+        }
+        if (!errorMessage) {
+            if (orignalQuantityAndActualQuantity[PHOTO]) {
+                orignalQuantityAndActualQuantity[PHOTO].value = this.changeSKUPhotoStatus(orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value, skuValidationForImageAndReason, orignalQuantityAndActualQuantity[ORIGNAL_QUANTITY].value)
+            }
+            if (orignalQuantityAndActualQuantity[REASON]) {
+                orignalQuantityAndActualQuantity[REASON].value = this.changeSKUReasonStatus(orignalQuantityAndActualQuantity[ACTUAL_QUANTITY].value, skuValidationForImageAndReason, orignalQuantityAndActualQuantity[ORIGNAL_QUANTITY].value)
+            }
+        }
+        cloneSkuChildItemsMap[jobId] = cloneSkuChildItems
+        return { errorMessage, cloneSkuChildItemsMap }
+    }
+
+    changeSKUPhotoStatus(actualQuantityValue, skuValidationForImageAndReason, originalQuantityValue) {
+        if (skuValidationForImageAndReason) {
+            const imageAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtZeroQty')
+            const imageAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtAnyQty')
+            const imageAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.leftKey, 'imageAtMaxQty')
+            return (skuValidationForImageAndReason && (imageAtMaxQty || imageAt0Qty || imageAtAnyQty)) ? OPEN_CAMERA : null
+        }
+    }
+
+    changeSKUReasonStatus(actualQuantityValue, skuValidationForImageAndReason, originalQuantityValue) {
+        if (skuValidationForImageAndReason) {
+            const reasonAt0Qty = actualQuantityValue == 0 && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtZeroQty')
+            const reasonAtAnyQty = actualQuantityValue != 0 && actualQuantityValue != originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtAnyQty')
+            const reasonAtMaxQty = actualQuantityValue == originalQuantityValue && _.includes(skuValidationForImageAndReason.rightKey, 'reasonAtMaxQty')
+            return (skuValidationForImageAndReason && (reasonAtMaxQty || reasonAt0Qty || reasonAtAnyQty)) ? REASON : null
         }
     }
 }

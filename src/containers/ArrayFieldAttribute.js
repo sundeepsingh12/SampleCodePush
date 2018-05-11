@@ -37,7 +37,7 @@ import platform from '../../native-base-theme/variables/platform';
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
 import Loader from '../components/Loader'
-import { TOTAL_COUNT, ADD, SAVE,ADD_TOAST,OK } from '../lib/ContainerConstants'
+import { TOTAL_COUNT, ADD, SAVE, ADD_TOAST, OK } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -48,6 +48,7 @@ function mapStateToProps(state) {
         errorMessage: state.array.errorMessage,
         arrayMainObject: state.array.arrayMainObject,
         isLoading: state.array.isLoading,
+        arrayReverseDataStoreFilterMap: state.formLayout.arrayReverseDataStoreFilterMap,
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -61,25 +62,33 @@ class ArrayFieldAttribute extends PureComponent {
     componentDidMount() {
         this.props.actions.setInitialArray(
             this.props.navigation.state.params.currentElement,
-            this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.jobStatusId,
-            this.props.navigation.state.params.jobTransaction
+            this.props.navigation.state.params.formLayoutState,
+            this.props.navigation.state.params.jobTransaction,
+            this.props.arrayReverseDataStoreFilterMap,
         )
     }
     componentWillUnmount() {
         this.props.actions.clearArrayState()
     }
     renderData = (arrayRow) => {
+        let formLayoutState = {
+            formElement: this.props.arrayElements,
+            isSaveDisabled: this.props.isSaveDisabled,
+            latestPositionId: this.props.navigation.state.params.formLayoutState.latestPositionId,
+            fieldAttributeMasterParentIdMap: this.props.navigation.state.params.formLayoutState.fieldAttributeMasterParentIdMap,
+            jobAndFieldAttributesList: this.props.navigation.state.params.formLayoutState.jobAndFieldAttributesList
+
+        }
         return (
             <ArrayBasicComponent
                 arrayRow={arrayRow.item}
+                formLayoutState={formLayoutState}
                 arrayElements={this.props.arrayElements}
                 isSaveDisabled={this.props.isSaveDisabled}
                 lastRowId={this.props.lastRowId}
                 jobTransaction={this.props.navigation.state.params.jobTransaction}
                 jobStatusId={this.props.jobStatusId}
-                latestPositionId={this.props.navigation.state.params.latestPositionId}
-                fieldAttributeMasterParentIdMap={this.props.navigation.state.params.fieldAttributeMasterParentIdMap}
+                arrayFieldAttributeMasterId={this.props.navigation.state.params.currentElement.fieldAttributeMasterId}
             />
         )
     }
@@ -95,18 +104,17 @@ class ArrayFieldAttribute extends PureComponent {
             this.props.actions.addRowInArray(this.props.lastRowId,
                 this.props.childElementsTemplate,
                 this.props.arrayElements,
-                this.props.navigation.state.params.jobTransaction)
+                this.props.navigation.state.params.jobTransaction,
+                this.props.isSaveDisabled)
         }
     }
     savePressed = () => {
         this.props.actions.saveArray(this.props.arrayElements,
             this.props.navigation.state.params.currentElement,
             this.props.navigation.state.params.jobTransaction,
-            this.props.navigation.state.params.latestPositionId,
-            this.props.navigation.state.params.formElements,
-            this.props.navigation.state.params.isSaveDisabled,
+            this.props.navigation.state.params.formLayoutState,
             this.props.arrayMainObject,
-            this.props.navigation.state.params.fieldAttributeMasterParentIdMap)
+            this.props.arrayReverseDataStoreFilterMap)
     }
     static navigationOptions = ({ navigation }) => {
         return { header: null }
@@ -134,34 +142,37 @@ class ArrayFieldAttribute extends PureComponent {
         }
         return list
     }
+    headerView() {
+        let view
+        view = <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
+            <Body>
+                <View
+                    style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
+                    <TouchableOpacity style={[style.headerLeft]} onPress={this.backPressed}>
+                        <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
+                    </TouchableOpacity>
+                    <View style={[style.headerBody]}>
+                        <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.currentElement.label}</Text>
+                    </View>
+                    <View style={[style.headerRight]}>
+                    </View>
+                    <View />
+                </View>
+            </Body>
+        </Header>
+        return view
+    }
     render() {
-        let loader = this.getLoader()
-        let list = this.getListView()
         return (
-            < StyleProvider style={getTheme(platform)} >
+            <StyleProvider style={getTheme(platform)} >
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
-                        <Body>
-                            <View
-                                style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
-                                <TouchableOpacity style={[style.headerLeft]} onPress={this.backPressed}>
-                                    <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
-                                </TouchableOpacity>
-                                <View style={[style.headerBody]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.currentElement.label}</Text>
-                                </View>
-                                <View style={[style.headerRight]}>
-                                </View>
-                                <View />
-                            </View>
-                        </Body>
-                    </Header>
+                    {this.headerView()}
                     {renderIf(this.props.errorMessage != '',
                         <CustomAlert title='Alert' message={this.props.errorMessage} onOkPressed={this.backPressed} />
                     )}
-                    {loader}
+                    {this.getLoader()}
                     <Content style={[styles.flex1, styles.bgWhite]}>
-                        {list}
+                        {this.getListView()}
                     </Content>
                     <Footer
                         style={[style.footer, styles.bgWhite]}>
@@ -172,7 +183,7 @@ class ArrayFieldAttribute extends PureComponent {
                                 <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
                             </Button>
                         </View>
-                        <View style={[styles.bgPrimary]}>
+                        <View style={[{backgroundColor : styles.bgPrimaryColor}]}>
                             <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
                                 <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
                             </Button>

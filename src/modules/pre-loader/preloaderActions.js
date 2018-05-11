@@ -75,23 +75,29 @@ import {
   PENDING_SYNC_TRANSACTION_IDS,
   SET_UNSYNC_TRANSACTION_PRESENT,
   UnsyncBackupUpload,
-  GEO_FENCING
+  GEO_FENCING,
+  PAGES,
+  PAGES_ADDITIONAL_UTILITY,
+  MDM_POLICIES
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
 import { NavigationActions } from 'react-navigation'
 import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
-import BackgroundTimer from 'react-native-background-timer';
+import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
+import { LOGOUT_UNSUCCESSFUL, OK } from '../../lib/ContainerConstants'
+import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
+
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
   return {
@@ -265,12 +271,13 @@ export function downloadJobMaster() {
       const json = await jobMasters.json
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
-      dispatch(autoLogout(userObject))
+      // dispatch(autoLogout(userObject))
     } catch (error) {
+      showToastAndAddUserExceptionLog(1801, error.message, 'danger', 0)
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error.message))
+        dispatch(error_400_403_Logout(error))
       } else {
         dispatch(jobMasterDownloadFailure(error.message))
       }
@@ -279,7 +286,6 @@ export function downloadJobMaster() {
 }
 
 /**This method logs out the user and deletes session token from store in case of AutoLogout
- *  It also handles when user don't have network connection
  * 
  * @function invalidateUserSessionForAutoLogout()
  * 
@@ -302,6 +308,7 @@ export function invalidateUserSessionForAutoLogout() {
       await trackingService.inValidateStoreVariables(fenceIdentifier)
       dispatch(deleteSessionToken())
     } catch (error) {
+      showToastAndAddUserExceptionLog(1802, error.message, 'danger', 1)
       dispatch(startLoginScreenWithoutLogout())
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
@@ -309,10 +316,10 @@ export function invalidateUserSessionForAutoLogout() {
 }
 
 /**This method logs out the user and deletes session token from store
- *
+ * @param {*} createBackup if it is called from backup class 
  * @return {Function}
  */
-export function invalidateUserSession() {
+export function invalidateUserSession(createBackup) {
   return async function (dispatch) {
     try {
       dispatch(preLogoutRequest())
@@ -320,20 +327,24 @@ export function invalidateUserSession() {
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       // TODO uncomment this code when run sync in logout
       // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")  
-      await backupService.createBackupOnLogout()
-      await authenticationService.logout(token)
+      if (createBackup) {
+        await backupService.createBackupOnLogout()
+      }
+      let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
       dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
-      dispatch(setState(TOGGLE_LOGOUT, false))
+      dispatch(deleteSessionToken())
       // below 2 lines are used to delete geofence on logout 
       // <---- DON'T REMOVE THESE LINES --->
       // let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
       // await trackingService.inValidateStoreVariables(fenceIdentifier)
-      dispatch(deleteSessionToken())
 
     } catch (error) {
+      showToastAndAddUserExceptionLog(1803, error.message, 'danger', 1)
       dispatch(error_400_403_Logout(error.message))
+    }
+    finally {
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }
@@ -359,7 +370,7 @@ export function autoLogout(userData) {
         }, timeLimit * 1000)
       }
     } catch (error) {
-      console.log(error)
+      showToastAndAddUserExceptionLog(1804, error.message, 'danger', 1)
     }
   }
 }
@@ -368,10 +379,15 @@ export function autoLogout(userData) {
  */
 export function startLoginScreenWithoutLogout() {
   return async function (dispatch) {
-    await logoutService.deleteDataBase()
-    dispatch(preLogoutSuccess())
-    dispatch(deleteSessionToken())
-    dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+    try {
+      await logoutService.deleteDataBase()
+      dispatch(preLogoutSuccess())
+      dispatch(deleteSessionToken())
+      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+    } catch (error) {
+      showToastAndAddUserExceptionLog(1805, error.message, 'danger', 1)
+    }
+
   }
 }
 
@@ -383,20 +399,24 @@ export function startLoginScreenWithoutLogout() {
  */
 export function saveSettingsAndValidateDevice(configDownloadService, configSaveService, deviceVerificationService) {
   return async function (dispatch) {
-    const otpScreen = await keyValueDBService.getValueFromStore(IS_SHOW_OTP_SCREEN)
-    const mobileScreen = await keyValueDBService.getValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
-    if (otpScreen && otpScreen.value) {
-      dispatch(showOtp())
-      return
-    }
-    if (mobileScreen && mobileScreen.value) {
-      dispatch(showMobileNumber())
-      return
-    }
-    if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
-      dispatch(checkAsset())
-    } else {
-      dispatch(downloadJobMaster())
+    try {
+      const otpScreen = await keyValueDBService.getValueFromStore(IS_SHOW_OTP_SCREEN)
+      const mobileScreen = await keyValueDBService.getValueFromStore(IS_SHOW_MOBILE_NUMBER_SCREEN)
+      if (otpScreen && otpScreen.value) {
+        dispatch(showOtp())
+        return
+      }
+      if (mobileScreen && mobileScreen.value) {
+        dispatch(showMobileNumber())
+        return
+      }
+      if (configDownloadService === SERVICE_SUCCESS && configSaveService === SERVICE_SUCCESS && (deviceVerificationService === SERVICE_PENDING || deviceVerificationService == SERVICE_FAILED)) {
+        dispatch(checkAsset())
+      } else {
+        dispatch(downloadJobMaster())
+      }
+    } catch (error) {
+      showToastAndAddUserExceptionLog(1806, error.message, 'danger', 1)
     }
   }
 }
@@ -419,6 +439,7 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
+      showToastAndAddUserExceptionLog(1807, error.message, 'danger', 0)
       const keys = [
         JOB_MASTER,
         JOB_ATTRIBUTE,
@@ -442,6 +463,9 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
         CUSTOMIZATION_LIST_MAP,
         TABIDMAP,
         JOB_ATTRIBUTE_STATUS,
+        PAGES,
+        PAGES_ADDITIONAL_UTILITY,
+        MDM_POLICIES
       ]
       await keyValueDBService.deleteValueFromStore(keys)
       dispatch(jobMasterSavingFailure(error.message))
@@ -470,13 +494,14 @@ export function checkAsset() {
         if (unsyncBackupFilesList.length > 0) {
           dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         } else {
-          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
       } else {
         await deviceVerificationService.populateDeviceImeiAndDeviceSim(user)
         dispatch(checkIfSimValidOnServer());
       }
     } catch (error) {
+      showToastAndAddUserExceptionLog(1808, error.message, 'danger', 0)
       dispatch(checkAssetFailure(error.message))
     }
   }
@@ -513,17 +538,18 @@ export function checkIfSimValidOnServer() {
         if (unsyncBackupFilesList.length > 0) {
           dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
         } else {
-          dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+          dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
         }
       } else {
         await keyValueDBService.validateAndSaveData(IS_SHOW_MOBILE_NUMBER_SCREEN, true)
         dispatch(showMobileNumber())
       }
     } catch (error) {
+      showToastAndAddUserExceptionLog(1809, error.message, 'danger', 0)
       if (error.code == 403 || error.code == 400) {
         // clear user session without Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error.message))
+        dispatch(error_400_403_Logout(error))
       } else {
         dispatch(checkAssetFailure(error.message))
       }
@@ -550,6 +576,7 @@ export function generateOtp(mobileNumber) {
       await keyValueDBService.validateAndSaveData(IS_SHOW_OTP_SCREEN, true)
       dispatch(showOtp())
     } catch (error) {
+      showToastAndAddUserExceptionLog(1810, error.message, 'danger', 0)
       dispatch(otpGenerationFailure(error.message))
     }
   }
@@ -579,9 +606,10 @@ export function validateOtp(otpNumber) {
       if (unsyncBackupFilesList.length > 0) {
         dispatch(NavigationActions.navigate({ routeName: UnsyncBackupUpload }))
       } else {
-        dispatch(NavigationActions.navigate({ routeName: HomeTabNavigatorScreen }))
+        dispatch(resetNavigationState(0, [NavigationActions.navigate({ routeName: HomeTabNavigatorScreen })]))
       }
     } catch (error) {
+      showToastAndAddUserExceptionLog(1811, error.message, 'danger', 0)
       dispatch(otpValidationFailure(error.message))
     }
   }
@@ -596,11 +624,41 @@ export function checkForUnsyncTransactionAndLogout() {
       if (isUnsyncTransactionsPresent) {
         dispatch(setState(SET_UNSYNC_TRANSACTION_PRESENT, true))
       } else {
-        dispatch(invalidateUserSession())
+        dispatch(invalidateUserSessionWhenLogoutPressed(true))
       }
     } catch (error) {
-      console.log(error)
+      showToastAndAddUserExceptionLog(1812, error.message, 'danger', 0)
       dispatch(error_400_403_Logout(error.message))
+      dispatch(setState(TOGGLE_LOGOUT, false))
+    }
+  }
+}
+
+export function invalidateUserSessionWhenLogoutPressed(createBackup) {
+  return async function (dispatch) {
+    try {
+      dispatch(preLogoutRequest())
+      dispatch(setState(TOGGLE_LOGOUT, true))
+      const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
+      // TODO uncomment this code when run sync in logout
+      // await userEventLogService.addUserEventLog(LOGOUT_SUCCESSFUL, "")  
+      if (createBackup) {
+        await backupService.createBackupOnLogout()
+      }
+      let response = await authenticationService.logout(token) // hit logout api
+      await logoutService.deleteDataBase()
+      dispatch(preLogoutSuccess())
+      dispatch(NavigationActions.navigate({ routeName: LoginScreen }))
+      dispatch(deleteSessionToken())
+      // below 2 lines are used to delete geofence on logout 
+      // <---- DON'T REMOVE THESE LINES --->
+      // let fenceIdentifier = await keyValueDBService.getValueFromStore(GEO_FENCING)
+      // await trackingService.inValidateStoreVariables(fenceIdentifier)
+
+    } catch (error) {
+      dispatch(showToastAndAddUserExceptionLog(1813, error.message, 'danger', 1))
+    }
+    finally {
       dispatch(setState(TOGGLE_LOGOUT, false))
     }
   }

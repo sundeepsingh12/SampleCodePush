@@ -11,7 +11,7 @@ export default class Loader extends PureComponent {
     render() {
         return (
             <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 50}}>
-               <Spinner color={styles.bgPrimary.backgroundColor} size={'small'} />
+               <Spinner color={styles.bgPrimaryColor} size={'small'} />
             </View>
         )
     }

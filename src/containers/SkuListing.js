@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   FlatList,
+  SectionList
 }
   from 'react-native'
 import { bindActionCreators } from 'redux'
@@ -25,7 +26,8 @@ import {
   Body,
   Right,
   Icon,
-  Toast
+  Toast,
+  Separator
 } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import styles from '../themes/FeStyle'
@@ -34,86 +36,94 @@ import _ from 'lodash'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import * as globalActions from '../modules/global/globalActions'
-
+import SearchBarV2 from '../components/SearchBarV2'
+import { SEARCH_PLACE_HOLDER } from '../lib/ContainerConstants'
+import { SET_SKU_CODE, SKU_CODE_CHANGE } from '../lib/constants'
+import Title from '../../native-base-theme/components/Title';
 class SkuListing extends PureComponent {
 
   componentDidMount() {
-    const fieldAttributeMasterId = this.props.navigation.state.params.currentElement.fieldAttributeMasterId
-    const jobId = this.props.navigation.state.params.jobTransaction.jobId
-    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.jobTransaction.jobId)
+    const jobTransactions = _.isArray(this.props.navigation.state.params.jobTransaction) ? this.props.navigation.state.params.jobTransaction :  [this.props.navigation.state.params.jobTransaction]
+    this.props.actions.prepareSkuList(this.props.navigation.state.params.currentElement.fieldAttributeMasterId, jobTransactions)
   }
 
-  renderData(item) {
+  renderData(item,title) {
     return (
-      <SkuListItem item={item} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList = {this.props.reasonsList} navigateToScene = {this.props.actions.navigateToScene.bind(this)}/>
+      <SkuListItem  item={item} title = {title} skuObjectValidation={this.props.skuObjectValidation} updateSkuActualQuantity={this.updateSkuActualQty.bind(this)} reasonsList={this.props.reasonsList} navigateToScene={this.props.actions.navigateToScene.bind(this)} skuValidationForImageAndReason = {this.props.skuValidationForImageAndReason} />
     )
   }
 
-  updateSkuActualQty(value, rowItem) {
-    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason)
+  updateSkuActualQty(value, rowItem, title) {
+    this.props.actions.updateSkuActualQuantityAndOtherData(value, rowItem, this.props.skuListItems, this.props.skuChildItems, this.props.skuValidationForImageAndReason, title)
   }
 
   onChangeSkuCode(skuCode) {
-    this.props.actions.changeSkuCode(skuCode)
+    this.props.actions.setState(SKU_CODE_CHANGE, skuCode)
   }
 
   static navigationOptions = ({ navigation }) => {
     return { header: null }
   }
 
+  setSearchText = (searchText) => {
+    this.props.actions.setState(SET_SKU_CODE, searchText)
+  }
+
+  returnValue = (searchText) => {
+    this.setSearchText(searchText)
+    this.props.actions.scanSkuItem({
+      skuListItems: this.props.skuListItems,
+      searchText,
+      skuObjectValidation: this.props.skuObjectValidation,
+      skuValidationForImageAndReason: this.props.skuValidationForImageAndReason,
+      skuChildItems: this.props.skuChildItems,
+      skuCodeMap: this.props.isSearchBarVisible
+    })
+  }
+
+  searchIconPressed = () => {
+    if (this.props.searchText) {
+      this.props.actions.scanSkuItem({
+        skuListItems: this.props.skuListItems,
+        searchText: this.props.searchText,
+        skuObjectValidation: this.props.skuObjectValidation,
+        skuValidationForImageAndReason: this.props.skuValidationForImageAndReason,
+        skuChildItems: this.props.skuChildItems,
+        skuCodeMap: this.props.isSearchBarVisible
+      })
+    }
+  }
+
   render() {
-    if (this.props.skuListingLoading) {
+    let jobIdTransactionMap = (_.isArray(this.props.navigation.state.params.jobTransaction)) ? _.keyBy(this.props.navigation.state.params.jobTransaction,'jobId') : null
+    if (this.props.skuListingLoading || !_.size(this.props.skuListItems)) {
       return <Loader />
     }
     else {
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container>
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
               <Body>
                 <View
-                  style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
+                  style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom5, styles.marginTop15]}>
                   <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
                   <Text
                     style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>SKU</Text>
                   <View />
                 </View>
-                {/* <View
-                style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.relative]}>
-                <Input
-                  placeholder="Filter Reference Numbers"
-                  placeholderTextColor={'rgba(255,255,255,.4)'}
-                  style={[style.headerSearch]}/>
-                <Button small transparent style={[style.headerQRButton]}>
-                  <Icon name="md-qr-scanner" style={[styles.fontWhite, styles.fontXl]}/>
-                </Button>
-              </View> */}
+                {!_.isEmpty(this.props.isSearchBarVisible) ? <SearchBarV2 placeholder={SEARCH_PLACE_HOLDER} setSearchText={this.setSearchText} navigation={this.props.navigation} returnValue={this.returnValue} onPress={this.searchIconPressed} searchText={this.props.searchText} /> : null}
               </Body>
-
             </Header>
 
             <Content style={[styles.flex1, styles.padding10, styles.bgLightGray]}>
-              <FlatList
-                data={_.values(this.props.skuListItems)}
-                renderItem={({ item }) => this.renderData(item)}
-                keyExtractor={item => String(_.values(this.props.skuListItems).indexOf(item))}
-              />
+            <SectionList
+            sections={this.createSkuSectionList(this.props.skuListItems)}
+        renderItem={({ item, section }) => this.renderData(item,section.title)}
+        renderSectionHeader={({section}) => this.renderGroupHeader(jobIdTransactionMap,section.title)}
+        keyExtractor={items => items.title}
+        />
             </Content>
-
-            {/* {renderIf(this.props.isSearchBarVisible,
-            <View style={{ flex: 2, flexDirection: 'row' }}>
-              <View style={{ backgroundColor: '#fff', flexGrow: .90, height: 40 }}>
-                <Input value={this.props.skuSearchTerm}
-                  onChangeText={value => this.onChangeSkuCode(value)}
-                  bordered='true'
-                  rounded
-                  style={{ fontSize: 14, backgroundColor: '#ffffff', borderColor: '#d3d3d3', borderWidth: 1 }}
-                  placeholder="Scan Sku Code" />
-              </View>
-              <View onPress={() => this.scanSkuItem()} style={{ backgroundColor: '#d7d7d7', flexGrow: .10, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name='ios-barcode-outline' style={{ fontSize: 34 }} />
-              </View>
-            </View>)} */}
 
             <Footer style={[styles.heightAuto, styles.column, styles.padding10]}>
               <Button primary full onPress={this.saveSkuList}>
@@ -126,20 +136,35 @@ class SkuListing extends PureComponent {
     }
   }
 
-  scanSkuItem() {
-    //Code incomplete
-    const searchTerm = this.props.skuSearchTerm;
-    if (skuSearchTerm) {
-      this.props.actions.scanSkuItem(this.props.skuListItems, searchTerm)
-    }
+  renderGroupHeader(jobIdTransactionMap,title){
+    return (
+     (jobIdTransactionMap && jobIdTransactionMap[title]) ?  <Separator  key = {title} style={[style.sectionHeader]}>
+        <Text style={[{fontSize : 20}, styles.fontDarkGray]}>{'REF#'+jobIdTransactionMap[title].referenceNumber}</Text>
+      </Separator> : null
+    );
   }
-  
+
+  createSkuSectionList(skuObject){
+    let sectionList = []
+    for (let group in skuObject) {
+      let data = Object.values(skuObject[group])
+      let title = group
+      sectionList.push({ data, title });
+  }
+  return sectionList
+  }
+
   saveSkuList = () => {
-      this.props.actions.saveSkuListItems(
-        this.props.skuListItems, this.props.skuObjectValidation, this.props.skuChildItems,
-        this.props.skuObjectAttributeId, this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.latestPositionId,
-        this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formElements,
-        this.props.navigation.state.params.isSaveDisabled, this.props.navigation, this.props.skuValidationForImageAndReason)
+    this.props.actions.saveSkuListItems(
+      this.props.skuListItems,
+      this.props.skuObjectValidation,
+      this.props.skuChildItems,
+      this.props.skuObjectAttributeId,
+      this.props.navigation.state.params.jobTransaction,
+      this.props.navigation.state.params.currentElement,
+      this.props.navigation.state.params.formLayoutState,
+      this.props.skuValidationForImageAndReason,
+      this.props.skuObjectAttributeKey)
   }
 }
 
@@ -152,8 +177,10 @@ function mapStateToProps(state) {
     skuObjectValidation: state.skuListing.skuObjectValidation,
     skuChildItems: state.skuListing.skuChildItems,
     skuObjectAttributeId: state.skuListing.skuObjectAttributeId,
+    skuObjectAttributeKey: state.skuListing.skuObjectAttributeKey,
     skuValidationForImageAndReason: state.skuListing.skuValidationForImageAndReason,
     reasonsList: state.skuListing.reasonsList,
+    searchText: state.skuListing.searchText,
   }
 }
 
@@ -170,62 +197,12 @@ const style = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10
   },
-  headerIcon: {
-    width: 24
-  },
-  headerSearch: {
-    paddingLeft: 10,
-    paddingRight: 30,
-    backgroundColor: '#1260be',
-    borderRadius: 2,
-    height: 30,
-    color: '#fff',
-    fontSize: 10
-  },
-  headerQRButton: {
-    position: 'absolute',
-    right: 5,
-    paddingLeft: 0,
-    paddingRight: 0
-  },
-  card: {
-    paddingLeft: 10,
-    marginBottom: 10,
-    backgroundColor: '#ffffff',
-    elevation: 1,
-    shadowColor: '#d3d3d3',
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 2
-  },
-  cardLeft: {
-    flex: 0.85,
-    borderRightColor: '#f3f3f3',
-    borderRightWidth: 1
-  },
-  cardLeftTopRow: {
-    flexDirection: 'row',
-    borderBottomColor: '#f3f3f3',
-    borderBottomWidth: 1
-  },
-  cardRight: {
-    width: 40,
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  cardCheckbox: {
-    alignSelf: 'center',
-    backgroundColor: 'green',
-    position: 'absolute',
-    marginLeft: 10,
-    borderRadius: 0,
-    left: 0
-  }
-
+  sectionHeader: {
+    height: 50,
+    flex: 1,
+    justifyContent: 'center',
+    paddingLeft: 10
+},
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SkuListing)

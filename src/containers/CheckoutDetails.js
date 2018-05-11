@@ -234,13 +234,13 @@ class CheckoutDetails extends PureComponent {
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
                                     onPress={() => { this._showModalView(-1) }} >
-                                    <Text style={[styles.fontPrimary]}>{CANCEL}</Text>
+                                    <Text style={{color : styles.fontPrimaryColor}}>{CANCEL}</Text>
                                 </Button>
                             </View>
                             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
                                 <Button transparent full
                                     onPress={() => { this._sendSmsToTheNumberEntered() }} >
-                                    <Text style={[styles.fontPrimary]}>{SEND}</Text>
+                                    <Text style={{color : styles.fontPrimaryColor}}>{SEND}</Text>
                                 </Button>
                             </View>
                         </View>
@@ -267,7 +267,7 @@ class CheckoutDetails extends PureComponent {
                             {emails[counter]}
                         </Text>
                         <View style={[{ paddingVertical: 3, paddingHorizontal: 5 }]}>
-                            <Icon name="ios-close-outline" style={[styles.fontLg, styles.fontPrimary]} onPress={() => { this._deleteEmailId(counter) }} />
+                            <Icon name="ios-close-outline" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} onPress={() => { this._deleteEmailId(counter) }} />
                         </View>
                     </View>
                 )
@@ -312,13 +312,13 @@ class CheckoutDetails extends PureComponent {
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
                                     onPress={() => { this._showModalView(-1) }} >
-                                    <Text style={[styles.fontPrimary]}>{CANCEL}</Text>
+                                    <Text style={{color : styles.fontPrimaryColor}}>{CANCEL}</Text>
                                 </Button>
                             </View>
                             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
                                 <Button transparent full
                                     onPress={() => { this._sendMailToAllEmailsIds() }}>
-                                    <Text style={[styles.fontPrimary]}>{SEND}</Text>
+                                    <Text style={{color : styles.fontPrimaryColor}}>{SEND}</Text>
                                 </Button>
                             </View>
                         </View>
@@ -335,7 +335,7 @@ class CheckoutDetails extends PureComponent {
                     <List>
                         <ListItem style={[style.jobListItem]} >
                             <View style={[styles.row, styles.alignCenter]}>
-                                <Icon name="md-print" style={[styles.fontLg, styles.fontPrimary]} />
+                                <Icon name="md-print" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
                                 <View style={[style.statusCircle, { backgroundColor: '#4cd964' }]}></View>
                                 <Text style={[styles.fontDefault, styles.fontWeight400, styles.marginLeft10]}>{Print}</Text>
                             </View>
@@ -347,7 +347,7 @@ class CheckoutDetails extends PureComponent {
                     <List>
                         <ListItem style={[style.jobListItem]} onPress={() => { this._showModalView(3) }}>
                             <View style={[styles.row, styles.alignCenter]}>
-                                <Icon name="md-mail" style={[styles.fontLg, styles.fontPrimary]} />
+                                <Icon name="md-mail" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
                                 <Text style={[styles.fontDefault, styles.fontWeight400, styles.marginLeft10]}>{EMAIL}</Text>
                             </View>
                             <Right>
@@ -358,7 +358,7 @@ class CheckoutDetails extends PureComponent {
                     <List>
                         <ListItem style={[style.jobListItem]} onPress={() => { this._sendSMS() }}>
                             <View style={[styles.row, styles.alignCenter]}>
-                                <Icon name="md-chatboxes" style={[styles.fontLg, styles.fontPrimary]} />
+                                <Icon name="md-chatboxes" style={[styles.fontLg, {color : styles.fontPrimaryColor}]} />
                                 <View style={[style.statusCircle, { backgroundColor: '#4cd964' }]}></View>
                                 <Text style={[styles.fontDefault, styles.fontWeight400, styles.marginLeft10]}>{SMS}</Text>
                             </View>
@@ -397,7 +397,7 @@ class CheckoutDetails extends PureComponent {
             <StyleProvider style={getTheme(platform)}>
                 <Container>
 
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -463,7 +463,7 @@ class CheckoutDetails extends PureComponent {
                             <Button onPress={() => {
                                 this.props.actions.clearStateAndStore(this.props.navigation.state.params.jobMasterId)
                             }}>
-                                <Text style={[styles.fontPrimary, styles.fontDefault]}>{Return_To_Home}</Text>
+                                <Text style={[{color : styles.fontPrimaryColor}, styles.fontDefault]}>{Return_To_Home}</Text>
                             </Button>
                         </FooterTab>
                     </Footer>

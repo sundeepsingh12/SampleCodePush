@@ -13,6 +13,22 @@ import { dataStoreFilterService } from '../classes/DataStoreFilterService'
 import { EXTERNAL_DATA_STORE, DATA_STORE } from '../../lib/AttributeConstants'
 import { SEARCH_TEXT_MISSING, DATA_STORE_MAP_MISSING, CURRENT_ELEMENT_MISSING } from '../../lib/ContainerConstants'
 
+describe('test checkIfUniqueConditionExists', () => {
+    it('should return false', () => {
+        expect(dataStoreService.checkIfUniqueConditionExists({
+        })).toEqual(undefined)
+    })
+
+    it('should return true', () => {
+        expect(dataStoreService.checkIfUniqueConditionExists({
+            validation: [{
+                timeOfExecution: MINMAX,
+                condition: 'true'
+            }]
+        })).toEqual(true)
+    })
+})
+
 describe('test getValidations', () => {
     it('should return validation array having all validations', () => {
         const validationArray = [{
@@ -30,13 +46,18 @@ describe('test getValidations', () => {
         {
             timeOfExecution: SPECIAL,
             condition: 'true'
+        },
+        {
+            timeOfExecution: SPECIAL,
+            condition: 'true'
         }]
 
         const validationsResult = {
             isScannerEnabled: true,
             isAutoStartScannerEnabled: false,
             isSearchEnabled: true,
-            isMinMaxValidation: true
+            isMinMaxValidation: true,
+            isAllowFromFieldInExternalDS: true
         }
         expect(dataStoreService.getValidations(validationArray)).toEqual(validationsResult)
     })
@@ -102,7 +123,7 @@ describe('test fillKeysInFormElement', () => {
             positionId: 0,
             parentId: 0,
             showHelpText: false,
-            editable: false,
+            editable: true,
             focus: false,
             validation: [],
             value: 'xyz',
@@ -120,7 +141,7 @@ describe('test fillKeysInFormElement', () => {
             positionId: 0,
             parentId: 0,
             showHelpText: true,
-            editable: false,
+            editable: true,
             focus: false,
             validation: [],
             value: '123456',
@@ -304,20 +325,11 @@ describe('test fetchJsonForExternalDS', () => {
 })
 
 describe('test checkForUniqueValidation', () => {
-
+    realm._encryptData = jest.fn()
     it('should throw fieldAttributeValue missing error', () => {
         const message = 'fieldAttributeValue missing in currentElement'
         try {
             dataStoreService.checkForUniqueValidation(null, 123)
-        } catch (error) {
-            expect(error.message).toEqual(message)
-        }
-    })
-
-    it('should throw FieldAttributeMasterId missing error', () => {
-        const message = 'fieldAttributeMasterId missing in currentElement'
-        try {
-            dataStoreService.checkForUniqueValidation('abhi', null)
         } catch (error) {
             expect(error.message).toEqual(message)
         }
@@ -333,7 +345,10 @@ describe('test checkForUniqueValidation', () => {
             positionId: 0,
             value: 'abhi'
         }]);
-        expect(dataStoreService.checkForUniqueValidation('abhi', 123)).toEqual(true)
+        dataStoreService.checkIfUniqueConditionExists = jest.fn()
+        dataStoreService.checkIfUniqueConditionExists.mockReturnValue(true)
+        realm._encryptData.mockReturnValue('abhi')
+        expect(dataStoreService.checkForUniqueValidation('abhi', { fieldAttributeMasterId: 123 })).toEqual(true)
     })
 
     it('should return false as fieldAttributeValue is not present is FieldData Table', () => {
@@ -346,7 +361,10 @@ describe('test checkForUniqueValidation', () => {
             positionId: 0,
             value: 'abhi'
         }]);
-        expect(dataStoreService.checkForUniqueValidation('xyz', 989)).toEqual(false)
+        realm._encryptData.mockReturnValue('abhi')
+        dataStoreService.checkIfUniqueConditionExists = jest.fn()
+        dataStoreService.checkIfUniqueConditionExists.mockReturnValue(false)
+        expect(dataStoreService.checkForUniqueValidation('xyz', { fieldAttributeMasterId: 12345 })).toEqual(false)
     })
 })
 
@@ -636,6 +654,12 @@ describe('test getDataStoreMasters', () => {
 
 
 describe('test fetchDatastoreAndSaveInDB', () => {
+
+    beforeEach(() => {
+        dataStoreService.fetchDataStore = jest.fn()
+        dataStoreService.saveDataStoreToDB = jest.fn()
+    })
+
     it('should throw Token missing error', () => {
         const message = 'Token Missing'
         try {
@@ -652,12 +676,6 @@ describe('test fetchDatastoreAndSaveInDB', () => {
         } catch (error) {
             expect(error.message).toEqual(message)
         }
-    })
-
-
-    beforeEach(() => {
-        dataStoreService.fetchDataStore = jest.fn()
-        dataStoreService.saveDataStoreToDB = jest.fn()
     })
 
     it('should return totalElements && numberOfElements', () => {
@@ -952,13 +970,6 @@ describe('test checkForOfflineDsResponse', () => {
 })
 
 describe('test searchDataStoreAttributeValueMap', () => {
-    it('should throw searchText missing error', () => {
-        try {
-            dataStoreService.searchDataStoreAttributeValueMap(null)
-        } catch (error) {
-            expect(error.message).toEqual(SEARCH_TEXT_MISSING)
-        }
-    })
 
     it('should throw data store map missing error', () => {
         try {
@@ -1093,7 +1104,8 @@ describe('test checkForFiltersAndValidations', () => {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
             .then((result) => {
@@ -1114,7 +1126,8 @@ describe('test checkForFiltersAndValidations', () => {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
             .then((result) => {
@@ -1135,7 +1148,8 @@ describe('test checkForFiltersAndValidations', () => {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         return dataStoreService.checkForFiltersAndValidations(currentElement, {}, null, {})
             .then((result) => {
@@ -1184,7 +1198,8 @@ describe('test checkForFiltersAndValidations', () => {
             isScannerEnabled: false,
             isAutoStartScannerEnabled: false,
             isMinMaxValidation: false,
-            isSearchEnabled: false
+            isSearchEnabled: false,
+            isAllowFromFieldInExternalDS: false
         }
         keyValueDBService.getValueFromStore.mockReturnValue({})
         dataStoreFilterService.fetchDataForFilter.mockReturnValue({
@@ -1209,6 +1224,45 @@ describe('test checkForFiltersAndValidations', () => {
     })
 })
 
+
+describe('test checkForFiltersAndValidationsForArray', () => {
+    beforeEach(() => {
+        dataStoreService.checkForFiltersAndValidations = jest.fn()
+    })
+
+    let functionParamsFromDS = {
+        currentElement: {},
+        formElement: {
+            1: {}
+        },
+        jobTransaction: {},
+        arrayReverseDataStoreFilterMap: {
+            123: {}
+        },
+        arrayFieldAttributeMasterId: 123,
+        rowId: 1
+    }
+
+    it('should return isFiltersPresent to true and check for validations', () => {
+        dataStoreService.checkForFiltersAndValidations.mockReturnValue({
+            dataStoreFilterReverseMap: {},
+            dataStoreAttrValueMap: {},
+            isFiltersPresent: true,
+            validation: {}
+        })
+        return dataStoreService.checkForFiltersAndValidationsForArray(functionParamsFromDS)
+            .then((result) => {
+                expect(result).toEqual(
+                    {
+                        dataStoreAttrValueMap: {},
+                        arrayReverseDataStoreFilterMap: { 123: {} },
+                        isFiltersPresent: true,
+                        validation: {}
+                    }
+                )
+            })
+    })
+})
 
 function getMapFromObject(obj) {
     let strMap = new Map();

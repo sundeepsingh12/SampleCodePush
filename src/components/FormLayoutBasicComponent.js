@@ -22,7 +22,7 @@ import * as formLayoutActions from '../modules/form-layout/formLayoutActions.js'
 import FormLayoutActivityComponent from '../components/FormLayoutActivityComponent'
 import * as cashTenderingActions from '../modules/cashTendering/cashTenderingActions'
 import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import DataStoreFilter from '../containers/DataStoreFilter'
 import {
     MONEY_COLLECT,
@@ -79,6 +79,7 @@ import {
 import * as globalActions from '../modules/global/globalActions'
 import NPSFeedback from '../components/NPSFeedback'
 import TimePicker from '../components/TimePicker'
+import { checkForNewJob } from '../modules/skulisting/skuListingActions'
 
 function mapStateToProps(state) {
     return {
@@ -89,14 +90,14 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions }, dispatch)
+        actions: bindActionCreators({ ...formLayoutActions, ...cashTenderingActions, ...globalActions, checkForNewJob }, dispatch)
     }
 }
 class BasicFormElement extends PureComponent {
 
     navigateToScene = (item) => {
         let screenName = ''
-        this.props.actions.fieldValidations(item, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
+        this.props.actions.fieldValidations(item, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
         switch (item.attributeTypeId) {
             case MONEY_PAY:
             case MONEY_COLLECT: {
@@ -110,13 +111,9 @@ class BasicFormElement extends PureComponent {
             case CASH_TENDERING: {
                 this.props.actions.checkForCash({
                     currentElement: item,
-                    formElements: this.props.formElement,
-                    jobStatusId: this.props.jobStatusId,
                     jobTransaction: this.props.jobTransaction,
-                    latestPositionId: this.props.latestPositionId,
-                    isSaveDisabled: this.props.isSaveDisabled,
                     returnData: this._searchForReferenceValue.bind(this),
-                    fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                    formLayoutState: this.props.formLayoutState
                 })
                 break
             }
@@ -125,7 +122,12 @@ class BasicFormElement extends PureComponent {
                 break
             }
             case SKU_ARRAY: {
-                screenName = 'SkuListing'
+                this.props.actions.checkForNewJob({
+                    currentElement: item,
+                    jobTransaction: this.props.jobTransaction,
+                    returnData: this._searchForReferenceValue.bind(this),
+                    formLayoutState: this.props.formLayoutState
+                })
                 break
             }
             case EXTERNAL_DATA_STORE:
@@ -156,51 +158,48 @@ class BasicFormElement extends PureComponent {
             }
         }
 
-        this.props.actions.navigateToScene(screenName,
-            {
-                currentElement: item,
-                formElements: this.props.formElement,
-                jobStatusId: this.props.jobStatusId,
-                jobTransaction: this.props.jobTransaction,
-                latestPositionId: this.props.latestPositionId,
-                isSaveDisabled: this.props.isSaveDisabled,
-                returnData: this._searchForReferenceValue.bind(this),
-                fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
-            }
-        )
+        if (screenName) {
+            this.props.actions.navigateToScene(screenName,
+                {
+                    currentElement: item,
+                    formLayoutState: this.props.formLayoutState,
+                    jobTransaction: this.props.jobTransaction,
+                    returnData: this._searchForReferenceValue.bind(this),
+                }
+            )
+        }
     }
 
     _searchForReferenceValue = (value) => {
-        this.props.actions.checkUniqueValidationThenSave(this.props.item, this.props.formElement, this.props.isSaveDisabled, value, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction)
+        this.props.actions.checkUniqueValidationThenSave(this.props.item, this.props.formLayoutState, value, this.props.jobTransaction)
     }
 
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidations(currentElement, this.props.formElement, BEFORE, this.props.jobTransaction, this.props.isSaveDisabled, this.props.fieldAttributeMasterParentIdMap)
+        this.props.actions.fieldValidations(currentElement, this.props.formLayoutState, BEFORE, this.props.jobTransaction)
         if (currentElement && !currentElement.displayValue && currentElement.attributeTypeId == 62) {
-            currentElement.editable = false
             Keyboard.dismiss();
-            this.props.actions.setSequenceDataAndNextFocus(currentElement.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, currentElement.sequenceMasterId, this.props.jobTransaction)
+            this.props.actions.setSequenceDataAndNextFocus(currentElement, this.props.formLayoutState, currentElement.sequenceMasterId, this.props.jobTransaction)
         }
     }
 
     _onBlurEvent(currentElement) {
         if (currentElement.attributeTypeId == SCAN_OR_TEXT || currentElement.attributeTypeId == QR_SCAN) {
-            this.props.actions.checkUniqueValidationThenSave(currentElement, this.props.formElement, this.props.isSaveDisabled, currentElement.displayValue, { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction)
+            this.props.actions.checkUniqueValidationThenSave(currentElement, this.props.formLayoutState, currentElement.displayValue, this.props.jobTransaction)
         }
-        this.props.actions.fieldValidations(currentElement, this.props.formElement, AFTER, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap)
+        this.props.actions.fieldValidations(currentElement, this.props.formLayoutState, AFTER, this.props.jobTransaction)
     }
 
-    _getNextFocusableElement(fieldAttributeMasterId, formElement, value, isSaveDisabled) {
-        if (value.length < 2 && formElement.get(fieldAttributeMasterId).attributeTypeId != 62) {
-            this.props.actions.getNextFocusableAndEditableElements(fieldAttributeMasterId, formElement, isSaveDisabled, value, null, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap);
+    _getNextFocusableElement(value) {
+        if (value.length < 2 && this.props.formLayoutState.formElement.get(this.props.item.fieldAttributeMasterId).attributeTypeId != 62) {
+            this.props.actions.getNextFocusableAndEditableElements(this.props.item.fieldAttributeMasterId, this.props.formLayoutState, value, null, this.props.jobTransaction);
         }
         else {
-            this.props.actions.updateFieldData(fieldAttributeMasterId, value, formElement);
+            this.props.actions.updateFieldData(this.props.item.fieldAttributeMasterId, value, this.props.formLayoutState, this.props.jobTransaction);
         }
     }
 
     onSaveDateTime = (value) => {
-        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formElement, this.props.isSaveDisabled, value + '', { latestPositionId: this.props.latestPositionId }, this.props.jobTransaction, this.props.fieldAttributeMasterParentIdMap, true)
+        this.props.actions.updateFieldDataWithChildData(this.props.item.fieldAttributeMasterId, this.props.formLayoutState, value + '', { latestPositionId: this.props.formLayoutState.latestPositionId }, this.props.jobTransaction, true)
     }
 
     onPressModal = () => {
@@ -212,7 +211,7 @@ class BasicFormElement extends PureComponent {
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? {color : styles.fontPrimaryColor} : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -229,12 +228,8 @@ class BasicFormElement extends PureComponent {
                 <View>
                     <MultipleOptionsAttribute
                         currentElement={this.props.item}
-                        formElements={this.props.formElement}
-                        isSaveDisabled={this.props.isSaveDisabled}
+                        formLayoutState={this.props.formLayoutState}
                         jobTransaction={this.props.jobTransaction}
-                        jobStatusId={this.props.jobStatusId}
-                        latestPositionId={this.props.latestPositionId}
-                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
                     />
                 </View>
             )
@@ -247,12 +242,18 @@ class BasicFormElement extends PureComponent {
                         transparent={true}
                         onRequestClose={this.onCloseModal}>
                         <TouchableHighlight
-                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
-                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}
+                            onPress={() => this.onCloseModal()}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .2 }}>
                                 <View>
-                                    <NPSFeedback
-                                        onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item}
-                                    />
+                                    <Text style={[styles.alignStart, styles.fontLg, styles.padding10]}>
+                                        Rating
+                                    </Text>
+                                    <View style={[styles.padding20, styles.justifyCenter]}>
+                                        <NPSFeedback
+                                            onSave={this.onSaveDateTime} onCancel={this.onCloseModal} item={this.props.item}
+                                        />
+                                    </View>
                                 </View>
                             </TouchableHighlight>
                         </TouchableHighlight>
@@ -271,11 +272,8 @@ class BasicFormElement extends PureComponent {
                 <View>
                     <DataStoreFilter
                         currentElement={this.props.item}
-                        formElement={this.props.formElement}
-                        isSaveDisabled={this.props.isSaveDisabled}
+                        formLayoutState={this.props.formLayoutState}
                         jobTransaction={this.props.jobTransaction}
-                        latestPositionId={this.props.latestPositionId}
-                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
                         onClose={this.onCloseModal}
                     />
                 </View>
@@ -287,11 +285,6 @@ class BasicFormElement extends PureComponent {
     goToQRCode = () => {
         this.props.actions.navigateToScene('QrCodeScanner',
             {
-                formElements: this.props.formElement,
-                jobStatusId: this.props.jobStatusId,
-                jobTransaction: this.props.jobTransaction,
-                latestPositionId: this.props.latestPositionId,
-                isSaveDisabled: this.props.isSaveDisabled,
                 returnData: this._searchForReferenceValue.bind(this)
             })
     }
@@ -314,7 +307,7 @@ class BasicFormElement extends PureComponent {
         }
 
         if (this.props.item.value != ARRAY_SAROJ_FAREYE && this.props.item.value != OBJECT_SAROJ_FAREYE) {
-            return this.props.item.containerValue
+            return this.props.item.containerValue ? this.props.item.containerValue : this.props.item.value
         }
         return null
     }
@@ -322,7 +315,7 @@ class BasicFormElement extends PureComponent {
     getMultipleOptionCardView(modalView) {
         return (
             <TouchableOpacity
-                style={[{ paddingVertical: 50 }, this.props.item.focus ? styles.borderLeft4 : null]}
+                style={[{ paddingVertical: 50 }, this.props.item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}
                 onPress={() => { this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, this.props.item.fieldAttributeMasterId) }}
                 disabled={!this.props.item.editable || this.props.modalFieldAttributeMasterId ? true : false}
             >
@@ -367,7 +360,7 @@ class BasicFormElement extends PureComponent {
             case CONTACT_NUMBER:
                 return (
                     <View>
-                        <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? styles.borderLeft4 : null]}>
+                        <View style={[styles.bgWhite, styles.paddingLeft10, styles.paddingRight10, styles.relative, { paddingTop: 40, paddingBottom: 40 }, this.props.item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}>
                             {this.props.item.label ?
                                 <Label style={[styles.fontDefault, this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)]}>{this.props.item.label}
                                     {this.props.item.required ? null : <Text style={[styles.italic, styles.fontLowGray]}> {OPTIONAL}</Text>}
@@ -395,7 +388,7 @@ class BasicFormElement extends PureComponent {
                                         editable={this.props.item.editable}
                                         returnKeyType='done'
                                         multiline={this.props.item.attributeTypeId == 2 ? true : false}
-                                        onChangeText={value => this._getNextFocusableElement(this.props.item.fieldAttributeMasterId, this.props.formElement, value, this.props.isSaveDisabled)}
+                                        onChangeText={value => this._getNextFocusableElement(value)}
                                         onFocus={() => { this.onFocusEvent(this.props.item) }}
                                         onEndEditing={(e) => this._onBlurEvent(this.props.item)}
                                         secureTextEntry={this.props.item.attributeTypeId == 61 ? true : false}
@@ -407,7 +400,7 @@ class BasicFormElement extends PureComponent {
                                         onPress={this.goToQRCode}
                                     >
                                         <View>
-                                            <QRIcon width={30} height={30} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable)} />
+                                            <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(this.props.item.focus, this.props.item.editable).color} />
                                         </View>
                                     </TouchableHighlight> : null}
                             </View>
@@ -433,11 +426,6 @@ class BasicFormElement extends PureComponent {
             case CAMERA_HIGH:
             case CAMERA_MEDIUM:
                 return <FormLayoutActivityComponent item={this.props.item} press={this.navigateToScene} />
-            case NPS_FEEDBACK:
-                return <View>
-                    {modalView}
-                    <FormLayoutActivityComponent item={this.props.item} press={this.onPressModal} />
-                </View>
             case CHECKBOX:
             case RADIOBUTTON:
             case DROPDOWN:
@@ -451,13 +439,8 @@ class BasicFormElement extends PureComponent {
             case DATE:
             case RE_ATTEMPT_DATE:
             case TIME:
-                return (
-                    <View>
-                        {modalView}
-                        <FormLayoutActivityComponent item={this.props.item} press={this.onPressModal} />
-                    </View>
-                )
             case DATA_STORE_FILTER:
+            case NPS_FEEDBACK:
                 return (
                     <View>
                         {modalView}

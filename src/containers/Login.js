@@ -8,10 +8,11 @@ import {
   Platform,
   TouchableHighlight,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
+  TextInput
 }
   from 'react-native'
-import { StyleProvider, Container, Content, Button, Input, Item, CheckBox, Spinner ,Icon as Iconimg} from 'native-base'
+import { StyleProvider, Container, Content, Button, Item, CheckBox, Spinner, Icon as Iconimg, ActionSheet } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -23,6 +24,7 @@ import renderIf from '../lib/renderIf'
 import codePush from "react-native-code-push"
 import { QrCodeScanner } from '../lib/constants'
 import Icon from '../../native-base-theme/components/Icon'
+import CONFIG from '../lib/config'
 import {
   OK,
   CANCEL,
@@ -30,6 +32,7 @@ import {
   RESET_ACCOUNT_SETTINGS,
   REMEMBER_ME
 } from '../lib/ContainerConstants'
+import { keyValueDBService } from '../services/classes/KeyValueDBService';
 
 
 var style = StyleSheet.create({
@@ -96,12 +99,32 @@ class Login extends PureComponent {
 
   }
 
+  scaneerLongPressToChooseEnvironment = () => {
+    let domainList = CONFIG.FAREYE.domain.map((domain) => domain.name)
+    domainList.push(CANCEL)
+    ActionSheet.show(
+      {
+        options: domainList,
+        cancelButtonIndex: domainList.length - 1,
+        title: 'SELECT DOMAIN'
+      },
+      buttonIndex => {
+        if (buttonIndex != domainList.length - 1 && buttonIndex >= 0) {
+          this.onScannerLongPress(CONFIG.FAREYE.domain[buttonIndex].url)
+        }
+      }
+    )
+  }
+  onScannerLongPress = (url ) => {
+    this.props.onLongPressResetSettings(url)
+  }
+
   _onBarCodeRead = (value) => {
     const username = value.split("/")[0]
     const password = value.split("/")[1]
     this.onChangeUsername(username)
     this.onChangePassword(password)
-    this.props.authenticateUser(this.props.auth.form.username, this.props.auth.form.password, this.props.auth.form.rememberMe)
+    this.props.authenticateUser(username, password, this.props.auth.form.rememberMe)
   }
 
   _onScaningCancelled = () => {
@@ -128,17 +151,17 @@ class Login extends PureComponent {
     }
     if (!this.props.auth.form.authenticationService) {
       return (
-        <TouchableOpacity onLongPress = {this.onLongPress}>
-        <Image
-          style={styles.logoStyle}
-          source={require('../../images/fareye-logo.png')}
-        />
+        <TouchableOpacity onLongPress={this.onLongPress}>
+          <Image
+            style={styles.logoStyle}
+            source={require('../../images/fareye-logo.png')}
+          />
         </TouchableOpacity >
       )
     }
   }
 
-  onLongPress = () =>{
+  onLongPress = () => {
     Alert.alert(
       CONFIRM_RESET,
       RESET_ACCOUNT_SETTINGS,
@@ -157,39 +180,41 @@ class Login extends PureComponent {
     this.props.navigation.navigate(QrCodeScanner, { returnData: this._onBarCodeRead.bind(this) })
   }
 
-  showUsernameView(){
+  showUsernameView() {
     return (
       <Item rounded style={[styles.marginBottom10]}>
-        <Input
+        <TextInput
           value={this.props.auth.form.username}
           autoCapitalize="none"
           placeholder='Username'
+          underlineColorAndroid='transparent'
           onChangeText={this.onChangeUsername}
           disabled={this.props.auth.form.isEditTextDisabled}
-          style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, { height: 40 }]}
+          style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
         />
       </Item>
     )
   }
 
-  showPasswordView(){
+  showPasswordView() {
     return (
-      <Item rounded>
-        <Input
+      <Item rounded style={[styles.marginBottom10]}>
+        <TextInput
           value={this.props.auth.form.password}
           placeholder='Password'
+          underlineColorAndroid='transparent'
           secureTextEntry={true}
           onChangeText={this.onChangePassword}
           onSubmitEditing={this.loginButtonPress}
           disabled={this.props.auth.form.isEditTextDisabled}
-          style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, { height: 40 }]}
+          style={[styles.fontSm, styles.paddingLeft15, styles.paddingRight15, styles.width100, { height: 40 }]}
         />
-       {this.showForgetPasswordView()}
+        {this.showForgetPasswordView()}
       </Item>
     )
   }
 
-  showForgetPasswordView(){
+  showForgetPasswordView() {
     return (
       <Iconimg
         name='ios-help-circle-outline'
@@ -201,7 +226,7 @@ class Login extends PureComponent {
     )
   }
 
-  showLoginButton(){
+  showLoginButton() {
     return (
       <Button
         full rounded success
@@ -214,7 +239,7 @@ class Login extends PureComponent {
     )
   }
 
-  showRememberMe(){
+  showRememberMe() {
     return (
       <View style={[styles.row, styles.flex1, styles.justifyStart, styles.marginTop15]}>
         <CheckBox checked={this.props.auth.form.rememberMe}
@@ -224,14 +249,16 @@ class Login extends PureComponent {
     )
   }
 
-  showDisplayMessageAndScanner(){
-    return(
+  showDisplayMessageAndScanner() {
+    return (
       <View style={[styles.marginTop30]}>
         <Text style={[styles.fontCenter, styles.fontDanger, styles.marginBottom10]}>
           {this.props.auth.form.displayMessage}
         </Text>
         <Button
-          onPress={this.startScanner} full rounded>
+          onPress={this.startScanner} full rounded 
+          onLongPress = {this.scaneerLongPressToChooseEnvironment}
+          >
           <Text style={[styles.fontWhite]}>Scanner</Text>
         </Button>
       </View>
@@ -241,26 +268,26 @@ class Login extends PureComponent {
   render() {
     const imageView = this.getImageView()
     return (
-          <StyleProvider style={getTheme(platform)}>
-            <Container>
-              <Content>
-                <View style={style.container}>
-                  <View style={style.logoContainer}>
-                    {imageView}
-                  </View>
-                  <View style={[style.width70, styles.marginTop30]}>
-                  {this.showUsernameView()}
-                  {this.showPasswordView()}
-                  {this.showLoginButton()}
-                  {this.showRememberMe()}
-                  {this.showDisplayMessageAndScanner()}
-                    
-                  </View>
-                </View>
-              </Content>
-            </Container>
-            
-          </StyleProvider>
+      <StyleProvider style={getTheme(platform)}>
+        <Container>
+          <Content>
+            <View style={style.container}>
+              <View style={style.logoContainer}>
+                {imageView}
+              </View>
+              <View style={[style.width70, styles.marginTop30]}>
+                {this.showUsernameView()}
+                {this.showPasswordView()}
+                {this.showLoginButton()}
+                {this.showRememberMe()}
+                {this.showDisplayMessageAndScanner()}
+
+              </View>
+            </View>
+          </Content>
+        </Container>
+
+      </StyleProvider>
     )
   }
 };

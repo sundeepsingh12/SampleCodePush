@@ -9,18 +9,6 @@ import {
 import { Container, Card, CardItem, Body, Icon, Right } from 'native-base'
 import styles from '../themes/FeStyle'
 import renderIf from '../lib/renderIf'
-import SearchIcon from '../../src/svg_components/icons/SearchIcon'
-import CameraIcon from '../svg_components/icons/CameraIcon'
-import CartIcon from '../svg_components/icons/CartIcon'
-import StarIcon from '../svg_components/icons/StarIcon'
-import PaperMoneyIcon from '../svg_components/icons/PaperMoneyIcon'
-import QRIcon from '../svg_components/icons/QRIcon'
-import BankCardIcon from '../svg_components/icons/BankCardIcon'
-import DateIcon from '../svg_components/icons/DateIcon'
-import TimeIcon from '../svg_components/icons/TimeIcon'
-import SignatureIcon from '../svg_components/icons/SignatureIcon'
-import CashTenderingIcon from '../svg_components/icons/CashTenderingIcon'
-import RadioButtonIcon from '../svg_components/icons/RadioButtonIcon'
 import {
     ARRAY,
     CASH_TENDERING,
@@ -41,31 +29,37 @@ import {
     CAMERA_MEDIUM,
     RADIOBUTTON
 } from '../lib/AttributeConstants'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 class FormLayoutActivityComponent extends PureComponent {
 
     getIcon(attributeTypeId) {
         switch (attributeTypeId) {
-            case ARRAY: return <QRIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case CASH_TENDERING: return <PaperMoneyIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case DATA_STORE: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case ARRAY: return <MaterialIcons name='format-list-numbered' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case CASH_TENDERING: return <MaterialCommunityIcons name='cash-multiple' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case DATA_STORE: <MaterialCommunityIcons name='database-search' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
             case MONEY_COLLECT:
-            case MONEY_PAY: return <BankCardIcon width={26} height={19} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case SIGNATURE: return <SignatureIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case MONEY_PAY: return <MaterialIcons name='account-balance-wallet' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case SIGNATURE: return <MaterialCommunityIcons name='pen' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
             case NPS_FEEDBACK:
-            case SIGNATURE_AND_FEEDBACK: return <StarIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case SKU_ARRAY: return <CartIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+            case SIGNATURE_AND_FEEDBACK: return <MaterialIcons name='star' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case SKU_ARRAY: return <MaterialIcons name='shopping-cart' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
             case DATE:
             case RE_ATTEMPT_DATE:
-                return <DateIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case TIME: return <TimeIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
-            case RADIOBUTTON: return <RadioButtonIcon width={38} height={37} color={this.getComponentIconStyle(this.props.item.editable)} />
-            default: return <QRIcon width={30} height={30} color={this.getComponentIconStyle(this.props.item.editable)} />
+                return <MaterialIcons name='date-range' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case TIME:
+                return <MaterialIcons name='access-time' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case RADIOBUTTON: return <MaterialIcons name='radio-button-checked' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            case CAMERA_HIGH:
+            case CAMERA_MEDIUM:
+            case CAMERA: return <MaterialIcons name='photo-camera' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
+            default: return <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentIconStyle(this.props.item.editable).color} />
         }
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? {color : styles.fontPrimaryColor} : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -84,7 +78,7 @@ class FormLayoutActivityComponent extends PureComponent {
         const icon = this.getIcon(this.props.item.attributeTypeId)
         return (
             <TouchableHighlight disabled={!this.props.item.editable} onPress={() => this.props.press(this.props.item)}>
-                <View style={[style.formCard, this.props.item.focus ? styles.borderLeft4 : null]}>
+                <View style={[style.formCard, this.props.item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}>
 
                     <View style={style.formCardDetail}>
                         <View>

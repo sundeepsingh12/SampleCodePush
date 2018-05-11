@@ -41,13 +41,13 @@ class Statistics extends PureComponent {
 
     showHeaderView(){
       return (
-        <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+        <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
           <Body>
             <View
               style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.marginBottom10, styles.marginTop15]}>
               <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl]} onPress={() => { this.props.navigation.goBack(null) }} />
               <Text
-                style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{STATISTICS}  {moment(new Date()).format('DD-MM-YYYY')}</Text>
+                style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName}  {moment(new Date()).format('DD-MM-YYYY')}</Text>
               <View />
             </View>
           </Body>

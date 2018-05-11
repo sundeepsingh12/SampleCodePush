@@ -5,7 +5,8 @@ import {
 } from '../../lib/constants'
 import moment from 'moment'
 import { fieldAttributeMasterService } from './FieldAttributeMaster'
-
+import { jobDataService } from './JobData'
+import { addServerSmsService } from './AddServerSms'
 import {
     AFTER,
     ALERT_MESSAGE,
@@ -59,11 +60,11 @@ class FieldValidation {
      * @param {*} timeOfExecution 
      * @param {*} jobTransaction 
      */
-    fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, fieldAttributeMasterParentIdMap) {
+    fieldValidations(currentElement, formElement, timeOfExecution, jobTransaction, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         let validationList = currentElement.validation ? currentElement.validation.filter(validationObject => validationObject.timeOfExecution == timeOfExecution) : null
         let validationMapObject = this.prepareValidationReferenceMap(validationList)
         let validationStringMap = this.validationStringMap(validationMapObject.validationReferenceMap)
-        let validationsResult = this.evaluateValidationMap(validationStringMap, validationMapObject.validationMap, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterParentIdMap)
+        let validationsResult = this.evaluateValidationMap(validationStringMap, validationMapObject.validationMap, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList)
         return validationsResult
     }
 
@@ -121,7 +122,7 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    evaluateValidationMap(validationStringMap, validationMap, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterParentIdMap) {
+    evaluateValidationMap(validationStringMap, validationMap, formElement, jobTransaction, timeOfExecution, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         let validationActionList, returnValue = true
         for (let index in validationStringMap) {
             if (this.evaluateValidation(validationStringMap[index], validationMap, '||', formElement, jobTransaction, fieldAttributeMasterParentIdMap)) {
@@ -129,7 +130,7 @@ class FieldValidation {
             } else {
                 validationActionList = validationMap[index].conditions ? validationMap[index].conditions.filter(validationAction => validationAction.conditionType == ELSE) : null
             }
-            let validationActionResult = validationActionList ? this.runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, validationMap[index].fieldAttributeMasterId, fieldAttributeMasterParentIdMap) : null
+            let validationActionResult = validationActionList ? this.runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, validationMap[index].fieldAttributeMasterId, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) : null
             returnValue = returnValue ? validationActionResult : returnValue
         }
         return returnValue
@@ -209,7 +210,7 @@ class FieldValidation {
                 return (leftKey === rightKey)
             }
             case CONTAINS: {
-                return leftKey.includes(rightKey)
+                return _.includes(leftKey, rightKey)
             }
             case GREATER_THAN:
             case GREATER_THAN_OR_EQUAL_TO:
@@ -246,26 +247,28 @@ class FieldValidation {
      * @param {*} formElement 
      * @param {*} jobTransaction 
      */
-    runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, currentFieldAttributeMasterId, fieldAttributeMasterParentIdMap) {
+    runValidationActions(validationActionList, formElement, jobTransaction, timeOfExecution, currentFieldAttributeMasterId, fieldAttributeMasterParentIdMap, jobAndFieldAttributesList) {
         let returnValue = true
         for (let index in validationActionList) {
             switch (validationActionList[index].type) {
                 case ALERT_MESSAGE: {
-                    formElement.get(currentFieldAttributeMasterId).alertMessage = validationActionList[index].assignValue
+                    let alertMessage = this.setAlertMessage(validationActionList[index].assignValue, jobTransaction, formElement, jobAndFieldAttributesList)
+                    formElement.get(currentFieldAttributeMasterId).alertMessage = alertMessage
                     break
                 }
                 case ASSIGN: {
                     let fieldAttributeMasterId = this.checkKey(validationActionList[index].key)
+                    if(!formElement.get(parseInt(fieldAttributeMasterId))){
+                        break
+                    }
                     let valueToBeAssigned = null
                     if (validationActionList[index].actionOnAssignFrom) {
                         valueToBeAssigned = this.actionOnAssignFrom(fieldAttributeMasterId, jobTransaction, formElement, validationActionList[index], fieldAttributeMasterParentIdMap)
                     } else {
-                        if (formElement.get(parseInt(fieldAttributeMasterId))) {
                             valueToBeAssigned = this.parseKey(validationActionList[index].assignValue, formElement, jobTransaction, fieldAttributeMasterParentIdMap)
-                        }
                     }
-                    formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = valueToBeAssigned || valueToBeAssigned === 0 ? valueToBeAssigned + '' : null
-                    formElement.get(parseInt(fieldAttributeMasterId)).editable = true
+                        formElement.get(parseInt(fieldAttributeMasterId)).displayValue = formElement.get(parseInt(fieldAttributeMasterId)).value = valueToBeAssigned || valueToBeAssigned === 0 ? valueToBeAssigned + '' : null
+                        formElement.get(parseInt(fieldAttributeMasterId)).editable = true
                     break
                 }
                 case ASSIGN_BY_MATHEMATICAL_FORMULA: {
@@ -516,6 +519,40 @@ class FieldValidation {
             min,
             max
         }
+    }
+
+    setAlertMessage(alertMessage, jobTransaction, formElement, jobAndFieldAttributesList) {
+        if (!alertMessage || alertMessage.trim() == '' || !jobAndFieldAttributesList) {
+            return alertMessage
+        }
+        let singleJobTransactionArray = []
+        if (jobTransaction.length) {
+            singleJobTransactionArray.push(jobTransaction[0])
+        } else {
+            singleJobTransactionArray.push(jobTransaction)
+        }
+        let jobDataMap = jobDataService.getJobData(singleJobTransactionArray)[singleJobTransactionArray[0].jobId]
+        let fieldAndJobAttrMap = this.getKeyToAttributeMap(jobAndFieldAttributesList, singleJobTransactionArray[0].jobMasterId)
+        alertMessage = addServerSmsService.setSmsBodyJobData(alertMessage, jobDataMap, singleJobTransactionArray[0], fieldAndJobAttrMap.keyToJobAttributeMap)
+        alertMessage = addServerSmsService.setSmsBodyFixedAttribute(alertMessage, singleJobTransactionArray[0], { value: jobAndFieldAttributesList.user })
+        alertMessage = addServerSmsService.setSMSBodyFieldData(alertMessage, null, singleJobTransactionArray[0], fieldAndJobAttrMap.keyToFieldAttributeMap, formElement)
+        alertMessage = addServerSmsService.checkForRecursiveData(alertMessage, '', jobDataMap, null, jobTransaction, fieldAndJobAttrMap, { value: jobAndFieldAttributesList.user }, formElement)
+        return alertMessage
+    }
+
+    getKeyToAttributeMap(jobAndFieldAttributesList, jobMasterId) {
+        let keyToJobAttributeMap = {}, keyToFieldAttributeMap = {}
+        for (let jobAttribute of jobAndFieldAttributesList.jobAttributes) {
+            if (jobAttribute.jobMasterId == jobMasterId) {
+                keyToJobAttributeMap[jobAttribute.key] = jobAttribute
+            }
+        }
+        for (let fieldAttribute of jobAndFieldAttributesList.fieldAttributes) {
+            if (fieldAttribute.jobMasterId == jobMasterId) {
+                keyToFieldAttributeMap[fieldAttribute.key] = fieldAttribute
+            }
+        }
+        return { keyToJobAttributeMap, keyToFieldAttributeMap }
     }
 
 }

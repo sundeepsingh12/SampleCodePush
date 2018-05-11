@@ -94,7 +94,7 @@ class Payment extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formElements, this.props.navigation.state.params.jobStatusId)
+        this.props.actions.getPaymentParameters(this.props.navigation.state.params.jobTransaction, this.props.navigation.state.params.currentElement.fieldAttributeMasterId, this.props.navigation.state.params.formLayoutState.formElement, this.props.navigation.state.params.formLayoutState.statusId)
     }
 
     renderPaymentModeId(modeId, type) {
@@ -220,7 +220,7 @@ class Payment extends PureComponent {
         let finalPaymentView = []
         let paymentModeView = []
         paymentModeView.push(
-            <Text key='PaymentText' style={[styles.fontPrimary, styles.fontSm, styles.width100, styles.marginBottom10]}>
+            <Text key='PaymentText' style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100, styles.marginBottom10]}>
                 {this.props.splitPaymentMode == YES ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
             </Text>
         )
@@ -264,7 +264,7 @@ class Payment extends PureComponent {
         }
         return (
             <View style={[styles.marginBottom15]}>
-                <Text style={[styles.fontPrimary, styles.fontSm]}>
+                <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>
                     {SPLIT_PAYMENT}
                 </Text>
                 <View style={[styles.row, styles.marginTop10]}>
@@ -325,30 +325,25 @@ class Payment extends PureComponent {
                 actualAmount: this.props.actualAmount,
                 originalAmount: this.props.originalAmount,
                 currentElement: this.props.navigation.state.params.currentElement,
-                formElements: this.props.navigation.state.params.formElements,
+                formLayoutState: this.props.navigation.state.params.formLayoutState,
                 jobTransaction: this.props.navigation.state.params.jobTransaction,
                 moneyCollectMaster: this.props.moneyCollectMaster,
-                isSaveDisabled: this.props.navigation.state.params.isSaveDisabled,
-                latestPositionId: this.props.navigation.state.params.latestPositionId,
-                paymentContainerKey: this.props.navigation.state.key
+                paymentContainerKey: this.props.navigation.state.key,
+                renderPaymentModeId: this.renderPaymentModeId,
             })
         } else {
             this.props.actions.saveMoneyCollectObject(
                 this.props.actualAmount,
                 this.props.navigation.state.params.currentElement,
-                this.props.navigation.state.params.formElements,
-                this.props.navigation.state.params.jobTransaction.jobMasterId,
-                this.props.navigation.state.params.jobTransaction.jobId,
                 this.props.navigation.state.params.jobTransaction,
-                this.props.navigation.state.params.latestPositionId,
                 this.props.moneyCollectMaster,
-                this.props.navigation.state.params.isSaveDisabled,
                 this.props.originalAmount,
                 this.props.selectedPaymentMode,
                 this.props.transactionNumber,
                 null,
                 null,
-                this.props.jobTransactionIdAmountMap
+                this.props.jobTransactionIdAmountMap,
+                this.props.navigation.state.params.formLayoutState
             )
         }
     }
@@ -361,7 +356,7 @@ class Payment extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>

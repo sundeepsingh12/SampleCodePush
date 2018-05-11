@@ -8,9 +8,9 @@ import {
     SET_NEW_PASSWORD,
     SET_CONFIRM_NEW_PASSWORD,
     CLEAR_PASSWORD_TEXTINPUT,
-    TOGGLE_SAVE_RESET_BUTTON,   
-    IS_PROFILE_LOADING,   
-    RESET_STATE     
+    TOGGLE_SAVE_RESET_BUTTON,
+    IS_PROFILE_LOADING,
+    RESET_STATE
 } from '../../lib/constants'
 
 const initialState = new InitialState()
@@ -24,9 +24,10 @@ export default function profileReducer(state = initialState, action) {
                 .set('email', action.payload.emailOfUser)
 
         case CLEAR_PASSWORD_TEXTINPUT:
-            return state.set('currentPassword', action.payload.currentPassword)
-                .set('newPassword', action.payload.newPassword)
-                .set('confirmNewPassword', action.payload.confirmNewPassword)
+            return state.set('currentPassword', '')
+                .set('newPassword', '')
+                .set('confirmNewPassword', '')
+                .set('isSaveResetButtonDisabled', true)
 
         case CHECK_CURRENT_PASSWORD:
             return state.set('currentPassword', action.payload)
@@ -41,10 +42,10 @@ export default function profileReducer(state = initialState, action) {
             return state.set('isSaveResetButtonDisabled', action.payload)
 
         case IS_PROFILE_LOADING:
-        return state.set('isLoaderInProfile', action.payload)
+            return state.set('isLoaderInProfile', action.payload)
 
         case RESET_STATE:
-        return initialState
+            return initialState
     }
     return state
 }

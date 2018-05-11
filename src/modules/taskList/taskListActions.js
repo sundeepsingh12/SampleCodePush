@@ -1,22 +1,15 @@
 'use strict'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { jobMasterService } from '../../services/classes/JobMaster'
 import { jobTransactionService } from '../../services/classes/JobTransaction'
 import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
-import { setState } from '../global/globalActions'
-import {
-  JOB_LISTING_START,
-  JOB_LISTING_END,
-  JOB_STATUS,
-  SET_TABS_LIST,
-  CUSTOM_NAMING,
-  FUTURE_RUNSHEET_ENABLED,
-  TAB,
-  SET_SELECTED_DATE,
-  SHOULD_RELOAD_START
-} from '../../lib/constants'
+import { setState, navigateToScene } from '../global/globalActions'
+import { performSyncService } from '../../modules/home/homeActions'
+import { JOB_LISTING_START, JOB_LISTING_END, JOB_STATUS, SET_TABS_LIST, CUSTOM_NAMING, TAB, SHOULD_RELOAD_START, SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE, TABS_LOADING, TASKLIST_LOADER_FOR_SYNC, JobDetailsV2, BulkListing } from '../../lib/constants'
+import { Toast } from 'native-base'
+import { NetInfo } from 'react-native'
 import moment from 'moment'
 import _ from 'lodash'
+import { jobStatusService } from '../../services/classes/JobStatus';
 
 /**
  * This function fetches tabs list and set in state
@@ -24,17 +17,16 @@ import _ from 'lodash'
 export function fetchTabs() {
   return async function (dispatch) {
     try {
-      const tabs = await keyValueDBService.getValueFromStore(TAB)
-      const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS)
-      const tabIdStatusIdMap = jobMasterService.prepareTabStatusIdMap(statusList.value)
-      dispatch(setState(SET_TABS_LIST, {
-        tabsList: tabs.value,
-        tabIdStatusIdMap
-      }
-      ))
+      dispatch(setState(TABS_LOADING, { tabsLoading: true }));
+      const tabs = await keyValueDBService.getValueFromStore(TAB);
+      const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
+      const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING);
+      const tabIdStatusIdMap = jobStatusService.prepareTabStatusIdMap(statusList.value);
+      let isFutureRunsheetEnabled = jobTransactionService.getFutureRunsheetEnabled(customNaming);
+      dispatch(setState(SET_TABS_LIST, { tabsList: tabs.value, tabIdStatusIdMap, isFutureRunsheetEnabled }));
     } catch (error) {
       //TODO handle UI
-      console.log(error)
+      console.log(error);
     }
   }
 }
@@ -42,25 +34,21 @@ export function fetchTabs() {
 /**
  * This function fetches jobTransaction from db and set jobTransactionCustomizationListDTO in state
  */
-export function fetchJobs(date) {
+export function fetchJobs() {
   return async function (dispatch) {
     try {
-      const customNaming = await keyValueDBService.getValueFromStore(CUSTOM_NAMING)
-      dispatch(setState(JOB_LISTING_START))
-      const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-      let jobMasterListWithMultipart = jobTransactionService.getEnableMultiPartJobMaster(jobTransactionCustomizationListParametersDTO.jobMasterList)
-      let jobIdGroupIdMap = jobMasterListWithMultipart && jobMasterListWithMultipart.length > 0 ?  jobTransactionService.getJobIdGroupIdMap(jobMasterListWithMultipart) : {}
-      let enableFutureDateRunsheet = customNaming && customNaming.value && customNaming.value.enableFutureDateRunsheet && _.isEmpty(jobIdGroupIdMap) ? customNaming.value.enableFutureDateRunsheet : false
-      dispatch(setState(FUTURE_RUNSHEET_ENABLED, enableFutureDateRunsheet))
-      if(_.isUndefined(date) && customNaming.value.enableFutureDateRunsheet) date = moment().format('YYYY-MM-DD')
-      dispatch(setState(SET_SELECTED_DATE,date))
-      let selectedDate = customNaming.value.enableFutureDateRunsheet && _.isEmpty(jobIdGroupIdMap) ? date : null
-      let {jobTransactionCustomizationList,statusNextStatusListMap } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO,'AllTasks',null,selectedDate,jobIdGroupIdMap)
-      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList, statusNextStatusListMap}))
+      dispatch(setState(JOB_LISTING_START));
+      const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters();
+      // Fetch jobIdGroupIdMap in case of multi part assignment
+      // let jobIdGroupIdMap = jobTransactionService.getJobIdGroupIdMap(jobTransactionCustomizationListParametersDTO.jobMasterList)
+      // Fetch future enable runsheet and selected Date for calender
+      // dispatch(setState(SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE, { enableFutureDateRunsheet, selectedDate }))
+      let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO);
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList }));
     } catch (error) {
       //TODO handle UI
-      console.log(error)
-      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList:[],statusNextStatusListMap : {}}))
+      console.log(error);
+      dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }));
     }
   }
 }
@@ -70,13 +58,14 @@ export function fetchJobs(date) {
  * @param {*} jobTransactionCustomizationList 
  *  This action will fetch jobs if SHOULD_RELOAD_START is true in store or if jobTransactionCustomizationList is empty
  */
-export function shouldFetchJobsOrNot(jobTransactionCustomizationList) {
+export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject) {
   return async function (dispatch) {
     try {
       let shouldFetchJobs = await keyValueDBService.getValueFromStore(SHOULD_RELOAD_START)
       if ((shouldFetchJobs && shouldFetchJobs.value) || _.isEmpty(jobTransactionCustomizationList)) {
-        dispatch(fetchJobs(moment().format('YYYY-MM-DD')))
+        dispatch(fetchJobs(moment().format('YYYY-MM-DD'), pageObject))
       }
+      // Sets SHOULD_RELOAD_START to false so jobs are not fetched unnecessesarily 
       await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(false))
     } catch (error) {
       //TODO handle UI

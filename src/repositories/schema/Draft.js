@@ -11,6 +11,8 @@ Draft.schema = {
         jobTransactionId: 'int',
         statusId: 'int',
         formLayoutObject: 'string',
-        jobMasterId: 'int'
+        jobMasterId: 'int',
+        navigationFormLayoutStates: { type: 'string', default: '{}' },
+        statusName: 'string',
     }
 }

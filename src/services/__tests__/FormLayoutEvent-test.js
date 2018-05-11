@@ -59,9 +59,7 @@ formLayoutMap.set(1, {
     focus: false,
     validation: []
 });
-let nextEditable = {
-    1: ['required$$2']
-}
+
 
 describe('save events implementation', () => {
     it('should disable save if required with save disabled', () => {
@@ -594,19 +592,18 @@ describe('update user summary after completing transactions', () => {  // _updat
         jobStatusService.getStatusCategoryOnStatusId = jest.fn()
         keyValueDBService.validateAndSaveData = jest.fn()
        })
-        const jobTransaction = {
+        const jobTransaction = [{
             id: 2521299,
             jobMasterId: 3,
             jobStatusId: 11,
             runsheetId: 1,
             lastUpdatedAtServer: '2018-12-10 12:12:12',
-            }
+            }]
           const jobTransactionValue = {
             lastTransactionTimeOnMobile : '2018-12-10 12:12:12',
             referenceNumber : '123'
           }
       let userSummary = {
-        value: {
             hubId: 24629,
             id: 233438,
             lastBattery: 54,
@@ -619,10 +616,9 @@ describe('update user summary after completing transactions', () => {  // _updat
             lastOrderTime : null,
             lastOrderNumber : null,
         }
-    }
         it('should set update user summary db', () => {
-        jobStatusService.getStatusCategoryOnStatusId.mockReturnValueOnce(3)
-          return formLayoutEventsInterface._updateUserSummary(jobTransaction,3,null,userSummary,jobTransactionValue)
+        jobStatusService.getStatusCategoryOnStatusId.mockReturnValueOnce(1)
+          return formLayoutEventsInterface._updateUserSummary(12,3,jobTransaction,3,userSummary,11)
           .then((count) =>{
             expect(jobStatusService.getStatusCategoryOnStatusId).toHaveBeenCalledTimes(1)
             expect(keyValueDBService.validateAndSaveData).toHaveBeenCalledTimes(4)                
@@ -656,7 +652,7 @@ describe('update user summary after completing transactions', () => {  // _updat
                 id: 1,
                 userId: 54,
                 jobMasterId: 123,
-                jobStatusId: 1,
+                jobStatusId: 11,
                 count : 0, 
                 updatedTime : null
             },
@@ -665,7 +661,7 @@ describe('update user summary after completing transactions', () => {  // _updat
                 id: 2,
                 userId: 54,
                 jobMasterId: 124,
-                jobStatusId: 2,
+                jobStatusId: 11,
                 count : 1, 
                 updatedTime : null
             },
@@ -682,7 +678,7 @@ describe('update user summary after completing transactions', () => {  // _updat
         }
             it('should set update user summary db', () => {
               keyValueDBService.getValueFromStore.mockReturnValueOnce(jobSummary)
-              return formLayoutEventsInterface._updateJobSummary(jobTransaction,3,null)
+             formLayoutEventsInterface._updateJobSummary(jobTransaction,3,null)
               .then(() =>{
                 expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(keyValueDBService.validateAndUpdateData).toHaveBeenCalledTimes(1)                
@@ -696,13 +692,13 @@ describe('update user summary after completing transactions', () => {  // _updat
                 jobStatusService.getStatusCategoryOnStatusId = jest.fn()
                 realm.getRecordListOnQuery = jest.fn()
                })
-                const jobTransaction = {
+                const jobTransaction = [{
                     id: 2521299,
                     jobMasterId: 3,
                     jobStatusId: 11,
                     runsheetId: 2260,
                     lastUpdatedAtServer: '2018-12-10 12:12:12',
-                    }
+                    }]
             let runsheetList = [
                 {
                  id: 2260,
@@ -741,7 +737,7 @@ describe('update user summary after completing transactions', () => {  // _updat
                 it('should  update runsheet summary db', () => {
                 jobStatusService.getStatusCategoryOnStatusId.mockReturnValueOnce(1)
                 realm.getRecordListOnQuery.mockReturnValueOnce(runsheetList)
-                  return formLayoutEventsInterface._updateRunsheetSummary(jobTransaction,3,null)
+                  return formLayoutEventsInterface._updateRunsheetSummary(11,3,jobTransaction)
                   .then((data) =>{
                     expect(jobStatusService.getStatusCategoryOnStatusId).toHaveBeenCalledTimes(1)
                     expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(1) 

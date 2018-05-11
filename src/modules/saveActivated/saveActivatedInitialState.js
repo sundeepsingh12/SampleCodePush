@@ -15,6 +15,7 @@ var InitialState = Record({
     companyCodeDhl: false,
     showDiscardAlert: false,
     isReturnToHome: false,
+    draftStatusInfo: {}
 })
 
 export default InitialState

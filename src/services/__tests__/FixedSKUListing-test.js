@@ -229,7 +229,7 @@ describe('test cases for prepareFixedSKUObjectsFromTemplate', () => {
                         label: 'sample_label',
                         attributeTypeId: 6,
                         fieldAttributeMasterId: 333,
-                        value: ''
+                        value: 0
                     }
                 }
             }
@@ -306,7 +306,7 @@ describe('test cases for prepareFixedSKUObjectsFromTemplate', () => {
                         label: 'sample_label',
                         attributeTypeId: 6,
                         fieldAttributeMasterId: 333,
-                        value: ''
+                        value: 0
                     }
                 }
             }

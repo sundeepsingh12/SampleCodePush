@@ -39,7 +39,8 @@ import {
     SET_MODAL_FIELD_ATTRIBUTE,
     SET_OPTION_ATTRIBUTE_ERROR,
     SET_OPTION_SEARCH_INPUT,
-    SET_ADV_DROPDOWN_MESSAGE_OBJECT
+    SET_ADV_DROPDOWN_MESSAGE_OBJECT,
+    SET_ERROR_AND_ADV_DROPDOWN_MESSAGE_NULL
 } from '../lib/constants'
 import {
     DONE,
@@ -71,7 +72,7 @@ class MultipleOptionsAttribute extends PureComponent {
     }
 
     componentDidMount() {
-        let formElement = this.props.calledFromArray ? this.props.formElements[this.props.rowId].formLayoutObject : this.props.formElements
+        let formElement = this.props.calledFromArray ? this.props.formLayoutState.formElement[this.props.rowId].formLayoutObject : this.props.formLayoutState.formElement
         if (this.props.currentElement.attributeTypeId == OPTION_RADIO_FOR_MASTER) {
             this.props.actions.getOptionsListFromJobData(this.props.currentElement, this.props.jobTransaction)
         } else {
@@ -104,13 +105,10 @@ class MultipleOptionsAttribute extends PureComponent {
                             this.props.actions.saveOptionsFieldData(
                                 this.props.optionsMap,
                                 this.props.currentElement,
-                                this.props.latestPositionId,
-                                this.props.formElements,
-                                this.props.isSaveDisabled,
+                                this.props.formLayoutState,
                                 this.props.jobTransaction,
                                 this.props.calledFromArray,
                                 this.props.rowId,
-                                this.props.fieldAttributeMasterParentIdMap,
                                 item
                             ))
 
@@ -199,6 +197,11 @@ class MultipleOptionsAttribute extends PureComponent {
                     style={{ backgroundColor: 'rgba(0,0,0,.5)', flex: 1 }}
                     onPress={() => {
                         this.props.actions.setState(SET_ADV_DROPDOWN_MESSAGE_OBJECT, {})
+                        if (!this.props.calledFromArray) {
+                            this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
+                        } else {
+                            this.props.onCloseModal()
+                        }
                     }}
                 >
                     {/* Added empty view because touchableheghlight must have a child */}
@@ -215,17 +218,14 @@ class MultipleOptionsAttribute extends PureComponent {
                                     this.props.actions.saveOptionsFieldData(
                                         this.props.optionsMap,
                                         this.props.currentElement,
-                                        this.props.latestPositionId,
-                                        this.props.formElements,
-                                        this.props.isSaveDisabled,
+                                        this.props.formLayoutState,
                                         this.props.jobTransaction,
                                         this.props.calledFromArray,
                                         this.props.rowId,
-                                        this.props.fieldAttributeMasterParentIdMap,
                                         this.props.advanceDropdownMessageObject
                                     )
                                 }}>
-                                <Text style={[styles.fontPrimary, styles.padding10]}> {DONE} </Text>
+                                <Text style={[{color : styles.fontPrimaryColor}, styles.padding10]}> {DONE} </Text>
                             </TouchableHighlight>
                         </View>
                     </View>
@@ -277,6 +277,8 @@ class MultipleOptionsAttribute extends PureComponent {
                             onPress={() => {
                                 if (!this.props.calledFromArray) {
                                     this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
+                                } else {
+                                    this.props.onCloseModal()
                                 }
                                 this.props.actions.setState(SET_OPTION_ATTRIBUTE_ERROR, { error: null })
                             }}
@@ -296,16 +298,13 @@ class MultipleOptionsAttribute extends PureComponent {
                                                 this.props.actions.saveOptionsFieldData(
                                                     this.props.optionsMap,
                                                     this.props.currentElement,
-                                                    this.props.latestPositionId,
-                                                    this.props.formElements,
-                                                    this.props.isSaveDisabled,
+                                                    this.props.formLayoutState,
                                                     this.props.jobTransaction,
                                                     this.props.calledFromArray,
                                                     this.props.rowId,
-                                                    this.props.fieldAttributeMasterParentIdMap,
                                                 )
                                             }}>
-                                            <Text style={[styles.fontPrimary, styles.padding10]}> {DONE} </Text>
+                                            <Text style={[{color : styles.fontPrimaryColor}, styles.padding10]}> {DONE} </Text>
                                         </TouchableHighlight> : null
                                     }
                                 </View>
@@ -332,13 +331,15 @@ class MultipleOptionsAttribute extends PureComponent {
         let modalView = this.getModalView()
         return (
             <Modal
-                animationType="slide"
+                // animationType="slide"
                 transparent={true}
                 onRequestClose={() => {
                     if (!this.props.calledFromArray) {
                         this.props.actions.setState(SET_MODAL_FIELD_ATTRIBUTE, null)
+                    } else {
+                        this.props.onCloseModal()
                     }
-                    this.props.actions.setState(SET_OPTION_ATTRIBUTE_ERROR, { error: null })
+                    this.props.actions.setState(SET_ERROR_AND_ADV_DROPDOWN_MESSAGE_NULL)
                 }}
             >
                 {modalView}

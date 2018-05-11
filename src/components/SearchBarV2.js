@@ -8,8 +8,9 @@ import {
 } from 'native-base';
 import styles from '../themes/FeStyle'
 import { QrCodeScanner } from '../lib/constants'
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
+
 export default class SearchBarV2 extends PureComponent {
     _setQrValue = (value) => {
         this.props.returnValue(_.trim(value))
@@ -26,19 +27,20 @@ export default class SearchBarV2 extends PureComponent {
                         placeholderTextColor={'rgba(255,255,255,.6)'}
                         selectionColor={'rgba(224, 224, 224,.5)'}
                         style={[style.headerSearch]}
-                        returnKeyType = {"search"}
-                        keyboardAppearance = {"dark"}
-                        underlineColorAndroid= {'transparent'}
+                        returnKeyType={"search"}
+                        keyboardAppearance={"dark"}
+                        underlineColorAndroid={'transparent'}
                         onChangeText={(searchText) => {
                             this.props.setSearchText(searchText)
                         }}
+                        onEndEditing={this.onPress}
                         value={this.props.searchText} />
                     <Button small transparent style={[style.inputInnerBtn]} onPress={this.onPress}>
                         <Icon name="md-search" style={[styles.fontWhite, styles.fontXl]} />
                     </Button>
                 </View>
                 <TouchableOpacity style={[{ width: '15%' }, styles.marginLeft15]} onPress={() => this.props.navigation.navigate(QrCodeScanner, { returnData: this._setQrValue.bind(this) })} >
-                    <QRIcon width={30} height={30} color={styles.fontWhite} />
+                    <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl]} color={styles.fontWhite.color} />
                 </TouchableOpacity>
             </View>
         )

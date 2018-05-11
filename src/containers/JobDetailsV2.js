@@ -20,6 +20,7 @@ import {
   SELECT_NUMBER_FOR_CALL,
   CONFIRMATION,
   CALL_CONFIRM,
+  DRAFT_RESTORE_MESSAGE,
   YOU_ARE_NOT_AT_LOCATION_WANT_TO_CONTINUE,
   SELECT_ADDRESS_NAVIGATION,
   REVERT_STATUS,
@@ -60,7 +61,8 @@ import {
   RESET_STATE_FOR_JOBDETAIL,
   BulkListing,
   SHOW_DROPDOWN,
-  SET_DRAFT_JOB_DETAILS_INFO
+  SET_JOBDETAILS_DRAFT_INFO,
+  SET_LOADER_FOR_SYNC_IN_JOBDETAIL
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -71,16 +73,17 @@ import {
   ADDRESS_LINE_2
 } from '../lib/AttributeConstants'
 import Communications from 'react-native-communications'
-import CallIcon from '../svg_components/icons/CallIcon'
-import RevertIcon from '../svg_components/icons/RevertIcon'
-import GroupIcon from '../svg_components/icons/GroupIcon'
-
 import getDirections from 'react-native-google-maps-directions'
 import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
-import { jobStatusService } from '../services/classes/JobStatus'
-
+import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/formLayoutActions'
+import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
+import DraftModal from '../components/DraftModal'
+import Line1Line2View from '../components/Line1Line2View'
+import SyncLoader from '../components/SyncLoader'
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 function mapStateToProps(state) {
   return {
@@ -99,14 +102,15 @@ function mapStateToProps(state) {
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
     isShowDropdown: state.jobDetails.isShowDropdown,
-    jobExpiryTime: state.jobDetails.jobExpiryTime
+    jobExpiryTime: state.jobDetails.jobExpiryTime,
+    syncLoading: state.jobDetails.syncLoading
   }
 }
 
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions, restoreDraftAndNavigateToFormLayout, startSyncAndNavigateToContainer }, dispatch)
   }
 }
 
@@ -123,7 +127,10 @@ class JobDetailsV2 extends PureComponent {
     if (this.props.errorMessage || !_.isEmpty(this.props.draftStatusInfo)) {
       this.props.actions.setState(RESET_STATE_FOR_JOBDETAIL)
     }
-    this.props.actions.setState(SHOW_DROPDOWN, null)
+    // reset dropdown state only when required
+    if (this.props.isShowDropdown) {
+      this.props.actions.setState(SHOW_DROPDOWN, null)
+    }
   }
 
   navigateToDataStoreDetails = (navigationParam) => {
@@ -152,28 +159,48 @@ class JobDetailsV2 extends PureComponent {
       )
     }
   }
+  renderStatusForGroup(groupId) {
+    return (
+      <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={() => this.updateTransactionForGroupId(groupId)} key={groupId}>
+        <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+          <View style={[styles.row, styles.alignCenter]}>
+            <View style={[styles.marginTop12]}>
+              <MaterialIcons name='playlist-play' style={[styles.fontXxl]} color={styles.fontBlack.color} />
+            </View>
+            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
+            <Right>
+              <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+            </Right>
+          </View>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  renderDropDownStatus(length, minIndexDropDown) {
+    return (
+      <ListItem
+        key={1}
+        style={[style.jobListItem, styles.justifySpaceBetween]}
+        onPress={() => { this.props.actions.setState(SHOW_DROPDOWN, !this.props.isShowDropdown) }}
+      >
+        <View style={[styles.row, styles.alignCenter]}>
+          <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{length - minIndexDropDown} {MORE}</Text>
+          <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
+        </View>
+      </ListItem>
+    )
+  }
 
   renderStatusList(statusList) {
     let statusView = []
-    if (this.props.jobTransaction.id < 0 && this.props.jobDataList.length < 1) {
+    if (this.props.jobTransaction.id < 0 && this.props.jobTransaction.jobId < 0 && this.props.jobDataList.length < 1) {//In case of new job which is not synced with server do not show status button
       return statusView
     }
     let groupId = this.props.navigation.state.params.groupId ? this.props.navigation.state.params.groupId : null
     if (groupId && statusList.length > 0) {
       statusView.push(
-        <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={() => this.updateTransactionForGroupId(groupId)} key={groupId}>
-          <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
-            <View style={[styles.row, styles.alignCenter]}>
-              <View style={[styles.marginTop12]}>
-                <GroupIcon />
-              </View>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{UPDATE_GROUP}</Text>
-              <Right>
-                <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-              </Right>
-            </View>
-          </View>
-        </TouchableOpacity>
+        this.renderStatusForGroup(groupId)
       )
       return statusView
     }
@@ -184,38 +211,28 @@ class JobDetailsV2 extends PureComponent {
       )
       if (index == minIndexDropDown - 1 && statusList.length > minIndexDropDown) {
         statusView.push(
-          <ListItem
-            key={1}
-            style={[style.jobListItem, styles.justifySpaceBetween]}
-            onPress={() => { this.props.actions.setState(SHOW_DROPDOWN, !this.props.isShowDropdown) }}
-          >
-            <View style={[styles.row, styles.alignCenter]}>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft20]}>{statusList.length - minIndexDropDown} {MORE}</Text>
-              <Icon name={!this.props.isShowDropdown ? 'ios-arrow-down' : 'ios-arrow-up'} style={[styles.fontLg, styles.fontLightGray, styles.marginLeft15]} />
-            </View>
-          </ListItem>)
+          this.renderDropDownStatus(statusList.length, minIndexDropDown)
+        )
       }
     }
     return statusView
   }
 
   _onGoToNextStatus = () => {
-    this.props.actions.navigateToScene('FormLayout', {
+    this.props.actions.checkForInternetAndStartSyncAndNavigateToFormLayout({
       contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
       jobTransaction: this.props.jobTransaction,
       statusId: this.props.statusList.id,
       statusName: this.props.statusList.name,
-      jobMasterId: this.props.jobTransaction.jobMasterId
+      jobMasterId: this.props.jobTransaction.jobMasterId,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+      jobDetailsScreenKey: this.props.navigation.state.key
     })
     this._onCancel()
   }
   _onCancel = () => {
     this.props.actions.setState(IS_MISMATCHING_LOCATION, null)
-  }
-
-  _onCancelForDraft = () => {
-    this.props.actions.setState(SET_DRAFT_JOB_DETAILS_INFO, {})
   }
 
   _onCheckLocationMismatch = (statusList, jobTransaction) => {
@@ -232,7 +249,9 @@ class JobDetailsV2 extends PureComponent {
       const FormLayoutObject = {
         contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
         jobTransaction,
-        statusList
+        statusList,
+        pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+        jobDetailsScreenKey: this.props.navigation.state.key
       }
       this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
     }
@@ -407,12 +426,11 @@ class JobDetailsV2 extends PureComponent {
   }
 
   updateTransactionForGroupId(groupId) {
-    this.props.actions.navigateToScene(BulkListing, {
-      jobMasterId: this.props.jobTransaction.jobMasterId,
-      statusId: this.props.currentStatus.id,
-      nextStatusList: this.props.currentStatus.nextStatusList,
-      groupId
-    })
+    this.props.actions.startSyncAndNavigateToContainer({
+      jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
+      additionalParams: JSON.stringify({ statusId: this.props.currentStatus.id }),
+      groupId: groupId
+    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
   }
 
   selectStatusToRevert = () => {
@@ -427,7 +445,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onGoToPreviousStatus = (statusData) => {
-    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation)
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation.state.params.pageObjectAdditionalParams)
   }
 
   statusRevertSelection(statusList) {
@@ -445,18 +463,11 @@ class JobDetailsV2 extends PureComponent {
       }
     )
   }
-
+  _onCancelDraft = () => {
+    this.props.actions.setState(SET_DRAFT_INFO_JOBDETAILS, {})
+  }
   showDraftAlert() {
-    // let draftStatus = this.props.currentStatus.nextStatusList.filter(nextStatus => nextStatus.id == this.props.draftStatusId)
-    // let draftMessage = (draftStatus.length > 0) ? 'Do you want to restore draft for ' + draftStatus[0].name + '?' : 'Do you want to restore draft?'
-    let draftMessage = 'Do you want to restore draft for ' + this.props.draftStatusInfo.name + '?'
-    let view =
-      <CustomAlert
-        title="Draft"
-        message={draftMessage}
-        onOkPressed={() => this._goToFormLayoutWithDraft()}
-        onCancelPressed={this._onCancelForDraft} />
-    return view
+    return <DraftModal draftStatusInfo={this.props.draftStatusInfo} onOkPress={() => this._goToFormLayoutWithDraft()} onCancelPress={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} onRequestClose={() => this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})} />
   }
 
   showLocationMisMatchAlert() {
@@ -469,78 +480,78 @@ class JobDetailsV2 extends PureComponent {
     )
   }
 
-  showJobMasterIdentifier(){
-    return(
+  showJobMasterIdentifier() {
+    return (
       <View style={[style.seqCircle, { backgroundColor: this.props.navigation.state.params.jobTransaction.identifierColor }]}>
-      <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
-        {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
-      </Text>
-    </View>
+        <Text style={[styles.fontWhite, styles.fontCenter, styles.fontLg]}>
+          {this.props.navigation.state.params.jobTransaction.jobMasterIdentifier}
+        </Text>
+      </View>
     )
   }
-
+  showTransactionView() {
+    return (
+      <View>
+        <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
+          {this.props.navigation.state.params.jobTransaction.line1}
+        </Text>
+        <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
+          {this.props.navigation.state.params.jobTransaction.line2}
+        </Text>
+        <Text
+          style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
+          {this.props.navigation.state.params.jobTransaction.circleLine1}
+        </Text>
+      </View>
+    )
+  }
 
   showHeaderView() {
     return (
       <Header style={[style.header]}>
         <View style={style.seqCard}>
-        {this.showJobMasterIdentifier()}
-        
-          <View style={style.seqCardDetail}>
-            <View>
-              <Text style={[styles.fontDefault, styles.fontWeight500, styles.lineHeight25]}>
-                {this.props.navigation.state.params.jobTransaction.line1}
-              </Text>
-              <Text style={[styles.fontSm, styles.fontWeight300, styles.lineHeight20]}>
-                {this.props.navigation.state.params.jobTransaction.line2}
-              </Text>
-              <Text
-                style={[styles.fontSm, styles.italic, styles.fontWeight300, styles.lineHeight20]}>
-                {this.props.navigation.state.params.jobTransaction.circleLine1}
-              </Text>
-            </View>
-          </View>
+          {this.showJobMasterIdentifier()}
+          <Line1Line2View data={this.props.navigation.state.params.jobTransaction} />
           {this.showCloseIcon()}
-         
         </View>
       </Header>
     )
   }
 
-  showCloseIcon(){
+  showCloseIcon() {
     return (
       <TouchableOpacity onPress={() => this.props.navigation.goBack(null)} >
-      <View
-        style={{
-          width: 40,
-          alignSelf: 'flex-start',
-          alignItems: 'center',
-          paddingTop: 10,
-          flex: 1
-        }}>
-        <Icon
-          name="md-close"
-          style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
-      </View>
-    </TouchableOpacity>
+        <View
+          style={{
+            width: 40,
+            alignSelf: 'flex-start',
+            alignItems: 'center',
+            paddingTop: 10,
+            flex: 1
+          }}>
+          <Icon
+            name="md-close"
+            style={[styles.fontXl, styles.fontBlack, styles.fontXxl]} />
+        </View>
+      </TouchableOpacity>
     )
   }
 
-  showRevertView (){
-    return(
-    <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={this.selectStatusToRevert}>
-    <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
-      <View style={[styles.row, styles.alignCenter]}>
-        <View>
-          <RevertIcon color={styles.fontPrimary} />
+  showRevertView() {
+    return (
+      <TouchableOpacity style={[styles.marginTop5, styles.bgWhite, styles.paddingBottom15]} onPress={this.selectStatusToRevert}>
+        <View style={[styles.marginLeft15, styles.marginRight15, styles.marginTop15]}>
+          <View style={[styles.row, styles.alignCenter]}>
+            <View>
+              <MaterialIcons name='rotate-left' style={[styles.fontXxl]} color={styles.fontBlack.color} />
+            </View>
+            <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{REVERT_STATUS}</Text>
+            <Right>
+              <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
+            </Right>
+          </View>
         </View>
-        <Text style={[styles.fontDefault, styles.fontWeight500, styles.marginLeft10]} >{REVERT_STATUS}</Text>
-        <Right>
-          <Icon name="ios-arrow-forward" style={[styles.fontLg, styles.fontLightGray]} />
-        </Right>
-      </View>
-    </View>
-  </TouchableOpacity>
+      </TouchableOpacity>
     )
   }
 
@@ -550,7 +561,7 @@ class JobDetailsV2 extends PureComponent {
     return (
     <Content>
       {!this.props.errorMessage && this.props.statusRevertList && this.props.statusRevertList.length > 0 ?
-        this.showRevertView(): null}
+        this.showRevertView() : null}
 
       <View style={[styles.marginTop5, styles.bgWhite]}>
         {this.props.errorMessage ? <View style={StyleSheet.flatten([styles.column, { padding: 12, backgroundColor: 'white' }])}>
@@ -563,42 +574,42 @@ class JobDetailsV2 extends PureComponent {
       </View>
 
       {/*Basic Details*/}
-     {this.showJobDetails()}
+      {this.showJobDetails()}
 
       {/*Field Details*/}
-     {this.showFieldDetails()}
+      {this.showFieldDetails()}
     </Content>
     )
   }
 
-  showJobDetails(){
+  showJobDetails() {
     return (
       <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
-      <ExpandableHeader
-        title={'Basic Details'}
-        navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-        dataList={this.props.jobDataList}
-      />
-    </View>
+        <ExpandableHeader
+          title={'Basic Details'}
+          navigateToDataStoreDetails={this.navigateToDataStoreDetails}
+          dataList={this.props.jobDataList}
+        />
+      </View>
     )
   }
 
-  showFieldDetails(){
+  showFieldDetails() {
     return (
-    <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
-    <ExpandableHeader
-      title={'Field Details'}
-      dataList={this.props.fieldDataList}
-      navigateToDataStoreDetails={this.navigateToDataStoreDetails}
-      navigateToCameraDetails={this.navigateToCameraDetails} />
-  </View>
+      <View style={[styles.bgWhite, styles.marginTop10, styles.paddingTop5, styles.paddingBottom5]}>
+        <ExpandableHeader
+          title={'Field Details'}
+          dataList={this.props.fieldDataList}
+          navigateToDataStoreDetails={this.navigateToDataStoreDetails}
+          navigateToCameraDetails={this.navigateToCameraDetails} />
+      </View>
     )
   }
 
   showFooterView() {
     return (
       <Footer style={[style.footer]}>
-        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0  && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData  && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
+        {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0 && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData && this.props.navigation.state.params.jobSwipableDetails.smsTemplateData.length > 0,
           <FooterTab>
             <Button full style={[styles.bgWhite]} onPress={this.chatButtonPressed}>
               <Icon name="md-text" style={[styles.fontLg, styles.fontBlack]} />
@@ -606,13 +617,13 @@ class JobDetailsV2 extends PureComponent {
           </FooterTab>
         )}
         {renderIf(this.props.navigation.state.params.jobSwipableDetails.contactData && this.props.navigation.state.params.jobSwipableDetails.contactData.length > 0,
-           <FooterTab>
-           <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
-             <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
-           </Button>
-         </FooterTab>
+          <FooterTab>
+            <Button full style={[styles.bgWhite]} onPress={this.callButtonPressed}>
+              <Icon name="md-call" style={[styles.fontLg, styles.fontBlack]} />
+            </Button>
+          </FooterTab>
         )}
-        {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) ||  (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
+        {renderIf(!_.isEmpty(this.props.navigation.state.params.jobSwipableDetails.addressData) || (this.props.navigation.state.params.jobTransaction.jobLatitude && this.props.navigation.state.params.jobTransaction.jobLongitude),
           <FooterTab>
             <Button full onPress={this.navigationButtonPressed}>
               <Icon name="md-map" style={[styles.fontLg, styles.fontBlack]} />
@@ -621,7 +632,7 @@ class JobDetailsV2 extends PureComponent {
         {renderIf(this.props.navigation.state.params.jobSwipableDetails.customerCareData && this.props.navigation.state.params.jobSwipableDetails.customerCareData.length > 0,
           <FooterTab>
             <Button full style={[styles.bgWhite]} onPress={this.customerCareButtonPressed}>
-              <CallIcon />
+              <SimpleLineIcons name="call-out" style={[styles.fontLg, styles.fontBlack]} />
             </Button>
           </FooterTab>)}
       </Footer>
@@ -640,18 +651,17 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _goToFormLayoutWithDraft = () => {
-    this.props.actions.navigateToScene('FormLayout', {
-      contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
-      jobTransactionId: this.props.jobTransaction.id,
-      jobTransaction: this.props.jobTransaction,
-      statusId: this.props.draftStatusInfo.id,
-      statusName: this.props.draftStatusInfo.name,
-      jobMasterId: this.props.jobTransaction.jobMasterId,
-      isDraftRestore: true
-    })
-    this.props.actions.setState(SET_DRAFT_JOB_DETAILS_INFO, {})
-
+    this.props.actions.restoreDraftAndNavigateToFormLayout(
+      this.props.navigation.state.params.jobSwipableDetails.contactData,
+      this.props.jobTransaction,
+      this.props.draftStatusInfo,
+      null,
+      this.props.navigation.state.params.pageObjectAdditionalParams,
+      this.props.navigation.state.key
+    )
+    this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }
+
   render() {
     if (this.props.jobDetailsLoading) {
       return (
@@ -659,11 +669,12 @@ class JobDetailsV2 extends PureComponent {
       )
     }
     else {
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
       const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
+            {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
             {draftAlert}
             {mismatchAlert}
             {this.showHeaderView()}

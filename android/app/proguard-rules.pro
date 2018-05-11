@@ -50,6 +50,10 @@
 
 -dontwarn com.facebook.react.**
 
+# TextLayoutBuilder uses a non-public Android constructor within StaticLayout.
+# See libs/proxy/src/main/java/com/facebook/fbui/textlayoutbuilder/proxy for details.
+-dontwarn android.text.StaticLayout
+
 # okhttp
 
 -keepattributes Signature
@@ -65,9 +69,14 @@
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn okio.**
 
-# BackgroundGeolocation
+# BackgroundGeolocation lib tslocationmanager.aar is *already* proguarded
 -keep class com.transistorsoft.** { *; }
 -dontwarn com.transistorsoft.**
+
+-keep class com.google.**
+-dontwarn com.google.**
+-dontwarn org.apache.http.**
+-dontwarn com.android.volley.toolbox.**
 
 # BackgroundGeolocation (EventBus)
 -keepclassmembers class * extends de.greenrobot.event.util.ThrowableFailureEvent {

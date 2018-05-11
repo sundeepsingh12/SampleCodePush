@@ -46,13 +46,14 @@ import {
     OPTION_RADIO_VALUE,
     AFTER,
     BEFORE,
-    ADVANCE_DROPDOWN
+    ADVANCE_DROPDOWN,
+    DATA_STORE_FILTER,
 } from '../lib/AttributeConstants'
 import TimePicker from '../components/TimePicker'
 import NPSFeedback from '../components/NPSFeedback'
 import MultipleOptionsAttribute from '../containers/MultipleOptionsAttribute'
 import * as globalActions from '../modules/global/globalActions'
-import QRIcon from '../svg_components/icons/QRIcon'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import {
     ON_BLUR,
     NEXT_FOCUS,
@@ -63,6 +64,8 @@ import {
     SELECTED,
     REMOVE
 } from '../lib/ContainerConstants'
+import DataStoreFilter from '../containers/DataStoreFilter'
+
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({ ...arrayActions, ...globalActions }, dispatch)
@@ -72,18 +75,18 @@ function mapDispatchToProps(dispatch) {
 class ArrayBasicComponent extends PureComponent {
 
     _searchForReferenceValue = (value, item) => {
-        this.props.actions.fieldValidationsArray(item, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, value)
+        this.props.actions.fieldValidationsArray(item, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, value, this.props.formLayoutState)
     }
     onFocusEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, BEFORE, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
     }
 
     _onBlurEvent(currentElement) {
-        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+        this.props.actions.fieldValidationsArray(currentElement, this.props.arrayElements, AFTER, this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
     }
 
     _getNextFocusableElement(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId) {
-        this.props.actions.getNextFocusableForArrayWithoutChildDatalist(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, this.props.fieldAttributeMasterParentIdMap);
+        this.props.actions.getNextFocusableForArrayWithoutChildDatalist(fieldAttributeMasterId, isSaveDisabled, value, arrayElements, rowId, null, this.props.formLayoutState);
     }
 
     _styleNextFocusable(isFocusable) {
@@ -93,7 +96,7 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     onSaveDateTime = (value, item) => {
-        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2);
+        this.props.actions.getNextFocusableAndEditableElement(item.fieldAttributeMasterId, this.props.isSaveDisabled, value, this.props.arrayElements, this.props.arrayRow.rowId, null, NEXT_FOCUS, 2, null, this.props.formLayoutState);
     }
     onPressModal = (fieldAttributeMasterId) => {
         this.props.actions.showOrDropModal(fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, fieldAttributeMasterId, this.props.isSaveDisabled)
@@ -104,7 +107,7 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? {color : styles.fontPrimaryColor} : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -114,7 +117,7 @@ class ArrayBasicComponent extends PureComponent {
         this.props.actions.navigateToScene('QrCodeScanner',
             {
                 currentElement: item,
-                formElements: this.props.arrayElements,
+                formLayoutState: this.props.formLayoutState,
                 jobStatusId: this.props.jobStatusId,
                 jobTransaction: this.props.jobTransaction,
                 latestPositionId: this.props.latestPositionId,
@@ -133,15 +136,12 @@ class ArrayBasicComponent extends PureComponent {
                 <View>
                     <MultipleOptionsAttribute
                         currentElement={item}
-                        formElements={this.props.arrayElements}
-                        isSaveDisabled={this.props.isSaveDisabled}
+                        formLayoutState={this.props.formLayoutState}
                         jobTransaction={this.props.jobTransaction}
                         jobStatusId={this.props.jobStatusId}
-                        latestPositionId={this.props.latestPositionId}
                         calledFromArray={true}
                         rowId={this.props.arrayRow.rowId}
-                        onCloseModal={this.onCloseModal}
-                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
+                        onCloseModal={() => this.onCloseModal(item)}
                     />
                 </View>
             )
@@ -154,12 +154,17 @@ class ArrayBasicComponent extends PureComponent {
                         transparent={true}
                         onRequestClose={() => this.onCloseModal(item)}>
                         <TouchableHighlight
-                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
-                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .6 }}>
+                            style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]} onPress={() => this.onCloseModal(item)}>
+                            <TouchableHighlight style={{ backgroundColor: '#ffffff', flex: .2 }}>
                                 <View>
-                                    <NPSFeedback
-                                        onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item}
-                                    />
+                                    <Text style={[styles.alignStart, styles.fontLg, styles.padding10]}>
+                                        Rating
+                                    </Text>
+                                    <View style={[styles.padding20, styles.justifyCenter]}>
+                                        <NPSFeedback
+                                            onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item}
+                                        />
+                                    </View>
                                 </View>
                             </TouchableHighlight>
                         </TouchableHighlight>
@@ -170,6 +175,25 @@ class ArrayBasicComponent extends PureComponent {
         if (attributeTypeId == TIME || attributeTypeId == DATE || attributeTypeId == RE_ATTEMPT_DATE) {
             return (
                 <TimePicker onSave={this.onSaveDateTime} onCancel={() => this.onCloseModal(item)} item={item} />
+            )
+        }
+
+        if (attributeTypeId == DATA_STORE_FILTER) {
+            return (
+                <View>
+                    <DataStoreFilter
+                        currentElement={item}
+                        formLayoutState={this.props.formLayoutState}
+                        isSaveDisabled={this.props.isSaveDisabled}
+                        jobTransaction={this.props.jobTransaction}
+                        latestPositionId={this.props.latestPositionId}
+                        fieldAttributeMasterParentIdMap={this.props.fieldAttributeMasterParentIdMap}
+                        onClose={this.onCloseModal}
+                        calledFromArray={true}
+                        rowId={this.props.arrayRow.rowId}
+                        arrayFieldAttributeMasterId={this.props.arrayFieldAttributeMasterId}
+                    />
+                </View>
             )
         }
         return null
@@ -192,7 +216,7 @@ class ArrayBasicComponent extends PureComponent {
         }
 
         if (item.value != ARRAY_SAROJ_FAREYE && item.value != OBJECT_SAROJ_FAREYE) {
-            return item.containerValue
+            return item.containerValue ? item.containerValue : item.value
         }
         return null
     }
@@ -200,7 +224,7 @@ class ArrayBasicComponent extends PureComponent {
     getMultipleOptionCardView(modalView, item) {
         return (
             <TouchableOpacity
-                style={[{ paddingVertical: 50 }, item.focus ? styles.borderLeft4 : null]}
+                style={[{ paddingVertical: 50 }, item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}
                 onPress={() => this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
                 }
                 disabled={!item.editable || this.props.modalFieldAttributeMasterId ? true : false}
@@ -274,8 +298,7 @@ class ArrayBasicComponent extends PureComponent {
                                     style={[styles.absolute, { bottom: 50, right: 10 }]}
                                     onPress={() => this.goToQRCode(item)} >
                                     <View>
-                                        <QRIcon width={30} height={30} color={this.getComponentLabelStyle(item.focus, item.editable)} />
-                                    </View>
+                                        <MaterialCommunityIcons name='qrcode' style={[styles.fontXxl, styles.padding5]} color={this.getComponentLabelStyle(item.focus, item.editable).color} />                                    </View>
                                 </TouchableHighlight> : null}
                             {item.alertMessage ?
                                 <Label style={[styles.fontDanger, styles.fontSm, styles.paddingTop10]}>{item.alertMessage}</Label>
@@ -314,28 +337,37 @@ class ArrayBasicComponent extends PureComponent {
                     <View>
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
                                 this.props.actions.navigateToScene('DataStore',
                                     {
                                         currentElement: item,
-                                        formElements: this.props.arrayElements,
+                                        formLayoutState: this.props.formLayoutState,
                                         jobStatusId: this.props.jobStatusId,
                                         jobTransaction: this.props.jobTransaction,
                                         latestPositionId: this.props.latestPositionId,
                                         isSaveDisabled: this.props.isSaveDisabled,
                                         calledFromArray: true,
                                         rowId: this.props.arrayRow.rowId,
-                                        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
+                                        fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap,
+                                        arrayFieldAttributeMasterId: this.props.arrayFieldAttributeMasterId
                                     })
                             }} />
                     </View>
                 )
+            case DATA_STORE_FILTER:
+                return (
+                    <View>
+                        {modalView}
+                        <FormLayoutActivityComponent item={item} press={() => this.onPressModal(item.fieldAttributeMasterId)} />
+                    </View>
+                )
+
             case QR_SCAN:
                 return (
                     <View>
                         <FormLayoutActivityComponent item={item} press={
                             () => {
-                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled)
+                                this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.arrayRow.isSaveDisabled, null, this.props.formLayoutState)
                                 this.goToQRCode(item)
                             }} />
                     </View>
@@ -346,11 +378,11 @@ class ArrayBasicComponent extends PureComponent {
                 return (<View>
                     <FormLayoutActivityComponent item={item} press={
                         () => {
-                            this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled)
+                            this.props.actions.fieldValidationsArray(item, this.props.arrayElements, 'Before', this.props.jobTransaction, this.props.arrayRow.rowId, this.props.isSaveDisabled, null, this.props.formLayoutState)
                             this.props.actions.navigateToScene(CameraAttribute,
                                 {
                                     currentElement: item,
-                                    formElements: this.props.arrayElements,
+                                    formLayoutState: this.props.formLayoutState,
                                     jobStatusId: this.props.jobStatusId,
                                     jobTransaction: this.props.jobTransaction,
                                     latestPositionId: this.props.latestPositionId,

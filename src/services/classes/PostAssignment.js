@@ -11,6 +11,7 @@ import {
     TABLE_JOB_TRANSACTION,
     USER,
     HUB,
+    USER_SUMMARY,
     POST_ASSIGNMENT_FORCE_ASSIGN_ORDERS,
 } from '../../lib/constants'
 import * as realm from '../../repositories/realmdb'
@@ -79,10 +80,13 @@ class PostAssignment {
         let jobTransaction = { ...transaction }
         let transactionDTO = {
             id: jobTransaction.id,
-            referenceNumber: jobTransaction.referenceNumber
+            referenceNumber: jobTransaction.referenceNumber,
+            jobId:jobTransaction.jobId
         }
-        const runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction, pendingStatus.statusCategory)
+        const runSheet = await formLayoutEventsInterface._updateRunsheetSummary(jobTransaction.jobStatusId, pendingStatus.statusCategory, [jobTransaction])
         await formLayoutEventsInterface._updateJobSummary(jobTransaction, pendingStatus.id)
+        let userSummary = await keyValueDBService.getValueFromStore(USER_SUMMARY)
+        await formLayoutEventsInterface._updateUserSummary(jobTransaction.jobStatusId, pendingStatus.statusCategory, [jobTransaction], userSummary.value, pendingStatus.id)
         let user = await keyValueDBService.getValueFromStore(USER)
         let hub = await keyValueDBService.getValueFromStore(HUB)
         jobTransaction.jobStatusId = pendingStatus.id

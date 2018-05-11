@@ -25,7 +25,6 @@ import array from './array/arrayReducer'
 import sequence from './sequence/sequenceReducer'
 import cashTenderingReducer from './cashTendering/cashTenderingReducer'
 import dataStore from './dataStore/dataStoreReducer'
-import newJob from './newJob/newJobReducer'
 import transientStatus from './transientStatus/transientReducer'
 import saveActivated from './saveActivated/saveActivatedReducer'
 import statistics from './statistics/statisticsReducer'
@@ -40,16 +39,15 @@ import { combineReducers } from 'redux'
 import { PRE_LOGOUT_SUCCESS } from '../lib/constants'
 import summary from './summary/summaryReducer'
 import customApp from './customApp/customAppReducers'
-import jobMaster from './job-master/jobMasterReducer'
 import postAssignment from './postAssignment/postAssignmentReducer'
 import qrCodeReducer from './qrCodeGenerator/qrCodeReducer'
 import offlineDS from './offlineDS/offlineDSReducer'
 import cameraReducer from './camera/cameraReducer'
-import autoLogout from './autoLogout/autoLogoutReducer'
 import dataStoreFilterReducer from './dataStoreFilter/dataStoreFilterReducer'
 import backup from './backup/backupReducer'
 import mosambeeWalletPayment from './cardTypePaymentModules/mosambeeWalletPayment/mosambeeWalletReducer'
 // import profile from './profile/profileReducer'
+import bluetooth from './bluetooth/bluetoothReducer'
 
 
 /**
@@ -77,7 +75,6 @@ const rootReducer = combineReducers({
   sequence,
   cashTenderingReducer,
   dataStore,
-  newJob,
   transientStatus,
   saveActivated,
   statistics,
@@ -89,16 +86,15 @@ const rootReducer = combineReducers({
   liveJob,
   summary,
   customApp,
-  jobMaster,
   postAssignment,
   qrCodeReducer,
   offlineDS,
   cameraReducer,
-  autoLogout,
   dataStoreFilterReducer,
   backup,
   multipleOptionsAttribute,
-  mosambeeWalletPayment
+  mosambeeWalletPayment,
+  bluetooth
 })
 
 // const rootReducer = (state, action) => {

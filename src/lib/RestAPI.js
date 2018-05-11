@@ -18,7 +18,8 @@ import RNFetchBlob from 'react-native-fetch-blob'
 import { keyValueDBService } from '../services/classes/KeyValueDBService.js'
 import {
   PENDING_SYNC_TRANSACTION_IDS,
-  LAST_SYNC_WITH_SERVER
+  LAST_SYNC_WITH_SERVER,
+  DOMAIN_URL
 } from './constants'
 import moment from 'moment'
 const fetch = require('react-native-cancelable-fetch');
@@ -35,9 +36,9 @@ class RestAPI {
     }
     this._sessionToken = _.isNull(token) ? null : token
 
-    this.API_BASE_URL = CONFIG.backend.fareyeProduction ?
-      CONFIG.FAREYE.production.url :
-      CONFIG.FAREYE.staging.url
+    // this.API_BASE_URL = CONFIG.backend.fareyeProduction ?
+    //   CONFIG.FAREYE.production.url :
+    //   CONFIG.FAREYE.staging.url
   }
 
   /**
@@ -57,10 +58,11 @@ class RestAPI {
    */
   async _fetch(opts, fetchRequestId) {
     let url = opts.url
-    if(!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK) && opts.method != 'WALLET'){
-       url = this.API_BASE_URL + url
+    if (!_.includes(opts.url, CONFIG.API.SEND_SMS_LINK) && !_.includes(opts.url, CONFIG.API.SEND_EMAIL_LINK) && opts.method != 'WALLET') {
+      let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+      url = data.value + url
     }
-    if(opts.method == 'WALLET') opts.method = 'POST'
+    if (opts.method == 'WALLET') opts.method = 'POST'
     if (this._sessionToken) {
       opts.headers['Cookie'] = this._sessionToken
     }
@@ -128,12 +130,12 @@ class RestAPI {
   */
   serviceCall(body, url, method) {
     let opts;
-    if (method === 'POST' || method ==='WALLET') {
+    if (method === 'POST' || method === 'WALLET') {
       opts = {
         method,
         headers: {
           'Accept': 'application/json',
-          'Content-Type': method !='WALLET' ? 'application/json' : 'application/x-www-form-urlencoded'
+          'Content-Type': method != 'WALLET' ? 'application/json' : 'application/x-www-form-urlencoded'
         },
         url,
         body
@@ -188,40 +190,30 @@ class RestAPI {
     });
   }
 
-  async uploadZipFile(path, fileName) {
+  async uploadZipFile(path, fileName, currenDate) {
     // const jid = this._sessionToken.split(';')[1].split(',')[1].trim()
     // console.log('jid',jid)
     var PATH = (!path) ? RNFS.DocumentDirectoryPath + '/' + CONFIG.APP_FOLDER : path
     var filePath = (!path) ? PATH + '/sync.zip' : PATH
     let responseBody = "Fail"
-    await RNFetchBlob.fetch('POST', this.API_BASE_URL + CONFIG.API.UPLOAD_DATA_API, {
+    let data = await keyValueDBService.getValueFromStore(DOMAIN_URL)
+    await RNFetchBlob.fetch('POST', data.value + CONFIG.API.UPLOAD_DATA_API, {
       'cookie': this._sessionToken,
       'Content-Type': 'multipart/form-data',
     }, [
         { name: 'file', filename: (!fileName) ? 'sync.zip' : fileName, data: RNFetchBlob.wrap(filePath) },
       ]).uploadProgress((written, total) => {
       }).then(async (resp) => {
-        if (!path) {
-          responseBody = resp.text()
-          const message = responseBody.split(",")[0]
-          const syncCount = responseBody.split(",")[1]
-          if (message == 'success') {
-            //do something
-            const currenDate = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+        responseBody = resp.text()
+        const message = responseBody.split(",")[0]
+        if (!path && message == 'success') {
+          if (currenDate) {
             await keyValueDBService.validateAndSaveData(LAST_SYNC_WITH_SERVER, currenDate)
-            await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
-            // let transactionIdToBeSynced = await keyValueDBService.getValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
           }
-          else {
-            throw new Error(responseBody)
-          }
-        } else {
-          responseBody = resp.text()
-          console.log('responseBody', responseBody)
-          const message = responseBody.split(",")[0]
-          if (message != 'success') {
-            throw new Error(responseBody)
-          }
+          await keyValueDBService.deleteValueFromStore(PENDING_SYNC_TRANSACTION_IDS);
+        }
+        else if (message != 'success') {
+          throw new Error(responseBody)
         }
       }).catch(err => {
         throw {

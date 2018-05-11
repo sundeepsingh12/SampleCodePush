@@ -36,12 +36,14 @@ var InitialState = Record({
         isLoading: false,
         errorMessage: '',
         paymentAtEnd: {},
-        draftStatusId: null,
-        updateDraft: false,
+        updateDraft: true,
         isFormValid: true,
         dataStoreFilterReverseMap: {},
         fieldAttributeMasterParentIdMap: {},
-        modalFieldAttributeMasterId: null
+        modalFieldAttributeMasterId: null,
+        noFieldAttributeMappedWithStatus: false,
+        arrayReverseDataStoreFilterMap: {}, // used in array when it has DSF or DataStore as child attribute and they also have mapping with other DSF
+        jobAndFieldAttributesList: {}
 })
 
 export default InitialState

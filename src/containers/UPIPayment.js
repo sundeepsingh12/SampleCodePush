@@ -45,7 +45,6 @@ function mapDispatchToProps(dispatch) {
 class UPIPayment extends PureComponent {
 
     componentWillMount() {
-        console.log(this.props)
         this.props.actions.getUPIPaymentParameters(this.props.navigation.state.params.jobTransaction.jobMasterId, this.props.navigation.state.params.jobTransaction.jobId)
     }
 
@@ -54,7 +53,6 @@ class UPIPayment extends PureComponent {
     }
 
     render() {
-        console.log('UPIPayment props', this.props)
         return (
             <Container>
                 <Modal animationType={"slide"}

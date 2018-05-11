@@ -10,8 +10,6 @@ import { jobMasterService } from '../../../services/classes/JobMaster'
 const middlewares = [thunk]
 const mockStore = configureStore(middlewares)
 import {
-    SET_JOB_MASTER_LIST,
-    SET_POST_ASSIGNMENT_PARAMETERS,
     SET_POST_ASSIGNMENT_TRANSACTION_LIST,
     SET_POST_SCAN_SUCCESS,
     SET_POST_ASSIGNMENT_ERROR,
@@ -20,97 +18,31 @@ import { jobTransactionService } from '../../../services/classes/JobTransaction'
 import { jobStatusService } from '../../../services/classes/JobStatus';
 import { postAssignmentService } from '../../../services/classes/PostAssignment';
 
-describe('test cases for fetchJobMasterList action', () => {
-    beforeEach(() => {
-        keyValueDBService.getValueFromStore = jest.fn()
-        moduleCustomizationService.getModuleCustomizationForAppModuleId = jest.fn()
-        jobMasterService.getJobMasterListFromPostAndPreAssignmentList = jest.fn()
-    })
-
-    it('should set undefined job master list', () => {
-        const store = mockStore({})
-        moduleCustomizationService.getModuleCustomizationForAppModuleId.mockReturnValue([])
-        return store.dispatch(actions.fetchJobMasterList())
-            .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
-                expect(moduleCustomizationService.getModuleCustomizationForAppModuleId).toHaveBeenCalledTimes(1)
-                expect(jobMasterService.getJobMasterListFromPostAndPreAssignmentList).toHaveBeenCalledTimes(1)
-                expect(store.getActions()[0].type).toEqual(SET_JOB_MASTER_LIST)
-                expect(store.getActions()[0].payload).toEqual({ jobMasterList: undefined, loading: true })
-                expect(store.getActions()[1].type).toEqual(SET_JOB_MASTER_LIST)
-                expect(store.getActions()[1].payload).toEqual({ jobMasterList: undefined, loading: false })
-                expect(store.getActions()[2].type).toEqual(SET_POST_ASSIGNMENT_PARAMETERS)
-                expect(store.getActions()[2].payload).toEqual({ isManualSelectionAllowed: null, isForceAssignmentAllowed: null })
-            })
-    })
-
-    it('should set job master list', () => {
-        const store = mockStore({})
-        moduleCustomizationService.getModuleCustomizationForAppModuleId.mockReturnValue([])
-        let jobMasterList = [
-            {
-                id: '123',
-                code: 'xyz'
-            },
-            {
-                id: '124',
-                code: 'abc'
-            }
-        ]
-        jobMasterService.getJobMasterListFromPostAndPreAssignmentList.mockReturnValue(jobMasterList)
-        return store.dispatch(actions.fetchJobMasterList())
-            .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
-                expect(moduleCustomizationService.getModuleCustomizationForAppModuleId).toHaveBeenCalledTimes(1)
-                expect(jobMasterService.getJobMasterListFromPostAndPreAssignmentList).toHaveBeenCalledTimes(1)
-                expect(store.getActions()[0].type).toEqual(SET_JOB_MASTER_LIST)
-                expect(store.getActions()[0].payload).toEqual({ jobMasterList: undefined, loading: true })
-                expect(store.getActions()[1].type).toEqual(SET_JOB_MASTER_LIST)
-                expect(store.getActions()[1].payload).toEqual({ jobMasterList, loading: false })
-                expect(store.getActions()[2].type).toEqual(SET_POST_ASSIGNMENT_PARAMETERS)
-                expect(store.getActions()[2].payload).toEqual({ isManualSelectionAllowed: null, isForceAssignmentAllowed: null })
-            })
-    })
-
-    it('should throw error and set undefined job master list', () => {
-        const store = mockStore({})
-        moduleCustomizationService.getModuleCustomizationForAppModuleId = jest.fn(() => {
-            throw new Error('error')
-        })
-        return store.dispatch(actions.fetchJobMasterList())
-            .then(() => {
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
-                expect(moduleCustomizationService.getModuleCustomizationForAppModuleId).toHaveBeenCalledTimes(1)
-                expect(jobMasterService.getJobMasterListFromPostAndPreAssignmentList).not.toHaveBeenCalled()
-                expect(store.getActions()[0].type).toEqual(SET_JOB_MASTER_LIST)
-                expect(store.getActions()[0].payload).toEqual({ jobMasterList: undefined, loading: true })
-                expect(store.getActions()[1].type).toEqual(SET_JOB_MASTER_LIST)
-                expect(store.getActions()[1].payload).toEqual({ jobMasterList: undefined, loading: false })
-            })
-    })
-})
-
 describe('test cases for fetchUnseenJobs', () => {
     beforeEach(() => {
         jobTransactionService.getUnseenJobTransaction = jest.fn()
+        jobMasterService.getJobMasterFromJobMasterList = jest.fn()
     })
 
     const jobMaster = 1
 
     it('should set empty job transaction', () => {
         const store = mockStore({})
+        jobMasterService.getJobMasterFromJobMasterList.mockReturnValue({ id: 1 })
         jobTransactionService.getUnseenJobTransaction.mockReturnValue({
             jobTransactionMap: {},
             pendingCount: 0
         })
         return store.dispatch(actions.fetchUnseenJobs(jobMaster))
             .then(() => {
-                expect(jobTransactionService.getUnseenJobTransaction).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(SET_POST_ASSIGNMENT_TRANSACTION_LIST)
                 expect(store.getActions()[0].payload).toEqual({
                     jobTransactionMap: null,
-                    loading: true
+                    loading: true,
+                    jobMaster: null
                 })
+                expect(jobMasterService.getJobMasterFromJobMasterList).toHaveBeenCalledTimes(1)
+                expect(jobTransactionService.getUnseenJobTransaction).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[1].type).toEqual(SET_POST_ASSIGNMENT_TRANSACTION_LIST)
                 expect(store.getActions()[1].payload).toEqual({
                     jobTransactionMap: {},
@@ -136,19 +68,23 @@ describe('test cases for fetchUnseenJobs', () => {
             jobTransactionMap,
             pendingCount: 0
         })
+        jobMasterService.getJobMasterFromJobMasterList.mockReturnValue([{ id: 1 }])
         return store.dispatch(actions.fetchUnseenJobs(jobMaster))
             .then(() => {
+                expect(jobMasterService.getJobMasterFromJobMasterList).toHaveBeenCalledTimes(1)
                 expect(jobTransactionService.getUnseenJobTransaction).toHaveBeenCalledTimes(1)
                 expect(store.getActions()[0].type).toEqual(SET_POST_ASSIGNMENT_TRANSACTION_LIST)
                 expect(store.getActions()[0].payload).toEqual({
                     jobTransactionMap: null,
-                    loading: true
+                    loading: true,
+                    jobMaster: null
                 })
                 expect(store.getActions()[1].type).toEqual(SET_POST_ASSIGNMENT_TRANSACTION_LIST)
                 expect(store.getActions()[1].payload).toEqual({
                     jobTransactionMap,
                     loading: false,
-                    pendingCount: 0
+                    pendingCount: 0,
+                    jobMaster: { id: 1 }
                 })
             })
     })
@@ -164,12 +100,14 @@ describe('test cases for fetchUnseenJobs', () => {
                 expect(store.getActions()[0].type).toEqual(SET_POST_ASSIGNMENT_TRANSACTION_LIST)
                 expect(store.getActions()[0].payload).toEqual({
                     jobTransactionMap: null,
-                    loading: true
+                    loading: true,
+                    jobMaster: null
                 })
                 expect(store.getActions()[1].type).toEqual(SET_POST_ASSIGNMENT_TRANSACTION_LIST)
                 expect(store.getActions()[1].payload).toEqual({
                     jobTransactionMap: null,
-                    loading: false
+                    loading: false,
+                    jobMaster: null
                 })
             })
     })
@@ -203,13 +141,16 @@ describe('test cases for checkScannedJob', () => {
                     jobTransactionMap,
                     loading: true,
                     pendingCount,
-                    scanError: null
+                    scanError: null,
+                    jobMaster: {}
                 })
                 expect(store.getActions()[1].type).toEqual(SET_POST_ASSIGNMENT_TRANSACTION_LIST)
                 expect(store.getActions()[1].payload).toEqual({
                     jobTransactionMap: jobTransactionMapResult,
                     loading: false,
                     pendingCount: 2,
+                    jobMaster: {}
+
                 })
             })
     })
@@ -231,6 +172,7 @@ describe('test cases for checkScannedJob', () => {
                         jobTransactionMap: jobTransactionMapResult,
                         loading: false,
                         pendingCount: 2,
+                        jobMaster: {}
                     })
                 }, 3000)
 
@@ -241,7 +183,8 @@ describe('test cases for checkScannedJob', () => {
                     jobTransactionMap,
                     loading: true,
                     pendingCount,
-                    scanError: null
+                    scanError: null,
+                    jobMaster: {}
                 })
                 expect(store.getActions()[1].type).toEqual(SET_POST_SCAN_SUCCESS)
                 expect(store.getActions()[1].payload).toEqual({
@@ -267,6 +210,7 @@ describe('test cases for checkScannedJob', () => {
                     jobTransactionMap,
                     loading: true,
                     pendingCount,
+                    jobMaster: {},
                     scanError: null
                 })
                 expect(store.getActions()[1].type).toEqual(SET_POST_ASSIGNMENT_ERROR)
@@ -295,14 +239,16 @@ describe('test cases for checkScannedJob', () => {
                     jobTransactionMap,
                     loading: true,
                     pendingCount,
-                    scanError: null
+                    scanError: null,
+                    jobMaster: {}
                 })
                 expect(store.getActions()[1].type).toEqual(SET_POST_ASSIGNMENT_TRANSACTION_LIST)
                 expect(store.getActions()[1].payload).toEqual({
                     jobTransactionMap,
                     loading: false,
                     pendingCount,
-                    scanError: 'Test Error'
+                    scanError: 'Test Error',
+                    jobMaster: {}
                 })
             })
     })

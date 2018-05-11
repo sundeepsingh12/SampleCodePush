@@ -28,7 +28,6 @@ module.exports = keyMirror({
     SET_ERROR_FOR_OTP: null,
 
     //Auth Actions
-    LOGIN: null,
     LOGOUT: null,
     LOGIN_START: null,
     LOGIN_SUCCESS: null,
@@ -59,10 +58,6 @@ module.exports = keyMirror({
     OTP_VALIDATION_SUCCESS: null,
     OTP_VALIDATION_FAILURE: null,
 
-    SESSION_TOKEN_REQUEST: null,
-    SESSION_TOKEN_SUCCESS: null,
-    SESSION_TOKEN_FAILURE: null,
-
     DELETE_TOKEN_REQUEST: null,
     DELETE_TOKEN_SUCCESS: null,
 
@@ -78,6 +73,7 @@ module.exports = keyMirror({
     ON_MOBILE_NO_CHANGE: null,
     ON_OTP_CHANGE: null,
     ERROR_400_403_LOGOUT: null,
+    ERROR_400_403_LOGOUT_FAILURE: null,
 
     PRE_LOGOUT_START: null,
     PRE_LOGOUT_SUCCESS: null,
@@ -107,11 +103,22 @@ module.exports = keyMirror({
     SET_TRANSACTION_SERVICE_STARTED: null,
     SET_ERP_PULL_ACTIVATED: null,
     ERP_SYNC_STATUS: null,
+    SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
+    SET_NEWJOB_DRAFT_INFO: null,
+    SET_LANDING_TAB: null,
+    TABS_LOADING: null,
+    SET_SELECTED_DATE: null,
+    LOADER_FOR_SYNCING:null,
+
+    //Pages
+    PAGES_LOADING: null,
+    SET_PAGES_UTILITY_N_PIESUMMARY: null,
+    PAGES: null,
+    PAGES_ADDITIONAL_UTILITY: null,
+    MAIN_MENU: null,
 
     //Home Container
     PIECHART: null,
-    FUTURE_RUNSHEET_ENABLED: null,
-    SET_SELECTED_DATE: null,
     IS_CALENDAR_VISIBLE: null,
     SYNC_ERROR: null,
     SYNC_STATUS: null,
@@ -121,6 +128,7 @@ module.exports = keyMirror({
     //Listing Actions
     JOB_LISTING_START: null,
     JOB_LISTING_END: null,
+    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
@@ -128,7 +136,9 @@ module.exports = keyMirror({
     IS_MISMATCHING_LOCATION: null,
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
-    SET_DRAFT_JOB_DETAILS_INFO: null,
+    SET_JOBDETAILS_DRAFT_INFO: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -148,6 +158,10 @@ module.exports = keyMirror({
     //Pay By Link Payment Actions
     SET_PAY_BY_LINK_PARAMETERS: null,
 
+    //Bluetooth Actions
+    BLUETOOTH_SCANNING_START: null,
+    BLUETOOTH_SCANNING_STOP: null,
+
     //Long running service's possible status
     SERVICE_PENDING: null,
     SERVICE_RUNNING: null,
@@ -159,6 +173,7 @@ module.exports = keyMirror({
     USERNAME: null,
     PASSWORD: null,
     REMEMBER_ME: null,
+    DOMAIN_URL: null,
 
     //Preloader Credentials
     IS_SHOW_OTP_SCREEN: null,
@@ -206,12 +221,15 @@ module.exports = keyMirror({
     SET_SAVE_ACTIVATED_TOAST_MESSAGE: null,
     EMAILID_VIEW_ARRAY: null,
     IS_COMPANY_CODE_DHL: null,
-    SHOULD_CREATE_BACKUP: null,
+    BACKUP_ALREADY_EXIST: null,
     BACKUP_UPLOAD_FAIL_COUNT: null,
     HUB_LAT_LONG: null,
     GEO_FENCING: null,
     GEO_FENCE_STATUS: null,
     LAT_LONG_GEO_FENCE: null,
+    SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
+    MDM_POLICIES: null,
+    APP_THEME : null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -239,12 +257,11 @@ module.exports = keyMirror({
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
-    DISABLE_SAVE: null,
     UPDATE_FIELD_DATA: null,
     STATUS_NAME: null,
     BASIC_INFO: null,
+    SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT: null,
     ON_BLUR: null,
-    TOOGLE_HELP_TEXT: null,
     IS_LOADING: null,
     PENDING_SYNC_TRANSACTION_IDS: null,
     RESET_STATE: null,
@@ -253,15 +270,16 @@ module.exports = keyMirror({
     UPDATE_PAYMENT_AT_END: null,
     SET_FORM_LAYOUT_STATE: null,
     CLEAR_FORM_LAYOUT: null,
-    SET_DRAFT: null,
     SET_UPDATE_DRAFT: null,
+    SET_ARRAY_DATA_STORE_FILTER_MAP: null,
 
-    UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
     SET_FORM_TO_INVALID: null,
     SET_DSF_REVERSE_MAP: null,
     SET_MODAL_FIELD_ATTRIBUTE: null,
+    SET_NO_FIELD_ATTRIBUTE_MAPPED: null,
+    SET_FORM_INVALID_AND_FORM_ELEMENT: null,
 
     //Route names (Used in React Navigation)
     ApplicationScreen: null,
@@ -281,9 +299,6 @@ module.exports = keyMirror({
     SaveActivated: null,
     Transient: null,
     CheckoutDetails: null,
-    NewJob: null,
-    NewJobStatus: null,
-    BulkConfiguration: null,
     BulkListing: null,
     Sorting: null,
     ProfileView: null,
@@ -304,6 +319,7 @@ module.exports = keyMirror({
     Payment: null,
     SequenceRunsheetList: null,
     UnsyncBackupUpload: null,
+    BluetoothListing: null,
 
     //Skulisting Actions
     SKU_LIST_FETCHING_STOP: null,
@@ -311,6 +327,7 @@ module.exports = keyMirror({
     SHOW_SEARCH_BAR: null,
     SKU_CODE_CHANGE: null,
     UPDATE_SKU_ACTUAL_QUANTITY: null,
+    SET_SKU_CODE: null,
 
     //CheckBox 
     SET_VALUE_IN_SELECT_FROM_LIST_ATTRIBUTE: null,
@@ -365,18 +382,17 @@ module.exports = keyMirror({
     SEQUENCE_LIST_FETCHING_START: null,
     SEQUENCE_LIST_FETCHING_STOP: null,
     PREPARE_UPDATE_LIST: null,
-    CLEAR_SEQUENCE_STATE: null,
     SET_RUNSHEET_NUMBER_LIST: null,
     SET_RESPONSE_MESSAGE: null,
     CLEAR_TRANSACTIONS_WITH_CHANGED_SEQUENCE_MAP: null,
     SEQUENCE_LIST_ITEM_DRAGGED: null,
     SET_REFERENCE_NO: null,
     SET_SEQUENCE_LIST_ITEM: null,
+    SET_SEQ_INITIAL_STATE_EXCEPT_RUNSHEET_LIST: null,
+    SET_SEQUENCE_BACK_ENABLED: null,
 
     //New Job
-    NEW_JOB_MASTER: null,
     NEW_JOB_STATUS: null,
-    SET_ERROR_MSG_FOR_NEW_JOB: null,
 
     //Transient
     ADD_FORM_LAYOUT_STATE: null,
@@ -401,10 +417,9 @@ module.exports = keyMirror({
     Checkout: null,
     SHOW_DISCARD_ALERT: null,
     RETURN_TO_HOME: null,
+    SET_SAVE_ACTIVATED_DRAFT: null,
 
     //Bulk Module
-    START_FETCHING_BULK_CONFIG: null,
-    STOP_FETCHING_BULK_CONFIG: null,
     START_FETCHING_BULK_TRANSACTIONS: null,
     STOP_FETCHING_BULK_TRANSACTIONS: null,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM: null,
@@ -412,6 +427,7 @@ module.exports = keyMirror({
     CLEAR_BULK_STATE: null,
     SET_BULK_SEARCH_TEXT: null,
     SET_BULK_ERROR_MESSAGE: null,
+    SET_BULK_TRANSACTION_PARAMETERS: null,
 
     //statisticsModule
     SET_DATA_IN_STATISTICS_LIST: null,
@@ -428,6 +444,7 @@ module.exports = keyMirror({
     SORTING_SEARCH_VALUE: null,
     SORTING_ITEM_DETAILS: null,
     SORTING_LOADER: null,
+    DEFAULT_ERROR_MESSAGE_IN_SORTING: null,
 
     //Live Job actions
     SET_LIVE_JOB_LIST: null,
@@ -450,14 +467,10 @@ module.exports = keyMirror({
     ON_CHANGE_STATE: null,
     SCANNER_TEXT: null,
 
-    //Job Master
-    SET_JOB_MASTER_LIST: null,
-
     //Post Assignment
     SET_POST_ASSIGNMENT_TRANSACTION_LIST: null,
     SET_POST_ASSIGNMENT_ERROR: null,
     SET_POST_SCAN_SUCCESS: null,
-    SET_POST_ASSIGNMENT_PARAMETERS: null,
     //QrCodeGenerator
     SCANNING: null,
 
@@ -485,6 +498,8 @@ module.exports = keyMirror({
     VIEW_IMAGE_DATA: null,
     SET_SHOW_VIEW_IMAGE: null,
     UPDATE_SKU_LIST_ITEMS: null,
+    SET_SHOW_IMAGE_AND_DATA: null,
+    SET_VALIDATION_FOR_CAMERA: null,
 
     //Offline Actions
     SET_DOWNLOADING_DS_FILE_AND_PROGRESS_BAR: null,
@@ -512,6 +527,7 @@ module.exports = keyMirror({
     SET_OPTION_ATTRIBUTE_ERROR: null,
     SET_OPTION_SEARCH_INPUT: null,
     SET_ADV_DROPDOWN_MESSAGE_OBJECT: null,
+    SET_ERROR_AND_ADV_DROPDOWN_MESSAGE_NULL: null,
     // backup actions
     SET_LOADER_BACKUP: null,
     SET_BACKUP_FILES: null,
@@ -519,6 +535,9 @@ module.exports = keyMirror({
     SET_UPLOADING_FILE: null,
     SET_SYNCED_FILES: null,
     SET_BACKUP_TOAST: null,
+
+    //userExceptionLogs
+    USER_EXCEPTION_LOGS: null,
 })
 
 

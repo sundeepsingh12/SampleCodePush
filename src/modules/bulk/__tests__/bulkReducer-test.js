@@ -1,8 +1,6 @@
 'use strict'
 
 import {
-    START_FETCHING_BULK_CONFIG,
-    STOP_FETCHING_BULK_CONFIG,
     START_FETCHING_BULK_TRANSACTIONS,
     STOP_FETCHING_BULK_TRANSACTIONS,
     TOGGLE_JOB_TRANSACTION_LIST_ITEM,
@@ -10,20 +8,13 @@ import {
     RESET_STATE,
     CLEAR_BULK_STATE,
     SET_BULK_SEARCH_TEXT,
-    SET_BULK_ERROR_MESSAGE
+    SET_BULK_ERROR_MESSAGE,
+    SET_BULK_TRANSACTION_PARAMETERS
 } from '../../../lib/constants'
 
 import bulkReducer from '../bulkReducer'
 
 describe('bulk reducer', () => {
-
-    it('should start fetching bulk config list', () => {
-        const action = {
-            type: START_FETCHING_BULK_CONFIG
-        }
-        let nextState = bulkReducer(undefined, action)
-        expect(nextState.isLoaderRunning).toBe(true)
-    })
 
     it('should start fetching bulk transaction listing', () => {
         const action = {
@@ -31,16 +22,6 @@ describe('bulk reducer', () => {
         }
         let nextState = bulkReducer(undefined, action)
         expect(nextState.isLoaderRunning).toBe(true)
-    })
-
-    it('should stop fetching bulk config', () => {
-        const action = {
-            type: STOP_FETCHING_BULK_CONFIG,
-            payload: {}
-        }
-        let nextState = bulkReducer(undefined, action)
-        expect(nextState.isLoaderRunning).toBe(false)
-        expect(nextState.bulkConfigList).toBe(action.payload)
     })
 
     it('should stop fetching bulk transactions', () => {
@@ -95,13 +76,28 @@ describe('bulk reducer', () => {
             payload: {}
         }
         let nextState = bulkReducer(undefined, action)
-        expect(nextState.selectedItems).toEqual([])
+        expect(nextState.selectedItems).toEqual({})
         expect(nextState.bulkTransactionList).toEqual({})
         expect(nextState.selectAllNone).toBe('Select All')
         expect(nextState.searchText).toBe(null)
         expect(nextState.searchSelectionOnLine1Line2).toBe(null)
         expect(nextState.idToSeparatorMap).toEqual({})
     })
+
+    it('should reset bulk state', () => {
+        const action = {
+            type: RESET_STATE,
+            payload: {}
+        }
+        let nextState = bulkReducer(undefined, action)
+        expect(nextState.selectedItems).toEqual({})
+        expect(nextState.bulkTransactionList).toEqual({})
+        expect(nextState.selectAllNone).toBe('Select All')
+        expect(nextState.searchText).toBe(null)
+        expect(nextState.searchSelectionOnLine1Line2).toBe(false)
+        expect(nextState.idToSeparatorMap).toEqual({})
+    })
+
     it('should set search text', () => {
         const action = {
             type: SET_BULK_SEARCH_TEXT,
@@ -110,6 +106,7 @@ describe('bulk reducer', () => {
         let nextState = bulkReducer(undefined, action)
         expect(nextState.searchText).toBe(action.payload)
     })
+
     it('should set error toast message', () => {
         const action = {
             type: SET_BULK_ERROR_MESSAGE,
@@ -118,5 +115,22 @@ describe('bulk reducer', () => {
         let nextState = bulkReducer(undefined, action)
         expect(nextState.errorToastMessage).toBe(action.payload)
         expect(nextState.searchText).toBe('')
+    })
+
+    it('should set bulk transaction params', () => {
+        const action = {
+            type: SET_BULK_TRANSACTION_PARAMETERS,
+            payload: {
+                selectedItems: [],
+                bulkTransactions: {},
+                displayText: '',
+                searchText: ''
+            }
+        }
+        let nextState = bulkReducer(undefined, action)
+        expect(nextState.selectedItems).toBe(action.payload.selectedItems)
+        expect(nextState.bulkTransactionList).toBe(action.payload.bulkTransactions)
+        expect(nextState.selectAllNone).toBe(action.payload.displayText)
+        expect(nextState.searchText).toBe(action.payload.searchText)
     })
 })
