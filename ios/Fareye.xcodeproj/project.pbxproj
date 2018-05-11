@@ -1396,7 +1396,7 @@
 								enabled = true;
 							};
 							com.apple.Push = {
-								enabled = 0;
+								enabled = 1;
 							};
 						};
 					};
@@ -2371,9 +2371,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Fareye/Fareye.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Gaurav Srivastava (V5RMU6PK5W)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Gaurav Srivastava (V5RMU6PK5W)";
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = 484RJ94GY3;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../node_modules/react-native-background-fetch/ios/**",
 					"$(PROJECT_DIR)/../node_modules/react-native-background-geolocation/**",
@@ -2417,7 +2420,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.roboticwares.fareye;
 				PRODUCT_NAME = Fareye;
-				PROVISIONING_PROFILE = "bd5753ec-d85f-4f7e-8ed3-4245c562997e";
+				PROVISIONING_PROFILE = "7642be6c-5d10-4b24-b619-da1886886c36";
+				PROVISIONING_PROFILE_SPECIFIER = "Development Provisioning Profile";
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -2427,8 +2431,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: ROBOTIC WARES PRIVATE LIMITED (484RJ94GY3)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: ROBOTIC WARES PRIVATE LIMITED (484RJ94GY3)";
+				CODE_SIGN_ENTITLEMENTS = Fareye/Fareye.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Gaurav Srivastava (V5RMU6PK5W)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Gaurav Srivastava (V5RMU6PK5W)";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 484RJ94GY3;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2474,8 +2479,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.roboticwares.fareye;
 				PRODUCT_NAME = Fareye;
-				PROVISIONING_PROFILE = "3bb73ca6-ac14-4fbe-a8e1-ddb077cf2514";
-				PROVISIONING_PROFILE_SPECIFIER = "App Center Provisioning";
+				PROVISIONING_PROFILE = "7642be6c-5d10-4b24-b619-da1886886c36";
+				PROVISIONING_PROFILE_SPECIFIER = "Development Provisioning Profile";
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
