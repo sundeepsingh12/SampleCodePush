@@ -1,7 +1,6 @@
 'use strict'
 import { keyValueDBService } from "../classes/KeyValueDBService";
 import { backupService } from "../classes/BackupService";
-//import { restAPI } from "../../lib/RestAPI";
 import * as realm from '../../repositories/realmdb'
 import { error } from "util";
 import CONFIG from '../../lib/config'
@@ -50,13 +49,13 @@ describe('test cases for _getSyncDataFromDb', () => {
             userSummary: {},
             serverSmsLog: []
         }
-        jobSummaryService.getJobSummaryDataOnLastSync = jest.fn()
-        jobSummaryService.getJobSummaryDataOnLastSync.mockReturnValue([])
+        jobSummaryService.getJobSummaryListForSync = jest.fn()
+        jobSummaryService.getJobSummaryListForSync.mockReturnValue([])
         backupService._getDataFromRealm = jest.fn()
         backupService._getDataFromRealm.mockReturnValue([])
         return backupService._getSyncDataFromDb(transactionList).then((result) => {
             expect(backupService._getDataFromRealm).toHaveBeenCalledTimes(5)
-            expect(jobSummaryService.getJobSummaryDataOnLastSync).toHaveBeenCalledTimes(1)
+            expect(jobSummaryService.getJobSummaryListForSync).toHaveBeenCalledTimes(1)
             expect(result).toEqual(JSON.stringify(json))
         })
     })
@@ -90,7 +89,7 @@ describe('test cases for deleteOldBackup', () => {
     it('does not delete backup', () => {
         RNFS.unlink = jest.fn()
         RNFS.readDir = jest.fn()
-        const dateTimeForBackup = '2018-01-10'
+        const dateTimeForBackup = moment().format('YYYY-MM-DD')
         const backupFilesFromDirectory = [
             {
                 name: 'staging-backup_' + dateTimeForBackup + '_div_abc' + '.zip',
@@ -155,6 +154,8 @@ describe('test cases for createUnsyncBackupIfNeeded', () => {
         })
     })
 })
+
+
 describe('test cases for createManualBackup', () => {
     it('returns null for empty user', () => {
         return backupService.createManualBackup().then(() => {
@@ -184,12 +185,13 @@ describe('test cases for createManualBackup', () => {
             path: 'test'
         })
         keyValueDBService.getValueFromStore = jest.fn()
-        keyValueDBService.getValueFromStore.mockReturnValue(null)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce(null)
+        keyValueDBService.getValueFromStore.mockReturnValueOnce({ value: '' })
         backupService.getJsonData = jest.fn()
         backupService.getJsonData.mockReturnValue('test')
         RNFS.writeFile = jest.fn()
         return backupService.createManualBackup(user, syncedBackupFiles).then((result) => {
-            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
+            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
             expect(RNFS.mkdir).toHaveBeenCalledTimes(3)
             expect(backupService.getJsonData).toHaveBeenCalledTimes(1)
             expect(RNFS.writeFile).toHaveBeenCalledTimes(1)
@@ -222,12 +224,6 @@ describe('test cases for createManualBackup', () => {
     })
 })
 describe('test cases for createSyncedBackup', () => {
-    it('returns null for empty user', () => {
-        return backupService.createSyncedBackup().then(() => {
-        }).catch((error) => {
-            expect(error.message).toEqual('user missing')
-        })
-    })
     it('creates backup on logout', () => {
         const user = { value: {} }
         RNFS.mkdir = jest.fn()
@@ -428,62 +424,3 @@ describe('test cases for deleteBackupFile', () => {
     })
 })
 
-
-
-describe('test cases for moveImageFilesToBackup', () => {
-    beforeEach(() => {
-        keyValueDBService.getValueFromStore = jest.fn()
-    })
-    it('returns null for null field attributes from store', () => {
-        keyValueDBService.getValueFromStore.mockReturnValue(null)
-
-        return backupService.moveImageFilesToBackup().then((result) => {
-            expect(result).toEqual(undefined)
-        })
-    })
-    it('does not move image present in field data when file doen not exist', () => {
-        const fieldAtrributes = {
-            value: [
-                {
-                    id: 1,
-                    attributeTypeId: 42
-                }
-            ]
-        }
-        keyValueDBService.getValueFromStore.mockReturnValue(fieldAtrributes)
-        const fieldData = [{
-            fieldAttributeMasterId: 1,
-            value: 'xyz.zip'
-        }]
-        RNFS.exists = jest.fn()
-        RNFS.exists.mockReturnValue(false)
-        return backupService.moveImageFilesToBackup(fieldData).then(() => {
-            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
-            expect(RNFS.exists).toHaveBeenCalledTimes(1)
-        })
-    })
-    it('moves image present in field data', () => {
-        const fieldAtrributes = {
-            value: [
-                {
-                    id: 1,
-                    attributeTypeId: 42
-                }
-            ]
-        }
-        keyValueDBService.getValueFromStore.mockReturnValue(fieldAtrributes)
-        const fieldData = [{
-            fieldAttributeMasterId: 1,
-            value: 'xyz.zip'
-        }]
-        RNFS.exists = jest.fn()
-        RNFS.exists.mockReturnValue(true)
-        RNFS.copyFile = jest.fn()
-
-        return backupService.moveImageFilesToBackup(fieldData).then(() => {
-            expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
-            expect(RNFS.exists).toHaveBeenCalledTimes(1)
-            expect(RNFS.copyFile).toHaveBeenCalledTimes(1)
-        })
-    })
-})

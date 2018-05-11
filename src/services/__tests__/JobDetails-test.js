@@ -9,6 +9,7 @@ import { formLayoutEventsInterface } from '../classes/formLayout/FormLayoutEvent
 import moment from 'moment'
 import { keyValueDBService } from '../classes/KeyValueDBService'
 import { geoFencingService } from '../classes/GeoFencingService'
+import { draftService } from '../classes/DraftService'
 
 
 describe('test cases for check out for delivery', () => { //checkOutForDelivery(jobMasterList)
@@ -696,7 +697,7 @@ describe('test cases for check Latitude and longitude', () => { //checkLocationM
     it('should check aerial distance between user and job location and return false', () => {
         realm.getRecordListOnQuery = jest.fn()
         realm.getRecordListOnQuery.mockReturnValueOnce(jobTransactionList)
-        expect(jobDetailsService.checkLatLong(jobId, userLat, userLong)).toEqual(false)
+        expect(jobDetailsService.checkLatLong(jobId, null, userLong)).toEqual(false)
     })
 
     it('should not check aerial distance between user and job location', () => {
@@ -908,6 +909,22 @@ describe('test cases for set All data for revert status', () => {   // setAllDat
         lastUpdatedAtServer: moment().format('YYYY-MM-DD HH:mm:ss'),
 
     }]
+    let transactionLogs = [{
+        userId: 1,
+        transactionId: 1,
+        jobMasterId: 1,
+    },
+    {
+        userId: 1,
+        transactionId: 2,
+        jobMasterId: 2,
+    },
+    {
+        userId: 2,
+        transactionId: 3,
+        jobMasterId: 3,
+    },
+]
     let data = {
         tableName: TABLE_JOB_TRANSACTION,
         value: updateTransaction
@@ -917,6 +934,7 @@ describe('test cases for set All data for revert status', () => {   // setAllDat
         keyValueDBService.getValueFromStore.mockReturnValueOnce(userSummary)
         formLayoutEventsInterface._setJobDbValues(updatedJobDb)
         jobDetailsService.updateTransactionOnRevert.mockReturnValueOnce(data)
+        formLayoutEventsInterface._updateTransactionLogs.mockReturnValueOnce(transactionLogs)
         return jobDetailsService.setAllDataForRevertStatus(statusList, jobTransaction, previousStatus)
             .then(() => {
                 expect(jobDetailsService.updateTransactionOnRevert).toHaveBeenCalledTimes(1)
@@ -925,6 +943,8 @@ describe('test cases for set All data for revert status', () => {   // setAllDat
                 expect(formLayoutEventsInterface._updateRunsheetSummary).toHaveBeenCalledTimes(1)
                 expect(formLayoutEventsInterface._updateJobSummary).toHaveBeenCalledTimes(1)
                 expect(formLayoutEventsInterface.addTransactionsToSyncList).toHaveBeenCalledTimes(1)
+                expect(realm.performBatchSave).toHaveBeenCalledTimes(1)
+                expect(draftService.deleteDraftFromDb).toHaveBeenCalledTimes(1)
             })
             .catch((error) => {
                 expect(error).toEqual(error)

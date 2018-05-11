@@ -61,7 +61,8 @@ import {
   RESET_STATE_FOR_JOBDETAIL,
   BulkListing,
   SHOW_DROPDOWN,
-  SET_JOBDETAILS_DRAFT_INFO
+  SET_JOBDETAILS_DRAFT_INFO,
+  SET_LOADER_FOR_SYNC_IN_JOBDETAIL
 } from '../lib/constants'
 import renderIf from '../lib/renderIf'
 import CustomAlert from "../components/CustomAlert"
@@ -77,8 +78,10 @@ import _ from 'lodash'
 import EtaCountDownTimer from '../components/EtaCountDownTimer'
 import moment from 'moment'
 import { restoreDraftAndNavigateToFormLayout } from '../modules/form-layout/formLayoutActions'
+import { startSyncAndNavigateToContainer } from '../modules/home/homeActions'
 import DraftModal from '../components/DraftModal'
 import Line1Line2View from '../components/Line1Line2View'
+import SyncLoader from '../components/SyncLoader'
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
@@ -99,14 +102,15 @@ function mapStateToProps(state) {
     draftStatusInfo: state.jobDetails.draftStatusInfo,
     isEtaTimerShow: state.jobDetails.isEtaTimerShow,
     isShowDropdown: state.jobDetails.isShowDropdown,
-    jobExpiryTime: state.jobDetails.jobExpiryTime
+    jobExpiryTime: state.jobDetails.jobExpiryTime,
+    syncLoading: state.jobDetails.syncLoading
   }
 }
 
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions, restoreDraftAndNavigateToFormLayout }, dispatch)
+    actions: bindActionCreators({ ...globalActions, ...jobDetailsActions, restoreDraftAndNavigateToFormLayout, startSyncAndNavigateToContainer }, dispatch)
   }
 }
 
@@ -215,13 +219,15 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onGoToNextStatus = () => {
-    this.props.actions.navigateToScene('FormLayout', {
+    this.props.actions.checkForInternetAndStartSyncAndNavigateToFormLayout({
       contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
       jobTransactionId: this.props.jobTransaction.id,
       jobTransaction: this.props.jobTransaction,
       statusId: this.props.statusList.id,
       statusName: this.props.statusList.name,
-      jobMasterId: this.props.jobTransaction.jobMasterId
+      jobMasterId: this.props.jobTransaction.jobMasterId,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+      jobDetailsScreenKey: this.props.navigation.state.key
     })
     this._onCancel()
   }
@@ -243,7 +249,9 @@ class JobDetailsV2 extends PureComponent {
       const FormLayoutObject = {
         contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
         jobTransaction,
-        statusList
+        statusList,
+        pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+        jobDetailsScreenKey: this.props.navigation.state.key
       }
       this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
     }
@@ -418,13 +426,11 @@ class JobDetailsV2 extends PureComponent {
   }
 
   updateTransactionForGroupId(groupId) {
-    this.props.actions.navigateToScene(BulkListing, {
-      pageObject: {
-        jobMasterIds: [this.props.jobTransaction.jobMasterId],
-        additionalParams: { statusId: this.props.currentStatus.id },
-        groupId: groupId
-      }
-    })
+    this.props.actions.startSyncAndNavigateToContainer({
+      jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
+      additionalParams: JSON.stringify({ statusId: this.props.currentStatus.id }),
+      groupId: groupId
+    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
   }
 
   selectStatusToRevert = () => {
@@ -439,7 +445,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onGoToPreviousStatus = (statusData) => {
-    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation)
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation.state.params.pageObjectAdditionalParams)
   }
 
   statusRevertSelection(statusList) {
@@ -648,6 +654,9 @@ class JobDetailsV2 extends PureComponent {
       this.props.navigation.state.params.jobSwipableDetails.contactData,
       this.props.jobTransaction,
       this.props.draftStatusInfo,
+      null,
+      this.props.navigation.state.params.pageObjectAdditionalParams,
+      this.props.navigation.state.key
     )
     this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }
@@ -659,11 +668,12 @@ class JobDetailsV2 extends PureComponent {
       )
     }
     else {
-      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
+      const draftAlert = (!_.isEmpty(this.props.draftStatusInfo) && this.props.isShowDropdown == null && !this.props.syncLoading && !this.props.statusList && !this.props.errorMessage) ? this.showDraftAlert() : null
       const mismatchAlert = this.props.statusList ? this.showLocationMisMatchAlert() : null
       return (
         <StyleProvider style={getTheme(platform)}>
           <Container style={[styles.bgLightGray]}>
+            {(this.props.syncLoading) ? <SyncLoader moduleLoading={this.props.syncLoading} /> : null}
             {draftAlert}
             {mismatchAlert}
             {this.showHeaderView()}

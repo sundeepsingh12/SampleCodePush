@@ -745,18 +745,18 @@ describe('test for getJobFieldAttributeForJobmaster', () => {
 
 describe('test for getServerSmsLogs', () => {
     it('should return empty array', () => {
-        const lastSyncTime = { value: '2018-01-01 12:12:12' }
+        const lastSyncTime = '2018-01-01 12:12:12'
         expect(addServerSmsService.getServerSmsLogs([], lastSyncTime)).toEqual([])
     })
     it('should return all sms logs', () => {
-        const lastSyncTime = { value: '2018-01-01 12:12:12' }
+        const lastSyncTime = '2018-01-01 12:12:12'
         const serverSmsLogs = [{
             dateTime: '2018-01-01 13:12:12'
         }]
         expect(addServerSmsService.getServerSmsLogs(serverSmsLogs, lastSyncTime)).toEqual(serverSmsLogs)
     })
     it('should return all sms logs with datetime after last sync time', () => {
-        const lastSyncTime = { value: '2018-01-01 12:12:12' }
+        const lastSyncTime = '2018-01-01 12:12:12'
         const serverSmsLogs = [{
             dateTime: '2018-01-01 13:12:12'
         },
@@ -882,7 +882,7 @@ describe('test for setServerSmsMapForPendingStatus', () => {
         return addServerSmsService.setServerSmsMapForPendingStatus(transactionIdDtosMap)
             .then(() => {
                 expect(addServerSmsService.prepareServerSmsMap).toHaveBeenCalledTimes(1)
-                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(2)
+                expect(keyValueDBService.getValueFromStore).toHaveBeenCalledTimes(1)
                 expect(addServerSmsService.getJobFieldAttributeForJobmaster).toHaveBeenCalledTimes(1)
                 expect(realm.getRecordListOnQuery).toHaveBeenCalledTimes(2)
                 expect(jobDataService.getJobData).toHaveBeenCalledTimes(1)

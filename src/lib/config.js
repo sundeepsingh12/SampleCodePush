@@ -4,17 +4,17 @@ module.exports = {
   SYNC_SERVICE_DELAY: 120,
   intervalId: 0,
   FAREYE: {
-    domain : [
+    domain: [
       {
         name: 'Production',
         url: 'https://www.fareye.co'
       },
-     {
-       name : 'Staging',
+      {
+        name: 'Staging',
         url: 'https://staging.fareye.co'
       },
       {
-        name : 'Dev',
+        name: 'Dev',
         url: 'https://dev.fareye.co'
       },
     ],

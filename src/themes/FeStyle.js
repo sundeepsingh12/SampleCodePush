@@ -1,18 +1,10 @@
 
-
-const themeColor = '#00796B';
-
+var themeColor = '#00796B'
 export default {
     primaryColor: themeColor,
-
-    bgPrimary: {
-        backgroundColor: themeColor
-    },
+    bgPrimaryColor : themeColor,
+    fontPrimaryColor : themeColor,
     shadeColor: themeColor + '98',
-    fontPrimary: {
-        color: themeColor
-    },
-
     mainBg: {
         backgroundColor: '#F7F8FA'
     },
@@ -554,10 +546,7 @@ export default {
         shadowColor: '#d3d3d3',
         shadowOpacity: .5,
     },
-    borderLeft4: {
-        borderLeftColor: themeColor,
-        borderLeftWidth: 4
-    },
+    borderLeft4Color : themeColor,
     header: {
         borderBottomWidth: 0,
         height: 'auto',

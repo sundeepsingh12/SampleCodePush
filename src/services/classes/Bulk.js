@@ -1,45 +1,20 @@
 'use strict'
-import {
-    keyValueDBService
-} from './KeyValueDBService'
-import {
-    jobStatusService
-} from './JobStatus'
-import {
-    jobMasterService
-} from './JobMaster'
-import {
-    jobTransactionService
-} from './JobTransaction'
-import {
-    transactionCustomizationService
-} from './TransactionCustomization'
-import {
-    UNSEEN,
-    JOB_STATUS,
-    CUSTOMIZATION_LIST_MAP,
-    JOB_ATTRIBUTE,
-    JOB_ATTRIBUTE_STATUS,
-    CUSTOMER_CARE,
-    SMS_TEMPLATE,
-    JOB_MASTER,
-    HUB,
-    TABLE_JOB_TRANSACTION
-} from '../../lib/constants'
+import { keyValueDBService } from './KeyValueDBService'
+import { jobStatusService } from './JobStatus'
+import { jobMasterService } from './JobMaster'
+import { jobTransactionService } from './JobTransaction'
+import { transactionCustomizationService } from './TransactionCustomization'
+import { UNSEEN, JOB_STATUS, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, CUSTOMER_CARE, SMS_TEMPLATE, JOB_MASTER, HUB, TABLE_JOB_TRANSACTION } from '../../lib/constants'
 import _ from 'lodash'
 import { moduleCustomizationService } from './ModuleCustomization'
-import {
-    BULK_ID
-} from '../../lib/AttributeConstants'
-import {
-    INVALID_SCAN
-} from '../../lib/ContainerConstants'
+import { BULK_ID } from '../../lib/AttributeConstants'
+import { INVALID_SCAN, SELECT_ALL, SELECT_NONE } from '../../lib/ContainerConstants'
 
 class Bulk {
 
     /**
      * This function returns job transaction map of job transaction corresponding to job master id and status id
-     * @param {*} bulkData 
+     * @param {*} bulkParamas 
      * @returns
      * {
      *      jobTransactionId : jobTransactionCustomization {
@@ -60,11 +35,15 @@ class Bulk {
      *                                      }
      * }
      */
-    async getJobListingForBulk(bulkData) {
-        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        let { jobTransactionCustomizationList } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Bulk', bulkData)
-        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id')
-        return idJobTransactionCustomizationListMap
+    async getJobListingForBulk(bulkParamas) {
+        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters();
+        let queryDTO = {};
+        let jobMaster = jobTransactionCustomizationListParametersDTO.jobMasterList.filter(jobmaster => jobmaster.id == bulkParamas.pageObject.jobMasterIds[0])[0];
+        queryDTO.jobTransactionQuery = `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND jobStatusId = ${bulkParamas.pageObject.additionalParams.statusId} AND jobId > 0`;
+        queryDTO.jobQuery = bulkParamas.pageObject.groupId ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = "${bulkParamas.pageObject.groupId}"` : jobMaster.enableMultipartAssignment ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = null` : `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]}`;
+        let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO)
+        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id');
+        return idJobTransactionCustomizationListMap;
     }
 
     /**
@@ -80,30 +59,49 @@ class Bulk {
      *      errorMessage : string
      * }
      */
-    performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems) {
+    performSearch(searchValue, bulkTransactions, searchSelectionOnLine1Line2, idToSeparatorMap, selectedItems, pageObject) {
         let searchText = _.toLower(searchValue)
         let isSearchFound = false
-        let errorMessage = ''
+        let errorMessage = '', numberOfEnabledItems
+        let clonePageObject = _.cloneDeep(pageObject)
+        let bulkJobSimilarityConfig = this.getBulkJobSimilarityConfig(clonePageObject)
+
         for (let key in bulkTransactions) {
             if (_.isEqual(_.toLower(bulkTransactions[key].referenceNumber), searchText) || _.isEqual(_.toLower(bulkTransactions[key].runsheetNo), searchText)) { // If search text is equal to reference number or runsheet number.Search on reference or runsheet can toggle multiple transactions
-                bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
-                bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
-                isSearchFound = true
+                if (bulkJobSimilarityConfig && isSearchFound) {
+                    errorMessage = INVALID_SCAN
+                    break
+                }
+                if (bulkJobSimilarityConfig) {
+                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
+                }
+                isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems)
             } else if (searchSelectionOnLine1Line2 && this.checkForPresenceInDisplayText(searchText, bulkTransactions[key], idToSeparatorMap)) { // If search on line1 and line2 is allowed and search text is present in line1 or line2
-                bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
-                bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
                 if (isSearchFound) { // Search on lin1 or line2 cannot toggle multiple transactions
                     errorMessage = INVALID_SCAN
                     break
                 }
-                isSearchFound = true
+                if (bulkJobSimilarityConfig) {
+                    numberOfEnabledItems = this.setEnabledTransactions(bulkTransactions, bulkTransactions[key], bulkJobSimilarityConfig, selectedItems)
+                }
+                isSearchFound = this.toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems)
             }
         }
+        let { displayText, selectAll } = this.getDisplayTextAndSelectAll(bulkJobSimilarityConfig, selectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject)
         if (!isSearchFound) { // If transaction not found
             return { errorMessage: INVALID_SCAN }
         } else {
-            return { errorMessage }
+            return { errorMessage, displayText, selectAll }
         }
+    }
+
+    toggleTransaction(bulkTransactions, key, isSearchFound, selectedItems) {
+        if (!bulkTransactions[bulkTransactions[key].id].disabled) {
+            bulkTransactions[key].isChecked = !bulkTransactions[key].isChecked
+            bulkTransactions[key].isChecked ? selectedItems[key] = this.getSelectedTransactionObject(bulkTransactions[key]) : delete selectedItems[key]
+            isSearchFound = true
+        }
+        return isSearchFound
     }
 
     /**
@@ -115,16 +113,20 @@ class Bulk {
      * boolean - whether search text is present in ine1, line2, circle line 1 or circle line 2
      */
     checkForPresenceInDisplayText(searchValue, bulkTransaction, idToSeparatorMap) {
+        let line1match = false
         if (bulkTransaction.line1 && _.toLower(bulkTransaction.line1).includes(searchValue)) { // If line1 includes search text
-            return this.checkLineContents(_.toLower(bulkTransaction.line1), idToSeparatorMap[1], searchValue)
-        } else if (bulkTransaction.line2 && _.toLower(bulkTransaction.line2).includes(searchValue)) { // If line2 includes search text
-            return this.checkLineContents(_.toLower(bulkTransaction.line2), idToSeparatorMap[2], searchValue)
-        } else if (bulkTransaction.circleLine1 && _.toLower(bulkTransaction.circleLine1).includes(searchValue)) { // If circleline1 includes search text
-            return this.checkLineContents(_.toLower(bulkTransaction.circleLine1), idToSeparatorMap[3], searchValue)
-        } else if (bulkTransaction.circleLine2 && _.toLower(bulkTransaction.circleLine2).includes(searchValue)) { // If circleline2 includes search text
-            return this.checkLineContents(_.toLower(bulkTransaction.circleLine2), idToSeparatorMap[4], searchValue)
+            line1match = this.checkLineContents(_.toLower(bulkTransaction.line1), idToSeparatorMap[1], searchValue)
         }
-        return false;
+        if (!line1match && bulkTransaction.line2 && _.toLower(bulkTransaction.line2).includes(searchValue)) { // If line2 includes search text
+            line1match = this.checkLineContents(_.toLower(bulkTransaction.line2), idToSeparatorMap[2], searchValue)
+        }
+        if (!line1match && bulkTransaction.circleLine1 && _.toLower(bulkTransaction.circleLine1).includes(searchValue)) { // If circleline1 includes search text
+            line1match = this.checkLineContents(_.toLower(bulkTransaction.circleLine1), idToSeparatorMap[3], searchValue)
+        }
+        if (!line1match && bulkTransaction.circleLine2 && _.toLower(bulkTransaction.circleLine2).includes(searchValue)) { // If circleline2 includes search text
+            line1match = this.checkLineContents(_.toLower(bulkTransaction.circleLine2), idToSeparatorMap[4], searchValue)
+        }
+        return line1match;
     }
 
     /**
@@ -175,8 +177,65 @@ class Bulk {
         return {
             jobTransactionId: jobTransaction.id,
             jobId: jobTransaction.jobId,
-            jobMasterId: jobTransaction.jobMasterId
+            jobMasterId: jobTransaction.jobMasterId,
+            referenceNumber:jobTransaction.referenceNumber
         }
+    }
+
+    checkForSimilarityBulk(jobTransaction, previousJobTransaction, bulkJobSimilarityConfig) {
+        let differentDataPresent = false
+
+        if (bulkJobSimilarityConfig.lineOneEnabled && jobTransaction.line1 != previousJobTransaction.line1) {
+            differentDataPresent = true
+        } else if (bulkJobSimilarityConfig.lineTwoEnabled && jobTransaction.line2 != previousJobTransaction.line2) {
+            differentDataPresent = true
+        } else if (bulkJobSimilarityConfig.circleLineOneEnabled && jobTransaction.circleLine1 != previousJobTransaction.circleLine1) {
+            differentDataPresent = true
+        } else if (bulkJobSimilarityConfig.circleLineTwoEnabled && jobTransaction.circleLine2 != previousJobTransaction.circleLine2) {
+            differentDataPresent = true
+        }
+        return differentDataPresent
+    }
+
+    setEnabledTransactions(bulkTransactions, currentTransaction, bulkJobSimilarityConfig, selectedItems) {
+        let numberOfEnabledItems = 0
+        for (let index in bulkTransactions) {
+            if (_.size(selectedItems) == 0) {
+                let differentDataPresent = this.checkForSimilarityBulk(bulkTransactions[index], currentTransaction, bulkJobSimilarityConfig)
+                bulkTransactions[index].disabled = differentDataPresent
+            } else if (selectedItems[currentTransaction.id] && _.size(selectedItems) == 1) {
+                bulkTransactions[index].disabled = false
+            }
+            if (!bulkTransactions[index].disabled) {
+                numberOfEnabledItems++
+            }
+        }
+        return numberOfEnabledItems
+    }
+
+    getBulkJobSimilarityConfig(clonePageObject) {
+        clonePageObject.additionalParams = JSON.parse(clonePageObject.additionalParams)
+        let bulkJobSimilarityConfig = clonePageObject.additionalParams.bulkJobSimilarityConf
+        if (!bulkJobSimilarityConfig || !(bulkJobSimilarityConfig.lineOneEnabled || bulkJobSimilarityConfig.lineTwoEnabled || bulkJobSimilarityConfig.circleLineOneEnabled || bulkJobSimilarityConfig.circleLineTwoEnabled)) {
+            return
+        } else {
+            return bulkJobSimilarityConfig
+        }
+    }
+
+    getDisplayTextAndSelectAll(bulkJobSimilarityConfig, cloneSelectedItems, numberOfEnabledItems, bulkTransactions, clonePageObject) {
+        let displayText, selectAll = clonePageObject.additionalParams.selectAll
+        if (bulkJobSimilarityConfig) {
+            displayText = _.size(cloneSelectedItems) == numberOfEnabledItems ? SELECT_NONE : SELECT_ALL
+        } else {
+            displayText = _.size(cloneSelectedItems) == _.size(bulkTransactions) ? SELECT_NONE : SELECT_ALL
+        }
+        if (!clonePageObject.additionalParams.selectAll) {
+            selectAll = false
+        } else if (bulkJobSimilarityConfig) {
+            selectAll = (_.size(cloneSelectedItems) > 0) ? true : false
+        }
+        return { displayText, selectAll }
     }
 }
 

@@ -16,6 +16,8 @@ module.exports = {
     INVALID_SCAN: 'Invalid Scan',
     NO_JOBS_PRESENT: 'No jobs present',
     TOTAL_COUNT: 'Total Count : ',
+    PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB: 'Please enable internet connection to update this job!!!',
+    UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET: 'unable to sync with server, Please check your internet connection',
 
     //Common Error Strings
     JOB_STATUS_MISSING: 'Job status missing in store',
@@ -233,6 +235,7 @@ module.exports = {
     ORIGNAL_QUANTITY: 'ORIGINAL QUANTITY',
     PHOTO: 'PHOTO',
     ACTUAL_QUANTITY: 'ACTUAL QUANTITY',
+    ACTUAL_AMOUNT: 'ACTUAL AMOUNT',
     UNIT_PRICE: 'UNIT_PRICE',
     SKU_CODE_MAX_LIMIT_REACHED: 'Maximum value reached',
     SKU_CODE_MIN_LIMIT_REACHED: 'Minimum value reached',
@@ -263,7 +266,6 @@ module.exports = {
     EDIT: 'Edit',
     JOB_EXPIRED: 'Job Expired!',
     DETAILS: "Details",
-    UPDATE_GROUP: 'Update Group',
 
     //JOb List
     SELECT_NUMBER: 'Select number for message',
@@ -365,6 +367,9 @@ module.exports = {
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',
 
+    //TabScreen
+    NO_TAB_PRESENT: 'No Tab Present',
+
     //Draft Modal
     DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
 
@@ -380,10 +385,25 @@ module.exports = {
     LOGOUT: 'Logout',
 
     //App Upgrade Constants
-    DOWNLOAD_LATEST_APP_VERSION:'You must download latest version to proceed',
-    NEW_VERSION_AVAILABLE:'New version available',
-    DOWNLOAD:'DOWNLOAD',
-    DOWNLOADING_LATEST_VERSION:'Downloading latest version. Please wait',
-    UPDATE_FAILED:'Update Failed',
-    NO_INTERNET_CONNECTIVITY:'Please check your internet and try again'
+    DOWNLOAD_LATEST_APP_VERSION: 'You must download latest version to proceed',
+    NEW_VERSION_AVAILABLE: 'New version available',
+    DOWNLOAD: 'DOWNLOAD',
+    DOWNLOADING_LATEST_VERSION: 'Downloading latest version. Please wait',
+    UPDATE_FAILED: 'Update Failed',
+    NO_INTERNET_CONNECTIVITY: 'Please check your internet and try again',
+    //Pages Default Name
+    ALL_TASKS: 'All Tasks',
+
+    //Mobile Job List Customization Fixed Attributes
+    ATTEMPT: 'Attempt: ',
+    SLOT: 'Slot: ',
+    START: 'Start: ',
+    END: 'End: ',
+    DISTANCE: 'Distance: ',
+    HALT_DURATION: 'Halt Duration: ',
+    CALL_COUNT: 'Call Count: ',
+    CALL_DURATION: 'Call Duration: ',
+    SMS: 'Sms: ',
+    TIME_SPENT: 'Time Spent: ',
+    SEQUENCE: 'Sequence: ',
 }

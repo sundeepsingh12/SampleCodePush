@@ -97,7 +97,7 @@ class HomeTabNavigator extends PureComponent {
             animationEnabled: true,
             tabBarOptions: {
                 showIcon: true,
-                activeTintColor: styles.bgPrimary.backgroundColor,
+                activeTintColor: styles.bgPrimaryColor,
                 inactiveTintColor: '#aaaaaa',
                 style: {
                     backgroundColor: '#ffffff',

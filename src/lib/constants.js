@@ -95,6 +95,10 @@ module.exports = keyMirror({
     ERP_SYNC_STATUS: null,
     SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
+    SET_LANDING_TAB: null,
+    TABS_LOADING: null,
+    SET_SELECTED_DATE: null,
+    LOADER_FOR_SYNCING:null,
 
     //Pages
     PAGES_LOADING: null,
@@ -114,6 +118,7 @@ module.exports = keyMirror({
     //Listing Actions
     JOB_LISTING_START: null,
     JOB_LISTING_END: null,
+    TASKLIST_LOADER_FOR_SYNC: null,
 
     //Job Details Actions
     JOB_DETAILS_FETCHING_START: null,
@@ -122,6 +127,8 @@ module.exports = keyMirror({
     RESET_STATE_FOR_JOBDETAIL: null,
     SHOW_DROPDOWN: null,
     SET_JOBDETAILS_DRAFT_INFO: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL: null,
+    SET_LOADER_FOR_SYNC_IN_JOBDETAIL_AND_DRAFT: null,
 
     //Payment Actions
     CLEAR_PAYMENT_STATE: null,
@@ -212,6 +219,7 @@ module.exports = keyMirror({
     LAT_LONG_GEO_FENCE: null,
     SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
     MDM_POLICIES: null,
+    APP_THEME : null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,
@@ -239,13 +247,11 @@ module.exports = keyMirror({
 
     //Form Layout
     GET_SORTED_ROOT_FIELD_ATTRIBUTES: null,
-    DISABLE_SAVE: null,
     UPDATE_FIELD_DATA: null,
     STATUS_NAME: null,
     BASIC_INFO: null,
     SET_FIELD_ATTRIBUTE_AND_INITIAL_SETUP_FOR_FORMLAYOUT: null,
     ON_BLUR: null,
-    TOOGLE_HELP_TEXT: null,
     IS_LOADING: null,
     PENDING_SYNC_TRANSACTION_IDS: null,
     RESET_STATE: null,
@@ -257,7 +263,6 @@ module.exports = keyMirror({
     SET_UPDATE_DRAFT: null,
     SET_ARRAY_DATA_STORE_FILTER_MAP: null,
 
-    UPDATE_FIELD_DATA_VALIDATION: null,
     UPDATE_NEXT_EDITABLE: null,
     NEXT_FOCUS: null,
     SET_FORM_TO_INVALID: null,
@@ -451,9 +456,6 @@ module.exports = keyMirror({
     END_FETCHING_URL: null,
     ON_CHANGE_STATE: null,
     SCANNER_TEXT: null,
-
-    //Job Master
-    SET_JOB_MASTER_LIST: null,
 
     //Post Assignment
     SET_POST_ASSIGNMENT_TRANSACTION_LIST: null,

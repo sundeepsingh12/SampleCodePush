@@ -59,7 +59,7 @@ class OfflineDS extends Component {
     }
 
     headerView() {
-        return <Header style={[styles.bgPrimary, style.header]}>
+        return <Header style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
             <Body>
                 <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -91,7 +91,7 @@ class OfflineDS extends Component {
                         {this.props.lastSyncTime}
                     </Text>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button style={[styles.bgPrimary]}
+                        <Button style={{backgroundColor : styles.bgPrimaryColor}}
                             onPress={() => {
                                 this.props.actions.syncDataStore(this.props.lastSyncTime)
                             }} >
@@ -116,7 +116,7 @@ class OfflineDS extends Component {
                     </Text>
                     </View>
                     <View style={{ width: '100%', borderRadius: 8, height: 10, backgroundColor: styles.bgGray.backgroundColor }}>
-                        <View style={{ width: String(this.props.progressBarStatus + "%"), borderRadius: 8, height: 10, backgroundColor: styles.bgPrimary.backgroundColor }}>
+                        <View style={{ width: String(this.props.progressBarStatus + "%"), borderRadius: 8, height: 10, backgroundColor:styles.bgPrimaryColor}}>
                         </View>
                     </View>
                 </View>
@@ -139,9 +139,9 @@ class OfflineDS extends Component {
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
+                        <Button bordered style={{ borderColor: styles.bgPrimaryColor }}
                             onPress={() => { this.goBack() }}  >
-                            <Text style={[styles.fontPrimary]}>Close</Text>
+                            <Text style={{color : styles.fontPrimaryColor}}>Close</Text>
                         </Button>
                     </View>
                 </View>
@@ -164,9 +164,9 @@ class OfflineDS extends Component {
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
+                        <Button bordered style={{ borderColor: styles.bgPrimaryColor}}
                             onPress={() => { this.goBack() }}  >
-                            <Text style={[styles.fontPrimary]}>{CLOSE}</Text>
+                            <Text style={{color : styles.fontPrimaryColor}}>{CLOSE}</Text>
                         </Button>
                     </View>
                 </View>

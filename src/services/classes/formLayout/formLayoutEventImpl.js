@@ -20,7 +20,7 @@ import {
     TRACK_BATTERY,
     NPSFEEDBACK_VALUE,
     CUSTOM_NAMING,
-    PENDING_SYNC_TRANSACTION_IDS
+    PENDING_SYNC_TRANSACTION_IDS,
 } from '../../../lib/constants'
 
 import CONFIG from '../../../lib/config'
@@ -53,7 +53,8 @@ import {
     SEQUENCE_ID,
     SEQUENCE_ID_UNAVAILABLE,
     GET,
-    TOKEN_MISSING
+    TOKEN_MISSING,
+    SKU_ARRAY
 } from '../../../lib/AttributeConstants'
 import { fieldValidations } from '../../../modules/form-layout/formLayoutActions';
 import { summaryAndPieChartService } from '../SummaryAndPieChart'
@@ -293,7 +294,7 @@ export default class FormLayoutEventImpl {
         }
     }
 
-    async _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user, lastTrackLog) {
+     _updateTransactionLogs(jobTransaction, statusId, prevStatusId, jobMasterId, user, lastTrackLog) {
         let transactionLogs = this._prepareTransactionLogsData(prevStatusId, statusId, jobTransaction, jobMasterId, user.value, moment(new Date()).format('YYYY-MM-DD HH:mm:ss'), lastTrackLog)
         return { tableName: TABLE_TRANSACTION_LOGS, value: transactionLogs }
     }
@@ -400,13 +401,19 @@ export default class FormLayoutEventImpl {
             total[current.id] = Object.assign({}, current);
             return total;
         }, {}); // build map of runsheetId and runsheet
+        let prevJobTransactionValue = realm.getRecordListOnQuery(TABLE_JOB_TRANSACTION) // in case of mapping of moneycollect to more than 1 status, we have to get actual amount in previous status
+        let prevJobTransactionMap = _.keyBy(prevJobTransactionValue, 'id')
         for (let id in jobTransactionList) {
             if (prevStatusCategory && runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] > 0) { // check for previousStatus category undefined and runSheetMap conut is greater than 0 
                 runsheetMap[jobTransactionList[id].runsheetId][status[prevStatusCategory - 1]] -= 1
             }
             runsheetMap[jobTransactionList[id].runsheetId][status[statusCategory - 1]] += 1;
-            if (jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0) { // check for moneyTransactionType and  actualAmount 
-                runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount
+            if (jobTransactionList[id].moneyTransactionType && jobTransactionList[id].actualAmount > 0) { // check for moneyTransactionType and  actualAmount
+                if(prevJobTransactionMap[jobTransactionList[id].id].moneyTransactionType == jobTransactionList[id].moneyTransactionType && prevJobTransactionMap[jobTransactionList[id].id].actualAmount > 0){
+                    runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount - prevJobTransactionMap[jobTransactionList[id].id].actualAmount
+                }else{
+                   runsheetMap[jobTransactionList[id].runsheetId][moneyTypeCollectionTypeMap[jobTransactionList[id].moneyTransactionType]] += jobTransactionList[id].actualAmount
+                }
             }
             runSheetList.push(runsheetMap[jobTransactionList[id].runsheetId])
         }
@@ -427,7 +434,7 @@ export default class FormLayoutEventImpl {
         let fieldDataArray = []
         let npsFeedbackValue = null
         let reAttemptDate = null
-        let moneyCollectObject = null
+        let moneyCollectObject = skuArrayObject = null
         let amountMap = {
             originalAmount: null,
             actualAmount: null,
@@ -452,6 +459,12 @@ export default class FormLayoutEventImpl {
                     amountMap.originalAmount = value.jobTransactionIdAmountMap.originalAmount
                     amountMap.moneyTransactionType = value.jobTransactionIdAmountMap.moneyTransactionType
                 }
+            }else if(value.attributeTypeId == SKU_ARRAY){
+                if(isBulk){
+                    skuArrayObject = value 
+                    continue
+                }else
+                value.childDataList = value.childDataList[jobTransactionId]
             }
             let fieldDataObject = this._convertFormLayoutToFieldData(value, jobTransactionId, ++currentFieldDataObject.currentFieldDataId, currentTime)
             fieldDataArray.push(fieldDataObject)
@@ -465,10 +478,22 @@ export default class FormLayoutEventImpl {
             npsFeedbackValue,
             reAttemptDate,
             moneyCollectObject,
+            skuArrayObject,
             amountMap
         }
     }
-
+    _saveFieldDataForSkuArrayInBulk(fieldData, jobTransactionId, lastId, currentTime){
+        let skuArrayFieldData = []
+        let currentFieldDataObject = {}
+        currentFieldDataObject.currentFieldDataId = lastId
+        skuArrayFieldData.push(this._convertFormLayoutToFieldData(fieldData, jobTransactionId, ++currentFieldDataObject.currentFieldDataId, currentTime))
+        if (fieldData.childDataList ) {
+            currentFieldDataObject.currentFieldDataId = this._recursivelyFindChildData(fieldData.childDataList[jobTransactionId], skuArrayFieldData, currentFieldDataObject, jobTransactionId, currentTime);
+        }
+        return{
+            skuArrayFieldData,currentFieldDataObject
+        } 
+    }
 
     _saveFieldDataForBulk(formLayoutObject, jobTransactionList, currentTime) {
         let fieldDataArray = []
@@ -478,30 +503,42 @@ export default class FormLayoutEventImpl {
         fieldDataArray.push(...fieldData.value)
         let lastId = fieldData.value.length
         let moneyCollectFieldData = []
+        let skuArrayFieldData = []
         if (fieldData.moneyCollectObject) {
             moneyCollectFieldData.push(this._convertFormLayoutToFieldData(fieldData.moneyCollectObject, jobTransactionList[0].jobTransactionId, ++lastId, currentTime))
             let moneyCollectFieldDataObject = this.setMoneyCollectFieldDataForBulk(fieldData.moneyCollectObject.childDataList, jobTransactionList[0], lastId, jobTransactionIdAmountMap, currentTime)
             moneyCollectFieldData = moneyCollectFieldData.concat(moneyCollectFieldDataObject.fieldDataArray)
             lastId = moneyCollectFieldDataObject.lastId
         }
+        if(fieldData.skuArrayObject){
+          let {skuArrayFieldData,currentFieldDataObject} =  this._saveFieldDataForSkuArrayInBulk(fieldData.skuArrayObject, jobTransactionList[0].jobTransactionId, ++lastId, currentTime)
+          lastId = currentFieldDataObject.currentFieldDataId
+          fieldDataArray = fieldDataArray.concat(skuArrayFieldData)
+        }
         fieldDataArray = fieldDataArray.concat(moneyCollectFieldData)
+
         //Now copy this fieldData for all other job transactions,just change job transaction id
         for (let i = 1; i < jobTransactionList.length; i++) {
-            moneyCollectFieldData = []
+            moneyCollectFieldData = skuArrayFieldData =  []
             if (fieldData.moneyCollectObject) {
                 moneyCollectFieldData.push(this._convertFormLayoutToFieldData(fieldData.moneyCollectObject, jobTransactionList[i].jobTransactionId, ++lastId, currentTime))
                 let moneyCollectFieldDataObject = this.setMoneyCollectFieldDataForBulk(fieldData.moneyCollectObject.childDataList, jobTransactionList[i], lastId, jobTransactionIdAmountMap, currentTime)
                 moneyCollectFieldData = moneyCollectFieldData.concat(moneyCollectFieldDataObject.fieldDataArray)
                 lastId = moneyCollectFieldDataObject.lastId
             }
+            if(fieldData.skuArrayObject){
+                let {skuArrayFieldData,currentFieldDataObject} =  this._saveFieldDataForSkuArrayInBulk(fieldData.skuArrayObject, jobTransactionList[i].jobTransactionId, ++lastId, currentTime)
+                lastId = currentFieldDataObject.currentFieldDataId
+                fieldDataArray = fieldDataArray.concat(skuArrayFieldData)
+             }
             let fieldDataForJobTransaction = []
             fieldData.value.forEach(fieldDataObject => {
-                let newObject = { ...fieldDataObject }
+                let newObject = {...fieldDataObject} 
                 newObject.jobTransactionId = jobTransactionList[i].jobTransactionId
                 newObject.id = ++lastId
                 fieldDataArray.push(newObject)
             })
-            fieldDataArray = fieldDataArray.concat(moneyCollectFieldData)
+            fieldDataArray = fieldDataArray.concat(moneyCollectFieldData )
         }
         return {
             tableName: TABLE_FIELD_DATA,
