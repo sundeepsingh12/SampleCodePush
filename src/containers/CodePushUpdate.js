@@ -1,24 +1,34 @@
 'use strict'
 
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    Platform,
-    View,
-    Text,
-    Modal,
-    Image,
-    TouchableOpacity
-} from 'react-native'
-
+import { StyleSheet, Platform, View, Text, Modal, Image, TouchableOpacity } from 'react-native'
 import styles from '../themes/FeStyle'
 import { Container, Right, StyleProvider, Content, Button } from 'native-base'
-
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
-import { DOWNLOAD_LATEST_APP_VERSION, NEW_VERSION_AVAILABLE, DOWNLOAD } from '../lib/ContainerConstants'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+// import { DOWNLOAD_LATEST_APP_VERSION, NEW_VERSION_AVAILABLE, DOWNLOAD } from '../lib/ContainerConstants'
 
-export default class AppOutdated extends PureComponent {
+function mapStateToProps(state) {
+    return {
+        showMobileNumberScreen: state.preloader.showMobileNumberScreen,
+        errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
+        isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
+        showOtpScreen: state.preloader.showOtpScreen,
+        downloadLatestAppMessage: state.preloader.downloadLatestAppMessage,
+        androidDownloadUrl: state.preloader.androidDownloadUrl,
+        isAppUpdatedThroughCodePush: state.preloader.isAppUpdatedThroughCodePush,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators({ ...preloaderActions, ...globalActions }, dispatch)
+    }
+}
+
+class CodePushUpdate extends PureComponent {
 
     render() {
         console.log('this.props', this.props)
@@ -56,3 +66,5 @@ export default class AppOutdated extends PureComponent {
     }
 
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(CodePushUpdate)

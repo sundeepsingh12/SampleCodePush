@@ -69,7 +69,8 @@ module.exports = keyMirror({
     TOGGLE_CHECKBOX: null,
     REMEMBER_ME_SET_TRUE: null,
     OTP_SUCCESS: null,
-    DOWNLOAD_LATEST_APP:null,
+    DOWNLOAD_LATEST_APP: null,
+    SET_APP_UPDATE_BY_CODEPUSH: null,
 
     //Home Actions
     HOME_LOADING: null,
@@ -527,7 +528,7 @@ module.exports = keyMirror({
     USER_EXCEPTION_LOGS: null,
 
     //ApplicationVersion
-    APP_VERSION:null
+    APP_VERSION: null
 })
 
 

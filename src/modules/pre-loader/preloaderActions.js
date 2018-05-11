@@ -79,14 +79,15 @@ import {
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
   DOWNLOAD_LATEST_APP,
-  MDM_POLICIES
+  MDM_POLICIES,
+  SET_APP_UPDATE_BY_CODEPUSH
 } from '../../lib/constants'
-import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL,MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED} from '../../lib/AttributeConstants'
+import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
 import { authenticationService } from '../../services/classes/Authentication'
 import { deviceVerificationService } from '../../services/classes/DeviceVerification'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState,resetApp } from '../global/globalActions'
+import { deleteSessionToken, stopMqttService, setState, showToastAndAddUserExceptionLog, resetNavigationState, resetApp, navigateToScene } from '../global/globalActions'
 import { onChangePassword, onChangeUsername } from '../login/loginActions'
 import CONFIG from '../../lib/config'
 import { logoutService } from '../../services/classes/Logout'
@@ -95,7 +96,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
-import { LOGOUT_UNSUCCESSFUL, OK,DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
+import { LOGOUT_UNSUCCESSFUL, OK, DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
 import codePush from "react-native-code-push"
@@ -452,8 +453,9 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
   }
 }
 
-export function patchUpdateViaCodePush(error){
-  return async function(dispatch){
+export function patchUpdateViaCodePush(error) {
+  return async function (dispatch) {
+    dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: true }))
     codePush.sync({
       updateDialog: (Platform.OS === 'ios') ? false : true,
       installMode: codePush.InstallMode.IMMEDIATE,
@@ -483,11 +485,11 @@ export function patchUpdateViaCodePush(error){
   }
 }
 
-export function checkIfAppIsOutdated(error){
-  return async function (dispatch){
+export function checkIfAppIsOutdated(error) {
+  return async function (dispatch) {
     if (error.errorCode == MAJOR_VERSION_OUTDATED) {
-      dispatch(setState(DOWNLOAD_LATEST_APP,{displayMessage:error.errorCode,androidDownloadUrl:error.androidDownloadUrl}))
-    } 
+      dispatch(setState(DOWNLOAD_LATEST_APP, { displayMessage: error.errorCode, androidDownloadUrl: error.androidDownloadUrl }))
+    }
     else if (error.errorCode == MINOR_PATCH_OUTDATED) {
       dispatch(patchUpdateViaCodePush(error))
     }

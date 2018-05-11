@@ -48,7 +48,8 @@ import {
   PRELOADER_SUCCESS,
   OTP_SUCCESS,
   ERROR_400_403_LOGOUT_FAILURE,
-  DOWNLOAD_LATEST_APP
+  DOWNLOAD_LATEST_APP,
+  SET_APP_UPDATE_BY_CODEPUSH
 } from '../../lib/constants'
 
 /**
@@ -57,13 +58,15 @@ import {
  * @param {Object} action - type and payload
  */
 export default function preloaderReducer(state = initialState, action) {
-  if (!(state instanceof InitialState)) return initialState.merge(state)
+  if (!(state instanceof InitialState)) {
+    return initialState.merge(state)
+  }
   switch (action.type) {
     case MASTER_DOWNLOAD_START:
       return state.set('configDownloadService', SERVICE_RUNNING)
         .set('error', '')
         .set('configSaveService', SERVICE_PENDING)
-        .set('isError',false)
+        .set('isError', false)
     case MASTER_DOWNLOAD_SUCCESS:
       return state.set('configDownloadService', SERVICE_SUCCESS)
     case MASTER_DOWNLOAD_FAILURE:
@@ -181,12 +184,16 @@ export default function preloaderReducer(state = initialState, action) {
       return state.set('isErrorType_403_400_Logout', false)
         .set('errorMessage_403_400_Logout', action.payload)
 
-    case OTP_SUCCESS: 
-      return state.set('showOtpScreen',false)
+    case OTP_SUCCESS:
+      return state.set('showOtpScreen', false)
 
     case DOWNLOAD_LATEST_APP:
-      return state.set('downloadLatestAppMessage',action.payload.displayMessage)
-                  .set('androidDownloadUrl',action.payload.androidDownloadUrl)
+      return state.set('downloadLatestAppMessage', action.payload.displayMessage)
+        .set('androidDownloadUrl', action.payload.androidDownloadUrl)
+
+    case SET_APP_UPDATE_BY_CODEPUSH: {
+      return state.set('isAppUpdatedThroughCodePush', action.payload.isCodePushUpdate)
+    }
   }
   return state
 }

@@ -142,20 +142,20 @@ class JobMaster {
   async saveJobMaster(json) {
     json.applicationVersion = 1
 
-    await keyValueDBService.validateAndSaveData(APP_VERSION,json.applicationVersion+"")
+    await keyValueDBService.validateAndSaveData(APP_VERSION, json.applicationVersion + "")
     const packageJsonMajorVersion = parseInt(package_json.version.split('.')[0])
 
     //Check if appMajorVersion from server is greater than package json major version
-    if(json.applicationVersion && parseInt(json.applicationVersion) > packageJsonMajorVersion){
-      throw ({errorCode:MAJOR_VERSION_OUTDATED,androidDownloadUrl:json.androidDownloadUrl})
+    if (json.applicationVersion && parseInt(json.applicationVersion) > packageJsonMajorVersion) {
+      throw ({ errorCode: MAJOR_VERSION_OUTDATED, androidDownloadUrl: json.androidDownloadUrl })
     }
     const minorPatchVersion = json.minorPatchVersion
     if (minorPatchVersion) {
-      const [minorVersionFromServer,patchVersionFromServer] = minorPatchVersion.split('.')
-      const [appMajorVersion,appMinorVersion,appPatchVersion] = package_json.version.split('.')
+      const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
+      const [appMajorVersion, appMinorVersion, appPatchVersion] = package_json.version.split('.')
       //Check if minor or patch version from server is greater than current minor/patch version installed in phone
       if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
-        throw ({ errorCode: MINOR_PATCH_OUTDATED,androidDeploymentKey:json.androidDeployementKey,iosDeploymentKey:json.iosDeployementKey})
+        throw ({ errorCode: MINOR_PATCH_OUTDATED, androidDeploymentKey: json.androidDeployementKey, iosDeploymentKey: json.iosDeployementKey })
       }
     }
 
@@ -187,7 +187,7 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'));
     await keyValueDBService.validateAndSaveData(PAGES, json.pages);
     await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, json.additionalUtilities);
-    if(!_.isEmpty(json.companyMDM)) await keyValueDBService.validateAndSaveData(MDM_POLICIES, json.companyMDM);
+    if (!_.isEmpty(json.companyMDM)) await keyValueDBService.validateAndSaveData(MDM_POLICIES, json.companyMDM);
     if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {
       await keyValueDBService.validateAndSaveData(HUB_LAT_LONG, json.hubLatLng)
     }
@@ -326,7 +326,7 @@ class JobMaster {
     return jobMasterTitleList
   }
 
-  async getJobMasterIdList(){
+  async getJobMasterIdList() {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     return jobMasterList.value.map((data) => data.id)
   }
