@@ -80,7 +80,8 @@ import {
   PAGES_ADDITIONAL_UTILITY,
   DOWNLOAD_LATEST_APP,
   MDM_POLICIES,
-  SET_APP_UPDATE_BY_CODEPUSH
+  SET_APP_UPDATE_BY_CODEPUSH,
+  SET_APP_UPDATE_STATUS
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -457,28 +458,35 @@ export function patchUpdateViaCodePush(error) {
   return async function (dispatch) {
     dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: true }))
     codePush.sync({
-      updateDialog: (Platform.OS === 'ios') ? false : true,
+      updateDialog: true,
       installMode: codePush.InstallMode.IMMEDIATE,
       deploymentKey: (Platform.OS === 'ios') ? error.iosDeploymentKey : error.androidDeploymentKey,
     }, (status) => {
       switch (status) {
         case codePush.SyncStatus.CHECKING_FOR_UPDATE:
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: 'Checking for updates' }))
           console.log("Checking for updates.");
           break;
         case codePush.SyncStatus.DOWNLOADING_PACKAGE:
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: 'Downloading package' }))
           console.log("Downloading package.");
           break;
         case codePush.SyncStatus.INSTALLING_UPDATE:
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: 'Installing update' }))
           console.log("Installing update.");
           break;
         case codePush.SyncStatus.UP_TO_DATE:
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: 'Up-to-date' }))
           console.log("Up-to-date.");
           break;
         case codePush.SyncStatus.UPDATE_INSTALLED:
+          dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: false }))
           console.log("Update installed.");
           dispatch(resetApp())
           break;
         default:
+          console.log('default', status)
+          console.log(error);
           dispatch(jobMasterSavingFailure(error.message))
       }
     })

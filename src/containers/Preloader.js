@@ -1,13 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import {
-    StyleSheet,
-    Platform,
-    View,
-    Image,
-    Text,
-}
-    from 'react-native'
+import { StyleSheet, Platform, View, Image, Text, } from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
 import { Container, Button } from 'native-base'
@@ -19,9 +12,7 @@ import renderIf from '../lib/renderIf'
 import OtpScreen from './OtpScreen'
 import MobileNoScreen from './MobileNoScreen'
 import InitialSetup from './InitialSetup'
-import {
-    ERROR_400_403_LOGOUT_FAILURE,
-} from '../lib/constants'
+import { ERROR_400_403_LOGOUT_FAILURE } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
 import RNFS from 'react-native-fs'
 import ApkInstaller from 'react-native-apk-installer'

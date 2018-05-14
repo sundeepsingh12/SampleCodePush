@@ -30,7 +30,8 @@ var InitialState = Record({
   otpDisplayMessage: '', //message which will be displayed in otp screen,
   downloadLatestAppMessage: null,
   androidDownloadUrl: null,
-  isAppUpdatedThroughCodePush: false
+  isAppUpdatedThroughCodePush: false,
+  codePushUpdateStatus: ''
 })
 
 export default InitialState

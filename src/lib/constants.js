@@ -71,6 +71,7 @@ module.exports = keyMirror({
     OTP_SUCCESS: null,
     DOWNLOAD_LATEST_APP: null,
     SET_APP_UPDATE_BY_CODEPUSH: null,
+    SET_APP_UPDATE_STATUS: null,
 
     //Home Actions
     HOME_LOADING: null,
@@ -98,7 +99,7 @@ module.exports = keyMirror({
     SET_LANDING_TAB: null,
     TABS_LOADING: null,
     SET_SELECTED_DATE: null,
-    LOADER_FOR_SYNCING:null,
+    LOADER_FOR_SYNCING: null,
 
     //Pages
     PAGES_LOADING: null,
@@ -219,7 +220,7 @@ module.exports = keyMirror({
     LAT_LONG_GEO_FENCE: null,
     SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
     MDM_POLICIES: null,
-    APP_THEME : null,
+    APP_THEME: null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

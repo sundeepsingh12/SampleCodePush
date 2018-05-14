@@ -49,7 +49,9 @@ import {
   OTP_SUCCESS,
   ERROR_400_403_LOGOUT_FAILURE,
   DOWNLOAD_LATEST_APP,
-  SET_APP_UPDATE_BY_CODEPUSH
+  SET_APP_UPDATE_BY_CODEPUSH,
+  SET_APP_UPDATE_STATUS,
+  RESET_STATE
 } from '../../lib/constants'
 
 /**
@@ -193,6 +195,14 @@ export default function preloaderReducer(state = initialState, action) {
 
     case SET_APP_UPDATE_BY_CODEPUSH: {
       return state.set('isAppUpdatedThroughCodePush', action.payload.isCodePushUpdate)
+    }
+
+    case SET_APP_UPDATE_STATUS: {
+      return state.set('codePushUpdateStatus', action.payload.codePushUpdateStatus)
+    }
+
+    case RESET_STATE: {
+      return initialState
     }
   }
   return state
