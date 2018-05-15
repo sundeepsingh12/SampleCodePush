@@ -22,6 +22,7 @@ import {
     OUTSIDE_BOUNDARY
 } from '../../lib/ContainerConstants'
 import { userEventLogService } from './UserEvent'
+import FCM from "react-native-fcm"
 class Tracking {
 
     init() {
@@ -287,7 +288,8 @@ class Tracking {
             title: FAREYE_UPDATES,      
             body:message,  
             priority: "high",              
-            show_in_foreground: true                    
+            show_in_foreground: true,
+            sound:"default" 
           });
         this.updateUserEvent(geofence, message, eventId)// update user event with appropriate eventId
     }
