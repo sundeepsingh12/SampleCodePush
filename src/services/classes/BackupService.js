@@ -62,12 +62,10 @@ class Backup {
             let syncFilePath = PATH + '/sync.zip'
             RNFS.mkdir(PATH);
             RNFS.mkdir(PATH_BACKUP);
-            RNFS.mkdir(PATH_BACKUP_TEMP);
-            await unzip(syncFilePath, PATH_BACKUP_TEMP)
-            const targetPath = PATH_BACKUP + '/' + backupFileName
-            const sourcePath = PATH_BACKUP_TEMP
-            await zip(sourcePath, targetPath);
-            await RNFS.unlink(PATH_BACKUP_TEMP)
+            let fileExits = await RNFS.exists(syncFilePath)
+            if (fileExits) {
+                await RNFS.copyFile(syncFilePath, PATH_BACKUP + '/' + backupFileName)
+            }
         }
     }
     /**
