@@ -137,8 +137,8 @@ class JobMaster {
     console.log('saveJobMaster start');
     console.log('saveJobMaster start json.applicationVersion', json.applicationVersion);
     console.log('saveJobMaster start json.minorPatchVersion', json.minorPatchVersion);
-    await keyValueDBService.validateAndSaveData(APP_VERSION, json.applicationVersion + "")
-    console.log('saveJobMaster start packageVersion', package_json.version);
+    await keyValueDBService.validateAndSaveData(APP_VERSION, json.applicationVersion + "");
+    console.log('APP_VERSION', APP_VERSION);
     const packageJsonMajorVersion = parseInt(APP_VERSION_NUMBER.split('.')[0])
 
     //Check if appMajorVersion from server is greater than package json major version
