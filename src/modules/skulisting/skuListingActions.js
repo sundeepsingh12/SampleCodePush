@@ -63,9 +63,8 @@ export function prepareSkuList(fieldAttributeMasterId, jobId) {
                 skuObjectAttributeKey: skuListingDto.childFieldAttributeKey,
                 skuValidationForImageAndReason,
                 reasonsList: skuData.reasonsList,
+                skuCodeMap: skuData.skuCodeMap
             }))
-            if (skuListingDto.isSkuCodePresent)
-                dispatch(setState(SHOW_SEARCH_BAR))
         } catch (error) {
             dispatch(setState(SKU_LIST_FETCHING_START, false))    // false to stop sku loader        
             showToastAndAddUserExceptionLog(2201, error.message, 'danger', 1)
@@ -101,7 +100,7 @@ export function scanSkuItem(functionParams) {
  *This method updates SkuActualQuantity of a particular list item and TotalActualQuantity,
  * TotalOriginalQuantity & SkuActualAmount as well,Called when actualQuantity is changed by user
  */
-export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason) {
+export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId) {
     return async function (dispatch) {
         try {
             if (rowItem.attributeTypeId == SKU_PHOTO || rowItem.attributeTypeId == SKU_REASON) {
@@ -111,13 +110,13 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
                     dispatch(setState(SET_SHOW_VIEW_IMAGE, { imageData: '', showImage: false, viewData: '' }))
                 }
                 let copyOfskuListItems = _.cloneDeep(skuListItems)
-                copyOfskuListItems[rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
+                copyOfskuListItems[jobId][rowItem.parentId].filter(item => item.attributeTypeId == rowItem.attributeTypeId)[0].value = value
                 dispatch(setState(UPDATE_SKU_LIST_ITEMS, copyOfskuListItems))
             } else {
-                const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason)
+                const updatedSkuArray = skuListing.prepareUpdatedSkuArray(value, rowItem, skuListItems, skuChildElements, skuValidationForImageAndReason, jobId)
                 dispatch(setState(UPDATE_SKU_ACTUAL_QUANTITY, {
-                    skuListItems: updatedSkuArray.updatedObject,
-                    skuRootChildElements: updatedSkuArray.updatedChildElements
+                    skuListItems: updatedSkuArray.updatedSkuList,
+                    skuRootChildElements: updatedSkuArray.updatedSkuChildList
                 }))
             }
         } catch (error) {
@@ -134,20 +133,35 @@ export function updateSkuActualQuantityAndOtherData(value, rowItem, skuListItems
  * @param {*} skuRootChildItems 
  * @param {*} skuObjectAttributeId 
  */
-export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransaction, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey) {
+export function saveSkuListItems(skuListItems, skuObjectValidation, skuRootChildItems, skuObjectAttributeId, jobTransactionList, parentObject, formLayoutState, skuValidationForImageAndReason, skuObjectAttributeKey) {
     return async function (dispatch) {
         try {
+            let jobTransaction = _.isArray(jobTransactionList) ? jobTransactionList : [jobTransactionList]
             const message = skuListing.getFinalCheckForValidation(skuObjectValidation, skuRootChildItems)
             if (!message) {
-                const skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems, skuRootChildItems, skuObjectAttributeId, skuValidationForImageAndReason, skuObjectAttributeKey)
-                if (_.isNull(skuChildElements)) {
+                let fieldDataListWithLatestPositionId = {}
+                fieldDataListWithLatestPositionId.fieldDataList = {}
+                let positionId = formLayoutState.latestPositionId, checkForSkuChild = false, skuChildElements
+                for (let id in jobTransaction) {
+                    let jobId = jobTransaction[id].jobId
+                    let jobTransactionId = jobTransaction[id].jobTransactionId ? jobTransaction[id].jobTransactionId : jobTransaction[id].id
+                    skuChildElements = skuListing.prepareSkuListChildElementsForSaving(skuListItems[jobId], skuRootChildItems[jobId], skuObjectAttributeId, skuValidationForImageAndReason, skuObjectAttributeKey, jobId)
+                    if (_.isEmpty(skuChildElements)) {
+                        break;
+                    } else {
+                        let { fieldDataList, latestPositionId } = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransactionId, parentObject.positionId, positionId)
+                        fieldDataListWithLatestPositionId.fieldDataList[jobTransactionId] = fieldDataList
+                        positionId = latestPositionId
+                    }
+                }
+                if (_.isEmpty(skuChildElements)) {
                     Toast.show({
                         text: `Please Fill all the Required Details`,
                         position: 'bottom',
                         buttonText: OK
                     })
                 } else {
-                    let fieldDataListWithLatestPositionId = await fieldDataService.prepareFieldDataForTransactionSavingInState(skuChildElements, jobTransaction.id, parentObject.positionId, formLayoutState.latestPositionId)
+                    fieldDataListWithLatestPositionId.latestPositionId = positionId
                     dispatch(updateFieldDataWithChildData(parentObject.fieldAttributeMasterId, formLayoutState, ARRAY_SAROJ_FAREYE, fieldDataListWithLatestPositionId, jobTransaction))
                 }
             }

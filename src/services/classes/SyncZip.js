@@ -102,10 +102,6 @@ class SyncZip {
     _getSyncDataFromDb(transactionIdsObject) {
         let userExceptionLog = _getDataFromRealm([], null, USER_EXCEPTION_LOGS)
         let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
-        // console.log('lastSyncTime',lastSyncTime.value)
-        // const formattedTime = moment(lastSyncTime.value).format('YYYY-MM-DD HH:mm:ss')
-        // console.log('moment',formattedTime)
-        // let trackLogQuery = `Date(trackTime) > ${formattedTime}`
         let trackLogs = _getDataFromRealm([], null, TABLE_TRACK_LOGS)
         let transactionList = [],
             fieldDataList = [],

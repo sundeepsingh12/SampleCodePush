@@ -44,8 +44,8 @@ export function getBulkJobTransactions(bulkParams) {
         try {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS));
             let cloneBulkParams = _.cloneDeep(bulkParams);
-            cloneBulkParams.pageObject.additionalParams = (!cloneBulkParams.pageObject.groupId) ? JSON.parse(cloneBulkParams.pageObject.additionalParams) : { statusId: cloneBulkParams.pageObject.additionalParams.statusId }
-            cloneBulkParams.pageObject.jobMasterIds = (!cloneBulkParams.pageObject.groupId) ? JSON.parse(cloneBulkParams.pageObject.jobMasterIds) : cloneBulkParams.pageObject.jobMasterIds
+            cloneBulkParams.pageObject.additionalParams =JSON.parse(cloneBulkParams.pageObject.additionalParams)
+            cloneBulkParams.pageObject.jobMasterIds = JSON.parse(cloneBulkParams.pageObject.jobMasterIds)
             const bulkTransactions = await bulkService.getJobListingForBulk(cloneBulkParams);
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
             const currentStatus = jobStatusService.getJobStatusForJobStatusId(statusList ? statusList.value : null, cloneBulkParams.pageObject.additionalParams.statusId)

@@ -5,23 +5,6 @@ class JobAttributeMaster {
     /**
      * @param {*} jobAttributeMasterList 
      * @returns
-     * JobAttributeMasterMap : {
-     *                              jobAttributeMasterId : {jobAttributeMaster}
-     *                         }
-     */
-    getJobAttributeMasterMap(jobAttributeMasterList) {
-        let jobAttributeMasterMap = {}
-        jobAttributeMasterList = jobAttributeMasterList ? jobAttributeMasterList : []
-        jobAttributeMasterList.forEach(jobAttributeMaster => {
-            jobAttributeMasterMap[jobAttributeMaster.id] = jobAttributeMaster
-        })
-
-        return jobAttributeMasterMap
-    }
-
-    /**
-     * @param {*} jobAttributeMasterList 
-     * @returns
      * JobMasterJobAttributeMasterMap : {
      *                                      jobMasterId : {
      *                                                      jobAttributeMasterId : {jobAttributeMaster}

@@ -1,24 +1,20 @@
 'use strict'
-import {
-    jobTransactionService
-} from './JobTransaction'
-import {
-    transactionCustomizationService
-} from './TransactionCustomization'
-
+import { keyValueDBService } from './KeyValueDBService'
+import { jobStatusService } from './JobStatus'
+import { jobMasterService } from './JobMaster'
+import { jobTransactionService } from './JobTransaction'
+import { transactionCustomizationService } from './TransactionCustomization'
+import { UNSEEN, JOB_STATUS, CUSTOMIZATION_LIST_MAP, JOB_ATTRIBUTE, JOB_ATTRIBUTE_STATUS, CUSTOMER_CARE, SMS_TEMPLATE, JOB_MASTER, HUB, TABLE_JOB_TRANSACTION } from '../../lib/constants'
 import _ from 'lodash'
-
-import {
-    INVALID_SCAN,
-    SELECT_ALL,
-    SELECT_NONE
-} from '../../lib/ContainerConstants'
+import { moduleCustomizationService } from './ModuleCustomization'
+import { BULK_ID } from '../../lib/AttributeConstants'
+import { INVALID_SCAN, SELECT_ALL, SELECT_NONE } from '../../lib/ContainerConstants'
 
 class Bulk {
 
     /**
      * This function returns job transaction map of job transaction corresponding to job master id and status id
-     * @param {*} bulkData 
+     * @param {*} bulkParamas 
      * @returns
      * {
      *      jobTransactionId : jobTransactionCustomization {
@@ -39,11 +35,15 @@ class Bulk {
      *                                      }
      * }
      */
-    async getJobListingForBulk(bulkData) {
-        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        let { jobTransactionCustomizationList } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Bulk', bulkData)
-        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id')
-        return idJobTransactionCustomizationListMap
+    async getJobListingForBulk(bulkParamas) {
+        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters();
+        let queryDTO = {};
+        let jobMaster = jobTransactionCustomizationListParametersDTO.jobMasterList.filter(jobmaster => jobmaster.id == bulkParamas.pageObject.jobMasterIds[0])[0];
+        queryDTO.jobTransactionQuery = `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND jobStatusId = ${bulkParamas.pageObject.additionalParams.statusId} AND jobId > 0`;
+        queryDTO.jobQuery = bulkParamas.pageObject.groupId ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = "${bulkParamas.pageObject.groupId}"` : jobMaster.enableMultipartAssignment ? `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]} AND groupId = null` : `jobMasterId = ${bulkParamas.pageObject.jobMasterIds[0]}`;
+        let jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO)
+        const idJobTransactionCustomizationListMap = _.mapKeys(jobTransactionCustomizationList, 'id');
+        return idJobTransactionCustomizationListMap;
     }
 
     /**
@@ -177,7 +177,8 @@ class Bulk {
         return {
             jobTransactionId: jobTransaction.id,
             jobId: jobTransaction.jobId,
-            jobMasterId: jobTransaction.jobMasterId
+            jobMasterId: jobTransaction.jobMasterId,
+            referenceNumber:jobTransaction.referenceNumber
         }
     }
 

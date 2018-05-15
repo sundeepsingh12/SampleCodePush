@@ -109,7 +109,7 @@ class FixedSKUListing extends PureComponent {
 
   showHeaderView() {
     return (
-      <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+      <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
         <Body>
           <View
             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -137,8 +137,8 @@ class FixedSKUListing extends PureComponent {
             {TOTAL_QUANTITY} {parseInt(this.props.totalQuantity)}
           </Text>
         </View>
-        <View style={[styles.bgPrimary]}>
-          <Button success full style={[styles.bgPrimary]}
+        <View style={{backgroundColor : styles.bgPrimaryColor}}>
+          <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
             onPress={() => {
               this.props.actions.onSave(this.props.navigation.state.params.currentElement, this.props.navigation.state.params.formLayoutState, this.props.fixedSKUList, this.props.navigation.state.params.jobTransaction)
             }}>

@@ -95,7 +95,7 @@ class SplitPayment extends Component {
                     <Text style={[styles.fontLg, styles.width100, styles.fontCenter, styles.marginBottom10, styles.paddingTop5]}>
                         {titleText} {PAYMENT}
                     </Text>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
                         {AMOUNT}
                     </Text>
                     <Item>
@@ -114,7 +114,7 @@ class SplitPayment extends Component {
                 </View>
                 {paymentView ? <View style={[styles.marginTop5, styles.marginBottom15]}>
                     <Button bordered small onPress={() => { this.props.actions.changeChequeOrDDPaymentModeList(modeTypeId, this.props.splitPaymentModeMap) }}>
-                        <Text style={[styles.fontPrimary]}>{ADD_PAYMENT_MODE}</Text>
+                        <Text style={{color : styles.fontPrimaryColor}}>{ADD_PAYMENT_MODE}</Text>
                     </Button>
                 </View> : null}
             </View>
@@ -126,7 +126,7 @@ class SplitPayment extends Component {
         return (
             <View key={`${id}${modeTypeId}`} style={[styles.row, styles.justifySpaceBetween, styles.marginTop10]}>
                 <View style={[styles.justifySpaceBetween, { width: '50%' }]}>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
                         {titleText} {NUMBER}
                     </Text>
                     <Item>
@@ -142,7 +142,7 @@ class SplitPayment extends Component {
                     </Item>
                 </View>
                 <View style={[styles.justifySpaceBetween, { width: '35%' }]}>
-                    <Text style={[styles.fontPrimary, styles.fontSm, styles.width100]}>
+                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100]}>
                         {titleText} {AMOUNT}
                     </Text>
                     <Item>
@@ -184,7 +184,7 @@ class SplitPayment extends Component {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>

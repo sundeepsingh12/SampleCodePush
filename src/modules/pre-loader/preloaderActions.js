@@ -301,6 +301,9 @@ export function invalidateUserSessionForAutoLogout() {
       dispatch(setState(TOGGLE_LOGOUT, true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await backupService.createBackupOnLogout()
+      const userObject  = await keyValueDBService.getValueFromStore(USER)
+      const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+      await sync.deregisterFcmTokenFromServer(userObject,token,fcmToken)
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
@@ -666,7 +669,6 @@ export function invalidateUserSessionWhenLogoutPressed(createBackup) {
       // await trackingService.inValidateStoreVariables(fenceIdentifier)
 
     } catch (error) {
-      console.log('error1',error)
       dispatch(showToastAndAddUserExceptionLog(1813, error.message, 'danger', 1))
     }
     finally {

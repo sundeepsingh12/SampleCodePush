@@ -220,7 +220,7 @@ class Payment extends PureComponent {
         let finalPaymentView = []
         let paymentModeView = []
         paymentModeView.push(
-            <Text key='PaymentText' style={[styles.fontPrimary, styles.fontSm, styles.width100, styles.marginBottom10]}>
+            <Text key='PaymentText' style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.width100, styles.marginBottom10]}>
                 {this.props.splitPaymentMode == YES ? SELECT_PAYMENT_METHOD_TO_SPLIT : SELECT_PAYMENT_METHOD}
             </Text>
         )
@@ -264,7 +264,7 @@ class Payment extends PureComponent {
         }
         return (
             <View style={[styles.marginBottom15]}>
-                <Text style={[styles.fontPrimary, styles.fontSm]}>
+                <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>
                     {SPLIT_PAYMENT}
                 </Text>
                 <View style={[styles.row, styles.marginTop10]}>
@@ -356,7 +356,7 @@ class Payment extends PureComponent {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween, styles.paddingTop5]}>

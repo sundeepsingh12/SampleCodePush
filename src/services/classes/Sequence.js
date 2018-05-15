@@ -47,18 +47,16 @@ class Sequence {
      */
     async getSequenceList(runsheetNumber, jobMasterIds) {
         if (!runsheetNumber) {
-            throw new Error(RUNSHEET_NUMBER_MISSING)
+            throw new Error(RUNSHEET_NUMBER_MISSING);
         }
         //get all pending status Ids
-        const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING)
-        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters()
-        //get all jobTransaction List whose status is pending, runsheet number is as given in argument and delete flag != 1
-        const { jobTransactionCustomizationList } = await jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, 'Sequence', {
-            statusIds,
-            runsheetNumber,
-            jobMasterIds
-        })
-        return jobTransactionCustomizationList
+        const statusIds = await jobStatusService.getNonUnseenStatusIdsForStatusCategory(PENDING);
+        const jobTransactionCustomizationListParametersDTO = await transactionCustomizationService.getJobListingParameters();
+        //get all jobTransaction List whose status is pending, runsheet number is as given in argument and has lies within list of job master 
+        let queryDTO = {};
+        queryDTO.jobTransactionQuery = `(${jobMasterIds.map(jobMasterId => 'jobMasterId = ' + jobMasterId).join(' OR ')}) AND (${statusIds.map(statusId => 'jobStatusId = ' + statusId).join(' OR ')}) AND runsheetNo = "${runsheetNumber}"`;
+        const jobTransactionCustomizationList = jobTransactionService.getAllJobTransactionsCustomizationList(jobTransactionCustomizationListParametersDTO, queryDTO);
+        return jobTransactionCustomizationList;
     }
 
     /**

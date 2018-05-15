@@ -178,7 +178,7 @@ class Sequence extends PureComponent {
    */
   getButtonView() {
     return _.isEmpty(this.props.transactionsWithChangedSeqeunceMap) ? <Button
-      style={[styles.bgPrimary]}
+      style={{backgroundColor : styles.bgPrimaryColor}}
       onPress={this.showAlert}
       disabled={this.props.isResequencingDisabled}
       full>
@@ -282,13 +282,13 @@ class Sequence extends PureComponent {
             <View style={{ width: '50%' }}>
               <Button transparent full
                 onPress={() => this.setModalView({})} >
-                <Text style={[styles.fontPrimary]}>{CANCEL}</Text>
+                <Text style={{color : styles.fontPrimaryColor}}>{CANCEL}</Text>
               </Button>
             </View>
             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
               <Button transparent full
                 onPress={() => this.onJumpSequencePressed(this.state.newSequenceNumber)}>
-                <Text style={[styles.fontPrimary]}>{JUMP_SEQUENCE}</Text>
+                <Text style={{color : styles.fontPrimaryColor}}>{JUMP_SEQUENCE}</Text>
               </Button>
             </View>
           </View>
@@ -301,7 +301,7 @@ class Sequence extends PureComponent {
    * inflate header view
    */
   headerView() {
-    return <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+    return <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
       <Body>
         <View
           style={[styles.row, styles.width100, styles.justifySpaceBetween]}>

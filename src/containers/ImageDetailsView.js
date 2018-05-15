@@ -56,11 +56,12 @@ class ImageDetailsView extends PureComponent {
                 <Container>
                     <View style={{ flex: 1 }}>
                         <Image
+                           resizeMethod = {'resize'}
                             source={{
                                 isStatic: true,
                                 uri: 'data:image/jpeg;base64,' + this.props.viewData,
                             }}
-                            style={{ height: '100%', width: '100%', padding: 5 }}
+                            style={[{ height: '100%', width: '100%', padding: 5 } ,styles.flex1]}
                         />
                         <View style={[styles.absolute, styles.padding10, { top: 0, left: 0, flex: 2 }]}>
                             <Icon

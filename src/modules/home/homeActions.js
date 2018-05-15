@@ -51,8 +51,10 @@ import {
   LiveJobs,
   OfflineDS,
   ProfileView,
+  FCM_TOKEN,
+  LOADER_FOR_SYNCING,
   MDM_POLICIES,
-  FCM_TOKEN
+  APP_THEME
 } from '../../lib/constants'
 
 import {
@@ -88,7 +90,7 @@ import {
   Piechart,
   SERVICE_ALREADY_SCHEDULED
 } from '../../lib/AttributeConstants'
-import { Toast, ActionSheet } from 'native-base'
+import { Toast, ActionSheet, } from 'native-base'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { summaryAndPieChartService } from '../../services/classes/SummaryAndPieChart'
 import { trackingService } from '../../services/classes/Tracking'
@@ -97,7 +99,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo,Platform } from 'react-native'
+import { NetInfo, Alert,Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -113,9 +115,9 @@ import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
 import FCM, {NotificationActionType,FCMEvent} from "react-native-fcm"
-
-
-
+import feStyle from '../../themes/FeStyle'
+import { jobMasterService } from '../../services/classes/JobMaster';
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,FCM_REGISTRATION_ERROR,TOKEN_MISSING,APNS_TOKEN_ERROR } from '../../lib/ContainerConstants'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -185,7 +187,7 @@ export function navigateToPage(pageObject) {
         case PAGE_BLUETOOTH_PAIRING:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_BULK_UPDATE: {
-          dispatch(navigateToScene(BulkListing, { pageObject }));
+          dispatch(startSyncAndNavigateToContainer(pageObject, true, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_CUSTOM_WEB_PAGE:
@@ -199,14 +201,14 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }));
+          dispatch(navigateToScene(LiveJobs, { pageObject }));
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_MSWIPE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_NEW_JOB: {
-          dispatch(redirectToContainer(pageObject))
+          dispatch(startSyncAndNavigateToContainer(pageObject, false, LOADER_FOR_SYNCING))
           break;
         }
         case PAGE_OFFLINE_DATASTORE:
@@ -239,9 +241,6 @@ export function navigateToPage(pageObject) {
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
       }
     } catch (error) {
-      //TODO : show proper error code message ERROR CODE 600
-      //Save the error in exception logs
-      console.log(error)
       showToastAndAddUserExceptionLog(2702, error.message, 'danger', 1)
     }
   }
@@ -274,9 +273,49 @@ export function checkCustomErpPullActivated() {
     try {
       const user = await keyValueDBService.getValueFromStore(USER)
       const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
+      let appTheme = await keyValueDBService.getValueFromStore(APP_THEME);
+      if (appTheme && appTheme.value) {
+        feStyle.primaryColor = appTheme.value
+        feStyle.bgPrimaryColor = appTheme.value
+        feStyle.fontPrimaryColor = appTheme.value
+        feStyle.shadeColor = appTheme.value + '98'
+        feStyle.borderLeft4Color = appTheme.value
+      }
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
       showToastAndAddUserExceptionLog(2704, error.message, 'danger', 1)
+    }
+  }
+}
+
+export function startSyncAndNavigateToContainer(pageObject, isBulk, syncLoader) {
+  return async function (dispatch) {
+    try {
+      if (await jobMasterService.checkForEnableLiveJobMaster(JSON.parse(pageObject.jobMasterIds)[0])) {
+        dispatch(setState(syncLoader, true))
+        let message = await dispatch(performSyncService())
+        if (message === true) {
+          dispatch(setState(syncLoader, false))
+          if (!isBulk) {
+            dispatch(redirectToContainer(pageObject))
+          } else {
+            dispatch(navigateToScene(BulkListing, { pageObject }))
+          }
+        } else {
+          dispatch(setState(syncLoader, false))
+          alert(UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET)
+        }
+      }
+      else {
+        if (!isBulk) {
+          dispatch(redirectToContainer(pageObject))
+        } else {
+          dispatch(navigateToScene(BulkListing, { pageObject }))
+        }
+      }
+    } catch (error) {
+      dispatch(setState(syncLoader, false))
+      showToastAndAddUserExceptionLog(2714, error.message, 'danger', 1)
     }
   }
 }
@@ -309,10 +348,11 @@ export function startFCM(pieChart) {
         sync.sendRegistrationTokenToServer(token, fcmToken, topic)
       }, (error) => {
       }).catch(
-        () => console.log('notification permission rejected'))
+        () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
+
       if (Platform.OS === 'ios') {
         FCM.getAPNSToken().then(token => {
-        });
+        }).catch(()=>Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
       }
 
       FCM.getInitialNotification().then(notif => {
@@ -357,6 +397,9 @@ export function startFCM(pieChart) {
     });
 
       FCM.subscribeToTopic(topic)
+    }
+    else{
+      Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
     }
   }
 }
@@ -406,11 +449,11 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
           if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
-          //dispatch(fetchJobs())
+          dispatch(fetchJobs())
         }
-        if (isLiveJob) {
-          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
-        }
+        // if (isLiveJob) {
+        //   dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
+        // }
       }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
@@ -425,8 +468,8 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
         await keyValueDBService.validateAndSaveData(IS_SERVER_REACHABLE, 1)
       }
+      return true;
     } catch (error) {
-      console.log(error)
       showToastAndAddUserExceptionLog(2706, error.message, 'danger', 0)
       let syncStatus = ''
       if (error.code == 500 || error.code == 502) {
@@ -448,6 +491,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         unsyncedTransactionList: syncStoreDTO.transactionIdToBeSynced ? syncStoreDTO.transactionIdToBeSynced : [],
         syncStatus
       }))
+      return false;
     } finally {
       if (!erpPull) {
         const difference = await sync.calculateDifference()
@@ -488,8 +532,6 @@ export function pieChartCount() {
       const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
       dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
     } catch (error) {
-      //Update UI here
-      console.log(error)
       showToastAndAddUserExceptionLog(2707, error.message, 'danger', 1)
       dispatch(setState(CHART_LOADING, { loading: false, count: null }))
     }
@@ -567,7 +609,6 @@ export function uploadUnsyncFiles(backupFilesList) {
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2709, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
@@ -585,7 +626,6 @@ export function readAndUploadFiles() {
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
@@ -595,7 +635,6 @@ export function resetFailCountInStore() {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
@@ -612,7 +651,6 @@ export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
       dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {
       showToastAndAddUserExceptionLog(2712, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
