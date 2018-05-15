@@ -40,7 +40,7 @@ import {
   APP_VERSION,
   APP_THEME,
 } from '../../lib/constants'
-import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
+import { UNSEEN, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED, APP_VERSION_NUMBER } from '../../lib/AttributeConstants'
 import { DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
 import _ from 'lodash'
 import package_json from '../../../package.json'
@@ -134,10 +134,12 @@ class JobMaster {
    * @param json
    */
   async saveJobMaster(json) {
-    json.applicationVersion = 1
-
+    console.log('saveJobMaster start');
+    console.log('saveJobMaster start json.applicationVersion', json.applicationVersion);
+    console.log('saveJobMaster start json.minorPatchVersion', json.minorPatchVersion);
     await keyValueDBService.validateAndSaveData(APP_VERSION, json.applicationVersion + "")
-    const packageJsonMajorVersion = parseInt(package_json.version.split('.')[0])
+    console.log('saveJobMaster start packageVersion', package_json.version);
+    const packageJsonMajorVersion = parseInt(APP_VERSION_NUMBER.split('.')[0])
 
     //Check if appMajorVersion from server is greater than package json major version
     if (json.applicationVersion && parseInt(json.applicationVersion) > packageJsonMajorVersion) {
@@ -146,7 +148,7 @@ class JobMaster {
     const minorPatchVersion = json.minorPatchVersion
     if (minorPatchVersion) {
       const [minorVersionFromServer, patchVersionFromServer] = minorPatchVersion.split('.')
-      const [appMajorVersion, appMinorVersion, appPatchVersion] = package_json.version.split('.')
+      const [appMajorVersion, appMinorVersion, appPatchVersion] = APP_VERSION_NUMBER.split('.')
       //Check if minor or patch version from server is greater than current minor/patch version installed in phone
       if (parseInt(minorVersionFromServer) > parseInt(appMinorVersion) || parseInt(patchVersionFromServer) > parseInt(appPatchVersion)) {
         throw ({ errorCode: MINOR_PATCH_OUTDATED, androidDeploymentKey: json.androidDeployementKey, iosDeploymentKey: json.iosDeployementKey })

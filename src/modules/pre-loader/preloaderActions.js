@@ -278,6 +278,7 @@ export function downloadJobMaster() {
       if (!jobMasters)
         throw new Error('No response returned from server')
       const json = await jobMasters.json
+      console.log('downloadJobMaster json', json)
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
       // dispatch(autoLogout(userObject))
@@ -441,6 +442,7 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
 export function validateAndSaveJobMaster(jobMasterResponse) {
   return async function (dispatch) {
     try {
+      console.log('validateAndSaveJobMaster jobMasterResponse', jobMasterResponse)
       if (!jobMasterResponse)
         throw new Error('No response returned from server')
       await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
@@ -449,6 +451,7 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
+      console.log('validateAndSaveJobMaster catch error', error)
       dispatch(checkIfAppIsOutdated(error))
     }
   }
@@ -456,6 +459,7 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
 
 export function patchUpdateViaCodePush(error) {
   return async function (dispatch) {
+    console.log('patchUpdateViaCodePush error', error)
     dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: true }))
     codePush.sync({
       updateDialog: true,
@@ -482,7 +486,6 @@ export function patchUpdateViaCodePush(error) {
         case codePush.SyncStatus.UPDATE_INSTALLED:
           dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: false }))
           console.log("Update installed.");
-          dispatch(resetApp())
           break;
         default:
           console.log('default', status)
@@ -495,6 +498,7 @@ export function patchUpdateViaCodePush(error) {
 
 export function checkIfAppIsOutdated(error) {
   return async function (dispatch) {
+    console.log('checkIfAppIsOutdated error', error)
     if (error.errorCode == MAJOR_VERSION_OUTDATED) {
       dispatch(setState(DOWNLOAD_LATEST_APP, { displayMessage: error.errorCode, androidDownloadUrl: error.androidDownloadUrl }))
     }

@@ -2,6 +2,7 @@ import RNFS from 'react-native-fs'
 import CONFIG from '../lib/config'
 module.exports = {
 
+    APP_VERSION_NUMBER: '0.0.9',
     /**
      * TODO : Change money collect details object keys to attribute type id
      */
@@ -287,7 +288,7 @@ module.exports = {
     PAGE_NEW_JOB: 2,
     Piechart: {
         enabled: false,
-        params:[]
+        params: []
     },
     Start: {
         landingTab: false
@@ -388,7 +389,7 @@ module.exports = {
     PAGE_MESSAGING: 2,
 
     //App Upgrade & Code Push Constants
-    LATEST_APK_PATH:'/fareye_latest1.apk',
-    MAJOR_VERSION_OUTDATED:'1',
-    MINOR_PATCH_OUTDATED:'2'
+    LATEST_APK_PATH: '/fareye_latest1.apk',
+    MAJOR_VERSION_OUTDATED: '1',
+    MINOR_PATCH_OUTDATED: '2'
 }
