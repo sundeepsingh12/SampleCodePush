@@ -141,6 +141,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':react-native-compress-image') 
     compile project(':react-native-background-fetch')
     compile project(':react-native-image-picker')
     compile project(':react-native-bluetooth-serial')

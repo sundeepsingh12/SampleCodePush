@@ -6,7 +6,8 @@ import {
     Text,
     View,
     TouchableOpacity,
-    Image
+    Image,
+    ImageStore,
 } from 'react-native';
 
 import {
@@ -20,9 +21,11 @@ import {
     Footer,
     StyleProvider,
     Button,
-
+    Toast
 } from 'native-base';
+import Loader from '../components/Loader'
 import * as skuListingActions from '../modules/skulisting/skuListingActions'
+import CompressImage from 'react-native-compress-image';
 
 import { RNCamera } from 'react-native-camera'
 import { bindActionCreators } from 'redux'
@@ -32,7 +35,8 @@ import * as cameraActions from '../modules/camera/cameraActions'
 import {
     SET_IMAGE_DATA,
     SET_SHOW_IMAGE,
-    SET_SHOW_IMAGE_AND_DATA
+    SET_SHOW_IMAGE_AND_DATA,
+    SET_CAMERA_LOADER
 } from '../lib/constants'
 import styles from '../themes/FeStyle'
 import platform from '../../native-base-theme/variables/platform'
@@ -53,7 +57,8 @@ function mapStateToProps(state) {
     return {
         imageData: state.cameraReducer.imageData,
         showImage: state.cameraReducer.showImage,
-        validation: state.cameraReducer.validation
+        validation: state.cameraReducer.validation,
+        cameraLoader: state.cameraReducer.cameraLoader
     }
 }
 
@@ -109,6 +114,16 @@ class CameraFieldAttribute extends PureComponent {
     _setTorchOff = () => {
         this.setState({ torchOff: RNCamera.Constants.FlashMode.off })
     }
+
+    _setToastForError(message){
+        Toast.show({
+            text: message,
+            position: 'bottom',
+            buttonText: 'Ok',
+            type: 'danger',
+            duration: 5000
+        })
+    }
     toggleCameraType = () => {
         this.setState(previousState => {
             if (previousState.cameraType == 'back') {
@@ -135,13 +150,27 @@ class CameraFieldAttribute extends PureComponent {
             }
         ImagePicker.launchImageLibrary(options, (response) => {
             if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
+                this._setToastForError(response.error)
             }
             else if (response.data) {
-                this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                    data: response.data,
-                    showImage: true
-                })
+                this.props.actions.setState(SET_CAMERA_LOADER, true)
+                CompressImage.createCompressedImage(response.uri, 'Compress/Images').then((resizedImage) => {
+                    ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
+                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                            data: base64Data,
+                            showImage: true
+                        })
+                    }, (reason) => {
+                        this.props.actions.setState(SET_CAMERA_LOADER, false)
+                        this._setToastForError(reason)
+                    });
+                  }, (error) => {
+                    this.props.actions.setState(SET_CAMERA_LOADER, false)
+                    this._setToastForError(error.message)
+                }).catch((error) => {
+                    this.props.actions.setState(SET_CAMERA_LOADER, false)
+                    this._setToastForError(error.message)
+                });
             }
         })
     }
@@ -249,6 +278,8 @@ class CameraFieldAttribute extends PureComponent {
     }
     render() {
         let item = this.props.navigation.state.params.currentElement
+        if(this.props.cameraLoader)
+        return <Loader/>
         if (((item.value && item.value != '' && item.value != OPEN_CAMERA) || this.props.imageData ) && this.props.showImage) {
             return this.showImageView()
         } else {
@@ -260,13 +291,27 @@ class CameraFieldAttribute extends PureComponent {
         if (this.camera) {
             const options = { quality: 0.5, base64: true };
          try{
-            const data = await this.camera.takePictureAsync(options)
-            this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
-                data: data.base64,
-                showImage: true
-            })
+            const data = await this.camera.takePictureAsync(options).then((capturedImg) => {
+                const { uri, width, height } = capturedImg;
+              
+                CompressImage.createCompressedImage(uri, 'Compress/Images').then((resizedImage) => {
+                    ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
+                        this.props.actions.setState(SET_SHOW_IMAGE_AND_DATA, {
+                            data: base64Data,
+                            showImage: true
+                        })
+                    }, (reason) => {
+                        this._setToastForError(reason)
+                    });
+                  }, (error) => {
+                    this._setToastForError(error.message)
+                });
+              })
+              .catch((error) => {
+                this._setToastForError(error.message)
+              });
             }catch(error){
-             console.log(error.message)
+                this._setToastForError(error.message)
             }
         }
     };

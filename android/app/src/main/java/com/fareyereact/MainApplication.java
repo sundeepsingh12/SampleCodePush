@@ -1,7 +1,7 @@
 package com.fareyereact;
 
 import android.app.Application;
-
+import com.emekalites.react.compress.image.ImageCompressPackage;
 import com.facebook.react.ReactApplication;
 import com.imagepicker.ImagePickerPackage;
 import org.reactnative.camera.RNCameraPackage;
@@ -47,6 +47,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
           new ImagePickerPackage(),
+           new ImageCompressPackage(), 	
             new RNCameraPackage(),
             new RNBackgroundFetchPackage(),
             new RCTBluetoothSerialPackage(),
