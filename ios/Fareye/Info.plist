@@ -24,6 +24,8 @@
 	<string>juO4AoW41ONJEiyrQ62Njga-RRlO4a75534d-31ba-4f8d-b228-2bb58f951a4d</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -35,8 +37,6 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Fareye needs access to your bluetooth</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Fareye needs access to your camera</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -44,7 +44,7 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>CHANGEME: Location Always Usage Description</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSMotionUsageDescription</key>
 	<string>CHANGEME: Motion updates increase battery efficiency by intelligently toggling location-services when device is detected to be moving</string>
 	<key>NSPhotoLibraryUsageDescription</key>

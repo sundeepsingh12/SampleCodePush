@@ -17,6 +17,10 @@ module.exports = {
         name: 'Dev',
         url: 'https://dev.fareye.co'
       },
+      {
+        name:'QA',
+        url:'https://qa.fareye.co'
+      },
     ],
     port: 8083,
     PUSH_QOS: 2
@@ -48,5 +52,7 @@ module.exports = {
     DATA_STORE_FILTER_SEARCH: '/app/rest/distinct_data_fetch_api',
     SEND_EMAIL_LINK: 'https://dhlintegration.fareye.co/app/rest/sit/dhl_send_email?jsessionId=',
     SEND_SMS_LINK: 'https://dhlintegration.fareye.co/app/rest/sit/dhl_send_sms?jsessionId=',
+    FCM_TOKEN_REGISTRATON:'/app/rest/fcm/register',
+    FCM_TOKEN_DEREGISTRATION:'/app/rest/fcm/deRegister'
   }
 }

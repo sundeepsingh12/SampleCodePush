@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.google.gms:google-services:3.2.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -15,10 +16,10 @@ buildscript {
 allprojects {
     repositories {
         configurations.all {
-            resolutionStrategy {
-                force "com.google.android.gms:play-services-gcm:11.6.0"
+          resolutionStrategy {
+                force "com.google.android.gms:play-services-gcm:12.0.1"
             }
-        }
+       }
         mavenLocal()
         jcenter()
         maven {
@@ -38,4 +39,9 @@ allprojects {
             url "https://jitpack.io" 
        }
     }
+}
+
+
+ext{
+    googlePlayServicesVersion = "12.0.1" 
 }
