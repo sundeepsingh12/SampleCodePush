@@ -6,7 +6,8 @@ import styles from '../themes/FeStyle'
 import { Container, Right, StyleProvider, Content } from 'native-base'
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
-import { DOWNLOADING_LATEST_VERSION } from '../lib/ContainerConstants'
+import { DOWNLOADING_LATEST_VERSION, HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } from '../lib/ContainerConstants'
+import Loader from '../components/Loader'
 export default class DownloadProgressbar extends PureComponent {
 
     render() {
@@ -16,10 +17,9 @@ export default class DownloadProgressbar extends PureComponent {
                 transparent={false}
                 onRequestClose={() => null}>
                 <StyleProvider style={getTheme(platform)}>
-                    {(Platform.OS == 'android') ? this.renderProgressBarForAndroid() : this.openWebView()}
+                    {(Platform.OS == 'android') ? this.renderProgressBarForAndroid() : this.renderIOSAppLinkView()}
                 </StyleProvider>
             </Modal>
-
         )
     }
 
@@ -47,15 +47,4 @@ export default class DownloadProgressbar extends PureComponent {
             </View>
         )
     }
-
-    openWebView() {
-        return (
-            <WebView
-                style={styles.WebViewStyle}
-                source={{ uri: 'https://Google.com' }}
-                javaScriptEnabled={true}
-                domStorageEnabled={true} />
-        )
-    }
-
 }

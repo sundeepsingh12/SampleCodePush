@@ -72,6 +72,7 @@ module.exports = keyMirror({
     DOWNLOAD_LATEST_APP: null,
     SET_APP_UPDATE_BY_CODEPUSH: null,
     SET_APP_UPDATE_STATUS: null,
+    SET_IOS_UPGRADE_SCREEN: null,
 
     //Home Actions
     HOME_LOADING: null,

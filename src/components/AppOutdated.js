@@ -21,7 +21,6 @@ import { DOWNLOAD_LATEST_APP_VERSION, NEW_VERSION_AVAILABLE, DOWNLOAD } from '..
 export default class AppOutdated extends PureComponent {
 
     render() {
-        console.log('this.props', this.props)
         return (
             <Modal
                 animationType={"slide"}

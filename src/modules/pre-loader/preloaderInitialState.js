@@ -29,9 +29,10 @@ var InitialState = Record({
   mobileDisplayMessage: '', //message which will be displayed in mobile no screen
   otpDisplayMessage: '', //message which will be displayed in otp screen,
   downloadLatestAppMessage: null,
-  androidDownloadUrl: null,
+  downloadUrl: null,
   isAppUpdatedThroughCodePush: false,
-  codePushUpdateStatus: ''
+  codePushUpdateStatus: '',
+  iosDownloadScreen: null
 })
 
 export default InitialState

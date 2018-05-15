@@ -9,18 +9,18 @@ import {
     Modal,
     Image,
     TouchableOpacity
-}from 'react-native'
+} from 'react-native'
 
 import styles from '../themes/FeStyle'
-import { Container, Right,StyleProvider,Content,Button } from 'native-base'
+import { Container, Right, StyleProvider, Content, Button } from 'native-base'
 
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
-import {UPDATE_FAILED,NO_INTERNET_CONNECTIVITY} from '../lib/ContainerConstants'
+import { UPDATE_FAILED, NO_INTERNET_CONNECTIVITY } from '../lib/ContainerConstants'
 
 export default class ErrorScreen extends PureComponent {
 
-    render(){
+    render() {
         return (
             <Modal
                 animationType={"slide"}
@@ -36,8 +36,8 @@ export default class ErrorScreen extends PureComponent {
                             <Text style={[styles.fontBlack, styles.marginTop30, styles.fontLg, styles.bold]}>
                                 {UPDATE_FAILED}
                             </Text>
-                            <Text style={[styles.fontBlack, styles.marginTop15, styles.fontLg, styles.fontDarkGray, styles.fontCenter, {width: '60%'}]}>
-                              {NO_INTERNET_CONNECTIVITY}
+                            <Text style={[styles.fontBlack, styles.marginTop15, styles.fontLg, styles.fontDarkGray, styles.fontCenter, { width: '60%' }]}>
+                                {NO_INTERNET_CONNECTIVITY}
                             </Text>
                         </View>
                         <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>

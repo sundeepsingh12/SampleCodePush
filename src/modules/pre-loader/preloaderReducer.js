@@ -8,41 +8,31 @@ import InitialState from './preloaderInitialState'
 
 const initialState = new InitialState()
 import {
-
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
   MASTER_DOWNLOAD_FAILURE,
-
   MASTER_SAVING_START,
   MASTER_SAVING_SUCCESS,
   MASTER_SAVING_FAILURE,
-
   CHECK_ASSET_START,
   CHECK_ASSET_FAILURE,
-
   OTP_GENERATION_START,
   OTP_GENERATION_SUCCESS,
   OTP_GENERATION_FAILURE,
-
   OTP_VALIDATION_START,
   OTP_VALIDATION_SUCCESS,
   OTP_VALIDATION_FAILURE,
-
-
   SERVICE_PENDING,
   SERVICE_RUNNING,
   SERVICE_SUCCESS,
   SERVICE_FAILED,
-
   SHOW_MOBILE_NUMBER_SCREEN,
   SHOW_OTP_SCREEN,
   SET_MOBILE_NUMBER,
-
   ERROR_400_403_LOGOUT,
   PRE_LOGOUT_START,
   PRE_LOGOUT_SUCCESS,
   PRE_LOGOUT_FAILURE,
-
   ON_MOBILE_NO_CHANGE,
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS,
@@ -51,7 +41,8 @@ import {
   DOWNLOAD_LATEST_APP,
   SET_APP_UPDATE_BY_CODEPUSH,
   SET_APP_UPDATE_STATUS,
-  RESET_STATE
+  RESET_STATE,
+  SET_IOS_UPGRADE_SCREEN
 } from '../../lib/constants'
 
 /**
@@ -85,6 +76,7 @@ export default function preloaderReducer(state = initialState, action) {
       return state.set('configSaveService', SERVICE_FAILED)
         .set('isError', true)
         .set('error', action.payload)
+        .set('isCodePushUpdate', false)
 
     case CHECK_ASSET_START:
       return state.set('deviceVerificationService', SERVICE_RUNNING)
@@ -191,7 +183,7 @@ export default function preloaderReducer(state = initialState, action) {
 
     case DOWNLOAD_LATEST_APP:
       return state.set('downloadLatestAppMessage', action.payload.displayMessage)
-        .set('androidDownloadUrl', action.payload.androidDownloadUrl)
+        .set('downloadUrl', action.payload.downloadUrl)
 
     case SET_APP_UPDATE_BY_CODEPUSH: {
       return state.set('isAppUpdatedThroughCodePush', action.payload.isCodePushUpdate)
@@ -199,6 +191,12 @@ export default function preloaderReducer(state = initialState, action) {
 
     case SET_APP_UPDATE_STATUS: {
       return state.set('codePushUpdateStatus', action.payload.codePushUpdateStatus)
+    }
+
+    case SET_IOS_UPGRADE_SCREEN: {
+      return state.set('iosDownloadScreen', action.payload.iosDownloadScreen)
+        .set('downloadUrl', action.payload.downloadUrl)
+        .set('downloadLatestAppMessage', null)
     }
 
     case RESET_STATE: {

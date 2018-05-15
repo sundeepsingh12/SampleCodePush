@@ -224,7 +224,7 @@ class Login extends PureComponent {
         onPress={this.loginButtonPress}
         style={[styles.marginTop15]}
       >
-        <Text style={[styles.fontWhite]}>Log In Fareye</Text>
+        <Text style={[styles.fontWhite]}>Log In</Text>
       </Button>
     )
   }

@@ -4,46 +4,36 @@ import {
   MASTER_DOWNLOAD_START,
   MASTER_DOWNLOAD_SUCCESS,
   MASTER_DOWNLOAD_FAILURE,
-
   MASTER_SAVING_START,
   MASTER_SAVING_SUCCESS,
   MASTER_SAVING_FAILURE,
-
   CHECK_ASSET_START,
   CHECK_ASSET_FAILURE,
-
   OTP_GENERATION_START,
   OTP_GENERATION_SUCCESS,
   OTP_GENERATION_FAILURE,
-
   OTP_VALIDATION_START,
   OTP_VALIDATION_SUCCESS,
   OTP_VALIDATION_FAILURE,
-
   SERVICE_PENDING,
   SERVICE_RUNNING,
   SERVICE_SUCCESS,
   SERVICE_FAILED,
-
   SHOW_OTP_SCREEN,
   SHOW_MOBILE_NUMBER_SCREEN,
-
   DEVICE_IMEI,
   DEVICE_SIM,
   USER,
   IS_PRELOADER_COMPLETE,
-
   PRE_LOGOUT_START,
   PRE_LOGOUT_SUCCESS,
   PRE_LOGOUT_FAILURE,
-
   ERROR_400_403_LOGOUT,
   ON_MOBILE_NO_CHANGE,
   ON_OTP_CHANGE,
   PRELOADER_SUCCESS,
   IS_SHOW_MOBILE_NUMBER_SCREEN,
   IS_SHOW_OTP_SCREEN,
-
   Home,
   Login,
   AutoLogoutScreen,
@@ -97,7 +87,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
-import { LOGOUT_UNSUCCESSFUL, OK, DOWNLOAD_LATEST_APP_VERSION } from '../../lib/ContainerConstants'
+import { CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_INSTALLING_UPDATE, CODEPUSH_SOMETHING_WENT_WRONG } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
 import codePush from "react-native-code-push"
@@ -278,7 +268,6 @@ export function downloadJobMaster() {
       if (!jobMasters)
         throw new Error('No response returned from server')
       const json = await jobMasters.json
-      console.log('downloadJobMaster json', json)
       dispatch(jobMasterDownloadSuccess())
       dispatch(validateAndSaveJobMaster(json))
       // dispatch(autoLogout(userObject))
@@ -442,7 +431,6 @@ export function saveSettingsAndValidateDevice(configDownloadService, configSaveS
 export function validateAndSaveJobMaster(jobMasterResponse) {
   return async function (dispatch) {
     try {
-      console.log('validateAndSaveJobMaster jobMasterResponse', jobMasterResponse)
       if (!jobMasterResponse)
         throw new Error('No response returned from server')
       await jobMasterService.matchServerTimeWithMobileTime(jobMasterResponse.serverTime)
@@ -451,7 +439,6 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
       dispatch(jobMasterSavingSuccess())
       dispatch(checkAsset())
     } catch (error) {
-      console.log('validateAndSaveJobMaster catch error', error)
       dispatch(checkIfAppIsOutdated(error))
     }
   }
@@ -459,7 +446,6 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
 
 export function patchUpdateViaCodePush(error) {
   return async function (dispatch) {
-    console.log('patchUpdateViaCodePush error', error)
     dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: true }))
     codePush.sync({
       updateDialog: true,
@@ -468,29 +454,26 @@ export function patchUpdateViaCodePush(error) {
     }, (status) => {
       switch (status) {
         case codePush.SyncStatus.CHECKING_FOR_UPDATE:
-          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: 'Checking for updates' }))
-          console.log("Checking for updates.");
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: CODEPUSH_CHECKING_FOR_UPDATE }))
           break;
         case codePush.SyncStatus.DOWNLOADING_PACKAGE:
-          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: 'Downloading package' }))
-          console.log("Downloading package.");
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: CODEPUSH_DOWNLOADING_PACKAGE }))
           break;
         case codePush.SyncStatus.INSTALLING_UPDATE:
-          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: 'Installing update' }))
-          console.log("Installing update.");
+          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: CODEPUSH_INSTALLING_UPDATE }))
           break;
         case codePush.SyncStatus.UP_TO_DATE:
-          dispatch(setState(SET_APP_UPDATE_STATUS, { codePushUpdateStatus: 'Up-to-date' }))
-          console.log("Up-to-date.");
+          dispatch(resetApp());
           break;
         case codePush.SyncStatus.UPDATE_INSTALLED:
           dispatch(setState(SET_APP_UPDATE_BY_CODEPUSH, { isCodePushUpdate: false }))
-          console.log("Update installed.");
+          break;
+        case codePush.SyncStatus.AWAITING_USER_ACTION:
+          break;
+        case codePush.SyncStatus.SYNC_IN_PROGRESS:
           break;
         default:
-          console.log('default', status)
-          console.log(error);
-          dispatch(jobMasterSavingFailure(error.message))
+          dispatch(jobMasterSavingFailure(CODEPUSH_SOMETHING_WENT_WRONG))
       }
     })
   }
@@ -498,9 +481,8 @@ export function patchUpdateViaCodePush(error) {
 
 export function checkIfAppIsOutdated(error) {
   return async function (dispatch) {
-    console.log('checkIfAppIsOutdated error', error)
     if (error.errorCode == MAJOR_VERSION_OUTDATED) {
-      dispatch(setState(DOWNLOAD_LATEST_APP, { displayMessage: error.errorCode, androidDownloadUrl: error.androidDownloadUrl }))
+      dispatch(setState(DOWNLOAD_LATEST_APP, { displayMessage: error.errorCode, downloadUrl: error.downloadUrl }))
     }
     else if (error.errorCode == MINOR_PATCH_OUTDATED) {
       dispatch(patchUpdateViaCodePush(error))

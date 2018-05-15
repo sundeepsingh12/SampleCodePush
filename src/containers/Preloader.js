@@ -1,6 +1,6 @@
 'use strict'
 import React, { PureComponent } from 'react'
-import { StyleSheet, Platform, View, Image, Text, } from 'react-native'
+import { StyleSheet, Platform, View, Image, Text, WebView } from 'react-native'
 import CustomAlert from "../components/CustomAlert"
 import styles from '../themes/FeStyle'
 import { Container, Button } from 'native-base'
@@ -24,6 +24,8 @@ import * as appDownloadActions from '../modules/appDownload/appDownloadActions'
 import AppOutdated from '../components/AppOutdated'
 import { LATEST_APK_PATH } from '../lib/AttributeConstants'
 import CodePushUpdate from './CodePushUpdate'
+import Loader from '../components/Loader'
+import { DOWNLOADING_LATEST_VERSION, HANG_ON, PLEASE_WAIT_FOR_IOS_LINK_URL } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
     return {
@@ -32,8 +34,9 @@ function mapStateToProps(state) {
         isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
         showOtpScreen: state.preloader.showOtpScreen,
         downloadLatestAppMessage: state.preloader.downloadLatestAppMessage,
-        androidDownloadUrl: state.preloader.androidDownloadUrl,
+        downloadUrl: state.preloader.downloadUrl,
         isAppUpdatedThroughCodePush: state.preloader.isAppUpdatedThroughCodePush,
+        iosDownloadScreen: state.preloader.iosDownloadScreen
     }
 }
 
@@ -73,7 +76,7 @@ class Preloader extends PureComponent {
             //Path where new Apk will be downloaded
             const filePath = RNFS.CachesDirectoryPath + LATEST_APK_PATH
             const download = RNFS.downloadFile({
-                fromUrl: this.props.androidDownloadUrl,
+                fromUrl: this.props.downloadUrl,
                 toFile: filePath,
                 progress: res => {
                     this.setState({
@@ -84,64 +87,96 @@ class Preloader extends PureComponent {
             });
             download.promise.then(result => {
                 if (result.statusCode == 200) {
+                    this.props.actions.resetApp()
                     ApkInstaller.install(filePath)
                 } else {
-                    this.setState({ error: true, showDownloadProgressBar: false })
+                    this.setState({ errorInDownload: true, showDownloadProgressBar: false })
                 }
             })
         }
         catch (error) {
-            this.setState({ error: true, showDownloadProgressBar: false })
+            this.setState({ errorInDownload: true, showDownloadProgressBar: false })
         }
     }
 
     downloadLatestApk = () => {
-        // this.props.actions.resetApp()
-        this.setState({ showDownloadProgressBar: true })
-        //In ios open Web View
         if (Platform.OS === 'ios') {
             this.props.actions.getIOSDownloadUrl()
         } else {
+            this.setState({ showDownloadProgressBar: true })
             this.downloadLatestApplicationForAndroid()
         }
     }
 
-    render() {
+    renderIOSAppLinkView() {
         return (
-            <Container>
-                {renderIf(!this.props.showMobileNumberScreen,
-                    <InitialSetup />
-                )}
-                {(this.props.isErrorType_403_400_Logout &&
-                    <CustomAlert
-                        title="Unauthorised Device"
-                        message={this.props.errorMessage_403_400_Logout.message}
-                        onOkPressed={this.startLoginScreenWithoutLogout} />
-                )}
-                {renderIf(this.props.showMobileNumberScreen,
-                    <MobileNoScreen invalidateUserSession={this.invalidateSession} />
-                )}
-
-                {renderIf(this.props.showOtpScreen,
-                    <OtpScreen invalidateUserSession={this.invalidateSession} />
-                )}
-                {renderIf(this.props.downloadLatestAppMessage,
-                    <AppOutdated downloadLatestApk={this.downloadLatestApk} />
-                )}
-
-                {renderIf(this.state.showDownloadProgressBar,
-                    <DownloadProgressBar progressBarStatus={this.state.progressBarStatus} />
-                )}
-
-                {renderIf(this.state.errorInDownload,
-                    <ErrorScreen downloadLatestApk={this.downloadLatestApk} invalidateUserSession={this.invalidateSession} />
-                )}
-                {renderIf(this.props.isAppUpdatedThroughCodePush,
-                    <CodePushUpdate />
-                )}
-
-            </Container>
+            <View style={[styles.alignCenter, styles.justifyCenter, { marginTop: 120 }]}>
+                <Loader />
+                <Text style={[styles.fontBlack, styles.fontLg, styles.fontCenter, styles.marginTop30, { width: '60%' }]}>
+                    {HANG_ON}
+                </Text>
+                <Text style={[styles.fontDarkGray, styles.fontLg, styles.fontCenter, styles.marginTop30, { width: '60%' }]}>
+                    {PLEASE_WAIT_FOR_IOS_LINK_URL}
+                </Text>
+            </View>
         )
+    }
+
+    render() {
+        if (this.props.iosDownloadScreen == 'Loading') {
+            return (
+                <View style={[styles.flex1, styles.justifySpaceBetween]}>
+                    {this.renderIOSAppLinkView()}
+                </View>
+            )
+        } else if (this.props.iosDownloadScreen == 'Failed') {
+            return <ErrorScreen downloadLatestApk={this.downloadLatestApk} invalidateUserSession={this.invalidateSession} />
+        } else if (this.props.iosDownloadScreen == 'WebView') {
+            return (
+                <WebView
+                    style={styles.WebViewStyle}
+                    source={{ uri: this.props.downloadUrl }}
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true} />
+            )
+        } else {
+            return (
+                <Container>
+                    {renderIf(!this.props.showMobileNumberScreen,
+                        <InitialSetup />
+                    )}
+                    {(this.props.isErrorType_403_400_Logout &&
+                        <CustomAlert
+                            title="Unauthorised Device"
+                            message={this.props.errorMessage_403_400_Logout.message}
+                            onOkPressed={this.startLoginScreenWithoutLogout} />
+                    )}
+                    {renderIf(this.props.showMobileNumberScreen,
+                        <MobileNoScreen invalidateUserSession={this.invalidateSession} />
+                    )}
+
+                    {renderIf(this.props.showOtpScreen,
+                        <OtpScreen invalidateUserSession={this.invalidateSession} />
+                    )}
+                    {renderIf(this.props.downloadLatestAppMessage,
+                        <AppOutdated downloadLatestApk={this.downloadLatestApk} />
+                    )}
+
+                    {renderIf(this.state.showDownloadProgressBar,
+                        <DownloadProgressBar progressBarStatus={this.state.progressBarStatus} downloadUrl={this.props.downloadUrl} iosDownloadScreen={this.props.iosDownloadScreen} />
+                    )}
+
+                    {renderIf(this.state.errorInDownload,
+                        <ErrorScreen downloadLatestApk={this.downloadLatestApk} invalidateUserSession={this.invalidateSession} />
+                    )}
+
+                    {renderIf(this.props.isAppUpdatedThroughCodePush,
+                        <CodePushUpdate />
+                    )}
+
+                </Container>
+            )
+        }
     }
 }
 
