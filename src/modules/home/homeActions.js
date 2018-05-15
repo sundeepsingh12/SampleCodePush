@@ -51,7 +51,8 @@ import {
   LiveJobs,
   OfflineDS,
   ProfileView,
-  MDM_POLICIES
+  MDM_POLICIES,
+  FCM_TOKEN
 } from '../../lib/constants'
 
 import {
@@ -95,24 +96,26 @@ import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'
-// import { Client } from 'react-native-paho-mqtt'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo } from 'react-native'
+import { NetInfo,Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { logoutService } from '../../services/classes/Logout'
 import { authenticationService } from '../../services/classes/Authentication'
-import { backupService } from '../../services/classes/BackupService';
+import { backupService } from '../../services/classes/BackupService'
 import { autoLogoutAfterUpload } from '../backup/backupActions'
 import { utilitiesService } from '../../services/classes/Utilities'
-import { transactionCustomizationService } from '../../services/classes/TransactionCustomization';
-import { moduleCustomizationService } from '../../services/classes/ModuleCustomization';
+import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
+import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
-import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
-import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
-import FCM, {NotificationActionType,FCMEvent} from "react-native-fcm";
+import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
+import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
+import FCM, {NotificationActionType,FCMEvent} from "react-native-fcm"
+
+
+
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -291,34 +294,41 @@ export function startTracking(trackingServiceStarted) {
   }
 }
 
-export function startMqttService(pieChart) {
+export function startFCM(pieChart) {
   return async function (dispatch) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    //Check if user session is alive
+    const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
     if (token && token.value) {
-      // const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
       const userObject = await keyValueDBService.getValueFromStore(USER)
       const topic = `FE_${userObject.value.id}`
+      await FCM.requestPermissions()
 
-      FCM.requestPermissions().then(
-        ()=>console.logs('granted'))
-        FCM.getFCMToken().then(fcmToken => {
-          console.logs('fcmToken',fcmToken)
-          sync.sendRegistrationTokenToServer(token,fcmToken,topic)
-        }, (error) => {
-          console.logs('The token could not be generated! , ', error)
-        }).catch(
-          ()=>console.logs('notification permission rejected'))
-  
-      
+      FCM.getFCMToken().then(async fcmToken => {
+        console.log('fcmToken', fcmToken)
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+      }, (error) => {
+      }).catch(
+        () => console.log('notification permission rejected'))
+      if (Platform.OS === 'ios') {
+        FCM.getAPNSToken().then(token => {
+        });
+      }
+
       FCM.getInitialNotification().then(notif => {
-        console.logs('INITIAL NOTIFICATION', notif)
+        console.log('notif 111>>' + JSON.stringify(notif))
       }, (err) => {
-        console.logs('Initial Notifications can not be displayed! ', err)
       })
 
-      this.notificationListner = FCM.on(FCMEvent.Notification, notif => {
-        console.log('Notification', notif)
+       FCM.on(FCMEvent.Notification, notif => {
+        
+        if(notif.Notification == 'Android push notification'){
+          dispatch(performSyncService(pieChart, true))
+        }
+        else if(notif.Notification == 'Live Job Notification'){
+          keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
+          dispatch(performSyncService(pieChart, true, true))
+        }
         if (notif.local_notification) {
           return
         }
@@ -327,10 +337,6 @@ export function startMqttService(pieChart) {
         }
   
         if (Platform.OS === 'ios') {
-                // optional
-                // iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see the above documentation link.
-                // This library handles it for you automatically with default behavior (for remote notification, finish with NoData; for WillPresent, finish depend on "show_in_foreground"). However if you want to return different result, follow the following code to override
-                // notif._notificationType is available for iOS platfrom
           switch (notif._notificationType) {
             case NotificationType.Remote:
               notif.finish(RemoteNotificationResult.NewData) // other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
@@ -343,53 +349,14 @@ export function startMqttService(pieChart) {
               break
           }
         }
-        // this.showLocalNotification(notif)
       })
 
+      FCM.on(FCMEvent.RefreshToken, async token => {
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+    });
+
       FCM.subscribeToTopic(topic)
-
-      // const storage = {
-      //   setItem: (key, item) => {
-      //     storage[key] = item;
-      //   },
-      //   getItem: (key) => storage[key],
-      //   removeItem: (key) => {
-      //     delete storage[key]
-      //   },
-      // };
-
-      // Create a client instance 
-      // const client = new Client({
-      //   uri,
-      //   clientId,
-      //   storage
-      // })
-
-      // set event handlers 
-      //TODO connection re-establishment on connection lost
-      // client.on('connectionLost', responseObject => {
-      // })
-      // client.on('messageReceived', message => {
-      //   if (message.payloadString == 'Live Job Notification') {
-      //     keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-      //     dispatch(performSyncService(pieChart, true, true))
-      //   } else {
-      //     dispatch(performSyncService(pieChart, true))
-      //   }
-      // })
-
-      // connect the client 
-      // client.connect()
-      //   .then(() => {
-      //     // Once a connection has been made, make a subscription 
-      //     return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
-      //   })
-      //   .catch(responseObject => {
-      //     if (responseObject.errorCode !== 0) {
-      //       console.log('onConnectionLost:' + responseObject.errorMessage);
-      //       // dispatch(startMqttService())
-      //     }
-      //   })
     }
   }
 }

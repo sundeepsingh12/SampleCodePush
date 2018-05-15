@@ -39,11 +39,11 @@ import {
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
 import { pages } from './Pages'
-import PushNotification from 'react-native-push-notification'
 import {
   JOBS_DELETED
 } from '../../lib/ContainerConstants'
 import { geoFencingService } from './GeoFencingService'
+import FCM from "react-native-fcm"
 
 class Sync {
 
@@ -642,14 +642,17 @@ class Sync {
   }
 
   showNotification(jobMasterTitleList) {
-    const alertBody = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
-    const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${alertBody} jobs` : alertBody
-    PushNotification.localNotification({
-      /* iOS and Android properties */
-      title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-      message, // (required)
-      soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+    const body = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
+    const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${body} jobs` : body
+    FCM.presentLocalNotification({
+      id: new Date().valueOf().toString(),         // (optional for instant notification)
+      title: FAREYE_UPDATES,      // as FCM payload
+      body:message,  
+      priority: "high",          
+      sound:"default"  ,  
+      show_in_foreground: true                    
     });
+    
   }
 
   async calculateDifference() {
@@ -685,13 +688,34 @@ class Sync {
     }
   }
 
+  /**Called when home screen is mounted,app sends fcm token to server
+   * 
+   * @param {*} token 
+   * @param {*} fcmToken 
+   * @param {*} topic 
+   */
   sendRegistrationTokenToServer(token,fcmToken,topic){
-    let url = CONFIG.API.FCM_TOKEN_REGISTRATON +'?topic='+topic
-    console.logs('url',url)
-    const postData = {token}
-    let response = RestAPIFactory(token.value).serviceCall(postData, url, 'POST')
-    console.log('response',response)
+    const url = CONFIG.API.FCM_TOKEN_REGISTRATON +'?topic='+topic
+    const response = RestAPIFactory(token.value).serviceCall(fcmToken, url, 'POST')
+  }
+
+
+  /**
+   * 
+   */
+  deregisterFcmTokenFromServer(userObject,token,fcmToken){
+    try {
+      FCM.cancelAllLocalNotifications()
+      FCM.removeAllDeliveredNotifications()
+      const topic = `FE_${userObject.value.id}`
+      FCM.unsubscribeFromTopic(topic);
+      const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
+       RestAPIFactory(token.value).serviceCall(fcmToken.value, url, 'POST')
+    } catch (error) {
+      console.log('error', error)
+    }
   }
 }
+
 
 export let sync = new Sync()
