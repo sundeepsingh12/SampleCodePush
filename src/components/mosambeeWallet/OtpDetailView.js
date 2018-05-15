@@ -14,13 +14,13 @@ export default class OtpGeneratedView extends PureComponent {
                 <View style={[{ marginTop: 50 }]}>
                     <Text>{ENTER_OTP_SENT_TO_MOBILE_NO+this.props.contactNumber}</Text>
                     <TouchableOpacity style={[{ marginTop: 20, position: 'relative' }, styles.row]} onPress={() => this.props.showModalView(this.props.isModalShow)}>
-                        <Icon name="md-create" style={[styles.fontLg, styles.fontPrimary, styles.marginRight5]} />
-                        <Text style={[styles.fontPrimary, styles.fontSm, styles.fontWeight]} >{CHANGE_MOBILE_NO}</Text>
+                        <Icon name="md-create" style={[styles.fontLg, {color : styles.fontPrimaryColor}, styles.marginRight5]} />
+                        <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm, styles.fontWeight]} >{CHANGE_MOBILE_NO}</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={[styles.bgWhite, { marginTop: 100 }]}>
                     <View style={{ marginTop: 50 }}>
-                        <Text style={[styles.fontPrimary, styles.fontSm]}>{ENTER_OTP_SENT_TO_CUSTOMER}</Text>
+                        <Text style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{ENTER_OTP_SENT_TO_CUSTOMER}</Text>
                     </View>
                     <TextInput
                         placeholder={ENTER_OTP}
@@ -31,7 +31,7 @@ export default class OtpGeneratedView extends PureComponent {
                         onChangeText={this.props.onChangeOtpNo}
                         style={[styles.flexBasis75, styles.fontXl]}
                     />
-                    <Text style={[styles.fontWeight100, styles.flex1, { right: 5, position: 'absolute', marginTop: 65, marginRight: 10 }, { color: styles.bgPrimary.backgroundColor }]} onPress={() => this.props.onResendOtp(RESEND,false,this.props.actualAmount)}>{RESEND_OTP}</Text>
+                    <Text style={[styles.fontWeight100, styles.flex1, { right: 5, position: 'absolute', marginTop: 65, marginRight: 10 }, { color: styles.bgPrimaryColor }]} onPress={() => this.props.onResendOtp(RESEND,false,this.props.actualAmount)}>{RESEND_OTP}</Text>
                     <Text style={[styles.fontDanger, styles.fontSm, styles.marginLeft5]}>{this.props.message}</Text>
                 </View>
             </Content>

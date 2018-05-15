@@ -31,7 +31,7 @@ export default class errorScreen extends PureComponent {
 
     resendOtpButtonView() {
         return (
-            <TouchableOpacity onPress={() => this.props.onResendOtp()}> <Text style={[styles.fontWeight100, { color: styles.bgPrimary.backgroundColor }]}>Resend OTP</Text> </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.props.onResendOtp()}> <Text style={[styles.fontWeight100, { color: styles.bgPrimaryColor }]}>Resend OTP</Text> </TouchableOpacity>
         )
     }
     render() {
@@ -49,9 +49,9 @@ export default class errorScreen extends PureComponent {
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
+                        <Button bordered style={{ borderColor: styles.bgPrimaryColor }}
                             onPress={() => { this.props.goBack() }}  >
-                            <Text style={[styles.fontPrimary]}>{CLOSE}</Text>
+                            <Text style={{color : styles.fontPrimaryColor}}>{CLOSE}</Text>
                         </Button>
                     </View>
                 </View>

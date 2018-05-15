@@ -114,7 +114,7 @@ class MosambeeWalletPayment extends PureComponent {
 
     checkForOtpNumberForPaymentApi(actualAmount) {
         (this.props.otpNumber) && _.size(this.props.otpNumber) ?
-            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params.jobTransaction, this.props.otpNumber)
+            this.props.actions.hitPaymentUrlforPayment(this.props.contactNumber, this.props.walletParameters, this.props.selectedWalletDetails, actualAmount, this.props.navigation.state.params.jobTransaction, this.props.otpNumber, this.props.navigation.state.params)
             : this.props.actions.setState(SET_ERROR_FOR_OTP, OTP_NUMBER_CAN_NOT_BE_BLANK)
     }
 
@@ -162,9 +162,9 @@ class MosambeeWalletPayment extends PureComponent {
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
 
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
+                        <Button bordered style={{ borderColor: styles.bgPrimaryColor }}
                             onPress={() => { this._showModalView(this.props.isModalVisible) }}  >
-                            <Text style={[styles.fontPrimary]}>{CLOSE}</Text>
+                            <Text style={[{ color: styles.fontPrimaryColor }]}>{CLOSE}</Text>
                         </Button>
                     </View>
                 </View>
@@ -209,11 +209,11 @@ class MosambeeWalletPayment extends PureComponent {
         )
     }
 
-    checkForModalToShow(errorMessage,actualAmount) {
+    checkForModalToShow(errorMessage, actualAmount) {
         switch (errorMessage) {
             case OTP_NUMBER_CAN_NOT_BE_BLANK:
             case MOBILE_NO_CAN_NOT_BE_BLANK:
-            case null: return this.setModal(this.props.isModalVisible,actualAmount)
+            case null: return this.setModal(this.props.isModalVisible, actualAmount)
             case TRANSACTION_SUCCESSFUL: return this.showPaymentSuccessfulScreen()
             case FAILED: return this.showPaymentFailedScreen()
             default: return this.showErrorScreen()
@@ -222,7 +222,7 @@ class MosambeeWalletPayment extends PureComponent {
 
     _headerModal(checkForPayment) {
         return (
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -242,7 +242,7 @@ class MosambeeWalletPayment extends PureComponent {
         )
     }
 
-    render() { 
+    render() {
         const paymentAtEnd = this.props.navigation.state.params.paymentAtEnd
         const actualAmount = (paymentAtEnd && paymentAtEnd.currentElement && paymentAtEnd.currentElement.jobTransactionIdAmountMap && paymentAtEnd.currentElement.jobTransactionIdAmountMap.actualAmount) ? paymentAtEnd.currentElement.jobTransactionIdAmountMap.actualAmount : 0
         const viewModal = (this.props.isLoaderRunning) ? <Loader /> : this.checkForModalToShow(this.props.errorMessage, actualAmount)

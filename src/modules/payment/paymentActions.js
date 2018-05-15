@@ -111,11 +111,6 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
             const moneyCollectChildFieldDataList = paymentService.prepareMoneyCollectChildFieldDataListDTO(actualAmount, moneyCollectMaster, originalAmount, selectedPaymentMode, transactionNumber, remarks, receipt)
             const fieldDataListObject = fieldDataService.prepareFieldDataForTransactionSavingInState(moneyCollectChildFieldDataList, jobTransaction.id, currentElement.positionId, formLayoutState.latestPositionId)
             const isCardPayment = paymentService.checkCardPayment(selectedPaymentMode)
-            let paymentAtEnd = {
-                currentElement,
-                modeTypeId: selectedPaymentMode,
-                isCardPayment
-            }
             //Initialising jobTransactionIdAmountMap in case of null for saving actual and original amount in job transaction
             if (!jobTransactionIdAmountMap) {
                 jobTransactionIdAmountMap = {}
@@ -133,6 +128,12 @@ export function saveMoneyCollectObject(actualAmount, currentElement, jobTransact
             }
             formLayoutState.formElement.get(currentElement.fieldAttributeMasterId).jobTransactionIdAmountMap = jobTransactionIdAmountMap
             formLayoutState.formElement = CashTenderingService.checkForCashTenderingAndResetValue(formLayoutState.formElement, currentElement)
+            let paymentAtEnd = {
+                currentElement: formLayoutState.formElement.get(currentElement.fieldAttributeMasterId),
+                modeTypeId: selectedPaymentMode,
+                isCardPayment
+            }
+            formLayoutState.paymentAtEnd = paymentAtEnd
             dispatch(updateFieldDataWithChildData(currentElement.fieldAttributeMasterId, formLayoutState, OBJECT_SAROJ_FAREYE, fieldDataListObject, jobTransaction))
             dispatch(setState(UPDATE_PAYMENT_AT_END, {
                 paymentAtEnd

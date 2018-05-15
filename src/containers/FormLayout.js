@@ -168,6 +168,12 @@ class FormLayout extends PureComponent {
       currentElement: this.props.currentElement,
       fieldAttributeMasterParentIdMap: this.props.fieldAttributeMasterParentIdMap
     }
+
+    let taskListScreenDetails = {
+      jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
+    }
+
     if (this.props.paymentAtEnd && this.props.paymentAtEnd.isCardPayment) {
       this.props.actions.navigateToScene(this.paymentSceneFromModeTypeId(this.props.paymentAtEnd.modeTypeId),
         {
@@ -175,12 +181,14 @@ class FormLayout extends PureComponent {
           formElement: this.props.formElement,
           jobTransaction: this.props.navigation.state.params.jobTransaction,
           paymentAtEnd: this.props.paymentAtEnd,
+          formLayoutState,
+          jobMasterId: this.props.navigation.state.params.jobMasterId,
+          navigationFormLayoutStates: this.props.navigation.state.params.navigationFormLayoutStates,
+          saveActivatedStatusData: this.props.navigation.state.params.saveActivatedStatusData,
+          pieChart: this.props.pieChart,
+          taskListScreenDetails
         })
     } else {
-      let taskListScreenDetails = {
-        jobDetailsScreenKey: this.props.navigation.state.params.jobDetailsScreenKey,
-        pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams
-      }
       this.props.actions.saveJobTransaction(
         formLayoutState,
         this.props.navigation.state.params.jobMasterId,
@@ -238,7 +246,7 @@ class FormLayout extends PureComponent {
           <Button success full
             onPress={() => this.saveJobTransaction()}
             disabled={this.props.isSaveDisabled}>
-            <Text style={[styles.fontLg, styles.fontWhite]}>{this.props.paymentAtEnd ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
+            <Text style={[styles.fontLg, styles.fontWhite]}>{!_.isEmpty(this.props.paymentAtEnd) ? this.props.paymentAtEnd.isCardPayment ? 'Proceed To Payment' : this.props.statusName : this.props.statusName}</Text>
           </Button>
         </FooterTab>
       </Footer>

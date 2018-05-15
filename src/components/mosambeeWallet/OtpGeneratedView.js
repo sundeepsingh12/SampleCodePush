@@ -15,7 +15,7 @@ export default class OtpGeneratedView extends PureComponent {
                     </View>
                     <View>
                         <View style={{ marginTop: 50 }}>
-                            <Text style={[styles.fontPrimary, styles.paddingHorizontal10, styles.fontSm]}>{ENTER_REGISTERED + this.props.selectedWalletDetails.name+' '+ MOBILE_NUMBER}</Text>
+                            <Text style={[{color : styles.fontPrimaryColor}, styles.paddingHorizontal10, styles.fontSm]}>{ENTER_REGISTERED + this.props.selectedWalletDetails.name+' '+ MOBILE_NUMBER}</Text>
                         </View>
                         <View>
                             <TextInput

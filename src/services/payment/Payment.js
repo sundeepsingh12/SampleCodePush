@@ -610,6 +610,32 @@ class Payment {
         throw new Error(SPLIT_AMOUNT_ERROR)
     }
 
+    addPaymentObjectToDetailsArray(actualAmount, modeType, transactionNumber, receipt, remarks, formLayoutState) {
+        let moneyCollectAttributeId = formLayoutState.paymentAtEnd.currentElement.fieldAttributeMasterId
+        if (moneyCollectAttributeId && formLayoutState.formElement.get(moneyCollectAttributeId)) {
+            let moneyCollectChildList = formLayoutState.formElement.get(moneyCollectAttributeId).childDataList
+            for (let index in moneyCollectChildList) {
+                if (moneyCollectChildList[index].childDataList && moneyCollectChildList[index].childDataList[0].childDataList) {
+                    let detailsList = moneyCollectChildList[index].childDataList[0].childDataList
+                    for (let index in detailsList) {
+                        let childAttribute = detailsList[index]
+                        if (childAttribute.key.toLocaleLowerCase() == MODE) {
+                            childAttribute.value = this.getModeTypeFromModeTypeId(modeType)
+                        } else if (childAttribute.key.toLocaleLowerCase() == TRANSACTION_NUMBER) {
+                            childAttribute.value = transactionNumber
+                        } else if (childAttribute.key.toLocaleLowerCase() == AMOUNT) {
+                            childAttribute.value = actualAmount
+                        } else if (childAttribute.key.toLocaleLowerCase() == RECEIPT) {
+                            childAttribute.value = receipt
+                        } else if (childAttribute.key.toLocaleLowerCase() == REMARKS) {
+                            childAttribute.value = JSON.stringify(remarks)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
+
 
 export let paymentService = new Payment()

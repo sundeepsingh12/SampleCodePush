@@ -373,7 +373,7 @@ module.exports = {
     PAYMENT_FAILED: 'Payment Failed',
     MOSAMBEE_WALLET: 'Mosambee Wallet',
     PAYMENT: 'Payment',
-    SELECT_PREFERRED_METHOD: 'Select Preffered method',
+    SELECT_PREFERRED_METHOD: 'Select Preferred method',
     ENTER_OTP_SENT_TO_MOBILE_NO:'Enter One Time Password (OTP) Sent to Mobile Number ',
     CHANGE_MOBILE_NO:'Change Mobile Number',
     ENTER_OTP_SENT_TO_CUSTOMER:'Enter OTP Sent to Customer',
