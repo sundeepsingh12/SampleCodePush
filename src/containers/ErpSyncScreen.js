@@ -106,7 +106,7 @@ class ErpSyncScreen extends PureComponent {
             {INTERNAL_SERVER_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={{backgroundColor : styles.bgPrimaryColor}} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true, null, true) }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, null, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -124,7 +124,7 @@ class ErpSyncScreen extends PureComponent {
             {NO_INTERNET}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={{backgroundColor : styles.bgPrimaryColor}} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true, null, true) }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, null, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -141,7 +141,7 @@ class ErpSyncScreen extends PureComponent {
             {INTERNAL_ERROR}
           </Text>
           <View style={[styles.marginTop30]}>
-            <Button style={{backgroundColor : styles.bgPrimaryColor}} onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true, null, true) }}>
+            <Button style={{ backgroundColor: styles.bgPrimaryColor }} onPress={() => { this.props.actions.performSyncService(true, null, true) }}>
               <Text> {RETRY} </Text>
             </Button>
           </View>
@@ -153,8 +153,8 @@ class ErpSyncScreen extends PureComponent {
           <ErpSyncIcon />
           <View style={[styles.marginTop30]}>
             <Button
-              style={!isErpDisable ? {backgroundColor : styles.bgPrimaryColor} : null}
-              onPress={() => { this.props.actions.performSyncService(this.props.pieChart, true, null, true) }}
+              style={!isErpDisable ? { backgroundColor: styles.bgPrimaryColor } : null}
+              onPress={() => { this.props.actions.performSyncService(true, null, true) }}
               disabled={isErpDisable}>
               <Text> {isErpDisable ? this.state.erpSyncTimer : SYNC} </Text>
             </Button>
@@ -181,7 +181,7 @@ class ErpSyncScreen extends PureComponent {
       let erySyncDiffTimeInSecondsFinal = 300 - erySyncDiffTimeInSeconds
       let min = parseInt(erySyncDiffTimeInSecondsFinal / 60)
       let sec = parseInt(erySyncDiffTimeInSecondsFinal % 60)
-      message = (min > 0)?`${RESYNC_IN} ${min} : ${sec}`:`${RESYNC_IN} ${sec}`
+      message = (min > 0) ? `${RESYNC_IN} ${min} : ${sec}` : `${RESYNC_IN} ${sec}`
       this.setState({ erpSyncTimer: message })
     }
 
@@ -209,7 +209,7 @@ class ErpSyncScreen extends PureComponent {
             </Text>
             <View style={[styles.marginTop30]}>
               <Button transparent onPress={() => { this.props.actions.setState(ERP_SYNC_STATUS, { syncStatus: 'OK', lastErpSyncTime: this.props.lastErpSyncTime }) }} >
-                <Text style={{color : styles.fontPrimaryColor}}> {CLOSE} </Text>
+                <Text style={{ color: styles.fontPrimaryColor }}> {CLOSE} </Text>
               </Button>
             </View>
           </View>

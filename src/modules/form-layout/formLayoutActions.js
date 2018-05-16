@@ -225,7 +225,7 @@ export function saveJobTransaction(formLayoutState, jobMasterId, contactData, jo
                 syncRunningAndTransactionSaving.value.transactionSaving = false
             }
             await keyValueDBService.validateAndSaveData(SYNC_RUNNING_AND_TRANSACTION_SAVING, syncRunningAndTransactionSaving.value)
-            dispatch(performSyncService(pieChart))
+            dispatch(performSyncService())
         }
     }
 }

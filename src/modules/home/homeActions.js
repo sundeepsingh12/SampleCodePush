@@ -99,7 +99,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo, Alert,Platform } from 'react-native'
+import { NetInfo, Alert, Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
@@ -114,10 +114,10 @@ import { moduleCustomizationService } from '../../services/classes/ModuleCustomi
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
 import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
 import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
-import FCM, {NotificationActionType,FCMEvent} from "react-native-fcm"
+import FCM, { NotificationActionType, FCMEvent } from "react-native-fcm"
 import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster';
-import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,FCM_REGISTRATION_ERROR,TOKEN_MISSING,APNS_TOKEN_ERROR } from '../../lib/ContainerConstants'
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET, FCM_REGISTRATION_ERROR, TOKEN_MISSING, APNS_TOKEN_ERROR } from '../../lib/ContainerConstants'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -333,41 +333,38 @@ export function startTracking(trackingServiceStarted) {
   }
 }
 
-export function startFCM(pieChart) {
+export function startFCM() {
   return async function (dispatch) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
     if (token && token.value) {
       const userObject = await keyValueDBService.getValueFromStore(USER)
       const topic = `FE_${userObject.value.id}`
       await FCM.requestPermissions()
 
       FCM.getFCMToken().then(async fcmToken => {
-        console.log('fcmToken', fcmToken)
         await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
       }, (error) => {
       }).catch(
         () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
 
       if (Platform.OS === 'ios') {
         FCM.getAPNSToken().then(token => {
-        }).catch(()=>Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
+        }).catch(() => Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
       }
 
       FCM.getInitialNotification().then(notif => {
-        console.log('notif 111>>' + JSON.stringify(notif))
       }, (err) => {
       })
 
-       FCM.on(FCMEvent.Notification, notif => {
-        
-        if(notif.Notification == 'Android push notification'){
-          dispatch(performSyncService(pieChart, true))
+      FCM.on(FCMEvent.Notification, notif => {
+
+        if (notif.Notification == 'Android push notification') {
+          dispatch(performSyncService(true))
         }
-        else if(notif.Notification == 'Live Job Notification'){
+        else if (notif.Notification == 'Live Job Notification') {
           keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
-          dispatch(performSyncService(pieChart, true, true))
+          dispatch(performSyncService(true, true))
         }
         if (notif.local_notification) {
           return
@@ -375,7 +372,7 @@ export function startFCM(pieChart) {
         if (notif.opened_from_tray) {
           return
         }
-  
+
         if (Platform.OS === 'ios') {
           switch (notif._notificationType) {
             case NotificationType.Remote:
@@ -391,20 +388,20 @@ export function startFCM(pieChart) {
         }
       })
 
-      FCM.on(FCMEvent.RefreshToken, async token => {
+      FCM.on(FCMEvent.RefreshToken, async fcmToken => {
         await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
-        sync.sendRegistrationTokenToServer(token, fcmToken, topic)
-    });
+        await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+      });
 
       FCM.subscribeToTopic(topic)
     }
-    else{
+    else {
       Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
     }
   }
 }
 
-export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPull) {
+export function performSyncService(isCalledFromHome, isLiveJob, erpPull) {
   return async function (dispatch) {
     let syncStoreDTO
     try {
@@ -462,7 +459,7 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
         lastErpSyncTime: userData.lastERPSyncWithServer
       }))
       //Now schedule sync service which will run regularly after 2 mins
-      await dispatch(syncService(pieChart))
+      await dispatch(syncService())
       let serverReachable = await keyValueDBService.getValueFromStore(IS_SERVER_REACHABLE)
       if (_.isNull(serverReachable) || serverReachable.value == 2) {
         await userEventLogService.addUserEventLog(SERVER_REACHABLE, "")
@@ -507,16 +504,16 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
 /**
  * This services schedules sync service at interval of 2 minutes
  */
-export function syncService(pieChart) {
+export function syncService() {
   return async (dispatch) => {
     try {
       if (CONFIG.intervalId) {
         throw new Error(SERVICE_ALREADY_SCHEDULED)
       }
       const mdmPolicies = await keyValueDBService.getValueFromStore(MDM_POLICIES)
-      const timeInterval = (mdmPolicies && mdmPolicies.value && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
+      const timeInterval = (mdmPolicies && mdmPolicies.value && mdmPolicies.value.basicSetting && mdmPolicies.value.syncFrequency) ? mdmPolicies.value.syncFrequency : CONFIG.SYNC_SERVICE_DELAY
       CONFIG.intervalId = BackgroundTimer.setInterval(async () => {
-        dispatch(performSyncService(pieChart))
+        dispatch(performSyncService())
       }, timeInterval * 1000)
     } catch (error) {
       //Update UI here

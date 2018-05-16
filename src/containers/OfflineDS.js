@@ -225,7 +225,5 @@ const style = StyleSheet.create({
     },
 });
 
-/**
- * Connect the properties
- */
+
 export default connect(mapStateToProps, mapDispatchToProps)(OfflineDS)
