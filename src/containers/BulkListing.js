@@ -141,7 +141,7 @@ class BulkListing extends PureComponent {
             onChangeText={(searchText) => {
               this.props.actions.setState(SET_BULK_SEARCH_TEXT, searchText)
             }}
-            onEndEditing={() => {
+            onSubmitEditing={() => {
               if (this.props.searchText && this.props.searchText != '')
                 this.props.actions.setSearchedItem(this.props.searchText, this.props.bulkTransactionList, this.props.searchSelectionOnLine1Line2, this.props.idToSeparatorMap, this.props.selectedItems, this.props.navigation.state.params.pageObject)
             }}

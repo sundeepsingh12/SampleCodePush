@@ -92,7 +92,7 @@ export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pa
             let enabledJobs = 0
             let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
             for (let index in bulkTransactions) {
-                if (!bulkTransactions[index].disabled && bulkService.performFilterBeforeSelectAll(bulkTransactions[index], searchText)) {
+                if (!bulkTransactions[index].disabled && (bulkJobSimilarityConfig || bulkService.performFilterBeforeSelectAll(bulkTransactions[index], searchText))) {
                     bulkTransactions[index].isChecked = selectAllNone == SELECT_ALL;
                     selectAllNone == SELECT_ALL ? cloneSelectedItems[bulkTransactions[index].id] = bulkService.getSelectedTransactionObject(bulkTransactions[index]) : delete cloneSelectedItems[bulkTransactions[index].id]
                     enabledJobs++
