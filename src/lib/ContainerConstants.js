@@ -11,7 +11,7 @@ module.exports = {
     DONE: 'DONE',
     DISMISS: 'DISMISS',
     CLOSE: 'Close',
-    VERIFY: 'Verify',
+    PROCEED: 'Proceed',
     SELECT_ALL: 'Select All',
     INVALID_SCAN: 'Invalid Scan',
     NO_JOBS_PRESENT: 'No jobs present',
@@ -356,10 +356,13 @@ module.exports = {
     APPLYING_SETTINGS: 'Applying settings',
     VERIFY_HANDSET: 'Verifying handset',
     VERIFY_MOBILE: 'Verify your mobile',
-    ENTER_OTP: 'Enter Otp',
+    ENTER_OTP: 'Enter OTP',
     OTP_CODE_SENT: 'We have sent a password via SMS on',
     ENTER_MOBILE: 'Mobile Verification',
     SEND_OTP: 'Send OTP',
+    RESEND: 'Resend',
+    DID_NOT_RECEIVE_OTP: 'Didn’t Receive the OTP?',
+    ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO: 'A One Time Password will be sent to this mobile number',
 
     //TaskListCalender
     ALL: 'All',
@@ -367,6 +370,9 @@ module.exports = {
 
     //TaskListScreen
     NO_NEXT_STATUS: 'No NextStatus Available',
+
+    //TabScreen
+    NO_TAB_PRESENT: 'No Tab Present',
 
     //Draft Modal
     DRAFT_RESTORE_MESSAGE: 'Do you want to restore draft for ',
@@ -380,5 +386,21 @@ module.exports = {
 
     //Menu Container Constants
     APP: 'App',
-    LOGOUT: 'Logout'
+    LOGOUT: 'Logout',
+
+    //Pages Default Name
+    ALL_TASKS: 'All Tasks',
+
+    //Mobile Job List Customization Fixed Attributes
+    ATTEMPT: 'Attempt: ',
+    SLOT: 'Slot: ',
+    START: 'Start: ',
+    END: 'End: ',
+    DISTANCE: 'Distance: ',
+    HALT_DURATION: 'Halt Duration: ',
+    CALL_COUNT: 'Call Count: ',
+    CALL_DURATION: 'Call Duration: ',
+    SMS: 'Sms: ',
+    TIME_SPENT: 'Time Spent: ',
+    SEQUENCE: 'Sequence: ',
 }

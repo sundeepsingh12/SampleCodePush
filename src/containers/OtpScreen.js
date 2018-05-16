@@ -146,7 +146,7 @@ class OtpScreen extends PureComponent{
                             <View style={[feStyle.alignCenter, feStyle.column]}>
                                 <Text style={[feStyle.fontWeight500, feStyle.fontXxl, feStyle.fontBlack]}>{VERIFY_MOBILE}</Text>
                                 <Text style={[feStyle.fontSm, feStyle.fontDarkGray, feStyle.marginTop10]}>{OTP_CODE_SENT}</Text>
-                                <Text style={[feStyle.fontXl, feStyle.fontPrimary, feStyle.marginTop10]}>{this.props.mobileNumber}</Text>
+                                <Text style={[feStyle.fontXl, {color : styles.fontPrimaryColor}, feStyle.marginTop10]}>{this.props.mobileNumber}</Text>
                             </View>
 
                             {this.showOtpInputView()}

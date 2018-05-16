@@ -3,10 +3,12 @@ import {
     StyleSheet,
     View,
     Text,
-    Modal
+    Modal,
+    TextInput,
+    TouchableOpacity
 } from 'react-native'
 import Loader from '../components/Loader'
-import {Content, Button, Input,StyleProvider,Item, Icon, Spinner } from 'native-base';
+import { Content, Button, StyleProvider, Item, Icon, Spinner } from 'native-base';
 import getTheme from '../../native-base-theme/components'
 import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
@@ -16,32 +18,43 @@ import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import {
     ENTER_MOBILE,
     CLOSE,
-    SEND_OTP
+    SEND_OTP,
+    ENTER_OTP,
+    OTP_CODE_SENT,
+    PROCEED,
+    EDIT,
+    RESEND,
+    DID_NOT_RECEIVE_OTP,
+    ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO,
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
-  return {
-    mobileOtpDisplayMessage:state.preloader.mobileOtpDisplayMessage,
-    isGenerateMobileOtpButtonDisabled:state.preloader.isGenerateMobileOtpButtonDisabled,
-    isMobileOtpScreenLogoutDisabled:state.preloader.isMobileOtpScreenLogoutDisabled,
-    mobileNumber:state.preloader.mobileNumber,
-    otpNumber: state.preloader.otpNumber,
-  }
+    return {
+        mobileOtpDisplayMessage: state.preloader.mobileOtpDisplayMessage,
+        mobileNumber: state.preloader.mobileNumber,
+        otpNumber: state.preloader.otpNumber,
+        isLoggingOut: state.home.isLoggingOut,
+    }
 };
 
 function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators({  ...preloaderActions }, dispatch)
-  }
+    return {
+        actions: bindActionCreators({ ...preloaderActions }, dispatch)
+    }
 }
 
-class MobileNoScreen extends PureComponent{
-
-     getOtp = () => {
-        this.props.actions.generateOtp(this.props.mobileNumber)
+class MobileNoScreen extends PureComponent {
+    componentDidMount() {
+        if (!this.props.isMobileScreen && !this.props.mobileNumber) this.onShowMobileNoScreen()
     }
 
-     onChangeMobileNo = (value) => {
+    getOtp = () => {
+        this.props.actions.generateOtp(this.props.mobileNumber)
+    }
+    onShowMobileNoScreen = () => {
+        this.props.actions.showMobileNumber()
+    }
+    onChangeMobileNo = (value) => {
         this.props.actions.onChangeMobileNumber(value)
     }
 
@@ -54,120 +67,132 @@ class MobileNoScreen extends PureComponent{
         this.props.actions.validateOtp(this.props.otpNumber)
     }
 
-    renderMobileNoView(){
+    renderMobileNoView() {
         return (
-        <View style={[styles.bgWhite, styles.alignCenter, styles.justifyCenter, styles.marginBottom30]}>
-            <View style={[styles.marginTop30, {width: 150}]}>
-                <Item floatingLabel>
-                    <Input
-                        placeholder='0000000000'
+            <View style={[styles.bgWhite, styles.alignCenter, styles.justifyCenter, styles.marginBottom30]}>
+                <View style={[styles.marginTop30, { width: 150 }]}>
+                    <TextInput
+                        placeholder={'0000000000'}
                         value={this.props.mobileNumber}
                         keyboardType={'numeric'}
+                        editable={true}
                         returnKeyType={'done'}
                         onChangeText={this.onChangeMobileNo}
                         style={[styles.fontXxl]}
                     />
-                </Item>
-            </View>    
-            <Text style={[styles.fontCenter, styles.fontDanger, styles.marginTop5, styles.marginBottom5]}>
-                {this.props.mobileOtpDisplayMessage} 
-            </Text>
-            <View style={[styles.marginTop5, styles.marginBottom5, styles.justifyCenter, styles.alignCenter, {height: 40}]}>
-                <Spinner color={styles.bgBlack.backgroundColor} size={'small'} />
+                </View>
+                <View style={{ height: 40 }}>
+                    {!(this.props.mobileOtpDisplayMessage === false) ? <Text style={[styles.fontCenter, styles.fontDanger]}>
+                        {this.props.mobileOtpDisplayMessage}
+                    </Text> :
+                        <View style={[styles.justifyCenter, styles.alignCenter, styles.marginBottom5]}>
+                            <Spinner color={styles.bgBlack.backgroundColor} size={'small'} />
+                        </View>}
+                </View>
+                <View>
+                    <Button onPress={this.getOtp} full
+                        style={[{ width: 150 }, styles.marginLeft5, styles.justifyCenter, styles.alignCenter, styles.marginTop5]}
+                        disabled={_.size(this.props.mobileNumber) == 0}>
+                        <Text style={[styles.fontWhite]}>{SEND_OTP}</Text>
+                    </Button>
+                </View>
             </View>
-            <Button onPress={this.getOtp} full
-                disabled={this.props.isGenerateOtpButtonDisabled}>
-                <Text style={[styles.fontWhite]}>{SEND_OTP}</Text>
-            </Button>
-        </View>
         )
     }
 
-    showOtpContent(){
+    showOtpContent() {
         return (
-            <Content style={[ styles.paddingTop0, styles.paddingLeft10]}>
-            <View style={[ { top: 10, left: 0, height: 60, }]}>
-                    <Icon
-                        name="md-close"
-                        style={[styles.fontXxxl, styles.fontBlack]}
-                        onPress={this.props.isOtpScreenLogoutDisabled} />
+            <Content style={[styles.paddingTop0]}>
+                <View style={[{ top: 10, left: 0, height: 60, }]}>
+                    <Button transparent disabled={this.props.isLoggingOut}>
+                        <Icon
+                            name="md-close"
+                            style={[styles.fontXxxl, styles.fontBlack]}
+                            onPress={this.props.invalidateUserSession} />
+                    </Button>
                 </View>
                 <View style={[styles.bgWhite, styles.column, styles.justifyCenter, styles.alignCenter, styles.paddingTop30]}>
-                    <View style={[styles.alignCenter, styles.column, styles.justifyCenter, {width: 240}]}>
-                        <Text style={[feStyle.fontWeight500, feStyle.fontXxl, feStyle.fontBlack]}>{ENTER_OTP}</Text>
-                        <Text style={[feStyle.fontDefault, feStyle.fontDarkGray, feStyle.marginTop10]}>{OTP_CODE_SENT}</Text>
-                        <View style = {{flexDirection: 'row'}}>
-                        <Text style={[feStyle.fontDefault, feStyle.fontDarkGray]}>2134</Text>
-                        <Text style={[feStyle.fontDefault, styles.marginLeft5, feStyle.fontBlack]}>Edit</Text>
+                    <View style={[styles.alignCenter, styles.column, styles.justifyCenter, { width: 240 }]}>
+                        <Text style={[styles.fontWeight500, styles.fontXxl, styles.fontBlack]}>{ENTER_OTP}</Text>
+                        <Text style={[styles.fontDefault, styles.fontDarkGray, styles.marginTop10]}>{OTP_CODE_SENT}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={[styles.fontDefault, styles.fontDarkGray]}>{this.props.mobileNumber}</Text>
+                            <TouchableOpacity onPress={this.onShowMobileNoScreen}>
+                                <Text style={[styles.fontDefault, styles.marginLeft5, styles.fontBlack]}>{EDIT}</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
-                    
+
                     {this.showOtpInputView()}
                 </View>
             </Content>
         )
     }
-    showOtpInputView(){
-        return(
-        <View style={[styles.bgWhite, styles.alignCenter, styles.justifyCenter, styles.marginBottom30]}>
-            <View style={[styles.marginTop30, {width: 100}]}>
-                <Item floatingLabel>
-                    <Input
-                    placeholder='000000'
-                    value={this.props.otpNumber}
-                    keyboardType='numeric'
-                    returnKeyType='done'
-                    onChangeText={this.onChangeOtp}
-                    style={[styles.fontXxl]}
-                />
-                </Item>
-            </View>    
-            <Text style={[styles.fontCenter, styles.fontDanger, styles.marginTop5, styles.marginBottom5]}>
-                {this.props.otpDisplayMessage} 
-            </Text>
-            <View style={[styles.marginTop5, styles.marginBottom5, styles.justifyCenter, styles.alignCenter, {height: 40}]}>
-                <Spinner color={styles.bgBlack.backgroundColor} size={'small'} />
+    showOtpInputView() {
+        return (
+            <View style={[styles.bgWhite, styles.alignCenter, styles.justifyCenter, styles.marginBottom30]}>
+                <View style={[styles.marginTop30, { width: 100 }]}>
+                    <TextInput
+                        placeholder='000000'
+                        value={this.props.otpNumber}
+                        keyboardType='numeric'
+                        editable={true}
+                        returnKeyType='done'
+                        onChangeText={this.onChangeOtp}
+                        style={[styles.fontXxl]}
+                    />
+                </View>
+                <View style={{ height: 40 }}>
+                    {!(this.props.mobileOtpDisplayMessage === false) ? <Text style={[styles.fontDanger]}>
+                        {this.props.mobileOtpDisplayMessage}
+                    </Text> :
+                        <View style={[styles.justifyCenter, styles.alignCenter, styles.marginBottom20]}>
+                            <Spinner color={styles.bgBlack.backgroundColor} size={'small'} />
+                        </View>}
+                </View>
+                <View>
+                    <Button onPress={this.validateOtp} full
+                        style={[{ width: 100 }, styles.marginLeft5, styles.marginTop10]}
+                        disabled={_.size(this.props.otpNumber) == 0}>
+                        <Text style={[styles.fontWhite]}>{PROCEED}</Text>
+                    </Button>
+                </View>
+                <Text style={[styles.marginTop20, styles.fontCenter, styles.fontDefault, styles.fontDarkGray]}>{DID_NOT_RECEIVE_OTP}</Text>
+                <TouchableOpacity onPress={this.getOtp}>
+                    <Text style={[styles.fontDefault, styles.marginLeft5, styles.fontBlack, styles.alignCenter, styles.justifyCenter]}>{RESEND}</Text>
+                </TouchableOpacity>
             </View>
-            <Button onPress={this.validateOtp}  full
-                    disabled={this.props.isGenerateMobileOtpButtonDisabled}>
-                    <Text style={[styles.fontWhite]}>{VERIFY}</Text>
-                </Button>
-        </View>
-
         )
     }
 
-    showMobileContent(){
-        return(
-            <Content style={[ styles.paddingTop0, styles.paddingLeft10]}>
-                    <View style={[ { top: 10, left: 0, height: 60, }]}>
-                            <Icon
-                                name="md-close"
-                                style={[styles.fontXxxl, styles.fontBlack]}
-                                onPress={this.props.invalidateUserSession} />
-                        </View>
-                        <View style={[styles.bgWhite, styles.column, styles.justifyCenter, styles.alignCenter, styles.paddingTop30]}>
-                            <View style={[styles.alignCenter, styles.column, styles.justifyCenter, {width: 280}]}>
-                                <Text style={[styles.bold, styles.fontXxl, styles.fontBlack]}>{ENTER_MOBILE}</Text>
-                                <Text style={[styles.marginTop10, styles.fontCenter, styles.fontDefault, styles.fontDarkGray]}>A One Time Password will be sent to this mobile number</Text>
-                            </View>
-                           {this.renderMobileNoView()}
-                        </View>
-                    </Content>
+    showMobileContent() {
+        return (
+            <Content style={[styles.paddingTop0, styles.paddingLeft5]}>
+                <View style={[{ top: 10, left: 0, height: 60, }]}>
+                    <Button transparent disabled={this.props.isLoggingOut}>
+                        <Icon
+                            name="md-close"
+                            style={[styles.fontXxxl, styles.fontBlack]}
+                            onPress={this.props.invalidateUserSession} />
+                    </Button>
+                </View>
+                <View style={[styles.bgWhite, styles.column, styles.justifyCenter, styles.alignCenter, styles.paddingTop30]}>
+                    <View style={[styles.alignCenter, styles.column, styles.justifyCenter, { width: 280 }]}>
+                        <Text style={[styles.bold, styles.fontXxl, styles.fontBlack]}>{ENTER_MOBILE}</Text>
+                        <Text style={[styles.marginTop10, styles.fontCenter, styles.fontDefault, styles.fontDarkGray]}>{ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO}</Text>
+                    </View>
+                    {this.renderMobileNoView()}
+                </View>
+            </Content>
         )
     }
 
-    render(){
+    render() {
         let showContent = this.props.isMobileScreen ? this.showMobileContent() : this.showOtpContent()
         return (
-              <Modal
-                animationType={"slide"}
-                transparent={false}
-                onRequestClose={() => null}>
-                <StyleProvider style={getTheme(platform)}> 
-                    {showContent}
-                </StyleProvider>
-            </Modal>
+            <StyleProvider style={getTheme(platform)}>
+                {showContent}
+            </StyleProvider>
         )
     }
 }

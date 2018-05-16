@@ -234,7 +234,7 @@ class Backup extends Component {
     }
 
     headerView() {
-        return <Header style={[styles.bgPrimary, style.header]}>
+        return <Header style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
             <Body>
                 <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -267,7 +267,7 @@ class Backup extends Component {
                             style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
                             <View style={[styles.bgWhite, styles.justifyEnd]}>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.syncedFiles)}>
-                                    <Text style={[styles.fontPrimary, styles.fontXl]}>
+                                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontXl]}>
                                         {UPLOAD}
                                     </Text>
                                 </Button>
@@ -294,7 +294,7 @@ class Backup extends Component {
                             style={[styles.flex1, styles.column, styles.justifyEnd, { backgroundColor: 'rgba(0,0,0,.5)' }]}>
                             <View style={[styles.bgWhite, styles.justifyEnd]}>
                                 <Button full transparent style={[{ borderBottomColor: '#f4f4f4', borderBottomWidth: 1, height: 60 }]} onPress={() => this.props.actions.uploadBackupFile(this.state.indexOfModal, this.props.unSyncedFiles)}>
-                                    <Text style={[styles.fontPrimary, styles.fontXl]}>
+                                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontXl]}>
                                         {UPLOAD}
                                     </Text>
                                 </Button>
@@ -391,7 +391,7 @@ class Backup extends Component {
         let button =
             <View style={[styles.padding15]}>
                 <Button full style={[styles.bgWhite]} onPress={this.createBackupPressed}>
-                    <Text style={[styles.fontPrimary]}>
+                    <Text style={[{color : styles.fontPrimaryColor}]}>
                         {CREATE_BACKUP_BUTTON}
                     </Text>
                 </Button>
@@ -430,12 +430,12 @@ class Backup extends Component {
                 </View>
                 <View style={[styles.flexBasis40, styles.alignCenter, styles.justifyCenter]}>
                     <View style={[styles.marginTop30, styles.alignCenter]}>
-                        <Button bordered style={{ borderColor: styles.bgPrimary.backgroundColor }}
+                        <Button bordered style={{ borderColor: styles.bgPrimaryColor }}
                             onPress={() => {
                                 this.props.actions.setState(SET_BACKUP_VIEW, 0)
                                 this.setState({ indexOfModal: 0 })
                             }}  >
-                            <Text style={[styles.fontPrimary]}>{CLOSE}</Text>
+                            <Text style={[{color : styles.fontPrimaryColor}]}>{CLOSE}</Text>
                         </Button>
                     </View>
                 </View>

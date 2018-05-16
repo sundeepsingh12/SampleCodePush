@@ -78,7 +78,7 @@ class BluetoothListing extends Component {
   
   renderHeadeView(){
     return (
-      <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+      <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
         <Body>
           <View
             style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -99,7 +99,7 @@ class BluetoothListing extends Component {
 
   showHeaderView(){
     return(
-      <Header searchBar style={[styles.bgPrimary, style.header]}>
+      <Header searchBar style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
           <Body>
               <View
                   style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -125,7 +125,7 @@ showPairedAndUnpairedDevices(){
   return (
     <Content style={[styles.marginTop15, styles.bgWhite]}>
       <View style={[styles.padding10, styles.borderBottomGray]}>
-        <Text style={[styles.fontPrimary, styles.paddingLeft5]}>My Devices</Text>
+        <Text style={[{color : styles.fontPrimaryColor}, styles.paddingLeft5]}>My Devices</Text>
       </View>
       <FlatList
         data={this.props.pairedDevices}
@@ -134,7 +134,7 @@ showPairedAndUnpairedDevices(){
       />
       <View style={[styles.borderBottomGray, { height: 1 }]}></View>
       <View style={[styles.padding10, styles.borderBottomGray]}>
-        <Text style={[styles.fontPrimary, styles.paddingLeft5]}>Other Devices</Text>
+        <Text style={[{color : styles.fontPrimaryColor}, styles.paddingLeft5]}>Other Devices</Text>
       </View>
       <FlatList
         data={this.props.unpairedDevices}
@@ -155,7 +155,7 @@ renderBluetoothListing(){
       {this.showHeaderView()}
       <Button full style={[styles.bgWhite, { height: 60 }]}
         onPress={this.scanMoreDevice}>
-        <Text style={[styles.fontPrimary]}>Scan More Devices</Text>
+        <Text style={{color : styles.fontPrimaryColor}}>Scan More Devices</Text>
       </Button>
       {this.showPairedAndUnpairedDevices()}
     </Container>

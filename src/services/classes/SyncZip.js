@@ -72,6 +72,7 @@ class SyncZip {
         const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
+        console.log('SYNC_RESULTS',SYNC_RESULTS)
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');

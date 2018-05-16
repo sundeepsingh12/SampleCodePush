@@ -144,7 +144,7 @@ class ArrayFieldAttribute extends PureComponent {
     }
     headerView() {
         let view
-        view = <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+        view = <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
             <Body>
                 <View
                     style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -183,7 +183,7 @@ class ArrayFieldAttribute extends PureComponent {
                                 <Text style={[styles.fontSuccess, styles.padding10]}>{ADD}</Text>
                             </Button>
                         </View>
-                        <View style={[styles.bgPrimary]}>
+                        <View style={[{backgroundColor : styles.bgPrimaryColor}]}>
                             <Button success full disabled={this.props.isSaveDisabled} onPress={this.savePressed} >
                                 <Text style={[styles.fontLg, styles.fontWhite]}>{SAVE}</Text>
                             </Button>

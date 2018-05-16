@@ -38,6 +38,13 @@ class KeyValueDB {
     const storeValue = keyValueDB.updateValueInStore(schemaName, data);
     return storeValue
   }
+  
+// used for check of null json and save data in store
+ async checkForNullValidateAndSaveInStore(json,schemaName){
+    if(!_.isEmpty(json)) {
+      await keyValueDBService.validateAndSaveData(schemaName, json)
+    }
+ }
 
   validateData(schemaName, data) {
     let schemaInstance = ''

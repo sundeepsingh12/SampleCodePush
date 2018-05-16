@@ -90,29 +90,27 @@ export default function preloaderReducer(state = initialState, action) {
         .set('error', action.payload)
 
     case OTP_GENERATION_START:
-      return state.set('mobileOtpDisplayMessage', 'Sending OTP')
-        .set('isGenerateMobileOtpButtonDisabled', true)
+      return state.set('mobileOtpDisplayMessage', false)
     case OTP_GENERATION_FAILURE:
       return state.set('mobileOtpDisplayMessage', action.payload)
-        .set('isGenerateMobileOtpButtonDisabled', false)
 
     case OTP_VALIDATION_START:
-      return state.set('mobileOtpDisplayMessage', 'Validating OTP')
-        .set('isGenerateMobileOtpButtonDisabled', true)
+      return state.set('mobileOtpDisplayMessage', false)
     case OTP_VALIDATION_FAILURE:
       return state.set('mobileOtpDisplayMessage', action.payload)
-        .set('isGenerateMobileOtpButtonDisabled', false)
 
     case SHOW_MOBILE_NUMBER_SCREEN:
       return state.set('showMobileNumberScreen', action.payload)
+      .set('showOtpScreen', !action.payload)
+      .set('mobileOtpDisplayMessage', '')
+      .set('otpNumber', '')
     case SHOW_OTP_SCREEN:
       return state.set('showMobileNumberScreen', !action.payload)
         .set('showOtpScreen', action.payload)
+        .set('mobileOtpDisplayMessage', '')
     case PRE_LOGOUT_START:
       return state.set('error', 'Logging out')
-        .set('mobileOtpDisplayMessage', 'Logging out')
-        .set('isOtpScreenLogoutDisabled', true)
-        .set('isMobileScreenLogoutDisabled', true)
+        .set('mobileOtpDisplayMessage', false)
         .set('isPreloaderLogoutDisabled', true)
     case PRE_LOGOUT_SUCCESS:
       return state.set('deviceVerificationService', SERVICE_PENDING)
@@ -124,8 +122,6 @@ export default function preloaderReducer(state = initialState, action) {
         .set('mobileNumber', '')
         .set('otpNumber', '')
         .set('error', '')
-        .set('isOtpScreenLogoutDisabled', false)
-        .set('isMobileScreenLogoutDisabled', false)
         .set('isPreloaderLogoutDisabled', false)
         .set('isError', false)
         .set('isErrorType_403_400_Logout', false)
@@ -134,8 +130,6 @@ export default function preloaderReducer(state = initialState, action) {
     case PRE_LOGOUT_FAILURE:
       return state.set('isError', true)
         .set('error', action.payload)
-        .set('isOtpScreenLogoutDisabled', false)
-        .set('isMobileScreenLogoutDisabled', false)
         .set('isPreloaderLogoutDisabled', false)
 
     case ERROR_400_403_LOGOUT:
@@ -143,28 +137,13 @@ export default function preloaderReducer(state = initialState, action) {
         .set('errorMessage_403_400_Logout', action.payload)
 
     case ON_MOBILE_NO_CHANGE:
-      let mobileNo = action.payload;
-      if (mobileNo) {
-        return state.set('isGenerateMobileOtpButtonDisabled', false)
-          .set('mobileNumber', mobileNo)
-          .set('mobileOtpDisplayMessage', '')
-      } else {
-        return state.set('isGenerateMobileOtpButtonDisabled', true)
-          .set('mobileNumber', mobileNo)
-          .set('mobileOtpDisplayMessage', '')
-      }
+     return  state.set('mobileNumber', action.payload)
+      .set('mobileOtpDisplayMessage', '')
 
     case ON_OTP_CHANGE:
-      let otpNumber = action.payload
-      if (otpNumber) {
-        return state.set('isGenerateMobileOtpButtonDisabled', false)
-          .set('otpNumber', otpNumber)
-          .set('mobileOtpDisplayMessage', '')
-      } else {
-        return state.set('isGenerateMobileOtpButtonDisabled', true)
-          .set('otpNumber', otpNumber)
-          .set('mobileOtpDisplayMessage', '')
-      }
+        return state.set('otpNumber', action.payload)
+        .set('mobileOtpDisplayMessage', '')
+
     case PRELOADER_SUCCESS:
       return state.set('deviceVerificationService', SERVICE_PENDING)
         .set('configDownloadService', SERVICE_PENDING)

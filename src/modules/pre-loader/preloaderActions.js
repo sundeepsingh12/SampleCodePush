@@ -208,6 +208,13 @@ export function onChangeMobileNumber(mobileNumber) {
   }
 }
 
+// export function onChangeMobileNumber(mobileNumber) {
+//   return {
+//     type: ON_MOBILE_NO_CHANGE,
+//     payload: mobileNumber
+//   }
+// }
+
 //Action dispatched when user enters otp in enter mobile no screen
 export function onChangeOtp(otpNumber) {
   return {

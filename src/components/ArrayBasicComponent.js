@@ -107,7 +107,7 @@ class ArrayBasicComponent extends PureComponent {
     }
 
     getComponentLabelStyle(focus, editable) {
-        return focus ? styles.fontPrimary : editable ? styles.fontBlack : styles.fontLowGray
+        return focus ? {color : styles.fontPrimaryColor} : editable ? styles.fontBlack : styles.fontLowGray
     }
 
     getComponentSubLabelStyle(editable) {
@@ -224,7 +224,7 @@ class ArrayBasicComponent extends PureComponent {
     getMultipleOptionCardView(modalView, item) {
         return (
             <TouchableOpacity
-                style={[{ paddingVertical: 50 }, item.focus ? styles.borderLeft4 : null]}
+                style={[{ paddingVertical: 50 }, item.focus ? {borderLeftColor : styles.borderLeft4Color, borderLeftWidth: 4} : null]}
                 onPress={() => this.props.actions.showOrDropModal(item.fieldAttributeMasterId, this.props.arrayElements, this.props.arrayRow.rowId, item.fieldAttributeMasterId, this.props.isSaveDisabled)
                 }
                 disabled={!item.editable || this.props.modalFieldAttributeMasterId ? true : false}

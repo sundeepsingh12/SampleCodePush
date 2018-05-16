@@ -67,7 +67,7 @@ class JobStatus {
    *  {930: 4813}
    * 
    */
-   getjobMasterIdStatusIdMap(jobMasterIdList, jobStatusCode, jobStatusArray) {
+  getjobMasterIdStatusIdMap(jobMasterIdList, jobStatusCode, jobStatusArray) {
     let jobMasterIdStatusIdMap = {}
     // const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS) 
     if (!jobStatusArray) {
@@ -119,8 +119,7 @@ class JobStatus {
    * }
    */
   getJobMasterIdStatusIdMap(statusList, jobAttributeStatusMap) {
-    let jobMasterIdJobAttributeStatusMap = {}
-    let statusIdStatusMap = {}
+    let jobMasterIdJobAttributeStatusMap = {}, statusIdStatusMap = {}
     statusList = statusList ? statusList : []
     statusList.forEach(status => {
       statusIdStatusMap[status.id] = status
@@ -130,10 +129,7 @@ class JobStatus {
       jobMasterIdJobAttributeStatusMap[status.jobMasterId] = jobMasterIdJobAttributeStatusMap[status.jobMasterId] ? jobMasterIdJobAttributeStatusMap[status.jobMasterId] : {}
       jobMasterIdJobAttributeStatusMap[status.jobMasterId][status.id] = jobAttributeStatusMap[status.id]
     })
-    return {
-      jobMasterIdJobAttributeStatusMap,
-      statusIdStatusMap
-    }
+    return { jobMasterIdJobAttributeStatusMap, statusIdStatusMap }
   }
 
   /** Returns statusIds based on particular status category 
@@ -154,15 +150,15 @@ class JobStatus {
     return filteredJobStatusIds
   }
 
-   /**@function getStatusIdsForAllStatusCategory()
-    * 
-    * function return map of allStatusIds (pending, fail, success) with its status category and 
-    * also map of status whose nextStatusList is empty
-    * It also check for hidden tab
-    *
-    *@return  {allStatusMap :  {  123 : 1 , 124 : 2 , 125 : 3 }, noNextStatusMap : { 126 : true , 130 : true } }
-    *
-    */
+  /**@function getStatusIdsForAllStatusCategory()
+   * 
+   * function return map of allStatusIds (pending, fail, success) with its status category and 
+   * also map of status whose nextStatusList is empty
+   * It also check for hidden tab
+   *
+   *@return  {allStatusMap :  {  123 : 1 , 124 : 2 , 125 : 3 }, noNextStatusMap : { 126 : true , 130 : true } }
+   *
+   */
 
   async getStatusIdsForAllStatusCategory() {
     const jobStatusArray = await keyValueDBService.getValueFromStore(JOB_STATUS)
@@ -186,14 +182,14 @@ class JobStatus {
     return { allStatusMap, noNextStatusMap }
   }
 
-/**@function checkForHiddenTab()
-    * 
-    * function return tabLisId map with boolean whose tabName is not equal to hidden
-    * 
-    *@return {tabListMap : {1 : true, 2 : true}} 
-    *
-    */
-   
+  /**@function checkForHiddenTab()
+      * 
+      * function return tabLisId map with boolean whose tabName is not equal to hidden
+      * 
+      *@return {tabListMap : {1 : true, 2 : true}} 
+      *
+      */
+
   async checkForHiddenTab() {
     const tabs = await keyValueDBService.getValueFromStore(TAB)
     if (!tabs || !tabs.value) {
@@ -270,6 +266,31 @@ class JobStatus {
       }
     }
     return jobMasterIdJobStatusIdMap;
+  }
+
+  /**
+   * This function prepares map of tabId on basis of jobStatusList
+   * @param {*} jobStatusList 
+   * @param {*} tabMap 
+   * {
+   *    tabId : {
+   *                [statusIds]
+   *                tab
+   *            }
+   * }
+   */
+  prepareTabStatusIdMap(jobStatusList) {
+    let tabIdStatusIdsMap = {};
+    for (let index in jobStatusList) {
+      if (jobStatusList[index].code == UNSEEN) {
+        continue;
+      }
+      if (!tabIdStatusIdsMap[jobStatusList[index].tabId]) {
+        tabIdStatusIdsMap[jobStatusList[index].tabId] = []
+      }
+      tabIdStatusIdsMap[jobStatusList[index].tabId].push(jobStatusList[index].id)
+    }
+    return tabIdStatusIdsMap;
   }
 }
 

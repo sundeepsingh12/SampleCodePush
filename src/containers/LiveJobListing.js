@@ -116,8 +116,8 @@ class LiveJobListing extends PureComponent {
         let time = this.getJobEtaTime(item.id)
         if (time != 'TimeUp') {
             return (
-                <JobListItem data={item.jobTransactionCustomization} jobEndTime={time}
-                    onPressItem={() => { this.navigateToScene(item.jobTransactionCustomization) }}
+                <JobListItem data={item} jobEndTime={time}
+                    onPressItem={() => { this.navigateToScene(item) }}
                     onLongPressItem={() => this.toggleLiveJobSelection(item.id)}
                 />
             )
@@ -140,31 +140,36 @@ class LiveJobListing extends PureComponent {
         this.props.actions.acceptOrRejectMultiple(status, this.props.selectedItems, this.props.liveJobList)
     }
     renderList() {
-        if (!this.props.searchText || this.props.searchText == '') {
-            return Object.values(this.props.liveJobList)
-        }
-        else {
-            let jobTransactionArray = []
-            let searchText = this.props.searchText
-            _.forEach(this.props.liveJobList, function (value) {
-                let values = [value.referenceNo]
-                if (_.some(values, (data) => _.includes(_.toLower(data), _.toLower(searchText)))) {
-                    jobTransactionArray.push(value)
-                }
-            })
-            if (_.isEmpty(jobTransactionArray) && this.state.isScannerUsed) {
-                this.props.actions.setState(SET_LIVE_JOB_TOAST, INVALID_SCAN)
-                this.setState({ isScannerUsed: false })
+        let jobMasterId = JSON.parse(this.props.navigation.state.params.pageObject.jobMasterIds)[0]
+        let jobTransactionArray = []
+        let jobTransactionList = this.props.liveJobList
+        for (let index in jobTransactionList) {
+            if (jobTransactionList[index].jobMasterId == jobMasterId && this.checkTransactionForSearchText(jobTransactionList[index])) {
+                jobTransactionArray.push(jobTransactionList[index])
             }
-            return jobTransactionArray;
+
         }
+        return jobTransactionArray
+    }
+    checkTransactionForSearchText(jobTransaction) {
+        let trimmedSearchText = _.trim(this.props.searchText);
+        if (!_.trim(trimmedSearchText)) {
+            return true
+        }
+        let result = false;
+        let searchText = _.toLower(trimmedSearchText);
+        let values = [jobTransaction.referenceNumber];
+        if (_.some(values, (data) => _.includes(_.toLower(data), searchText))) {
+            result = true
+        }
+        return result;
     }
 
     emptyListView() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
-                    <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+                    <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
                         <Body>
                             <View
                                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -172,7 +177,7 @@ class LiveJobListing extends PureComponent {
                                     <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                                 </TouchableOpacity>
                                 <View style={[styles.headerBody, styles.paddingTop15]}>
-                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.displayName ? this.props.navigation.state.params.displayName : LIVE_TASKS}</Text>
+                                    <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
                                 </View>
                                 <View style={[styles.headerRight]}>
                                 </View>
@@ -195,7 +200,7 @@ class LiveJobListing extends PureComponent {
     showListWithSearchBar() {
         let view
         if (!this.props.selectedItems || this.props.selectedItems.length == 0) {
-            view = <Header searchBar style={[styles.bgPrimary, style.header]}>
+            view = <Header searchBar style={[{backgroundColor : styles.bgPrimaryColor}, style.header]}>
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -205,7 +210,7 @@ class LiveJobListing extends PureComponent {
                             <Icon name="md-arrow-back" style={[styles.fontWhite, styles.fontXl, styles.fontLeft]} />
                         </TouchableOpacity>
                         <View style={[style.headerBody]}>
-                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{LIVE_TASKS}</Text>
+                            <Text style={[styles.fontCenter, styles.fontWhite, styles.fontLg, styles.alignCenter]}>{this.props.navigation.state.params.pageObject.name ? this.props.navigation.state.params.pageObject.name : LIVE_TASKS}</Text>
                         </View>
                         <View style={[style.headerRight]}>
                         </View>
@@ -222,7 +227,7 @@ class LiveJobListing extends PureComponent {
     showMultipleSelectList() {
         let view
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
-            view = <Header style={StyleSheet.flatten([styles.bgPrimary, style.header])}>
+            view = <Header style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
                 <Body>
                     <View style={[styles.column, { alignSelf: 'stretch' }]}>
                         <View style={[styles.row, styles.justifySpaceBetween, styles.alignCenter, styles.paddingLeft10, styles.paddingRight10]}>

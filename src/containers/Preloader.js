@@ -52,7 +52,7 @@ class Preloader extends PureComponent {
     render() {
         return (
             <Container>
-                {renderIf(!this.props.showMobileNumberScreen,
+                {renderIf(!(this.props.showMobileNumberScreen || this.props.showOtpScreen),
                     <InitialSetup />
                 )}
                 {(this.props.isErrorType_403_400_Logout &&
