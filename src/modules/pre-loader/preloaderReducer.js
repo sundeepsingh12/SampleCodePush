@@ -1,4 +1,3 @@
-
 'use strict'
 /**
  * ## Imports
@@ -60,8 +59,10 @@ export default function preloaderReducer(state = initialState, action) {
         .set('error', '')
         .set('configSaveService', SERVICE_PENDING)
         .set('isError', false)
+
     case MASTER_DOWNLOAD_SUCCESS:
       return state.set('configDownloadService', SERVICE_SUCCESS)
+
     case MASTER_DOWNLOAD_FAILURE:
       return state.set('configDownloadService', SERVICE_FAILED)
         .set('isError', true)
@@ -70,13 +71,15 @@ export default function preloaderReducer(state = initialState, action) {
     case MASTER_SAVING_START:
       return state.set('configSaveService', SERVICE_RUNNING)
         .set('error', '')
+
     case MASTER_SAVING_SUCCESS:
       return state.set('configSaveService', SERVICE_SUCCESS)
+
     case MASTER_SAVING_FAILURE:
       return state.set('configSaveService', SERVICE_FAILED)
         .set('isError', true)
         .set('error', action.payload)
-        .set('isCodePushUpdate', false)
+        .set('isAppUpdatedThroughCodePush', false)
 
     case CHECK_ASSET_START:
       return state.set('deviceVerificationService', SERVICE_RUNNING)
@@ -90,6 +93,7 @@ export default function preloaderReducer(state = initialState, action) {
     case OTP_GENERATION_START:
       return state.set('mobileDisplayMessage', 'Sending OTP')
         .set('isGenerateOtpButtonDisabled', true)
+
     case OTP_GENERATION_FAILURE:
       return state.set('mobileDisplayMessage', action.payload)
         .set('isGenerateOtpButtonDisabled', false)
@@ -97,15 +101,18 @@ export default function preloaderReducer(state = initialState, action) {
     case OTP_VALIDATION_START:
       return state.set('otpDisplayMessage', 'Validating OTP')
         .set('isOtpVerificationButtonDisabled', true)
+
     case OTP_VALIDATION_FAILURE:
       return state.set('otpDisplayMessage', action.payload)
         .set('isOtpVerificationButtonDisabled', false)
 
     case SHOW_MOBILE_NUMBER_SCREEN:
       return state.set('showMobileNumberScreen', action.payload)
+
     case SHOW_OTP_SCREEN:
       return state.set('showMobileNumberScreen', !action.payload)
         .set('showOtpScreen', action.payload)
+
     case PRE_LOGOUT_START:
       return state.set('error', 'Logging out')
         .set('otpDisplayMessage', 'Logging out')
@@ -113,6 +120,7 @@ export default function preloaderReducer(state = initialState, action) {
         .set('isOtpScreenLogoutDisabled', true)
         .set('isMobileScreenLogoutDisabled', true)
         .set('isPreloaderLogoutDisabled', true)
+
     case PRE_LOGOUT_SUCCESS:
       return state.set('deviceVerificationService', SERVICE_PENDING)
         .set('configDownloadService', SERVICE_PENDING)
@@ -165,6 +173,7 @@ export default function preloaderReducer(state = initialState, action) {
           .set('otpNumber', otpNumber)
           .set('otpDisplayMessage', '')
       }
+
     case PRELOADER_SUCCESS:
       return state.set('deviceVerificationService', SERVICE_PENDING)
         .set('configDownloadService', SERVICE_PENDING)

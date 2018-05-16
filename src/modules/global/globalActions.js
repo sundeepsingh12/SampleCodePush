@@ -79,7 +79,7 @@ export function deleteSessionToken() {
       CONFIG.intervalId = 0
       dispatch(setState(RESET_STATE))
     } catch (error) {
-      throw error
+      console.log(error)
     }
   }
 }
