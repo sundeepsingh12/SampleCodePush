@@ -135,8 +135,7 @@ class JobMaster {
    */
   async saveJobMaster(json) {
     await keyValueDBService.validateAndSaveData(APP_VERSION, json.applicationVersion + "");
-    const packageJsonMajorVersion = parseInt(APP_VERSION_NUMBER.split('.')[0])
-    json.applicationVersion = 1;
+    const packageJsonMajorVersion = parseInt(APP_VERSION_NUMBER.split('.')[0]);
     //Check if appMajorVersion from server is greater than package json major version
     if (json.applicationVersion && parseInt(json.applicationVersion) > packageJsonMajorVersion) {
       throw ({ errorCode: MAJOR_VERSION_OUTDATED, downloadUrl: json.androidDownloadUrl })

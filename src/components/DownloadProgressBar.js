@@ -37,7 +37,7 @@ export default class DownloadProgressbar extends PureComponent {
                     </Text>
                     <View style={[{ width: '80%', marginTop: 70 }]}>
                         <View style={{ width: '100%', borderRadius: 8, height: 10, backgroundColor: styles.bgGray.backgroundColor }}>
-                            <View style={{ width: String(this.props.progressBarStatus + "%"), borderRadius: 8, height: 10, backgroundColor: styles.bgPrimary.backgroundColor }}></View>
+                            <View style={{ width: String(this.props.progressBarStatus + "%"), borderRadius: 8, height: 10, backgroundColor: styles.bgPrimaryColor }}></View>
                         </View>
                         <Text style={[styles.fontBlack, styles.fontCenter, styles.marginTop15, styles.fontLg]}>
                             {this.props.progressBarStatus}%

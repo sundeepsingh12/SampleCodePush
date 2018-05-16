@@ -131,7 +131,7 @@ class Preloader extends PureComponent {
             )
         } else if (this.props.iosDownloadScreen == 'Failed') {
             return <ErrorScreen downloadLatestApk={this.downloadLatestApk} invalidateUserSession={this.invalidateSession} />
-        } else if (this.props.iosDownloadScreen == 'WebView') {
+        } else if (this.props.iosDownloadScreen == 'Webview') {
             return (
                 <WebView
                     style={styles.WebViewStyle}
