@@ -403,4 +403,8 @@ module.exports = {
     SMS: 'Sms: ',
     TIME_SPENT: 'Time Spent: ',
     SEQUENCE: 'Sequence: ',
+
+    //FCM
+    FCM_REGISTRATION_ERROR:'FCM Permission Denied',
+    APNS_TOKEN_ERROR:'APNS Token Registration Error'
 }

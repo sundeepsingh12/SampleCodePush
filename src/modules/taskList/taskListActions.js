@@ -68,8 +68,6 @@ export function shouldFetchJobsOrNot(jobTransactionCustomizationList, pageObject
       // Sets SHOULD_RELOAD_START to false so jobs are not fetched unnecessesarily 
       await keyValueDBService.validateAndSaveData(SHOULD_RELOAD_START, new Boolean(false))
     } catch (error) {
-      //TODO handle UI
-      console.log(error)
       dispatch(setState(JOB_LISTING_END, { jobTransactionCustomizationList: [] }))
     }
   }

@@ -78,7 +78,8 @@ import {
   GEO_FENCING,
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
-  MDM_POLICIES
+  MDM_POLICIES,
+  FCM_TOKEN
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -97,6 +98,7 @@ import moment from 'moment'
 import { LOGOUT_UNSUCCESSFUL, OK } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
+import { sync } from '../../services/classes/Sync'
 
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
@@ -306,6 +308,9 @@ export function invalidateUserSessionForAutoLogout() {
       dispatch(setState(TOGGLE_LOGOUT, true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await backupService.createBackupOnLogout()
+      const userObject  = await keyValueDBService.getValueFromStore(USER)
+      const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+      await sync.deregisterFcmTokenFromServer(userObject,token,fcmToken)
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
@@ -337,6 +342,10 @@ export function invalidateUserSession(createBackup) {
       if (createBackup) {
         await backupService.createBackupOnLogout()
       }
+      const userObject  = await keyValueDBService.getValueFromStore(USER)
+      const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+      
+      await sync.deregisterFcmTokenFromServer(userObject,token,fcmToken)
       let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
@@ -654,6 +663,10 @@ export function invalidateUserSessionWhenLogoutPressed(createBackup) {
       if (createBackup) {
         await backupService.createBackupOnLogout()
       }
+      const userObject  = await keyValueDBService.getValueFromStore(USER)
+      const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+      
+      await sync.deregisterFcmTokenFromServer(userObject,token,fcmToken)
       let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())

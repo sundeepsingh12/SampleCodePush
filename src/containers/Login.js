@@ -135,16 +135,6 @@ class Login extends PureComponent {
     this.props.toggleCheckbox()
   }
 
-  // codepushSync = () => {
-  //   codePush.sync({
-  //     updateDialog: true,
-  //     installMode: codePush.InstallMode.IMMEDIATE
-  //   }, (status) => {
-  //     console.log("====Code push update=====");
-  //     console.log(status);
-  //   });
-  // }
-
   getImageView() {
     if (this.props.auth.form.authenticationService || this.props.auth.form.isLongPress) {
       return <Spinner />
