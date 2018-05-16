@@ -415,6 +415,6 @@ module.exports = {
     CODEPUSH_INSTALLING_UPDATE: 'Installing update',
     CODEPUSH_SOMETHING_WENT_WRONG: 'Something Went Wrong.Please try again.',
     //FCM
-    FCM_REGISTRATION_ERROR:'FCM Permission Denied',
-    APNS_TOKEN_ERROR:'APNS Token Registration Error',
+    FCM_REGISTRATION_ERROR: 'FCM Permission Denied',
+    APNS_TOKEN_ERROR: 'APNS Token Registration Error',
 }

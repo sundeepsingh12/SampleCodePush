@@ -178,7 +178,7 @@ class Bulk {
             jobTransactionId: jobTransaction.id,
             jobId: jobTransaction.jobId,
             jobMasterId: jobTransaction.jobMasterId,
-            referenceNumber:jobTransaction.referenceNumber
+            referenceNumber: jobTransaction.referenceNumber
         }
     }
 
@@ -236,6 +236,16 @@ class Bulk {
             selectAll = (_.size(cloneSelectedItems) > 0) ? true : false
         }
         return { displayText, selectAll }
+    }
+    performFilterBeforeSelectAll(bulkTransaction, searchText) {
+        if (!searchText || searchText == '') {
+            return true
+        } else {
+            let values = [bulkTransaction.runsheetNo, bulkTransaction.referenceNumber, bulkTransaction.line1, bulkTransaction.line2, bulkTransaction.circleLine1, bulkTransaction.circleLine2]
+            if (_.some(values, (data) => _.includes(_.toLower(data), _.toLower(searchText)))) {
+                return true
+            }
+        }
     }
 }
 
