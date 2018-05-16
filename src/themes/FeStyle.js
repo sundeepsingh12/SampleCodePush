@@ -71,9 +71,7 @@ export default {
     fontInfo: {
         color: '#51adfd'
     },
-    fontXs: {
-        fontSize: 10
-    },
+    
     fontXs: {
         fontSize: 10
     },

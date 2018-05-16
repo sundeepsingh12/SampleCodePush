@@ -27,21 +27,21 @@ import {
   PENDING_SYNC_TRANSACTION_IDS,
   BACKUP_ALREADY_EXIST,
   USER_EXCEPTION_LOGS,
-  SYNC_RUNNING_AND_TRANSACTION_SAVING
+  SYNC_RUNNING_AND_TRANSACTION_SAVING,
+  DOWNLOAD_LATEST_APP,
+  LoginScreen
 } from '../../lib/constants'
-
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
-
 import CONFIG from '../../lib/config'
-
 import { onResyncPress } from '../home/homeActions'
-
 import BackgroundTimer from 'react-native-background-timer'
 import { NavigationActions } from 'react-navigation'
 import { trackingService } from '../../services/classes/Tracking'
 import { Toast } from 'native-base'
 import { userExceptionLogsService } from '../../services/classes/UserException'
 import { OK } from '../../lib/ContainerConstants'
+import { logoutService } from '../../services/classes/Logout'
+import package_json from '../../../package.json'
 
 export function setState(type, payload) {
   return {
@@ -49,7 +49,6 @@ export function setState(type, payload) {
     payload
   }
 }
-
 
 //Use to navigate to other scene
 export function navigateToScene(routeName, params) {
@@ -80,7 +79,7 @@ export function deleteSessionToken() {
       CONFIG.intervalId = 0
       dispatch(setState(RESET_STATE))
     } catch (error) {
-      throw error
+      console.log(error)
     }
   }
 }
@@ -93,10 +92,10 @@ export function deleteSessionToken() {
  * @param {Integer} isToastShow integer whether to show toast or not.
  */
 export function showToastAndAddUserExceptionLog(errorCode, errorMessage, type, isToastShow) {
-      if (isToastShow == 1) {
-        Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
-      }
-      userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
+  if (isToastShow == 1) {
+    Toast.show({ text: "ErrorCode: " + errorCode + "\n" + errorMessage, type: type, position: 'bottom', buttonText: OK, duration: 10000 })
+  }
+  userExceptionLogsService.addUserExceptionLogs(errorMessage, errorCode)
 }
 //Use to reset navigation state
 export function resetNavigationState(index, actions) {
@@ -105,6 +104,23 @@ export function resetNavigationState(index, actions) {
       index: 0,
       actions
     }))
+  }
+}
+
+
+export function resetApp() {
+  return async function (dispatch) {
+    try {
+      console.log('package_json.version', package_json.version)
+      await logoutService.deleteDataBase()
+      const allSchemaInstance = await keyValueDBService.getAllKeysFromStore()
+      await keyValueDBService.deleteValueFromStore(allSchemaInstance)
+      dispatch(NavigationActions.reset({ index: 0, actions: [NavigationActions.navigate({ routeName: LoginScreen })] }))
+      dispatch(setState(RESET_STATE))
+      // dispatch(setState(DOWNLOAD_LATEST_APP, {displayMessage:null}))
+    } catch (error) {
+      console.log('error1', error)
+    }
   }
 }
 
