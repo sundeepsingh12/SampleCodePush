@@ -21,7 +21,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as authActions from '../modules/login/loginActions'
 import renderIf from '../lib/renderIf'
-import codePush from "react-native-code-push"
 import { QrCodeScanner } from '../lib/constants'
 import Icon from '../../native-base-theme/components/Icon'
 import CONFIG from '../lib/config'
@@ -225,6 +224,18 @@ class Login extends PureComponent {
         style={[styles.marginTop15]}
       >
         <Text style={[styles.fontWhite]}>Log In</Text>
+      </Button>
+    )
+  }
+
+  showCodePush(){
+    return (
+      <Button
+        full rounded success
+        onPress={this.codepushSync}
+        style={[styles.marginTop15]}
+      >
+        <Text style={[styles.fontWhite]}>Code Push</Text>
       </Button>
     )
   }
