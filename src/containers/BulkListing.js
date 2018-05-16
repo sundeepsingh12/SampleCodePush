@@ -114,7 +114,7 @@ class BulkListing extends PureComponent {
   }
 
   selectAll = () => {
-    this.props.actions.toggleAllItems(this.props.bulkTransactionList, this.props.selectAllNone, this.props.selectedItems, this.props.navigation.state.params.pageObject)
+    this.props.actions.toggleAllItems(this.props.bulkTransactionList, this.props.selectAllNone, this.props.selectedItems, this.props.navigation.state.params.pageObject, this.props.searchText)
   }
 
   componentDidMount() {
@@ -176,11 +176,7 @@ class BulkListing extends PureComponent {
           jobTransactionArray.push(value)
         }
       })
-      //return jobTransactionArray;
     }
-    // jobTransactionArray.sort(function (transaction1, transaction2) {
-    //   return (transaction1.disabled && transaction2.disabled)
-    // })
     jobTransactionArray = _.sortBy(jobTransactionArray, ['disabled'])
     return jobTransactionArray
   }
@@ -189,7 +185,7 @@ class BulkListing extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.padding5])}>
+          <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, styles.padding5])}>
             <Body>
               <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -229,7 +225,7 @@ class BulkListing extends PureComponent {
     return (
       <StyleProvider style={getTheme(platform)}>
         <Container>
-          <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, style.header])}>
+          <Header searchBar style={StyleSheet.flatten([{ backgroundColor: styles.bgPrimaryColor }, style.header])}>
             <Body>
               <View
                 style={[styles.row, styles.width100, styles.justifySpaceBetween,]}>
