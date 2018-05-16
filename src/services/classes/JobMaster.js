@@ -36,7 +36,8 @@ import {
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
   HUB_LAT_LONG,
-  MDM_POLICIES
+  MDM_POLICIES,
+  APP_THEME,
 } from '../../lib/constants'
 
 import {
@@ -160,11 +161,11 @@ class JobMaster {
     await keyValueDBService.validateAndSaveData(TRANSACTION_TIME_SPENT, moment().format('YYYY-MM-DD HH:mm:ss'));
     await keyValueDBService.validateAndSaveData(PAGES, json.pages);
     await keyValueDBService.validateAndSaveData(PAGES_ADDITIONAL_UTILITY, json.additionalUtilities);
-    if(!_.isEmpty(json.companyMDM)) await keyValueDBService.validateAndSaveData(MDM_POLICIES, json.companyMDM);
-    if (json.hubLatLng && !_.isEmpty(json.hubLatLng)) {
-      await keyValueDBService.validateAndSaveData(HUB_LAT_LONG, json.hubLatLng)
-    }
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.appTheme,APP_THEME)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.companyMDM, MDM_POLICIES)
+    await keyValueDBService.checkForNullValidateAndSaveInStore(json.hubLatLng, HUB_LAT_LONG)
   }
+
 
   /**
    * 
@@ -215,37 +216,15 @@ class JobMaster {
     return jobMasterIdCustomizationMap
   }
 
-  /**
-   * 
-   * @param {*} jobStatus 
-   * Map<TabId,[StatusIds]>
-   */
-  prepareTabStatusIdMap(jobStatus) {
-    if (!jobStatus) {
-      return null
+  async checkForEnableLiveJobMaster(jobMasterId) {
+    const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
+    const jobMasterListValue = jobMasterList.value
+    for (let id in jobMasterListValue) {
+      if (jobMasterListValue[id].id == jobMasterId && jobMasterListValue[id].enableLiveJobMaster) {
+        return true
+      }
     }
-    let tabIdStatusIdsMap = {}
-    jobStatus.forEach(jobStatusObject => {
-      if (jobStatusObject.code == UNSEEN) {
-        return
-      }
-      if (!tabIdStatusIdsMap[jobStatusObject.tabId]) {
-        tabIdStatusIdsMap[jobStatusObject.tabId] = []
-      }
-      tabIdStatusIdsMap[jobStatusObject.tabId].push(jobStatusObject.id)
-    })
-    return tabIdStatusIdsMap
-  }
-
-  async checkForEnableLiveJobMaster(jobMasterId){
-   const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
-   const jobMasterListValue = jobMasterList.value
-   for (let id in jobMasterListValue){
-     if(jobMasterListValue[id].id == jobMasterId && jobMasterListValue[id].enableLiveJobMaster){
-       return true
-     }
-   }
-   return false
+    return false
   }
 
 
@@ -263,18 +242,17 @@ class JobMaster {
     return statusIdsTabIdsMap
   }
   /**
-   * 
+   * filters tab on hidden and save tabs list
    * @param {*} tabs 
-   * validates ,sort and save tabs list 
-   * sort on basis of isDefault
+   * @returns
+   * [tabs]
    */
   validateAndSortTabList(tabs) {
     if (!tabs) {
-      return null
+      return null;
     }
-    tabs = tabs.filter(tab => tab.name.toLocaleLowerCase() !== 'hidden')
-      .sort((x, y) => x.isDefault === y.isDefault ? 0 : x.isDefault ? -1 : 1);
-    return tabs
+    tabs = tabs.filter(tab => tab.name.toLocaleLowerCase() !== 'hidden').sort((x, y) => x.isDefault === y.isDefault ? 0 : x.isDefault ? -1 : 1);
+    return tabs;
   }
 
 
@@ -310,7 +288,7 @@ class JobMaster {
     return jobMasterTitleList
   }
 
-  async getJobMasterIdList(){
+  async getJobMasterIdList() {
     const jobMasterList = await keyValueDBService.getValueFromStore(JOB_MASTER)
     return jobMasterList.value.map((data) => data.id)
   }

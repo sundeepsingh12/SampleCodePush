@@ -33,13 +33,13 @@ export default class DraftModal extends PureComponent {
                             <View style={{ width: '50%' }}>
                                 <Button transparent full
                                     onPress={() => this.props.onOkPress()} >
-                                    <Text style={[styles.fontPrimary, styles.fontDefault]}>{OK}</Text>
+                                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontDefault]}>{OK}</Text>
                                 </Button>
                             </View>
                             <View style={{ width: '50%', borderLeftColor: '#d3d3d3', borderLeftWidth: 1 }}>
                                 <Button transparent full
                                     onPress={() => this.props.onCancelPress()}>
-                                    <Text style={[styles.fontPrimary, styles.fontDefault]}>{CANCEL}</Text>
+                                    <Text style={[{color : styles.fontPrimaryColor}, styles.fontDefault]}>{CANCEL}</Text>
                                 </Button>
                             </View>
                         </View>

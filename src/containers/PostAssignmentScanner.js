@@ -242,7 +242,7 @@ class PostAssignmentScanner extends PureComponent {
 
     getHeader() {
         return (
-            <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])} hasTabs>
+            <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])} hasTabs>
                 <Body>
                     <View
                         style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -271,12 +271,12 @@ class PostAssignmentScanner extends PureComponent {
 
                 <View style={{ width: 200, height: 200, justifyContent: 'space-between' }}>
                     <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-                        <View style={{ width: 50, height: 50, borderTopWidth: 3, borderLeftWidth: 3, borderTopColor: styles.bgPrimary.backgroundColor, borderLeftColor: styles.bgPrimary.backgroundColor }}></View>
-                        <View style={{ width: 50, height: 50, borderTopWidth: 3, borderRightWidth: 3, borderTopColor: styles.bgPrimary.backgroundColor, borderRightColor: styles.bgPrimary.backgroundColor }}></View>
+                        <View style={{ width: 50, height: 50, borderTopWidth: 3, borderLeftWidth: 3, borderTopColor:  styles.bgPrimaryColor, borderLeftColor: styles.bgPrimaryColor }}></View>
+                        <View style={{ width: 50, height: 50, borderTopWidth: 3, borderRightWidth: 3, borderTopColor: styles.bgPrimaryColor, borderRightColor: styles.bgPrimaryColor}}></View>
                     </View>
                     <View style={{ justifyContent: 'space-between', flexDirection: 'row' }}>
-                        <View style={{ width: 50, height: 50, borderBottomWidth: 3, borderLeftWidth: 3, borderBottomColor: styles.bgPrimary.backgroundColor, borderLeftColor: styles.bgPrimary.backgroundColor }}></View>
-                        <View style={{ width: 50, height: 50, borderBottomWidth: 3, borderRightWidth: 3, borderBottomColor: styles.bgPrimary.backgroundColor, borderRightColor: styles.bgPrimary.backgroundColor }}></View>
+                        <View style={{ width: 50, height: 50, borderBottomWidth: 3, borderLeftWidth: 3, borderBottomColor: styles.bgPrimaryColor, borderLeftColor: styles.bgPrimaryColor }}></View>
+                        <View style={{ width: 50, height: 50, borderBottomWidth: 3, borderRightWidth: 3, borderBottomColor: styles.bgPrimaryColor, borderRightColor: styles.bgPrimaryColor }}></View>
                     </View>
                 </View>
                 {this.props.scanSuccess ?

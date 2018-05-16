@@ -225,7 +225,9 @@ class JobDetailsV2 extends PureComponent {
       jobTransaction: this.props.jobTransaction,
       statusId: this.props.statusList.id,
       statusName: this.props.statusList.name,
-      jobMasterId: this.props.jobTransaction.jobMasterId
+      jobMasterId: this.props.jobTransaction.jobMasterId,
+      pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+      jobDetailsScreenKey: this.props.navigation.state.key
     })
     this._onCancel()
   }
@@ -247,7 +249,9 @@ class JobDetailsV2 extends PureComponent {
       const FormLayoutObject = {
         contactData: this.props.navigation.state.params.jobSwipableDetails.contactData,
         jobTransaction,
-        statusList
+        statusList,
+        pageObjectAdditionalParams: this.props.navigation.state.params.pageObjectAdditionalParams,
+        jobDetailsScreenKey: this.props.navigation.state.key
       }
       this.props.actions.checkForLocationMismatch(FormLayoutObject, this.props.currentStatus.statusCategory)
     }
@@ -423,11 +427,10 @@ class JobDetailsV2 extends PureComponent {
 
   updateTransactionForGroupId(groupId) {
     this.props.actions.startSyncAndNavigateToContainer({
-        jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
-        additionalParams: { statusId: this.props.currentStatus.id },
-        groupId: groupId
-      }
-    , true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
+      jobMasterIds: JSON.stringify([this.props.jobTransaction.jobMasterId]),
+      additionalParams: JSON.stringify({ statusId: this.props.currentStatus.id }),
+      groupId: groupId
+    }, true, SET_LOADER_FOR_SYNC_IN_JOBDETAIL)
   }
 
   selectStatusToRevert = () => {
@@ -442,7 +445,7 @@ class JobDetailsV2 extends PureComponent {
   }
 
   _onGoToPreviousStatus = (statusData) => {
-    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation)
+    this.props.actions.setAllDataOnRevert(this.props.jobTransaction, statusData, this.props.navigation.state.params.pageObjectAdditionalParams)
   }
 
   statusRevertSelection(statusList) {
@@ -651,6 +654,9 @@ class JobDetailsV2 extends PureComponent {
       this.props.navigation.state.params.jobSwipableDetails.contactData,
       this.props.jobTransaction,
       this.props.draftStatusInfo,
+      null,
+      this.props.navigation.state.params.pageObjectAdditionalParams,
+      this.props.navigation.state.key
     )
     this.props.actions.setState(SET_JOBDETAILS_DRAFT_INFO, {})
   }

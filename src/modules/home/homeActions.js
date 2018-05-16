@@ -51,8 +51,10 @@ import {
   LiveJobs,
   OfflineDS,
   ProfileView,
+  FCM_TOKEN,
   LOADER_FOR_SYNCING,
-  MDM_POLICIES
+  MDM_POLICIES,
+  APP_THEME
 } from '../../lib/constants'
 
 import {
@@ -96,26 +98,26 @@ import { jobStatusService } from '../../services/classes/JobStatus'
 import { userEventLogService } from '../../services/classes/UserEvent'
 import { setState, navigateToScene, showToastAndAddUserExceptionLog } from '../global/globalActions'
 import CONFIG from '../../lib/config'
-import { Client } from 'react-native-paho-mqtt'
 import { sync } from '../../services/classes/Sync'
-import { NetInfo, Alert } from 'react-native'
+import { NetInfo, Alert,Platform } from 'react-native'
 import moment from 'moment'
 import BackgroundTimer from 'react-native-background-timer'
 import { fetchJobs } from '../taskList/taskListActions'
 import RestAPIFactory from '../../lib/RestAPIFactory'
 import { logoutService } from '../../services/classes/Logout'
 import { authenticationService } from '../../services/classes/Authentication'
-import { backupService } from '../../services/classes/BackupService';
+import { backupService } from '../../services/classes/BackupService'
 import { autoLogoutAfterUpload } from '../backup/backupActions'
 import { utilitiesService } from '../../services/classes/Utilities'
-import { transactionCustomizationService } from '../../services/classes/TransactionCustomization';
-import { moduleCustomizationService } from '../../services/classes/ModuleCustomization';
+import { transactionCustomizationService } from '../../services/classes/TransactionCustomization'
+import { moduleCustomizationService } from '../../services/classes/ModuleCustomization'
 import { getRunsheetsForSequence } from '../sequence/sequenceActions'
-import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions';
-import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions';
+import { redirectToContainer, redirectToFormLayout } from '../newJob/newJobActions'
+import { restoreDraftAndNavigateToFormLayout } from '../form-layout/formLayoutActions'
+import FCM, {NotificationActionType,FCMEvent} from "react-native-fcm"
+import feStyle from '../../themes/FeStyle'
 import { jobMasterService } from '../../services/classes/JobMaster';
-import { PLEASE_ENABLE_INTERNET_TO_UPDATE_THIS_JOB, UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET } from '../../lib/ContainerConstants'
-
+import { UNABLE_TO_SYNC_WITH_SERVER_PLEASE_CHECK_YOUR_INTERNET,FCM_REGISTRATION_ERROR,TOKEN_MISSING,APNS_TOKEN_ERROR } from '../../lib/ContainerConstants'
 /**
  * Function which updates STATE when component is mounted
  * - List of pages for showing on Home Page
@@ -199,7 +201,7 @@ export function navigateToPage(pageObject) {
         case PAGE_JOB_ASSIGNMENT:
           throw new Error("CODE it, if you want to use it !");
         case PAGE_LIVE_JOB:
-          dispatch(navigateToScene(LiveJobs, { displayName: (pageObject.name) ? pageObject.name : 'LiveJob' }));
+          dispatch(navigateToScene(LiveJobs, { pageObject }));
           break;
         case PAGE_MOSAMBEE_INITIALIZE:
           throw new Error("CODE it, if you want to use it !");
@@ -239,9 +241,6 @@ export function navigateToPage(pageObject) {
           throw new Error("Unknown page type " + pageObject.screenTypeId + ". Contact support");
       }
     } catch (error) {
-      //TODO : show proper error code message ERROR CODE 600
-      //Save the error in exception logs
-      console.log(error)
       showToastAndAddUserExceptionLog(2702, error.message, 'danger', 1)
     }
   }
@@ -274,6 +273,14 @@ export function checkCustomErpPullActivated() {
     try {
       const user = await keyValueDBService.getValueFromStore(USER)
       const customErpPullActivated = user && user.value && user.value.company && user.value.company.customErpPullActivated ? 'activated' : 'notActivated'
+      let appTheme = await keyValueDBService.getValueFromStore(APP_THEME);
+      if (appTheme && appTheme.value) {
+        feStyle.primaryColor = appTheme.value
+        feStyle.bgPrimaryColor = appTheme.value
+        feStyle.fontPrimaryColor = appTheme.value
+        feStyle.shadeColor = appTheme.value + '98'
+        feStyle.borderLeft4Color = appTheme.value
+      }
       dispatch(setState(SET_ERP_PULL_ACTIVATED, { customErpPullActivated }))
     } catch (error) {
       showToastAndAddUserExceptionLog(2704, error.message, 'danger', 1)
@@ -326,56 +333,73 @@ export function startTracking(trackingServiceStarted) {
   }
 }
 
-export function startMqttService(pieChart) {
+export function startFCM(pieChart) {
   return async function (dispatch) {
     const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
-    //Check if user session is alive
+    const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
     if (token && token.value) {
-      const uri = `ws://${CONFIG.API.PUSH_BROKER}:${CONFIG.FAREYE.port}/ws`
       const userObject = await keyValueDBService.getValueFromStore(USER)
-      const clientId = `FE_${userObject.value.id}`
-      const storage = {
-        setItem: (key, item) => {
-          storage[key] = item;
-        },
-        getItem: (key) => storage[key],
-        removeItem: (key) => {
-          delete storage[key]
-        },
-      };
+      const topic = `FE_${userObject.value.id}`
+      await FCM.requestPermissions()
 
-      // Create a client instance 
-      const client = new Client({
-        uri,
-        clientId,
-        storage
+      FCM.getFCMToken().then(async fcmToken => {
+        console.log('fcmToken', fcmToken)
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+      }, (error) => {
+      }).catch(
+        () => Toast.show({ text: FCM_REGISTRATION_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }))
+
+      if (Platform.OS === 'ios') {
+        FCM.getAPNSToken().then(token => {
+        }).catch(()=>Toast.show({ text: APNS_TOKEN_ERROR, position: 'bottom', buttonText: OK, duration: 6000 }));
+      }
+
+      FCM.getInitialNotification().then(notif => {
+        console.log('notif 111>>' + JSON.stringify(notif))
+      }, (err) => {
       })
 
-      // set event handlers 
-      //TODO connection re-establishment on connection lost
-      client.on('connectionLost', responseObject => {
-      })
-      client.on('messageReceived', message => {
-        if (message.payloadString == 'Live Job Notification') {
+       FCM.on(FCMEvent.Notification, notif => {
+        
+        if(notif.Notification == 'Android push notification'){
+          dispatch(performSyncService(pieChart, true))
+        }
+        else if(notif.Notification == 'Live Job Notification'){
           keyValueDBService.validateAndSaveData('LIVE_JOB', new Boolean(false))
           dispatch(performSyncService(pieChart, true, true))
-        } else {
-          dispatch(performSyncService(pieChart, true))
+        }
+        if (notif.local_notification) {
+          return
+        }
+        if (notif.opened_from_tray) {
+          return
+        }
+  
+        if (Platform.OS === 'ios') {
+          switch (notif._notificationType) {
+            case NotificationType.Remote:
+              notif.finish(RemoteNotificationResult.NewData) // other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+              break
+            case NotificationType.NotificationResponse:
+              notif.finish()
+              break
+            case NotificationType.WillPresent:
+              notif.finish(WillPresentNotificationResult.All) // other types available: WillPresentNotificationResult.None
+              break
+          }
         }
       })
 
-      // connect the client 
-      client.connect()
-        .then(() => {
-          // Once a connection has been made, make a subscription 
-          return client.subscribe(`${clientId}/#`, CONFIG.FAREYE.PUSH_QOS);
-        })
-        .catch(responseObject => {
-          if (responseObject.errorCode !== 0) {
-            console.log('onConnectionLost:' + responseObject.errorMessage);
-            // dispatch(startMqttService())
-          }
-        })
+      FCM.on(FCMEvent.RefreshToken, async token => {
+        await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
+        sync.sendRegistrationTokenToServer(token, fcmToken, topic)
+    });
+
+      FCM.subscribeToTopic(topic)
+    }
+    else{
+      Toast.show({ text: TOKEN_MISSING, position: 'bottom', buttonText: OK, duration: 6000 })
     }
   }
 }
@@ -425,11 +449,11 @@ export function performSyncService(pieChart, isCalledFromHome, isLiveJob, erpPul
           if (Piechart.enabled) {
             dispatch(pieChartCount())
           }
-          //dispatch(fetchJobs())
+          dispatch(fetchJobs())
         }
-        if (isLiveJob) {
-          dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
-        }
+        // if (isLiveJob) {
+        //   dispatch(navigateToScene(LiveJobs, { callAlarm: true }))
+        // }
       }
       dispatch(setState(erpPull ? ERP_SYNC_STATUS : SYNC_STATUS, {
         unsyncedTransactionList: [],
@@ -508,8 +532,6 @@ export function pieChartCount() {
       const countForPieChart = await summaryAndPieChartService.getAllStatusIdsCount(Piechart.params)
       dispatch(setState(CHART_LOADING, { loading: false, count: countForPieChart }))
     } catch (error) {
-      //Update UI here
-      console.log(error)
       showToastAndAddUserExceptionLog(2707, error.message, 'danger', 1)
       dispatch(setState(CHART_LOADING, { loading: false, count: null }))
     }
@@ -587,7 +609,6 @@ export function uploadUnsyncFiles(backupFilesList) {
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2709, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
@@ -605,7 +626,6 @@ export function readAndUploadFiles() {
       }
     } catch (error) {
       showToastAndAddUserExceptionLog(2710, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
@@ -615,7 +635,6 @@ export function resetFailCountInStore() {
       await keyValueDBService.validateAndSaveData(BACKUP_UPLOAD_FAIL_COUNT, -1)
     } catch (error) {
       showToastAndAddUserExceptionLog(2711, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }
@@ -632,7 +651,6 @@ export function restoreNewJobDraft(draftStatusInfo, restoreDraft) {
       dispatch(setState(SET_NEWJOB_DRAFT_INFO, {}))
     } catch (error) {
       showToastAndAddUserExceptionLog(2712, error.message, 'danger', 1)
-      console.log(error)
     }
   }
 }

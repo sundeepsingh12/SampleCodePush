@@ -91,7 +91,7 @@ class ResetPassword extends PureComponent {
   }
 
   _getHeaderView() {
-    return <Header searchBar style={StyleSheet.flatten([styles.bgPrimary, styles.header])}>
+    return <Header searchBar style={StyleSheet.flatten([{backgroundColor : styles.bgPrimaryColor}, styles.header])}>
       <Body>
         <View
           style={[styles.row, styles.width100, styles.justifySpaceBetween]}>
@@ -113,16 +113,16 @@ class ResetPassword extends PureComponent {
     return <Content style={[styles.flex1, styles.bgWhite]}>
       <View style={[styles.bgWhite, styles.padding10, styles.marginTop30]}>
         <Item stackedLabel style={[styles.marginBottom15]}>
-          <Label style={[styles.fontPrimary, styles.fontSm]}>{CURRENT_PASSWORD}</Label>
+          <Label style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{CURRENT_PASSWORD}</Label>
           <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setCurrentPassword} value={this.props.currentPassword} />
         </Item>
         <Item stackedLabel style={[styles.marginBottom15]}>
-          <Label style={[styles.fontPrimary, styles.fontSm]}>{NEW_PASSWORD}</Label>
+          <Label style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{NEW_PASSWORD}</Label>
           <Label style={[styles.fontDarkGray, styles.fontXs]}>{MINIMUM_REQUIREMENT_FOR_PASSWORD}</Label>
           <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setNewPassword} value={this.props.newPassword} />
         </Item>
         <Item stackedLabel style={[styles.marginBottom15]}>
-          <Label style={[styles.fontPrimary, styles.fontSm]}>{CONFIRM_NEW_PASSWORD}</Label>
+          <Label style={[{color : styles.fontPrimaryColor}, styles.fontSm]}>{CONFIRM_NEW_PASSWORD}</Label>
           <Input style={[styles.inputType]} secureTextEntry={true} onChangeText={this._setConfirmNewPassword} value={this.props.confirmNewPassword} />
         </Item>
       </View>

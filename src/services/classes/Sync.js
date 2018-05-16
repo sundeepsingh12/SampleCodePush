@@ -39,11 +39,11 @@ import {
 } from '../../lib/AttributeConstants'
 import { Platform } from 'react-native'
 import { pages } from './Pages'
-import PushNotification from 'react-native-push-notification'
 import {
   JOBS_DELETED
 } from '../../lib/ContainerConstants'
 import { geoFencingService } from './GeoFencingService'
+import FCM from "react-native-fcm"
 
 class Sync {
 
@@ -192,23 +192,23 @@ class Sync {
       jobIdJobIdMap[transactionList[jobTransaction].jobId] = transactionList[jobTransaction].jobId
     }
     for (let jobs of query.job) {
-      let jobMasterId = jobMasterMapWithAssignOrderToHubEnabled[jobs.jobMasterId]
+      let jobMaster = jobMasterMapWithAssignOrderToHubEnabled[jobs.jobMasterId]
       //Make transactions for those whose job transaction node is null
-      if (jobMasterId && (!jobIdJobIdMap[jobs.id])) {
-        let unassignedTransactions = this.createTransactionsOfUnassignedJobs(jobs, syncStoreDTO, jobMasterWithAssignOrderToHubEnabled, jobMasterIdJobStatusIdOfPendingCodeMap)
+      if (jobMaster && (!jobIdJobIdMap[jobs.id])) {
+        let unassignedTransactions = this.createTransactionsOfUnassignedJobs(jobs, syncStoreDTO, jobMaster, jobMasterIdJobStatusIdOfPendingCodeMap)
         allJobsToTransactions.push(unassignedTransactions)
       }
     }
     return allJobsToTransactions
   }
 
-  createTransactionsOfUnassignedJobs(job, syncStoreDTO, jobMasterIdvsCode, jobMasterIdJobStatusIdOfPendingCodeMap) {
+  createTransactionsOfUnassignedJobs(job, syncStoreDTO, jobMaster, jobMasterIdJobStatusIdOfPendingCodeMap) {
     let jobStatusId = jobMasterIdJobStatusIdOfPendingCodeMap[job.jobMasterId];
-    let jobtransaction = this.getDefaultValuesForJobTransaction(-job.id, jobStatusId, job.referenceNo, syncStoreDTO.user, syncStoreDTO.hub, syncStoreDTO.imei, jobMasterIdvsCode);
+    let jobtransaction = this.getDefaultValuesForJobTransaction(-job.id, jobStatusId, job.referenceNo, syncStoreDTO.user, syncStoreDTO.hub, syncStoreDTO.imei, jobMaster);
     return jobtransaction
   }
 
-  getDefaultValuesForJobTransaction(id, statusid, referenceNumber, user, hub, imei, jobMasterIdVSCode) {
+  getDefaultValuesForJobTransaction(id, statusid, referenceNumber, user, hub, imei, jobMaster) {
     //TODO some values like lat/lng and battery are not valid values, update them as their library is added
     return jobTransaction = {
       id,
@@ -238,8 +238,8 @@ class Sync {
       lastTransactionTimeOnMobile: moment().format('YYYY-MM-DD HH:mm:ss'),
       deleteFlag: 0,
       attemptCount: 1,
-      jobType: _.values(jobMasterIdVSCode)[0], // single value pass in param
-      jobMasterId: Number(_.keys(jobMasterIdVSCode)[0]), // single value pass in param
+      jobType: jobMaster.code, // single value pass in param
+      jobMasterId: jobMaster.id, // single value pass in param
       employeeCode: user.employeeCode,
       hubCode: hub.code,
       statusCode: "PENDING",
@@ -642,14 +642,17 @@ class Sync {
   }
 
   showNotification(jobMasterTitleList) {
-    const alertBody = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
-    const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${alertBody} jobs` : alertBody
-    PushNotification.localNotification({
-      /* iOS and Android properties */
-      title: FAREYE_UPDATES, // (optional, for iOS this is only used in apple watch, the title will be the app name on other iOS devices)
-      message, // (required)
-      soundName: 'default', // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
+    const body = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
+    const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${body} jobs` : body
+    FCM.presentLocalNotification({
+      id: new Date().valueOf().toString(),         
+      title: FAREYE_UPDATES,     
+      body:message,  
+      priority: "high",          
+      sound:"default"  ,  
+      show_in_foreground: true                    
     });
+    
   }
 
   async calculateDifference() {
@@ -684,6 +687,40 @@ class Sync {
       newJobTransactionsIds
     }
   }
+
+  /**Called when home screen is mounted,app sends fcm token to server
+   * 
+   * @param {*} token 
+   * @param {*} fcmToken 
+   * @param {*} topic 
+   */
+  sendRegistrationTokenToServer(token,fcmToken,topic){
+    const url = CONFIG.API.FCM_TOKEN_REGISTRATON +'?topic='+topic
+    const response = RestAPIFactory(token.value).serviceCall(fcmToken, url, 'POST')
+  }
+
+
+  /**This de-registers fcm token from server and removes local/delivered notifications
+   * 
+   * Try/Catch is written here so that logout doesn't gets affected
+   * 
+   * @param {*} userObject 
+   * @param {*} token 
+   * @param {*} fcmToken 
+   */
+  deregisterFcmTokenFromServer(userObject,token,fcmToken){
+    try {
+      FCM.cancelAllLocalNotifications()
+      FCM.removeAllDeliveredNotifications()
+      const topic = `FE_${userObject.value.id}`
+      FCM.unsubscribeFromTopic(topic);
+      const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
+       RestAPIFactory(token.value).serviceCall(fcmToken.value, url, 'POST')
+    } catch (error) {
+      console.log('error', error)
+    }
+  }
 }
+
 
 export let sync = new Sync()

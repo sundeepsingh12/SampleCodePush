@@ -93,6 +93,9 @@ module.exports = keyMirror({
     ERP_SYNC_STATUS: null,
     SET_FUTURE_RUNSHEET_ENABLED_AND_SELECTED_DATE: null,
     SET_NEWJOB_DRAFT_INFO: null,
+    SET_LANDING_TAB: null,
+    TABS_LOADING: null,
+    SET_SELECTED_DATE: null,
     LOADER_FOR_SYNCING:null,
 
     //Pages
@@ -214,6 +217,8 @@ module.exports = keyMirror({
     LAT_LONG_GEO_FENCE: null,
     SYNC_RUNNING_AND_TRANSACTION_SAVING: null,
     MDM_POLICIES: null,
+    FCM_TOKEN:null,
+    APP_THEME : null,
 
     //Realm Tables
     TABLE_JOB_TRANSACTION: null,

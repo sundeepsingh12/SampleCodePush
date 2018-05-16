@@ -256,7 +256,7 @@ class DataStore extends PureComponent {
                     {((this.props.isMinMaxValidation || this.props.isAllowFromFieldInExternalDS) && _.size(this.props.searchText) > 2) &&
                         <Footer style={{ height: 'auto', backgroundColor: 'white' }}>
                             <FooterTab style={StyleSheet.flatten([styles.padding10, styles.bgWhite])}>
-                                <Button success full style={styles.bgPrimary}
+                                <Button success full style={{backgroundColor : styles.bgPrimaryColor}}
                                     onPress={() => {
                                         this.props.actions.onSave(
                                             this.props.navigation.state.params.currentElement.fieldAttributeMasterId,
