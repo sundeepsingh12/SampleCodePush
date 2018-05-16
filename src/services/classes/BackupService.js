@@ -26,7 +26,6 @@ import RNFS from 'react-native-fs'
 import moment from 'moment'
 import {
     zip,
-    unzip
 } from 'react-native-zip-archive'
 import _ from 'lodash'
 import { syncZipService } from './SyncZip'
