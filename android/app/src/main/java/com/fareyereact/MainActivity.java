@@ -2,6 +2,7 @@ package com.fareyereact;
 
 import com.facebook.react.ReactActivity;
 import io.realm.react.RealmReactPackage;
+import android.content.Intent;
 
 public class MainActivity extends ReactActivity {
 
@@ -12,5 +13,11 @@ public class MainActivity extends ReactActivity {
     @Override
     protected String getMainComponentName() {
         return "Fareye";
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
     }
 }
