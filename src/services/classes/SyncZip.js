@@ -72,7 +72,6 @@ class SyncZip {
         const userSummary = this.updateUserSummaryNextJobTransactionId(syncStoreDTO.statusList, syncStoreDTO.jobMasterList, syncStoreDTO.userSummary)
         await keyValueDBService.validateAndSaveData(USER_SUMMARY, userSummary);
         SYNC_RESULTS.userSummary = userSummary ? userSummary : {};
-        console.log('SYNC_RESULTS',SYNC_RESULTS)
         await this.moveImageFilesToSync(realmDbData.fieldDataList, PATH_TEMP, syncStoreDTO.fieldAttributesList)
         //Writing Object to File at TEMP location
         await RNFS.writeFile(PATH_TEMP + '/logs.json', JSON.stringify(SYNC_RESULTS), 'utf8');
@@ -103,10 +102,6 @@ class SyncZip {
     _getSyncDataFromDb(transactionIdsObject) {
         let userExceptionLog = _getDataFromRealm([], null, USER_EXCEPTION_LOGS)
         let runSheetSummary = _getDataFromRealm([], null, TABLE_RUNSHEET)
-        // console.log('lastSyncTime',lastSyncTime.value)
-        // const formattedTime = moment(lastSyncTime.value).format('YYYY-MM-DD HH:mm:ss')
-        // console.log('moment',formattedTime)
-        // let trackLogQuery = `Date(trackTime) > ${formattedTime}`
         let trackLogs = _getDataFromRealm([], null, TABLE_TRACK_LOGS)
         let transactionList = [],
             fieldDataList = [],
