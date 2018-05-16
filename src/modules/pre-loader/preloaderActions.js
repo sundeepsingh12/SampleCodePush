@@ -71,7 +71,8 @@ import {
   DOWNLOAD_LATEST_APP,
   MDM_POLICIES,
   SET_APP_UPDATE_BY_CODEPUSH,
-  SET_APP_UPDATE_STATUS
+  SET_APP_UPDATE_STATUS,
+  FCM_TOKEN
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL, MAJOR_VERSION_OUTDATED, MINOR_PATCH_OUTDATED } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -91,11 +92,8 @@ import { CODEPUSH_CHECKING_FOR_UPDATE, CODEPUSH_DOWNLOADING_PACKAGE, CODEPUSH_IN
 import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
 import codePush from "react-native-code-push"
-import {
-  Platform,
-}
-  from 'react-native'
-
+import { Platform, } from 'react-native'
+import { sync } from '../../services/classes/Sync'
 
 //Action dispatched when job master downloading starts
 export function jobMasterDownloadStart() {
@@ -298,6 +296,9 @@ export function invalidateUserSessionForAutoLogout() {
       dispatch(setState(TOGGLE_LOGOUT, true))
       const token = await keyValueDBService.getValueFromStore(CONFIG.SESSION_TOKEN_KEY)
       await backupService.createBackupOnLogout()
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+      await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
       await authenticationService.logout(token)
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
@@ -329,6 +330,10 @@ export function invalidateUserSession(createBackup) {
       if (createBackup) {
         await backupService.createBackupOnLogout()
       }
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+
+      await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
       let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())
@@ -694,6 +699,10 @@ export function invalidateUserSessionWhenLogoutPressed(createBackup) {
       if (createBackup) {
         await backupService.createBackupOnLogout()
       }
+      const userObject = await keyValueDBService.getValueFromStore(USER)
+      const fcmToken = await keyValueDBService.getValueFromStore(FCM_TOKEN)
+
+      await sync.deregisterFcmTokenFromServer(userObject, token, fcmToken)
       let response = await authenticationService.logout(token) // hit logout api
       await logoutService.deleteDataBase()
       dispatch(preLogoutSuccess())

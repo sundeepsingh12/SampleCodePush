@@ -134,7 +134,6 @@ class Login extends PureComponent {
     this.props.toggleCheckbox()
   }
 
-
   getImageView() {
     if (this.props.auth.form.authenticationService || this.props.auth.form.isLongPress) {
       return <Spinner />

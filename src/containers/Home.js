@@ -15,11 +15,11 @@ import platform from '../../native-base-theme/variables/platform'
 import styles from '../themes/FeStyle'
 import FareyeLogo from '../../images/fareye-default-iconset/fareyeLogoSm.png'
 import { Platform } from 'react-native'
-import PushNotification from 'react-native-push-notification'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { UNTITLED } from '../lib/ContainerConstants'
 import { Summary } from '../lib/constants'
 import DraftModal from '../components/DraftModal'
+import FCM, {NotificationActionType,FCMEvent} from "react-native-fcm";
 import SyncLoader from '../components/SyncLoader'
 
 function mapStateToProps(state) {
@@ -48,24 +48,11 @@ function mapDispatchToProps(dispatch) {
 class Home extends PureComponent {
 
   componentDidMount() {
-    if (Platform.OS === 'ios') {
-      PushNotification.configure({
-        onNotification: function (notification) {
-          console.log('NOTIFICATION:', notification);
-          Toast.show({
-            text: `${notification.message}`,
-            position: 'top',
-            buttonText: 'OK',
-            duration: 10000
-          })
-          notification.finish(PushNotificationIOS.FetchResult.NoData);
-        }
-      })
-    }
+     
     this.props.actions.fetchPagesAndPiechart();
-    this.props.actions.startMqttService(this.props.pieChart);
     this.props.actions.performSyncService(this.props.pieChart, this.props.customErpPullActivated == 'notActivated');
     this.props.actions.startTracking(this.props.trackingServiceStarted);
+    this.props.actions.startFCM(this.props.pieChart);
   }
 
   getPageView(page) {

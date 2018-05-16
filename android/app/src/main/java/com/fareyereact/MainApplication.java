@@ -4,12 +4,12 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.cnull.apkinstaller.ApkInstallerPackage;
+import com.evollu.react.fcm.FIRMessagingPackage;
 import com.imagepicker.ImagePickerPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
 import io.realm.react.RealmReactPackage;
-import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.rssignaturecapture.RSSignatureCapturePackage;
 import com.horcrux.svg.SvgPackage;
@@ -50,10 +50,10 @@ public class MainApplication extends Application implements ReactApplication {
             new ApkInstallerPackage(),
             new ImagePickerPackage(),
             new RNCameraPackage(),
+            new FIRMessagingPackage(),
             new RNBackgroundFetchPackage(),
             new RCTBluetoothSerialPackage(),
             new RealmReactPackage(),
-            new ReactNativePushNotificationPackage(),
             new LinearGradientPackage(),
             new RSSignatureCapturePackage(),
             new SvgPackage(),
