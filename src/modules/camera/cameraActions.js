@@ -5,7 +5,9 @@ import {
     VIEW_IMAGE_DATA,
     SET_SHOW_IMAGE,
     SET_SHOW_VIEW_IMAGE,
-    SET_VALIDATION_FOR_CAMERA
+    SET_VALIDATION_FOR_CAMERA,
+    SET_CAMERA_LOADER,
+    SET_SHOW_IMAGE_AND_DATA
 } from '../../lib/constants'
 import { keyValueDBService } from '../../services/classes/KeyValueDBService'
 import { signatureService } from '../../services/classes/SignatureRemarks'
@@ -13,6 +15,14 @@ import moment from 'moment'
 import { updateFieldDataWithChildData } from '../form-layout/formLayoutActions'
 import { getNextFocusableAndEditableElement } from '../array/arrayActions'
 import { setState, showToastAndAddUserExceptionLog } from '../global/globalActions';
+import CompressImage from 'react-native-compress-image';
+import CONFIG from '../../lib/config'
+
+import {
+    ImageStore,
+} from 'react-native';
+import RNFS from 'react-native-fs'
+var PATH_COMPRESS_IMAGES = '/compressImages';
 
 export function saveImage(result, fieldAttributeMasterId, formLayoutState, calledFromArray, rowId, jobTransaction) {
     return async function (dispatch) {
@@ -51,6 +61,30 @@ export function getValidation(value) {
             dispatch(setState(SET_VALIDATION_FOR_CAMERA, result))
         } catch (error) {
             showToastAndAddUserExceptionLog(305, error.message, 'danger', 1)
+        }
+    }
+}
+
+export function compressImages(uri) {
+    return async function (dispatch) {
+        try {
+            dispatch(setState(SET_CAMERA_LOADER, true))
+            CompressImage.createCompressedImage(uri, PATH_COMPRESS_IMAGES).then((resizedImage) => {
+                ImageStore.getBase64ForTag(resizedImage.uri, (base64Data) => {
+                    dispatch(setState(SET_SHOW_IMAGE_AND_DATA, {
+                        data: base64Data,
+                        showImage: true
+                    }))
+                    RNFS.unlink(resizedImage.path).then(() => { }).catch((error) => { })
+                }, (reason) => {
+                    showToastAndAddUserExceptionLog(306, reason.message, 'danger', 1)
+                });
+            }, (error) => {
+                showToastAndAddUserExceptionLog(307, error.message, 'danger', 1)
+            });
+        } catch (error) {
+            dispatch(setState(SET_CAMERA_LOADER, false))
+            showToastAndAddUserExceptionLog(308, error.message, 'danger', 1)
         }
     }
 }
