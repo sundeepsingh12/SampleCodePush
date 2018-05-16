@@ -645,14 +645,14 @@ class Sync {
     const body = (jobMasterTitleList.constructor === Array) ? jobMasterTitleList.join() : jobMasterTitleList
     const message = (jobMasterTitleList.constructor === Array) ? `You have new updates for ${body} jobs` : body
     FCM.presentLocalNotification({
-      id: new Date().valueOf().toString(),         
-      title: FAREYE_UPDATES,     
-      body:message,  
-      priority: "high",          
-      sound:"default"  ,  
-      show_in_foreground: true                    
+      id: new Date().valueOf().toString(),
+      title: FAREYE_UPDATES,
+      body: message,
+      priority: "high",
+      sound: "default",
+      show_in_foreground: true
     });
-    
+
   }
 
   async calculateDifference() {
@@ -694,8 +694,8 @@ class Sync {
    * @param {*} fcmToken 
    * @param {*} topic 
    */
-  sendRegistrationTokenToServer(token,fcmToken,topic){
-    const url = CONFIG.API.FCM_TOKEN_REGISTRATON +'?topic='+topic
+  sendRegistrationTokenToServer(token, fcmToken, topic) {
+    const url = CONFIG.API.FCM_TOKEN_REGISTRATON + '?topic=' + topic
     RestAPIFactory(token.value).serviceCall(fcmToken, url, 'POST')
   }
 
@@ -708,14 +708,14 @@ class Sync {
    * @param {*} token 
    * @param {*} fcmToken 
    */
-  deregisterFcmTokenFromServer(userObject,token,fcmToken){
+  deregisterFcmTokenFromServer(userObject, token, fcmToken) {
     try {
       FCM.cancelAllLocalNotifications()
       FCM.removeAllDeliveredNotifications()
       const topic = `FE_${userObject.value.id}`
       FCM.unsubscribeFromTopic(topic);
       const url = CONFIG.API.FCM_TOKEN_DEREGISTRATION + '?topic=' + topic
-       RestAPIFactory(token.value).serviceCall(fcmToken.value, url, 'POST')
+      RestAPIFactory(token.value).serviceCall(fcmToken.value, url, 'POST')
     } catch (error) {
       console.log('error', error)
     }

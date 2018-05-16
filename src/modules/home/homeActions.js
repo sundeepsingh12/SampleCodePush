@@ -390,7 +390,7 @@ export function startFCM() {
         }
       })
 
-      FCM.on(FCMEvent.RefreshToken, async token => {
+      FCM.on(FCMEvent.RefreshToken, async fcmToken => {
         await keyValueDBService.validateAndSaveData(FCM_TOKEN, fcmToken)
         await sync.sendRegistrationTokenToServer(token, fcmToken, topic)
       });

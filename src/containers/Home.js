@@ -51,7 +51,7 @@ class Home extends PureComponent {
     this.props.actions.fetchPagesAndPiechart();
     this.props.actions.performSyncService(this.props.customErpPullActivated == 'notActivated');
     this.props.actions.startTracking(this.props.trackingServiceStarted);
-    this.props.actions.startFCM(this.props.pieChart);
+    this.props.actions.startFCM();
   }
 
   getPageView(page) {
