@@ -76,10 +76,6 @@ class MosambeeWalletPayment extends PureComponent {
         if (!this.props.walletList) this.props.actions.setWalletParametersAndGetWalletList(this.props.navigation.state.params.contactData[0])
     }
 
-    // static navigationOptions = ({ navigation }) => {
-    //     return { header: null }
-    // }
-
     _showModalView = (modalStatus, checkForPayment) => {
         if (this.props.errorMessage && !checkForPayment) {
             if (modalStatus == 0) this.props.navigation.goBack()
