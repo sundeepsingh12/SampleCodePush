@@ -24,24 +24,23 @@ import {
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
-  return {
-    configDownloadService:state.preloader.configDownloadService,
-    configSaveService:state.preloader.configSaveService,
-    deviceVerificationService:state.preloader.deviceVerificationService,
-    isError:state.preloader.isError,
-    error:state.preloader.error
-  }
+    return {
+        configDownloadService: state.preloader.configDownloadService,
+        configSaveService: state.preloader.configSaveService,
+        deviceVerificationService: state.preloader.deviceVerificationService,
+        error: state.preloader.error
+    }
 };
 
 function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators({  ...preloaderActions }, dispatch)
-  }
+    return {
+        actions: bindActionCreators({ ...preloaderActions }, dispatch)
+    }
 }
 
-class InitialSetup extends PureComponent{
+class InitialSetup extends PureComponent {
 
-     invalidateSession = () => {
+    invalidateSession = () => {
         this.props.actions.invalidateUserSession()
     }
 
@@ -49,7 +48,7 @@ class InitialSetup extends PureComponent{
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
 
-    showSettingUpHeader(){
+    showSettingUpHeader() {
         return (
             <View style={[feStyle.column, feStyle.flexBasis40, feStyle.alignCenter, feStyle.flex1, feStyle.width100, feStyle.marginTop30, feStyle.marginBottom30]}>
                 <View style={{ flexBasis: '70%' }}>
@@ -67,7 +66,7 @@ class InitialSetup extends PureComponent{
         )
     }
 
-    showDownloadSettings(){
+    showDownloadSettings() {
         return (
             <ListItem style={{ height: 50 }}>
                 <Left style={{ flex: 1 }}>
@@ -81,7 +80,7 @@ class InitialSetup extends PureComponent{
         )
     }
 
-    showApplyingSettings(){
+    showApplyingSettings() {
         return (
             <ListItem style={{ height: 50 }}>
                 <Left style={{ flex: 1 }}>
@@ -95,7 +94,7 @@ class InitialSetup extends PureComponent{
         )
     }
 
-    showVerifyHandset(){
+    showVerifyHandset() {
         return (
             <ListItem style={{ height: 50 }}>
                 <Left style={{ flex: 1 }}>
@@ -109,55 +108,47 @@ class InitialSetup extends PureComponent{
         )
     }
 
-    render(){
+    render() {
         return (
             <StyleProvider style={getTheme(platform)}>
                 <Container>
                     <Content style={[feStyle.paddingTop30]}>
-                    {this.showSettingUpHeader()}
-                      
+                        {this.showSettingUpHeader()}
                         <View style={[feStyle.column, feStyle.flexBasis30, feStyle.marginTop30, feStyle.flex1, feStyle.justifyCenter]}>
                             <List>
                                 {this.showDownloadSettings()}
                                 {this.showApplyingSettings()}
                                 {this.showVerifyHandset()}
-                               
                             </List>
                         </View>
                         <View style={[feStyle.flexBasis25, feStyle.marginTop15, feStyle.flex1, feStyle.column, feStyle.alignCenter, feStyle.justifyCenter, feStyle.marginTop30]}>
                             {this._renderErrorMessage()}
-                            {this._renderButtons()}
                         </View>
                     </Content>
                 </Container>
             </StyleProvider>
         )
     }
-       _renderErrorMessage() {
-        if (this.props.isError) {
-            return (
-                <Text
-                    style={[feStyle.row, feStyle.justifyCenter, feStyle.fontDanger]}>{this.props.error}</Text>
-            )
-        } else {
-            return null
-        }
-    }
 
-     _renderButtons() {
-        if (this.props.isError) {
+    _renderErrorMessage() {
+        if (!_.isEmpty(this.props.error)) {
             return (
-                <View style={[feStyle.row, feStyle.marginTop30]}>
-                    <Button onPress={this.invalidateSession} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
-                        <Text style={{ color: '#ffffff' }}>{CANCEL}</Text>
-                    </Button>
-                    <Button onPress={this.retry} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
-                        <Text style={{ color: '#ffffff' }}>{RETRY}</Text>
-                    </Button>
+                <View>
+                    <View>
+                        <Text style={[feStyle.fontCenter, feStyle.fontDanger]}>{this.props.error}</Text>
+                    </View>
+                    <View style={[feStyle.row, feStyle.marginTop30]}>
+                        <Button onPress={this.invalidateSession} rounded danger style={{ marginLeft: 10, marginRight: 10, }}>
+                            <Text style={{ color: '#ffffff' }}>{CANCEL}</Text>
+                        </Button>
+                        <Button onPress={this.retry} rounded success style={{ marginLeft: 10, marginRight: 10, }}>
+                            <Text style={{ color: '#ffffff' }}>{RETRY}</Text>
+                        </Button>
+                    </View>
                 </View>
             )
         }
-        else{
+        else {
             return null
         }
     }

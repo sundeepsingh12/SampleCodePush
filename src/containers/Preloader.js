@@ -1,7 +1,7 @@
 'use strict'
 import React, { PureComponent } from 'react'
 import {
-    StyleSheet 
+    StyleSheet
 }
     from 'react-native'
 import CustomAlert from "../components/CustomAlert"
@@ -12,20 +12,14 @@ import { connect } from 'react-redux'
 import ServiceStatusIcon from "../components/ServiceStatusIcon"
 import * as preloaderActions from '../modules/pre-loader/preloaderActions'
 import renderIf from '../lib/renderIf'
-import OtpScreen from './OtpScreen'
 import MobileNoScreen from './MobileNoScreen'
 import InitialSetup from './InitialSetup'
-import {
-    ERROR_400_403_LOGOUT_FAILURE,
-  } from '../lib/constants'
 import * as globalActions from '../modules/global/globalActions'
-  
+
 function mapStateToProps(state) {
     return {
-        showMobileNumberScreen: state.preloader.showMobileNumberScreen,
-        errorMessage_403_400_Logout:state.preloader.errorMessage_403_400_Logout,
-        isErrorType_403_400_Logout:state.preloader.isErrorType_403_400_Logout,
-        showOtpScreen:state.preloader.showOtpScreen
+        showMobileOtpNumberScreen: state.preloader.showMobileOtpNumberScreen,
+        errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
     }
 }
 
@@ -40,34 +34,26 @@ class Preloader extends PureComponent {
     componentDidMount() {
         this.props.actions.saveSettingsAndValidateDevice(this.props.configDownloadService, this.props.configSaveService, this.props.deviceVerificationService)
     }
- 
+
     startLoginScreenWithoutLogout = () => {
-            this.props.actions.startLoginScreenWithoutLogout()
+        this.props.actions.startLoginScreenWithoutLogout()
     }
 
-      invalidateSession = () => {
+    invalidateSession = () => {
         this.props.actions.invalidateUserSession()
     }
 
     render() {
         return (
             <Container>
-                {renderIf(!(this.props.showMobileNumberScreen || this.props.showOtpScreen),
-                    <InitialSetup />
-                )}
-                {(this.props.isErrorType_403_400_Logout &&
+                {(_.isEmpty(this.props.showMobileOtpNumberScreen) ? <InitialSetup /> : null)}
+                {(!_.isEmpty(this.props.errorMessage_403_400_Logout) &&
                     <CustomAlert
                         title="Unauthorised Device"
-                        message={this.props.errorMessage_403_400_Logout.message}
+                        message={this.props.errorMessage_403_400_Logout}
                         onCancelPressed={this.startLoginScreenWithoutLogout} />
-                )}                   
-                {renderIf(this.props.showMobileNumberScreen || this.props.showOtpScreen,
-                    <MobileNoScreen invalidateUserSession = {this.invalidateSession} isMobileScreen = {this.props.showMobileNumberScreen} />
-                  )}
-
-                {/* {renderIf(this.props.showOtpScreen,
-                    <OtpScreen invalidateUserSession = {this.invalidateSession}/>
-                )} */}
+                )}
+                {(!_.isEmpty(this.props.showMobileOtpNumberScreen) ? <MobileNoScreen invalidateUserSession={this.invalidateSession} isMobileScreen={this.props.showMobileOtpNumberScreen} /> : null)}
             </Container>
         )
     }

@@ -363,6 +363,8 @@ module.exports = {
     RESEND: 'Resend',
     DID_NOT_RECEIVE_OTP: 'Didn’t Receive the OTP?',
     ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO: 'A One Time Password will be sent to this mobile number',
+    SHOW_MOBILE_SCREEN: 'SHOW_MOBILE_SCREEN',
+    SHOW_OTP: 'SHOW_OTP_SCREEN',
 
     //TaskListCalender
     ALL: 'All',

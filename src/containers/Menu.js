@@ -37,7 +37,6 @@ import {
   OfflineDS,
   Backup,
   SET_UNSYNC_TRANSACTION_PRESENT,
-  ERROR_400_403_LOGOUT_FAILURE,
   BluetoothListing
 } from '../lib/constants'
 
@@ -55,7 +54,6 @@ function mapStateToProps(state) {
   return {
     loading: state.home.loading,
     errorMessage_403_400_Logout: state.preloader.errorMessage_403_400_Logout,
-    isErrorType_403_400_Logout: state.preloader.isErrorType_403_400_Logout,
     menu: state.home.menu,
     isLoggingOut: state.home.isLoggingOut,
     isUnsyncTransactionOnLogout: state.home.isUnsyncTransactionOnLogout,
@@ -153,10 +151,10 @@ class Menu extends PureComponent {
       <StyleProvider style={getTheme(platform)}>
         <Container>
           {this.renderMenuHeader()}
-          {(this.props.isErrorType_403_400_Logout &&
+          {(!_.isEmpty(this.props.errorMessage_403_400_Logout) &&
             <CustomAlert
               title="Unauthorised Device"
-              message={this.props.errorMessage_403_400_Logout.message}
+              message={this.props.errorMessage_403_400_Logout}
               onCancelPressed={this.startLoginScreenWithoutLogout} />
           )}
           {renderIf(this.props.isLoggingOut, <Loader />)}

@@ -79,7 +79,8 @@ import {
   PAGES,
   PAGES_ADDITIONAL_UTILITY,
   MDM_POLICIES,
-  FCM_TOKEN
+  FCM_TOKEN,
+  APP_THEME
 } from '../../lib/constants'
 import { LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL } from '../../lib/AttributeConstants'
 import { jobMasterService } from '../../services/classes/JobMaster'
@@ -95,7 +96,7 @@ import { userEventLogService } from '../../services/classes/UserEvent'
 import { backupService } from '../../services/classes/BackupService'
 import BackgroundTimer from 'react-native-background-timer'
 import moment from 'moment'
-import { LOGOUT_UNSUCCESSFUL, OK } from '../../lib/ContainerConstants'
+import { LOGOUT_UNSUCCESSFUL, OK, SHOW_MOBILE_SCREEN, SHOW_OTP } from '../../lib/ContainerConstants'
 import { Toast } from 'native-base'
 import { trackingService } from '../../services/classes/Tracking'
 import { sync } from '../../services/classes/Sync'
@@ -168,7 +169,7 @@ export function checkAssetFailure(error) {
 export function showMobileNumber() {
   return {
     type: SHOW_MOBILE_NUMBER_SCREEN,
-    payload: true
+    payload:SHOW_MOBILE_SCREEN
   }
 }
 
@@ -176,7 +177,7 @@ export function showMobileNumber() {
 export function showOtp() {
   return {
     type: SHOW_OTP_SCREEN,
-    payload: true
+    payload: SHOW_OTP
   }
 }
 
@@ -228,7 +229,8 @@ export function onChangeOtp(otpNumber) {
 //This action is dispatched as soon as we click on Send OTP button in enter mobile no screen
 export function otpGenerationStart() {
   return {
-    type: OTP_GENERATION_START
+    type: OTP_GENERATION_START, 
+    payload: false
   }
 }
 
@@ -244,7 +246,8 @@ export function otpGenerationFailure(error) {
 //This action is dispatched as soon as we click on Verify button in enter otp screen
 export function optValidationStart() {
   return {
-    type: OTP_VALIDATION_START
+    type: OTP_VALIDATION_START,
+    payload: false
   }
 }
 
@@ -286,7 +289,7 @@ export function downloadJobMaster() {
       if (error.code == 403 || error.code == 400) {
         // clear user session WITHOUT Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error))
+        dispatch(error_400_403_Logout(error.message))
       } else {
         dispatch(jobMasterDownloadFailure(error.message))
       }
@@ -481,7 +484,8 @@ export function validateAndSaveJobMaster(jobMasterResponse) {
         JOB_ATTRIBUTE_STATUS,
         PAGES,
         PAGES_ADDITIONAL_UTILITY,
-        MDM_POLICIES
+        MDM_POLICIES,
+        APP_THEME
       ]
       await keyValueDBService.deleteValueFromStore(keys)
       dispatch(jobMasterSavingFailure(error.message))
@@ -502,7 +506,6 @@ export function checkAsset() {
       const deviceSIM = await keyValueDBService.getValueFromStore(DEVICE_SIM)
       const user = await keyValueDBService.getValueFromStore(USER)
       const isVerified = await deviceVerificationService.checkAssetLocal(deviceIMEI, deviceSIM, user)
-      isVerified = false
       if (isVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         await userEventLogService.addUserEventLog(LOGIN_SUCCESSFUL, "")
@@ -548,7 +551,6 @@ export function checkIfSimValidOnServer() {
       await keyValueDBService.validateAndSaveData(DEVICE_IMEI, responseDeviceIMEI)
       await keyValueDBService.validateAndSaveData(DEVICE_SIM, responseDeviceSIM)
       const responseIsVerified = await deviceVerificationService.checkIfSimValidOnServer(responseDeviceSIM)
-      responseIsVerified = false
       if (responseIsVerified) {
         await keyValueDBService.validateAndSaveData(IS_PRELOADER_COMPLETE, true)
         dispatch(preloaderSuccess())
@@ -567,7 +569,7 @@ export function checkIfSimValidOnServer() {
       if (error.code == 403 || error.code == 400) {
         // clear user session without Logout API call
         // Logout API will return 500 as the session is pre-cleared on Server
-        dispatch(error_400_403_Logout(error))
+        dispatch(error_400_403_Logout(error.message))
       } else {
         dispatch(checkAssetFailure(error.message))
       }

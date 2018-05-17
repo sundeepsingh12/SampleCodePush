@@ -26,6 +26,8 @@ import {
     RESEND,
     DID_NOT_RECEIVE_OTP,
     ONE_TIME_PASSOWRD_WILL_BE_SENT_TO_MOBILE_NO,
+    SHOW_MOBILE_SCREEN,
+    SHOW_OTP
 } from '../lib/ContainerConstants'
 
 function mapStateToProps(state) {
@@ -45,7 +47,7 @@ function mapDispatchToProps(dispatch) {
 
 class MobileNoScreen extends PureComponent {
     componentDidMount() {
-        if (!this.props.isMobileScreen && !this.props.mobileNumber) this.onShowMobileNoScreen()
+        if (this.props.isMobileScreen == SHOW_OTP && !this.props.mobileNumber) this.onShowMobileNoScreen()
     }
 
     getOtp = () => {
@@ -103,14 +105,7 @@ class MobileNoScreen extends PureComponent {
     showOtpContent() {
         return (
             <Content style={[styles.paddingTop0]}>
-                <View style={[{ top: 10, left: 0, height: 60, }]}>
-                    <Button transparent disabled={this.props.isLoggingOut}>
-                        <Icon
-                            name="md-close"
-                            style={[styles.fontXxxl, styles.fontBlack]}
-                            onPress={this.props.invalidateUserSession} />
-                    </Button>
-                </View>
+                {this.showCloseButton()}
                 <View style={[styles.bgWhite, styles.column, styles.justifyCenter, styles.alignCenter, styles.paddingTop30]}>
                     <View style={[styles.alignCenter, styles.column, styles.justifyCenter, { width: 240 }]}>
                         <Text style={[styles.fontWeight500, styles.fontXxl, styles.fontBlack]}>{ENTER_OTP}</Text>
@@ -122,7 +117,6 @@ class MobileNoScreen extends PureComponent {
                             </TouchableOpacity>
                         </View>
                     </View>
-
                     {this.showOtpInputView()}
                 </View>
             </Content>
@@ -164,18 +158,23 @@ class MobileNoScreen extends PureComponent {
             </View>
         )
     }
+    showCloseButton() {
+        return (
+            <View style={[{ top: 10, left: 0, height: 60, }]}>
+                <Button transparent disabled={this.props.isLoggingOut}>
+                    <Icon
+                        name="md-close"
+                        style={[styles.fontXxxl, styles.fontBlack]}
+                        onPress={this.props.invalidateUserSession} />
+                </Button>
+            </View>
+        )
+    }
 
     showMobileContent() {
         return (
             <Content style={[styles.paddingTop0, styles.paddingLeft5]}>
-                <View style={[{ top: 10, left: 0, height: 60, }]}>
-                    <Button transparent disabled={this.props.isLoggingOut}>
-                        <Icon
-                            name="md-close"
-                            style={[styles.fontXxxl, styles.fontBlack]}
-                            onPress={this.props.invalidateUserSession} />
-                    </Button>
-                </View>
+                {this.showCloseButton()}
                 <View style={[styles.bgWhite, styles.column, styles.justifyCenter, styles.alignCenter, styles.paddingTop30]}>
                     <View style={[styles.alignCenter, styles.column, styles.justifyCenter, { width: 280 }]}>
                         <Text style={[styles.bold, styles.fontXxl, styles.fontBlack]}>{ENTER_MOBILE}</Text>
@@ -188,7 +187,7 @@ class MobileNoScreen extends PureComponent {
     }
 
     render() {
-        let showContent = this.props.isMobileScreen ? this.showMobileContent() : this.showOtpContent()
+        let showContent = this.props.isMobileScreen == SHOW_MOBILE_SCREEN ? this.showMobileContent() : this.showOtpContent()
         return (
             <StyleProvider style={getTheme(platform)}>
                 {showContent}
