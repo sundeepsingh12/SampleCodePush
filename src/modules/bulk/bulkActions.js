@@ -44,7 +44,7 @@ export function getBulkJobTransactions(bulkParams) {
         try {
             dispatch(setState(START_FETCHING_BULK_TRANSACTIONS));
             let cloneBulkParams = _.cloneDeep(bulkParams);
-            cloneBulkParams.pageObject.additionalParams =JSON.parse(cloneBulkParams.pageObject.additionalParams)
+            cloneBulkParams.pageObject.additionalParams = JSON.parse(cloneBulkParams.pageObject.additionalParams)
             cloneBulkParams.pageObject.jobMasterIds = JSON.parse(cloneBulkParams.pageObject.jobMasterIds)
             const bulkTransactions = await bulkService.getJobListingForBulk(cloneBulkParams);
             const statusList = await keyValueDBService.getValueFromStore(JOB_STATUS);
@@ -83,7 +83,7 @@ export function getBulkJobTransactions(bulkParams) {
  * @param {*} selectAllNone 
  * @param {*} selectedItems 
  */
-export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pageObject) {
+export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pageObject, searchText) {
     return function (dispatch) {
         try {
             const bulkTransactions = _.cloneDeep(allTransactions)
@@ -91,9 +91,8 @@ export function toggleAllItems(allTransactions, selectAllNone, selectedItems, pa
             let clonePageObject = _.cloneDeep(pageObject)
             let enabledJobs = 0
             let bulkJobSimilarityConfig = bulkService.getBulkJobSimilarityConfig(clonePageObject)
-
             for (let index in bulkTransactions) {
-                if (!bulkTransactions[index].disabled) {
+                if (!bulkTransactions[index].disabled && (bulkJobSimilarityConfig || bulkService.performFilterBeforeSelectAll(bulkTransactions[index], searchText))) {
                     bulkTransactions[index].isChecked = selectAllNone == SELECT_ALL;
                     selectAllNone == SELECT_ALL ? cloneSelectedItems[bulkTransactions[index].id] = bulkService.getSelectedTransactionObject(bulkTransactions[index]) : delete cloneSelectedItems[bulkTransactions[index].id]
                     enabledJobs++
